@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaLibHeader>
+    <BaseName>EdkIfrSupportLib</BaseName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <ComponentType>LIBRARY</ComponentType>
+    <Guid>ea55bada-d488-427b-9d2d-227e0aaa3707</Guid>
+    <Version>EDK_RELEASE_VERSION        0x00020000</Version>
+    <Abstract>Graphics Library for UEFI drivers</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-31 13:14</Updated>
+  </MsaLibHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">EdkIfrSupportLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PrintLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiRuntimeServicesTableLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>IfrCommon.c</Filename>
+    <Filename>IfrOnTheFly.c</Filename>
+    <Filename>IfrOpCodeCreation.c</Filename>
+    <Filename>IfrLibrary.h</Filename>
+    <Filename>IfrVariable.c</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">Hii</Protocol>
+  </Protocols>
+  <Variables>
+    <Variable>
+      <String>L"Lang"</String>
+      <Guid>0x8BE4DF61, 0x93CA, 0x11d2, {0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C}</Guid>
+    </Variable>
+  </Variables>
+  <Guids>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>GlobalVariable</C_Name>
+    </GuidEntry>
+  </Guids>
+  <Externs>
+    <Extern>
+      <Constructor>IfrLibConstruct</Constructor>
+    </Extern>
+  </Externs>
+</LibraryModuleSurfaceArea>

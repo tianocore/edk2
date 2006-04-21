@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaLibHeader>
+    <BaseName>DxeCorePerformanceLib</BaseName>
+    <ModuleType>DXE_CORE</ModuleType>
+    <ComponentType>LIBRARY</ComponentType>
+    <Guid>D0F78BBF-0A30-4c63-8A48-0F618A4AFACD</Guid>
+    <Version>EDK_RELEASE_VERSION        0x00020000</Version>
+    <Abstract>Component description file for the Tiano Decompress Library</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+    <Created>2006-04-04 11:10</Created>
+  </MsaLibHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">PerformanceLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">TimerLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>DxeCorePerformanceLib.c</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_PRODUCED">Performance</Protocol>
+  </Protocols>
+  <Guids>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>PeiPerformanceHob</C_Name>
+    </GuidEntry>
+  </Guids>
+  <Externs>
+    <Extern>
+      <Constructor>DxeCorePerformanceLibConstructor</Constructor>
+    </Extern>
+  </Externs>
+  <PCDs>
+    <PcdData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
+      <Token>0x00000001</Token>
+      <DatumType>UINT8</DatumType>
+    </PcdData>
+  </PCDs>
+</LibraryModuleSurfaceArea>

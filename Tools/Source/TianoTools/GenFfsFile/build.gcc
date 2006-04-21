@@ -1,0 +1,1 @@
+gcc -mno-cygwin -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/ -I../Common -I$WORKSPACE/MdePkg/Include/ -I$WORKSPACE/MdePkg/Include/Ia32 -I. GenFfsFile.c  -L../Library-mingw -lCommon -lCustomizedCompress -o GenFfsFile

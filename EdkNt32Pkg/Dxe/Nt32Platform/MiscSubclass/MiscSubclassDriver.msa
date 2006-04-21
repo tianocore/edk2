@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>MiscSubclass</BaseName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <ComponentType>BS_DRIVER</ComponentType>
+    <Guid>4A9B9DB8-EC62-4A92-818F-8AA0246D246E</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for MiscSubclass Driver module</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-13 17:07</Created>
+    <Updated>2006-03-23 13:50</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">HiiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>MiscSubclassDriver.uni</Filename>
+    <Filename>MiscSubclassDriver.h</Filename>
+    <Filename>MiscSubclassDriverEntryPoint.c</Filename>
+    <Filename>MiscSubclassDriverDataTable.c</Filename>
+    <Filename>MiscBaseBoardManufacturerData.c</Filename>
+    <Filename>MiscBiosVendorData.c</Filename>
+    <Filename>MiscBootInformationData.c</Filename>
+    <Filename>MiscChassisManufacturerData.c</Filename>
+    <Filename>MiscNumberOfInstallableLanguagesData.c</Filename>
+    <Filename>MiscOemStringData.c</Filename>
+    <Filename>MiscOnboardDeviceData.c</Filename>
+    <Filename>MiscPortInternalConnectorDesignatorData.c</Filename>
+    <Filename>MiscResetCapabilitiesData.c</Filename>
+    <Filename>MiscSystemLanguageStringData.c</Filename>
+    <Filename>MiscSystemManufacturerData.c</Filename>
+    <Filename>MiscSystemManufacturerFunction.c</Filename>
+    <Filename>MiscSystemOptionStringData.c</Filename>
+    <Filename>MiscSystemSlotDesignationData.c</Filename>
+    <Filename>MiscPortInternalConnectorDesignatorFunction.c</Filename>
+    <Filename>MiscSubclassDriver.dxs</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+    <PackageName>EdkNt32Pkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">DataHub</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">Hii</Protocol>
+    <ProtocolNotify Usage="SOMETIMES_CONSUMED">WinNtIo</ProtocolNotify>
+  </Protocols>
+  <DataHubs>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscPortKeyboard</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscPortMouse</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscPortCom1</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscPortCom2</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscBiosVendor</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscSystemManufacturer</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscBaseBoardManufacturer</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscChassisManufacturer</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">MiscSystemSlotDesignation</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">OemString</DataHubRecord>
+    <DataHubRecord Usage="ALWAYS_PRODUCED">SystemOptionString</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">ProcessorSubClassData</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_PRODUCED">MemorySubClassData</DataHubRecord>
+  </DataHubs>
+  <Guids>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>MiscSubClass</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="SOMETIMES_CONSUMED">
+      <C_Name>ProcessorSubClass</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="SOMETIMES_CONSUMED">
+      <C_Name>MemoryProducer</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="SOMETIMES_CONSUMED">
+      <C_Name>MemorySubClass</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="SOMETIMES_CONSUMED">
+      <C_Name>WinNtMemory</C_Name>
+    </GuidEntry>
+  </Guids>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>MiscSubclassDriverEntryPoint</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

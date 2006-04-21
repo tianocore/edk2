@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleBuildDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MbdHeader>
+    <BaseName>MonoStatusCode</BaseName>
+    <Guid>1501614E-0E6C-4ef4-8B8F-C276CDFB646F</Guid>
+    <Version>0</Version>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Created>2006-03-14 17:04</Created>
+    <Modified>2006-03-19 15:17</Modified>
+  </MbdHeader>
+  <Libraries>
+    <Library>PeiReportStatusCodeLib</Library>
+    <Library>BaseDebugLibReportStatusCode</Library>
+    <Library>BaseLib</Library>
+    <Library>PeiMemoryLib</Library>
+    <Library>PeiServicesTablePointerLib</Library>
+    <Library>PeiHobLib</Library>
+    <Library>PeimEntryPoint</Library>
+    <Library>EdkMemoryStatusCodeLib</Library>
+    <Library>PeiCoreLib</Library>
+  </Libraries>
+  <BuildOptions ToolChain="MSFT">
+    <ImageEntryPoint>_ModuleEntryPoint</ImageEntryPoint>
+  </BuildOptions>
+</ModuleBuildDescription>

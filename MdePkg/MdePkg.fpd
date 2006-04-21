@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<FrameworkPlatformDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <PlatformHeader>
+    <PlatformName>MdePkg</PlatformName>
+    <Abstract>EFI/Tiano MdePkg Package</Abstract>
+    <Description>This FPD file is used for Package Level build.</Description>
+    <Created>2006-04-03 13:40</Created>
+    <CreatedBy>lhauch</CreatedBy>
+  </PlatformHeader>
+  <Flash>
+    <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>
+  </Flash>
+  <TianoImage>
+    <SEC>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </SEC>
+    <PEI_CORE>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </PEI_CORE>
+    <PEIM>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </PEIM>
+    <DXE_CORE>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </DXE_CORE>
+    <DXE_DRIVERS>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </DXE_DRIVERS>
+    
+    <OTHER_COMPONENTS>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibRepStr" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibMmx" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibSse2" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseCacheMaintenanceLib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseIoLibIntrinsic" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseTimerLibLocalApic" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffGetEntryPointLib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePrintLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePerformanceLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePcdLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibPciExpress" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibCf8" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciCf8Lib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciExpressLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseSmbusLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiSmbusLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeimEntryPoint" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeHobLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiHobLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreHobLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeServicesTableLib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeIoLibCpuIo" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+  
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
+  
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiRuntimeServicesTableLib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverModelLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiMemoryLib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibStdErr" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibConOut" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxePcdLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiPcdLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeMemoryAllocationLib" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryAllocationLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseUefiDecompressLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLibDevicePathProtocol" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HiiLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseMemoryLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseMemoryLibMmx" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseMemoryLibSse2" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseCacheMaintenanceLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseIoLibIntrinsic" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseTimerLibLocalApic" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePeCoffLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePeCoffGetEntryPointLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePrintLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseDebugLibNull" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePerformanceLibNull" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePcdLibNull" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePciLibPciExpress" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePciLibCf8" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePciCf8Lib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePciExpressLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseSmbusLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiSmbusLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeSmbusLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiMemoryLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeimEntryPoint" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeCoreEntryPoint" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeHobLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiHobLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeCoreHobLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeServicesTableLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeIoLibCpuIo" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+  
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
+  
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiRuntimeServicesTableLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiDriverModelLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiMemoryLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiDebugLibStdErr" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiDebugLibConOut" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxePcdLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiPcdLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeMemoryAllocationLib" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiMemoryAllocationLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseUefiDecompressLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiDevicePathLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiDevicePathLibDevicePathProtocol" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="HiiLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseMemoryLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseMemoryLibRepStr" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseMemoryLibMmx" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseMemoryLibSse2" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseCacheMaintenanceLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseIoLibIntrinsic" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseTimerLibLocalApic" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePeCoffLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePeCoffGetEntryPointLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePrintLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseDebugLibNull" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePerformanceLibNull" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePcdLibNull" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePciLibPciExpress" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePciLibCf8" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePciCf8Lib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePciExpressLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseSmbusLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiSmbusLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeSmbusLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiMemoryLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeimEntryPoint" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeCoreEntryPoint" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeHobLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiHobLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeCoreHobLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeServicesTableLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeIoLibCpuIo" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+  
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+  
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
+  
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiRuntimeServicesTableLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDriverModelLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiMemoryLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDebugLibStdErr" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDebugLibConOut" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxePcdLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiPcdLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeMemoryAllocationLib" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiMemoryAllocationLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseUefiDecompressLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDevicePathLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDevicePathLibDevicePathProtocol" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="HiiLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseMemoryLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseMemoryLibMmx" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseMemoryLibSse2" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseCacheMaintenanceLib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseIoLibIntrinsic" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseTimerLibLocalApic" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePeCoffLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePeCoffGetEntryPointLib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePrintLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseDebugLibNull" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePerformanceLibNull" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePcdLibNull" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePciLibPciExpress" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePciLibCf8" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePciCf8Lib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePciExpressLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseSmbusLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiSmbusLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeSmbusLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiMemoryLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeimEntryPoint" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeCoreEntryPoint" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeHobLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiHobLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeCoreHobLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeServicesTableLib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeIoLibCpuIo" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+  
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
+  
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiRuntimeServicesTableLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiDriverModelLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiMemoryLib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiDebugLibStdErr" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiDebugLibConOut" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxePcdLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiPcdLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeMemoryAllocationLib" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiMemoryAllocationLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseUefiDecompressLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiDevicePathLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UefiDevicePathLibDevicePathProtocol" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="HiiLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" />
+    </OTHER_COMPONENTS>
+  </TianoImage>
+  <PcdBuildDeclarations>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+      <Token>0x00000001</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>1000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdMaximumAsciiStringLength</C_Name>
+      <Token>0x00000002</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>1000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdMaximumLinkedListLength</C_Name>
+      <Token>0x00000003</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>1000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdSpinLockTimeout</C_Name>
+      <Token>0x00000004</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>10000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdDebugPropertyMask</C_Name>
+      <Token>0x00000005</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>1</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="PATCHABLE_IN_MODULE">
+      <C_Name>PcdDebugPrintErrorLevel</C_Name>
+      <Token>0x00000006</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0x80000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+      <Token>0x00000007</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>1</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdDebugClearMemoryValue</C_Name>
+      <Token>0x00000008</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>1</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0xAF</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
+      <Token>0x00000009</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>1</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0x0</DefaultValue>
+    </PcdBuildData>
+  </PcdBuildDeclarations>
+  <BuildOptions>
+    <OutputDirectory IntermediateDirectories="UNIFIED"/>
+  </BuildOptions>
+</FrameworkPlatformDescription>

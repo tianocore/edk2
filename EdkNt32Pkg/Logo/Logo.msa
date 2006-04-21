@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>Logo</BaseName>
+    <ModuleType>BASE</ModuleType>
+    <ComponentType>LOGO</ComponentType>
+    <Guid>7BB28B99-61BB-11D5-9A5D-0090273FC14D</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for creating a Logo file.</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-14 17:04</Created>
+    <Updated>2006-03-19 15:17</Updated>
+  </MsaHeader>
+  <SourceFiles>
+    <Filename FileType="Graphics">Logo.bmp</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+  </Includes>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint></ModuleEntryPoint>
+    </Extern>
+  </Externs>
+  <BuildOptions>
+    <Option>BUILD_TYPE=CUSTOM_BUILD</Option>
+  </BuildOptions>
+</ModuleSurfaceArea>

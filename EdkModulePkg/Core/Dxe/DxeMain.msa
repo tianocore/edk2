@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+    <MsaHeader>
+        <BaseName>DxeMain</BaseName>
+        <ModuleType>DXE_CORE</ModuleType>
+        <ComponentType>BS_DRIVER</ComponentType>
+        <Guid>D6A2CB7F-6A18-4e2f-B43B-9920A733700A</Guid>
+        <Version>0</Version>
+        <Abstract>Component description file for DxeMain.</Abstract>
+        <Description>FIX ME!</Description>
+        <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+        <License> All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at http://opensource.org/licenses/bsd-license.php THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. </License>
+        <Specification>0</Specification>
+        <Created>2006-03-12 17:09</Created>
+        <Updated>2006-03-19 15:18</Updated>
+    </MsaHeader>
+    <LibraryClassDefinitions>
+        <LibraryClass Usage="ALWAYS_CONSUMED">DxeCoreEntryPoint</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">PerformanceLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">UefiDecompressLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">TianoDecompressLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">CustomDecompressLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">EdkPeCoffLoaderLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">CacheMaintenanceLib</LibraryClass>
+        <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    </LibraryClassDefinitions>
+    <SourceFiles>
+        <Filename>DxeMain\DxeMain.c</Filename>
+        <Filename>DxeMain\DxeProtocolNotify.c</Filename>
+        <Filename>Dispatcher\Dispatcher.c</Filename>
+        <Filename>Dispatcher\Dependency.c</Filename>
+        <Filename>Event\ExecData.c</Filename>
+        <Filename>Event\Event.c</Filename>
+        <Filename>Event\Timer.c</Filename>
+        <Filename>Event\Tpl.c</Filename>
+        <Filename>FwVol\FwVol.c</Filename>
+        <Filename>FwVol\Ffs.c</Filename>
+        <Filename>FwVol\FwVolAttrib.c</Filename>
+        <Filename>FwVol\FwVolRead.c</Filename>
+        <Filename>FwVol\FwVolWrite.c</Filename>
+        <Filename>FwVolBlock\FwVolBlock.c</Filename>
+        <Filename>Mem\MemData.c</Filename>
+        <Filename>Mem\Page.c</Filename>
+        <Filename>Mem\Pool.c</Filename>
+        <Filename>Gcd\Gcd.c</Filename>
+        <Filename>Hand\Handle.c</Filename>
+        <Filename>Hand\Locate.c</Filename>
+        <Filename>Hand\Notify.c</Filename>
+        <Filename>Hand\DriverSupport.c</Filename>
+        <Filename>Library\Library.c</Filename>
+        <Filename>Misc\InstallConfigurationTable.c</Filename>
+        <Filename>Misc\SetWatchdogTimer.c</Filename>
+        <Filename>Misc\Stall.c</Filename>
+        <Filename>Misc\DebugImageInfo.c</Filename>
+        <Filename>Image\Image.c</Filename>
+        <Filename>Image\ImageFile.c</Filename>
+        <Filename>SectionExtraction\CoreSectionExtraction.c</Filename>
+        <Filename>DebugImageInfo.h</Filename>
+        <Filename>DebugMask.h</Filename>
+        <Filename>DxeMain.h</Filename>
+        <Filename>Exec.h</Filename>
+        <Filename>FwVolBlock.h</Filename>
+        <Filename>FwVolDriver.h</Filename>
+        <Filename>Gcd.h</Filename>
+        <Filename>Hand.h</Filename>
+        <Filename>Image.h</Filename>
+        <Filename>Imem.h</Filename>
+        <Filename>Library.h</Filename>
+    </SourceFiles>
+    <Includes>
+        <PackageName>MdePkg</PackageName>
+        <PackageName>EdkModulePkg</PackageName>
+    </Includes>
+    <Protocols>
+        <Protocol Usage="SOMETIMES_CONSUMED">Ebc</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">LoadedImage</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">DevicePath</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Cpu</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">FirmwareVolume</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">FirmwareVolumeDispatch</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">FirmwareVolumeBlock</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">SectionExtraction</Protocol>
+        <Protocol Usage="SOMETIMES_CONSUMED">DriverBinding</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">PlatformDriverOverride</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">BusSpecificDriverOverride</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Timer</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Metronome</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">MonotonicCounter</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">VariableWrite</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Bds</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Variable</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Security</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">WatchdogTimer</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Runtime</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">RealTimeClock</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Reset</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">LoadFile</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">SimpleFileSystem</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">LoadPeImage</Protocol>
+    </Protocols>
+    <Guids>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>MemoryTypeInformation</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>DxeServicesTable</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>HobList</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>DebugImageInfoTable</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>Apriori</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>FirmwareFileSystem</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>FileInfo</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>HobMemoryAllocModule</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>PeiPeCoffLoader</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>LoadPeImage</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>EventExitBootServices</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>EventVirtualAddressChange</C_Name>
+        </GuidEntry>
+        <GuidEntry Usage="ALWAYS_CONSUMED">
+            <C_Name>EventMemoryMapChange</C_Name>
+        </GuidEntry>
+    </Guids>
+    <Externs>
+        <Extern>
+            <ModuleEntryPoint>DxeMain</ModuleEntryPoint>
+        </Extern>
+    </Externs>
+    <BuildOptions>
+        <Option>BUILD_TYPE=DXE_CORE</Option>
+    </BuildOptions>
+</ModuleSurfaceArea>

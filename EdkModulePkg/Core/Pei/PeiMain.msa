@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>PeiMain</BaseName>
+    <ModuleType>PEI_CORE</ModuleType>
+    <ComponentType>PEI_CORE</ComponentType>
+    <Guid>52C05B14-0B98-496c-BC3B-04B50211D680</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for PeiMain module</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-19 15:18</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiCoreEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PerformanceLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiCoreLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">ReportStatusCodeLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeCoffGetEntryPointLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">TimerLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>PeiMain.h</Filename>
+    <Filename>BootMode\BootMode.c</Filename>
+    <Filename>Dependency\Dependency.c</Filename>
+    <Filename>Dispatcher\Dispatcher.c</Filename>
+    <Filename>FwVol\FwVol.c</Filename>
+    <Filename>Hob\Hob.c</Filename>
+    <Filename>Image\Image.c</Filename>
+    <Filename>Memory\MemoryServices.c</Filename>
+    <Filename>PeiMain\PeiMain.c</Filename>
+    <Filename>Ppi\Ppi.c</Filename>
+    <Filename>Reset\Reset.c</Filename>
+    <Filename>Security\Security.c</Filename>
+    <Filename>StatusCode\StatusCode.c</Filename>
+    <Arch ArchType="IPF">
+      <Filename>ipf\SwitchToCacheMode.c</Filename>
+      <Filename>ipf\IpfCpuCore.i</Filename>
+      <Filename>ipf\IpfCpuCore.s</Filename>
+    </Arch>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Hobs>
+    <Hob Usage="ALWAYS_PRODUCED" HobType="PHIT"></Hob>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="GUID_EXTENSION">
+      <C_Name>gPeiPerformanceHobGuid</C_Name>
+      <Guid>0xec4df5af, 0x4395, 0x4cc9, 0x94, 0xde, 0x77, 0x50, 0x6d, 0x12, 0xc7, 0xb8</Guid>
+    </Hob>
+  </Hobs>
+  <PPIs>
+    <Ppi Usage="ALWAYS_PRODUCED">MemoryDiscovered</Ppi>
+    <Ppi Usage="ALWAYS_CONSUMED">FindFv</Ppi>
+    <Ppi Usage="ALWAYS_CONSUMED">FvFileLoader</Ppi>
+    <Ppi Usage="ALWAYS_CONSUMED">DxeIpl</Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">Reset</Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">StatusCode</Ppi>
+    <PpiNotify Usage="SOMETIMES_CONSUMED">Security</PpiNotify>
+  </PPIs>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>PeiCore</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

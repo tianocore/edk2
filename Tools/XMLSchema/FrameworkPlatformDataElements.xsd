@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns="http://www.TianoCore.org/2006/Edk2.0" targetNamespace="http://www.TianoCore.org/2006/Edk2.0">
+    <!--
+    Filename: FrameworkPlatformDataElements.xsd
+    
+    Copyright (c) 2006, Intel Corp.
+    All rights reserved. This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which may be found at http://opensource.org/licenses/bsd-license.php
+    
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    
+  -->
+    <xs:annotation>
+        <xs:documentation xml:lang="en"> This schema defines EFI and Framework Platform Data Elements that are specific to platform creation.</xs:documentation>
+    </xs:annotation>
+    <xs:include schemaLocation="NamingConvention.xsd"/>
+    <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
+    <xs:include schemaLocation="FrameworkDataElements.xsd"/>
+    <xs:element name="Capsule">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="CapsuleId" type="xs:string"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="CapsuleOptions"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="CapsuleAttributes"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CapsuleAttributes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This element is used specify different name value pairs.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Enable"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Disable"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CapsuleOptions">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This element is used specify different name value pairs.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Enable"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Disable"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Capsules">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Permit multiple Capsule Sections</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:element ref="Capsule"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Disable" type="xs:string"/>
+    <xs:element name="Enable" type="xs:string"/>
+    <xs:element name="Flash">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation xml:lang="en">We allow specifying the Flash layout in this directory, or we allow specifying a flashmap filename</xs:documentation>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:choice>
+                    <xs:element name="FlashDefinition" type="FlashData"/>
+                    <xs:element name="FlashDefinitionFile" type="FileNameConvention"/>
+                </xs:choice>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImages"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Capsules"/>
+            </xs:sequence>
+            <xs:attribute name="MicrocodeFile" type="FileNameConvention" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FlashDeviceImage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Define contents of the regions in flash. The files and data are placed in the output image in the order they are encountered in this definition. Multiple FlashDeviceImage sections may be defined. Which one the tool should use is specified by Name on the command line.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:element minOccurs="1" maxOccurs="1" name="Name" type="NameConvention"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="File" type="FvImageFileType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FlashDeviceInfo">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This is the Flash Devcie definition List</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="Name" type="UCNameType"/>
+                <xs:element default="512KB" minOccurs="1" maxOccurs="1" name="FlashSize" type="FlashSize"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="BaseAddress" type="HexAddressType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="OutputDirectory" type="DirectoryNamingConvention"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="MicrocodeFile" type="FileNameConvention"/>
+                <xs:element minOccurs="1" maxOccurs="255" name="Block" type="BlockNameType"/>
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="Region" type="RegionDataType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FlashDeviceOverrideImage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Define OVERRIDE contents of the regions in flash. Only what is different here from what may defined in other areas (or files) is needed </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" name="Name" type="NameConvention"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="File" type="FvImageOverrideFileType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FlashDeviceOverrideInfo">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This is the Flash Devcie Override Definition list. Only what is different from the previously defined stuff needs to be included.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" name="Name" type="UCNameType"/>
+                <xs:element default="512KB" minOccurs="0" maxOccurs="1" name="FlashSize" type="FlashSize"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="BaseAddress" type="HexAddressType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory" type="DirectoryNamingConvention"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="MicrocodeFile" type="FileNameConvention"/>
+                <xs:element minOccurs="0" maxOccurs="255" name="Block" type="BlockNameType"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Region" type="RegionDataType"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FvImage">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="FvImageNames"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FvImageOptions"/>
+            </xs:sequence>
+            <xs:attribute name="Type" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FvImageName">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="FvImageOptions"/>
+            </xs:sequence>
+            <xs:attribute name="Name" type="FvRegionTypes" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FvImageNames" type="xs:string"/>
+    <xs:element name="FvImageOptions">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This element is used specify different name value pairs.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Enable"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Disable"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FvImages">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This section allows the user to define specific information regarding the FvImage</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImage"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImageName"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ModuleSA">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This element is used to specify information in the Platform Description File.</xs:documentation>
+            <xs:documentation xml:lang="en">This is a mixed element, allowing the user to specify the name of the MSA file, as well as to optionally specify additional override information.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="1">
+                <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Libraries"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PPIs"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Variables"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="MsaAttributes"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="NameValue">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:string">
+                    <xs:attribute name="Name" type="xs:string" use="required"/>
+                    <xs:attribute name="Value" type="xs:string" use="required"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Overrides">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceOverrideInfo"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceOverrideImage"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="PlatformDescriptions">
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element ref="Platform"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="TianoImage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This defines the required sections of a valid EFI/Tiano binary image</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="SEC" type="Components"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="PEI_CORE" type="Components"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="PEIM" type="Components"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="DXE_CORE" type="Components"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="OTHER_COMPONENTS" type="Components"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:simpleType name="EfiFvAttributeType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">The list of EFI_FLASH_AREA Attributes</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="EFI_FLASH_AREA_FV"/>
+            <xs:enumeration value="EFI_FLASH_AREA_MEMMAPPED_FV"/>
+            <xs:enumeration value="EFI_FLASH_AREA_SUBFV"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="EfiFvAreaType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">The list of valid EFI Area Types</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="EFI_FLASH_AREA_EFI_VARIABLES"/>
+            <xs:enumeration value="EFI_FLASH_AREA_UNUSED"/>
+            <xs:enumeration value="EFI_FLASH_AREA_MAIN_BIOS"/>
+            <xs:enumeration value="EFI_FLASH_AREA_GUID_DEFINED"/>
+            <xs:enumeration value="EFI_FLASH_AREA_FTW_STATE"/>
+            <xs:enumeration value="EFI_FLASH_AREA_FTW_BACKUP"/>
+            <xs:enumeration value="EFI_FLASH_AREA_RECOVERY_BIOS"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="EfiNameGuidType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Right now, only EFI_FLASH_MAP_HOB_GUID is defined</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="EFI_FLASH_MAP_HOB_GUID"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FlashSize">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="256KB"/>
+            <xs:enumeration value="512KB"/>
+            <xs:enumeration value="1MB"/>
+            <xs:enumeration value="2MB"/>
+            <xs:enumeration value="4MB"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FvSubRegionTypes">
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="NV_VARIABLE_STORE"/>
+            <xs:enumeration value="MICROCODE"/>
+            <xs:enumeration value="NV_FTW_WORKING"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="Components">
+        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+            <xs:element ref="ModuleSA"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="FlashData">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="UserDefinedFvRegion" type="NameConvention"/>
+            <xs:choice minOccurs="0" maxOccurs="1">
+                <xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="1" ref="FlashDeviceInfo"/>
+                    <xs:element minOccurs="1" maxOccurs="1" ref="FlashDeviceImage"/>
+                </xs:sequence>
+            </xs:choice>
+            <xs:element minOccurs="0" maxOccurs="1" ref="Overrides"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="FvImageFileType">
+        <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="FileNameConvention"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="Region" type="FvRegionTypes"/>
+            <xs:element minOccurs="1" maxOccurs="unbounded" name="RawData" type="RawDataType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="FvImageOverrideFileType">
+        <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="1" name="Name" type="FileNameConvention"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="Region" type="FvRegionTypes"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="UserDefinedFvRegion" type="NameConvention"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="RawData" type="RawDataType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="RawDataType">
+        <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="NameConvention"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="Region" type="FvRegionTypes"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="UserDefinedFvRegion" type="NameConvention"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="SubRegion" type="FvSubRegionTypes"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="Data" type="HexDataType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="RegionDataType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Define the regions and their uses for the device</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="UCNameType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="Size" type="HexAddressType"/>
+            <xs:element minOccurs="1" maxOccurs="unbounded" name="Attributes" type="EfiFvAttributeType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="AreaType" type="EfiFvAreaType"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="SubRegion" type="SubRegionType"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SubRegionType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Define the regions and their uses for the device</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element default="true" minOccurs="1" maxOccurs="1" name="CreateHob" type="xs:boolean"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="UCNameType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="Size" type="HexAddressType"/>
+            <xs:element minOccurs="1" maxOccurs="unbounded" name="Attributes" type="EfiFvAttributeType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="AreaType" type="EfiFvAreaType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="NameGuid" type="EfiNameGuidType"/>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

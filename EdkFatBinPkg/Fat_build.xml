@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project name="Fat" default="main" basedir="." >
+  <!-- Apply external ANT task -->
+  <taskdef resource="frameworktasks.tasks" /> 
+  <taskdef resource="cpptasks.tasks" /> 
+  <typedef resource="cpptasks.types" /> 
+  <taskdef resource="net/sf/antcontrib/antlib.xml" />
+  <property environment="env" />
+  <!-- All Properties --> 
+  <property name="BASE_NAME" value="Fat" /> 
+  
+  <!-- Default target --> 
+  <target name="main" depends="libraries, sourcefiles, sections, output" /> 
+  <!-- Compile all dependency Library instances. --> 
+  <target name="libraries" />
+
+  <target name="sourcefiles" />
+  
+  <target name="sections" />
+
+  <target name="output">
+    <copy file="${MODULE_DIR}\${ARCH}\${BASE_NAME}.FFS" 
+      tofile="${BIN_DIR}\${FILE_GUID}-${BASE_NAME}.DXE" />
+  </target>
+    
+</project>

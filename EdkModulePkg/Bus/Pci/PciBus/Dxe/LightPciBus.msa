@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>LightPciBusPciBus</BaseName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <ComponentType>BS_DRIVER</ComponentType>
+    <Guid>C0734D12-7927-432b-986B-A7E3A35BA005</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for LightPciBus module.</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-19 15:18</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverModelLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">ReportStatusCodeLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>PciBus.h</Filename>
+    <Filename>PciIo.h</Filename>
+    <Filename>PciCommand.h</Filename>
+    <Filename>PciDeviceSupport.h</Filename>
+    <Filename>PciResourceSupport.h</Filename>
+    <Filename>PciEnumerator.h</Filename>
+    <Filename>PciEnumeratorSupport.h</Filename>
+    <Filename>PciOptionRomSupport.h</Filename>
+    <Filename>PciRomTable.h</Filename>
+    <Filename>PciLib.h</Filename>
+    <Filename>PciRomTable.c</Filename>
+    <Filename>PciDriverOverride.h</Filename>
+    <Filename>PciPowerManagement.h</Filename>
+    <Filename>PciPowerManagement.c</Filename>
+    <Filename>PciDriverOverride.c</Filename>
+    <Filename>PciOptionRomSupport.c</Filename>
+    <Filename>PciEnumerator.c</Filename>
+    <Filename>PciEnumeratorSupport.c</Filename>
+    <Filename>PciResourceSupport.c</Filename>
+    <Filename>PciCOmmand.c</Filename>
+    <Filename>ComponentName.c</Filename>
+    <Filename>PciDeviceSupport.c</Filename>
+    <Filename>PciHotPlugSupport.c</Filename>
+    <Filename>PciBus.c</Filename>
+    <Filename>PciIo.c</Filename>
+    <Filename>LightPciLib.c</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">DevicePath</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PciRootBridgeIo</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">Decompress</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">UgaIo</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PciPlatform</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PciIo</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">BusSpecificDriverOverride</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PciHotPlugRequest</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">IncompatiblePciDeviceSupport</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PciHotPlugInit</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PciHostBridgeResourceAllocation</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">LoadedImage</Protocol>
+  </Protocols>
+  <Guids>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>PciOptionRomTable</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>PciHotplugDevice</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>StatusCodeSpecificData</C_Name>
+    </GuidEntry>
+  </Guids>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>PciBusEntryPoint</ModuleEntryPoint>
+    </Extern>
+    <Extern>
+      <DriverBinding>gPciBusDriverBinding</DriverBinding>
+      <ComponentName>gPciBusComponentName</ComponentName>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

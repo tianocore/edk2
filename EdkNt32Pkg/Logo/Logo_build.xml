@@ -1,0 +1,75 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project name="Logo" default="main" basedir="." >
+  <!-- Apply external ANT task -->
+  <taskdef resource="frameworktasks.tasks" /> 
+  <taskdef resource="cpptasks.tasks" /> 
+  <typedef resource="cpptasks.types" /> 
+  <taskdef resource="net/sf/antcontrib/antlib.xml" />
+  <property environment="env" />
+  <!-- All Properties --> 
+  <property name="BASE_NAME" value="Logo" /> 
+  
+  <!-- Default target --> 
+  <target name="main" depends="libraries, sourcefiles, sections, output" /> 
+  <!-- Compile all dependency Library instances. --> 
+  <target name="libraries" />
+
+  <target name="sourcefiles">
+    <copy file="${MODULE_DIR}\Logo.bmp" 
+      tofile="${DEST_DIR_OUTPUT}\Logo.bmp" />
+    <!--
+    <Build_Graphics FILENAME="logo" FILEPATH="." FILEEXT="bmp"></Build_Graphics>
+    -->
+  </target>
+  
+  <target name="sections">
+    <OnDependency>
+      <sourcefiles>
+        <file name="${DEST_DIR_OUTPUT}\logo.bmp"/>
+      </sourcefiles>
+      <targetfiles>
+        <file name="${DEST_DIR_OUTPUT}\Logo.bin"/>
+      </targetfiles>
+      
+      <sequential>
+        <gensection inputfile="${DEST_DIR_OUTPUT}\logo.bmp" 
+          outputfile="${DEST_DIR_OUTPUT}\Logo.bin" 
+          sectiontype="EFI_SECTION_RAW" />
+      </sequential>
+    </OnDependency>
+  </target>
+
+  <target name="output">
+    <OnDependency>
+      <sourcefiles>
+        <file name="${DEST_DIR_OUTPUT}\Logo.bin"/>
+      </sourcefiles>
+      <targetfiles>
+        <file name="${BIN_DIR}\7BB28B99-61BB-11D5-9A5D-0090273FC14D-Logo.FFS"/>
+      </targetfiles>
+      
+      <sequential>
+        <genffsfile BaseName="Logo" ffsATTRIBCHECKSUM="TRUE"
+          ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" fileGuid="7BB28B99-61BB-11D5-9A5D-0090273FC14D"
+          outputDir="${BIN_DIR}">
+          <compress compressName="dummy">
+            <tool outputPath="${DEST_DIR_OUTPUT}" toolName="${WORKSPACE_DIR}\Tools\Bin\GenCRC32Section">
+              <input file="${DEST_DIR_OUTPUT}\Logo.bin" />
+            </tool>
+          </compress>
+        </genffsfile>
+      </sequential>
+    </OnDependency>
+  </target>
+    
+</project>

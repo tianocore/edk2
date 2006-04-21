@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project default="GenTool" basedir=".">
+  <!--EDK GenDepex Tool
+  Copyright (c) 2006, Intel Corporation-->
+  <property environment="env"/>
+  <property name="WORKSPACE" value="${env.WORKSPACE}"/>
+  <property name="ToolName" value="CompressDll"/>
+  <property name="LibName" value="CompressDll"/>
+  <property name="FileSet" value="CompressDll.c CompressDll.h"/>
+  <property name="LibFileSet" value="CompressDll.c DepexParser.h"/>
+  <taskdef resource="cpptasks.tasks"/>
+  <typedef resource="cpptasks.types"/>
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+  <property name="LINK_OUTPUT_TYPE" value="static"/>
+  <property name="BUILD_DIR" value="${WORKSPACE}/Tools/Source/TianoTools/${ToolName}/tmp"/>
+  <target name="GenTool" depends="init,Lib,Dll">
+    <echo message="Building the EDK Tool: ${ToolName}"/>
+  </target>
+  <target name="init">
+    <echo message="The EDK Tool: ${ToolName}"/>
+    <mkdir dir="${BUILD_DIR}"/>
+    <if>
+      <equals arg1="${GCC}" arg2="cygwin"/>
+      <then>
+        <echo message="Cygwin Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+      <elseif>
+        <os family="dos"/>
+        <then>
+          <echo message="Windows Family"/>
+          <property name="ToolChain" value="msvc"/>
+        </then>
+      </elseif>
+      <elseif>
+        <os family="unix"/>
+        <then>
+          <echo message="UNIX Family"/>
+          <property name="ToolChain" value="gcc"/>
+        </then>
+      </elseif>
+      <else>
+        <echo>Unsupported Operating System
+        Please Contact Intel Corporation</echo>
+      </else>
+    </if>
+    <if>
+      <equals arg1="${ToolChain}" arg2="msvc"/>
+      <then>
+        <property name="ext_static" value=".lib"/>
+        <property name="ext_dynamic" value=".dll"/>
+        <property name="ext_exe" value=".exe"/>
+      </then>
+      <elseif>
+        <equals arg1="${ToolChain}" arg2="gcc"/>
+        <then>
+          <property name="ext_static" value=".a"/>
+          <property name="ext_dynamic" value=".so"/>
+          <property name="ext_exe" value=""/>
+        </then>
+      </elseif>
+    </if>
+    <condition property="CheckDepends">
+      <uptodate targetfile="${BIN_DIR}/${LibName}${ext_dynamic}">
+        <srcfiles dir="${BUILD_DIR}" includes="CommonTools.lib, CustomizedCompress.lib, CompressDll.obj"/>
+      </uptodate>
+    </condition>
+  
+  </target>
+  
+  <target name="Lib" depends="init">
+    <cc name="${ToolChain}" objdir="${BUILD_DIR}" outtype="static" optimize="speed">
+      <fileset dir="${ToolName}" includes="${LibFileSet}" defaultexcludes="TRUE" excludes="*.xml *.inf"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${PACKAGE_DIR}/Common"/>
+      <includepath path="${env.JAVA_HOME}/include"/>
+      <includepath path="${env.JAVA_HOME}/include/win32"/>
+    </cc>
+  </target>
+  <target name="Dll" unless="CheckDepends">
+     <if>
+      <os family="dos"/>
+      <then>
+        <echo message="Begin link!"/>
+        <exec dir="${BUILD_DIR}" executable="link" failonerror="false">
+          <arg line="kernel32.lib ${LIB_DIR}/CommonTools.lib ${LIB_DIR}/CustomizedCompress.lib /NOLOGO /DLL /MACHINE:I386  /OUT:${BUILD_DIR}/${LibName}${ext_dynamic} ${ToolName}"/>
+        </exec>
+        <copy todir="${BIN_DIR}" file="${BUILD_DIR}/${LibName}${ext_dynamic}"/>
+      </then>
+    </if>
+  </target>
+  <target name="clean" depends="init">
+    <echo message="Removing Intermediate Files Only"/>
+    <delete>
+      <fileset dir="${BUILD_DIR}" includes="*.obj"/>
+    </delete>
+  </target>
+  <target name="cleanall" depends="init">
+    <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>
+    <delete dir="${BUILD_DIR}">
+      <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_dynamic}"/>
+    </delete>
+  </target>
+</project>

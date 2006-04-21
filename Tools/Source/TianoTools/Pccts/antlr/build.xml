@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project default="GenTool" basedir=".">
+<!--
+    EDK antlr Tool
+  Copyright (c) 2006, Intel Corporation
+-->
+  <property name="ToolName" value="antlr"/>
+
+  <taskdef resource="cpptasks.tasks"/>
+  <typedef resource="cpptasks.types"/>
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+  <property environment="env"/>
+
+  <target name="init">
+    <echo message="The EDK Tool: ${ToolName}"/>
+    <if>
+      <equals arg1="${GCC}" arg2="cygwin"/>
+      <then>
+        <echo message="Cygwin Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    <elseif>
+      <os family="dos"/>
+      <then>
+        <echo message="Windows Family"/>
+        <property name="ToolChain" value="msvc"/>
+      </then>
+    </elseif>
+    <elseif>
+      <os family="unix"/>
+      <then>
+        <echo message="UNIX Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    </elseif>
+
+    <else>
+      <echo>
+        Unsupported Operating System
+        Please Contact Intel Corporation
+      </echo>
+    </else>
+    </if>
+		<if>
+		  <equals arg1="${ToolChain}" arg2="msvc"/>
+			<then>
+        <property name="ext_static" value=".lib"/>
+        <property name="ext_dynamic" value=".dll"/>
+        <property name="ext_exe" value=".exe"/>
+			</then>
+			<elseif>
+			  <equals arg1="${ToolChain}" arg2="gcc"/>
+				<then>
+          <property name="ext_static" value=".a"/>
+          <property name="ext_dynamic" value=".so"/>
+          <property name="ext_exe" value=""/>
+				</then>
+			</elseif>
+		</if>
+		<condition property="CheckDepends">
+		  <uptodate targetfile="${WORKSPACE}/Tools/bin/antlr.exe">
+			  <srcfiles dir="." includes="*.c *.h *.g"/>
+			</uptodate>
+		</condition>
+		<if>
+		  <equals arg1="${CheckDepends}" arg2="true"/>
+			<then>
+				<echo message="Executable, antlr.exe, is up to date."/>
+			</then>
+		</if>
+  </target>
+
+  <target name="GenTool" depends="init" unless="CheckDepends">
+    <echo message="Building the EDK Tool: ${ToolName}"/>
+    <if>
+      <equals arg1="${ToolChain}" arg2="msvc"/>
+			<then>
+    	  <exec dir="${basedir}" executable="nmake" failonerror="TRUE">
+	    	  <arg line="-f AntlrMS.mak"/>
+    		</exec>
+		  </then>
+		<elseif>
+      <equals arg1="${ToolChain}" arg2="gcc"/>
+			<then>
+    	  <exec dir="${basedir}" executable="make" failonerror="TRUE">
+	    	  <arg line="-f makefile"/>
+    		</exec>
+		  </then>
+		</elseif>
+		</if>
+	</target>
+
+  <target name="clean" depends="init">
+    <echo message="Removing Intermediate Files Only"/>  
+    <if>
+      <equals arg1="${ToolChain}" arg2="msvc"/>
+			<then>
+    	  <exec dir="${basedir}" executable="nmake" failonerror="TRUE">
+	    	  <arg line="-f AntlrMS.mak clean"/>
+    		</exec>
+		  </then>
+		<elseif>
+      <equals arg1="${ToolChain}" arg2="gcc"/>
+			<then>
+    	  <exec dir="${basedir}" executable="make" failonerror="TRUE">
+	    	  <arg line="-f makefile clean"/>
+    		</exec>
+		  </then>
+		</elseif>
+		</if>
+  </target>
+
+  <target name="cleanall" depends="init">
+    <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
+    <if>
+      <equals arg1="${ToolChain}" arg2="msvc"/>
+			<then>
+    	  <exec dir="${basedir}" executable="nmake" failonerror="TRUE">
+	    	  <arg line="-f AntlrMS.mak distclean"/>
+    		</exec>
+		  </then>
+		<elseif>
+      <equals arg1="${ToolChain}" arg2="gcc"/>
+			<then>
+    	  <exec dir="${basedir}" executable="make" failonerror="TRUE">
+	    	  <arg line="-f makefile distclean"/>
+    		</exec>
+		  </then>
+		</elseif>
+		</if>
+  </target>
+
+</project>

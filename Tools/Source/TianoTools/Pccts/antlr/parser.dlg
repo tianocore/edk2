@@ -1,0 +1,1387 @@
+<<
+/* parser.dlg -- DLG Description of scanner
+ *
+ * Generated from: antlr.g
+ *
+ * Terence Parr, Will Cohen, and Hank Dietz: 1989-2001
+ * Purdue University Electrical Engineering
+ * With AHPCRC, University of Minnesota
+ * ANTLR Version 1.33MR33
+ */
+
+#define ANTLR_VERSION	13333
+#include "pcctscfg.h"
+#include "pccts_stdio.h"
+
+#include "pcctscfg.h"
+#include "set.h"
+#include <ctype.h>
+#include "syn.h"
+#include "hash.h"
+#include "generic.h"
+#define zzcr_attr(attr,tok,t)
+#include "antlr.h"
+#include "tokens.h"
+#include "dlgdef.h"
+LOOKAHEAD
+
+void
+#ifdef __USE_PROTOS
+zzerraction(void)
+#else
+zzerraction()
+#endif
+{
+	(*zzerr)("invalid token");
+	zzadvance();
+	zzskip();
+}
+>>
+
+<<%%lexaction
+
+/* maintained, but not used for now */
+set AST_nodes_refd_in_actions = set_init;
+int inAlt = 0;
+set attribsRefdFromAction = set_init; /* MR20 */
+int UsedOldStyleAttrib = 0;
+int UsedNewStyleLabel = 0;
+#ifdef __USE_PROTOS
+char *inline_set(char *);
+#else
+char *inline_set();
+#endif
+
+/* MR1	10-Apr-97  MR1  Previously unable to put right shift operator	    */
+/* MR1					in DLG action			                    */
+
+int tokenActionActive=0;                                            /* MR1 */
+
+  
+>>
+
+<<%%lexaction
+
+
+static char *
+#ifdef __USE_PROTOS
+getFileNameFromTheLineInfo(char *toStr, char *fromStr)
+#else
+getFileNameFromTheLineInfo(toStr, fromStr)
+char *toStr, *fromStr;
+#endif
+{
+  int i, j, k;
+  
+  if (!fromStr || !toStr) return toStr;
+  
+  /* find the first " */
+  
+  for (i=0;
+  (i<MaxFileName) &&
+  (fromStr[i] != '\n') &&
+  (fromStr[i] != '\r') &&
+  (fromStr[i] != '\"');
+  i++) /* nothing */ ;
+  
+  if ( (i == MaxFileName) ||
+  (fromStr[i] == '\n') ||
+  (fromStr[i] == '\r') ) {
+  return toStr;
+}
+
+  /* find the second " */
+
+  for (j=i+1;
+(j<MaxFileName) &&
+(fromStr[j] != '\n') &&
+(fromStr[j] != '\r') &&
+(fromStr[j] != '\"');
+j++) /* nothing */ ;
+
+  if ((j == MaxFileName) ||
+(fromStr[j] == '\n') ||
+(fromStr[j] == '\r') ) {
+  return toStr;
+}
+
+  /* go back until the last / or \ */
+
+  for (k=j-1;
+(fromStr[k] != '\"') &&
+(fromStr[k] != '/') &&
+(fromStr[k] != '\\');
+k--) /* nothing */ ;
+
+  /* copy the string after " / or \ into toStr */
+
+  for (i=k+1; fromStr[i] != '\"'; i++) {
+toStr[i-k-1] = fromStr[i];
+}
+
+  toStr[i-k-1] = '\0';
+
+  return toStr;
+}
+
+/* MR14 end of a block to support #line in antlr source code */
+
+  
+>>
+
+<<%%lexaction
+
+#ifdef __USE_PROTOS
+void mark_label_used_in_sem_pred(LabelEntry *le)              /* MR10 */
+#else
+void mark_label_used_in_sem_pred(le)                          /* MR10 */
+LabelEntry    *le;
+#endif
+{
+  TokNode   *tn;
+  require (le->elem->ntype == nToken,"mark_label_used... ntype != nToken");
+  tn=(TokNode *)le->elem;
+  require (tn->label != 0,"mark_label_used... TokNode has no label");
+  tn->label_used_in_semantic_pred=1;
+}
+>>
+
+
+%%START
+
+@
+	<<
+		NLA = Eof;
+    /* L o o k  F o r  A n o t h e r  F i l e */
+    {
+      FILE *new_input;
+      new_input = NextFile();
+      if ( new_input == NULL ) { NLA=Eof; return; }
+      fclose( input );
+      input = new_input;
+      zzrdstream( input );
+      zzskip();	/* Skip the Eof (@) char i.e continue */
+    }
+	>>
+
+[\t\ ]+
+	<<
+		NLA = 76;
+    zzskip();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 77;
+    zzline++; zzskip();   
+	>>
+
+\[
+	<<
+		NLA = 78;
+    zzmode(ACTIONS); zzmore();
+    istackreset();
+    pushint(']');   
+	>>
+
+\<\<
+	<<
+		NLA = 79;
+    action_file=CurFile; action_line=zzline;
+    zzmode(ACTIONS); zzmore();
+    list_free(&CurActionLabels,0);       /* MR10 */
+    numericActionLabel=0;                /* MR10 */
+    istackreset();
+    pushint('>');   
+	>>
+
+\"
+	<<
+		NLA = 80;
+    zzmode(STRINGS); zzmore();   
+	>>
+
+/\*
+	<<
+		NLA = 81;
+    zzmode(COMMENTS); zzskip();   
+	>>
+
+\*/
+	<<
+		NLA = 82;
+    warn("Missing /*; found dangling */"); zzskip();   
+	>>
+
+//
+	<<
+		NLA = 83;
+    zzmode(CPP_COMMENTS); zzskip();   
+	>>
+
+#line[\ \t]* [0-9]+ {[\ \t]* \"~[\"]+\" ([\ \t]* [0-9]*)* } (\n|\r|\r\n)
+	<<
+		NLA = 84;
+    
+    zzline = atoi(zzbegexpr+5) - 1; zzline++; zzmore();
+    getFileNameFromTheLineInfo(FileStr[CurFile], zzbegexpr);
+	>>
+
+#line ~[\n\r]* (\n|\r|\r\n)
+	<<
+		NLA = 85;
+    
+    zzline++; zzmore();
+	>>
+
+\>\>
+	<<
+		NLA = 86;
+    warn("Missing <<; found dangling \>\>"); zzskip();   
+	>>
+
+.
+	<<
+		NLA = WildCard;
+	>>
+
+\@
+	<<
+		NLA = 88;
+    FoundException = 1;		/* MR6 */
+    FoundAtOperator = 1;  
+	>>
+
+{\\}#pragma
+	<<
+		NLA = Pragma;
+	>>
+
+{\\}#FirstSetSymbol
+	<<
+		NLA = FirstSetSymbol;
+	>>
+
+{\\}#header
+	<<
+		NLA = 94;
+	>>
+
+{\\}#first
+	<<
+		NLA = 95;
+	>>
+
+{\\}#parser
+	<<
+		NLA = 96;
+	>>
+
+{\\}#tokdefs
+	<<
+		NLA = 97;
+	>>
+
+\}
+	<<
+		NLA = 98;
+	>>
+
+class
+	<<
+		NLA = 99;
+	>>
+
+\{
+	<<
+		NLA = 102;
+	>>
+
+!
+	<<
+		NLA = 103;
+	>>
+
+\<
+	<<
+		NLA = 104;
+	>>
+
+\>
+	<<
+		NLA = 105;
+	>>
+
+:
+	<<
+		NLA = 106;
+	>>
+
+;
+	<<
+		NLA = 107;
+	>>
+
+{\\}#lexaction
+	<<
+		NLA = 108;
+	>>
+
+{\\}#lexmember
+	<<
+		NLA = 109;
+	>>
+
+{\\}#lexprefix
+	<<
+		NLA = 110;
+	>>
+
+{\\}#pred
+	<<
+		NLA = 111;
+	>>
+
+\|\|
+	<<
+		NLA = 112;
+	>>
+
+&&
+	<<
+		NLA = 113;
+	>>
+
+\(
+	<<
+		NLA = 114;
+	>>
+
+\)
+	<<
+		NLA = 115;
+	>>
+
+{\\}#lexclass
+	<<
+		NLA = 116;
+	>>
+
+{\\}#errclass
+	<<
+		NLA = 117;
+	>>
+
+{\\}#tokclass
+	<<
+		NLA = 118;
+	>>
+
+..
+	<<
+		NLA = 119;
+	>>
+
+{\\}#token
+	<<
+		NLA = 120;
+	>>
+
+=
+	<<
+		NLA = 121;
+	>>
+
+[0-9]+
+	<<
+		NLA = 122;
+	>>
+
+\|
+	<<
+		NLA = 123;
+	>>
+
+\~
+	<<
+		NLA = 124;
+	>>
+
+^
+	<<
+		NLA = 125;
+	>>
+
+approx
+	<<
+		NLA = 126;
+	>>
+
+LL\(1\)
+	<<
+		NLA = 127;
+	>>
+
+LL\(2\)
+	<<
+		NLA = 128;
+	>>
+
+\*
+	<<
+		NLA = 129;
+	>>
+
+\+
+	<<
+		NLA = 130;
+	>>
+
+?
+	<<
+		NLA = 131;
+	>>
+
+=>
+	<<
+		NLA = 132;
+	>>
+
+exception
+	<<
+		NLA = 133;
+	>>
+
+default
+	<<
+		NLA = 134;
+	>>
+
+catch
+	<<
+		NLA = 135;
+	>>
+
+[a-z] [A-Za-z0-9_]*
+	<<
+		NLA = NonTerminal;
+    
+    while ( zzchar==' ' || zzchar=='\t' ) {
+      zzadvance();
+    }
+    if ( zzchar == ':' && inAlt ) NLA = LABEL;
+	>>
+
+[A-Z] [A-Za-z0-9_]*
+	<<
+		NLA = TokenTerm;
+    
+    while ( zzchar==' ' || zzchar=='\t' ) {
+      zzadvance();
+    }
+    if ( zzchar == ':' && inAlt ) NLA = LABEL;
+	>>
+
+{\\}#[A-Za-z0-9_]*
+	<<
+		NLA = 136;
+    warn(eMsg1("unknown meta-op: %s",LATEXT(1))); zzskip();   
+	>>
+
+
+%%STRINGS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\"
+	<<
+		NLA = QuotedTerm;
+    zzmode(START);   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 3;
+    
+    zzline++;
+    warn("eoln found in string");
+    zzskip();
+	>>
+
+\\(\n|\r|\r\n)
+	<<
+		NLA = 4;
+    zzline++; zzmore();   
+	>>
+
+\\~[]
+	<<
+		NLA = 5;
+    zzmore();   
+	>>
+
+~[\n\r\"\\]+
+	<<
+		NLA = 6;
+    zzmore();   
+	>>
+
+
+%%ACTION_STRINGS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\"
+	<<
+		NLA = 7;
+    zzmode(ACTIONS); zzmore();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 8;
+    
+    zzline++;
+    warn("eoln found in string (in user action)");
+    zzskip();
+	>>
+
+\\(\n|\r|\r\n)
+	<<
+		NLA = 9;
+    zzline++; zzmore();   
+	>>
+
+\\~[]
+	<<
+		NLA = 10;
+    zzmore();   
+	>>
+
+~[\n\r\"\\]+
+	<<
+		NLA = 11;
+    zzmore();   
+	>>
+
+
+%%ACTION_CHARS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+'
+	<<
+		NLA = 12;
+    zzmode(ACTIONS); zzmore();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 13;
+    
+    zzline++;
+    warn("eoln found in char literal (in user action)");
+    zzskip();
+	>>
+
+\\~[]
+	<<
+		NLA = 14;
+    zzmore();   
+	>>
+
+~[\n\r'\\]+
+	<<
+		NLA = 15;
+    zzmore();   
+	>>
+
+
+%%ACTION_COMMENTS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\*/
+	<<
+		NLA = 16;
+    zzmode(ACTIONS); zzmore();   
+	>>
+
+\*
+	<<
+		NLA = 17;
+    zzmore();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 18;
+    zzline++; zzmore(); DAWDLE;   
+	>>
+
+~[\n\r\*]+
+	<<
+		NLA = 19;
+    zzmore();   
+	>>
+
+
+%%TOK_DEF_COMMENTS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\*/
+	<<
+		NLA = 20;
+    zzmode(PARSE_ENUM_FILE);
+    zzmore();   
+	>>
+
+\*
+	<<
+		NLA = 21;
+    zzmore();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 22;
+    zzline++; zzmore(); DAWDLE;   
+	>>
+
+~[\n\r\*]+
+	<<
+		NLA = 23;
+    zzmore();   
+	>>
+
+
+%%TOK_DEF_CPP_COMMENTS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 24;
+    zzline++; zzmode(PARSE_ENUM_FILE); zzskip(); DAWDLE;   
+	>>
+
+~[\n\r]+
+	<<
+		NLA = 25;
+    zzskip();   
+	>>
+
+
+%%ACTION_CPP_COMMENTS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 26;
+    zzline++; zzmode(ACTIONS); zzmore(); DAWDLE;   
+	>>
+
+~[\n\r]+
+	<<
+		NLA = 27;
+    zzmore();   
+	>>
+
+
+%%CPP_COMMENTS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 28;
+    zzline++; zzmode(START); zzskip(); DAWDLE;   
+	>>
+
+~[\n\r]+
+	<<
+		NLA = 29;
+    zzskip();   
+	>>
+
+
+%%COMMENTS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\*/
+	<<
+		NLA = 30;
+    zzmode(START); zzskip();   
+	>>
+
+\*
+	<<
+		NLA = 31;
+    zzskip();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 32;
+    zzline++; zzskip(); DAWDLE;   
+	>>
+
+~[\n\r\*]+
+	<<
+		NLA = 33;
+    zzskip();   
+	>>
+
+
+%%ACTIONS
+
+@
+	<<
+		NLA = Eof;
+	>>
+
+\>\>
+	<<
+		NLA = Action;
+    /* these do not nest */
+    zzmode(START);
+    NLATEXT[0] = ' ';
+    NLATEXT[1] = ' ';
+    zzbegexpr[0] = ' ';
+    zzbegexpr[1] = ' ';
+    if ( zzbufovf ) {
+      err( eMsgd("action buffer overflow; size %d",ZZLEXBUFSIZE));
+    }
+    
+/* MR1	10-Apr-97  MR1  Previously unable to put right shift operator	*/
+    /* MR1					in DLG action			*/
+    /* MR1			Doesn't matter what kind of action it is - reset*/
+    
+			      tokenActionActive=0;		 /* MR1 */
+	>>
+
+\>\>?
+	<<
+		NLA = Pred;
+    /* these do not nest */
+    zzmode(START);
+    NLATEXT[0] = ' ';
+    NLATEXT[1] = ' ';
+    zzbegexpr[0] = '\0';
+    if ( zzbufovf ) {
+      err( eMsgd("predicate buffer overflow; size %d",ZZLEXBUFSIZE));
+    };
+#ifdef __cplusplus__
+    /* MR10 */                    list_apply(CurActionLabels, (void (*)(void *))mark_label_used_in_sem_pred);
+#else
+#ifdef __STDC__
+    /* MR10 */                    list_apply(CurActionLabels, (void (*)(void *))mark_label_used_in_sem_pred);
+#else
+#ifdef __USE_PROTOS
+    /* MRxx */                    list_apply(CurActionLabels, (void (*)(void *))mark_label_used_in_sem_pred);
+#else
+    /* MR10 */                    list_apply(CurActionLabels,mark_label_used_in_sem_pred);
+#endif
+#endif
+#endif
+	>>
+
+\]
+	<<
+		NLA = PassAction;
+    if ( topint() == ']' ) {
+      popint();
+      if ( istackempty() )	/* terminate action */
+      {
+        zzmode(START);
+        NLATEXT[0] = ' ';
+        zzbegexpr[0] = ' ';
+        if ( zzbufovf ) {
+          err( eMsgd("parameter buffer overflow; size %d",ZZLEXBUFSIZE));
+        }
+      }
+      else {
+        /* terminate $[..] and #[..] */
+        if ( GenCC ) zzreplstr("))");
+        else zzreplstr(")");
+        zzmore();
+      }
+    }
+    else if ( topint() == '|' ) { /* end of simple [...] */
+      popint();
+      zzmore();
+    }
+    else zzmore();
+	>>
+
+consumeUntil\( [\ \t]* \{~[\}]+\} [\ \t]* \)
+	<<
+		NLA = 37;
+    
+    zzmore();
+    zzreplstr(inline_set(zzbegexpr+
+    strlen("consumeUntil(")));
+	>>
+
+consumeUntil\( ~[\)]+ \)
+	<<
+		NLA = 38;
+    zzmore();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 39;
+    zzline++; zzmore(); DAWDLE;   
+	>>
+
+\>
+	<<
+		NLA = 40;
+    zzmore();   
+	>>
+
+$
+	<<
+		NLA = 41;
+    zzmore();   
+	>>
+
+$$
+	<<
+		NLA = 42;
+    if ( !GenCC ) {zzreplstr("zzaRet"); zzmore();}
+    else err("$$ use invalid in C++ mode");   
+	>>
+
+$\[\]
+	<<
+		NLA = 43;
+    if ( !GenCC ) {zzreplstr("zzempty_attr"); zzmore();}
+    else err("$[] use invalid in C++ mode");   
+	>>
+
+$\[
+	<<
+		NLA = 44;
+    
+    pushint(']');
+    if ( !GenCC ) zzreplstr("zzconstr_attr(");
+    else err("$[..] use invalid in C++ mode");
+    zzmore();
+	>>
+
+$[0-9]+
+	<<
+		NLA = 45;
+    {
+      static char buf[100];
+      numericActionLabel=1;       /* MR10 */
+      if ( strlen(zzbegexpr)>(size_t)85 )
+      fatal("$i attrib ref too big");
+      set_orel(atoi(zzbegexpr+1), &attribsRefdFromAction);
+      if ( !GenCC ) sprintf(buf,"zzaArg(zztasp%d,%s)",
+      BlkLevel-1,zzbegexpr+1);
+      else sprintf(buf,"_t%d%s",
+      BlkLevel-1,zzbegexpr+1);
+      zzreplstr(buf);
+      zzmore();
+      UsedOldStyleAttrib = 1;
+      if ( UsedNewStyleLabel )
+      err("cannot mix old-style $i with new-style labels");
+    }
+	>>
+
+$[0-9]+.
+	<<
+		NLA = 46;
+    {
+      static char buf[100];
+      numericActionLabel=1;       /* MR10 */
+      if ( strlen(zzbegexpr)>(size_t)85 )
+      fatal("$i.field attrib ref too big");
+      zzbegexpr[strlen(zzbegexpr)-1] = ' ';
+      set_orel(atoi(zzbegexpr+1), &attribsRefdFromAction);
+      if ( !GenCC ) sprintf(buf,"zzaArg(zztasp%d,%s).",
+      BlkLevel-1,zzbegexpr+1);
+      else sprintf(buf,"_t%d%s.",
+      BlkLevel-1,zzbegexpr+1);
+      zzreplstr(buf);
+      zzmore();
+      UsedOldStyleAttrib = 1;
+      if ( UsedNewStyleLabel )
+      err("cannot mix old-style $i with new-style labels");
+    }
+	>>
+
+$[0-9]+.[0-9]+
+	<<
+		NLA = 47;
+    {
+      static char buf[100];
+      static char i[20], j[20];
+      char *p,*q;
+      numericActionLabel=1;       /* MR10 */
+      if (strlen(zzbegexpr)>(size_t)85) fatal("$i.j attrib ref too big");
+      for (p=zzbegexpr+1,q= &i[0]; *p!='.'; p++) {
+        if ( q == &i[20] )
+        fatalFL("i of $i.j attrib ref too big",
+        FileStr[CurFile], zzline );
+        *q++ = *p;
+      }
+      *q = '\0';
+      for (p++, q= &j[0]; *p!='\0'; p++) {
+        if ( q == &j[20] )
+        fatalFL("j of $i.j attrib ref too big",
+        FileStr[CurFile], zzline );
+        *q++ = *p;
+      }
+      *q = '\0';
+      if ( !GenCC ) sprintf(buf,"zzaArg(zztasp%s,%s)",i,j);
+      else sprintf(buf,"_t%s%s",i,j);
+      zzreplstr(buf);
+      zzmore();
+      UsedOldStyleAttrib = 1;
+      if ( UsedNewStyleLabel )
+      err("cannot mix old-style $i with new-style labels");
+    }
+	>>
+
+$[_a-zA-Z][_a-zA-Z0-9]*
+	<<
+		NLA = 48;
+    { static char buf[300]; LabelEntry *el;
+      zzbegexpr[0] = ' ';
+      if ( CurRule != NULL &&
+      strcmp(CurRule, &zzbegexpr[1])==0 ) {
+        if ( !GenCC ) zzreplstr("zzaRet");
+      }
+      else if ( CurRetDef != NULL &&
+      strmember(CurRetDef, &zzbegexpr[1])) {
+        if ( hasMultipleOperands( CurRetDef ) ) {
+          require (strlen(zzbegexpr)<=(size_t)285,
+          "$retval attrib ref too big");
+          sprintf(buf,"_retv.%s",&zzbegexpr[1]);
+          zzreplstr(buf);
+        }
+        else zzreplstr("_retv");
+      }
+      else if ( CurParmDef != NULL &&
+      strmember(CurParmDef, &zzbegexpr[1])) {
+      ;
+    }
+    else if ( Elabel==NULL ) {
+    { err("$-variables in actions outside of rules are not allowed"); }
+  } else if ( (el=(LabelEntry *)hash_get(Elabel, &zzbegexpr[1]))!=NULL ) {
+  /* MR10 */
+  /* MR10 */                      /* element labels might exist without an elem when */
+  /* MR10 */                      /*  it is a forward reference (to a rule)          */
+  /* MR10 */
+  /* MR10 */						if ( GenCC && (el->elem == NULL || el->elem->ntype==nRuleRef) )
+  /* MR10 */							{ err(eMsg1("There are no token ptrs for rule references: '$%s'",&zzbegexpr[1])); }
+  /* MR10 */
+  /* MR10 */						if ( !GenCC && (el->elem == NULL || el->elem->ntype==nRuleRef) && GenAST) {
+  /* MR10 */                          err("You can no longer use attributes returned by rules when also using ASTs");
+  /* MR10 */                          err("   Use upward inheritance (\"rule >[Attrib a] : ... <<$a=...\>\>\")");
+  /* MR10 */                      };
+  /* MR10 */
+  /* MR10 */                      /* keep track of <<... $label ...>> for semantic predicates in guess mode */
+  /* MR10 */                      /* element labels contain pointer to the owners node                      */
+  /* MR10 */
+  /* MR10 */                      if (el->elem != NULL && el->elem->ntype == nToken) {
+  /* MR10 */                        list_add(&CurActionLabels,el);
+  /* MR10 */                      };
+}
+else
+warn(eMsg1("$%s not parameter, return value, (defined) element label",&zzbegexpr[1]));
+}
+zzmore();
+	>>
+
+#0
+	<<
+		NLA = 49;
+    zzreplstr("(*_root)"); zzmore(); chkGTFlag();   
+	>>
+
+#\[\]
+	<<
+		NLA = 50;
+    if ( GenCC ) {
+      if (NewAST) zzreplstr("(newAST)");
+      else zzreplstr("(new AST)");}
+    else {zzreplstr("zzastnew()");} zzmore();
+    chkGTFlag();
+	>>
+
+#\(\)
+	<<
+		NLA = 51;
+    zzreplstr("NULL"); zzmore(); chkGTFlag();   
+	>>
+
+#[0-9]+
+	<<
+		NLA = 52;
+    {
+      static char buf[100];
+      if ( strlen(zzbegexpr)>(size_t)85 )
+      fatal("#i AST ref too big");
+      if ( GenCC ) sprintf(buf,"_ast%d%s",BlkLevel-1,zzbegexpr+1);
+      else sprintf(buf,"zzastArg(%s)",zzbegexpr+1);
+      zzreplstr(buf);
+      zzmore();
+      set_orel(atoi(zzbegexpr+1), &AST_nodes_refd_in_actions);
+      chkGTFlag();
+    }
+	>>
+
+#line[\ \t]* [0-9]+ {[\ \t]* \"~[\"]+\" ([\ \t]* [0-9]*)* } (\n|\r|\r\n)
+	<<
+		NLA = 53;
+    
+    zzline = atoi(zzbegexpr+5) - 1; zzline++; zzmore();
+    getFileNameFromTheLineInfo(FileStr[CurFile], zzbegexpr);
+	>>
+
+#line ~[\n\r]* (\n|\r|\r\n)
+	<<
+		NLA = 54;
+    
+    zzline++; zzmore();
+	>>
+
+#[_a-zA-Z][_a-zA-Z0-9]*
+	<<
+		NLA = 55;
+    
+    if ( !(strcmp(zzbegexpr, "#ifdef")==0 ||
+    strcmp(zzbegexpr, "#if")==0 ||
+    strcmp(zzbegexpr, "#else")==0 ||
+    strcmp(zzbegexpr, "#endif")==0 ||
+    strcmp(zzbegexpr, "#ifndef")==0 ||
+    strcmp(zzbegexpr, "#define")==0 ||
+    strcmp(zzbegexpr, "#pragma")==0 ||
+    strcmp(zzbegexpr, "#undef")==0 ||
+    strcmp(zzbegexpr, "#import")==0 ||
+    strcmp(zzbegexpr, "#line")==0 ||
+    strcmp(zzbegexpr, "#include")==0 ||
+    strcmp(zzbegexpr, "#error")==0) )
+    {
+      static char buf[100];
+      sprintf(buf, "%s_ast", zzbegexpr+1);
+      /* MR27 */						list_add(&CurAstLabelsInActions, mystrdup(zzbegexpr+1));
+      zzreplstr(buf);
+      chkGTFlag();
+    }
+    zzmore();
+	>>
+
+#\[
+	<<
+		NLA = 56;
+    
+    pushint(']');
+    if ( GenCC ) {
+      if (NewAST) zzreplstr("(newAST(");
+      else zzreplstr("(new AST("); }
+    else zzreplstr("zzmk_ast(zzastnew(),");
+    zzmore();
+    chkGTFlag();
+	>>
+
+#\(
+	<<
+		NLA = 57;
+    
+    pushint('}');
+    if ( GenCC ) {
+      if (tmakeInParser) {
+        zzreplstr("tmake(");
+      }
+      else {
+        zzreplstr("ASTBase::tmake(");
+      }
+    }
+    else {
+      zzreplstr("zztmake(");
+    }
+    zzmore();
+    chkGTFlag();
+	>>
+
+#
+	<<
+		NLA = 58;
+    zzmore();   
+	>>
+
+\)
+	<<
+		NLA = 59;
+    
+    if ( istackempty() )
+    zzmore();
+    else if ( topint()==')' ) {
+      popint();
+    }
+    else if ( topint()=='}' ) {
+      popint();
+      /* terminate #(..) */
+      zzreplstr(", NULL)");
+    }
+    zzmore();
+	>>
+
+\[
+	<<
+		NLA = 60;
+    
+    pushint('|');	/* look for '|' to terminate simple [...] */
+    zzmore();
+	>>
+
+\(
+	<<
+		NLA = 61;
+    
+    pushint(')');
+    zzmore();
+	>>
+
+\\\]
+	<<
+		NLA = 62;
+    zzreplstr("]");  zzmore();   
+	>>
+
+\\\)
+	<<
+		NLA = 63;
+    zzreplstr(")");  zzmore();   
+	>>
+
+\\>
+	<<
+		NLA = 64;
+    if (! tokenActionActive) zzreplstr(">");	 /* MR1 */
+    zzmore();				         /* MR1 */
+	>>
+
+'
+	<<
+		NLA = 65;
+    zzmode(ACTION_CHARS); zzmore();  
+	>>
+
+\"
+	<<
+		NLA = 66;
+    zzmode(ACTION_STRINGS); zzmore();  
+	>>
+
+\\$
+	<<
+		NLA = 67;
+    zzreplstr("$");  zzmore();   
+	>>
+
+\\#
+	<<
+		NLA = 68;
+    zzreplstr("#");  zzmore();   
+	>>
+
+\\(\n|\r|\r\n)
+	<<
+		NLA = 69;
+    zzline++; zzmore();   
+	>>
+
+\\~[\]\)>$#]
+	<<
+		NLA = 70;
+    zzmore();   
+	>>
+
+/
+	<<
+		NLA = 71;
+    zzmore();   
+	>>
+
+/\*
+	<<
+		NLA = 72;
+    zzmode(ACTION_COMMENTS); zzmore();   
+	>>
+
+\*/
+	<<
+		NLA = 73;
+    warn("Missing /*; found dangling */ in action"); zzmore();   
+	>>
+
+//
+	<<
+		NLA = 74;
+    zzmode(ACTION_CPP_COMMENTS); zzmore();   
+	>>
+
+~[\n\r\)\(\\$#\>\]\[\"'/]+
+	<<
+		NLA = 75;
+    zzmore();   
+	>>
+
+
+%%PARSE_ENUM_FILE
+
+@
+	<<
+		NLA = Eof;
+    ;   
+	>>
+
+[\t\ ]+
+	<<
+		NLA = 137;
+    zzskip();   
+	>>
+
+\n|\r|\r\n
+	<<
+		NLA = 138;
+    zzline++; zzskip();   
+	>>
+
+//
+	<<
+		NLA = 139;
+    zzmode(TOK_DEF_CPP_COMMENTS); zzmore();   
+	>>
+
+/\*
+	<<
+		NLA = 140;
+    zzmode(TOK_DEF_COMMENTS); zzskip();   
+	>>
+
+#ifdef
+	<<
+		NLA = 141;
+    zzmode(TOK_DEF_CPP_COMMENTS); zzskip();   
+	>>
+
+#if
+	<<
+		NLA = 142;
+    zzmode(TOK_DEF_CPP_COMMENTS); zzskip();   
+	>>
+
+#ifndef
+	<<
+		NLA = 143;
+    ;   
+	>>
+
+#else
+	<<
+		NLA = 144;
+    zzmode(TOK_DEF_CPP_COMMENTS); zzskip();   
+	>>
+
+#endif
+	<<
+		NLA = 145;
+    zzmode(TOK_DEF_CPP_COMMENTS); zzskip();   
+	>>
+
+#undef
+	<<
+		NLA = 146;
+    zzmode(TOK_DEF_CPP_COMMENTS); zzskip();   
+	>>
+
+#import
+	<<
+		NLA = 147;
+    zzmode(TOK_DEF_CPP_COMMENTS); zzskip();   
+	>>
+
+#define
+	<<
+		NLA = 149;
+	>>
+
+enum
+	<<
+		NLA = 151;
+	>>
+
+\{
+	<<
+		NLA = 152;
+	>>
+
+=
+	<<
+		NLA = 153;
+	>>
+
+,
+	<<
+		NLA = 154;
+	>>
+
+\}
+	<<
+		NLA = 155;
+	>>
+
+;
+	<<
+		NLA = 156;
+	>>
+
+[0-9]+
+	<<
+		NLA = INT;
+	>>
+
+[a-zA-Z_][_a-zA-Z0-9]*
+	<<
+		NLA = ID;
+	>>
+
+%%

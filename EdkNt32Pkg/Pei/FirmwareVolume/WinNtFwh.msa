@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>WinNtFwh</BaseName>
+    <ModuleType>PEIM</ModuleType>
+    <ComponentType>PE32_PEIM</ComponentType>
+    <Guid>F0384FFD-8633-452f-9010-F6B7D2EAE2F1</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for WinNtFwh module</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-14 17:04</Created>
+    <Updated>2006-03-23 10:33</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeimEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiCoreLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesTablePointerLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>WinNtFwh.c</Filename>
+    <Filename>WinNtFwh.dxs</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+    <PackageName>EdkNt32Pkg</PackageName>
+  </Includes>
+  <Hobs>
+    <Hob Usage="ALWAYS_PRODUCED" HobType="FIRMWARE_VOLUME">
+      <Name>FvRecovery.fv</Name>
+    </Hob>
+    <Hob Usage="ALWAYS_PRODUCED" HobType="RESOURCE_DESCRIPTOR">
+      <Name>EFI_RESOURCE_FIRMWARE_DEVICE</Name>
+    </Hob>
+    <Hob Usage="ALWAYS_PRODUCED" HobType="FIRMWARE_VOLUME">
+      <Name>NVSTORAGE.fv</Name>
+    </Hob>
+  </Hobs>
+  <PPIs>
+    <Ppi Usage="ALWAYS_CONSUMED">NtFwh</Ppi>
+  </PPIs>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>PeimInitializeWinNtFwh</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

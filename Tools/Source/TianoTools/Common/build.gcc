@@ -1,0 +1,8 @@
+mkdir -p ../Library-mingw
+mkdir -p ../Library-cygwin
+rm *.o
+gcc -c -I "$WORKSPACE/MdePkg/Include/" -I"$WORKSPACE/MdePkg/Include/Ia32/" -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/  *.c
+ar cr ../Library-cygwin/libCommon.a *.o
+rm *.o
+gcc -mno-cygwin -c -I "$WORKSPACE/MdePkg/Include/" -I"$WORKSPACE/MdePkg/Include/Ia32/" -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/  *.c
+ar cr ../Library-mingw/libCommon.a *.o

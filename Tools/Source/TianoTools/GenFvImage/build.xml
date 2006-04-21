@@ -1,0 +1,246 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project default="GenTool" basedir=".">
+<!--
+    EDK GenFvImage Tool
+  Copyright (c) 2006, Intel Corporation
+-->
+  <property name="ToolName" value="GenFvImage"/>
+  <property name="FileSet" value="BasePeCoff.c GenFvImageLib.c GenFvImageExe.c"/>
+
+  <taskdef resource="cpptasks.tasks"/>
+  <typedef resource="cpptasks.types"/>
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+  <property environment="env"/>
+
+  <property name="LINK_OUTPUT_TYPE" value="static"/>
+  <property name="BUILD_DIR_IA32" value="${PACKAGE_DIR}/${ToolName}/tmp/Ia32"/>
+  <property name="BUILD_DIR_X64" value="${PACKAGE_DIR}/${ToolName}/tmp/X64"/>
+  <property name="BUILD_DIR_IPF" value="${PACKAGE_DIR}/${ToolName}/tmp/Ipf"/>
+
+  <target name="GenTool" depends="init, Tool">
+    <echo message="Building the EDK Tool: ${ToolName}"/>
+  </target>
+
+  <target name="init">
+    <echo message="The EDK Tool: ${ToolName}"/>
+    <mkdir dir="${BUILD_DIR_IA32}"/>
+    <mkdir dir="${BUILD_DIR_X64}"/>
+    <mkdir dir="${BUILD_DIR_IPF}"/>
+    <if>
+      <equals arg1="${GCC}" arg2="cygwin"/>
+      <then>
+        <echo message="Cygwin Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    <elseif>
+      <os family="dos"/>
+      <then>
+        <echo message="Windows Family"/>
+        <property name="ToolChain" value="msvc"/>
+      </then>
+    </elseif>
+    <elseif>
+      <os family="unix"/>
+      <then>
+        <echo message="UNIX Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    </elseif>
+
+    <else>
+      <echo>
+        Unsupported Operating System
+        Please Contact Intel Corporation
+      </echo>
+    </else>
+    </if>
+		<if>
+		  <equals arg1="${ToolChain}" arg2="msvc"/>
+			<then>
+        <property name="ext_static" value=".lib"/>
+        <property name="ext_dynamic" value=".dll"/>
+        <property name="ext_exe" value=".exe"/>
+			</then>
+			<elseif>
+			  <equals arg1="${ToolChain}" arg2="gcc"/>
+				<then>
+          <property name="ext_static" value=".a"/>
+          <property name="ext_dynamic" value=".so"/>
+          <property name="ext_exe" value=""/>
+				</then>
+			</elseif>
+		</if>
+  </target>
+
+  <target name="Tool" depends="init, GenFvImage, GenFvImage_IA32, GenFvImage_X64, GenFvImage_IPF"/>
+
+  <target name="GenFvImage">
+    <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
+        outfile="${BIN_DIR}/${ToolName}"
+        outtype="executable"
+        libtool="${haveLibtool}"
+        optimize="speed">
+
+      <defineset>
+        <define name="BUILDING_TOOLS"/>
+        <define name="TOOL_BUILD_IA32_TARGET"/>
+      </defineset>
+    
+      <fileset dir="${basedir}/${ToolName}" 
+        includes="${FileSet} Ia32/PeCoffLoaderEx.c" 
+        defaultexcludes="TRUE" 
+        excludes="*.xml *.inf"/>
+
+      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
+      <includepath path="${PACKAGE_DIR}/Common"/>
+
+			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+			<linkerarg value="/nodefaultlib:libc.lib"/>
+			<linkerarg value="RpcRT4.Lib"/>
+
+    </cc>
+  </target>
+
+  <target name="GenFvImage_IA32">
+    <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
+        outfile="${BIN_DIR}/${ToolName}_IA32"
+        outtype="executable"
+        libtool="${haveLibtool}"
+        optimize="speed">
+
+      <defineset>
+        <define name="BUILDING_TOOLS"/>
+        <define name="TOOL_BUILD_IA32_TARGET"/>
+      </defineset>
+    
+      <fileset dir="${basedir}/${ToolName}" 
+        includes="${FileSet} Ia32/PeCoffLoaderEx.c" 
+        defaultexcludes="TRUE" 
+        excludes="*.xml *.inf"/>
+
+      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
+      <includepath path="${PACKAGE_DIR}/Common"/>
+
+			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+			<linkerarg value="/nodefaultlib:libc.lib"/>
+			<linkerarg value="RpcRT4.Lib"/>
+
+    </cc>
+  </target>
+
+  <target name="GenFvImage_X64">
+    <cc name="${ToolChain}" objdir="${BUILD_DIR_X64}" 
+        outfile="${BIN_DIR}/${ToolName}_X64"
+        outtype="executable"
+        libtool="${haveLibtool}"
+        optimize="speed">
+
+      <defineset>
+        <define name="BUILDING_TOOLS"/>
+        <define name="TOOL_BUILD_X64_TARGET"/>
+      </defineset>
+    
+      <fileset dir="${basedir}/${ToolName}" 
+        includes="${FileSet} x64/PeCoffLoaderEx.c"  
+        defaultexcludes="TRUE" 
+        excludes="*.xml *.inf"/>
+
+      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
+      <includepath path="${PACKAGE_DIR}/Common"/>
+
+			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+			<linkerarg value="/nodefaultlib:libc.lib"/>
+			<linkerarg value="RpcRT4.Lib"/>
+
+    </cc>
+  </target>
+
+  <target name="GenFvImage_IPF">
+    <cc name="${ToolChain}" objdir="${BUILD_DIR_IPF}" 
+        outfile="${BIN_DIR}/${ToolName}_IPF"
+        outtype="executable"
+        libtool="${haveLibtool}"
+        optimize="speed">
+
+      <defineset>
+        <define name="BUILDING_TOOLS"/>
+        <define name="TOOL_BUILD_IPF_TARGET"/>
+      </defineset>
+    
+      <fileset dir="${basedir}/${ToolName}" 
+        includes="${FileSet} Ipf/PeCoffLoaderEx.c"  
+        defaultexcludes="TRUE" 
+        excludes="*.xml *.inf"/>
+
+      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
+      <includepath path="${PACKAGE_DIR}/Common"/>
+
+			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+			<linkerarg value="/nodefaultlib:libc.lib"/>
+			<linkerarg value="RpcRT4.Lib"/>
+
+    </cc>
+  </target>
+
+  <target name="clean" depends="init">
+    <echo message="Removing Intermediate Files Only"/>  
+    <delete>
+      <fileset dir="${BUILD_DIR_IA32}" includes="*.obj"/>
+      <fileset dir="${BUILD_DIR_X64}" includes="*.obj"/>
+      <fileset dir="${BUILD_DIR_IPF}" includes="*.obj"/>
+    </delete>
+  </target>
+
+  <target name="cleanall" depends="init">
+    <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
+    <delete dir="${PACKAGE_DIR}/${ToolName}/tmp">
+	    
+      <fileset dir="${BIN_DIR}" includes="${ToolName}_IA32${ext_exe}"/>
+      <fileset dir="${BIN_DIR}" includes="${ToolName}_X64${ext_exe}"/>
+      <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
+      <fileset dir="${BIN_DIR}" includes="${ToolName}_IPF${ext_exe}"/>
+    </delete>
+  </target>
+
+</project>

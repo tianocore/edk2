@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaLibHeader>
+    <BaseName>BaseMemoryLibSse2</BaseName>
+    <ModuleType>BASE</ModuleType>
+    <ComponentType>LIBRARY</ComponentType>
+    <Guid>65a18235-5096-4032-8c63-214f0249ce8d</Guid>
+    <Version>EDK_RELEASE_VERSION        0x00090000</Version>
+    <Abstract>Memory-only library functions with no library constructor/destructor</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+    <Created>2006-04-12 13:46</Created>
+  </MsaLibHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Arch ArchType="IA32">
+      <Filename>MemLibGuid.c</Filename>
+      <Filename>MemLibWrapper.c</Filename>
+      <Filename>Ia32\CopyMem.asm</Filename>
+      <Filename>Ia32\SetMem.asm</Filename>
+      <Filename>Ia32\SetMem16.asm</Filename>
+      <Filename>Ia32\SetMem32.asm</Filename>
+      <Filename>Ia32\SetMem64.asm</Filename>
+      <Filename>Ia32\ZeroMem.asm</Filename>
+      <Filename>Ia32\CompareMem.asm</Filename>
+      <Filename>Ia32\ScanMem8.asm</Filename>
+      <Filename>Ia32\ScanMem16.asm</Filename>
+      <Filename>Ia32\ScanMem32.asm</Filename>
+      <Filename>Ia32\ScanMem64.asm</Filename>
+    </Arch>
+    <Arch ArchType="X64">
+      <Filename>MemLibGuid.c</Filename>
+      <Filename>MemLibWrapper.c</Filename>
+      <Filename>x64\CopyMem.asm</Filename>
+      <Filename>x64\SetMem.asm</Filename>
+      <Filename>x64\SetMem16.asm</Filename>
+      <Filename>x64\SetMem32.asm</Filename>
+      <Filename>x64\SetMem64.asm</Filename>
+      <Filename>x64\ZeroMem.asm</Filename>
+      <Filename>x64\CompareMem.asm</Filename>
+      <Filename>x64\ScanMem8.asm</Filename>
+      <Filename>x64\ScanMem16.asm</Filename>
+      <Filename>x64\ScanMem32.asm</Filename>
+      <Filename>x64\ScanMem64.asm</Filename>
+    </Arch>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+  </Includes>
+</LibraryModuleSurfaceArea>

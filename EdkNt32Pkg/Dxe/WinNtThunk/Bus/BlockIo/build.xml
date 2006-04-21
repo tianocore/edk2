@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- Copyright (c) 2006, Intel Corporation 
+All rights reserved. This program and the accompanying materials 
+are licensed and made available under the terms and conditions of the BSD License 
+which accompanies this distribution.  The full text of the license may be found at  
+http://opensource.org/licenses/bsd-license.php 
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<project basedir="." default="WinNtBlockIo"><!--Apply external ANT tasks-->
+   <taskdef resource="GenBuild.tasks"/>
+   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+   <property environment="env"/>
+   <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
+   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Dxe\WinNtThunk\Bus\BlockIo"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <target name="WinNtBlockIo">
+      <GenBuild baseName="WinNtBlockIo" mbdFilename="${MODULE_DIR}\WinNtBlockIo.mbd" msaFilename="${MODULE_DIR}\WinNtBlockIo.msa"/>
+   </target>
+   <target depends="WinNtBlockIo_clean" name="clean"/>
+   <target depends="WinNtBlockIo_cleanall" name="cleanall"/>
+   <target name="WinNtBlockIo_clean">
+      <OutputDirSetup baseName="WinNtBlockIo" mbdFilename="${MODULE_DIR}\WinNtBlockIo.mbd" msaFilename="${MODULE_DIR}\WinNtBlockIo.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\WinNtBlockIo_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\WinNtBlockIo_build.xml" target="clean"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
+   </target>
+   <target name="WinNtBlockIo_cleanall">
+      <OutputDirSetup baseName="WinNtBlockIo" mbdFilename="${MODULE_DIR}\WinNtBlockIo.mbd" msaFilename="${MODULE_DIR}\WinNtBlockIo.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\WinNtBlockIo_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\WinNtBlockIo_build.xml" target="cleanall"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}"/>
+      <delete dir="${DEST_DIR_DEBUG}"/>
+      <delete>
+         <fileset dir="${BIN_DIR}" includes="**WinNtBlockIo*"/>
+      </delete>
+   </target>
+</project>
