@@ -45,8 +45,8 @@ if not defined CYGWIN_HOME (
   )
 )
 
-if "%ANT_HOME%"=="" set ANT_HOME=%WORKSPACE%\Tools\bin\apache-ant
-if "%XMLBEANS_HOME%"=="" set XMLBEANS_HOME=%WORKSPACE%\Tools\bin\xmlbeans
+if "%ANT_HOME%"=="" goto no_ant
+if "%XMLBEANS_HOME%"=="" goto no_xmlbeans
 set Framework_Tools_Path=%WORKSPACE%\Tools\bin
 
 echo.
@@ -79,7 +79,19 @@ goto end
 
 :no_jdk
 echo.
-echo !!! Please set JAVA_HOME !!!
+echo !!! Please install Java, and set JAVA_HOME !!!
+echo.
+goto end 
+
+:no_ant
+echo.
+echo !!! Please install Apache Ant, and set ANT_HOME !!!
+echo.
+goto end 
+
+:no_xmlbeans
+echo.
+echo !!! Please install XML Beans, and set XMLBEANS_HOME !!!
 echo.
 goto end 
 
