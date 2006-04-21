@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>ToolResources</BaseName>
+    <ModuleType>BASE</ModuleType>
+    <ComponentType>CUSTOM_BUILD</ComponentType>
+    <Guid>5d6c499e-53fd-430e-9285-2d7811b924e8</Guid>
+    <Version>2.0</Version>
+    <Abstract>This is the EFI/Tiano Tool Resources Module</Abstract>
+    <Description> This Module provides the EFI/Tiano Tools and resources that are used to create EFI/Tiano Modules and Platform Binary Files (PBF) These resources and tools do not require compilation. (The three JAR files are provided, Pre-compiled, and do not require additional compilation, the sources are provided, but will not be built under normal procedures. </Description>
+    <Copyright>Copyright 2005-2006, Intel Corporation</Copyright>
+    <License> All rights reserved. This program and the accompanying materials are licensed and made available under the terms and conditions of the BSD License which accompanies this distribution. The full text of the license may be found at http://opensource.org/licenses/bsd-license.php THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. </License>
+    <Created>2006-03-30 10:05</Created>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass>Java</LibraryClass>
+    <LibraryClass>Perl</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename Path="bin" FileType="pl">inf2msa.pl</Filename>
+    <Filename Path="bin" FileType="pl">mkspd.pl</Filename>
+    <Filename Path="bin" FileType="pl">mkdb.pl</Filename>
+    <Filename Path="Conf" FileType="db">FrameworkDatabase.db</Filename>
+    <Filename Path="Conf" FileType="txt">cygwin_tools.txt</Filename>
+    <Filename Path="Conf" FileType="txt">desktop_efi_flags.txt</Filename>
+    <Filename Path="Conf" FileType="txt">embedded_efi_flags.txt</Filename>
+    <Filename Path="Conf" FileType="txt">gcc_tools.txt</Filename>
+    <Filename Path="Conf" FileType="txt">global_efi_flags.txt</Filename>
+    <Filename Path="Conf" FileType="txt">intel_tools.txt</Filename>
+    <Filename Path="Conf" FileType="txt">mobile_efi_flags.txt</Filename>
+    <Filename Path="Conf" FileType="txt">msft_tools.txt</Filename>
+    <Filename Path="Conf" FileType="txt">my_efi_flags.txt</Filename>
+    <Filename Path="Conf" FileType="txt">node.txt</Filename>
+    <Filename Path="Conf" FileType="txt">server_efi_flags.txt</Filename>
+    <Filename Path="Conf" FileType="txt">target.txt</Filename>
+    <Filename Path="Conf" FileType="txt">tools_def.txt</Filename>
+    <Filename Path="Conf" FileType="txt">winddk_tools.txt</Filename>
+    <Filename Path="Jars" FileType="jar">cpptasks.jar</Filename>
+    <Filename Path="Jars" FileType="jar">frameworktasks.jar</Filename>
+    <Filename Path="Jars" FileType="jar">GenBuild.jar</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>Base</PackageName>
+  </Includes>
+  <BuildOptions>
+    <Option>DO_NOTHING</Option>
+  </BuildOptions>
+</ModuleSurfaceArea>

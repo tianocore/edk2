@@ -1,0 +1,2 @@
+gcc -mno-cygwin -c -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/ -I../Common -I$WORKSPACE/MdePkg/Include/ -I$WORKSPACE/MdePkg/Include/Ia32 -I. SetStamp.c 
+gcc -mno-cygwin -o SetStamp SetStamp.o

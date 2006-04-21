@@ -1,0 +1,1196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns="http://www.TianoCore.org/2006/Edk2.0" targetNamespace="http://www.TianoCore.org/2006/Edk2.0">
+    <!--
+    Filename: FrameworkDataTypes.xsd
+    
+    Copyright (c) 2006, Intel Corp.
+    All rights reserved. This program and the accompanying materials
+    are licensed and made available under the terms and conditions of the BSD License
+    which may be found at http://opensource.org/licenses/bsd-license.php
+    
+    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    
+  -->
+    <xs:annotation>
+        <xs:documentation xml:lang="en">This schema defines EFI and Framework Attribute and Data Types. Only simpleType and attributeGroups are specified in this file. </xs:documentation>
+    </xs:annotation>
+    <xs:include schemaLocation="NamingConvention.xsd"/>
+    <xs:simpleType name="BlockNameType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">FIRMWARE: Define a block name to be BLOCK[A-F0-9]{2}</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:pattern value="BLOCK([A-F0-9]){2}"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="BootModeNames">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes what boot modes can be set (produced) or what boot modes can be supported, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="FULL">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_WITH_FULL_CONFIGURATION</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="MINIMAL">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_WITH_MINIMAL_CONFIGURATION</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="NO_CHANGE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_ASSUMING_NO_CONFIGURATION_CHANGES</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DIAGNOSTICS">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_WITH_FULL_CONFIGURATION_PLUS_DIAGNOSTICS</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DEFAULT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_WITH_DEFAULT_SETTINGS</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="S2_RESUME">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_ON_S2_RESUME</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="S3_RESUME">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_ON_S3_RESUME</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="S4_RESUME">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_ON_S4_RESUME</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="S5_RESUME">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_ON_S5_RESUME</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FLASH_UPDATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_ON_FLASH_UPDATE</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="RECOVERY">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">BOOT_IN_RECOVERY_MODE</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="BootModeUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Boot Mode Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Supports the Boot Mode</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Supports the Boot Mode on some execution path</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Always changes the Boot Mode</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Sometimes changes the Boot Mode</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ComponentExecutionPhase">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">These are the supported EFI/Framework Execution Phases</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="MDE"/>
+            <xs:enumeration value="SEC"/>
+            <xs:enumeration value="PEI_CORE"/>
+            <xs:enumeration value="PEIM"/>
+            <xs:enumeration value="DXE_CORE"/>
+            <xs:enumeration value="DXE_DRIVER"/>
+            <xs:enumeration value="DXE_RUNTIME_DRIVER"/>
+            <xs:enumeration value="DXE_SAL_DRIVER"/>
+            <xs:enumeration value="DXE_SMM_DRIVER"/>
+            <xs:enumeration value="UEFI"/>
+            <xs:enumeration value="UEFI_APPLICATION"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ConditionalTarget">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Conditional Targets are Other FeatureFlag Identifiers</xs:documentation>
+        </xs:annotation>
+        <xs:list itemType="C_Name"/>
+    </xs:simpleType>
+    <xs:simpleType name="DataHubUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Data Hub Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The module always consumes a data hub entry via registering a filter driver.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The module will use a data hub entry if it exists via registering a filter driver.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The module always logs data into the data hub.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The module will log data into the data hub under certain circumstances</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">DataHub is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DateType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Date Format is YYYY-MM-DD HH:MM (24hr time format)</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="[1-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DefaultValue">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> The DefaultValue is a union of a string and an integer. </xs:documentation>
+        </xs:annotation>
+        <xs:union memberTypes="xs:normalizedString xs:int UnicodeString"/>
+    </xs:simpleType>
+    <xs:simpleType name="EfiSectionType">
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="EFI_SECTION_FREEFORM_SUBTYPE_GUID"/>
+            <xs:enumeration value="EFI_SECTION_VERSION"/>
+            <xs:enumeration value="EFI_SECTION_USER_INTERFACE"/>
+            <xs:enumeration value="EFI_SECTION_DXE_DEPEX"/>
+            <xs:enumeration value="EFI_SECTION_PEI_DEPEX"/>
+            <xs:enumeration value="EFI_SECTION_PE32"/>
+            <xs:enumeration value="EFI_SECTION_PIC"/>
+            <xs:enumeration value="EFI_SECTION_TE"/>
+            <xs:enumeration value="EFI_SECTION_RAW"/>
+            <xs:enumeration value="EFI_SECTION_COMPRESSION"/>
+            <xs:enumeration value="EFI_SECTION_GUID_DEFINED"/>
+            <xs:enumeration value="EFI_SECTION_COMPATIBILITY16"/>
+            <xs:enumeration value="EFI_SECTION_FIRMWARE_VOLUME_IMAGE"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="EventTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Supported Event Groups, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="EVENT_GROUP_EXIT_BOOT_SERVICES"/>
+            <xs:enumeration value="EVENT_GROUP_VIRTUAL_ADDRESS_CHANGE"/>
+            <xs:enumeration value="EVENT_GROUP_MEMORY_MAP_CHANGE"/>
+            <xs:enumeration value="EVENT_GROUP_READY_TO_BOOT"/>
+            <xs:enumeration value="EVENT_GROUP_LEGACY_BOOT"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="EventUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Event Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A module registers a notification function and requires it to be executed for the module to fully function.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A module registers a notification function and utilizes it if it's signaled.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A module will always signal the event.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A module will sometimes signal the event.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Event is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ExecutionType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> This defines the output types: Relocatable (REL,) Non-Relocatable (NREL,) Execute in Place (XIP) or Position Independent Code (PIC) </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="REL" id="Relocatable"/>
+            <xs:enumeration value="NREL" id="Non-Relocatable"/>
+            <xs:enumeration value="XIP" id="Execute_In_Place"/>
+            <xs:enumeration value="PIC" id="Position_Independent_Code"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ExternType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">C Identifier Name for the Extern data as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(_*\w*\W*)*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ExternUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Extern Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The EXTERN is always imported by the module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The EXTERN is always exported by the module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FileNameUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the FileName Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module requires a file named GUID in an FV</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module will use a file named GUID in an FV if it is present</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module Always produces a file named GUID in an FV</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module sometimes produces a file named GUID in an FV</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Filename is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FormSetUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Formset Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The Formset is always registered into HII by the module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Some execution paths through the modules register forms into HII</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Formset is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FrameworkComponentTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> These are the EFI/Framework Component Types defined in the EFI Development Kit (EDK) Getting Started Guide </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="APRIORI"/>
+            <xs:enumeration value="SEC"/>
+            <xs:enumeration value="LIBRARY"/>
+            <xs:enumeration value="FV_IMAGE_FILE"/>
+            <xs:enumeration value="BS_DRIVER"/>
+            <xs:enumeration value="RT_DRIVER"/>
+            <xs:enumeration value="SAL_RT_DRIVER"/>
+            <xs:enumeration value="PE32_PEIM"/>
+            <xs:enumeration value="PIC_PEIM"/>
+            <xs:enumeration value="COMBINED_PEIM_DRIVER"/>
+            <xs:enumeration value="PEI_CORE"/>
+            <xs:enumeration value="DXE_CORE"/>
+            <xs:enumeration value="APPLICATION"/>
+            <xs:enumeration value="BS_DRIVER_EFI"/>
+            <xs:enumeration value="SHELLAPP"/>
+            <xs:enumeration value="APPLICATION"/>
+            <xs:enumeration value="UEFI_APPLICATION"/>
+            <xs:enumeration value="BINARY"/>
+            <xs:enumeration value="LOGO"/>
+            <xs:enumeration value="CUSTOM_BUILD"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FvRegionTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">FIRMWARE: Pre-defined Firmware Volume Region Types</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="FV_MAIN"/>
+            <xs:enumeration value="FV_MAIN_COMPACT"/>
+            <xs:enumeration value="NV_STORAGE"/>
+            <xs:enumeration value="FV_RECOVERY"/>
+            <xs:enumeration value="FV_RECOVERY_FLOPPY"/>
+            <xs:enumeration value="FV_FILE"/>
+            <xs:enumeration value="CAPSULE_CARGO"/>
+            <xs:enumeration value="NULL"/>
+            <xs:enumeration value="USER_DEFINED"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="GuidUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Guid Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module always consumes the GUID</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module will consume the GUID only if the GUID is present</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module will always produce the GUID</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module sometimes produces the GUID</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DEFAULT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The default is the GUID that specifies the instance of the package</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Guid is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="HobTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Type of HOB that is being produced or consumed, as specified in the Module Surface Area Specification.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="PHIT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_HANDOFF</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="MEMORY_ALLOCATION">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_MEMORY_ALLOCATION Note: The BaseName of the GUID is also required</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="RESOURCE_DESCRIPTOR">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_RESOURCE_DESCRIPTOR</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="GUID_EXTENSION">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_GUID_EXTENSION Note: The BaseName of the GUID is also required.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FIRMWARE_VOLUME">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_FV</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="CPU">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_CPU</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="POOL">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_PEI_MEMORY_POOL</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="CAPSULE_VOLUME">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">EFI_HOB_TYPE_CV</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="HobUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Hob Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The HOB must be present in the system</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The HOB will be used if it's present in the system</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The HOB is always produced by the module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The HOB will sometimes be produced by the module.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">HOB is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="LibraryUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Library Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A module always consumes the library. This Guid represents the class of the library.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED"/>
+            <xs:enumeration value="ALWAYS_PRODUCED"/>
+            <xs:enumeration value="SOMETIMES_PRODUCED"/>
+            <xs:enumeration value="DEFAULT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The default is the GUID that specifies the instance of the library.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Library is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ModuleTypeDef">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> These are the supported Framework Module Types </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="BASE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module only depends on things in the MDE package and is environment neutral</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SEC">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is the Security Section and depends on catching the reset vectory</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PEI_CORE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is the PEI Core</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PEIM">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is a PEIM and depends on the PEI Services Table</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_CORE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is the DXE Core</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is a DXE Driver and depends on the EFI Boot Services, EFI Runtime Services and the DXE Service Table</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_RUNTIME_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is a DXE Driver and depends on the EFI Boot Services, EFI Runtime Services and the DXE Service Table. The module runs after ExitBootServices and produces CreateEvent EventGroupExitBootServices and EventGroupVirtualAddressChange. Code written in this module can run in physical or virtual mode.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_SAL_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is a DXE Driver and depends on the EFI Boot Services, EFI Runtime Services and the DXE Service Table. The module runs after ExitBootServices and produces CreateEvent EventGroupExitBootServices and EventGroupVirtualAddressChange. Code written in this module can run in physical AND in virtual mode.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DXE_SMM_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is a DXE Driver and depends on the EFI Boot Services, EFI Runtime Services and the DXE Service Table. The module also runs in SMM mode and depends on the SMM Service Table. </xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="TOOLS">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The TOOLS ModuleType is to be used for Tiano Tools modules</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UEFI_DRIVER">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is a UEFI Driver and depends on the EFI and Service Tables.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="UEFI_APPLICATION">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module is a UEFI Applciation and depens on the EFI and Service Tables.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="USER_DEFINED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module does not fit into other classifications. The user must have an apriori knowledge of its Usage, and must provide that information to others using this module.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Module_Unified">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Define a flag to determine whether to put intermediate build files into a directory under the Module, or into a unified tree under the package or platform build trees</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="MODULE"/>
+            <xs:enumeration value="UNIFIED"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PackageType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Packages are either source, binary or mixed packages.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="SOURCE"/>
+            <xs:enumeration value="BINARY"/>
+            <xs:enumeration value="MIXED"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PackageUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Package Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">A module always consumes a package. This GUID represents the class of the package.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">This is the Package we are creating. This GUID represents the class of the package.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DEFAULT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The default is the GUID that specifies the instance of the package.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PcdTypes">
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="FIXED_AT_BUILD">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is only a build time option and cannot be Dyanmic or Binary patched into the module.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PATCHABLE_IN_MODULE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is set to a default value at build time and a binary of the module can be patched to update the value.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DYNAMIC">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is found via a PCD PPI in PEI or a PCD Protocol in DXE. The token that matches the PCD entry is either generated by the build (and is only unique to that build) or is from the default database. This form also implies a build option will be produced for this module that allows the user to pick FixedAtBuild, PatchableInModule or Dynamic. If no Type is specified, it defaults to Dynamic</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DYNAMIC_EX">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is found via a PCD PPI in PEI or a PCD Protocol in DXE. The token that matches the PCD entry is either generated by the build (and is only unique to that build) or is from the default database. This form also implies a build option will be produced for this module that allows the user to pick FixedAtBuild, PatchableInModule or Dynamic. If no Type is specified, it defaults to Dynamic</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PcdDataTypes">
+        <xs:restriction base="xs:normalizedString">
+            <xs:enumeration value="UINT8"/>
+            <xs:enumeration value="UINT16"/>
+            <xs:enumeration value="UINT32"/>
+            <xs:enumeration value="UINT64"/>
+            <xs:enumeration value="VOID*"/>
+            <xs:enumeration value="BOOLEAN"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PcdFeatureFlagUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the PCD FEATURE_FLAG Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UsageTypes">
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Always produced</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DEFAULT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is tagged as the default</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PcdItemTypes">
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="FEATURE_FLAG">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The PCD Item represents a feature flag for the module. Features can only be selected at build time. Items of type FeatureFlag are used to conditionally construct module surface area that is produced as a result of a buld.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="FIXED_AT_BUILD">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is only a build time option and cannot be Dyanmic or Binary patched into the module.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PATCHABLE_IN_MODULE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is set to a default value at build time and a binary of the module can be patched to update the value.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DYNAMIC">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is found via a PCD PPI in PEI or a PCD Protocol in DXE. The token that matches the PCD entry is either generated by the build (and is only unique to that build) or is from the default database. This form also implies a build option will be produced for this module that allows the user to pick FixedAtBuild, PatchableInModule or Dynamic. If no Type is specified, it defaults to Dynamic</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DYNAMIC_EX">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">PCD Item is found via a PCD PPI in PEI or a PCD Protocol in DXE. Any PCD token database is supported</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PcdUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">The PCD Usage is only relevant to Items tagged with FeatureFlag, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The PCD entry must always be provide as the build will include the code and the associated Surface Area.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">If the FEATURE_FLAG is TRUE the build will include the code and the associated Surface Area. If the FEATURE_FLAG is FALSE, the code and the associated surface area is not included.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">The PCD Entry is Always included in the build code</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">If the FEATURE_FLAG is TRUE the build will include the code and the associated Surface Area. If the FEATURE_FLAG is FALSE, the code and the associated surface area is not included.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DEFAULT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">"true" or "false". Indicates the default value for the PCD entry. This is used by the platform wizard to suggest values for a given platform build.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PpiNotifyUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the PPI Notify Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module will consume the PPI if it's produced. Consumption is defined by executing the PPI notify function.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PpiUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the PPI Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Required for the driver to function. This is part of the dependency expression of a module if the item represents a PPI or Protocol</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Consumed by the driver if the Item exists</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Always produced</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Conditionally produced</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Ppi is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ProtocolNotifyUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the PROTOCOL Notify Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module will Consume protocol if it's produced. Consumption is defined by executing the protocol notify function.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ProtocolUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the PROTOCOL Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Required for the driver to function. This is part of the dependency expression of a module if the item represents a PPI or Protocol</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Consumed by the driver if the Item exists</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Always produced</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Conditionally produced</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="TO_START">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Protocol Only - Protocol is required by driver binding Start() function to make Start() succeed</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="BY_START">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Protocol Only - Protocol is produced by driver binding Start() function if and only if Start() succeeds</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Protocol is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="SupportedArchitectures">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> These are the currently Supportted Architectures type codes </xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALL"/>
+            <xs:enumeration value="EBC"/>
+            <xs:enumeration value="ARM"/>
+            <xs:enumeration value="IA32"/>
+            <xs:enumeration value="X64"/>
+            <xs:enumeration value="IPF"/>
+            <xs:enumeration value="PPC"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="SystemTableUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the System Table Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module requires a GUIDed entry in the system table</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module will use the GUIDed entry in the system table only if the GUID is present</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module Always produces a GUIDed entry in the system table</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module sometimes produces a GUIDed entry in the system table for some of its execution flow</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">SystemTable is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="Token">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> The Token data is union of HexDoubleWordDataType, GuidNaming Convetion and GuidArrayType. </xs:documentation>
+        </xs:annotation>
+        <xs:union memberTypes="GuidArrayType GuidNamingConvention HexDoubleWordDataType"/>
+    </xs:simpleType>
+    <xs:simpleType name="ToolChains">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Supported Tool Chains are MSFT, INTEL, GCC and CYGWIN</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="MSFT"/>
+            <xs:enumeration value="INTEL"/>
+            <xs:enumeration value="GCC"/>
+            <xs:enumeration value="CYGWIN"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="ToothPick">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Describes which way the directory separator is leaning, either \ for WINDOWS or / for UNIX</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:enumeration value="UNIX"/>
+            <xs:enumeration value="WINDOWS"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="UnicodeString">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Define how we specify unicode strings</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="L(:)?(&quot;)(\w+)*((\W*)*(\s*)*(\w*)*)*(&quot;)"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="UsageTypes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Generic Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Required for the driver to function. This is part of the dependency expression of a module if the item represents a PPI or Protocol</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Consumed by the driver if the Item exists</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Always produced</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Conditionally produced</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="TO_START">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Protocol Only - Protocol is required by driver binding Start() function to make Start() succeed</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="BY_START">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Protocol Only - Protocol is produced by driver binding Start() function if and only if Start() succeeds</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Item is Private to the module and cannot be used by other modules</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="DEFAULT">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">This is the default value for an Item</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="VariableOffsetValues">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Describes the available Variable Offset data types, Bytes:Bits or BitSize</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="\d+(:)?\d*"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="VariableUsage">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This describes the Variable Usage Attributes, as defined in the Module Surface Area Specification</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="ALWAYS_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module requires the variable entry to be set</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_CONSUMED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module will use the variable entry if it's set</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="ALWAYS_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module Always will write the variable</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="SOMETIMES_PRODUCED">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Module sometimes writes the variable</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="PRIVATE">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">Variable is produced and consumed only by this module</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- Complex Data Types -->
+    <xs:complexType name="ArgsType">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="Arg" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ToolType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This type is to permit adding specific tools and tool arguments for User Defined tools, into the Module Build Description file.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="ToolName" type="xs:string"/>
+            <xs:element name="ToolArgs" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:attributeGroup name="BaseNameAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="BootModeAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="BootModeName" type="BootModeNames" use="required"/>
+        <xs:attribute name="Usage" type="BootModeUsage" use="required"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="ConvertAttributeString">
+        <xs:attribute name="SourceString" type="xs:string" use="optional"/>
+        <xs:attribute default="Unicode" name="OutputFiletype" type="xs:string" use="optional"/>
+        <xs:attribute name="OutputFilename" type="FileNameConvention" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="DataHubAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Usage" type="DataHubUsage" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="DirectoryAttributes">
+        <xs:attribute name="Separator" type="ToothPick"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="EventAttributes">
+        <xs:attribute name="Usage" type="EventUsage" use="optional"/>
+        <xs:attribute name="EventGroup" type="EventTypes" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="ExternAttributes">
+        <xs:attribute name="Usage" type="ExternUsage" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="FilenameAttributes">
+        <xs:attribute name="Usage" type="FileNameUsage" use="optional"/>
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Path" type="DirectoryNamingConvention" use="optional"/>
+        <xs:attribute name="FileType" type="xs:string" use="optional"/>
+        <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="FormsetAttributes">
+        <xs:attribute name="Usage" type="FormSetUsage" use="optional"/>
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="GuidAttributes">
+        <xs:attribute name="Usage" type="GuidUsage" use="optional"/>
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="HobAttributes">
+        <xs:attribute name="Usage" type="HobUsage" use="optional"/>
+        <xs:attribute name="HobType" type="HobTypes" use="required"/>
+        <xs:attribute default="true" name="HobEnabled" type="xs:boolean" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="IncludeAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Path" type="DirectoryNamingConvention" use="optional"/>
+        <xs:attribute name="Class" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+        <xs:attribute name="ModuleType" type="ModuleTypeDef" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="LibraryAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="LibraryClass" type="BaseNameConvention" use="optional"/>
+        <xs:attribute name="ClassGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+        <xs:attribute name="Usage" type="LibraryUsage" use="optional"/>
+        <xs:attribute name="Package" type="xs:string" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="ModuleNameAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="MsaAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <xs:attribute name="ModuleName" type="C_Name" use="optional"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+        <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
+        <xs:attribute name="BuildSequence" type="xs:int" use="optional"/>
+        <xs:attribute name="FV" type="xs:string" use="optional"/>
+        <xs:attribute name="FvBinding" type="xs:string" use="optional"/>
+        <xs:attribute name="PACKAGE" type="xs:string" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="OptionAttributes">
+        <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+        <xs:attribute name="ToolChain" type="ToolChains"  use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="PackageAttributes">
+        <xs:attribute name="Usage" type="PackageUsage" use="optional"/>
+        <xs:attribute name="PackageType" type="PackageType" use="optional"/>
+        <xs:attribute name="UpdatedDate" type="DateType" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="PackageNameAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="PcdAttributes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">These attributes are for the Pcds listed in PcdData, PcdEntry and/or PcdBuildData entries.</xs:documentation>
+            <xs:documentation xml:lang="en">PcdUsage is only valid for PcdItemTypes = FEATURE_FLAG</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="ItemType" type="PcdItemTypes" use="required"/>
+        <xs:attribute name="PcdUsage" type="PcdUsage" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="PlatformAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+        <xs:attribute name="AlternateName" type="FileNameConvention" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="PpiAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Usage" type="PpiUsage" use="optional"/>
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="C_Name" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="PpiNotifyAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Usage" type="PpiNotifyUsage" use="optional"/>
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="C_Name" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="ProtocolAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Usage" type="ProtocolUsage" use="optional"/>
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="C_Name" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="ProtocolNotifyAttributes">
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Usage" type="ProtocolNotifyUsage" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="SectionAttributes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Attributes are either compressable and/or sequence order binding</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="SectionType" type="EfiSectionType" use="optional"/>
+        <xs:attribute default="true" name="Compressible" type="xs:boolean" use="optional"/>
+        <xs:attribute name="BindingOrder" type="xs:int" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="SectionsAttributes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Attributes for Sections, EncapsulationTag, EncapsulationType and OverrideID</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="EncapsulationType" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="EncapsulationTag" type="xs:string" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="SystemTableAttributes">
+        <xs:attribute name="Usage" type="SystemTableUsage" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="VariableAttributes">
+        <xs:attribute name="Usage" type="VariableUsage" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="UrlAttribute">
+        <xs:attribute name="Url" type="xs:anyURI"/>
+    </xs:attributeGroup>
+</xs:schema>

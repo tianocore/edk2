@@ -1,0 +1,120 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project default="CommonTools.lib" basedir=".">
+<!--
+    EDK Common Tools Library
+  Copyright (c) 2006, Intel Corporation
+-->
+
+  <taskdef resource="cpptasks.tasks"/>
+  <typedef resource="cpptasks.types"/>
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+  <property environment="env"/>
+  <property name="tmp" value="tmp"/>
+
+  <property name="LINK_OUTPUT_TYPE" value="static"/>
+  <property name="BUILD_DIR" value="${PACKAGE_DIR}/Common/tmp"/>
+
+  <target name="CommonTools.lib" depends="init, ToolsLibrary">
+    <echo message="Building the EDK CommonTools Library"/>
+  </target>
+
+  <target name="init">
+    <echo message="The EDK CommonTools Library"/>
+    <mkdir dir="${BUILD_DIR}"/>
+    <if>
+      <equals arg1="${GCC}" arg2="cygwin"/>
+      <then>
+        <echo message="Cygwin Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    <elseif>
+      <os family="dos"/>
+      <then>
+        <echo message="Windows Family"/>
+        <property name="ToolChain" value="msvc"/>
+      </then>
+    </elseif>
+    <elseif>
+      <os family="unix"/>
+      <then>
+        <echo message="UNIX Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    </elseif>
+
+    <else>
+      <echo>
+        Unsupported Operating System
+        Please Contact Intel Corporation
+      </echo>
+    </else>
+    </if>
+		<if>
+		  <equals arg1="${ToolChain}" arg2="msvc"/>
+			<then>
+        <property name="ext_static" value=".lib"/>
+        <property name="ext_dynamic" value=".dll"/>
+			</then>
+			<elseif>
+			  <equals arg1="${ToolChain}" arg2="gcc"/>
+				<then>
+          <property name="ext_static" value=".a"/>
+          <property name="ext_dynamic" value=".so"/>
+				</then>
+			</elseif>
+		</if>
+  </target>
+
+  <target name="ToolsLibrary" depends="init">
+    <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
+        outfile="${LIB_DIR}/CommonTools"
+        outtype="static"
+        libtool="${haveLibtool}"
+        optimize="speed">
+
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+
+      <fileset dir="${basedir}/Common" 
+        includes="*.h *.c" 
+        defaultexcludes="TRUE" 
+        excludes="*.xml *.inf"/>
+
+    </cc>
+    <if>
+      <os family="dos"/>
+      <then>
+        <exec dir="${BUILD_DIR}" executable="lib" failonerror="false">
+          <arg line="/NOLOGO *.lib /OUT:${LIB_DIR}/CommonTools${ext_static}"/>
+        </exec>
+      </then>
+    </if>
+  </target>
+
+  <target name="clean" depends="init">
+    <echo message="Removing Intermediate Files Only from ${BUILD_DIR}"/>  
+    <delete>
+      <fileset dir="${BUILD_DIR}" includes="*.obj"/>
+    </delete>
+  </target>
+
+  <target name="cleanall" depends="init">
+    <echo message="Removing Object Files and the Library: CommonTools${ext_static}"/>  
+    <delete dir="${BUILD_DIR}">
+      <fileset dir="${LIB_DIR}" includes="CommonTools${ext_static}"/>
+    </delete>
+  </target>
+
+</project>

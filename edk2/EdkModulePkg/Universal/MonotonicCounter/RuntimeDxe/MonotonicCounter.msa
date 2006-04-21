@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>MonotonicCounter</BaseName>
+    <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
+    <ComponentType>RT_DRIVER</ComponentType>
+    <Guid>AD608272-D07F-4964-801E-7BD3B7888652</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for DiskIo module.</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-22 14:36</Created>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DxeRuntimeDriverLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiRuntimeServicesTableLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>MonotonicCounter.c</Filename>
+    <Filename>MonotonicCounter.h</Filename>
+    <Filename>MonotonicCounter.dxs</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_PRODUCED">MonotonicCounter</Protocol>
+  </Protocols>
+  <Variables>
+    <Variable Usage="PRIVATE">
+      <String>MTC</String>
+      <Guid>0xeb704011, 0x1402, 0x11d3, 0x8e, 0x77, 0x0, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+    </Variable>
+  </Variables>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>MonotonicCounterDriverInitialize</ModuleEntryPoint>
+    </Extern>
+    <Extern>
+      <SetVirtualAddressMapCallBack></SetVirtualAddressMapCallBack>
+      <ExitBootServicesCallBack></ExitBootServicesCallBack>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

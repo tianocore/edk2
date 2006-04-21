@@ -1,0 +1,1 @@
+gcc -mno-cygwin -I../Common/ -I/workspace/mdk/MdePkg/Include/Guid -I/workspace/mdk/MdePkg/Include/Protocol/ -I/workspace/mdk/MdePkg/Include/Common/ -I/workspace/mdk/MdePkg/Include/ -I/workspace/mdk/MdePkg/Include/Ia32 -I. GuidChk.c  GuidList.c  UtilsMsgs.c -o GuidChk.exe

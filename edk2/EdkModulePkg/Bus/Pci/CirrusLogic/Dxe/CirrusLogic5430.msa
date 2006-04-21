@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>CirrusLogic5430UgaDraw</BaseName>
+    <ModuleType>UEFI_DRIVER</ModuleType>
+    <ComponentType>BS_DRIVER</ComponentType>
+    <Guid>555F76EA-785F-40d7-9174-153C43636C68</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for CirrusLogic5430 module</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-19 15:18</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverModelLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>CirrusLogic5430.h</Filename>
+    <Filename>CirrusLogic5430.c</Filename>
+    <Filename>CirrusLogic5430UgaDraw.c</Filename>
+    <Filename>ComponentName.c</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="TO_START">PciIo</Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">UgaDraw</Protocol>
+  </Protocols>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint></ModuleEntryPoint>
+    </Extern>
+    <Extern>
+      <DriverBinding>gCirrusLogic5430DriverBinding</DriverBinding>
+      <ComponentName>gCirrusLogic5430ComponentName</ComponentName>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project default="all" basedir=".">
+<!-- Copyright (c) 2006, Intel Corporation -->
+<!-- Filename: Tools/Source/build.xml -->
+
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+  <property environment="env" />
+  <property name="WORKSPACE" value="${env.WORKSPACE}" />
+  <property name="WORKSPACE_DIR" value="${WORKSPACE}" />
+  <property name="PACKAGE" value="Tools" />
+  <property name="PACKAGE_DIR" value="${WORKSPACE}/Tools/Source/TianoTools" />
+  <property name="LIB_DIR" value="${PACKAGE_DIR}/Library" />
+  <property name="BIN_DIR" value="${WORKSPACE}/Tools/bin" />
+  <property name="BUILD_MODE" value="PACKAGE" />
+
+  <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml" />
+
+  <path id="classpath">
+    <fileset dir="${WORKSPACE}/Tools/Jars" includes="*.jar"/>
+    <fileset dir="${WORKSPACE}/Tools/bin/xmlbeans/lib" includes="*.jar"/>
+  </path>
+
+  <target name="all" depends="init, Tools" />
+  
+  <target name="init">
+    <taskdef classpathref="classpath" resource="GenBuild.tasks" />
+    <taskdef classpathref="classpath" resource="net/sf/antcontrib/antlib.xml" />
+
+    <taskdef classpathref="classpath" resource="cpptasks.tasks"/>
+    <typedef classpathref="classpath" resource="cpptasks.types"/>
+
+    <mkdir dir="${BIN_DIR}" />
+    <mkdir dir="${LIB_DIR}" />
+    <if>
+      <os family="unix" />
+      <then>
+        <echo message="OS Family UNIX" />
+      </then>
+      <elseif>
+        <os family="dos" />
+        <then>
+          <echo message="OS Family DOS" />
+        </then>
+      </elseif>
+      <elseif>
+        <os family="mac" />
+        <then>
+          <echo message="OS Family OS X" />
+        </then>
+      </elseif>
+      <else>
+        <echo message="OS Family Unsupported" />
+      </else>
+    </if>
+
+    <property name="HOST_ARCH" value="IA32"/>
+    <ToolChainSetup confPath="${WORKSPACE_DIR}/Tools/Conf" />
+  </target>
+  
+  <target name="Libraries">
+    <subant target="" inheritall="true">
+      <fileset dir="${PACKAGE_DIR}" 
+        includes="Common/build.xml CustomizedCompress/build.xml"/>
+    </subant>
+  </target>
+
+  <target name="Tools" depends="Libraries">
+    <subant target="" inheritall="true">
+      <fileset dir="${PACKAGE_DIR}" includes="*/build.xml"
+        excludes="Common/build.xml CustomizedCompress/build.xml"/>
+    </subant>
+  </target>
+
+  <target name="clean">
+    <subant target="clean" inheritall="true">
+      <fileset dir="${PACKAGE_DIR}" includes="*/build.xml"/>
+    </subant>
+  </target>
+
+  <target name="cleanall">
+    <subant target="cleanall" inheritall="true">
+      <fileset dir="${PACKAGE_DIR}" includes="*/build.xml"/>
+    </subant>
+    <delete dir="${LIB_DIR}"/>
+  </target>
+</project>

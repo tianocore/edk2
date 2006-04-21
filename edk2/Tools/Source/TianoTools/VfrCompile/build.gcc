@@ -1,0 +1,10 @@
+../../../bin/antlr -CC -e3 -ck 3 -o . VfrCompile.g 
+../../../bin/dlg -C2 -i -CC -o . parser.dlg 
+g++ -mno-cygwin -c -I -I. -I../Pccts/h -g -O0 ../Pccts/h/AParser.cpp
+g++ -mno-cygwin -c -I. -I../Pccts/h -g -O0 ../Pccts/h/ATokenBuffer.cpp
+g++ -mno-cygwin -c -I. -I../Pccts/h -g -O0 ../Pccts/h/DLexerBase.cpp
+g++ -mno-cygwin -c -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/ -I../Common -I$WORKSPACE/MdePkg/Include/ -I$WORKSPACE/MdePkg/Include/Ia32 -I. -I../Pccts/h -g -O0 VfrCompile.cpp
+g++ -mno-cygwin -c -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/ -I../Common -I$WORKSPACE/MdePkg/Include/ -I$WORKSPACE/MdePkg/Include/Ia32 -I. -I../Pccts/h -g -O0 VfrServices.cpp
+g++ -mno-cygwin -c -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/ -I../Common -I$WORKSPACE/MdePkg/Include/ -I$WORKSPACE/MdePkg/Include/Ia32 -I. -I../Pccts/h -g -O0 DLGLexer.cpp
+g++ -mno-cygwin -c -I"../Common/" -I$WORKSPACE/MdePkg/Include/Protocol/ -I$WORKSPACE/MdePkg/Include/Common/ -I../Common -I$WORKSPACE/MdePkg/Include/ -I$WORKSPACE/MdePkg/Include/Ia32 -I. -I../Pccts/h -g -O0 EfiVfrParser.cpp
+g++ -mno-cygwin -o VfrCompile *.o -L../Library-mingw -lCommon

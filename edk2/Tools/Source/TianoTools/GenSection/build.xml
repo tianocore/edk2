@@ -1,0 +1,119 @@
+<?xml version="1.0" ?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<project default="GenTool" basedir=".">
+<!--
+    EDK GenSection Tool
+  Copyright (c) 2006, Intel Corporation
+-->
+  <property name="ToolName" value="GenSection"/>
+  <property name="FileSet" value="GenSection.c"/>
+
+  <taskdef resource="cpptasks.tasks"/>
+  <typedef resource="cpptasks.types"/>
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+
+  <property environment="env"/>
+
+  <property name="LINK_OUTPUT_TYPE" value="static"/>
+  <property name="BUILD_DIR" value="${PACKAGE_DIR}/${ToolName}/tmp"/>
+
+  <target name="GenTool" depends="init, Tool">
+    <echo message="Building the EDK Tool: ${ToolName}"/>
+  </target>
+
+  <target name="init">
+    <echo message="The EDK Tool: ${ToolName}"/>
+    <mkdir dir="${BUILD_DIR}"/>
+    <if>
+      <equals arg1="${GCC}" arg2="cygwin"/>
+      <then>
+        <echo message="Cygwin Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    <elseif>
+      <os family="dos"/>
+      <then>
+        <echo message="Windows Family"/>
+        <property name="ToolChain" value="msvc"/>
+      </then>
+    </elseif>
+    <elseif>
+      <os family="unix"/>
+      <then>
+        <echo message="UNIX Family"/>
+        <property name="ToolChain" value="gcc"/>
+      </then>
+    </elseif>
+
+    <else>
+      <echo>
+        Unsupported Operating System
+        Please Contact Intel Corporation
+      </echo>
+    </else>
+    </if>
+		<if>
+		  <equals arg1="${ToolChain}" arg2="msvc"/>
+			<then>
+        <property name="ext_static" value=".lib"/>
+        <property name="ext_dynamic" value=".dll"/>
+        <property name="ext_exe" value=".exe"/>
+			</then>
+			<elseif>
+			  <equals arg1="${ToolChain}" arg2="gcc"/>
+				<then>
+          <property name="ext_static" value=".a"/>
+          <property name="ext_dynamic" value=".so"/>
+          <property name="ext_exe" value=""/>
+				</then>
+			</elseif>
+		</if>
+  </target>
+
+  <target name="Tool" depends="init">
+    <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
+        outfile="${BIN_DIR}/${ToolName}"
+        outtype="executable"
+        libtool="${haveLibtool}"
+        optimize="speed">
+
+      <fileset dir="${basedir}/${ToolName}" 
+        includes="${FileSet}" 
+        defaultexcludes="TRUE" 
+        excludes="*.xml *.inf"/>
+
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
+      <includepath path="${PACKAGE_DIR}/Common"/>
+			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+
+    </cc>
+  </target>
+
+  <target name="clean" depends="init">
+    <echo message="Removing Intermediate Files Only"/>  
+    <delete>
+      <fileset dir="${BUILD_DIR}" includes="*.obj"/>
+    </delete>
+  </target>
+
+  <target name="cleanall" depends="init">
+    <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
+    <delete dir="${BUILD_DIR}">
+      <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
+    </delete>
+  </target>
+
+</project>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaLibHeader>
+    <BaseName>EdkGraphicsLib</BaseName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <ComponentType>LIBRARY</ComponentType>
+    <Guid>08c1a0e4-1208-47f8-a2c5-f42eabee653a</Guid>
+    <Version>0</Version>
+    <Abstract>Graphics Library for UEFI drivers</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-19 15:19</Updated>
+  </MsaLibHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">EdkGraphicsLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PrintLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>Graphics.c</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">OEMBadging</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">FirmwareVolume</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">ConsoleControl</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">UgaDraw</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">SimpleTextOut</Protocol>
+  </Protocols>
+  <Guids>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>Bmp</C_Name>
+    </GuidEntry>
+  </Guids>
+</LibraryModuleSurfaceArea>

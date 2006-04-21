@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaLibHeader>
+    <BaseName>EdkUefiDebugLibStdErr</BaseName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <ComponentType>LIBRARY</ComponentType>
+    <Guid>8b9968e0-c76b-4b57-aec4-24e17fe602c0</Guid>
+    <Version>EDK_RELEASE_VERSION        0x00020000</Version>
+    <Abstract>Debug Library for UEFI drivers</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-31 13:14</Updated>
+  </MsaLibHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PrintLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>DebugLib.c</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_PRODUCED">DebugLevel</Protocol>
+  </Protocols>
+  <Externs>
+    <Extern>
+      <Constructor>DebugLibConstructor</Constructor>
+    </Extern>
+  </Externs>
+  <PCDs>
+    <PcdData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdDebugPropertyMask</C_Name>
+      <Token>0x00000005</Token>
+      <DatumType>UINT8</DatumType>
+    </PcdData>
+    <PcdData ItemType="PATCHABLE_IN_MODULE">
+      <C_Name>PcdDebugPrintErrorLevel</C_Name>
+      <Token>0x00000006</Token>
+      <DatumType>UINT32</DatumType>
+    </PcdData>
+  </PCDs>
+</LibraryModuleSurfaceArea>

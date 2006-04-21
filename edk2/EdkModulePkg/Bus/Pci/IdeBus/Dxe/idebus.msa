@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>IdeBus</BaseName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <ComponentType>BS_DRIVER</ComponentType>
+    <Guid>69FD8E47-A161-4550-B01A-5594CEB2B2B2</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for PS2 keyboard module.</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-22 16:27</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverModelLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">ReportStatusCodeLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PerformanceLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiRuntimeServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>idebus.h</Filename>
+    <Filename>ide.h</Filename>
+    <Filename>idedata.h</Filename>
+    <Filename>idebus.c</Filename>
+    <Filename>ide.c</Filename>
+    <Filename>ata.c</Filename>
+    <Filename>atapi.c</Filename>
+    <Filename>ComponentName.c</Filename>
+    <Filename>ComponentName.h</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="TO_START">DevicePath</Protocol>
+    <Protocol Usage="TO_START">PciIo</Protocol>
+    <Protocol Usage="TO_START">IdeControllerInit</Protocol>
+    <Protocol Usage="BY_START">BlockIo</Protocol>
+    <Protocol Usage="BY_START">DiskInfo</Protocol>
+  </Protocols>
+  <Variables>
+    <Variable Usage="ALWAYS_CONSUMED">
+      <String>Configuration</String>
+      <Guid>0x69fd8e47, 0xa161, 0x4550, 0xb0, 0x1a, 0x55, 0x94, 0xce, 0xb2, 0xb2, 0xb2</Guid>
+    </Variable>
+  </Variables>
+  <Guids>
+    <GuidEntry Usage="SOMETIMES_CONSUMED">
+      <C_Name>DiskInfoIde</C_Name>
+    </GuidEntry>
+  </Guids>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint></ModuleEntryPoint>
+    </Extern>
+    <Extern>
+      <DriverBinding>gIDEBusDriverBinding</DriverBinding>
+      <ComponentName>gIDEBusComponentName</ComponentName>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>StatusCode</BaseName>
+    <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
+    <ComponentType>RT_DRIVER</ComponentType>
+    <Guid>9F455D3B-2B8A-4c06-960B-A71B9714B9CD</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for DiskIo module.</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-12 17:09</Created>
+    <Updated>2006-03-19 15:19</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DxeRuntimeDriverLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PrintLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">IoLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">EdkRtPlatformStatusCodeLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">EdkDxeSalLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>DebugAssert.c</Filename>
+    <Filename>StatusCode.c</Filename>
+    <Filename>StatusCode.h</Filename>
+    <Arch ArchType="IA32">
+      <Filename>Ia32\Ia32StatusCode.c</Filename>
+      <Filename>Ia32\Ia32StatusCode.dxs</Filename>
+    </Arch>
+    <Arch ArchType="X64">
+      <Filename>x64\x64StatusCode.c</Filename>
+      <Filename>x64\x64StatusCode.dxs</Filename>
+    </Arch>
+    <Arch ArchType="IPF">
+      <Filename>Ipf\IpfStatusCode.c</Filename>
+      <Filename>Ipf\IpfStatusCode.dxs</Filename>
+    </Arch>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">DebugAssert</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">ExtendedSalStatusCodeServices</Protocol>
+  </Protocols>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>InstallStatusCode</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

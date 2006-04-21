@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>Shell</BaseName>
+    <ModuleType>UEFI_APPLICATION</ModuleType>
+    <ComponentType>APPLICATION</ComponentType>
+    <Guid>c57ad6b7-0515-40a8-9d21-551652854e37</Guid>
+    <Version>0x00090000</Version>
+    <Abstract>Component description file for EFI Shell module.</Abstract>
+    <Description>
+		  This is a binary package containing multiple binary files, however there is
+			only a single MSA and MBD file.
+    </Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+    <Created>2006-03-17 20:56</Created>
+  </MsaHeader>
+  <SourceFiles>
+    <Filename Path="ia32" FileType="EFI">Shell_Full.efi</Filename>
+    <!--
+    <Arch ArchType="IA32">
+      <Filename Path="ia32" FileType="EFI">Shell_Full.efi</Filename>
+    </Arch>
+    -->
+    <Arch ArchType="IPF">
+      <Filename Path="ipf">Shell_Full.efi</Filename>
+    </Arch>
+  </SourceFiles>
+</ModuleSurfaceArea>

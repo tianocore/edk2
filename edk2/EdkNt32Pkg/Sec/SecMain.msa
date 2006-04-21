@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>SecMain</BaseName>
+    <ModuleType>SEC</ModuleType>
+    <ComponentType>SEC</ComponentType>
+    <Guid>4b837b03-6587-4d19-b82b-edfad836c0a0</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for NT32 Sec.Warning the [sources.*] does not work like you think!If you add a file you need to update the makefile in the NT32 build tipSEC_OBJECTS needs to get the OBJ of the new C file added in.We keep [sources.*] synced up with SEC_OBJECTS so dependencies workproperly.Libraries.Common does not work you must update SEC_OBJECTS in the platformmakefile</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-14 17:04</Created>
+    <Updated>2006-03-19 15:17</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeCoffLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PrintLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">ReportStatusCodeLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>SecMain.c</Filename>
+    <Filename>FwVol.c</Filename>
+    <Filename>WinNtThunk.c</Filename>
+    <Filename>SecMain.h</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+    <PackageName>EdkNt32Pkg</PackageName>
+  </Includes>
+  <PPIs>
+    <Ppi Usage="ALWAYS_PRODUCED">NtThunk</Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">NtAutoScan</Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">NtFwh</Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">StatusCode</Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">NtPeiLoadFile</Ppi>
+  </PPIs>
+  <Guids>
+    <GuidEntry Usage="ALWAYS_PRODUCED">
+      <C_Name>PeiPeCoffLoader</C_Name>
+    </GuidEntry>
+  </Guids>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint></ModuleEntryPoint>
+    </Extern>
+  </Externs>
+  <PCDs>
+    <PcdData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdWinNtCpuSpeed</C_Name>
+      <Token>0x00001008</Token>
+      <DatumType>VOID*</DatumType>
+    </PcdData>
+    <PcdData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdWinNtMemorySize</C_Name>
+      <Token>0x00001005</Token>
+      <DatumType>VOID*</DatumType>
+    </PcdData>
+    <PcdData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdWinNtFirmwareVolume</C_Name>
+      <Token>0x00001009</Token>
+      <DatumType>VOID*</DatumType>
+    </PcdData>
+    <PcdData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdWinNtBootMode</C_Name>
+      <Token>0x00001006</Token>
+      <DatumType>UINT32</DatumType>
+    </PcdData>
+  </PCDs>
+  <BuildOptions>
+    <Option>BUILD_TYPE=CUSTOM_BUILD</Option>
+  </BuildOptions>
+</ModuleSurfaceArea>

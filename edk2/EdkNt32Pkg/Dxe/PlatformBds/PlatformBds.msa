@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaHeader>
+    <BaseName>Bds</BaseName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <ComponentType>BS_DRIVER</ComponentType>
+    <Guid>A6F691AC-31C8-4444-854C-E2C1A6950F92</Guid>
+    <Version>0</Version>
+    <Abstract>Component description file for DxeIpl module</Abstract>
+    <Description>FIX ME!</Description>
+    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <Specification>0</Specification>
+    <Created>2006-03-13 17:04</Created>
+    <Updated>2006-03-23 14:14</Updated>
+  </MsaHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">EdkGraphicsLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DxeServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PerformanceLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PrintLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">EdkIfrSupportLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">ReportStatusCodeLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">EdkGenericBdsLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiRuntimeServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">HiiLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>PlatformData.c</Filename>
+    <Filename>BdsPlatform.c</Filename>
+    <Filename>Generic\BdsEntry.c</Filename>
+    <Filename>Generic\FrontPage.c</Filename>
+    <Filename>Generic\FrontPageStrings.uni</Filename>
+    <Filename>Generic\FrontPageVfr.vfr</Filename>
+    <Filename>Generic\Language.c</Filename>
+    <Filename>Generic\String.c</Filename>
+    <Filename>Generic\Strings.uni</Filename>
+    <Filename>Generic\Capsules.c</Filename>
+    <Filename>Generic\MemoryTest.c</Filename>
+    <Filename>Generic\BootMaint\BmString.uni</Filename>
+    <Filename>Generic\BootMaint\bm.vfr</Filename>
+    <Filename>Generic\BootMaint\BmLib.c</Filename>
+    <Filename>Generic\BootMaint\BootOption.c</Filename>
+    <Filename>Generic\BootMaint\ConsoleOption.c</Filename>
+    <Filename>Generic\BootMaint\Data.c</Filename>
+    <Filename>Generic\BootMaint\Variable.c</Filename>
+    <Filename>Generic\BootMaint\UpdatePage.c</Filename>
+    <Filename>Generic\BootMaint\BBSsupport.c</Filename>
+    <Filename>Generic\BootMaint\BootMaint.c</Filename>
+    <Filename>Generic\BootMaint\FileExplorer.c</Filename>
+    <Filename>Generic\BootMaint\FE.vfr</Filename>
+    <Filename>Generic\BootMngr\BootManager.c</Filename>
+    <Filename>Generic\BootMngr\BootManagerStrings.uni</Filename>
+    <Filename>Generic\BootMngr\BootManagerVfr.Vfr</Filename>
+    <Filename>Generic\DeviceMngr\DeviceManager.c</Filename>
+    <Filename>Generic\DeviceMngr\DeviceManagerStrings.uni</Filename>
+    <Filename>Generic\DeviceMngr\DeviceManagerVfr.Vfr</Filename>
+    <Filename>Generic\Bds.dxs</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+    <PackageName>EdkModulePkg</PackageName>
+    <PackageName>EdkNt32Pkg</PackageName>
+  </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_PRODUCED">Bds</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">LegacyBios</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">UgaSplash</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">Hii</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">FormCallback</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">DataHub</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">FormBrowser</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">ConsoleControl</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">CpuIo</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">UgaDraw</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">LoadFile</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">SimpleFileSystem</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">DevicePath</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">BlockIo</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">SerialIo</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">GenericMemTest</Protocol>
+    <Protocol Usage="SOMETIMES_CONSUMED">Cpu</Protocol>
+    <Protocol Usage="SOMETIMES_CONSUMED">DriverBinding</Protocol>
+  </Protocols>
+  <Hobs>
+    <Hob Usage="SOMETIMES_CONSUMED" HobType="GUID_EXTENSION">
+      <Name>FlashMapEntryData</Name>
+      <C_Name>gEfiFlashMapHobGuid</C_Name>
+      <Guid>0xb091e7d2, 0x5a0, 0x4198, 0x94, 0xf0, 0x74, 0xb7, 0xb8, 0xc5, 0x54, 0x59</Guid>
+    </Hob>
+    <Hob Usage="SOMETIMES_CONSUMED" HobType="CAPSULE_VOLUME"></Hob>
+  </Hobs>
+  <DataHubs>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">BiosVendor</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">SystemManufacturer</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">ProcessorVersion</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">ProcessorFrequency</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">MemoryArray</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">SerialIoDevice</DataHubRecord>
+    <DataHubRecord Usage="SOMETIMES_CONSUMED">SerialIoPort</DataHubRecord>
+  </DataHubs>
+  <Guids>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>BootState</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>GlobalVariable</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>FlashMapHob</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>FileSystemVolumeLabelInfoId</C_Name>
+    </GuidEntry>
+    <GuidEntry Usage="ALWAYS_CONSUMED">
+      <C_Name>FileInfo</C_Name>
+    </GuidEntry>
+  </Guids>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>BdsInitialize</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+</ModuleSurfaceArea>

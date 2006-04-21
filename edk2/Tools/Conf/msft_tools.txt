@@ -1,0 +1,8 @@
+ASL = "/nologo"
+
+IA32_CC = "/nologo", "/W3", "/WX", "/GX", "/Gy", "/Gs-", "/c", "/D EFI32", "/D UNICODE"
+IA32_LIB = "/NOLOGO"
+IA32_LINK = "/NOLOGO", "/SUBSYSTEM:CONSOLE", "/NODEFAULTLIB", "/IGNORE:4086", "/MAP", "/OPT:REF", "/MACHINE:I386", "/ALIGN:32", "/DLL", "/LTCG"
+IA32_ASM = "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32"
+IA32_ASMLINK = 
+IA32_PP = "/P"

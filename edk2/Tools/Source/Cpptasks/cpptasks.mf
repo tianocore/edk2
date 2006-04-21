@@ -1,0 +1,7 @@
+Manifest-Version: 2.0
+Main-Class: net.sf.antcontrib.cpptasks.AboutCCTask
+
+Name: CCTask
+Implementation-Vendor: Ant-Contrib project
+Implementation-Version: 1.0
+Implementation-Title: Compile and link tasks for Apache Ant

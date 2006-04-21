@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!-- Copyright (c) 2006, Intel Corporation 
+All rights reserved. This program and the accompanying materials 
+are licensed and made available under the terms and conditions of the BSD License 
+which accompanies this distribution.  The full text of the license may be found at  
+http://opensource.org/licenses/bsd-license.php 
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<project basedir="." default="PciBus"><!--Apply external ANT tasks-->
+   <taskdef resource="GenBuild.tasks"/>
+   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+   <property environment="env"/>
+   <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
+   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Bus\Pci\PciBus\Dxe"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <target name="PciBus">
+      <GenBuild baseName="PciBus" mbdFilename="${MODULE_DIR}\PciBus.mbd" msaFilename="${MODULE_DIR}\PciBus.msa"/>
+   </target>
+   <target name="LightPciBusPciBus">
+      <GenBuild baseName="LightPciBusPciBus" mbdFilename="${MODULE_DIR}\LightPciBus.mbd" msaFilename="${MODULE_DIR}\LightPciBus.msa"/>
+   </target>
+   <target name="PciBusPciBusLite">
+      <GenBuild baseName="PciBusPciBusLite" mbdFilename="${MODULE_DIR}\PciBusLite.mbd" msaFilename="${MODULE_DIR}\PciBusLite.msa"/>
+   </target>
+   <target depends="PciBus_clean" name="clean"/>
+   <target depends="PciBus_cleanall" name="cleanall"/>
+   <target name="PciBus_clean">
+      <OutputDirSetup baseName="PciBus" mbdFilename="${MODULE_DIR}\PciBus.mbd" msaFilename="${MODULE_DIR}\PciBus.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\PciBus_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\PciBus_build.xml" target="clean"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
+   </target>
+   <target name="LightPciBusPciBus_clean">
+      <OutputDirSetup baseName="LightPciBusPciBus" mbdFilename="${MODULE_DIR}\LightPciBus.mbd" msaFilename="${MODULE_DIR}\LightPciBus.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\LightPciBusPciBus_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\LightPciBusPciBus_build.xml" target="clean"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
+   </target>
+   <target name="PciBusPciBusLite_clean">
+      <OutputDirSetup baseName="PciBusPciBusLite" mbdFilename="${MODULE_DIR}\PciBusLite.mbd" msaFilename="${MODULE_DIR}\PciBusLite.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\PciBusPciBusLite_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\PciBusPciBusLite_build.xml" target="clean"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
+   </target>
+   <target name="PciBus_cleanall">
+      <OutputDirSetup baseName="PciBus" mbdFilename="${MODULE_DIR}\PciBus.mbd" msaFilename="${MODULE_DIR}\PciBus.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\PciBus_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\PciBus_build.xml" target="cleanall"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}"/>
+      <delete dir="${DEST_DIR_DEBUG}"/>
+      <delete>
+         <fileset dir="${BIN_DIR}" includes="**PciBus*"/>
+      </delete>
+   </target>
+   <target name="LightPciBusPciBus_cleanall">
+      <OutputDirSetup baseName="LightPciBusPciBus" mbdFilename="${MODULE_DIR}\LightPciBus.mbd" msaFilename="${MODULE_DIR}\LightPciBus.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\LightPciBusPciBus_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\LightPciBusPciBus_build.xml" target="cleanall"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}"/>
+      <delete dir="${DEST_DIR_DEBUG}"/>
+      <delete>
+         <fileset dir="${BIN_DIR}" includes="**LightPciBusPciBus*"/>
+      </delete>
+   </target>
+   <target name="PciBusPciBusLite_cleanall">
+      <OutputDirSetup baseName="PciBusPciBusLite" mbdFilename="${MODULE_DIR}\PciBusLite.mbd" msaFilename="${MODULE_DIR}\PciBusLite.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}\PciBusPciBusLite_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}\PciBusPciBusLite_build.xml" target="cleanall"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}"/>
+      <delete dir="${DEST_DIR_DEBUG}"/>
+      <delete>
+         <fileset dir="${BIN_DIR}" includes="**PciBusPciBusLite*"/>
+      </delete>
+   </target>
+</project>

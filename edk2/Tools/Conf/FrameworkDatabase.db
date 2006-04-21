@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FrameworkDatabase xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <FdbHeader>
+    <DatabaseName>FrameworkDatabase</DatabaseName>
+    <Guid>5ce32c23-6448-43ab-b509-a9deae3aae65</Guid>
+    <Version>0.3</Version>
+    <Created>2006-03-04 22:14</Created>
+    <Updated>2006-03-06 16:56</Updated>
+    <Abstract>The Framework Module Development Packaging System Database</Abstract>
+    <Description>This Database tracks the Basename, Version, Guid and Path for all packages installed in this workspace.</Description>
+    <Copyright>Copyright (c) 2006,  Intel Corporation.</Copyright>
+    <License>
+      All rights reserved.
+      This program and the accompanying materials are licensed and made available 
+      under the terms and conditions of the BSD License which accompanies this distribution.
+      The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
+      OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+</License>
+  </FdbHeader>
+  <PackageList>
+    <Package>
+      <PackageName>EdkFatBinPkg</PackageName>
+      <Guid>0fd7197b-9bde-44fe-a7e4-d2177a9922e5</Guid>
+      <Version>0.3</Version>
+      <Path>EdkFatBinPkg/</Path>
+      <InstalledDate>2006-03-05 09:49</InstalledDate>
+    </Package>
+    <Package>
+      <PackageName>EdkModulePkg</PackageName>
+      <Guid>0xb6ec423c, 0x21d2, 0x490d, 0x85, 0xc6, 0xdd, 0x58, 0x64, 0xea, 0xa6, 0x74</Guid>
+      <Version>0.3</Version>
+      <Path>EdkModulePkg/</Path>
+      <InstalledDate>2006-02-21 17:43</InstalledDate>
+    </Package>
+    <Package>
+      <PackageName>EdkNt32Pkg</PackageName>
+      <Guid>146fab65-922d-4bc3-b34b-cf1b0fe16eed</Guid>
+      <Version>0.01-test1</Version>
+      <Path>EdkNt32Pkg/</Path>
+      <InstalledDate>2006-02-22 13:25</InstalledDate>
+    </Package>
+    <Package>
+      <PackageName>EdkShellBinPkg</PackageName>
+      <Guid>d4266a1b-1d38-4116-93ae-60dc3e2012a6</Guid>
+      <Version>0.3</Version>
+      <Path>EdkShellBinPkg/</Path>
+      <InstalledDate>2006-03-05 10:13</InstalledDate>
+    </Package>
+    <Package>
+      <PackageName>MdePkg</PackageName>
+      <Guid>18413569-8b0d-43b1-920f-c110aa37265d</Guid>
+      <Version>0.3</Version>
+      <Path>MdePkg/</Path>
+      <InstalledDate>2006-03-05 09:01</InstalledDate>
+    </Package>
+    <Package>
+      <PackageName>Tools</PackageName>
+      <Guid>53f84ca0-53fe-4412-b4e7-dcec602e1d49</Guid>
+      <Version>0.1</Version>
+      <Path>Tools/</Path>
+      <InstalledDate>2006-02-24 14:49</InstalledDate>
+    </Package>
+  </PackageList>
+</FrameworkDatabase>
