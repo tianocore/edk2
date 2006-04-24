@@ -3,20 +3,22 @@ HOST_VENDOR = INTEL
 PATH_TO_HOST_CC = c:\cygwin\bin
 
 #Default values
-CC_NAME = gcc.exe
-LIB_NAME = ar.exe
-LINK_NAME = ld.exe
+CC_NAME = gcc
+LIB_NAME = ar
+LINK_NAME = ld
 ASM_NAME = ml.exe
 ASMLINK_NAME = link.exe
 ASL_NAME = iasl.exe
-PP_NAME=gcc.exe
+PP_NAME=gcc
 
 #define for IA32
 IA32_VENDOR = GCC
 IA32_CC_VENDOR = GCC
 IA32_ASL_VENDOR = GCC
 IA32_ASM_VENDOR = MSFT
+# IA32_PATH = /usr/bin
 IA32_PATH = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
+# IA32_ASM_PATH = /usr/bin
 IA32_ASM_PATH = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
 #IA32_ASMLINK_PATH = C:\MASM611\BINR
 IA32_ASL_PATH = C:\TianoTools\Bin
