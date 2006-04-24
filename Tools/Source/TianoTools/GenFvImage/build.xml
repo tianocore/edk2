@@ -65,25 +65,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </echo>
     </else>
     </if>
-		<if>
-		  <equals arg1="${ToolChain}" arg2="msvc"/>
-			<then>
+    <if>
+      <equals arg1="${ToolChain}" arg2="msvc"/>
+      <then>
         <property name="ext_static" value=".lib"/>
         <property name="ext_dynamic" value=".dll"/>
         <property name="ext_exe" value=".exe"/>
-			</then>
-			<elseif>
-			  <equals arg1="${ToolChain}" arg2="gcc"/>
-				<then>
+      </then>
+      <elseif>
+        <equals arg1="${ToolChain}" arg2="gcc"/>
+        <then>
           <property name="ext_static" value=".a"/>
           <property name="ext_dynamic" value=".so"/>
           <property name="ext_exe" value=""/>
-				</then>
-			</elseif>
-		</if>
+        </then>
+      </elseif>
+    </if>
   </target>
 
-  <target name="Tool" depends="init, GenFvImage, GenFvImage_IA32, GenFvImage_X64, GenFvImage_IPF"/>
+  <target name="Tool" depends="init, GenFvImage, GenFvImage_Ia32, GenFvImage_X64, GenFvImage_Ipf"/>
 
   <target name="GenFvImage">
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
@@ -112,17 +112,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
 
-			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-			<linkerarg value="/nodefaultlib:libc.lib"/>
-			<linkerarg value="RpcRT4.Lib"/>
+      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+      <linkerarg value="/nodefaultlib:libc.lib"/>
+      <linkerarg value="RpcRT4.Lib"/>
 
     </cc>
   </target>
 
-  <target name="GenFvImage_IA32">
+  <target name="GenFvImage_Ia32">
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
-        outfile="${BIN_DIR}/${ToolName}_IA32"
+        outfile="${BIN_DIR}/${ToolName}_Ia32"
         outtype="executable"
         libtool="${haveLibtool}"
         optimize="speed">
@@ -147,10 +147,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
 
-			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-			<linkerarg value="/nodefaultlib:libc.lib"/>
-			<linkerarg value="RpcRT4.Lib"/>
+      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+      <linkerarg value="/nodefaultlib:libc.lib"/>
+      <linkerarg value="RpcRT4.Lib"/>
 
     </cc>
   </target>
@@ -181,17 +181,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
 
-			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-			<linkerarg value="/nodefaultlib:libc.lib"/>
-			<linkerarg value="RpcRT4.Lib"/>
+      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+      <linkerarg value="/nodefaultlib:libc.lib"/>
+      <linkerarg value="RpcRT4.Lib"/>
 
     </cc>
   </target>
 
-  <target name="GenFvImage_IPF">
+  <target name="GenFvImage_Ipf">
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IPF}" 
-        outfile="${BIN_DIR}/${ToolName}_IPF"
+        outfile="${BIN_DIR}/${ToolName}_Ipf"
         outtype="executable"
         libtool="${haveLibtool}"
         optimize="speed">
@@ -215,10 +215,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
 
-			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-			<linkerarg value="/nodefaultlib:libc.lib"/>
-			<linkerarg value="RpcRT4.Lib"/>
+      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
+      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
+      <linkerarg value="/nodefaultlib:libc.lib"/>
+      <linkerarg value="RpcRT4.Lib"/>
 
     </cc>
   </target>
@@ -235,11 +235,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <target name="cleanall" depends="init">
     <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
     <delete dir="${PACKAGE_DIR}/${ToolName}/tmp">
-	    
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_IA32${ext_exe}"/>
+      
+      <fileset dir="${BIN_DIR}" includes="${ToolName}_Ia32${ext_exe}"/>
       <fileset dir="${BIN_DIR}" includes="${ToolName}_X64${ext_exe}"/>
       <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_IPF${ext_exe}"/>
+      <fileset dir="${BIN_DIR}" includes="${ToolName}_Ipf${ext_exe}"/>
     </delete>
   </target>
 
