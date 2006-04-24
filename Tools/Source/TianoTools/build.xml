@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <path id="classpath">
     <fileset dir="${WORKSPACE}/Tools/Jars" includes="*.jar"/>
-    <fileset dir="${WORKSPACE}/Tools/bin/xmlbeans/lib" includes="*.jar"/>
+    <fileset dir="${env.XMLBEANS_HOME}/lib" includes="*.jar"/>
   </path>
 
   <target name="all" depends="init, Tools" />

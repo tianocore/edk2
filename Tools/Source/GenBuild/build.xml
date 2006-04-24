@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="WORKSPACE" value="${env.WORKSPACE}"/>
   <path id="classpath">
     <fileset dir="${WORKSPACE}/Tools/Jars" includes="SurfaceArea.jar"/>
-    <fileset dir="${WORKSPACE}/Tools/bin/xmlbeans/lib" includes="*.jar"/>
+    <fileset dir="${env.XMLBEANS_HOME}/lib" includes="*.jar"/>
   </path>
   <property name="buildDir" value="build"/>
   <property name="installLocation" value="${WORKSPACE}/Tools/Jars"/>

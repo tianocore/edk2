@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <fileset dir="${WORKSPACE}/Tools/Jars">
       <include name="*.jar"/>
     </fileset>
-    <fileset dir="${WORKSPACE}/Tools/bin/xmlbeans/lib">
+    <fileset dir="${env.XMLBEANS_HOME}/lib">
       <include name="*.jar"/>
     </fileset>
     <pathelement path = "${env.CLASSPATH}"/>
