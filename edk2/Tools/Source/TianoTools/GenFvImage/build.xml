@@ -168,7 +168,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </defineset>
     
       <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet} x64/PeCoffLoaderEx.c"  
+        includes="${FileSet} X64/PeCoffLoaderEx.c"  
         defaultexcludes="TRUE" 
         excludes="*.xml *.inf"/>
 
