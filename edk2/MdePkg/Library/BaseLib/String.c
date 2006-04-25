@@ -116,7 +116,7 @@ StrnCpy (
 
   ReturnValue = Destination;
 
-  while ((*Source != L'\0') && (Length > 1)) {
+  while ((*Source != L'\0') && (Length > 0)) {
     *(Destination++) = *(Source++);
     Length--;
   }
@@ -481,7 +481,7 @@ AsciiStrnCpy (
 
   ReturnValue = Destination;
 
-  while (*Source && Length > 1) {
+  while (*Source && Length > 0) {
     *(Destination++) = *(Source++);
     Length--;
   }
