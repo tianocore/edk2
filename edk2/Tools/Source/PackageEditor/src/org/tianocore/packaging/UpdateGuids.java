@@ -155,6 +155,9 @@ public class UpdateGuids extends JFrame implements ActionListener {
      Remove original GUID declarations before saving updated ones
     **/
     protected void save() {
+        if (jTable.isEditing()) {
+            jTable.getCellEditor().stopCellEditing();
+        }
         sfc.removeSpdGuidDeclaration();
         int rowCount = model.getRowCount();
         int i = 0;
