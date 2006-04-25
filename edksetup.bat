@@ -60,8 +60,7 @@ echo XMLBEANS_HOME: %XMLBEANS_HOME%
 set Framework_Tools_Path=%WORKSPACE%\Tools\bin
 
 
-if "%PATHBACKUP%"=="" set PATHBACKUP=%PATH%
-set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%WORKSPACE%\Tools\bin;%XMLBEANS_HOME%\bin;%PATHBACKUP%;%CYGWIN_HOME%\bin
+set PATH=%Framework_Tools_Path%;%PATH%
 
 echo PATH:      %PATH%
 echo.
