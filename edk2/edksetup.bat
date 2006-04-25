@@ -32,9 +32,12 @@ if defined VS71COMNTOOLS (
 
 :check_java
 if "%JAVA_HOME%"=="" goto no_jdk
+echo.
+echo JAVA_HOME:     %JAVA_HOME%
 
 @REM Set the WORKSPACE to the Current Working Directory
 set WORKSPACE=%~dp0
+echo WORKSPACE:     %WORKSPACE%
 
 :set_cygwin
 if not defined CYGWIN_HOME (
@@ -43,22 +46,29 @@ if not defined CYGWIN_HOME (
     echo !!! Not set CYGWIN_HOME, gcc build may not be used !!!
     echo.
   )
+) else (
+  echo CYGWIN_HOME:   %CYGWIN_HOME%
 )
 
 if "%ANT_HOME%"=="" goto no_ant
+echo ANT_HOME:      %ANT_HOME%
+if not exist %ANT_HOME%\lib\ant-contrib.jar goto no_antcontrib
+
 if "%XMLBEANS_HOME%"=="" goto no_xmlbeans
+echo XMLBEANS_HOME: %XMLBEANS_HOME%
+
 set Framework_Tools_Path=%WORKSPACE%\Tools\bin
 
-echo.
-echo WORKSPACE: %WORKSPACE%
-echo ANT_HOME:  %ANT_HOME%
-echo JAVA_HOME: %JAVA_HOME%
 
 if "%PATHBACKUP%"=="" set PATHBACKUP=%PATH%
 set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%WORKSPACE%\Tools\bin;%XMLBEANS_HOME%\bin;%PATHBACKUP%;%CYGWIN_HOME%\bin
 
 echo PATH:      %PATH%
 echo.
+
+if not exist %XMLBEANS_HOME%\lib\saxon8.jar goto no_saxon8
+
+echo Building the Tiano Tools
 
 @REM We are going to create the SurfaceArea.jar file first so that other Java Program can use it
 set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar;%XMLBEANS_HOME%\lib\saxon8.jar
@@ -89,9 +99,21 @@ echo !!! Please install Apache Ant, and set ANT_HOME !!!
 echo.
 goto end 
 
+:no_antcontrib
+echo.
+echo !!! Please install Ant-contrib to ANT_HOME !!!
+echo.
+goto end 
+
 :no_xmlbeans
 echo.
 echo !!! Please install XML Beans, and set XMLBEANS_HOME !!!
+echo.
+goto end 
+
+:no_saxon8
+echo.
+echo !!! Please copy saxon8.jar file to XMLBEANS_HOME\lib !!!
 echo.
 goto end 
 
