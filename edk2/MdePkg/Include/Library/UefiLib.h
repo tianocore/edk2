@@ -412,7 +412,7 @@ EfiSignalEventLegacyBoot (
 EFI_STATUS
 EFIAPI
 EfiCreateEventLegacyBoot (
-  OUT  EFI_EVENT   *LegacyBootEvent
+  OUT EFI_EVENT  *LegacyBootEvent
   );
 
 /**
@@ -434,7 +434,7 @@ EfiCreateEventLegacyBoot (
 EFI_STATUS
 EFIAPI
 EfiCreateEventReadyToBoot (
-  OUT  EFI_EVENT   *ReadyToBootEvent
+  OUT EFI_EVENT  *ReadyToBootEvent
   );
 
 /**
@@ -454,8 +454,8 @@ EfiCreateEventReadyToBoot (
 VOID
 EFIAPI
 EfiInitializeFwVolDevicepathNode (
-  IN  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH     *FvDevicePathNode,
-  IN EFI_GUID                               *NameGuid
+  IN OUT MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode,
+  IN CONST EFI_GUID                         *NameGuid
   );
 
 /**
@@ -479,7 +479,7 @@ EfiInitializeFwVolDevicepathNode (
 EFI_GUID *
 EFIAPI
 EfiGetNameGuidFromFwVolDevicePathNode (
-  IN  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH     *FvDevicePathNode
+  IN CONST MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvDevicePathNode
   );
 
 
