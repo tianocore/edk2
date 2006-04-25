@@ -155,6 +155,9 @@ public class UpdateLibraryClass extends JFrame implements ActionListener {
     Remove original library classes before saving updated ones
     **/
     protected void save() {
+        if (jTable.isEditing()) {
+            jTable.getCellEditor().stopCellEditing();
+        }
         sfc.removeSpdLibClass();
         int rowCount = model.getRowCount();
         int i = 0;

@@ -156,6 +156,9 @@ public class UpdatePpi extends JFrame implements ActionListener {
     Remove original ppi declarations before saving updated ones
     **/
     protected void save() {
+        if (jTable.isEditing()) {
+            jTable.getCellEditor().stopCellEditing();
+        }
         sfc.removeSpdPpiDeclaration();
         int rowCount = model.getRowCount();
         int i = 0;

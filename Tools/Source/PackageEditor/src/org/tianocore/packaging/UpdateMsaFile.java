@@ -152,7 +152,9 @@ public class UpdateMsaFile extends JFrame implements ActionListener {
     Remove original Msa files before saving updated ones
     **/
     protected void save() {
-
+        if (jTable.isEditing()) {
+            jTable.getCellEditor().stopCellEditing();
+        }
         sfc.removeSpdMsaFile();
         int rowCount = jTable.getRowCount();
         int i = 0;

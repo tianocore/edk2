@@ -115,6 +115,9 @@ public class UpdatePCD extends JFrame implements ActionListener {
     Remove original Pcd definitions before saving updated ones
     **/
     protected void save() {
+        if (jTable.isEditing()) {
+            jTable.getCellEditor().stopCellEditing();
+        }
         sfc.removeSpdPcdDefinition();
         int rowCount = model.getRowCount();
         int i = 0;
