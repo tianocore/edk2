@@ -34,7 +34,7 @@ It can build all packages or clean up the build products.
   </target>
 
   <target name="distclean" description="Remove everything not in the distribution.">
-    <subant target="distclean" inheritall="false">
+    <subant target="cleanall" inheritall="false">
       <filelist refid="Pkg.Dirs"/>
     </subant>
   </target>
