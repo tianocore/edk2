@@ -10,27 +10,32 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <project name="mdk" default="all" basedir=".">
+  <description>
+This is the highest-level build file.
+It can build all packages or clean up the build products.
+  </description>
   <property environment="env"/>
-  <target name="all">
+  <!-- Note: this is an ordered list. The projects have dependencies between them. -->
+  <filelist
+      id="Pkg.Dirs"
+      dir="."
+      files="Tools,MdePkg,EdkModulePkg,EdkNt32Pkg"/>
+
+  <target name="all" description="Build all packages.">
     <subant target="" inheritall="false">
-      <!-- Note: this is an ordered list. The projects have dependencies between them. -->
-      <filelist dir="."
-        files="
-          Tools/build.xml
-          MdePkg/build.xml
-          EdkModulePkg/build.xml
-          EdkNt32Pkg/build.xml
-          "/>
+      <filelist refid="Pkg.Dirs"/>
     </subant>
   </target>
-  <target name="clean">
+
+  <target name="clean" description="Remove compile and assembly artifacts.">
     <subant target="clean" inheritall="false">
-      <fileset dir="." includes="*/build.xml"/>
+      <filelist refid="Pkg.Dirs"/>
     </subant>
   </target>
-  <target name="distclean">
+
+  <target name="distclean" description="Remove everything not in the distribution.">
     <subant target="distclean" inheritall="false">
-      <fileset dir="." includes="*/build.xml"/>
+      <filelist refid="Pkg.Dirs"/>
     </subant>
   </target>
 </project>
