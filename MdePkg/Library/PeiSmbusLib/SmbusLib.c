@@ -66,7 +66,7 @@ SmBusQuickRead (
                           This is an optional parameter and may be NULL.
 
 **/
-BOOLEAN
+VOID
 EFIAPI
 SmBusQuickWrite (
   IN  UINTN                     SmBusAddress,
@@ -79,10 +79,6 @@ SmBusQuickWrite (
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
   InternalSmBusExec (EfiSmbusQuickWrite, SmBusAddress, 0, NULL, Status);
-  //
-  // Bugbug: Undefined return value in spec
-  //
-  return TRUE;
 }
 
 /**
@@ -381,7 +377,7 @@ SmBusReadBlock (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return InternalSmBusExec (EfiSmbusReadBlock, SmBusAddress, 0x1f, Buffer, Status);
+  return InternalSmBusExec (EfiSmbusReadBlock, SmBusAddress, 0x20, Buffer, Status);
 }
 
 /**
@@ -413,10 +409,13 @@ SmBusWriteBlock (
   OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
+  UINTN  Length;
+
   ASSERT (Buffer != NULL);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return InternalSmBusExec (EfiSmbusWriteBlock, SmBusAddress, SMBUS_LIB_LENGTH (SmBusAddress), Buffer, Status);
+  Length = SMBUS_LIB_LENGTH (SmBusAddress) + 1;
+  return InternalSmBusExec (EfiSmbusWriteBlock, SmBusAddress, Length, Buffer, Status);
 }
 
 /**
@@ -447,151 +446,21 @@ UINTN
 EFIAPI
 SmBusBlockProcessCall (
   IN  UINTN          SmBusAddress,
-  OUT VOID           *OutBuffer,
+  IN  VOID           *OutBuffer,
   OUT VOID           *InBuffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
+  UINTN   Length;
+
   ASSERT (InBuffer  != NULL);
   ASSERT (OutBuffer != NULL);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
+  Length   = SMBUS_LIB_LENGTH (SmBusAddress) + 1;
   //
-  // BugBug: Not sure whether it's all right.
+  // Assuming that InBuffer is large enough to save another memory copy.
   //
-  InternalSmBusExec (EfiSmbusWriteBlock, SmBusAddress, SMBUS_LIB_LENGTH (SmBusAddress), OutBuffer, Status);
-
-  return InternalSmBusExec (EfiSmbusReadBlock, SmBusAddress, 1, InBuffer, Status);
-}
-
-/**
-  Enumerates the SMBUS and assigns slave addresses.
-
-  Executes the SMBUS enumeration algorithm and assigns a valid address to all SMBUS slave devices.
-  The total number of SMBUS slave devices detected is returned.
-  The status of the executed command is returned.
-  If Slave Address in SmBusAddress is not zero, then ASSERT().
-  If Command in SmBusAddress is not zero, then ASSERT().
-  If Length in SmBusAddress is not zero, then ASSERT().
-  If PEC in SmBusAddress is set, then ASSERT().
-  If any reserved bits of SmBusAddress are set, then ASSERT().
-
-  @param  SmBusAddress        Address that encodes the SMBUS Slave Address,
-                              SMBUS Command, SMBUS Data Length, and PEC.
-
-  @retval RETURN_SUCCESS      The SMBUS command was executed.
-  @retval RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
-  @retval RETURN_DEVICE_ERROR The request was not completed because a failure reflected
-                              in the Host Status Register bit.
-                              Device errors are a result of a transaction collision, illegal command field,
-                              unclaimed cycle (host initiated), or bus errors (collisions).
-
-**/
-RETURN_STATUS
-EFIAPI
-SmBusArpAll (
-  IN UINTN  SmBusAddress
-  )
-{
-  ASSERT (!SMBUS_LIB_PEC (SmBusAddress));
-  ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)       == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress)     == 0);
-  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)        == 0);
-  ASSERT (SMBUS_LIB_SLAVE_ADDRESS (SmBusAddress) == 0);
-
-  return InternalSmBusArpDevice (SmBusAddress, NULL);
-}
-
-/**
-  Assigns an SMBUS slave addresses.
-
-  Assigns the SMBUS device specified by Uuid the slave address specified by SmBusAddress.
-  The status of the executed command is returned.
-  If Command in SmBusAddress is not zero, then ASSERT().
-  If Length in SmBusAddress is not zero, then ASSERT().
-  If PEC in SmBusAddress is set, then ASSERT().
-  If any reserved bits of SmBusAddress are set, then ASSERT().
-
-  @param  SmBusAddress        Address that encodes the SMBUS Slave Address,
-                              SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Uuid                Pointer to the UUID of the device to assign a slave address.
-
-  @retval RETURN_SUCCESS      The SMBUS command was executed.
-  @retval RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
-  @retval RETURN_DEVICE_ERROR The request was not completed because a failure reflected
-                              in the Host Status Register bit.
-                              Device errors are a result of a transaction collision, illegal command field,
-                              unclaimed cycle (host initiated), or bus errors (collisions).
-
-**/
-RETURN_STATUS
-EFIAPI
-SmBusArpDevice (
-  IN UINTN       SmBusAddress,
-  IN CONST GUID  *Uuid
-  )
-{
-  ASSERT (!SMBUS_LIB_PEC (SmBusAddress));
-  ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
-  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-
-  return InternalSmBusArpDevice (SmBusAddress, Uuid);
-}
-
-/**
-  Retrieves the UUID associated with an SMBUS slave device.
-
-  Retrieves the UUID associated with the slave address specified
-  by SmBusAddress and returns the UUID in Uuid.
-  The status of the executed command is returned.
-  If Command in SmBusAddress is not zero, then ASSERT().
-  If Length in SmBusAddress is not zero, then ASSERT().
-  If PEC in SmBusAddress is set, then ASSERT().
-  If Uuid is NULL, then ASSERT().
-  If any reserved bits of SmBusAddress are set, then ASSERT().
-
-  @param  SmBusAddress        Address that encodes the SMBUS Slave Address,
-                              SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Uuid                Pointer to the UUID retrieved from the SMBUS slave device.
-
-  @retval RETURN_SUCCESS      The SMBUS command was executed.
-  @retval RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
-  @retval RETURN_DEVICE_ERROR The request was not completed because a failure reflected
-                              in the Host Status Register bit.
-                              Device errors are a result of a transaction collision, illegal command field,
-                              unclaimed cycle (host initiated), or bus errors (collisions).
-
-**/
-RETURN_STATUS
-EFIAPI
-SmBusGetUuid (
-  IN  UINTN  SmBusAddress,
-  OUT GUID   *Uuid
-  )
-{
-  UINTN                     Length;
-  EFI_SMBUS_DEVICE_MAP      *SmBusDeviceMap;
-  RETURN_STATUS             ReturnStatus;
-  UINTN                     SmbusDeviceAddress;
-  UINTN                     Index;
-
-  ASSERT (Uuid != NULL);
-  ASSERT (!SMBUS_LIB_PEC (SmBusAddress));
-  ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
-  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
-  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
-
-  ReturnStatus = InternalGetArpMap (&Length, &SmBusDeviceMap);
-  if (!RETURN_ERROR (ReturnStatus)) {
-    SmbusDeviceAddress = SMBUS_LIB_SLAVE_ADDRESS (SmBusAddress);
-    for (Index = 0; Index < Length; Index++) {
-      if (SmBusDeviceMap[Index].SmbusDeviceAddress.SmbusDeviceAddress == SmbusDeviceAddress) {
-        CopyMem (Uuid, &SmBusDeviceMap[Index].SmbusDeviceUdid, sizeof (EFI_SMBUS_UDID));
-        break;
-      }
-    }
-  }
-
-  return ReturnStatus;
+  InBuffer = CopyMem (InBuffer, OutBuffer, Length);
+  return InternalSmBusExec (EfiSmbusBWBRProcessCall, SmBusAddress, Length, InBuffer, Status);
 }

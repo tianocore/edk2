@@ -168,6 +168,13 @@ InternalAllocateAlignedPages (
     //
     AlignmentMask  = Alignment - 1;
     RealPages      = Pages + EFI_SIZE_TO_PAGES (Alignment);
+    if (RealPages <= Pages) {
+      //
+      // This extra checking is to make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow. 
+      //
+      return NULL;
+    }
+
     Status         = gBS->AllocatePages (AllocateAnyPages, MemoryType, RealPages, &Memory);
     if (EFI_ERROR (Status)) {
       return NULL;
@@ -576,8 +583,8 @@ InternalAllocateAlignedPool (
   UINTN       AlignedAddress;
   UINTN       AlignmentMask;
   UINTN       OverAllocationSize;
+  UINTN       RealAllocationSize;
   VOID        **FreePointer;
-  EFI_STATUS  Status;
 
   //
   // Alignment must be a power of two or zero.
@@ -593,8 +600,15 @@ InternalAllocateAlignedPool (
   // Calculate the extra memory size, over-allocate memory pool and get the aligned memory address. 
   //
   OverAllocationSize  = sizeof (RawAddress) + AlignmentMask;
-  Status = gBS->AllocatePool (PoolType, AllocationSize + OverAllocationSize, &RawAddress);
-  if (EFI_ERROR (Status)) {
+  RealAllocationSize  = AllocationSize + OverAllocationSize;
+  if (RealAllocationSize <= AllocationSize ) {
+    //
+    // This extra checking is to make sure that AllocationSize plus OverAllocationSize does not overflow. 
+    //
+    return NULL;
+  }
+  RawAddress = InternalAllocatePool (PoolType, RealAllocationSize);
+  if (RawAddress == NULL) {
     return NULL;
   }
   AlignedAddress      = ((UINTN) RawAddress + OverAllocationSize) & ~AlignmentMask;

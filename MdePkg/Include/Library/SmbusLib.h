@@ -17,6 +17,11 @@
 #ifndef __SMBUS_LIB__
 #define __SMBUS_LIB__
 
+//
+// PEC BIT is bit 21 in SMBUS address
+//
+#define SMBUS_LIB_PEC_BIT   (1 << 21)
+
 /**
   Macro that converts SMBUS slave address, SMBUS command, SMBUS data length,
   and PEC to a value that can be passed to the SMBUS Library functions.
@@ -27,15 +32,15 @@
   
   @param  SlaveAddress    SMBUS Slave Address.  Range 0..127.
   @param  Command         SMBUS Command.  Range 0..255.
-  @param  Length          SMBUS Data Length.  Range 0..32.
+  @param  Length          SMBUS Data Length.  Range 0..31.
   @param  Pec             TRUE if Packet Error Checking is enabled.  Otherwise FALSE.
 
 **/
 #define SMBUS_LIB_ADDRESS(SlaveAddress,Command,Length,Pec)  \
-  ( ((Pec) ? MAX_BIT : 0)          | \
-    (((SlaveAddress) & 0x7f) << 1) | \
-    (((Command) & 0xff) << 8)      | \
-    (((Length) & 0x1f) << 16)        \
+  ( ((Pec) ? SMBUS_LIB_PEC_BIT: 0)      | \
+    (((SlaveAddress) & 0x7f) << 1)      | \
+    (((Command)      & 0xff) << 8)      | \
+    (((Length)       & 0x1f) << 16)       \
   )
 
 /**
@@ -80,7 +85,7 @@ SmBusQuickRead (
                           This is an optional parameter and may be NULL.
 
 **/
-BOOLEAN
+VOID
 EFIAPI
 SmBusQuickWrite (
   IN  UINTN                     SmBusAddress,
@@ -373,101 +378,9 @@ UINTN
 EFIAPI
 SmBusBlockProcessCall (
   IN  UINTN          SmBusAddress,
-  OUT VOID           *OutBuffer,
+  IN  VOID           *OutBuffer,
   OUT VOID           *InBuffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
-  )
-;
-
-/**
-  Enumerates the SMBUS and assigns slave addresses.
-
-  Executes the SMBUS enumeration algorithm and assigns a valid address to all SMBUS slave devices.
-  The total number of SMBUS slave devices detected is returned.
-  The status of the executed command is returned.
-  If Slave Address in SmBusAddress is not zero, then ASSERT().
-  If Command in SmBusAddress is not zero, then ASSERT().
-  If Length in SmBusAddress is not zero, then ASSERT().
-  If PEC in SmBusAddress is set, then ASSERT().
-  If any reserved bits of SmBusAddress are set, then ASSERT().
-
-  @param  SmBusAddress        Address that encodes the SMBUS Slave Address,
-                              SMBUS Command, SMBUS Data Length, and PEC.
-
-  @retval RETURN_SUCCESS      The SMBUS command was executed.
-  @retval RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
-  @retval RETURN_DEVICE_ERROR The request was not completed because a failure reflected
-                              in the Host Status Register bit.
-                              Device errors are a result of a transaction collision, illegal command field,
-                              unclaimed cycle (host initiated), or bus errors (collisions).
-
-**/
-RETURN_STATUS
-EFIAPI
-SmBusArpAll (
-  IN UINTN  SmBusAddress
-  )
-;
-
-/**
-  Assigns an SMBUS slave addresses.
-
-  Assigns the SMBUS device specified by Uuid the slave address specified by SmBusAddress.
-  The status of the executed command is returned.
-  If Command in SmBusAddress is not zero, then ASSERT().
-  If Length in SmBusAddress is not zero, then ASSERT().
-  If PEC in SmBusAddress is set, then ASSERT().
-  If any reserved bits of SmBusAddress are set, then ASSERT().
-
-  @param  SmBusAddress        Address that encodes the SMBUS Slave Address,
-                              SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Uuid                Pointer to the UUID of the device to assign a slave address.
-
-  @retval RETURN_SUCCESS      The SMBUS command was executed.
-  @retval RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
-  @retval RETURN_DEVICE_ERROR The request was not completed because a failure reflected
-                              in the Host Status Register bit.
-                              Device errors are a result of a transaction collision, illegal command field,
-                              unclaimed cycle (host initiated), or bus errors (collisions).
-
-**/
-RETURN_STATUS
-EFIAPI
-SmBusArpDevice (
-  IN UINTN       SmBusAddress,
-  IN CONST GUID  *Uuid
-  )
-;
-
-/**
-  Retrieves the UUID associated with an SMBUS slave device.
-
-  Retrieves the UUID associated with the slave address specified
-  by SmBusAddress and returns the UUID in Uuid.
-  The status of the executed command is returned.
-  If Command in SmBusAddress is not zero, then ASSERT().
-  If Length in SmBusAddress is not zero, then ASSERT().
-  If PEC in SmBusAddress is set, then ASSERT().
-  If Uuid is NULL, then ASSERT().
-  If any reserved bits of SmBusAddress are set, then ASSERT().
-
-  @param  SmBusAddress        Address that encodes the SMBUS Slave Address,
-                              SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Uuid                Pointer to the UUID retrieved from the SMBUS slave device.
-
-  @retval RETURN_SUCCESS      The SMBUS command was executed.
-  @retval RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
-  @retval RETURN_DEVICE_ERROR The request was not completed because a failure reflected
-                              in the Host Status Register bit.
-                              Device errors are a result of a transaction collision, illegal command field,
-                              unclaimed cycle (host initiated), or bus errors (collisions).
-
-**/
-RETURN_STATUS
-EFIAPI
-SmBusGetUuid (
-  IN  UINTN  SmBusAddress,
-  OUT GUID   *Uuid
   )
 ;
 
