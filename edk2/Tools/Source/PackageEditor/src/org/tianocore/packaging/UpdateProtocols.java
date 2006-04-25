@@ -156,6 +156,9 @@ public class UpdateProtocols extends JFrame implements ActionListener {
     Remove original protocol declarations before saving updated ones
     **/
     protected void save() {
+        if (jTable.isEditing()) {
+            jTable.getCellEditor().stopCellEditing();
+        }
         sfc.removeSpdProtocolDeclaration();
         int rowCount = model.getRowCount();
         int i = 0;

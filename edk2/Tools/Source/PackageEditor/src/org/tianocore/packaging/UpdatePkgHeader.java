@@ -174,6 +174,9 @@ public class UpdatePkgHeader extends JFrame implements ActionListener {
     Remove original package headers before saving updated ones
     **/
     protected void save() {
+        if (jTable.isEditing()) {
+            jTable.getCellEditor().stopCellEditing();
+        }
         sfc.removeSpdPkgHeader();
         int rowCount = model.getRowCount();
         int i = 0;
