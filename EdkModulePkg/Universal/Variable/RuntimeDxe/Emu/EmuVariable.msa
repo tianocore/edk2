@@ -44,13 +44,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>EmuVariable.c</Filename>
     <Filename>EmuVariable.dxs</Filename>
     <Arch ArchType="IA32">
-      <Filename>..\Ia32\Ia32Variable.c</Filename>
+      <Filename>../Ia32/Ia32Variable.c</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>..\x64\x64Variable.c</Filename>
+      <Filename>../x64/x64Variable.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>..\Ipf\IpfVariable.c</Filename>
+      <Filename>../Ipf/IpfVariable.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

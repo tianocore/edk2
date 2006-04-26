@@ -11,44 +11,44 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Bus\Pci\IdeBus\Dxe"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Bus/Pci/IdeBus/Dxe"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="IdeBusLite">
-      <GenBuild baseName="IdeBusLite" mbdFilename="${MODULE_DIR}\idebusLite.mbd" msaFilename="${MODULE_DIR}\idebusLite.msa"/>
+      <GenBuild baseName="IdeBusLite" mbdFilename="${MODULE_DIR}/idebusLite.mbd" msaFilename="${MODULE_DIR}/idebusLite.msa"/>
    </target>
    <target name="IdeBus">
-      <GenBuild baseName="IdeBus" mbdFilename="${MODULE_DIR}\idebus.mbd" msaFilename="${MODULE_DIR}\idebus.msa"/>
+      <GenBuild baseName="IdeBus" mbdFilename="${MODULE_DIR}/idebus.mbd" msaFilename="${MODULE_DIR}/idebus.msa"/>
    </target>
    <target depends="IdeBus_clean" name="clean"/>
    <target depends="IdeBus_cleanall" name="cleanall"/>
    <target name="IdeBusLite_clean">
-      <OutputDirSetup baseName="IdeBusLite" mbdFilename="${MODULE_DIR}\idebusLite.mbd" msaFilename="${MODULE_DIR}\idebusLite.msa"/>
+      <OutputDirSetup baseName="IdeBusLite" mbdFilename="${MODULE_DIR}/idebusLite.mbd" msaFilename="${MODULE_DIR}/idebusLite.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\IdeBusLite_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/IdeBusLite_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\IdeBusLite_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/IdeBusLite_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="IdeBus_clean">
-      <OutputDirSetup baseName="IdeBus" mbdFilename="${MODULE_DIR}\idebus.mbd" msaFilename="${MODULE_DIR}\idebus.msa"/>
+      <OutputDirSetup baseName="IdeBus" mbdFilename="${MODULE_DIR}/idebus.mbd" msaFilename="${MODULE_DIR}/idebus.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\IdeBus_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/IdeBus_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\IdeBus_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/IdeBus_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="IdeBusLite_cleanall">
-      <OutputDirSetup baseName="IdeBusLite" mbdFilename="${MODULE_DIR}\idebusLite.mbd" msaFilename="${MODULE_DIR}\idebusLite.msa"/>
+      <OutputDirSetup baseName="IdeBusLite" mbdFilename="${MODULE_DIR}/idebusLite.mbd" msaFilename="${MODULE_DIR}/idebusLite.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\IdeBusLite_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/IdeBusLite_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\IdeBusLite_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/IdeBusLite_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>
@@ -58,11 +58,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       </delete>
    </target>
    <target name="IdeBus_cleanall">
-      <OutputDirSetup baseName="IdeBus" mbdFilename="${MODULE_DIR}\idebus.mbd" msaFilename="${MODULE_DIR}\idebus.msa"/>
+      <OutputDirSetup baseName="IdeBus" mbdFilename="${MODULE_DIR}/idebus.mbd" msaFilename="${MODULE_DIR}/idebus.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\IdeBus_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/IdeBus_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\IdeBus_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/IdeBus_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

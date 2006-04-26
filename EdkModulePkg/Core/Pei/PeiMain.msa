@@ -45,22 +45,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PeiMain.h</Filename>
-    <Filename>BootMode\BootMode.c</Filename>
-    <Filename>Dependency\Dependency.c</Filename>
-    <Filename>Dispatcher\Dispatcher.c</Filename>
-    <Filename>FwVol\FwVol.c</Filename>
-    <Filename>Hob\Hob.c</Filename>
-    <Filename>Image\Image.c</Filename>
-    <Filename>Memory\MemoryServices.c</Filename>
-    <Filename>PeiMain\PeiMain.c</Filename>
-    <Filename>Ppi\Ppi.c</Filename>
-    <Filename>Reset\Reset.c</Filename>
-    <Filename>Security\Security.c</Filename>
-    <Filename>StatusCode\StatusCode.c</Filename>
+    <Filename>BootMode/BootMode.c</Filename>
+    <Filename>Dependency/Dependency.c</Filename>
+    <Filename>Dispatcher/Dispatcher.c</Filename>
+    <Filename>FwVol/FwVol.c</Filename>
+    <Filename>Hob/Hob.c</Filename>
+    <Filename>Image/Image.c</Filename>
+    <Filename>Memory/MemoryServices.c</Filename>
+    <Filename>PeiMain/PeiMain.c</Filename>
+    <Filename>Ppi/Ppi.c</Filename>
+    <Filename>Reset/Reset.c</Filename>
+    <Filename>Security/Security.c</Filename>
+    <Filename>StatusCode/StatusCode.c</Filename>
     <Arch ArchType="IPF">
-      <Filename>ipf\SwitchToCacheMode.c</Filename>
-      <Filename>ipf\IpfCpuCore.i</Filename>
-      <Filename>ipf\IpfCpuCore.s</Filename>
+      <Filename>ipf/SwitchToCacheMode.c</Filename>
+      <Filename>ipf/IpfCpuCore.i</Filename>
+      <Filename>ipf/IpfCpuCore.s</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

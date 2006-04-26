@@ -67,8 +67,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <property name="ext_static" value=".lib"/>
         <property name="ext_dynamic" value=".dll"/>
         <property name="ext_exe" value=".exe"/>
-				<property name="MSVC_DIR" value="C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\Include" />
-				<property name="MSVC_SDK_DIR" value="C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Include" />
+				<property name="MSVC_DIR" value="C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/Include" />
+				<property name="MSVC_SDK_DIR" value="C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/PlatformSDK/Include" />
 			</then>
 			<elseif>
 			  <equals arg1="${ToolChain}" arg2="gcc"/>

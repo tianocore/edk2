@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Library\DxeSmmDriverEntryPoint"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Library/DxeSmmDriverEntryPoint"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="DxeSmmDriverEntryPoint">
-      <GenBuild baseName="DxeSmmDriverEntryPoint" mbdFilename="${MODULE_DIR}\DxeSmmDriverEntryPoint.mbd" msaFilename="${MODULE_DIR}\DxeSmmDriverEntryPoint.msa"/>
+      <GenBuild baseName="DxeSmmDriverEntryPoint" mbdFilename="${MODULE_DIR}/DxeSmmDriverEntryPoint.mbd" msaFilename="${MODULE_DIR}/DxeSmmDriverEntryPoint.msa"/>
    </target>
    <target depends="DxeSmmDriverEntryPoint_clean" name="clean"/>
    <target depends="DxeSmmDriverEntryPoint_cleanall" name="cleanall"/>
    <target name="DxeSmmDriverEntryPoint_clean">
-      <OutputDirSetup baseName="DxeSmmDriverEntryPoint" mbdFilename="${MODULE_DIR}\DxeSmmDriverEntryPoint.mbd" msaFilename="${MODULE_DIR}\DxeSmmDriverEntryPoint.msa"/>
+      <OutputDirSetup baseName="DxeSmmDriverEntryPoint" mbdFilename="${MODULE_DIR}/DxeSmmDriverEntryPoint.mbd" msaFilename="${MODULE_DIR}/DxeSmmDriverEntryPoint.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\DxeSmmDriverEntryPoint_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/DxeSmmDriverEntryPoint_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\DxeSmmDriverEntryPoint_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/DxeSmmDriverEntryPoint_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="DxeSmmDriverEntryPoint_cleanall">
-      <OutputDirSetup baseName="DxeSmmDriverEntryPoint" mbdFilename="${MODULE_DIR}\DxeSmmDriverEntryPoint.mbd" msaFilename="${MODULE_DIR}\DxeSmmDriverEntryPoint.msa"/>
+      <OutputDirSetup baseName="DxeSmmDriverEntryPoint" mbdFilename="${MODULE_DIR}/DxeSmmDriverEntryPoint.mbd" msaFilename="${MODULE_DIR}/DxeSmmDriverEntryPoint.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\DxeSmmDriverEntryPoint_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/DxeSmmDriverEntryPoint_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\DxeSmmDriverEntryPoint_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/DxeSmmDriverEntryPoint_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

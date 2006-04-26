@@ -38,16 +38,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <SourceFiles>
     <Filename>BasePeCoff.c</Filename>
     <Arch ArchType="IA32">
-      <Filename>ia32\PeCoffLoaderEx.c</Filename>
+      <Filename>ia32/PeCoffLoaderEx.c</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>x64\PeCoffLoaderEx.c</Filename>
+      <Filename>x64/PeCoffLoaderEx.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>ipf\PeCoffLoaderEx.c</Filename>
+      <Filename>ipf/PeCoffLoaderEx.c</Filename>
     </Arch>
     <Arch ArchType="EBC">
-      <Filename>ebc\PeCoffLoaderEx.c</Filename>
+      <Filename>ebc/PeCoffLoaderEx.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

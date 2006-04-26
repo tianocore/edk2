@@ -52,10 +52,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>DxeIpl.dxs</Filename>
     <Filename>DxeLoadX64.c</Filename>
     <Arch ArchType="IA32">
-      <Filename>x64\ImageRead.c</Filename>
-      <Filename>x64\LongMode.asm</Filename>
-      <Filename>x64\DxeLoadFunc.c</Filename>
-      <Filename>x64\VirtualMemory.c</Filename>
+      <Filename>x64/ImageRead.c</Filename>
+      <Filename>x64/LongMode.asm</Filename>
+      <Filename>x64/DxeLoadFunc.c</Filename>
+      <Filename>x64/VirtualMemory.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

@@ -53,7 +53,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>InitVariable.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>Ipf\InitVariable.c</Filename>
+      <Filename>Ipf/InitVariable.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

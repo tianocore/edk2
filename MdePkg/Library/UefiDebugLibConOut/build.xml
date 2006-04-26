@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Library\UefiDebugLibConOut"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Library/UefiDebugLibConOut"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="UefiDebugLibConOut">
-      <GenBuild baseName="UefiDebugLibConOut" mbdFilename="${MODULE_DIR}\UefiDebugLibConOut.mbd" msaFilename="${MODULE_DIR}\UefiDebugLibConOut.msa"/>
+      <GenBuild baseName="UefiDebugLibConOut" mbdFilename="${MODULE_DIR}/UefiDebugLibConOut.mbd" msaFilename="${MODULE_DIR}/UefiDebugLibConOut.msa"/>
    </target>
    <target depends="UefiDebugLibConOut_clean" name="clean"/>
    <target depends="UefiDebugLibConOut_cleanall" name="cleanall"/>
    <target name="UefiDebugLibConOut_clean">
-      <OutputDirSetup baseName="UefiDebugLibConOut" mbdFilename="${MODULE_DIR}\UefiDebugLibConOut.mbd" msaFilename="${MODULE_DIR}\UefiDebugLibConOut.msa"/>
+      <OutputDirSetup baseName="UefiDebugLibConOut" mbdFilename="${MODULE_DIR}/UefiDebugLibConOut.mbd" msaFilename="${MODULE_DIR}/UefiDebugLibConOut.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\UefiDebugLibConOut_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/UefiDebugLibConOut_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\UefiDebugLibConOut_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/UefiDebugLibConOut_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="UefiDebugLibConOut_cleanall">
-      <OutputDirSetup baseName="UefiDebugLibConOut" mbdFilename="${MODULE_DIR}\UefiDebugLibConOut.mbd" msaFilename="${MODULE_DIR}\UefiDebugLibConOut.msa"/>
+      <OutputDirSetup baseName="UefiDebugLibConOut" mbdFilename="${MODULE_DIR}/UefiDebugLibConOut.mbd" msaFilename="${MODULE_DIR}/UefiDebugLibConOut.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\UefiDebugLibConOut_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/UefiDebugLibConOut_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\UefiDebugLibConOut_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/UefiDebugLibConOut_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

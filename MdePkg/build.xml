@@ -18,10 +18,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property environment="env" />  
   <property name="WORKSPACE_DIR" value="${env.WORKSPACE}" />
   <property name="PACKAGE" value="MdePkg" />
-  <property name="PACKAGE_DIR" value="${WORKSPACE_DIR}\MdePkg" />
+  <property name="PACKAGE_DIR" value="${WORKSPACE_DIR}/MdePkg" />
   <property name="BUILD_MODE" value="PACKAGE" />
   
-  <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml" />
+  <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml" />
   
   <target name="buildfpd" depends="init, fpdparser, builds" />
   
@@ -34,11 +34,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <fail message="WORKSPACE environmental variable not set." />
       </then>
     </if>
-    <ToolChainSetup confPath="${WORKSPACE_DIR}\Tools\Conf" />
+    <ToolChainSetup confPath="${WORKSPACE_DIR}/Tools/Conf" />
   </target>
 
   <target name="tools">
-    <ant antfile="${WORKSPACE_DIR}\Tools\Source\TianoTools\build.xml" />
+    <ant antfile="${WORKSPACE_DIR}/Tools/Source/TianoTools/build.xml" />
   </target>
   
   <target name="fpdparser" unless="FPD_File">
@@ -46,15 +46,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
   
   <target name="builds" depends="fpdparser">
-    <ant antfile="${PACKAGE_DIR}\build.out.xml" />
+    <ant antfile="${PACKAGE_DIR}/build.out.xml" />
   </target>
   
   <!-- clean. -->
   <target name="clean" depends="init">
     <if>
-      <available file="${PACKAGE_DIR}\build.out.xml" />
+      <available file="${PACKAGE_DIR}/build.out.xml" />
       <then>
-        <ant antfile="${PACKAGE_DIR}\build.out.xml" target="clean" />
+        <ant antfile="${PACKAGE_DIR}/build.out.xml" target="clean" />
       </then>
     </if>
   </target>
@@ -62,13 +62,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <!-- clean All. -->
   <target name="cleanall" depends="init">
     <if>
-      <available file="${PACKAGE_DIR}\build.out.xml" />
+      <available file="${PACKAGE_DIR}/build.out.xml" />
       <then>
-        <ant antfile="${PACKAGE_DIR}\build.out.xml" target="cleanall" />
-        <delete file="${PACKAGE_DIR}\build.out.xml" />
+        <ant antfile="${PACKAGE_DIR}/build.out.xml" target="cleanall" />
+        <delete file="${PACKAGE_DIR}/build.out.xml" />
       </then>
     </if>
-    <delete dir="${PACKAGE_DIR}\Build\FV" />
+    <delete dir="${PACKAGE_DIR}/Build/FV" />
   </target>
   
 </project>

@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Library\EdkRuntimeStatusCodeLib\RtPlatformStatusCode"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Library/EdkRuntimeStatusCodeLib/RtPlatformStatusCode"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="EdkRtPlatformStatusCodeLib">
-      <GenBuild baseName="EdkRtPlatformStatusCodeLib" mbdFilename="${MODULE_DIR}\RtPlatformStatusCode.mbd" msaFilename="${MODULE_DIR}\RtPlatformStatusCode.msa"/>
+      <GenBuild baseName="EdkRtPlatformStatusCodeLib" mbdFilename="${MODULE_DIR}/RtPlatformStatusCode.mbd" msaFilename="${MODULE_DIR}/RtPlatformStatusCode.msa"/>
    </target>
    <target depends="EdkRtPlatformStatusCodeLib_clean" name="clean"/>
    <target depends="EdkRtPlatformStatusCodeLib_cleanall" name="cleanall"/>
    <target name="EdkRtPlatformStatusCodeLib_clean">
-      <OutputDirSetup baseName="EdkRtPlatformStatusCodeLib" mbdFilename="${MODULE_DIR}\RtPlatformStatusCode.mbd" msaFilename="${MODULE_DIR}\RtPlatformStatusCode.msa"/>
+      <OutputDirSetup baseName="EdkRtPlatformStatusCodeLib" mbdFilename="${MODULE_DIR}/RtPlatformStatusCode.mbd" msaFilename="${MODULE_DIR}/RtPlatformStatusCode.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\EdkRtPlatformStatusCodeLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/EdkRtPlatformStatusCodeLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\EdkRtPlatformStatusCodeLib_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/EdkRtPlatformStatusCodeLib_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="EdkRtPlatformStatusCodeLib_cleanall">
-      <OutputDirSetup baseName="EdkRtPlatformStatusCodeLib" mbdFilename="${MODULE_DIR}\RtPlatformStatusCode.mbd" msaFilename="${MODULE_DIR}\RtPlatformStatusCode.msa"/>
+      <OutputDirSetup baseName="EdkRtPlatformStatusCodeLib" mbdFilename="${MODULE_DIR}/RtPlatformStatusCode.mbd" msaFilename="${MODULE_DIR}/RtPlatformStatusCode.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\EdkRtPlatformStatusCodeLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/EdkRtPlatformStatusCodeLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\EdkRtPlatformStatusCodeLib_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/EdkRtPlatformStatusCodeLib_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

@@ -11,44 +11,44 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Universal\Console\ConSplitter\Dxe"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Universal/Console/ConSplitter/Dxe"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="ConSplitter">
-      <GenBuild baseName="ConSplitter" mbdFilename="${MODULE_DIR}\ConSplitter.mbd" msaFilename="${MODULE_DIR}\ConSplitter.msa"/>
+      <GenBuild baseName="ConSplitter" mbdFilename="${MODULE_DIR}/ConSplitter.mbd" msaFilename="${MODULE_DIR}/ConSplitter.msa"/>
    </target>
    <target name="ConSplitterLite">
-      <GenBuild baseName="ConSplitterLite" mbdFilename="${MODULE_DIR}\ConSplitterLite.mbd" msaFilename="${MODULE_DIR}\ConSplitterLite.msa"/>
+      <GenBuild baseName="ConSplitterLite" mbdFilename="${MODULE_DIR}/ConSplitterLite.mbd" msaFilename="${MODULE_DIR}/ConSplitterLite.msa"/>
    </target>
    <target depends="ConSplitter_clean" name="clean"/>
    <target depends="ConSplitter_cleanall" name="cleanall"/>
    <target name="ConSplitter_clean">
-      <OutputDirSetup baseName="ConSplitter" mbdFilename="${MODULE_DIR}\ConSplitter.mbd" msaFilename="${MODULE_DIR}\ConSplitter.msa"/>
+      <OutputDirSetup baseName="ConSplitter" mbdFilename="${MODULE_DIR}/ConSplitter.mbd" msaFilename="${MODULE_DIR}/ConSplitter.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\ConSplitter_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/ConSplitter_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\ConSplitter_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/ConSplitter_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="ConSplitterLite_clean">
-      <OutputDirSetup baseName="ConSplitterLite" mbdFilename="${MODULE_DIR}\ConSplitterLite.mbd" msaFilename="${MODULE_DIR}\ConSplitterLite.msa"/>
+      <OutputDirSetup baseName="ConSplitterLite" mbdFilename="${MODULE_DIR}/ConSplitterLite.mbd" msaFilename="${MODULE_DIR}/ConSplitterLite.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\ConSplitterLite_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/ConSplitterLite_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\ConSplitterLite_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/ConSplitterLite_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="ConSplitter_cleanall">
-      <OutputDirSetup baseName="ConSplitter" mbdFilename="${MODULE_DIR}\ConSplitter.mbd" msaFilename="${MODULE_DIR}\ConSplitter.msa"/>
+      <OutputDirSetup baseName="ConSplitter" mbdFilename="${MODULE_DIR}/ConSplitter.mbd" msaFilename="${MODULE_DIR}/ConSplitter.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\ConSplitter_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/ConSplitter_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\ConSplitter_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/ConSplitter_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>
@@ -58,11 +58,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       </delete>
    </target>
    <target name="ConSplitterLite_cleanall">
-      <OutputDirSetup baseName="ConSplitterLite" mbdFilename="${MODULE_DIR}\ConSplitterLite.mbd" msaFilename="${MODULE_DIR}\ConSplitterLite.msa"/>
+      <OutputDirSetup baseName="ConSplitterLite" mbdFilename="${MODULE_DIR}/ConSplitterLite.mbd" msaFilename="${MODULE_DIR}/ConSplitterLite.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\ConSplitterLite_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/ConSplitterLite_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\ConSplitterLite_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/ConSplitterLite_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

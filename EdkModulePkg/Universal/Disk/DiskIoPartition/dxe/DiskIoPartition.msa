@@ -43,18 +43,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>..\..\DiskIo\Dxe\diskio.c</Filename>
-    <Filename>..\..\DiskIo\Dxe\diskio.h</Filename>
-    <Filename>..\..\DiskIo\Dxe\ComponentName.c</Filename>
-    <Filename>..\..\Partition\Dxe\Partition.h</Filename>
-    <Filename>..\..\Partition\Dxe\ElTorito.h</Filename>
-    <Filename>..\..\Partition\Dxe\Gpt.h</Filename>
-    <Filename>..\..\Partition\Dxe\Mbr.h</Filename>
-    <Filename>..\..\Partition\Dxe\Partition.c</Filename>
-    <Filename>..\..\Partition\Dxe\Eltorito.c</Filename>
-    <Filename>..\..\Partition\Dxe\Gpt.c</Filename>
-    <Filename>..\..\Partition\Dxe\Mbr.c</Filename>
-    <Filename>..\..\Partition\Dxe\ComponentName.c</Filename>
+    <Filename>../../DiskIo/Dxe/diskio.c</Filename>
+    <Filename>../../DiskIo/Dxe/diskio.h</Filename>
+    <Filename>../../DiskIo/Dxe/ComponentName.c</Filename>
+    <Filename>../../Partition/Dxe/Partition.h</Filename>
+    <Filename>../../Partition/Dxe/ElTorito.h</Filename>
+    <Filename>../../Partition/Dxe/Gpt.h</Filename>
+    <Filename>../../Partition/Dxe/Mbr.h</Filename>
+    <Filename>../../Partition/Dxe/Partition.c</Filename>
+    <Filename>../../Partition/Dxe/Eltorito.c</Filename>
+    <Filename>../../Partition/Dxe/Gpt.c</Filename>
+    <Filename>../../Partition/Dxe/Mbr.c</Filename>
+    <Filename>../../Partition/Dxe/ComponentName.c</Filename>
   </SourceFiles>
   <Includes>
     <PackageName>MdePkg</PackageName>
