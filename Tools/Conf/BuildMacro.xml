@@ -616,32 +616,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <!-- <echo>re-generate dll</echo> -->
-          <cc userdefine="on">
-            <command type="LIB">
-              <argument value="${LIB_FLAGS}"/>
-              <FileList dir="" files="${OBJECTS}"/>
-              <LIB.ARG/>
-              <!-- <argument value="/OUT:${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Local.lib"/> -->
-              <OutputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Local.lib"/>
-            </command>
-          </cc>
-    
           <cc userdefine="on">
             <command type="LINK">
               <argument value="${LINK_FLAGS}"/>
-              <!-- <argument value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Local.lib"/> -->
-              <!--<argument value="${LIBS}"/>-->
-              <libSet libs="${LIBS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Local.lib"/>
+              <libset libs="${LIBS}"/>
               <LINK.ARG/>
-              <!-- <argument value="/ENTRY:_ModuleEntryPoint"/> -->
               <EntryPoint value="_ModuleEntryPoint"/>
-              <!-- <argument value="/MAP:${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.map"/> -->
               <map value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.map"/>
-              <!-- <argument value="/PDB:${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.pdb"/> -->
               <pdb value="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.pdb"/>
-              <!-- <argument value="/OUT:${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.dll"/> -->
               <OutputFile value="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.dll"/>
+              <FileList dir="" files="${OBJECTS}"/>
             </command>
           </cc>
         </sequential>

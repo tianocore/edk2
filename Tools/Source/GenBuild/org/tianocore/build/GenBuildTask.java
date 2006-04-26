@@ -237,8 +237,8 @@ public class GenBuildTask extends Task {
         // Update flags like CC_FLAGS, LIB_FLAGS etc.
         //
         flagsSetup();
-        GlobalData.addLibrary(baseName, getProject().getProperty("BIN_DIR") + File.separatorChar + baseName + ".lib");
-        GlobalData.addModuleLibrary(baseName, libraries);
+        GlobalData.addLibrary(baseName, arch, getProject().getProperty("BIN_DIR") + File.separatorChar + baseName + ".lib");
+        GlobalData.addModuleLibrary(baseName, arch, libraries);
         //
         // If ComponentType is USER_DEFINED,
         // then call the exist BaseName_build.xml directly.
