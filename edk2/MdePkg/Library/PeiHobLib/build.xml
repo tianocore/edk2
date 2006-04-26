@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Library\PeiHobLib"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Library/PeiHobLib"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="PeiHobLib">
-      <GenBuild baseName="PeiHobLib" mbdFilename="${MODULE_DIR}\PeiHobLib.mbd" msaFilename="${MODULE_DIR}\PeiHobLib.msa"/>
+      <GenBuild baseName="PeiHobLib" mbdFilename="${MODULE_DIR}/PeiHobLib.mbd" msaFilename="${MODULE_DIR}/PeiHobLib.msa"/>
    </target>
    <target depends="PeiHobLib_clean" name="clean"/>
    <target depends="PeiHobLib_cleanall" name="cleanall"/>
    <target name="PeiHobLib_clean">
-      <OutputDirSetup baseName="PeiHobLib" mbdFilename="${MODULE_DIR}\PeiHobLib.mbd" msaFilename="${MODULE_DIR}\PeiHobLib.msa"/>
+      <OutputDirSetup baseName="PeiHobLib" mbdFilename="${MODULE_DIR}/PeiHobLib.mbd" msaFilename="${MODULE_DIR}/PeiHobLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\PeiHobLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/PeiHobLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\PeiHobLib_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/PeiHobLib_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="PeiHobLib_cleanall">
-      <OutputDirSetup baseName="PeiHobLib" mbdFilename="${MODULE_DIR}\PeiHobLib.mbd" msaFilename="${MODULE_DIR}\PeiHobLib.msa"/>
+      <OutputDirSetup baseName="PeiHobLib" mbdFilename="${MODULE_DIR}/PeiHobLib.mbd" msaFilename="${MODULE_DIR}/PeiHobLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\PeiHobLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/PeiHobLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\PeiHobLib_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/PeiHobLib_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

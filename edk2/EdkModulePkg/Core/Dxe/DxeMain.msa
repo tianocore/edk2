@@ -39,36 +39,36 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
     </LibraryClassDefinitions>
     <SourceFiles>
-        <Filename>DxeMain\DxeMain.c</Filename>
-        <Filename>DxeMain\DxeProtocolNotify.c</Filename>
-        <Filename>Dispatcher\Dispatcher.c</Filename>
-        <Filename>Dispatcher\Dependency.c</Filename>
-        <Filename>Event\ExecData.c</Filename>
-        <Filename>Event\Event.c</Filename>
-        <Filename>Event\Timer.c</Filename>
-        <Filename>Event\Tpl.c</Filename>
-        <Filename>FwVol\FwVol.c</Filename>
-        <Filename>FwVol\Ffs.c</Filename>
-        <Filename>FwVol\FwVolAttrib.c</Filename>
-        <Filename>FwVol\FwVolRead.c</Filename>
-        <Filename>FwVol\FwVolWrite.c</Filename>
-        <Filename>FwVolBlock\FwVolBlock.c</Filename>
-        <Filename>Mem\MemData.c</Filename>
-        <Filename>Mem\Page.c</Filename>
-        <Filename>Mem\Pool.c</Filename>
-        <Filename>Gcd\Gcd.c</Filename>
-        <Filename>Hand\Handle.c</Filename>
-        <Filename>Hand\Locate.c</Filename>
-        <Filename>Hand\Notify.c</Filename>
-        <Filename>Hand\DriverSupport.c</Filename>
-        <Filename>Library\Library.c</Filename>
-        <Filename>Misc\InstallConfigurationTable.c</Filename>
-        <Filename>Misc\SetWatchdogTimer.c</Filename>
-        <Filename>Misc\Stall.c</Filename>
-        <Filename>Misc\DebugImageInfo.c</Filename>
-        <Filename>Image\Image.c</Filename>
-        <Filename>Image\ImageFile.c</Filename>
-        <Filename>SectionExtraction\CoreSectionExtraction.c</Filename>
+        <Filename>DxeMain/DxeMain.c</Filename>
+        <Filename>DxeMain/DxeProtocolNotify.c</Filename>
+        <Filename>Dispatcher/Dispatcher.c</Filename>
+        <Filename>Dispatcher/Dependency.c</Filename>
+        <Filename>Event/ExecData.c</Filename>
+        <Filename>Event/Event.c</Filename>
+        <Filename>Event/Timer.c</Filename>
+        <Filename>Event/Tpl.c</Filename>
+        <Filename>FwVol/FwVol.c</Filename>
+        <Filename>FwVol/Ffs.c</Filename>
+        <Filename>FwVol/FwVolAttrib.c</Filename>
+        <Filename>FwVol/FwVolRead.c</Filename>
+        <Filename>FwVol/FwVolWrite.c</Filename>
+        <Filename>FwVolBlock/FwVolBlock.c</Filename>
+        <Filename>Mem/MemData.c</Filename>
+        <Filename>Mem/Page.c</Filename>
+        <Filename>Mem/Pool.c</Filename>
+        <Filename>Gcd/Gcd.c</Filename>
+        <Filename>Hand/Handle.c</Filename>
+        <Filename>Hand/Locate.c</Filename>
+        <Filename>Hand/Notify.c</Filename>
+        <Filename>Hand/DriverSupport.c</Filename>
+        <Filename>Library/Library.c</Filename>
+        <Filename>Misc/InstallConfigurationTable.c</Filename>
+        <Filename>Misc/SetWatchdogTimer.c</Filename>
+        <Filename>Misc/Stall.c</Filename>
+        <Filename>Misc/DebugImageInfo.c</Filename>
+        <Filename>Image/Image.c</Filename>
+        <Filename>Image/ImageFile.c</Filename>
+        <Filename>SectionExtraction/CoreSectionExtraction.c</Filename>
         <Filename>DebugImageInfo.h</Filename>
         <Filename>DebugMask.h</Filename>
         <Filename>DxeMain.h</Filename>

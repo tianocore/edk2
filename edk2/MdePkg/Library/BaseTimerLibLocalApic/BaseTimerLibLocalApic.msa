@@ -45,9 +45,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>x86TimerLib.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>Ipf\CallPalProc.s</Filename>
-      <Filename>Ipf\ReadItc.s</Filename>
-      <Filename>Ipf\IpfTimerLib.c</Filename>
+      <Filename>Ipf/CallPalProc.s</Filename>
+      <Filename>Ipf/ReadItc.s</Filename>
+      <Filename>Ipf/IpfTimerLib.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

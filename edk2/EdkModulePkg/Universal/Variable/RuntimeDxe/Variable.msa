@@ -60,7 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>x64Variable.dxs</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>Ipf\InitVariable.c</Filename>
+      <Filename>Ipf/InitVariable.c</Filename>
       <Filename>IpfVariable.dxs</Filename>
     </Arch>
   </SourceFiles>

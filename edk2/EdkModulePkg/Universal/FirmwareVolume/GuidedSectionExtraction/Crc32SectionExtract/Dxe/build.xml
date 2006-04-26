@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Universal/FirmwareVolume/GuidedSectionExtraction/Crc32SectionExtract/Dxe"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="Crc32SectionExtract">
-      <GenBuild baseName="Crc32SectionExtract" mbdFilename="${MODULE_DIR}\Crc32SectionExtract.mbd" msaFilename="${MODULE_DIR}\Crc32SectionExtract.msa"/>
+      <GenBuild baseName="Crc32SectionExtract" mbdFilename="${MODULE_DIR}/Crc32SectionExtract.mbd" msaFilename="${MODULE_DIR}/Crc32SectionExtract.msa"/>
    </target>
    <target depends="Crc32SectionExtract_clean" name="clean"/>
    <target depends="Crc32SectionExtract_cleanall" name="cleanall"/>
    <target name="Crc32SectionExtract_clean">
-      <OutputDirSetup baseName="Crc32SectionExtract" mbdFilename="${MODULE_DIR}\Crc32SectionExtract.mbd" msaFilename="${MODULE_DIR}\Crc32SectionExtract.msa"/>
+      <OutputDirSetup baseName="Crc32SectionExtract" mbdFilename="${MODULE_DIR}/Crc32SectionExtract.mbd" msaFilename="${MODULE_DIR}/Crc32SectionExtract.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\Crc32SectionExtract_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/Crc32SectionExtract_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\Crc32SectionExtract_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/Crc32SectionExtract_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="Crc32SectionExtract_cleanall">
-      <OutputDirSetup baseName="Crc32SectionExtract" mbdFilename="${MODULE_DIR}\Crc32SectionExtract.mbd" msaFilename="${MODULE_DIR}\Crc32SectionExtract.msa"/>
+      <OutputDirSetup baseName="Crc32SectionExtract" mbdFilename="${MODULE_DIR}/Crc32SectionExtract.mbd" msaFilename="${MODULE_DIR}/Crc32SectionExtract.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\Crc32SectionExtract_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/Crc32SectionExtract_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\Crc32SectionExtract_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/Crc32SectionExtract_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Universal\DataHub\DataHub\Dxe"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Universal/DataHub/DataHub/Dxe"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="DataHub">
-      <GenBuild baseName="DataHub" mbdFilename="${MODULE_DIR}\DataHub.mbd" msaFilename="${MODULE_DIR}\DataHub.msa"/>
+      <GenBuild baseName="DataHub" mbdFilename="${MODULE_DIR}/DataHub.mbd" msaFilename="${MODULE_DIR}/DataHub.msa"/>
    </target>
    <target depends="DataHub_clean" name="clean"/>
    <target depends="DataHub_cleanall" name="cleanall"/>
    <target name="DataHub_clean">
-      <OutputDirSetup baseName="DataHub" mbdFilename="${MODULE_DIR}\DataHub.mbd" msaFilename="${MODULE_DIR}\DataHub.msa"/>
+      <OutputDirSetup baseName="DataHub" mbdFilename="${MODULE_DIR}/DataHub.mbd" msaFilename="${MODULE_DIR}/DataHub.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\DataHub_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/DataHub_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\DataHub_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/DataHub_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="DataHub_cleanall">
-      <OutputDirSetup baseName="DataHub" mbdFilename="${MODULE_DIR}\DataHub.mbd" msaFilename="${MODULE_DIR}\DataHub.msa"/>
+      <OutputDirSetup baseName="DataHub" mbdFilename="${MODULE_DIR}/DataHub.mbd" msaFilename="${MODULE_DIR}/DataHub.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\DataHub_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/DataHub_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\DataHub_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/DataHub_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

@@ -25,17 +25,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${DEST_DIR_OUTPUT}\@{FILEPATH}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
-            <input file="${DEST_DIR_DEBUG}\AutoGen.h"/>
+          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
+            <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
             <includepath path="${WORKSPACE_DIR}"/>
             <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
+            <includepath path="${MODULE_DIR}/${ARCH}"/>
             <EXTRA.INC/>
           </makedeps>
         </then>
@@ -43,10 +43,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file ListFile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
         </sourcefiles>
         <targetfiles>
-          <file Name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+          <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         </targetfiles>
 
         <sequential>
@@ -54,17 +54,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="CC" workdir="${DEST_DIR_OUTPUT}">
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
               <EXTRA.INC/>
 
               <argument value="${CC_FLAGS}"/>
               <EXTRA.ARG/>
-              <!-- <argument value="/FI${DEST_DIR_DEBUG}\AutoGen.h" /> -->
-              <includeFile value="${DEST_DIR_DEBUG}\AutoGen.h"/>
-              <!-- <argument value="/Fo${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/> -->
-              <outputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+              <!-- <argument value="/FI${DEST_DIR_DEBUG}/AutoGen.h" /> -->
+              <includeFile value="${DEST_DIR_DEBUG}/AutoGen.h"/>
+              <!-- <argument value="/Fo${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/> -->
+              <outputFile value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
 
-              <fileset casesensitive="off" file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
         </sequential>
@@ -73,7 +73,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <!--
         for library generation later
         -->
-      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/> 
+      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/> 
     </sequential>
   </macrodef>
 
@@ -87,17 +87,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${DEST_DIR_OUTPUT}\@{FILEPATH}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
-            <input file="${DEST_DIR_DEBUG}\AutoGen.h"/>
+          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
+            <input file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            <input file="${DEST_DIR_DEBUG}/AutoGen.h"/>
             <includepath path="${WORKSPACE_DIR}"/>
             <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
+            <includepath path="${MODULE_DIR}/${ARCH}"/>
             <EXTRA.INC/>
           </makedeps>
         </then>
@@ -105,10 +105,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file ListFile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep"/>
+          <file ListFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
         </sourcefiles>
         <targetfiles>
-          <file Name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+          <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         </targetfiles>
 
         <sequential>
@@ -116,17 +116,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="CC" workdir="${DEST_DIR_OUTPUT}">
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
               <EXTRA.INC/>
     
               <argument value="${CC_FLAGS}"/>
               <EXTRA.ARG/>
-              <!-- <argument value="/FI${DEST_DIR_DEBUG}\AutoGen.h" />  -->
-              <includeFile value="${DEST_DIR_DEBUG}\AutoGen.h"/>
-              <!-- <argument value="/Fo${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/> -->
-              <outputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+              <!-- <argument value="/FI${DEST_DIR_DEBUG}/AutoGen.h" />  -->
+              <includeFile value="${DEST_DIR_DEBUG}/AutoGen.h"/>
+              <!-- <argument value="/Fo${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/> -->
+              <outputFile value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
     
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
         </sequential>
@@ -134,7 +134,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <!--
         for library generation later
         -->
-      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/> 
+      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/> 
     </sequential>
   </macrodef>
 
@@ -147,36 +147,36 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${DEST_DIR_OUTPUT}\@{FILEPATH}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <OnDependency>
         <sourcefiles>
-          <file name="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\${BASE_NAME}.@{FILEEXT}.depex"/>
+          <file name="${DEST_DIR_OUTPUT}/${BASE_NAME}.@{FILEEXT}.depex"/>
         </targetfiles>
 
         <sequential>
-          <copy file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-                tofile="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.c"/>
+          <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+                tofile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.c"/>
 
           <cc userdefine="on">
             <command type="CC" workdir=".">
               <includepath path="${DEST_DIR_DEBUG}" /> 
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
               <EXTRA.INC/>
               <argument value="${PP_FLAGS}"/>
-              <fileset casesensitive="off" file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.c"/>
+              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.c"/>
               <outputFile value="@{FILENAME}.@{FILEEXT}.i"/>
             </command>
           </cc>
     
-          <gendepex inputFile="@{FILENAME}.@{FILEEXT}.i" outputFile="${DEST_DIR_OUTPUT}\${BASE_NAME}.@{FILEEXT}.depex"/>
+          <gendepex inputFile="@{FILENAME}.@{FILEEXT}.i" outputFile="${DEST_DIR_OUTPUT}/${BASE_NAME}.@{FILEEXT}.depex"/>
           <delete file="@{FILENAME}.@{FILEEXT}.i" />
-          <delete file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.c" /> 
+          <delete file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.c" /> 
         </sequential>
       </OnDependency>
     </sequential>
@@ -188,8 +188,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
      FILENAME="${SOURCE_NAME}"
      FILEEXT="c">
      <EXTRA.INC>
-       <includepath path="${PACKAGE_DIR}\Include"/>
-       <includepath path="${PACKAGE_DIR}\Include\${ARCH}"/>
+       <includepath path="${PACKAGE_DIR}/Include"/>
+       <includepath path="${PACKAGE_DIR}/Include/${ARCH}"/>
      </EXTRA.INC>
 
      <EXTRA.ARG>
@@ -210,14 +210,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${DEST_DIR_OUTPUT}\@{FILEPATH}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <OnDependency>
         <sourcefiles>
-          <file Name="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+          <file Name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </sourcefiles>
         <targetfiles>
-          <file Name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+          <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         </targetfiles>
 
         <sequential>
@@ -225,15 +225,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="ASM">
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
               <EXTRA.INC/>
       
               <argument value="${ASM_FLAGS}"/>
               <EXTRA.ARG/>
-              <argument value="/Fl${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.lst"/>
-              <OutputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+              <argument value="/Fl${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.lst"/>
+              <OutputFile value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
       
-              <fileset casesensitive="off" file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
         </sequential>
@@ -241,7 +241,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <!--
         for library generation later
         -->
-      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
     </sequential>
   </macrodef>
 
@@ -263,7 +263,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <file list="${OBJECTS}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${BIN_DIR}\@{FILENAME}.lib"/>
+          <file name="${BIN_DIR}/@{FILENAME}.lib"/>
         </targetfiles>
 
         <sequential>
@@ -273,8 +273,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <argument value="${LIB_FLAGS}"/>
               <!--<argument value="${OBJECTS}"/>-->
               <FileList dir="" files="${OBJECTS}"/>
-              <!-- <argument value="/out:${BIN_DIR}\@{FILENAME}.lib"/> -->
-              <OutputFile value="${BIN_DIR}\@{FILENAME}.lib"/>
+              <!-- <argument value="/out:${BIN_DIR}/@{FILENAME}.lib"/> -->
+              <OutputFile value="${BIN_DIR}/@{FILENAME}.lib"/>
             </command>
           </cc>
         </sequential>
@@ -294,16 +294,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${DEST_DIR_OUTPUT}\@{FILEPATH}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
+            <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             <includepath path="${WORKSPACE_DIR}"/>
             <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
+            <includepath path="${MODULE_DIR}/${ARCH}"/>
             <EXTRA.INC/>
           </makedeps>
         </then>
@@ -311,41 +311,41 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file listfile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep"/>
+          <file listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         </targetfiles>
 
         <sequential>
-          <copy file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-                tofile="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.c"/>
+          <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+                tofile="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.c"/>
           <cc userdefine="on">
             <command type="CC" workdir="."> 
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
               <EXTRA.INC/>
               <argument value="${PP_FLAGS}"/>
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.c"/>
+              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.c"/>
             </command>
           </cc>
           <move file="@{FILENAME}.@{FILEEXT}.i" 
-                tofile="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.pro"/>
+                tofile="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.pro"/>
       
           <cc userdefine="on">
             <command type="ASM" includepathDelimiter="-I">
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
               <EXTRA.INC/>
       
               <argument value="${ASM_FLAGS}"/>
               <EXTRA.ARG/>
-              <!-- <argument value="-o ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/> -->
-              <OutputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+              <!-- <argument value="-o ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/> -->
+              <OutputFile value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
       
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.pro"/>
+              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.pro"/>
             </command>
           </cc>
         </sequential>
@@ -353,7 +353,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <!--
         for library generation later
         -->
-      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
     </sequential>
   </macrodef>
 
@@ -367,28 +367,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${DEST_DIR_OUTPUT}\@{FILEPATH}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
   
       <cc userdefine="on">
         <command type="ASM" includepathDelimiter="-I">
           <includepath path="${WORKSPACE_DIR}"/>
           <includepath path="${MODULE_DIR}"/>
-          <includepath path="${MODULE_DIR}\${ARCH}"/>
+          <includepath path="${MODULE_DIR}/${ARCH}"/>
           <EXTRA.INC/>
   
           <argument value="${ASM_FLAGS}"/>
           <EXTRA.ARG/>
-          <!-- <argument value="-o ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/> -->
-          <OutputFile File="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+          <!-- <argument value="-o ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/> -->
+          <OutputFile File="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
   
-          <fileset casesensitive="off" file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+          <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </command>
       </cc>
   
       <!--
         for library generation later
         -->
-      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
     </sequential>
   </macrodef>
   
@@ -421,30 +421,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${DEST_DIR_OUTPUT}\@{FILEPATH}"/>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
 
       <OnDependency>
         <sourcefiles>
-          <file name="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+          <file name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.sdb"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb"/>
         </targetfiles>
 
         <sequential>
           <strgather commandtype="parse" newdatabase="true">
-            <database name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.sdb"/>
+            <database name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb"/>
             <includepath path="${WORKSPACE_DIR}"/>
             <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
+            <includepath path="${MODULE_DIR}/${ARCH}"/>
             <EXTRA.INC/>
             <EXTRA.ARG/>
-            <inputfile name="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+            <inputfile name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
           </strgather>
         </sequential>
       </OnDependency>
 
-      <bl name="SDB_FILES" value="${SDB_FILES}, ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.sdb"/>
+      <bl name="SDB_FILES" value="${SDB_FILES}, ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb"/>
     </sequential>
   </macrodef>
 
@@ -466,11 +466,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <file list="${SOURCE_FILES}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.sdb"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb"/>
         </targetfiles>
         
         <sequential>
-          <strgather commandtype="scan" outputdatabase="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.sdb" verbose="read">
+          <strgather commandtype="scan" outputdatabase="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb" verbose="read">
             <skipext name=".uni"/>
             <skipext name=".h"/>
             <database list="${SDB_FILES}"/>
@@ -481,30 +481,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.sdb"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}StrDefs.h"/>
-          <file name="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}Strings.hpk"/>
-          <file name="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}Strings.c"/>
+          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}StrDefs.h"/>
+          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.hpk"/>
+          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c"/>
         </targetfiles>
         
         <sequential>
           <strgather basename="@{FILENAME}Strings" commandtype="dump"
-                     outputdefines="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}StrDefs.h"
-                     outputhpk="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}Strings.hpk"
-                     outputstring="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}Strings.c">
-            <database name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.sdb"/>
+                     outputdefines="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}StrDefs.h"
+                     outputhpk="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.hpk"
+                     outputstring="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c">
+            <database name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.sdb"/>
           </strgather>
         </sequential>
       </OnDependency>
 
       <OnDependency>
         <sourcefiles>
-          <file name="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}Strings.c"/>
+          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Strings.obj"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj"/>
         </targetfiles>
         
         <sequential>
@@ -512,18 +512,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="CC" workdir="${DEST_DIR_OUTPUT}" includepathDelimiter="-I">
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
 
               <argument value="${CC_FLAGS}"/>
-              <OutputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Strings.obj"/>
+              <OutputFile value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj"/>
 
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}Strings.c"/>
+              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c"/>
             </command>
           </cc>
         </sequential>
       </OnDependency>
 
-      <bl name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Strings.obj"/>
+      <bl name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj"/>
     </sequential>
   </macrodef>
 
@@ -542,14 +542,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <mkdir dir="${DEST_DIR_DEBUG}/@{FILEPATH}"/>
 
       <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         <then>
-          <makedeps DepsFile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep">
-            <input file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
-            <!-- <input file="${DEST_DIR_DEBUG}\AutoGen.h"/> -->
+          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
+            <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            <!-- <input file="${DEST_DIR_DEBUG}/AutoGen.h"/> -->
             <includepath path="${WORKSPACE_DIR}"/>
             <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
+            <includepath path="${MODULE_DIR}/${ARCH}"/>
             <EXTRA.INC/>
           </makedeps>
         </then>
@@ -557,17 +557,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file listfile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}.dep"/>
+          <file listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
         </targetfiles>
 
         <sequential>
-          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}\@{FILEPATH}" vfrFile="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}">
+          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}">
             <includepath path="${WORKSPACE_DIR}"/>
             <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
+            <includepath path="${MODULE_DIR}/${ARCH}"/>
             <EXTRA.INC/>
           </vfrcompile>
     
@@ -575,19 +575,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="CC" workdir="${DEST_DIR_OUTPUT}" includepathDelimiter="-I">
               <includepath path="${WORKSPACE_DIR}"/>
               <includepath path="${MODULE_DIR}"/>
-              <includepath path="${MODULE_DIR}\${ARCH}"/>
+              <includepath path="${MODULE_DIR}/${ARCH}"/>
               <argument value="${CC_FLAGS}"/>
-              <OutputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+              <OutputFile value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
               <EXTRA.ARG/>
     
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.c"/>
+              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.c"/>
             </command>
           </cc>
     
           <delete file="@{FILENAME}.i"/>
         </sequential>
       </OnDependency>
-      <bl name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.obj"/>
+      <bl name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
     </sequential>
   </macrodef>
 
@@ -612,7 +612,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <file list="${LIBS}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.dll"/>
+          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
         </targetfiles>
 
         <sequential>
@@ -622,9 +622,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <libset libs="${LIBS}"/>
               <LINK.ARG/>
               <EntryPoint value="_ModuleEntryPoint"/>
-              <map value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.map"/>
-              <pdb value="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.pdb"/>
-              <OutputFile value="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.dll"/>
+              <map value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.map"/>
+              <pdb value="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.pdb"/>
+              <OutputFile value="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
               <FileList dir="" files="${OBJECTS}"/>
             </command>
           </cc>
@@ -644,15 +644,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <OnDependency>
         <sourcefiles>
-          <file name="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+          <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.efi"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
         </targetfiles>
 
         <sequential>
-          <fwimage componenttype="${COMPONENT_TYPE}" outImage="${DEST_DIR_OUTPUT}\@{FILENAME}.efi" 
-                   peImage="${DEST_DIR_DEBUG}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" time="0"/>
+          <fwimage componenttype="${COMPONENT_TYPE}" outImage="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" 
+                   peImage="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" time="0"/>
         </sequential>
       </OnDependency>
     </sequential>
@@ -704,16 +704,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.efi"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.pe32"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.pe32"/>
         </targetfiles>
 
         <sequential>
-          <copy file="${DEST_DIR_OUTPUT}\@{FILENAME}.efi" tofile="${BIN_DIR}\@{FILENAME}.efi" />
-          <gensection inputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.efi" 
-                      outputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.pe32" 
+          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
+          <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" 
+                      outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.pe32" 
                       sectiontype="EFI_SECTION_PE32"/>
     
           <POST.PROCESS/>
@@ -737,12 +737,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <if>
         <not>
-          <available type="file" file="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.ver"/>
+          <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.ver"/>
         </not>
 
         <then>
           <PRE.PROCESS/>
-          <gensection outputfile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.ver" 
+          <gensection outputfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.ver" 
                       versionnum="@{VERSION}"
                       sectiontype="EFI_SECTION_VERSION"/>
           <POST.PROCESS/>
@@ -766,13 +766,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <if>
         <not>
-          <available type="file" file="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.ui"/>
+          <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.ui"/>
         </not>
 
         <then>
           <PRE.PROCESS/>
           <gensection interfacestring="@{UI}"
-                      outputfile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.ui" 
+                      outputfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.ui" 
                       sectiontype="EFI_SECTION_USER_INTERFACE"/>
           <POST.PROCESS/>
         </then>
@@ -813,18 +813,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <PRE.PROCESS/>
 
       <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}.depex"/>
+        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}.depex"/>
         <then>
           <OnDependency>
             <sourcefiles>
-              <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}.depex"/>
+              <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}.depex"/>
             </sourcefiles>
             <targetfiles>
-              <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx"/>
+              <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx"/>
             </targetfiles>
             <sequential>
-              <gensection inputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}.depex" 
-                          outputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx" 
+              <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}.depex" 
+                          outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx" 
                           sectiontype="EFI_SECTION_DXE_DEPEX"/>
             </sequential>
           </OnDependency>
@@ -832,10 +832,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <else>
           <if>
             <not>
-              <available type="file" file="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx"/>
+              <available type="file" file="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx"/>
             </not>
             <then>
-              <touch file="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx"/>
+              <touch file="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx"/>
             </then>
           </if>
         </else>
@@ -858,19 +858,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <PRE.PROCESS/>
       <if>
-        <available type="file" file="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}.depex"/>
+        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}.depex"/>
         <then>
           <OnDependency>
             <sourcefiles>
-              <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}.depex"/>
+              <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}.depex"/>
             </sourcefiles>
             <targetfiles>
-              <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx"/>
+              <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx"/>
             </targetfiles>
 
             <sequential>
-              <gensection inputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}.depex" 
-                          outputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx" 
+              <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}.depex" 
+                          outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx" 
                           sectiontype="EFI_SECTION_PEI_DEPEX"/>
             </sequential>
           </OnDependency>
@@ -879,10 +879,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <else>
           <if>
             <not>
-              <available type="file" file="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx"/>
+              <available type="file" file="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx"/>
             </not>
             <then>
-              <touch file="${DEST_DIR_OUTPUT}\@{FILENAME}.dpx"/>
+              <touch file="${DEST_DIR_OUTPUT}/@{FILENAME}.dpx"/>
             </then>
           </if>
         </else>
@@ -902,8 +902,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <element name="EXTRA.ARG" optional="yes"/>
   
       <sequential>
-        <gensection inputfile="${BIN_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-                    outputfile="${BIN_DIR}\@{FILENAME}.pe32" 
+        <gensection inputfile="${BIN_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+                    outputfile="${BIN_DIR}/@{FILENAME}.pe32" 
                     sectiontype="EFI_SECTION_PIC"/>
       </sequential>
     </macrodef>
@@ -920,8 +920,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <element name="EXTRA.ARG" optional="yes"/>
   
       <sequential>
-        <gensection inputfile="${BIN_DIR}\@{FILENAME}.@{FILEEXT}" 
-                    outputfile="${BIN_DIR}\@{FILENAME}.pe32" 
+        <gensection inputfile="${BIN_DIR}/@{FILENAME}.@{FILEEXT}" 
+                    outputfile="${BIN_DIR}/@{FILENAME}.pe32" 
                     sectiontype="EFI_SECTION_PE32"/>
       </sequential>
     </macrodef>
@@ -941,16 +941,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <OnDependency>
         <sourcefiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.sec"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.sec"/>
         </targetfiles>
 
         <sequential>
           <PRE.PROCESS/>
-          <gensection inputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.@{FILEEXT}" 
-                      outputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.sec" 
+          <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.@{FILEEXT}" 
+                      outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.sec" 
                       sectiontype="EFI_SECTION_RAW"/>
           <POST.PROCESS/>
         </sequential>
@@ -969,8 +969,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <element name="EXTRA.ARG" optional="yes"/>
   
       <sequential>
-        <gensection inputfile="${BIN_DIR}\@{FILENAME}.@{FILEEXT}" 
-                    outputfile="${BIN_DIR}\@{FILENAME}.pe32" 
+        <gensection inputfile="${BIN_DIR}/@{FILENAME}.@{FILEEXT}" 
+                    outputfile="${BIN_DIR}/@{FILENAME}.pe32" 
                     sectiontype="EFI_SECTION_PE32"/>
       </sequential>
     </macrodef>
@@ -987,8 +987,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <element name="EXTRA.ARG" optional="yes"/>
   
       <sequential>
-        <gensection inputfile="${BIN_DIR}\@{FILENAME}.@{FILEEXT}" 
-                    outputfile="${BIN_DIR}\@{FILENAME}.pe32" 
+        <gensection inputfile="${BIN_DIR}/@{FILENAME}.@{FILEEXT}" 
+                    outputfile="${BIN_DIR}/@{FILENAME}.pe32" 
                     sectiontype="EFI_SECTION_PE32"/>
       </sequential>
     </macrodef>
@@ -1005,8 +1005,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <element name="EXTRA.ARG" optional="yes"/>
   
       <sequential>
-        <gensection inputfile="${BIN_DIR}\@{FILENAME}.@{FILEEXT}" 
-                    outputfile="${BIN_DIR}\@{FILENAME}.pe32" 
+        <gensection inputfile="${BIN_DIR}/@{FILENAME}.@{FILEEXT}" 
+                    outputfile="${BIN_DIR}/@{FILENAME}.pe32" 
                     sectiontype="EFI_SECTION_PE32"/>
       </sequential>
     </macrodef>
@@ -1026,20 +1026,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <sequential>
       <OnDependency>
         <sourcefiles>
-          <file name="${FV_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}"/>
+          <file name="${FV_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </sourcefiles>
         <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}fv.sec"/>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}fv.sec"/>
         </targetfiles>
 
         <sequential>
           <PRE.PROCESS/>
     
-          <copy file="${FV_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-                tofile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
+          <copy file="${FV_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+                tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
                 overwrite="true"/>
-          <gensection inputfile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-                      outputfile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}fv.sec" 
+          <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+                      outputfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}fv.sec" 
                       sectiontype="EFI_SECTION_FIRMWARE_VOLUME_IMAGE"/>
     
           <POST.PROCESS/>
@@ -1060,8 +1060,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <copy file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-            tofile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.bin"/>
+      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+            tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
     </sequential>
   </macrodef>
 
@@ -1077,9 +1077,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${MODULE_DIR}\@{FILEPATH}" /> 
-      <copy file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-            tofile="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}.bin"/>
+      <mkdir dir="${MODULE_DIR}/@{FILEPATH}" /> 
+      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+            tofile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.bin"/>
     </sequential>
   </macrodef>
   <macrodef name="Build_EFI">
@@ -1091,9 +1091,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${MODULE_DIR}\@{FILEPATH}" /> 
-      <copy file="${MODULE_DIR}\@{FILEPATH}\@{FILENAME}.@{FILEEXT}" 
-        tofile="${DEST_DIR_OUTPUT}\${BASE_NAME}.efi"/>
+      <mkdir dir="${MODULE_DIR}/@{FILEPATH}" /> 
+      <copy file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" 
+        tofile="${DEST_DIR_OUTPUT}/${BASE_NAME}.efi"/>
     </sequential>
   </macrodef>
 </project>

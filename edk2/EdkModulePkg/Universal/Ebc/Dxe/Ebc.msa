@@ -48,20 +48,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>EbcExecute.h</Filename>
     <Filename>Ebc.dxs</Filename>
     <Arch ArchType="IA32">
-      <Filename>Ia32\EbcLowLevel.asm</Filename>
-      <Filename>Ia32\Ia32Math.asm</Filename>
-      <Filename>Ia32\EbcSupport.c</Filename>
+      <Filename>Ia32/EbcLowLevel.asm</Filename>
+      <Filename>Ia32/Ia32Math.asm</Filename>
+      <Filename>Ia32/EbcSupport.c</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>x64\EbcLowLevel.asm</Filename>
-      <Filename>x64\x64Math.c</Filename>
-      <Filename>x64\EbcSupport.c</Filename>
+      <Filename>x64/EbcLowLevel.asm</Filename>
+      <Filename>x64/x64Math.c</Filename>
+      <Filename>x64/EbcSupport.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>Ipf\EbcLowLevel.s</Filename>
-      <Filename>Ipf\IpfMath.c</Filename>
-      <Filename>Ipf\IpfMul.s</Filename>
-      <Filename>Ipf\EbcSupport.c</Filename>
+      <Filename>Ipf/EbcLowLevel.s</Filename>
+      <Filename>Ipf/IpfMath.c</Filename>
+      <Filename>Ipf/IpfMul.s</Filename>
+      <Filename>Ipf/EbcSupport.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

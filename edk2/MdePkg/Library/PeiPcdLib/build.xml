@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Library\PeiPcdLib"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Library/PeiPcdLib"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="PeiPcdLib">
-      <GenBuild baseName="PeiPcdLib" mbdFilename="${MODULE_DIR}\PeiPcdLib.mbd" msaFilename="${MODULE_DIR}\PeiPcdLib.msa"/>
+      <GenBuild baseName="PeiPcdLib" mbdFilename="${MODULE_DIR}/PeiPcdLib.mbd" msaFilename="${MODULE_DIR}/PeiPcdLib.msa"/>
    </target>
    <target depends="PeiPcdLib_clean" name="clean"/>
    <target depends="PeiPcdLib_cleanall" name="cleanall"/>
    <target name="PeiPcdLib_clean">
-      <OutputDirSetup baseName="PeiPcdLib" mbdFilename="${MODULE_DIR}\PeiPcdLib.mbd" msaFilename="${MODULE_DIR}\PeiPcdLib.msa"/>
+      <OutputDirSetup baseName="PeiPcdLib" mbdFilename="${MODULE_DIR}/PeiPcdLib.mbd" msaFilename="${MODULE_DIR}/PeiPcdLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\PeiPcdLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/PeiPcdLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\PeiPcdLib_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/PeiPcdLib_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="PeiPcdLib_cleanall">
-      <OutputDirSetup baseName="PeiPcdLib" mbdFilename="${MODULE_DIR}\PeiPcdLib.mbd" msaFilename="${MODULE_DIR}\PeiPcdLib.msa"/>
+      <OutputDirSetup baseName="PeiPcdLib" mbdFilename="${MODULE_DIR}/PeiPcdLib.mbd" msaFilename="${MODULE_DIR}/PeiPcdLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\PeiPcdLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/PeiPcdLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\PeiPcdLib_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/PeiPcdLib_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

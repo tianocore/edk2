@@ -49,16 +49,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>StatusCode.c</Filename>
     <Filename>StatusCode.h</Filename>
     <Arch ArchType="IA32">
-      <Filename>Ia32\Ia32StatusCode.c</Filename>
-      <Filename>Ia32\Ia32StatusCode.dxs</Filename>
+      <Filename>Ia32/Ia32StatusCode.c</Filename>
+      <Filename>Ia32/Ia32StatusCode.dxs</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>x64\x64StatusCode.c</Filename>
-      <Filename>x64\x64StatusCode.dxs</Filename>
+      <Filename>x64/x64StatusCode.c</Filename>
+      <Filename>x64/x64StatusCode.dxs</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>Ipf\IpfStatusCode.c</Filename>
-      <Filename>Ipf\IpfStatusCode.dxs</Filename>
+      <Filename>Ipf/IpfStatusCode.c</Filename>
+      <Filename>Ipf/IpfStatusCode.dxs</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

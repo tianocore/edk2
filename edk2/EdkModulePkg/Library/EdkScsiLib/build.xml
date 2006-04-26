@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Library\EdkScsiLib"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Library/EdkScsiLib"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="EdkScsiLib">
-      <GenBuild baseName="EdkScsiLib" mbdFilename="${MODULE_DIR}\EdkScsiLib.mbd" msaFilename="${MODULE_DIR}\EdkScsiLib.msa"/>
+      <GenBuild baseName="EdkScsiLib" mbdFilename="${MODULE_DIR}/EdkScsiLib.mbd" msaFilename="${MODULE_DIR}/EdkScsiLib.msa"/>
    </target>
    <target depends="EdkScsiLib_clean" name="clean"/>
    <target depends="EdkScsiLib_cleanall" name="cleanall"/>
    <target name="EdkScsiLib_clean">
-      <OutputDirSetup baseName="EdkScsiLib" mbdFilename="${MODULE_DIR}\EdkScsiLib.mbd" msaFilename="${MODULE_DIR}\EdkScsiLib.msa"/>
+      <OutputDirSetup baseName="EdkScsiLib" mbdFilename="${MODULE_DIR}/EdkScsiLib.mbd" msaFilename="${MODULE_DIR}/EdkScsiLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\EdkScsiLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/EdkScsiLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\EdkScsiLib_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/EdkScsiLib_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="EdkScsiLib_cleanall">
-      <OutputDirSetup baseName="EdkScsiLib" mbdFilename="${MODULE_DIR}\EdkScsiLib.mbd" msaFilename="${MODULE_DIR}\EdkScsiLib.msa"/>
+      <OutputDirSetup baseName="EdkScsiLib" mbdFilename="${MODULE_DIR}/EdkScsiLib.mbd" msaFilename="${MODULE_DIR}/EdkScsiLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\EdkScsiLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/EdkScsiLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\EdkScsiLib_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/EdkScsiLib_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

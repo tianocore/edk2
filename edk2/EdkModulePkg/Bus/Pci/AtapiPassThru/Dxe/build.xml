@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Bus\Pci\AtapiPassThru\Dxe"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Bus/Pci/AtapiPassThru/Dxe"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="AtapiPassThru">
-      <GenBuild baseName="AtapiPassThru" mbdFilename="${MODULE_DIR}\AtapiPassThru.mbd" msaFilename="${MODULE_DIR}\AtapiPassThru.msa"/>
+      <GenBuild baseName="AtapiPassThru" mbdFilename="${MODULE_DIR}/AtapiPassThru.mbd" msaFilename="${MODULE_DIR}/AtapiPassThru.msa"/>
    </target>
    <target depends="AtapiPassThru_clean" name="clean"/>
    <target depends="AtapiPassThru_cleanall" name="cleanall"/>
    <target name="AtapiPassThru_clean">
-      <OutputDirSetup baseName="AtapiPassThru" mbdFilename="${MODULE_DIR}\AtapiPassThru.mbd" msaFilename="${MODULE_DIR}\AtapiPassThru.msa"/>
+      <OutputDirSetup baseName="AtapiPassThru" mbdFilename="${MODULE_DIR}/AtapiPassThru.mbd" msaFilename="${MODULE_DIR}/AtapiPassThru.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\AtapiPassThru_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/AtapiPassThru_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\AtapiPassThru_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/AtapiPassThru_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="AtapiPassThru_cleanall">
-      <OutputDirSetup baseName="AtapiPassThru" mbdFilename="${MODULE_DIR}\AtapiPassThru.mbd" msaFilename="${MODULE_DIR}\AtapiPassThru.msa"/>
+      <OutputDirSetup baseName="AtapiPassThru" mbdFilename="${MODULE_DIR}/AtapiPassThru.mbd" msaFilename="${MODULE_DIR}/AtapiPassThru.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\AtapiPassThru_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/AtapiPassThru_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\AtapiPassThru_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/AtapiPassThru_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>

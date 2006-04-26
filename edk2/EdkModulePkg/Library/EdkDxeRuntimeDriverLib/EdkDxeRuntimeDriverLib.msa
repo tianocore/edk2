@@ -41,16 +41,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </LibraryClassDefinitions>
   <SourceFiles>
     <Arch ArchType="IA32">
-      <Filename>Common\RuntimeLib.c</Filename>
-      <Filename>Common\RuntimeService.c</Filename>
+      <Filename>Common/RuntimeLib.c</Filename>
+      <Filename>Common/RuntimeService.c</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>Common\RuntimeLib.c</Filename>
-      <Filename>Common\RuntimeService.c</Filename>
+      <Filename>Common/RuntimeLib.c</Filename>
+      <Filename>Common/RuntimeService.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>Ipf\RuntimeLib.c</Filename>
-      <Filename>Ipf\RuntimeService.c</Filename>
+      <Filename>Ipf/RuntimeLib.c</Filename>
+      <Filename>Ipf/RuntimeService.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

@@ -49,15 +49,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Runtime.h</Filename>
     <Filename>Crc32.c</Filename>
     <Arch ArchType="IA32">
-      <Filename>Ia32\PeHotRelocateEx.c</Filename>
+      <Filename>Ia32/PeHotRelocateEx.c</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>x64\PeHotRelocateEx.c</Filename>
-      <Filename>x64\PeHotRelocateEx.h</Filename>
+      <Filename>x64/PeHotRelocateEx.c</Filename>
+      <Filename>x64/PeHotRelocateEx.h</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>Ipf\PeHotRelocateEx.c</Filename>
-      <Filename>Ipf\PeHotRelocateEx.h</Filename>
+      <Filename>Ipf/PeHotRelocateEx.c</Filename>
+      <Filename>Ipf/PeHotRelocateEx.h</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

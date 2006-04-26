@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Library\UefiDriverModelLib"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Library/UefiDriverModelLib"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="UefiDriverModelLib">
-      <GenBuild baseName="UefiDriverModelLib" mbdFilename="${MODULE_DIR}\UefiDriverModelLib.mbd" msaFilename="${MODULE_DIR}\UefiDriverModelLib.msa"/>
+      <GenBuild baseName="UefiDriverModelLib" mbdFilename="${MODULE_DIR}/UefiDriverModelLib.mbd" msaFilename="${MODULE_DIR}/UefiDriverModelLib.msa"/>
    </target>
    <target depends="UefiDriverModelLib_clean" name="clean"/>
    <target depends="UefiDriverModelLib_cleanall" name="cleanall"/>
    <target name="UefiDriverModelLib_clean">
-      <OutputDirSetup baseName="UefiDriverModelLib" mbdFilename="${MODULE_DIR}\UefiDriverModelLib.mbd" msaFilename="${MODULE_DIR}\UefiDriverModelLib.msa"/>
+      <OutputDirSetup baseName="UefiDriverModelLib" mbdFilename="${MODULE_DIR}/UefiDriverModelLib.mbd" msaFilename="${MODULE_DIR}/UefiDriverModelLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\UefiDriverModelLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/UefiDriverModelLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\UefiDriverModelLib_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/UefiDriverModelLib_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="UefiDriverModelLib_cleanall">
-      <OutputDirSetup baseName="UefiDriverModelLib" mbdFilename="${MODULE_DIR}\UefiDriverModelLib.mbd" msaFilename="${MODULE_DIR}\UefiDriverModelLib.msa"/>
+      <OutputDirSetup baseName="UefiDriverModelLib" mbdFilename="${MODULE_DIR}/UefiDriverModelLib.mbd" msaFilename="${MODULE_DIR}/UefiDriverModelLib.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\UefiDriverModelLib_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/UefiDriverModelLib_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\UefiDriverModelLib_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/UefiDriverModelLib_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>
