@@ -1,0 +1,385 @@
+Intel(R) Platform Innovation Framework for EFI
+EFI Development Kit 2.0 (EDK 2.0) 
+Alpha Release
+2006-04-26
+
+Copyright (c) 2006, Intel Corporation
+
+This document provides updates to documentation, along with a description on 
+how to install and build the Edk 2.0.
+
+Package Contents
+----------------
+  ReleaseNote.txt- These release notes for the package.
+  MdePkg         - A package containing Industry Standard headers and libraries
+  Tools          - A package containing Build Specific tools which are designed
+                   to help the developer create and modify drivers and
+                   libraries
+  EdkModulePkg   - A package containing reference drivers
+  EdkFatBinPkg   - A package containing binary DXE drivers for the Fat 32 file
+                   system
+  EdkShellBinPkg - A package containing binary Shell applications and commands
+  EdkNt32Pkg     - A package containing the NT32 Emulation platform reference
+
+Note: MDE and MDK that appear in other documentation refer to the MdePkg and
+Tools packages.  These two packages are the minimum requirement for developing
+EDK 2.0 Packages.  It is also recommended that the top level files included
+with the EDK be downloaded in conjunction with these two packages.
+
+Note: Documents have the following filenames:
+  EDK 2.0 Module Development Environment Library Specification v0.50 
+      (MDE_Library_Spec_0_50.rtf)
+  EDK 2.0 Build and Packaging Architecture Specification v0.50
+      (Build_Packaging_Spec_0_50.rtf)
+  EDK 2.0 Platform Configuration Database Infrastructure Description v0.51
+      (PCD_Infrastructure_0_51.rtf)
+  EDK 2.0 Module Surface Area v0.50
+      (Module_Surface_Area_0_50.rtf)
+  EDK 2.0 Module Development Environment (MDE) Package Specification v0.50
+      (MDE_Package_Spec_0_50.rtf)
+  EDK 2.0 C Coding Standards Specification v0.50
+      (C_Coding_Standards_Specification_ 0_50.rtf)
+
+Pre-Requisites
+--------------
+The following list of tools must be installed on the development workstation
+prior to using the Edk 2.0.
+
+Compiler Tool Chain
+      Microsoft* Visual Studio .NET 2003*  (http://www.microsoft.com)
+    or
+      GCC version 4.x or later (http://gcc.gnu.org)
+
+Assembler Tool Chain
+      Microsoft Macro Assembler, version 6.15 or later
+    or
+      GCC version 4.x or later
+
+Java Development Kit ( Java 5.0 or later)
+      Sun* jdk-1.5.0_04 or later (http://java.sun.com)
+    or
+      Bea Systems* jrockit-25.2.0-jdk1.5.0_03 or later (http://www.bea.com)
+
+Java Tools
+    Apache-ANT, version 1.6.5 or later (http://ant.apache.org)
+    Ant-contrib, version 1.0b2 or later (http://antcontrib.sourceforge.net)
+    Saxon8, version 8.1.1
+      (http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip?download)
+    XMLBeans, version 2.1.0 or later (http://xmlbeans.apache.org) 
+
+Other Tools
+    TortoiseSVN version 1.3.3. (http://tortoisesvn.tigris.org/)
+
+Optional Tools
+--------------
+Compiler Tool Chains:
+    Intel C++ Compiler for Windows, ver. 9.0 or later (http://www.intel,com)
+    Intel C Compiler for EFI Byte Code, ver. 1.2 or later
+    Microsoft Driver Development Kit, version 3790.1830 or later
+    Microsoft ACPI Source Language Assembler, Version 1.0.13NT or later
+    Intel ACPI Component Architecture, version 20060113
+
+-----------------------
+Notes On Required Tools (Source Control System)
+-----------------------
+The EDK 2.0 is being managed by the Subversion Source Control on Tianocore.org.
+This software package provides speed, security, and additional features. The
+recommended client is TortoiseSVN version 1.3.3. 
+ (Available at http://tortoisesvn.tigris.org/)
+
+There are instructions for the use of Subversion Source Control on the
+Tianocore.org website, as part of the checkout procedures.
+
+The URL of the EDK 2.0 repository is:
+  https://edk2.tianocore.org/svn/edk2/trunk/edk2
+
+-----------------------
+Notes On Documentation
+-----------------------
+The documents are being managed by the Subversion Source Control on
+Tianocore.org.  The document repository is "docs" and must be checked out
+separately from the EDK 2.0 source tree. Refer to the checkout procedures on
+the Tianocore.org website for EDK 2.0.
+
+The URL of the document repository is:
+  https://edk2.tianocore.org/svn/edk2/trunk/docs
+
+
+-----------------------
+Notes On Required Tools (MS Windows environment example)
+-----------------------
+Software Installation Order:
+  After installing the compiler tools and your Subversion client, the following
+  required tools should be installed in order: 
+    Java JDK, Apache-Ant, ant-contrib, xmlbeans, saxon8
+
+Java Development Kit:
+ 
+   The Java Environment Variable must be set before attempting to build.
+       i.e. For Sun JDK (see note below*):
+              set JAVA_HOME=c:\ Java\jdk1.5.0_06  
+       i.e. For Bea Systems:
+              set JAVA_HOME=c:\Program Files\Java\jrockit-R26.0.0-jdk1.5.0_04
+ 
+  *When using the Sun JDK5.0
+    During installation, you should specify the install directory as C:\Java
+    instead of C:\Program Files\(or some other drive letter.)  While installing
+    to this non-standard location is not required. In use, it seems to work 
+    more reliably. 
+    For the JDK, the install path would be C:\Java\jdk1.5.0_06
+    For the JRE, the install path would be C:\Java\jre1.5.0_06
+    Alternatively, you can specify C:\sunjavajdk and C:\sunjavajre.
+    NOTE: You cannot combine the location for the JDK and the JRE, as the JRE
+    install removes most of the binaries and libraries installed by the JDK
+    install.
+
+Java Tools:
+    The Apache-ANT requires the ANT_HOME environment variable to be set before
+    attempting to build:
+         i.e.  set ANT_HOME=c:\ant
+
+    The ant-contrib.jar file should be installed in the %ANT_HOME%\lib 
+    directory.
+
+    The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
+    before attempting to build:
+         i.e. set XMLBEANS_HOME=C:\XMLBEANS 
+
+    The saxon8.jar file should be copied to the %XMLBEANS_HOME%\lib directory.
+
+   The Ant and XMLBean tools are required to be in the path.
+     MS system example:
+        set PATH=%PATH%;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin
+     Linux/OS X bash shell example:
+        export PATH=$PATH:${ANT_HOME}/bin:${XMLBEANS_HOME}/bin
+ 
+-------------------------------------------------------------------------------
+Quick Start
+-----------
+Edit the text file, tools_def.txt, located in the Tools/Conf directory.  This
+file contains the names of the compiler tool chains and the location of the
+compiler binaries.  It has been pre-populated with the standard location for
+the Microsoft tool chains and includes the standard location of the Intel C 
+Compiler for EFI Byte Code (EBC)
+  
+Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
+checkout the entire EDK 2.0 source tree.
+
+In a command window, change to the top level directory of the Edk 2.0 sources.
+  Set the WORKSPACE environment variable, e.g.:
+
+    c:\> set WORKSPACE=C:\MyWork\Edk2.0
+
+To test your tool chain setup and to build the Supplied Tools, execute:
+    c:\MyWork\Edk2.0\> edksetup
+
+(This command will be referred to as the setup command throughout the rest of
+this document.)
+      NOTE: You should run the setup command at the start of every session.
+            This configures the environment to include the TianoTools and the
+            Java applications and libraries.
+
+Once this is completed, you are ready to test the Build, by executing:
+    c:\MyWork\Edk2.0\> ant
+
+This command builds all of the packages, including the NT32 reference platform.
+
+-------------------------
+Individual Package Builds
+-------------------------
+After running the setup command, you can build individual packages.
+  In the command window, cd to the package that you want to build, and just
+  type:
+    c:\MyWork\Edk2.0\EdkNt32Pkg\> ant
+
+The EdkNt32Pkg has a special target; "run" that will execute the Nt32 emulation
+platform under Microsoft Windows.
+
+------------------------
+Individual Module Builds
+------------------------
+After running the setup command, you can build individual modules.
+  In the command window, cd to the module that you want to build, and just
+  type:
+    c:\MyWork\Edk2.0\MdePkg\Library\BaseLib\> ant
+
+-------------------------------------------------------------------------------
+A Word on Apache-ANT
+--------------------
+The Apache-ANT program is a build tool that uses XML-based project files.
+Similar to Makefiles, these project files may contain multiple targets.  Most
+build.xml files in Edk2.0 are auto-generated; any edits performed on the
+build.xml files will be overwritten the next time ant is executed.
+
+Pre-defined targets in the build.xml files include:
+    all      - This target builds binaries for defined architectures
+    clean    - This target removes object files generated by commands
+    cleanall - This target removes all generated files and directories.
+
+A Word on GCC tool chain
+------------------------
+You will find a script in the tree that will download, configure, compile, and
+install a gcc 4.0.2 tool chain for development. It has support for the ia32
+architecture.  It can be built and run on Cygwin, Linux, and many other POSIX
+compliant host environments. There are a few tools that you will need on your
+host computer in order to compile the tool chain. Among them are bash, gcc,
+gmake, curl (or wget).
+
+-------------------------------------------------------------------------------
+
+General Information:
+===============================================================    
+Mechanisms:
+----------
+A quick understanding:
+
+A) Surface Area Package Description (SPD) file contains information about the
+modules that the package contains, including the location of all MSA files, and
+public library names and headers that might be provided by a module in the
+package.  Packages are defined by SPD files.  (Found in the root of the Package
+subdirectory (i.e. EdkNt32Pkg)) The SPD is further explained in the "Build 
+Packaging Specification" document.
+ 
+B) Module Surface Area Definition (MSA) files.  A description of a module's 
+surface area, with all module specific default flags and features specified.
+Refer to the "Module Surface Area Architecture Specification" for additional
+details. The MSA is further explained in the "Build Packaging Specification"
+document.
+ 
+C) Module Build Description (MDB). The "as-built" definition file that contains
+only the changes to the default flags defined in the MSA. The MSA and MDB are
+further explained in the "Build Packaging Specification" document.
+
+D) Platform Configuration Database (PCD).  A platform database which contains a
+variety of current platform settings or directives by which a driver or
+application can interact with.  The PCD is defined by the PCD_Protocol (This is
+further explained in the "Platform Configuration Database Infrastructure 
+Description" document.
+
+E) Library Class.  A library class is a logical grouping of similar functions.
+When developing components, the module surface area declares the class of
+libraries that can be used by the component. The MBD file specifies the
+instance(s) of the library that will be used during compilation/linking. All
+library type modules must include header files in their distribution package,
+as well as their surface area and module build description files. Components,
+on the other hand, need only provide the binary and build description files
+when distributing BINARY packages.  The Library Classes are further explained
+in the "Build Packaging Specification" document.
+
+=========================================================================
+The common operations by developers of new modules are:
+-------------------------------------------------------
+
+1) How to manually create a new module in a package:
+  - The module source code must first be created in an appropriate directory
+    (under the package the module is to be a part of.)  
+  - An MSA file must be created, spelling out all aspects of the module.
+  - The MSA must be added to the SPD for the package to include the module.
+
+-----------------------------------------
+2) Add/Remove module(s) to/from a package:
+
+  - Setup environment as Build
+  - Add a module to a package
+     * Generate the module SurfaceArea description file and build description
+       file
+     * Run GenBuildFile.bat under <PackageDir> to generate an entrance
+       build.xml for the module
+     * Add a new <MsaFile> element under <MsaFiles> into
+       <PackageDir>\<PackageName>.spd, using relative path to package
+     * Add a new <ModuleSA> entry under each <TianoImage> into
+       <PackageDir>\<PackageName>.fpd file
+
+   - Remove a module from a package
+     * Comment out or remove corresponding <MsaFile> element under <MsaFiles>
+       from <PackageDir>\<PackageName>.spd
+     * Comment out or remove corresponding <ModuleSA> entry under each
+       <TianoImage> from <PackageDir>\<PackageName>.fpd
+
+-----------------------------------
+3) How to manually create a package:
+  - Identify the modules that are to be members of the project.
+  - Identify the Variables and Guids required in and of the Package (including
+    consumption/production information).
+  - Create an SPD file defining these modules and calling out their MSA files.
+
+--------------------------------------
+4) Declare a new Protocol in a package: 
+  - This release requires manual editing of the SPD file, adding the protocol
+    to the ProtocolDeclarations section of the file. 
+  - Add the Protocol .h file to the Include\Protocol directory.
+  - Add an entry to the Protocol.info file
+     * Each line contains Protocol base name then the global variable name and
+       then the hex value of the Protocol GUID.
+
+Example Protocol.info file (2 lines):
+UnicodeCollation   gEfiUnicodeCollationProtocolGuid
+  { 0x1d85cd7f, 0xf43d, 0x11d2, 0x9a, 0xc, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } 
+UsbHc   gEfiUsbHcProtocolGuid
+  { 0xf5089266, 0x1aa0, 0x4953, 0x97, 0xd8, 0x56, 0x2f, 0x8a, 0x73, 0xb5, 0x19 }
+
+---------------------------------
+5) Declare a new PPI in a package:
+ - This release requires manual editing of the SPD file
+  - Add the PPI .h file to the Include\Ppi directory.
+  - Add an entry to the Ppi.info file
+     * Each line contains PPI base name then the global variable name and then
+       the hex value of the PPI GUID.
+
+Example Ppi.info file (2 lines):
+NtPeiLoadFile gNtPeiLoadFilePpiGuid
+  { 0xfd0c65eb, 0x405, 0x4cd2, 0x8a, 0xee, 0xf4, 0x0, 0xef, 0x13, 0xba, 0xc2 }
+NtThunk       gPeiNtThunkPpiGuid
+  { 0x98c281e5, 0xf906, 0x43dd, 0xa9, 0x2b, 0xb0, 0x3, 0xbf, 0x27, 0x65, 0xda }
+
+----------------------------------
+6) Declare a new GUID in a package:
+  - This release requires manual editing of the SPD file to include the new
+    Guid.
+
+--------------------------------------- 
+7) Declare a new PCD entry in a package:
+  - This release requires manual editing of the SPD file to include the new
+    PCD.
+  
+------------------------------
+8) Declare a new Library Class:
+  - This release requires manual editing of the SPD file to include the new
+    Library Class.
+
+--------------------------------------
+9) Add a library instance to a package:
+  - This requires manual MSA and MBD file.
+
+-----------------------------
+10) Add a module to a package:
+  - This requires manual MSA and MBD editing
+
+
+=======================================================
+Notes:
+------
+The EDK 2.0 represents significant changes in the structure of the EDK.
+Therefore it is very difficult to isolate all of the changes of this version of
+the EDK with the previous (EDK 1.0) version.
+
+Of particular note:
+
+1) EDK 2.0 contains new hardware feature support for the ICH SMBUS Libraries.
+   These libraries are provided to make Memory Reference Code (MRC) development
+   easier.
+2) The MDE Libraries - The MDE libraries resent significant changes in source
+   (with only limited changes in functionality.)  These new libraries conform
+   to the "MDE Library Specification". 
+3) The Fat Binary and the EDK Shell Binary Packages are functionally identical
+   to the EDK 1.0 version.
+4) The EDK tools directory has been expanded to include more tools and more
+   tool functionality.
+5) The EDK NT32 section has been ported to the new build process, but
+   functionally remains the same as the EDK 1.0 version.
+6) The Application "HelloWorld" has been ported to EDK 2.0 as well.
+
+=======================================================
+Virus scanned by McAfee VirusScan Enterprise 8.0.0, Virus Definitions 4718, no
+virus detected.
+
