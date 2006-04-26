@@ -40,11 +40,13 @@ public class ExpandTask extends Task {
       Set <code>LIBS</code> for further build usage. 
     **/
     public void execute() throws BuildException {
-        
-        String[] libraries = GlobalData.getModuleLibrary(getProject().getProperty("BASE_NAME"));
+        String basename = getProject().getProperty("BASE_NAME");
+        String arch = getProject().getProperty("ARCH");
+        arch = arch.toUpperCase();
+        String[] libraries = GlobalData.getModuleLibrary(basename, arch);
         String str = "";
         for (int i = 0; i < libraries.length; i ++){
-            str += " " + GlobalData.getLibrary(libraries[i]);
+            str += " " + GlobalData.getLibrary(libraries[i], arch);
         }
         getProject().setProperty("LIBS", str);
        

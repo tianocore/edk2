@@ -326,8 +326,8 @@ public class GlobalData {
       @param moduleName the base name of the module
       @return the libraries which the module depends on
     **/
-    public synchronized static String[] getModuleLibrary(String moduleName) {
-        Set<String> set = moduleLibraryMap.get(moduleName);
+    public synchronized static String[] getModuleLibrary(String moduleName, String arch) {
+        Set<String> set = moduleLibraryMap.get(moduleName + "-" + arch);
         return set.toArray(new String[set.size()]);
     }
 
@@ -337,8 +337,8 @@ public class GlobalData {
       @param moduleName the base name of the module
       @param libraryList the libraries which the module depends on
     **/
-    public synchronized static void addModuleLibrary(String moduleName, Set<String> libraryList) {
-        moduleLibraryMap.put(moduleName, libraryList);
+    public synchronized static void addModuleLibrary(String moduleName, String arch, Set<String> libraryList) {
+        moduleLibraryMap.put(moduleName + "-" + arch, libraryList);
     }
 
     /**
@@ -347,8 +347,8 @@ public class GlobalData {
       @param library the base name of the library
       @return the library absolute file name
     **/
-    public synchronized static String getLibrary(String library) {
-        return libraries.get(library);
+    public synchronized static String getLibrary(String library, String arch) {
+        return libraries.get(library + "-" + arch);
     }
 
     /**
@@ -357,8 +357,8 @@ public class GlobalData {
       @param library the base name of the library
       @param resultPath the library absolute file name
     **/
-    public synchronized static void addLibrary(String library, String resultPath) {
-        libraries.put(library, resultPath);
+    public synchronized static void addLibrary(String library, String arch, String resultPath) {
+        libraries.put(library + "-" + arch, resultPath);
     }
 
     /**
