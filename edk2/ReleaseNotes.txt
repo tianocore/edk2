@@ -129,6 +129,7 @@ Java Development Kit:
     For the JDK, the install path would be C:\Java\jdk1.5.0_06
     For the JRE, the install path would be C:\Java\jre1.5.0_06
     Alternatively, you can specify C:\sunjavajdk and C:\sunjavajre.
+
     NOTE: You cannot combine the location for the JDK and the JRE, as the JRE
     install removes most of the binaries and libraries installed by the JDK
     install.
@@ -136,14 +137,14 @@ Java Development Kit:
 Java Tools:
     The Apache-ANT requires the ANT_HOME environment variable to be set before
     attempting to build:
-         i.e.  set ANT_HOME=c:\ant
+         i.e.  set ANT_HOME=c:\<full path to where ant was installed>
 
     The ant-contrib.jar file should be installed in the %ANT_HOME%\lib 
     directory.
 
     The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
     before attempting to build:
-         i.e. set XMLBEANS_HOME=C:\XMLBEANS 
+         i.e. set XMLBEANS_HOME=C:\<full path to where xmlbeans  was installed>
 
     The saxon8.jar file should be copied to the %XMLBEANS_HOME%\lib directory.
 
