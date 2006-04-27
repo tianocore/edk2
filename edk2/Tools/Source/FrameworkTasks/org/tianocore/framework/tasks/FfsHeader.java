@@ -110,7 +110,7 @@ public class FfsHeader {
       
       This class is used to record the struct of checksum.
     **/
-    public class integrityCheckSum {
+    public class IntegrityCheckSum {
         byte header;
         byte file;
     }
@@ -123,7 +123,7 @@ public class FfsHeader {
     ///
     /// CheckSum
     ///
-    integrityCheckSum integrityCheck = new integrityCheckSum();
+    IntegrityCheckSum integrityCheck = new IntegrityCheckSum();
 
     ///
     /// File type
