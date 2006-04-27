@@ -309,44 +309,81 @@ The common operations by developers of new modules are:
   - This release requires manual editing of the SPD file, adding the protocol
     to the ProtocolDeclarations section of the file. 
   - Add the Protocol .h file to the Include\Protocol directory.
-  - Add an entry to the Protocol.info file
+  - Add an <Entry> to the <ProtocolDeclarations> element in the 
+    <PackageName>.spd file
      * Each line contains Protocol base name then the global variable name and
        then the hex value of the Protocol GUID.
 
-Example Protocol.info file (2 lines):
-UnicodeCollation   gEfiUnicodeCollationProtocolGuid
-  { 0x1d85cd7f, 0xf43d, 0x11d2, 0x9a, 0xc, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } 
-UsbHc   gEfiUsbHcProtocolGuid
-  { 0xf5089266, 0x1aa0, 0x4953, 0x97, 0xd8, 0x56, 0x2f, 0x8a, 0x73, 0xb5, 0x19 }
+Example Protocol Entries (NOTE: The Guid entry is a single line in the SPD file):
+<ProtocolDeclarations>
+  <Entry Name="UnicodeCollation">
+  <C_Name>gEfiUnicodeCollationProtocolGuid</C_Name>
+  <Guid>{ 0x1d85cd7f, 0xf43d, 0x11d2, 0x9a, 0xc, 0x0, 0x90, 0x27,
+    0x3f, 0xc1, 0x4d }</Guid>
+  <Entry Name="UsbHc">
+  <C_Name>gEfiUsbHcProtocolGuid</C_Name>
+  <Guid>{ 0xf5089266, 0x1aa0, 0x4953, 0x97, 0xd8, 0x56, 0x2f, 0x8a,
+    0x73, 0xb5, 0x19 }</Guid>
 
 ---------------------------------
 5) Declare a new PPI in a package:
  - This release requires manual editing of the SPD file
   - Add the PPI .h file to the Include\Ppi directory.
-  - Add an entry to the Ppi.info file
+  - Add an <Entry> to the package <PpiDeclarations> element in the 
+    <PackageName>.spd file
      * Each line contains PPI base name then the global variable name and then
        the hex value of the PPI GUID.
 
-Example Ppi.info file (2 lines):
-NtPeiLoadFile gNtPeiLoadFilePpiGuid
-  { 0xfd0c65eb, 0x405, 0x4cd2, 0x8a, 0xee, 0xf4, 0x0, 0xef, 0x13, 0xba, 0xc2 }
-NtThunk       gPeiNtThunkPpiGuid
-  { 0x98c281e5, 0xf906, 0x43dd, 0xa9, 0x2b, 0xb0, 0x3, 0xbf, 0x27, 0x65, 0xda }
+Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
+<PpiDeclarations>
+  <Entry Name="NtPeiLoadFile">
+    <C_Name>gNtPeiLoadFilePpiGuid</C_Name>
+    <Guid>{ 0xfd0c65eb, 0x405, 0x4cd2, 0x8a, 0xee, 0xf4, 0x0, 0xef, 0x13,
+      0xba, 0xc2 }</Guid>
+  </Entry>
+  <Entry Name="NtThunk">
+    <C_Name>gPeiNtThunkPpiGuid</C_Name>
+    <Guid>{ 0x98c281e5, 0xf906, 0x43dd, 0xa9, 0x2b, 0xb0, 0x3, 0xbf,
+      0x27, 0x65, 0xda }</Guid>
+  </Entry>
+</PpiDeclarations>
+
 
 ----------------------------------
 6) Declare a new GUID in a package:
   - This release requires manual editing of the SPD file to include the new
-    Guid.
+    Guid.  This is identical to adding a ProtocolDeclaration or PpiDeclaration
+    element as described above.
 
 --------------------------------------- 
-7) Declare a new PCD entry in a package:
+7) Define a new PCD entry in a package:
   - This release requires manual editing of the SPD file to include the new
-    PCD.
+    PCD.  New Pcd entries are added to the PcdDefinitions section of the
+    <PackageName>.spd file using the following example for the format:
+    NOTE: The hex <Token> value must be unique.
+
+<PcdDefinitions>
+  <PcdEntry ItemType="FIXED_AT_BUILD">
+    <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+    <Token>0x00000001</Token>
+    <DatumType>UINT32</DatumType>
+    <DefaultValue>1000000</DefaultValue>
+  </PcdEntry>
+</PcdDefinition>
   
 ------------------------------
 8) Declare a new Library Class:
   - This release requires manual editing of the SPD file to include the new
-    Library Class.
+    Library Class.  New Library Class entries are added to the 
+    LibraryClassDeclarations seection of the <PackageName>.spd file using
+    the following example for the format:
+
+<LibraryClassDeclarations>
+  <LibraryClassDeclaration>
+    <LibraryClass>BaseLib</LibraryClass>
+    <IncludeHeader>Include/Library/BaseLib.h</IncludeHeader>
+  </LibraryClassDeclaration>
+</LibraryClassDeclarations>
 
 --------------------------------------
 9) Add a library instance to a package:
