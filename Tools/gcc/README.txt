@@ -14,3 +14,16 @@ You will need
   bash
   and possibly others
 
+CYGWIN Notes
+
+You must have the directory mounted as binary, or the build will not succeed.
+In the example below, /workspace is mounted as binary.
+
+C:\cygwin\bin on /usr/bin type user (textmode)
+C:\cygwin\lib on /usr/lib type user (textmode)
+c:\workspace on /workspace type system (binmode)
+C:\cygwin on / type user (textmode)
+c: on /cygdrive/c type user (textmode,noumount)
+n: on /cygdrive/n type user (textmode,noumount)
+
+
