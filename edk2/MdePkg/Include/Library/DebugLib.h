@@ -61,8 +61,8 @@
 VOID
 EFIAPI
 DebugPrint (
-  IN  UINTN ErrorLevel,
-  IN  CHAR8 *Format,
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
   ...
   );
 
@@ -93,9 +93,9 @@ DebugPrint (
 VOID
 EFIAPI
 DebugAssert (
-  IN CHAR8  *FileName,
-  IN INTN   LineNumber,
-  IN CHAR8  *Description
+  IN CONST CHAR8  *FileName,
+  IN INTN         LineNumber,
+  IN CONST CHAR8  *Description
   );
 
 
