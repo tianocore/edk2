@@ -87,7 +87,7 @@ public class GenDepexTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                System.out.println("GenDepex execute successed!");
+                System.out.println("GenDepex execute succeeded!");
 
             } else {
                 //

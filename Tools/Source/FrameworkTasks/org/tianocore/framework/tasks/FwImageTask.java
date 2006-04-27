@@ -99,7 +99,7 @@ public class FwImageTask extends Task implements EfiDefine{
                 //
                 // command execution success
                 //
-                System.out.println("fwimage successed!");
+                System.out.println("fwimage succeeded!");
             } else {
                 //
                 // command execution fail
