@@ -4,6 +4,10 @@
 # Get, build and install the latest cross-development tools and libraries
 #
 
+###
+### CYGWIN :: Make sure that cygwin is mouting its file systems in binmode.
+###
+
 #
 # Specify the architectures for which the tools are to be built
 # To build for single target: ARCHS="m68k"
@@ -23,6 +27,7 @@ GCC=gcc-4.1.0
 BINUTILS=binutils-2.16.1
 # BINUTILS=binutils-2.16.91-20060119-1
 CYGWIN_SNAP=20060403 # You may need to find a more recent one.
+export PATH=/bin:/usr/bin
 
 #
 # Where to install
@@ -103,15 +108,15 @@ build() {
         cd build-binutils-$targ
         "${CONF_SHELL}" "../${BINUTILS}/configure" \
             --disable-nls "--target=${targ}" "--prefix=${pref}"
-        ${MAKE} -j5 -w all
+        ${MAKE} -j1 -w all
         ${MAKE} -w install
-        ) >> ${targ}.log 2>&1
+        ) >> ${targ}.log 2>&1 &&
 
         (
             mkdir -p $pref/$targ/sys-include;
             cp -fr cygwin-snapshot-${CYGWIN_SNAP}-1/newlib/libc/include/* $pref/$targ/sys-include
             cp -fr cygwin-snapshot-${CYGWIN_SNAP}-1/winsup/cygwin/include/* $pref/$targ/sys-include
-        )
+        ) &&
 
         ( mkdir -p build-gcc-$targ
         cd build-gcc-$targ
@@ -119,7 +124,7 @@ build() {
             --with-gnu-as --with-gnu-ld --with-newlib --verbose \
             --disable-libssp \
             --disable-nls --enable-languages=c
-        ${MAKE} -j5 -w all
+        ${MAKE} -j1 -w all
         ${MAKE} -w install 
         ) >> ${targ}.log 2>&1
     ) &
