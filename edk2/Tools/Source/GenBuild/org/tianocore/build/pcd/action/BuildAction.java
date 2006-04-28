@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.pcd.action;
 
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.Project;
 import org.tianocore.build.pcd.exception.BuildActionException;
 
 /** BuildAction is the parent class for all action related to ant Task. This class will
@@ -68,9 +69,7 @@ abstract class BuildAction extends Task {
         //
         // Comment following code because in console debug environment, we can't 
         // get Project instance.
-        //((Task) action).log(errorText, Project.MSG_INFO);
-        //
-        System.out.println(logStr);
+        ((Task) action).log(logStr, Project.MSG_INFO);
     }
 
     /**
@@ -87,9 +86,7 @@ abstract class BuildAction extends Task {
         //
         // Comment following code because in console debug environment, we can't 
         // get Project instance.
-        //((Task) action).log(warningText, Project.MSG_WARN);
-        //
-        System.out.println(warningStr);
+        ((Task) action).log(warningStr, Project.MSG_WARN);
     }
 
     /**

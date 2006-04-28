@@ -799,7 +799,7 @@ public class FpdParserTask extends Task {
         collectAction.perform (
           getProject().getProperty("WORKSPACE_DIR"),
           fpdFilename.getPath(),
-          ActionMessage.NULL_MESSAGE_LEVEL
+          ActionMessage.MAX_MESSAGE_LEVEL
           );
       } catch (Exception exp) {
         throw new BuildException (exp.getMessage());

@@ -501,7 +501,8 @@ public class CollectPCDAction {
             token.skuDataArrayEnabled  = pcdBuildData.getSkuDataArrayEnable();
             token.assignedtokenNumber  = Integer.decode(pcdBuildData.getToken().getStringValue());
             skuDataArray               = pcdBuildData.getSkuDataArray1();
-           
+            token.datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
+
             if(skuDataArray != null) {
                 for(skuIndex = 0; skuIndex < skuDataArray.size(); skuIndex ++) {
                     //
@@ -550,11 +551,12 @@ public class CollectPCDAction {
     private void updateTokenBySPD(UsageInstance  usageInstance,
                                   String         packageFullPath) 
         throws EntityException {
-        PackageSurfaceAreaDocument  pkgDoc          = null;
-        List<PcdDefinitions.PcdEntry> pcdEntryArray = new ArrayList<PcdDefinitions.PcdEntry>();
-        int                         index;
-        boolean                     isFoundInSpd  = false;
-        Token.DATUM_TYPE            datumType     = Token.DATUM_TYPE.UNKNOWN;
+        PackageSurfaceAreaDocument      pkgDoc          = null;
+        PcdDefinitions                  pcdDefinitions  = null;
+        List<PcdDefinitions.PcdEntry>   pcdEntryArray   = new ArrayList<PcdDefinitions.PcdEntry>();
+        int                             index           = 0;
+        boolean                         isFoundInSpd    = false;
+        Token.DATUM_TYPE                datumType       = Token.DATUM_TYPE.UNKNOWN;
 
         try {
             pkgDoc =(PackageSurfaceAreaDocument)XmlObject.Factory.parse(new File(packageFullPath));
@@ -563,8 +565,18 @@ public class CollectPCDAction {
         } catch(XmlException xmlE) {
             throw new EntityException("Can't parse the FPD xml fle:" + packageFullPath);
         }
+        pcdDefinitions = pkgDoc.getPackageSurfaceArea().getPcdDefinitions();
+        //
+        // It is illege for SPD file does not contains any PCD information.
+        //
+        if (pcdDefinitions == null) {
+            return;
+        }
 
-        pcdEntryArray = pkgDoc.getPackageSurfaceArea().getPcdDefinitions().getPcdEntryList();
+        pcdEntryArray = pcdDefinitions.getPcdEntryList();
+        if (pcdEntryArray == null) {
+            return;
+        }
         for(index = 0; index < pcdEntryArray.size(); index ++) {
             if(pcdEntryArray.get(index).getCName().equalsIgnoreCase(
                 usageInstance.parentToken.cName)) {
@@ -615,12 +627,6 @@ public class CollectPCDAction {
                     }
                 }
             }
-        }
-
-        if(!isFoundInSpd ) {
-            ActionMessage.warning(this, 
-                                  "Can *not* find the PCD token " + usageInstance.parentToken.cName + 
-                                  " in SPD file!");
         }
     }
 
