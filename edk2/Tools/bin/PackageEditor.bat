@@ -13,16 +13,28 @@
 
 :check_java
 if "%JAVA_HOME%"=="" goto no_jdk
+
 :check_wks
 if "%WORKSPACE%"=="" goto no_wks
 
-set ANT_HOME=%WORKSPACE%\Tools\bin\apache-ant
-set XMLBEANS_HOME=%WORKSPACE%\Tools\bin\xmlbeans
+:check_ant
+if "%ANT_HOME%"=="" goto no_ant
+@REM set ANT_HOME=%WORKSPACE%\Tools\bin\apache-ant
+
+:check_xmlbeans
+if "%XMLBEANS_HOME"=="" goto no_xmlbeans
+@REM set XMLBEANS_HOME=%WORKSPACE%\Tools\bin\xmlbeans
+
 set Framework_Tools_Path=%WORKSPACE%\Tools\bin
 
-set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%WORKSPACE%\Tools\bin;%XMLBEANS_HOME%\bin;%PATH%
+set PATH=%WORKSPACE%\Tools\bin;%PATH%
 
-set CLASSPATH=%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\saxon8-jdom.jar;%XMLBEANS_HOME%\lib\saxon8-sql.jar;%XMLBEANS_HOME%\lib\resolver.jar
+set CLASSPATH=%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\saxon8-jdom.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8-sql.jar;%XMLBEANS_HOME%\lib\resolver.jar
 
 call "ant" -f %WORKSPACE%\Tools\Source\PackageEditor\build.xml
 
@@ -39,6 +51,18 @@ goto check_wks
 :no_wks
 echo.
 echo !!! Please set WORKSPACE !!!
+echo.
+goto check_ant
+
+:no_ant
+echo.
+echo !!! Please set ANT_HOME !!!
+echo.
+goto check_xmlbeans
+
+:no_xmlbeans
+echo.
+echo !!! Please set XMLBEANS_HOME !!!
 echo.
 goto end
 
