@@ -5,8 +5,9 @@ system to make the scripts work.
 
 You will need
 
-  A recent version of gcc that is able to produce executables for the machine
-    that you want to run this compiler on (the host machine).
+  A recent version (3.0 or later should be fine) of gcc that is able to produce
+    executables for the machine that you want to run this compiler on (the host
+    machine).
   wget or curl
   tar
   bzip
@@ -16,14 +17,19 @@ You will need
 
 CYGWIN Notes
 
-You must have the directory mounted as binary, or the build will not succeed.
-In the example below, /workspace is mounted as binary.
+You should setup cygwin to use binmode on all mounts. When you initially
+install cygwin it gives you the choice of Unix file mode (recommended) or DOS
+file mode. Unix mode will cause all the cygwin directories to be mounted in
+binmode, while DOS will mount the dirs in textmode. Here is an example of a
+cygwin install where the dirs are (properly) mounted in binmode.
 
-C:\cygwin\bin on /usr/bin type user (textmode)
-C:\cygwin\lib on /usr/lib type user (textmode)
+C:\cygwin\bin on /usr/bin type user (binmode)
+C:\cygwin\lib on /usr/lib type user (binmode)
 c:\workspace on /workspace type system (binmode)
-C:\cygwin on / type user (textmode)
-c: on /cygdrive/c type user (textmode,noumount)
-n: on /cygdrive/n type user (textmode,noumount)
+C:\cygwin on / type user (binmode)
 
+If you use textmode, it is likely that the build will fail in a way that is
+hard to debug.
+
+Cygwin is pretty slow, so it is not recommended for large builds.
 

@@ -22,6 +22,7 @@ set -ex
 GCC=gcc-4.0.2
 BINUTILS=binutils-2.16.1
 CYGWIN_SNAP=20060120 # You may need to find a more recent one.
+export PATH=/bin:/usr/bin
 
 #
 # Where to install
