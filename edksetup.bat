@@ -70,17 +70,22 @@ if not exist %XMLBEANS_HOME%\lib\saxon8.jar goto no_saxon8
 echo Building the Tiano Tools
 
 @REM We are going to create the SurfaceArea.jar file first so that other Java Program can use it
-set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar;%XMLBEANS_HOME%\lib\saxon8.jar
+@REM It needs the xmlbeans libaries in order to compile.
+set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar
 
 call ant -f %WORKSPACE%Tools\build.xml SurfaceArea
 
 @REM Now we can make the other Java Programs
-set CLASSPATH=%WORKSPACE%Tools\Jars\SurfaceArea.jar;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar;%XMLBEANS_HOME%\lib\saxon8.jar
+@REM All of the remaining Java Programs require the SurfaceArea library to compile
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%Tools\Jars\SurfaceArea.jar
 
 call ant -f %WORKSPACE%Tools\build.xml JavaCode
 
 @REM We have all of the Java Programs and add-in classes created, so we can start using the cpp-tasks to create our tools
-set CLASSPATH=%WORKSPACE%Tools\Jars\SurfaceArea.jar;%WORKSPACE%Tools\Jars\GenBuild.jar;%WORKSPACE%Tools\Jars\cpptasks.jar;%WORKSPACE%Tools\Jars\frameworktasks.jar;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar;%XMLBEANS_HOME%\lib\saxon8.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%Tools\Jars\SurfaceArea.jar;%WORKSPACE%Tools\Jars\GenBuild.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%Tools\Jars\cpptasks.jar;%WORKSPACE%Tools\Jars\frameworktasks.jar
 
 call ant -f %WORKSPACE%Tools\build.xml C_Code
 
