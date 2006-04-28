@@ -78,8 +78,6 @@ public class MsaLibHeader extends IInternalFrame {
 
     private JLabel jLabelCopyright = null;
 
-    private JTextArea jTextAreaCopyright = null;
-
     private JLabel jLabelDescription = null;
 
     private JTextArea jTextAreaDescription = null;
@@ -88,19 +86,13 @@ public class MsaLibHeader extends IInternalFrame {
 
     private JTextField jTextFieldSpecification = null;
 
-    private JTextField jTextFieldSpecificationVersion = null;
-
     private JButton jButtonOk = null;
 
     private JButton jButtonCancel = null;
 
     private JScrollPane jScrollPaneLicense = null;
 
-    private JScrollPane jScrollPaneCopyright = null;
-
     private JScrollPane jScrollPaneDescription = null;
-
-    private JLabel jLabelSpecVersion = null;
 
     private JLabel jLabelAbstract = null;
 
@@ -138,6 +130,8 @@ public class MsaLibHeader extends IInternalFrame {
 
     private JTextField jTextFieldAbstractURL = null;
 
+    private JTextField jTextFieldCopyright = null;
+
     /**
      This method initializes jTextFieldBaseName 
      
@@ -161,7 +155,7 @@ public class MsaLibHeader extends IInternalFrame {
     private JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 240, 20));
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 250, 20));
         }
         return jTextFieldGuid;
     }
@@ -189,7 +183,7 @@ public class MsaLibHeader extends IInternalFrame {
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
             jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(405, 35, 75, 20));
+            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(415, 35, 65, 20));
             jButtonGenerateGuid.setText("GEN");
             jButtonGenerateGuid.addActionListener(this);
         }
@@ -209,20 +203,6 @@ public class MsaLibHeader extends IInternalFrame {
             jTextAreaLicense.setLineWrap(true);
         }
         return jTextAreaLicense;
-    }
-
-    /**
-     This method initializes jTextAreaCopyright 
-     
-     @return javax.swing.JTextArea jTextAreaCopyright
-     
-     **/
-    private JTextArea getJTextAreaCopyright() {
-        if (jTextAreaCopyright == null) {
-            jTextAreaCopyright = new JTextArea();
-            jTextAreaCopyright.setLineWrap(true);
-        }
-        return jTextAreaCopyright;
     }
 
     /**
@@ -248,23 +228,9 @@ public class MsaLibHeader extends IInternalFrame {
     private JTextField getJTextFieldSpecification() {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
-            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 340, 220, 20));
+            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 280, 320, 20));
         }
         return jTextFieldSpecification;
-    }
-
-    /**
-     This method initializes jTextFieldSpecificationVersion 
-     
-     @return javax.swing.JTextField jTextFieldSpecificationVersion
-     
-     **/
-    private JTextField getJTextFieldSpecificationVersion() {
-        if (jTextFieldSpecificationVersion == null) {
-            jTextFieldSpecificationVersion = new JTextField();
-            jTextFieldSpecificationVersion.setBounds(new java.awt.Rectangle(400, 340, 80, 20));
-        }
-        return jTextFieldSpecificationVersion;
     }
 
     /**
@@ -316,22 +282,6 @@ public class MsaLibHeader extends IInternalFrame {
     }
 
     /**
-     This method initializes jScrollPaneCopyright 
-     
-     @return javax.swing.JScrollPane jScrollPaneCopyright
-     
-     **/
-    private JScrollPane getJScrollPaneCopyright() {
-        if (jScrollPaneCopyright == null) {
-            jScrollPaneCopyright = new JScrollPane();
-            jScrollPaneCopyright.setBounds(new java.awt.Rectangle(160, 170, 320, 80));
-            jScrollPaneCopyright.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneCopyright.setViewportView(getJTextAreaCopyright());
-        }
-        return jScrollPaneCopyright;
-    }
-
-    /**
      This method initializes jScrollPaneDescription 
      
      @return javax.swing.JScrollPane jScrollPaneDescription
@@ -340,7 +290,7 @@ public class MsaLibHeader extends IInternalFrame {
     private JScrollPane getJScrollPaneDescription() {
         if (jScrollPaneDescription == null) {
             jScrollPaneDescription = new JScrollPane();
-            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160, 255, 320, 80));
+            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160, 195, 320, 80));
             jScrollPaneDescription.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneDescription.setViewportView(getJTextAreaDescription());
         }
@@ -356,7 +306,7 @@ public class MsaLibHeader extends IInternalFrame {
     private JTextField getJTextFieldAbstract() {
         if (jTextFieldAbstract == null) {
             jTextFieldAbstract = new JTextField();
-            jTextFieldAbstract.setBounds(new java.awt.Rectangle(160, 365, 200, 20));
+            jTextFieldAbstract.setBounds(new java.awt.Rectangle(160, 305, 320, 20));
         }
         return jTextFieldAbstract;
     }
@@ -370,7 +320,7 @@ public class MsaLibHeader extends IInternalFrame {
     private JComboBox getJComboBoxCompontentType() {
         if (jComboBoxCompontentType == null) {
             jComboBoxCompontentType = new JComboBox();
-            jComboBoxCompontentType.setBounds(new java.awt.Rectangle(160, 415, 320, 20));
+            jComboBoxCompontentType.setBounds(new java.awt.Rectangle(160, 380, 320, 20));
         }
         return jComboBoxCompontentType;
     }
@@ -384,7 +334,7 @@ public class MsaLibHeader extends IInternalFrame {
     private JComboBox getJComboBoxModuleType() {
         if (jComboBoxModuleType == null) {
             jComboBoxModuleType = new JComboBox();
-            jComboBoxModuleType.setBounds(new java.awt.Rectangle(160, 390, 320, 20));
+            jComboBoxModuleType.setBounds(new java.awt.Rectangle(160, 355, 320, 20));
         }
         return jComboBoxModuleType;
     }
@@ -398,9 +348,22 @@ public class MsaLibHeader extends IInternalFrame {
     private JTextField getJTextFieldAbstractURL() {
         if (jTextFieldAbstractURL == null) {
             jTextFieldAbstractURL = new JTextField();
-            jTextFieldAbstractURL.setBounds(new java.awt.Rectangle(390, 365, 90, 20));
+            jTextFieldAbstractURL.setBounds(new java.awt.Rectangle(160,330,320,20));
         }
         return jTextFieldAbstractURL;
+    }
+
+    /**
+     * This method initializes jTextFieldCopyright	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextFieldCopyright() {
+        if (jTextFieldCopyright == null) {
+            jTextFieldCopyright = new JTextField();
+            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160,170,320,20));
+        }
+        return jTextFieldCopyright;
     }
 
     public static void main(String[] args) {
@@ -465,16 +428,13 @@ public class MsaLibHeader extends IInternalFrame {
                 this.jTextAreaLicense.setText(this.msaLibHeader.getLicense().getStringValue());
             }
             if (this.msaLibHeader.getCopyright() != null) {
-                this.jTextAreaCopyright.setText(this.msaLibHeader.getCopyright());
+                this.jTextFieldCopyright.setText(this.msaLibHeader.getCopyright());
             }
             if (this.msaLibHeader.getDescription() != null) {
                 this.jTextAreaDescription.setText(this.msaLibHeader.getDescription());
             }
             if (this.msaLibHeader.getSpecification() != null) {
                 this.jTextFieldSpecification.setText(this.msaLibHeader.getSpecification().getStringValue());
-            }
-            if (this.msaLibHeader.getSpecification() != null) {
-                this.jTextFieldSpecificationVersion.setText(this.msaLibHeader.getSpecification().getVersion());
             }
             if (this.msaLibHeader.getAbstract() != null) {
                 this.jTextFieldAbstract.setText(this.msaLibHeader.getAbstract().getStringValue());
@@ -503,10 +463,9 @@ public class MsaLibHeader extends IInternalFrame {
             this.jTextFieldGuid.setEnabled(!isView);
             this.jTextFieldVersion.setEnabled(!isView);
             this.jTextAreaLicense.setEnabled(!isView);
-            this.jTextAreaCopyright.setEnabled(!isView);
+            this.jTextFieldCopyright.setEnabled(!isView);
             this.jTextAreaDescription.setEnabled(!isView);
             this.jTextFieldSpecification.setEnabled(!isView);
-            this.jTextFieldSpecificationVersion.setEnabled(!isView);
             this.jTextFieldAbstract.setEnabled(!isView);
             this.jTextFieldAbstractURL.setEnabled(!isView);
             this.jComboBoxModuleType.setEnabled(!isView);
@@ -526,27 +485,23 @@ public class MsaLibHeader extends IInternalFrame {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelURL = new JLabel();
-            jLabelURL.setBounds(new java.awt.Rectangle(365, 365, 25, 20));
+            jLabelURL.setBounds(new java.awt.Rectangle(15,330,140,20));
             jLabelURL.setText("URL");
             jLabelCompontentType = new JLabel();
-            jLabelCompontentType.setBounds(new java.awt.Rectangle(15, 415, 140, 20));
+            jLabelCompontentType.setBounds(new java.awt.Rectangle(15, 380, 140, 20));
             jLabelCompontentType.setText("Compontent Type");
             jLabelModuleType = new JLabel();
-            jLabelModuleType.setBounds(new java.awt.Rectangle(15, 390, 140, 20));
+            jLabelModuleType.setBounds(new java.awt.Rectangle(15, 355, 140, 20));
             jLabelModuleType.setText("Module Type");
             jLabelAbstract = new JLabel();
-            jLabelAbstract.setBounds(new java.awt.Rectangle(15, 365, 140, 20));
+            jLabelAbstract.setBounds(new java.awt.Rectangle(15, 305, 140, 20));
             jLabelAbstract.setText("Abstract");
-            jLabelSpecVersion = new JLabel();
-            jLabelSpecVersion.setBounds(new java.awt.Rectangle(382, 340, 15, 20));
-            jLabelSpecVersion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            jLabelSpecVersion.setText("V");
             jLabelSpecification = new JLabel();
             jLabelSpecification.setText("Specification");
-            jLabelSpecification.setBounds(new java.awt.Rectangle(15, 340, 140, 20));
+            jLabelSpecification.setBounds(new java.awt.Rectangle(15, 280, 140, 20));
             jLabelDescription = new JLabel();
             jLabelDescription.setText("Description");
-            jLabelDescription.setBounds(new java.awt.Rectangle(15, 255, 140, 20));
+            jLabelDescription.setBounds(new java.awt.Rectangle(15, 195, 140, 20));
             jLabelCopyright = new JLabel();
             jLabelCopyright.setText("Copyright");
             jLabelCopyright.setBounds(new java.awt.Rectangle(15, 170, 140, 20));
@@ -579,15 +534,12 @@ public class MsaLibHeader extends IInternalFrame {
             jContentPane.add(jLabelDescription, null);
             jContentPane.add(jLabelSpecification, null);
             jContentPane.add(getJTextFieldSpecification(), null);
-            jContentPane.add(getJTextFieldSpecificationVersion(), null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
             jContentPane.add(getJScrollPaneLicense(), null);
-            jContentPane.add(getJScrollPaneCopyright(), null);
             jContentPane.add(getJScrollPaneDescription(), null);
             jContentPane.add(jLabelAbstract, null);
             jContentPane.add(getJTextFieldAbstract(), null);
-            jContentPane.add(jLabelSpecVersion, null);
             jContentPane.add(jLabelModuleType, null);
             jContentPane.add(jLabelCompontentType, null);
             jContentPane.add(getJComboBoxCompontentType(), null);
@@ -604,13 +556,13 @@ public class MsaLibHeader extends IInternalFrame {
             jStarLabel5 = new StarLabel();
             jStarLabel5.setLocation(new java.awt.Point(0, 170));
             jStarLabel6 = new StarLabel();
-            jStarLabel6.setLocation(new java.awt.Point(0, 255));
+            jStarLabel6.setLocation(new java.awt.Point(0, 195));
             jStarLabel7 = new StarLabel();
-            jStarLabel7.setLocation(new java.awt.Point(0, 365));
+            jStarLabel7.setLocation(new java.awt.Point(0, 305));
             jStarLabel8 = new StarLabel();
-            jStarLabel8.setLocation(new java.awt.Point(0, 390));
+            jStarLabel8.setLocation(new java.awt.Point(0, 355));
             jStarLabel9 = new StarLabel();
-            jStarLabel9.setLocation(new java.awt.Point(0, 415));
+            jStarLabel9.setLocation(new java.awt.Point(0, 380));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
@@ -623,6 +575,7 @@ public class MsaLibHeader extends IInternalFrame {
             jContentPane.add(jStarLabel9, null);
             jContentPane.add(jLabelURL, null);
             jContentPane.add(getJTextFieldAbstractURL(), null);
+            jContentPane.add(getJTextFieldCopyright(), null);
         }
         return jContentPane;
     }
@@ -675,7 +628,7 @@ public class MsaLibHeader extends IInternalFrame {
             Log.err("License couldn't be empty");
             return false;
         }
-        if (isEmpty(this.jTextAreaCopyright.getText())) {
+        if (isEmpty(this.jTextFieldCopyright.getText())) {
             Log.err("Copyright couldn't be empty");
             return false;
         }
@@ -703,7 +656,7 @@ public class MsaLibHeader extends IInternalFrame {
             Log.err("Incorrect data type for Abstract");
             return false;
         }
-        if (!DataValidation.isCopyright(this.jTextAreaCopyright.getText())) {
+        if (!DataValidation.isCopyright(this.jTextFieldCopyright.getText())) {
             Log.err("Incorrect data type for Copyright");
             return false;
         }
@@ -747,17 +700,15 @@ public class MsaLibHeader extends IInternalFrame {
                 this.msaLibHeader.setLicense(mLicense);
             }
 
-            this.msaLibHeader.setCopyright(this.jTextAreaCopyright.getText());
+            this.msaLibHeader.setCopyright(this.jTextFieldCopyright.getText());
             this.msaLibHeader.setDescription(this.jTextAreaDescription.getText());
 
             if (this.msaLibHeader.getSpecification() != null) {
                 this.msaLibHeader.getSpecification().setStringValue(this.jTextFieldSpecification.getText());
-                this.msaLibHeader.getSpecification().setVersion(this.jTextFieldSpecificationVersion.getText());
             } else {
                 SpecificationDocument.Specification mSpecification = SpecificationDocument.Specification.Factory
                                                                                                                 .newInstance();
                 mSpecification.setStringValue(this.jTextFieldSpecification.getText());
-                mSpecification.setVersion(this.jTextFieldSpecificationVersion.getText());
                 this.msaLibHeader.setSpecification(mSpecification);
             }
 

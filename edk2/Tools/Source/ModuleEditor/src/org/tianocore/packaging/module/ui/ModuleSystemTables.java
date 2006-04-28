@@ -139,7 +139,7 @@ public class ModuleSystemTables extends IInternalFrame {
     private JTextField getJTextFieldOverrideID() {
         if (jTextFieldOverrideID == null) {
             jTextFieldOverrideID = new JTextField();
-            jTextFieldOverrideID.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jTextFieldOverrideID.setBounds(new java.awt.Rectangle(160, 60, 50, 20));
         }
         return jTextFieldOverrideID;
     }

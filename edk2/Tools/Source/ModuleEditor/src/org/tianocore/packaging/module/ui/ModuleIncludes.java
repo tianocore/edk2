@@ -36,6 +36,7 @@ import org.tianocore.common.Log;
 import org.tianocore.packaging.common.ui.IDefaultMutableTreeNode;
 import org.tianocore.packaging.common.ui.IInternalFrame;
 import org.tianocore.packaging.common.ui.StarLabel;
+import org.tianocore.packaging.workspace.common.Workspace;
 
 /**
  The class is used to create, update Include of MSA/MBD file
@@ -91,8 +92,6 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
 
     private StarLabel jStarLabel1 = null;
 
-    private JTextField jTextFieldPackageName = null;
-
     private JComboBox jComboBoxFileList = null;
 
     private JButton jButtonAdd = null;
@@ -108,6 +107,12 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
     private JCheckBox jCheckBoxArch = null;
 
     private JComboBox jComboBoxArch = null;
+
+    private JComboBox jComboBoxPackageName = null;
+    
+    private Workspace ws = null;
+    
+    private Vector vecPackageName = null;
 
     /**
      This method initializes jButtonOk 
@@ -168,20 +173,6 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
             jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
         }
         return jComboBoxUsage;
-    }
-
-    /**
-     This method initializes jTextFieldPackageName 
-     
-     @return javax.swing.JTextField jTextFieldPackageName
-     
-     **/
-    private JTextField getJTextFieldPackageName() {
-        if (jTextFieldPackageName == null) {
-            jTextFieldPackageName = new JTextField();
-            jTextFieldPackageName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-        }
-        return jTextFieldPackageName;
     }
 
     /**
@@ -291,6 +282,19 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
             jComboBoxArch.setEnabled(false);
         }
         return jComboBoxArch;
+    }
+
+    /**
+     * This method initializes jComboBoxPackageName	
+     * 	
+     * @return javax.swing.JComboBox	
+     */
+    private JComboBox getJComboBoxPackageName() {
+        if (jComboBoxPackageName == null) {
+            jComboBoxPackageName = new JComboBox();
+            jComboBoxPackageName.setBounds(new java.awt.Rectangle(160,10,320,20));
+        }
+        return jComboBoxPackageName;
     }
 
     public static void main(String[] args) {
@@ -465,7 +469,7 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
         if (isView) {
             this.jComboBoxPackageType.setEnabled(!isView);
             this.jComboBoxUsage.setEnabled(!isView);
-            this.jTextFieldPackageName.setEnabled(!isView);
+            this.jComboBoxPackageName.setEnabled(!isView);
             this.jButtonAdd.setEnabled(!isView);
             this.jButtonUpdate.setEnabled(!isView);
             this.jButtonRemove.setEnabled(!isView);
@@ -512,7 +516,6 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
             jStarLabel1.setLocation(new java.awt.Point(0, 10));
 
             jContentPane.add(jStarLabel1, null);
-            jContentPane.add(getJTextFieldPackageName(), null);
             jContentPane.add(getJComboBoxFileList(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonUpdate(), null);
@@ -521,6 +524,7 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
             jContentPane.add(getJTextFieldUpdatedDate(), null);
             jContentPane.add(getJCheckBoxArch(), null);
             jContentPane.add(getJComboBoxArch(), null);
+            jContentPane.add(getJComboBoxPackageName(), null);
         }
         return jContentPane;
     }
@@ -573,6 +577,12 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
      
      **/
     private void initFrame() {
+        ws = new Workspace();
+        vecPackageName = ws.getAllPackageName();
+        for (int index = 0; index < vecPackageName.size(); index++) {
+            jComboBoxPackageName.addItem(vecPackageName.elementAt(index));
+        }
+        
         jComboBoxUsage.addItem("ALWAYS_CONSUMED");
         jComboBoxUsage.addItem("ALWAYS_PRODUCED");
         jComboBoxUsage.addItem("DEFAULT");
@@ -596,12 +606,12 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
      **/
     private void addToList() {
         intSelectedItemId = vPackageName.size();
-        vPackageName.addElement(this.jTextFieldPackageName.getText());
+        vPackageName.addElement(this.jComboBoxPackageName.getSelectedItem().toString());
         vUsage.addElement(this.jComboBoxUsage.getSelectedItem().toString());
         vPackageType.addElement(this.jComboBoxPackageType.getSelectedItem().toString());
         vUpdatedDate.addElement(this.jTextFieldUpdatedDate.getText());
-        jComboBoxFileList.addItem(this.jTextFieldPackageName.getText());
-        jComboBoxFileList.setSelectedItem(this.jTextFieldPackageName.getText());
+        jComboBoxFileList.addItem(this.jComboBoxPackageName.getSelectedItem().toString());
+        jComboBoxFileList.setSelectedItem(this.jComboBoxPackageName.getSelectedItem().toString());
         
         //
         // Reset select item index
@@ -647,7 +657,7 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
         //
         int intTempIndex = intSelectedItemId;
         
-        vPackageName.setElementAt(this.jTextFieldPackageName.getText(), intSelectedItemId);
+        vPackageName.setElementAt(this.jComboBoxPackageName.getSelectedItem().toString(), intSelectedItemId);
         vUsage.setElementAt(this.jComboBoxUsage.getSelectedItem().toString(), intSelectedItemId);
         vPackageType.setElementAt(this.jComboBoxPackageType.getSelectedItem().toString(), intSelectedItemId);
         vUpdatedDate.setElementAt(this.jTextFieldUpdatedDate.getText(), intSelectedItemId);
@@ -684,14 +694,14 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
             //
             intSelectedItemId = jComboBoxFileList.getSelectedIndex();
             
-            this.jTextFieldPackageName.setText(vPackageName.elementAt(intSelectedItemId).toString());
+            this.jComboBoxPackageName.setSelectedItem(vPackageName.elementAt(intSelectedItemId).toString());
             this.jComboBoxUsage.setSelectedItem(vUsage.elementAt(intSelectedItemId).toString());
             this.jComboBoxPackageType.setSelectedItem(vPackageType.elementAt(intSelectedItemId).toString());
             this.jTextFieldUpdatedDate.setText(vUpdatedDate.elementAt(intSelectedItemId).toString());
         } else {
-            this.jTextFieldPackageName.setText("");
-            this.jComboBoxUsage.setSelectedItem("");
-            this.jComboBoxPackageType.setSelectedItem("");
+            this.jComboBoxPackageName.setSelectedIndex(0);
+            this.jComboBoxUsage.setSelectedIndex(0);
+            this.jComboBoxPackageType.setSelectedIndex(0);
             this.jTextFieldUpdatedDate.setText("");
         }
     }
@@ -752,20 +762,8 @@ public class ModuleIncludes extends IInternalFrame implements ItemListener {
      **/
     public boolean checkAdd() {
         //
-        // Check if all required fields are not empty
-        //
-        if (isEmpty(this.jTextFieldPackageName.getText())) {
-            Log.err("File Name couldn't be empty");
-            return false;
-        }
-
-        //
         // Check if all fields have correct data types 
         //
-        if (!DataValidation.isPackageName(this.jTextFieldPackageName.getText())) {
-            Log.err("Incorrect data type for Package Name");
-            return false;
-        }
         if (!isEmpty(this.jTextFieldUpdatedDate.getText())
             && !DataValidation.isDateType(this.jTextFieldUpdatedDate.getText())) {
             Log.err("Incorrect data type for Update Date");

@@ -16,6 +16,7 @@
 package org.tianocore.packaging.workspace.common;
 
 import java.io.File;
+import java.util.Vector;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
@@ -36,6 +37,8 @@ public class Workspace {
     private String currentWorkspace = null;
 
     private FrameworkDatabaseDocument xmlFrameworkDbDoc = null;
+    
+    //private PackageDocument xmlPackage = null;
 
     private String strWorkspaceDatabaseFile = System.getProperty("file.separator") + "Tools"
                                               + System.getProperty("file.separator") + "Conf"
@@ -113,8 +116,9 @@ public class Workspace {
      **/
     private void openFrameworkDb() {
         String strFrameworkDbFilePath = this.getCurrentWorkspace() + strWorkspaceDatabaseFile;
+        File db = new File(strFrameworkDbFilePath);
         try {
-            xmlFrameworkDbDoc = (FrameworkDatabaseDocument) XmlObject.Factory.parse(strFrameworkDbFilePath);
+            xmlFrameworkDbDoc = (FrameworkDatabaseDocument) XmlObject.Factory.parse(db);
         } catch (XmlException e) {
             Log.err("Open Framework Database " + strFrameworkDbFilePath, e.getMessage());
             return;
@@ -143,5 +147,23 @@ public class Workspace {
      **/
     public void setXmlFrameworkDbDoc(FrameworkDatabaseDocument xmlFrameworkDbDoc) {
         this.xmlFrameworkDbDoc = xmlFrameworkDbDoc;
+    }
+
+    /**
+     Get all package name form the FrameworkDatabase.db file
+     
+     @return vPackageName A vector includes all package names
+     
+     **/
+    public Vector getAllPackageName() {
+        Vector<String> vPackageName = new Vector<String>();
+        openFrameworkDb();
+
+        for (int index = 0; index < xmlFrameworkDbDoc.getFrameworkDatabase().getPackageList().sizeOfPackageArray(); index++) {
+            vPackageName.addElement(xmlFrameworkDbDoc.getFrameworkDatabase().getPackageList().getPackageArray(index)
+                                                     .getPackageNameArray(0).getStringValue());
+        }
+
+        return vPackageName;
     }
 }

@@ -100,7 +100,7 @@ public class ModuleFormsets extends IInternalFrame {
     private JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 240, 20));
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 250, 20));
         }
         return jTextFieldGuid;
     }
@@ -160,7 +160,7 @@ public class ModuleFormsets extends IInternalFrame {
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
             jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(405, 35, 75, 20));
+            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(415, 35, 65, 20));
             jButtonGenerateGuid.setText("GEN");
             jButtonGenerateGuid.addActionListener(this);
         }
@@ -176,7 +176,7 @@ public class ModuleFormsets extends IInternalFrame {
     private JTextField getJTextFieldOverrideID() {
         if (jTextFieldOverrideID == null) {
             jTextFieldOverrideID = new JTextField();
-            jTextFieldOverrideID.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jTextFieldOverrideID.setBounds(new java.awt.Rectangle(160, 85, 50, 20));
         }
         return jTextFieldOverrideID;
     }

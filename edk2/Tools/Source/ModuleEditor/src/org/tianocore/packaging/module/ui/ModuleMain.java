@@ -1491,7 +1491,7 @@ public class ModuleMain extends IFrame implements MouseListener, TreeSelectionLi
             Log.err("Open Msa " + strMsaFilePath, e.getMessage());
             return;
         } catch (Exception e) {
-            Log.err("Open Msa " + strMsaFilePath, e.getMessage());
+            Log.err("Open Msa " + strMsaFilePath, "Invalid file type");
             return;
         }
 
@@ -1539,7 +1539,7 @@ public class ModuleMain extends IFrame implements MouseListener, TreeSelectionLi
             Log.err("Open Mbd " + strMbdFilePath, e.getMessage());
             return;
         } catch (Exception e) {
-            Log.err("Open Mbd " + strMbdFilePath, e.getMessage());
+            Log.err("Open Mbd " + strMbdFilePath, "Invalid file type");
             return;
         }
 
@@ -1587,7 +1587,7 @@ public class ModuleMain extends IFrame implements MouseListener, TreeSelectionLi
             Log.err("Open Mlsa " + strMlsaFilePath, e.getMessage());
             return;
         } catch (Exception e) {
-            Log.err("Open Mlsa " + strMlsaFilePath, e.getMessage());
+            Log.err("Open Mlsa " + strMlsaFilePath, "Invalid file type");
             return;
         }
 
@@ -1635,7 +1635,7 @@ public class ModuleMain extends IFrame implements MouseListener, TreeSelectionLi
             Log.err("Open Mlbd " + strMlbdFilePath, e.getMessage());
             return;
         } catch (Exception e) {
-            Log.err("Open Mlbd " + strMlbdFilePath, e.getMessage());
+            Log.err("Open Mlbd " + strMlbdFilePath, "Invalid file type");
             return;
         }
 

@@ -72,8 +72,6 @@ public class MbdLibHeader extends IInternalFrame {
 
     private JLabel jLabelCopyright = null;
 
-    private JTextArea jTextAreaCopyright = null;
-
     private JLabel jLabelDescription = null;
 
     private JTextArea jTextAreaDescription = null;
@@ -83,8 +81,6 @@ public class MbdLibHeader extends IInternalFrame {
     private JButton jButtonCancel = null;
 
     private JScrollPane jScrollPaneLicense = null;
-
-    private JScrollPane jScrollPaneCopyright = null;
 
     private JScrollPane jScrollPaneDescription = null;
 
@@ -101,6 +97,8 @@ public class MbdLibHeader extends IInternalFrame {
     private StarLabel jStarLabel6 = null;
 
     private MbdLibHeaderDocument.MbdLibHeader mbdLibHeader = null;
+
+    private JTextField jTextFieldCopyright = null;
 
     /**
      This method initializes jTextFieldBaseName 
@@ -125,7 +123,7 @@ public class MbdLibHeader extends IInternalFrame {
     private JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 240, 20));
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 250, 20));
         }
         return jTextFieldGuid;
     }
@@ -153,7 +151,7 @@ public class MbdLibHeader extends IInternalFrame {
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
             jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(405, 35, 75, 20));
+            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(415, 35, 65, 20));
             jButtonGenerateGuid.setText("GEN");
             jButtonGenerateGuid.addActionListener(this);
         }
@@ -173,20 +171,6 @@ public class MbdLibHeader extends IInternalFrame {
             jTextAreaLicense.setLineWrap(true);
         }
         return jTextAreaLicense;
-    }
-
-    /**
-     This method initializes jTextAreaCopyright 
-     
-     @return javax.swing.JTextArea jTextAreaCopyright
-     
-     **/
-    private JTextArea getJTextAreaCopyright() {
-        if (jTextAreaCopyright == null) {
-            jTextAreaCopyright = new JTextArea();
-            jTextAreaCopyright.setLineWrap(true);
-        }
-        return jTextAreaCopyright;
     }
 
     /**
@@ -252,22 +236,6 @@ public class MbdLibHeader extends IInternalFrame {
     }
 
     /**
-     This method initializes jScrollPaneCopyright 
-     
-     @return javax.swing.JScrollPane jScrollPaneCopyright
-     
-     **/
-    private JScrollPane getJScrollPaneCopyright() {
-        if (jScrollPaneCopyright == null) {
-            jScrollPaneCopyright = new JScrollPane();
-            jScrollPaneCopyright.setBounds(new java.awt.Rectangle(160, 170, 320, 80));
-            jScrollPaneCopyright.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneCopyright.setViewportView(getJTextAreaCopyright());
-        }
-        return jScrollPaneCopyright;
-    }
-
-    /**
      This method initializes jScrollPaneDescription 
      
      @return javax.swing.JScrollPane jScrollPaneDescription
@@ -276,11 +244,25 @@ public class MbdLibHeader extends IInternalFrame {
     private JScrollPane getJScrollPaneDescription() {
         if (jScrollPaneDescription == null) {
             jScrollPaneDescription = new JScrollPane();
-            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160, 255, 320, 80));
+            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160, 195, 320, 80));
             jScrollPaneDescription.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneDescription.setViewportView(getJTextAreaDescription());
         }
         return jScrollPaneDescription;
+    }
+
+    /**
+      This method initializes jTextFieldCopyright	
+      	
+      @return javax.swing.JTextField jTextFieldCopyright
+     
+     **/
+    private JTextField getJTextFieldCopyright() {
+        if (jTextFieldCopyright == null) {
+            jTextFieldCopyright = new JTextField();
+            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160,170,320,20));
+        }
+        return jTextFieldCopyright;
     }
 
     public static void main(String[] args) {
@@ -345,7 +327,7 @@ public class MbdLibHeader extends IInternalFrame {
                 this.jTextAreaLicense.setText(this.mbdLibHeader.getLicense().getStringValue());
             }
             if (this.mbdLibHeader.getCopyright() != null) {
-                this.jTextAreaCopyright.setText(this.mbdLibHeader.getCopyright());
+                this.jTextFieldCopyright.setText(this.mbdLibHeader.getCopyright());
             }
             if (this.mbdLibHeader.getDescription() != null) {
                 this.jTextAreaDescription.setText(this.mbdLibHeader.getDescription());
@@ -367,7 +349,7 @@ public class MbdLibHeader extends IInternalFrame {
             this.jTextFieldGuid.setEnabled(!isView);
             this.jTextFieldVersion.setEnabled(!isView);
             this.jTextAreaLicense.setEnabled(!isView);
-            this.jTextAreaCopyright.setEnabled(!isView);
+            this.jTextFieldCopyright.setEnabled(!isView);
             this.jTextAreaDescription.setEnabled(!isView);
             this.jButtonCancel.setEnabled(!isView);
             this.jButtonGenerateGuid.setEnabled(!isView);
@@ -385,7 +367,7 @@ public class MbdLibHeader extends IInternalFrame {
         if (jContentPane == null) {
             jLabelDescription = new JLabel();
             jLabelDescription.setText("Description");
-            jLabelDescription.setBounds(new java.awt.Rectangle(15, 255, 140, 20));
+            jLabelDescription.setBounds(new java.awt.Rectangle(15, 195, 140, 20));
             jLabelCopyright = new JLabel();
             jLabelCopyright.setText("Copyright");
             jLabelCopyright.setBounds(new java.awt.Rectangle(15, 170, 140, 20));
@@ -419,7 +401,6 @@ public class MbdLibHeader extends IInternalFrame {
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
             jContentPane.add(getJScrollPaneLicense(), null);
-            jContentPane.add(getJScrollPaneCopyright(), null);
             jContentPane.add(getJScrollPaneDescription(), null);
 
             jStarLabel1 = new StarLabel();
@@ -433,7 +414,7 @@ public class MbdLibHeader extends IInternalFrame {
             jStarLabel5 = new StarLabel();
             jStarLabel5.setLocation(new java.awt.Point(0, 170));
             jStarLabel6 = new StarLabel();
-            jStarLabel6.setLocation(new java.awt.Point(0, 255));
+            jStarLabel6.setLocation(new java.awt.Point(0, 195));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
@@ -441,6 +422,7 @@ public class MbdLibHeader extends IInternalFrame {
             jContentPane.add(jStarLabel4, null);
             jContentPane.add(jStarLabel5, null);
             jContentPane.add(jStarLabel6, null);
+            jContentPane.add(getJTextFieldCopyright(), null);
         }
         return jContentPane;
     }
@@ -493,7 +475,7 @@ public class MbdLibHeader extends IInternalFrame {
             Log.err("License couldn't be empty");
             return false;
         }
-        if (isEmpty(this.jTextAreaCopyright.getText())) {
+        if (isEmpty(this.jTextFieldCopyright.getText())) {
             Log.err("Copyright couldn't be empty");
             return false;
         }
@@ -513,7 +495,7 @@ public class MbdLibHeader extends IInternalFrame {
             Log.err("Incorrect data type for Guid");
             return false;
         }
-        if (!DataValidation.isCopyright(this.jTextAreaCopyright.getText())) {
+        if (!DataValidation.isCopyright(this.jTextFieldCopyright.getText())) {
             Log.err("Incorrect data type for Copyright");
             return false;
         }
@@ -557,7 +539,7 @@ public class MbdLibHeader extends IInternalFrame {
                 this.mbdLibHeader.setLicense(mLicense);
             }
 
-            this.mbdLibHeader.setCopyright(this.jTextAreaCopyright.getText());
+            this.mbdLibHeader.setCopyright(this.jTextFieldCopyright.getText());
             this.mbdLibHeader.setDescription(this.jTextAreaDescription.getText());
 
             if (this.mbdLibHeader.getCreated() == null) {

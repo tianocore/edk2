@@ -1,3 +1,2 @@
 Manifest-Version: 1.0
 Main-Class: org.tianocore.packaging.module.ui.ModuleMain
-Class-Path: ../Jars/SurfaceArea.jar ../bin/xmlbeans/lib/jsr173_1.0_api.jar ../bin/xmlbeans/lib/xbean.jar ../bin/xmlbeans/lib/xbean_xpath.jar ../bin/xmlbeans/lib/xmlpublic.jar ../bin/xmlbeans/lib/saxon8.jar ../bin/xmlbeans/lib/saxon8-jdom.jar ../bin/xmlbeans/lib/saxon8-sql.jar ../bin/xmlbeans/lib/resolver.jar
