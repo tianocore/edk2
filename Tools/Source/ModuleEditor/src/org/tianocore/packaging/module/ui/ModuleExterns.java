@@ -181,7 +181,7 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
     private JTextField getJTextFieldOverrideID() {
         if (jTextFieldOverrideID == null) {
             jTextFieldOverrideID = new JTextField();
-            jTextFieldOverrideID.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jTextFieldOverrideID.setBounds(new java.awt.Rectangle(160, 60, 50, 20));
         }
         return jTextFieldOverrideID;
     }
@@ -763,11 +763,11 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
         jComboBoxUsage.addItem("ALWAYS_CONSUMED");
         jComboBoxUsage.addItem("ALWAYS_PRODUCED");
 
-        jComboBoxType.addItem("Type 1");
-        jComboBoxType.addItem("Type 2");
-        jComboBoxType.addItem("Type 3");
-        jComboBoxType.addItem("Type 4");
-        jComboBoxType.addItem("Type 5");
+        jComboBoxType.addItem("Entry/Unload");
+        jComboBoxType.addItem("Library");
+        jComboBoxType.addItem("Driver Bindings");
+        jComboBoxType.addItem("Call Backs");
+        jComboBoxType.addItem("Other");
 
         jPanelType1.setVisible(true);
         jPanelType2.setVisible(false);

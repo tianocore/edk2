@@ -111,7 +111,7 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
         if (jRadioButtonSelect == null) {
             jRadioButtonSelect = new JRadioButton();
             jRadioButtonSelect.setBounds(new java.awt.Rectangle(15, 10, 205, 20));
-            jRadioButtonSelect.setText("Select an existed Library Class");
+            jRadioButtonSelect.setText("Select an existing Library Class");
             jRadioButtonSelect.addActionListener(this);
             jRadioButtonSelect.setSelected(true);
         }
@@ -605,7 +605,7 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
     /**
      Get LibraryClassDefinitionsDocument.LibraryClassDefinitions
      
-     @return
+     @return LibraryClassDefinitionsDocument.LibraryClassDefinitions
      
      **/
     public LibraryClassDefinitionsDocument.LibraryClassDefinitions getLibraryClassDefinitions() {
