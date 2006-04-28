@@ -66,9 +66,6 @@ abstract class BuildAction extends Task {
       @param logStr     The string contains log information.
     **/
     public static void logMsg(Object action, String logStr) {
-        //
-        // Comment following code because in console debug environment, we can't 
-        // get Project instance.
         ((Task) action).log(logStr, Project.MSG_INFO);
     }
 
@@ -83,9 +80,6 @@ abstract class BuildAction extends Task {
       @param warningStr  The string contains warning information.
     **/  
     public static void warningMsg(Object action, String warningStr) {
-        //
-        // Comment following code because in console debug environment, we can't 
-        // get Project instance.
         ((Task) action).log(warningStr, Project.MSG_WARN);
     }
 
