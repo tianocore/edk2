@@ -27,7 +27,7 @@ if "%XMLBEANS_HOME"=="" goto no_xmlbeans
 
 set Framework_Tools_Path=%WORKSPACE%\Tools\bin
 
-set PATH=%WORKSPACE%\Tools\bin;%PATH%
+set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%WORKSPACE%\Tools\bin;%XMLBEANS_HOME%\bin;%PATH%
 
 set CLASSPATH=%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
@@ -35,10 +35,11 @@ set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\saxon8-jdom.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8-sql.jar;%XMLBEANS_HOME%\lib\resolver.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\bin\PackageEditor.jar
 
 call "ant" -f %WORKSPACE%\Tools\Source\PackageEditor\build.xml
 
-call "java" -jar %WORKSPACE%\Tools\bin\PackageEditor.jar
+call "java" org.tianocore.packaging.PackagingMain
 
 goto end
 
