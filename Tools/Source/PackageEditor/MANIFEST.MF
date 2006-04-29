@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: org.tianocore.packaging.PackagingMain
-Class-Path: ../Jars/SurfaceArea.jar ../Jars/FDPManifest.jar ./xmlbeans/lib/jsr173_1.0_api.jar ./xmlbeans/lib/xbean.jar ./xmlbeans/lib/xbean_xpath.jar ./xmlbeans/lib/xmlpublic.jar ./xmlbeans/lib/saxon8.jar ./xmlbeans/lib/saxon8-jdom.jar ./xmlbeans/lib/saxon8-sql.jar ./xmlbeans/lib/resolver.jar
+
