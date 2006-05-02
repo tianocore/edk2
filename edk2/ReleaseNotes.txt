@@ -406,7 +406,7 @@ Of particular note:
 1) EDK 2.0 contains new hardware feature support for the ICH SMBUS Libraries.
    These libraries are provided to make Memory Reference Code (MRC) development
    easier.
-2) The MDE Libraries - The MDE libraries resent significant changes in source
+2) The MDE Libraries - The MDE libraries represent significant changes in source
    (with only limited changes in functionality.)  These new libraries conform
    to the "MDE Library Specification". 
 3) The Fat Binary and the EDK Shell Binary Packages are functionally identical
