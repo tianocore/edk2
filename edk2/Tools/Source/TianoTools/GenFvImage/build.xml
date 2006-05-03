@@ -85,11 +85,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <target name="Tool" depends="init, GenFvImage, GenFvImage_Ia32, GenFvImage_X64, GenFvImage_Ipf"/>
 
-  <target name="GenFvImage">
+  <target name="GenFvImage" >
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <defineset>
@@ -98,9 +97,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </defineset>
     
       <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet} Ia32/PeCoffLoaderEx.c" 
-        defaultexcludes="TRUE" 
-        excludes="*.xml *.inf"/>
+        includes="${FileSet} Ia32/PeCoffLoaderEx.c" />
 
       <includepath path="${PACKAGE_DIR}/${ToolName}"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
@@ -111,12 +108,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-
-      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-      <linkerarg value="/nodefaultlib:libc.lib"/>
-      <linkerarg value="RpcRT4.Lib"/>
-
+      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
+      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
+      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
 
@@ -124,7 +119,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
         outfile="${BIN_DIR}/${ToolName}_Ia32"
         outtype="executable"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <defineset>
@@ -146,12 +140,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-
-      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-      <linkerarg value="/nodefaultlib:libc.lib"/>
-      <linkerarg value="RpcRT4.Lib"/>
-
+      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
+      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
+      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
 
@@ -180,12 +172,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-
-      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-      <linkerarg value="/nodefaultlib:libc.lib"/>
-      <linkerarg value="RpcRT4.Lib"/>
-
+      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
+      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
+      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
 
@@ -214,12 +204,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-
-      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-      <linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-      <linkerarg value="/nodefaultlib:libc.lib"/>
-      <linkerarg value="RpcRT4.Lib"/>
-
+      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
+      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
+      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
 

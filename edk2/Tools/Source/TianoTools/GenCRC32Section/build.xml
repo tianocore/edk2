@@ -67,8 +67,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <property name="ext_static" value=".lib"/>
         <property name="ext_dynamic" value=".dll"/>
         <property name="ext_exe" value=".exe"/>
-				<property name="MSVC_DIR" value="C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/Include" />
-				<property name="MSVC_SDK_DIR" value="C:/Program Files/Microsoft Visual Studio .NET 2003/Vc7/PlatformSDK/Include" />
 			</then>
 			<elseif>
 			  <equals arg1="${ToolChain}" arg2="gcc"/>
@@ -85,29 +83,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet}" 
-        defaultexcludes="TRUE" 
-        excludes="*.xml *.inf"/>
+        includes="${FileSet}"/>
 
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-			<linkerarg value="${LIB_DIR}/CommonTools${ext_static}"/>
+			<libset dir="${LIB_DIR}" libs="CommonTools"/>
 
     </cc>
-    <if>
-      <os family="dos"/>
-      <then>
-        <exec dir="${BUILD_DIR}" executable="lib" failonerror="false">
-          <arg line="/NOLOGO *.lib /OUT:${LIB_DIR}/${ToolName}${ext_exe}"/>
-        </exec>
-      </then>
-    </if>
   </target>
 
   <target name="clean" depends="init">

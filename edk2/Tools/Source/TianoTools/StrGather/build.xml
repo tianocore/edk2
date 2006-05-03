@@ -79,7 +79,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 		</if>
   </target>
 
-  <target name="Tool" depends="init">
+  <target name="Tool" depends="init" unless="gcc">
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
@@ -96,9 +96,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-			<linkerarg value="${LIB_DIR}/CustomizedCompress.lib"/>
-
+			<libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
     </cc>
   </target>
 
