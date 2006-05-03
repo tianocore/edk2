@@ -53,7 +53,7 @@ Compiler Tool Chain
 Assembler Tool Chain
       Microsoft Macro Assembler, version 6.15 or later
     or
-      GCC version 4.x or later
+      GNU binutils 2.16.1 or later
 
 Java Development Kit ( Java 5.0 or later)
       Sun* jdk-1.5.0_04 or later (http://java.sun.com)
@@ -75,8 +75,10 @@ Optional Tools
 --------------
 Compiler Tool Chains:
     Intel C++ Compiler for Windows, ver. 9.0 or later (http://www.intel.com)
-    Intel C Compiler for EFI Byte Code, ver. 1.2 or later
+    Intel C Compiler for EFI Byte Code, ver. 1.2 or later 
+      (http://www.intel.com/cd/software/products/asmo-na/eng/compilers/efibc/index.htm)
     Microsoft Driver Development Kit, version 3790.1830 or later
+      (http://www.microsoft.com/whdc/devtools/ddk/orderddkcd.mspx)
     Microsoft ACPI Source Language Assembler, Version 1.0.13NT or later
     Intel ACPI Component Architecture, version 20060113
 
@@ -233,7 +235,7 @@ General Information:
 ===============================================================    
 Mechanisms:
 ----------
-A quick understanding:
+A brief overview:
 
 A) Surface Area Package Description (SPD) file contains information about the
 modules that the package contains, including the location of all MSA files, and
