@@ -1,4 +1,3 @@
-WORKSPACE = C:\MDE
 #Host definitions
 HOST_VENDOR = INTEL
 PATH_TO_HOST_CC = C:\Program Files\Intel\Compiler\c++\9.0\IA32\Bin
