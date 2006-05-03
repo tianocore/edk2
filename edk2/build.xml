@@ -21,7 +21,15 @@ It can build all packages or clean up the build products.
       dir="."
       files="Tools,MdePkg,EdkModulePkg,EdkNt32Pkg"/>
 
-  <target name="all" description="Build all packages.">
+  <target name="all" description="Issue a warning.">
+    <echo>
+Top-level builds may not be functional.
+Please build each package individually from its own directory.
+If you would like to try anyway, type
+ant All
+    </echo>
+  </target>
+  <target name="All" description="Build all packages.">
     <subant target="" inheritall="false">
       <filelist refid="Pkg.Dirs"/>
     </subant>
