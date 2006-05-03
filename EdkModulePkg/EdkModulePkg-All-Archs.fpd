@@ -1,0 +1,453 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+-->
+<FrameworkPlatformDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <PlatformHeader>
+    <PlatformName>MdePkg</PlatformName>
+    <Abstract>EFI/Tiano MdePkg Package</Abstract>
+    <Description>This FPD file is used for Package Level build.</Description>
+    <Created>2006-04-03 13:40</Created>
+    <CreatedBy>lhauch</CreatedBy>
+  </PlatformHeader>
+  <Flash>
+    <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>
+  </Flash>
+  <TianoImage>
+    <SEC>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HelloWorld" />
+    </SEC>
+    <PEI_CORE>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HelloWorld" />
+    </PEI_CORE>
+    <PEIM>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HelloWorld" />
+    </PEIM>
+    <DXE_CORE>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HelloWorld" />
+    </DXE_CORE>
+    <DXE_DRIVERS>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HelloWorld" />
+    </DXE_DRIVERS>
+    <OTHER_COMPONENTS>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HelloWorld" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Partition" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="English" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DiskIo" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DiskIoPartition" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="SecurityStub" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeMain" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMain" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeIpl" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="GraphicsConsole" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Runtime" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="MonotonicCounter" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Variable" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="EmuVariable" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="StatusCode" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiBaseMemoryTestInit" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiVariable" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="WatchDogTimer" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="FtwLite" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DebugPort" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DebugSupport" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Terminal" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DataHub" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DataHubStdErr" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="NullMemoryTest" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HiiDatabase" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="ConSplitter" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BC" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Dhcp4" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="SNP" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Ebc" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="SetupBrowser" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DriverSample" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PciBus" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="AtapiPassThru" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="CirrusLogic5430UgaDraw" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="IdeBus" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Uhci" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="ScsiBus" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="ScsiDisk" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UsbBot" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UsbBus" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UsbCbi0" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UsbCbi1" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UsbKb" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UsbMassStorage" />
+      
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UsbMouse" />
+      <!-- X64 -->
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="HelloWorld" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="Partition" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="English" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DiskIo" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DiskIoPartition" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="SecurityStub" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeMain" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiMain" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeIpl" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="GraphicsConsole" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="Runtime" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="MonotonicCounter" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="Variable" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="EmuVariable" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="StatusCode" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiBaseMemoryTestInit" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiVariable" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="WatchDogTimer" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="FtwLite" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DebugPort" />
+      <!--
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DebugSupport" />
+      -->
+
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="Terminal" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DataHub" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DataHubStdErr" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="NullMemoryTest" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="HiiDatabase" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="ConSplitter" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BC" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="Dhcp4" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="SNP" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="Ebc" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="SetupBrowser" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DriverSample" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PciBus" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="AtapiPassThru" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="CirrusLogic5430UgaDraw" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="IdeBus" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="Uhci" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="ScsiBus" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="ScsiDisk" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UsbBot" />
+      
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UsbBus" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UsbCbi0" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UsbCbi1" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UsbKb" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UsbMassStorage" />
+
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UsbMouse" />
+      <!-- IFP -->
+
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="HelloWorld" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="Partition" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="English" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DiskIo" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DiskIoPartition" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="SecurityStub" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeMain" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiMain" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeIpl" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="GraphicsConsole" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="Runtime" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="MonotonicCounter" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="Variable" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="EmuVariable" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="StatusCode" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiBaseMemoryTestInit" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiVariable" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="WatchDogTimer" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="FtwLite" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DebugPort" />
+
+      <!--
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DebugSupport" />
+      -->
+
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="Terminal" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DataHub" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DataHubStdErr" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="NullMemoryTest" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="HiiDatabase" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="ConSplitter" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BC" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="Dhcp4" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="SNP" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="Ebc" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="SetupBrowser" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DriverSample" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PciBus" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="AtapiPassThru" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="CirrusLogic5430UgaDraw" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="IdeBus" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="Uhci" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="ScsiBus" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="ScsiDisk" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UsbBot" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UsbBus" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UsbCbi0" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UsbCbi1" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UsbKb" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UsbMassStorage" />
+      
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UsbMouse" />
+
+      <!-- EBC -->
+
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="HelloWorld" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="Partition" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="English" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DiskIo" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DiskIoPartition" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="SecurityStub" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeMain" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiMain" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeIpl" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="GraphicsConsole" />
+
+      <!-- Not Support 
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="Runtime" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="MonotonicCounter" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="Variable" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="EmuVariable" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="StatusCode" />
+      -->
+
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiBaseMemoryTestInit" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiVariable" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="WatchDogTimer" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="FtwLite" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DebugPort" />
+
+      <!--
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DebugSupport" />
+      -->
+
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="Terminal" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DataHub" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DataHubStdErr" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="NullMemoryTest" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="HiiDatabase" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="ConSplitter" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BC" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="Dhcp4" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="SNP" />
+
+      <!--
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="Ebc" />
+      -->
+
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="SetupBrowser" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DriverSample" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PciBus" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="AtapiPassThru" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="CirrusLogic5430UgaDraw" />
+
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="IdeBus" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="Uhci" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="ScsiBus" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="ScsiDisk" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UsbBot" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UsbBus" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UsbCbi0" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UsbCbi1" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UsbKb" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UsbMassStorage" />
+      
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="UsbMouse" />
+    </OTHER_COMPONENTS>
+  </TianoImage>
+  <PcdBuildDeclarations>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+      <Token>0x00000001</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>1000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdMaximumAsciiStringLength</C_Name>
+      <Token>0x00000002</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>4</DatumSize>      
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>1000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdMaximumLinkedListLength</C_Name>
+      <Token>0x00000003</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>1000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdSpinLockTimeout</C_Name>
+      <Token>0x00000004</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>4</DatumSize>      
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>10000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdDebugPropertyMask</C_Name>
+      <Token>0x00000005</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>4</DatumSize>            
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0x0f</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="PATCHABLE_IN_MODULE">
+      <C_Name>PcdDebugPrintErrorLevel</C_Name>
+      <Token>0x00000006</Token>
+      <DatumType>UINT32</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>4</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0x80000000</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+      <Token>0x00000007</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>1</DatumSize>      
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0x07</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdDebugClearMemoryValue</C_Name>
+      <Token>0x00000008</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0</MaxSku>
+      <SkuId>0</SkuId>
+      <DatumSize>1</DatumSize>            
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0xAF</DefaultValue>
+    </PcdBuildData>
+    <PcdBuildData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
+      <Token>0x00000009</Token>
+      <DatumType>UINT8</DatumType>
+      <HiiEnable>false</HiiEnable>
+      <VpdEnable>false</VpdEnable>
+      <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+      <SkuEnable>false</SkuEnable>
+      <SkuDataArrayEnable>false</SkuDataArrayEnable>
+      <MaxSku>0x00</MaxSku>
+      <SkuId>0x00</SkuId>
+      <DatumSize>1</DatumSize>
+      <VariableGuid>0</VariableGuid>
+      <VariableName>L""</VariableName>
+      <DataOffset>0</DataOffset>
+      <GuidOffset>0</GuidOffset>
+      <DefaultValue>0</DefaultValue>
+    </PcdBuildData>
+  </PcdBuildDeclarations>
+  <BuildOptions>
+    <OutputDirectory IntermediateDirectories="UNIFIED"/>
+  </BuildOptions>
+</FrameworkPlatformDescription>
