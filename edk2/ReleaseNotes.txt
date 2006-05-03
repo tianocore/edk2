@@ -62,7 +62,8 @@ Java Development Kit ( Java 5.0 or later)
 
 Java Tools
     Apache-ANT, version 1.6.5 or later (http://ant.apache.org)
-    Ant-contrib, version 1.0b2 or later (http://antcontrib.sourceforge.net)
+    Ant-contrib, version 1.0b2 or later
+      (http://sourceforge.net/project/showfiles.php?group_id=36177)
     Saxon8, version 8.1.1
       (http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip?download)
     XMLBeans, version 2.1.0 or later (http://xmlbeans.apache.org) 
@@ -73,7 +74,7 @@ Other Tools
 Optional Tools
 --------------
 Compiler Tool Chains:
-    Intel C++ Compiler for Windows, ver. 9.0 or later (http://www.intel,com)
+    Intel C++ Compiler for Windows, ver. 9.0 or later (http://www.intel.com)
     Intel C Compiler for EFI Byte Code, ver. 1.2 or later
     Microsoft Driver Development Kit, version 3790.1830 or later
     Microsoft ACPI Source Language Assembler, Version 1.0.13NT or later
