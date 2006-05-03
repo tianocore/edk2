@@ -83,7 +83,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <fileset dir="${basedir}/${ToolName}" 
@@ -95,8 +94,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-			<linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-
+			<libset dir="${LIB_DIR}" libs="CommonTools"/>
     </cc>
   </target>
 

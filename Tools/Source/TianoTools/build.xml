@@ -63,8 +63,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </else>
     </if>
 
-    <property name="HOST_ARCH" value="IA32"/>
     <ToolChainSetup confPath="${WORKSPACE_DIR}/Tools/Conf" />
+    
+    <if>
+        <isset property="env.TOOL_CHAIN" />
+      <then>
+        <property name="ToolChain" value="${env.TOOL_CHAIN}"/>
+        <condition property="gcc">
+          <equals arg1="${ToolChain}" arg2="gcc"/>
+        </condition>
+      </then>
+    </if>
+
   </target>
   
   <target name="Libraries">

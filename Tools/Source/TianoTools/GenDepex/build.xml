@@ -15,9 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Copyright (c) 2006, Intel Corporation
 -->
   <property name="ToolName" value="GenDepex"/>
-  <property name="LibName" value="DepexParser"/>
-  <property name="FileSet" value="GenDepex.c GenDepex.h"/>
-	<property name="LibFileSet" value="DepexParser.c DepexParser.h" />
+  <property name="FileSet" value="DepexParser.c GenDepex.c GenDepex.h"/>
 
   <taskdef resource="cpptasks.tasks"/>
   <typedef resource="cpptasks.types"/>
@@ -28,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="LINK_OUTPUT_TYPE" value="static"/>
   <property name="BUILD_DIR" value="${PACKAGE_DIR}/${ToolName}/tmp"/>
 
-  <target name="GenTool" depends="init, Lib, Tool">
+  <target name="GenTool" depends="init, Tool">
     <echo message="Building the EDK Tool: ${ToolName}"/>
   </target>
 
@@ -81,54 +79,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 		</if>
   </target>
 
-  <target name="Tool" depends="init, Lib">
+  <target name="Tool" depends="init">
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet}" 
-        defaultexcludes="TRUE" 
-        excludes="*.xml *.inf"/>
+        includes="${FileSet}" />
 
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-			<linkerarg value="${LIB_DIR}/CommonTools${ext_static}"/>
-			<linkerarg value="${LIB_DIR}/${LibName}${ext_static}"/>
+			<libset dir="${LIB_DIR}" libs="CommonTools"/>
     </cc>
 	</target>
 
-	<target name="Lib" depends="init">
-    <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
-        outfile="${LIB_DIR}/${LibName}"
-        outtype="static"
-        libtool="${haveLibtool}"
-        optimize="speed">
-
-      <fileset dir="${basedir}/${ToolName}" 
-        includes="${LibFileSet}" 
-        defaultexcludes="TRUE" 
-        excludes="*.xml *.inf"/>
-
-      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Common"/>
-		</cc>
-      <if>
-        <os family="dos"/>
-        <then>
-          <exec dir="${BUILD_DIR}" executable="lib" failonerror="false">
-            <arg line="/NOLOGO *.lib /OUT:${LIB_DIR}/${LibName}${ext_static}"/>
-          </exec>
-        </then>
-      </if>
-  </target>
-	
   <target name="clean" depends="init">
     <echo message="Removing Intermediate Files Only"/>  
     <delete>

@@ -80,7 +80,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${LIB_DIR}/CommonTools"
         outtype="static"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
@@ -88,19 +87,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
 
       <fileset dir="${basedir}/Common" 
-        includes="*.h *.c" 
-        defaultexcludes="TRUE" 
-        excludes="*.xml *.inf"/>
-
+        includes="*.c" />
     </cc>
-    <if>
-      <os family="dos"/>
-      <then>
-        <exec dir="${BUILD_DIR}" executable="lib" failonerror="false">
-          <arg line="/NOLOGO *.lib /OUT:${LIB_DIR}/CommonTools${ext_static}"/>
-        </exec>
-      </then>
-    </if>
   </target>
 
   <target name="clean" depends="init">

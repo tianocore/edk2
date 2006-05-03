@@ -79,19 +79,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </if>
 		<condition property="CheckDepends">
 		  <uptodate targetfile="${WORKSPACE}/Tools/bin/VfrCompile${ext_exe}">
-			  <srcfiles dir="${WORKSPACE}/Tools/Source/TianoTools/VfrCompile" includes="EfiVfrParser.cpp DLGLexer.cpp VfrCompile.cpp VfrCompile.g VfrServices.cpp parser.dlg"/>
+			  <srcfiles dir="${WORKSPACE}/Tools/Source/TianoTools/VfrCompile" 
+        includes="EfiVfrParser.cpp DLGLexer.cpp VfrCompile.cpp VfrCompile.g VfrServices.cpp parser.dlg"/>
 			</uptodate>
 		</condition>
   </target>
 
   <target name="Antlr" depends="init" unless="CheckDepends">
-    <exec dir="${basedir}/${ToolName}" executable="antlr.exe" failonerror="TRUE">
+    <exec dir="${basedir}/${ToolName}" executable="antlr" failonerror="TRUE">
       <arg line="-CC -e3 -ck 3 -o . VfrCompile.g"/>
     </exec>
   </target>
 
   <target name="Dlg" depends="Antlr" unless="CheckDepends">
-    <exec dir="${basedir}/${ToolName}" executable="dlg.exe" failonerror="TRUE">
+    <exec dir="${basedir}/${ToolName}" executable="dlg" failonerror="TRUE">
       <arg line="-C2 -i -CC -o . Parser.dlg"/>
     </exec>
   </target>
@@ -100,18 +101,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet}" 
-        defaultexcludes="TRUE" 
-        excludes="*.xml *.inf"/>
+        includes="${FileSet}" />
 
       <fileset dir="${basedir}/Pccts/h" 
-        includes="${FileSetPccts}" 
-        defaultexcludes="TRUE" 
-        excludes="*.xml *.inf"/>
+        includes="${FileSetPccts}" />
 
       <includepath path="${env.WORKSPACE}/Tools/Source/TianoTools/Pccts/h"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
@@ -119,21 +115,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-
-      <linkerarg value="${LIB_DIR}/CommonTools.lib"/>
-
+      <libset dir="${LIB_DIR}" libs="CommonTools"/>
+      <syslibset libs="stdc++" if="gcc"/>
     </cc>
   </target>
 
   <target name="clean" depends="init">
-    <echo message="Removing Intermediate Files Only"/>  
+    <echo message="Removing Intermediate Files Only"/>
     <delete>
       <fileset dir="${BUILD_DIR}" includes="*.obj"/>
     </delete>
   </target>
 
   <target name="cleanall" depends="init">
-    <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
+    <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>
     <delete dir="${BUILD_DIR}">
       <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
     </delete>
