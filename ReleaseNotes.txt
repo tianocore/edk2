@@ -157,10 +157,10 @@ Java Tools:
 -------------------------------------------------------------------------------
 Quick Start
 -----------
-Edit the text file, tools_def.txt, located in the Tools/Conf directory.  This
-file contains the names of the compiler tool chains and the location of the
-compiler binaries.  It has been pre-populated with the standard location for
-the Microsoft tool chains and includes the standard location of the Intel C 
+Edit the text file, msft_tools_def.txt, located in the Tools/Conf directory.
+This file contains the names of the compiler tool chains and the location of
+the compiler binaries.  It has been pre-populated with the standard location
+for the Microsoft tool chains and includes the standard location of the Intel C
 Compiler for EFI Byte Code (EBC)
   
 Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
