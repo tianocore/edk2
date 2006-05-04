@@ -6,7 +6,9 @@
   <title>EDK 2.0 Installation Guide</title>
 </head>
 <body>
-<h2>Table of Contents</h2>
+<h3>Gett<br>
+</h3>
+<h3>Table of Contents</h3>
 <ul>
   <li><a href="#Requirements">Requirements</a></li>
 </ul>
@@ -166,7 +168,7 @@ ACPI Component Architecture<br>
     </tr>
   </tbody>
 </table>
-<h3>Install and <span style="font-weight: bold;"></span>Configure
+<h3>Install and Configure
 Tools on Windows XP<br>
 </h3>
 <h4>Software Installation Order</h4>
@@ -174,10 +176,9 @@ After installing the compiler tools and your Subversion client, the
 following required tools should be installed in this order: <br>
 Java JDK, Apache-Ant, ant-contrib, xmlbeans, saxon8<br>
 <h4>Java Development Kit</h4>
-The JAVA_HOME Environment Variable must be set before attempting to
-build.<br>
+The Java Environment Variable must be set before attempting to build.<br>
 e.g. For Sun JDK:<br>
-<pre><span style="font-weight: bold;">set JAVA_HOME=c:\Java\jdk1.5.0_06</span><br></pre>
+<pre>set JAVA_HOME=c:\Java\jdk1.5.0_06</pre>
 During installation, you should specify the install directory as
 C:\Java instead of C:\Program Files (or some other drive letter.)&nbsp;
 While installing to this non-standard location is not required. In use,
@@ -190,21 +191,41 @@ JDK install.<br>
 The Apache-ANT requires the ANT_HOME environment variable to be set
 before attempting to build:<br>
 <pre>set ANT_HOME=c:\&lt;full path to where ant was installed&gt;</pre>
-The ant-contrib.jar file should be installed in the %ANT_HOME%\lib
+The ant-contrib.jar file should be <span style="font-weight: bold;">installed</span>
+in the %ANT_HOME%\lib
 directory.<br>
 <br>
 The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
 before attempting to build:<br>
-<pre>set XMLBEANS_HOME=C:\&lt;full path to where xmlbeans&nbsp; was installed&gt;</pre>
-The saxon8.jar file should be copied to the %XMLBEANS_HOME%\lib
+<pre>set XMLBEANS_HOME=C:\&lt;full path to where xmlbeans was installed&gt;</pre>
+The saxon8.jar file should be <span style="font-weight: bold;">copied </span>to
+the %XMLBEANS_HOME%\lib
 directory.<br>
 <br>
 The Ant and XMLBean tools are required to be in the path.<br>
 <pre>set PATH=%PATH%;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin<br></pre>
-<h4>Environment Variables</h4>
+<h3>Cygwin</h3>
+If you optionally install cygwin (for gcc support) you should install
+it in "Unix" mode. The gcc tool chain will not compile in "DOS" mode.<br>
+<h3>Environment Variables</h3>
+You need to set WORKSPACE to the location of the edk2 directory that
+you pulled from Subversion. For example<br>
+<pre>set WORKSPACE=c:\workspace\edk2\</pre>
 It is recommended that you wrap up all the environment variables above
 into a script that you can launch each time you begin to do development
 in your EDK2 workspace.<br>
+<h3>The first build</h3>
+Once the external tools are installed, the environment variables are
+set, and you have the ant executable in your path, you can try a build.<br>
+<ol>
+  <li>cd to %WORKSPACE%</li>
+  <li>run edksetup.bat (this will build several tools that are used in
+edk2 development. It will fail if the external tools above are not
+properly installed.)<br>
+  </li>
+  <li>cd MdePkg</li>
+  <li>type ant</li>
+</ol>
 </div>
 </div>
 </body>
