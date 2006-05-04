@@ -93,7 +93,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <target name="Dlg" depends="Antlr" unless="CheckDepends">
     <exec dir="${basedir}/${ToolName}" executable="dlg" failonerror="TRUE">
-      <arg line="-C2 -i -CC -o . Parser.dlg"/>
+      <arg line="-C2 -i -CC -o . parser.dlg"/>
     </exec>
   </target>
 
