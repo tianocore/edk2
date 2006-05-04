@@ -389,7 +389,7 @@ public class ToolChainFactory {
         //
         // parse ${TARGET}_efi_flags
         //
-        map = ConfigReader.parse(confPath, target + "_efi_flags.txt");
+        map = ConfigReader.parse(confPath, target.toLowerCase() + "_efi_flags.txt");
         for (int i = 0; i < map.length; i++){
             if(globalFlagsMap.containsKey(map[i][0])){
                 globalFlagsMap.remove(map[i][0]);
