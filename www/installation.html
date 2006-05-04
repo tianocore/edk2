@@ -1,102 +1,210 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-
 <head>
-
-  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type" />
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
   <title>EDK 2.0 Installation Guide</title>
-
-
 </head>
-
 <body>
-
 <h2>Table of Contents</h2>
-
 <ul>
-
   <li><a href="#Requirements">Requirements</a></li>
-
 </ul>
-
 <h3><a name="Requirements"></a>Requirements</h3>
-
 <p>
 The following are required to be able to build the EDK:
 </p>
-
 <div id="requirements">
-<table id="requirements_table" border="1" cellpadding="0" cellspacing="0" width="50%">
-
+<table id="requirements_table" border="1" cellpadding="0"
+ cellspacing="0" width="50%">
   <tbody>
-
     <tr class="header">
-
-      <th style="border-color: black; background-color: grey; color: white;">Name</th>
-
-      <th style="border-color: black; background-color: grey; color: white;">Version</th>
-
-      <th style="border-color: black; background-color: grey; color: white;">URL</th>
-
+      <th
+ style="border-color: black; background-color: grey; color: white;">Name</th>
+      <th
+ style="border-color: black; background-color: grey; color: white;">Version</th>
+      <th
+ style="border-color: black; background-color: grey; color: white;">URL</th>
     </tr>
-
     <tr>
-
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">TortoiseSVN<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">1.3.3<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.3.3.6219-svn-1.3.1.msi?download">http://prdownloads.sourceforge.net/tortoisesvn/</a><br>
+      <a
+ href="http://prdownloads.sourceforge.net/tortoisesvn/TortoiseSVN-1.3.3.6219-svn-1.3.1.msi?download">TortoiseSVN-1.3.3.6219-svn-1.3.1.msi?download</a><br>
+      </td>
+    </tr>
+    <tr>
       <td style="text-align: center; font-weight: bold;">Ant</td>
-
       <td style="text-align: center; font-weight: bold;">1.6.5</td>
-
-      <td style="text-align: center;"><a href="http://ant.apache.org/bindownload.cgi">http://ant.apache.org/bindownload.cgi</a></td>
-
+      <td style="text-align: center;"><a
+ href="http://ant.apache.org/bindownload.cgi">http://ant.apache.org/bindownload.cgi</a></td>
     </tr>
-
     <tr>
-
       <td style="text-align: center; font-weight: bold;">Ant
 Contrib</td>
-
       <td style="text-align: center; font-weight: bold;">1.0b2</td>
-
-      <td style="text-align: center;"><a href="http://sourceforge.net/project/showfiles.php?group_id=36177">http://sourceforge.net/project/showfiles.php?group_id=36177</a></td>
-
+      <td style="text-align: center;"><a
+ href="http://sourceforge.net/project/showfiles.php?group_id=36177">http://sourceforge.net/project/showfiles.php?group_id=36177</a></td>
     </tr>
-
     <tr>
-
       <td style="text-align: center; font-weight: bold;">Java
 JDK</td>
-
       <td style="text-align: center; font-weight: bold;">1.5.x</td>
-
-      <td style="text-align: center;"><a href="http://java.sun.com/j2se/1.5.0/download.jsp">http://java.sun.com/j2se/1.5.0/download.jsp</a></td>
-
+      <td style="text-align: center;"><a
+ href="http://java.sun.com/j2se/1.5.0/download.jsp">http://java.sun.com/j2se/1.5.0/download.jsp</a></td>
     </tr>
-
     <tr>
-
       <td style="text-align: center; font-weight: bold;">Saxon</td>
-
       <td style="text-align: center; font-weight: bold;">8.7.1</td>
-
-      <td style="text-align: center;"><a href="http://saxon.sourceforge.net/#F8.7.1SA">http://saxon.sourceforge.net/#F8.7.1SA</a></td>
-
+      <td style="text-align: center;"><a
+ href="http://saxon.sourceforge.net/#F8.7.1SA">http://saxon.sourceforge.net/#F8.7.1SA</a></td>
     </tr>
-
     <tr>
-
       <td style="text-align: center; font-weight: bold;">XMLBeans</td>
-
       <td style="text-align: center; font-weight: bold;">2.1.0</td>
-
-      <td style="text-align: center;"><a href="http://xmlbeans.apache.org/sourceAndBinaries/index.html">http://xmlbeans.apache.org/sourceAndBinaries/index.html</a></td>
-
+      <td style="text-align: center;"><a
+ href="http://xmlbeans.apache.org/sourceAndBinaries/index.html">http://xmlbeans.apache.org/sourceAndBinaries/index.html</a></td>
     </tr>
-
   </tbody>
 </table>
-
+<br>
+<p>The following tools are optional:<br>
+</p>
+<div id="requirements">
+<table style="width: 745px; height: 46px;" id="requirements_table"
+ border="1" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr class="header">
+      <th
+ style="border-color: black; background-color: grey; color: white;">Name</th>
+      <th
+ style="border-color: black; background-color: grey; color: white;">Version</th>
+      <th
+ style="border-color: black; background-color: grey; color: white;">URL</th>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; font-weight: bold; text-align: center;">Cygwin<br>
+      </td>
+      <td
+ style="vertical-align: top; font-weight: bold; text-align: center;">Current<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="http://www.cygwin.com">http://www.cygwin.com</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Intel
+C++ Compiler for Windows<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">9.0
+      <br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="http://www.intel.com">http://www.intel.com</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Intel
+C Compiler for EFI Byte Code<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">1.2<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="http://www.intel.com/cd/software/products/asmo-na/eng/compilers/efibc/index.htm">http://www.intel.com/cd/software/products</a><br>
+      <a
+ href="http://www.intel.com/cd/software/products/asmo-na/eng/compilers/efibc/index.htm">/asmo-na/eng/compilers/efibc/index.htm</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Microsoft
+Driver Development Kit<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">3790.1830<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="http://www.microsoft.com/whdc/devtools/ddk/orderddkcd.mspx">http://www.microsoft.com/whdc/devtools/ddk/orderddkcd.mspx</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Microsoft
+ACPI Source Language Assembler<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">1.0.13NT<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="http://download.microsoft.com/download/0/e/2/0e258da3-dd7a-4d3b-9b48-8673b6b5897c/ASL.exe">http://download.microsoft.com/download/0/e/2/0e2</a><br>
+      <a
+ href="http://download.microsoft.com/download/0/e/2/0e258da3-dd7a-4d3b-9b48-8673b6b5897c/ASL.exe">58da3-dd7a-4d3b-9b48-8673b6b5897c/ASL.exe</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">Intel
+ACPI Component Architecture<br>
+      </td>
+      <td
+ style="vertical-align: top; text-align: center; font-weight: bold;">20060113<br>
+      </td>
+      <td style="vertical-align: top; text-align: center;"><a
+ href="http://www.intel.com/technology/iapc/acpi/downloads.htm">http://www.intel.com/technology/iapc/acpi/downloads.htm</a><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<h3>Install and <span style="font-weight: bold;"></span>Configure
+Tools on Windows XP<br>
+</h3>
+<h4>Software Installation Order</h4>
+After installing the compiler tools and your Subversion client, the
+following required tools should be installed in this order: <br>
+Java JDK, Apache-Ant, ant-contrib, xmlbeans, saxon8<br>
+<h4>Java Development Kit</h4>
+The Java Environment Variable must be set before attempting to build.<br>
+e.g. For Sun JDK:<br>
+<pre><span style="font-weight: bold;">set JAVA_HOME=c:\Java\jdk1.5.0_06</span><br></pre>
+During installation, you should specify the install directory as
+C:\Java instead of C:\Program Files (or some other drive letter.)&nbsp;
+While installing to this non-standard location is not required. In use,
+it seems to work more reliably.<br>
+<br>
+NOTE: You cannot combine the location for the JDK and the JRE, as the
+JRE install removes most of the binaries and libraries installed by the
+JDK install.<br>
+<h4>Java Tools</h4>
+The Apache-ANT requires the ANT_HOME environment variable to be set
+before attempting to build:<br>
+<pre>set ANT_HOME=c:\&lt;full path to where ant was installed&gt;</pre>
+The ant-contrib.jar file should be installed in the %ANT_HOME%\lib
+directory.<br>
+<br>
+The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
+before attempting to build:<br>
+<pre>set XMLBEANS_HOME=C:\&lt;full path to where xmlbeans&nbsp; was installed&gt;</pre>
+The saxon8.jar file should be copied to the %XMLBEANS_HOME%\lib
+directory.<br>
+<br>
+The Ant and XMLBean tools are required to be in the path.<br>
+<pre>set PATH=%PATH%;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin<br></pre>
+<h4>Environment Variables</h4>
+It is recommended that you wrap up all the environment variables above
+into a script that you can launch each time you begin to do development
+in your EDK2 workspace.<br>
 </div>
-
+</div>
 </body>
-
 </html>
