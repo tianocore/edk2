@@ -115,22 +115,6 @@ public class PCDAutoGenAction extends BuildAction {
         if(!isEmulatedPCDDriver && moduleName.length() == 0) {
             throw new BuildActionException("Wrong module name parameter for PCDAutoGenAction tool!");
         }
-
-        //
-        // Check the PCD memory database manager is valid.
-        //
-        if(GlobalData.getPCDMemoryDBManager() == null) {
-            throw new BuildActionException("Memory database has not been initlizated!");
-        }
-
-        dbManager = GlobalData.getPCDMemoryDBManager();
-
-        if(dbManager.getDBSize() == 0) {
-            throw new BuildActionException("Memory database does not contain any record!");
-        }
-
-        ActionMessage.debug(this,
-                            "PCD memory database contains " + dbManager.getDBSize() + " PCD tokens");
     }
 
     /**
@@ -146,6 +130,22 @@ public class PCDAutoGenAction extends BuildAction {
     void performAction() throws BuildActionException {
         ActionMessage.debug(this, 
                             "Starting PCDAutoGenAction to generate autogen.h and autogen.c!...");
+                            
+        //
+        // Check the PCD memory database manager is valid.
+        //
+        if(GlobalData.getPCDMemoryDBManager() == null) {
+            throw new BuildActionException("Memory database has not been initlizated!");
+        }
+
+        dbManager = GlobalData.getPCDMemoryDBManager();
+
+        if(dbManager.getDBSize() == 0) {
+           return; 
+        }
+
+        ActionMessage.debug(this,
+                            "PCD memory database contains " + dbManager.getDBSize() + " PCD tokens");
 
         hAutoGenString = "";
         cAutoGenString = "";
