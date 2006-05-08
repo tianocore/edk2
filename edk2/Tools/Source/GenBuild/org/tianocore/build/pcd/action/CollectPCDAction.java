@@ -373,15 +373,13 @@ public class CollectPCDAction {
 
         if(Token.PCD_USAGE.UNKNOWN != token.isUsageInstanceExist(moduleName)) {
             //
-            // BUGBUG: It should *not* throw exception here. Becaues in MdePkg.fpd, 
-            // more than on BaseLib exist. But why? need confirmation.
+            // BUGBUG: It is legal that same base name exist in one FPD file. In furture
+            //         we should use "Guid, Version, Package" and "Arch" to differ a module.
+            //         So currently, warning should be disabled.
             //
-            //throw new EntityException(
-            //  "In module " + moduleName + " exist more than one PCD token " + token.cName
-            //  );
-            ActionMessage.warning(this,
-                                  "In module " + moduleName + " exist more than one PCD token " + token.cName
-                                  );
+            //ActionMessage.warning(this,
+            //                      "In module " + moduleName + " exist more than one PCD token " + token.cName
+            //                      );
             return null;
         }
 
