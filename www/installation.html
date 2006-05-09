@@ -63,10 +63,11 @@ JDK</td>
     </tr>
     <tr>
       <td style="text-align: center; font-weight: bold;">Saxon-B</td>
-      <td style="text-align: center; font-weight: bold;">8.7.1 for Java<br>
+      <td style="text-align: center; font-weight: bold;">8.1.1 for Java<br>
       </td>
       <td style="text-align: center;"><a
- href="http://saxon.sourceforge.net/#F8.7.1B">http://saxon.sourceforge.net/#F8.7.1B</a></td>
+ href="http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip">http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip<br>
+      </a></td>
     </tr>
     <tr>
       <td style="text-align: center; font-weight: bold;">XMLBeans</td>
@@ -199,8 +200,9 @@ before attempting to build:<br>
 <pre>set XMLBEANS_HOME=C:\&lt;full path to where xmlbeans was installed&gt;</pre>
 The saxon8.jar file should be <span style="font-weight: bold;">copied </span>to
 the %XMLBEANS_HOME%\lib
-directory.<br>
-<br>
+directory. Do not download a later version of saxon 8. You will get the
+following error message if you do:<br>
+<pre>build.xml:45: java.lang.RuntimeException:&nbsp; Trying XBeans path engine... Trying XQRL... Trying Saxon... FAILED on declare namespace sans='http://www.TianoCore.org/2006/Edk2.0'; $this/sans:FrameworkPlatformDescription/sans:Flash/sans:FvImages/sans:FvImage[@Type='ValidImageNames']/sans:FvImageNames</pre>
 The Ant and XMLBean tools are required to be in the path.<br>
 <pre>set PATH=%PATH%;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin<br></pre>
 <h3>Cygwin</h3>
