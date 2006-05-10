@@ -184,7 +184,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" ModuleName="NullMemoryTest"/>
       <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" ModuleName="HiiDatabase"/>
       <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" ModuleName="Partition"/>
-      <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" PACKAGE="Logo" ModuleName="Logo"/>
+      <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" ModuleName="Logo"/>
       <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" ModuleName="PciBus"/>
       <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" ModuleName="SetupBrowser"/>
       <ModuleSA Arch="IA32" FvBinding="FV_RECOVERY" ModuleName="DriverSample"/>
