@@ -231,11 +231,11 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" name="SEC" type="Components"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="PEI_CORE" type="Components"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="PEIM" type="Components"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="DXE_CORE" type="Components"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="SEC" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="PEI_CORE" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="PEIM" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="DXE_CORE" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="OTHER_COMPONENTS" type="Components"/>
             </xs:sequence>
         </xs:complexType>
