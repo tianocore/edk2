@@ -1101,15 +1101,13 @@
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="MsaAttributes">
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="ModuleName" type="C_Name" use="optional"/>
-        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
-        <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
-        <xs:attribute name="BuildSequence" type="xs:int" use="optional"/>
-        <xs:attribute name="FV" type="xs:string" use="optional"/>
         <xs:attribute name="FvBinding" type="xs:string" use="optional"/>
-        <xs:attribute name="PACKAGE" type="xs:string" use="optional"/>
+        <xs:attribute name="ModuleName" type="C_Name" use="optional"/>
+        <xs:attribute name="ModuleGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="PackageName" type="C_Name" use="optional"/>
+        <xs:attribute name="PackageGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="BuildSequence" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="OptionAttributes">
         <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
