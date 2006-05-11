@@ -32,7 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Updated>2006-03-19 15:17</Updated>
   </MsaLibHeader>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">SmBusLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_PRODUCED">SmbusLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">IoLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">PciLib</LibraryClass>

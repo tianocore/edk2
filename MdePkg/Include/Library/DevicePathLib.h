@@ -74,24 +74,23 @@ AppendDevicePath (
 ;
 
 /**
-	This function appends the device path node SecondDevicePath
-	to every device path instance in FirstDevicePath.
+  This function appends the device path node SecondDevicePath
+  to every device path instance in FirstDevicePath.
 
-	@param	FirstDevicePath A pointer to a device path data structure.
-	
-	@param	SecondDevicePath A pointer to a single device path node.
+  @param  DevicePath A pointer to a device path data structure.
+  
+  @param  DevicePathNode A pointer to a single device path node.
 
-	@return
-	A pointer to the new device path.
-	If there is not enough temporary pool memory available to complete this function,
-	then NULL is returned.
+  @return A pointer to the new device path.
+  If there is not enough temporary pool memory available to complete this function,
+  then NULL is returned.
 
 **/
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePathNode (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *FirstDevicePath,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *SecondDevicePath
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode
   )
 ;
 

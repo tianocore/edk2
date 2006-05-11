@@ -10,548 +10,852 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  SmbusLib.h
+  Module Name:  SmbusLib.c
 
 **/
 
-RETURN_STATUS
-EFIAPI
-BaseSmBusLibConstructor (
-  IN      VOID                      *Param1,
-  IN      VOID                      *Param2
+#include "SmbusLibRegisters.h"
+
+#define SMBUS_LIB_SLAVE_ADDRESS(SmBusAddress)      (((SmBusAddress) >> 1)  & 0x7f)
+#define SMBUS_LIB_COMMAND(SmBusAddress)            (((SmBusAddress) >> 8)  & 0xff)
+#define SMBUS_LIB_LENGTH(SmBusAddress)             (((SmBusAddress) >> 16) & 0x1f)
+#define SMBUS_LIB_PEC(SmBusAddress)     ((BOOLEAN) (((SmBusAddress) & SMBUS_LIB_PEC_BIT) != 0))
+#define SMBUS_LIB_RESEARVED(SmBusAddress)          ((SmBusAddress) & ~(((1 << 21) - 2) | SMBUS_LIB_PEC_BIT))
+
+//
+// Replaced by PCD
+//
+#define ICH_SMBUS_BASE_ADDRESS               0xEFA0
+
+/**
+  Reads an 8-bit SMBUS register on ICH.
+
+  This internal function reads an SMBUS register specified by Offset.
+
+  @param  Offset  The offset of SMBUS register.
+
+  @return The value read.
+
+**/
+UINT8
+InternalSmBusIoRead8 (
+  IN UINTN      Offset
   )
 {
+  return IoRead8 (ICH_SMBUS_BASE_ADDRESS + Offset);
+}
+
+/**
+  Writes an 8-bit SMBUS register on ICH.
+
+  This internal function writes an SMBUS register specified by Offset.
+
+  @param  Offset  The offset of SMBUS register.
+  @param  Value   The value to write to SMBUS register.
+
+  @return The value written the SMBUS register.
+
+**/
+UINT8
+InternalSmBusIoWrite8 (
+  IN UINTN      Offset,
+  IN UINT8      Value
+  )
+{
+  return IoWrite8 (ICH_SMBUS_BASE_ADDRESS + Offset, Value);
+}
+
+/**
+  Acquires the ownership of SMBUS.
+
+  This internal function reads the host state register.
+  If the SMBUS is not available, RETURN_TIMEOUT is returned;
+  Otherwise, it performs some basic initializations and returns
+  RETURN_SUCCESS. 
+
+  @retval RETURN_SUCCESS    The SMBUS command was executed successfully.
+  @retval RETURN_TIMEOUT    A timeout occurred while executing the SMBUS command.
+
+**/
+RETURN_STATUS
+InternalSmBusAcquire (
+  VOID 
+  )
+{
+  UINT8   HostStatus;
+
+  HostStatus = InternalSmBusIoRead8 (SMBUS_R_HST_STS);
+  if ((HostStatus & SMBUS_B_INUSE_STS) != 0) {
+    return RETURN_TIMEOUT;
+  } else if ((HostStatus & SMBUS_B_HOST_BUSY) != 0) {
+    //
+    // Clear Status Register and exit
+    //
+    InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);
+    return RETURN_TIMEOUT;
+  }
+  //
+  // Clear byte pointer of 32-byte buffer.
+  //
+  InternalSmBusIoRead8 (SMBUS_R_HST_CTL);
+  //
+  // Clear BYTE_DONE status
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_BYTE_DONE_STS);
+  
   return RETURN_SUCCESS;
 }
 
-//
-// BUGBUG: use PCD to retrieve BUS, DEV, FUNC & OFFSET for SMBUS host BAR
-//
-#define SMBUS_HOST_BUS              0
-#define SMBUS_HOST_DEV              31
-#define SMBUS_HOST_FUNC             3
-#define SMBUS_HOST_SMB_BASE         0x20
+/**
+  Waits until the completion of SMBUS transaction.
 
-//
-// Offsets of registers for SMBUS controller
-//
-#define R_HST_STS                   0
-#define R_HST_CNT                   2
-#define R_HST_CMD                   3
-#define R_XMIT_SLVA                 4
-#define R_HST_D0                    5
-#define R_HST_D1                    6
-#define R_HOST_BLOCK_DB             7
-#define R_PEC                       8
-#define R_RCV_SLVA                  9
-#define R_SLV_DATA                  0x0a
-#define R_AUX_STS                   0x0c
-#define R_AUX_CTL                   0x0d
-#define R_SMLINK_PIN_CTL            0x0e
-#define R_SMBUS_PIN_CTL             0x0f
-#define R_SLV_STS                   0x10
-#define R_SLV_CMD                   0x11
-#define R_NOTIFY_DADDR              0x14
-#define R_NOTIFY_DLOW               0x16
-#define R_NOTIFY_DHIGH              0x17
+  This internal function waits until the transaction of SMBUS is over
+  by polling the INTR bit of Host status register.
+  If the SMBUS is not available, RETURN_TIMEOUT is returned;
+  Otherwise, it performs some basic initializations and returns
+  RETURN_SUCCESS. 
 
-//
-// Bits in HST_STS
-//
-#define B_HST_STS_DS                0x80
-#define B_HST_STS_INUSE             0x40
-#define B_HST_STS_SMBALERT          0x20
-#define B_HST_STS_FAILED            0x10
-#define B_HST_STS_BUS_ERR           0x08
-#define B_HST_STS_DEV_ERR           0x04
-#define B_HST_STS_INTR              0x02
-#define B_HST_STS_BUSY              0x01
-#define B_HST_STS_ERR               ( B_HST_STS_BUS_ERR   | \
-                                      B_HST_STS_DEV_ERR   | \
-                                      B_HST_STS_FAILED )
-#define B_HST_STS_ALL               ( B_HST_STS_DS        | \
-                                      B_HST_STS_INUSE     | \
-                                      B_HST_STS_SMBALERT  | \
-                                      B_HST_STS_ERR       | \
-                                      B_HST_STS_INTR )
+  @retval RETURN_SUCCESS      The SMBUS command was executed successfully.
+  @retval RETURN_CRC_ERROR    The checksum is not correct (PEC is incorrect).
+  @retval RETURN_DEVICE_ERROR The request was not completed because a failure reflected
+                              in the Host Status Register bit.  Device errors are
+                              a result of a transaction collision, illegal command field,
+                              unclaimed cycle (host initiated), or bus errors (collisions).
 
-//
-// Bits in HST_CNT
-//
-#define B_HST_CNT_PEC               0x80
-#define B_HST_CNT_START             0x40
-#define B_HST_CNT_LAST_BYTE         0x20
-#define B_HST_CNT_SMB_CMD           0x1c
-#define B_HST_CNT_KILL              0x02
-#define B_HST_CNT_INTREN            0x01
-
-//
-// SMBUS Protocols
-//
-#define B_SMB_CMD_QUICK             0
-#define B_SMB_CMD_BYTE              1
-#define B_SMB_CMD_BYTE_DATA         2
-#define B_SMB_CMD_WORD_DATA         3
-#define B_SMB_CMD_PROCESS_CALL      4
-#define B_SMB_CMD_BLOCK             5
-#define B_SMB_CMD_I2C               6
-#define B_SMB_CMD_BLOCK_PROCESS     7
-
-//
-// Bits in AUX_CTL
-//
-#define B_AUX_CTL_E32B              0x02
-#define B_AUX_CTL_AAC               0x01
-
-//
-// SMBUS Rd/Wr control
-//
-#define B_SMBUS_READ                1
-#define B_SMBUS_WRITE               0
-
-static
-UINT16
-EFIAPI
-GetSmBusIOBaseAddress (
-  VOID
-  )
-{
-  UINT32                            SmbusBar;
-
-  SmbusBar = PciRead32 (
-               PCI_LIB_ADDRESS (
-                 SMBUS_HOST_BUS,
-                 SMBUS_HOST_DEV,
-                 SMBUS_HOST_FUNC,
-                 SMBUS_HOST_SMB_BASE
-                 )
-               );
-  ASSERT ((SmbusBar & 0xffff001f) == 1);
-  return (UINT16)(SmbusBar & ~1);
-}
-
-static
-BOOLEAN
-EFIAPI
-SmBusAcquire (
-  IN      UINT16                    SmBusBase
-  )
-{
-  UINT8                             HstSts;
-
-  HstSts = IoRead8 (SmBusBase + R_HST_STS);
-  if (HstSts & B_HST_STS_INUSE) {
-    return FALSE;
-  }
-
-  //
-  // BUGBUG: Dead loop may occur here
-  //
-  while (HstSts & B_HST_STS_BUSY) {
-    ASSERT (HstSts & B_HST_STS_INUSE);
-    HstSts = IoRead8 (SmBusBase + R_HST_STS);
-  }
-  return TRUE;
-}
-
-static
-VOID
-EFIAPI
-SmBusStart (
-  IN      UINT16                    SmBusBase,
-  IN      UINT8                     SmBusProtocol,
-  IN      UINT8                     SlaveAddress
-  )
-{
-  IoWrite8 (SmBusBase + R_XMIT_SLVA, SlaveAddress);
-  IoWrite8 (
-    SmBusBase + R_HST_CNT,
-    IoBitFieldWrite8 (SmBusBase + R_HST_CNT, 2, 4, SmBusProtocol) |
-    B_HST_CNT_START
-    );
-}
-
-static
-UINT8
-EFIAPI
-SmBusWait (
-  IN      UINT16                    SmBusBase
-  )
-{
-  UINT8                             HstSts;
-
-  while (((HstSts = IoRead8 (SmBusBase + R_HST_STS)) & B_HST_STS_INTR) == 0);
-  return HstSts;
-}
-
-static
-VOID
-EFIAPI
-SmBusCleanup (
-  IN      UINT16                    SmBusBase
-  )
-{
-  IoWrite8 (SmBusBase + R_HST_STS, B_HST_STS_ALL);
-}
-
-static
+**/
 RETURN_STATUS
-EFIAPI
-SmBusQuick (
-  IN      UINT8                     SmBusAddress
+InternalSmBusWait (
+  VOID 
   )
 {
-  RETURN_STATUS                     Status;
-  UINT16                            SmBusBase;
+  UINT8   HostStatus;
+  UINT8   AuxiliaryStatus;
+  BOOLEAN First;
+  First = TRUE;
 
-  SmBusBase = GetSmBusIOBaseAddress ();
-  if (!SmBusAcquire (SmBusBase)) {
-    return RETURN_TIMEOUT;
+  do {
+    //
+    // Poll INTR bit of host status register.
+    //
+    HostStatus = InternalSmBusIoRead8 (SMBUS_R_HST_STS);
+  } while ((HostStatus & (SMBUS_B_INTR | SMBUS_B_ERROR | SMBUS_B_BYTE_DONE_STS)) == 0);
+  
+  if ((HostStatus & SMBUS_B_ERROR) == 0) {
+    return RETURN_SUCCESS;
+  }
+  //
+  // Clear error bits of host status register
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_ERROR);
+  //
+  // Read auxiliary status register to judge CRC error.
+  //
+  AuxiliaryStatus = InternalSmBusIoRead8 (SMBUS_R_AUX_STS);
+  if ((AuxiliaryStatus & SMBUS_B_CRCE) != 0) {
+    return RETURN_CRC_ERROR;
   }
 
-  SmBusStart (SmBusAddress, B_SMB_CMD_QUICK, SmBusAddress);
-  if (SmBusWait (SmBusAddress) & B_HST_STS_ERR) {
-    Status = RETURN_DEVICE_ERROR;
-  } else {
-    Status = RETURN_SUCCESS;
-  }
-
-  SmBusCleanup (SmBusAddress);
-  return Status;
+  return RETURN_DEVICE_ERROR;
 }
 
+/**
+  Executes an SMBUS quick read/write command.
+
+  This internal function executes an SMBUS quick read/write command
+  on the SMBUS device specified by SmBusAddress.
+  Only the SMBUS slave address field of SmBusAddress is required.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+**/
+VOID
+EFIAPI
+InternalSmBusQuick (
+  IN  UINTN                     SmBusAddress,
+  OUT RETURN_STATUS             *Status       OPTIONAL
+  )
+{
+  RETURN_STATUS   ReturnStatus;
+
+  ReturnStatus = InternalSmBusAcquire ();
+  if (RETURN_ERROR (ReturnStatus)) {
+    goto Done;
+  }
+ 
+  //
+  // Set Command register
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CMD, 0);
+  //
+  // Set Auxiliary Control register
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_AUX_CTL, 0);
+  //
+  // Set SMBus slave address for the device to send/receive from
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_XMIT_SLVA, (UINT8) SmBusAddress);
+  //
+  // Set Control Register (Initiate Operation, Interrupt disabled)
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CTL, SMBUS_V_SMB_CMD_QUICK + SMBUS_B_START);
+
+  //
+  // Wait for the end
+  //
+  ReturnStatus = InternalSmBusWait ();
+
+  //
+  // Clear status register and exit
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);;
+
+Done:
+  if (Status != NULL) {
+    *Status = ReturnStatus;
+  }
+}
+
+/**
+  Executes an SMBUS quick read command.
+
+  Executes an SMBUS quick read command on the SMBUS device specified by SmBusAddress.
+  Only the SMBUS slave address field of SmBusAddress is required.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If PEC is set in SmBusAddress, then ASSERT().
+  If Command in SmBusAddress is not zero, then ASSERT().
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+**/
 VOID
 EFIAPI
 SmBusQuickRead (
-  IN      UINTN                     SmBusAddress,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN                     SmBusAddress,
+  OUT RETURN_STATUS             *Status       OPTIONAL
   )
 {
-  RETURN_STATUS                     RetStatus;
+  ASSERT (!SMBUS_LIB_PEC (SmBusAddress));
+  ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  ASSERT ((SmBusAddress & ~0xfe) == 0);
-  RetStatus = SmBusQuick ((UINT8)SmBusAddress | B_SMBUS_READ);
-  if (Status) {
-    *Status = RetStatus;
-  }
+  InternalSmBusQuick (SmBusAddress | SMBUS_B_READ, Status);
 }
 
-BOOLEAN
+/**
+  Executes an SMBUS quick write command.
+
+  Executes an SMBUS quick write command on the SMBUS device specified by SmBusAddress.
+  Only the SMBUS slave address field of SmBusAddress is required.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If PEC is set in SmBusAddress, then ASSERT().
+  If Command in SmBusAddress is not zero, then ASSERT().
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+**/
+VOID
 EFIAPI
 SmBusQuickWrite (
-  IN      UINTN                     SmBusAddress,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN                     SmBusAddress,
+  OUT RETURN_STATUS             *Status       OPTIONAL
   )
 {
-  RETURN_STATUS                     RetStatus;
+  ASSERT (!SMBUS_LIB_PEC (SmBusAddress));
+  ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  ASSERT ((SmBusAddress & ~0xfe) == 0);
-  RetStatus = SmBusQuick ((UINT8)SmBusAddress | B_SMBUS_WRITE);
-  if (Status) {
-    *Status = RetStatus;
-  }
-  return (BOOLEAN)!RETURN_ERROR (RetStatus);
+  InternalSmBusQuick (SmBusAddress | SMBUS_B_WRITE, Status);
 }
 
-static
+/**
+  Executes an SMBUS byte or word command.
+
+  This internal function executes an .
+  Only the SMBUS slave address field of SmBusAddress is required.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+
+  @param  HostControl     The value of Host Control Register to set.  
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value           The byte/word write to the SMBUS.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The byte/word read from the SMBUS.
+
+**/
 UINT16
-EFIAPI
-SmBusByteWord (
-  IN      UINTN                     SmBusAddress,
-  IN      UINT16                    Value,
-  IN      UINT8                     SmBusProtocol,
-  OUT     RETURN_STATUS             *Status
+InternalSmBusByteWord (
+  IN  UINT8                     HostControl,
+  IN  UINTN                     SmBusAddress,
+  IN  UINT16                    Value,
+  OUT RETURN_STATUS             *Status
   )
 {
-  RETURN_STATUS                     RetStatus;
-  UINT16                            SmBusBase;
+  RETURN_STATUS                 ReturnStatus;
+  UINT8                         AuxiliaryControl;
 
-  if (Status == NULL) {
-    Status = &RetStatus;
+  ReturnStatus = InternalSmBusAcquire ();
+  if (RETURN_ERROR (ReturnStatus)) {
+    goto Done;
   }
 
-  SmBusBase = GetSmBusIOBaseAddress ();
-  if (!SmBusAcquire (SmBusBase)) {
-    *Status = RETURN_TIMEOUT;
-    return Value;
+  AuxiliaryControl = 0;
+  if (SMBUS_LIB_PEC (SmBusAddress)) {
+    AuxiliaryControl |= SMBUS_B_AAC;
+    HostControl      |= SMBUS_B_PEC_EN;
+  }
+ 
+  //
+  // Set commond register
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CMD, (UINT8) SMBUS_LIB_COMMAND (SmBusAddress));
+
+  InternalSmBusIoWrite8 (SMBUS_R_HST_D0, (UINT8) Value);
+  InternalSmBusIoWrite8 (SMBUS_R_HST_D1, (UINT8) (Value >> 8));
+
+  //
+  // Set Auxiliary Control Regiester.
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_AUX_CTL, AuxiliaryControl);
+  //
+  // Set SMBus slave address for the device to send/receive from.
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_XMIT_SLVA, (UINT8) SmBusAddress);
+  //
+  // Set Control Register (Initiate Operation, Interrupt disabled)
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CTL, HostControl + SMBUS_B_START);
+
+  //
+  // Wait for the end
+  //
+  ReturnStatus = InternalSmBusWait ();
+ 
+  Value  = InternalSmBusIoRead8 (SMBUS_R_HST_D1) << 8;
+  Value |= InternalSmBusIoRead8 (SMBUS_R_HST_D0);
+
+  //
+  // Clear status register and exit
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);;
+
+Done:
+  if (Status != NULL) {
+    *Status = ReturnStatus;
   }
 
-  IoWrite8 (SmBusBase + R_HST_CMD, (UINT8)(SmBusAddress >> 8));
-  IoWrite8 (SmBusBase + R_HST_D0, (UINT8)Value);
-  IoWrite8 (SmBusBase + R_HST_D1, (UINT8)(Value >> 8));
-  if ((INTN)SmBusAddress < 0) {
-    IoOr8 (SmBusBase + R_HST_CNT, B_HST_CNT_PEC);
-    IoOr8 (SmBusBase + R_AUX_CTL, B_AUX_CTL_AAC);
-  } else {
-    IoAnd8 (SmBusBase + R_HST_CNT, (UINT8)~B_HST_CNT_PEC);
-    IoAnd8 (SmBusBase + R_AUX_CTL, (UINT8)~B_AUX_CTL_AAC);
-  }
-
-  SmBusStart (SmBusBase, SmBusProtocol, (UINT8)SmBusAddress);
-
-  if (SmBusWait (SmBusBase) & B_HST_STS_ERR) {
-    *Status = RETURN_DEVICE_ERROR;
-  } else {
-    *Status = RETURN_SUCCESS;
-    Value = IoRead8 (SmBusBase + R_HST_D0);
-    Value |= (UINT16)IoRead8 (SmBusBase + R_HST_D1) << 8;
-  }
-
-  SmBusCleanup (SmBusBase);
   return Value;
 }
 
+/**
+  Executes an SMBUS receive byte command.
+
+  Executes an SMBUS receive byte command on the SMBUS device specified by SmBusAddress.
+  Only the SMBUS slave address field of SmBusAddress is required.
+  The byte received from the SMBUS is returned.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If Command in SmBusAddress is not zero, then ASSERT().
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The byte received from the SMBUS.
+
+**/
 UINT8
 EFIAPI
 SmBusReceiveByte (
-  IN      UINTN                     SmBusAddress,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfe | MAX_BIT)) == 0);
-  return (UINT8)SmBusByteWord (
-                  SmBusAddress | B_SMBUS_READ,
-                  0,
-                  B_SMB_CMD_BYTE,
-                  Status
-                  );
+  ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return (UINT8) InternalSmBusByteWord (
+                   SMBUS_V_SMB_CMD_BYTE,
+                   SmBusAddress | SMBUS_B_READ,
+                   0,
+                   Status
+                   );
 }
 
+/**
+  Executes an SMBUS send byte command.
+
+  Executes an SMBUS send byte command on the SMBUS device specified by SmBusAddress.
+  The byte specified by Value is sent.
+  Only the SMBUS slave address field of SmBusAddress is required.  Value is returned.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If Command in SmBusAddress is not zero, then ASSERT().
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value           The 8-bit value to send.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The parameter of Value.
+
+**/
 UINT8
 EFIAPI
 SmBusSendByte (
-  IN      UINTN                     SmBusAddress,
-  IN      UINT8                     Value,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  IN  UINT8          Value,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfe | MAX_BIT)) == 0);
-  return (UINT8)SmBusByteWord (
-                  SmBusAddress | B_SMBUS_WRITE,
-                  Value,
-                  B_SMB_CMD_BYTE,
-                  Status
-                  );
+  ASSERT (SMBUS_LIB_COMMAND (SmBusAddress)   == 0);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return (UINT8) InternalSmBusByteWord (
+                   SMBUS_V_SMB_CMD_BYTE,
+                   SmBusAddress | SMBUS_B_WRITE,
+                   Value,
+                   Status
+                   );
 }
 
+/**
+  Executes an SMBUS read data byte command.
+
+  Executes an SMBUS read data byte command on the SMBUS device specified by SmBusAddress.
+  Only the SMBUS slave address and SMBUS command fields of SmBusAddress are required.
+  The 8-bit value read from the SMBUS is returned.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The byte read from the SMBUS.
+
+**/
 UINT8
 EFIAPI
 SmBusReadDataByte (
-  IN      UINTN                     SmBusAddress,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfffe | MAX_BIT)) == 0);
-  return (UINT8)SmBusByteWord (
-                  SmBusAddress | B_SMBUS_READ,
-                  0,
-                  B_SMB_CMD_BYTE_DATA,
-                  Status
-                  );
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return (UINT8) InternalSmBusByteWord (
+                   SMBUS_V_SMB_CMD_BYTE_DATA,
+                   SmBusAddress | SMBUS_B_READ,
+                   0,
+                   Status
+                   );
 }
 
+/**
+  Executes an SMBUS write data byte command.
+
+  Executes an SMBUS write data byte command on the SMBUS device specified by SmBusAddress.
+  The 8-bit value specified by Value is written.
+  Only the SMBUS slave address and SMBUS command fields of SmBusAddress are required.
+  Value is returned.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value           The 8-bit value to write.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The parameter of Value.
+
+**/
 UINT8
 EFIAPI
 SmBusWriteDataByte (
-  IN      UINTN                     SmBusAddress,
-  IN      UINT8                     Value,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  IN  UINT8          Value,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT (((UINT32)SmBusAddress & ~(0xfffe | MAX_BIT)) == 0);
-  return (UINT8)SmBusByteWord (
-                  SmBusAddress | B_SMBUS_WRITE,
-                  Value,
-                  B_SMB_CMD_BYTE_DATA,
-                  Status
-                  );
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return (UINT8) InternalSmBusByteWord (
+                   SMBUS_V_SMB_CMD_BYTE_DATA,
+                   SmBusAddress | SMBUS_B_WRITE,
+                   Value,
+                   Status
+                   );
 }
 
+/**
+  Executes an SMBUS read data word command.
+
+  Executes an SMBUS read data word command on the SMBUS device specified by SmBusAddress.
+  Only the SMBUS slave address and SMBUS command fields of SmBusAddress are required.
+  The 16-bit value read from the SMBUS is returned.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+  
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The byte read from the SMBUS.
+
+**/
 UINT16
 EFIAPI
 SmBusReadDataWord (
-  IN      UINTN                     SmBusAddress,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfffe | MAX_BIT)) == 0);
-  return SmBusByteWord (
-           SmBusAddress | B_SMBUS_READ,
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return InternalSmBusByteWord (
+           SMBUS_V_SMB_CMD_WORD_DATA,
+           SmBusAddress | SMBUS_B_READ,
            0,
-           B_SMB_CMD_WORD_DATA,
            Status
            );
 }
 
+/**
+  Executes an SMBUS write data word command.
+
+  Executes an SMBUS write data word command on the SMBUS device specified by SmBusAddress.
+  The 16-bit value specified by Value is written.
+  Only the SMBUS slave address and SMBUS command fields of SmBusAddress are required.
+  Value is returned.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value           The 16-bit value to write.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The parameter of Value.
+
+**/
 UINT16
 EFIAPI
 SmBusWriteDataWord (
-  IN      UINTN                     SmBusAddress,
-  IN      UINT16                    Value,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  IN  UINT16         Value,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfffe | MAX_BIT)) == 0);
-  return SmBusByteWord (
-           SmBusAddress | B_SMBUS_WRITE,
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return InternalSmBusByteWord (
+           SMBUS_V_SMB_CMD_WORD_DATA,
+           SmBusAddress | SMBUS_B_WRITE,
            Value,
-           B_SMB_CMD_WORD_DATA,
            Status
            );
 }
 
+/**
+  Executes an SMBUS process call command.
+
+  Executes an SMBUS process call command on the SMBUS device specified by SmBusAddress.
+  The 16-bit value specified by Value is written.
+  Only the SMBUS slave address and SMBUS command fields of SmBusAddress are required.
+  The 16-bit value returned by the process call command is returned.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value           The 16-bit value to write.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The 16-bit value returned by the process call command.
+
+**/
 UINT16
 EFIAPI
 SmBusProcessCall (
-  IN      UINTN                     SmBusAddress,
-  IN      UINT16                    Value,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  IN  UINT16         Value,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfffe | MAX_BIT)) == 0);
-  return SmBusByteWord (
-           SmBusAddress | B_SMBUS_WRITE,
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return InternalSmBusByteWord (
+           SMBUS_V_SMB_CMD_PROCESS_CALL,
+           SmBusAddress | SMBUS_B_WRITE,
            Value,
-           B_SMB_CMD_PROCESS_CALL,
            Status
            );
 }
 
-static
+/**
+  Executes an SMBUS block command.
+
+  Executes an SMBUS block read, block write and block write-block read command
+  on the SMBUS device specified by SmBusAddress.
+  Bytes are read from the SMBUS and stored in Buffer.
+  The number of bytes read is returned, and will never return a value larger than 32-bytes.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  It is the caller¡¯s responsibility to make sure Buffer is large enough for the total number of bytes read.
+  SMBUS supports a maximum transfer size of 32 bytes, so Buffer does not need to be any larger than 32 bytes.
+
+  @param  HostControl     The value of Host Control Register to set.  
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  OutBuffer       Pointer to the buffer of bytes to write to the SMBUS.
+  @param  InBuffer        Pointer to the buffer of bytes to read from the SMBUS.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The number of bytes read from the SMBUS.
+
+**/
 UINTN
-EFIAPI
-SmBusBlock (
-  IN      UINTN                     SmBusAddress,
-  IN      UINT8                     SmBusProtocol,
-  IN      VOID                      *InBuffer,
-  OUT     VOID                      *OutBuffer,
-  OUT     RETURN_STATUS             *Status
+InternalSmBusBlock (
+  IN  UINT8                     HostControl,
+  IN  UINTN                     SmBusAddress,
+  IN  UINT8                     *OutBuffer,
+  OUT UINT8                     *InBuffer,
+  OUT RETURN_STATUS             *Status
   )
 {
-  RETURN_STATUS                     RetStatus;
-  UINT16                            SmBusBase;
-  UINTN                             Index;
-  UINTN                             BytesCount;
+  RETURN_STATUS                 ReturnStatus;
+  UINTN                         Index;
+  UINTN                         BytesCount;
+  UINT8                         AuxiliaryControl;
 
-  BytesCount = (UINT8)(SmBusAddress >> 16);
-  ASSERT (BytesCount <= 32);
+  BytesCount = SMBUS_LIB_LENGTH (SmBusAddress) + 1;
 
-  if (Status == NULL) {
-    Status = &RetStatus;
+  ReturnStatus = InternalSmBusAcquire ();
+  if (RETURN_ERROR (ReturnStatus)) {
+    goto Done;
+  }
+  
+  AuxiliaryControl = SMBUS_B_E32B;
+  if (SMBUS_LIB_PEC (SmBusAddress)) {
+    AuxiliaryControl |= SMBUS_B_AAC;
+    HostControl      |= SMBUS_B_PEC_EN;
   }
 
-  SmBusBase = GetSmBusIOBaseAddress ();
-  if (!SmBusAcquire (SmBusBase)) {
-    *Status = RETURN_TIMEOUT;
-    return 0;
-  }
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CMD, (UINT8) SMBUS_LIB_COMMAND (SmBusAddress));
 
-  IoWrite8 (SmBusBase + R_HST_CMD, (UINT8)(SmBusAddress >> 8));
-  IoWrite8 (SmBusBase + R_HST_D0, (UINT8)BytesCount);
-  if ((INTN)SmBusAddress < 0) {
-    IoOr8 (SmBusBase + R_HST_CNT, B_HST_CNT_PEC);
-    IoOr8 (SmBusBase + R_AUX_CTL, B_AUX_CTL_AAC);
-  } else {
-    IoAnd8 (SmBusBase + R_HST_CNT, (UINT8)~B_HST_CNT_PEC);
-    IoAnd8 (SmBusBase + R_AUX_CTL, (UINT8)~B_AUX_CTL_AAC);
+  InternalSmBusIoWrite8 (SMBUS_R_HST_D0, (UINT8) BytesCount);
+
+  if (OutBuffer != NULL) {
+    for (Index = 0; Index < BytesCount; Index++) {
+      InternalSmBusIoWrite8 (SMBUS_R_HOST_BLOCK_DB, OutBuffer[Index]);
+    }
   }
+  //
+  // Set Auxiliary Control Regiester.
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_AUX_CTL, AuxiliaryControl);
+  //
+  // Set SMBus slave address for the device to send/receive from
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_XMIT_SLVA, (UINT8) SmBusAddress);
+  //
+  // Set Control Register (Initiate Operation, Interrupt disabled)
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CTL, HostControl + SMBUS_B_START);
 
   //
-  // BUGBUG: E32B bit does not exist in ICH3 or earlier
+  // Wait for the end
   //
-  IoOr8 (SmBusBase + R_AUX_CTL, B_AUX_CTL_E32B);
-  ASSERT (IoRead8 (SmBusBase + R_AUX_CTL) & B_AUX_CTL_E32B);
-  for (Index = 0; InBuffer != NULL && Index < BytesCount; Index++) {
-    IoWrite8 (SmBusBase + R_HOST_BLOCK_DB, ((UINT8*)InBuffer)[Index]);
+  ReturnStatus = InternalSmBusWait ();
+  if (RETURN_ERROR (ReturnStatus)) {
+    goto Done;
   }
 
-  SmBusStart (SmBusBase, SmBusProtocol, (UINT8)SmBusAddress);
-
-  if (SmBusWait (SmBusBase) & B_HST_STS_ERR) {
-    *Status = RETURN_DEVICE_ERROR;
-  } else {
-    *Status = RETURN_SUCCESS;
-    BytesCount = IoRead8 (SmBusBase + R_HST_D0);
-    for (Index = 0; OutBuffer != NULL && Index < BytesCount; Index++) {
-      ((UINT8*)OutBuffer)[Index] = IoRead8 (SmBusBase + R_HOST_BLOCK_DB);
+  BytesCount = InternalSmBusIoRead8 (SMBUS_R_HST_D0);
+  if (InBuffer != NULL) {
+    for (Index = 0; Index < BytesCount; Index++) {
+      InBuffer[Index] = InternalSmBusIoRead8 (SMBUS_R_HOST_BLOCK_DB);
     }
   }
 
-  SmBusCleanup (SmBusBase);
+  //
+  // Clear status register and exit
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);
+
+Done:
+  if (Status != NULL) {
+    *Status = ReturnStatus;
+  }
+
   return BytesCount;
 }
 
+/**
+  Executes an SMBUS read block command.
+
+  Executes an SMBUS read block command on the SMBUS device specified by SmBusAddress.
+  Only the SMBUS slave address and SMBUS command fields of SmBusAddress are required.
+  Bytes are read from the SMBUS and stored in Buffer.
+  The number of bytes read is returned, and will never return a value larger than 32-bytes.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  It is the caller¡¯s responsibility to make sure Buffer is large enough for the total number of bytes read.
+  SMBUS supports a maximum transfer size of 32 bytes, so Buffer does not need to be any larger than 32 bytes.
+  If Length in SmBusAddress is not zero, then ASSERT().
+  If Buffer is NULL, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Buffer          Pointer to the buffer to store the bytes read from the SMBUS.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The number of bytes read.
+
+**/
 UINTN
 EFIAPI
 SmBusReadBlock (
-  IN      UINTN                     SmBusAddress,
-  OUT     VOID                      *Buffer,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  OUT VOID           *Buffer,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfffffe | MAX_BIT)) == 0);
-  return SmBusBlock (
-           SmBusAddress | B_SMBUS_READ,
-           B_SMB_CMD_BLOCK,
+  ASSERT (Buffer != NULL);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) == 0);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return InternalSmBusBlock (
+           SMBUS_V_SMB_CMD_BLOCK,
+           SmBusAddress | SMBUS_B_READ,
            NULL,
            Buffer,
            Status
            );
 }
 
+/**
+  Executes an SMBUS write block command.
+
+  Executes an SMBUS write block command on the SMBUS device specified by SmBusAddress.
+  The SMBUS slave address, SMBUS command, and SMBUS length fields of SmBusAddress are required.
+  Bytes are written to the SMBUS from Buffer.
+  The number of bytes written is returned, and will never return a value larger than 32-bytes.
+  If Status is not NULL, then the status of the executed command is returned in Status.  
+  If Length in SmBusAddress is zero or greater than 32, then ASSERT().
+  If Buffer is NULL, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Buffer          Pointer to the buffer to store the bytes read from the SMBUS.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The number of bytes written.
+
+**/
 UINTN
 EFIAPI
 SmBusWriteBlock (
-  IN      UINTN                     SmBusAddress,
-  OUT     VOID                      *Buffer,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  OUT VOID           *Buffer,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfffffe | MAX_BIT)) == 0);
-  return SmBusBlock (
-           SmBusAddress | B_SMBUS_WRITE,
-           B_SMB_CMD_BLOCK,
+  ASSERT (Buffer != NULL);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return InternalSmBusBlock (
+           SMBUS_V_SMB_CMD_BLOCK,
+           SmBusAddress | SMBUS_B_WRITE,
            Buffer,
            NULL,
            Status
            );
 }
 
+/**
+  Executes an SMBUS block process call command.
+
+  Executes an SMBUS block process call command on the SMBUS device specified by SmBusAddress.
+  The SMBUS slave address, SMBUS command, and SMBUS length fields of SmBusAddress are required.
+  Bytes are written to the SMBUS from OutBuffer.  Bytes are then read from the SMBUS into InBuffer.
+  If Status is not NULL, then the status of the executed command is returned in Status.
+  It is the caller¡¯s responsibility to make sure InBuffer is large enough for the total number of bytes read.
+  SMBUS supports a maximum transfer size of 32 bytes, so Buffer does not need to be any larger than 32 bytes.
+  If OutBuffer is NULL, then ASSERT().
+  If InBuffer is NULL, then ASSERT().
+  If any reserved bits of SmBusAddress are set, then ASSERT().
+
+  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
+                          SMBUS Command, SMBUS Data Length, and PEC.
+  @param  OutBuffer       Pointer to the buffer of bytes to write to the SMBUS.
+  @param  InBuffer        Pointer to the buffer of bytes to read from the SMBUS.
+  @param  Status          Return status for the executed command.
+                          This is an optional parameter and may be NULL.
+
+  @return The number of bytes written.
+
+**/
 UINTN
 EFIAPI
 SmBusBlockProcessCall (
-  IN      UINTN                     SmBusAddress,
-  IN      VOID                      *OutBuffer,
-  OUT     VOID                      *InBuffer,
-  OUT     RETURN_STATUS             *Status
+  IN  UINTN          SmBusAddress,
+  IN  VOID           *OutBuffer,
+  OUT VOID           *InBuffer,
+  OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT ((SmBusAddress & ~(0xfffffe | MAX_BIT)) == 0);
-  return SmBusBlock (
-           SmBusAddress | B_SMBUS_WRITE,
-           B_SMB_CMD_BLOCK_PROCESS,
+  ASSERT (InBuffer  != NULL);
+  ASSERT (OutBuffer != NULL);
+  ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
+
+  return InternalSmBusBlock (
+           SMBUS_V_SMB_CMD_BLOCK_PROCESS,
+           SmBusAddress | SMBUS_B_WRITE,
            OutBuffer,
            InBuffer,
            Status
            );
 }
-
-RETURN_STATUS
-EFIAPI
-SmBusArpAll (
-  IN      UINTN                     SmBusAddress
-  );
-
-RETURN_STATUS
-EFIAPI
-SmBusArpDevice (
-  IN      UINTN                     SmBusAddress,
-  IN      CONST GUID                *Uuid
-  );
-
-RETURN_STATUS
-EFIAPI
-SmBusGetUuid (
-  IN      UINTN                     SmBusAddress,
-  OUT     GUID                      *Uuid
-  );

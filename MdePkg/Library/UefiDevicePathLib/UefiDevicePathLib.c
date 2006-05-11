@@ -155,9 +155,9 @@ AppendDevicePath (
   This function appends the device path node SecondDevicePath
   to every device path instance in FirstDevicePath.
 
-  @param  FirstDevicePath A pointer to a device path data structure.
+  @param  DevicePath A pointer to a device path data structure.
   
-  @param  SecondDevicePath A pointer to a single device path node.
+  @param  DevicePathNode A pointer to a single device path node.
 
   @return A pointer to the new device path.
   If there is not enough temporary pool memory available to complete this function,
@@ -167,40 +167,37 @@ AppendDevicePath (
 EFI_DEVICE_PATH_PROTOCOL *
 EFIAPI
 AppendDevicePathNode (
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *FirstDevicePath,
-  IN CONST EFI_DEVICE_PATH_PROTOCOL  *SecondDevicePath
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePathNode
   )
 {
+  EFI_DEVICE_PATH_PROTOCOL  *TempDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *NextNode;
   EFI_DEVICE_PATH_PROTOCOL  *NewDevicePath;
   UINTN                     NodeLength;
-  UINTN                     Size1;
 
   //
   // Build a Node that has a terminator on it
   //
-  NodeLength  = DevicePathNodeLength (SecondDevicePath);
-  Size1       = GetDevicePathSize (FirstDevicePath);
-  
-  NewDevicePath = AllocatePool (NodeLength + Size1);
-  if (NewDevicePath != NULL) {
-    //
-    // Copy the first device path to the new device path
-    //
-    NewDevicePath = CopyMem (NewDevicePath, FirstDevicePath, Size1);
+  NodeLength = DevicePathNodeLength (DevicePathNode);
 
-    //
-    // Copy the device path node to the new device path
-    //
-    NextNode      = (EFI_DEVICE_PATH_PROTOCOL *) ((CHAR8 *) NewDevicePath + (Size1 - sizeof (EFI_DEVICE_PATH_PROTOCOL)));
-    NextNode      = CopyMem (NextNode, SecondDevicePath, NodeLength);
-
-    //
-    // Terminate the whole device path
-    //
-    NextNode      = NextDevicePathNode (NextNode);
-    SetDevicePathEndNode (NextNode);
+  TempDevicePath = AllocatePool (NodeLength + sizeof (EFI_DEVICE_PATH_PROTOCOL));
+  if (TempDevicePath == NULL) {
+    return NULL;
   }
+  TempDevicePath = CopyMem (TempDevicePath, DevicePathNode, NodeLength);
+  //
+  // Add and end device path node to convert Node to device path
+  //
+  NextNode = NextDevicePathNode (TempDevicePath);
+  SetDevicePathEndNode (NextNode);
+  //
+  // Append device paths
+  //
+  NewDevicePath = AppendDevicePath (DevicePath, TempDevicePath);
+
+  FreePool (TempDevicePath);
+
   return NewDevicePath;
 }
 
