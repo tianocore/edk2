@@ -48,9 +48,9 @@ HobLibConstructor (
 /**
   Returns the pointer to the HOB list.
 
-  None.
+  This function returns the pointer to first HOB in the list.
 
-  The pointer to the HOB list.
+  @return The pointer to the HOB list.
 
 **/
 VOID *
@@ -63,11 +63,17 @@ GetHobList (
 }
 
 /**
-  This function searches the first instance of a HOB type from the starting HOB pointer. 
-  If there does not exist such HOB type from the starting HOB pointer, it will return NULL. 
+  Returns the next instance of a HOB type from the starting HOB.
 
-  @param  Type The HOB type to return.
-  @param  HobStart The starting HOB pointer to search from.
+  This function searches the first instance of a HOB type from the starting HOB pointer. 
+  If there does not exist such HOB type from the starting HOB pointer, it will return NULL.
+  In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
+  unconditionally: it returns HobStart back if HobStart itself meets the requirement;
+  caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
+  If HobStart is NULL, then ASSERT().
+
+  @param  Type          The HOB type to return.
+  @param  HobStart      The starting HOB pointer to search from.
 
   @return The next instance of a HOB type from the starting HOB.
 
@@ -85,7 +91,7 @@ GetNextHob (
    
   Hob.Raw = (UINT8 *) HobStart;
   //
-  // Parse the HOB list, stop if end of list or matching type found.
+  // Parse the HOB list until end of list or matching type is found.
   //
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == Type) {
@@ -97,10 +103,12 @@ GetNextHob (
 }
 
 /**
+  Returns the first instance of a HOB type among the whole HOB list.
+
   This function searches the first instance of a HOB type among the whole HOB list. 
   If there does not exist such HOB type in the HOB list, it will return NULL. 
 
-  @param  Type The HOB type to return.
+  @param  Type          The HOB type to return.
 
   @return The next instance of a HOB type from the starting HOB.
 
@@ -122,9 +130,16 @@ GetFirstHob (
   Such HOB should satisfy two conditions: 
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid. 
   If there does not exist such HOB from the starting HOB pointer, it will return NULL. 
+  Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
+  to extract the data section and its size info respectively.
+  In contrast with macro GET_NEXT_HOB(), this function does not skip the starting HOB pointer
+  unconditionally: it returns HobStart back if HobStart itself meets the requirement;
+  caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
+  If Guid is NULL, then ASSERT().
+  If HobStart is NULL, then ASSERT().
 
-  @param  Guid The GUID to match with in the HOB list.
-  @param  HobStart A pointer to a Guid.
+  @param  Guid          The GUID to match with in the HOB list.
+  @param  HobStart      A pointer to a Guid.
 
   @return The next instance of the matched GUID HOB from the starting HOB.
 
@@ -153,8 +168,11 @@ GetNextGuidHob (
   Such HOB should satisfy two conditions:
   its HOB type is EFI_HOB_TYPE_GUID_EXTENSION and its GUID Name equals to the input Guid.
   If there does not exist such HOB from the starting HOB pointer, it will return NULL.
+  Caller is required to apply GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE ()
+  to extract the data section and its size info respectively.
+  If Guid is NULL, then ASSERT().
 
-  @param  Guid The GUID to match with in the HOB list.
+  @param  Guid          The GUID to match with in the HOB list.
 
   @return The first instance of the matched GUID HOB among the whole HOB list.
 
@@ -172,12 +190,18 @@ GetFirstGuidHob (
 }
 
 /**
-  This function builds a HOB for a loaded PE32 module.
+  Builds a HOB for a loaded PE32 module.
 
-  @param  ModuleName The GUID File Name of the module.
-  @param  MemoryAllocationModule The 64 bit physical address of the module.
-  @param  ModuleLength The length of the module in bytes.
-  @param  EntryPoint The 64 bit physical address of the module’s entry point.
+  This function builds a HOB for a loaded PE32 module.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If ModuleName is NULL, then ASSERT().
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  ModuleName              The GUID File Name of the module.
+  @param  MemoryAllocationModule  The 64 bit physical address of the module.
+  @param  ModuleLength            The length of the module in bytes.
+  @param  EntryPoint              The 64 bit physical address of the module’s entry point.
 
 **/
 VOID
@@ -198,10 +222,15 @@ BuildModuleHob (
 /**
   Builds a HOB that describes a chunk of system memory.
 
-  @param  ResourceType The type of resource described by this HOB.
-  @param  ResourceAttribute The resource attributes of the memory described by this HOB.
-  @param  PhysicalStart The 64 bit physical address of memory described by this HOB.
-  @param  NumberOfBytes The length of the memory described by this HOB in bytes.
+  This function builds a HOB that describes a chunk of system memory.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  ResourceType        The type of resource described by this HOB.
+  @param  ResourceAttribute   The resource attributes of the memory described by this HOB.
+  @param  PhysicalStart       The 64 bit physical address of memory described by this HOB.
+  @param  NumberOfBytes       The length of the memory described by this HOB in bytes.
 
 **/
 VOID
@@ -220,11 +249,19 @@ BuildResourceDescriptorHob (
 }
 
 /**
+  Builds a GUID HOB with a certain data length.
+
   This function builds a customized HOB tagged with a GUID for identification 
   and returns the start address of GUID HOB data so that caller can fill the customized data. 
+  The HOB Header and Name field is already stripped.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If Guid is NULL, then ASSERT().
+  If there is no additional space for HOB creation, then ASSERT().
+  If DataLength > (0x10000 - sizeof (EFI_HOB_TYPE_GUID)), then ASSERT().
 
-  @param  Guid The GUID to tag the customized HOB.
-  @param  DataLength The size of the data payload for the GUID HOB.
+  @param  Guid          The GUID to tag the customized HOB.
+  @param  DataLength    The size of the data payload for the GUID HOB.
 
   @return The start address of GUID HOB data.
 
@@ -244,12 +281,21 @@ BuildGuidHob (
 }
 
 /**
-  This function builds a customized HOB tagged with a GUID for identification, 
-  copies the input data to the HOB data field, and returns the start address of GUID HOB data.
+  Copies a data buffer to a newly-built HOB.
 
-  @param  Guid The GUID to tag the customized HOB.
-  @param  Data The data to be copied into the data field of the GUID HOB.
-  @param  DataLength The size of the data payload for the GUID HOB.
+  This function builds a customized HOB tagged with a GUID for identification,
+  copies the input data to the HOB data field and returns the start address of the GUID HOB data.
+  The HOB Header and Name field is already stripped.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If Guid is NULL, then ASSERT().
+  If Data is NULL and DataLength > 0, then ASSERT().
+  If there is no additional space for HOB creation, then ASSERT().
+  If DataLength > (0x10000 - sizeof (EFI_HOB_TYPE_GUID)), then ASSERT().
+
+  @param  Guid          The GUID to tag the customized HOB.
+  @param  Data          The data to be copied into the data field of the GUID HOB.
+  @param  DataLength    The size of the data payload for the GUID HOB.
 
   @return The start address of GUID HOB data.
 
@@ -272,8 +318,13 @@ BuildGuidDataHob (
 /**
   Builds a Firmware Volume HOB.
 
-  @param  BaseAddress The base address of the Firmware Volume.
-  @param  Length The size of the Firmware Volume in bytes.
+  This function builds a Firmware Volume HOB.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The base address of the Firmware Volume.
+  @param  Length        The size of the Firmware Volume in bytes.
 
 **/
 VOID
@@ -292,8 +343,13 @@ BuildFvHob (
 /**
   Builds a Capsule Volume HOB.
 
-  @param  BaseAddress The base address of the Capsule Volume.
-  @param  Length The size of the Capsule Volume in bytes.
+  This function builds a Capsule Volume HOB.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The base address of the Capsule Volume.
+  @param  Length        The size of the Capsule Volume in bytes.
 
 **/
 VOID
@@ -312,8 +368,13 @@ BuildCvHob (
 /**
   Builds a HOB for the CPU.
 
-  @param  SizeOfMemorySpace The maximum physical memory addressability of the processor.
-  @param  SizeOfIoSpace The maximum physical I/O addressability of the processor.
+  This function builds a HOB for the CPU.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  SizeOfMemorySpace   The maximum physical memory addressability of the processor.
+  @param  SizeOfIoSpace       The maximum physical I/O addressability of the processor.
 
 **/
 VOID
@@ -332,8 +393,13 @@ BuildCpuHob (
 /**
   Builds a HOB for the Stack.
 
-  @param  BaseAddress The 64 bit physical address of the Stack.
-  @param  Length The length of the stack in bytes.
+  This function builds a HOB for the stack.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The 64 bit physical address of the Stack.
+  @param  Length        The length of the stack in bytes.
 
 **/
 VOID
@@ -352,9 +418,14 @@ BuildStackHob (
 /**
   Builds a HOB for the BSP store.
 
-  @param  BaseAddress The 64 bit physical address of the BSP.
-  @param  Length The length of the BSP store in bytes.
-  @param  MemoryType Type of memory allocated by this HOB.
+  This function builds a HOB for BSP store.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The 64 bit physical address of the BSP.
+  @param  Length        The length of the BSP store in bytes.
+  @param  MemoryType    Type of memory allocated by this HOB.
 
 **/
 VOID
@@ -374,9 +445,14 @@ BuildBspStoreHob (
 /**
   Builds a HOB for the memory allocation.
 
-  @param  BaseAddress The 64 bit physical address of the memory.
-  @param  Length The length of the memory allocation in bytes.
-  @param  MemoryType Type of memory allocated by this HOB.
+  This function builds a HOB for the memory allocation.
+  It can only be invoked during PEI phase;
+  for DXE phase, it will ASSERT() since PEI HOB is read-only for DXE phase.
+  If there is no additional space for HOB creation, then ASSERT().
+
+  @param  BaseAddress   The 64 bit physical address of the memory.
+  @param  Length        The length of the memory allocation in bytes.
+  @param  MemoryType    Type of memory allocated by this HOB.
 
 **/
 VOID

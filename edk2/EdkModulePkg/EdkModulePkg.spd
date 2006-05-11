@@ -469,6 +469,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <C_Name>gEfiCompatibleMemoryTestedGuid</C_Name>
       <Guid>0x64c475ef, 0x344b, 0x492c, 0x93, 0xad, 0xab, 0x9e, 0xb4, 0x39, 0x50, 0x4</Guid>
     </Entry>
+    <Entry Name="PeiPerformanceHob">
+      <C_Name>gPeiPerformanceHobGuid</C_Name>
+      <Guid>0xec4df5af, 0x4395, 0x4cc9, 0x94, 0xde, 0x77, 0x50, 0x6d, 0x12, 0xc7, 0xb8</Guid>
+    </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="CustomizedDecompress">
@@ -570,6 +574,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Entry Name="IsaAcpi">
       <C_Name>gEfiIsaAcpiProtocolGuid</C_Name>
       <Guid>0x64a892dc, 0x5561, 0x4536, 0x92, 0xc7, 0x79, 0x9b, 0xfc, 0x18, 0x33, 0x55</Guid>
+    </Entry>
+    <Entry Name="Performance">
+      <C_Name>gPerformanceProtocolGuid</C_Name>
+      <Guid>0x76b6bdfa, 0x2acd, 0x4462, 0x9E, 0x3F, 0xcb, 0x58, 0xC9, 0x69, 0xd9, 0x37</Guid>
     </Entry>
   </ProtocolDeclarations>
   <PpiDeclarations>
