@@ -73,7 +73,7 @@ JDK</td>
       <td style="text-align: center; font-weight: bold;">XMLBeans</td>
       <td style="text-align: center; font-weight: bold;">2.1.0</td>
       <td style="text-align: center;"><a
- href="http://xmlbeans.apache.org/sourceAndBinaries/index.html">http://xmlbeans.apache.org/sourceAndBinaries/index.html</a></td>
+ href="http://www.apache.org/dyn/closer.cgi/xmlbeans/binaries">http://www.apache.org/dyn/closer.cgi/xmlbeans/binaries</a></td>
     </tr>
   </tbody>
 </table>
@@ -190,17 +190,27 @@ JDK install.<br>
 <h4>Java Tools</h4>
 The Apache-ANT requires the ANT_HOME environment variable to be set
 before attempting to build:<br>
-<pre>set ANT_HOME=c:\&lt;full path to where ant was installed&gt;</pre>
-The ant-contrib.jar file should be <span style="font-weight: bold;">installed</span>
-in the %ANT_HOME%\lib
+<br>
+Unzip <span style="font-weight: bold;">apache-ant-1.6.5-bin.zip</span>
+to a directory. We need to set an environment variable ANT_HOME to this
+location:
+<pre>set ANT_HOME=&lt;full path to where ant was unzipped&gt;</pre>
+Unzip the <span style="font-weight: bold;">ant-contrib-1.0b2-bin.zip</span>
+file. The ant-contrib.jar file should be <span
+ style="font-weight: bold;">copied </span>into the %ANT_HOME%\lib
 directory.<br>
 <br>
-The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
+Unzip <span style="font-weight: bold;">xmlbeans-2.1.0.zip</span> to a
+directory. XMLBeans requires the XMLBEANS_HOME environment variable to
+be set
 before attempting to build:<br>
-<pre>set XMLBEANS_HOME=C:\&lt;full path to where xmlbeans was installed&gt;</pre>
-The saxon8.jar file should be <span style="font-weight: bold;">copied </span>to
+<pre>set XMLBEANS_HOME=&lt;full path to where xmlbeans was unzipped&gt;</pre>
+Unzip the <span style="font-weight: bold;">saxonb8-1-1.zip</span>
+file. The saxon8.jar file should be <span style="font-weight: bold;">copied
+</span>to
 the %XMLBEANS_HOME%\lib
-directory. Do not download a later version of saxon 8. You will get the
+directory. Do <span style="font-style: italic;">not </span>download a
+later version of saxon 8. You will get the
 following error message if you do:<br>
 <pre>build.xml:45: java.lang.RuntimeException:&nbsp; Trying XBeans path engine... Trying XQRL... Trying Saxon... FAILED on declare namespace sans='http://www.TianoCore.org/2006/Edk2.0'; $this/sans:FrameworkPlatformDescription/sans:Flash/sans:FvImages/sans:FvImage[@Type='ValidImageNames']/sans:FvImageNames</pre>
 The Ant and XMLBean tools are required to be in the path.<br>
