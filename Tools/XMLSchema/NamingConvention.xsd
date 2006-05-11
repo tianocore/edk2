@@ -296,6 +296,14 @@
             <xs:pattern value="0"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="ZeroOrOne">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Define Zero as a vaild value</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:int">
+            <xs:pattern value="0|1"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="OldVersionDataType">
         <xs:annotation>
             <xs:documentation xml:lang="en"> Definition of a Version Number, which can be any combination of a number followed by zero or more alphanumeric-dot-alphanumeric characters </xs:documentation>
