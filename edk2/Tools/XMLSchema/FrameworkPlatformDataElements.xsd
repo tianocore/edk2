@@ -84,10 +84,22 @@
             <xs:documentation xml:lang="en">Define contents of the regions in flash. The files and data are placed in the output image in the order they are encountered in this definition. Multiple FlashDeviceImage sections may be defined. Which one the tool should use is specified by Name on the command line.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                <xs:element minOccurs="1" maxOccurs="1" name="Name" type="NameConvention"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="File" type="FvImageFileType"/>
-            </xs:sequence>
+            <xs:all>
+                <xs:element minOccurs="0" maxOccurs="1" name="RawData">
+                    <xs:complexType>
+                        <xs:sequence minOccurs="0" maxOccurs="1">
+                            <xs:element name="Data" type="xs:string"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="RawDataAttributes"/>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="1" name="File">
+                    <xs:complexType>
+                        <xs:attributeGroup ref="FlashDeviceImageFileAttributes"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:all>
+            <xs:attributeGroup ref="FlashDeviceImageAttributes"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="FlashDeviceInfo">
@@ -96,14 +108,51 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" name="Name" type="UCNameType"/>
-                <xs:element default="512KB" minOccurs="1" maxOccurs="1" name="FlashSize" type="FlashSize"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="BaseAddress" type="HexAddressType"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="OutputDirectory" type="DirectoryNamingConvention"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="MicrocodeFile" type="FileNameConvention"/>
-                <xs:element minOccurs="1" maxOccurs="255" name="Block" type="BlockNameType"/>
-                <xs:element minOccurs="1" maxOccurs="unbounded" name="Region" type="RegionDataType"/>
+                <xs:element name="Blocks">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="255" name="Block">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="BlockNameType">
+                                            <xs:attributeGroup ref="BlockAttributes"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="Regions">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Region">
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element name="SubRegions">
+                                            <xs:complexType>
+                                                <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                                                    <xs:element name="SubRegion">
+                                                        <xs:complexType>
+                                                            <xs:simpleContent>
+                                                                <xs:extension base="xs:string">
+                                                                    <xs:attributeGroup ref="SubRegionAttributes"/>
+                                                                </xs:extension>
+                                                            </xs:simpleContent>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:all>
+                                    <xs:attributeGroup ref="RegionAttributes"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
             </xs:sequence>
+            <xs:attributeGroup ref="BlockAttributes"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="FlashDeviceOverrideImage">
@@ -354,4 +403,47 @@
             <xs:element minOccurs="1" maxOccurs="1" name="NameGuid" type="EfiNameGuidType"/>
         </xs:sequence>
     </xs:complexType>
+    <xs:attributeGroup name="BlockAttributes">
+        <xs:attribute name="Name" type="BlockNameType" use="required"/>
+        <xs:attribute name="Size" type="HexAddressType" use="required"/>
+        <xs:attribute name="Flags" type="HexAddressType" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="FlashDeviceImageAttributes">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="FlashDeviceImageFileAttributes">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+        <xs:attribute name="Region" type="xs:string" use="required"/>
+        <xs:attribute name="SubRegion" type="xs:string" use="optional"/>
+        <xs:attribute name="Optional" type="xs:boolean" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="FlashDeviceInfoAttributes">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+        <xs:attribute name="Size" type="HexAddressType" use="required"/>
+        <xs:attribute name="BaseAddress" type="HexAddressType" use="required"/>
+        <xs:attribute name="ErasePolarity" type="ZeroOrOne" use="required"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="RawDataAttributes">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+        <xs:attribute name="Region" type="xs:string" use="required"/>
+        <xs:attribute name="SubRegion" type="xs:string" use="required"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="RegionAttributes">
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+        <xs:attribute name="Size" type="HexAddressType" use="required"/>
+        <xs:attribute name="Flags" type="HexAddressType" use="optional"/>
+        <xs:attribute name="Alignment" type="HexAddressType" use="optional"/>
+        <xs:attribute name="Attributes" type="xs:string" use="required"/>
+        <xs:attribute name="AreaType" type="EfiFvAreaType" use="required"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="SubRegionAttributes">
+        <xs:attribute name="CreateHob" type="xs:boolean" use="required"/>
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+        <xs:attribute name="Size" type="HexAddressType" use="required"/>
+        <xs:attribute name="Attributes" type="xs:string" use="required"/>
+        <xs:attribute name="AreaType" type="EfiFvAreaType" use="required"/>
+        <xs:attribute name="NameGuid" type="xs:string" use="required"/>
+        <xs:attribute name="AreaTypeGuid" type="xs:string" use="optional"/>
+        <xs:attribute name="FileSystemGuid" type="xs:string" use="optional"/>
+    </xs:attributeGroup>
 </xs:schema>
