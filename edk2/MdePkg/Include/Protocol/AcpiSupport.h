@@ -168,6 +168,6 @@ struct _EFI_ACPI_SUPPORT_PROTOCOL {
 //
 // Extern the GUID for protocol users.
 //
-extern EFI_GUID gEfiAcpiSupportGuid;
+extern EFI_GUID gEfiAcpiSupportProtocolGuid;
 
 #endif
