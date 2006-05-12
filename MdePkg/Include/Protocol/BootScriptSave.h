@@ -105,6 +105,6 @@ struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL {
   EFI_BOOT_SCRIPT_CLOSE_TABLE CloseTable;
 };
 
-extern EFI_GUID gEfiBootScriptSaveGuid;
+extern EFI_GUID gEfiBootScriptSaveProtocolGuid;
 
 #endif
