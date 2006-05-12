@@ -44,6 +44,8 @@ Abstract:
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/FlashMapHob.h>
 #include <Guid/MemoryTypeInformation.h>
+#include <Guid/CapsuleVendor.h>
+#include <Guid/BootState.h>
 
 #include <Ppi/PeiInMemory.h>
 #include <Ppi/FlashMap.h>
