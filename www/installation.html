@@ -6,16 +6,21 @@
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.0  (Win32)">
 	<META NAME="CREATED" CONTENT="20060512;12074440">
 	<META NAME="CHANGEDBY" CONTENT="Bruce Bahnsen">
-	<META NAME="CHANGED" CONTENT="20060512;13164621">
+	<META NAME="CHANGED" CONTENT="20060512;15352415">
+	<STYLE>
+	<!--
+		H3.heading-2 { font-size: 18pt }
+	-->
+	</STYLE>
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H3>Getting and installing the required tools for building the EDK2</H3>
-<H3>Table of Contents</H3>
+<H1>Getting and installing the required tools for building the EDK2</H1>
+<H3 CLASS="heading-2">Table of Contents</H3>
 <UL>
 	<LI><P><A HREF="#Requirements">Requirements</A> 
 	</P>
 </UL>
-<H3><A NAME="Requirements"></A>Requirements</H3>
+<H3 CLASS="heading-2"><A NAME="Requirements"></A>Requirements</H3>
 <P>The following are required to be able to build the EDK: 
 </P>
 <DIV ID="requirements" DIR="LTR"><A NAME="requirements_table"></A>
@@ -182,12 +187,12 @@
 				</TD>
 			</TR>
 		</TABLE>
-		<H3>Install and Configure Tools on Windows XP</H3>
-		<H4>Software Installation Order</H4>
+		<H3 CLASS="heading-2">Install and Configure Tools on Windows XP</H3>
+		<H3>Software Installation Order</H3>
 		<P>After installing the compiler tools and your Subversion client,
 		the following required tools should be installed in this order:
 		<BR>Java JDK, Apache-Ant, ant-contrib, xmlbeans, saxon8</P>
-		<H4>Java Development Kit</H4>
+		<H3>Java Development Kit</H3>
 		<P>The Java Environment Variable must be set before attempting to
 		build.<BR>e.g. For Sun JDK:</P>
 		<PRE STYLE="margin-bottom: 0.2in">set JAVA_HOME=c:\Java\jdk1.5.0_06</PRE><P>
@@ -198,7 +203,7 @@
 		combine the location for the JDK and the JRE, as the JRE install
 		removes most of the binaries and libraries installed by the JDK
 		install.</P>
-		<H4>Java Tools</H4>
+		<H3>Java Tools</H3>
 		<P>The Apache-ANT requires the ANT_HOME environment variable to be
 		set before attempting to build:<BR><BR>Unzip
 		<B>apache-ant-1.6.5-bin.zip</B> to a directory. We need to set an
@@ -237,7 +242,7 @@
 		<P>If you optionally install cygwin (for gcc support) you should
 		install it in &quot;Unix&quot; mode. The gcc tool chain will not
 		compile in &quot;DOS&quot; mode.</P>
-		<H3>Environment Variables</H3>
+		<H3 CLASS="heading-2">Environment Variables</H3>
 		<P>Environment variables are <B>case sensitive</B>. You must use
 		the exact case as in the examples of this document. Even though
 		windows does not care about case, Java does.<BR><BR>You need to set
@@ -247,7 +252,7 @@
 		It is recommended that you wrap up all the environment variables
 		above into a script that you can launch each time you begin to do
 		development in your EDK2 workspace.</P>
-		<H3>The first build</H3>
+		<H3 CLASS="heading-2">The first build</H3>
 		<P>Once the external tools are installed, the environment variables
 		are set, and you have the ant executable in your path, you can try
 		a build.</P>
