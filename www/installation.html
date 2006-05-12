@@ -6,7 +6,7 @@
 	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.0  (Win32)">
 	<META NAME="CREATED" CONTENT="20060512;12074440">
 	<META NAME="CHANGEDBY" CONTENT="Bruce Bahnsen">
-	<META NAME="CHANGED" CONTENT="20060512;12101742">
+	<META NAME="CHANGED" CONTENT="20060512;12483250">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
 <H3>Getting and installing the required tools for building the EDK2</H3>
@@ -215,8 +215,17 @@
 		be <B>copied </B>to the %XMLBEANS_HOME%\lib directory. Do <I>not
 		</I>download a later version of saxon 8. You will get the following
 		error message if you do:</P>
-		<PRE STYLE="margin-bottom: 0.2in">build.xml:45: java.lang.RuntimeException: Trying XBeans path engine... Trying XQRL... Trying Saxon... FAILED on declare namespace sans='http://www.TianoCore.org/2006/Edk2.0'; $this/sans:FrameworkPlatformDescription/sans:Flash/sans:FvImages/sans:FvImage[@Type='ValidImageNames']/sans:FvImageNames</PRE><P>
-		The Ant and XMLBean tools are required to be in the path.</P>
+		<TABLE WIDTH=597 BORDER=1 CELLPADDING=4 CELLSPACING=3 STYLE="page-break-inside: avoid">
+			<COL WIDTH=581>
+			<THEAD>
+				<TR>
+					<TD WIDTH=581 VALIGN=TOP>
+						<PRE>build.xml:45: java.lang.RuntimeException: Trying XBeans path engine... Trying XQRL... Trying Saxon...FAILED on declarenamespacesans='http://www.TianoCore.org/2006/Edk2.0';$this/sans:FrameworkPlatformDescription/sans:Flash/sans:FvImags/sans:FvImage[@Type='ValidImageNames']/sans:FvImageNames</PRE>
+					</TD>
+				</TR>
+			</THEAD>
+		</TABLE>
+		<P>The Ant and XMLBean tools are required to be in the path.</P>
 		<PRE STYLE="margin-bottom: 0.2in">set PATH=%PATH%;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin</PRE><H3>
 		Cygwin</H3>
 		<P>If you optionally install cygwin (for gcc support) you should
