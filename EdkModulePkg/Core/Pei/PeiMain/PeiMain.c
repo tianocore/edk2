@@ -113,7 +113,6 @@ Returns:
   }
 #endif
 
-
   //
   // For IPF in CAR mode the real memory access is uncached,in InstallPeiMemory()
   //  the 63-bit of address is set to 1.

@@ -394,7 +394,7 @@ Returns:
 #endif
 
   mHobStart = HobStart;
-  
+
   //
   // Initialize Memory Services
   //

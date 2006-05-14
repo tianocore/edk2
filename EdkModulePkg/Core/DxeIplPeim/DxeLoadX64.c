@@ -220,10 +220,6 @@ Returns:
   EFI_PHYSICAL_ADDRESS                                      DxeCoreAddress;
   UINT64                                                    DxeCoreSize;
   EFI_PHYSICAL_ADDRESS                                      DxeCoreEntryPoint;
-  VOID                                                      *PpisNeededByDxePe32Data;
-  EFI_PHYSICAL_ADDRESS                                      PpisNeededByDxeAddress;
-  UINT64                                                    PpisNeededByDxeSize;
-  EFI_PHYSICAL_ADDRESS                                      PpisNeededByDxeEntryPoint;
   EFI_PEI_PE_COFF_LOADER_PROTOCOL                           *PeiEfiPeiPeCoffLoader;
   EFI_BOOT_MODE                                             BootMode;
   EFI_PEI_RECOVERY_MODULE_PPI                               *PeiRecovery;
@@ -318,17 +314,6 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Find the PpisNeededByDxe in a Firmware Volume
-  //
-  Status = PeiFindFile (
-             EFI_FV_FILETYPE_ALL,
-             EFI_SECTION_PE32,
-             &mPpiNeededByDxeGuid,
-             &PpisNeededByDxePe32Data
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Transfer control to the DXE Core
   // The handoff state is simply a pointer to the HOB list
   //
@@ -346,19 +331,6 @@ Returns:
   // Limit to 36 bits of addressing for debug. Should get it from CPU
   //
   PageTables = CreateIdentityMappingPageTables (36);
-
-  //
-  // Load the PpiNeededByDxe from a Firmware Volume
-  //
-  Status = PeiLoadx64File (
-             PeiEfiPeiPeCoffLoader,
-             PpisNeededByDxePe32Data,
-             EfiBootServicesData,
-             &PpisNeededByDxeAddress,
-             &PpisNeededByDxeSize,
-             &PpisNeededByDxeEntryPoint
-             );
-  ASSERT_EFI_ERROR (Status);
 
 
   //
@@ -402,7 +374,7 @@ Returns:
     PageTables, 
     (EFI_PHYSICAL_ADDRESS)(UINTN)(HobList.Raw), 
     TopOfStack,
-    PpisNeededByDxeEntryPoint,
+    0x00000000,
     DxeCoreEntryPoint
     );
 

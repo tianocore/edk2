@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
   <MsaHeader>
-    <BaseName>DxeIpl</BaseName>
+    <BaseName>DxeIplX64</BaseName>
     <ModuleType>PEIM</ModuleType>
     <ComponentType>PE32_PEIM</ComponentType>
     <Guid>86D70125-BAA3-4296-A62F-602BEBBB9081</Guid>
@@ -67,19 +67,56 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Protocol Usage="ALWAYS_CONSUMED">TianoDecompress</Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">CustomizedDecompress</Protocol>
   </Protocols>
+  <Hobs>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="MEMORY_ALLOCATION">
+      <C_Name>gEfiHobMemoryAllocBspStoreGuid</C_Name>
+      <Guid>0x564b33cd, 0xc92a, 0x4593, 0x90, 0xbf, 0x24, 0x73, 0xe4, 0x3c, 0x63, 0x22</Guid>
+    </Hob>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="GUID_EXTENSION">
+      <C_Name>gEfiDecompressProtocolGuid</C_Name>
+      <Guid>0xd8117cfe, 0x94a6, 0x11d4, 0x9a, 0x3a, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+    </Hob>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="GUID_EXTENSION">
+      <C_Name>gEfiTianoDecompressProtocolGuid</C_Name>
+      <Guid>0xe84cf29c, 0x191f, 0x4eae, 0x96, 0xe1, 0xf4, 0x6a, 0xec, 0xea, 0xea, 0x0b</Guid>
+    </Hob>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="GUID_EXTENSION">
+      <C_Name>gEfiCustomizedDecompressProtocolGuid</C_Name>
+      <Guid>0x9a44198e, 0xa4a2, 0x44e6, 0x8a, 0x1f, 0x39, 0xbe, 0xfd, 0xac, 0x89, 0x6f</Guid>
+    </Hob>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="GUID_EXTENSION">
+      <C_Name>gEfiPeiPeCoffLoaderGuid</C_Name>
+      <Guid>0xd8117cff, 0x94a6, 0x11d4, 0x9a, 0x3a, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+    </Hob>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="MEMORY_ALLOCATION">
+      <C_Name>gEfiHobMemoryAllocModuleGuid</C_Name>
+      <Guid>0xf8e21975, 0x0899, 0x4f58, 0xa4, 0xbe, 0x55, 0x25, 0xa9, 0xc6, 0xd7, 0x7a</Guid>
+    </Hob>
+    <Hob Usage="SOMETIMES_PRODUCED" HobType="FIRMWARE_VOLUME">
+      <Name>DecompressedFvmain.fv</Name>
+    </Hob>
+  </Hobs>
   <PPIs>
-    <Ppi Usage="ALWAYS_CONSUMED">PeiInMemory</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">RecoveryModule</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">SectionExtraction</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">Security</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">DxeIpl</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">S3Resume</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">EndOfPeiSignal</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">FvFileLoader</Ppi>
+    <Ppi Usage="SOMETIMES_PRODUCED">DxeIpl</Ppi>
+    <Ppi Usage="SOMETIMES_PRODUCED">FvFileLoader</Ppi>
+    <Ppi Usage="SOMETIMES_PRODUCED">EndOfPeiSignal</Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">RecoveryModule</Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">S3Resume</Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">SectionExtraction</Ppi>
+    <Ppi Usage="SOMETIMES_CONSUMED">Security</Ppi>
+    <Ppi Usage="PRIVATE">PeiInMemory</Ppi>
   </PPIs>
   <Guids>
     <GuidEntry Usage="ALWAYS_CONSUMED">
       <C_Name>PeiPeCoffLoader</C_Name>
     </GuidEntry>
   </Guids>
+  <Externs>
+    <Extern>
+      <ModuleEntryPoint>PeimInitializeDxeIpl</ModuleEntryPoint>
+    </Extern>
+  </Externs>
+  <BuildOptions ToolChain="MSFT">
+    <ImageEntryPoint>_ModuleEntryPoint</ImageEntryPoint>
+  </BuildOptions>
 </ModuleSurfaceArea>

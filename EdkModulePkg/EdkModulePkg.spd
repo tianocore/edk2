@@ -155,6 +155,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Core/DxeIplPeim/DxeIpl.msa</Filename>
     </MsaFile>
     <MsaFile>
+      <Filename>Core/DxeIplPeim/DxeIplX64.msa</Filename>
+    </MsaFile>
+    <MsaFile>
       <Filename>Core/Pei/PeiMain.msa</Filename>
     </MsaFile>
     <MsaFile>
@@ -210,6 +213,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </MsaFile>
     <MsaFile>
       <Filename>Library/EdkPeCoffLoaderLib/EdkPeCoffLoaderLib.msa</Filename>
+    </MsaFile>
+    <MsaFile>
+      <Filename>Library/EdkPeCoffLoaderLibX64/EdkPeCoffLoaderLibX64.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/EdkPeCoffLoaderX64Lib/EdkPeCoffLoaderX64Lib.msa</Filename>
