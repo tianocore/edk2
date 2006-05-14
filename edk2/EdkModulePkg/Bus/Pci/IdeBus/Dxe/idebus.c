@@ -503,15 +503,6 @@ IDEBusDriverBindingStart (
       IdeBlkIoDevicePtr->IoPort->BusMasterBaseAddr = IdeRegsBaseAddr[IdeChannel].BusMasterBaseAddr;
 
       //
-      // Report Status code: is about to detect IDE drive
-      //
-      REPORT_STATUS_CODE_WITH_DEVICE_PATH (
-        EFI_PROGRESS_CODE,
-        (EFI_IO_BUS_ATA_ATAPI | EFI_P_PC_PRESENCE_DETECT),
-        IdeBlkIoDevicePtr->DevicePath
-        );
-
-      //
       // Discover device, now!
       //
       PERF_START (0, "DiscoverIdeDevice", "IDE", 0);

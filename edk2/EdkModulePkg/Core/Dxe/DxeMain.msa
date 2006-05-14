@@ -111,6 +111,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <Protocol Usage="ALWAYS_CONSUMED">LoadFile</Protocol>
         <Protocol Usage="ALWAYS_CONSUMED">SimpleFileSystem</Protocol>
         <Protocol Usage="ALWAYS_CONSUMED">LoadPeImage</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">Decompress</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">CustomizedDecompress</Protocol>
+        <Protocol Usage="ALWAYS_CONSUMED">TianoDecompress</Protocol>
     </Protocols>
     <Guids>
         <GuidEntry Usage="ALWAYS_CONSUMED">

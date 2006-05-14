@@ -150,17 +150,23 @@ Returns:
     EFI_IMAGE_DOS_HEADER  *DosHeader;
     EFI_IMAGE_NT_HEADERS  *PeHeader;
 
-    DosHeader = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
-    if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-      //
-      // DOS image header is present, so read the PE header after the DOS image header
-      //
-      PeHeader = (EFI_IMAGE_NT_HEADERS *) ((UINTN) Pe32Data + (UINTN) ((DosHeader->e_lfanew) & 0x0ffff));
-    } else {
-      //
-      // DOS image header is not present, so PE header is at the image base
-      //
-      PeHeader = (EFI_IMAGE_NT_HEADERS *) Pe32Data;
+    //
+    // Pe32Data is NULL when load TE image 
+    //    
+    PeHeader = NULL;
+    if (TEImageHeader == NULL) {
+      DosHeader = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
+      if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+        //
+        // DOS image header is present, so read the PE header after the DOS image header
+        //
+        PeHeader = (EFI_IMAGE_NT_HEADERS *) ((UINTN) Pe32Data + (UINTN) ((DosHeader->e_lfanew) & 0x0ffff));
+      } else {
+        //
+        // DOS image header is not present, so PE header is at the image base
+        //
+        PeHeader = (EFI_IMAGE_NT_HEADERS *) Pe32Data;
+      }
     }
 
     //

@@ -170,15 +170,8 @@ in_long_mode::
     db  48h
     mov esp, ebx              ; On a new stack now
 
-    db  48h
-    mov ecx, [ebp+10h]        ; Pass Hob Start in RCX
-    db  48h
-    mov eax, [ebp+20h]        ; Get the function pointer for 
-                              ; PpisNeededByDxeIplEntryPoint into EAX
 
 ;; 00000905  FF D0		    call rax
-    db 0ffh
-    db 0d0h
 
     db  48h
     mov ecx, [ebp+10h]        ; Pass Hob Start in RCX

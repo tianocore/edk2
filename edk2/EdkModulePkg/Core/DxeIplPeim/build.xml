@@ -15,11 +15,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <property name="MODULE_RELATIVE_PATH" value="Core/DxeIplPeim"/>
    <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
    <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
+   <target name="DxeIplX64">
+      <GenBuild baseName="DxeIplX64" mbdFilename="${MODULE_DIR}/DxeIplX64.mbd" msaFilename="${MODULE_DIR}/DxeIplX64.msa"/>
+   </target>
    <target name="DxeIpl">
       <GenBuild baseName="DxeIpl" mbdFilename="${MODULE_DIR}/DxeIpl.mbd" msaFilename="${MODULE_DIR}/DxeIpl.msa"/>
    </target>
    <target depends="DxeIpl_clean" name="clean"/>
    <target depends="DxeIpl_cleanall" name="cleanall"/>
+   <target name="DxeIplX64_clean">
+      <OutputDirSetup baseName="DxeIplX64" mbdFilename="${MODULE_DIR}/DxeIplX64.mbd" msaFilename="${MODULE_DIR}/DxeIplX64.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}/DxeIplX64_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}/DxeIplX64_build.xml" target="clean"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
+   </target>
    <target name="DxeIpl_clean">
       <OutputDirSetup baseName="DxeIpl" mbdFilename="${MODULE_DIR}/DxeIpl.mbd" msaFilename="${MODULE_DIR}/DxeIpl.msa"/>
       <if>
@@ -29,6 +42,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
+   </target>
+   <target name="DxeIplX64_cleanall">
+      <OutputDirSetup baseName="DxeIplX64" mbdFilename="${MODULE_DIR}/DxeIplX64.mbd" msaFilename="${MODULE_DIR}/DxeIplX64.msa"/>
+      <if>
+         <available file="${DEST_DIR_OUTPUT}/DxeIplX64_build.xml"/>
+         <then>
+            <ant antfile="${DEST_DIR_OUTPUT}/DxeIplX64_build.xml" target="cleanall"/>
+         </then>
+      </if>
+      <delete dir="${DEST_DIR_OUTPUT}"/>
+      <delete dir="${DEST_DIR_DEBUG}"/>
+      <delete>
+         <fileset dir="${BIN_DIR}" includes="**DxeIplX64*"/>
+      </delete>
    </target>
    <target name="DxeIpl_cleanall">
       <OutputDirSetup baseName="DxeIpl" mbdFilename="${MODULE_DIR}/DxeIpl.mbd" msaFilename="${MODULE_DIR}/DxeIpl.msa"/>

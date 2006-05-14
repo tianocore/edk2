@@ -35,12 +35,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiLib</Library>
     <Library>BasePrintLib</Library>
     <Library>BaseDebugLibReportStatusCode</Library>
-    <Library>EdkRtPlatformStatusCodeLib</Library>
     <Library>DxeIoLibCpuIo</Library>
     <Library>BaseMemoryLib</Library>
     <Library>DxeReportStatusCodeLib</Library>
-    <Library>EdkRtMemoryStatusCodeLib</Library>
-    <Library>EdkBsDataHubStatusCodeLib</Library>
+    <Library OverrideID="1111">EdkRtPlatformStatusCodeLib</Library>
+    <Library OverrideID="1111">EdkRtMemoryStatusCodeLib</Library>
+    <Library OverrideID="1111">EdkBsDataHubStatusCodeLib</Library>
     <Library>DxeHobLib</Library>
     <Library>DxeMemoryAllocationLib</Library>
     <Library>EdkMemoryStatusCodeLib</Library>

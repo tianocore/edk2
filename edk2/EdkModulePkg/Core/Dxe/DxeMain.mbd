@@ -25,10 +25,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <Library>BaseCacheMaintenanceLib</Library>
         <Library>DxeReportStatusCodeLib</Library>
         <Library>BaseDebugLibReportStatusCode</Library>
-        <Library>DxeCoreUefiDecompressLibFromHob</Library>
-        <Library>DxeCoreTianoDecompressLibFromHob</Library>
-        <Library>DxeCoreCustomDecompressLibFromHob</Library>
-        <Library>EdkDxePeCoffLoaderFromHobLib</Library>
+        <Library OverrideID="1111">DxeCoreUefiDecompressLibFromHob</Library>
+        <Library OverrideID="1111">DxeCoreTianoDecompressLibFromHob</Library>
+        <Library OverrideID="3333">DxeCoreCustomDecompressLibFromHob</Library>
+        <Library OverrideID="4444">EdkDxePeCoffLoaderFromHobLib</Library>
         <Library>DxeCoreHobLib</Library>
         <Library>DxeCoreEntryPoint</Library>
         <Library>BaseMemoryLib</Library>

@@ -433,7 +433,7 @@ Returns:
   // Map the Tiano extensions Events to CreateEventEx form
   //
   if (Type == EFI_EVENT_SIGNAL_READY_TO_BOOT) {
-    GuidPtr = &gEfiEventReadToBootGuid;
+    GuidPtr = &gEfiEventReadyToBootGuid;
   } else if (Type == EFI_EVENT_SIGNAL_LEGACY_BOOT) {
     GuidPtr = &gEfiEventLegacyBootGuid
   }
