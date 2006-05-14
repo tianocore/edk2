@@ -1362,6 +1362,9 @@ Returns:
   UINTN         Index;
   UINTN         Index2;
   BOOLEAN       Found;
+  CHAR16        StrTemp[100];
+  UINT16        *OptionBuffer;
+  UINTN         OptionSize;
 
   BootOrderListSize = 0;
   BootOrderList     = NULL;
@@ -1388,6 +1391,14 @@ Returns:
       }
 
       if (Found) {
+  	   UnicodeSPrint (StrTemp, 100, L"Boot%04x", Index);
+  	   DEBUG((EFI_D_ERROR,"INdex= %s\n", StrTemp));
+       OptionBuffer = BdsLibGetVariableAndSize (
+                StrTemp,
+                &gEfiGlobalVariableGuid,
+                &OptionSize
+                );
+      if (NULL == OptionBuffer) 
         break;
       }
     }
