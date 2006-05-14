@@ -51,7 +51,7 @@ AsmCpuid    PROC    USES    rbx
     jrcxz   @F
     mov     [rcx], ebx
 @@:
-    mov     rcx, [rsp + 30h]
+    mov     rcx, [rsp + 38h]
     jrcxz   @F
     mov     [rcx], edx
 @@:

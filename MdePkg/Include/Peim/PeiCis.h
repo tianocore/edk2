@@ -641,6 +641,7 @@ typedef struct {
 #include <Guid/MemoryAllocationHob.h>
 #include <Guid/FirmwareFileSystem.h>
 #include <Guid/SmramMemoryReserve.h>
+#include <Guid/GlobalVariable.h>
 
 #include <Ppi/BlockIo.h>
 #include <Ppi/BootInRecoveryMode.h>
