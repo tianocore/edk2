@@ -83,6 +83,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         includes="EfiVfrParser.cpp DLGLexer.cpp VfrCompile.cpp VfrCompile.g VfrServices.cpp parser.dlg"/>
 			</uptodate>
 		</condition>
+
+    <condition property="gxx_extra_libs" value="stdc++ System gcc_s.10.4 gcc">
+      <os family="mac"/>
+	</condition>
+		
+    <condition property="gxx_extra_libs" value="stdc++">
+      <os name="linux"/>
+	</condition>
+		
+    <condition property="gxx_extra_libs" value="stdc++">
+      <os family="windows"/>
+	</condition>
+		
   </target>
 
   <target name="Antlr" depends="init" unless="CheckDepends">
@@ -98,7 +111,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="Tool" depends="init, Dlg">
-    <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
+    <cc name="g++" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
         optimize="speed">
@@ -116,7 +129,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
-      <syslibset libs="stdc++" if="gcc"/>
+      <syslibset libs="${gxx_extra_libs}" if="gcc"/>
     </cc>
   </target>
 
