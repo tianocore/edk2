@@ -28,6 +28,7 @@ Abstract:
 #include <Base.h>
 #include <UEfiBaseTypes.h>
 #include "EfiUtilityMsgs.h"
+#include <CommonLib.h>
 
 //
 // Structure to maintain a linked list of strings
