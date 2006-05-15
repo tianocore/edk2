@@ -98,3 +98,67 @@ GetInterruptState (
   ASSERT (FALSE);
   return FALSE;
 }
+
+/**
+  Enables CPU interrupts for the smallest window required to capture any
+  pending interrupts.
+
+  Enables CPU interrupts for the smallest window required to capture any
+  pending interrupts.
+
+**/
+VOID
+EFIAPI
+EnableDisableInterrupts (
+  VOID
+  )
+{
+  EnableInterrupts ();
+  DisableInterrupts ();
+}
+
+/**
+  Requests CPU to pause for a short period of time.
+
+  Requests CPU to pause for a short period of time. Typically used in MP
+  systems to prevent memory starvation while waiting for a spin lock.
+
+**/
+VOID
+EFIAPI
+CpuPause (
+  VOID
+  )
+{
+}
+
+/**
+  Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.
+
+  Flushes all the Translation Lookaside Buffers(TLB) entries in a CPU.
+
+**/
+VOID
+EFIAPI
+CpuFlushTlb (
+  VOID
+  )
+{
+  ASSERT (FALSE);
+}
+
+/**
+  Places the CPU in a sleep state until an interrupt is received.
+
+  Places the CPU in a sleep state until an interrupt is received. If interrupts
+  are disabled prior to calling this function, then the CPU will be placed in a
+  sleep state indefinitely.
+
+**/
+VOID
+EFIAPI
+CpuSleep (
+  VOID
+  )
+{
+}

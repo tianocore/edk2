@@ -2969,14 +2969,15 @@ typedef union {
 // Byte packed structure for an 16-bit real mode thunks
 //
 typedef struct {
-  IA32_REGISTER_SET                 RealModeState;
+  IA32_REGISTER_SET                 *RealModeState;
   VOID                              *RealModeBuffer;
-  UINTN                             RealModeBufferSize;
-  VOID                              *CallStack;
-  UINTN                             CallStackSize;
-  VOID                              *RealModeCode;
-  UINTN                             RealModeCodeSize;
+  UINT32                            RealModeBufferSize;
+  UINT32                            ThunkAttributes;
 } THUNK_CONTEXT;
+
+#define THUNK_ATTRIBUTE_BIG_REAL_MODE             0x00000001
+#define THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15   0x00000002
+#define THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL 0x00000004
 
 /**
   Retrieves CPUID information.
@@ -4797,6 +4798,34 @@ AsmDisablePaging64 (
 //
 // 16-bit thunking services
 //
+
+/**
+  Retrieves the properties for 16-bit thunk functions.
+
+  Computes the size of the buffer and stack below 1MB required to use the
+  AsmPrepareThunk16(), AsmThunk16() and AsmPrepareAndThunk16() functions. This
+  buffer size is returned in RealModeBufferSize, and the stack size is returned
+  in ExtraStackSize. If parameters are passed to the 16-bit real mode code,
+  then the actual minimum stack size is ExtraStackSize plus the maximum number
+  of bytes that need to be passed to the 16-bit real mode code.
+
+  If RealModeBufferSize is NULL, then ASSERT().
+  If ExtraStackSize is NULL, then ASSERT().
+
+  @param  RealModeBufferSize  A pointer to the size of the buffer below 1MB
+                              required to use the 16-bit thunk functions.
+  @param  ExtraStackSize      A pointer to the extra size of stack below 1MB
+                              that the 16-bit thunk functions require for
+                              temporary storage in the transition to and from
+                              16-bit real mode.
+
+**/
+VOID
+EFIAPI
+AsmGetThunk16Properties (
+  OUT     UINT32                    *RealModeBufferSize,
+  OUT     UINT32                    *ExtraStackSize
+  );
 
 /**
   Prepares all structures a code required to use AsmThunk16().
