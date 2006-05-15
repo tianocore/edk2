@@ -99,3 +99,21 @@ GetInterruptState (
 {
   return FALSE;
 }
+
+/**
+  Enables CPU interrupts for the smallest window required to capture any
+  pending interrupts.
+
+  Enables CPU interrupts for the smallest window required to capture any
+  pending interrupts.
+
+**/
+VOID
+EFIAPI
+EnableDisableInterrupts (
+  VOID
+  )
+{
+  EnableInterrupts ();
+  DisableInterrupts ();
+}

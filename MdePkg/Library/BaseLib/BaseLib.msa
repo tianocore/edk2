@@ -272,6 +272,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ipf/InterlockedCompareExchange32.s</Filename>
       <Filename>Ipf/InterlockedCompareExchange64.s</Filename>
       <Filename>Ipf/Synchronization.c</Filename>
+      <Filename>Ipf/CpuPause.s</Filename>
     </Arch>
     <Arch ArchType="EBC">
       <Filename>Math64.c</Filename>
@@ -279,9 +280,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>SetJumpLongJump.c</Filename>
       <Filename>Unaligned.c</Filename>
       <Filename>Ebc/CpuBreakpoint.c</Filename>
+      <Filename>Ebc/Synchronization.c</Filename>
     </Arch>
   </SourceFiles>
-  <Includes>
+ <Includes>
     <PackageName>MdePkg</PackageName>
   </Includes>
   <PCDs>

@@ -19,34 +19,16 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .data
+EXTERNDEF   m16Start:BYTE
+EXTERNDEF   m16Size:WORD
+EXTERNDEF   mThunk16Attr:WORD
+EXTERNDEF   m16Gdt:WORD
+EXTERNDEF   m16GdtrBase:WORD
+EXTERNDEF   mTransition:WORD
 
-NullSegSel      DQ      0
-_16CsSegSel     LABEL   QWORD
-                DW      -1
-                DW      0
-                DB      0
-                DB      9bh
-                DB      8fh             ; 16-bit segment
-                DB      0
-_16BitDsSel     LABEL   QWORD
-                DW      -1
-                DW      0
-                DB      0
-                DB      93h
-                DB      8fh             ; 16-bit segment
-                DB      0
-GdtEnd          LABEL   QWORD
-
-    .const
-
-_16Gdtr         LABEL   FWORD
-                DW      offset GdtEnd - offset NullSegSel - 1
-                DQ      offset NullSegSel
-
-_16Idtr         FWORD   (1 SHL 10) - 1
-
-    .code
+THUNK_ATTRIBUTE_BIG_REAL_MODE               EQU 1
+THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15     EQU 2
+THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL   EQU 4
 
 IA32_REGS   STRUC   4t
 _EDI        DD      ?
@@ -61,128 +43,192 @@ _DS         DW      ?
 _ES         DW      ?
 _FS         DW      ?
 _GS         DW      ?
-_RFLAGS     DQ      ?
+_EFLAGS     DQ      ?
 _EIP        DD      ?
 _CS         DW      ?
 _SS         DW      ?
 IA32_REGS   ENDS
 
-InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi r12 r13 r14 r15
-    mov     eax, ds
-    push    rax
-    mov     eax, es
-    push    rax
-    push    fs
-    push    gs
-    mov     rsi, rcx                    ; rsi <- RegSet
-    push    sizeof (IA32_REGS)
-    pop     rcx
-    movzx   r8, (IA32_REGS ptr [rsi])._SS
-    xor     rdi, rdi
-    mov     edi, (IA32_REGS ptr [rsi])._ESP
-    sub     rdi, rcx                    ; reserve space on realmode stack
-    push    rdi                         ; save stack offset
-    imul    rax, r8, 16
-    add     rdi, rax                    ; rdi <- linear address of 16-bit stack
-    rep     movsb                       ; copy RegSet
-    mov     rsi, r8                     ; si <- 16-bit stack segment
-    pop     rbx                         ; rbx <- 16-bit stack offset
-    mov     rdi, rdx                    ; rdi <- realmode patch
-    lea     eax, @BackToThunk           ; rax <- address to back from real mode
-    push    rax                         ; use in a far return
-    mov     eax, cs
-    mov     [rsp + 4], eax              ; save CS
-    lea     eax, @16Return              ; thus @Return must < 4GB
-    stosd                               ; set ret address offset
-    xor     eax, eax
-    stosw                               ; set ret CS base to 0
-    mov     eax, esp
-    stosd                               ; rsp must < 4GB
-    mov     eax, ss
-    stosd
-    mov     rax, cr0
-    mov     ecx, eax                    ; ecx <- CR0
-    and     ecx, 7ffffffeh              ; clear PE, PG bits
-    stosd
-    mov     rax, cr4
-    mov     ebp, eax
-    and     ebp, 300h                   ; clear all but PCE and OSFXSR bits
-    stosd
-    sidt    fword ptr [rsp + 70h]       ; use parameter space to save IDTR
-    sgdt    fword ptr [rdi]
-    lea     edi, _16Idtr
-    lea     eax, @16Start               ; rax <- seg:offset of @16Start
-    push    rax
-    mov     dword ptr [rsp + 4], 8
-    push    10h
-    pop     rax                         ; rax <- 10h as dataseg selector
-    lgdt    _16Gdtr
-    retf
-@16Start:                               ; 16-bit starts here
-    mov     ss, eax                     ; set SS to be a 16-bit segment
-    mov     cr0, rcx                    ; disable protected mode
-    mov     cr4, rbp
+    .const
+
+m16Size         DW      offset InternalAsmThunk16 - offset m16Start
+mThunk16Attr    DW      offset _ThunkAttr - offset m16Start
+m16Gdt          DW      offset _NullSegDesc - offset m16Start
+m16GdtrBase     DW      offset _16GdtrBase - offset m16Start
+mTransition     DW      offset _EntryPoint - offset m16Start
+
+    .code
+
+m16Start    LABEL   BYTE
+
+SavedGdt        LABEL   FWORD
+                DW      ?
+                DQ      ?
+
+_BackFromUserCode   PROC
+    DB      16h                         ; push ss
+    DB      0eh                         ; push cs
     DB      66h
-    mov     ecx, 0c0000080h
-    rdmsr
-    and     ah, NOT 1                   ; clear LME
-    wrmsr
-    mov     ss, esi                     ; set up 16-bit stack
-    mov     sp, bx                      ; mov esp, ebx actually
-    lidt    fword ptr [edi]
-    DB      66h, 61h                    ; popad
-    DB      1fh                         ; pop ds
-    DB      7                           ; pop es
-    pop     fs
-    pop     gs
-    add     sp, 8                       ; skip _RFLAGS
+    call    @Base                       ; push eip
+@Base:
     DB      66h
-    retf                                ; transfer control to 16-bit code
-@16Return:
-    DB      66h
-    push    0                           ; high order 32 bits of rflags
+    push    0                           ; reserved high order 32 bits of EFlags
     pushf                               ; pushfd actually
+    cli                                 ; disable interrupts
     push    gs
     push    fs
     DB      6                           ; push es
     DB      1eh                         ; push ds
     DB      66h, 60h                    ; pushad
-    DB      67h, 66h, 0c5h, 74h, 24h, 30h   ; lds esi, [esp + 12*4]
-    DB      66h
-    mov     eax, [esi + 12]
-    mov     cr4, rax                    ; restore CR4
-    DB      66h
-    lgdt    fword ptr [esi + 16]
+    DB      66h, 0bah                   ; mov edx, imm32
+_ThunkAttr  DD      ?
+    test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15
+    jz      @1
+    mov     eax, 15cd2401h              ; mov ax, 2401h & int 15h
+    cli                                 ; disable interrupts
+    jnc     @2
+@1:
+    test    dl, THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL
+    jz      @2
+    in      al, 92h
+    or      al, 2
+    out     92h, al                     ; deactivate A20M#
+@2:
+    mov     eax, ss
+    lea     bp, [esp + sizeof (IA32_REGS)]
+    mov     word ptr (IA32_REGS ptr [rsi - sizeof (IA32_REGS)])._ESP, bp
+    mov     ebx, (IA32_REGS ptr [rsi - sizeof (IA32_REGS)])._EIP
+    shl     ax, 4                       ; shl eax, 4
+    add     bp, ax                      ; add ebp, eax
+    DB      66h, 0b8h                   ; mov eax, imm32
+SavedCr4    DD      ?
+    mov     cr4, rax
+    DB      66h, 2eh
+    lgdt    fword ptr [rdi + (offset SavedGdt - offset @Base)]
     DB      66h
     mov     ecx, 0c0000080h
     rdmsr
-    or      ah, 1                       ; set LME
+    or      ah, 1
     wrmsr
+    DB      66h, 0b8h                   ; mov eax, imm32
+SavedCr0    DD      ?
+    mov     cr0, rax
+    DB      0b8h                        ; mov ax, imm16
+SavedSs     DW      ?
+    mov     ss, eax
+    DB      66h, 0bch                   ; mov esp, imm32
+SavedEsp    DD      ?
     DB      66h
-    mov     eax, [esi + 8]
-    mov     cr0, rax                    ; restore CR0
-    xor     ax, ax                      ; xor eax, eax actually
-    mov     eax, ss
-    mov     dword ptr (IA32_REGS ptr [esp])._SS, eax
-    shl     ax, 4                       ; shl eax, 4 actually
-    add     ax, sp                      ; add eax, esp actually
-    add     sp, sizeof (IA32_REGS)      ; add esp, sizeof (IA32_REGS)
+    retf                                ; return to protected mode
+_BackFromUserCode   ENDP
+
+_EntryPoint     DD      offset _ToUserCode - offset m16Start
+                DW      8h
+_16Gdtr         LABEL   FWORD
+                DW      offset GdtEnd - offset _NullSegDesc - 1
+_16GdtrBase     DQ      offset _NullSegDesc
+_16Idtr         FWORD   (1 SHL 10) - 1
+
+_ToUserCode PROC
+    mov     edi, ss
+    mov     ss, edx                     ; set new segment selectors
+    mov     ds, edx
+    mov     es, edx
+    mov     fs, edx
+    mov     gs, edx
     DB      66h
-    mov     dword ptr (IA32_REGS ptr [esp - sizeof (IA32_REGS)])._ESP, esp
+    mov     ecx, 0c0000080h
+    mov     cr0, rax                    ; real mode starts at next instruction
+    rdmsr
+    and     ah, NOT 1
+    wrmsr
+    mov     cr4, rbp
+    mov     ss, esi                     ; set up 16-bit stack segment
+    xchg    sp, bx                      ; set up 16-bit stack pointer
     DB      66h
-    lss     esp, fword ptr [esi]        ; restore protected mode stack
+    call    @Base                       ; push eip
+@Base:
+    pop     bp                          ; ebp <- offset @Base
+    DB      2eh                         ; cs:
+    mov     [rsi + (offset SavedSs - offset @Base)], edi
+    DB      2eh                         ; cs:
+    mov     [rsi + (offset SavedEsp - offset @Base)], bx
+    DB      66h, 2eh                    ; CS and operand size override
+    lidt    fword ptr [rsi + (offset _16Idtr - offset @Base)]
+    DB      66h, 61h                    ; popad
+    DB      1fh                         ; pop ds
+    DB      07h                         ; pop es
+    pop     fs
+    pop     gs
+    popf                                ; popfd
+    lea     sp, [esp + 4]               ; skip high order 32 bits of EFlags
     DB      66h
-    retf                                ; go back to protected mode
-@BackToThunk:
-    lidt    fword ptr [rsp + 68h]       ; restore protected mode IDTR
-    shl     rax, 32
-    shr     rax, 32                     ; clear high order 32 bits of RAX
+    retf                                ; transfer control to user code
+_ToUserCode ENDP
+
+_NullSegDesc    DQ      0
+_16CsDesc       LABEL   QWORD
+                DW      -1
+                DW      0
+                DB      0
+                DB      9bh
+                DB      8fh             ; 16-bit segment, 4GB limit
+                DB      0
+_16DsDesc       LABEL   QWORD
+                DW      -1
+                DW      0
+                DB      0
+                DB      93h
+                DB      8fh             ; 16-bit segment, 4GB limit
+                DB      0
+GdtEnd          LABEL   QWORD
+
+;
+;   @param  RegSet  Pointer to a IA32_DWORD_REGS structure
+;   @param  Transition  Pointer to the transition code
+;   @return The address of the 16-bit stack after returning from user code
+;
+InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
+    mov     r10d, ds
+    mov     r11d, es
+    push    fs
+    push    gs
+    mov     rsi, rcx
+    movzx   r8d, (IA32_REGS ptr [rsi])._SS
+    mov     edi, (IA32_REGS ptr [rsi])._ESP
+    lea     rdi, [edi - (sizeof (IA32_REGS) + 4)]
+    imul    eax, r8d, 16                ; eax <- r8d(stack segment) * 16
+    mov     ebx, edi                    ; ebx <- stack offset for 16-bit code
+    push    sizeof (IA32_REGS) / 4
+    add     edi, eax                    ; edi <- linear address of 16-bit stack
+    pop     rcx
+    rep     movsd                       ; copy RegSet
+    lea     ecx, [rdx + (offset SavedCr4 - offset m16Start)]
+    mov     eax, edx                    ; eax <- transition code address
+    and     edx, 0fh
+    shl     eax, 12
+    lea     edx, [rdx + (offset _BackFromUserCode - offset m16Start)]
+    mov     ax, dx
+    stosd                               ; [edi] <- return address of user code
+    sgdt    fword ptr [rcx + (offset SavedGdt - offset SavedCr4)]
+    sidt    fword ptr [rsp + 38h]       ; save IDT stack in argument space
+    mov     rax, cr0
+    mov     [rcx + (offset SavedCr0 - offset SavedCr4)], eax
+    and     eax, 7ffffffeh              ; clear PE, PG bits
+    mov     rbp, cr4
+    mov     [rcx], ebp                  ; save CR4 in SavedCr4
+    and     ebp, 300h                   ; clear all but PCE and OSFXSR bits
+    mov     esi, r8d                    ; esi <- 16-bit stack segment
+    push    10h
+    pop     rdx                         ; rdx <- selector for data segments
+    lgdt    fword ptr [rcx + (offset _16Gdtr - offset SavedCr4)]
+    call    fword ptr [rcx + (offset _EntryPoint - offset SavedCr4)]
+    lidt    fword ptr [rsp + 38h]       ; restore protected mode IDTR
+    lea     eax, [rbp - sizeof (IA32_REGS)]
     pop     gs
     pop     fs
-    pop     rcx
-    mov     es, ecx
-    pop     rcx
-    mov     ds, ecx
+    mov     es, r11d
+    mov     ds, r10d
     ret
 InternalAsmThunk16  ENDP
 
