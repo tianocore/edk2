@@ -129,6 +129,7 @@ PrintGuidToBuffer (
 
 #ifdef __GNUC__
 #define stricmp strcasecmp
+#define strnicmp strncasecmp
 #define strcmpi strcasecmp
 #endif
 
