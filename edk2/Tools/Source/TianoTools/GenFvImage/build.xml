@@ -65,6 +65,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </echo>
     </else>
     </if>
+        <property name="ToolChain" value="gcc"/>
     <if>
       <equals arg1="${ToolChain}" arg2="msvc"/>
       <then>
@@ -82,6 +83,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </elseif>
     </if>
 
+    <condition property="syslibdirs" value="">
+      <os family="mac"/>
+    </condition>
+    
+    <condition property="syslibs" value="">
+      <os family="mac"/>
+    </condition>
+    
+    <condition property="syslibdirs" value="${env.CYGWIN_HOME}/lib/e2fsprogs">
+      <os family="windows"/>
+    </condition>
+    
+    <condition property="syslibs" value="uuid">
+      <os family="windows"/>
+    </condition>
+    
+    <condition property="syslibdirs" value="/usr/lib">
+      <os name="Linux"/>
+    </condition>
+    
+    <condition property="syslibs" value="uuid">
+      <os name="Linux"/>
+    </condition>
+    
   </target>
 
   <target name="Tool" depends="init, GenFvImage, GenFvImage_Ia32, GenFvImage_X64, GenFvImage_Ipf"/>
@@ -111,7 +136,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
+      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
@@ -143,7 +168,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
+      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
@@ -175,7 +200,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
+      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
@@ -207,7 +232,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
+      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>

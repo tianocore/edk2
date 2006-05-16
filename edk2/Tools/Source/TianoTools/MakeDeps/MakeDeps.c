@@ -26,7 +26,7 @@ Abstract:
 #include <ctype.h>
 
 #include <Base.h>
-#include <UEfiBaseTypes.h>
+#include <UefiBaseTypes.h>
 #include "EfiUtilityMsgs.h"
 #include <CommonLib.h>
 
