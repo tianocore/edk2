@@ -131,6 +131,7 @@ PrintGuidToBuffer (
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
+void strlwr(char *s);
 #endif
 
 #endif

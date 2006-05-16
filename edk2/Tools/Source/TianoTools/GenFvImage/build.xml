@@ -81,6 +81,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </then>
       </elseif>
     </if>
+
   </target>
 
   <target name="Tool" depends="init, GenFvImage, GenFvImage_Ia32, GenFvImage_X64, GenFvImage_Ipf"/>
@@ -110,7 +111,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
@@ -142,7 +143,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
@@ -174,7 +175,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
@@ -206,7 +207,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/>
+      <!-- <syslibset dir="${env.CYGWIN_HOME}/lib/e2fsprogs" libs="uuid" if="gcc"/> -->
       <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>

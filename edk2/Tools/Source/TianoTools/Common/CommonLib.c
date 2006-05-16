@@ -493,3 +493,12 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
+#ifdef __GNUC__
+void strlwr(char *s)
+{
+  for(;*s;s++) {
+    *s = tolower(*s);
+  }
+}
+#endif
