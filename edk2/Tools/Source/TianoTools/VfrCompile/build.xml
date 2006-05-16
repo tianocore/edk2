@@ -129,7 +129,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
-      <syslibset libs="${gxx_extra_libs}" if="g++"/>
+      <syslibset libs="${gxx_extra_libs}" if="gcc"/>
     </cc>
   </target>
 
