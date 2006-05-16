@@ -1,4 +1,5 @@
-#------------------------------------------------------------------------------ ;
+#------------------------------------------------------------------------------
+#
 # Copyright (c) 2006, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -10,11 +11,11 @@
 #
 # Module Name:
 #
-#   CpuBreakpoint.s
+#   ReadDr4.Asm
 #
 # Abstract:
 #
-#   CpuBreakpoint function
+#   AsmReadDr4 function
 #
 # Notes:
 #
@@ -23,18 +24,17 @@
 
 
      
-     
 
 #------------------------------------------------------------------------------
-# VOID
+# UINTN
 # EFIAPI
-# CpuBreakpoint (
+# AsmReadDr4 (
 #   VOID
 #   );
 #------------------------------------------------------------------------------
-.global _CpuBreakpoint
-_CpuBreakpoint: 
-    int  $3
+.global _AsmReadDr4
+_AsmReadDr4: 
+    movl    %dr4, %eax
     ret
 
 
