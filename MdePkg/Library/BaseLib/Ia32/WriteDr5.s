@@ -1,4 +1,5 @@
-#------------------------------------------------------------------------------ ;
+#------------------------------------------------------------------------------
+#
 # Copyright (c) 2006, Intel Corporation
 # All rights reserved. This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -10,11 +11,11 @@
 #
 # Module Name:
 #
-#   CpuBreakpoint.s
+#   WriteDr5.Asm
 #
 # Abstract:
 #
-#   CpuBreakpoint function
+#   AsmWriteDr5 function
 #
 # Notes:
 #
@@ -23,18 +24,18 @@
 
 
      
-     
 
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# CpuBreakpoint (
-#   VOID
+# AsmWriteDr5 (
+#   IN UINTN Value
 #   );
 #------------------------------------------------------------------------------
-.global _CpuBreakpoint
-_CpuBreakpoint: 
-    int  $3
+.global _AsmWriteDr5
+_AsmWriteDr5: 
+    movl    4(%esp),%eax
+    movl    %eax, %dr5
     ret
 
 
