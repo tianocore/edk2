@@ -20,23 +20,7 @@
 
 **/
 
-/**
-  Set Buffer to Value for Size bytes.
-
-  @param  Buffer Memory to set.
-  @param  Size Number of bytes to set
-  @param  Value Value of the set operation.
-
-  @return Buffer
-
-**/
-VOID *
-EFIAPI
-InternalMemSetMem (
-  OUT     VOID                      *Buffer,
-  IN      UINTN                     Length,
-  IN      UINT8                     Value
-  );
+#include "MemLibInternals.h"
 
 /**
   Fills a target buffer with a 16-bit value, and returns the target buffer.
