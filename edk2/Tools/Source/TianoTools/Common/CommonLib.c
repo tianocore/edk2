@@ -495,10 +495,14 @@ Returns:
 }
 
 #ifdef __GNUC__
-void strlwr(char *s)
+#ifndef __CYGWIN__
+char *strlwr(char *s)
 {
+  char *p = s;
   for(;*s;s++) {
     *s = tolower(*s);
   }
+  return p;
 }
+#endif
 #endif

@@ -131,7 +131,9 @@ PrintGuidToBuffer (
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
-void strlwr(char *s);
+#ifndef __CYGWIN__
+char *strlwr(char *s);
+#endif
 #endif
 
 #endif
