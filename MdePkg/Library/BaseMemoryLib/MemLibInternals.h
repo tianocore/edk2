@@ -10,7 +10,7 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  MemLibWrappers.h
+  Module Name:  MemLibInternals.h
 
   The following BaseMemoryLib instances share the same version of this file:
 
@@ -23,8 +23,8 @@
 
 **/
 
-#ifndef __MEM_LIB_WRAPPERS__
-#define __MEM_LIB_WRAPPERS__
+#ifndef __MEM_LIB_INTERNALS__
+#define __MEM_LIB_INTERNALS__
 
 /**
   Copy Length bytes from Source to Destination.

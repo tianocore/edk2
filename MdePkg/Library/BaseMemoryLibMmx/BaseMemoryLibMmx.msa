@@ -38,7 +38,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <SourceFiles>
     <Arch ArchType="IA32">
       <Filename>MemLibGuid.c</Filename>
-      <Filename>MemLibWrapper.c</Filename>
+      <Filename>CopyMemWrapper.c</Filename>
+      <Filename>SetMemWrapper.c</Filename>
+      <Filename>SetMem16Wrapper.c</Filename>
+      <Filename>SetMem32Wrapper.c</Filename>
+      <Filename>SetMem64Wrapper.c</Filename>
+      <Filename>CompareMemWrapper.c</Filename>
+      <Filename>ZeroMemWrapper.c</Filename>
+      <Filename>ScanMem8Wrapper.c</Filename>
+      <Filename>ScanMem16Wrapper.c</Filename>
+      <Filename>ScanMem32Wrapper.c</Filename>
+      <Filename>ScanMem64Wrapper.c</Filename>
       <Filename>Ia32/CopyMem.asm</Filename>
       <Filename>Ia32/SetMem.asm</Filename>
       <Filename>Ia32/ZeroMem.asm</Filename>
