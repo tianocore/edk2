@@ -221,22 +221,27 @@ public class PCDAutoGenAction extends BuildAction {
             // Get one consumer instance and generate autogen for this token.
             //
             if(tokenArray[index].consumers != null ) {
-                if(tokenArray[index].consumers.size() == 0) {
-                    continue;
+                if(tokenArray[index].consumers.size() != 0) {
+                    usageInstance = tokenArray[index].consumers.get(0);
+                    try {
+                        usageInstance.generateAutoGen();
+                    } catch(EntityException exp) {
+                        throw new BuildActionException(exp.getMessage());
+                    }
+    
+                    hAutoGenString += usageInstance.getHAutogenStr();
+                    cAutoGenString += usageInstance.getCAutogenStr();
+    
+                    hAutoGenString += "\r\n";
+                    cAutoGenString += "\r\n";
+                } else {
+                    //
+                    // If the PCD does *not* usded by any module, also generate 
+                    // it into autogen.h/autogen.c in Pcd driver according the
+                    // information in FPD file.
+                    //
+                    generateUnReferencePcdAutogenString(tokenArray[index]);
                 }
-
-                usageInstance = tokenArray[index].consumers.get(0);
-                try {
-                    usageInstance.generateAutoGen();
-                } catch(EntityException exp) {
-                    throw new BuildActionException(exp.getMessage());
-                }
-
-                hAutoGenString += usageInstance.getHAutogenStr();
-                cAutoGenString += usageInstance.getCAutogenStr();
-
-                hAutoGenString += "\r\n";
-                cAutoGenString += "\r\n";
             }
         }
 
@@ -251,6 +256,111 @@ public class PCDAutoGenAction extends BuildAction {
 
     }
 
+    /**
+      Generate unreference token definition string for PCD emulated string. 
+      
+      Maybe some PCD token definition in FPD but not used by any module or library, we 
+      should also generate token definition in autoge.h/autogen.c, because maybe some
+      driver loaded in shell will use this PCD. 
+
+     @param token   The token who want be generated autogen string.
+    
+    **/
+    private void generateUnReferencePcdAutogenString(Token token) {
+        hAutoGenString += String.format("#define _PCD_TOKEN_%s   0x%016x\r\n", 
+                                        token.cName, token.tokenNumber);
+        switch (token.pcdType) {
+        case FEATURE_FLAG:
+            hAutoGenString += String.format(
+                                "#define _PCD_VALUE_%s   %s\r\n", 
+                                token.cName, 
+                                token.datum.toString()
+                                );
+            hAutoGenString += String.format(
+                                "extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
+                                token.cName
+                                );
+            cAutoGenString += String.format(
+                                "GLOBAL_REMOVE_IF_UNREFERENCED const BOOLEAN _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                token.cName,
+                                token.cName
+                                );
+            hAutoGenString += String.format(
+                                "#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
+                                Token.GetAutogenDefinedatumTypeString(token.datumType),
+                                token.cName,
+                                token.cName
+                                );
+            break;
+        case FIXED_AT_BUILD:
+            hAutoGenString += String.format(
+                                "#define _PCD_VALUE_%s   %s\r\n", 
+                                token.cName, 
+                                token.datum.toString()
+                                );
+            hAutoGenString += String.format(
+                                "extern const %s _gPcd_FixedAtBuild_%s;\r\n",
+                                Token.getAutogendatumTypeString(token.datumType),
+                                token.cName
+                                );
+            cAutoGenString += String.format(
+                                "GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                Token.getAutogendatumTypeString(token.datumType),
+                                token.cName,
+                                token.cName
+                                );
+            hAutoGenString += String.format(
+                                "#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
+                                Token.GetAutogenDefinedatumTypeString(token.datumType),
+                                token.cName,
+                                token.cName
+                                );
+            break;
+        case PATCHABLE_IN_MODULE:
+            hAutoGenString += String.format(
+                                 "#define _PCD_VALUE_%s   %s\r\n", 
+                                 token.cName, 
+                                 token.datum.toString()
+                                 );
+            hAutoGenString += String.format(
+                                 "extern %s _gPcd_BinaryPatch_%s;\r\n",
+                                 Token.getAutogendatumTypeString(token.datumType),
+                                 token.cName
+                                 );
+            cAutoGenString += String.format(
+                                 "GLOBAL_REMOVE_IF_UNREFERENCED %s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;\r\n",
+                                 Token.getAutogendatumTypeString(token.datumType),
+                                 token.cName,
+                                 token.cName
+                                 );
+            hAutoGenString += String.format(
+                                 "#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
+                                 Token.GetAutogenDefinedatumTypeString(token.datumType),
+                                 token.cName,
+                                 token.cName
+                                 );
+            break;
+        case DYNAMIC:
+            hAutoGenString += String.format(
+                                "#define _PCD_MODE_%s_%s  LibPcdGet%s(_PCD_TOKEN_%s)\r\n",
+                                Token.GetAutogenDefinedatumTypeString(token.datumType),
+                                token.cName,
+                                Token.getAutogenLibrarydatumTypeString(token.datumType),
+                                token.cName
+                                );
+            break;
+        case DYNAMIC_EX:
+            break;
+        default:
+            ActionMessage.warning(this, 
+                                  "The PCD_TYPE setted by platform is unknown"
+                                  );
+        }
+
+        hAutoGenString += "\r\n";
+        cAutoGenString += "\r\n";
+    }
+        
     /**
       Generate PCDEmulated array in PCDEmulated driver for emulated runtime database.
       
@@ -274,12 +384,6 @@ public class PCDAutoGenAction extends BuildAction {
         for(index = 0; index < tokenArray.length; index ++) {
             token = tokenArray[index];
 
-            if((token.producers.size() == 0) &&(token.consumers.size() == 0)) {
-                //
-                // If no one use this PCD token, it will not generated in emulated array.
-                //
-                continue;
-            }
             value = token.datum.toString();
             if(token.datumType == Token.DATUM_TYPE.POINTER) {
                 if(!((value.charAt(0) == 'L' && value.charAt(1) == '"') ||(value.charAt(0) == '"'))) {
@@ -298,13 +402,6 @@ public class PCDAutoGenAction extends BuildAction {
 
         for(index = 0; index < tokenArray.length; index ++) {
             token = tokenArray[index];
-
-            if((token.producers.size() == 0) &&(token.consumers.size() == 0)) {
-                //
-                // If no one use this PCD token, it will not generated in emulated array.
-                //
-                continue;
-            }
 
             if(index != 0) {
                 cAutoGenString += ",\r\n";
@@ -421,7 +518,7 @@ public class PCDAutoGenAction extends BuildAction {
       @param argv  paramter from command line
     **/
     public static void main(String argv[]) {
-        String logFilePath = "G:/mdk/EdkNt32Pkg/build/Nt32.fpd";
+        String logFilePath = "M:/tianocore/edk2/trunk/edk2/EdkNt32Pkg/Nt32.fpd";
 
         //
         // At first, CollectPCDAction should be invoked to collect
@@ -429,12 +526,12 @@ public class PCDAutoGenAction extends BuildAction {
         //
         CollectPCDAction collectionAction = new CollectPCDAction();
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "G:/mdk");
+                            "M:/tianocore/edk2/trunk/edk2");
 
         GlobalData.getPCDMemoryDBManager().setLogFileName(logFilePath + ".PCDMemroyDatabaseLog.txt");
 
         try {
-            collectionAction.perform("G:/mdk", 
+            collectionAction.perform("M:/tianocore/edk2/trunk/edk2", 
                                      logFilePath,
                                      ActionMessage.MAX_MESSAGE_LEVEL);
         } catch(Exception e) {
@@ -444,9 +541,12 @@ public class PCDAutoGenAction extends BuildAction {
         //
         // Then execute the PCDAuotoGenAction to get generated Autogen.h and Autogen.c
         //
-        PCDAutoGenAction autogenAction = new PCDAutoGenAction("HelloWorld",
+        PCDAutoGenAction autogenAction = new PCDAutoGenAction("PcdEmulator",
                                                               true
                                                               );
         autogenAction.execute();
+        System.out.println (autogenAction.hAutoGenString);
+        System.out.println (autogenAction.cAutoGenString);
+
     }
 }

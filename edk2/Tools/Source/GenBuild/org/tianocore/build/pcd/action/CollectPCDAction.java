@@ -489,6 +489,7 @@ public class CollectPCDAction {
             // BUGBUG: in FPD, <defaultValue> should be defined as <Value>
             //
             token.datum        = pcdBuildData.getDefaultValue();
+            token.tokenNumber  = Integer.decode(pcdBuildData.getToken().getStringValue());
             token.hiiEnabled   = pcdBuildData.getHiiEnable();
             token.variableGuid = Token.getGUIDFromSchemaObject(pcdBuildData.getVariableGuid());
             token.variableName = pcdBuildData.getVariableName();
