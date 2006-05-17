@@ -22,7 +22,7 @@
     .686: 
     .code: 
 
-.global InternalMathRShiftU64
+.global _InternalMathRShiftU64
 _InternalMathRShiftU64:
     movb    12(%esp),%cl
     xorl    %edx,%edx
