@@ -19,12 +19,11 @@
 #
 #------------------------------------------------------------------------------
 
+    .386: 
+    .code: 
 
-
-     
-
-.global _DivU64x32
-_DivU64x32: 
+.global _InternalMathDivU64x32
+_InternalMathDivU64x32:
     movl    8(%esp),%eax
     movl    12(%esp),%ecx
     xorl    %edx,%edx
@@ -34,6 +33,3 @@ _DivU64x32:
     divl    %ecx
     popl    %edx
     ret
-
-
-

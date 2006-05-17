@@ -19,21 +19,17 @@
 #
 #------------------------------------------------------------------------------
 
+    .686: 
+    .code: 
 
-
-     
-
-.global _RShiftU64
-_RShiftU64: 
+.global InternalMathRShiftU64
+_InternalMathRShiftU64:
     movb    12(%esp),%cl
     xorl    %edx,%edx
     movl    8(%esp),%eax
     testb   $32,%cl
     cmovz   %eax, %edx
-    cmovz   4(%esp), %eax
+    cmovz   0x4(%esp), %eax
     shrdl   %cl,%edx,%eax
-    shrl    %cl,%edx
+    shr     %cl,%edx
     ret
-
-
-

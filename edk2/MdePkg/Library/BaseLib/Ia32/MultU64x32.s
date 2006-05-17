@@ -19,18 +19,14 @@
 #
 #------------------------------------------------------------------------------
 
+    .386: 
+    .code: 
 
-
-     
-
-.global _MultU64x32
-_MultU64x32: 
+.global _InternalMathMultU64x32
+_InternalMathMultU64x32:
     movl    12(%esp),%ecx
     movl    %ecx,%eax
     imull   8(%esp),%ecx
-    mull    4(%esp)
+    mull   0x4(%esp)
     addl    %ecx,%edx
     ret
-
-
-
