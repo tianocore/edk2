@@ -19,21 +19,18 @@
 #
 #------------------------------------------------------------------------------
 
+    .686: 
+    #.MODEL flat,C
+    .code: 
 
-
-     
-
-.global _LShiftU64
-_LShiftU64: 
-    movb    12(%esp),%cl
-    xorl    %eax,%eax
-    movl    4(%esp),%edx
-    testb   $32,%cl
+.global _InternalMathLShiftU64
+_InternalMathLShiftU64:
+    movb    12(%esp), %cl
+    xorl    %eax, %eax
+    movl    4(%esp), %edx
+    testb   $32, %cl
     cmovz   %edx, %eax
-    cmovz   8(%esp), %edx
-    shldl   %cl,%eax,%edx
-    shll    %cl,%eax
+    cmovz   0x8(%esp), %edx
+    shld    %cl,%eax,%edx
+    shl     %cl, %eax
     ret
-
-
-
