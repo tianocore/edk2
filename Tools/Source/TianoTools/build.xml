@@ -75,6 +75,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </then>
     </if>
 
+    <condition property="linux" value="true">
+      <os name="Linux"/>
+    </condition>
+    
+    <condition property="windows" value="true">
+      <os family="Windows"/>
+    </condition>
+    
+    <condition property="OSX" value="true">
+      <os family="Mac"/>
+    </condition>
+    
   </target>
   
   <target name="Libraries">

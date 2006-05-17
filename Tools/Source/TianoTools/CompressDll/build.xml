@@ -72,7 +72,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </if>
   </target>
   
-  <target name="Lib" depends="init" unless="gcc">
+  <target name="Lib" depends="init">
     <cc name="${ToolChain}" 
       objdir="${BUILD_DIR}" 
       outtype="shared" 
@@ -85,7 +85,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <includepath path="${env.JAVA_HOME}/include"/>
-      <includepath path="${env.JAVA_HOME}/include/win32"/>
+      <includepath path="${env.JAVA_HOME}/include/win32" if="windows"/>
+      <includepath path="${env.JAVA_HOME}/include/linux" if="linux"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
       <syslibset libs="kernel32" unless="gcc"/>
     </cc>
