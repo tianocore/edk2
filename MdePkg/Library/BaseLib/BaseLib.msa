@@ -273,6 +273,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ipf/InterlockedCompareExchange64.s</Filename>
       <Filename>Ipf/Synchronization.c</Filename>
       <Filename>Ipf/CpuPause.s</Filename>
+      <Filename>Ipf/CpuFlushTlb.s</Filename>
     </Arch>
     <Arch ArchType="EBC">
       <Filename>Math64.c</Filename>
