@@ -62,4 +62,26 @@
       <InstalledDate>2006-02-24 14:49</InstalledDate>
     </Package>
   </PackageList>
+  <PlatformList>
+    <Platform PlatformName="NT32" PlatformGuid="eb216561-961f-47ee-9ef9-ca426ef547c2" PlatformVersion="1.0">
+      <File>EdkNt32Pkg/Nt32.fpd</File>
+      <InstalledDate>2006-02-24 14:49</InstalledDate>
+      <ModifiedDate>2006-05-14 09:49</ModifiedDate>
+    </Platform>
+    <Platform PlatformName="MdePkgAll" PlatformGuid="0fe7dd3e-0969-48c3-8cd2-de9a190088e2" PlatformVersion="1.0">
+      <File>MdePkg/MdePkg-All-Archs.fpd</File>
+      <InstalledDate>2006-02-24 14:49</InstalledDate>
+      <ModifiedDate>2006-05-14 09:49</ModifiedDate>
+    </Platform>
+    <Platform PlatformName="MdePkg" PlatformGuid="1123e1a9-4d9b-499f-843c-b2297ff61a11" PlatformVersion="1.0">
+      <File>MdePkg/MdePkg.fpd</File>
+      <InstalledDate>2006-02-24 14:49</InstalledDate>
+      <ModifiedDate>2006-05-14 09:49</ModifiedDate>
+    </Platform>
+    <Platform PlatformName="EdkModuleAll" PlatformGuid="dc967761-e6e9-4d1a-b02c-818102db4cc6" PlatformVersion="1.0">
+      <File>EdkModulePkg/EdkModulePkg-All-Archs.fpd</File>
+      <InstalledDate>2006-02-24 14:49</InstalledDate>
+      <ModifiedDate>2006-05-14 09:49</ModifiedDate>
+    </Platform>
+  </PlatformList>
 </FrameworkDatabase>
