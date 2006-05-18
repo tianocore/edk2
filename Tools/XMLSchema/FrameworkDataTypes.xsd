@@ -1136,6 +1136,9 @@
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
         <xs:attribute name="AlternateName" type="FileNameConvention" use="optional"/>
+        <xs:attribute name="PlatformName" type="BaseNameConvention" use="optional"/>
+        <xs:attribute name="PlatformGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="PlatformVersion" type="xs:string" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PpiAttributes">
         <xs:attribute name="Guid" type="GuidType" use="optional"/>

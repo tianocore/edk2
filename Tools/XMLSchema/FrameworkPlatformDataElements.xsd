@@ -260,6 +260,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="Overrides">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">DO NOT USE! - Removing this from Schema</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceOverrideInfo"/>
@@ -268,15 +271,43 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="PlatformDescriptions">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">DO NOT USE! - Use PlatformList instead</xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence maxOccurs="unbounded">
                 <xs:element ref="Platform"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="PlatformList">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This is used in the Framework Database file</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded">
+                <xs:element ref="Platform"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="FrameworkModules">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This is used in a Framework Platform Description (FPD) file</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" name="SEC" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="PEI_CORE" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="PEIM" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="DXE_CORE" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="OTHER_COMPONENTS" type="Components"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="TianoImage">
         <xs:annotation>
-            <xs:documentation xml:lang="en">This defines the required sections of a valid EFI/Tiano binary image</xs:documentation>
+            <xs:documentation xml:lang="en">DO NOT USE - Use FrameworkModules Instead.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
