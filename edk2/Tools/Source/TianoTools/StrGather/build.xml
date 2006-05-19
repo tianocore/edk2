@@ -84,7 +84,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
         libtool="${haveLibtool}"
-        optimize="speed">
+        debug="true">
 
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}" 
