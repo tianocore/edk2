@@ -18,7 +18,7 @@ Revision history:
 --*/
 
 
-#include "snp.h"
+#include "Snp.h"
 
 EFI_STATUS
 pxe_get_stn_addr (

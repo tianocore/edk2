@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #define RAND_MAX  0x10000
-#include "bc.h"
+#include "Bc.h"
 
 //
 // Definitions for internet group management protocol version 2 message

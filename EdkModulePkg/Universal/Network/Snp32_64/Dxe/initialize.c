@@ -18,7 +18,7 @@ Revision history:
 --*/
 
 
-#include "snp.h"
+#include "Snp.h"
 
 VOID
 EFIAPI

@@ -76,7 +76,7 @@ Abstract:
 #include <Protocol/AcpiS3Save.h>
 #include <Protocol/Performance.h>
 #include <Protocol/PxeDhcp4.h>
-#include <Protocol/PxeDhcp4Callback.h>
+#include <Protocol/PxeDhcp4CallBack.h>
 #include <Protocol/UgaIo.h>
 #include <Protocol/DebugAssert.h>
 #include <Protocol/usbatapi.h>

@@ -48,7 +48,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Gpt.h</Filename>
     <Filename>Mbr.h</Filename>
     <Filename>Partition.c</Filename>
-    <Filename>Eltorito.c</Filename>
+    <Filename>ElTorito.c</Filename>
     <Filename>Gpt.c</Filename>
     <Filename>Mbr.c</Filename>
     <Filename>ComponentName.c</Filename>

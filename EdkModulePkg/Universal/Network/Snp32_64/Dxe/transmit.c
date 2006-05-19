@@ -19,7 +19,7 @@ Revision history:
 --*/
 
 
-#include "snp.h"
+#include "Snp.h"
 
 EFI_STATUS
 pxe_fillheader (

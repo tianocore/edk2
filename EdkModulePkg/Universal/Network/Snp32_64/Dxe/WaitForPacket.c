@@ -17,7 +17,7 @@ Abstract:
 --*/
 
 
-#include "snp.h"
+#include "Snp.h"
 
 VOID
 EFIAPI

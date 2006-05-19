@@ -46,7 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>FtwWorkSpace.c</Filename>
     <Filename>FtwLite.dxs</Filename>
     <Arch ArchType="IA32">
-      <Filename>ia32/Ia32FtwMisc.c</Filename>
+      <Filename>Ia32/Ia32FtwMisc.c</Filename>
     </Arch>
     <Arch ArchType="X64">
       <Filename>x64/x64FtwMisc.c</Filename>
@@ -55,7 +55,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ipf/IpfFtwMisc.c</Filename>
     </Arch>
     <Arch ArchType="EBC">
-      <Filename>ia32/Ia32FtwMisc.c</Filename>
+      <Filename>Ia32/Ia32FtwMisc.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>

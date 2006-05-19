@@ -18,7 +18,7 @@ Abstract:
 --*/
 
 
-#include "bc.h"
+#include "Bc.h"
 
 STATIC EFI_PXE_BASE_CODE_UDP_PORT DhcpServerPort        = DHCP_SERVER_PORT;
 STATIC EFI_PXE_BASE_CODE_UDP_PORT DHCPClientPort        = DHCP_CLIENT_PORT;

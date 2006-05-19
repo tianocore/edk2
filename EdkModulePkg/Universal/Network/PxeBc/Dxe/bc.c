@@ -15,7 +15,7 @@ Abstract:
 
 --*/
 
-#include "bc.h"
+#include "Bc.h"
 
 //
 //

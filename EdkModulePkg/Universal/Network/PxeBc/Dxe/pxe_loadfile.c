@@ -18,7 +18,7 @@ Abstract:
 --*/
 
 
-#include "bc.h"
+#include "Bc.h"
 
 #define DO_MENU     (EFI_SUCCESS)
 #define NO_MENU     (DO_MENU + 1)

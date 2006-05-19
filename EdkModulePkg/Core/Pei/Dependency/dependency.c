@@ -24,7 +24,7 @@ Abstract:
 --*/
 
 #include <PeiMain.h>
-#include "Dependency.h"
+#include "dependency.h"
 
 STATIC
 BOOLEAN
