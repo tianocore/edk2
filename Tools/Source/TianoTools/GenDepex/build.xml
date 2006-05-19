@@ -83,7 +83,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
-        debug="true"
+        debug="false"
         optimize="speed">
 
       <fileset dir="${basedir}/${ToolName}" 
