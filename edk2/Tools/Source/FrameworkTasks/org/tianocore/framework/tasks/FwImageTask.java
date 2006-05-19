@@ -68,9 +68,9 @@ public class FwImageTask extends Task implements EfiDefine{
         String path = project.getProperty("env.Framework_Tools_Path");
         String command;
         if (path == null) {
-            command = "fwimage";
+            command = "FwImage";
         } else {
-            command = path + "/" + "fwimage";
+            command = path + "/" + "FwImage";
         }
         //
         // argument of tools

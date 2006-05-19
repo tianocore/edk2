@@ -61,9 +61,9 @@ public class GenSectionTask extends Task implements EfiDefine {
         //
         String path = project.getProperty("env.Framework_Tools_Path");
         if (path == null) {
-            command = "gensection";
+            command = "GenSection";
         } else {
-            command = path + "/" + "gensection";
+            command = path + "/" + "GenSection";
         }
         //
         // argument of tools
