@@ -1056,9 +1056,9 @@
                                     <xs:documentation xml:lang="en">If HII is enabled, This is the offset into the variable data entry, If Vpd is enabled, then it's the Offset into the VPD area of the image defined by platform manufacturer, if neither HII nor Vpd are enabled, it's the offset into the PCD Data Area. HII and VPD can never be enabled at the same time (as of the date of this document.)</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
-                            <xs:element minOccurs="1" maxOccurs="1" name="GuidOffset" type="Hex64BitDataType">
+                            <xs:element minOccurs="0" maxOccurs="1" name="GuidOffset" type="Hex64BitDataType">
                                 <xs:annotation>
-                                    <xs:documentation xml:lang="en">This field is only valid if AlternateNameSpaceEnable is true.</xs:documentation>
+                                    <xs:documentation xml:lang="en">FIELD IS NOT USED! REMOVE in FINAL!</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element minOccurs="1" maxOccurs="1" name="DefaultValue" type="xs:normalizedString"/>
@@ -1190,9 +1190,9 @@
                                     <xs:documentation xml:lang="en">If HII is enabled, This is the offset into the variable data entry, If Vpd is enabled, then it's the Offset into the VPD area of the image defined by platform manufacturer, if neither HII nor Vpd are enabled, it's the offset into the PCD Data Area. HII and VPD can never be enabled at the same time (as of the date of this document.)</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
-                            <xs:element minOccurs="1" maxOccurs="1" name="GuidOffset" type="Hex64BitDataType">
+                            <xs:element minOccurs="0" maxOccurs="1" name="GuidOffset" type="Hex64BitDataType">
                                 <xs:annotation>
-                                    <xs:documentation xml:lang="en">This field is only valid if AlternateNameSpaceEnable is true.</xs:documentation>
+                                    <xs:documentation xml:lang="en">FIELD IS NOT USED! REMOVE in FINAL!</xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element minOccurs="1" maxOccurs="1" name="DefaultValue" type="xs:normalizedString"/>
