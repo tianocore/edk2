@@ -129,7 +129,12 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="License"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
-                <xs:element maxOccurs="0" minOccurs="1" ref="CreatedBy"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy">
+                   <xs:annotation>
+                       <xs:documentation xml:lang="en">DO NOT USE! removing from XMLSchema</xs:documentation>
+                   </xs:annotation>
+                </xs:element>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
             </xs:sequence>
