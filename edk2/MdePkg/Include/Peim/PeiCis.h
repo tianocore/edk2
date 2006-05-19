@@ -661,7 +661,7 @@ typedef struct {
 #include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SectionExtraction.h>
 #include <Ppi/Security.h>
-#include <Ppi/SmBus.h>
+#include <Ppi/Smbus.h>
 #include <Ppi/Stall.h>
 #include <Ppi/StatusCode.h>
 
