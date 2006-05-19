@@ -231,21 +231,22 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="1">
-                <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>  <!-- DO NOT USE! REMOVE in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Libraries"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="PPIs"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Variables"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="PPIs"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Variables"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>  <!-- DO NOT USE! REMOVE in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations">
+                <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
             </xs:sequence>
             <xs:attributeGroup ref="MsaAttributes"/>
         </xs:complexType>
