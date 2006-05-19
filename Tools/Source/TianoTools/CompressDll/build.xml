@@ -92,6 +92,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <syslibset libs="kernel32" unless="gcc"/>
     </cc>
     <copy file="${result}" tofile="${BIN_DIR}/CompressDll.dll"/>
+    <chmod file="${BIN_DIR}/CompressDll.dll" perm="ugo+x"/>
   </target>
   <target name="clean" depends="init">
     <echo message="Removing Intermediate Files Only"/>
