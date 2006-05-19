@@ -42,7 +42,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>DebugSupport.c</Filename>
     <Filename>DebugSupport.dxs</Filename>
     <Arch ArchType="IA32">
-      <Filename>Ia32/AsmFuncs.s</Filename>
+      <Filename>Ia32/AsmFuncs.asm</Filename>
       <Filename>Ia32/plDebugSupport.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
