@@ -321,7 +321,7 @@ DebugClearMemoryEnabled (
           _ASSERT (Guid already installed in database);                    \
         }                                                                  \
       } else {                                                             \
-        if (!EFI_ERROR (gBS->LocateProtocol (Handle, Guid, &Instance))) {  \
+        if (!EFI_ERROR (gBS->LocateProtocol (Guid, Handle, &Instance))) {  \
           _ASSERT (Guid already installed on Handle);                      \
         }                                                                  \
       }                                                                    \
