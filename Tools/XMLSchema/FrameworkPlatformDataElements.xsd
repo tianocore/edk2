@@ -245,6 +245,7 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations">
             </xs:sequence>
             <xs:attributeGroup ref="MsaAttributes"/>
         </xs:complexType>

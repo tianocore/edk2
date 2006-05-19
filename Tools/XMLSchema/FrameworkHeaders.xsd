@@ -20,7 +20,8 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="DatabaseName"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Path"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
@@ -75,7 +76,8 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="BaseName"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ModuleType"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ComponentType"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
@@ -120,13 +122,14 @@
                     </xs:annotation>
                 </xs:element>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="License"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
-                <xs:element maxOccurs="1" minOccurs="1" ref="CreatedBy"/>
+                <xs:element maxOccurs="0" minOccurs="1" ref="CreatedBy"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
             </xs:sequence>
@@ -139,7 +142,8 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="PackageName"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
