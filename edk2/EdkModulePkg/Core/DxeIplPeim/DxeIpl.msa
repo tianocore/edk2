@@ -52,20 +52,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>DxeLoad.c</Filename>
     <Filename>DxeIpl.dxs</Filename>
     <Arch ArchType="IA32">
-      <Filename>ia32/ImageRead.c</Filename>
-      <Filename>ia32/DxeLoadFunc.c</Filename>
+      <Filename>Ia32/ImageRead.c</Filename>
+      <Filename>Ia32/DxeLoadFunc.c</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>ia32/ImageRead.c</Filename>
-      <Filename>ia32/DxeLoadFunc.c</Filename>
+      <Filename>Ia32/ImageRead.c</Filename>
+      <Filename>Ia32/DxeLoadFunc.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
       <Filename>ipf/ImageRead.c</Filename>
       <Filename>ipf/DxeLoadFunc.c</Filename>
     </Arch>
     <Arch ArchType="EBC">
-      <Filename>ia32/ImageRead.c</Filename>
-      <Filename>ia32/DxeLoadFunc.c</Filename>
+      <Filename>Ia32/ImageRead.c</Filename>
+      <Filename>Ia32/DxeLoadFunc.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>
