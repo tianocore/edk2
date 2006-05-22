@@ -277,7 +277,7 @@ StrnCmp (
   ASSERT (StrSize (SecondString) != 0);
 
   while ((*FirstString != L'\0') &&
-         (*FirstString != *SecondString) &&
+         (*FirstString == *SecondString) &&
          (Length > 1)) {
     FirstString++;
     SecondString++;
@@ -696,7 +696,7 @@ AsciiStrnCmp (
   ASSERT (AsciiStrSize (SecondString));
 
   while ((*FirstString != '\0') &&
-         (*FirstString != *SecondString) &&
+         (*FirstString == *SecondString) &&
          (Length > 1)) {
     FirstString++;
     SecondString++;
