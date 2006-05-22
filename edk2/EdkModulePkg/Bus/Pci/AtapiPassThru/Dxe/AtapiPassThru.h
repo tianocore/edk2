@@ -23,7 +23,7 @@ Revision History
 #define _APT_H
 
 
-#include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/pci22.h>
 
 //
 // bit definition

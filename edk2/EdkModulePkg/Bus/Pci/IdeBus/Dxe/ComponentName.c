@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "IDEBus.h"
+#include "idebus.h"
 
 //
 // EFI Component Name Protocol

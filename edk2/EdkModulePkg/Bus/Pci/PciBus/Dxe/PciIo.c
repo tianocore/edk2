@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "Pcibus.h"
+#include "pcibus.h"
 
 //
 // Internal use only

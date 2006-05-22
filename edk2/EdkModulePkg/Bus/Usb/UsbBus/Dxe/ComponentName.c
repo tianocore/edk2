@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "UsbBus.h"
+#include "usbbus.h"
 
 //
 // EFI Component Name Functions

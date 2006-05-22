@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "PciBus.h"
+#include "pcibus.h"
 
 //
 // EFI Component Name Protocol

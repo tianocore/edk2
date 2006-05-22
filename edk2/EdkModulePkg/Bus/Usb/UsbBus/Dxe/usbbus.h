@@ -26,9 +26,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EFI_USB_BUS_H
 
 
-#include <IndustryStandard/usb.h>
-#include "Hub.h"
-#include "Usbutil.h"
+#include <IndustryStandard/Usb.h>
+#include "hub.h"
+#include "usbutil.h"
 
 //#ifdef EFI_DEBUG
 extern UINTN  gUSBDebugLevel;

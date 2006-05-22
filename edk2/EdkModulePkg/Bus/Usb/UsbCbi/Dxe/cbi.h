@@ -22,7 +22,7 @@ Abstract:
 #define _CBI_H
 
 
-#include <IndustryStandard/usb.h>
+#include <IndustryStandard/Usb.h>
 
 #define bit(a)                  (1 << (a))
 

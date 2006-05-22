@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "PciBus.h"
+#include "pcibus.h"
 #include "PciResourceSupport.h"
 #include "PciCommand.h"
 

@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _USB_MOUSE_H
 #define _USB_MOUSE_H
 
-#include <IndustryStandard/usb.h>
+#include <IndustryStandard/Usb.h>
 
 #define CLASS_HID               3
 #define SUBCLASS_BOOT           1

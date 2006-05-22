@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "Pcibus.h"
+#include "pcibus.h"
 #include "PciEnumerator.h"
 #include "PciResourceSupport.h"
 #include "PciOptionRomSupport.h"

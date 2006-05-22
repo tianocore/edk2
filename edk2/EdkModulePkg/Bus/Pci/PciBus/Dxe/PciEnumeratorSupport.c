@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "Pcibus.h"
+#include "pcibus.h"
 #include "PciEnumeratorSupport.h"
 #include "PciCommand.h"
 #include "PciIo.h"
