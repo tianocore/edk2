@@ -21,7 +21,7 @@ Revision History
 
 --*/
 
-#include "Pcibus.h"
+#include "pcibus.h"
 #include "PciHotPlugSupport.h"
 
 EFI_PCI_HOT_PLUG_INIT_PROTOCOL  *gPciHotPlugInit;

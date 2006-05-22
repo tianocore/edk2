@@ -21,7 +21,7 @@ Abstract:
 #define _BOT_H
 
 
-#include <IndustryStandard/usb.h>
+#include <IndustryStandard/Usb.h>
 
 #pragma pack(1)
 //

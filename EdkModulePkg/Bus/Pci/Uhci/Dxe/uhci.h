@@ -26,7 +26,7 @@ Revision History
  * Universal Host Controller Interface data structures and defines
  */
 
-#include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/pci22.h>
 
 #define EFI_D_UHCI  EFI_D_INFO
 

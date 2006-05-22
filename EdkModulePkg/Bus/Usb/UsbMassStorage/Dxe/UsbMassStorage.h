@@ -23,7 +23,7 @@ Revision History
 #define _USB_FLP_H
 
 
-#include <IndustryStandard/usb.h>
+#include <IndustryStandard/Usb.h>
 #include "UsbMassStorageData.h"
 
 #define CLASS_MASSTORAGE          8

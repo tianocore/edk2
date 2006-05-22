@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
-  PciBus.h
+  pcibus.h
   
 Abstract:
 
@@ -25,7 +25,7 @@ Revision History
 #define _EFI_PCI_BUS_H
 
 
-#include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/pci22.h>
 #include <IndustryStandard/Acpi.h>
 #include "ComponentName.h"
 

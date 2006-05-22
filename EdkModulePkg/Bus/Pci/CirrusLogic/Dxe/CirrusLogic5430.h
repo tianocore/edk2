@@ -29,7 +29,7 @@ Revision History
 #define _CIRRUS_LOGIC_5430_H_
 
 
-#include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/pci22.h>
 //
 // Cirrus Logic 5430 PCI Configuration Header values
 //

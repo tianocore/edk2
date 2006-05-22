@@ -29,7 +29,7 @@ Revision History
 
 
 #include "E100b.h"
-#include <IndustryStandard\pci22.h>
+#include <IndustryStandard/pci22.h>
 
 #define MAX_NIC_INTERFACES 16
 

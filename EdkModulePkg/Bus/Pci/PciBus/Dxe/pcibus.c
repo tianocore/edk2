@@ -21,7 +21,7 @@ Revision History
  
 --*/
 
-#include "PciBus.h"
+#include "pcibus.h"
 
 //
 // PCI Bus Support Function Prototypes

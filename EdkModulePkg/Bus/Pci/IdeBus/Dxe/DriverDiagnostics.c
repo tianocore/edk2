@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "IDEBus.h"
+#include "idebus.h"
 
 #define IDE_BUS_DIAGNOSTIC_ERROR  L"PCI IDE/ATAPI Driver Diagnostics Failed"
 

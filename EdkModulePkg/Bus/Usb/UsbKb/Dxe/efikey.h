@@ -22,7 +22,7 @@ Revision History
 #define _USB_KB_H
 
 
-#include <IndustryStandard/usb.h>
+#include <IndustryStandard/Usb.h>
 
 #define MAX_KEY_ALLOWED     32
 

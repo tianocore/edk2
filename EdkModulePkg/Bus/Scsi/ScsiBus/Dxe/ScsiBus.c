@@ -19,7 +19,7 @@ Abstract:
 Revision History
 --*/
 
-#include "scsibus.h"
+#include "ScsiBus.h"
 
 EFI_STATUS
 EFIAPI

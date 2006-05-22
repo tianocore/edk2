@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "IDEBus.h"
+#include "idebus.h"
 
 CHAR16 *OptionString[4] = {
   L"Enable Primary Master    (Y/N)? -->",

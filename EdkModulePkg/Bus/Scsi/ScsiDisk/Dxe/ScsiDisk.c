@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "scsidisk.h"
+#include "ScsiDisk.h"
 
 EFI_STATUS
 EFIAPI
