@@ -59,7 +59,7 @@ MicroSecondDelay (
 
   Ticks = GetPerformanceCounter ();
   Delay = GetPerformanceCounterProperties (NULL, NULL) * MicroSeconds / 1000000;
-  while (Ticks + Delay < GetPerformanceCounter ());
+  while (Ticks + Delay >= GetPerformanceCounter ());
   return (UINTN)Delay;
 }
 
@@ -84,7 +84,7 @@ NanoSecondDelay (
 
   Ticks = GetPerformanceCounter ();
   Delay = GetPerformanceCounterProperties (NULL, NULL) * NanoSeconds / 1000000000;
-  while (Ticks + Delay < GetPerformanceCounter ());
+  while (Ticks + Delay >= GetPerformanceCounter ());
   return (UINTN)Delay;
 }
 
