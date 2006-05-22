@@ -121,7 +121,6 @@ AsmPrepareThunk16 (
   ASSERT ((UINTN)ThunkContext->RealModeBuffer < 0x100000);
   ASSERT (ThunkContext->RealModeBufferSize >= m16Size);
   ASSERT ((UINTN)ThunkContext->RealModeBuffer + m16Size <= 0x100000);
-  ASSERT (((UINTN)ThunkContext->RealModeBuffer & 0x0f) == 0);
 
   CopyMem (ThunkContext->RealModeBuffer, &m16Start, m16Size);
 
@@ -201,7 +200,6 @@ AsmThunk16 (
   ASSERT ((UINTN)ThunkContext->RealModeBuffer < 0x100000);
   ASSERT (ThunkContext->RealModeBufferSize >= m16Size);
   ASSERT ((UINTN)ThunkContext->RealModeBuffer + m16Size <= 0x100000);
-  ASSERT (((UINTN)ThunkContext->RealModeBuffer & 0x0f) == 0);
 
   UpdatedRegs = InternalAsmThunk16 (
                   ThunkContext->RealModeState,
