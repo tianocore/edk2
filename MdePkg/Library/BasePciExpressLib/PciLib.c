@@ -37,8 +37,7 @@ GetPciExpressBaseAddress (
   VOID
   )
 {
-  /// @bug Change this to a PCD Get call to retrieve the PCI-E Base Address
-  return 0xc0000000;
+  return (UINTN)PcdGet64 (PcdPciExpressBaseAddress);
 }
 
 /**
