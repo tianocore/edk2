@@ -25,18 +25,18 @@ DelayWorker (
   IN      UINT64                    NDelay
   )
 {
-  UINTN                             Ticks;
+  UINT64                            Ticks;
 
-  Ticks = (UINTN)GetPerformanceCounter ();
-  Ticks -= (UINTN)DivU64x32 (
-                    MultU64x64 (
-                      GetPerformanceCounterProperties (NULL, NULL),
-                      NDelay
-                      ),
-                    1000000000u
-                    );
-  while (Ticks >= GetPerformanceCounter ());
-  return Ticks;
+  Ticks = GetPerformanceCounter ();
+  Ticks -= DivU64x32 (
+             MultU64x64 (
+               GetPerformanceCounterProperties (NULL, NULL),
+               NDelay
+               ),
+             1000000000u
+             );
+  while (Ticks <= GetPerformanceCounter ());
+  return (UINTN)Ticks;
 }
 
 /**
