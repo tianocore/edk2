@@ -373,7 +373,7 @@ public class PackagePkgHeader extends JFrame implements ActionListener {
                 strLibClass = jComboBoxSelect.getSelectedItem().toString();
             }
 
-            listItem.addElement(jTextField.getText() + Separator + strLibClass);
+            listItem.addElement(jTextField.getText().replace('\\', '/') + Separator + strLibClass);
         }
 
         if (arg0.getSource() == jButtonRemove) {

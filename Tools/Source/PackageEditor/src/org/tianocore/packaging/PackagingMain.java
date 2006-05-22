@@ -37,6 +37,8 @@ public class PackagingMain extends JFrame {
 
     static JFrame frame;
 
+    static String dirForNewSpd = null;
+
     private JPanel jContentPane = null;
 
     private JButton jButton = null;
@@ -227,6 +229,25 @@ public class PackagingMain extends JFrame {
             jButton5.setText("Create Package Description File");
             jButton5.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent e) {
+                    JFileChooser chooser = new JFileChooser(System.getenv("WORKSPACE"));
+                    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                    chooser.setMultiSelectionEnabled(false);
+                    chooser.setDialogTitle("Please specify where to save the new spd file");
+
+                    int retval = chooser.showSaveDialog(frame);
+                    if (retval == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            File theFile = chooser.getSelectedFile();
+                            PackagingMain.dirForNewSpd = theFile.getPath();
+
+                        } catch (Exception ee) {
+                            System.out.println(ee.toString());
+                        }
+//                        pThis.dispose();
+                    }
+                    else {
+                        return;
+                    }
                     SpdFileContents sfc = new SpdFileContents();
                     ModalFrameUtil.showAsModal(new PackageAction(sfc), pThis);
                 }

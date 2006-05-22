@@ -24,6 +24,7 @@ import java.awt.GridLayout;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.filechooser.FileFilter;
 
 /**
  GUI for create spd file
@@ -137,6 +138,8 @@ public class PackageAction extends JFrame {
       @return javax.swing.JButton	
      **/
     private JButton getJButton() {
+        final FileFilter filter = new PkgFileFilter("spd");
+        
         if (jButton == null) {
             jButton = new JButton();
             jButton.setText("Save");
@@ -145,8 +148,9 @@ public class PackageAction extends JFrame {
                     //
                     // save sfc contents to file
                     //
-                    JFileChooser chooser = new JFileChooser(System.getenv("WORKSPACE"));
+                    JFileChooser chooser = new JFileChooser(PackagingMain.dirForNewSpd);
                     chooser.setMultiSelectionEnabled(false);
+                    chooser.setFileFilter(filter);
 
                     int retval = chooser.showSaveDialog(frame);
                     if (retval == JFileChooser.APPROVE_OPTION) {

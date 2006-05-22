@@ -288,7 +288,7 @@ public class DbFileContents {
         p.addNewPackageName().setStringValue(name);
         p.addNewGuid().setStringValue(guid);
         p.addNewVersion().setStringValue(version);
-        p.addNewPath().setStringValue(installDir);
+        p.addNewPath().setStringValue(installDir + "/");
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date date = new Date();

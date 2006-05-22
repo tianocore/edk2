@@ -416,7 +416,7 @@ public class PackageLibraryClass extends JFrame implements ActionListener {
             if (jRadioButtonSelect.isSelected()) {
                 strLibClass = jComboBoxSelect.getSelectedItem().toString();
             }
-            listItem.addElement(jTextField.getText() + this.Separator + strLibClass);
+            listItem.addElement(jTextField.getText().replace('\\', '/') + this.Separator + strLibClass);
         }
         //
         // remove selected line
@@ -517,25 +517,40 @@ public class PackageLibraryClass extends JFrame implements ActionListener {
                     // Select files from current workspace
                     //
                     JFileChooser chooser = new JFileChooser(System.getenv("WORKSPACE"));
+                    File theFile = null;
+                    String headerDest = null;
                     
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                     int retval = chooser.showOpenDialog(frame);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
-                        File theFile = chooser.getSelectedFile();
+                        theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(System.getenv("WORKSPACE"))) {
                             JOptionPane.showMessageDialog(frame, "You can only select files in current workspace!");
                             return;
                         }
-                        //
-                        // record relative path of selected file. Assume top level package directory lies directly in workspace
-                        //
-                        int fileIndex = file.indexOf(System.getProperty("file.separator"), System.getenv("WORKSPACE").length() + 1);
-                        jTextField.setText(file.substring(fileIndex + 1));
+                        
                         
                     }
+                    else {
+                        return;
+                    }
+                    
+                    if (!theFile.getPath().startsWith(PackagingMain.dirForNewSpd)) {
+                        //
+                        //ToDo: copy elsewhere header file to new pkg dir, prompt user to chooser a location
+                        //
+                        JOptionPane.showMessageDialog(frame, "You must copy header file into current package directory!");
+                        return;
+                    }
+                    
+                    headerDest = theFile.getPath();
+                    int fileIndex = headerDest.indexOf(System.getProperty("file.separator"), PackagingMain.dirForNewSpd.length());
+                    
+                    jTextField.setText(headerDest.substring(fileIndex + 1).replace('\\', '/'));
+                        
                 }
             });
         }

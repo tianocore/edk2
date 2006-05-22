@@ -32,6 +32,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.filechooser.FileFilter;
 
 /**
  GUI for create MsaFile elements of spd file
@@ -318,6 +319,8 @@ public class PackageMsaFile extends JFrame implements ActionListener {
      @return javax.swing.JButton	
      **/
     private JButton getJButton() {
+        final FileFilter filter = new PkgFileFilter("msa");
+        
         if (jButton == null) {
             jButton = new JButton();
             jButton.setBounds(new java.awt.Rectangle(377,46,89,20));
@@ -326,23 +329,39 @@ public class PackageMsaFile extends JFrame implements ActionListener {
             jButton.addMouseListener(new java.awt.event.MouseAdapter() {
                 public void mouseClicked(java.awt.event.MouseEvent e) {
                     JFileChooser chooser = new JFileChooser(System.getenv("WORKSPACE"));
+                    File theFile = null;
+                    String msaDest = null;
                     
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                    chooser.setFileFilter(new PkgFileFilter("msa"));
+                    chooser.setFileFilter(filter);
                     int retval = chooser.showOpenDialog(frame);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
-                        File theFile = chooser.getSelectedFile();
+                        theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(System.getenv("WORKSPACE"))) {
                             JOptionPane.showMessageDialog(frame, "You can only select files in current workspace!");
                             return;
                         }
-                        int fileIndex = file.indexOf(System.getProperty("file.separator"), System.getenv("WORKSPACE").length() + 1);
-                        jTextField.setText(file.substring(fileIndex + 1));
                         
                     }
+                    else {
+                        return;
+                    }
+                    
+                    if (!theFile.getPath().startsWith(PackagingMain.dirForNewSpd)) {
+                        //
+                        //ToDo: copy elsewhere msa to new pkg dir, prompt user to chooser a location
+                        //
+                        JOptionPane.showMessageDialog(frame, "You must copy msa file into current package directory!");
+                        return;
+                    }
+                    
+                    msaDest = theFile.getPath();
+                    int fileIndex = msaDest.indexOf(System.getProperty("file.separator"), PackagingMain.dirForNewSpd.length());
+                    
+                    jTextField.setText(msaDest.substring(fileIndex + 1).replace('\\', '/'));
                 }
             });
         }
