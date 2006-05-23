@@ -53,7 +53,7 @@
 
 **/
 #define PCI_TO_CF8_ADDRESS(A) \
-  ((UINT32) ((((A) >> 4) & 0xffffff00) | ((A) & 0xfc) | 0x80000000))
+  ((UINT32) ((((A) >> 4) & 0x00ffff00) | ((A) & 0xfc) | 0x80000000))
 
 /**
   Reads an 8-bit PCI configuration register.
