@@ -11,29 +11,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <project default="GenTool" basedir=".">
 <!--
-    EDK GenFvImage Tool
+    EDK PeCoffLoader
   Copyright (c) 2006, Intel Corporation
 -->
-  <property name="ToolName" value="GenFvImage"/>
-  <property name="FileSet" value="GenFvImageLib.c GenFvImageExe.c"/>
-
   <taskdef resource="cpptasks.tasks"/>
   <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
+  <property name="LibName" value="PeCoffLoader"/>
   <property environment="env"/>
 
   <property name="LINK_OUTPUT_TYPE" value="static"/>
-  <property name="BUILD_DIR_IA32" value="${PACKAGE_DIR}/${ToolName}/tmp/Ia32"/>
-  <property name="BUILD_DIR_X64" value="${PACKAGE_DIR}/${ToolName}/tmp/X64"/>
-  <property name="BUILD_DIR_IPF" value="${PACKAGE_DIR}/${ToolName}/tmp/Ipf"/>
+  <property name="BUILD_DIR_IA32" value="${PACKAGE_DIR}/${LibName}/tmp/Ia32"/>
+  <property name="BUILD_DIR_X64" value="${PACKAGE_DIR}/${LibName}/tmp/X64"/>
+  <property name="BUILD_DIR_IPF" value="${PACKAGE_DIR}/${LibName}/tmp/Ipf"/>
 
   <target name="GenTool" depends="init, Tool">
-    <echo message="Building the EDK Tool: ${ToolName}"/>
+    <echo message="Building the EDK Tool: ${LibName}"/>
   </target>
 
   <target name="init">
-    <echo message="The EDK Tool: ${ToolName}"/>
+    <echo message="The EDK Library: ${LibName}"/>
     <mkdir dir="${BUILD_DIR_IA32}"/>
     <mkdir dir="${BUILD_DIR_X64}"/>
     <mkdir dir="${BUILD_DIR_IPF}"/>
@@ -109,12 +107,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     
   </target>
 
-  <target name="Tool" depends="init, GenFvImage, GenFvImage_Ia32, GenFvImage_X64, GenFvImage_Ipf"/>
+  <target name="Tool" depends="init, PeCoffLoader_Ia32, PeCoffLoader_Ipf, PeCoffLoader_X64"/>
 
-  <target name="GenFvImage" >
+  <target name="PeCoffLoader_Ia32" >
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
-        outfile="${BIN_DIR}/${ToolName}"
-        outtype="executable"
+        outfile="${LIB_DIR}/${LibName}_Ia32"
+        outtype="static"
         optimize="speed">
 
       <defineset>
@@ -122,88 +120,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <define name="TOOL_BUILD_IA32_TARGET"/>
       </defineset>
     
-      <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet}"/>
+      <fileset dir="${basedir}/${LibName}" 
+        includes="BasePeCoff.c Ia32/PeCoffLoaderEx.c" />
 
-      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
+      <includepath path="${PACKAGE_DIR}/${LibName}"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress PeCoffLoader_Ia32"/>
-      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
-      <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
 
-  <target name="GenFvImage_Ia32">
-    <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
-        outfile="${BIN_DIR}/${ToolName}_Ia32"
-        outtype="executable"
-        optimize="speed">
-
-      <defineset>
-        <define name="BUILDING_TOOLS"/>
-        <define name="TOOL_BUILD_IA32_TARGET"/>
-      </defineset>
-    
-      <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet}"/>
-
-      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
-      <includepath path="${PACKAGE_DIR}/Common"/>
-      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress PeCoffLoader_Ia32"/>
-      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
-      <syslibset libs="RpcRT4" unless="gcc"/>
-    </cc>
-  </target>
-
-  <target name="GenFvImage_X64">
-    <cc name="${ToolChain}" objdir="${BUILD_DIR_X64}" 
-        outfile="${BIN_DIR}/${ToolName}_X64"
-        outtype="executable"
-        optimize="speed">
-
-      <defineset>
-        <define name="BUILDING_TOOLS"/>
-        <define name="TOOL_BUILD_X64_TARGET"/>
-      </defineset>
-    
-      <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet}"/>
-
-      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
-      <includepath path="${PACKAGE_DIR}/Common"/>
-      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress PeCoffLoader_X64"/>
-      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
-      <syslibset libs="RpcRT4" unless="gcc"/>
-    </cc>
-  </target>
-
-  <target name="GenFvImage_Ipf">
+  <target name="PeCoffLoader_Ipf" >
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IPF}" 
-        outfile="${BIN_DIR}/${ToolName}_Ipf"
-        outtype="executable"
+        outfile="${LIB_DIR}/${LibName}_Ipf"
+        outtype="static"
         optimize="speed">
 
       <defineset>
@@ -211,23 +145,45 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <define name="TOOL_BUILD_IPF_TARGET"/>
       </defineset>
     
-      <fileset dir="${basedir}/${ToolName}" 
-        includes="${FileSet}"/>
+      <fileset dir="${basedir}/${LibName}" 
+        includes="BasePeCoff.c Ipf/PeCoffLoaderEx.c" />
 
-      <includepath path="${PACKAGE_DIR}/${ToolName}"/>
+      <includepath path="${PACKAGE_DIR}/${LibName}"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
       <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress PeCoffLoader_Ipf"/>
-      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
-      <syslibset libs="RpcRT4" unless="gcc"/>
     </cc>
   </target>
+
+  <target name="PeCoffLoader_X64" >
+    <cc name="${ToolChain}" objdir="${BUILD_DIR_X64}" 
+        outfile="${LIB_DIR}/${LibName}_X64"
+        outtype="static"
+        optimize="speed">
+
+      <defineset>
+        <define name="BUILDING_TOOLS"/>
+        <define name="TOOL_BUILD_X64_TARGET"/>
+      </defineset>
+    
+      <fileset dir="${basedir}/${LibName}" 
+        includes="BasePeCoff.c X64/PeCoffLoaderEx.c" />
+
+      <includepath path="${PACKAGE_DIR}/${LibName}"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
+      <includepath path="${env.WORKSPACE}/MdePkg/Include/Library"/>
+      <includepath path="${PACKAGE_DIR}/Common"/>
+    </cc>
+  </target>
+
 
   <target name="clean" depends="init">
     <echo message="Removing Intermediate Files Only"/>  
@@ -239,13 +195,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="cleanall" depends="init">
-    <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
-    <delete dir="${PACKAGE_DIR}/${ToolName}/tmp">
-      
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_Ia32${ext_exe}"/>
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_X64${ext_exe}"/>
-      <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_Ipf${ext_exe}"/>
+    <echo message="Removing Object Files and the Executable: ${LibName}${ext_exe}"/>  
+    <delete dir="${PACKAGE_DIR}/${LibName}/tmp">
     </delete>
   </target>
 
