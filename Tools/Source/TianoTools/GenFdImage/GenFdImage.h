@@ -33,11 +33,10 @@ Abstract:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <io.h>
+// #include <io.h>
 #include <assert.h>
-#include "TianoCommon.h"
 #include "ParseInf.h"
-#include "GenFvImage.h"
+// #include "GenFvImage.h"
 
 //
 // Defines

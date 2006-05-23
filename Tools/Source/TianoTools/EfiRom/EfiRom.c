@@ -33,14 +33,16 @@ Abstract:
 // #include "Compress.h"   // for compression function
 // Includes for Tiano build
 //
-#include "TianoCommon.h"
-#include "EfiImage.h" // for PE32 structure definitions
-#include "EfiCompress.h"
+#include <UefiBaseTypes.h>
+#include <EfiImage.h> // for PE32 structure definitions
+#include <EfiCompress.h>
+#include <CommonLib.h>
+#include <MultiPhase.h>
 
 //
 // END include differences
 //
-#include "Pci22.h"  // for option ROM header structures
+#include "pci22.h"  // for option ROM header structures
 //
 // Version of this utility
 //

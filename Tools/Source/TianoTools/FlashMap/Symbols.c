@@ -29,7 +29,10 @@ Abstract:
 //
 #include <ctype.h>
 
-#include "Tiano.h"
+#include <UefiBaseTypes.h>
+#include <Base.h>
+#include <CommonLib.h>
+
 #include "EfiUtilityMsgs.h"
 #include "Symbols.h"
 

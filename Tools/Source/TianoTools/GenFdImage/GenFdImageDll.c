@@ -26,11 +26,12 @@ Intel Corporation.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <io.h>
+// #include <io.h>
 #include <assert.h>
-#include "TianoCommon.h"
+#include "UefiBaseTypes.h"
+#include "Base.h"
 #include "GenFdImage.h"
-#include "GenFvImage.h"
+// #include "GenFvImage.h"
 #include "ParseInf.h"
 
 //

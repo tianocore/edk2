@@ -24,8 +24,10 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 
-#include "Tiano.h"
-#include "TianoCommon.h"
+#include <UefiBaseTypes.h>
+#include <Base.h>
+#include <CommonLib.h>
+
 #include "EfiImage.h" // for PE32 structure definitions
 #include "EfiUtilityMsgs.h"
 

@@ -28,11 +28,18 @@ Abstract:
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "Tiano.h"                  // need a guid definition
+#include <UefiBaseTypes.h>
+#include <Base.h>
+#include <CommonLib.h>
+
 #include "EfiUtilityMsgs.h"
-#include "EfiCapsule.h"
-#include "EfiFirmwareVolumeHeader.h"
-#include "EfiFirmwareFileSystem.h"  // for FV header GUID
+#include "MultiPhase.h"
+#include "Capsule.h"
+#include "Guid/Capsule.h"
+#include "FirmwareVolumeImageFormat.h"
+#include "FirmwareVolumeHeader.h"
+#include "FirmwareFileSystem.h"  // for FV header GUID
+#include "Guid/FirmwareFileSystem.h"  // for FV header GUID
 #define MAX_PATH                  256
 #define PROGRAM_NAME              "GenCapsuleHdr"
 

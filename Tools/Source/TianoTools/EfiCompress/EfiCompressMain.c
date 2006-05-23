@@ -25,7 +25,8 @@ Abstract:
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "TianoCommon.h"
+#include <UefiBaseTypes.h>
+#include <Base.h>
 #include "EfiCompress.h"
 
 int
