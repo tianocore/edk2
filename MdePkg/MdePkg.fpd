@@ -22,90 +22,862 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </Flash>
   <TianoImage>
     <SEC>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+            <Token>0x00000001</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumAsciiStringLength</C_Name>
+            <Token>0x00000002</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdSpinLockTimeout</C_Name>
+            <Token>0x00000004</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>10000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumLinkedListLength</C_Name>
+            <Token>0x00000003</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
     </SEC>
     <PEI_CORE>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+            <Token>0x00000001</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumAsciiStringLength</C_Name>
+            <Token>0x00000002</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdSpinLockTimeout</C_Name>
+            <Token>0x00000004</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>10000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumLinkedListLength</C_Name>
+            <Token>0x00000003</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
     </PEI_CORE>
     <PEIM>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+            <Token>0x00000001</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumAsciiStringLength</C_Name>
+            <Token>0x00000002</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdSpinLockTimeout</C_Name>
+            <Token>0x00000004</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>10000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumLinkedListLength</C_Name>
+            <Token>0x00000003</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
     </PEIM>
     <DXE_CORE>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+            <Token>0x00000001</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumAsciiStringLength</C_Name>
+            <Token>0x00000002</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdSpinLockTimeout</C_Name>
+            <Token>0x00000004</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>10000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumLinkedListLength</C_Name>
+            <Token>0x00000003</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
     </DXE_CORE>
     <DXE_DRIVERS>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+            <Token>0x00000001</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumAsciiStringLength</C_Name>
+            <Token>0x00000002</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdSpinLockTimeout</C_Name>
+            <Token>0x00000004</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>10000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumLinkedListLength</C_Name>
+            <Token>0x00000003</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
     </DXE_DRIVERS>
 
     <OTHER_COMPONENTS>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibRepStr" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibMmx" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibSse2" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseCacheMaintenanceLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumUnicodeStringLength</C_Name>
+            <Token>0x00000001</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumAsciiStringLength</C_Name>
+            <Token>0x00000002</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdSpinLockTimeout</C_Name>
+            <Token>0x00000004</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>10000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdMaximumLinkedListLength</C_Name>
+            <Token>0x00000003</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>1000000</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibRepStr" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibMmx" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibSse2" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseCacheMaintenanceLib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseIoLibIntrinsic" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseTimerLibLocalApic" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffGetEntryPointLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseIoLibIntrinsic" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseTimerLibLocalApic" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffGetEntryPointLib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePrintLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibNull" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePerformanceLibNull" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePcdLibNull" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibPciExpress" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibCf8" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciCf8Lib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePrintLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibNull" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugPropertyMask</C_Name>
+            <Token>0x00000005</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x0f</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="PATCHABLE_IN_MODULE">
+            <C_Name>PcdDebugPrintErrorLevel</C_Name>
+            <Token>0x00000006</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x80000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugClearMemoryValue</C_Name>
+            <Token>0x00000008</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0</MaxSku>
+            <SkuId>0</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0xAF</DefaultValue>
+          </PcdBuildData>           
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePerformanceLibNull" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
+            <Token>0x00000009</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>      
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePcdLibNull" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibPciExpress" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibCf8" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciCf8Lib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciExpressLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseSmbusLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiSmbusLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciExpressLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseSmbusLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiSmbusLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeimEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+            <Token>0x00000007</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x07</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugPropertyMask</C_Name>
+            <Token>0x00000005</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x0f</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="PATCHABLE_IN_MODULE">
+            <C_Name>PcdDebugPrintErrorLevel</C_Name>
+            <Token>0x00000006</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x80000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugClearMemoryValue</C_Name>
+            <Token>0x00000008</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0</MaxSku>
+            <SkuId>0</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0xAF</DefaultValue>
+          </PcdBuildData>           
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeimEntryPoint" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreEntryPoint" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeHobLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiHobLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreHobLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeServicesTableLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreEntryPoint" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeHobLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiHobLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreHobLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeServicesTableLib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeIoLibCpuIo" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeIoLibCpuIo" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+            <Token>0x00000007</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x07</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+            <Token>0x00000007</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x07</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiRuntimeServicesTableLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiRuntimeServicesTableLib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverModelLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiMemoryLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" >
+        <PcdBuildDeclarations>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverModelLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiMemoryLib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibStdErr" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibConOut" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxePcdLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiPcdLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeMemoryAllocationLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibStdErr" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugPropertyMask</C_Name>
+            <Token>0x00000005</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x0f</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="PATCHABLE_IN_MODULE">
+            <C_Name>PcdDebugPrintErrorLevel</C_Name>
+            <Token>0x00000006</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x80000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugClearMemoryValue</C_Name>
+            <Token>0x00000008</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0</MaxSku>
+            <SkuId>0</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0xAF</DefaultValue>
+          </PcdBuildData>   
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibConOut" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugPropertyMask</C_Name>
+            <Token>0x00000005</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x0f</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="PATCHABLE_IN_MODULE">
+            <C_Name>PcdDebugPrintErrorLevel</C_Name>
+            <Token>0x00000006</Token>
+            <DatumType>UINT32</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x80000000</DefaultValue>
+          </PcdBuildData>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdDebugClearMemoryValue</C_Name>
+            <Token>0x00000008</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0</MaxSku>
+            <SkuId>0</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0xAF</DefaultValue>
+          </PcdBuildData>           
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxePcdLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiPcdLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeMemoryAllocationLib" >
+      </ModuleSA>        
 
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryAllocationLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseUefiDecompressLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLibDevicePathProtocol" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HiiLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryAllocationLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseUefiDecompressLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLibDevicePathProtocol" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HiiLib" >
+      </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" >
+      </ModuleSA>        
     </OTHER_COMPONENTS>
   </TianoImage>
   <PcdBuildDeclarations>
