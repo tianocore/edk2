@@ -24,8 +24,6 @@ Abstract:
 #include <string.h> // for memset()
 #include <ctype.h>
 #include <stdlib.h> // for malloc()
-#define INT8    char
-#define UINT32  unsigned int
 
 #include "EfiUtilityMsgs.h"
 #include "Microcode.h"

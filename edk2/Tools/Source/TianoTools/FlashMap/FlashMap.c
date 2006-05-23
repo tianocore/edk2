@@ -24,12 +24,8 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-
-#include "Tiano.h"
-
-#ifndef INT8
-#define INT8  char
-#endif
+#include <UefiBaseTypes.h>
+#include <Base.h>
 
 #include "EfiUtilityMsgs.h"
 #include "Microcode.h"

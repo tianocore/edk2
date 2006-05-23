@@ -28,9 +28,10 @@ Abstract:
 
 #include <stdio.h>
 
-#include "EfiCommon.h"
+#include <UefiBaseTypes.h>
+#include <Base.h>
 #include "EfiImage.h"
-#include "EfiImageFormat.h"
+#include "FirmwareVolumeImageFormat.h"
 #include "EfiUtilityMsgs.c"
 
 #include "SecFixup.h"

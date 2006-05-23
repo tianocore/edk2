@@ -22,18 +22,23 @@ Abstract:
 
 --*/
 
-#include "PeiRebaseExe.h"
+#include <UefiBaseTypes.h>
+#include <Base.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "CommonLib.h"
 #include "ParseInf.h"
-#include EFI_GUID_DEFINITION (PeiPeCoffLoader)
+// #include <Guid/PeiPeCoffLoader.h>
 #include "FvLib.h"
 
 #include "EfiUtilityMsgs.h"
+#include "FirmwareFileSystem.h"
+#include "PeCoffLib.h"
 
-extern EFI_PEI_PE_COFF_LOADER_PROTOCOL  mPeCoffLoader;
+#include "PeiRebaseExe.h"
+
+extern PEI_PE_COFF_LOADER_PROTOCOL  mPeCoffLoader;
 
 EFI_STATUS
 ReadHeader (
