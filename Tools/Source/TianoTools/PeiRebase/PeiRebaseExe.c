@@ -29,7 +29,6 @@ Abstract:
 #include <string.h>
 #include "CommonLib.h"
 #include "ParseInf.h"
-// #include <Guid/PeiPeCoffLoader.h>
 #include "FvLib.h"
 
 #include "EfiUtilityMsgs.h"
@@ -37,8 +36,6 @@ Abstract:
 #include "PeCoffLib.h"
 
 #include "PeiRebaseExe.h"
-
-extern PEI_PE_COFF_LOADER_PROTOCOL  mPeCoffLoader;
 
 EFI_STATUS
 ReadHeader (
@@ -491,7 +488,7 @@ Returns:
 --*/
 {
   EFI_STATUS                            Status;
-  EFI_PEI_PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
+  PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
   UINTN                                 MemoryImagePointer;
   UINTN                                 MemoryImagePointerAligned;
   EFI_PHYSICAL_ADDRESS                  ImageAddress;
@@ -570,9 +567,9 @@ Returns:
     //
     memset (&ImageContext, 0, sizeof (ImageContext));
     ImageContext.Handle     = (VOID *) ((UINTN) CurrentPe32Section.Pe32Section + sizeof (EFI_PE32_SECTION));
-    ImageContext.ImageRead  = (EFI_PEI_PE_COFF_LOADER_READ_FILE) FfsRebaseImageRead;
+    ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) FfsRebaseImageRead;
 
-    Status                  = mPeCoffLoader.GetImageInfo (&mPeCoffLoader, &ImageContext);
+    Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
 
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "GetImageInfo() call failed on rebase", FileGuidString);
@@ -593,7 +590,7 @@ Returns:
 
     ImageContext.ImageAddress = MemoryImagePointerAligned;
 
-    Status                    = mPeCoffLoader.LoadImage (&mPeCoffLoader, &ImageContext);
+    Status                    = PeCoffLoaderLoadImage (&ImageContext);
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "LoadImage() call failed on rebase", FileGuidString);
       free ((VOID *) MemoryImagePointer);
@@ -601,7 +598,7 @@ Returns:
     }
 
     ImageContext.DestinationAddress = NewPe32BaseAddress;
-    Status                          = mPeCoffLoader.RelocateImage (&mPeCoffLoader, &ImageContext);
+    Status                          = PeCoffLoaderRelocateImage (&ImageContext);
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "RelocateImage() call failed on rebase", FileGuidString);
       free ((VOID *) MemoryImagePointer);
@@ -802,9 +799,9 @@ Returns:
     //
     memset (&ImageContext, 0, sizeof (ImageContext));
     ImageContext.Handle     = (VOID *) TEBuffer;
-    ImageContext.ImageRead  = (EFI_PEI_PE_COFF_LOADER_READ_FILE) FfsRebaseImageRead;
+    ImageContext.ImageRead  = (PE_COFF_LOADER_READ_FILE) FfsRebaseImageRead;
 
-    Status                  = mPeCoffLoader.GetImageInfo (&mPeCoffLoader, &ImageContext);
+    Status                  = PeCoffLoaderGetImageInfo (&ImageContext);
 
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "GetImageInfo() call failed on rebase of TE image", FileGuidString);
@@ -825,7 +822,7 @@ Returns:
     
 
     ImageContext.ImageAddress = MemoryImagePointerAligned;
-    Status                    = mPeCoffLoader.LoadImage (&mPeCoffLoader, &ImageContext);
+    Status                    = PeCoffLoaderLoadImage (&ImageContext);
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "LoadImage() call failed on rebase of TE image", FileGuidString);
       free (TEBuffer);
@@ -834,7 +831,7 @@ Returns:
     }
 
     ImageContext.DestinationAddress = NewPe32BaseAddress;
-    Status                          = mPeCoffLoader.RelocateImage (&mPeCoffLoader, &ImageContext);
+    Status                          = PeCoffLoaderRelocateImage (&ImageContext);
     if (EFI_ERROR (Status)) {
       Error (NULL, 0, 0, "RelocateImage() call failed on rebase of TE image", FileGuidString);
       free ((VOID *) MemoryImagePointer);

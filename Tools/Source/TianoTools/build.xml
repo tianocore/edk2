@@ -22,6 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="LIB_DIR" value="${PACKAGE_DIR}/Library" />
   <property name="BIN_DIR" value="${WORKSPACE}/Tools/bin" />
   <property name="BUILD_MODE" value="PACKAGE" />
+  <property name="Libs" 
+    value="Common/build.xml CustomizedCompress/build.xml PeCoffLoader/build.xml"/>
 
   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml" />
 
@@ -92,14 +94,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <target name="Libraries">
     <subant target="" inheritall="true">
       <fileset dir="${PACKAGE_DIR}" 
-        includes="Common/build.xml CustomizedCompress/build.xml"/>
+        includes="${Libs}"/>
     </subant>
   </target>
 
   <target name="Tools" depends="Libraries">
     <subant target="" inheritall="true">
       <fileset dir="${PACKAGE_DIR}" includes="*/build.xml"
-        excludes="Common/build.xml CustomizedCompress/build.xml"/>
+        excludes="${Libs}"/>
     </subant>
   </target>
 
