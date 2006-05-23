@@ -36,8 +36,8 @@
 ;------------------------------------------------------------------------------
 AsmCpuid    PROC    USES    rbx
     mov     eax, ecx
-    push    rdx
     push    rax                         ; save Index on stack
+    push    rdx
     cpuid
     test    r9, r9
     jz      @F
