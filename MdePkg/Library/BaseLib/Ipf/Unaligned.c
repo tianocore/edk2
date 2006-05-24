@@ -33,6 +33,8 @@ ReadUnaligned16 (
   IN      CONST UINT16              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return (UINT16)(((UINT8*)Buffer)[0] | (((UINT8*)Buffer)[1] << 8));
 }
 
@@ -58,8 +60,11 @@ WriteUnaligned16 (
   IN      UINT16                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   ((UINT8*)Buffer)[0] = (UINT8)Value;
   ((UINT8*)Buffer)[1] = (UINT8)(Value >> 8);
+
   return Value;
 }
 
@@ -82,6 +87,8 @@ ReadUnaligned24 (
   IN      CONST UINT32              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return (UINT32)(
             ReadUnaligned16 ((UINT16*)Buffer) |
             (((UINT8*)Buffer)[2] << 16)
@@ -110,6 +117,8 @@ WriteUnaligned24 (
   IN      UINT32                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   WriteUnaligned16 ((UINT16*)Buffer, (UINT16)Value);
   *(UINT8*)((UINT16*)Buffer + 1) = (UINT8)(Value >> 16);
   return Value;
@@ -134,6 +143,8 @@ ReadUnaligned32 (
   IN      CONST UINT32              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return (UINT32)(
            ReadUnaligned16 ((UINT16*)Buffer) |
            (ReadUnaligned16 ((UINT16*)Buffer + 1) << 16)
@@ -162,6 +173,8 @@ WriteUnaligned32 (
   IN      UINT32                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   WriteUnaligned16 ((UINT16*)Buffer, (UINT16)Value);
   WriteUnaligned16 ((UINT16*)Buffer + 1, (UINT16)(Value >> 16));
   return Value;
@@ -186,6 +199,8 @@ ReadUnaligned64 (
   IN      CONST UINT64              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return (UINT64)(
            ReadUnaligned32 ((UINT32*)Buffer) |
            LShiftU64 (ReadUnaligned32 ((UINT32*)Buffer + 1), 32)
@@ -214,6 +229,8 @@ WriteUnaligned64 (
   IN      UINT64                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   WriteUnaligned32 ((UINT32*)Buffer, (UINT32)Value);
   WriteUnaligned32 ((UINT32*)Buffer + 1, (UINT32)RShiftU64 (Value, 32));
   return Value;
