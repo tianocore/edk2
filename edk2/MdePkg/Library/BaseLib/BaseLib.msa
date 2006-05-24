@@ -265,6 +265,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </Arch>
     <Arch ArchType="IPF">
       <Filename>Math64.c</Filename>
+      <Filename>Ipf/PalCallStatic.s</Filename>
       <Filename>Ipf/setjmp.s</Filename>
       <Filename>Ipf/SwitchStack.s</Filename>
       <Filename>Ipf/Unaligned.c</Filename>
