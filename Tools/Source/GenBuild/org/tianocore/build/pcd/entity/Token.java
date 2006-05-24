@@ -252,11 +252,15 @@ public class Token {
         UUID  nullUUID = new UUID(0, 0);
 
         if (platformtokenSpaceName == nullUUID) {
-            return cName + "-" + tokenSpaceName.toString();
+            return cName + "_" + tokenSpaceName.toString().replace('-', '_');
         } else {
-            return cName + "-" + platformtokenSpaceName.toString();
+            return cName + "_" + platformtokenSpaceName.toString().replace('-', '_');
         }
     }
+
+		public String getPrimaryKeyString () {
+				return cName + "_" + tokenSpaceName.toString().replace('-', '_');
+		}
 
     /**
       Judge datumType is valid
@@ -634,6 +638,43 @@ public class Token {
 
         return uuid;
     }
+
+    //
+    // BugBug: We need change this algorithm accordingly when schema is updated
+    //          to support no default value.
+    //
+    public boolean hasDefaultValue () {
+
+				if (hiiEnabled) {
+						return true;
+				}
+
+				if (vpdEnabled) {
+						return true;
+				}
+
+        if (datum.toString().compareTo("NoDefault") == 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+		public boolean isStringType () {
+				String str = datum.toString();
+
+				if (datumType == Token.DATUM_TYPE.POINTER &&
+						str.startsWith("L\"") && 
+						str.endsWith("\"")) {
+						return true;
+				}
+
+				return false;
+		}
+
+		public String getStringTypeString () {                       
+				return datum.toString().substring(2, datum.toString().length() - 1);
+		}
 }
 
 

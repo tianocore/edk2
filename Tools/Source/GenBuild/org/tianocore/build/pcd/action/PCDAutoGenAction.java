@@ -190,6 +190,14 @@ public class PCDAutoGenAction extends BuildAction {
             }
         }
 
+				if (moduleName.equalsIgnoreCase("PcdPeim")) {
+						hAutoGenString += dbManager.PcdPeimHString;
+						cAutoGenString += dbManager.PcdPeimCString;
+				} else if (moduleName.equalsIgnoreCase("PcdDxe")) {
+						hAutoGenString += dbManager.PcdDxeHString;
+						cAutoGenString += dbManager.PcdDxeCString;
+				}
+
         ActionMessage.debug(this,
                             "Module " + moduleName + "'s PCD header file:\r\n" + hAutoGenString + "\r\n"
                            );
@@ -518,7 +526,9 @@ public class PCDAutoGenAction extends BuildAction {
       @param argv  paramter from command line
     **/
     public static void main(String argv[]) {
-        String logFilePath = "M:/tianocore/edk2/trunk/edk2/EdkNt32Pkg/Nt32.fpd";
+
+				String WorkSpace = "G:/edk2";
+        String logFilePath = WorkSpace  + "/EdkNt32Pkg/Nt32.fpd";
 
         //
         // At first, CollectPCDAction should be invoked to collect
@@ -526,12 +536,12 @@ public class PCDAutoGenAction extends BuildAction {
         //
         CollectPCDAction collectionAction = new CollectPCDAction();
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "M:/tianocore/edk2/trunk/edk2");
+                            WorkSpace);
 
         GlobalData.getPCDMemoryDBManager().setLogFileName(logFilePath + ".PCDMemroyDatabaseLog.txt");
 
         try {
-            collectionAction.perform("M:/tianocore/edk2/trunk/edk2", 
+            collectionAction.perform(WorkSpace, 
                                      logFilePath,
                                      ActionMessage.MAX_MESSAGE_LEVEL);
         } catch(Exception e) {
@@ -541,10 +551,16 @@ public class PCDAutoGenAction extends BuildAction {
         //
         // Then execute the PCDAuotoGenAction to get generated Autogen.h and Autogen.c
         //
-        PCDAutoGenAction autogenAction = new PCDAutoGenAction("PcdEmulator",
-                                                              true
+        PCDAutoGenAction autogenAction = new PCDAutoGenAction("PcdDxe",
+																															false
                                                               );
-        autogenAction.execute();
+				autogenAction.execute();
+
+				System.out.println(autogenAction.OutputH());
+				System.out.println("WQWQWQWQWQ");
+				System.out.println(autogenAction.OutputC());
+
+
         System.out.println (autogenAction.hAutoGenString);
         System.out.println (autogenAction.cAutoGenString);
 
