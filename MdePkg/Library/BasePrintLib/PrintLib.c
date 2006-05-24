@@ -133,7 +133,7 @@ BasePrintLibVSPrint (
   //
   // Get the first character from the format string
   //
-  FormatCharacter = (*Format | (*(Format + 1) << 8)) & FormatMask;
+  FormatCharacter = (*Format | (*(Format - 1) << 8)) & FormatMask;
 
   //
   // Loop until the end of the format string is reached or the output buffer is full
@@ -333,17 +333,17 @@ BasePrintLibVSPrint (
             0, 
             0,
             "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
-            TmpGuid->Data1,                    
-            TmpGuid->Data2,
-            TmpGuid->Data3,
-            TmpGuid->Data4[0],
-            TmpGuid->Data4[1],
-            TmpGuid->Data4[2],
-            TmpGuid->Data4[3],
-            TmpGuid->Data4[4],
-            TmpGuid->Data4[5],
-            TmpGuid->Data4[6],
-            TmpGuid->Data4[7]
+            (UINTN) TmpGuid->Data1,
+            (UINTN) TmpGuid->Data2,
+            (UINTN) TmpGuid->Data3,
+            (UINTN) TmpGuid->Data4[0],
+            (UINTN) TmpGuid->Data4[1],
+            (UINTN) TmpGuid->Data4[2],
+            (UINTN) TmpGuid->Data4[3],
+            (UINTN) TmpGuid->Data4[4],
+            (UINTN) TmpGuid->Data4[5],
+            (UINTN) TmpGuid->Data4[6],
+            (UINTN) TmpGuid->Data4[7]
             );
           ArgumentString = ValueBuffer;
         }
@@ -359,11 +359,11 @@ BasePrintLibVSPrint (
             0,
             0,
             "%02d/%02d/%04d  %02d:%02d",
-            TmpTime->Month,
-            TmpTime->Day,
-            TmpTime->Year,
-            TmpTime->Hour,
-            TmpTime->Minute
+            (UINTN) TmpTime->Month,
+            (UINTN) TmpTime->Day,
+            (UINTN) TmpTime->Year,
+            (UINTN) TmpTime->Hour,
+            (UINTN) TmpTime->Minute
             );
           ArgumentString = ValueBuffer;
         }
