@@ -30,16 +30,6 @@ import java.util.Map;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.pcd.action.ActionMessage;
 
-class AlignmentSizeComp implements Comparator {
-    public int compare (Object a, Object b) {
-        Token tA = (Token) a;
-        Token tB = (Token) b;
-
-        return Token.getAutogendatumTypeAlignmentSize(tA.datumType) 
-                - Token.getAutogendatumTypeAlignmentSize(tB.datumType);
-    }
-}
-
 /** Database hold all PCD information comes from SPD, MSA, FPD file in memory.
 **/
 public class MemoryDatabaseManager {
