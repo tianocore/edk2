@@ -19,10 +19,12 @@ if [ "$JAVA_HOME" == "" ]
 then
   echo "Please set JAVA_HOME before sourcing this script."
 else
+if [ "$ANT_HOME" == "" ]
+then
+  echo "Please set ANT_HOME before sourcing this script."
+else
 
 # These should be ok as they are.
-#export ANT_HOME=$WORKSPACE/Tools/bin/apache-ant
-#export XMLBEANS_HOME=$WORKSPACE/Tools/bin/xmlbeans
 export CLASSPATH=$WORKSPACE/Tools/Jars/SurfaceArea.jar:$WORKSPACE/Tools/Jars/frameworktasks.jar:$WORKSPACE/Tools/Jars/saxon8.jar:$WORKSPACE/Tools/Jars/cpptasks.jar:$WORKSPACE/Tools/Jars/GenBuild.jar:$XMLBEANS_HOME/lib/resolver.jar:$XMLBEANS_HOME/lib/xbean.jar:$XMLBEANS_HOME/lib/xmlpublic.jar:$XMLBEANS_HOME/lib/jsr173_1.0_api.jar:$XMLBEANS_HOME/lib/saxon8.jar:$XMLBEANS_HOME/lib/xbean_xpath.jar
 export Framework_Tools_Path=$WORKSPACE/Tools/bin
 export PATH=$Framework_Tools_Path:$ANT_HOME/bin:$JAVA_HOME/bin:$PATH
@@ -38,5 +40,6 @@ esac
 
 # Now we need to build the tools.
 echo "If you have not done so, please build the tools by issuing 'ant -f \$WORKSPACE/Tools/build.xml'."
+fi
 fi
 fi
