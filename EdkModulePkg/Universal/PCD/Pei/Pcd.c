@@ -1,5 +1,4 @@
-/** @file
-PCD PEIM
+/** @file PCD PEIM
 
 Copyright (c) 2006, Intel Corporation                                                         
 All rights reserved. This program and the accompanying materials                          
@@ -15,7 +14,7 @@ Module Name: Pcd.c
 
 **/
 
-#include "../Common/PcdCommon.h"
+#include "PcdCommon.h"
 #include "Service.h"
 
 
@@ -75,12 +74,9 @@ PcdPeimInit (
   )
 {
   EFI_STATUS Status;
-  UINT8      *PcdImage;
 
-  PcdImage = (UINT8 *) LocatePcdImage ();
-
-  BuildPcdDatabase (PcdImage);
-
+  BuildPcdDatabase ();
+  
   Status = PeiCoreInstallPpi (&mPpiPCD);
 
   ASSERT_EFI_ERROR (Status);
@@ -88,25 +84,16 @@ PcdPeimInit (
   return EFI_SUCCESS;
 }
 
-
-
 EFI_STATUS
 EFIAPI
 PeiPcdSetSku (
   IN  UINTN                  SkuId
   )
 {
-  PCD_DATABASE      *Database;
-  EFI_HOB_GUID_TYPE *GuidHob;
 
-  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  ASSERT (GuidHob != NULL);
-  
-  Database = (PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
+  GetPcdDatabase()->Init.SystemSkuId = (SKU_ID) SkuId;
 
-  Database->Info.SkuId = SkuId;
-
-  return SkuId;
+  return  EFI_SUCCESS;
 }
 
 
@@ -117,7 +104,7 @@ PeiPcdGet8 (
   IN UINTN  TokenNumber
   )
 {
-  return PeiPcdGet8Ex (NULL, TokenNumber);
+  return *((UINT8 *) GetWorker (TokenNumber, sizeof (UINT8)));
 }
 
 
@@ -128,7 +115,7 @@ PeiPcdGet16 (
   IN UINTN  TokenNumber
   )
 {
-  return PeiPcdGet16Ex (NULL, TokenNumber);
+  return ReadUnaligned16 (GetWorker (TokenNumber, sizeof (UINT16)));
 }
 
 
@@ -139,7 +126,7 @@ PeiPcdGet32 (
   IN UINTN  TokenNumber
   )
 {
-  return PeiPcdGet32Ex (NULL, TokenNumber);
+  return ReadUnaligned32 (GetWorker (TokenNumber, sizeof (UINT32)));
 }
 
 
@@ -150,7 +137,7 @@ PeiPcdGet64 (
   IN UINTN  TokenNumber
   )
 {
-  return PeiPcdGet64Ex (NULL, TokenNumber);
+  return ReadUnaligned64 (GetWorker (TokenNumber, sizeof (UINT64)));
 }
 
 
@@ -161,7 +148,7 @@ PeiPcdGetPtr (
   IN UINTN  TokenNumber
   )
 {
-  return PeiPcdGetPtrEx (NULL, TokenNumber);
+  return GetWorker (TokenNumber, 0);
 }
 
 
@@ -172,7 +159,7 @@ PeiPcdGetBool (
   IN UINTN  TokenNumber
   )
 {
-  return PeiPcdGetBoolEx (NULL, TokenNumber);
+  return *((BOOLEAN *) GetWorker (TokenNumber, sizeof (BOOLEAN)));
 }
 
 
@@ -183,7 +170,9 @@ PeiPcdGetSize (
   IN UINTN  TokenNumber
   )
 {
-  return PeiPcdGetSizeEx (NULL, TokenNumber);
+  ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+
+  return GetPcdDatabase()->Init.SizeTable[TokenNumber];
 }
 
 
@@ -192,14 +181,10 @@ UINT8
 EFIAPI
 PeiPcdGet8Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN  ExTokenNumber
   )
 {
-  UINT8 Data;
-  
-  PeiGetPcdEntryWorker (TokenNumber, Guid, PcdByte8, &Data);
-  
-  return Data;
+  return *((UINT8 *) ExGetWorker (Guid, ExTokenNumber, sizeof (UINT8)));
 }
 
 
@@ -208,14 +193,10 @@ UINT16
 EFIAPI
 PeiPcdGet16Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN  ExTokenNumber
   )
 {
-  UINT16 Data;
-  
-  PeiGetPcdEntryWorker (TokenNumber, Guid, PcdByte16, &Data);
-  
-  return Data;
+  return ReadUnaligned16 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT16)));
 }
 
 
@@ -224,14 +205,10 @@ UINT32
 EFIAPI
 PeiPcdGet32Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN  ExTokenNumber
   )
 {
-  UINT32 Data;
-  
-  PeiGetPcdEntryWorker (TokenNumber, Guid, PcdByte32, &Data);
-  
-  return Data;
+  return ReadUnaligned32 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT32)));
 }
 
 
@@ -240,14 +217,10 @@ UINT64
 EFIAPI
 PeiPcdGet64Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN  ExTokenNumber
   )
 {
-  UINT64 Data;
-  
-  PeiGetPcdEntryWorker (TokenNumber, Guid, PcdByte64, &Data);
-  
-  return Data;
+  return ReadUnaligned64 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT64)));
 }
 
 
@@ -256,14 +229,10 @@ VOID *
 EFIAPI
 PeiPcdGetPtrEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN  ExTokenNumber
   )
 {
-  VOID *Data;
-  
-  PeiGetPcdEntryWorker (TokenNumber, Guid, PcdPointer, &Data);
-  
-  return Data;
+  return ExGetWorker (Guid, ExTokenNumber, 0);
 }
 
 
@@ -272,14 +241,10 @@ BOOLEAN
 EFIAPI
 PeiPcdGetBoolEx (
   IN CONST  EFI_GUID        *Guid,
-  IN UINTN                  TokenNumber
+  IN UINTN                  ExTokenNumber
   )
 {
-  BOOLEAN Data;
-  
-  PeiGetPcdEntryWorker (TokenNumber, Guid, PcdBoolean, &Data);
-  
-  return Data;
+  return *((BOOLEAN *) ExGetWorker (Guid, ExTokenNumber, sizeof (BOOLEAN)));
 }
 
 
@@ -288,10 +253,14 @@ UINTN
 EFIAPI
 PeiPcdGetSizeEx (
   IN CONST  EFI_GUID        *Guid,
-  IN UINTN                  TokenNumber
+  IN UINTN                  ExTokenNumber
   )
 {
-  return PeiGetPcdEntrySizeWorker (TokenNumber, Guid);
+  EX_PCD_ENTRY_ATTRIBUTE      Attr;
+
+  GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
+  
+  return Attr.Size;
 }
 
 
@@ -303,7 +272,7 @@ PeiPcdSet8 (
   IN UINT8             Value
   )
 {
-  return PeiPcdSet8Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -315,7 +284,7 @@ PeiPcdSet16 (
   IN UINT16             Value
   )
 {
-  return PeiPcdSet16Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -327,7 +296,7 @@ PeiPcdSet32 (
   IN UINT32             Value
   )
 {
-  return PeiPcdSet32Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -339,7 +308,7 @@ PeiPcdSet64 (
   IN UINT64             Value
   )
 {
-  return PeiPcdSet64Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -350,7 +319,12 @@ PeiPcdSetPtr (
   IN CONST VOID         *Value
   )
 {
-  return PeiPcdSetPtrEx (NULL, TokenNumber, Value);
+  //
+  // BugBug, please change the Size to Input size when sync with spec
+  //
+  //ASSERT (sizeof (Value) == GetPcdDatabase()->Init.SizeTable[TokenNumber]);
+
+  return SetWorker (TokenNumber, (VOID *) Value, GetPcdDatabase()->Init.SizeTable[TokenNumber], TRUE);
 }
 
 
@@ -362,7 +336,7 @@ PeiPcdSetBool (
   IN BOOLEAN            Value
   )
 {
-  return PeiPcdSetBoolEx (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -371,11 +345,17 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet8Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  TokenNumber,
+  IN UINTN                  ExTokenNumber,
   IN UINT8                  Value
   )
 {
-  return PeiSetPcdEntryWorker (TokenNumber, Guid, PcdByte8, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -384,11 +364,17 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet16Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  TokenNumber,
+  IN UINTN                  ExTokenNumber,
   IN UINT16                 Value
   )
 {
-  return PeiSetPcdEntryWorker (TokenNumber, Guid, PcdByte16, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -397,11 +383,17 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet32Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  TokenNumber,
+  IN UINTN                  ExTokenNumber,
   IN UINT32                 Value
   )
 {
-  return PeiSetPcdEntryWorker (TokenNumber, Guid, PcdByte32, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -410,11 +402,17 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet64Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  TokenNumber,
+  IN UINTN                  ExTokenNumber,
   IN UINT64                 Value
   )
 {
-  return PeiSetPcdEntryWorker (TokenNumber, Guid, PcdByte64, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -423,11 +421,17 @@ EFI_STATUS
 EFIAPI
 PeiPcdSetPtrEx (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  TokenNumber,
+  IN UINTN                  ExTokenNumber,
   IN CONST VOID             *Value
   )
 {
-  return PeiSetPcdEntryWorker (TokenNumber, Guid, PcdPointer, (VOID *)Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              (VOID *) Value, 
+                              sizeof (Value), 
+                              TRUE
+                              );
 }
 
 
@@ -436,12 +440,17 @@ EFI_STATUS
 EFIAPI
 PeiPcdSetBoolEx (
   IN CONST EFI_GUID       *Guid,
-  IN UINTN                TokenNumber,
+  IN UINTN                ExTokenNumber,
   IN BOOLEAN              Value
   )
 {
-  return PeiSetPcdEntryWorker (TokenNumber, Guid, PcdBoolean, &Value);
-
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -450,12 +459,12 @@ PeiPcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 PcdRegisterCallBackOnSet (
-  IN  UINTN                       TokenNumber,
+  IN  UINTN                       ExTokenNumber,
   IN  CONST EFI_GUID              *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
-  return PeiRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction, TRUE);
+  return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, TRUE);
 }
 
 
@@ -463,12 +472,12 @@ PcdRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PcdUnRegisterCallBackOnSet (
-  IN  UINTN                       TokenNumber,
+  IN  UINTN                       ExTokenNumber,
   IN  CONST EFI_GUID              *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
-  return PeiRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction, FALSE);
+  return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, FALSE);
 }
 
 
@@ -480,7 +489,19 @@ PeiPcdGetNextToken (
   IN OUT  UINTN                   *TokenNumber
   )
 {
-  return PeiGetNextTokenWorker (TokenNumber, Guid);
+  if (Guid == NULL) {
+    *TokenNumber++;
+
+    if (*TokenNumber >= PEI_LOCAL_TOKEN_NUMBER) {
+      *TokenNumber = 0;
+    }
+  }
+
+  //
+  // BugBug: Haven't implemented the portion to get Next Token for GuidSpace is not Local GuidSpace.
+  //
+
+  return EFI_SUCCESS;
 }
 
 
