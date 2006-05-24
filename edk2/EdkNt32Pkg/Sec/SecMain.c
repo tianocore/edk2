@@ -159,8 +159,8 @@ Returns:
   CHAR16                *MemorySizeStr;
   CHAR16                *FirmwareVolumesStr;
 
-  MemorySizeStr      = (CHAR16 *)FixedPcdGetPtr (PcdWinNtMemorySize);
-  FirmwareVolumesStr = (CHAR16 *)FixedPcdGetPtr (PcdWinNtFirmwareVolume);
+  MemorySizeStr      = (CHAR16 *)PcdGetPtr (PcdWinNtMemorySizeForSecMain);
+  FirmwareVolumesStr = (CHAR16 *)PcdGetPtr (PcdWinNtFirmwareVolume);
 
   printf ("\nEDK SEC Main NT Emulation Environment from www.TianoCore.org\n");
 
