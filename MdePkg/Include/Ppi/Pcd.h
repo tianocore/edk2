@@ -22,6 +22,8 @@ extern EFI_GUID gPcdPpiGuid;
 #define PCD_PPI_GUID \
   { 0x632df884, 0x8023, 0x4872, { 0xb6, 0x70, 0xb7, 0x4a, 0x30, 0x19, 0x16, 0xe9 } }
 
+typedef UINT8   SKU_ID;
+
 typedef 
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_SKU) (

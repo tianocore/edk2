@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -42,6 +42,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <Includes>
     <PackageName>MdePkg</PackageName>
   </Includes>
+  <Protocols>
+    <Protocol Usage="ALWAYS_CONSUMED">Pcd</Protocol>
+  </Protocols>
   <Externs>
     <Extern>
       <Constructor>PcdLibConstructor</Constructor>
