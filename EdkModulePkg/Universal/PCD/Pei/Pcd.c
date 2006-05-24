@@ -14,7 +14,6 @@ Module Name: Pcd.c
 
 **/
 
-#include "PcdCommon.h"
 #include "Service.h"
 
 
