@@ -141,6 +141,12 @@ _ToUserCode PROC
     call    @Base                       ; push eip
 @Base:
     pop     bp                          ; ebp <- offset @Base
+    DB      67h                         ; address size override
+    push    [esp + sizeof (IA32_REGS) + 2]
+    lea     eax, [esi + (offset @RealMode - offset @Base)]
+    push    eax
+    retf
+@RealMode:
     mov     cs:[esi + (offset SavedSs - offset @Base)], edx
     mov     cs:[esi + (offset SavedEsp - offset @Base)], bx
     DB      66h
@@ -208,7 +214,9 @@ InternalAsmThunk16  PROC    USES    ebp ebx esi edi ds  es  fs  gs
     push    10h
     pop     ecx                         ; ecx <- selector for data segments
     lgdt    fword ptr [edx + (offset _16Gdtr - offset SavedCr0)]
+    pushfd
     call    fword ptr [edx + (offset _EntryPoint - offset SavedCr0)]
+    popfd
     lidt    fword ptr [esp + 36]        ; restore protected mode IDTR
     lea     eax, [ebp - sizeof (IA32_REGS)]
     ret

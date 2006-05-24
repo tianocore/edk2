@@ -95,6 +95,10 @@ AsmGetThunk16Properties (
   ASSERT (ExtraStackSize != NULL);
 
   *RealModeBufferSize = m16Size;
+
+  //
+  // Extra 4 bytes for return address, and another 4 bytes for mode transition
+  //
   *ExtraStackSize = sizeof (IA32_DWORD_REGS) + 8;
 }
 
