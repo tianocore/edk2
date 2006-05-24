@@ -33,6 +33,8 @@ ReadUnaligned16 (
   IN      CONST UINT16              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer;
 }
 
@@ -58,6 +60,8 @@ WriteUnaligned16 (
   IN      UINT16                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer = Value;
 }
 
@@ -80,6 +84,8 @@ ReadUnaligned24 (
   IN      CONST UINT32              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer & 0xffffff;
 }
 
@@ -105,6 +111,8 @@ WriteUnaligned24 (
   IN      UINT32                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer = BitFieldWrite32 (*Buffer, 0, 23, Value);
 }
 
@@ -127,6 +135,8 @@ ReadUnaligned32 (
   IN      CONST UINT32              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer;
 }
 
@@ -152,6 +162,8 @@ WriteUnaligned32 (
   IN      UINT32                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer = Value;
 }
 
@@ -174,6 +186,8 @@ ReadUnaligned64 (
   IN      CONST UINT64              *Buffer
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer;
 }
 
@@ -199,5 +213,7 @@ WriteUnaligned64 (
   IN      UINT64                    Value
   )
 {
+  ASSERT (Buffer != NULL);
+
   return *Buffer = Value;
 }
