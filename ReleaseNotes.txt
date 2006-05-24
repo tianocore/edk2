@@ -199,6 +199,10 @@ After running the setup command, you can build individual packages.
 The EdkNt32Pkg has a special target; "run" that will execute the Nt32 emulation
 platform under Microsoft Windows.
 
+To exit the Nt32 emulation platform, you may type reset at the EFI Shell>
+command prompt.  Alternately, you may use the Graphical interface, Boot
+Maintenance Manager screen's Reset System command.
+
 ------------------------
 Individual Module Builds
 ------------------------
