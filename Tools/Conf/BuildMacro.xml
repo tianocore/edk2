@@ -283,6 +283,64 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </macrodef>
 
   <!--
+    GCC Assembly
+    -->
+  <macrodef name="Build_GCC_Assembly_Code">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="s"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+
+    <sequential>
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
+
+      <if>
+        <available type="file" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
+        <then>
+          <makedeps DepsFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep">
+            <input file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            <includepath path="${WORKSPACE_DIR}"/>
+            <includepath path="${MODULE_DIR}"/>
+            <includepath path="${MODULE_DIR}/${ARCH}"/>
+            <EXTRA.INC/>
+          </makedeps>
+        </then>
+      </if>
+
+      <OnDependency>
+        <sourcefiles>
+          <file listfile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}.dep"/>
+        </sourcefiles>
+        <targetfiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
+        </targetfiles>
+
+        <sequential>
+      
+          <cc userdefine="on">
+            <command type="ASM" includepathDelimiter="-I">
+              <EXTRA.INC/>
+      
+              <argument value="${ASM_FLAGS}"/>
+              <EXTRA.ARG/>
+              <!-- <argument value="-o ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/> -->
+              <OutputFile value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
+      
+              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            </command>
+          </cc>
+        </sequential>
+      </OnDependency>
+      <!--
+        for library generation later
+        -->
+      <bl NAME="OBJECTS" VALUE="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
+    </sequential>
+  </macrodef>
+
+  <!--
     IPF Assembly
     -->
   <macrodef name="Build_IPF_Assembly_Code">
