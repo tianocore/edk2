@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -70,12 +70,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </Externs>
   <PCDs>
     <PcdData ItemType="FIXED_AT_BUILD">
-      <C_Name>PcdWinNtCpuSpeed</C_Name>
-      <Token>0x00001008</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="FIXED_AT_BUILD">
-      <C_Name>PcdWinNtMemorySize</C_Name>
+      <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
       <Token>0x00001005</Token>
       <DatumType>VOID*</DatumType>
     </PcdData>

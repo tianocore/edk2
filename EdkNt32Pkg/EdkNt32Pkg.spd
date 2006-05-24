@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -283,38 +283,44 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>UINT8</DatumType>
       <DefaultValue>0</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtPhysicalDisk</C_Name>
       <Token>0x00001000</Token>
       <DatumType>VOID*</DatumType>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtVirtualDisk</C_Name>
       <Token>0x00001001</Token>
       <DatumType>VOID*</DatumType>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtSerialPort</C_Name>
       <Token>0x00001002</Token>
       <DatumType>VOID*</DatumType>
       <DefaultValue>L"COM1!COM2"</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtUga</C_Name>
       <Token>0x00001003</Token>
       <DatumType>VOID*</DatumType>
       <DefaultValue>L"UGA Window 1!UGA Window 2"</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtFileSystem</C_Name>
       <Token>0x00001004</Token>
       <DatumType>VOID*</DatumType>
       <DefaultValue>L".!C:\\D\\work\\Remodel\\mdk\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySize</C_Name>
+      <Token>0x00001005</Token>
+      <DatumType>VOID*</DatumType>
+      <DefaultValue>L"64!64"</DefaultValue>
+    </PcdEntry>
+    <PcdEntry ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
       <Token>0x00001005</Token>
       <DatumType>VOID*</DatumType>
       <DefaultValue>L"64!64"</DefaultValue>
@@ -325,13 +331,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>UINT32</DatumType>
       <DefaultValue>1</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuModel</C_Name>
       <Token>0x00001007</Token>
       <DatumType>VOID*</DatumType>
       <DefaultValue>L"Intel(R) Processor Model"</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuSpeed</C_Name>
       <Token>0x00001008</Token>
       <DatumType>VOID*</DatumType>
@@ -343,7 +349,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <DefaultValue>L"..\\..\\Fv\\Fv_Recovery.fd"</DefaultValue>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry ItemType="DYNAMIC">
       <C_Name>PcdWinNtConsole</C_Name>
       <Token>0x0000100a</Token>
       <DatumType>VOID*</DatumType>
