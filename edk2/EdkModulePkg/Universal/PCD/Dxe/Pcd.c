@@ -15,7 +15,6 @@ Module Name: Pcd.c
 
 **/
 
-#include "../Common/PcdCommon.h"
 #include "Service.h"
 
 
@@ -70,9 +69,19 @@ PcdDxeInit (
   IN EFI_SYSTEM_TABLE     *SystemTable
   )
 {
-  EFI_STATUS  Status;
+  EFI_STATUS          Status;
+
+  //
+  // Make sure the Pcd Protocol is not already installed in the system
+  //
   
-  InitPcdDxeDataBase ();
+  ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gPcdProtocolGuid);
+  
+  BuildPcdDxeDataBase ();
+
+  //
+  // BugBug Check if PcdDatabase is already installed.
+  //
   
   Status = gBS->InstallProtocolInterface (
                   &NewHandle,
@@ -91,10 +100,10 @@ PcdDxeInit (
 EFI_STATUS
 EFIAPI
 DxePcdSetSku (
-  IN  UINTN                  SkuId
+  IN  UINTN        SkuId
   )
 {
-  return DxeSetSku(SkuId);
+  return gPcdDatabase->PeiDb.Init.SystemSkuId = (SKU_ID) SkuId;
 }
 
 
@@ -102,10 +111,12 @@ DxePcdSetSku (
 UINT8
 EFIAPI
 DxePcdGet8 (
-  IN UINTN  TokenNumber
+  IN UINTN         TokenNumber
   )
 {
-  return DxePcdGet8Ex (NULL, TokenNumber);
+  ASSERT (sizeof (UINT8) == DxePcdGetSize (TokenNumber));
+  
+  return *((UINT8 *) GetWorker (TokenNumber));
 }
 
 
@@ -113,10 +124,12 @@ DxePcdGet8 (
 UINT16
 EFIAPI
 DxePcdGet16 (
-  IN UINTN  TokenNumber
+  IN UINTN         TokenNumber
   )
 {
-  return DxePcdGet16Ex (NULL, TokenNumber);
+  ASSERT (sizeof (UINT16) == DxePcdGetSize (TokenNumber));
+  
+  return ReadUnaligned16 (GetWorker (TokenNumber));
 }
 
 
@@ -124,10 +137,12 @@ DxePcdGet16 (
 UINT32
 EFIAPI
 DxePcdGet32 (
-  IN UINTN  TokenNumber
+  IN UINTN         TokenNumber
   )
 {
-  return DxePcdGet32Ex (NULL, TokenNumber);
+  ASSERT (sizeof (UINT32) == DxePcdGetSize (TokenNumber));
+  
+  return ReadUnaligned32 (GetWorker (TokenNumber));
 }
 
 
@@ -135,10 +150,12 @@ DxePcdGet32 (
 UINT64
 EFIAPI
 DxePcdGet64 (
-  IN UINTN  TokenNumber
+  IN UINTN          TokenNumber
   )
 {
-  return DxePcdGet32Ex (NULL, TokenNumber);
+  ASSERT (sizeof (UINT64) == DxePcdGetSize (TokenNumber));
+  
+  return ReadUnaligned64(GetWorker (TokenNumber));
 }
 
 
@@ -146,10 +163,10 @@ DxePcdGet64 (
 VOID *
 EFIAPI
 DxePcdGetPtr (
-  IN UINTN  TokenNumber
+  IN UINTN          TokenNumber
   )
 {
-  return DxePcdGetPtrEx (NULL, TokenNumber);
+  return GetWorker (TokenNumber);
 }
 
 
@@ -157,10 +174,12 @@ DxePcdGetPtr (
 BOOLEAN
 EFIAPI
 DxePcdGetBool (
-  IN UINTN  TokenNumber
+  IN UINTN          TokenNumber
   )
 {
-  return DxePcdGetBoolEx (NULL, TokenNumber);
+  ASSERT (sizeof (BOOLEAN) == DxePcdGetSize (TokenNumber));
+  
+  return *((BOOLEAN *) GetWorker (TokenNumber));
 }
 
 
@@ -168,10 +187,18 @@ DxePcdGetBool (
 UINTN
 EFIAPI
 DxePcdGetSize (
-  IN UINTN  TokenNumber
+  IN UINTN          TokenNumber
   )
 {
-  return  DxePcdGetSizeEx (NULL, TokenNumber);
+  UINT16 * SizeTable;
+
+  SizeTable = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? gPcdDatabase->PeiDb.Init.SizeTable :
+                                                    gPcdDatabase->DxeDb.Init.SizeTable;
+
+
+  TokenNumber = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TokenNumber : (TokenNumber - PEI_LOCAL_TOKEN_NUMBER);
+
+  return SizeTable[TokenNumber];
 }
 
 
@@ -179,15 +206,11 @@ DxePcdGetSize (
 UINT8
 EFIAPI
 DxePcdGet8Ex (
-  IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN CONST EFI_GUID         *Guid,
+  IN UINTN                  ExTokenNumber
   )
 {
-  UINT8 Data;
-
-  DxeGetPcdEntryWorker (TokenNumber, Guid, PcdByte8, &Data);
-
-  return Data;
+  return *((UINT8 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT8)));
 }
 
 
@@ -196,14 +219,10 @@ UINT16
 EFIAPI
 DxePcdGet16Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN                 ExTokenNumber
   )
 {
-  UINT16 Data;
-
-  DxeGetPcdEntryWorker (TokenNumber, Guid, PcdByte16, &Data);
-
-  return Data;
+  return *((UINT16 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT16)));
 }
 
 
@@ -212,14 +231,10 @@ UINT32
 EFIAPI
 DxePcdGet32Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN                  ExTokenNumber
   )
 {
-  UINT32 Data;
-
-  DxeGetPcdEntryWorker (TokenNumber, Guid, PcdByte32, &Data);
-
-  return Data;
+  return *((UINT32 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT32)));
 }
 
 
@@ -228,14 +243,13 @@ UINT64
 EFIAPI
 DxePcdGet64Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN                  ExTokenNumber
   )
 {
-  UINT64 Data;
-
-  DxeGetPcdEntryWorker (TokenNumber, Guid, PcdByte64, &Data);
-
-  return Data;
+  //
+  // BugBug: Must be changed to ReadUnaligned64
+  //
+  return *((UINT64 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT64)));
 }
 
 
@@ -244,14 +258,10 @@ VOID *
 EFIAPI
 DxePcdGetPtrEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN                  ExTokenNumber
   )
 {
-  VOID *Data;
-
-  DxeGetPcdEntryWorker (TokenNumber, Guid, PcdPointer, &Data);
-
-  return Data;
+  return ExGetWorker (Guid, ExTokenNumber, 0);
 }
 
 
@@ -260,12 +270,10 @@ BOOLEAN
 EFIAPI
 DxePcdGetBoolEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN                  ExTokenNumber
   )
 {
-  BOOLEAN Data;
-  DxeGetPcdEntryWorker (TokenNumber, Guid, PcdBoolean, &Data);
-  return Data;
+  return *((BOOLEAN *) ExGetWorker (Guid, ExTokenNumber, sizeof(BOOLEAN)));
 }
 
 
@@ -274,10 +282,14 @@ UINTN
 EFIAPI
 DxePcdGetSizeEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber
+  IN UINTN                  ExTokenNumber
   )
 {
-  return DxeGetPcdEntrySizeWorker (TokenNumber, Guid);
+  EX_PCD_ENTRY_ATTRIBUTE    Attr;
+  
+  GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
+
+  return Attr.Size;
 }
 
 
@@ -285,11 +297,11 @@ DxePcdGetSizeEx (
 EFI_STATUS
 EFIAPI
 DxePcdSet8 (
-  IN UINTN  TokenNumber,
-  IN UINT8             Value
+  IN UINTN              TokenNumber,
+  IN UINT8              Value
   )
 {
-  return DxePcdSet8Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -297,11 +309,11 @@ DxePcdSet8 (
 EFI_STATUS
 EFIAPI
 DxePcdSet16 (
-  IN UINTN  TokenNumber,
+  IN UINTN              TokenNumber,
   IN UINT16             Value
   )
 {
-  return DxePcdSet16Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -309,11 +321,11 @@ DxePcdSet16 (
 EFI_STATUS
 EFIAPI
 DxePcdSet32 (
-  IN UINTN  TokenNumber,
+  IN UINTN              TokenNumber,
   IN UINT32             Value
   )
 {
-  return DxePcdSet32Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -321,11 +333,11 @@ DxePcdSet32 (
 EFI_STATUS
 EFIAPI
 DxePcdSet64 (
-  IN UINTN  TokenNumber,
-  IN UINT64            Value
+  IN UINTN              TokenNumber,
+  IN UINT64             Value
   )
 {
-  return DxePcdSet64Ex (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -333,11 +345,16 @@ DxePcdSet64 (
 EFI_STATUS
 EFIAPI
 DxePcdSetPtr (
-  IN UINTN  TokenNumber,
-  IN CONST VOID        *Value
+  IN UINTN              TokenNumber,
+  IN CONST VOID         *Value
   )
 {
-  return DxePcdSetPtrEx (NULL, TokenNumber, Value);
+  //
+  // BugBug, please change the Size to Input size when sync with spec
+  //
+  //ASSERT (sizeof (Value) == DxePcdGetSize (TokenNumber));
+
+  return SetWorker (TokenNumber, (VOID *)Value, DxePcdGetSize (TokenNumber), TRUE);
 }
 
 
@@ -345,11 +362,11 @@ DxePcdSetPtr (
 EFI_STATUS
 EFIAPI
 DxePcdSetBool (
-  IN UINTN  TokenNumber,
-  IN BOOLEAN           Value
+  IN UINTN              TokenNumber,
+  IN BOOLEAN            Value
   )
 {
-  return DxePcdSetBoolEx (NULL, TokenNumber, Value);
+  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
 }
 
 
@@ -358,11 +375,17 @@ EFI_STATUS
 EFIAPI
 DxePcdSet8Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber,
-  IN UINT8             Value
+  IN UINTN                  ExTokenNumber,
+  IN UINT8                  Value
   )
 {
-  return DxeSetPcdEntryWorker (TokenNumber, Guid, PcdByte8, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -371,11 +394,17 @@ EFI_STATUS
 EFIAPI
 DxePcdSet16Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber,
+  IN UINTN  ExTokenNumber,
   IN UINT16            Value
   )
 {
-  return DxeSetPcdEntryWorker (TokenNumber, Guid, PcdByte16, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -384,11 +413,17 @@ EFI_STATUS
 EFIAPI
 DxePcdSet32Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber,
+  IN UINTN  ExTokenNumber,
   IN UINT32             Value
   )
 {
-  return DxeSetPcdEntryWorker (TokenNumber, Guid, PcdByte32, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -397,11 +432,17 @@ EFI_STATUS
 EFIAPI
 DxePcdSet64Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber,
+  IN UINTN  ExTokenNumber,
   IN UINT64            Value
   )
 {
-  return DxeSetPcdEntryWorker (TokenNumber, Guid, PcdByte64, &Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              FALSE
+                              );
 }
 
 
@@ -410,11 +451,17 @@ EFI_STATUS
 EFIAPI
 DxePcdSetPtrEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber,
+  IN UINTN  ExTokenNumber,
   IN CONST VOID        *Value
   )
 {
-  return DxeSetPcdEntryWorker (TokenNumber, Guid, PcdPointer, Value);
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              (VOID *) Value, 
+                              sizeof (Value), 
+                              TRUE
+                              );
 }
 
 
@@ -423,12 +470,17 @@ EFI_STATUS
 EFIAPI
 DxePcdSetBoolEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  TokenNumber,
+  IN UINTN  ExTokenNumber,
   IN BOOLEAN           Value
   )
 {
-  return DxeSetPcdEntryWorker (TokenNumber, Guid, PcdBoolean, &Value);
-
+  return          ExSetWorker(
+                              ExTokenNumber, 
+                              Guid,
+                              &Value, 
+                              sizeof (Value), 
+                              TRUE
+                              );
 }
 
 

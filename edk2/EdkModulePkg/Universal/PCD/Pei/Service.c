@@ -14,273 +14,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 Module Name: Service.c
 
 **/
-#include "../Common/PcdCommon.h"
 #include "Service.h"
 
 
+//
+// Build Tool will generate PEI_PCD_DB_INIT_VALUE in Autogen.h
+//
+/* PEI_PCD_DATABASE_INIT
+gPEIPcdDbInit = {
+  PEI_PCD_DB_INIT_VALUE
+};
+*/
 
-
-/**
-  This function expand the StateByte
-
-  @param[out]   StateByte The output StateByte information.
-  @param[in]    Byte The StateByte.
-
-  @retval       VOID
---*/
-VOID
-PcdImageExpandStateByte (
-  OUT PCD_STATEBYTE *StateByte,
-  IN  UINT8          Byte
-)
-{
-  switch (Byte & PCD_STATEBYTE_DATUMTYPE) {
-    case PCD_BYTE8:
-      StateByte->DataType = PcdByte8;
-      break;
-    case PCD_BYTE16:
-      StateByte->DataType = PcdByte16;
-      break;
-    case PCD_BYTE32:
-      StateByte->DataType = PcdByte32;
-      break;
-    case PCD_BYTE64:
-      StateByte->DataType = PcdByte64;
-      break;
-    case PCD_POINTER:
-      StateByte->DataType = PcdPointer;
-      break;
-    case PCD_BOOLEAN:
-      StateByte->DataType = PcdBoolean;
-      break;
-    default:
-      ASSERT (FALSE);
-  }
-
-  StateByte->ExtendedGuidPresent = (BOOLEAN) ((Byte & PCD_STATEBYTE_EXTENDEDGUIDPRESENT) != 0);
-  StateByte->HiiEnable           = (BOOLEAN) ((Byte & PCD_STATEBYTE_HIIENABLE)           != 0);
-  StateByte->SkuDataArrayEnable  = (BOOLEAN) ((Byte & PCD_STATEBYTE_SKUDATAARRAYENABLE)  != 0);
-  StateByte->SkuEnable           = (BOOLEAN) ((Byte & PCD_STATEBYTE_SKUENABLE)           != 0);
-  StateByte->VpdEnable           = (BOOLEAN) ((Byte & PCD_STATEBYTE_VPDENABLE)           != 0);
-
-}
-
-
-
-/**
-  This function locates the <PCD_IMAGE> on the flash and 
-  return a pointer to the Section Data on flash.
-
-  @param[in]  VOID
-
-  @retval     VOID
---*/
-UINT8 *
-LocatePcdImage (
-  VOID
-)
-{
-  EFI_STATUS                 Status;
-  EFI_FIRMWARE_VOLUME_HEADER *FvHdr;
-  EFI_FFS_FILE_HEADER        *FfsHdr;
-  VOID                       *SectionData;
-
-  Status = PeiCoreFfsFindNextVolume (0, &FvHdr);
-  ASSERT_EFI_ERROR (Status);
-
-  do {
-    FfsHdr = NULL;
-    Status = PeiCoreFfsFindNextFile (EFI_FV_FILETYPE_FREEFORM, FvHdr, &FfsHdr);
-    if (Status == EFI_SUCCESS) {
-      if (CompareGuid (&gPcdImageFileGuid, &FfsHdr->Name)) {
-
-        Status = PeiCoreFfsFindSectionData (EFI_SECTION_RAW, FfsHdr, &SectionData);
-        ASSERT_EFI_ERROR (Status);
-
-        return (UINT8 *)SectionData;
-      }
-    }
-  } while (Status == EFI_SUCCESS);
-
-  ASSERT (FALSE);
-
-  return NULL;
-}
-
-/**
-  The function retrieves the PCD data value according to
-  TokenNumber and Guid space given.
-
-  @param[in]  TokenNumber The token number.
-  @param[in]  Guid The Guid space.
-  @param[in]  Type The storage type.
-  @param[out] Data The output data.
-
-
-  @retval EFI_SUCESS    If data value is found according to SKU_ID.
-  @retval EFI_NOT_FOUND If not such a value is found.
-
---*/
-VOID
-PeiGetPcdEntryWorker (
-  IN UINTN TokenNumber,
-  IN CONST EFI_GUID       *Guid,  OPTIONAL
-  IN PCD_DATA_TYPE        Type,
-  OUT VOID                *Data
-  )
-{
-  PCD_DATABASE *Database;
-  EFI_HOB_GUID_TYPE *GuidHob;
-
-  ASSERT (Data != NULL);
-
-  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  ASSERT (GuidHob != NULL);
-
-  Database = GET_GUID_HOB_DATA (GuidHob);
-
-  GetPcdEntryWorker ( &Database->Info,
-                      TokenNumber,
-                      Guid,
-                      Type,
-                      Data
-                      );
-
-
-  return;
-}
-
-
-/**
-  The function set the PCD data value according to
-  TokenNumber and Guid space given.
-
-  @param[in] Database     The PCD Database Instance.
-  @param[in] TokenNumber  The token number.
-  @param[in] Guid         The Guid space.
-  @param[in] Type         The storage type.
-  @param[in] Data         The output data.
-
-
-  @retval EFI_SUCESS      If data value is found according to SKU_ID.
-  @retval EFI_NOT_FOUND   If not such a value is found.
-
---*/
-EFI_STATUS
-SetPcdEntryWorker (
-  IN CONST PCD_DATABASE     *Database,
-  IN UINTN                  TokenNumber,
-  IN CONST EFI_GUID         *Guid,  OPTIONAL
-  IN PCD_DATA_TYPE          Type,
-  IN VOID                   *Data
-  )
-{
-  PCD_INDEX               *PcdIndex;
-  EFI_STATUS              Status;
-  PCD_PPI_CALLBACK        *CallbackTable;
-  UINTN                   Idx;
-
-  ASSERT (Data != NULL);
-
-  //
-  // Find the PCD entry in list in memory first
-  //
-  PcdIndex = FindPcdIndex (TokenNumber, Guid, &Database->Info, &Idx);
-
-  ASSERT (PcdIndex != NULL);
-
-  ASSERT (PcdIndex->StateByte.DataType == Type);
-
-  //
-  // Invoke the callback function.
-  //
-  CallbackTable = (PCD_PPI_CALLBACK *)
-                              GetAbsoluteAddress (Idx * Database->Info.MaxCallbackNum * sizeof(PCD_PPI_CALLBACK),
-                              Database->Info.CallbackTableOffset,
-                              &Database->Info
-                              );
-  
-  for (Idx = 0; Idx < Database->Info.MaxCallbackNum; Idx++) {
-    if (CallbackTable[Idx] != NULL) {
-      CallbackTable[Idx] (Guid,
-                          PcdIndex->TokenNumber,
-                          Data,
-                          PcdIndex->DatumSize
-                          );
-    }
-  }
-
-  Status = SetPcdData (PcdIndex, &Database->Info, Data);
-
-  return Status;
-}
-
-
-
-/**
-  (reviewed) The function set the PCD data value according to
-  TokenNumber and Guid space given.
-
-  @param[in] TokenNumber  The token number.
-  @param[in] Guid         The Guid space.
-  @param[in] Type         The storage type.
-  @param[in] Data         The output data.
-
-
-  @retval EFI_SUCESS    If data value is found according to SKU_ID.
-  @retval EFI_NOT_FOUND If not such a value is found.
-
---*/
-EFI_STATUS
-PeiSetPcdEntryWorker (
-  IN UINTN TokenNumber,
-  IN CONST EFI_GUID       *Guid,  OPTIONAL
-  IN PCD_DATA_TYPE        Type,
-  IN VOID                 *Data
-  )
-{
-  PCD_DATABASE *Database;
-  EFI_HOB_GUID_TYPE *GuidHob;
-
-  ASSERT (Data != NULL);
-
-  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  ASSERT (GuidHob != NULL);
-  
-  Database = GET_GUID_HOB_DATA (GuidHob);
-
-  SetPcdEntryWorker (Database,
-                     TokenNumber,
-                     Guid,
-                     Type,
-                     Data
-                     );
-
-  return EFI_SUCCESS;
-}
-
-
-
-UINTN
-PeiGetPcdEntrySizeWorker (
-  IN UINTN                TokenNumber,
-  IN CONST EFI_GUID       *Guid  OPTIONAL
-  )
-{
-  PCD_DATABASE      *Database;
-  EFI_HOB_GUID_TYPE *GuidHob;
-
-  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  ASSERT (GuidHob != NULL);
-
-  Database = GET_GUID_HOB_DATA (GuidHob);
-
-  return GetPcdEntrySizeWorker (&Database->Info,
-                                TokenNumber,
-                                Guid
-                                );
-
-}
 
 
 
@@ -297,45 +42,43 @@ PeiGetPcdEntrySizeWorker (
 --*/
 EFI_STATUS
 PeiRegisterCallBackWorker (
-  IN  UINTN                       TokenNumber,
+  IN  UINTN                       ExTokenNumber,
   IN  CONST EFI_GUID              *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK            CallBackFunction,
   IN  BOOLEAN                     Register
 )
 {
-  PCD_DATABASE        *Database;
-  EFI_HOB_GUID_TYPE   *GuidHob;
-  PCD_INDEX           *PcdIndex;
-  UINTN               Idx;
-  PCD_PPI_CALLBACK    *CallbackTable;
-  PCD_PPI_CALLBACK    Compare;
-  PCD_PPI_CALLBACK    Assign;
+  EFI_HOB_GUID_TYPE       *GuidHob;
+  PCD_PPI_CALLBACK        *CallbackTable;
+  PCD_PPI_CALLBACK        Compare;
+  PCD_PPI_CALLBACK        Assign;
+  UINT32                  LocalTokenNumber;
+  UINTN                   TokenNumber;
+  UINTN                   Idx;
+  EX_PCD_ENTRY_ATTRIBUTE  Attr;
 
-  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  ASSERT (GuidHob != NULL);
-  
-  Database = GET_GUID_HOB_DATA (GuidHob);
-
-  PcdIndex = FindPcdIndex (TokenNumber, Guid, &Database->Info, NULL);
-
-  ASSERT (PcdIndex != NULL);
-
-  if (PcdIndex->StateByte.VpdEnable) {
-    return EFI_INVALID_PARAMETER;
+  if (Guid == NULL) {
+    TokenNumber = ExTokenNumber;
+    ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+    LocalTokenNumber = GetPcdDatabase()->Init.LocalTokenNumberTable[TokenNumber];
+  } else {
+    GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
+    TokenNumber = Attr.TokenNumber;
+    LocalTokenNumber = Attr.LocalTokenNumberAlias;
   }
 
-  Idx = ((UINTN) PcdIndex - Database->Info.CallbackTableOffset) / sizeof(PCD_INDEX);
+  ASSERT ((LocalTokenNumber & PCD_TYPE_HII) == 0);
+  ASSERT ((LocalTokenNumber & PCD_TYPE_VPD) == 0);
 
-  CallbackTable = (PCD_PPI_CALLBACK *) GetAbsoluteAddress (
-                                              sizeof (PCD_PPI_CALLBACK) * Idx * Database->Info.MaxCallbackNum,
-                                              Database->Info.CallbackTableOffset,
-                                              &Database->Info
-                                              );
+  GuidHob = GetFirstGuidHob (&gPcdPeiCallbackFnTableHobGuid);
+  ASSERT (GuidHob != NULL);
+  
+  CallbackTable = GET_GUID_HOB_DATA (GuidHob);
 
   Compare = Register? NULL: CallBackFunction;
   Assign  = Register? CallBackFunction: NULL;
 
-  for (Idx = 0; Idx < Database->Info.MaxCallbackNum; Idx++) {
+  for (Idx = 0; Idx < FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
     if (CallbackTable[Idx] == Compare) {
       CallbackTable[Idx] = Assign;
       return EFI_SUCCESS;
@@ -348,298 +91,6 @@ PeiRegisterCallBackWorker (
 
 
 
-EFI_STATUS
-PeiGetNextTokenWorker (
-  IN OUT UINTN                *TokenNumber,
-  IN CONST EFI_GUID           *Guid     OPTIONAL
-  )
-{
-  PCD_DATABASE        *Database;
-  EFI_HOB_GUID_TYPE   *GuidHob;
-
-  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  ASSERT (GuidHob != NULL);
-  
-  Database = GET_GUID_HOB_DATA (GuidHob);
-
-  return GetNextTokenWorker (&Database->Info,
-                             TokenNumber,
-                             Guid
-                             );
-
-}
-
-
-
-VOID
-GetPcdImageInfo (
-  IN CONST UINT8          *PcdImageOnFlash,
-  OUT PCD_IMAGE_RECORD    *ImageInfo
-)
-{
-  PCD_FFS_ENCODING *PcdFfsHdr;
-
-  PcdFfsHdr = (PCD_FFS_ENCODING *) PcdImageOnFlash;
-
-  ZeroMem (ImageInfo, sizeof (*ImageInfo));
-
-  ImageInfo->ImageStart = PcdImageOnFlash;
-
-  CopyMem (&ImageInfo->EntryCount,              PcdFfsHdr->EntryCount,         3);
-  
-  CopyMem (&ImageInfo->GlobalDatumLength,       PcdFfsHdr->GlobalDatumLength,  1);
-  ASSERT  (ImageInfo->GlobalDatumLength <= 3);
-  
-  CopyMem (&ImageInfo->GlobalOffsetLength,      PcdFfsHdr->GlobalOffsetLength, 1);
-  ASSERT  (ImageInfo->GlobalOffsetLength <= 3);
-  
-  CopyMem (&ImageInfo->GlobalTokenLength,       PcdFfsHdr->GlobalTokenLength,  1);
-  ASSERT  (ImageInfo->GlobalTokenLength <= 4);
-
-  CopyMem (&ImageInfo->GlobalGuidTabIdxLength,  PcdFfsHdr->GuidLength,         1);
-  ASSERT  (ImageInfo->GlobalGuidTabIdxLength <= 2);
-
-  CopyMem (&ImageInfo->GlobalStrTabIdxLength,   PcdFfsHdr->GlobalStrTabIdxLength, 1);
-  ASSERT  (ImageInfo->GlobalStrTabIdxLength <= 2);
-
-  CopyMem (&ImageInfo->ImageLength,             PcdFfsHdr->ImageLength,        3);
-  CopyMem (&ImageInfo->IndexLength,             PcdFfsHdr->PcdIndexLength,     3);
-  CopyMem (&ImageInfo->WholeDataDefaultLength,  PcdFfsHdr->WholeDataBufferLength, 3);
-  CopyMem (&ImageInfo->DataDefaultLength,       PcdFfsHdr->DataBufferLength, 3);
-  CopyMem (&ImageInfo->GuidTableLength,         PcdFfsHdr->GuidTableLength,  3);
-
-  ImageInfo->StringTableLength = ImageInfo->ImageLength
-                                  - sizeof (PCD_FFS_ENCODING)
-                                  - ImageInfo->DataDefaultLength
-                                  - ImageInfo->IndexLength
-                                  - ImageInfo->GuidTableLength;
-
-  ImageInfo->DataDefaultStart = PcdImageOnFlash + sizeof (PCD_FFS_ENCODING);
-  ImageInfo->IndexStart       = ImageInfo->DataDefaultStart + ImageInfo->DataDefaultLength;
-  ImageInfo->GuidTableStart   = (CONST EFI_GUID *)(ImageInfo->IndexStart + ImageInfo->IndexLength);
-  ImageInfo->StringTableStart = (CONST UINT16 *) ((UINT8 *) ImageInfo->GuidTableStart + ImageInfo->GuidTableLength);
-  
-  return;
-}
-
-
-
-/**
-  The function builds the PCD database based on the
-  PCD_IMAGE on the flash.
-
-  The layout of the PCD_DATABASE is as follows:
-
-  ---------------------------
-  |  PCD_DATABASE_HEADER    |
-  ---------------------------
-  |  GUID_TABLE             |  Aligned on GUID    (128 bits)
-  ---------------------------
-  |  PCD_CALL_BACK_TABLE    |  Aligned on Pointer (32 bits or 64 bits)
-  ---------------------------
-  |  PCD_INDEX_TABLE        |  Aligned on PCD_INDEX (see PCD_INDEX's declaration)
-  ---------------------------
-  |  IMAGE_STRING_TABLE     |  Aligned on 16 Bits
-  ---------------------------
-  |  IMAGE_PCD_INDEX        |  Unaligned
-  ---------------------------
-  |  Data Defaults          |  Unaligned
-  ---------------------------
-  |  Data Buffer            |
-  |  for entries without    |
-  |  defaults               |
-  ---------------------------
-
-  @param[in] PcdImageOnFlash  The PCD image on flash.
-
-  @retval VOID
---*/
-UINTN
-GetPcdDatabaseLen (
-  IN CONST UINT8          *PcdImageOnFlash,
-  OUT PCD_DATABASE_HEADER *Info,
-  OUT PCD_IMAGE_RECORD    *ImageInfo
-  )
-{
-  UINTN DatabaseLen;
-  UINTN DatabaseHeaderLength;
-  UINTN PcdIndexLength;
-  UINTN CallbackBufferLength;
-
-
-  GetPcdImageInfo (PcdImageOnFlash, ImageInfo);
-
-  Info->MaxCallbackNum = FixedPcdGet32(PcdMaxPcdCallBackNumber) ;
-
-  DatabaseHeaderLength = sizeof (PCD_DATABASE) - sizeof(UINT8);
-
-  PcdIndexLength       = sizeof (PCD_INDEX) * ImageInfo->EntryCount;
-  CallbackBufferLength = sizeof (PCD_PPI_CALLBACK) * Info->MaxCallbackNum * ImageInfo->EntryCount;
-
-  Info->EntryCount          = ImageInfo->EntryCount;
-  Info->GuidTableOffset     = DatabaseHeaderLength;
-  Info->CallbackTableOffset = Info->GuidTableOffset + ImageInfo->GuidTableLength;
-  Info->PcdIndexOffset      = Info->PcdIndexOffset + PcdIndexLength;
-  Info->ImageIndexOffset    = Info->CallbackTableOffset + CallbackBufferLength;
-  Info->DataBufferOffset    = Info->ImageIndexOffset + ImageInfo->DataDefaultLength;
-
-  Info->HiiGuidOffsetLength = ImageInfo->GlobalGuidTabIdxLength;
-  Info->HiiVariableOffsetLength = ImageInfo->GlobalStrTabIdxLength;
-  Info->ExtendedOffsetLength    = ImageInfo->GlobalOffsetLength;
-
-  Info->SkuId = 0;
-
-  DatabaseLen = DatabaseHeaderLength
-              + ImageInfo->GuidTableLength
-              + PcdIndexLength
-              + CallbackBufferLength
-              + ImageInfo->IndexLength
-              + ImageInfo->WholeDataDefaultLength;
-
-  Info->DatabaseLen = DatabaseLen;
-
-  return DatabaseLen;
-}
-
-
-/**
-  The function constructs a single PCD_INDEX according a index in
-  <PCD_IMAGE>.
-
-  @param[in] ImageIndex  The starting address of a PCD index defined in PCD spec 0.51.
-  @param[in] Index       The output PCD_INDEX. 
-  @param[in] ImageInfo   The attributes of the PCD_IMAGE as this binary stream is highly
-                          optimized for size.
-
-  @retval UINTN The length of the current PCD index.
-**/
-UINTN
-BuildPcdIndex (
-  IN CONST UINT8            *ImageIndex,
-  OUT PCD_INDEX             *Index,
-  IN CONST PCD_IMAGE_RECORD *ImageInfo
-)
-{
-  UINTN       SkuCount;
-  CONST UINT8 *ImageIndexBackUp;
-
-  ImageIndexBackUp = ImageIndex;
-  
-  //
-  // Token Number
-  //
-  CopyMem (&Index->TokenNumber,
-            ImageIndex,
-            ImageInfo->GlobalTokenLength
-            );
-
-  ImageIndex += ImageInfo->GlobalTokenLength;
-  
-  //
-  // State Byte
-  //
-  PcdImageExpandStateByte (&Index->StateByte,
-                           *ImageIndex
-                           );
-
-  ImageIndex += 1;
-  
-  //
-  // Dataum Size
-  //
-  CopyMem (&Index->DatumSize,
-          ImageIndex,
-          ImageInfo->GlobalDatumLength
-          );
-
-  ImageIndex += ImageInfo->GlobalDatumLength;
-
-  //
-  // SKU_DATA
-  //
-  if (Index->StateByte.SkuEnable) {
-    Index->SkuCount     = *ImageIndex;
-    SkuCount            = *ImageIndex;
-    ImageIndex++;
-    Index->SkuIdArray   = (UINT32) ImageIndex - (UINT32) ImageInfo->IndexStart;
-    ImageIndex         += Index->SkuCount;
-  } else {
-    //
-    // There is always a default SKU_ID of zero even 
-    // if SKU is not enabled for this PCD entry.
-    // 
-    //
-    SkuCount = 1;
-  }
-
-  //
-  // Extended Offset
-  //
-  CopyMem (&Index->ExtendedDataOffset,
-           ImageIndex,
-           ImageInfo->GlobalOffsetLength
-           );
-
-  ImageIndex += ImageInfo->GlobalOffsetLength * SkuCount;
-
-  //
-  // DynamicEX Guid Offset
-  //
-  if (Index->StateByte.ExtendedGuidPresent) {
-    CopyMem (&Index->DynamicExGuid,
-             ImageIndex,
-             ImageInfo->GlobalGuidTabIdxLength
-             );
-
-    ImageIndex += ImageInfo->GlobalGuidTabIdxLength;
-  }
-
-  //
-  // HII_DATA
-  //
-  if (Index->StateByte.HiiEnable) {
-    Index->HiiData = (UINT32) ImageIndex - (UINT32) ImageInfo->IndexStart;
-    ImageIndex += ((ImageInfo->GlobalStrTabIdxLength + ImageInfo->GlobalGuidTabIdxLength) * SkuCount);
-  }
-
-  return (UINTN) (ImageIndex - ImageIndexBackUp);
-}
-
-
-
-
-/**
-  The function builds the PCD database based on the
-  PCD_IMAGE on the flash.
-
-  @param[in] Database  The database instance.
-  @param[in] ImageIndex The starting address of a PCD index defined in PCD spec 0.51.
-  @param[in] ImageInfo The attributes of the PCD_IMAGE as this binary stream is highly
-              optimized for size.
-
-  @retval VOID
-**/
-VOID
-BuildPcdDatabaseIndex (
-  PCD_DATABASE     *Database,
-  UINT8            *ImageIndex,
-  PCD_IMAGE_RECORD *ImageInfo
-  )
-{
-  UINTN     Idx;
-  UINTN     Len;
-  PCD_INDEX *IndexTable;
-
-  IndexTable = (PCD_INDEX *) GetAbsoluteAddress (0, Database->Info.PcdIndexOffset, Database);
-
-  for (Idx = 0; Idx < Database->Info.EntryCount; Idx++) {
-    Len = BuildPcdIndex (ImageIndex, &IndexTable[Idx], ImageInfo);
-    ImageIndex += Len;
-  }
-
-  return;
-}
-
 
 /**
   The function builds the PCD database based on the
@@ -651,70 +102,29 @@ BuildPcdDatabaseIndex (
 --*/
 VOID
 BuildPcdDatabase (
-  UINT8 *PcdImageOnFlash
+  VOID
   )
 {
-  PCD_DATABASE        *Database;
-  UINTN               Len;
-  PCD_IMAGE_RECORD    ImageInfo;
-  UINT8               *ImageIndex;
-  PCD_DATABASE_HEADER DatabaseHeader;
-
-  Len = GetPcdDatabaseLen(PcdImageOnFlash, &DatabaseHeader, &ImageInfo);
-
-  Database = BuildGuidHob (&gPcdDataBaseHobGuid, Len);
-  ASSERT (Database != NULL);
-
-  ZeroMem (Database, Len);
-
-  //
-  // Update Database header
-  //
-  CopyMem (&Database->Info, &DatabaseHeader, sizeof (DatabaseHeader));
-
-  //
-  // I need this to get the GuidTableOffset as we don't
-  // know if Database field of PCD_DATABASE starts from an aligned
-  // address. The compilor may add padding after PCD_DATABASE_HEADER field.
-  //
-  Database->Info.GuidTableOffset = ((UINTN) &Database->GuidTable) - (UINTN)Database;
+  PEI_PCD_DATABASE  *Database;
+  VOID              *CallbackFnTable;
+  UINTN             SizeOfCallbackFnTable;
   
-  //
-  // Copy Guid Table from Flash
-  //
-  CopyMem ((UINT8 *) Database + Database->Info.GuidTableOffset,
-            ImageInfo.GuidTableStart,
-            ImageInfo.GuidTableLength
-            );
+  Database = BuildGuidHob (&gPcdDataBaseHobGuid, sizeof (PEI_PCD_DATABASE));
+
+  ZeroMem (Database, sizeof (PEI_PCD_DATABASE));
 
   //
-  // Copy ImageIndex from Flash
+  // gPEIPcdDbInit is smaller than PEI_PCD_DATABASE
   //
-  CopyMem ((UINT8 *) Database + Database->Info.ImageIndexOffset,
-            ImageInfo.IndexStart,
-            ImageInfo.IndexLength
-            );
+  
+  CopyMem (&Database->Init, &gPEIPcdDbInit, sizeof (gPEIPcdDbInit));
 
-  //
-  // Copy Default Value
-  //
-  CopyMem ((UINT8 *) Database + Database->Info.DataBufferOffset,
-           ImageInfo.DataDefaultStart,
-           ImageInfo.DataDefaultLength
-           );
+  SizeOfCallbackFnTable = PEI_LOCAL_TOKEN_NUMBER * sizeof (PCD_PPI_CALLBACK) * FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry);
 
-  //
-  // Copy String Table
-  //
-  CopyMem ((UINT8 *) Database + Database->Info.StringTableOffset,
-           ImageInfo.StringTableStart,
-           ImageInfo.StringTableLength
-           );
-
-  ImageIndex = GetAbsoluteAddress (0, Database->Info.ImageIndexOffset, Database);
-
-  BuildPcdDatabaseIndex (Database, ImageIndex, &ImageInfo);
-
+  CallbackFnTable = BuildGuidHob (&gPcdPeiCallbackFnTableHobGuid, SizeOfCallbackFnTable);
+  
+  ZeroMem (CallbackFnTable, SizeOfCallbackFnTable);
+  
   return;
 }
 
@@ -734,10 +144,10 @@ BuildPcdDatabase (
 --*/
 EFI_STATUS
 GetHiiVariable (
-  IN  EFI_GUID     *VariableGuid,
-  IN  UINT16       *VariableName,
-  OUT VOID         **VariableData,
-  OUT UINTN        *VariableSize
+  IN  CONST EFI_GUID      *VariableGuid,
+  IN  UINT16              *VariableName,
+  OUT VOID                **VariableData,
+  OUT UINTN               *VariableSize
   )
 {
   UINTN      Size;
@@ -753,7 +163,7 @@ GetHiiVariable (
   Status = VariablePpi->PeiGetVariable (
                           GetPeiServicesTablePointer (),
                           VariableName,
-                          VariableGuid,
+                          (EFI_GUID *) VariableGuid,
                           NULL,
                           &Size,
                           NULL
@@ -768,7 +178,7 @@ GetHiiVariable (
   Status = VariablePpi->PeiGetVariable (
                             GetPeiServicesTablePointer (),
                             (UINT16 *) VariableName,
-                            VariableGuid,
+                            (EFI_GUID *) VariableGuid,
                             NULL,
                             &Size,
                             Buffer
@@ -782,31 +192,382 @@ GetHiiVariable (
 }
 
 
-
-/**
-  The function is provided by PCD PEIM and PCD DXE driver to
-  do the work of reading a HII variable from variable service.
-
-  @param[in] VariableGuid     The Variable GUID.
-  @param[in] VariableName     The Variable Name.
-  @param[in] Data             The input data.
-  @param[out] VariableSize    The size of the variable.
-  @param[in] Offset           The offset of the variable data that a PCD entry will starts from.
-
-  @retval EFI_SUCCESS         Operation successful.
-  @retval EFI_SUCCESS         Variablel not found.
---*/
-EFI_STATUS
-SetHiiVariable (
-  IN  EFI_GUID     *VariableGuid,
-  IN  UINT16       *VariableName,
-  IN  CONST VOID   *Data,
-  IN  UINTN        VariableSize,
-  IN  UINTN        Offset
-  )
+UINT32
+GetSkuEnabledTokenNumber (
+  UINT32 LocalTokenNumber,
+  UINTN  Size
+  ) 
 {
+  PEI_PCD_DATABASE      *PeiPcdDb;
+  SKU_HEAD              *SkuHead;
+  SKU_ID                *SkuIdTable;
+  INTN                  i;
+  UINT8                 *Value;
+
+  PeiPcdDb = GetPcdDatabase ();
+
+  ASSERT ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0);
+
+  SkuHead     = (SKU_HEAD *) ((UINT8 *)PeiPcdDb + (LocalTokenNumber & PCD_DATABASE_OFFSET_MASK));
+  Value       = (UINT8 *) ((UINT8 *)PeiPcdDb + (SkuHead->SkuDataStartOffset));
+  SkuIdTable  = (SKU_ID *) ((UINT8 *)PeiPcdDb + (SkuHead->SkuIdTableOffset));
+        
+  for (i = 0; i < SkuIdTable[0]; i++) {
+    if (PeiPcdDb->Init.SystemSkuId == SkuIdTable[i + 1]) {
+      break;
+    }
+  }
+
+  switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
+    case PCD_TYPE_VPD:
+      Value += sizeof(VPD_HEAD) * i;
+      return ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_VPD);
+
+    case PCD_TYPE_HII:
+      Value += sizeof(VARIABLE_HEAD) * i;
+      return ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_HII);
+      
+    case 0: //Change to a MACRO PCD_TYPE_DATA
+      Value += Size * i;
+      return (Value - (UINT8 *) PeiPcdDb);
+      
+    default:
+      ASSERT (FALSE);
+  }
+
   ASSERT (FALSE);
-  return EFI_INVALID_PARAMETER;
+
+  return 0;
+  
 }
 
+
+
+
+VOID
+InvokeCallbackOnSet (
+  UINT32            ExTokenNumber,
+  CONST EFI_GUID    *Guid, OPTIONAL
+  UINTN             TokenNumber,
+  VOID              *Data,
+  UINTN             Size
+  )
+{
+  EFI_HOB_GUID_TYPE   *GuidHob;
+  PCD_PPI_CALLBACK    *CallbackTable;
+  UINTN               Idx;
+
+  if (Guid == NULL)
+    ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+
+  GuidHob = GetFirstGuidHob (&gPcdPeiCallbackFnTableHobGuid);
+  ASSERT (GuidHob != NULL);
+  
+  CallbackTable = GET_GUID_HOB_DATA (GuidHob);
+
+  CallbackTable += (TokenNumber * FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry));
+
+  for (Idx = 0; Idx < FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
+    if (CallbackTable[Idx] != NULL) {
+      CallbackTable[Idx] (Guid,
+                          (Guid == NULL)? TokenNumber: ExTokenNumber,
+                          Data,
+                          Size
+                          );
+    }
+  }
+  
+}
+
+EFI_STATUS
+SetWorker (
+  UINTN         TokenNumber,
+  VOID          *Data,
+  UINTN         Size,
+  BOOLEAN       PtrType
+  )
+{
+  UINT32              LocalTokenNumber;
+  PEI_PCD_DATABASE    *PeiPcdDb;
+
+  ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+    
+  PeiPcdDb = GetPcdDatabase ();
+
+  LocalTokenNumber = PeiPcdDb->Init.LocalTokenNumberTable[TokenNumber];
+
+  if (PtrType) {
+    ASSERT (PeiPcdDb->Init.SizeTable[TokenNumber] >= Size);
+  } else {
+    ASSERT (PeiPcdDb->Init.SizeTable[TokenNumber] == Size);
+  }
+
+  InvokeCallbackOnSet (0, NULL, TokenNumber, Data, Size);
+
+  return SetWorkerByLocalTokenNumber (LocalTokenNumber, Data, Size, PtrType);
+
+}
+
+
+
+
+EFI_STATUS
+ExSetWorker (
+  IN UINT32               ExTokenNumber,
+  IN CONST EFI_GUID       *Guid,
+  VOID                    *Data,
+  UINTN                   Size,
+  BOOLEAN                 PtrType
+  )
+{
+  PEI_PCD_DATABASE          *PeiPcdDb;
+  EX_PCD_ENTRY_ATTRIBUTE    Attr;
+
+
+  PeiPcdDb = GetPcdDatabase ();
+
+  GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
+
+  ASSERT (!PtrType && Attr.Size);
+
+  ASSERT (PtrType && Attr.Size >= Size);
+
+  InvokeCallbackOnSet (ExTokenNumber, Guid, Attr.TokenNumber, Data, Size);
+
+  SetWorkerByLocalTokenNumber (Attr.LocalTokenNumberAlias, Data, Size, PtrType);
+
+  return EFI_SUCCESS;
+  
+}
+
+
+
+
+EFI_STATUS
+SetWorkerByLocalTokenNumber (
+  UINT32        LocalTokenNumber,
+  VOID          *Data,
+  UINTN         Size,
+  BOOLEAN       PtrType
+  )
+{
+  PEI_PCD_DATABASE      *PeiPcdDb;
+  UINT8                 *PeiPcdDbRaw;
+  UINT16                StringTableIdx;
+  UINTN                 Offset;
+  VOID                  *InternalData;
+ 
+
+  PeiPcdDb    =    GetPcdDatabase ();
+  PeiPcdDbRaw =    (UINT8 *) PeiPcdDb;
+  
+  if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
+    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, Size);
+  }
+
+  Offset          = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+  InternalData    = (VOID *) (PeiPcdDbRaw + Offset);
+  
+  switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
+    case PCD_TYPE_VPD:
+    case PCD_TYPE_HII:
+    {
+      ASSERT (FALSE);
+      return EFI_INVALID_PARAMETER;
+    }
+
+    case PCD_TYPE_STRING:
+      StringTableIdx = *((UINT16 *)InternalData);
+      CopyMem (&PeiPcdDb->Init.StringTable[StringTableIdx], Data, Size);
+      break;
+
+    case PCD_TYPE_DATA:
+    {
+      
+      if (PtrType) {
+        CopyMem (InternalData, Data, Size);
+        return EFI_SUCCESS;
+      }
+
+      switch (Size) {
+        case sizeof(UINT8):
+          *((UINT8 *) InternalData) = *((UINT8 *) Data);
+          return EFI_SUCCESS;
+
+        case sizeof(UINT16):
+          *((UINT16 *) InternalData) = *((UINT16 *) Data);
+          return EFI_SUCCESS;
+
+        case sizeof(UINT32):
+          *((UINT32 *) InternalData) = *((UINT32 *) Data);
+          return EFI_SUCCESS;
+
+        case sizeof(UINT64):
+          *((UINT64 *) InternalData) = *((UINT64 *) Data);
+          return EFI_SUCCESS;
+
+        default:
+          ASSERT (FALSE);
+          return EFI_NOT_FOUND;
+      }
+    }
+      
+  }
+
+  ASSERT (FALSE);
+  return EFI_NOT_FOUND;
+}
+
+
+VOID *
+GetWorkerByLocalTokenNumber (
+  PEI_PCD_DATABASE    *PeiPcdDb,
+  UINT32              LocalTokenNumber,
+  UINTN               Size
+  )
+{
+  UINT32              Offset;
+  EFI_GUID            *Guid;
+  UINT16              *Name;
+  VARIABLE_HEAD       *VariableHead;
+  EFI_STATUS          Status;
+  UINTN               DataSize;
+  VOID                *Data;
+  UINT16              *StringTable;
+  UINT16              StringTableIdx;
+      
+  PeiPcdDb        = GetPcdDatabase ();
+
+  if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
+    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, Size);
+  }
+
+  Offset      = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
+  StringTable = PeiPcdDb->Init.StringTable;
+  
+  switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
+    case PCD_TYPE_VPD:
+    {
+      VPD_HEAD *VpdHead;
+      VpdHead = (VPD_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
+      return (VOID *) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
+    }
+      
+    case PCD_TYPE_HII:
+    {
+      VariableHead = (VARIABLE_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
+      
+      Guid = &(PeiPcdDb->Init.GuidTable[VariableHead->GuidTableIndex]);
+      Name = &StringTable[VariableHead->StringIndex];
+
+      Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
+      ASSERT_EFI_ERROR (Status);
+      ASSERT (DataSize >= (UINTN) (VariableHead->Offset + Size));
+
+      return (VOID *) ((UINT8 *) Data + VariableHead->Offset);
+    }
+
+    case PCD_TYPE_DATA:
+      return (VOID *) ((UINT8 *)PeiPcdDb + Offset);
+      break;
+
+    case PCD_TYPE_STRING:
+      StringTableIdx = (UINT16) *((UINT8 *) PeiPcdDb + Offset);
+      return (VOID *) (&StringTable[StringTableIdx]);
+
+    default:
+      ASSERT (FALSE);
+      break;
+      
+  }
+
+  ASSERT (FALSE);
+      
+  return NULL;
+  
+}
+
+
+VOID *
+ExGetWorker (
+  IN CONST  EFI_GUID  *Guid,
+  IN UINT32           ExTokenNumber,
+  IN UINTN            GetSize
+  )
+{
+  EX_PCD_ENTRY_ATTRIBUTE      Attr;
+
+  GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
+  
+  ASSERT ((GetSize == Attr.Size) || (GetSize == 0));
+
+  return GetWorkerByLocalTokenNumber (GetPcdDatabase(),
+                                      Attr.LocalTokenNumberAlias,
+                                      Attr.Size
+                                      );
+}
+
+VOID *
+GetWorker (
+  UINTN  TokenNumber,
+  UINTN   GetSize
+  )
+{
+  PEI_PCD_DATABASE      *PeiPcdDb;
+
+  ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+
+  ASSERT (GetSize == PeiPcdGetSize (TokenNumber) || GetSize == 0);
+
+  PeiPcdDb = GetPcdDatabase ();
+  
+  return  GetWorkerByLocalTokenNumber (PeiPcdDb, PeiPcdDb->Init.LocalTokenNumberTable[TokenNumber], GetSize);
+}
+
+
+VOID
+GetExPcdTokenAttributes (
+  IN CONST EFI_GUID             *Guid,
+  IN UINT32                     ExTokenNumber,
+  OUT EX_PCD_ENTRY_ATTRIBUTE    *ExAttr
+  )
+{
+  UINT32              i;
+  DYNAMICEX_MAPPING   *ExMap;
+  EFI_GUID            *GuidTable;
+  PEI_PCD_DATABASE    *PeiPcdDb;
+
+  PeiPcdDb    = GetPcdDatabase();
+  
+  ExMap       = PeiPcdDb->Init.ExMapTable;
+  GuidTable   = PeiPcdDb->Init.GuidTable;
+  
+  for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
+    if ((ExTokenNumber == ExMap[i].ExTokenNumber) && 
+        CompareGuid (Guid, (CONST EFI_GUID *) &GuidTable[ExMap[i].ExGuidIndex])) {
+      ExAttr->TokenNumber               = i + PEI_NEX_TOKEN_NUMBER;
+      ExAttr->Size                      = PeiPcdDb->Init.SizeTable[i + PEI_NEX_TOKEN_NUMBER];
+      ExAttr->LocalTokenNumberAlias     = ExMap[i].LocalTokenNumber;
+    }
+  }
+  
+  ASSERT (FALSE);
+  
+  return;
+}
+
+
+
+PEI_PCD_DATABASE *
+GetPcdDatabase (
+  VOID
+  )
+{
+  EFI_HOB_GUID_TYPE *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
+  ASSERT (GuidHob != NULL);
+  
+  return (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
+}
 
