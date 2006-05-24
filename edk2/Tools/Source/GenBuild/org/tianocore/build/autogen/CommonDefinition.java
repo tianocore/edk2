@@ -254,4 +254,29 @@ public class CommonDefinition {
       }
       return false;
     }
+
+		static public boolean isPeiPhaseComponent (int componentType) {
+			if (ComponentTypePe32Peim == componentType
+					|| ComponentTypePicPeim == componentType
+					|| ComponentTypeCombinedPeimDriver == componentType
+					|| ComponentTypePeiCore == componentType) {
+				return true;
+			}
+			return false;
+		}
+
+		static public boolean isPe32PeimComponent (int componentType) {
+			if (ComponentTypePe32Peim == componentType) {
+				return true;
+			}
+			return false;
+		}
+
+		static public boolean isBsDriverComponent (int componentType) {
+			if (ComponentTypeBsDriver == componentType) {
+				return true;
+			}
+			return false;
+		}
+		
 }

@@ -17,9 +17,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.pcd.action;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +45,1137 @@ import org.tianocore.build.pcd.entity.SkuInstance;
 import org.tianocore.build.pcd.entity.Token;
 import org.tianocore.build.pcd.entity.UsageInstance;
 import org.tianocore.build.pcd.exception.EntityException;
+
+class StringTable {
+    private ArrayList<String>   al; 
+		private ArrayList<String>   alComments;
+    private String              phase;
+    int                         len; 
+		int													bodyStart;
+		int													bodyLineNum;
+
+    public StringTable (String phase) {
+        this.phase = phase;
+        al = new ArrayList<String>();
+				alComments = new ArrayList<String>();
+        len = 0;
+				bodyStart = 0;
+				bodyLineNum = 0;
+    }
+
+    public String getSizeMacro () {
+        return String.format(PcdDatabase.StringTableSizeMacro, phase, getSize());
+    }
+
+    private int getSize () {
+				//
+				// We have at least one Unicode Character in the table.
+				//
+        return len == 0 ? 1 : len;
+    }
+
+		public int getTableLen () {
+				return al.size() == 0 ? 1 : al.size();
+		}
+
+    public String getExistanceMacro () {
+        return String.format(PcdDatabase.StringTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+
+    public String getTypeDeclaration () {
+
+				String output;
+
+				final String stringTable = "StringTable";
+				final String tab = "\t";
+				final String newLine = ";\r\n";
+
+				output =  "/* StringTable */\r\n";
+
+				if (al.size() == 0) {
+						output += tab + String.format("UINT16 %s[1] /* StringTable is Empty */", stringTable) + newLine;
+				}
+
+				for (int i = 0; i < al.size(); i++) {
+						String str = al.get(i);
+
+						if (i == 0) {
+								//
+								// StringTable is a well-known name in the PCD DXE driver
+								//
+								output += tab + String.format("UINT16 			%s[%d] /* %s */", stringTable, str.length() + 1, alComments.get(i)) + newLine;
+						} else {
+								output += tab + String.format("UINT16 			%s_%d[%d] /* %s */", stringTable, i, str.length() + 1, alComments.get(i)) + newLine;
+						}
+				}
+
+				return output;
+
+    }
+
+    public ArrayList<String> getInstantiation () {
+				ArrayList<String> output = new ArrayList<String>();
+
+				output.add("/* StringTable */"); 
+
+				if (al.size() == 0) {
+						output.add("{ 0 }");
+				} else {
+						String str;
+
+						for (int i = 0; i < al.size(); i++) {
+								str = String.format("L\"%s\" /* %s */", al.get(i), alComments.get(i));
+								if (i != al.size() - 1) {
+										str += ",";
+								}
+								output.add(str);
+						}
+				}
+
+        return output;
+    }
+
+    public int add (String str, Token token) {
+        int i;
+
+        i = len;
+        //
+        // Include the NULL character at the end of String
+        //
+        len += str.length() + 1; 
+        al.add(str);
+				alComments.add(token.getPrimaryKeyString());
+
+        return i;
+    }
+}
+
+class SizeTable {
+    private ArrayList<Integer>  al;
+		private ArrayList<String>   alComments;
+    private String              phase;
+    private int                 len;
+		private int							bodyStart;
+		private int							bodyLineNum;
+
+    public SizeTable (String phase) {
+        this.phase = phase;
+        al = new ArrayList<Integer>();
+				alComments = new ArrayList<String>();
+        len = 0;
+				bodyStart = 0;
+				bodyLineNum = 0;
+    }
+
+    public String getTypeDeclaration () {
+        return String.format(PcdDatabase.SizeTableDeclaration, phase);
+    }
+
+    public ArrayList<String> getInstantiation () {
+				ArrayList<String> Output = new ArrayList<String>();
+
+        Output.add("/* SizeTable */");
+        Output.add("{");
+				bodyStart = 2;
+
+				if (al.size() == 0) {
+						Output.add("0");
+				} else {
+						for (int index = 0; index < al.size(); index++) {
+								Integer n = al.get(index);
+								String str = n.toString();
+
+								if (index != (al.size() - 1)) {
+										str += ",";
+								}
+
+								str += " /* " + alComments.get(index) + " */"; 
+								Output.add(str);
+								bodyLineNum++;
+		
+						}
+				}
+				Output.add("}");
+
+        return Output;
+    }
+
+		public int getBodyStart() {
+				return bodyStart;
+		}
+
+		public int getBodyLineNum () {
+				return bodyLineNum;
+		}
+
+    public int add (Token token) {
+        int index = len;
+
+        len++; 
+        al.add(token.datumSize);
+				alComments.add(token.getPrimaryKeyString());
+
+        return index;
+    }
+
+		private int getDatumSize(Token token) {
+				/*
+				switch (token.datumType) {
+				case Token.DATUM_TYPE.UINT8:
+						return 1;
+				default:
+						return 0;
+				}
+				*/
+				return 0;
+		}
+
+		public int getTableLen () {
+				return al.size() == 0 ? 1 : al.size();
+		}
+
+}
+
+class GuidTable {
+    private ArrayList<UUID> al;
+		private ArrayList<String> alComments;
+    private String          phase;
+    private int             len;
+		private int							bodyStart;
+		private int							bodyLineNum;
+
+    public GuidTable (String phase) {
+        this.phase = phase;
+        al = new ArrayList<UUID>();
+				alComments = new ArrayList<String>();
+        len = 0;
+				bodyStart = 0;
+				bodyLineNum = 0;
+    }
+
+    public String getSizeMacro () {
+        return String.format(PcdDatabase.GuidTableSizeMacro, phase, getSize());
+    }
+
+    private int getSize () {
+        return (al.size() == 0)? 1 : al.size();
+    }
+
+    public String getExistanceMacro () {
+        return String.format(PcdDatabase.GuidTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+
+    public String getTypeDeclaration () {
+        return String.format(PcdDatabase.GuidTableDeclaration, phase);
+    }
+
+		private String getUuidCString (UUID uuid) {
+				String[]  guidStrArray;
+
+				guidStrArray =(uuid.toString()).split("-");
+
+				return String.format("{ 0x%s, 0x%s, 0x%s, { 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s } }",
+																				 guidStrArray[0],
+																				 guidStrArray[1],
+																				 guidStrArray[2],
+																				(guidStrArray[3].substring(0, 2)),
+																				(guidStrArray[3].substring(2, 4)),
+																				(guidStrArray[4].substring(0, 2)),
+																				(guidStrArray[4].substring(2, 4)),
+																				(guidStrArray[4].substring(4, 6)),
+																				(guidStrArray[4].substring(6, 8)),
+																				(guidStrArray[4].substring(8, 10)),
+																				(guidStrArray[4].substring(10, 12))
+																				);
+		}
+
+    public ArrayList<String> getInstantiation () {
+				ArrayList<String> Output = new ArrayList<String>();
+
+        Output.add("/* GuidTable */");
+        Output.add("{");
+				bodyStart = 2;
+
+				if (al.size() == 0) {
+						Output.add(getUuidCString(new UUID(0, 0)));
+				}
+        
+        for (Object u : al) {
+            UUID uuid = (UUID)u;
+						String str = getUuidCString(uuid);
+
+						if (al.indexOf(u) != (al.size() - 1)) {
+								str += ",";
+						}
+            Output.add(str);
+						bodyLineNum++;
+
+        }
+				Output.add("}");
+
+        return Output;
+    }
+
+		public int getBodyStart() {
+				return bodyStart;
+		}
+
+		public int getBodyLineNum () {
+				return bodyLineNum;
+		}
+
+    public int add (UUID uuid, String name) {
+        int index = len;
+        //
+        // Include the NULL character at the end of String
+        //
+        len++; 
+        al.add(uuid);
+
+        return index;
+    }
+
+		public int getTableLen () {
+				return al.size() == 0 ? 0 : al.size();
+		}
+
+}
+
+class SkuIdTable {
+    private ArrayList<Integer[]> al;
+		private ArrayList<String>    alComment;
+    private String               phase;
+    private int                  len;
+		private int										bodyStart;
+		private int										bodyLineNum;
+
+    public SkuIdTable (String phase) {
+        this.phase = phase;
+        al = new ArrayList<Integer[]>();
+				alComment = new ArrayList<String>();
+				bodyStart = 0;
+				bodyLineNum = 0;
+        len = 0;
+    }
+
+    public String getSizeMacro () {
+        return String.format(PcdDatabase.SkuIdTableSizeMacro, phase, getSize());
+    }
+
+    private int getSize () {
+        return (al.size() == 0)? 1 : al.size();
+    }
+
+    public String getExistanceMacro () {
+        return String.format(PcdDatabase.SkuTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+
+    public String getTypeDeclaration () {
+        return String.format(PcdDatabase.SkuIdTableDeclaration, phase);
+    }
+
+    public ArrayList<String> getInstantiation () {
+				ArrayList<String> Output = new ArrayList<String> ();
+
+        Output.add("/* SkuIdTable */");
+        Output.add("{");
+				bodyStart = 2;
+
+				if (al.size() == 0) {
+						Output.add("0");
+				}
+        
+        for (int index = 0; index < al.size(); index++) {
+						String str;
+
+						str = "/* " + alComment.get(index) + "*/ ";
+						str += "/* MaxSku */ ";
+
+
+						Integer[] ia = al.get(index);
+
+						str += ia[0].toString() + ", ";
+						for (int index2 = 1; index2 < ia.length; index2++) {
+							 str += ia[index2].toString();
+							 if (index != al.size() - 1) {
+									 str += ", ";
+							 }
+						}
+
+            Output.add(str);
+						bodyLineNum++;
+
+        }
+
+				Output.add("}");
+
+        return Output;
+    }
+
+    public int add (Token token) {
+
+				int index;
+
+				Integer [] skuIds = new Integer[token.maxSkuCount + 1];
+				skuIds[0] = new Integer(token.maxSkuCount);
+				for (index = 1; index < skuIds.length; index++) {
+						skuIds[index] = new Integer(token.skuData.get(index - 1).id);
+				}
+
+        index = len;
+
+        len += skuIds.length; 
+        al.add(skuIds);
+				alComment.add(token.getPrimaryKeyString());
+
+        return index;
+    }
+
+		public int getTableLen () {
+				return al.size() == 0 ? 1 : al.size();
+		}
+
+}
+
+class LocalTokenNumberTable {
+    private ArrayList<String>    al;
+		private ArrayList<String>    alComment;
+    private String               phase;
+    private int                  len;
+		private int 									bodyStart;
+		private int										bodyLineNum;
+
+    public LocalTokenNumberTable (String phase) {
+        this.phase = phase;
+        al = new ArrayList<String>();
+				alComment = new ArrayList<String>();
+				bodyStart = 0;
+				bodyLineNum = 0;
+
+        len = 0;
+    }
+
+    public String getSizeMacro () {
+        return String.format(PcdDatabase.LocalTokenNumberTableSizeMacro, phase, getSize());
+    }
+
+    public int getSize () {
+        return (al.size() == 0)? 1 : al.size();
+    }
+
+    public String getExistanceMacro () {
+        return String.format(PcdDatabase.DatabaseExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+
+    public String getTypeDeclaration () {
+        return String.format(PcdDatabase.LocalTokenNumberTableDeclaration, phase);
+    }
+
+    public ArrayList<String> getInstantiation () {
+				ArrayList<String> output = new ArrayList<String>();
+
+        output.add("/* LocalTokenNumberTable */");
+        output.add("{");
+				bodyStart = 2;
+
+				if (al.size() == 0) {
+						output.add("0");
+				}
+        
+        for (int index = 0; index < al.size(); index++) {
+						String str;
+
+						str = (String)al.get(index);
+
+						str += " /* " + alComment.get(index) + " */ ";
+
+
+						if (index != (al.size() - 1)) {
+								str += ",";
+						}
+
+            output.add(str);
+
+        }
+
+				bodyLineNum = al.size();
+
+				output.add("}");
+
+        return output;
+    }
+
+    public int add (Token token) {
+        int index = len;
+				String str;
+
+        len++; 
+
+				str =  String.format(PcdDatabase.offsetOfStrTemplate, phase, token.hasDefaultValue() ? "Init" : "Uninit", token.getPrimaryKeyString());
+
+				if (token.isStringType()) {
+						str += " | PCD_TYPE_STRING";
+				}
+
+				if (token.skuEnabled) {
+						str += " | PCD_TYPE_SKU_ENABLED";
+				}
+
+				if (token.hiiEnabled) {
+						str += " | PCD_TYPE_HII";
+				}
+
+				if (token.vpdEnabled) {
+						str += " | PCD_TYPE_VPD";
+				}
+				
+        al.add(str);
+				alComment.add(token.getPrimaryKeyString());
+
+        return index;
+    }
+}
+
+class ExMapTable {
+
+		class ExTriplet {
+				public Integer guidTableIdx;
+				public Long exTokenNumber;
+				public Long localTokenIdx;
+		
+				public ExTriplet (int guidTableIdx, long exTokenNumber, long localTokenIdx) {
+						this.guidTableIdx = new Integer(guidTableIdx);
+						this.exTokenNumber = new Long(exTokenNumber);
+						this.localTokenIdx = new Long(localTokenIdx);
+				}
+		}
+
+    private ArrayList<ExTriplet> al;
+		private ArrayList<String>    alComment;
+    private String               phase;
+    private int                  len;
+		private int										bodyStart;
+		private int										bodyLineNum;
+		private int										base;
+
+    public ExMapTable (String phase) {
+        this.phase = phase;
+        al = new ArrayList<ExTriplet>();
+				alComment = new ArrayList<String>();
+				bodyStart = 0;
+				bodyLineNum = 0;
+        len = 0;
+    }
+
+    public String getSizeMacro () {
+        return String.format(PcdDatabase.ExMapTableSizeMacro, phase, getTableLen())
+						 + String.format(PcdDatabase.ExTokenNumber, phase, al.size());
+    }
+
+    private int getSize () {
+        return (al.size() == 0)? 1 : al.size();
+    }
+
+    public String getExistanceMacro () {
+        return String.format(PcdDatabase.ExMapTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+
+    public String getTypeDeclaration () {
+        return String.format(PcdDatabase.ExMapTableDeclaration, phase);
+    }
+
+    public ArrayList<String> getInstantiation () {
+				ArrayList<String> Output = new ArrayList<String>();
+
+        Output.add("/* ExMapTable */");
+        Output.add("{");
+				bodyStart = 2;
+
+				if (al.size() == 0) {
+						Output.add("{0, 0, 0}");
+				}
+        
+				int index;
+        for (index = 0; index < al.size(); index++) {
+						String str;
+
+						ExTriplet e = (ExTriplet)al.get(index);
+
+						str = "{ " + e.exTokenNumber.toString() + ", ";
+						str += e.localTokenIdx.toString() + ", ";
+						str += e.guidTableIdx.toString();
+
+						str += " /* " + alComment.get(index) + " */";
+
+						if (index != al.size() - 1) {
+								str += ",";
+						}
+
+            Output.add(str);
+						bodyLineNum++;
+
+        }
+
+				Output.add("}");
+
+        return Output;
+    }
+
+    public int add (int localTokenIdx, long exTokenNum, int guidTableIdx, String name) {
+        int index = len;
+
+        len++; 
+        al.add(new ExTriplet(guidTableIdx, exTokenNum, localTokenIdx));
+				alComment.add(name);
+
+        return index;
+    }
+
+		public int getTableLen () {
+				return al.size() == 0 ? 1 : al.size();
+		}
+
+}
+
+class PcdDatabase {
+
+    public final static String ExMapTableDeclaration            = "DYNAMICEX_MAPPING ExMapTable[%s_EXMAPPING_TABLE_SIZE];\r\n";
+    public final static String GuidTableDeclaration             = "EFI_GUID          GuidTable[%s_GUID_TABLE_SIZE];\r\n";
+    public final static String LocalTokenNumberTableDeclaration = "UINT32            LocalTokenNumberTable[%s_LOCAL_TOKEN_NUMBER];\r\n";
+    public final static String StringTableDeclaration           = "UINT16            StringTable[%s_STRING_TABLE_SIZE];\r\n";
+    public final static String SizeTableDeclaration             = "UINT16            SizeTable[%s_LOCAL_TOKEN_NUMBER];\r\n";
+    public final static String SkuIdTableDeclaration              = "UINT8             SkuIdTable[%s_SKUID_TABLE_SIZE];\r\n";
+
+
+    public final static String ExMapTableSizeMacro              = "#define %s_EXMAPPING_TABLE_SIZE  %d\r\n";
+		public final static String ExTokenNumber										= "#define %s_EX_TOKEN_NUMBER				%d\r\n";
+    public final static String GuidTableSizeMacro               = "#define %s_GUID_TABLE_SIZE         %d\r\n";
+    public final static String LocalTokenNumberTableSizeMacro   = "#define %s_LOCAL_TOKEN_NUMBER            %d\r\n";
+    public final static String StringTableSizeMacro             = "#define %s_STRING_TABLE_SIZE       %d\r\n";
+    public final static String SkuIdTableSizeMacro              = "#define %s_SKUID_TABLE_SIZE        %d\r\n";
+
+
+    public final static String ExMapTableExistenceMacro         = "#define %s_EXMAP_TABLE_EMPTY    %s\r\n"; 
+    public final static String GuidTableExistenceMacro          = "#define %s_GUID_TABLE_EMPTY     %s\r\n";
+    public final static String DatabaseExistenceMacro           = "#define %s_DATABASE_EMPTY       %s\r\n";
+    public final static String StringTableExistenceMacro        = "#define %s_STRING_TABLE_EMPTY   %s\r\n";
+    public final static String SkuTableExistenceMacro           = "#define %s_SKUID_TABLE_EMPTY    %s\r\n";
+
+		public final static String offsetOfSkuHeadStrTemplate		  	= "offsetof(%s_PCD_DATABASE, %s.%s_SkuDataTable)";
+		public final static String offsetOfStrTemplate              = "offsetof(%s_PCD_DATABASE, %s.%s)";
+
+		private StringTable stringTable;
+		private GuidTable		guidTable;
+		private LocalTokenNumberTable localTokenNumberTable;
+		private SkuIdTable	skuIdTable;
+		private SizeTable   sizeTable;
+		private ExMapTable  exMapTable;
+
+		private ArrayList<Token> alTokens;
+		private String phase;
+		private int assignedTokenNumber;
+
+		private String hString;
+		private String cString;
+
+
+		class AlignmentSizeComp implements Comparator<Token> {
+        public int compare (Token a, Token b) {
+						return getAlignmentSize(b) 
+										- getAlignmentSize(a);
+				}
+		}
+
+		public PcdDatabase (ArrayList<Token> alTokens, String exePhase, int startLen) {
+			 phase = exePhase;
+
+			 stringTable = new StringTable(phase);
+			 guidTable = new GuidTable(phase);
+			 localTokenNumberTable = new LocalTokenNumberTable(phase);
+			 skuIdTable = new SkuIdTable(phase);
+			 sizeTable = new SizeTable(phase);
+			 exMapTable = new ExMapTable(phase); 
+
+			 assignedTokenNumber = startLen;
+			 this.alTokens = alTokens;
+		}
+
+		private void getTwoGroupsOfTokens (ArrayList<Token> alTokens, List<Token> initTokens, List<Token> uninitTokens) {
+				for (int i = 0; i < alTokens.size(); i++) {
+						Token t = (Token)alTokens.get(i);
+						if (t.hasDefaultValue()) {
+								initTokens.add(t);
+						} else {
+								uninitTokens.add(t);
+						}
+				}
+
+				return;
+		}
+
+		private int getAlignmentSize (Token token) {
+				if (token.hiiEnabled) {
+						return 2;
+				}
+
+				if (token.vpdEnabled) {
+						return 4;
+				}
+
+				if (token.isStringType()) {
+						return 2;
+				}
+
+				switch (token.datumType) {
+						case UINT8:
+								return 1;
+						case UINT16:
+								return 2;
+						case UINT32:
+								return 4;
+						case UINT64:
+								return 8;
+						case POINTER:
+								return 1;
+						case BOOLEAN:
+								return 1;
+						}
+						return 1;
+		 }
+
+		public String getCString () {
+				return cString;
+		}
+
+		public String getHString () {
+				return hString;
+		}
+
+     public void genCode () {
+
+				final String newLine                        = "\r\n";
+				final String instNewLine										= "\\\r\n";
+				final String declNewLine                    = ";\r\n";
+				final String tab                            = "\t";
+				final String commaInstNewLine										= "\t,\\\r\n";
+				final String commaNewLine										= ", \r\n";
+
+				int i;
+				ArrayList<String> decla;
+				ArrayList<String> inst;
+
+				String macroStr   = "";
+				String initDeclStr = "";
+				String initInstStr = "";
+				String uninitDeclStr = "";
+
+				List<Token> initTokens = new ArrayList<Token> ();
+				List<Token> uninitTokens = new ArrayList<Token> ();
+				
+				HashMap <String, ArrayList<String>> initCode = new HashMap<String, ArrayList<String>> ();
+				HashMap <String, ArrayList<String>> uninitCode = new HashMap<String, ArrayList<String>> ();
+
+				getTwoGroupsOfTokens (alTokens, initTokens, uninitTokens);
+
+				//
+				// Generate Structure Declaration for PcdTokens without Default Value
+				// PEI_PCD_DATABASE_INIT
+				//
+				java.util.Comparator comparator = new AlignmentSizeComp();
+				List<Token> list = initTokens;
+				java.util.Collections.sort(list, comparator);
+				initCode = processTokens(initTokens);
+
+				//
+				// Generate Structure Declaration for PcdTokens without Default Value
+				// PEI_PCD_DATABASE_UNINIT
+				//
+				java.util.Collections.sort(uninitTokens, comparator);
+				uninitCode = processTokens(uninitTokens);
+
+				//
+				// Generate size info Macro for all Tables
+				//
+				macroStr += guidTable.getSizeMacro();
+				macroStr += stringTable.getSizeMacro();
+				macroStr += skuIdTable.getSizeMacro();
+				macroStr += localTokenNumberTable.getSizeMacro();
+				macroStr += exMapTable.getSizeMacro();
+
+				//
+				// Generate existance info Macro for all Tables
+				//
+			  macroStr += guidTable.getExistanceMacro();
+				macroStr += stringTable.getExistanceMacro();
+				macroStr += skuIdTable.getExistanceMacro();
+				macroStr += localTokenNumberTable.getExistanceMacro();
+				macroStr += exMapTable.getExistanceMacro();
+
+				//
+				// Generate Structure Declaration for PcdTokens with Default Value
+				// for example PEI_PCD_DATABASE_INIT
+				//
+				initDeclStr += "typedef struct {" + newLine;
+						{
+								initDeclStr += tab + exMapTable.getTypeDeclaration();
+								initDeclStr += tab + guidTable.getTypeDeclaration();
+								initDeclStr += tab + localTokenNumberTable.getTypeDeclaration();
+								initDeclStr += tab + stringTable.getTypeDeclaration();
+								initDeclStr += tab + sizeTable.getTypeDeclaration();
+								initDeclStr += tab + skuIdTable.getTypeDeclaration();
+								if (phase.equalsIgnoreCase("PEI")) {
+										initDeclStr += tab + "SKU_ID            SystemSkuId;" + newLine;
+								}
+
+								decla = initCode.get(new String("Declaration"));
+								for (i = 0; i < decla.size(); i++)  {
+										initDeclStr += tab + decla.get(i) + declNewLine;
+								}
+
+								//
+								// Generate Structure Declaration for PcdToken with SkuEnabled
+								//
+								decla = initCode.get("DeclarationForSku");
+
+								for (i = 0; i < decla.size(); i++) {
+										initDeclStr += tab + decla.get(i) + declNewLine;
+								}
+						}
+			  initDeclStr += String.format("} %s_PCD_DATABASE_INIT;\r\n\r\n", phase);
+
+				//
+				// Generate MACRO for structure intialization of PCDTokens with Default Value
+				// The sequence must match the sequence of declaration of the memembers in the structure
+				String tmp = String.format("%s_PCD_DATABASE_INIT g%sPcdDbInit = { ", phase.toUpperCase(), phase.toUpperCase());
+				initInstStr +=  tmp + newLine;
+				initInstStr += tab + genInstantiationStr(exMapTable.getInstantiation()) + commaNewLine;
+				initInstStr += tab + genInstantiationStr(guidTable.getInstantiation()) + commaNewLine;
+				initInstStr += tab + genInstantiationStr(localTokenNumberTable.getInstantiation()) + commaNewLine; 
+				/*
+				inst = stringTable.getInstantiation();
+				for (i = 0; i < inst.size(); i++ ) {
+						initInstStr += tab + inst.get(i) + commaNewLine; 
+				}
+				*/
+				initInstStr += tab + genInstantiationStr(stringTable.getInstantiation()) + commaNewLine;
+				initInstStr += tab + genInstantiationStr(sizeTable.getInstantiation()) + commaNewLine;
+				initInstStr += tab + genInstantiationStr(skuIdTable.getInstantiation()) + commaNewLine;
+				//
+				// For SystemSkuId
+				//
+				if (phase.equalsIgnoreCase("PEI")) {
+						initInstStr += tab + "0" + tab + "/* SystemSkuId */" + commaNewLine;
+				}
+
+				inst = initCode.get("Instantiation");
+				for (i = 0; i < inst.size(); i++) {
+						initInstStr += tab + inst.get(i) + commaNewLine;
+				}
+
+				inst = initCode.get("InstantiationForSku");
+				for (i = 0; i < inst.size(); i++) {
+						initInstStr += tab + inst.get(i);
+						if (i != inst.size() - 1) {
+								initInstStr += commaNewLine;
+						}
+				}
+
+				initInstStr += "};";
+
+				uninitDeclStr += "typedef struct {" + newLine;
+						{
+								decla = uninitCode.get("Declaration");
+								if (decla.size() == 0) {
+										uninitDeclStr += "UINT8 dummy /* The UINT struct is empty */" + declNewLine;
+								} else {
+		
+										for (i = 0; i < decla.size(); i++) {
+												uninitDeclStr += tab + decla.get(i) + declNewLine;
+										}
+		
+										decla = uninitCode.get("DeclarationForSku");
+		
+										for (i = 0; i < decla.size(); i++) {
+												uninitDeclStr += tab + decla.get(i) + declNewLine;
+										}
+								}
+						}
+				uninitDeclStr += String.format("} %s_PCD_DATABASE_UNINIT;\r\n\r\n", phase);
+
+				cString = initInstStr + newLine;
+				hString = macroStr      + newLine  
+						  + initDeclStr 	+ newLine
+							+ uninitDeclStr + newLine
+						  + newLine;
+
+		}
+
+		private String genInstantiationStr (ArrayList<String> alStr) {
+				String str = "";
+				for (int i = 0; i< alStr.size(); i++) {
+						str += "\t" + alStr.get(i);
+						if (i != alStr.size() - 1) {
+								str += "\r\n";
+						}
+				}
+
+				return str;
+		}
+
+		private HashMap<String, ArrayList<String>> processTokens (List<Token> alToken) {
+
+				ArrayList[]  output = new ArrayList[4];
+				HashMap <String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
+
+				ArrayList<String> decl = new ArrayList<String>();
+				ArrayList<String> declForSkuEnableType = new ArrayList<String>();
+				ArrayList<String> inst = new ArrayList<String>();
+				ArrayList<String> instForSkuEnableType = new ArrayList<String>();
+
+				for (int index = 0; index < alToken.size(); index++) {
+						Token token = alToken.get(index);
+
+						if (token.skuEnabled) {
+								//
+								// BugBug: Schema only support Data type now
+								//
+								int tableIdx;
+
+								tableIdx = skuIdTable.add(token);
+
+								decl.add(getSkuEnabledTypeDeclaration(token));
+								if (token.hasDefaultValue()) {
+										inst.add(getSkuEnabledTypeInstantiaion(token, tableIdx)); 
+								}
+
+								declForSkuEnableType.add(getDataTypeDeclarationForSkuEnabled(token));
+								if (token.hasDefaultValue()) {
+										instForSkuEnableType.add(getDataTypeInstantiationForSkuEnabled(token));
+								}
+
+						} else {
+								if (token.hiiEnabled) {
+										decl.add(getVariableEnableTypeDeclaration(token));
+										inst.add(getVariableEnableInstantiation(token));
+								} else if (token.vpdEnabled) {
+										decl.add(getVpdEnableTypeDeclaration(token));
+										inst.add(getVpdEnableTypeInstantiation(token));
+								} else if (token.isStringType()) {
+										decl.add(getStringTypeDeclaration(token));
+										inst.add(getStringTypeInstantiation(stringTable.add(token.getStringTypeString(), token), token));
+								}
+								else {
+										decl.add(getDataTypeDeclaration(token));
+										if (token.hasDefaultValue()) {
+												inst.add(getDataTypeInstantiation(token));
+										}
+								}
+						}
+
+						sizeTable.add(token);
+						localTokenNumberTable.add(token);
+						token.assignedtokenNumber = assignedTokenNumber++;
+
+				}
+
+				map.put("Declaration",  decl);
+				map.put("DeclarationForSku", declForSkuEnableType);
+				map.put("Instantiation", inst);
+				map.put("InstantiationForSku", instForSkuEnableType);
+
+				return map;
+		}
+
+		private String getSkuEnabledTypeDeclaration (Token token) {
+				return String.format("SKU_HEAD %s;\r\n", token.getPrimaryKeyString());
+		}
+
+		private String getSkuEnabledTypeInstantiaion (Token token, int SkuTableIdx) {
+
+				String offsetof = String.format(PcdDatabase.offsetOfSkuHeadStrTemplate, phase, token.hasDefaultValue()? "Init" : "Uninit", token.getPrimaryKeyString());
+				return String.format("{ %s, %d }", offsetof, SkuTableIdx);
+		}
+
+		private String getDataTypeDeclarationForSkuEnabled (Token token) {
+				String typeStr = "";
+
+				if (token.datumType == Token.DATUM_TYPE.UINT8) {
+						typeStr = "UINT8 %s_%s[%d];\r\n";
+				} else if (token.datumType == Token.DATUM_TYPE.UINT16) {
+						typeStr = "UINT16 %s_%s[%d];\r\n";
+				} else if (token.datumType == Token.DATUM_TYPE.UINT32) {
+						typeStr = "UINT32 %s_%s[%d];\r\n";
+				} else if (token.datumType == Token.DATUM_TYPE.UINT64) {
+						typeStr = "UINT64 %s_%s[%d];\r\n";
+				} else if (token.datumType == Token.DATUM_TYPE.BOOLEAN) {
+						typeStr = "BOOLEAN %s_%s[%d];\r\n";
+				} else if (token.datumType == Token.DATUM_TYPE.POINTER) {
+						return String.format("UINT8 %s_s[%d];\r\n", token.getPrimaryKeyString(), "SkuDataTable", token.datumSize * token.maxSkuCount);
+				} 
+
+				return String.format(typeStr, token.getPrimaryKeyString(), "SkuDataTable", token.maxSkuCount);
+
+		}
+
+		private String getDataTypeInstantiationForSkuEnabled (Token token) {
+				String str = "";
+
+				if (token.datumType == Token.DATUM_TYPE.POINTER) {
+						return String.format("UINT8 %s_s[%d]", token.getPrimaryKeyString(), "SkuDataTable", token.datumSize * token.maxSkuCount);
+				} else {
+						str = "{ ";
+						for (int idx = 0; idx < token.maxSkuCount; idx++) {
+								str += token.skuData.get(idx).toString();
+								if (idx != token.maxSkuCount - 1) {
+										str += ", ";
+								}
+						}
+						str += "}";
+
+						return str;
+				}
+
+		}
+
+		private String getDataTypeInstantiation (Token token) {
+
+				String typeStr = "";
+
+				if (token.datumType == Token.DATUM_TYPE.POINTER) {
+						return String.format("%s /* %s */", token.datum.toString(), token.getPrimaryKeyString());
+				} else {
+						return String.format("%s /* %s */", token.datum.toString(), token.getPrimaryKeyString());
+				}
+		}
+
+
+		private String getDataTypeDeclaration (Token token) {
+
+				String typeStr = "";
+
+				if (token.datumType == Token.DATUM_TYPE.UINT8) {
+						typeStr = "UINT8";
+				} else if (token.datumType == Token.DATUM_TYPE.UINT16) {
+						typeStr = "UINT16";
+				} else if (token.datumType == Token.DATUM_TYPE.UINT32) {
+						typeStr = "UINT32";
+				} else if (token.datumType == Token.DATUM_TYPE.UINT64) {
+						typeStr = "UINT64";
+				} else if (token.datumType == Token.DATUM_TYPE.BOOLEAN) {
+						typeStr = "BOOLEAN";
+				} else if (token.datumType == Token.DATUM_TYPE.POINTER) {
+						return String.format("UINT8 %s[%d]", token.getPrimaryKeyString(), token.datumSize);
+				} else {
+				}
+
+				return String.format("%s		%s", typeStr, token.getPrimaryKeyString());
+		}
+
+		private String getVpdEnableTypeDeclaration (Token token) {
+				return String.format("VPD_HEAD %s", token.getPrimaryKeyString());
+		}
+
+		private String getVpdEnableTypeInstantiation (Token token) {
+				return String.format("{ %d } /* %s */", token.vpdOffset,
+																								token.getPrimaryKeyString());
+		}
+
+		private String getStringTypeDeclaration (Token token) {
+				return String.format("UINT16	%s", token.getPrimaryKeyString());
+		}
+
+		private String getStringTypeInstantiation (int StringTableIdx, Token token) {
+				return String.format ("%d /* %s */", StringTableIdx,
+																						 token.getPrimaryKeyString()); 
+		}
+
+
+		private String getVariableEnableTypeDeclaration (Token token) {
+			return String.format("VARIABLE_HEAD  %s", token.getPrimaryKeyString());
+		}
+
+		private String getVariableEnableInstantiation (Token token) {
+				return String.format("{ %d, %d, %d } /* %s */", guidTable.add(token.variableGuid, token.getPrimaryKeyString()),
+																												stringTable.add(token.variableName, token),
+																												token.variableOffset, 
+																												token.getPrimaryKeyString());
+		}
+
+		public int getTotalTokenNumber () {
+				return sizeTable.getTableLen();
+		}
+
+    public static String getPcdDatabaseCommonDefinitions () 
+        throws EntityException {
+
+        String retStr = "";
+        try {
+						File file = new File(GlobalData.getWorkspacePath() + File.separator + 
+																 "Tools" + File.separator + 
+																 "Conf" + File.separator +
+																 "Pcd" + File.separator +
+																 "PcdDatabaseCommonDefinitions.sample");
+						System.out.println(GlobalData.getWorkspacePath());
+            FileReader reader = new FileReader(file);
+            BufferedReader  in = new BufferedReader(reader);
+            String str;
+            while ((str = in.readLine()) != null) {
+                retStr = retStr +"\r\n" + str;
+            }
+        } catch (Exception ex) {
+            throw new EntityException("Fatal error when generating PcdDatabase Common Definitions");
+        }
+
+        return retStr;
+    }
+
+		public static String getPcdDxeDatabaseDefinitions () 
+				throws EntityException {
+
+				String retStr = "";
+				try {
+						File file = new File(GlobalData.getWorkspacePath() + File.separator + 
+																 "Tools" + File.separator + 
+																 "Conf" + File.separator +
+																 "Pcd" + File.separator +
+																 "PcdDatabaseDxeDefinitions.sample");
+						FileReader reader = new FileReader(file);
+						BufferedReader  in = new BufferedReader(reader);
+						String str;
+						while ((str = in.readLine()) != null) {
+								retStr = retStr +"\r\n" + str;
+						}
+				} catch (Exception ex) {
+						throw new EntityException("Fatal error when generating PcdDatabase Dxe Definitions");
+				}
+
+				return retStr;
+		}
+
+		public static String getPcdPeiDatabaseDefinitions () 
+				throws EntityException {
+
+				String retStr = "";
+				try {
+						File file = new File(GlobalData.getWorkspacePath() + File.separator + 
+																 "Tools" + File.separator + 
+																 "Conf" + File.separator +
+																 "Pcd" + File.separator +
+																 "PcdDatabasePeiDefinitions.sample");
+						FileReader reader = new FileReader(file);
+						BufferedReader  in = new BufferedReader(reader);
+						String str;
+						while ((str = in.readLine()) != null) {
+								retStr = retStr +"\r\n" + str;
+						}
+				} catch (Exception ex) {
+						throw new EntityException("Fatal error when generating PcdDatabase Pei Definitions");
+				}
+
+				return retStr;
+		}
+
+}
 
 /** This action class is to collect PCD information from MSA, SPD, FPD xml file.
     This class will be used for wizard and build tools, So it can *not* inherit
@@ -120,6 +1255,10 @@ public class CollectPCDAction {
          for module who consume this library and create usage instance for library for building.
       4) Collect token's package information from SPD, update these information for token in memory
          database.
+      5) Generate 3 strings for a) All modules using Dynamic(Ex) PCD entry. (Token Number)
+                                b) PEI PCD Database (C Structure) for PCD Service PEIM
+                                c) DXE PCD Database (C structure) for PCD Service DXE
+                                
       
       @throws  EntityException Exception indicate failed to execute this action.
       
@@ -207,9 +1346,48 @@ public class CollectPCDAction {
                 }
             }
         }
+        
+        //
+        // Call Private function genPcdDatabaseSourceCode (void); ComponentTypeBsDriver
+        // 1) Generate for PEI, DXE PCD DATABASE's definition and initialization.
+				//
+				genPcdDatabaseSourceCode ();
+				
     }
 
-    /**
+		/**
+			This function generates source code for PCD Database.
+		 
+			@param void
+			@throws EntityException  If the token does *not* exist in memory database.
+
+		**/
+
+    private void genPcdDatabaseSourceCode			()
+			throws EntityException {
+				String PcdCommonHeaderString = PcdDatabase.getPcdDatabaseCommonDefinitions ();
+
+				ArrayList<Token> alPei = new ArrayList<Token> ();
+				ArrayList<Token> alDxe = new ArrayList<Token> ();
+
+				dbManager.getTwoPhaseDynamicRecordArray(alPei, alDxe);
+        PcdDatabase pcdPeiDatabase = new PcdDatabase (alPei, "PEI", 0);
+				pcdPeiDatabase.genCode();
+				dbManager.PcdPeimHString        = PcdCommonHeaderString + pcdPeiDatabase.getHString()
+																						+ PcdDatabase.getPcdPeiDatabaseDefinitions();
+				dbManager.PcdPeimCString				= pcdPeiDatabase.getCString();
+
+        PcdDatabase pcdDxeDatabase = new PcdDatabase (alDxe, 
+																											"DXE",
+																											alPei.size()
+																											);
+				pcdDxeDatabase.genCode();
+				dbManager.PcdDxeHString   = dbManager.PcdPeimHString + pcdDxeDatabase.getHString()
+																			+ PcdDatabase.getPcdDxeDatabaseDefinitions();
+				dbManager.PcdDxeCString		= pcdDxeDatabase.getCString();
+		}
+
+		/**
       This function will collect inherit PCD information from library for a module.
      
       This function will create two usage instance for inherited PCD token, one is 
@@ -501,6 +1679,7 @@ public class CollectPCDAction {
             token.assignedtokenNumber  = Integer.decode(pcdBuildData.getToken().getStringValue());
             skuDataArray               = pcdBuildData.getSkuDataArray1();
             token.datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
+						token.datumSize    = pcdBuildData.getDatumSize();
 
             if(skuDataArray != null) {
                 for(skuIndex = 0; skuIndex < skuDataArray.size(); skuIndex ++) {

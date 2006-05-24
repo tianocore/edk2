@@ -20,12 +20,25 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.pcd.action.ActionMessage;
+
+class AlignmentSizeComp implements Comparator {
+    public int compare (Object a, Object b) {
+        Token tA = (Token) a;
+        Token tB = (Token) b;
+
+        return Token.getAutogendatumTypeAlignmentSize(tA.datumType) 
+                - Token.getAutogendatumTypeAlignmentSize(tB.datumType);
+    }
+}
 
 /** Database hold all PCD information comes from SPD, MSA, FPD file in memory.
 **/
@@ -39,6 +52,11 @@ public class MemoryDatabaseManager {
     /// The log file name for dumping memory database.
     ///
     private static String              logFileName    = null;
+
+    public static String PcdPeimHString       = "";
+		public static String PcdPeimCString				= "";
+    public static String PcdDxeHString  			= "";
+    public static String PcdDxeCString  			= "";
 
     /**
       Constructure function
@@ -135,7 +153,81 @@ public class MemoryDatabaseManager {
         return tokenArray;
     }
 
+
+    private ArrayList getDynamicRecordArray() {
+        Token[]     tokenArray  =   getRecordArray();
+        int         index       =   0;
+        int         count       =   0;
+        ArrayList   al          =   new ArrayList();
+
+        for (index = 0; index < tokenArray.length; index++) {
+            if (tokenArray[index].pcdType == Token.PCD_TYPE.DYNAMIC ||
+                tokenArray[index].pcdType == Token.PCD_TYPE.DYNAMIC_EX) {
+                al.add(tokenArray[index]);
+            }
+        }
+
+        return al;
+    }
+
+
     /**
+      Get the token record array contained all PCD token referenced by PEI phase.
+          The output array is sorted based on descending order of the size of alignment for each feilds.
+
+      @return the token record array contained all PCD token referenced in PEI phase.
+    **/
+    public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe) {
+        int                     usageInstanceIndex  =   0;
+        int                     index               =   0;
+        ArrayList               tokenArrayList      =   getDynamicRecordArray();
+        List<UsageInstance>     usageInstanceArray  =   null;
+        UsageInstance           usageInstance       =   null;
+
+				//pei = new ArrayList<Token>();
+				//dxe = new ArrayList<Token>();
+
+        for (index = 0; index < tokenArrayList.size(); index++) {
+            boolean found   =   false;
+            Token       token = (Token) tokenArrayList.get(index);
+            if (token.producers != null) {
+                usageInstanceArray = token.producers;
+                for (usageInstanceIndex = 0; usageInstanceIndex < usageInstanceArray.size(); usageInstanceIndex++) {
+                    usageInstance = (UsageInstance) usageInstanceArray.get(usageInstanceIndex);
+                    if (CommonDefinition.isPeiPhaseComponent(usageInstance.componentType)) {
+                        pei.add(token);
+                        found = true;
+                        break;
+                    }
+                }
+
+            }
+            if (!found) {
+                if (token.consumers != null) {
+                    usageInstanceArray = token.consumers;
+                    for (usageInstanceIndex = 0; usageInstanceIndex < usageInstanceArray.size(); usageInstanceIndex ++) {
+                        usageInstance =(UsageInstance) usageInstanceArray.get(usageInstanceIndex);
+                        if (CommonDefinition.isPeiPhaseComponent(usageInstance.componentType)) {
+                            pei.add(token);
+														found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+						//
+						// If no PEI components reference the PCD entry, we insert it to DXE list
+						//
+						if (!found) {
+								dxe.add(token);
+						}
+        }
+
+				return;
+    }
+
+		/**
       Get all PCD record for a module according to module's name.
      
       @param moduleName  the name of module.

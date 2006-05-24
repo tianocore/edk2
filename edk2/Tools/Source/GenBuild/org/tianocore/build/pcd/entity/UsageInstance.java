@@ -328,7 +328,7 @@ public class UsageInstance {
             )
           );
       }
- 
+
       switch(parentToken.pcdType) {
         case FEATURE_FLAG:
           if(CommonDefinition.isLibraryComponent(componentType)) {
@@ -429,7 +429,8 @@ public class UsageInstance {
                            parentToken.cName
                            );
           break;
-        case DYNAMIC:
+			case DYNAMIC:
+					hAutogenStr += "\r\n";
           hAutogenStr += String.format(
                            "#define _PCD_MODE_%s_%s  LibPcdGet%s(_PCD_TOKEN_%s)\r\n",
                            Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
