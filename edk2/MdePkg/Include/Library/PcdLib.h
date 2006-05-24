@@ -92,12 +92,12 @@ Module Name: PcdLib.h
 //
 // Dynamic Set Ex
 //
-#define PcdSetEx8   (Guid, TokenName, Value)      LibPcdSetEx8   (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx16  (Guid, TokenName, Value)      LibPcdSetEx16  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx32  (Guid, TokenName, Value)      LibPcdSetEx32  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx64  (Guid, TokenName, Value)      LibPcdSetEx64  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetExPtr (Guid, TokenName, Value)      LibPcdSetExPtr (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetExBool(Guid, TokenName, Value)      LibPcdSetExBool(Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx8(Guid, TokenName, Value)      LibPcdSetEx8   (Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx16(Guid, TokenName, Value)     LibPcdSetEx16  (Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx32(Guid, TokenName, Value)     LibPcdSetEx32  (Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx64(Guid, TokenName, Value)     LibPcdSetEx64  (Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetExPtr(Guid, TokenName, Value)    LibPcdSetExPtr (Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetExBool(Guid, TokenName, Value)   LibPcdSetExBool(Guid, _PCD_TOKEN_##TokenName, Value)
 
 
 /**
