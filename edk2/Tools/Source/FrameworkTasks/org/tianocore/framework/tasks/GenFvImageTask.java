@@ -14,7 +14,6 @@
 
  **/
 package org.tianocore.framework.tasks;
-import java.io.File;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -22,6 +21,16 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.ProcessBuilder;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
   GenFvImageTask
@@ -31,6 +40,10 @@ import org.apache.tools.ant.types.Commandline;
 **/
 public class GenFvImageTask extends Task implements EfiDefine{
     ///
+    /// tool name
+    ///
+    static final private String toolName = "GenFvImage";
+    ///
     /// The name of input inf file
     ///
     private String infFile="";
@@ -38,7 +51,15 @@ public class GenFvImageTask extends Task implements EfiDefine{
     /// The target architecture.
     ///
     private String arch="";
-    
+    ///
+    /// Output directory
+    ///
+    private String outputDir = ".";
+    ///
+    /// argument list
+    ///
+    LinkedList<String> argList = new LinkedList<String>();
+
     /**
       execute
       
@@ -48,67 +69,44 @@ public class GenFvImageTask extends Task implements EfiDefine{
     public void execute() throws BuildException  {
         Project project = this.getOwningTarget().getProject();
         String path = project.getProperty("env.Framework_Tools_Path");
-        String command = "";
-        
-        if (path == null){
+        if (path == null) {
             path = "";
-        }else {
-            path = path + File.separatorChar;
+        } else {
+            path += File.separatorChar;
         }
-        
-        if (arch.equalsIgnoreCase("")){
-            command = path + "GenFvImage";
+
+        if (arch != null && arch.length() > 0) {
+            argList.addFirst(path + toolName + "_" + arch);
+        } else {
+            argList.addFirst(path + toolName);
         }
-        if (arch.equalsIgnoreCase("ia32")){
-            command = path + "GenFvImage_IA32";
-        }   
-        if (arch.equalsIgnoreCase("x64")){
-            command = path + "GenFvImage_X64";
-        }
-        if (arch.equalsIgnoreCase("ipf")){
-            command = path + "GenFvImage_IPF";
-        }
-        String argument = infFile;
-        
+
+        ///
+        /// lauch the program
+        ///
+        ProcessBuilder pb = new ProcessBuilder(argList);
+        pb.directory(new File(outputDir));
+        int exitCode = 0;
         try {
-            
-            Commandline commandLine = new Commandline();
-            commandLine.setExecutable(command);
-            commandLine.createArgument().setLine(argument);
-            
-            LogStreamHandler streamHandler = new LogStreamHandler(this,
-                                                   Project.MSG_INFO,
-                                                   Project.MSG_WARN);
-            //
-            // create a execute object and set it's commandline
-            //
-            Execute runner = new Execute(streamHandler,null);
-            runner.setAntRun(project);
-            runner.setCommandline(commandLine.getCommandline());            
-            System.out.println(Commandline.toString(commandLine.getCommandline()));
-            
-            int revl = -1;
-            //
-            //  user execute class call external programs - GenFvImage
-            //
-            revl = runner.execute();
-            // 
-            // execute command line success!
-            //
-            if (EFI_SUCCESS == revl){
-                System.out.println("GenFvImage succeeded!");
+            Process cmdProc = pb.start();
+            InputStreamReader cmdOut = new InputStreamReader(cmdProc.getInputStream());
+            char[] buf = new char[1024];
+
+            exitCode = cmdProc.waitFor();
+            if (exitCode != 0) {
+                int len = cmdOut.read(buf, 0, 1024);
+                log(new String(buf, 0, len), Project.MSG_ERR);
             } else {
-                
-            // 
-            // execute command line failed! 
-            //
-                throw new BuildException("GenFvImage failed !(error =" + 
-                    Integer.toHexString(revl) + ")");
+                log("GenFvImage - DONE!", Project.MSG_VERBOSE);
             }
-            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }       
+            throw new BuildException(e.getMessage());
+        } finally {
+            if (exitCode != 0) {
+                throw new BuildException("GenFvImage: failed to generate FV file!");
+            }
+        }
+
     }
     /**
       getInfFile
@@ -128,7 +126,9 @@ public class GenFvImageTask extends Task implements EfiDefine{
       @param infFile  name of infFile
     **/
     public void setInfFile(String infFile) {
-        this.infFile = "-I " + infFile;
+        this.infFile = infFile;
+        argList.add("-I");
+        argList.add(infFile);
     }
     
     /**
@@ -150,5 +150,27 @@ public class GenFvImageTask extends Task implements EfiDefine{
     **/
     public void setArch(String arch) {
         this.arch = arch;
-    }   
+    }
+
+    /**
+      getOutputDir
+      
+      This function is to get output directory.
+      
+      @return                Path of output directory.
+    **/
+    public String getOutputDir() {
+        return outputDir;
+    }
+
+    /**
+      setOutputDir
+      
+      This function is to set output directory.
+      
+      @param outputDir        The output direcotry.
+    **/
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
+    }
 }
