@@ -98,6 +98,7 @@ AsciiSPrintUnicodeFormat (
   );
 
 UINTN
+EFIAPI
 UnicodeValueToString (
   IN OUT CHAR16  *Buffer,
   IN UINTN       Flags,
@@ -106,6 +107,7 @@ UnicodeValueToString (
   );
 
 UINTN
+EFIAPI
 AsciiValueToString (
   IN OUT CHAR8  *Buffer,
   IN UINTN      Flags,

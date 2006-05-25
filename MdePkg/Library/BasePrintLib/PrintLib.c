@@ -637,3 +637,27 @@ AsciiSPrintUnicodeFormat (
   VA_START (Marker, FormatString);
   return AsciiVSPrintUnicodeFormat (StartOfBuffer, BufferSize, FormatString, Marker);
 }
+
+UINTN
+EFIAPI
+UnicodeValueToString (
+  IN OUT CHAR16  *Buffer,
+  IN UINTN       Flags,
+  IN INT64       Value,
+  IN UINTN       Width
+  )
+{
+  return BasePrintLibConvertValueToString ((CHAR8 *)Buffer, Flags, Value, Width, 2);
+}
+
+UINTN
+EFIAPI
+AsciiValueToString (
+  IN OUT CHAR8  *Buffer,
+  IN UINTN      Flags,
+  IN INT64      Value,
+  IN UINTN      Width
+  )
+{
+  return BasePrintLibConvertValueToString ((CHAR8 *)Buffer, Flags, Value, Width, 1);
+}
