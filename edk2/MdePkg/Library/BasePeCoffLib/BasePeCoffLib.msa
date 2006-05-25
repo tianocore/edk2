@@ -27,9 +27,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <Specification>0</Specification>
     <Created>2006-03-09 23:16</Created>
     <Updated>2006-03-19 15:17</Updated>
+    <Specification>0</Specification>
   </MsaLibHeader>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">PeCoffLib</LibraryClass>
