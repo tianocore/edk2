@@ -24,7 +24,10 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Path"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
@@ -45,8 +48,14 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Modified"/>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                </xs:choice>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Modified"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
+                </xs:choice>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -62,8 +71,14 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Modified"/>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                </xs:choice>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Modified"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
+                </xs:choice>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -83,9 +98,12 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -104,9 +122,12 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -128,7 +149,10 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy">
                    <xs:annotation>
                        <xs:documentation xml:lang="en">DO NOT USE! removing from XMLSchema</xs:documentation>
@@ -153,7 +177,10 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Created"/>
+                <xs:choice minOccurs="1" maxOccurs="1">
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="E-Mail"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="URL"/>
