@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns="http://www.TianoCore.org/2006/Edk2.0" targetNamespace="http://www.TianoCore.org/2006/Edk2.0">
-    <!--
+  <!--
     Filename: FrameworkDataElements.xsd
     
     Copyright (c) 2006, Intel Corp.
@@ -12,40 +12,33 @@
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     
   -->
+  <xs:annotation>
+    <xs:documentation xml:lang="en"> This schema defines EFI and Framework Data Elements </xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="NamingConvention.xsd"/>
+  <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
+  <xs:element name="Abstract" type="Sentence">
     <xs:annotation>
-        <xs:documentation xml:lang="en"> This schema defines EFI and Framework Data Elements </xs:documentation>
+      <xs:documentation xml:lang="en">Abstract is valid for all Description Files</xs:documentation>
+      <xs:documentation xml:lang="en">This section is required. This is a single sentence to describe the module and will be used in sample files as the abstract data in the header comment section.</xs:documentation>
     </xs:annotation>
-    <xs:include schemaLocation="NamingConvention.xsd"/>
-    <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
-    <xs:element name="Abstract">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Abstract is valid for all Description Files</xs:documentation>
-            <xs:documentation xml:lang="en">This section is required. This is a single sentence to describe the module and will be used in sample files as the abstract data in the header comment section.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="Sentence">
-                    <xs:attribute name="URL" type="xs:anyURI"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="AntCmd">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This is a sub-element of AntTask</xs:documentation>
-            <xs:documentation xml:lang="en">This is an ant command that will be inserted into a biuld sequence. Since ant commands are valid XML statements, special care must be taken to use the correct tokens for reserved words and escape quote characters.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" name="Id" type="xs:int"/>
-                <xs:element name="ExecutionOrder">
-                    <xs:simpleType>
-                        <xs:list itemType="xs:normalizedString"/>
-                    </xs:simpleType>
-                </xs:element>
-            </xs:sequence>
-            <xs:attributeGroup ref="SectionAttributes"/>
-        </xs:complexType>
+  </xs:element>
+  <xs:element name="AntCmd">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This is a sub-element of AntTask</xs:documentation>
+      <xs:documentation xml:lang="en">This is an ant command that will be inserted into a biuld sequence. Since ant commands are valid XML statements, special care must be taken to use the correct tokens for reserved words and escape quote characters.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="Id" type="xs:int"/>
+          <xs:element name="ExecutionOrder">
+            <xs:simpleType>
+              <xs:list itemType="xs:normalizedString"/>
+            </xs:simpleType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attributeGroup ref="SectionAttributes"/>
+      </xs:complexType>
     </xs:element>
     <xs:element name="AntTask">
         <xs:annotation>
@@ -172,6 +165,7 @@
     <xs:element name="Constructor" type="C_Name"/>
     <xs:element name="Copyright" type="Sentence"/>
     <xs:element name="Created" type="DateType"/>
+    <xs:element name="CreatedDate" type="DateType"/>
     <xs:element name="CreatedBy" type="UserName"/>
     <xs:element name="DataHubs">
         <xs:annotation>
