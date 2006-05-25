@@ -17,11 +17,18 @@
   </xs:annotation>
   <xs:include schemaLocation="NamingConvention.xsd"/>
   <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
-  <xs:element name="Abstract" type="Sentence">
+  <xs:element name="Abstract">
     <xs:annotation>
       <xs:documentation xml:lang="en">Abstract is valid for all Description Files</xs:documentation>
       <xs:documentation xml:lang="en">This section is required. This is a single sentence to describe the module and will be used in sample files as the abstract data in the header comment section.</xs:documentation>
     </xs:annotation>
+      <xs:complexType>
+        <xs:simpleContent>
+          <xs:extension base="Sentence">
+            <xs:attribute name="URL" type="xs:anyURI" use="optional"/>
+          </xs:extension>
+        </xs:simpleContent>
+      </xs:complexType>
   </xs:element>
   <xs:element name="AntCmd">
     <xs:annotation>
@@ -713,7 +720,7 @@
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="Paragraph">
-                    <xs:attribute name="URL" type="xs:anyURI"/>
+                    <xs:attribute name="URL" type="xs:anyURI" use="optional"/>
                 </xs:extension>
             </xs:simpleContent>
         </xs:complexType>
