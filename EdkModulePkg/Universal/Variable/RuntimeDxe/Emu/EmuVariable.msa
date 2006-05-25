@@ -27,8 +27,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <Specification>0</Specification>
     <Created>2006-03-23 16:05</Created>
+    <Specification>0</Specification>
   </MsaHeader>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>

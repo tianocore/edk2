@@ -17,8 +17,8 @@
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
     <Created>2006-04-26 13:50</Created>
+    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
   </MsaLibHeader>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">EdkPeCoffLoaderLib</LibraryClass>
