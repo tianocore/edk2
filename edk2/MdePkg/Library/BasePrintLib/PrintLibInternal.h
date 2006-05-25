@@ -39,7 +39,7 @@
 ///   Maximum Length Decimal String     = 28    "-9,223,372,036,854,775,808"
 ///   Maximum Length Hexidecimal String = 17    "FFFFFFFFFFFFFFFF"
 ///   Maximum Length GUID               = 37    "00000000-0000-0000-0000-000000000000"
-///   Maximum Length TIME               = 17    "12/12/2006  12:12"
+///   Maximum Length TIME               = 18    "12/12/2006  12:12"
 ///
 #define MAXIMUM_VALUE_CHARACTERS  38
 
@@ -85,3 +85,11 @@ BasePrintLibValueToString (
   IN UINTN      Radix
   );
 
+UINTN
+BasePrintLibConvertValueToString (
+  IN OUT CHAR8   *Buffer,
+  IN UINTN       Flags,
+  IN INT64       Value,
+  IN UINTN       Width,
+  IN UINTN       Increment
+  );

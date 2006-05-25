@@ -72,7 +72,7 @@ DebugPrint (
   Prints an assert message containing a filename, line number, and description.  
   This may be followed by a breakpoint or a dead loop.
 
-  Print a message of the form “ASSERT <FileName>(<LineNumber>): <Description>\n” 
+  Print a message of the form “ASSERT <FileName>(<LineNumber>): <Description>\n?
   to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of 
   PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if 
   DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
@@ -81,9 +81,9 @@ DebugPrint (
   DebugAssert() must actively prevent recusrsion.  If DebugAssert() is called while
   processing another DebugAssert(), then DebugAssert() must return immediately.
 
-  If FileName is NULL, then a <FileName> string of “(NULL) Filename” is printed.
+  If FileName is NULL, then a <FileName> string of ?NULL) Filename?is printed.
 
-  If Description is NULL, then a <Description> string of “(NULL) Description” is printed.
+  If Description is NULL, then a <Description> string of ?NULL) Description?is printed.
 
   @param  FileName     Pointer to the name of the source file that generated the assert condition.
   @param  LineNumber   The line number in the source file that generated the assert condition
@@ -108,7 +108,7 @@ DebugAssert (
 
   If Buffer is NULL, then ASSERT().
 
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS ?Buffer + 1), then ASSERT(). 
 
   @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
   @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
@@ -321,7 +321,7 @@ DebugClearMemoryEnabled (
           _ASSERT (Guid already installed in database);                    \
         }                                                                  \
       } else {                                                             \
-        if (!EFI_ERROR (gBS->HandleProtocol (Guid, Handle, &Instance))) {  \
+        if (!EFI_ERROR (gBS->HandleProtocol (Handle, Guid, &Instance))) {  \
           _ASSERT (Guid already installed on Handle);                      \
         }                                                                  \
       }                                                                    \
@@ -411,7 +411,7 @@ DebugClearMemoryEnabled (
   by TYPE is compared to TestSignature.  If the signatures match, then a pointer 
   to the pointer to a data structure of the type specified by TYPE is returned.  
   If the signatures do not match, then DebugAssert() is called with a description 
-  of “CR has a bad signature” and Record is returned.  
+  of “CR has a bad signature?and Record is returned.  
 
   If the data type specified by TYPE does not contain the field specified by Field, 
   then the module will not compile.

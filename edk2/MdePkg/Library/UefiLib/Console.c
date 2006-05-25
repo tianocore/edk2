@@ -263,6 +263,10 @@ UnicodeStringDisplayLength (
   UINTN      Length;
   UINTN      Width;
 
+  if (String == NULL) {
+    return 0;
+  }
+
   Length = 0;
   while (*String != 0) {
     Width = GetGlyphWidth (*String);

@@ -301,8 +301,12 @@ Returns:
   EFI_STATUS               Status;
   EFI_HOB_MEMORY_POOL      *Hob;
 
-
-  Status = PeiCoreCreateHob (
+ //
+ // If some ¡°post-memory¡± PEIM wishes to allocate larger pool,
+ // it should use AllocatePages service instead.
+ //
+ ASSERT (Size < 0x10000 - sizeof (EFI_HOB_MEMORY_POOL));
+ Status = PeiCoreCreateHob (
              EFI_HOB_TYPE_PEI_MEMORY_POOL,
              (UINT16)(sizeof (EFI_HOB_MEMORY_POOL) + Size),
              (VOID **)&Hob

@@ -128,26 +128,3 @@ BasePrintLibConvertValueToString (
 
   return ((Buffer - OriginalBuffer) / Increment);
 }
-
-
-UINTN
-UnicodeValueToString (
-  IN OUT CHAR16  *Buffer,
-  IN UINTN       Flags,
-  IN INT64       Value,
-  IN UINTN       Width
-  )
-{
-  return BasePrintLibConvertValueToString ((CHAR8 *)Buffer, Flags, Value, Width, 2);
-}
-
-UINTN
-AsciiValueToString (
-  IN OUT CHAR8  *Buffer,
-  IN UINTN      Flags,
-  IN INT64      Value,
-  IN UINTN      Width
-  )
-{
-  return BasePrintLibConvertValueToString ((CHAR8 *)Buffer, Flags, Value, Width, 1);
-}

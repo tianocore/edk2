@@ -158,6 +158,10 @@ InternalAllocateAlignedPages (
     return NULL;
   }
   //
+  // Make sure that Pages plus EFI_SIZE_TO_PAGES (Alignment) does not overflow.
+  //
+  ASSERT (Pages <= (MAX_ADDRESS - EFI_SIZE_TO_PAGES (Alignment)));
+  //
   // We would rather waste some memory to save PEI code size.
   //
   Memory = InternalAllocatePages (MemoryType, Pages + EFI_SIZE_TO_PAGES (Alignment));
@@ -569,6 +573,10 @@ InternalAllocateAlignedPool (
   } else {
     AlignmentMask = Alignment - 1;
   }
+  //
+  // Make sure that AllocationSize plus AlignmentMask does not overflow.
+  //
+  ASSERT (AllocationSize <= (MAX_ADDRESS - AlignmentMask));
 
   RawAddress      = InternalAllocatePool (PoolType, AllocationSize + AlignmentMask);
   
@@ -608,6 +616,11 @@ AllocateAlignedPool (
   } else {
     AlignmentMask = Alignment - 1;
   }
+
+  //
+  // Make sure that AllocationSize plus AlignmentMask does not overflow.
+  //
+  ASSERT (AllocationSize <= (MAX_ADDRESS - AlignmentMask));
 
   RawAddress      = AllocatePool (AllocationSize + AlignmentMask);
   
