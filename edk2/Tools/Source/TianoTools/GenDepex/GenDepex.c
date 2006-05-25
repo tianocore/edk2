@@ -690,21 +690,33 @@ Returns:
         Ptrx++;
       }
 
-      ArgCountParsed = sscanf (
-                        Ptrx,
-						"%x, %x, %x, { %x, %x, %x, %x, %x, %x, %x, %x }",
-                        &Guid.Data1,
-                        &Guid.Data2,
-                        &Guid.Data3,
-                        &Guid.Data4[0],
-                        &Guid.Data4[1],
-                        &Guid.Data4[2],
-                        &Guid.Data4[3],
-                        &Guid.Data4[4],
-                        &Guid.Data4[5],
-                        &Guid.Data4[6],
-                        &Guid.Data4[7]
-                        );
+      {
+        int byte_index;
+        // This is an array of UINT32s. sscanf will trash memory
+        // if you try to read into a UINT8 with a %x formatter.
+        UINT32 Guid_Data4[8];
+
+        ArgCountParsed = sscanf (
+                         Ptrx,
+            "%x, %x, %x, { %x, %x, %x, %x, %x, %x, %x, %x }",
+                         &Guid.Data1,
+                         &Guid.Data2,
+                         &Guid.Data3,
+                         &Guid_Data4[0],
+                         &Guid_Data4[1],
+                         &Guid_Data4[2],
+                         &Guid_Data4[3],
+                         &Guid_Data4[4],
+                         &Guid_Data4[5],
+                         &Guid_Data4[6],
+                         &Guid_Data4[7]
+                         );
+        
+        // Now we can copy the 32 bit ints into the GUID.
+        for (byte_index=0; byte_index<8; byte_index++) {
+          Guid.Data4[byte_index] = (UINT8) Guid_Data4[byte_index];
+        }
+      }
 
       if (ArgCountParsed != 11) {
         printf ("We have found an illegal GUID\n");
