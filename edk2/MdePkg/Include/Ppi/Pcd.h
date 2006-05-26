@@ -17,149 +17,150 @@
 #ifndef __PCD_H__
 #define __PCD_H__
 
+#include <Common/Pcd.h>
+
 extern EFI_GUID gPcdPpiGuid;
 
 #define PCD_PPI_GUID \
   { 0x632df884, 0x8023, 0x4872, { 0xb6, 0x70, 0xb7, 0x4a, 0x30, 0x19, 0x16, 0xe9 } }
 
-typedef UINT8   SKU_ID;
-
 typedef 
-EFI_STATUS
+VOID
 (EFIAPI *PCD_PPI_SET_SKU) (
-  IN  UINTN          SkuId
+  IN  SKU_ID          SkuId
   );
 
 typedef
 UINT8
 (EFIAPI *PCD_PPI_GET8) (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINT16
 (EFIAPI *PCD_PPI_GET16) (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINT32
 (EFIAPI *PCD_PPI_GET32) (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINT64
 (EFIAPI *PCD_PPI_GET64) (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 VOID *
 (EFIAPI *PCD_PPI_GET_POINTER) (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 BOOLEAN
 (EFIAPI *PCD_PPI_GET_BOOLEAN) (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINTN
 (EFIAPI *PCD_PPI_GET_SIZE) (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINT8
 (EFIAPI *PCD_PPI_GET_EX_8) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINT16
 (EFIAPI *PCD_PPI_GET_EX_16) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN              TokenNumber
+  IN PCD_TOKEN_NUMBER   TokenNumber
   );
 
 typedef
 UINT32
 (EFIAPI *PCD_PPI_GET_EX_32) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINT64
 (EFIAPI *PCD_PPI_GET_EX_64) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 VOID *
 (EFIAPI *PCD_PPI_GET_EX_POINTER) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 BOOLEAN
 (EFIAPI *PCD_PPI_GET_EX_BOOLEAN) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 UINTN
 (EFIAPI *PCD_PPI_GET_EX_SIZE) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET8) (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT8             Value
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET16) (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
   IN UINT16             Value
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET32) (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT32            Value
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET64) (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT64            Value
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_POINTER) (
-  IN UINTN             TokenNumber,
-  IN CONST VOID        *Value
+  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             SizeOfBuffer,
+  IN VOID              *Buffer
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_BOOLEAN) (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN BOOLEAN           Value
   );
 
@@ -167,7 +168,7 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_8) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT8             Value
   );
 
@@ -175,7 +176,7 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_16) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT16            Value
   );
 
@@ -183,7 +184,7 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_32) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT32            Value
   );
 
@@ -191,7 +192,7 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_64) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT64            Value
   );
 
@@ -199,15 +200,16 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_POINTER) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN CONST VOID        *Value
+  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             SizeOfBuffer,
+  IN VOID              *Buffer
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_SET_EX_BOOLEAN) (
   IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN BOOLEAN           Value
   );
 
@@ -225,16 +227,16 @@ EFI_STATUS
 typedef
 VOID
 (EFIAPI *PCD_PPI_CALLBACK) (
-  IN  CONST EFI_GUID   *CallBackGuid, OPTIONAL
-  IN  UINTN            CallBackToken,
-  IN  VOID             *TokenData,
-  IN  UINTN            TokenDataSize
+  IN      CONST EFI_GUID   *CallBackGuid, OPTIONAL
+  IN      PCD_TOKEN_NUMBER CallBackToken,
+  IN  OUT VOID             *TokenData,
+  IN      UINTN            TokenDataSize
   );
 
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_CALLBACK_ONSET) (
-  IN  UINTN                  TokenNumber,
+  IN  PCD_TOKEN_NUMBER       TokenNumber,
   IN  CONST EFI_GUID         *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK       CallBackFunction
   );
@@ -242,7 +244,7 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_CANCEL_CALLBACK) (
-  IN  UINTN                   TokenNumber,
+  IN  PCD_TOKEN_NUMBER        TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK        CallBackFunction
   );
@@ -251,7 +253,7 @@ typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_GET_NEXT_TOKEN) (
   IN CONST EFI_GUID           *Guid, OPTIONAL
-  IN OUT  UINTN               *TokenNumber
+  IN OUT  PCD_TOKEN_NUMBER    *TokenNumber
   );
 
 typedef struct {

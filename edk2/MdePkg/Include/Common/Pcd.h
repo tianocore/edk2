@@ -20,14 +20,6 @@
 typedef UINT32  PCD_TOKEN_NUMBER;
 typedef UINT8   SKU_ID;
 
-#define PCD_INVALID_TOKEN     ((PCD_TOKEN_NUMBER)(-1))
-
-typedef
-VOID
-(EFIAPI *PCD_PROTOCOL_CALLBACK) (
-  IN  UINT32       CallBackToken,
-  IN  VOID         *TokenData,
-  IN  UINTN        TokenDataSize
-  );
+#define PCD_INVALID_TOKEN_NUMBER     ((PCD_TOKEN_NUMBER)(-1))
 
 #endif

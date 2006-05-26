@@ -49,6 +49,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/GlobalVariable.h>
 
 #include <Ppi/Pcd.h>
-#include <Common/PcdTemp.h> //This will be removed when PCD PEIM is completed!
 
 #endif

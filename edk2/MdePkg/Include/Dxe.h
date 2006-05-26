@@ -46,6 +46,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/DataHubRecords.h>
 
 #include <Protocol/Pcd.h>
-#include <Common/PcdTemp.h> //This will be removed when PCD PEIM is completed!
 
 #endif

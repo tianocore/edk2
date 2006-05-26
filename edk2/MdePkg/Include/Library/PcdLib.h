@@ -18,6 +18,8 @@ Module Name: PcdLib.h
 #ifndef __PCD_LIB_H__
 #define __PCD_LIB_H__
 
+#include <Common/Pcd.h>
+
 
 #define PcdToken(TokenName)  _PCD_TOKEN_##TokenName
 
@@ -54,6 +56,12 @@ Module Name: PcdLib.h
 #define PatchPcdGetBool(TokenName)  _gPcd_BinaryPatch_##TokenName
 #define PatchPcdGetPtr(TokenName)   ((VOID *)_gPcd_BinaryPatch_##TokenName)
 
+#define PatchPcdSet8(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = Value)
+#define PatchPcdSet16(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
+#define PatchPcdSet32(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
+#define PatchPcdSet64(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
+#define PatchPcdSetBool(TokenName, Value)  (_gPcd_BinaryPatch_##TokenName = Value)
+#define PatchPcdSetPtr(TokenName, Value, Size)   CopyMem (_gPcd_BinaryPatch_##TokenName, Value, Size)
 
 //
 // Dynamic is via the protocol with only the TokenNumber as argument
@@ -106,13 +114,13 @@ Module Name: PcdLib.h
   @param[in]  SkuId The SKU value that will be used when the PCD service will retrieve and 
               set values associated with a PCD token.
 
-  @retval UINTN Return the SKU ID that just be set.
+  @retval SKU_ID Return the SKU ID that just be set.
 
 **/
-UINTN
+SKU_ID
 EFIAPI
 LibPcdSetSku (
-  IN UINTN   SkuId
+  IN SKU_ID   SkuId
   );
 
 
@@ -127,7 +135,7 @@ LibPcdSetSku (
 UINT8
 EFIAPI
 LibPcdGet8 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -142,7 +150,7 @@ LibPcdGet8 (
 UINT16
 EFIAPI
 LibPcdGet16 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -157,7 +165,7 @@ LibPcdGet16 (
 UINT32
 EFIAPI
 LibPcdGet32 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -172,7 +180,7 @@ LibPcdGet32 (
 UINT64
 EFIAPI
 LibPcdGet64 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -187,7 +195,7 @@ LibPcdGet64 (
 VOID *
 EFIAPI
 LibPcdGetPtr (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -202,7 +210,7 @@ LibPcdGetPtr (
 BOOLEAN 
 EFIAPI
 LibPcdGetBool (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -217,7 +225,7 @@ LibPcdGetBool (
 UINTN
 EFIAPI
 LibPcdGetSize (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -236,7 +244,7 @@ UINT8
 EFIAPI
 LibPcdGetEx8 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -255,7 +263,7 @@ UINT16
 EFIAPI
 LibPcdGetEx16 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -274,7 +282,7 @@ UINT32
 EFIAPI
 LibPcdGetEx32 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -293,7 +301,7 @@ UINT64
 EFIAPI
 LibPcdGetEx64 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -312,7 +320,7 @@ VOID *
 EFIAPI
 LibPcdGetExPtr (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -331,7 +339,7 @@ BOOLEAN
 EFIAPI
 LibPcdGetExBool (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -350,7 +358,7 @@ UINTN
 EFIAPI
 LibPcdGetExSize (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   );
 
 
@@ -367,7 +375,7 @@ LibPcdGetExSize (
 UINT8
 EFIAPI
 LibPcdSet8 (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT8             Value
   );
 
@@ -385,7 +393,7 @@ LibPcdSet8 (
 UINT16
 EFIAPI
 LibPcdSet16 (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT16            Value
   );
 
@@ -403,7 +411,7 @@ LibPcdSet16 (
 UINT32
 EFIAPI
 LibPcdSet32 (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT32            Value
   );
 
@@ -421,7 +429,7 @@ LibPcdSet32 (
 UINT64
 EFIAPI
 LibPcdSet64 (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT64            Value
   );
 
@@ -440,7 +448,8 @@ LibPcdSet64 (
 VOID*
 EFIAPI
 LibPcdSetPtr (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             SizeOfBuffer,
   IN CONST VOID        *Value
   );
 
@@ -458,7 +467,7 @@ LibPcdSetPtr (
 BOOLEAN
 EFIAPI
 LibPcdSetBool (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN BOOLEAN           Value
   );
 
@@ -480,7 +489,7 @@ UINT8
 EFIAPI
 LibPcdSetEx8 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT8             Value
   );
 
@@ -502,7 +511,7 @@ UINT16
 EFIAPI
 LibPcdSetEx16 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT16            Value
   );
 
@@ -524,7 +533,7 @@ UINT32
 EFIAPI
 LibPcdSetEx32 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT32            Value
   );
 
@@ -546,7 +555,7 @@ UINT64
 EFIAPI
 LibPcdSetEx64 (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINT64            Value
   );
 
@@ -569,7 +578,8 @@ VOID *
 EFIAPI
 LibPcdSetExPtr (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             SizeOfBuffer,
   IN CONST VOID        *Value
   );
 
@@ -591,7 +601,7 @@ BOOLEAN
 EFIAPI
 LibPcdSetExBool (
   IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
   IN BOOLEAN           Value
   );
 
@@ -613,10 +623,10 @@ LibPcdSetExBool (
 typedef
 VOID
 (EFIAPI *PCD_CALLBACK) (
-  IN  CONST GUID   *CallBackGuid, OPTIONAL
-  IN  UINTN        CallBackToken,
-  IN  VOID         *TokenData,
-  IN  UINTN        TokenDataSize
+  IN        CONST GUID        *CallBackGuid, OPTIONAL
+  IN        PCD_TOKEN_NUMBER  CallBackToken,
+  IN  OUT   VOID              *TokenData,
+  IN        UINTN             TokenDataSize
   );
 
 
@@ -640,7 +650,7 @@ VOID
 EFIAPI
 LibPcdCallbackOnSet (
   IN CONST GUID               *Guid,       OPTIONAL
-  IN UINTN                    TokenNumber,
+  IN PCD_TOKEN_NUMBER         TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   );
 
@@ -659,7 +669,7 @@ VOID
 EFIAPI
 LibPcdCancelCallback (
   IN CONST GUID               *Guid,       OPTIONAL
-  IN UINTN                    TokenNumber,
+  IN PCD_TOKEN_NUMBER         TokenNumber,
   IN PCD_CALLBACK             NotificationFunction
   );
 
@@ -677,14 +687,14 @@ LibPcdCancelCallback (
   @param[in]  The previous PCD token number.  If 0, then retrieves the first PCD 
               token number.
 
-  @retval UINTN The next valid token number.
+  @retval PCD_TOKEN_NUMBER The next valid token number.
 
 **/
-UINTN
+PCD_TOKEN_NUMBER
 EFIAPI
 LibPcdGetNextToken (
   IN CONST GUID               *Guid,       OPTIONAL
-  IN UINTN                    *TokenNumber
+  IN PCD_TOKEN_NUMBER         TokenNumber
   );
 
 #endif
