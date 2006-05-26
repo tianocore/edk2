@@ -11,31 +11,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
    <property environment="env"/>
    <property name="WORKSPACE_DIR" value="${env.WORKSPACE}"/>
-   <import file="${WORKSPACE_DIR}\Tools\Conf\BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
-   <property name="MODULE_RELATIVE_PATH" value="Universal\PCD\Dxe"/>
-   <property name="MODULE_DIR" value="${PACKAGE_DIR}\${MODULE_RELATIVE_PATH}"/>
-   <property name="COMMON_FILE" value="${WORKSPACE_DIR}\Tools\Conf\Common.xml"/>
+   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml"/><!--MODULE_RELATIVE PATH is relative to PACKAGE_DIR-->
+   <property name="MODULE_RELATIVE_PATH" value="Universal/PCD/Dxe"/>
+   <property name="MODULE_DIR" value="${PACKAGE_DIR}/${MODULE_RELATIVE_PATH}"/>
+   <property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml"/>
    <target name="PcdDxe">
-      <GenBuild baseName="PcdDxe" mbdFilename="${MODULE_DIR}\Pcd.mbd" msaFilename="${MODULE_DIR}\Pcd.msa"/>
+      <GenBuild baseName="PcdDxe" mbdFilename="${MODULE_DIR}/Pcd.mbd" msaFilename="${MODULE_DIR}/Pcd.msa"/>
    </target>
    <target depends="PcdDxe_clean" name="clean"/>
    <target depends="PcdDxe_cleanall" name="cleanall"/>
    <target name="PcdDxe_clean">
-      <OutputDirSetup baseName="PcdDxe" mbdFilename="${MODULE_DIR}\Pcd.mbd" msaFilename="${MODULE_DIR}\Pcd.msa"/>
+      <OutputDirSetup baseName="PcdDxe" mbdFilename="${MODULE_DIR}/Pcd.mbd" msaFilename="${MODULE_DIR}/Pcd.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\PcdDxe_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/PcdDxe_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\PcdDxe_build.xml" target="clean"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/PcdDxe_build.xml" target="clean"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}" excludes="*.xml"/>
    </target>
    <target name="PcdDxe_cleanall">
-      <OutputDirSetup baseName="PcdDxe" mbdFilename="${MODULE_DIR}\Pcd.mbd" msaFilename="${MODULE_DIR}\Pcd.msa"/>
+      <OutputDirSetup baseName="PcdDxe" mbdFilename="${MODULE_DIR}/Pcd.mbd" msaFilename="${MODULE_DIR}/Pcd.msa"/>
       <if>
-         <available file="${DEST_DIR_OUTPUT}\PcdDxe_build.xml"/>
+         <available file="${DEST_DIR_OUTPUT}/PcdDxe_build.xml"/>
          <then>
-            <ant antfile="${DEST_DIR_OUTPUT}\PcdDxe_build.xml" target="cleanall"/>
+            <ant antfile="${DEST_DIR_OUTPUT}/PcdDxe_build.xml" target="cleanall"/>
          </then>
       </if>
       <delete dir="${DEST_DIR_OUTPUT}"/>
