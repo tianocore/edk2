@@ -83,16 +83,16 @@ PcdPeimInit (
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
+VOID
 EFIAPI
 PeiPcdSetSku (
-  IN  UINTN                  SkuId
+  IN  SKU_ID                  SkuId
   )
 {
 
-  GetPcdDatabase()->Init.SystemSkuId = (SKU_ID) SkuId;
+  GetPcdDatabase()->Init.SystemSkuId = SkuId;
 
-  return  EFI_SUCCESS;
+  return;
 }
 
 
@@ -100,7 +100,7 @@ PeiPcdSetSku (
 UINT8
 EFIAPI
 PeiPcdGet8 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   )
 {
   return *((UINT8 *) GetWorker (TokenNumber, sizeof (UINT8)));
@@ -111,7 +111,7 @@ PeiPcdGet8 (
 UINT16
 EFIAPI
 PeiPcdGet16 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   )
 {
   return ReadUnaligned16 (GetWorker (TokenNumber, sizeof (UINT16)));
@@ -122,7 +122,7 @@ PeiPcdGet16 (
 UINT32
 EFIAPI
 PeiPcdGet32 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   )
 {
   return ReadUnaligned32 (GetWorker (TokenNumber, sizeof (UINT32)));
@@ -133,7 +133,7 @@ PeiPcdGet32 (
 UINT64
 EFIAPI
 PeiPcdGet64 (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   )
 {
   return ReadUnaligned64 (GetWorker (TokenNumber, sizeof (UINT64)));
@@ -144,7 +144,7 @@ PeiPcdGet64 (
 VOID *
 EFIAPI
 PeiPcdGetPtr (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   )
 {
   return GetWorker (TokenNumber, 0);
@@ -155,7 +155,7 @@ PeiPcdGetPtr (
 BOOLEAN
 EFIAPI
 PeiPcdGetBool (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   )
 {
   return *((BOOLEAN *) GetWorker (TokenNumber, sizeof (BOOLEAN)));
@@ -166,7 +166,7 @@ PeiPcdGetBool (
 UINTN
 EFIAPI
 PeiPcdGetSize (
-  IN UINTN  TokenNumber
+  IN PCD_TOKEN_NUMBER  TokenNumber
   )
 {
   ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
@@ -180,7 +180,7 @@ UINT8
 EFIAPI
 PeiPcdGet8Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber
+  IN PCD_TOKEN_NUMBER  ExTokenNumber
   )
 {
   return *((UINT8 *) ExGetWorker (Guid, ExTokenNumber, sizeof (UINT8)));
@@ -192,7 +192,7 @@ UINT16
 EFIAPI
 PeiPcdGet16Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber
+  IN PCD_TOKEN_NUMBER  ExTokenNumber
   )
 {
   return ReadUnaligned16 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT16)));
@@ -204,7 +204,7 @@ UINT32
 EFIAPI
 PeiPcdGet32Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber
+  IN PCD_TOKEN_NUMBER  ExTokenNumber
   )
 {
   return ReadUnaligned32 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT32)));
@@ -216,7 +216,7 @@ UINT64
 EFIAPI
 PeiPcdGet64Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber
+  IN PCD_TOKEN_NUMBER  ExTokenNumber
   )
 {
   return ReadUnaligned64 (ExGetWorker (Guid, ExTokenNumber, sizeof (UINT64)));
@@ -228,7 +228,7 @@ VOID *
 EFIAPI
 PeiPcdGetPtrEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber
+  IN PCD_TOKEN_NUMBER  ExTokenNumber
   )
 {
   return ExGetWorker (Guid, ExTokenNumber, 0);
@@ -240,7 +240,7 @@ BOOLEAN
 EFIAPI
 PeiPcdGetBoolEx (
   IN CONST  EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER                  ExTokenNumber
   )
 {
   return *((BOOLEAN *) ExGetWorker (Guid, ExTokenNumber, sizeof (BOOLEAN)));
@@ -252,7 +252,7 @@ UINTN
 EFIAPI
 PeiPcdGetSizeEx (
   IN CONST  EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER                  ExTokenNumber
   )
 {
   EX_PCD_ENTRY_ATTRIBUTE      Attr;
@@ -267,7 +267,7 @@ PeiPcdGetSizeEx (
 EFI_STATUS
 EFIAPI
 PeiPcdSet8 (
-  IN UINTN             TokenNumber,
+  IN PCD_TOKEN_NUMBER             TokenNumber,
   IN UINT8             Value
   )
 {
@@ -279,7 +279,7 @@ PeiPcdSet8 (
 EFI_STATUS
 EFIAPI
 PeiPcdSet16 (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER              TokenNumber,
   IN UINT16             Value
   )
 {
@@ -291,7 +291,7 @@ PeiPcdSet16 (
 EFI_STATUS
 EFIAPI
 PeiPcdSet32 (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER              TokenNumber,
   IN UINT32             Value
   )
 {
@@ -303,7 +303,7 @@ PeiPcdSet32 (
 EFI_STATUS
 EFIAPI
 PeiPcdSet64 (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER              TokenNumber,
   IN UINT64             Value
   )
 {
@@ -314,16 +314,12 @@ PeiPcdSet64 (
 EFI_STATUS
 EFIAPI
 PeiPcdSetPtr (
-  IN UINTN              TokenNumber,
-  IN CONST VOID         *Value
+  IN PCD_TOKEN_NUMBER              TokenNumber,
+  IN UINTN                         SizeOfBuffer,
+  IN VOID                          *Buffer
   )
 {
-  //
-  // BugBug, please change the Size to Input size when sync with spec
-  //
-  //ASSERT (sizeof (Value) == GetPcdDatabase()->Init.SizeTable[TokenNumber]);
-
-  return SetWorker (TokenNumber, (VOID *) Value, GetPcdDatabase()->Init.SizeTable[TokenNumber], TRUE);
+  return SetWorker (TokenNumber, Buffer, SizeOfBuffer, TRUE);
 }
 
 
@@ -331,7 +327,7 @@ PeiPcdSetPtr (
 EFI_STATUS
 EFIAPI
 PeiPcdSetBool (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER              TokenNumber,
   IN BOOLEAN            Value
   )
 {
@@ -344,7 +340,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet8Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
   IN UINT8                  Value
   )
 {
@@ -363,7 +359,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet16Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
   IN UINT16                 Value
   )
 {
@@ -382,7 +378,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet32Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
   IN UINT32                 Value
   )
 {
@@ -401,7 +397,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet64Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
   IN UINT64                 Value
   )
 {
@@ -420,15 +416,16 @@ EFI_STATUS
 EFIAPI
 PeiPcdSetPtrEx (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
-  IN CONST VOID             *Value
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
+  IN UINTN                  SizeOfBuffer,
+  IN VOID                   *Value
   )
 {
   return          ExSetWorker(
                               ExTokenNumber, 
                               Guid,
-                              (VOID *) Value, 
-                              sizeof (Value), 
+                              Value, 
+                              SizeOfBuffer, 
                               TRUE
                               );
 }
@@ -439,7 +436,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSetBoolEx (
   IN CONST EFI_GUID       *Guid,
-  IN UINTN                ExTokenNumber,
+  IN PCD_TOKEN_NUMBER     ExTokenNumber,
   IN BOOLEAN              Value
   )
 {
@@ -458,7 +455,7 @@ PeiPcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 PcdRegisterCallBackOnSet (
-  IN  UINTN                       ExTokenNumber,
+  IN  PCD_TOKEN_NUMBER            ExTokenNumber,
   IN  CONST EFI_GUID              *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
@@ -471,7 +468,7 @@ PcdRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PcdUnRegisterCallBackOnSet (
-  IN  UINTN                       ExTokenNumber,
+  IN  PCD_TOKEN_NUMBER            ExTokenNumber,
   IN  CONST EFI_GUID              *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
@@ -485,22 +482,138 @@ EFI_STATUS
 EFIAPI
 PeiPcdGetNextToken (
   IN CONST EFI_GUID               *Guid, OPTIONAL
-  IN OUT  UINTN                   *TokenNumber
+  IN OUT  PCD_TOKEN_NUMBER                   *TokenNumber
   )
 {
+  UINTN               GuidTableIdx;
+  PEI_PCD_DATABASE    *PeiPcdDb;
+  EFI_GUID            *MatchGuid;
+  DYNAMICEX_MAPPING   *ExMapTable;
+  UINTN               i;
+  BOOLEAN             Found;
+    
   if (Guid == NULL) {
     *TokenNumber++;
 
-    if (*TokenNumber >= PEI_LOCAL_TOKEN_NUMBER) {
+    if (*TokenNumber >= PEI_NEX_TOKEN_NUMBER) {
       *TokenNumber = 0;
     }
-  }
+    
+  } else {
 
-  //
-  // BugBug: Haven't implemented the portion to get Next Token for GuidSpace is not Local GuidSpace.
-  //
+    if (PEI_EXMAP_TABLE_EMPTY) {
+      *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+      return EFI_NOT_FOUND;
+    }
+    
+    //
+    // Assume PCD Database AutoGen tool is sorting the ExMap based on the following order
+    // 1) ExGuid
+    // 2) ExTokenNumber
+    //
+    PeiPcdDb = GetPcdDatabase ();
+    
+    MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), Guid);
+
+    if (MatchGuid == NULL) {
+      *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+      return EFI_NOT_FOUND;
+    }
+
+    GuidTableIdx = MatchGuid - PeiPcdDb->Init.GuidTable;
+
+    ExMapTable = PeiPcdDb->Init.ExMapTable;
+
+    Found = FALSE;
+    for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
+      if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
+        Found = TRUE;
+        break;
+      }
+    }
+
+    if (Found) {
+      if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
+        *TokenNumber = ExMapTable[i].ExTokenNumber;
+         return EFI_SUCCESS;
+      }
+      
+      for ( ; ExMapTable[i].ExGuidIndex == GuidTableIdx; i++) {
+        if (ExMapTable[i].ExTokenNumber == *TokenNumber) {
+          i++;
+          if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
+            *TokenNumber = ExMapTable[i].ExTokenNumber;
+            return EFI_SUCCESS;
+          } else {
+            *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+            return EFI_SUCCESS;
+          }
+        }
+      }
+
+      return EFI_NOT_FOUND;
+    }
+    
+  }
 
   return EFI_SUCCESS;
 }
 
+EFI_GUID *
+EFIAPI
+PeiPcdGetNextTokenSpaceGuid (
+  IN CONST EFI_GUID               *Guid
+  )
+{
+  UINTN               GuidTableIdx;
+  EFI_GUID            *MatchGuid;
+  PEI_PCD_DATABASE    *PeiPcdDb;
+  DYNAMICEX_MAPPING   *ExMapTable;
+  UINTN               i;
+  BOOLEAN             Found;
+
+  if (PEI_EXMAP_TABLE_EMPTY) {
+    return NULL;
+  }
+
+  //
+  // Assume PCD Database AutoGen tool is sorting the ExMap based on the following order
+  // 1) ExGuid
+  // 2) ExTokenNumber
+  //
+  PeiPcdDb = GetPcdDatabase ();
+
+  MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), Guid);
+
+  if (MatchGuid == NULL) {
+    return NULL;
+  }
+  
+  GuidTableIdx = MatchGuid - PeiPcdDb->Init.GuidTable;
+
+  ExMapTable = PeiPcdDb->Init.ExMapTable;
+
+  Found = FALSE;
+  for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
+    if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
+      Found = TRUE;
+      break;
+    }
+  }
+
+  if (Found) {
+    for ( ; i < PEI_EXMAPPING_TABLE_SIZE; i++ ) {
+      if (ExMapTable[i].ExGuidIndex != GuidTableIdx ) {
+        if (i < PEI_EXMAPPING_TABLE_SIZE) {
+          return &PeiPcdDb->Init.GuidTable[ExMapTable[i].ExGuidIndex];
+        } else {
+          return NULL;
+        }
+      }
+    }
+  }
+
+  return NULL;
+
+}
 

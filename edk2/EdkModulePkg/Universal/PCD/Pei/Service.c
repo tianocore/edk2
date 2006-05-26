@@ -17,18 +17,6 @@ Module Name: Service.c
 #include "Service.h"
 
 
-//
-// Build Tool will generate PEI_PCD_DB_INIT_VALUE in Autogen.h
-//
-/* PEI_PCD_DATABASE_INIT
-gPEIPcdDbInit = {
-  PEI_PCD_DB_INIT_VALUE
-};
-*/
-
-
-
-
 /**
   The function registers the CallBackOnSet fucntion
   according to TokenNumber and EFI_GUID space.
@@ -59,7 +47,7 @@ PeiRegisterCallBackWorker (
 
   if (Guid == NULL) {
     TokenNumber = ExTokenNumber;
-    ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+    ASSERT (TokenNumber < PEI_NEX_TOKEN_NUMBER);
     LocalTokenNumber = GetPcdDatabase()->Init.LocalTokenNumberTable[TokenNumber];
   } else {
     GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
@@ -173,8 +161,6 @@ GetHiiVariable (
   Status = PeiCoreAllocatePool (Size, &Buffer);
   ASSERT_EFI_ERROR (Status);
 
-  // declare a local for STP.
-  //
   Status = VariablePpi->PeiGetVariable (
                             GetPeiServicesTablePointer (),
                             (UINT16 *) VariableName,
@@ -227,7 +213,7 @@ GetSkuEnabledTokenNumber (
       Value += sizeof(VARIABLE_HEAD) * i;
       return ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_HII);
       
-    case 0: //Change to a MACRO PCD_TYPE_DATA
+    case PCD_TYPE_DATA:
       Value += Size * i;
       return (Value - (UINT8 *) PeiPcdDb);
       

@@ -97,13 +97,15 @@ PcdDxeInit (
 }
 
 
-EFI_STATUS
+VOID
 EFIAPI
 DxePcdSetSku (
-  IN  UINTN        SkuId
+  IN  SKU_ID         SkuId
   )
 {
-  return gPcdDatabase->PeiDb.Init.SystemSkuId = (SKU_ID) SkuId;
+  gPcdDatabase->PeiDb.Init.SystemSkuId = SkuId;
+  
+  return;
 }
 
 
@@ -346,15 +348,11 @@ EFI_STATUS
 EFIAPI
 DxePcdSetPtr (
   IN UINTN              TokenNumber,
-  IN CONST VOID         *Value
+  IN UINTN              SizeOfBuffer,
+  IN VOID               *Buffer
   )
 {
-  //
-  // BugBug, please change the Size to Input size when sync with spec
-  //
-  //ASSERT (sizeof (Value) == DxePcdGetSize (TokenNumber));
-
-  return SetWorker (TokenNumber, (VOID *)Value, DxePcdGetSize (TokenNumber), TRUE);
+  return SetWorker (TokenNumber, Buffer, SizeOfBuffer, TRUE);
 }
 
 
@@ -450,16 +448,17 @@ DxePcdSet64Ex (
 EFI_STATUS
 EFIAPI
 DxePcdSetPtrEx (
-  IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber,
-  IN CONST VOID        *Value
+  IN CONST EFI_GUID         *Guid,
+  IN UINTN                  ExTokenNumber,
+  IN UINTN                  SizeOfBuffer,
+  IN VOID                   *Buffer
   )
 {
   return          ExSetWorker(
                               ExTokenNumber, 
                               Guid,
-                              (VOID *) Value, 
-                              sizeof (Value), 
+                              Buffer, 
+                              SizeOfBuffer, 
                               TRUE
                               );
 }

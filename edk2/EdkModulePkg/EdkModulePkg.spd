@@ -715,5 +715,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Token>0x00011004</Token>
       <DatumType>BOOLEAN</DatumType>
     </PcdEntry>    
+    <PcdEntry ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdMaxPeiPcdCallBackNumberPerPcdEntry</C_Name>
+      <Token>0x0001000f</Token>
+      <DatumType>UINT32</DatumType>
+    </PcdEntry>    
+    <PcdEntry ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdVpdBaseAddress</C_Name>
+      <Token>0x00010010</Token>
+      <DatumType>UINT32</DatumType>
+    </PcdEntry>    
   </PcdDefinitions>
 </PackageSurfaceArea>
