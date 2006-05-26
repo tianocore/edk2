@@ -788,7 +788,7 @@ class PcdDatabase {
         // Generate Structure Declaration for PcdTokens without Default Value
         // PEI_PCD_DATABASE_INIT
         //
-        java.util.Comparator comparator = new AlignmentSizeComp();
+        java.util.Comparator<Token> comparator = new AlignmentSizeComp();
         List<Token> list = initTokens;
         java.util.Collections.sort(list, comparator);
         initCode = processTokens(initTokens);

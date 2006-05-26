@@ -144,11 +144,11 @@ public class MemoryDatabaseManager {
     }
 
 
-    private ArrayList getDynamicRecordArray() {
+    private ArrayList<Token> getDynamicRecordArray() {
         Token[]     tokenArray  =   getRecordArray();
         int         index       =   0;
         int         count       =   0;
-        ArrayList   al          =   new ArrayList();
+        ArrayList<Token>   al   =   new ArrayList<Token>();
 
         for (index = 0; index < tokenArray.length; index++) {
             if (tokenArray[index].pcdType == Token.PCD_TYPE.DYNAMIC ||
@@ -170,12 +170,9 @@ public class MemoryDatabaseManager {
     public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe) {
         int                     usageInstanceIndex  =   0;
         int                     index               =   0;
-        ArrayList               tokenArrayList      =   getDynamicRecordArray();
+        ArrayList<Token>        tokenArrayList      =   getDynamicRecordArray();
         List<UsageInstance>     usageInstanceArray  =   null;
         UsageInstance           usageInstance       =   null;
-
-        //pei = new ArrayList<Token>();
-        //dxe = new ArrayList<Token>();
 
         for (index = 0; index < tokenArrayList.size(); index++) {
             boolean found   =   false;
