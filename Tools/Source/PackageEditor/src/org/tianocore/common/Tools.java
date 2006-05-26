@@ -25,6 +25,8 @@ import java.util.UUID;
 **/
 public class Tools {
 	
+        public static final String guidArrayPat = "0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\\})?";
+	public static final String guidRegistryPat = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}";
 	/**
 	  get current date and time, then return
 	  @return String
@@ -70,4 +72,88 @@ public class Tools {
 		return UUID.randomUUID().toString();
 	}
 	
+    public static String formatGuidString (String guidNameConv) {
+        String[] strList;
+        String guid = "";
+        int index = 0;
+        if (guidNameConv
+                        .matches(Tools.guidRegistryPat)) {
+            strList = guidNameConv.split("-");
+            guid = "0x" + strList[0] + ", ";
+            guid = guid + "0x" + strList[1] + ", ";
+            guid = guid + "0x" + strList[2] + ", ";
+//            guid = guid + "{";
+            guid = guid + "0x" + strList[3].substring(0, 2) + ", ";
+            guid = guid + "0x" + strList[3].substring(2, 4);
+
+            while (index < strList[4].length()) {
+                guid = guid + ", ";
+                guid = guid + "0x" + strList[4].substring(index, index + 2);
+                index = index + 2;
+            }
+//            guid = guid + "}";
+            return guid;
+        }
+        else if (guidNameConv
+                        .matches(Tools.guidArrayPat)) {
+            strList = guidNameConv.split(",");
+            
+            //
+            // chang ANSI c form to registry form
+            //
+            for (int i = 0; i < strList.length; i++){
+                strList[i] = strList[i].substring(strList[i].lastIndexOf("x") + 1);
+            }
+            if (strList[strList.length - 1].endsWith("}")) {
+                strList[strList.length -1] = strList[strList.length-1].substring(0, strList[strList.length-1].length()-1); 
+            }
+            //
+            //inserting necessary leading zeros
+            //
+            
+            int segLen = strList[0].length();
+            if (segLen < 8){
+                for (int i = 0; i < 8 - segLen; ++i){
+                    strList[0] = "0" + strList[0];
+                }
+            }
+            
+            segLen = strList[1].length();
+            if (segLen < 4){
+                for (int i = 0; i < 4 - segLen; ++i){
+                    strList[1] = "0" + strList[1];
+                }
+            }
+            segLen = strList[2].length();
+            if (segLen < 4){
+                for (int i = 0; i < 4 - segLen; ++i){
+                    strList[2] = "0" + strList[2];
+                }
+            }
+            for (int i = 3; i < 11; ++i) {
+                segLen = strList[i].length();
+                if (segLen < 2){
+                    strList[i] = "0" + strList[i];
+                }
+            }
+            
+            for (int i = 0; i < 3; i++){
+                guid += strList[i] + "-";
+            }
+            
+            guid += strList[3];
+            guid += strList[4] + "-";
+            
+            for (int i = 5; i < strList.length; ++i){
+                guid += strList[i];
+            }
+            
+            
+            return guid;
+        } else {
+            
+            return "0";
+
+        }
+    }
 }

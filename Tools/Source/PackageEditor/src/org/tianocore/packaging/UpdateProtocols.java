@@ -24,6 +24,8 @@ import javax.swing.table.*;
 
 import org.tianocore.common.Tools;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -88,8 +90,25 @@ public class UpdateProtocols extends JFrame implements ActionListener {
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         this.setTitle("Update Protocol Declarations");
         this.setContentPane(getJContentPane());
+        this.centerWindow();
     }
 
+    /**
+     Start the window at the center of screen
+     
+     **/
+    protected void centerWindow(int intWidth, int intHeight) {
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setLocation((d.width - intWidth) / 2, (d.height - intHeight) / 2);
+    }
+
+    /**
+     Start the window at the center of screen
+     
+     **/
+    protected void centerWindow() {
+        centerWindow(this.getSize().width, this.getSize().height);
+    }
     /**
      This method initializes jContentPane
      
@@ -147,6 +166,8 @@ public class UpdateProtocols extends JFrame implements ActionListener {
                 model.addRow(saa[i]);
                 i++;
             }
+
+            jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
 
         }
         return jTable;

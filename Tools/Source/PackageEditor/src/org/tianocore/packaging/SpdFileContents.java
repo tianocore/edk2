@@ -125,6 +125,7 @@ public class SpdFileContents {
             return;
         XmlCursor cursor = o.newCursor();
         cursor.removeXml();
+        spdPcdDefinitions = null;
     }
 
     /**
@@ -136,6 +137,7 @@ public class SpdFileContents {
             return;
         XmlCursor cursor = o.newCursor();
         cursor.removeXml();
+        spdPpiDeclarations = null;
     }
 
     /**
@@ -147,6 +149,7 @@ public class SpdFileContents {
             return;
         XmlCursor cursor = o.newCursor();
         cursor.removeXml();
+        spdProtocolDeclarations = null;
     }
 
     /**
@@ -158,10 +161,11 @@ public class SpdFileContents {
             return;
         XmlCursor cursor = o.newCursor();
         cursor.removeXml();
+        spdGuidDeclarations = null; 
     }
 
     /**
-     Remove existing spd package header using XmlCursor
+     Remove existing spd package include files using XmlCursor
     **/
     public void removeSpdPkgHeader() {
         XmlObject o = psaRoot.getPackageHeaders();
@@ -169,6 +173,7 @@ public class SpdFileContents {
             return;
         XmlCursor cursor = o.newCursor();
         cursor.removeXml();
+        spdModHdrs = null;
     }
 
     /**
@@ -180,6 +185,7 @@ public class SpdFileContents {
             return;
         XmlCursor cursor = o.newCursor();
         cursor.removeXml();
+        spdMsaFiles = null;
     }
 
     /**
@@ -191,7 +197,7 @@ public class SpdFileContents {
             return;
         XmlCursor cursor = o.newCursor();
         cursor.removeXml();
-
+        spdLibClassDeclarations = null;
     }
 
     /**
