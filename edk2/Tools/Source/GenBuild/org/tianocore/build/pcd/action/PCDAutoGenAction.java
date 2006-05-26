@@ -527,7 +527,7 @@ public class PCDAutoGenAction extends BuildAction {
     **/
     public static void main(String argv[]) {
 
-        String WorkSpace = "G:/edk2";
+        String WorkSpace = "X:/edk2";
         String logFilePath = WorkSpace  + "/EdkNt32Pkg/Nt32.fpd";
 
         //
