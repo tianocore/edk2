@@ -113,7 +113,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <target name="cleanall">
     <echo message="Removing Object Files and the Library: CustomizedCompress${ext_static}"/>  
-    <delete dir="${BUILD_DIR}">
+    <delete dir="${BUILD_DIR}" failonerror="false">
       <fileset dir="${LIB_DIR}" includes="CustomizedCompress${ext_static}"/>
     </delete>
   </target>

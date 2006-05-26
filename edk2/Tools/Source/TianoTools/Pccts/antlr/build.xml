@@ -126,14 +126,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <if>
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
-    	  <exec dir="${basedir}" executable="nmake" failonerror="TRUE">
+    	  <exec dir="${basedir}" executable="nmake" failonerror="FALSE">
 	    	  <arg line="-f AntlrMS.mak distclean"/>
     		</exec>
 		  </then>
 		<elseif>
       <equals arg1="${ToolChain}" arg2="gcc"/>
 			<then>
-    	  <exec dir="${basedir}" executable="make" failonerror="TRUE">
+    	  <exec dir="${basedir}" executable="make" failonerror="FALSE">
 	    	  <arg line="-f makefile distclean"/>
     		</exec>
 		  </then>
