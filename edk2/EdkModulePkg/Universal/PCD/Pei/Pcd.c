@@ -493,7 +493,7 @@ PeiPcdGetNextToken (
   BOOLEAN             Found;
     
   if (Guid == NULL) {
-    *TokenNumber++;
+    (*TokenNumber)++;
 
     if (*TokenNumber >= PEI_NEX_TOKEN_NUMBER) {
       *TokenNumber = 0;

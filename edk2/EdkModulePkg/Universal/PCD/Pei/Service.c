@@ -143,7 +143,7 @@ GetHiiVariable (
   VOID       *Buffer;
   EFI_PEI_READ_ONLY_VARIABLE_PPI *VariablePpi;
 
-  Status = PeiCoreLocatePpi (&gEfiPeiReadOnlyVariablePpiGuid, 0, NULL, &VariablePpi);
+  Status = PeiCoreLocatePpi (&gEfiPeiReadOnlyVariablePpiGuid, 0, NULL, (VOID **) &VariablePpi);
   ASSERT_EFI_ERROR (Status);
 
   Size = 0;
