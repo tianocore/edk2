@@ -217,7 +217,7 @@ class SizeTable {
 
         return index;
     }
-
+    
     private int getDatumSize(Token token) {
         /*
         switch (token.datumType) {
@@ -674,6 +674,15 @@ class PcdDatabase {
     private ArrayList<Token> alTokens;
     private String phase;
     private int assignedTokenNumber;
+    
+    //
+    // After Major changes done to the PCD
+    // database generation class PcdDatabase
+    // Please increment the version and please
+    // also update the version number in PCD
+    // service PEIM and DXE driver accordingly.
+    //
+    private final int version = 1;
 
     private String hString;
     private String cString;
@@ -754,10 +763,8 @@ class PcdDatabase {
      public void genCode () {
 
         final String newLine                        = "\r\n";
-        final String instNewLine                    = "\\\r\n";
         final String declNewLine                    = ";\r\n";
         final String tab                            = "\t";
-        final String commaInstNewLine                   = "\t,\\\r\n";
         final String commaNewLine                   = ", \r\n";
 
         int i;
@@ -790,7 +797,8 @@ class PcdDatabase {
         // Generate Structure Declaration for PcdTokens without Default Value
         // PEI_PCD_DATABASE_UNINIT
         //
-        java.util.Collections.sort(uninitTokens, comparator);
+        list = uninitTokens;
+        java.util.Collections.sort(list, comparator);
         uninitCode = processTokens(uninitTokens);
 
         //
@@ -851,12 +859,6 @@ class PcdDatabase {
         initInstStr += tab + genInstantiationStr(exMapTable.getInstantiation()) + commaNewLine;
         initInstStr += tab + genInstantiationStr(guidTable.getInstantiation()) + commaNewLine;
         initInstStr += tab + genInstantiationStr(localTokenNumberTable.getInstantiation()) + commaNewLine; 
-        /*
-        inst = stringTable.getInstantiation();
-        for (i = 0; i < inst.size(); i++ ) {
-            initInstStr += tab + inst.get(i) + commaNewLine; 
-        }
-        */
         initInstStr += tab + genInstantiationStr(stringTable.getInstantiation()) + commaNewLine;
         initInstStr += tab + genInstantiationStr(sizeTable.getInstantiation()) + commaNewLine;
         initInstStr += tab + genInstantiationStr(skuIdTable.getInstantiation()) + commaNewLine;
@@ -907,6 +909,8 @@ class PcdDatabase {
               + initDeclStr   + newLine
               + uninitDeclStr + newLine
               + newLine;
+        
+        hString += String.format("#define PCD_%s_SERVICE_DRIVER_VERSION			%d", phase, version);
 
     }
 
@@ -924,7 +928,6 @@ class PcdDatabase {
 
     private HashMap<String, ArrayList<String>> processTokens (List<Token> alToken) {
 
-        ArrayList[]  output = new ArrayList[4];
         HashMap <String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
 
         ArrayList<String> decl = new ArrayList<String>();
@@ -1038,8 +1041,6 @@ class PcdDatabase {
     }
 
     private String getDataTypeInstantiation (Token token) {
-
-        String typeStr = "";
 
         if (token.datumType == Token.DATUM_TYPE.POINTER) {
             return String.format("%s /* %s */", token.datum.toString(), token.getPrimaryKeyString());
