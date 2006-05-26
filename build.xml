@@ -41,7 +41,7 @@ ant All
     </subant>
   </target>
 
-  <target name="distclean" description="Remove everything not in the distribution.">
+  <target name="cleanall" description="Remove everything not in the distribution.">
     <subant target="cleanall" inheritall="false">
       <filelist refid="Pkg.Dirs"/>
     </subant>
