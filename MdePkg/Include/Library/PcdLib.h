@@ -450,7 +450,7 @@ EFIAPI
 LibPcdSetPtr (
   IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINTN             SizeOfBuffer,
-  IN CONST VOID        *Value
+  IN VOID              *Value
   );
 
 
@@ -580,7 +580,7 @@ LibPcdSetExPtr (
   IN CONST GUID        *Guid,
   IN PCD_TOKEN_NUMBER  TokenNumber,
   IN UINTN             SizeOfBuffer,
-  IN CONST VOID        *Value
+  IN VOID              *Value
   );
 
 
