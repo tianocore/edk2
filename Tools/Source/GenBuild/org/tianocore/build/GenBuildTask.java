@@ -268,6 +268,20 @@ public class GenBuildTask extends Task {
     }
 
     /**
+      Return the name of the directory that corresponds to the architecture.
+      This is a translation from the XML Schema tag to a directory that
+      corresponds to our directory name coding convention.
+     
+    **/
+    private String archDir(String arch) {
+        return arch.replaceFirst("X64", "x64")
+                   .replaceFirst("IPF", "Ipf")
+                   .replaceFirst("IA32", "Ia32")
+                   .replaceFirst("ARM", "Arm")
+                   .replaceFirst("EBC", "Ebc");
+    }
+
+    /**
       Get the dependent library instances and include package name from 
       surface area, and initialize module include pathes. 
      
@@ -281,7 +295,7 @@ public class GenBuildTask extends Task {
                 includes.add("${WORKSPACE_DIR}" + File.separatorChar + GlobalData.getPackagePath(packageName)
                              + File.separatorChar + "Include");
                 includes.add("${WORKSPACE_DIR}" + File.separatorChar + GlobalData.getPackagePath(packageName)
-                             + File.separatorChar + "Include" + File.separatorChar + "${ARCH}");
+                             + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
             }
         }
         includes.add("${DEST_DIR_DEBUG}");
