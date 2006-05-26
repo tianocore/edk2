@@ -44,9 +44,9 @@ public class MemoryDatabaseManager {
     private static String              logFileName    = null;
 
     public static String PcdPeimHString       = "";
-		public static String PcdPeimCString				= "";
-    public static String PcdDxeHString  			= "";
-    public static String PcdDxeCString  			= "";
+    public static String PcdPeimCString       = "";
+    public static String PcdDxeHString        = "";
+    public static String PcdDxeCString        = "";
 
     /**
       Constructure function
@@ -174,8 +174,8 @@ public class MemoryDatabaseManager {
         List<UsageInstance>     usageInstanceArray  =   null;
         UsageInstance           usageInstance       =   null;
 
-				//pei = new ArrayList<Token>();
-				//dxe = new ArrayList<Token>();
+        //pei = new ArrayList<Token>();
+        //dxe = new ArrayList<Token>();
 
         for (index = 0; index < tokenArrayList.size(); index++) {
             boolean found   =   false;
@@ -199,25 +199,25 @@ public class MemoryDatabaseManager {
                         usageInstance =(UsageInstance) usageInstanceArray.get(usageInstanceIndex);
                         if (CommonDefinition.isPeiPhaseComponent(usageInstance.componentType)) {
                             pei.add(token);
-														found = true;
+                            found = true;
                             break;
                         }
                     }
                 }
             }
 
-						//
-						// If no PEI components reference the PCD entry, we insert it to DXE list
-						//
-						if (!found) {
-								dxe.add(token);
-						}
+            //
+            // If no PEI components reference the PCD entry, we insert it to DXE list
+            //
+            if (!found) {
+                dxe.add(token);
+            }
         }
 
-				return;
+        return;
     }
 
-		/**
+    /**
       Get all PCD record for a module according to module's name.
      
       @param moduleName  the name of module.

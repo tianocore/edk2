@@ -190,13 +190,13 @@ public class PCDAutoGenAction extends BuildAction {
             }
         }
 
-				if (moduleName.equalsIgnoreCase("PcdPeim")) {
-						hAutoGenString += dbManager.PcdPeimHString;
-						cAutoGenString += dbManager.PcdPeimCString;
-				} else if (moduleName.equalsIgnoreCase("PcdDxe")) {
-						hAutoGenString += dbManager.PcdDxeHString;
-						cAutoGenString += dbManager.PcdDxeCString;
-				}
+        if (moduleName.equalsIgnoreCase("PcdPeim")) {
+            hAutoGenString += dbManager.PcdPeimHString;
+            cAutoGenString += dbManager.PcdPeimCString;
+        } else if (moduleName.equalsIgnoreCase("PcdDxe")) {
+            hAutoGenString += dbManager.PcdDxeHString;
+            cAutoGenString += dbManager.PcdDxeCString;
+        }
 
         ActionMessage.debug(this,
                             "Module " + moduleName + "'s PCD header file:\r\n" + hAutoGenString + "\r\n"
@@ -527,7 +527,7 @@ public class PCDAutoGenAction extends BuildAction {
     **/
     public static void main(String argv[]) {
 
-				String WorkSpace = "G:/edk2";
+        String WorkSpace = "G:/edk2";
         String logFilePath = WorkSpace  + "/EdkNt32Pkg/Nt32.fpd";
 
         //
@@ -552,13 +552,13 @@ public class PCDAutoGenAction extends BuildAction {
         // Then execute the PCDAuotoGenAction to get generated Autogen.h and Autogen.c
         //
         PCDAutoGenAction autogenAction = new PCDAutoGenAction("PcdDxe",
-																															false
+                                                              false
                                                               );
-				autogenAction.execute();
+        autogenAction.execute();
 
-				System.out.println(autogenAction.OutputH());
-				System.out.println("WQWQWQWQWQ");
-				System.out.println(autogenAction.OutputC());
+        System.out.println(autogenAction.OutputH());
+        System.out.println("WQWQWQWQWQ");
+        System.out.println(autogenAction.OutputC());
 
 
         System.out.println (autogenAction.hAutoGenString);

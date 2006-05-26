@@ -258,9 +258,9 @@ public class Token {
         }
     }
 
-		public String getPrimaryKeyString () {
-				return cName + "_" + tokenSpaceName.toString().replace('-', '_');
-		}
+    public String getPrimaryKeyString () {
+        return cName + "_" + tokenSpaceName.toString().replace('-', '_');
+    }
 
     /**
       Judge datumType is valid
@@ -645,13 +645,13 @@ public class Token {
     //
     public boolean hasDefaultValue () {
 
-				if (hiiEnabled) {
-						return true;
-				}
+        if (hiiEnabled) {
+            return true;
+        }
 
-				if (vpdEnabled) {
-						return true;
-				}
+        if (vpdEnabled) {
+            return true;
+        }
 
         if (datum.toString().compareTo("NoDefault") == 0) {
             return false;
@@ -660,21 +660,21 @@ public class Token {
         return true;
     }
 
-		public boolean isStringType () {
-				String str = datum.toString();
+    public boolean isStringType () {
+        String str = datum.toString();
 
-				if (datumType == Token.DATUM_TYPE.POINTER &&
-						str.startsWith("L\"") && 
-						str.endsWith("\"")) {
-						return true;
-				}
+        if (datumType == Token.DATUM_TYPE.POINTER &&
+            str.startsWith("L\"") && 
+            str.endsWith("\"")) {
+            return true;
+        }
 
-				return false;
-		}
+        return false;
+    }
 
-		public String getStringTypeString () {                       
-				return datum.toString().substring(2, datum.toString().length() - 1);
-		}
+    public String getStringTypeString () {                       
+        return datum.toString().substring(2, datum.toString().length() - 1);
+    }
 }
 
 
