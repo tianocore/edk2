@@ -24,6 +24,8 @@ import javax.swing.table.*;
 
 import org.tianocore.common.Tools;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
@@ -83,10 +85,11 @@ public class UpdateGuids extends JFrame implements ActionListener {
      @return void
      **/
     private void initialize() {
-        this.setSize(604, 553);
+        this.setSize(669, 568);
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         this.setTitle("Update GUID Declarations");
         this.setContentPane(getJContentPane());
+        this.centerWindow();
     }
 
     /**
@@ -114,7 +117,7 @@ public class UpdateGuids extends JFrame implements ActionListener {
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(38, 45, 453, 419));
+            jScrollPane.setBounds(new java.awt.Rectangle(38,45,586,315));
             jScrollPane.setViewportView(getJTable());
         }
         return jScrollPane;
@@ -147,6 +150,7 @@ public class UpdateGuids extends JFrame implements ActionListener {
                 i++;
             }
 
+            jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
         }
         return jTable;
     }
@@ -225,5 +229,21 @@ public class UpdateGuids extends JFrame implements ActionListener {
             jButton.addActionListener(this);
         }
         return jButton;
+    }
+    /**
+     Start the window at the center of screen
+     
+     **/
+    protected void centerWindow(int intWidth, int intHeight) {
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setLocation((d.width - intWidth) / 2, (d.height - intHeight) / 2);
+    }
+
+    /**
+     Start the window at the center of screen
+     
+     **/
+    protected void centerWindow() {
+        centerWindow(this.getSize().width, this.getSize().height);
     }
 } //  @jve:decl-index=0:visual-constraint="11,7"
