@@ -872,6 +872,7 @@
                             <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdAttributes"/>
+                        <xs:attribute name="PcdIsDriver" use="optional">
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1065,7 +1066,6 @@
                             <xs:element minOccurs="1" maxOccurs="1" name="DefaultValue" type="xs:normalizedString"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdAttributes"/>
-                        <xs:attribute name="PcdIsDriver" use="optional">
                            <xs:simpleType>
                              <xs:annotation>
                                <xs:documentation xml:lang="en">This is an enumerated data type that will be used for DYNAMIC_EX, PEIM or DXE only</xs:documentation>
@@ -1199,7 +1199,6 @@
                             <xs:element minOccurs="1" maxOccurs="1" name="DefaultValue" type="xs:normalizedString"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdAttributes"/>
-                        <xs:attribute name="PcdIsDriver" use="optional">
                            <xs:simpleType>
                              <xs:annotation>
                                <xs:documentation xml:lang="en">This is an enumerated data type that will be used for DYNAMIC_EX, PEIM or DXE only</xs:documentation>
