@@ -50,7 +50,7 @@ PCD_PPI mPcdPpiInstance = {
   PeiPcdSetPtrEx,         
   PeiPcdSetBoolEx,
 
-  PcdRegisterCallBackOnSet,
+  PeiRegisterCallBackOnSet,
   PcdUnRegisterCallBackOnSet,
   PeiPcdGetNextToken
 };
@@ -454,12 +454,14 @@ PeiPcdSetBoolEx (
 
 EFI_STATUS
 EFIAPI
-PcdRegisterCallBackOnSet (
+PeiRegisterCallBackOnSet (
   IN  PCD_TOKEN_NUMBER            ExTokenNumber,
   IN  CONST EFI_GUID              *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
+  ASSERT (CallBackFunction != NULL);
+  
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, TRUE);
 }
 
@@ -473,6 +475,8 @@ PcdUnRegisterCallBackOnSet (
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
+  ASSERT (CallBackFunction != NULL);
+  
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, FALSE);
 }
 
@@ -482,7 +486,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdGetNextToken (
   IN CONST EFI_GUID               *Guid, OPTIONAL
-  IN OUT  PCD_TOKEN_NUMBER                   *TokenNumber
+  IN OUT  PCD_TOKEN_NUMBER        *TokenNumber
   )
 {
   UINTN               GuidTableIdx;

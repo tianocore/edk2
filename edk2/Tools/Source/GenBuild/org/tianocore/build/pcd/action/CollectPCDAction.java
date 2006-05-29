@@ -711,7 +711,7 @@ class PcdDatabase {
 
     private void getTwoGroupsOfTokens (ArrayList<Token> alTokens, List<Token> initTokens, List<Token> uninitTokens) {
         for (int i = 0; i < alTokens.size(); i++) {
-            Token t = (Token)alTokens.get(i);
+            Token t = alTokens.get(i);
             if (t.hasDefaultValue()) {
                 initTokens.add(t);
             } else {
@@ -789,16 +789,14 @@ class PcdDatabase {
         // PEI_PCD_DATABASE_INIT
         //
         java.util.Comparator<Token> comparator = new AlignmentSizeComp();
-        List<Token> list = initTokens;
-        java.util.Collections.sort(list, comparator);
+        java.util.Collections.sort(initTokens, comparator);
         initCode = processTokens(initTokens);
 
         //
         // Generate Structure Declaration for PcdTokens without Default Value
         // PEI_PCD_DATABASE_UNINIT
         //
-        list = uninitTokens;
-        java.util.Collections.sort(list, comparator);
+        java.util.Collections.sort(uninitTokens, comparator);
         uninitCode = processTokens(uninitTokens);
 
         //
