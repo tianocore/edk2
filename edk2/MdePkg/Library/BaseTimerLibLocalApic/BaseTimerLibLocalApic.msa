@@ -49,6 +49,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ipf/ReadItc.s</Filename>
       <Filename>Ipf/IpfTimerLib.c</Filename>
     </Arch>
+    <Arch ArchType="EBC">
+      <Filename>Ebc/EbcTimerLib.c</Filename>
+    </Arch>
   </SourceFiles>
   <Includes>
     <PackageName>MdePkg</PackageName>

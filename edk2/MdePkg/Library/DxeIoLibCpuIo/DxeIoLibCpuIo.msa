@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </MsaLibHeader>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">IoLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
   </LibraryClassDefinitions>

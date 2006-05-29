@@ -119,6 +119,14 @@ ScanGuid (
 {
   CONST GUID                        *GuidPtr;
 
+  ASSERT (Buffer != NULL);
+  //
+  // Make sure Buffer is aligned on a 64-bit boundary.
+  //
+  ASSERT (((UINTN) Buffer & 7) == 0);
+
+  ASSERT (Length <= (MAX_ADDRESS - (UINTN)Buffer + 1));
+
   GuidPtr = (GUID*)Buffer;
   Buffer = GuidPtr + Length / sizeof (*GuidPtr);
   while (GuidPtr < (CONST GUID*)Buffer) {

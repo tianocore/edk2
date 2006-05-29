@@ -43,9 +43,10 @@ VOID *
 EFIAPI
 ZeroMem (
   IN      VOID                      *Buffer,
-  IN      UINTN                     Size
+  IN      UINTN                     Length
   )
 {
-  ASSERT (Buffer != NULL);
-  return InternalMemSetMem (Buffer, Size, 0);
+  ASSERT (!(Buffer == NULL && Length > 0));
+  ASSERT (Length <= (MAX_ADDRESS - (UINTN)Buffer + 1));
+  return InternalMemSetMem (Buffer, Length, 0);
 }
