@@ -42,7 +42,16 @@ GetPcdDatabase (
 
 EFI_STATUS
 SetWorker (
-  IN UINTN         TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
+  IN VOID               *Data,
+  IN UINTN              Size,
+  IN BOOLEAN            PtrType
+  )
+;
+
+EFI_STATUS
+SetWorkerByLocalTokenNumber (
+  IN UINT32        LocalTokenNumber,
   IN VOID          *Data,
   IN UINTN         Size,
   IN BOOLEAN       PtrType
@@ -50,35 +59,26 @@ SetWorker (
 ;
 
 EFI_STATUS
-SetWorkerByLocalTokenNumber (
-  UINT32        LocalTokenNumber,
-  VOID          *Data,
-  UINTN         Size,
-  BOOLEAN       PtrType
-  )
-;
-
-EFI_STATUS
 ExSetWorker (
-  IN UINT32               ExTokenNumber,
+  IN PCD_TOKEN_NUMBER     ExTokenNumber,
   IN CONST EFI_GUID       *Guid,
-  VOID                    *Data,
-  UINTN                   Size,
-  BOOLEAN                 PtrType
+  IN VOID                 *Data,
+  IN UINTN                Size,
+  IN BOOLEAN              PtrType
   )
 ;
 
 VOID *
 GetWorker (
-  UINTN     TokenNumber,
-  UINTN     GetSize
+  IN PCD_TOKEN_NUMBER     TokenNumber,
+  IN UINTN                GetSize
   )
 ;
 
 VOID *
 ExGetWorker (
   IN CONST EFI_GUID   *Guid,
-  IN UINT32           ExTokenNumber,
+  IN PCD_TOKEN_NUMBER ExTokenNumber,
   IN UINTN            GetSize
   )
 ;
@@ -92,18 +92,24 @@ typedef struct {
 VOID
 GetExPcdTokenAttributes (
   IN CONST EFI_GUID             *Guid,
-  IN UINT32                     ExTokenNumber,
+  IN PCD_TOKEN_NUMBER           ExTokenNumber,
   OUT EX_PCD_ENTRY_ATTRIBUTE    *ExAttr
   )
 ;
 
+
+
+
 EFI_STATUS
 PeiRegisterCallBackWorker (
-  IN  UINTN              TokenNumber,
+  IN  PCD_TOKEN_NUMBER   TokenNumber,
   IN  CONST GUID         *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK   CallBackFunction,
   IN  BOOLEAN            Register
 );
+
+
+
 
 VOID
 BuildPcdDatabase (

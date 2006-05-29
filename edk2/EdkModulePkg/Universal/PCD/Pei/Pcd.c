@@ -500,13 +500,13 @@ PeiPcdGetNextToken (
     (*TokenNumber)++;
 
     if (*TokenNumber >= PEI_NEX_TOKEN_NUMBER) {
-      *TokenNumber = 0;
+      *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
     }
     
   } else {
 
     if (PEI_EXMAP_TABLE_EMPTY) {
-      *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+      *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
       return EFI_NOT_FOUND;
     }
     
