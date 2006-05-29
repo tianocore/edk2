@@ -51,8 +51,8 @@ PCD_PROTOCOL mPcdInstance = {
   DxePcdSetPtrEx,
   DxePcdSetBoolEx,
 
-  PcdRegisterCallBackOnSet,
-  PcdUnRegisterCallBackOnSet,
+  DxeRegisterCallBackOnSet,
+  DxeUnRegisterCallBackOnSet,
   DxePcdGetNextToken
 };
 
@@ -103,7 +103,7 @@ DxePcdSetSku (
   IN  SKU_ID         SkuId
   )
 {
-  gPcdDatabase->PeiDb.Init.SystemSkuId = SkuId;
+  mPcdDatabase->PeiDb.Init.SystemSkuId = SkuId;
   
   return;
 }
@@ -113,7 +113,7 @@ DxePcdSetSku (
 UINT8
 EFIAPI
 DxePcdGet8 (
-  IN UINTN         TokenNumber
+  IN PCD_TOKEN_NUMBER         TokenNumber
   )
 {
   ASSERT (sizeof (UINT8) == DxePcdGetSize (TokenNumber));
@@ -126,7 +126,7 @@ DxePcdGet8 (
 UINT16
 EFIAPI
 DxePcdGet16 (
-  IN UINTN         TokenNumber
+  IN PCD_TOKEN_NUMBER         TokenNumber
   )
 {
   ASSERT (sizeof (UINT16) == DxePcdGetSize (TokenNumber));
@@ -139,7 +139,7 @@ DxePcdGet16 (
 UINT32
 EFIAPI
 DxePcdGet32 (
-  IN UINTN         TokenNumber
+  IN PCD_TOKEN_NUMBER         TokenNumber
   )
 {
   ASSERT (sizeof (UINT32) == DxePcdGetSize (TokenNumber));
@@ -152,7 +152,7 @@ DxePcdGet32 (
 UINT64
 EFIAPI
 DxePcdGet64 (
-  IN UINTN          TokenNumber
+  IN PCD_TOKEN_NUMBER          TokenNumber
   )
 {
   ASSERT (sizeof (UINT64) == DxePcdGetSize (TokenNumber));
@@ -165,7 +165,7 @@ DxePcdGet64 (
 VOID *
 EFIAPI
 DxePcdGetPtr (
-  IN UINTN          TokenNumber
+  IN PCD_TOKEN_NUMBER          TokenNumber
   )
 {
   return GetWorker (TokenNumber);
@@ -176,7 +176,7 @@ DxePcdGetPtr (
 BOOLEAN
 EFIAPI
 DxePcdGetBool (
-  IN UINTN          TokenNumber
+  IN PCD_TOKEN_NUMBER          TokenNumber
   )
 {
   ASSERT (sizeof (BOOLEAN) == DxePcdGetSize (TokenNumber));
@@ -189,13 +189,13 @@ DxePcdGetBool (
 UINTN
 EFIAPI
 DxePcdGetSize (
-  IN UINTN          TokenNumber
+  IN PCD_TOKEN_NUMBER          TokenNumber
   )
 {
   UINT16 * SizeTable;
 
-  SizeTable = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? gPcdDatabase->PeiDb.Init.SizeTable :
-                                                    gPcdDatabase->DxeDb.Init.SizeTable;
+  SizeTable = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? mPcdDatabase->PeiDb.Init.SizeTable :
+                                                    mPcdDatabase->DxeDb.Init.SizeTable;
 
 
   TokenNumber = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TokenNumber : (TokenNumber - PEI_LOCAL_TOKEN_NUMBER);
@@ -209,7 +209,7 @@ UINT8
 EFIAPI
 DxePcdGet8Ex (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
   return *((UINT8 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT8)));
@@ -221,7 +221,7 @@ UINT16
 EFIAPI
 DxePcdGet16Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN                 ExTokenNumber
+  IN PCD_TOKEN_NUMBER     ExTokenNumber
   )
 {
   return *((UINT16 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT16)));
@@ -233,7 +233,7 @@ UINT32
 EFIAPI
 DxePcdGet32Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
   return *((UINT32 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT32)));
@@ -245,7 +245,7 @@ UINT64
 EFIAPI
 DxePcdGet64Ex (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
   //
@@ -260,7 +260,7 @@ VOID *
 EFIAPI
 DxePcdGetPtrEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
   return ExGetWorker (Guid, ExTokenNumber, 0);
@@ -272,7 +272,7 @@ BOOLEAN
 EFIAPI
 DxePcdGetBoolEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
   return *((BOOLEAN *) ExGetWorker (Guid, ExTokenNumber, sizeof(BOOLEAN)));
@@ -284,7 +284,7 @@ UINTN
 EFIAPI
 DxePcdGetSizeEx (
   IN CONST EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber
+  IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
   EX_PCD_ENTRY_ATTRIBUTE    Attr;
@@ -299,7 +299,7 @@ DxePcdGetSizeEx (
 EFI_STATUS
 EFIAPI
 DxePcdSet8 (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
   IN UINT8              Value
   )
 {
@@ -311,7 +311,7 @@ DxePcdSet8 (
 EFI_STATUS
 EFIAPI
 DxePcdSet16 (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
   IN UINT16             Value
   )
 {
@@ -323,7 +323,7 @@ DxePcdSet16 (
 EFI_STATUS
 EFIAPI
 DxePcdSet32 (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
   IN UINT32             Value
   )
 {
@@ -335,7 +335,7 @@ DxePcdSet32 (
 EFI_STATUS
 EFIAPI
 DxePcdSet64 (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
   IN UINT64             Value
   )
 {
@@ -347,7 +347,7 @@ DxePcdSet64 (
 EFI_STATUS
 EFIAPI
 DxePcdSetPtr (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
   IN UINTN              SizeOfBuffer,
   IN VOID               *Buffer
   )
@@ -360,7 +360,7 @@ DxePcdSetPtr (
 EFI_STATUS
 EFIAPI
 DxePcdSetBool (
-  IN UINTN              TokenNumber,
+  IN PCD_TOKEN_NUMBER   TokenNumber,
   IN BOOLEAN            Value
   )
 {
@@ -372,8 +372,8 @@ DxePcdSetBool (
 EFI_STATUS
 EFIAPI
 DxePcdSet8Ex (
-  IN CONST EFI_GUID        *Guid,
-  IN UINTN                  ExTokenNumber,
+  IN CONST EFI_GUID         *Guid,
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
   IN UINT8                  Value
   )
 {
@@ -391,8 +391,8 @@ DxePcdSet8Ex (
 EFI_STATUS
 EFIAPI
 DxePcdSet16Ex (
-  IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber,
+  IN CONST EFI_GUID    *Guid,
+  IN PCD_TOKEN_NUMBER  ExTokenNumber,
   IN UINT16            Value
   )
 {
@@ -410,8 +410,8 @@ DxePcdSet16Ex (
 EFI_STATUS
 EFIAPI
 DxePcdSet32Ex (
-  IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber,
+  IN CONST EFI_GUID     *Guid,
+  IN PCD_TOKEN_NUMBER   ExTokenNumber,
   IN UINT32             Value
   )
 {
@@ -429,8 +429,8 @@ DxePcdSet32Ex (
 EFI_STATUS
 EFIAPI
 DxePcdSet64Ex (
-  IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber,
+  IN CONST EFI_GUID    *Guid,
+  IN PCD_TOKEN_NUMBER  ExTokenNumber,
   IN UINT64            Value
   )
 {
@@ -449,7 +449,7 @@ EFI_STATUS
 EFIAPI
 DxePcdSetPtrEx (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
   IN UINTN                  SizeOfBuffer,
   IN VOID                   *Buffer
   )
@@ -468,8 +468,8 @@ DxePcdSetPtrEx (
 EFI_STATUS
 EFIAPI
 DxePcdSetBoolEx (
-  IN CONST EFI_GUID        *Guid,
-  IN UINTN  ExTokenNumber,
+  IN CONST EFI_GUID    *Guid,
+  IN PCD_TOKEN_NUMBER  ExTokenNumber,
   IN BOOLEAN           Value
   )
 {
@@ -487,26 +487,30 @@ DxePcdSetBoolEx (
 
 EFI_STATUS
 EFIAPI
-PcdRegisterCallBackOnSet (
-  IN  UINTN        TokenNumber,
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
+DxeRegisterCallBackOnSet (
+  IN  PCD_TOKEN_NUMBER        TokenNumber,
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 {
-  return DxeRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction, TRUE);
+  ASSERT (CallBackFunction != NULL);
+  
+  return DxeRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
 }
 
 
 
 EFI_STATUS
 EFIAPI
-PcdUnRegisterCallBackOnSet (
-  IN  UINTN        TokenNumber,
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
+DxeUnRegisterCallBackOnSet (
+  IN  PCD_TOKEN_NUMBER        TokenNumber,
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 {
-  return DxeRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction, FALSE);
+  ASSERT (CallBackFunction != NULL);
+  
+  return DxeRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
 }
 
 
@@ -514,10 +518,65 @@ PcdUnRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 DxePcdGetNextToken (
-  IN CONST EFI_GUID               *Guid, OPTIONAL
-  IN OUT  UINTN    *TokenNumber
+  IN CONST EFI_GUID         *Guid, OPTIONAL
+  IN OUT   PCD_TOKEN_NUMBER *TokenNumber
   )
 {
-  return DxeGetNextTokenWorker (TokenNumber, Guid);
+  PCD_TOKEN_NUMBER    ExTokenNumber;
+  
+  //
+  // Scan the local token space
+  //
+  if (Guid == NULL) {
+    *TokenNumber++;
+    if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
+      return EFI_SUCCESS;
+    } else {
+      if (*TokenNumber >= PEI_NEX_TOKEN_NUMBER &&
+          *TokenNumber < PEI_LOCAL_TOKEN_NUMBER) {
+        //
+        // The first Non-Ex type Token Number for DXE PCD 
+        // database is PEI_LOCAL_TOKEN_NUMBER
+        //
+        *TokenNumber = PEI_LOCAL_TOKEN_NUMBER;
+        return EFI_SUCCESS;
+      } else if (*TokenNumber >= DXE_NEX_TOKEN_NUMBER + PEI_LOCAL_TOKEN_NUMBER) {
+        *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+        return EFI_SUCCESS;
+      }
+    }
+  }
+
+  if (PEI_EXMAP_TABLE_EMPTY && PEI_EXMAP_TABLE_EMPTY) {
+    *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+    return EFI_NOT_FOUND;
+  }
+
+  ExTokenNumber = *TokenNumber;
+  if (!PEI_EXMAP_TABLE_EMPTY) {
+    ExTokenNumber = ExGetNextTokeNumber (
+                        Guid,
+                        ExTokenNumber,
+                        mPcdDatabase->PeiDb.Init.GuidTable,
+                        sizeof(mPcdDatabase->PeiDb.Init.GuidTable),
+                        mPcdDatabase->PeiDb.Init.ExMapTable,
+                        sizeof(mPcdDatabase->PeiDb.Init.ExMapTable)
+                        );
+  }
+
+  if (!DXE_EXMAP_TABLE_EMPTY) {
+    ExTokenNumber = ExGetNextTokeNumber (
+                        Guid,
+                        ExTokenNumber,
+                        mPcdDatabase->PeiDb.Init.GuidTable,
+                        sizeof(mPcdDatabase->PeiDb.Init.GuidTable),
+                        mPcdDatabase->PeiDb.Init.ExMapTable,
+                        sizeof(mPcdDatabase->PeiDb.Init.ExMapTable)
+                        );
+  }
+
+  *TokenNumber = ExTokenNumber;
+
+  return EFI_SUCCESS;
 }
 

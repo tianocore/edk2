@@ -32,6 +32,14 @@ Module Name: Service.h
   #error "Please make sure the version of PCD Service DXE Driver and PCD DXE Database Generation Tool matches"
 #endif
 
+
+typedef struct {
+  LIST_ENTRY              Node;
+  PCD_PROTOCOL_CALLBACK   CallbackFn;
+} CALLBACK_FN_ENTRY;
+
+#define CR_FNENTRY_FROM_LISTNODE(Record, Type, Field) _CR(Record, Type, Field)
+
 //
 // Internal Functions
 //
@@ -89,17 +97,17 @@ GetHiiVariable (
 
 EFI_STATUS
 DxeRegisterCallBackWorker (
-  IN  UINTN        TokenNumber,
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
-  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction,
-  IN  BOOLEAN                 Reigster
+  IN  UINTN                   TokenNumber,
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 );
 
 EFI_STATUS
-DxeGetNextTokenWorker (
-  IN OUT UINTN *Token,
-  IN CONST EFI_GUID           *Guid     OPTIONAL
-  );
+DxeUnRegisterCallBackWorker (
+  IN  UINTN                   TokenNumber,
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
+);
 
 VOID
 BuildPcdDxeDataBase (
@@ -363,7 +371,7 @@ DxePcdSetPtrEx (
 EFI_STATUS
 EFIAPI
 DxePcdSetBoolEx (
-  IN CONST EFI_GUID        *Guid,
+  IN CONST EFI_GUID    *Guid,
   IN PCD_TOKEN_NUMBER  TokenNumber,
   IN BOOLEAN           Value
   )
@@ -373,9 +381,9 @@ DxePcdSetBoolEx (
 
 EFI_STATUS
 EFIAPI
-PcdRegisterCallBackOnSet (
+DxeRegisterCallBackOnSet (
   IN  PCD_TOKEN_NUMBER        TokenNumber,
-  IN  CONST EFI_GUID              *Guid, OPTIONAL
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 ;
@@ -383,7 +391,7 @@ PcdRegisterCallBackOnSet (
 
 EFI_STATUS
 EFIAPI
-PcdUnRegisterCallBackOnSet (
+DxeUnRegisterCallBackOnSet (
   IN  PCD_TOKEN_NUMBER        TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
@@ -409,9 +417,20 @@ SetWorkerByLocalTokenNumber (
   )
 ;
 
+PCD_TOKEN_NUMBER
+ExGetNextTokeNumber (
+  IN CONST EFI_GUID    *Guid,
+  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN EFI_GUID          *GuidTable,
+  IN UINTN             SizeOfGuidTable,
+  IN DYNAMICEX_MAPPING *ExMapTable,
+  IN UINTN             SizeOfExMapTable
+  )
+;
+
 extern EFI_GUID gPcdDataBaseHobGuid;
 
-extern PCD_DATABASE * gPcdDatabase;
+extern PCD_DATABASE * mPcdDatabase;
 
 extern DXE_PCD_DATABASE_INIT gDXEPcdDbInit;
 
