@@ -14,8 +14,23 @@
 
 **/
 
-static EFI_CPU_IO_PROTOCOL          *gCpuIo;
+//
+// Globle varible to cache pointer to CpuIo protocol.
+//
+STATIC EFI_CPU_IO_PROTOCOL          *mCpuIo = NULL;
 
+/**
+  The constructor function caches the pointer to CpuIo protocol.
+  
+  The constructor function locates CpuIo protocol from protocol database.
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
+**/
 EFI_STATUS
 IoLibConstructor (
   IN      EFI_HANDLE                ImageHandle,
@@ -24,15 +39,26 @@ IoLibConstructor (
 {
   EFI_STATUS                        Status;
 
-  Status = SystemTable->BootServices->LocateProtocol (
-                                        &gEfiCpuIoProtocolGuid,
-                                        NULL,
-                                        (VOID**)&gCpuIo
-                                        );
+  Status = gBS->LocateProtocol (&gEfiCpuIoProtocolGuid, NULL, (VOID**) &mCpuIo);
   ASSERT_EFI_ERROR (Status);
+
   return Status;
 }
 
+/**
+  Reads registers in the EFI CPU I/O space.
+
+  Reads the I/O port specified by Port with registers width specified by Width.
+  The read value is returned. If such operations are not supported, then ASSERT().
+  This function must guarantee that all I/O read and write operations are serialized.
+
+  @param  Port          The base address of the I/O operation.
+                        The caller is responsible for aligning the Address if required. 
+  @param  Width         The width of the I/O operation.
+  
+  @return Data read from registers in the EFI CPU I/O space.
+
+**/
 UINT64
 EFIAPI
 IoReadWorker (
@@ -40,12 +66,30 @@ IoReadWorker (
   IN      EFI_CPU_IO_PROTOCOL_WIDTH Width
   )
 {
+  EFI_STATUS                        Status;
   UINT64                            Data;
 
-  gCpuIo->Io.Read (gCpuIo, Width, Port, 1, &Data);
+  Status = mCpuIo->Io.Read (mCpuIo, Width, Port, 1, &Data);
+  ASSERT_EFI_ERROR (Status);
+
   return Data;
 }
 
+/**
+  Writes registers in the EFI CPU I/O space.
+
+  Writes the I/O port specified by Port with registers width and value specified by Width
+  and Data respectively.  Data is returned. If such operations are not supported, then ASSERT().
+  This function must guarantee that all I/O read and write operations are serialized.
+
+  @param  Port          The base address of the I/O operation.
+                        The caller is responsible for aligning the Address if required. 
+  @param  Width         The width of the I/O operation.
+  @param  Data          The value to write to the I/O port.
+  
+  @return The paramter of Data.
+
+**/
 UINT64
 EFIAPI
 IoWriteWorker (
@@ -54,10 +98,28 @@ IoWriteWorker (
   IN      UINT64                    Data
   )
 {
-  gCpuIo->Io.Write (gCpuIo, Width, Port, 1, &Data);
+  EFI_STATUS                        Status;
+
+  Status = mCpuIo->Io.Write (mCpuIo, Width, Port, 1, &Data);
+  ASSERT_EFI_ERROR (Status);
+
   return Data;
 }
 
+/**
+  Reads memory-mapped registers in the EFI system memory space. 
+
+  Reads the MMIO registers specified by Address with registers width specified by Width.
+  The read value is returned. If such operations are not supported, then ASSERT().
+  This function must guarantee that all MMIO read and write operations are serialized.
+
+  @param  Address       The MMIO register to read.
+                        The caller is responsible for aligning the Address if required. 
+  @param  Width         The width of the I/O operation.
+  
+  @return Data read from registers in the EFI system memory space.
+
+**/
 UINT64
 EFIAPI
 MmioReadWorker (
@@ -65,12 +127,29 @@ MmioReadWorker (
   IN      EFI_CPU_IO_PROTOCOL_WIDTH Width
   )
 {
+  EFI_STATUS                        Status;
   UINT64                            Data;
 
-  gCpuIo->Mem.Read (gCpuIo, Width, Address, 1, &Data);
+  Status = mCpuIo->Mem.Read (mCpuIo, Width, Address, 1, &Data);
+  ASSERT_EFI_ERROR (Status);
+
   return Data;
 }
 
+/**
+  Writes memory-mapped registers in the EFI system memory space. 
+
+  Writes the MMIO registers specified by Address with registers width and value specified by Width
+  and Data respectively. Data is returned. If such operations are not supported, then ASSERT().
+  This function must guarantee that all MMIO read and write operations are serialized.
+
+  @param  Address       The MMIO register to read.
+                        The caller is responsible for aligning the Address if required. 
+  @param  Width         The width of the I/O operation.
+  
+  @return Data read from registers in the EFI system memory space.
+
+**/
 UINT64
 EFIAPI
 MmioWriteWorker (
@@ -79,7 +158,11 @@ MmioWriteWorker (
   IN      UINT64                    Data
   )
 {
-  gCpuIo->Mem.Write (gCpuIo, Width, Address, 1, &Data);
+  EFI_STATUS                        Status;
+
+  Status = mCpuIo->Mem.Write (mCpuIo, Width, Address, 1, &Data);
+  ASSERT_EFI_ERROR (Status);
+
   return Data;
 }
 
@@ -151,6 +234,10 @@ IoRead16 (
   IN      UINTN                     Port
   )
 {
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
   return (UINT16)IoReadWorker (Port, EfiCpuIoWidthUint16);
 }
 
@@ -176,6 +263,10 @@ IoWrite16 (
   IN      UINT16                    Value
   )
 {
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
   return (UINT16)IoWriteWorker (Port, EfiCpuIoWidthUint16, Value);
 }
 
@@ -199,6 +290,10 @@ IoRead32 (
   IN      UINTN                     Port
   )
 {
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
   return (UINT32)IoReadWorker (Port, EfiCpuIoWidthUint32);
 }
 
@@ -224,6 +319,10 @@ IoWrite32 (
   IN      UINT32                    Value
   )
 {
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
   return (UINT32)IoWriteWorker (Port, EfiCpuIoWidthUint32, Value);
 }
 
@@ -247,6 +346,10 @@ IoRead64 (
   IN      UINTN                     Port
   )
 {
+  //
+  // Make sure Port is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Port & 7) == 0);
   return IoReadWorker (Port, EfiCpuIoWidthUint64);
 }
 
@@ -272,6 +375,10 @@ IoWrite64 (
   IN      UINT64                    Value
   )
 {
+  //
+  // Make sure Port is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Port & 7) == 0);
   return IoWriteWorker (Port, EfiCpuIoWidthUint64, Value);
 }
 
@@ -341,6 +448,10 @@ MmioRead16 (
   IN      UINTN                     Address
   )
 {
+  //
+  // Make sure Address is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Address & 1) == 0);
   return (UINT16)MmioReadWorker (Address, EfiCpuIoWidthUint16);
 }
 
@@ -364,6 +475,10 @@ MmioWrite16 (
   IN      UINT16                    Value
   )
 {
+  //
+  // Make sure Address is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Address & 1) == 0);
   return (UINT16)MmioWriteWorker (Address, EfiCpuIoWidthUint16, Value);
 }
 
@@ -387,6 +502,10 @@ MmioRead32 (
   IN      UINTN                     Address
   )
 {
+  //
+  // Make sure Address is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Address & 3) == 0);
   return (UINT32)MmioReadWorker (Address, EfiCpuIoWidthUint32);
 }
 
@@ -410,6 +529,10 @@ MmioWrite32 (
   IN      UINT32                    Value
   )
 {
+  //
+  // Make sure Address is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Address & 3) == 0);
   return (UINT32)MmioWriteWorker (Address, EfiCpuIoWidthUint32, Value);
 }
 
@@ -433,6 +556,10 @@ MmioRead64 (
   IN      UINTN                     Address
   )
 {
+  //
+  // Make sure Address is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Address & 7) == 0);
   return (UINT64)MmioReadWorker (Address, EfiCpuIoWidthUint64);
 }
 
@@ -456,5 +583,9 @@ MmioWrite64 (
   IN      UINT64                    Value
   )
 {
+  //
+  // Make sure Address is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Address & 7) == 0);
   return (UINT64)MmioWriteWorker (Address, EfiCpuIoWidthUint64, Value);
 }
