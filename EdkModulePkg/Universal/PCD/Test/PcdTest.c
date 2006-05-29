@@ -23,9 +23,10 @@ CONST GUID Guid1  = GUID1;
 EFI_STATUS
 EFIAPI
 OnsetCallback1 (
-  IN  UINT32    CallBackToken,
-  IN  VOID      *TokenData,
-  IN  UINTN     TokenDataSize
+  IN  CONST EFI_GUID  *Guid,
+  IN  UINT32          CallBackToken,
+  IN  VOID            *TokenData,
+  IN  UINTN           TokenDataSize
   )
 {
   DebugPrint (0x80000000, "In CallbackOnSet %x %d\n", * ((UINT32 *)TokenData), TokenDataSize);    
@@ -42,6 +43,10 @@ DoTest(
   UINT16    u16;
   UINT32    u32;
   UINT64    u64;
+  PCD_TOKEN_NUMBER Token;
+  
+
+  LibPcdCallbackOnSet (NULL, PcdToken(PcdTestDynamicUint32), OnsetCallback1);
   
   u32 = 0xafafafaf;
   PcdSet32(PcdTestDynamicUint32, u32);
@@ -57,6 +62,15 @@ DoTest(
   ASSERT (u16 == 0x1234);
   ASSERT (u64 == PcdGet64(PcdTestDynamicUint64));
   ASSERT (u32 == PcdGet32(PcdTestDynamicUint32));
+
+
+  Token = PCD_INVALID_TOKEN_NUMBER;
+
+  do {
+    Token = LibPcdGetNextToken (NULL, Token);
+    DebugPrint (EFI_D_ERROR, "Next Token Number is %d\n", Token);
+  } while (Token != PCD_INVALID_TOKEN_NUMBER);
+  
   
   return;
 }

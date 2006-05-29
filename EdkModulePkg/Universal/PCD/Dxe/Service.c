@@ -444,10 +444,10 @@ InvokeCallbackOnSet (
 
 EFI_STATUS
 SetWorker (
-  UINTN         TokenNumber,
-  VOID          *Data,
-  UINTN         Size,
-  BOOLEAN       PtrType
+  PCD_TOKEN_NUMBER        TokenNumber,
+  VOID                    *Data,
+  UINTN                   Size,
+  BOOLEAN                 PtrType
   )
 {
   UINT32              *LocalTokenNumberTable;
@@ -467,11 +467,11 @@ SetWorker (
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
 
+  InvokeCallbackOnSet (0, NULL, TokenNumber, Data, Size);
+
   TokenNumber = IsPeiDb ? TokenNumber
                         : TokenNumber - PEI_LOCAL_TOKEN_NUMBER;
   
-  InvokeCallbackOnSet (0, NULL, TokenNumber, Data, Size);
-
   return SetWorkerByLocalTokenNumber (LocalTokenNumberTable[TokenNumber], Data, Size, PtrType, IsPeiDb);
 
 }
@@ -505,7 +505,7 @@ ExGetWorker (
 
 EFI_STATUS
 ExSetWorker (
-  IN UINT32               ExTokenNumber,
+  IN PCD_TOKEN_NUMBER     ExTokenNumber,
   IN CONST EFI_GUID       *Guid,
   VOID                    *Data,
   UINTN                   SetSize,
@@ -683,7 +683,7 @@ SetHiiVariable (
 VOID
 GetExPcdTokenAttributes (
   IN CONST EFI_GUID             *Guid,
-  IN UINT32                     ExTokenNumber,
+  IN PCD_TOKEN_NUMBER           ExTokenNumber,
   OUT EX_PCD_ENTRY_ATTRIBUTE    *ExAttr
   )
 {
@@ -721,7 +721,7 @@ GetExPcdTokenAttributes (
 
         ExAttr->IsPeiDb               = FALSE;
         ExAttr->Size                  = SizeTable[i + DXE_NEX_TOKEN_NUMBER];
-        ExAttr->TokenNumber           = i + DXE_NEX_TOKEN_NUMBER;
+        ExAttr->TokenNumber           = i + PEI_LOCAL_TOKEN_NUMBER;
         ExAttr->LocalTokenNumberAlias = ExMap[i].LocalTokenNumber;
         return;
 

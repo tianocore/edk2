@@ -62,9 +62,11 @@ PeiRegisterCallBackWorker (
   ASSERT (GuidHob != NULL);
   
   CallbackTable = GET_GUID_HOB_DATA (GuidHob);
+  CallbackTable = CallbackTable + (TokenNumber * FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry));
 
   Compare = Register? NULL: CallBackFunction;
   Assign  = Register? CallBackFunction: NULL;
+
 
   for (Idx = 0; Idx < FixedPcdGet32(PcdMaxPeiPcdCallBackNumberPerPcdEntry); Idx++) {
     if (CallbackTable[Idx] == Compare) {

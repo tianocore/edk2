@@ -46,16 +46,16 @@ typedef struct {
 
 EFI_STATUS
 SetWorker (
-  UINTN         TokenNumber,
-  VOID          *Data,
-  UINTN         Size,
-  BOOLEAN       PtrType
+  IN PCD_TOKEN_NUMBER          TokenNumber,
+  IN VOID                      *Data,
+  IN UINTN                     Size,
+  IN BOOLEAN                   PtrType
   )
 ;
 
 EFI_STATUS
 ExSetWorker (
-  IN UINT32               ExTokenNumber,
+  IN PCD_TOKEN_NUMBER     ExTokenNumber,
   IN CONST EFI_GUID       *Guid,
   VOID                    *Data,
   UINTN                   Size,
@@ -66,14 +66,14 @@ ExSetWorker (
 
 VOID *
 GetWorker (
-  UINTN  TokenNumber
+  PCD_TOKEN_NUMBER  TokenNumber
   )
 ;
 
 VOID *
 ExGetWorker (
   IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
+  IN PCD_TOKEN_NUMBER       ExTokenNumber,
   IN UINTN                  GetSize
   ) 
 ;
@@ -90,21 +90,21 @@ EFI_STATUS
 GetHiiVariable (
   IN  EFI_GUID      *VariableGuid,
   IN  UINT16        *VariableName,
-  OUT VOID          ** VariableData,
+  OUT VOID          **VariableData,
   OUT UINTN         *VariableSize
   )
 ;
 
 EFI_STATUS
 DxeRegisterCallBackWorker (
-  IN  UINTN                   TokenNumber,
+  IN  PCD_TOKEN_NUMBER        TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 );
 
 EFI_STATUS
 DxeUnRegisterCallBackWorker (
-  IN  UINTN                   TokenNumber,
+  IN  PCD_TOKEN_NUMBER        TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 );
@@ -125,7 +125,7 @@ typedef struct {
 VOID
 GetExPcdTokenAttributes (
   IN CONST EFI_GUID             *Guid,
-  IN UINT32                     ExTokenNumber,
+  IN PCD_TOKEN_NUMBER           ExTokenNumber,
   OUT EX_PCD_ENTRY_ATTRIBUTE    *ExAttr
   )
 ;
