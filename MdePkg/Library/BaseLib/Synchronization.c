@@ -14,8 +14,8 @@
 
 **/
 
-#define SPIN_LOCK_RELEASED          ((SPIN_LOCK)0)
-#define SPIN_LOCK_ACQUIRED          ((SPIN_LOCK)-1)
+#define SPIN_LOCK_RELEASED          ((SPIN_LOCK)1)
+#define SPIN_LOCK_ACQUIRED          ((SPIN_LOCK)2)
 
 UINT32
 EFIAPI
@@ -94,7 +94,7 @@ InitializeSpinLock (
   )
 {
   ASSERT (SpinLock != NULL);
-  *SpinLock = 0;
+  *SpinLock = SPIN_LOCK_RELEASED;
   return SpinLock;
 }
 
@@ -178,6 +178,7 @@ AcquireSpinLockOrFail (
   )
 {
   ASSERT (SpinLock != NULL);
+  ASSERT (*SpinLock == SPIN_LOCK_ACQUIRED || *SpinLock == SPIN_LOCK_RELEASED);
   return (BOOLEAN)(
            InterlockedCompareExchangePointer (
              (VOID**)SpinLock,
@@ -208,7 +209,8 @@ ReleaseSpinLock (
   )
 {
   ASSERT (SpinLock != NULL);
-  *SpinLock = 0;
+  ASSERT (*SpinLock == SPIN_LOCK_ACQUIRED || *SpinLock == SPIN_LOCK_RELEASED);
+  *SpinLock = SPIN_LOCK_RELEASED;
   return SpinLock;
 }
 
