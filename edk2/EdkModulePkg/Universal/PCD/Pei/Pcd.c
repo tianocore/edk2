@@ -255,11 +255,7 @@ PeiPcdGetSizeEx (
   IN PCD_TOKEN_NUMBER                  ExTokenNumber
   )
 {
-  EX_PCD_ENTRY_ATTRIBUTE      Attr;
-
-  GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
-  
-  return Attr.Size;
+  return PeiPcdGetSize (GetExPcdTokenNumber (Guid, ExTokenNumber));
 }
 
 

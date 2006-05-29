@@ -50,15 +50,6 @@ SetWorker (
 ;
 
 EFI_STATUS
-SetWorkerByLocalTokenNumber (
-  IN UINT32        LocalTokenNumber,
-  IN VOID          *Data,
-  IN UINTN         Size,
-  IN BOOLEAN       PtrType
-  )
-;
-
-EFI_STATUS
 ExSetWorker (
   IN PCD_TOKEN_NUMBER     ExTokenNumber,
   IN CONST EFI_GUID       *Guid,
@@ -89,11 +80,11 @@ typedef struct {
   UINT32  LocalTokenNumberAlias;
 } EX_PCD_ENTRY_ATTRIBUTE;
 
-VOID
-GetExPcdTokenAttributes (
+
+PCD_TOKEN_NUMBER
+GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
-  IN PCD_TOKEN_NUMBER           ExTokenNumber,
-  OUT EX_PCD_ENTRY_ATTRIBUTE    *ExAttr
+  IN PCD_TOKEN_NUMBER           ExTokenNumber
   )
 ;
 

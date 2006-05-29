@@ -66,7 +66,8 @@ ExSetWorker (
 
 VOID *
 GetWorker (
-  PCD_TOKEN_NUMBER  TokenNumber
+  PCD_TOKEN_NUMBER  TokenNumber,
+  UINTN             GetSize
   )
 ;
 
@@ -115,21 +116,12 @@ BuildPcdDxeDataBase (
 );
 
 
-typedef struct {
-  UINTN   TokenNumber;
-  UINTN   Size;
-  UINT32  LocalTokenNumberAlias;
-  BOOLEAN IsPeiDb;
-} EX_PCD_ENTRY_ATTRIBUTE;
-
-VOID
-GetExPcdTokenAttributes (
+PCD_TOKEN_NUMBER
+GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
-  IN PCD_TOKEN_NUMBER           ExTokenNumber,
-  OUT EX_PCD_ENTRY_ATTRIBUTE    *ExAttr
+  IN PCD_TOKEN_NUMBER           ExTokenNumber
   )
 ;
-
 //
 // Protocol Interface function declaration.
 //
@@ -404,16 +396,6 @@ EFIAPI
 DxePcdGetNextToken (
   IN CONST EFI_GUID               *Guid, OPTIONAL
   IN OUT   PCD_TOKEN_NUMBER       *TokenNumber
-  )
-;
-
-EFI_STATUS
-SetWorkerByLocalTokenNumber (
-  UINT32        LocalTokenNumber,
-  VOID          *Data,
-  UINTN         Size,
-  BOOLEAN       PtrType,
-  BOOLEAN       IsPeiDb
   )
 ;
 

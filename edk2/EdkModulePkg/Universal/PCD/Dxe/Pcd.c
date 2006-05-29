@@ -116,9 +116,7 @@ DxePcdGet8 (
   IN PCD_TOKEN_NUMBER         TokenNumber
   )
 {
-  ASSERT (sizeof (UINT8) == DxePcdGetSize (TokenNumber));
-  
-  return *((UINT8 *) GetWorker (TokenNumber));
+  return *((UINT8 *) GetWorker (TokenNumber, sizeof (UINT8)));
 }
 
 
@@ -129,9 +127,7 @@ DxePcdGet16 (
   IN PCD_TOKEN_NUMBER         TokenNumber
   )
 {
-  ASSERT (sizeof (UINT16) == DxePcdGetSize (TokenNumber));
-  
-  return ReadUnaligned16 (GetWorker (TokenNumber));
+  return ReadUnaligned16 (GetWorker (TokenNumber, sizeof (UINT16)));
 }
 
 
@@ -142,9 +138,7 @@ DxePcdGet32 (
   IN PCD_TOKEN_NUMBER         TokenNumber
   )
 {
-  ASSERT (sizeof (UINT32) == DxePcdGetSize (TokenNumber));
-  
-  return ReadUnaligned32 (GetWorker (TokenNumber));
+  return ReadUnaligned32 (GetWorker (TokenNumber, sizeof (UINT32)));
 }
 
 
@@ -155,9 +149,7 @@ DxePcdGet64 (
   IN PCD_TOKEN_NUMBER          TokenNumber
   )
 {
-  ASSERT (sizeof (UINT64) == DxePcdGetSize (TokenNumber));
-  
-  return ReadUnaligned64(GetWorker (TokenNumber));
+  return ReadUnaligned64(GetWorker (TokenNumber, sizeof (UINT64)));
 }
 
 
@@ -168,7 +160,7 @@ DxePcdGetPtr (
   IN PCD_TOKEN_NUMBER          TokenNumber
   )
 {
-  return GetWorker (TokenNumber);
+  return GetWorker (TokenNumber, 0);
 }
 
 
@@ -179,9 +171,7 @@ DxePcdGetBool (
   IN PCD_TOKEN_NUMBER          TokenNumber
   )
 {
-  ASSERT (sizeof (BOOLEAN) == DxePcdGetSize (TokenNumber));
-  
-  return *((BOOLEAN *) GetWorker (TokenNumber));
+  return *((BOOLEAN *) GetWorker (TokenNumber, sizeof (BOOLEAN)));
 }
 
 
@@ -224,7 +214,7 @@ DxePcdGet16Ex (
   IN PCD_TOKEN_NUMBER     ExTokenNumber
   )
 {
-  return *((UINT16 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT16)));
+  return ReadUnaligned16 (ExGetWorker (Guid, ExTokenNumber, sizeof(UINT16)));
 }
 
 
@@ -236,7 +226,7 @@ DxePcdGet32Ex (
   IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
-  return *((UINT32 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT32)));
+  return ReadUnaligned32 (ExGetWorker (Guid, ExTokenNumber, sizeof(UINT32)));
 }
 
 
@@ -248,10 +238,7 @@ DxePcdGet64Ex (
   IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
-  //
-  // BugBug: Must be changed to ReadUnaligned64
-  //
-  return *((UINT64 *) ExGetWorker (Guid, ExTokenNumber, sizeof(UINT64)));
+  return ReadUnaligned64 (ExGetWorker (Guid, ExTokenNumber, sizeof(UINT64)));
 }
 
 
@@ -287,11 +274,7 @@ DxePcdGetSizeEx (
   IN PCD_TOKEN_NUMBER      ExTokenNumber
   )
 {
-  EX_PCD_ENTRY_ATTRIBUTE    Attr;
-  
-  GetExPcdTokenAttributes (Guid, ExTokenNumber, &Attr);
-
-  return Attr.Size;
+  return DxePcdGetSize(GetExPcdTokenNumber (Guid, ExTokenNumber));
 }
 
 
