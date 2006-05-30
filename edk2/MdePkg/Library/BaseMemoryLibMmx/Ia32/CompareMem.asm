@@ -39,7 +39,6 @@ InternalMemCompareMem   PROC    USES    esi edi
     movzx   eax, byte ptr [esi - 1]
     movzx   edx, byte ptr [edi - 1]
     sub     eax, edx
-    sub     eax, edx
     ret
 InternalMemCompareMem   ENDP
 
