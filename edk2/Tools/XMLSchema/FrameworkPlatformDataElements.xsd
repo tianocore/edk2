@@ -188,7 +188,7 @@
                 <xs:element minOccurs="1" maxOccurs="unbounded" ref="FvImageNames"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="FvImageOptions"/>
             </xs:sequence>
-            <xs:attribute name="Type" type="xs:string" use="optional"/>
+            <xs:attribute name="Type" type="FvImageTypes" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="FvImageName">
@@ -199,7 +199,7 @@
             <xs:attribute name="Name" type="FvRegionTypes" use="required"/>
         </xs:complexType>
     </xs:element>
-    <xs:element name="FvImageNames" type="xs:string"/>
+    <xs:element name="FvImageNames" type="xs:NCName"/>
     <xs:element name="FvImageOptions">
         <xs:annotation>
             <xs:documentation xml:lang="en">This element is used specify different name value pairs.</xs:documentation>
@@ -361,6 +361,13 @@
             <xs:enumeration value="1MB"/>
             <xs:enumeration value="2MB"/>
             <xs:enumeration value="4MB"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FvImageTypes">
+        <xs:restriction base="xs:NCName">
+            <xs:enumeration value="Attributes"/>
+            <xs:enumeration value="Options"/>
+            <xs:enumeration value="Components"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="FvSubRegionTypes">
