@@ -54,8 +54,8 @@ SetMem64 (
 {
   ASSERT (Buffer != NULL);
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Buffer + 1);
-  ASSERT ((((UINTN)Buffer) & 1) != 0);
-  ASSERT ((Length & 1) != 0);
+  ASSERT ((((UINTN)Buffer) & (sizeof (Value) - 1)) != 0);
+  ASSERT ((Length & (sizeof (Value) - 1)) != 0);
 
   if ((Length /= sizeof (Value)) == 0) {
     return Buffer;
