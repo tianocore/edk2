@@ -368,6 +368,7 @@
             <xs:enumeration value="Attributes"/>
             <xs:enumeration value="Options"/>
             <xs:enumeration value="Components"/>
+            <xs:enumeration value="ValidImageNames"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="FvSubRegionTypes">
