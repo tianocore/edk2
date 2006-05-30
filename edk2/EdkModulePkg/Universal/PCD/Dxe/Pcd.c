@@ -511,7 +511,7 @@ DxePcdGetNextToken (
   // Scan the local token space
   //
   if (Guid == NULL) {
-    *TokenNumber++;
+    (*TokenNumber)++;
     if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
       return EFI_SUCCESS;
     } else {
