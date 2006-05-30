@@ -127,28 +127,6 @@ typedef union {
 //
 // Main PEI entry
 //
-EFI_STATUS
-EFIAPI
-PeiMain (
-  IN EFI_PEI_STARTUP_DESCRIPTOR  *PeiStartupDescriptor
-  )
-/*++
-
-Routine Description:
-
-  Main entry point to Pei Core.
-
-Arguments:
-
-  PeiStartupDescriptor - Information and services provided by SEC phase.
-
-Returns:
-
-  This function never returns
-
---*/
-;
-
 
 EFI_STATUS
 EFIAPI
@@ -160,9 +138,8 @@ PeiCore (
 
 Routine Description:
 
-  The entry routine to Pei Core, invoked by PeiMain during transition
-  from SEC to PEI. After switching stack in the PEI core, it will restart
-  with the old core data.
+  Main entry point to Pei Core. After switching stack in the PEI core, 
+  it will restart with the old core data.
 
 Arguments:
 
