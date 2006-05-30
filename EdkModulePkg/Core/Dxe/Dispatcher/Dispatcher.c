@@ -1018,6 +1018,11 @@ Returns:
             //
             if (gDxeCoreLoadedImage->FilePath == NULL) {
               if (CompareGuid (&NameGuid, gDxeCoreFileName)) {
+                //
+                // Because mFvDevicePath has been initialized when discoveried 
+                // EFI_FV_FILETYPE_DRIVER file. So only need to update the name 
+                // guid of device path.
+                //
                 CopyGuid (&mFvDevicePath.File.NameGuid, &NameGuid);
 
                 gDxeCoreLoadedImage->FilePath = CoreDuplicateDevicePath (
