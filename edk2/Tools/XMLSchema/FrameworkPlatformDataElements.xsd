@@ -16,6 +16,7 @@
         <xs:documentation xml:lang="en"> This schema defines EFI and Framework Platform Data Elements that are specific to platform creation.</xs:documentation>
     </xs:annotation>
     <xs:include schemaLocation="NamingConvention.xsd"/>
+    <xs:include schemaLocation="FrameworkDataAttributes.xsd"/>
     <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
     <xs:include schemaLocation="FrameworkDataElements.xsd"/>
     <xs:element name="Capsule">
@@ -462,7 +463,7 @@
         <xs:attribute name="Name" type="xs:string" use="required"/>
         <xs:attribute name="Size" type="HexAddressType" use="required"/>
         <xs:attribute name="BaseAddress" type="HexAddressType" use="required"/>
-        <xs:attribute name="ErasePolarity" type="ZeroOrOne" use="required"/>
+        <xs:attribute name="ErasePolarity" type="Polarity" use="required"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="RawDataAttributes">
         <xs:attribute name="Name" type="xs:string" use="required"/>

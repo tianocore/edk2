@@ -174,6 +174,14 @@
             <xs:pattern value="(([a-zA-Z][a-zA-Z0-9]*)(_)*(.)*)+"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="Polarity">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Limit Polarity vaild values to -1, 0 and 1</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:int">
+            <xs:pattern value="-1|0|1"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="Sentence">
         <xs:annotation>
             <xs:documentation xml:lang="en"> This data type requires two or more words </xs:documentation>
@@ -294,14 +302,6 @@
         </xs:annotation>
         <xs:restriction base="xs:int">
             <xs:pattern value="0"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="ZeroOrOne">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define Zero as a vaild value</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:int">
-            <xs:pattern value="0|1"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="OldVersionDataType">

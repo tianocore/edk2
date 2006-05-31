@@ -17,6 +17,7 @@
   </xs:annotation>
   <xs:include schemaLocation="NamingConvention.xsd"/>
   <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
+  <xs:include schemaLocation="FrameworkDataAttributes.xsd"/>
   <xs:element name="Abstract">
     <xs:annotation>
       <xs:documentation xml:lang="en">Abstract is valid for all Description Files</xs:documentation>
