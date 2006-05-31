@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="BIN_DIR" value="${WORKSPACE}/Tools/bin" />
   <property name="BUILD_MODE" value="PACKAGE" />
   <property name="Libs" 
-    value="Common/build.xml CustomizedCompress/build.xml PeCoffLoader/build.xml"/>
+    value="String/build.xml Common/build.xml CustomizedCompress/build.xml PeCoffLoader/build.xml"/>
 
   <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml" />
 
