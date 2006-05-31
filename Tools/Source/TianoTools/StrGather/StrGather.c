@@ -1248,21 +1248,21 @@ ProcessTokenLanguage (
       // quoted strings, and concatenate them until we get a failure
       // back from the string parser.
       //
-      Len = wcslen (String) + 1;
+      Len = StrLen (String) + 1;
       ParserSetPosition (SourceFile->FileName, SourceFile->LineNum);
       do {
         SkipWhiteSpace (SourceFile);
         SecondString = GetQuotedString (SourceFile, TRUE);
         if (SecondString != NULL) {
-          Len += wcslen (SecondString);
+          Len += StrLen (SecondString);
           TempString = (WCHAR *) malloc (Len * sizeof (WCHAR));
           if (TempString == NULL) {
             Error (NULL, 0, 0, "application error", "failed to allocate memory");
             return ;
           }
 
-          wcscpy (TempString, String);
-          wcscat (TempString, SecondString);
+          StrCpy (TempString, String);
+          StrCat (TempString, SecondString);
           free (String);
           free (SecondString);
           String = TempString;
@@ -1973,14 +1973,14 @@ AddCommandLineLanguage (
     // long. If we find a comma, then we're done with this group, so
     // break out.
     //
-    swprintf (WNewList->Str, L"%S", Language);
+    UnicodeSPrint (WNewList->Str, (strlen (Language) + 1) * sizeof (WCHAR), L"%a", Language);
     From = To = WNewList->Str;
     while (*From) {
       if (*From == L',') {
         break;
       }
 
-      if ((wcslen (From) < LANGUAGE_IDENTIFIER_NAME_LEN) ||
+      if ((StrLen (From) < LANGUAGE_IDENTIFIER_NAME_LEN) ||
             (
               (From[LANGUAGE_IDENTIFIER_NAME_LEN] != 0) &&
               (From[LANGUAGE_IDENTIFIER_NAME_LEN] != UNICODE_PLUS_SIGN) &&
@@ -1993,7 +1993,7 @@ AddCommandLineLanguage (
         return STATUS_ERROR;
       }
 
-      wcsncpy (To, From, LANGUAGE_IDENTIFIER_NAME_LEN);
+      StrnCpy (To, From, LANGUAGE_IDENTIFIER_NAME_LEN);
       To += LANGUAGE_IDENTIFIER_NAME_LEN;
       From += LANGUAGE_IDENTIFIER_NAME_LEN;
       if (*From == L'+') {
@@ -2114,8 +2114,8 @@ ParseIndirectionFiles (
                 goto Done;
               }
 
-              swprintf (NewList->Str1, L"%S", StringName);
-              swprintf (NewList->Str2, L"%S", ScopeName);
+              UnicodeSPrint (NewList->Str1, strlen (StringName) + 1, L"%a", StringName);
+              UnicodeSPrint (NewList->Str2, strlen (ScopeName) + 1, L"%a", ScopeName);
               if (mGlobals.IndirectionList == NULL) {
                 mGlobals.IndirectionList = NewList;
               } else {

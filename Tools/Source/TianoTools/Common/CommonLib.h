@@ -127,6 +127,8 @@ PrintGuidToBuffer (
   )
 ;
 
+#define ASSERT(x) assert(x)
+
 #ifdef __GNUC__
 #define stricmp strcasecmp
 #define strnicmp strncasecmp
