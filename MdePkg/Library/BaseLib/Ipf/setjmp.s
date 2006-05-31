@@ -151,7 +151,7 @@ PROCEDURE_EXIT(SetJump)
 
 
 //
-// void LongJump(struct jmp_buffer *)
+// void _LongJump(struct jmp_buffer *)
 //
 //  Perform a non-local goto.
 //
@@ -163,7 +163,7 @@ PROCEDURE_EXIT(SetJump)
 //  for a second time to the 'SetJump'.
 //
 
-PROCEDURE_ENTRY(LongJump)
+PROCEDURE_ENTRY(_LongJump)
   //
   //  Make sure buffer is aligned at 16byte boundary
   //
@@ -312,6 +312,6 @@ PROCEDURE_ENTRY(LongJump)
   invala ;;
 
   br.ret.sptk  b0
-PROCEDURE_EXIT(LongJump)
+PROCEDURE_EXIT(_LongJump)
 
 
