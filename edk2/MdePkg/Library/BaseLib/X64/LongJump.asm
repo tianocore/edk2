@@ -15,13 +15,13 @@
 ;
 ; Abstract:
 ;
-;   Implementation of LongJump() on x64.
+;   Implementation of _LongJump() on x64.
 ;
 ;------------------------------------------------------------------------------
 
     .code
 
-LongJump    PROC
+_LongJump    PROC
     mov     rbx, [rcx]
     mov     rsp, [rcx + 8]
     mov     rbp, [rcx + 10h]
@@ -33,6 +33,6 @@ LongJump    PROC
     mov     r15, [rcx + 40h]
     mov     rax, rdx
     jmp     qword ptr [rcx + 48h]
-LongJump    ENDP
+_LongJump    ENDP
 
     END
