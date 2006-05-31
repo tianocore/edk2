@@ -113,7 +113,8 @@ WriteUnaligned24 (
 {
   ASSERT (Buffer != NULL);
 
-  return *Buffer = BitFieldWrite32 (*Buffer, 0, 23, Value);
+  BitFieldWrite32 (*Buffer, 0, 23, Value);
+  return Value;
 }
 
 /**
