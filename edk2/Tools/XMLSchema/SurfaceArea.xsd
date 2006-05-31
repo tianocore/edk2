@@ -169,7 +169,7 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="SpdHeader"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDeclarations"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
-        <xs:element minOccurs="1" maxOccurs="1" ref="MsaFiles"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="MsaFiles"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="PackageHeaders"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="GuidDeclarations"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="ProtocolDeclarations"/>
