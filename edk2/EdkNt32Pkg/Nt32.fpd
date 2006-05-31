@@ -10680,7 +10680,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <VariableName>L""</VariableName>
       <DataOffset>0</DataOffset>
       <GuidOffset>0</GuidOffset>
-      <DefaultValue>0x0</DefaultValue>
+      <DefaultValue>0x8</DefaultValue>
     </PcdBuildData>
     <PcdBuildData ItemType="FIXED_AT_BUILD">
       <C_Name>PcdVpdBaseAddress</C_Name>
