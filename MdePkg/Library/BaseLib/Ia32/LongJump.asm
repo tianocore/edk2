@@ -15,7 +15,7 @@
 ;
 ; Abstract:
 ;
-;   Implementation of LongJump() on IA-32.
+;   Implementation of _LongJump() on IA-32.
 ;
 ;------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@
     .model  flat
     .code
 
-_LongJump   PROC
+__LongJump   PROC
     pop     eax
     pop     edx
     pop     eax
@@ -33,6 +33,6 @@ _LongJump   PROC
     mov     ebp, [edx + 12]
     mov     esp, [edx + 16]
     jmp     dword ptr [edx + 20]
-_LongJump   ENDP
+__LongJump   ENDP
 
     END

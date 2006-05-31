@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   Implementation of LongJump() on IA-32.
+#   Implementation of _LongJump() on IA-32.
 #
 #------------------------------------------------------------------------------
 
@@ -23,8 +23,8 @@
 
      
 
-.global _LongJump
-_LongJump: 
+.global __LongJump
+__LongJump: 
     popl    %eax
     popl    %edx
     popl    %eax
