@@ -22,6 +22,89 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </Flash>
   <TianoImage>
     <SEC>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </SEC>
+    <PEI_CORE>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </PEI_CORE>
+    <PEIM>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </PEIM>
+    <DXE_CORE>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </DXE_CORE>
+    <DXE_DRIVERS>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+    </DXE_DRIVERS>
+
+    <OTHER_COMPONENTS>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibRepStr" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibMmx" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseMemoryLibSse2" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseCacheMaintenanceLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseIoLibIntrinsic" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseTimerLibLocalApic" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePeCoffGetEntryPointLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePrintLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePerformanceLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePcdLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibPciExpress" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibCf8" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciCf8Lib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciExpressLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseSmbusLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiSmbusLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
+
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeimEntryPoint" />
+
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeHobLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiHobLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeCoreHobLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeServicesTableLib" />
+
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeIoLibCpuIo" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiRuntimeServicesTableLib" />
+
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverModelLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiMemoryLib" />
+
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibStdErr" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDebugLibConOut" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxePcdLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiPcdLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeMemoryAllocationLib" />
+
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryAllocationLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseUefiDecompressLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDevicePathLibDevicePathProtocol" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="HiiLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" />
+    </OTHER_COMPONENTS>
+  </TianoImage>
+  <FrameworkModules>
+    <SEC>
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
         <PcdBuildDeclarations>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
@@ -391,7 +474,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </PcdBuildDeclarations>
       </ModuleSA>        
     </DXE_DRIVERS>
-
     <OTHER_COMPONENTS>
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseLib" >
         <PcdBuildDeclarations>
@@ -566,6 +648,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePcdLibNull" >
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibPciExpress" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPciExpressBaseAddress</C_Name>
+            <Token>0x0000000A</Token>
+            <DatumType>UINT64</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0</MaxSku>
+            <SkuId>0</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <GuidOffset>0</GuidOffset>
+            <DefaultValue>0xE0000000</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciLibCf8" >
       </ModuleSA>        
@@ -573,6 +675,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSA>        
 
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePciExpressLib" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPciExpressBaseAddress</C_Name>
+            <Token>0x0000000A</Token>
+            <DatumType>UINT64</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0</MaxSku>
+            <SkuId>0</SkuId>
+            <DatumSize>4</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <GuidOffset>0</GuidOffset>
+            <DefaultValue>0xE0000000</DefaultValue>
+          </PcdBuildData>        
+        </PcdBuildDeclarations>
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseSmbusLib" >
       </ModuleSA>        
@@ -878,8 +1000,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiResourcePublicationLib" >
       </ModuleSA>        
-    </OTHER_COMPONENTS>
-  </TianoImage>
+    </OTHER_COMPONENTS>  
+  </FrameworkModules>
   <PcdBuildDeclarations>
     <PcdBuildData ItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
