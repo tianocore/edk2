@@ -14,6 +14,15 @@
 
 **/
 
+VOID
+EFIAPI
+_SwitchStack (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,
+  IN      VOID                      *Context2,
+  IN      VOID                      *NewStack
+  );
+
 /**
   Transfers control to a function starting with a new stack.
 
