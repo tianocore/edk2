@@ -655,6 +655,12 @@
             </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="PcdDriverTypes">
+        <xs:restriction base="NameConvention">
+            <xs:enumeration value="PEI_PCD_DRIVER"/>
+            <xs:enumeration value="DXE_PCD_DRIVER"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="PcdDataTypes">
         <xs:restriction base="xs:normalizedString">
             <xs:enumeration value="UINT8"/>
