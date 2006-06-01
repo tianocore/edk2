@@ -63,11 +63,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>PciEnumerator.c</Filename>
     <Filename>PciEnumeratorSupport.c</Filename>
     <Filename>PciResourceSupport.c</Filename>
-    <Filename>PciCOmmand.c</Filename>
+    <Filename>PciCommand.c</Filename>
     <Filename>ComponentName.c</Filename>
     <Filename>PciDeviceSupport.c</Filename>
     <Filename>PciHotPlugSupport.c</Filename>
-    <Filename>PciBus.c</Filename>
+    <Filename>pcibus.c</Filename>
     <Filename>PciIo.c</Filename>
     <Filename>LightPciLib.c</Filename>
   </SourceFiles>

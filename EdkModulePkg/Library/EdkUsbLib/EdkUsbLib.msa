@@ -36,7 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>UsbDxelib.c</Filename>
+    <Filename>UsbDxeLib.c</Filename>
     <Filename>hid.c</Filename>
   </SourceFiles>
   <Includes>
