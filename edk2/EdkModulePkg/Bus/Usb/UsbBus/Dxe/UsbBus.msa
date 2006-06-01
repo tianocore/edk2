@@ -45,14 +45,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>UsbBus.h</Filename>
+    <Filename>usbbus.h</Filename>
     <Filename>usbutil.h</Filename>
     <Filename>hub.h</Filename>
-    <Filename>UsbBus.c</Filename>
-    <Filename>UsbIo.c</Filename>
+    <Filename>usbbus.c</Filename>
+    <Filename>usbio.c</Filename>
     <Filename>usb.c</Filename>
     <Filename>usbutil.c</Filename>
-    <Filename>Hub.c</Filename>
+    <Filename>hub.c</Filename>
     <Filename>ComponentName.c</Filename>
   </SourceFiles>
   <Includes>

@@ -46,7 +46,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Variable.c</Filename>
-    <Filename>Reclaim.c</Filename>
+    <Filename>reclaim.c</Filename>
     <Arch ArchType="IA32">
       <Filename>InitVariable.c</Filename>
       <Filename>Ia32Variable.dxs</Filename>

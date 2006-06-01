@@ -42,23 +42,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <Filename>DxeMain/DxeMain.c</Filename>
         <Filename>DxeMain/DxeProtocolNotify.c</Filename>
         <Filename>Dispatcher/Dispatcher.c</Filename>
-        <Filename>Dispatcher/Dependency.c</Filename>
-        <Filename>Event/ExecData.c</Filename>
-        <Filename>Event/Event.c</Filename>
-        <Filename>Event/Timer.c</Filename>
-        <Filename>Event/Tpl.c</Filename>
+        <Filename>Dispatcher/dependency.c</Filename>
+        <Filename>Event/execdata.c</Filename>
+        <Filename>Event/event.c</Filename>
+        <Filename>Event/timer.c</Filename>
+        <Filename>Event/tpl.c</Filename>
         <Filename>FwVol/FwVol.c</Filename>
         <Filename>FwVol/Ffs.c</Filename>
         <Filename>FwVol/FwVolAttrib.c</Filename>
         <Filename>FwVol/FwVolRead.c</Filename>
         <Filename>FwVol/FwVolWrite.c</Filename>
         <Filename>FwVolBlock/FwVolBlock.c</Filename>
-        <Filename>Mem/MemData.c</Filename>
+        <Filename>Mem/memdata.c</Filename>
         <Filename>Mem/Page.c</Filename>
-        <Filename>Mem/Pool.c</Filename>
-        <Filename>Gcd/Gcd.c</Filename>
-        <Filename>Hand/Handle.c</Filename>
-        <Filename>Hand/Locate.c</Filename>
+        <Filename>Mem/pool.c</Filename>
+        <Filename>Gcd/gcd.c</Filename>
+        <Filename>Hand/handle.c</Filename>
+        <Filename>Hand/locate.c</Filename>
         <Filename>Hand/Notify.c</Filename>
         <Filename>Hand/DriverSupport.c</Filename>
         <Filename>Library/Library.c</Filename>

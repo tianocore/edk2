@@ -44,8 +44,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>cbi0.c</Filename>
-    <Filename>componentname.c</Filename>
+    <Filename>Cbi0.c</Filename>
+    <Filename>ComponentName.c</Filename>
   </SourceFiles>
   <Includes>
     <PackageName>MdePkg</PackageName>
