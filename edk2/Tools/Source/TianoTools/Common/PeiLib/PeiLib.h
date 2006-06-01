@@ -259,42 +259,6 @@ Returns:
 #define PEI_PERF_END(Ps, Token, FileHeader, Value)
 #endif
 
-#ifdef EFI_NT_EMULATOR
-EFI_STATUS
-PeCoffLoaderWinNtLoadAsDll (
-  IN  CHAR8  *PdbFileName,
-  IN  VOID   **ImageEntryPoint,
-  OUT VOID   **ModHandle
-  )
-/*++
-
-Routine Description:
-
-  Loads the .DLL file is present when a PE/COFF file is loaded.  This provides source level
-  debugging for drivers that have cooresponding .DLL files on the local system.
-
-Arguments:
-
-  PdbFileName     - The name of the .PDB file.  This was found from the PE/COFF
-                    file's debug directory entry.
-
-  ImageEntryPoint - A pointer to the DLL entry point of the .DLL file was loaded.
-
-  ModHandle       - Pointer to loaded library.
-
-Returns:
-
-  EFI_SUCCESS     - The .DLL file was loaded, and the DLL entry point is returned in ImageEntryPoint
-
-  EFI_NOT_FOUND   - The .DLL file could not be found
-
-  EFI_UNSUPPORTED - The .DLL file was loaded, but the entry point to the .DLL file could not
-                    determined.
-
---*/
-;
-
-#endif
 //
 // hob.c
 //
