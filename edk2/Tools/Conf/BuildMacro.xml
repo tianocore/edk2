@@ -675,15 +675,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
+            <command type="LIB">
+              <argument value="${LIB_FLAGS}"/>
+              <FileList dir="" files="${OBJECTS}"/>
+              <LIB.ARG/>
+              <OutputFile value="${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Local.lib"/>
+            </command>
+          </cc>
+          <cc userdefine="on">
             <command type="LINK">
               <argument value="${LINK_FLAGS}"/>
-              <libset libs="${LIBS}"/>
+              <libset libs="${LIBS} ${DEST_DIR_OUTPUT}\@{FILEPATH}\@{FILENAME}Local.lib"/>
               <LINK.ARG/>
               <EntryPoint value="_ModuleEntryPoint"/>
               <map value="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.map"/>
               <pdb value="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.pdb"/>
               <OutputFile value="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
-              <FileList dir="" files="${OBJECTS}"/>
+              <!-- <FileList dir="" files="${OBJECTS}"/> -->
             </command>
           </cc>
         </sequential>
@@ -711,6 +719,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <sequential>
           <fwimage componenttype="${COMPONENT_TYPE}" outImage="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" 
                    peImage="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" time="0"/>
+          <copy file="${DEST_DIR_OUTPUT}\@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}\@{FILENAME}.efi" />
         </sequential>
       </OnDependency>
     </sequential>
