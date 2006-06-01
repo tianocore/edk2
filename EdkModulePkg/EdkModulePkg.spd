@@ -269,7 +269,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Universal/Disk/DiskIo/Dxe/DiskIo.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Universal/Disk/DiskIoPartition/dxe/DiskIoPartition.msa</Filename>
+      <Filename>Universal/Disk/DiskIoPartition/Dxe/DiskIoPartition.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Universal/Disk/Partition/Dxe/Partition.msa</Filename>
