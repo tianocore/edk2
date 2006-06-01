@@ -26,11 +26,6 @@ Revision History
 #include "PeiLib.h"
 #include "PeCoffLoaderEx.h"
 
-#ifdef EFI_NT_EMULATOR
-#include "peilib.h"
-#include "EfiHobLib.h"
-#include EFI_PPI_DEFINITION (NtLoadAsDll)
-#endif
 
 STATIC
 EFI_STATUS
@@ -89,9 +84,6 @@ EFI_PEI_PE_COFF_LOADER_PROTOCOL mPeCoffLoader = {
   PeCoffLoaderUnloadImage
 };
 
-#ifdef EFI_NT_EMULATOR
-EFI_NT_LOAD_AS_DLL_PPI          *mPeCoffLoaderWinNtLoadAsDll = NULL;
-#endif
 
 EFI_STATUS
 InstallEfiPeiPeCoffLoader (
@@ -119,38 +111,11 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
-
-  Status = EFI_SUCCESS;
-
-#ifdef EFI_NT_EMULATOR
-  //
-  // For use by PEI Core and Modules
-  //
-  if (NULL != PeiServices) {
-    Status = (**PeiServices).LocatePpi (
-                              PeiServices,
-                              &gEfiNtLoadAsDllPpiGuid,
-                              0,
-                              NULL,
-                              &mPeCoffLoaderWinNtLoadAsDll
-                              );
-  } else {
-    //
-    // Now in SecMain or ERM usage, bind appropriately
-    //
-    PEI_ASSERT (PeiServices, (NULL != ThisPpi));
-
-    mPeCoffLoaderWinNtLoadAsDll = (EFI_NT_LOAD_AS_DLL_PPI *) ThisPpi;
-    PEI_ASSERT (PeiServices, (NULL != mPeCoffLoaderWinNtLoadAsDll));
-  }
-#endif
-
   if (NULL != This) {
     *This = &mPeCoffLoader;
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -664,11 +629,6 @@ Returns:
   UINT32                    *F32;
   CHAR8                     *FixupData;
   EFI_PHYSICAL_ADDRESS      BaseAddress;
-#ifdef EFI_NT_EMULATOR
-  VOID                      *DllEntryPoint;
-  VOID                      *ModHandle;
-  ModHandle = NULL;
-#endif
 
   PeHdr = NULL;
   TeHdr = NULL;
@@ -829,27 +789,6 @@ Returns:
     //
     RelocBase = (EFI_IMAGE_BASE_RELOCATION *) RelocEnd;
   }
-
-#ifdef EFI_NT_EMULATOR
-  DllEntryPoint           = NULL;
-  ImageContext->ModHandle = NULL;
-  //
-  // Load the DLL if it's not an EBC image.
-  //
-  if ((ImageContext->PdbPointer != NULL) && 
-      (ImageContext->Machine != EFI_IMAGE_MACHINE_EBC)) {
-    Status = mPeCoffLoaderWinNtLoadAsDll->Entry (
-                                            ImageContext->PdbPointer,
-                                            &DllEntryPoint,
-                                            &ModHandle
-                                            );
-
-    if (!EFI_ERROR (Status) && DllEntryPoint != NULL) {
-      ImageContext->EntryPoint  = (EFI_PHYSICAL_ADDRESS) (UINTN) DllEntryPoint;
-      ImageContext->ModHandle   = ModHandle;
-    }
-  }
-#endif
 
   return EFI_SUCCESS;
 }
@@ -1237,13 +1176,5 @@ Returns:
 
 --*/
 {
-#ifdef EFI_NT_EMULATOR
-  //
-  // Calling Win32 API free library
-  //
-  mPeCoffLoaderWinNtLoadAsDll->FreeLibrary (ImageContext->ModHandle);
-
-#endif
-
   return EFI_SUCCESS;
 }
