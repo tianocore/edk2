@@ -51,7 +51,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>../../Partition/Dxe/Gpt.h</Filename>
     <Filename>../../Partition/Dxe/Mbr.h</Filename>
     <Filename>../../Partition/Dxe/Partition.c</Filename>
-    <Filename>../../Partition/Dxe/Eltorito.c</Filename>
+    <Filename>../../Partition/Dxe/ElTorito.c</Filename>
     <Filename>../../Partition/Dxe/Gpt.c</Filename>
     <Filename>../../Partition/Dxe/Mbr.c</Filename>
     <Filename>../../Partition/Dxe/ComponentName.c</Filename>
