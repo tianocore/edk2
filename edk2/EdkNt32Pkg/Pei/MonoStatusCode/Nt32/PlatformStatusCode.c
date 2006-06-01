@@ -59,7 +59,9 @@ Returns:
 
 --*/
 {
-  mSecReportStatusCode (PeiServices, CodeType, Value, Instance, CallerId, Data);
+  if (mSecReportStatusCode != NULL) {
+    mSecReportStatusCode (PeiServices, CodeType, Value, Instance, CallerId, Data);
+  }
   MemoryReportStatusCode (CodeType, Value, Instance, CallerId, Data);
   return EFI_SUCCESS;
 }
