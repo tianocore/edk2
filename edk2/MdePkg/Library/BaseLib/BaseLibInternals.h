@@ -114,6 +114,15 @@ InternalMathDivRemS64x64 (
   OUT     INT64                     *Remainder
   );
 
+VOID
+EFIAPI
+InternalSwitchStack (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,
+  IN      VOID                      *Context2,
+  IN      VOID                      *NewStack
+  );
+
 //
 // Ia32 and x64 specific functions
 //

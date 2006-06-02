@@ -73,6 +73,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>x86Thunk.c</Filename>
       <Filename>Unaligned.c</Filename>
       <Filename>LongJump.c</Filename>
+      <Filename>SwitchStack.c</Filename>
       <Filename>Ia32/Non-existing.c</Filename>
       <Filename FileType="GCC_Assembly_Code">Ia32/LShiftU64.s</Filename>
       <Filename FileType="GCC_Assembly_Code">Ia32/RShiftU64.s</Filename>
@@ -89,7 +90,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename FileType="GCC_Assembly_Code">Ia32/SwapBytes64.s</Filename>
       <Filename FileType="GCC_Assembly_Code">Ia32/SetJump.s</Filename>
       <Filename FileType="GCC_Assembly_Code">Ia32/LongJump.s</Filename>
-      <Filename>Ia32/SwitchStack.c</Filename>
+      <Filename>Ia32/InternalSwitchStack.c</Filename>
       <Filename FileType="GCC_Assembly_Code">Ia32/CpuId.s</Filename>
       <Filename FileType="GCC_Assembly_Code">Ia32/ReadEflags.s</Filename>
       <Filename FileType="GCC_Assembly_Code">Ia32/ReadMsr64.s</Filename>
@@ -179,8 +180,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Unaligned.c</Filename>
       <Filename>Math64.c</Filename>
       <Filename>LongJump.c</Filename>
+      <Filename>SwitchStack.c</Filename>
       <Filename>x64/Non-existing.c</Filename>
-      <Filename>x64/SwitchStack.c</Filename>
       <Filename>x64/SwitchStack.asm</Filename>
       <Filename>x64/SetJump.asm</Filename>
       <Filename>x64/LongJump.asm</Filename>
@@ -269,9 +270,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Arch ArchType="IPF">
       <Filename>Math64.c</Filename>
       <Filename>LongJump.c</Filename>
+      <Filename>SwitchStack.c</Filename>
       <Filename>Ipf/setjmp.s</Filename>
       <Filename>Ipf/SwitchStack.s</Filename>
-      <Filename>x64/SwitchStack.c</Filename>
       <Filename>Ipf/Unaligned.c</Filename>
       <Filename>Ipf/CpuBreakpoint.c</Filename>
       <Filename>Ipf/InterlockedCompareExchange32.s</Filename>

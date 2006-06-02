@@ -34,6 +34,10 @@ IsNodeInList (
   ASSERT (Node != NULL);
 
   Count = FixedPcdGet32 (PcdMaximumLinkedListLength);
+  if (Count != 0) {
+    Count++;
+  }
+
   Ptr = List;
   do {
     Ptr = Ptr->ForwardLink;
@@ -44,6 +48,7 @@ IsNodeInList (
   if (FixedPcdGet32 (PcdMaximumLinkedListLength) > 0) {
     while ((Count > 0) && (Ptr != List)) {
       Ptr = Ptr->ForwardLink;
+      Count--;
     }
     ASSERT (Count > 0);
   }
