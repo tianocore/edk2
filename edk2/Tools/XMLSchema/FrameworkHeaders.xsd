@@ -20,6 +20,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="DatabaseName"/>
+                <!-- Value fixed during initialization: FrameworkDatabase -->
                 <xs:choice minOccurs="1" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                     <!-- Guid needs to be removed -->
@@ -108,6 +109,7 @@
             <xs:sequence>
                 <xs:choice>
                     <xs:element minOccurs="0" maxOccurs="1" ref="BaseName"/>
+                    <!-- BaseName needs to be removed  -->
                     <xs:element minOccurs="0" maxOccurs="1" name="ModuleName" type="xs:NCName"/>
                 </xs:choice>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ModuleType"/>
@@ -172,10 +174,10 @@
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" name="PlatformName" type="PlatformNamingConvention"/>
                 <xs:choice>
-                  <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
-                  <!-- DO NOT USE Guid needs to be removed -->
-                  <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
-                  <!-- GuidValue needs to be required -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                    <!-- DO NOT USE Guid needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                    <!-- GuidValue needs to be required -->
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
@@ -183,17 +185,17 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="License"/>
                 <xs:choice minOccurs="1" maxOccurs="1">
-                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                  <!-- DO NOT USE Created needs to be removed -->
-                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                  <!-- CreatedDate needs to be required -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                    <!-- DO NOT USE Created needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                    <!-- CreatedDate needs to be required -->
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy"/>
                 <!-- DO NOT USE CreatedBy needs to be removed -->
                 <xs:choice>
-                  <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
-                  <!-- DO NOT USE Updated needs to be removed -->
-                  <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                    <!-- DO NOT USE Updated needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
                 <!-- DO NOT USE PackageType needs to be removed -->
@@ -214,6 +216,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                     <!-- Guid needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                    <!-- GuidValue needs to be required -->
                 </xs:choice>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
@@ -224,9 +227,15 @@
                     <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
                     <!-- Created needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                    <!-- CreatedDate needs to be required -->
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="E-Mail"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                <xs:choice minOccurs="0" maxOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                    <!-- Created needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
+                    <!-- CreatedDate needs to be required -->
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="URL"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="PackageType"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="ReadOnly"/>
