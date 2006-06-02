@@ -166,6 +166,12 @@
         </xs:annotation>
         <xs:restriction base="xs:normalizedString"/>
     </xs:simpleType>
+    <xs:simpleType name="PathAndFilename">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> Naming convention for a path and file name</xs:documentation>
+        </xs:annotation>
+        <xs:union memberTypes="Directory_DOS Directory_UNIX"/>
+    </xs:simpleType>
     <xs:simpleType name="PlatformNamingConvention">
         <xs:annotation>
             <xs:documentation xml:lang="en"> This defines what a Platform Name is: Alphanumeric characters and optional underscore (_) or dash (-) characters, followed by a dot and more alphanumeric characters. </xs:documentation>

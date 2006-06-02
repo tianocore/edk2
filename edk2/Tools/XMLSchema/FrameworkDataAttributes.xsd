@@ -52,6 +52,7 @@
     <xs:attributeGroup name="FilenameAttributes">
         <xs:attribute name="Usage" type="FileNameUsage" use="optional"/>
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="GuidValue" type="GuidType" use="optional"/>
         <xs:attribute name="Path" type="DirectoryNamingConvention" use="optional"/>
         <xs:attribute name="FileType" type="xs:string" use="optional"/>
         <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
@@ -91,7 +92,12 @@
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ModuleNameAttributes">
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="Guid" type="GuidType" use="required"/>
+        <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="ModuleNameSaAttributes">
+        <xs:attribute name="ModuleName" type="xs:NCName" use="required"/>
+        <xs:attribute name="Guid" type="GuidType" use="required"/>
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="MsaAttributes">
@@ -107,6 +113,7 @@
         <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
+        <xs:attribute name="BuildTarget" type="BuildTargets" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PackageAttributes">
         <xs:attribute name="Usage" type="PackageUsage" use="optional"/>
@@ -116,6 +123,7 @@
     <xs:attributeGroup name="PackageNameAttributes">
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PcdAttributes">
         <xs:annotation>

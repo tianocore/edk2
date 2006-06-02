@@ -677,12 +677,14 @@
     </xs:element>
     <xs:element name="LibraryClass">
         <xs:annotation>
-            <xs:documentation xml:lang="en">Define in the MSA and/or SPD, what class of library is being produced by a library module - for components, it can also specify what class of library is consumed.</xs:documentation>
+            <xs:documentation xml:lang="en">Used in MSA files.  This defines what class of library is being supported = produced  (library module) or consumed by a  module.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="BaseNameConvention">
-                    <xs:attribute name="Usage" type="LibraryUsage" use="optional"/>
+                    <xs:attribute name="Usage" type="LibraryUsage" use="required"/>
+                    <xs:attribute name="RecommendedInstance" type="BaseNameConvention" use="optional"/>
+                    <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
                 </xs:extension>
             </xs:simpleContent>
         </xs:complexType>
@@ -693,7 +695,19 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="0">
-                <xs:element minOccurs="1" maxOccurs="1" ref="LibraryClass"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="LibraryClass">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">Used in MSA and SPD files.  This defines what class of library is being supported = produced  (library module) or consumed by a  module.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="BaseNameConvention">
+                                <xs:attribute name="RecommendedInstance" type="BaseNameConvention" use="optional"/>
+                                <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
                 <xs:element minOccurs="1" maxOccurs="1" ref="IncludeHeader"/>
             </xs:sequence>
         </xs:complexType>
@@ -779,7 +793,7 @@
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="MsaFile">
                     <xs:annotation>
-                        <xs:documentation xml:lang="en">Describe the valid content of a Surface Area Package Description (SPD) file</xs:documentation>
+                        <xs:documentation xml:lang="en">Surface Area Package Description (SPD) list of Module Surface Area files</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence minOccurs="0" maxOccurs="1">
@@ -806,6 +820,24 @@
                             </xs:element>
                         </xs:sequence>
                         <xs:attribute name="ArchType" type="SupportedArchitectures"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="MsaFileList">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Surface Area Package Description (SPD) list of Module Surface Area files</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Filename">
+                     <xs:complexType>
+                         <xs:simpleContent>
+                             <xs:extension base="xs:anyURI">
+                                 <xs:attributeGroup ref="ModuleNameSaAttributes"/>
+                             </xs:extension>
+                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
