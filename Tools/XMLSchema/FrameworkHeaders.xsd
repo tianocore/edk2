@@ -155,12 +155,12 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
                 <xs:choice minOccurs="1" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
                     <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
