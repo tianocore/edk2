@@ -33,35 +33,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <Created>2006-03-23 12:00</Created>
+    <CreatedDate>2006-03-23 12:00</CreatedDate>
+    <ModifiedDate>2006-06-01 17:25</ModifiedDate>
     <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
   </MsaHeader>
   <LibraryClassDefinitions>
-    <LibraryClass>Java</LibraryClass>
-    <LibraryClass>Perl</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">SurfaceArea</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename Path="bin" FileType="pl">inf2msa.pl</Filename>
-    <Filename Path="bin" FileType="pl">mkspd.pl</Filename>
-    <Filename Path="bin" FileType="pl">mkdb.pl</Filename>
     <Filename Path="Conf" FileType="db">FrameworkDatabase.db</Filename>
     <Filename Path="Conf" FileType="txt">cygwin_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">desktop_efi_flags.txt</Filename>
-    <Filename Path="Conf" FileType="txt">embedded_efi_flags.txt</Filename>
     <Filename Path="Conf" FileType="txt">gcc_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">global_efi_flags.txt</Filename>
     <Filename Path="Conf" FileType="txt">intel_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">mobile_efi_flags.txt</Filename>
     <Filename Path="Conf" FileType="txt">msft_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">my_efi_flags.txt</Filename>
-    <Filename Path="Conf" FileType="txt">node.txt</Filename>
-    <Filename Path="Conf" FileType="txt">server_efi_flags.txt</Filename>
-    <Filename Path="Conf" FileType="txt">target.txt</Filename>
-    <Filename Path="Conf" FileType="txt">tools_def.txt</Filename>
+    <Filename Path="Conf" FileType="txt">tools_def.template</Filename>
     <Filename Path="Conf" FileType="txt">winddk_tools.txt</Filename>
-    <Filename Path="Jars" FileType="jar">cpptasks.jar</Filename>
-    <Filename Path="Jars" FileType="jar">frameworktasks.jar</Filename>
-    <Filename Path="Jars" FileType="jar">GenBuild.jar</Filename>
   </SourceFiles>
   <Includes>
     <PackageName>Base</PackageName>
