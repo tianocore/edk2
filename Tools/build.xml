@@ -58,6 +58,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     rewritePrefix="file:/]]>${env.WORKSPACE}<![CDATA[/Tools/XMLSchema/"/>
 </catalog>]]>
     </echo>
+    <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt" overwrite="false"/>
   </target>
   <target name="clean">
     <subant target="clean" inheritall="false">
