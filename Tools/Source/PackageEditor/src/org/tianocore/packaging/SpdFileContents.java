@@ -601,8 +601,7 @@ public class SpdFileContents {
      @param parent The tag under which library class declaration goes to
     **/
     public void setSpdLibraryClass(String clsName, String clsUsage, XmlObject parent) {
-        LibraryClassDocument.LibraryClass lc = ((LibraryClassDeclarationDocument.LibraryClassDeclaration) parent)
-                                                                                                                 .addNewLibraryClass();
+        LibraryClassDeclarationDocument.LibraryClassDeclaration.LibraryClass lc = ((LibraryClassDeclarationDocument.LibraryClassDeclaration) parent).addNewLibraryClass();
         lc.setStringValue(clsName);
     }
 
