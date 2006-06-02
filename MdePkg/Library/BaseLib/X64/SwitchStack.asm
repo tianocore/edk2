@@ -36,12 +36,12 @@
 ;   None
 ;
 ;------------------------------------------------------------------------------
-_SwitchStack PROC
+InternalSwitchStack PROC
     mov     rax, rcx
     mov     rcx, rdx
     mov     rdx, r8
     lea     rsp, [r9 - 20h]
     call    rax
-_SwitchStack ENDP
+InternalSwitchStack ENDP
 
     END

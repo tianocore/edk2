@@ -66,7 +66,7 @@
 
 
 //VOID
-//_SwitchStack (
+//InternalSwitchStack (
 //    VOID    *ContinuationFunction,
 //    UINTN   Parameter,
 //    UINTN   NewTopOfStack,
@@ -85,7 +85,7 @@
 //
 //--*/
 
-PROCEDURE_ENTRY(_SwitchStack)
+PROCEDURE_ENTRY(InternalSwitchStack)
 
         mov        r16 = -0x10;;
         and        r16 = r34, r16;;             // get new stack value in R16, 0 the last nibble.
@@ -117,6 +117,6 @@ PROCEDURE_ENTRY(_SwitchStack)
         ;;
         br.call.sptk.few b0=b6;;                // Call the continuation function
         ;;
-PROCEDURE_EXIT(_SwitchStack)
+PROCEDURE_EXIT(InternalSwitchStack)
 
 

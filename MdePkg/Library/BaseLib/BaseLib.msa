@@ -73,7 +73,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>x86Thunk.c</Filename>
       <Filename>Unaligned.c</Filename>
       <Filename>LongJump.c</Filename>
+      <Filename>SwitchStack.c</Filename>
       <Filename>Ia32/Non-existing.c</Filename>
+      <Filename>Ia32/InternalSwitchStack.c</Filename>
       <Filename>Ia32/LShiftU64.asm</Filename>
       <Filename>Ia32/RShiftU64.asm</Filename>
       <Filename>Ia32/ARShiftU64.asm</Filename>
@@ -89,7 +91,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ia32/SwapBytes64.asm</Filename>
       <Filename>Ia32/SetJump.asm</Filename>
       <Filename>Ia32/LongJump.asm</Filename>
-      <Filename>Ia32/SwitchStack.c</Filename>
       <Filename>Ia32/CpuId.asm</Filename>
       <Filename>Ia32/ReadEflags.asm</Filename>
       <Filename>Ia32/ReadMsr64.asm</Filename>
@@ -179,8 +180,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Unaligned.c</Filename>
       <Filename>Math64.c</Filename>
       <Filename>LongJump.c</Filename>
+      <Filename>SwitchStack.c</Filename>
       <Filename>x64/Non-existing.c</Filename>
-      <Filename>x64/SwitchStack.c</Filename>
       <Filename>x64/SwitchStack.asm</Filename>
       <Filename>x64/SetJump.asm</Filename>
       <Filename>x64/LongJump.asm</Filename>
@@ -269,9 +270,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Arch ArchType="IPF">
       <Filename>Math64.c</Filename>
       <Filename>LongJump.c</Filename>
+      <Filename>SwitchStack.c</Filename>
       <Filename>Ipf/PalCallStatic.s</Filename>
       <Filename>Ipf/setjmp.s</Filename>
-      <Filename>x64/SwitchStack.c</Filename>
       <Filename>Ipf/SwitchStack.s</Filename>
       <Filename>Ipf/Unaligned.c</Filename>
       <Filename>Ipf/CpuBreakpoint.c</Filename>
