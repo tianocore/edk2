@@ -361,7 +361,6 @@
             <xs:enumeration value="APPLICATION"/>
             <xs:enumeration value="BS_DRIVER_EFI"/>
             <xs:enumeration value="SHELLAPP"/>
-            <xs:enumeration value="APPLICATION"/>
             <xs:enumeration value="UEFI_APPLICATION"/>
             <xs:enumeration value="BINARY"/>
             <xs:enumeration value="LOGO"/>
