@@ -24,7 +24,7 @@ Module Name: Service.c
 
 PCD_DATABASE * mPcdDatabase;
 
-LIST_ENTRY mCallbackFnTable[PCD_TOTAL_TOKEN_NUMBER];
+LIST_ENTRY *mCallbackFnTable;
 
 VOID *
 GetWorker (
@@ -310,6 +310,11 @@ BuildPcdDxeDataBase (
   //
   // Initialized the Callback Function Table
   //
+
+  if (PCD_TOTAL_TOKEN_NUMBER != 0) {
+    mCallbackFnTable = AllocateZeroPool (PCD_TOTAL_TOKEN_NUMBER);
+  }
+  
   for (Idx = 0; Idx < PCD_TOTAL_TOKEN_NUMBER; Idx++) {
     InitializeListHead (&mCallbackFnTable[Idx]);
   }
