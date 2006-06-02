@@ -9,12 +9,12 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<ModuleSurfaceArea xmlns="http://nwlxweb02.jf.intel.com/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://nwlxweb02.jf.intel.com/2006/Edk2.0  http://nwlxweb02.jf.intel.com/2006/Edk2.0/SurfaceArea.xsd">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
   <MsaHeader>
-    <BaseName>Tools</BaseName>
+    <ModuleName>Tools</ModuleName>
     <ModuleType>BASE</ModuleType>
-    <ComponentType>USER_DEFINED</ComponentType>
-    <Guid>5d6c499e-53fd-430e-9285-2d7811b924e8</Guid>
+    <ComponentType>CUSTOM_BUILD</ComponentType>
+    <GuidValue>5d6c499e-53fd-430e-9285-2d7811b924e8</GuidValue>
     <Version>2.0</Version>
     <Abstract>This is the EFI/Tiano Tool Resources Module</Abstract>
     <Description>
@@ -33,34 +33,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
+    <CreatedDate>2006-02-02 09:30</CreatedDate>
+    <ModifiedDate>2006-06-02 11:32</ModifiedDate>
     <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
   </MsaHeader>
-  <LibraryClass>
-    <Library>Java</Library>
-    <Library>Perl</Library>
-  </LibraryClass>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="SOMETIMES_CONSUMED">SurfaceArea</LibraryClass>
+  </LibraryClassDefinitions>
   <SourceFiles>
     <Filename Path="Common">FrameworkDatabase.db</Filename>
     <Filename Path="Conf">cygwin_tools.txt</Filename>
-    <Filename Path="Conf">desktop_efi_flags.txt</Filename>
-    <Filename Path="Conf">embedded_efi_flags.txt</Filename>
     <Filename Path="Conf">gcc_tools.txt</Filename>
-    <Filename Path="Conf">global_efi_flags.txt</Filename>
     <Filename Path="Conf">intel_tools.txt</Filename>
-    <Filename Path="Conf">mobile_efi_flags.txt</Filename>
     <Filename Path="Conf">msft_tools.txt</Filename>
-    <Filename Path="Conf">my_efi_flags.txt</Filename>
-    <Filename Path="Conf">node.txt</Filename>
-    <Filename Path="Conf">server_efi_flags.txt</Filename>
-    <Filename Path="Conf">target.txt</Filename>
-    <Filename Path="Conf">tools_def.txt</Filename>
     <Filename Path="Conf">winddk_tools.txt</Filename>
-    <Filename Path="Jars">cpptasks.jar</Filename>
-    <Filename Path="Jars">frameworktasks.jar</Filename>
-    <Filename Path="Jars">GenBuild.jar</Filename>
+    <Filename Path="Conf">tools_def.template</Filename>
   </SourceFiles>
   <Includes>
-    <ModuleName>Base</ModuleName>
+    <PackageName>MdePkg</PackageName>
   </Includes>
   <Externs>
     <Extern>
