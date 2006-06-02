@@ -25,6 +25,7 @@
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="BootModeName" type="BootModeNames" use="required"/>
         <xs:attribute name="Usage" type="BootModeUsage" use="required"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ConvertAttributeString">
@@ -35,6 +36,7 @@
     <xs:attributeGroup name="DataHubAttributes">
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="DataHubUsage" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="DirectoryAttributes">
@@ -43,10 +45,12 @@
     <xs:attributeGroup name="EventAttributes">
         <xs:attribute name="Usage" type="EventUsage" use="optional"/>
         <xs:attribute name="EventGroup" type="EventTypes" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ExternAttributes">
         <xs:attribute name="Usage" type="ExternUsage" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="FilenameAttributes">
@@ -56,22 +60,26 @@
         <xs:attribute name="Path" type="DirectoryNamingConvention" use="optional"/>
         <xs:attribute name="FileType" type="xs:string" use="optional"/>
         <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="FormsetAttributes">
         <xs:attribute name="Usage" type="FormSetUsage" use="optional"/>
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="GuidAttributes">
         <xs:attribute name="Usage" type="GuidUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="HobAttributes">
         <xs:attribute name="Usage" type="HobUsage" use="optional"/>
         <xs:attribute name="HobType" type="HobTypes" use="required"/>
         <xs:attribute default="true" name="HobEnabled" type="xs:boolean" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="IncludeAttributes">
@@ -79,6 +87,7 @@
         <xs:attribute name="Path" type="DirectoryNamingConvention" use="optional"/>
         <xs:attribute name="Class" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <xs:attribute name="ModuleType" type="ModuleTypeDef" use="optional"/>
     </xs:attributeGroup>
@@ -89,6 +98,7 @@
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
         <xs:attribute name="Usage" type="LibraryUsage" use="optional"/>
         <xs:attribute name="Package" type="xs:string" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ModuleNameAttributes">
@@ -111,9 +121,10 @@
     </xs:attributeGroup>
     <xs:attributeGroup name="OptionAttributes">
         <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
-        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
         <xs:attribute name="BuildTarget" type="BuildTargets" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PackageAttributes">
         <xs:attribute name="Usage" type="PackageUsage" use="optional"/>
@@ -132,6 +143,7 @@
         </xs:annotation>
         <xs:attribute name="ItemType" type="PcdItemTypes" use="required"/>
         <xs:attribute name="PcdUsage" type="PcdUsage" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PlatformAttributes">
@@ -146,26 +158,27 @@
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="PpiUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="C_Name" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PpiNotifyAttributes">
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="PpiNotifyUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="C_Name" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ProtocolAttributes">
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="ProtocolUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="C_Name" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ProtocolNotifyAttributes">
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="ProtocolNotifyUsage" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="SectionAttributes">
@@ -175,6 +188,7 @@
         <xs:attribute name="SectionType" type="EfiSectionType" use="optional"/>
         <xs:attribute default="true" name="Compressible" type="xs:boolean" use="optional"/>
         <xs:attribute name="BindingOrder" type="xs:int" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="SectionsAttributes">
@@ -183,17 +197,20 @@
         </xs:annotation>
         <xs:attribute name="EncapsulationType" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="EncapsulationTag" type="xs:string" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="SystemTableAttributes">
         <xs:attribute name="Usage" type="SystemTableUsage" use="optional"/>
-        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="VariableAttributes">
-        <xs:attribute name="Usage" type="VariableUsage" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="UrlAttribute">
         <xs:attribute name="Url" type="xs:anyURI"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="VariableAttributes">
+        <xs:attribute name="Usage" type="VariableUsage" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
 </xs:schema>
