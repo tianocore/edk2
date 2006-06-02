@@ -21,11 +21,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/GenBuild/build.xml
           Source/FrameworkTasks/build.xml
           Source/Cpptasks/build.xml
-          "/>
-        <!-- 
           Source/ModuleEditor/build.xml
           Source/PackageEditor/build.xml
-          -->
+          "/>
     </subant>
   </target>
 
