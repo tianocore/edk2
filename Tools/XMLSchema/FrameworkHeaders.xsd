@@ -170,20 +170,12 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" name="PlatformName" type="PlatformNamingConvention">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">Define the Name of a Platform</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
+                <xs:element minOccurs="1" maxOccurs="1" name="PlatformName" type="PlatformNamingConvention"/>
                 <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid">
-                        <!-- Guid needs to be removed -->
-                        <xs:annotation>
-                            <xs:documentation xml:lang="en">DO NOT USE! removing from XMLSchema</xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
-                    <!-- GuidValue needs to be required -->
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                  <!-- DO NOT USE Guid needs to be removed -->
+                  <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                  <!-- GuidValue needs to be required -->
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
@@ -191,36 +183,20 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="License"/>
                 <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created">
-                        <!-- Created needs to be removed -->
-                        <xs:annotation>
-                            <xs:documentation xml:lang="en">DO NOT USE! removing from XMLSchema</xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                    <!-- CreatedDate needs to be required -->
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                  <!-- DO NOT USE Created needs to be removed -->
+                  <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
+                  <!-- CreatedDate needs to be required -->
                 </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy">
-                    <!-- CreatedBy needs to be removed -->
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">DO NOT USE! removing from XMLSchema</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy"/>
+                <!-- DO NOT USE CreatedBy needs to be removed -->
                 <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated">
-                        <!-- Updated needs to be removed -->
-                        <xs:annotation>
-                            <xs:documentation xml:lang="en">DO NOT USE! removing from XMLSchema</xs:documentation>
-                        </xs:annotation>
-                    </xs:element>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                  <!-- DO NOT USE Updated needs to be removed -->
+                  <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
                 </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="1" ref="PackageType">
-                    <!-- PackageType needs to be removed -->
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">DO NOT USE! removing from XMLSchema</xs:documentation>
-                    </xs:annotation>
-                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
+                <!-- DO NOT USE PackageType needs to be removed -->
                 <xs:element minOccurs="0" maxOccurs="1" name="BuildTarget" type="BuildTargets"/>
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
                 <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00090000 -->

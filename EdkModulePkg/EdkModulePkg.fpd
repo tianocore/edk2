@@ -11,11 +11,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <FrameworkPlatformDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
   <PlatformHeader>
-    <PlatformName>MdePkg</PlatformName>
-    <Abstract>EFI/Tiano MdePkg Package</Abstract>
+    <PlatformName>EdkModule</PlatformName>
+    <GuidValue>b750cfa0-f8fa-4d6f-bb2d-39789751ef4b</GuidValue>
+    <Version>0.5</Version>
+    <Abstract>EFI/Tiano Edk Module Reference Designs Package</Abstract>
     <Description>This FPD file is used for Package Level build.</Description>
-    <Created>2006-04-03 13:40</Created>
-    <CreatedBy>lhauch</CreatedBy>
+    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <CreatedDate>2006-04-03 13:40</CreatedDate>
+    <ModifiedDate>2006-06-01 17:59</ModifiedDate>
+    <BuildTarget>DEBUG</BuildTarget>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </PlatformHeader>
   <Flash>
     <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>
@@ -95,6 +109,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -112,6 +127,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -129,6 +145,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -146,6 +163,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -180,6 +198,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -220,6 +239,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -237,6 +257,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -254,6 +275,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -271,6 +293,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -305,6 +328,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -345,6 +369,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -362,6 +387,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -379,6 +405,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -396,6 +423,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -430,6 +458,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -470,6 +499,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -487,6 +517,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -504,6 +535,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -521,6 +553,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -555,6 +588,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -595,6 +629,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -612,6 +647,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -629,6 +665,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -646,6 +683,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -680,6 +718,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -753,6 +792,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -770,6 +810,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -787,6 +828,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -804,6 +846,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -838,6 +881,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -895,6 +939,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -912,6 +957,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -929,6 +975,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -946,6 +993,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -980,6 +1028,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1018,6 +1067,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1035,6 +1085,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1052,6 +1103,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1069,6 +1121,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1120,6 +1173,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1158,6 +1212,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1175,6 +1230,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1192,6 +1248,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1209,6 +1266,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1260,6 +1318,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1298,6 +1357,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1315,6 +1375,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1332,6 +1393,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1349,6 +1411,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1400,6 +1463,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1438,6 +1502,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1455,6 +1520,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1472,6 +1538,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1489,6 +1556,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1540,6 +1608,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1578,6 +1647,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1595,6 +1665,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1612,6 +1683,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1629,6 +1701,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1680,6 +1753,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1718,6 +1792,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1735,6 +1810,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1752,6 +1828,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1769,6 +1846,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1820,6 +1898,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1875,6 +1954,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1892,6 +1972,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1909,6 +1990,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1926,6 +2008,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -1977,6 +2060,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2032,6 +2116,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2049,6 +2134,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2066,6 +2152,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2083,6 +2170,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2134,6 +2222,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2172,6 +2261,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2189,6 +2279,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2206,6 +2297,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2223,6 +2315,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2274,6 +2367,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2312,6 +2406,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2329,6 +2424,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2346,6 +2442,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2363,6 +2460,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2414,6 +2512,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2452,6 +2551,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2469,6 +2569,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2486,6 +2587,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2503,6 +2605,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2554,6 +2657,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2592,6 +2696,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2609,6 +2714,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2626,6 +2732,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2643,6 +2750,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2694,6 +2802,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2732,6 +2841,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2749,6 +2859,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2766,6 +2877,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2783,6 +2895,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2834,6 +2947,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2872,6 +2986,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2889,6 +3004,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2906,6 +3022,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2923,6 +3040,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -2974,6 +3092,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3012,6 +3131,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3029,6 +3149,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3046,6 +3167,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3063,6 +3185,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3114,6 +3237,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3186,6 +3310,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3203,6 +3328,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3220,6 +3346,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3237,6 +3364,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3288,6 +3416,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3326,6 +3455,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3343,6 +3473,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3360,6 +3491,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3377,6 +3509,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3428,6 +3561,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3466,6 +3600,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3483,6 +3618,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3500,6 +3636,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3517,6 +3654,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3568,6 +3706,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3606,6 +3745,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3623,6 +3763,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3640,6 +3781,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3657,6 +3799,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3708,6 +3851,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3746,6 +3890,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3763,6 +3908,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3780,6 +3926,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3797,6 +3944,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3848,6 +3996,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3886,6 +4035,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3903,6 +4053,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3920,6 +4071,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3937,6 +4089,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -3988,6 +4141,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4026,6 +4180,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4043,6 +4198,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4060,6 +4216,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4077,6 +4234,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4128,6 +4286,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4166,6 +4325,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4183,6 +4343,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4200,6 +4361,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4217,6 +4379,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4268,6 +4431,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4306,6 +4470,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4323,6 +4488,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4340,6 +4506,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4357,6 +4524,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4408,6 +4576,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4446,6 +4615,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4463,6 +4633,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4480,6 +4651,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4497,6 +4669,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4548,6 +4721,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4586,6 +4760,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4603,6 +4778,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4620,6 +4796,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4637,6 +4814,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4688,6 +4866,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4726,6 +4905,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4743,6 +4923,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4760,6 +4941,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4777,6 +4959,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4828,6 +5011,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4866,6 +5050,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4883,6 +5068,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4900,6 +5086,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4917,6 +5104,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -4968,6 +5156,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5006,6 +5195,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5023,6 +5213,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5040,6 +5231,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5057,6 +5249,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5108,6 +5301,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5146,6 +5340,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5163,6 +5358,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5180,6 +5376,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5197,6 +5394,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5248,6 +5446,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5286,6 +5485,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5303,6 +5503,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5320,6 +5521,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5337,6 +5539,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5388,6 +5591,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5426,6 +5630,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5443,6 +5648,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5460,6 +5666,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5477,6 +5684,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5528,6 +5736,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5566,6 +5775,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5583,6 +5793,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5600,6 +5811,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5617,6 +5829,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5668,6 +5881,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5706,6 +5920,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5723,6 +5938,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5740,6 +5956,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5757,6 +5974,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5808,6 +6026,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5846,6 +6065,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5863,6 +6083,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5880,6 +6101,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5897,6 +6119,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5948,6 +6171,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -5986,6 +6210,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6003,6 +6228,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6020,6 +6246,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6037,6 +6264,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6088,6 +6316,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6126,6 +6355,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6143,6 +6373,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6160,6 +6391,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6177,6 +6409,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6228,6 +6461,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6283,6 +6517,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6300,6 +6535,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6317,6 +6553,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6334,6 +6571,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6385,6 +6623,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6423,6 +6662,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6440,6 +6680,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6457,6 +6698,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6474,6 +6716,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6525,6 +6768,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6563,6 +6807,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6580,6 +6825,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6597,6 +6843,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6614,6 +6861,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6665,6 +6913,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6703,6 +6952,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6720,6 +6970,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6737,6 +6988,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6754,6 +7006,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6805,6 +7058,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6843,6 +7097,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6860,6 +7115,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6877,6 +7133,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6894,6 +7151,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6945,6 +7203,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -6983,6 +7242,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7000,6 +7260,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7017,6 +7278,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7034,6 +7296,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7085,6 +7348,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7123,6 +7387,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7140,6 +7405,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7157,6 +7423,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7174,6 +7441,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7225,6 +7493,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7263,6 +7532,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7280,6 +7550,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7297,6 +7568,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7314,6 +7586,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7365,6 +7638,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7403,6 +7677,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7420,6 +7695,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7437,6 +7713,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7454,6 +7731,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7505,6 +7783,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7543,6 +7822,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumUnicodeStringLength</C_Name>
             <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7560,6 +7840,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumAsciiStringLength</C_Name>
             <Token>0x00000002</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7577,6 +7858,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
             <Token>0x00000005</Token>
+            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7594,6 +7876,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
             <Token>0x00000004</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7645,6 +7928,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdMaximumLinkedListLength</C_Name>
             <Token>0x00000003</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <HiiEnable>false</HiiEnable>
             <VpdEnable>false</VpdEnable>
@@ -7684,6 +7968,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <PcdBuildData ItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
       <Token>0x00000001</Token>
+            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
       <HiiEnable>false</HiiEnable>
       <VpdEnable>false</VpdEnable>
@@ -7702,6 +7987,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <PcdBuildData ItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
       <Token>0x00000002</Token>
+      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
       <HiiEnable>false</HiiEnable>
       <VpdEnable>false</VpdEnable>
@@ -7720,6 +8006,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <PcdBuildData ItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumLinkedListLength</C_Name>
       <Token>0x00000003</Token>
+      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
       <HiiEnable>false</HiiEnable>
       <VpdEnable>false</VpdEnable>
@@ -7738,6 +8025,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <PcdBuildData ItemType="FIXED_AT_BUILD">
       <C_Name>PcdSpinLockTimeout</C_Name>
       <Token>0x00000004</Token>
+      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
       <HiiEnable>false</HiiEnable>
       <VpdEnable>false</VpdEnable>
@@ -7756,6 +8044,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <PcdBuildData ItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugPropertyMask</C_Name>
       <Token>0x00000005</Token>
+      <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
       <DatumType>UINT8</DatumType>
       <HiiEnable>false</HiiEnable>
       <VpdEnable>false</VpdEnable>
