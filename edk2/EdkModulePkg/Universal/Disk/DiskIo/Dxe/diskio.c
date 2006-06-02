@@ -130,96 +130,7 @@ DiskIoDriverBindingSupported (
 {
   EFI_STATUS            Status;
   EFI_BLOCK_IO_PROTOCOL *BlockIo;
-/*
-  DEBUG_CODE_BEGIN
-    UINT32  Bar;
-    UINT32  Foo;
-    UINT32  HotPlug;
 
-    //
-    // Get TYPE 0
-    //
-    Bar = PcdGet32 (PciExpressBaseVersion);
-    DEBUG ((EFI_D_ERROR, "PciExpressBaseVersion = %08x\n", Bar));
-
-    //
-    // Get TYPE 1
-    //
-    Foo = PcdGet32 (PciExpressBaseAddress);
-    DEBUG ((EFI_D_ERROR, "PciExpressBaseAddress = %08x\n", Foo));
-
-    //
-    // Set TYPE 1
-    //
-    PcdSet32 (PciExpressBaseAddress, Foo + 1);
-
-    //
-    // Get TYPE 1
-    //
-    Foo = PcdGet32 (PciExpressBaseAddress);
-    DEBUG ((EFI_D_ERROR, "PciExpressBaseAddress = %08x\n", Foo));
-
-    //
-    // Get TYPE 2
-    //
-    HotPlug = PcdGet32 (PciExpressBaseHotPlug);
-    DEBUG ((EFI_D_ERROR, "PciExpressHotPlug = %08x\n", HotPlug));
-
-    //
-    // Set TYPE 1
-    //
-    PcdSet32 (PciExpressBaseHotPlug, HotPlug + 1);
-
-    //
-    // Get TYPE 1
-    //
-    HotPlug = PcdGet32 (PciExpressBaseHotPlug);
-    DEBUG ((EFI_D_ERROR, "PciExpressHotPlug = %08x\n", HotPlug));
-
-  DEBUG_CODE_END
-
-  DEBUG_CODE_BEGIN
-    UINT32  MyVariable;
-
-    if (ControllerHandle == NULL) {
-      MyVariable = 32 * (UINTN)This;
-      ControllerHandle = (EFI_HANDLE)MyVariable;
-      DEBUG ((EFI_D_ERROR, "DiskIoSupported-DebugCode.  MyVariable = %08x\n", MyVariable));
-      ASSERT (MyVariable != 32);
-    }
-  DEBUG_CODE_END
-*/
-  DEBUG ((EFI_D_ERROR, "DiskIoSupported\n"));
-
-//  Io8Or (0x400, 1);
-//  Io8And (0x400, 1);
-//  Io8AndThenOr (0x400, 1, 2);
-
-//  Mmio8Or (0xa0000000, 1);
-//  Mmio8And (0xa0000000, 1);
-//  Mmio8AndThenOr (0xa0000000, 1, 2);
-
-/*
-  PciRead8   (PCI_LIB_ADDRESS (1,2,3,4));
-  PciRead16  (PCI_LIB_ADDRESS (1,2,3,4));
-  PciRead32  (PCI_LIB_ADDRESS (1,2,3,4));
-
-  PciWrite8  (PCI_LIB_ADDRESS (1,2,3,4), 0xAA);
-  PciWrite16 (PCI_LIB_ADDRESS (1,2,3,4), 0xAA55);
-  PciWrite32 (PCI_LIB_ADDRESS (1,2,3,4), 0xAA55A55A);
-
-  Pci8Or         (PCI_LIB_ADDRESS (1,2,3,4), 0xAA);
-  Pci8And        (PCI_LIB_ADDRESS (1,2,3,4), 0x55);
-  Pci8AndThenOr  (PCI_LIB_ADDRESS (1,2,3,4), 0xAA, 0x55);
-
-  Pci16Or        (PCI_LIB_ADDRESS (1,2,3,4), 0xAA55);
-  Pci16And       (PCI_LIB_ADDRESS (1,2,3,4), 0x55AA);
-  Pci16AndThenOr (PCI_LIB_ADDRESS (1,2,3,4), 0xAA55, 0x55AA);
-
-  Pci32Or        (PCI_LIB_ADDRESS (1,2,3,4), 0xAA55A55A);
-  Pci32And       (PCI_LIB_ADDRESS (1,2,3,4), 0x55AA5AA5);
-  Pci32AndThenOr (PCI_LIB_ADDRESS (1,2,3,4), 0xAA555AA5, 0x55AAA55A);
-*/
   //
   // Open the IO Abstraction(s) needed to perform the supported test.
   //
@@ -276,7 +187,6 @@ DiskIoDriverBindingStart (
 
   Private = NULL;
 
-  DEBUG ((EFI_D_ERROR, "DiskIoStart\n"));
   //
   // Connect to the Block IO interface on ControllerHandle.
   //
@@ -358,7 +268,6 @@ DiskIoDriverBindingStop (
   EFI_DISK_IO_PROTOCOL  *DiskIo;
   DISK_IO_PRIVATE_DATA  *Private;
 
-  DEBUG ((EFI_D_ERROR, "DiskIoStop\n"));
   //
   // Get our context back.
   //
@@ -459,8 +368,6 @@ DiskIoReadDisk (
   UINTN                 IsBufferAligned;
   UINTN                 DataBufferSize;
   BOOLEAN               LastRead;
-
-  DEBUG ((EFI_D_ERROR, "DiskIoReadDisk\n"));
 
   Private   = DISK_IO_PRIVATE_DATA_FROM_THIS (This);
 
@@ -687,8 +594,6 @@ DiskIoWriteDisk (
   UINTN                 IsBufferAligned;
   UINTN                 DataBufferSize;
   BOOLEAN               LastWrite;
-
-  DEBUG ((EFI_D_ERROR, "DiskIoWriteDisk\n"));
 
   Private   = DISK_IO_PRIVATE_DATA_FROM_THIS (This);
 
