@@ -282,13 +282,24 @@ BuildPcdDxeDataBase (
   ASSERT (mPcdDatabase != NULL);
 
   GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-  ASSERT (GuidHob != NULL);
 
-  PeiDatabase = (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
-  //
-  // Copy PCD Entries refereneced in PEI phase to PCD DATABASE
-  //
-  CopyMem (&mPcdDatabase->PeiDb, PeiDatabase, sizeof (PEI_PCD_DATABASE));
+  if (GuidHob != NULL) {
+
+    //
+    // We will copy over the PEI phase's PCD Database.
+    // 
+    // If no PEIMs use dynamic Pcd Entry, the Pcd Service PEIM
+    // should not be included at all. So the GuidHob could
+    // be NULL. If it is NULL, we just copy over the DXE Default
+    // Value to PCD Database.
+    //
+    
+    PeiDatabase = (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
+    //
+    // Copy PCD Entries refereneced in PEI phase to PCD DATABASE
+    //
+    CopyMem (&mPcdDatabase->PeiDb, PeiDatabase, sizeof (PEI_PCD_DATABASE));
+  }
 
   //
   // Copy PCD Entries with default value to PCD DATABASE

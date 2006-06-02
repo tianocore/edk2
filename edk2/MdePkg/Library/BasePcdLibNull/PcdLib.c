@@ -723,8 +723,8 @@ LibPcdCancelCallback (
 PCD_TOKEN_NUMBER
 EFIAPI
 LibPcdGetNextToken (
-  IN CONST GUID             *Guid, OPTIONAL
-  IN OUT PCD_TOKEN_NUMBER   TokenNumber
+  IN CONST GUID               *Guid, OPTIONAL
+  IN       PCD_TOKEN_NUMBER   TokenNumber
   )
 {
   return 0;

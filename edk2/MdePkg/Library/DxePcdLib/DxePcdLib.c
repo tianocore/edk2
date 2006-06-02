@@ -837,7 +837,7 @@ PCD_TOKEN_NUMBER
 EFIAPI
 LibPcdGetNextToken (
   IN CONST GUID             *Guid, OPTIONAL
-  IN OUT PCD_TOKEN_NUMBER   TokenNumber
+  IN       PCD_TOKEN_NUMBER TokenNumber
   )
 {
   EFI_STATUS Status;
