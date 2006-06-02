@@ -442,21 +442,18 @@ class LocalTokenNumberTable {
     private ArrayList<String>    alComment;
     private String               phase;
     private int                  len;
-    private int                   bodyStart;
-    private int                   bodyLineNum;
 
     public LocalTokenNumberTable (String phase) {
         this.phase = phase;
         al = new ArrayList<String>();
         alComment = new ArrayList<String>();
-        bodyStart = 0;
-        bodyLineNum = 0;
 
         len = 0;
     }
 
     public String getSizeMacro () {
-        return String.format(PcdDatabase.LocalTokenNumberTableSizeMacro, phase, getSize());
+    	return String.format(PcdDatabase.LocalTokenNumberTableSizeMacro, phase, getSize())
+    			+ String.format(PcdDatabase.LocalTokenNumberSizeMacro, phase, al.size());
     }
 
     public int getSize () {
@@ -476,7 +473,6 @@ class LocalTokenNumberTable {
 
         output.add("/* LocalTokenNumberTable */");
         output.add("{");
-        bodyStart = 2;
 
         if (al.size() == 0) {
             output.add("0");
@@ -497,8 +493,6 @@ class LocalTokenNumberTable {
             output.add(str);
 
         }
-
-        bodyLineNum = al.size();
 
         output.add("}");
 
@@ -641,16 +635,17 @@ class PcdDatabase {
 
     public final static String ExMapTableDeclaration            = "DYNAMICEX_MAPPING ExMapTable[%s_EXMAPPING_TABLE_SIZE];\r\n";
     public final static String GuidTableDeclaration             = "EFI_GUID          GuidTable[%s_GUID_TABLE_SIZE];\r\n";
-    public final static String LocalTokenNumberTableDeclaration = "UINT32            LocalTokenNumberTable[%s_LOCAL_TOKEN_NUMBER];\r\n";
+    public final static String LocalTokenNumberTableDeclaration = "UINT32            LocalTokenNumberTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
     public final static String StringTableDeclaration           = "UINT16            StringTable[%s_STRING_TABLE_SIZE];\r\n";
-    public final static String SizeTableDeclaration             = "UINT16            SizeTable[%s_LOCAL_TOKEN_NUMBER];\r\n";
+    public final static String SizeTableDeclaration             = "UINT16            SizeTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
     public final static String SkuIdTableDeclaration              = "UINT8             SkuIdTable[%s_SKUID_TABLE_SIZE];\r\n";
 
 
     public final static String ExMapTableSizeMacro              = "#define %s_EXMAPPING_TABLE_SIZE  %d\r\n";
     public final static String ExTokenNumber                    = "#define %s_EX_TOKEN_NUMBER       %d\r\n";
     public final static String GuidTableSizeMacro               = "#define %s_GUID_TABLE_SIZE         %d\r\n";
-    public final static String LocalTokenNumberTableSizeMacro   = "#define %s_LOCAL_TOKEN_NUMBER            %d\r\n";
+    public final static String LocalTokenNumberTableSizeMacro   = "#define %s_LOCAL_TOKEN_NUMBER_TABLE_SIZE            %d\r\n";
+    public final static String LocalTokenNumberSizeMacro   		= "#define %s_LOCAL_TOKEN_NUMBER            %d\r\n";
     public final static String StringTableSizeMacro             = "#define %s_STRING_TABLE_SIZE       %d\r\n";
     public final static String SkuIdTableSizeMacro              = "#define %s_SKUID_TABLE_SIZE        %d\r\n";
 
