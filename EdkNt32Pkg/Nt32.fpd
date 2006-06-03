@@ -272,7 +272,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -527,7 +527,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -705,7 +705,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -845,7 +845,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -1075,7 +1075,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -1215,7 +1215,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -1355,7 +1355,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -1495,7 +1495,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -1635,7 +1635,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -1775,7 +1775,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -1915,7 +1915,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2055,7 +2055,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2200,7 +2200,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2360,7 +2360,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2538,7 +2538,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2678,7 +2678,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2818,7 +2818,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2958,7 +2958,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -3098,7 +3098,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -3238,7 +3238,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -3378,7 +3378,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -3536,7 +3536,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -3676,7 +3676,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -3816,7 +3816,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -3956,7 +3956,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -4096,7 +4096,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -4236,7 +4236,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -4376,7 +4376,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -4516,7 +4516,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -4656,7 +4656,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -4796,7 +4796,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -4936,7 +4936,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -5076,7 +5076,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -5216,7 +5216,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -5356,7 +5356,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -5496,7 +5496,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -5636,7 +5636,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -5776,7 +5776,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -5916,7 +5916,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -6056,7 +6056,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -6196,7 +6196,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -6336,7 +6336,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -6476,7 +6476,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -6616,7 +6616,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -6758,7 +6758,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -6898,7 +6898,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -7038,7 +7038,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -7178,7 +7178,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -7318,7 +7318,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -7458,7 +7458,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -7616,7 +7616,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -7756,7 +7756,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -7896,7 +7896,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -8036,7 +8036,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -8176,7 +8176,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -8316,7 +8316,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -8456,7 +8456,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -8596,7 +8596,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -8736,7 +8736,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -8876,7 +8876,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -9016,7 +9016,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -9156,7 +9156,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -9296,7 +9296,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -9436,7 +9436,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -9576,7 +9576,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -9716,7 +9716,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -10084,7 +10084,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -10224,7 +10224,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -10364,7 +10364,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -10504,7 +10504,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -10644,7 +10644,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -10784,7 +10784,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -10928,7 +10928,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <VariableGuid>0</VariableGuid>
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
-            <DefaultValue>0x0f</DefaultValue>
+            <DefaultValue>0x1f</DefaultValue>
           </PcdBuildData>
           <PcdBuildData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdSpinLockTimeout</C_Name>
@@ -11110,7 +11110,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <VariableName>L""</VariableName>
       <DataOffset>0</DataOffset>
       <GuidOffset>0</GuidOffset>
-      <DefaultValue>0x0f</DefaultValue>
+      <DefaultValue>0x1f</DefaultValue>
     </PcdBuildData>
     <PcdBuildData ItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
