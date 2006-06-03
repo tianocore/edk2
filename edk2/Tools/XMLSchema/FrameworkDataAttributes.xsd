@@ -71,6 +71,11 @@
         <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
     </xs:attributeGroup>
@@ -126,7 +131,11 @@
         <xs:attribute name="PackageName" type="BaseNameConvention" use="optional"/>
         <xs:attribute name="PackageVersion" type="VersionDataType" use="optional"/>
         <xs:attribute name="PackageGuid" type="GuidType" use="optional"/>
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
@@ -149,6 +158,11 @@
         <xs:attribute name="PackageName" type="BaseNameConvention" use="optional"/>
         <xs:attribute name="PackageGuid" type="GuidType" use="optional"/>
         <xs:attribute name="BuildSequence" type="xs:int" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
     </xs:attributeGroup>
     <xs:attributeGroup name="OptionAttributes">
         <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
@@ -206,6 +220,11 @@
         <xs:attribute name="Usage" type="PpiUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
     </xs:attributeGroup>
@@ -214,6 +233,11 @@
         <xs:attribute name="Usage" type="PpiNotifyUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
     </xs:attributeGroup>
@@ -222,6 +246,11 @@
         <xs:attribute name="Usage" type="ProtocolUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
     </xs:attributeGroup>
@@ -229,6 +258,11 @@
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="ProtocolNotifyUsage" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
     </xs:attributeGroup>
@@ -271,6 +305,11 @@
         <xs:attribute name="Usage" type="VariableUsage" use="optional"/>
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="ArchType" use="optional">
+            <xs:simpleType>
+                <xs:list itemType="SupportedArchitectures"/>
+            </xs:simpleType>
+        </xs:attribute>
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
     </xs:attributeGroup>
