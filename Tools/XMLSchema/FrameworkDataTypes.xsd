@@ -16,6 +16,12 @@
         <xs:documentation xml:lang="en">This schema defines EFI and Framework Data Types. Only simpleType are specified in this file. </xs:documentation>
     </xs:annotation>
     <xs:include schemaLocation="NamingConvention.xsd"/>
+    <xs:simpleType name="ArchList">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">A list of one or more: IA32, X64, IPF and/or EBC</xs:documentation>
+        </xs:annotation>
+        <xs:list itemType="SupportedArchitectures"/>
+    </xs:simpleType>
     <xs:simpleType name="BlockNameType">
         <xs:annotation>
             <xs:documentation xml:lang="en">FIRMWARE: Define a block name to be BLOCK[A-F0-9]{2}</xs:documentation>
@@ -637,6 +643,9 @@
             </xs:enumeration>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="PcdListType">
+        <xs:list itemType="PcdItemTypes"/>
+    </xs:simpleType>
     <xs:simpleType name="PcdTypes">
         <xs:restriction base="NameConvention">
             <xs:enumeration value="FIXED_AT_BUILD">
@@ -644,6 +653,7 @@
                     <xs:documentation xml:lang="en">PCD Item is only a build time option and cannot be Dyanmic or Binary patched into the module.</xs:documentation>
                 </xs:annotation>
             </xs:enumeration>
+            <xs:enumeration value="FEATURE_FLAG"/>
             <xs:enumeration value="PATCHABLE_IN_MODULE">
                 <xs:annotation>
                     <xs:documentation xml:lang="en">PCD Item is set to a default value at build time and a binary of the module can be patched to update the value.</xs:documentation>
