@@ -112,6 +112,7 @@
                             </xs:simpleContent>
                         </xs:complexType>
                     </xs:element>
+                    <!-- Arch element should be removed - use Arch attributes to the above instead. -->
                     <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                         <xs:complexType>
                             <xs:sequence minOccurs="1">
@@ -148,18 +149,8 @@
             <xs:documentation xml:lang="en">Describe the valid Framework Component Type</xs:documentation>
         </xs:annotation>
     </xs:element>
-    <xs:element name="Condition">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">A conditional expression that must be evaluated to determine whether a feature is implemented or not. The expression must be either numeric, string or boolean.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType mixed="true">
-            <xs:sequence minOccurs="0" maxOccurs="1">
-                <xs:element minOccurs="0" maxOccurs="1" name="Condition" type="xs:normalizedString"/>
-            </xs:sequence>
-            <xs:attribute name="ConditionalTarget" type="ConditionalTarget" use="optional"/>
-        </xs:complexType>
-    </xs:element>
     <xs:element name="ConditionalExpression">
+        <!-- DO NOT USE remove and use FeatureFlag instead -->
         <xs:annotation>
             <xs:documentation xml:lang="en">A conditional expression that must be evaluated to determine whether a feature is implemented or not. The expression must be either numeric, string or boolean.</xs:documentation>
         </xs:annotation>
@@ -190,6 +181,7 @@
                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
+                <!-- Remove Arch and use Arch Attribute for DataHubRecord instead. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
@@ -254,11 +246,15 @@
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                                        <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                        <xs:choice minOccurs="0">
+                                            <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                            <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                                        </xs:choice>
                                     </xs:sequence>
                                     <xs:attributeGroup ref="EventAttributes"/>
                                 </xs:complexType>
                             </xs:element>
+                            <!-- Remove Arch Section and use Arch Attribute instead in above. -->
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                                 <xs:complexType>
                                     <xs:sequence>
@@ -266,7 +262,10 @@
                                             <xs:complexType>
                                                 <xs:sequence>
                                                     <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                                                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                                    <xs:choice minOccurs="0">
+                                                        <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                                        <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                                                    </xs:choice>
                                                 </xs:sequence>
                                                 <xs:attributeGroup ref="EventAttributes"/>
                                             </xs:complexType>
@@ -288,11 +287,15 @@
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                                        <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                        <xs:choice minOccurs="0">
+                                            <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                            <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                                        </xs:choice>
                                     </xs:sequence>
                                     <xs:attributeGroup ref="EventAttributes"/>
                                 </xs:complexType>
                             </xs:element>
+                            <!-- Remove Arch and use Arch attribute in above -->
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                                 <xs:complexType>
                                     <xs:sequence>
@@ -300,7 +303,6 @@
                                             <xs:complexType>
                                                 <xs:sequence>
                                                     <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                                                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                                                 </xs:sequence>
                                                 <xs:attributeGroup ref="EventAttributes"/>
                                             </xs:complexType>
@@ -363,6 +365,8 @@
                         <xs:attributeGroup ref="ExternAttributes"/>
                     </xs:complexType>
                 </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
+                <!-- Remove Arch and use Arch Attribute in above. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
@@ -449,6 +453,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="Filename"/>
+                <!-- DO NOT USE Arch remove it element and use Arch Attribute to Filename instead -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence minOccurs="1">
@@ -519,7 +524,10 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
+                            <xs:choice minOccurs="1">
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                            </xs:choice>
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
                         </xs:sequence>
                         <xs:attribute name="Name" type="xs:normalizedString" use="required"/>
@@ -541,12 +549,14 @@
                             <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
                             <xs:element minOccurs="0" maxOccurs="unbounded" ref="ConditionalExpression"/>
+                            <!-- DO NOT USE remove and use FeatureFlag instead -->
                             <xs:element minOccurs="0" maxOccurs="1" ref="DefaultValue"/>
                             <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="GuidAttributes"/>
                     </xs:complexType>
                 </xs:element>
+                <!-- DO NOT USE Arch, Arch should be removed and the attribute Arch should be used in the above. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
@@ -560,6 +570,7 @@
                                         <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                                         <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
                                         <xs:element minOccurs="0" maxOccurs="unbounded" ref="ConditionalExpression"/>
+                                        <!-- DO NOT USE remove and use FeatureFlag instead -->
                                         <xs:element minOccurs="0" maxOccurs="1" ref="DefaultValue"/>
                                         <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                                     </xs:sequence>
@@ -587,11 +598,15 @@
                         <xs:sequence>
                             <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:normalizedString"/>
                             <xs:element minOccurs="0" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                            <xs:choice minOccurs="0">
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                            </xs:choice>
                         </xs:sequence>
                         <xs:attributeGroup ref="HobAttributes"/>
                     </xs:complexType>
                 </xs:element>
+                <!-- DO NOT USE Arch, use attribute Arch for Hob in above -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
@@ -644,7 +659,7 @@
     <xs:element name="InstalledDate" type="DateType"/>
     <xs:element name="Libraries">
         <xs:annotation>
-            <xs:documentation xml:lang="en">Different (Module)  Instances of Libraries used ONLY in FPD Files.</xs:documentation>
+            <xs:documentation xml:lang="en">Different (Module) Instances of Libraries used ONLY in FPD Files.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="1">
@@ -756,7 +771,10 @@
             </xs:annotation>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ModuleName"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
+                <xs:choice minOccurs="1">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                </xs:choice>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Path"/>
             </xs:sequence>
@@ -806,6 +824,7 @@
                         <xs:attributeGroup ref="MsaAttributes"/>
                     </xs:complexType>
                 </xs:element>
+                <!-- DO NOT USE Arch element, use attribute Arch in above. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence minOccurs="1">
@@ -866,6 +885,7 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="PCDs">
+        <!-- PCDs section is going away to be replaced by something else TB Named later -->
         <xs:annotation>
             <xs:documentation xml:lang="en">Child of Module Surface Area documents, MSA and MBD files, Library Modules and Other Modules</xs:documentation>
             <xs:documentation xml:lang="en">One or more PcdData or PcdBuildData Elements Only one type is permitted</xs:documentation>
@@ -950,16 +970,19 @@
                     <xs:complexType>
                         <xs:sequence maxOccurs="unbounded">
                             <xs:element minOccurs="0" maxOccurs="1" ref="PackageName"/>
-                            <xs:choice minOccurs="1">
+                            <xs:choice minOccurs="0">
                                 <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                                 <!-- DO NOT USE Guid should be removed, use PackageGuid instead -->
                                 <xs:element minOccurs="0" maxOccurs="1" name="PackageGuid" type="GuidType"/>
                             </xs:choice>
-                            <xs:choice minOccurs="1">
+                            <xs:choice minOccurs="0">
                                 <xs:element minOccurs="0" maxOccurs="1" ref="Version"/>
                                 <xs:element minOccurs="0" maxOccurs="1" name="PackageVersion" type="VersionDataType"/>
                             </xs:choice>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="Path"/>
+                            <xs:choice minOccurs="1">
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Path"/>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Filename"/>
+                            </xs:choice>
                             <xs:element minOccurs="1" maxOccurs="1" ref="InstalledDate"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PackageAttributes"/>
@@ -1009,7 +1032,6 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="Token">
                                 <xs:annotation>
                                     <xs:documentation xml:lang="en">This as a unique identifier defined for either this name space.</xs:documentation>
@@ -1332,10 +1354,10 @@
                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Path"/>
-                <!--
-                <xs:element minOccurs="0" maxOccurs="1" ref="File"/>
-                    -->
+                <xs:choice minOccurs="0">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Path"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Filename"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="InstalledDate"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
                 <xs:element minOccurs="0" maxOccurs="1" name="AlternatePcdFile" type="FileNameConvention"/>
@@ -1351,8 +1373,11 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
-                            <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
+                            <xs:choice>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                            </xs:choice>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="xs:normalizedString"/>
                         </xs:sequence>
                         <xs:attribute name="Name" type="xs:normalizedString" use="required"/>
                     </xs:complexType>
@@ -1384,6 +1409,7 @@
                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
+                <!-- DO NOT USE Arch element, use Arch Attribute in above instead. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
@@ -1599,7 +1625,10 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" name="String" type="xs:normalizedString"/>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
+                            <xs:choice minOccurs="1">
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                            </xs:choice>
                             <xs:element minOccurs="0" maxOccurs="1" name="ByteOffset" type="HexWordDataType">
                                 <xs:annotation>
                                     <xs:documentation xml:lang="en">This entry represents the Hex Byte Offset {0x0, 0xn} to where the data starts.</xs:documentation>
@@ -1631,6 +1660,7 @@
                         <xs:attributeGroup ref="VariableAttributes"/>
                     </xs:complexType>
                 </xs:element>
+                <!-- DO NOT USE Arch element, use attribute Arch in above. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
