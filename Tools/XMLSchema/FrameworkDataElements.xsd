@@ -629,6 +629,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="PackageName"/>
+                <!-- remove Arch element, start using the Arch attribute for the PackageName element above. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence minOccurs="1">
@@ -643,19 +644,20 @@
     <xs:element name="InstalledDate" type="DateType"/>
     <xs:element name="Libraries">
         <xs:annotation>
-            <xs:documentation xml:lang="en">Different Instances of Libraries</xs:documentation>
+            <xs:documentation xml:lang="en">Different (Module)  Instances of Libraries used ONLY in FPD Files.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Library">
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="BaseNameConvention">
+                            <xs:extension base="xs:NCName">
                                 <xs:attributeGroup ref="LibraryAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
+                <!-- remove Arch Element HERE, start using the Arch attribute in Library element above. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:choice minOccurs="1" maxOccurs="unbounded">
@@ -672,18 +674,19 @@
                         <xs:attribute name="ArchType" type="SupportedArchitectures"/>
                     </xs:complexType>
                 </xs:element>
+                <!-- /remove Arch Element -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
     <xs:element name="LibraryClass">
         <xs:annotation>
-            <xs:documentation xml:lang="en">Used in MSA files.  This defines what class of library is being supported = produced  (library module) or consumed by a  module.</xs:documentation>
+            <xs:documentation xml:lang="en">Used in MSA files. This defines what class of library is being supported = produced (library module) or consumed by a module.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="BaseNameConvention">
                     <xs:attribute name="Usage" type="LibraryUsage" use="required"/>
-                    <xs:attribute name="RecommendedInstance" type="BaseNameConvention" use="optional"/>
+                    <xs:attribute name="RecommendedInstance" type="xs:NCName" use="optional"/>
                     <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
                 </xs:extension>
             </xs:simpleContent>
@@ -697,12 +700,12 @@
             <xs:sequence minOccurs="0">
                 <xs:element minOccurs="1" maxOccurs="1" name="LibraryClass">
                     <xs:annotation>
-                        <xs:documentation xml:lang="en">Used in MSA and SPD files.  This defines what class of library is being supported = produced  (library module) or consumed by a  module.</xs:documentation>
+                        <xs:documentation xml:lang="en">Used in MSA and SPD files. This defines what class of library is being supported = produced (library module) or consumed by a module.</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:simpleContent>
                             <xs:extension base="BaseNameConvention">
-                                <xs:attribute name="RecommendedInstance" type="BaseNameConvention" use="optional"/>
+                                <xs:attribute name="RecommendedInstance" type="xs:NCName" use="optional"/>
                                 <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
                             </xs:extension>
                         </xs:simpleContent>
@@ -776,7 +779,7 @@
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
-                <xs:extension base="BaseNameConvention">
+                <xs:extension base="xs:NCName">
                     <xs:attributeGroup ref="ModuleNameAttributes"/>
                 </xs:extension>
             </xs:simpleContent>
@@ -831,13 +834,13 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Filename">
-                     <xs:complexType>
-                         <xs:simpleContent>
-                             <xs:extension base="xs:anyURI">
-                                 <xs:attributeGroup ref="ModuleNameSaAttributes"/>
-                             </xs:extension>
-                         </xs:simpleContent>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Filename">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:anyURI">
+                                <xs:attributeGroup ref="ModuleNameSaAttributes"/>
+                            </xs:extension>
+                        </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -936,7 +939,7 @@
     </xs:element>
     <xs:element name="PackageList">
         <xs:annotation>
-            <xs:documentation xml:lang="en">This tag is used in the Framework Package Database File to track all packages installed in a workspace.</xs:documentation>
+            <xs:documentation xml:lang="en">This tag is used in the Framework Package Database File to track all packages installed in a workspace. (Database)</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence maxOccurs="unbounded">
@@ -947,8 +950,15 @@
                     <xs:complexType>
                         <xs:sequence maxOccurs="unbounded">
                             <xs:element minOccurs="0" maxOccurs="1" ref="PackageName"/>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
+                            <xs:choice minOccurs="1">
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                <!-- DO NOT USE Guid should be removed, use PackageGuid instead -->
+                                <xs:element minOccurs="0" maxOccurs="1" name="PackageGuid" type="GuidType"/>
+                            </xs:choice>
+                            <xs:choice minOccurs="1">
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Version"/>
+                                <xs:element minOccurs="0" maxOccurs="1" name="PackageVersion" type="VersionDataType"/>
+                            </xs:choice>
                             <xs:element minOccurs="1" maxOccurs="1" ref="Path"/>
                             <xs:element minOccurs="1" maxOccurs="1" ref="InstalledDate"/>
                         </xs:sequence>
@@ -960,7 +970,7 @@
     </xs:element>
     <xs:element name="PackageName">
         <xs:annotation>
-            <xs:documentation xml:lang="en">This tag is used in the Package Surface Area Description File to track package dependencies for a module</xs:documentation>
+            <xs:documentation xml:lang="en">This tag is used in the Package Surface Area Description File to track package dependencies for a module (SPD) </xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
