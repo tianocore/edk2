@@ -254,7 +254,7 @@
                                     <xs:attributeGroup ref="EventAttributes"/>
                                 </xs:complexType>
                             </xs:element>
-                            <!-- Remove Arch Section and use Arch Attribute instead in above. -->
+                            <!-- Remove Arch Section and use Arch Attribute instead in Event. -->
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                                 <xs:complexType>
                                     <xs:sequence>
@@ -295,7 +295,7 @@
                                     <xs:attributeGroup ref="EventAttributes"/>
                                 </xs:complexType>
                             </xs:element>
-                            <!-- Remove Arch and use Arch attribute in above -->
+                            <!-- Remove Arch and use Arch attribute in Event above -->
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                                 <xs:complexType>
                                     <xs:sequence>
@@ -483,6 +483,7 @@
                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
+                <!-- DO NOT USE! removing Arch element, use Arch attribute in Formset instead. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
@@ -548,8 +549,8 @@
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
                             <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
+                            <!-- DO NOT USE remove ConditionalExpression and use FeatureFlag instead -->
                             <xs:element minOccurs="0" maxOccurs="unbounded" ref="ConditionalExpression"/>
-                            <!-- DO NOT USE remove and use FeatureFlag instead -->
                             <xs:element minOccurs="0" maxOccurs="1" ref="DefaultValue"/>
                             <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                         </xs:sequence>
@@ -569,8 +570,8 @@
                                         <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
                                         <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                                         <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
+                                        <!-- DO NOT USE remove ConditionalExpression and use FeatureFlag instead -->
                                         <xs:element minOccurs="0" maxOccurs="unbounded" ref="ConditionalExpression"/>
-                                        <!-- DO NOT USE remove and use FeatureFlag instead -->
                                         <xs:element minOccurs="0" maxOccurs="1" ref="DefaultValue"/>
                                         <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                                     </xs:sequence>
@@ -700,9 +701,7 @@
         <xs:complexType>
             <xs:simpleContent>
                 <xs:extension base="BaseNameConvention">
-                    <xs:attribute name="Usage" type="LibraryUsage" use="required"/>
-                    <xs:attribute name="RecommendedInstance" type="xs:NCName" use="optional"/>
-                    <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
+                    <xs:attributeGroup ref="LibraryClassAttributes"/>
                 </xs:extension>
             </xs:simpleContent>
         </xs:complexType>
@@ -860,6 +859,30 @@
                                 <xs:attributeGroup ref="ModuleNameSaAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="MsaPcdDeclarations">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Child of Module Surface Area Description (MSA)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="1">
+                <xs:element maxOccurs="unbounded" name="PcdEntry">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">This is the valid content of the PCD table of a Module. The contents may not be wired at build time, and these only refer to Platform Build values, not modules.</xs:documentation>
+                        <xs:documentation xml:lang="en">This element is valid for PcdInfo.xml and FPD files.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
+                        </xs:sequence>
+                        <!-- MSA file declares a single usage, and must match one of the entries in what the SPD file declares as the set of possible Item Types. -->
+                        <xs:attribute name="PcdItemType" type="PcdItemTypes" use="required"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1286,7 +1309,36 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <!-- PcdDynamicBuildDeclarations -->
+    <xs:element name="PcdDeclarations">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Child of Package Surface Area Description (SPD)</xs:documentation>
+            <xs:documentation xml:lang="en">This permits entering information about a package's PCD information</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="1">
+                <xs:element maxOccurs="unbounded" name="PcdEntry">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">This is the valid content of the PCD table of a Module. The contents may not be wired at build time, and these only refer to Platform Build values, not modules.</xs:documentation>
+                        <xs:documentation xml:lang="en">This element is valid for PcdInfo.xml and FPD files.</xs:documentation>
+                        <xs:documentation xml:lang="en">There is ONE required Attribute, ItemType</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Token" type="Token"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="ValidUsage" type="PcdListType"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="HelpText" type="Paragraph"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="PcdAttributes"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!-- DO NOT USE removing PcdDefinitions, use PcdDeclarations for SPD entries  Use PcdBuildDeclarations for MSA Entires and PcdDynamicBuildDeclarations for FPD Entries -->
     <xs:element name="PcdDefinitions">
         <xs:annotation>
             <xs:documentation xml:lang="en">Child of Package Surface Area Description (SPD)</xs:documentation>
@@ -1478,6 +1530,7 @@
                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
+                <!-- DO NOT USE! removing Arch element, use Arch attribute of Protocol or ProtocolNotify instead. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence>
@@ -1557,6 +1610,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="Filename"/>
+                <!-- DO NOT USE! removing Arch element, use Arch Attribute of Filename instead.  -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
                         <xs:sequence minOccurs="1">
