@@ -473,24 +473,30 @@ Returns:
     // The first 12 * UINT64 bytes of the string are really an
     // arguement stack to support varargs on the Format string.
     //
-    DebugInfo = (EFI_DEBUG_INFO *) (Data + 1);
-    Marker    = (VA_LIST) (DebugInfo + 1);
-    Format    = (CHAR8 *) (((UINT64 *) Marker) + 12);
+    if (Data != NULL) {
+      DebugInfo = (EFI_DEBUG_INFO *) (Data + 1);
+      Marker    = (VA_LIST) (DebugInfo + 1);
+      Format    = (CHAR8 *) (((UINT64 *) Marker) + 12);
 
-    AsciiVSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
-    printf (PrintBuffer);
+      AsciiVSPrint (PrintBuffer, BYTES_PER_RECORD, Format, Marker);
+      printf (PrintBuffer);
+    } else {
+      printf ("DEBUG <null>\n");
+    }
   }
 
   if (((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_ERROR_CODE) &&
       ((CodeType & EFI_STATUS_CODE_SEVERITY_MASK) == EFI_ERROR_UNRECOVERED)
       ) {
-    if (ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber)) {
+    if (Data != NULL && ReportStatusCodeExtractAssertInfo (CodeType, Value, Data, &Filename, &Description, &LineNumber)) {
       //
       // Support ASSERT () macro
       //
       printf ("ASSERT %s(%d): %s\n", Filename, LineNumber, Description);
-      CpuBreakpoint ();
+    } else {
+      printf ("ASSERT <null>\n");
     }
+    CpuBreakpoint ();
   }
 
   return EFI_SUCCESS;
