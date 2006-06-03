@@ -235,6 +235,10 @@ BasePrintLibVSPrint (
       // Handle each argument type
       //
       switch (FormatCharacter) {
+      case 'p':
+        if (sizeof (VOID *) > 4) {
+          Flags |= LONG_TYPE;
+        }
       case 'X':
         Flags |= PREFIX_ZERO;
         //
@@ -247,7 +251,7 @@ BasePrintLibVSPrint (
         //
       case 'd':
         if ((Flags & LONG_TYPE) == 0) {
-          Value = (VA_ARG (Marker, INTN));
+          Value = (VA_ARG (Marker, int));
         } else {
           Value = VA_ARG (Marker, INT64);
         }
@@ -275,7 +279,7 @@ BasePrintLibVSPrint (
           Radix = 16;
           Comma = FALSE;
           if ((Flags & LONG_TYPE) == 0 && Value < 0) {
-            Value = (UINTN)Value;
+            Value = (unsigned int)Value;
           }
         }
         //
