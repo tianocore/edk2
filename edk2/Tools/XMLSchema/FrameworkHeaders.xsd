@@ -136,6 +136,11 @@
                     <!-- Updated needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
                 </xs:choice>
+                <xs:element minOccurs="0" maxOccurs="1" name="SupportedArchitectures">
+                    <xs:simpleType>
+                        <xs:list itemType="SupportedArchitectures"/>
+                    </xs:simpleType>
+                </xs:element>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
                 <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00090000 -->
             </xs:sequence>
