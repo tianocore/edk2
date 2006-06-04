@@ -16,7 +16,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-
+/**
+  An empty function to pass error checking of CreateEventEx (). 
+  
+  This empty function enusres that EFI_EVENT_NOTIFY_SIGNAL_ALL is error
+  checked correctly since it is now mapped into CreateEventEx() in UEFI 2.0.
+  
+**/
+VOID
+InternalEmptyFuntion (
+  IN EFI_EVENT                Event,
+  IN VOID                     *Context
+  )
+{
+  return;
+}
 
 /**
   Create a Legacy Boot Event.  
@@ -40,6 +54,42 @@ EfiCreateEventLegacyBoot (
   OUT EFI_EVENT  *LegacyBootEvent
   )
 {
+  return EfiCreateEventLegacyBootEx (
+           EFI_TPL_CALLBACK,
+           InternalEmptyFuntion,
+           NULL,
+           LegacyBootEvent
+           );
+}
+
+/**
+  Create an EFI event in the Legacy Boot Event Group and allows
+  the caller to specify a notification function.  
+  
+  This function abstracts the creation of the Legacy Boot Event.
+  The Framework moved from a proprietary to UEFI 2.0 based mechanism.
+  This library abstracts the caller from how this event is created to prevent
+  to code form having to change with the version of the specification supported.
+  If LegacyBootEvent is NULL, then ASSERT().
+
+  @param  NotifyTpl         The task priority level of the event.
+  @param  NotifyFunction    The notification function to call when the event is signaled.
+  @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
+  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+
+  @retval EFI_SUCCESS       Event was created.
+  @retval Other             Event was not created.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiCreateEventLegacyBootEx (
+  IN  EFI_TPL           NotifyTpl,
+  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
+  IN  VOID              *NotifyContext,  OPTIONAL
+  OUT EFI_EVENT         *LegacyBootEvent
+  )
+{
   EFI_STATUS    Status;
 
   ASSERT (LegacyBootEvent != NULL);
@@ -50,9 +100,9 @@ EfiCreateEventLegacyBoot (
   //
   Status = gBS->CreateEvent (
                   EFI_EVENT_SIGNAL_LEGACY_BOOT | EFI_EVENT_NOTIFY_SIGNAL_ALL,
-                  EFI_TPL_CALLBACK,
-                  NULL,
-                  NULL,
+                  NotifyTpl,
+                  NotifyFunction,
+                  NotifyContext,
                   LegacyBootEvent
                   );
 #else
@@ -61,17 +111,16 @@ EfiCreateEventLegacyBoot (
   //
   Status = gBS->CreateEventEx (
                   EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
-                  NULL,
-                  NULL,
+                  NotifyTpl,
+                  NotifyFunction,
+                  NotifyContext,
                   &gEfiEventLegacyBootGuid,
                   LegacyBootEvent
                   );
 #endif
+
   return Status;
 }
-
-
 
 /**
   Create a Read to Boot Event.  
@@ -95,6 +144,42 @@ EfiCreateEventReadyToBoot (
   OUT EFI_EVENT  *ReadyToBootEvent
   )
 {
+  return EfiCreateEventReadyToBootEx (
+           EFI_TPL_CALLBACK,
+           InternalEmptyFuntion,
+           NULL,
+           ReadyToBootEvent
+           );
+}
+
+/**
+  Create an EFI event in the Ready To Boot Event Group and allows
+  the caller to specify a notification function.  
+  
+  This function abstracts the creation of the Ready to Boot Event.
+  The Framework moved from a proprietary to UEFI 2.0 based mechanism.
+  This library abstracts the caller from how this event is created to prevent
+  to code form having to change with the version of the specification supported.
+  If ReadyToBootEvent is NULL, then ASSERT().
+
+  @param  NotifyTpl         The task priority level of the event.
+  @param  NotifyFunction    The notification function to call when the event is signaled.
+  @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
+  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+
+  @retval EFI_SUCCESS       Event was created.
+  @retval Other             Event was not created.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiCreateEventReadyToBootEx (
+  IN  EFI_TPL           NotifyTpl,
+  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
+  IN  VOID              *NotifyContext,  OPTIONAL
+  OUT EFI_EVENT         *ReadyToBootEvent
+  )
+{
   EFI_STATUS    Status;
 
   ASSERT (ReadyToBootEvent != NULL);
@@ -105,9 +190,9 @@ EfiCreateEventReadyToBoot (
   //
   Status = gBS->CreateEvent (
                   EFI_EVENT_SIGNAL_READY_TO_BOOT | EFI_EVENT_NOTIFY_SIGNAL_ALL,
-                  EFI_TPL_CALLBACK,
-                  NULL,
-                  NULL,
+                  NotifyTpl,
+                  NotifyFunction,
+                  NotifyContext,
                   ReadyToBootEvent
                   );
 #else
@@ -116,9 +201,9 @@ EfiCreateEventReadyToBoot (
   //
   Status = gBS->CreateEventEx (
                   EVENT_NOTIFY_SIGNAL,
-                  EFI_TPL_CALLBACK,
-                  NULL,
-                  NULL,
+                  NotifyTpl,
+                  NotifyFunction,
+                  NotifyContext,
                   &gEfiEventReadyToBootGuid,
                   ReadyToBootEvent
                   );

@@ -121,14 +121,14 @@ InternalMathDivU64x32 (
   return Dividend / Divisor;
 }
 
-UINT64
+UINT32
 EFIAPI
 InternalMathModU64x32 (
   IN      UINT64                    Dividend,
   IN      UINT32                    Divisor
   )
 {
-  return Dividend % Divisor;
+  return (UINT32)(Dividend % Divisor);
 }
 
 UINT64
