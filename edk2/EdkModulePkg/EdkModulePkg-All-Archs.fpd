@@ -1,21 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
 <FrameworkPlatformDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
   <PlatformHeader>
-    <PlatformName>MdePkg</PlatformName>
-    <Abstract>EFI/Tiano MdePkg Package</Abstract>
+    <PlatformName>EdkModuleAll</PlatformName>
+    <GuidValue>dc967761-e6e9-4d1a-b02c-818102db4cc6</GuidValue>
+    <Version>0.3</Version>
+    <Abstract>EFI/Framework Reference Module Package for All Architectures</Abstract>
     <Description>This FPD file is used for Package Level build.</Description>
-    <Created>2006-04-03 13:40</Created>
-    <CreatedBy>lhauch</CreatedBy>
+    <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
+    <License>
+      All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
+      http://opensource.org/licenses/bsd-license.php
+
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+    </License>
+    <CreatedDate>2006-02-24 14:49</CreatedDate>
+    <ModifiedDate>2006-06-03 22:14</ModifiedDate>
+    <BuildTarget>BOTH</BuildTarget>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION     0x00000052</Specification>
   </PlatformHeader>
   <Flash>
     <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>

@@ -201,6 +201,7 @@
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
         <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
+        <xs:attribute name="ToolChainTag" type="xs:NCName" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
