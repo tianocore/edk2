@@ -657,6 +657,13 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="IndustryStdHeaders">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="IncludeHeader"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="InstalledDate" type="DateType"/>
     <xs:element name="Libraries">
         <xs:annotation>
@@ -741,7 +748,7 @@
     </xs:element>
     <xs:element name="LibraryClassDefinitions">
         <xs:annotation>
-            <xs:documentation xml:lang="en">This section defines what Classes of Libraries that this library belongs to. A Library may belong to multiple different library classes.</xs:documentation>
+            <xs:documentation xml:lang="en">This section defines what Classes of Library that this library supports. A Library may belong to multiple different library classes.</xs:documentation>
         </xs:annotation>
         <xs:complexType mixed="true">
             <xs:sequence minOccurs="1" maxOccurs="unbounded">

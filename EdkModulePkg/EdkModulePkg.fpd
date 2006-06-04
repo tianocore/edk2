@@ -1,19 +1,9 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
 <FrameworkPlatformDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
   <PlatformHeader>
     <PlatformName>EdkModule</PlatformName>
-    <GuidValue>b750cfa0-f8fa-4d6f-bb2d-39789751ef4b</GuidValue>
-    <Version>0.5</Version>
+    <GuidValue>dbb0551f-a04b-4038-9303-e60998023c8d</GuidValue>
+    <Version>0.3</Version>
     <Abstract>EFI/Tiano Edk Module Reference Designs Package</Abstract>
     <Description>This FPD file is used for Package Level build.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
@@ -26,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <CreatedDate>2006-04-03 13:40</CreatedDate>
+    <CreatedDate>2006-02-24 14:49</CreatedDate>
     <ModifiedDate>2006-06-01 17:59</ModifiedDate>
     <BuildTarget>DEBUG</BuildTarget>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
