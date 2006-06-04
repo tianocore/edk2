@@ -93,7 +93,6 @@ public class ShowPCDDatabaseAction extends UIAction {
         //
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
                             workspacePath);
-        GlobalData.getPCDMemoryDBManager().setLogFileName(fpdFilePath + ".PCDMemroyDatabaseLog.txt");
 
         //
         // Collect PCD information.
@@ -123,8 +122,10 @@ public class ShowPCDDatabaseAction extends UIAction {
     **/
     public static void main(String[] argv) throws UIException {
         ShowPCDDatabaseAction showAction = new ShowPCDDatabaseAction();
-        showAction.setWorkspacePath(argv[0]);
-        showAction.setFPDFilePath(argv[1]);
+        //showAction.setWorkspacePath(argv[0]);
+        //showAction.setFPDFilePath(argv[1]);
+        showAction.setWorkspacePath("M:/tianocore/edk2/trunk/edk2");
+        showAction.setFPDFilePath("EdkNt32Pkg/Nt32.fpd");
         showAction.execute();
     }
 }

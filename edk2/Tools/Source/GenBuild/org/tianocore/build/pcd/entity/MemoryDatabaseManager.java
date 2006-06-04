@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.pcd.action.ActionMessage;
 
 /** Database hold all PCD information comes from SPD, MSA, FPD file in memory.
@@ -37,12 +37,18 @@ public class MemoryDatabaseManager {
     ///  Memory database. The string "cName + SpaceNameGuid" is primary key.
     ///  memory database is in global scope, and it will be used for others PCD tools.
     ///
-    private static Map<String, Token>  memoryDatabase = null;
-    ///
-    /// The log file name for dumping memory database.
-    ///
-    private static String              logFileName    = null;
+    private static Map<String, Token>  memoryDatabase       = null;
 
+    ///
+    /// Before build a module, the used libary will be build firstly, the PCD of these
+    /// libarry is inheritted by the module, so stored module's PCD information as PCD
+    /// context of building libary.
+    /// 
+    public static List<UsageInstance> UsageInstanceContext = null;
+    ///
+    /// 
+    /// 
+    public static String CurrentModuleName                 = null;
     public static String PcdPeimHString       = "";
     public static String PcdPeimCString       = "";
     public static String PcdDxeHString        = "";
@@ -58,22 +64,6 @@ public class MemoryDatabaseManager {
         if (memoryDatabase == null) {
             memoryDatabase = new HashMap<String, Token>();
         }
-    }
-
-    /**
-      Get the log file name.
-    **/
-    public String getLogFileName() {
-        return logFileName;
-    }
-
-    /**
-      Set parameter log file name.
-  
-      @param fileName log file name parameter.
-    **/
-    public void setLogFileName(String fileName) {
-        logFileName = fileName;
     }
 
     /**
@@ -143,8 +133,12 @@ public class MemoryDatabaseManager {
         return tokenArray;
     }
 
-
-    private ArrayList<Token> getDynamicRecordArray() {
+    /**
+       Get record array only contains DYNAMIC or DYNAMIC_EX type PCD.
+       
+       @return ArrayList
+     */
+    private ArrayList getDynamicRecordArray() {
         Token[]     tokenArray  =   getRecordArray();
         int         index       =   0;
         int         count       =   0;
@@ -170,40 +164,28 @@ public class MemoryDatabaseManager {
     public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe) {
         int                     usageInstanceIndex  =   0;
         int                     index               =   0;
-        ArrayList<Token>        tokenArrayList      =   getDynamicRecordArray();
-        List<UsageInstance>     usageInstanceArray  =   null;
+        ArrayList               tokenArrayList      =   getDynamicRecordArray();
+        Object[]                usageInstanceArray  =   null;
         UsageInstance           usageInstance       =   null;
+
+        //pei = new ArrayList<Token>();
+        //dxe = new ArrayList<Token>();
 
         for (index = 0; index < tokenArrayList.size(); index++) {
             boolean found   =   false;
             Token       token = (Token) tokenArrayList.get(index);
-            if (token.producers != null) {
-                usageInstanceArray = token.producers;
-                for (usageInstanceIndex = 0; usageInstanceIndex < usageInstanceArray.size(); usageInstanceIndex++) {
-                    usageInstance = (UsageInstance) usageInstanceArray.get(usageInstanceIndex);
-                    if (CommonDefinition.isPeiPhaseComponent(usageInstance.componentType)) {
+            if (token.consumers != null) {
+                usageInstanceArray = token.consumers.entrySet().toArray();
+                for (usageInstanceIndex = 0; usageInstanceIndex < token.consumers.size(); usageInstanceIndex ++) {
+                    usageInstance =(UsageInstance) (((Map.Entry)usageInstanceArray[usageInstanceIndex]).getValue());
+                    if (usageInstance.isPeiPhaseComponent()) {
                         pei.add(token);
                         found = true;
                         break;
                     }
                 }
-
-            }
-            if (!found) {
-                if (token.consumers != null) {
-                    usageInstanceArray = token.consumers;
-                    for (usageInstanceIndex = 0; usageInstanceIndex < usageInstanceArray.size(); usageInstanceIndex ++) {
-                        usageInstance =(UsageInstance) usageInstanceArray.get(usageInstanceIndex);
-                        if (CommonDefinition.isPeiPhaseComponent(usageInstance.componentType)) {
-                            pei.add(token);
-                            found = true;
-                            break;
-                        }
-                    }
-                }
             }
 
-            //
             // If no PEI components reference the PCD entry, we insert it to DXE list
             //
             if (!found) {
@@ -215,17 +197,40 @@ public class MemoryDatabaseManager {
     }
 
     /**
-      Get all PCD record for a module according to module's name.
+      Get all PCD record for a module according to module's name, module's GUID,
+      package name, package GUID, arch, version information.
      
       @param moduleName  the name of module.
       
       @return  all usage instance for this module in memory database.
     **/
-    public List<UsageInstance> getUsageInstanceArrayByModuleName(String moduleName) {
+    public List<UsageInstance> getUsageInstanceArrayByModuleName(String moduleName,
+                                                                 UUID   moduleGuid,
+                                                                 String packageName,
+                                                                 UUID   packageGuid,
+                                                                 String arch,
+                                                                 String version) {
+
+        String primaryKey = UsageInstance.getPrimaryKey(moduleName, 
+                                                        moduleGuid,
+                                                        packageName,
+                                                        packageGuid,
+                                                        arch,
+                                                        version);
+
+        return getUsageInstanceArrayByKeyString(primaryKey);
+    }
+
+    /**
+       Get all PCD token for a usage instance according to primary key.
+       
+       @param primaryKey    the primary key of usage instance.
+       
+       @return List<UsageInstance>
+     */
+    public List<UsageInstance> getUsageInstanceArrayByKeyString(String primaryKey) {
         Token[]               tokenArray          = null;
         int                   recordIndex         = 0; 
-        int                   usageInstanceIndex  = 0;
-        List<UsageInstance>   usageInstanceArray  = null;
         UsageInstance         usageInstance       = null;
         List<UsageInstance>   returnArray         = new ArrayList<UsageInstance>();
 
@@ -235,29 +240,12 @@ public class MemoryDatabaseManager {
         // Loop to find all PCD record related to current module
         //
         for (recordIndex = 0; recordIndex < getDBSize(); recordIndex ++) {
-            if (tokenArray[recordIndex].producers != null) {
-                usageInstanceArray = tokenArray[recordIndex].producers;
-                for (usageInstanceIndex = 0; usageInstanceIndex < usageInstanceArray.size(); usageInstanceIndex ++) {
-                    usageInstance =(UsageInstance) usageInstanceArray.get(usageInstanceIndex);
-                    if (usageInstance.moduleName.equalsIgnoreCase(moduleName)) {
-                        returnArray.add(usageInstance);
-                    }
+            if (tokenArray[recordIndex].consumers.size() != 0) {
+                usageInstance = tokenArray[recordIndex].consumers.get(primaryKey);
+                if (usageInstance != null) {
+                    returnArray.add(usageInstance);
                 }
             }
-
-            if (tokenArray[recordIndex].consumers != null) {
-                usageInstanceArray = tokenArray[recordIndex].consumers;
-                for (usageInstanceIndex = 0; usageInstanceIndex < usageInstanceArray.size(); usageInstanceIndex ++) {
-                    usageInstance =(UsageInstance) usageInstanceArray.get(usageInstanceIndex);
-                    if (usageInstance.moduleName.equalsIgnoreCase(moduleName)) {
-                        returnArray.add(usageInstance);
-                    }
-                }
-            }
-        }
-
-        if (returnArray.size() == 0) {
-            ActionMessage.warning(this, "Can *not* find any usage instance for " + moduleName + " !");
         }
 
         return returnArray;
@@ -274,112 +262,31 @@ public class MemoryDatabaseManager {
         int                       usageIndex    = 0;
         int                       moduleIndex   = 0;
         Token[]                   tokenArray    = null;
+        Object[]                  usageInstanceArray = null;
         List<String>              moduleNames   = new ArrayList<String>();
         UsageInstance             usageInstance = null;
         boolean                   bFound        = false;
 
-        tokenArray = this.getRecordArray();
-        //
-        // Find all producer usage instance for retrieving module's name
-        //
-        for (indexToken = 0; indexToken < getDBSize(); indexToken ++) {
-            for (usageIndex = 0; usageIndex < tokenArray[indexToken].producers.size(); usageIndex ++) {
-                usageInstance = tokenArray[indexToken].producers.get(usageIndex);
-                bFound        = false;
-                for (moduleIndex = 0; moduleIndex < moduleNames.size(); moduleIndex ++) {
-                    if (moduleNames.get(moduleIndex).equalsIgnoreCase(usageInstance.moduleName)) {
-                        bFound = true;
-                        break;
-                    }
-                }
-                if (!bFound) {
-                    moduleNames.add(usageInstance.moduleName);
-                }
-            }
-        }
-
+        tokenArray = getRecordArray();
         //
         // Find all consumer usage instance for retrieving module's name
         //
         for (indexToken = 0; indexToken < getDBSize(); indexToken ++) {
+            usageInstanceArray = tokenArray[indexToken].consumers.entrySet().toArray();
             for (usageIndex = 0; usageIndex < tokenArray[indexToken].consumers.size(); usageIndex ++) {
-                usageInstance = tokenArray[indexToken].consumers.get(usageIndex);
+                usageInstance = (UsageInstance)((Map.Entry)usageInstanceArray[usageIndex]).getValue();
                 bFound        = false;
                 for (moduleIndex = 0; moduleIndex < moduleNames.size(); moduleIndex ++) {
-                    if (moduleNames.get(moduleIndex).equalsIgnoreCase(usageInstance.moduleName)) {
+                    if (moduleNames.get(moduleIndex).equalsIgnoreCase(usageInstance.getPrimaryKey())) {
                         bFound = true;
                         break;
                     }
                 }
                 if (!bFound) {
-                    moduleNames.add(usageInstance.moduleName);
+                    moduleNames.add(usageInstance.getPrimaryKey());
                 }
             }
         }
         return moduleNames;
-    }
-
-    /**
-      Dump all PCD record into file for reviewing.
-    **/
-    public void DumpAllRecords() {
-        BufferedWriter    bWriter           = null;
-        Object[]          tokenArray        = null;
-        Map.Entry         entry             = null;
-        Token             token             = null;
-        int               index             = 0;
-        int               usageIndex        = 0;
-        UsageInstance     usageInstance     = null;
-        String            inheritString     = null;
-        String            componentTypeName = null;
-
-        try {
-            bWriter = new BufferedWriter(new FileWriter(new File(logFileName)));
-            tokenArray = memoryDatabase.entrySet().toArray();
-            for (index = 0; index < memoryDatabase.size(); index ++) {
-                entry =(Map.Entry) tokenArray [index];
-                token =(Token) entry.getValue();
-                bWriter.write("****** token [" + Integer.toString(index) + "] ******\r\n");
-                bWriter.write(" cName:" + token.cName + "\r\n");
-                for (usageIndex = 0; usageIndex < token.producers.size(); usageIndex ++) {
-                    usageInstance     =(UsageInstance)token.producers.get(usageIndex);
-                    componentTypeName = CommonDefinition.getComponentTypeString(usageInstance.componentType);
-
-                    if (usageInstance.isInherit) {
-                        inheritString = "Inherit";
-                    } else {
-                        inheritString = "";
-                    }
-                    bWriter.write(String.format("   (Producer)#%d: %s:%s  Package:%s  %s\r\n",
-                                                usageIndex,
-                                                componentTypeName,
-                                                usageInstance.moduleName,
-                                                usageInstance.packageName,
-                                                inheritString
-                                               )
-                                 );
-                }
-                for (usageIndex = 0; usageIndex < token.consumers.size(); usageIndex ++) {
-                    usageInstance     =(UsageInstance)token.consumers.get(usageIndex);
-                    componentTypeName = CommonDefinition.getComponentTypeString(usageInstance.componentType);
-                    if (usageInstance.isInherit) {
-                        inheritString = "Inherit";
-                    } else {
-                        inheritString = "";
-                    }
-                    bWriter.write(String.format("   (Consumer)#%d: %s:%s  Package:%s  %s\r\n",
-                                                usageIndex,
-                                                componentTypeName,
-                                                usageInstance.moduleName,
-                                                usageInstance.packageName,
-                                                inheritString
-                                               )
-                                 );
-                }
-            }
-            bWriter.close();
-        } catch (IOException exp) {
-            ActionMessage.warning(this, "Failed to open database log file: " + logFileName);
-        }
     }
 }

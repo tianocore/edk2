@@ -17,6 +17,7 @@ package org.tianocore.build.pcd.ui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Map;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -82,7 +83,7 @@ public class PCDDatabaseFrame extends JFrame {
     public JTree initializeTree() {
         Token[]                tokenArray     = null;
         Token                  token          = null;
-        DefaultMutableTreeNode root           = new DefaultMutableTreeNode(dbManager.getLogFileName());
+        DefaultMutableTreeNode root           = new DefaultMutableTreeNode("PCDTreeRoot");
         DefaultMutableTreeNode rootByPCD      = new DefaultMutableTreeNode("By PCD");
         DefaultMutableTreeNode rootByModule   = new DefaultMutableTreeNode("By Module");
         DefaultMutableTreeNode tokenNode      = null;
@@ -92,6 +93,7 @@ public class PCDDatabaseFrame extends JFrame {
         int                    index          = 0; 
         int                    usageIndex     = 0;
         int                    moduleIndex    = 0;
+        Object[]               objectArray    = null;
         java.util.List<UsageInstance>    usageArray     = null;
         UsageInstance          usageInstance  = null;
 
@@ -106,17 +108,14 @@ public class PCDDatabaseFrame extends JFrame {
             ActionMessage.debug(this, token.cName);
             tokenNode = new DefaultMutableTreeNode(token.cName);
             tokenNode.add(new DefaultMutableTreeNode(String.format("TOKEN NUMBER: 0x%08x", token.tokenNumber)));
-            tokenNode.add(new DefaultMutableTreeNode(String.format("ASSIGNED TOKEN NUMBER: 0x%08x", token.assignedtokenNumber)));
             tokenNode.add(new DefaultMutableTreeNode("TOKEN SPACE NAME: " + token.tokenSpaceName.toString()));
-            tokenNode.add(new DefaultMutableTreeNode("ASSIGNED TOKEN SPACE NAME: " + token.assignedtokenSpaceName.toString()));
             tokenNode.add(new DefaultMutableTreeNode("PCD TYPE: " + Token.getStringOfpcdType(token.pcdType)));
             tokenNode.add(new DefaultMutableTreeNode("DATUM TYPE: " +Token.getStringOfdatumType(token.datumType)));
             tokenNode.add(new DefaultMutableTreeNode("DATUM: " + token.datum.toString()));
             tokenNode.add(new DefaultMutableTreeNode("HIIENABLE: " +(token.hiiEnabled?"true":"false")));
             tokenNode.add(new DefaultMutableTreeNode("VARIABLE NAME: " + token.variableName));
-            tokenNode.add(new DefaultMutableTreeNode("VARIABLE GUID: " + token.variableGuid.toString()));
+            //tokenNode.add(new DefaultMutableTreeNode("VARIABLE GUID: " + token.variableGuid.toString()));
             tokenNode.add(new DefaultMutableTreeNode("SKUENABLE: " +(token.skuEnabled?"true":"false")));
-            tokenNode.add(new DefaultMutableTreeNode("SKUDATA ARRAY ENABLE: " +(token.skuDataArrayEnabled?"true":"false")));
             tokenNode.add(new DefaultMutableTreeNode(String.format("SKUID: %d", token.skuId)));
             tokenNode.add(new DefaultMutableTreeNode(String.format("MAX SKU COUNT: %d", token.maxSkuCount)));
             tokenNode.add(new DefaultMutableTreeNode("VPDENABLE: " +(token.vpdEnabled?"true":"false")));
@@ -124,22 +123,16 @@ public class PCDDatabaseFrame extends JFrame {
             usageNode = new DefaultMutableTreeNode("PRODUCER");
             tokenNode.add(usageNode);
 
-            //
-            // Prepare producer's leaf node
-            //
-
-            for (usageIndex = 0; usageIndex < token.producers.size(); usageIndex ++) {
-                usageNode.add(new DefaultMutableTreeNode(token.producers.get(usageIndex).moduleName));
-            }
 
             //
             // Prepare consumer's leaf node
             //
             usageNode = new DefaultMutableTreeNode("CONSUMER");
             tokenNode.add(usageNode);
-
+            objectArray = token.consumers.entrySet().toArray();
             for (usageIndex = 0; usageIndex < token.consumers.size(); usageIndex ++) {
-                usageNode.add(new DefaultMutableTreeNode(token.consumers.get(usageIndex).moduleName));
+                usageInstance = (UsageInstance) ((Map.Entry)objectArray[usageIndex]).getValue();
+                usageNode.add(new DefaultMutableTreeNode(usageInstance.getPrimaryKey()));
             }
 
             rootByPCD.add(tokenNode);
@@ -155,14 +148,11 @@ public class PCDDatabaseFrame extends JFrame {
         }
         for (moduleIndex = 0; moduleIndex < moduleNames.size(); moduleIndex ++) {
             moduleNode = new DefaultMutableTreeNode(moduleNames.get(moduleIndex));
-            usageArray = dbManager.getUsageInstanceArrayByModuleName(moduleNames.get(moduleIndex));
+            usageArray = dbManager.getUsageInstanceArrayByKeyString(moduleNames.get(moduleIndex));
             for (usageIndex = 0; usageIndex < usageArray.size(); usageIndex ++) {
                 usageInstance = usageArray.get(usageIndex);
                 usageNode = new DefaultMutableTreeNode(usageInstance.parentToken.cName);
                 usageNode.add(new DefaultMutableTreeNode("MODULE PCD TYPE: " + Token.getStringOfpcdType(usageInstance.modulePcdType)));
-                usageNode.add(new DefaultMutableTreeNode("HELP TEXT: " + usageInstance.helpTextInMSA));
-                usageNode.add(new DefaultMutableTreeNode("IS INHERIT: " +(usageInstance.isInherit?"true":"false")));
-                usageNode.add(new DefaultMutableTreeNode("USAGE: " + Token.getStringOfUsage(usageInstance.usage)));
                 moduleNode.add(usageNode);
             }
             rootByModule.add(moduleNode);
