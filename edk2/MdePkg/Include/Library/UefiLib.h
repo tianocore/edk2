@@ -416,6 +416,34 @@ EfiCreateEventLegacyBoot (
   );
 
 /**
+  Create an EFI event in the Legacy Boot Event Group and allows
+  the caller to specify a notification function.  
+  
+  This function abstracts the creation of the Legacy Boot Event.
+  The Framework moved from a proprietary to UEFI 2.0 based mechanism.
+  This library abstracts the caller from how this event is created to prevent
+  to code form having to change with the version of the specification supported.
+  If LegacyBootEvent is NULL, then ASSERT().
+
+  @param  NotifyTpl         The task priority level of the event.
+  @param  NotifyFunction    The notification function to call when the event is signaled.
+  @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
+  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+
+  @retval EFI_SUCCESS       Event was created.
+  @retval Other             Event was not created.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiCreateEventLegacyBootEx (
+  IN  EFI_TPL           NotifyTpl,
+  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
+  IN  VOID              *NotifyContext,  OPTIONAL
+  OUT EFI_EVENT         *LegacyBootEvent
+  );
+
+/**
   Create a Read to Boot Event.  
   
   Tiano extended the CreateEvent Type enum to add a ready to boot event type. 
@@ -435,6 +463,34 @@ EFI_STATUS
 EFIAPI
 EfiCreateEventReadyToBoot (
   OUT EFI_EVENT  *ReadyToBootEvent
+  );
+
+/**
+  Create an EFI event in the Ready To Boot Event Group and allows
+  the caller to specify a notification function.  
+  
+  This function abstracts the creation of the Ready to Boot Event.
+  The Framework moved from a proprietary to UEFI 2.0 based mechanism.
+  This library abstracts the caller from how this event is created to prevent
+  to code form having to change with the version of the specification supported.
+  If ReadyToBootEvent is NULL, then ASSERT().
+
+  @param  NotifyTpl         The task priority level of the event.
+  @param  NotifyFunction    The notification function to call when the event is signaled.
+  @param  NotifyContext     The content to pass to NotifyFunction when the event is signaled.
+  @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
+
+  @retval EFI_SUCCESS       Event was created.
+  @retval Other             Event was not created.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiCreateEventReadyToBootEx (
+  IN  EFI_TPL           NotifyTpl,
+  IN  EFI_EVENT_NOTIFY  NotifyFunction,  OPTIONAL
+  IN  VOID              *NotifyContext,  OPTIONAL
+  OUT EFI_EVENT         *ReadyToBootEvent
   );
 
 /**

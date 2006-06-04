@@ -451,6 +451,9 @@ InternalAllocateCopyPool (
 {
   VOID  *Memory;
 
+  ASSERT (Buffer != NULL);
+  ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN) Buffer + 1));
+
   Memory = InternalAllocatePool (PoolType, AllocationSize);
   if (Memory != NULL) {
      Memory = CopyMem (Memory, Buffer, AllocationSize);
@@ -476,6 +479,9 @@ AllocateCopyPool (
   )
 {
   VOID  *Memory;
+
+  ASSERT (Buffer != NULL);
+  ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN) Buffer + 1));
 
   Memory = AllocatePool (AllocationSize);
   if (Memory != NULL) {
@@ -791,6 +797,9 @@ InternalAllocateAlignedCopyPool (
 {
   VOID  *Memory;
   
+  ASSERT (Buffer != NULL);
+  ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN) Buffer + 1));
+
   Memory = InternalAllocateAlignedPool (PoolType, AllocationSize, Alignment);
   if (Memory != NULL) {
     Memory = CopyMem (Memory, Buffer, AllocationSize);
@@ -820,6 +829,9 @@ AllocateAlignedCopyPool (
 {
   VOID  *Memory;
   
+  ASSERT (Buffer != NULL);
+  ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN) Buffer + 1));
+
   Memory = AllocateAlignedPool (AllocationSize, Alignment);
   if (Memory != NULL) {
     Memory = CopyMem (Memory, Buffer, AllocationSize);

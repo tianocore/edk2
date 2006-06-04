@@ -39,7 +39,6 @@ IoRead8 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
 
   return CpuIo->IoRead8 (PeiServices, CpuIo, (UINT64) Port);
@@ -72,7 +71,6 @@ IoWrite8 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
 
   CpuIo->IoWrite8 (PeiServices, CpuIo, (UINT64) Port, Value);
@@ -104,9 +102,11 @@ IoRead16 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
   return CpuIo->IoRead16 (PeiServices, CpuIo, (UINT64) Port);
 }
 
@@ -137,9 +137,11 @@ IoWrite16 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Port is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Port & 1) == 0);
   CpuIo->IoWrite16 (PeiServices, CpuIo, (UINT64) Port, Value);
   return Value;
 }
@@ -169,9 +171,11 @@ IoRead32 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
   return CpuIo->IoRead32 (PeiServices, CpuIo, (UINT64) Port);
 }
 
@@ -202,9 +206,11 @@ IoWrite32 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Port is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Port & 3) == 0);
   CpuIo->IoWrite32 (PeiServices, CpuIo, (UINT64) Port, Value);
   return Value;
 }
@@ -234,9 +240,11 @@ IoRead64 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Port is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Port & 7) == 0);
   return CpuIo->IoRead64 (PeiServices, CpuIo, (UINT64) Port);
 }
 
@@ -267,9 +275,11 @@ IoWrite64 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Port is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Port & 7) == 0);
   CpuIo->IoWrite64 (PeiServices, CpuIo, (UINT64) Port, Value);
   return Value;;
 }
@@ -299,7 +309,6 @@ MmioRead8 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
 
   return CpuIo->MemRead8 (PeiServices, CpuIo, (UINT64) Address);
@@ -330,7 +339,6 @@ MmioWrite8 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
 
   CpuIo->MemWrite8 (PeiServices, CpuIo, (UINT64) Address, Value);
@@ -362,9 +370,11 @@ MmioRead16 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Address is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Address & 1) == 0);
   return CpuIo->MemRead16 (PeiServices, CpuIo, (UINT64) Address);
 
 }
@@ -394,9 +404,11 @@ MmioWrite16 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Address is aligned on a 16-bit boundary.
+  //
+  ASSERT ((Address & 1) == 0);
   CpuIo->MemWrite16 (PeiServices, CpuIo, (UINT64) Address, Value);
   return Value;
 }
@@ -426,9 +438,11 @@ MmioRead32 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Address is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Address & 3) == 0);
   return CpuIo->MemRead32 (PeiServices, CpuIo, (UINT64) Address);
 
 }
@@ -458,9 +472,11 @@ MmioWrite32 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Address is aligned on a 32-bit boundary.
+  //
+  ASSERT ((Address & 3) == 0);
   CpuIo->MemWrite32 (PeiServices, CpuIo, (UINT64) Address, Value);
   return Value;
 }
@@ -490,9 +506,11 @@ MmioRead64 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Address is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Address & 7) == 0);
   return CpuIo->MemRead64 (PeiServices, CpuIo, (UINT64) Address);
 
 }
@@ -522,9 +540,11 @@ MmioWrite64 (
 
   PeiServices = GetPeiServicesTablePointer ();
   CpuIo       = (*PeiServices)->CpuIo;
-
   ASSERT (CpuIo != NULL);
-
+  //
+  // Make sure Address is aligned on a 64-bit boundary.
+  //
+  ASSERT ((Address & 7) == 0);
   CpuIo->MemWrite64 (PeiServices, CpuIo, (UINT64) Address, Value);
   return Value;
 }
