@@ -408,8 +408,14 @@ public class AutoGen {
         // isPCDEmulatedDriver parameter will be removed.
         //
         try {
-            this.myPcdAutogen = new PCDAutoGenAction(baseName, 
-                                                     baseName.equalsIgnoreCase("PcdEmulatorPeim"));
+            this.myPcdAutogen = new PCDAutoGenAction(baseName,
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     this.arch,
+                                                     null,
+                                                     baseName.equalsIgnoreCase("PcdEmulatorPeim"),
+                                                     false);
             this.myPcdAutogen.execute();
         } catch (Exception e) {
             throw new BuildException("PCD Autogen failed:" + e.getMessage());
@@ -543,8 +549,14 @@ public class AutoGen {
         // isPCDEmulatedDriver parameter will be removed.
         //
         try {
-            this.myPcdAutogen = new PCDAutoGenAction(baseName, baseName
-                    .equalsIgnoreCase("PcdEmulatorPeim"));
+            this.myPcdAutogen = new PCDAutoGenAction(baseName, 
+                                                     null,
+                                                     null,
+                                                     null,
+                                                     this.arch,
+                                                     null,
+                                                     baseName.equalsIgnoreCase("PcdEmulatorPeim"), 
+                                                     true);
             this.myPcdAutogen.execute();
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

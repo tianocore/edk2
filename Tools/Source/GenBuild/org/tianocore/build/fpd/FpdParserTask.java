@@ -785,12 +785,6 @@ public class FpdParserTask extends Task {
     public void collectPCDInformation() {
       CollectPCDAction collectAction = new CollectPCDAction ();
       //
-      // Set memory database log file path. It should be put into same directory with FPD file. 
-      //
-      GlobalData.getPCDMemoryDBManager().setLogFileName(
-                   fpdFilename.getPath() + ".PCDMemroyDatabaseLog.txt"
-                   );
-      //
       // Collect all PCD information from FPD to MSA, and get help information from SPD.
       // These all information will be stored into memory database for future usage such 
       // as autogen.
@@ -802,7 +796,7 @@ public class FpdParserTask extends Task {
           ActionMessage.MAX_MESSAGE_LEVEL
           );
       } catch (Exception exp) {
-        throw new BuildException (exp.getMessage());
+        throw new BuildException (String.format("Fail to do PCD preprocess from FPD file,  the cause is %s", exp.getMessage()));
       }
     }
 }

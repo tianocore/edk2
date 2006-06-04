@@ -18,10 +18,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.pcd.entity;
 
 
-import org.tianocore.build.pcd.exception.EntityException;
-import org.tianocore.build.pcd.action.ActionMessage;
+import java.util.UUID;
 
 import org.tianocore.build.autogen.CommonDefinition;
+import org.tianocore.build.pcd.action.ActionMessage;
+import org.tianocore.build.pcd.exception.EntityException;
 
 /**
   This class indicate an usage instance for a PCD token. This instance maybe a module
@@ -30,49 +31,49 @@ import org.tianocore.build.autogen.CommonDefinition;
 **/
 public class UsageInstance {
   ///
+  /// The module type of usage instance.
+  /// 
+  public enum MODULE_TYPE {SEC, PEI_CORE, PEIM, DXE_CORE, DXE_DRIVERS, OTHER_COMPONENTS}
+  ///
   /// This parent that this usage instance belongs to.
   ///
   public Token            parentToken;
-  ///
-  /// The usage of this token for platform or module.
-  ///
-  public Token.PCD_USAGE  usage;
-  ///
-  /// Whether this usage instance inherit from library
-  ///
-  public boolean          isInherit;
-  ///
-  /// The pcd type of this token for module.
-  ///
-  public Token.PCD_TYPE   modulePcdType;
   ///
   /// The name of the module who contains this PCD.
   ///
   public String           moduleName;
   ///
+  /// The GUID of the module who contains this PCD. 
+  /// 
+  public UUID             moduleGUID;
+  ///
   /// The name of the package whose module contains this PCD.
   ///
   public String           packageName;
   ///
-  /// The component type for this usage instance.
+  /// The GUID of the package whose module contains this PCD.
+  /// 
+  public UUID             packageGUID;
   ///
-  public int              componentType;
+  /// The PCD type defined for module 
+  /// 
+  public Token.PCD_TYPE   modulePcdType;
   ///
-  /// The default value defined in MSA has high prior than defined in SPD.
+  /// The arch string of module contains this PCD
   ///
-  public Object           defaultValueInMSA;
+  public String           arch;
   ///
-  /// The default value defined in SPD.
+  /// The version of module contains this PCD
+  /// 
+  public String           version;
   ///
-  public Object           defaultValueInSPD;
+  /// The module type for this usage instance.
   ///
-  /// Help text in MSA
+  public MODULE_TYPE      moduleType;
   ///
-  public String           helpTextInMSA;
-  ///
-  /// Help text in SPD
-  ///
-  public String           helpTextInSPD;
+  /// The value of the PCD in this usage instance. 
+  /// 
+  public Object           datum;
   ///
   /// Autogen string for header file.
   ///
@@ -83,367 +84,265 @@ public class UsageInstance {
   public String           cAutogenStr;
 
   /**
-    Constructure function
-    
-    @param parentToken         Member variable.
-    @param usage               Member variable.
-    @param pcdType             Member variable.
-    @param componentType       Member variable.
-    @param defaultValueInMSA   Member variable.
-    @param defaultValueInSPD   Member variable.
-    @param helpTextInMSA       Member variable.
-    @param helpTextInSPD       Member variable.
-    @param moduleName          Member variable.
-    @param packageName         Member variable.
-    @param isInherit           Member variable.
+     Constructure function
+     
+     @param parentToken         Member variable.
+     @param pcdType             Member variable.
+     @param moduleName          Member variable.
+     @param moduleGUID          Member variable.
+     @param packageName         Member variable.
+     @param packageGUID         Member variable.
+     @param moduleType          Member variable.
+     @param modulePcdType       Member variable.
+     @param arch                Member variable.
+     @param version             Member variable.
+     @param value               Member variable.
   **/
-  public UsageInstance(
-    Token           parentToken,
-    Token.PCD_USAGE usage,
-    Token.PCD_TYPE  pcdType,
-    int             componentType,
-    Object          defaultValueInMSA,
-    Object          defaultValueInSPD,
-    String          helpTextInMSA,
-    String          helpTextInSPD,
-    String          moduleName,
-    String          packageName,
-    boolean         isInherit
-    )
-  {
-    this.parentToken       = parentToken;
-    this.usage             = usage;
-    this.modulePcdType     = pcdType;
-    this.componentType     = componentType;
-    this.defaultValueInMSA = defaultValueInMSA;
-    this.defaultValueInSPD = defaultValueInSPD;
-    this.helpTextInMSA     = helpTextInMSA;
-    this.helpTextInSPD     = helpTextInSPD;
-    this.moduleName        = moduleName;
-    this.packageName       = packageName;
-    this.isInherit         = isInherit;
+  public UsageInstance (Token             parentToken,
+                        Token.PCD_TYPE    pcdType,
+                        String            moduleName,
+                        UUID              moduleGUID,
+                        String            packageName,
+                        UUID              packageGUID,
+                        MODULE_TYPE       moduleType,
+                        Token.PCD_TYPE    modulePcdType,
+                        String            arch,
+                        String            version,
+                        Object            value) {
+      this.parentToken      = parentToken;
+      this.moduleName       = moduleName;
+      this.moduleGUID       = moduleGUID;
+      this.packageName      = packageName;
+      this.packageGUID      = packageGUID;
+      this.moduleType       = moduleType;
+      this.modulePcdType    = modulePcdType;
+      this.arch             = arch;
+      this.version          = version;
+      this.datum            = value;
+      this.modulePcdType    = pcdType;
   }
 
   /**
-    Generate autogen string for header file and C code file.
-    
-    @throws EntityException Fail to generate.
+     Get the primary key for usage instance array for every token.
+     
+     @param moduleName      the name of module
+     @param moduleGUID      the GUID name of module
+     @param packageName     the name of package who contains this module
+     @param packageGUID     the GUID name of package
+     @param arch            the archtecture string
+     @param version         the version of this module
+     
+     @return String         primary key
+   */
+  public static String getPrimaryKey(String moduleName,  
+                                     UUID   moduleGUID,  
+                                     String packageName,  
+                                     UUID   packageGUID,
+                                     String arch,
+                                     String version) {
+      //
+      // Because currently transition schema not require write moduleGuid, package Name, Packge GUID in
+      // <ModuleSA> section, So currently no expect all paramter must be valid.
+      return (moduleName                                                              + "_" +
+              ((moduleGUID  != null) ? moduleGUID.toString() : "NullModuleGuid")      + "_" +
+              ((packageName != null) ? packageName : "NullPackageName")               + "_" +
+              ((packageGUID != null) ? packageGUID.toString() : "NullPackageGuid")    + "_" +
+              ((arch        != null) ? arch : "NullArch")                             + "_" +
+              ((version     != null) ? version : "NullVersion"));
+  }
+
+  /**
+     Get primary key string for this usage instance
+     
+     @return String primary key string
   **/
-  public void generateAutoGen() throws EntityException {
-    Object value        = null;
-    int    tokenNumber  = 0;
+  public String getPrimaryKey() {
+      return UsageInstance.getPrimaryKey(moduleName, moduleGUID, packageName, packageGUID, arch, version);
+  }
+
+  /**
+     Judget whether current module is PEI driver
+     
+     @return boolean
+   */
+  public boolean isPeiPhaseComponent() {
+      if ((moduleType == MODULE_TYPE.PEI_CORE) ||
+          (moduleType == MODULE_TYPE.PEIM)) {
+          return true;
+      }
+      return false;
+  }
+
+  /**
+     Generate autogen string for header file and C code file.
+     
+     @throws EntityException Fail to generate.
+     
+     @param isBuildUsedLibrary  whether the autogen is for library.
+   */
+  public void generateAutoGen(boolean isBuildUsedLibrary) 
+    throws EntityException {
 
     hAutogenStr = "";
     cAutogenStr = "";
 
-    value = this.parentToken.datum;
-
-    //
-    // If this pcd token's PCD_TYPE is DYNAMIC_EX, use itself token space name 
-    // otherwices use assgined token space name from tool automatically.
-    //
-    if(parentToken.pcdType == Token.PCD_TYPE.DYNAMIC_EX) {
-      tokenNumber = parentToken.tokenNumber;
-    } else {
-      tokenNumber = parentToken.assignedtokenNumber;
-    }
-
     hAutogenStr += String.format("#define _PCD_TOKEN_%s   0x%016x\r\n", 
-                                 parentToken.cName, tokenNumber);
-
+                                 parentToken.cName, parentToken.tokenNumber);
     switch(modulePcdType) {
     case FEATURE_FLAG:
-      //
-      // BUGBUG: The judegement of module PCD type and platform PCD type should not be 
-      //         done here, but in wizard tools, But here is just following something 
-      //         PcdEmulation driver. 
-      //
-      if(parentToken.pcdType.ordinal() > Token.PCD_TYPE.FEATURE_FLAG.ordinal()) {
-        throw new EntityException(
-          String.format(
-            "%s:Platform PCD Type %d is not compatible with Module PCD Type %d\r\n",
-            parentToken.cName,
-            parentToken.pcdType.name(),
-            modulePcdType.name()
-            )
-          );
-      }
-
-      if(CommonDefinition.isLibraryComponent(componentType)) {
-          hAutogenStr += String.format(
-                           "extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
-                           parentToken.cName
-                           );
-          hAutogenStr += String.format(
-                             "#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
-                             parentToken.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                             parentToken.cName,
-                             parentToken.cName
-                             );
+      if(isBuildUsedLibrary) {
+          hAutogenStr += String.format("extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
+                                       parentToken.cName);
+          hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
+                                       parentToken.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                       parentToken.cName,
+                                       parentToken.cName);
       } else {
-          hAutogenStr += String.format(
-                           "#define _PCD_VALUE_%s   %s\r\n", 
-                           parentToken.cName, 
-                           value.toString()
-                           );
-          hAutogenStr += String.format(
-                           "extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
-                           parentToken.cName
-                           );
-          cAutogenStr += String.format(
-                           "GLOBAL_REMOVE_IF_UNREFERENCED const BOOLEAN _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
-                           parentToken.cName,
-                           parentToken.cName
-                           );
-          hAutogenStr += String.format(
-                           "#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
-                           Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                           parentToken.cName,
-                           parentToken.cName
-                           );
+          hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                       parentToken.cName, 
+                                       datum.toString());
+          hAutogenStr += String.format("extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
+                                       parentToken.cName);
+          cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const BOOLEAN _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                       parentToken.cName,
+                                       parentToken.cName);
+          hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
+                                       Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                       parentToken.cName,
+                                       parentToken.cName);
       }
       break;
     case FIXED_AT_BUILD:
-      //
-      // BUGBUG: The judegement of module PCD type and platform PCD type should not be 
-      //         done here, but in wizard tools, But here is just following something 
-      //         PcdEmulation driver. 
-      //
-      if(parentToken.pcdType.ordinal() > Token.PCD_TYPE.FIXED_AT_BUILD.ordinal()) {
-        throw new EntityException(
-          String.format(
-            "%s:Platform PCD Type %d is not compatible with Module PCD Type %d\r\n",
-            parentToken.cName,
-            parentToken.pcdType.name(),
-            modulePcdType.name()
-            )
-          );
-      }
-
-      if(CommonDefinition.isLibraryComponent(componentType)) {
-        hAutogenStr += String.format(
-                         "extern const %s _gPcd_FixedAtBuild_%s;\r\n",
-                         Token.getAutogendatumTypeString(parentToken.datumType),
-                         parentToken.cName
-                         );
-        hAutogenStr += String.format(
-                         "#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
-                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                         parentToken.cName,
-                         parentToken.cName
-                         );
+      if(isBuildUsedLibrary) {
+        hAutogenStr += String.format("extern const %s _gPcd_FixedAtBuild_%s;\r\n",
+                                     Token.getAutogendatumTypeString(parentToken.datumType),
+                                     parentToken.cName);
+        hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
+                                     Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                     parentToken.cName,
+                                     parentToken.cName);
       } else {
-        hAutogenStr += String.format(
-                         "#define _PCD_VALUE_%s   %s\r\n", 
-                         parentToken.cName, 
-                         value.toString()
-                         );
-        hAutogenStr += String.format(
-                         "extern const %s _gPcd_FixedAtBuild_%s;\r\n",
-                         Token.getAutogendatumTypeString(parentToken.datumType),
-                         parentToken.cName
-                         );
-        cAutogenStr += String.format(
-                         "GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
-                         Token.getAutogendatumTypeString(parentToken.datumType),
-                         parentToken.cName,
-                         parentToken.cName
-                         );
-        hAutogenStr += String.format(
-                         "#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
-                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                         parentToken.cName,
-                         parentToken.cName
-                         );
+        hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                     parentToken.cName, 
+                                     datum.toString());
+        hAutogenStr += String.format("extern const %s _gPcd_FixedAtBuild_%s;\r\n",
+                                     Token.getAutogendatumTypeString(parentToken.datumType),
+                                     parentToken.cName);
+        cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                     Token.getAutogendatumTypeString(parentToken.datumType),
+                                     parentToken.cName,
+                                     parentToken.cName);
+        hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
+                                     Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                     parentToken.cName,
+                                     parentToken.cName);
       }
       break;
     case PATCHABLE_IN_MODULE:
-      //
-      // BUGBUG: The judegement of module PCD type and platform PCD type should not be 
-      //         done here, but in wizard tools, But here is just following something 
-      //         PcdEmulation driver. 
-      //
-      if(parentToken.pcdType.ordinal() > Token.PCD_TYPE.PATCHABLE_IN_MODULE.ordinal()) {
-        throw new EntityException(
-          String.format(
-            "%s:Platform PCD Type %d is not compatible with Module PCD Type %d\r\n",
-            parentToken.cName,
-            parentToken.pcdType.name(),
-            modulePcdType.name()
-            )
-          );
-      }
-
-      if(CommonDefinition.isLibraryComponent(componentType)) {
-        hAutogenStr += String.format(
-                         "extern %s _gPcd_BinaryPatch_%s;\r\n",
-                         Token.getAutogendatumTypeString(parentToken.datumType),
-                         parentToken.cName
-                         );
-        hAutogenStr += String.format(
-                         "#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
-                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                         parentToken.cName,
-                         parentToken.cName
-                         );
+      if(isBuildUsedLibrary) {
+        hAutogenStr += String.format("extern %s _gPcd_BinaryPatch_%s;\r\n",
+                                     Token.getAutogendatumTypeString(parentToken.datumType),
+                                     parentToken.cName);
+        hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
+                                     Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                     parentToken.cName,
+                                     parentToken.cName);
       } else {
-        hAutogenStr += String.format(
-                         "#define _PCD_VALUE_%s   %s\r\n", 
-                         parentToken.cName, 
-                         value
-                         );
-        hAutogenStr += String.format(
-                         "extern %s _gPcd_BinaryPatch_%s;\r\n",
-                         Token.getAutogendatumTypeString(parentToken.datumType),
-                         parentToken.cName
-                         );
-        cAutogenStr += String.format(
-                         "GLOBAL_REMOVE_IF_UNREFERENCED %s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;\r\n",
-                         Token.getAutogendatumTypeString(parentToken.datumType),
-                         parentToken.cName,
-                         parentToken.cName
-                         );
-        hAutogenStr += String.format(
-                         "#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
-                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                         parentToken.cName,
-                         parentToken.cName
-                         );
+        hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                     parentToken.cName, 
+                                     datum.toString());
+        hAutogenStr += String.format("extern %s _gPcd_BinaryPatch_%s;\r\n",
+                                     Token.getAutogendatumTypeString(parentToken.datumType),
+                                     parentToken.cName);
+        cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED %s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;\r\n",
+                                     Token.getAutogendatumTypeString(parentToken.datumType),
+                                     parentToken.cName,
+                                     parentToken.cName);
+        hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
+                                     Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                     parentToken.cName,
+                                     parentToken.cName);
       }
 
       break;
     case DYNAMIC:
-      //
-      // BUGBUG: The judegement of module PCD type and platform PCD type should not be 
-      //         done here, but in wizard tools, But here is just following something 
-      //         PcdEmulation driver. 
-      //
-      if(parentToken.pcdType.ordinal() > Token.PCD_TYPE.DYNAMIC.ordinal()) {
-        throw new EntityException(
-          String.format(
-            "%s:Platform PCD Type %d is not compatible with Module PCD Type %d\r\n",
-            parentToken.cName,
-            parentToken.pcdType.name(),
-            modulePcdType.name()
-            )
-          );
-      }
-
       switch(parentToken.pcdType) {
         case FEATURE_FLAG:
-          if(CommonDefinition.isLibraryComponent(componentType)) {
-            hAutogenStr += String.format(
-                             "extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
-                             parentToken.cName
-                             );
-            hAutogenStr += String.format(
-                             "#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
-                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                             parentToken.cName,
-                             parentToken.cName
-                             );
+          if(isBuildUsedLibrary) {
+            hAutogenStr += String.format("extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
+                                         parentToken.cName);
+            hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
+                                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                         parentToken.cName,
+                                         parentToken.cName);
           } else {
-            hAutogenStr += String.format(
-                             "#define _PCD_VALUE_%s   %s\r\n", 
-                             parentToken.cName, 
-                             value
-                             );
-            hAutogenStr += String.format(
-                             "extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
-                             parentToken.cName
-                             );
-            cAutogenStr += String.format(
-                             "const BOOLEAN _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
-                             parentToken.cName,
-                             parentToken.cName
-                             );
-            hAutogenStr += String.format(
-                             "#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
-                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                             parentToken.cName,
-                             parentToken.cName
-                             );
+            hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                         parentToken.cName, 
+                                         datum.toString());
+            hAutogenStr += String.format("extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
+                                         parentToken.cName);
+            cAutogenStr += String.format("const BOOLEAN _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                         parentToken.cName,
+                                         parentToken.cName);
+            hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
+                                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                         parentToken.cName,
+                                         parentToken.cName);
           }
           break;
         case FIXED_AT_BUILD:
-          if(CommonDefinition.isLibraryComponent(componentType)) {
-            hAutogenStr += String.format(
-                             "extern const %s _gPcd_FixedAtBuild_%s;\r\n",
-                             Token.getAutogendatumTypeString(parentToken.datumType),
-                             parentToken.cName
-                             );
-            hAutogenStr += String.format(
-                             "#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
-                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                             parentToken.cName,
-                             parentToken.cName
-                             );
+          if(isBuildUsedLibrary) {
+            hAutogenStr += String.format("extern const %s _gPcd_FixedAtBuild_%s;\r\n",
+                                         Token.getAutogendatumTypeString(parentToken.datumType),
+                                         parentToken.cName);
+            hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
+                                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                         parentToken.cName,
+                                         parentToken.cName);
 
           } else {
-            hAutogenStr += String.format(
-                             "#define _PCD_VALUE_%s   %s\r\n", 
-                             parentToken.cName, 
-                             value
-                             );
-            hAutogenStr += String.format(
-                             "extern const %s _gPcd_FixedAtBuild_%s\r\n",
-                             Token.getAutogendatumTypeString(parentToken.datumType),
-                             parentToken.cName
-                             );
-            cAutogenStr += String.format(
-                             "const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
-                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                             parentToken.cName,
-                             parentToken.cName
-                             );
-            hAutogenStr += String.format(
-                             "#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
-                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                             parentToken.cName,
-                             parentToken.cName
-                             );
+            hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                         parentToken.cName, 
+                                         datum.toString());
+            hAutogenStr += String.format("extern const %s _gPcd_FixedAtBuild_%s\r\n",
+                                         Token.getAutogendatumTypeString(parentToken.datumType),
+                                         parentToken.cName);
+            cAutogenStr += String.format("const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                         parentToken.cName,
+                                         parentToken.cName);
+            hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
+                                         Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                         parentToken.cName,
+                                         parentToken.cName);
           }
           break;
         case PATCHABLE_IN_MODULE:
-          hAutogenStr += String.format(
-                           "#define _PCD_VALUE_%s   %s\r\n", 
-                           parentToken.cName, 
-                           value
-                           );
-          hAutogenStr += String.format(
-                           "extern %s _gPcd_BinaryPatch_%s;\r\n",
-                           Token.getAutogendatumTypeString(parentToken.datumType),
-                           parentToken.cName,
-                           parentToken.cName
-                           );
-          cAutogenStr += String.format(
-                           "%s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;",
-                           Token.getAutogendatumTypeString(parentToken.datumType),
-                           parentToken.cName,
-                           parentToken.cName
-                           );
-          hAutogenStr += String.format(
-                           "#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
-                           Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                           parentToken.cName,
-                           parentToken.cName
-                           );
+          hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                       parentToken.cName, 
+                                       datum.toString());
+          hAutogenStr += String.format("extern %s _gPcd_BinaryPatch_%s;\r\n",
+                                       Token.getAutogendatumTypeString(parentToken.datumType),
+                                       parentToken.cName,
+                                       parentToken.cName);
+          cAutogenStr += String.format("%s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;",
+                                       Token.getAutogendatumTypeString(parentToken.datumType),
+                                       parentToken.cName,
+                                       parentToken.cName);
+          hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
+                                       Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                       parentToken.cName,
+                                       parentToken.cName);
           break;
-			case DYNAMIC:
-					hAutogenStr += "\r\n";
-          hAutogenStr += String.format(
-                           "#define _PCD_MODE_%s_%s  LibPcdGet%s(_PCD_TOKEN_%s)\r\n",
-                           Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                           parentToken.cName,
-                           Token.getAutogenLibrarydatumTypeString(parentToken.datumType),
-                           parentToken.cName
-                           );
+      case DYNAMIC:
+          hAutogenStr += String.format("#define _PCD_MODE_%s_%s  LibPcdGet%s(_PCD_TOKEN_%s)\r\n",
+                                       Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                       parentToken.cName,
+                                       Token.getAutogenLibrarydatumTypeString(parentToken.datumType),
+                                       parentToken.cName);
           break;
-        default:
-         ActionMessage.log(
-           this, 
-           "The PCD_TYPE setted by platform is unknown"
-           );
+      default:
+          throw new EntityException ("The PCD type is unknown");
       }
       break;
     case DYNAMIC_EX:

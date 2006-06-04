@@ -18,8 +18,11 @@ package org.tianocore.build.pcd.entity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.tianocore.build.pcd.action.ActionMessage;
+import org.tianocore.build.pcd.exception.EntityException;
 
 /** This class is to descript a PCD token object. The information of a token mainly 
     comes from MSA, SPD and setting produced by platform developer. 
@@ -67,28 +70,9 @@ public class Token {
     public int              tokenNumber;
 
     ///
-    /// The token space name assigned by platform. For Non-DynamicEx driver this value is same.
-    /// assignedtokenSpaceName is defined in FPD.
-    ///
-    public UUID             assignedtokenSpaceName;
-
-    ///
-    /// The token number assigned by platform. The number indiect the offset of this token in platform
-    /// token space.
-    /// AssgiendtokenNumber is defined in FPD.
-    ///
-    public int              assignedtokenNumber;
-
-    ///
     /// pcdType is the PCD item type defined by platform developer.
     ///
     public PCD_TYPE         pcdType;
-
-    ///
-    /// PCDtype is set by platform developer. It is final PCD type of this token.
-    /// SupportedPcdType is defined in SPD.
-    ///
-    public PCD_TYPE[]       supportedpcdType;
 
     ///
     /// datumSize is to descript the fix size or max size for this token. 
@@ -101,13 +85,6 @@ public class Token {
     /// datumType is defined in SPD.
     ///
     public DATUM_TYPE       datumType;
-
-    ///
-    /// Isplatform is to descript whether this token is defined in platform level.
-    /// If token is belong to platform level. The value can be different for every
-    /// module. All are determined by platform developer.
-    ///
-    public boolean          isPlatform;
 
     ///
     /// hiiEnabled is to indicate whether the token support Hii functionality.
@@ -141,11 +118,6 @@ public class Token {
     public boolean          skuEnabled;
 
     ///
-    /// skuDataArrayEnabled is to indicate wheter use the skuData array or default value.
-    ///
-    public boolean          skuDataArrayEnabled;
-
-    ///
     /// skuData contains all value for SkuNumber of token.
     /// skuData is defined in FPD.
     ///
@@ -170,12 +142,6 @@ public class Token {
     public Object           datum;
 
     ///
-    /// Default value of this token.
-    /// This default value is defined in SPD level.
-    ///
-    public Object           defaultValue;
-
-    ///
     /// BUGBUG: fix comment
     /// vpdEnabled is defined in FPD.
     ///
@@ -188,54 +154,32 @@ public class Token {
     public long             vpdOffset;
 
     ///
-    /// producers array record all module private information who produce this PCD token.
-    ///
-    public List<UsageInstance>  producers;
-
-    ///
     /// consumers array record all module private information who consume this PCD token.
     ///
-    public List<UsageInstance>  consumers;
+    public Map<String, UsageInstance>  consumers;
 
-    /**
-      Constructure function.
-     
-      Initialize the value of token.
-     
-      @param cName                   The cName of this token
-      @param tokenSpaceName          The tokenSpaceName of this token, it is a GUID.
-      @param assignedtokenSpaceName  The assignedtokenSpaceName of this token, it is a GUID.
-      
-    **/ 
-    public Token(String cName, UUID tokenSpaceName, UUID assignedtokenSpaceName) {
+    public Token(String cName, UUID tokenSpaceName) {
         UUID    nullUUID = new UUID(0, 0);
 
         this.cName                  = cName;
-        this.tokenSpaceName         =(tokenSpaceName == null) ? nullUUID : tokenSpaceName;
-        this.assignedtokenSpaceName =(assignedtokenSpaceName == null) ? nullUUID : assignedtokenSpaceName;
+        this.tokenSpaceName         = (tokenSpaceName == null) ? nullUUID : tokenSpaceName;
         this.tokenNumber            = 0;
-        this.assignedtokenNumber    = 0;
         this.pcdType                = PCD_TYPE.UNKNOWN;
-        this.supportedpcdType       = null;
-        this.isPlatform             = false;
         this.datumType              = DATUM_TYPE.UNKNOWN;
         this.datumSize              = -1;
-        this.defaultValue           = null;
         this.datum                  = null;
         this.hiiEnabled             = false;
         this.variableGuid           = null;
         this.variableName           = "";
         this.variableOffset         = -1;
         this.skuEnabled             = false;
-        this.skuDataArrayEnabled    = false;
         this.skuId                  = -1;
         this.maxSkuCount            = -1;
         this.skuData                = new ArrayList<SkuInstance>();
         this.vpdEnabled             = false;
         this.vpdOffset              = -1;
 
-        this.producers              = new ArrayList<UsageInstance>();
-        this.consumers              = new ArrayList<UsageInstance>();
+        this.consumers              = new HashMap<String, UsageInstance>();
     }
 
     /**
@@ -247,19 +191,23 @@ public class Token {
       
       @return  primary key for this token in token database.
     **/
-    public static String getPrimaryKeyString(String cName, UUID tokenSpaceName, 
-                                             UUID platformtokenSpaceName) {
+    public static String getPrimaryKeyString(String cName, UUID tokenSpaceName) {
         UUID  nullUUID = new UUID(0, 0);
 
-        if (platformtokenSpaceName == nullUUID) {
-            return cName + "_" + tokenSpaceName.toString().replace('-', '_');
+        if (tokenSpaceName == null) {
+            return cName + "_" + nullUUID.toString().replace('-', '_');
         } else {
-            return cName + "_" + platformtokenSpaceName.toString().replace('-', '_');
+            return cName + "_" + tokenSpaceName.toString().replace('-', '_');
         }
     }
 
+    /**
+       Get the token primary key in token database.
+       
+       @return String
+     */
     public String getPrimaryKeyString () {
-        return cName + "_" + tokenSpaceName.toString().replace('-', '_');
+        return Token.getPrimaryKeyString(cName, tokenSpaceName);
     }
 
     /**
@@ -302,99 +250,52 @@ public class Token {
       @retval TRUE  - Success to add usage instance.
       @retval FALSE - Fail to add usage instance
     **/
-    public boolean addUsageInstance(UsageInstance usageInstance) {
-        if (usageInstance.usage == PCD_USAGE.UNKNOWN) {
-            return false;
+    public boolean addUsageInstance(UsageInstance usageInstance) 
+        throws EntityException {
+        String exceptionStr;
+
+        if (isUsageInstanceExist(usageInstance.moduleName,
+                                 usageInstance.moduleGUID,
+                                 usageInstance.packageName,
+                                 usageInstance.packageGUID,
+                                 usageInstance.arch,
+                                 usageInstance.version)) {
+            exceptionStr = String.format("PCD %s for module %s has already exist in database, Please check all PCD build entries "+
+                                         "in modules PcdPeim in <ModuleSA> to make sure no duplicated definitions!",
+                                         usageInstance.parentToken.cName,
+                                         usageInstance.moduleName);
+            throw new EntityException(exceptionStr);
         }
 
-        if ((usageInstance.usage == PCD_USAGE.ALWAYS_PRODUCED) ||
-            (usageInstance.usage == PCD_USAGE.SOMETIMES_PRODUCED)) {
-            producers.add(usageInstance);
-        } else {
-            consumers.add(usageInstance);
-        }
+        consumers.put(usageInstance.getPrimaryKey(), usageInstance);
         return true;
     }
 
     /**
-      Judge whether exist an usage instance for this token
-      
-      @param moduleName   Use xmlFilePath as keyword to search the usage instance
-      
-      @retval PCD_USAGE - if UsageInstance exists.
-      @retval UNKNOWN   - if UsageInstance does not exist, return UNKONW.
-    **/
-    public PCD_USAGE isUsageInstanceExist(String moduleName) {
-        int           index;
-        UsageInstance usageInstance;
-
-        if (moduleName == null) {
-            ActionMessage.warning(this, "Error parameter for isUsageInstanceExist() function!");
-            return PCD_USAGE.UNKNOWN;
-        }
-
-        if (moduleName.length() == 0) {
-            return PCD_USAGE.UNKNOWN;
-        }
-
-        //
-        // Searching the usage instance in module's producer and consumer according to 
-        // module's name.
-        //
-        for (index = 0; index < producers.size(); index ++) {
-            usageInstance =(UsageInstance)producers.get(index);
-            if (usageInstance.moduleName.equalsIgnoreCase(moduleName)) {
-                return usageInstance.usage;
-            }
-        }
-
-        for (index = 0; index < consumers.size(); index ++) {
-            usageInstance =(UsageInstance)consumers.get(index);
-            if (usageInstance.moduleName.equalsIgnoreCase(moduleName)) {
-                return usageInstance.usage;
-            }
-        }
-        return PCD_USAGE.UNKNOWN;
-    }
-
-    /**
-      Get usage instance according to a MSA file name
-      
-      @param moduleName   The file path string of MSA file.
-
-      @return usage instance object.
-    **/
-    public UsageInstance getUsageInstance(String moduleName) {
-        int           usageIndex;
-        UsageInstance usageInstance;
-
-        if (moduleName == null) {
-            ActionMessage.warning(this, "Error parameter for isUsageInstanceExist() function!");
-            return null;
-        }
-
-        if (moduleName.length() == 0) {
-            return null;
-        }
-
-        if (producers.size() != 0) {
-            for (usageIndex = 0; usageIndex < producers.size(); usageIndex ++) {
-                usageInstance =(UsageInstance)producers.get(usageIndex);
-                if (usageInstance.moduleName.equalsIgnoreCase(moduleName)) {
-                    return usageInstance;
-                }
-            }
-        }
-
-        if (consumers.size() != 0) {
-            for (usageIndex = 0; usageIndex < consumers.size(); usageIndex ++) {
-                usageInstance =(UsageInstance)consumers.get(usageIndex);
-                if (usageInstance.moduleName.equalsIgnoreCase(moduleName)) {
-                    return usageInstance;
-                }
-            }
-        }
-        return null;
+       Judge whether exist an usage instance for this token
+       
+       @param moduleName    the name of module
+       @param moduleGuid    the GUID name of modules
+       @param packageName   the name of package contains this module
+       @param packageGuid   the GUID name of package contains this module
+       @param arch          the architecture string
+       @param version       the version string
+       
+       @return boolean      whether exist an usage instance for this token.
+     */
+    public boolean isUsageInstanceExist(String moduleName,
+                                        UUID   moduleGuid,
+                                        String packageName,
+                                        UUID   packageGuid,
+                                        String arch,
+                                        String version) {
+        String keyStr = UsageInstance.getPrimaryKey(moduleName, 
+                                                    moduleGuid, 
+                                                    packageName, 
+                                                    packageGuid, 
+                                                    arch, 
+                                                    version);
+        return (consumers.get(keyStr) != null);
     }
 
     /**

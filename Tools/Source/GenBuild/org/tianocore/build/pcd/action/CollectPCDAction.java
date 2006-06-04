@@ -31,11 +31,16 @@ import java.util.UUID;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.tianocore.FrameworkModulesDocument;
 import org.tianocore.FrameworkPlatformDescriptionDocument;
+import org.tianocore.FrameworkPlatformDescriptionDocument.FrameworkPlatformDescription;
 import org.tianocore.ModuleSADocument;
+import org.tianocore.ModuleSADocument.ModuleSA;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.PcdBuildDeclarationsDocument.PcdBuildDeclarations.PcdBuildData;
+import org.tianocore.PcdBuildDeclarationsDocument.PcdBuildDeclarations.PcdBuildData.SkuData;
 import org.tianocore.PcdDefinitionsDocument.PcdDefinitions;
+import org.tianocore.PcdDynamicBuildDeclarationsDocument.PcdDynamicBuildDeclarations;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
@@ -706,7 +711,7 @@ class PcdDatabase {
 
     private void getTwoGroupsOfTokens (ArrayList<Token> alTokens, List<Token> initTokens, List<Token> uninitTokens) {
         for (int i = 0; i < alTokens.size(); i++) {
-            Token t = alTokens.get(i);
+            Token t = (Token)alTokens.get(i);
             if (t.hasDefaultValue()) {
                 initTokens.add(t);
             } else {
@@ -970,7 +975,7 @@ class PcdDatabase {
 
             sizeTable.add(token);
             localTokenNumberTable.add(token);
-            token.assignedtokenNumber = assignedTokenNumber++;
+            token.tokenNumber = assignedTokenNumber++;
 
         }
 
@@ -1109,7 +1114,6 @@ class PcdDatabase {
                                  "Conf" + File.separator +
                                  "Pcd" + File.separator +
                                  "PcdDatabaseCommonDefinitions.sample");
-            System.out.println(GlobalData.getWorkspacePath());
             FileReader reader = new FileReader(file);
             BufferedReader  in = new BufferedReader(reader);
             String str;
@@ -1171,6 +1175,16 @@ class PcdDatabase {
 
 }
 
+class ModuleInfo {
+    public ModuleSADocument.ModuleSA module;
+    public UsageInstance.MODULE_TYPE type;
+
+    public ModuleInfo (ModuleSADocument.ModuleSA module, UsageInstance.MODULE_TYPE type) {
+        this.module = module;
+        this.type   = type;
+    }
+}
+
 /** This action class is to collect PCD information from MSA, SPD, FPD xml file.
     This class will be used for wizard and build tools, So it can *not* inherit
     from buildAction or UIAction.
@@ -1187,6 +1201,9 @@ public class CollectPCDAction {
 
     /// Message level for CollectPCDAction.
     private int                   originalMessageLevel;
+
+    /// Cache the fpd docment instance for private usage.
+    private FrameworkPlatformDescriptionDocument fpdDocInstance;
 
     /**
       Set WorkspacePath parameter for this action class.
@@ -1243,103 +1260,34 @@ public class CollectPCDAction {
       Core execution function for this action class.
      
       This function work flows will be:
-      1) Get all token's platform information from FPD, and create token object into memory database.
-      2) Get all token's module information from MSA, and create usage instance for every module's PCD entry.
-      3) Get all token's inherited information from MSA's library, and create usage instance 
-         for module who consume this library and create usage instance for library for building.
-      4) Collect token's package information from SPD, update these information for token in memory
-         database.
-      5) Generate 3 strings for a) All modules using Dynamic(Ex) PCD entry. (Token Number)
-                                b) PEI PCD Database (C Structure) for PCD Service PEIM
-                                c) DXE PCD Database (C structure) for PCD Service DXE
+      1) Collect and prepocess PCD information from FPD file, all PCD
+      information will be stored into memory database.
+      2) Generate 3 strings for
+        a) All modules using Dynamic(Ex) PCD entry.(Token Number)
+        b) PEI PCDDatabase (C Structure) for PCD Service PEIM.
+        c) DXE PCD Database (C structure) for PCD Service DXE.
                                 
       
       @throws  EntityException Exception indicate failed to execute this action.
       
     **/
     private void execute() throws EntityException {
-        FrameworkPlatformDescriptionDocument fpdDoc               = null;
-        Object[][]                           modulePCDArray       = null;
-        Map<String, XmlObject>               docMap               = null;
-        ModuleSADocument.ModuleSA[]          moduleSAs            = null;
-        UsageInstance                        usageInstance        = null;
-        String                               packageName          = null;
-        String                               packageFullPath      = null;
-        int                                  index                = 0;
-        int                                  libraryIndex         = 0;
-        int                                  pcdArrayIndex        = 0;
-        List<String>                         listLibraryInstance  = null;
-        String                               componentTypeStr     = null;
+        //
+        // Get memoryDatabaseManager instance from GlobalData.
+        // The memoryDatabaseManager should be initialized for whatever build
+        // tools or wizard tools
+        //
+        if((dbManager = GlobalData.getPCDMemoryDBManager()) == null) {
+            throw new EntityException("The instance of PCD memory database manager is null");
+        }
 
         //
         // Collect all PCD information defined in FPD file.
         // Evenry token defind in FPD will be created as an token into 
         // memory database.
         //
-        fpdDoc = createTokenInDBFromFPD();
+        createTokenInDBFromFPD();
 
-        //
-        // Searching MSA and SPD document. 
-        // The information of MSA will be used to create usage instance into database.
-        // The information of SPD will be used to update the token information in database.
-        //
-
-        HashMap<String, XmlObject> map = new HashMap<String, XmlObject>();
-        map.put("FrameworkPlatformDescription", fpdDoc);
-        SurfaceAreaQuery.setDoc(map);    
-
-        moduleSAs = SurfaceAreaQuery.getFpdModules();
-        for(index = 0; index < moduleSAs.length; index ++) {
-            //
-            // Get module document and use SurfaceAreaQuery to get PCD information
-            //
-            docMap = GlobalData.getDoc(moduleSAs[index].getModuleName());
-            SurfaceAreaQuery.setDoc(docMap);
-            modulePCDArray    = SurfaceAreaQuery.getModulePCDTokenArray();
-            componentTypeStr  = SurfaceAreaQuery.getComponentType();
-            packageName       = 
-                GlobalData.getPackageNameForModule(moduleSAs[index].getModuleName());
-            packageFullPath   = this.workspacePath + File.separator    +
-                                GlobalData.getPackagePath(packageName) +
-                                packageName + ".spd";
-
-            if(modulePCDArray != null) {
-                //
-                // If current MSA contains <PCDs> information, then create usage
-                // instance for PCD information from MSA
-                //
-                for(pcdArrayIndex = 0; pcdArrayIndex < modulePCDArray.length; 
-                     pcdArrayIndex ++) {
-                    usageInstance = 
-                        createUsageInstanceFromMSA(moduleSAs[index].getModuleName(),
-                                                   modulePCDArray[pcdArrayIndex]);
-
-                    if(usageInstance == null) {
-                        continue;
-                    }
-                    //
-                    // Get remaining PCD information from the package which this module belongs to
-                    //
-                    updateTokenBySPD(usageInstance, packageFullPath);
-                }
-            }
-
-            //
-            // Get inherit PCD information which inherit from library instance of this module.
-            //
-            listLibraryInstance = 
-                SurfaceAreaQuery.getLibraryInstance(moduleSAs[index].getArch().toString(),
-                                                    CommonDefinition.AlwaysConsumed);
-            if(listLibraryInstance != null) {
-                for(libraryIndex = 0; libraryIndex < listLibraryInstance.size(); 
-                     libraryIndex ++) {
-                    inheritPCDFromLibraryInstance(listLibraryInstance.get(libraryIndex),
-                                                  moduleSAs[index].getModuleName(),
-                                                  packageName,
-                                                  componentTypeStr);
-                }
-            }
-        }
         
         //
         // Call Private function genPcdDatabaseSourceCode (void); ComponentTypeBsDriver
@@ -1356,9 +1304,8 @@ public class CollectPCDAction {
       @throws EntityException  If the token does *not* exist in memory database.
 
     **/
-
-    private void genPcdDatabaseSourceCode     ()
-      throws EntityException {
+    private void genPcdDatabaseSourceCode()
+        throws EntityException {
         String PcdCommonHeaderString = PcdDatabase.getPcdDatabaseCommonDefinitions ();
 
         ArrayList<Token> alPei = new ArrayList<Token> ();
@@ -1382,424 +1329,488 @@ public class CollectPCDAction {
     }
 
     /**
-      This function will collect inherit PCD information from library for a module.
-     
-      This function will create two usage instance for inherited PCD token, one is 
-      for module and another is for library.
-      For module, if it inherited a PCD token from library, this PCD token's value 
-      should be instanced in module level, and belongs to module.
-      For library, it also need a usage instance for build.
+      Get component array from FPD.
       
-      @param libraryName         The name of library instance.
-      @param moduleName          The name of module.
-      @param packageName         The name of package while module belongs to.
-      @param parentcomponentType The component type of module.
+      This function maybe provided by some Global class.
       
-      @throws EntityException  If the token does *not* exist in memory database.
+      @return List<ModuleInfo> the component array.
       
-    **/
-    private void inheritPCDFromLibraryInstance(String libraryName,
-                                               String moduleName,
-                                               String packageName,
-                                               String parentcomponentType) 
+     */
+    private List<ModuleInfo> getComponentsFromFPD() 
         throws EntityException {
-        Map<String, XmlObject>  docMap            = null;
-        String                  primaryKeyString  = null;
-        Object[][]              libPcdDataArray   = null;
-        UUID                    nullUUID          = new UUID(0,0);
-        UUID                    platformUUID      = nullUUID;
-        UUID                    tokenSpaceGuid    = null;
-        int                     tokenIndex        = 0;
-        Token                   token             = null;
-        Token.PCD_TYPE          pcdType           = Token.PCD_TYPE.UNKNOWN;
-        UsageInstance           usageInstance     = null;
-        String                  packageFullPath   = null;
+        HashMap<String, XmlObject>  map         = new HashMap<String, XmlObject>();
+        List<ModuleInfo>            allModules  = new ArrayList<ModuleInfo>();
+        ModuleInfo                  current     = null;
+        int                         index       = 0;
+        org.tianocore.Components    components  = null;
+        FrameworkModulesDocument.FrameworkModules fModules = null;
+        java.util.List<ModuleSADocument.ModuleSA> modules  = null;
+        
 
-        //
-        // Query PCD information from library's document.
-        //
-        docMap          = GlobalData.getDoc(libraryName);
-        SurfaceAreaQuery.setDoc(docMap);
-        libPcdDataArray = SurfaceAreaQuery.getModulePCDTokenArray();
-
-        if(libPcdDataArray == null) {
-            return;
-        }
-
-        for(tokenIndex = 0; tokenIndex < libPcdDataArray.length; tokenIndex ++) {
-            tokenSpaceGuid =((UUID)libPcdDataArray[tokenIndex][2] == null) ? 
-                             nullUUID :(UUID)libPcdDataArray[tokenIndex][2];
-
-            //
-            // Get token from memory database. The token must be created from FPD already.
-            //
-            primaryKeyString = Token.getPrimaryKeyString((String)libPcdDataArray[tokenIndex][0],
-                                                         tokenSpaceGuid,
-                                                         platformUUID
-                                                         );
-
-            if(dbManager.isTokenInDatabase(primaryKeyString)) {
-                token = dbManager.getTokenByKey(primaryKeyString);
-            } else {
-                throw new EntityException("The PCD token " + primaryKeyString + 
-                                          " defined in module " + moduleName + 
-                                          " does not exist in FPD file!");
-            }      
-
-            //
-            // Create usage instance for module.
-            //
-            pcdType = Token.getpcdTypeFromString((String)libPcdDataArray[tokenIndex][1]);
-            usageInstance = new UsageInstance(token,
-                                              Token.PCD_USAGE.ALWAYS_CONSUMED,
-                                              pcdType,
-                                              CommonDefinition.getComponentType(parentcomponentType),
-                                              libPcdDataArray[tokenIndex][3],
-                                              null,
-                                             (String) libPcdDataArray[tokenIndex][5],
-                                              "",
-                                              moduleName,
-                                              packageName,
-                                              true);
-            if(Token.PCD_USAGE.UNKNOWN == token.isUsageInstanceExist(moduleName)) {
-                token.addUsageInstance(usageInstance);
-
-                packageFullPath = this.workspacePath + File.separator    +
-                                  GlobalData.getPackagePath(packageName) +
-                                  packageName + ".spd";
-                updateTokenBySPD(usageInstance, packageFullPath);
+        if (fpdDocInstance == null) {
+            try {
+                fpdDocInstance = (FrameworkPlatformDescriptionDocument)XmlObject.Factory.parse(new File(fpdFilePath));
+            } catch(IOException ioE) {
+                throw new EntityException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
+            } catch(XmlException xmlE) {
+                throw new EntityException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
             }
 
-            //
-            // We need create second usage instance for inherited case, which
-            // add library as an usage instance, because when build a module, and 
-            // if module inherited from base library, then build process will build
-            // library at first. 
-            //
-            if(Token.PCD_USAGE.UNKNOWN == token.isUsageInstanceExist(libraryName)) {
-                packageName   = GlobalData.getPackageNameForModule(libraryName);
-                usageInstance = new UsageInstance(token,
-                                                  Token.PCD_USAGE.ALWAYS_CONSUMED,
-                                                  pcdType,
-                                                  CommonDefinition.ComponentTypeLibrary,
-                                                  libPcdDataArray[tokenIndex][3],
-                                                  null,
-                                                 (String)libPcdDataArray[tokenIndex][5],
-                                                  "",
-                                                  libraryName,
-                                                  packageName,
-                                                  false);
-                token.addUsageInstance(usageInstance);
-            }
         }
-    }
-
-    /**
-      Create usage instance for PCD token defined in MSA document
-
-      A PCD token maybe used by many modules, and every module is one of usage
-      instance of this token. For ALWAY_CONSUMED, SOMETIMES_CONSUMED, it is 
-      consumer type usage instance of this token, and for ALWAYS_PRODUCED, 
-      SOMETIMES_PRODUCED, it is produce type usage instance.
-     
-      @param moduleName      The name of module 
-      @param tokenInfoInMsa  The PCD token information array retrieved from MSA.
-      
-      @return UsageInstance  The usage instance created in memroy database.
-      
-      @throws EntityException  If token did not exist in database yet.
-      
-    **/
-    private UsageInstance createUsageInstanceFromMSA(String   moduleName,
-                                                     Object[] tokenInfoInMsa) 
-        throws EntityException {
-        String          packageName         = null;
-        UsageInstance   usageInstance       = null;
-        UUID            tokenSpaceGuid      = null;
-        UUID            nullUUID            = new UUID(0,0);
-        String          primaryKeyString    = null;
-        UUID            platformTokenSpace  = nullUUID;
-        Token           token               = null;
-        Token.PCD_TYPE  pcdType             = Token.PCD_TYPE.UNKNOWN;
-        Token.PCD_USAGE pcdUsage            = Token.PCD_USAGE.UNKNOWN;
-
-        tokenSpaceGuid =((UUID)tokenInfoInMsa[2] == null) ? nullUUID :(UUID)tokenInfoInMsa[2];
-
-        primaryKeyString = Token.getPrimaryKeyString((String)tokenInfoInMsa[0],
-                                                     tokenSpaceGuid,
-                                                     platformTokenSpace);
 
         //
-        // Get token object from memory database firstly.
-        //
-        if(dbManager.isTokenInDatabase(primaryKeyString)) {
-            token = dbManager.getTokenByKey(primaryKeyString);
-        } else {
-            throw new EntityException("The PCD token " + primaryKeyString + " defined in module " + 
-                                      moduleName + " does not exist in FPD file!" );
-        }
-        pcdType     = Token.getpcdTypeFromString((String)tokenInfoInMsa[1]);
-        pcdUsage    = Token.getUsageFromString((String)tokenInfoInMsa[4]);
-
-        packageName = GlobalData.getPackageNameForModule(moduleName);
-
-        if(Token.PCD_USAGE.UNKNOWN != token.isUsageInstanceExist(moduleName)) {
-            //
-            // BUGBUG: It is legal that same base name exist in one FPD file. In furture
-            //         we should use "Guid, Version, Package" and "Arch" to differ a module.
-            //         So currently, warning should be disabled.
-            //
-            //ActionMessage.warning(this,
-            //                      "In module " + moduleName + " exist more than one PCD token " + token.cName
-            //                      );
+        // Check whether FPD contians <FramworkModules>
+        // 
+        fModules = fpdDocInstance.getFrameworkPlatformDescription().getFrameworkModules();
+        if (fModules == null) {
             return null;
         }
 
         //
-        // BUGBUG: following code could be enabled at current schema. Because 
-        //         current schema does not provide usage information.
+        // BUGBUG: The following is work around code, the final component type should be get from
+        // GlobalData class.
         // 
-        // For FEATRURE_FLAG, FIXED_AT_BUILD, PATCH_IN_MODULE type PCD token, his 
-        // usage is always ALWAYS_CONSUMED
-        //
-        //if((pcdType != Token.PCD_TYPE.DYNAMIC) &&
-        //   (pcdType != Token.PCD_TYPE.DYNAMIC_EX)) {
-        pcdUsage = Token.PCD_USAGE.ALWAYS_CONSUMED;
-        //}
-
-        usageInstance = new UsageInstance(token,
-                                          pcdUsage,
-                                          pcdType,
-                                          CommonDefinition.getComponentType(SurfaceAreaQuery.getComponentType()),
-                                          tokenInfoInMsa[3],
-                                          null,
-                                         (String) tokenInfoInMsa[5],
-                                          "",
-                                          moduleName,
-                                          packageName,
-                                          false);
-
-        //
-        // Use default value defined in MSA to update datum of token,
-        // if datum of token does not defined in FPD file.
-        //
-        if((token.datum == null) &&(tokenInfoInMsa[3] != null)) {
-            token.datum = tokenInfoInMsa[3];
+        components = fModules.getSEC();
+        if (components != null) {
+            modules = components.getModuleSAList();
+            for (index = 0; index < modules.size(); index ++) {
+                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.SEC));
+            }
         }
 
-        token.addUsageInstance(usageInstance);
+        components = fModules.getPEICORE();
+        if (components != null) {
+            modules = components.getModuleSAList();
+            for (index = 0; index < modules.size(); index ++) {
+                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.PEI_CORE));
+            }
+        }
 
-        return usageInstance;
+        components = fModules.getPEIM();
+        if (components != null) {
+            modules = components.getModuleSAList();
+            for (index = 0; index < modules.size(); index ++) {
+                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.PEIM));
+            }
+        }
+
+        components = fModules.getDXECORE();
+        if (components != null) {
+            modules = components.getModuleSAList();
+            for (index = 0; index < modules.size(); index ++) {
+                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.DXE_CORE));
+            }
+        }
+
+        components = fModules.getDXEDRIVERS();
+        if (components != null) {
+            modules = components.getModuleSAList();
+            for (index = 0; index < modules.size(); index ++) {
+                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.DXE_DRIVERS));
+            }
+        }
+
+        components = fModules.getOTHERCOMPONENTS();
+        if (components != null) {
+            modules = components.getModuleSAList();
+            for (index = 0; index < modules.size(); index ++) {
+                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.OTHER_COMPONENTS));
+            }
+        }
+        
+        return allModules;
     }
 
     /**
       Create token instance object into memory database, the token information
       comes for FPD file. Normally, FPD file will contain all token platform 
       informations.
-     
-      This fucntion should be executed at firsly before others collection work
-      such as searching token information from MSA, SPD.
       
       @return FrameworkPlatformDescriptionDocument   The FPD document instance for furture usage.
       
       @throws EntityException                        Failed to parse FPD xml file.
       
     **/
-    private FrameworkPlatformDescriptionDocument createTokenInDBFromFPD() 
+    private void createTokenInDBFromFPD() 
         throws EntityException {
-        XmlObject                            doc               = null;
-        FrameworkPlatformDescriptionDocument fpdDoc            = null;
-        int                                  index             = 0;
-        List<PcdBuildData>                   pcdBuildDataArray = new ArrayList<PcdBuildData>();
-        PcdBuildData                         pcdBuildData      = null;
-        Token                                token             = null;
-        UUID                                 nullUUID          = new UUID(0,0);
-        UUID                                 platformTokenSpace= nullUUID;
-        List                                 skuDataArray      = new ArrayList();
-        SkuInstance                          skuInstance       = null;
-        int                                  skuIndex          = 0;
+        int                                 index             = 0;
+        int                                 index2            = 0;
+        int                                 pcdIndex          = 0;
+        List<PcdBuildData>                  pcdBuildDataArray = new ArrayList<PcdBuildData>();
+        PcdBuildData                        pcdBuildData      = null;
+        Token                               token             = null;
+        UUID                                nullUUID          = new UUID(0,0);
+        UUID                                platformTokenSpace= nullUUID;
+        SkuInstance                         skuInstance       = null;
+        int                                 skuIndex          = 0;
+        List<ModuleInfo>                    modules           = null;
+        String                              primaryKey        = null;
+        PcdBuildData.SkuData[]              skuDataArray      = null;
+        String                              exceptionString   = null;
+        UsageInstance                       usageInstance     = null;
+        String                              primaryKey1       = null;
+        String                              primaryKey2       = null;
+        boolean                             isDuplicate       = false;
+        java.util.List<java.lang.String>    tokenGuidStringArray = null;
 
         //
-        // Get all tokens from FPD file and create token into database.
+        // Get all <ModuleSA> from FPD file.
         // 
+        modules = getComponentsFromFPD();
 
-        try {
-            doc = XmlObject.Factory.parse(new File(fpdFilePath));
-        } catch(IOException ioE) {
-            throw new EntityException("Can't find the FPD xml fle:" + fpdFilePath);
-        } catch(XmlException xmlE) {
-            throw new EntityException("Can't parse the FPD xml fle:" + fpdFilePath);
+        if (modules == null) {
+            throw new EntityException("No modules in FPD file, Please check whether there are elements in <FrameworkModules> in FPD file!");
         }
 
         //
-        // Get memoryDatabaseManager instance from GlobalData.
-        //
-        if((dbManager = GlobalData.getPCDMemoryDBManager()) == null) {
-            throw new EntityException("The instance of PCD memory database manager is null");
-        }
-
-        dbManager = new MemoryDatabaseManager();
-
-        if(!(doc instanceof FrameworkPlatformDescriptionDocument)) {
-            throw new EntityException("File " + fpdFilePath + 
-                                       " is not a FrameworkPlatformDescriptionDocument");
-        }
-
-        fpdDoc =(FrameworkPlatformDescriptionDocument)doc;
-
-        //
-        // Add all tokens in FPD into Memory Database.
-        //
-        pcdBuildDataArray = 
-            fpdDoc.getFrameworkPlatformDescription().getPcdBuildDeclarations().getPcdBuildDataList();
-        for(index = 0; 
-             index < fpdDoc.getFrameworkPlatformDescription().getPcdBuildDeclarations().sizeOfPcdBuildDataArray(); 
-             index ++) {
-            pcdBuildData = pcdBuildDataArray.get(index);
-            token        = new Token(pcdBuildData.getCName(), new UUID(0, 0), new UUID(0, 0));
-            //
-            // BUGBUG: in FPD, <defaultValue> should be defined as <Value>
-            //
-            token.datum        = pcdBuildData.getDefaultValue();
-            token.tokenNumber  = Integer.decode(pcdBuildData.getToken().getStringValue());
-            token.hiiEnabled   = pcdBuildData.getHiiEnable();
-            token.variableGuid = Token.getGUIDFromSchemaObject(pcdBuildData.getVariableGuid());
-            token.variableName = pcdBuildData.getVariableName();
-            token.variableOffset = Integer.decode(pcdBuildData.getDataOffset());
-            token.skuEnabled   = pcdBuildData.getSkuEnable();
-            token.maxSkuCount  = Integer.decode(pcdBuildData.getMaxSku());
-            token.skuId        = Integer.decode(pcdBuildData.getSkuId());
-            token.skuDataArrayEnabled  = pcdBuildData.getSkuDataArrayEnable();
-            token.assignedtokenNumber  = Integer.decode(pcdBuildData.getToken().getStringValue());
-            skuDataArray               = pcdBuildData.getSkuDataArray1();
-            token.datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
-            token.datumSize    = pcdBuildData.getDatumSize();
-
-            if(skuDataArray != null) {
-                for(skuIndex = 0; skuIndex < skuDataArray.size(); skuIndex ++) {
-                    //
-                    // BUGBUG: Now in current schema, The value is defined as String type, 
-                    // it is not correct, the type should be same as the datumType
-                    //
-                    skuInstance = new SkuInstance(((PcdBuildData.SkuData)skuDataArray.get(skuIndex)).getId(),
-                                                  ((PcdBuildData.SkuData)skuDataArray.get(skuIndex)).getValue());
-                    token.skuData.add(skuInstance);
+        // Loop all modules to process <PcdBuildDeclarations> for each module.
+        // 
+        for (index = 0; index < modules.size(); index ++) {
+            isDuplicate =  false;
+            for (index2 = 0; index2 < index; index2 ++) {
+                //
+                // BUGBUG: For transition schema, we can *not* get module's version from 
+                // <ModuleSAs>, It is work around code.
+                // 
+                primaryKey1 = UsageInstance.getPrimaryKey(modules.get(index).module.getModuleName(), 
+                                                          translateSchemaStringToUUID(modules.get(index).module.getModuleGuid()),
+                                                          modules.get(index).module.getPackageName(), 
+                                                          translateSchemaStringToUUID(modules.get(index).module.getPackageGuid()), 
+                                                          modules.get(index).module.getArch().toString(),
+                                                          null);
+                primaryKey2 = UsageInstance.getPrimaryKey(modules.get(index2).module.getModuleName(), 
+                                                          translateSchemaStringToUUID(modules.get(index2).module.getModuleGuid()), 
+                                                          modules.get(index2).module.getPackageName(), 
+                                                          translateSchemaStringToUUID(modules.get(index2).module.getPackageGuid()), 
+                                                          modules.get(index2).module.getArch().toString(), 
+                                                          null);
+                if (primaryKey1.equalsIgnoreCase(primaryKey2)) {
+                    isDuplicate = true;
+                    break;
                 }
             }
 
-            if(dbManager.isTokenInDatabase(Token.getPrimaryKeyString(token.cName, 
-                                                                      token.tokenSpaceName, 
-                                                                      platformTokenSpace))) {
-                //
-                // If found duplicate token, Should tool be hold?
-                //
-                ActionMessage.warning(this, 
-                                       "Token " + token.cName + " exists in token database");
+            if (isDuplicate) {
                 continue;
             }
-            token.pcdType = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
-            dbManager.addTokenToDatabase(Token.getPrimaryKeyString(token.cName, 
-                                                                   token.tokenSpaceName, 
-                                                                   platformTokenSpace), 
-                                         token);
-        }
 
-        return fpdDoc;
+            if (modules.get(index).module.getPcdBuildDeclarations() == null) {
+                continue;
+            }
+            pcdBuildDataArray = modules.get(index).module.getPcdBuildDeclarations().getPcdBuildDataList();
+            if (pcdBuildDataArray == null) {
+                continue;
+            }
+            if (pcdBuildDataArray.size() == 0) {
+                continue;
+            }
+
+            //
+            // Loop all Pcd entry for a module and add it into memory database.
+            // 
+            for (pcdIndex = 0; pcdIndex < pcdBuildDataArray.size(); pcdIndex ++) {
+                pcdBuildData = pcdBuildDataArray.get(pcdIndex);
+                primaryKey   = Token.getPrimaryKeyString(pcdBuildData.getCName(),
+                                                         translateSchemaStringToUUID(pcdBuildData.getTokenSpaceGuid()));
+
+
+                if (dbManager.isTokenInDatabase(primaryKey)) {
+                    //
+                    // If the token is already exist in database, do some necessary checking
+                    // and add a usage instance into this token in database
+                    // 
+                    token = dbManager.getTokenByKey(primaryKey);
+
+                    //
+                    // Checking for DatumSize
+                    // 
+                    if (token.datumSize != pcdBuildData.getDatumSize()) {
+                        exceptionString = String.format("The datum size of PCD entry %s is %d, which is different with %d defined in before!",
+                                                        pcdBuildData.getCName(),  pcdBuildData.getDatumSize(), token.datumSize);
+                        throw new EntityException(exceptionString);
+                    }
+
+                    //
+                    // checking for DatumType
+                    // 
+                    if (token.datumType != Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString())) {
+                        exceptionString = String.format("The datum type of PCD entry %s is %s, which is different with  %s defined in before!",
+                                                        pcdBuildData.getCName(), 
+                                                        pcdBuildData.getDatumType().toString(), 
+                                                        Token.getStringOfdatumType(token.datumType));
+                        throw new EntityException(exceptionString);
+                    }
+                } else {
+                    //
+                    // If the token is not in database, create a new token instance and add
+                    // a usage instance into this token in database.
+                    // 
+                    token = new Token(pcdBuildData.getCName(), 
+                                      translateSchemaStringToUUID(pcdBuildData.getTokenSpaceGuid()));
+
+                    token.datum         = pcdBuildData.getDefaultValue();
+                    token.pcdType       = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
+                    token.datumType     = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
+                    token.datumSize     = pcdBuildData.getDatumSize();
+                    token.skuId         = Integer.decode(pcdBuildData.getSkuId());
+
+                    if (pcdBuildData.getToken() == null) {
+                        exceptionString = String.format("In FPD file, No <TokenNumber> defined for PCD entry %s in module %s",
+                                                        token.cName,
+                                                        modules.get(index).module.getModuleName());
+                        throw new EntityException(exceptionString);
+                    }
+                    token.tokenNumber = Integer.decode(pcdBuildData.getToken().getStringValue());
+
+                    if ((token.pcdType == Token.PCD_TYPE.DYNAMIC) ||
+                        (token.pcdType == Token.PCD_TYPE.DYNAMIC_EX)) {
+                        updateDynamicInformation(modules.get(index).module.getModuleName(),  token);
+                    }
+
+                    dbManager.addTokenToDatabase(primaryKey, token);
+                }
+
+                //
+                // Create an usage instance for this token
+                // 
+                usageInstance = new UsageInstance(token, 
+                                                  Token.getpcdTypeFromString(pcdBuildData.getItemType().toString()),
+                                                  modules.get(index).module.getModuleName(), 
+                                                  translateSchemaStringToUUID(modules.get(index).module.getModuleGuid()),
+                                                  modules.get(index).module.getPackageName(),
+                                                  translateSchemaStringToUUID(modules.get(index).module.getPackageGuid()),
+                                                  modules.get(index).type, 
+                                                  Token.getpcdTypeFromString(pcdBuildData.getItemType().toString()),
+                                                  modules.get(index).module.getArch().toString(), 
+                                                  null,
+                                                  pcdBuildData.getDefaultValue());
+                token.addUsageInstance(usageInstance);
+            }
+        }
     }
 
     /**
-      Update PCD token in memory database by help information in SPD.
-
-      After create token from FPD and create usage instance from MSA, we should collect
-      PCD package level information from SPD and update token information in memory 
-      database.
-      
-      @param usageInstance   The usage instance defined in MSA and want to search in SPD.
-      @param packageFullPath The SPD file path.
-      
-      @throws EntityException Failed to parse SPD xml file.
-      
+       Update dynamic information for PCD entry.
+       
+       Dynamic information is retrieved from <PcdDynamicBuildDeclarations> in
+       FPD file.
+       
+       @param moduleName
+       @param token
+       
+       @return Token
     **/
-    private void updateTokenBySPD(UsageInstance  usageInstance,
-                                  String         packageFullPath) 
+    private Token updateDynamicInformation(String moduleName, Token token) 
         throws EntityException {
-        PackageSurfaceAreaDocument      pkgDoc          = null;
-        PcdDefinitions                  pcdDefinitions  = null;
-        List<PcdDefinitions.PcdEntry>   pcdEntryArray   = new ArrayList<PcdDefinitions.PcdEntry>();
-        int                             index           = 0;
-        boolean                         isFoundInSpd    = false;
-        Token.DATUM_TYPE                datumType       = Token.DATUM_TYPE.UNKNOWN;
+        PcdDynamicBuildDeclarations                pcdDynamicBuildDescriptions = null;
+        
+        boolean                                    isFound                     = false;            
+        int                                        index                       = 0;
+        String                                     primaryKey                  = null;
+        SkuInstance                                skuInstance                 = null;
+        int                                        skuIndex                    = 0;
+        String                                     exceptionString             = null;
+        PcdDynamicBuildDeclarations.PcdBuildData.SkuData[] skuDataArray             = null;
+        List<PcdDynamicBuildDeclarations.PcdBuildData>     pcdDynamicBuildDataArray = null;
 
-        try {
-            pkgDoc =(PackageSurfaceAreaDocument)XmlObject.Factory.parse(new File(packageFullPath));
-        } catch(IOException ioE) {
-            throw new EntityException("Can't find the FPD xml fle:" + packageFullPath);
-        } catch(XmlException xmlE) {
-            throw new EntityException("Can't parse the FPD xml fle:" + packageFullPath);
-        }
-        pcdDefinitions = pkgDoc.getPackageSurfaceArea().getPcdDefinitions();
         //
-        // It is illege for SPD file does not contains any PCD information.
-        //
-        if (pcdDefinitions == null) {
-            return;
-        }
-
-        pcdEntryArray = pcdDefinitions.getPcdEntryList();
-        if (pcdEntryArray == null) {
-            return;
-        }
-        for(index = 0; index < pcdEntryArray.size(); index ++) {
-            if(pcdEntryArray.get(index).getCName().equalsIgnoreCase(
-                usageInstance.parentToken.cName)) {
-                isFoundInSpd = true;
-                //
-                // From SPD file , we can get following information.
-                //  Token:        Token number defined in package level.
-                //  PcdItemType:  This item does not single one. It means all supported item type.
-                //  datumType:    UINT8, UNIT16, UNIT32, UINT64, VOID*, BOOLEAN 
-                //  datumSize:    The size of default value or maxmine size.
-                //  defaultValue: This value is defined in package level.
-                //  HelpText:     The help text is provided in package level.
-                //
-
-                usageInstance.parentToken.tokenNumber = Integer.decode(pcdEntryArray.get(index).getToken());
-
-                if(pcdEntryArray.get(index).getDatumType() != null) {
-                    datumType = Token.getdatumTypeFromString(
-                        pcdEntryArray.get(index).getDatumType().toString());
-                    if(usageInstance.parentToken.datumType == Token.DATUM_TYPE.UNKNOWN) {
-                        usageInstance.parentToken.datumType = datumType;
-                    } else {
-                        if(datumType != usageInstance.parentToken.datumType) {
-                            throw new EntityException("Different datum types are defined for Token :" + 
-                                                      usageInstance.parentToken.cName);
-                        }
-                    }
-
-                } else {
-                    throw new EntityException("The datum type for token " + usageInstance.parentToken.cName + 
-                                              " is not defind in SPD file " + packageFullPath);
-                }
-
-                usageInstance.defaultValueInSPD = pcdEntryArray.get(index).getDefaultValue();
-                usageInstance.helpTextInSPD     = "Help Text in SPD";
-
-                //
-                // If token's datum is not valid, it indicate that datum is not provided
-                // in FPD and defaultValue is not provided in MSA, then use defaultValue
-                // in SPD as the datum of token.
-                //
-                if(usageInstance.parentToken.datum == null) {
-                    if(pcdEntryArray.get(index).getDefaultValue() != null) {
-                        usageInstance.parentToken.datum = pcdEntryArray.get(index).getDefaultValue();
-                    } else {
-                        throw new EntityException("FPD does not provide datum for token " + usageInstance.parentToken.cName +
-                                                  ", MSA and SPD also does not provide <defaultValue> for this token!");
-                    }
-                }
+        // If FPD document is not be opened, open and initialize it.
+        // 
+        if (fpdDocInstance == null) {
+            try {
+                fpdDocInstance = (FrameworkPlatformDescriptionDocument)XmlObject.Factory.parse(new File(fpdFilePath));
+            } catch(IOException ioE) {
+                throw new EntityException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
+            } catch(XmlException xmlE) {
+                throw new EntityException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
             }
         }
+
+        pcdDynamicBuildDescriptions = fpdDocInstance.getFrameworkPlatformDescription().getPcdDynamicBuildDeclarations();
+        if (pcdDynamicBuildDescriptions == null) {
+            throw new EntityException(String.format("There are no <PcdDynamicBuildDescriptions> in FPD file but contains Dynamic type "+
+                                                    "PCD entry %s in module %s!",
+                                                    token.cName,
+                                                    moduleName));
+        }
+
+        pcdDynamicBuildDataArray    = pcdDynamicBuildDescriptions.getPcdBuildDataList();
+        if (pcdDynamicBuildDataArray == null) {
+            throw new EntityException(String.format("There are no PcdDynamicBuildData in <PcdDynamicBuildDeclaration> section but contains Dynamic type"+
+                                                    "PCD entry %s in module %s.!",
+                                                    token.cName,
+                                                    moduleName));
+        }
+
+        isFound = false;
+        for (index = 0; index < pcdDynamicBuildDataArray.size(); index ++) {
+            if (pcdDynamicBuildDataArray.get(index).getTokenSpaceGuidList().size() != 0) {
+                primaryKey = Token.getPrimaryKeyString(pcdDynamicBuildDataArray.get(index).getCName(), 
+                                                       translateSchemaStringToUUID(pcdDynamicBuildDataArray.get(index).getTokenSpaceGuidList().get(0)));
+            } else {
+                primaryKey = Token.getPrimaryKeyString(pcdDynamicBuildDataArray.get(index).getCName(), 
+                                                       translateSchemaStringToUUID(null));
+            }
+
+            if (primaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
+                isFound = true;
+
+                //
+                // For Hii related value
+                // 
+                token.hiiEnabled    = pcdDynamicBuildDataArray.get(index).getHiiEnable();
+                if (token.hiiEnabled) {
+                    token.variableGuid      = Token.getGUIDFromSchemaObject(pcdDynamicBuildDataArray.get(index).getVariableGuid());
+                    if (token.variableGuid == null) {
+                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, HiiEnable is true" +
+                                                                "but no <VariableGuid> is found! Please fix the FPD file!",
+                                                                token.cName));
+
+                    }
+                    token.variableName      = pcdDynamicBuildDataArray.get(index).getVariableName();
+                    if (token.variableName == null) {
+                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, HiiEnable is true" +
+                                                                "but no <VariableName> is found! Please fix the FPD file!",
+                                                                token.cName));
+                    }
+
+                    if (pcdDynamicBuildDataArray.get(index).getDataOffset() == null) {
+                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, HiiEnable is true" +
+                                                                "but no <DataOffset> is found! Please fix the FPD file!",
+                                                                token.cName));
+                    }
+                    token.variableOffset    = Integer.decode(pcdDynamicBuildDataArray.get(index).getDataOffset());
+                }
+
+                //
+                // For Vpd related value
+                // 
+                token.vpdEnabled    = pcdDynamicBuildDataArray.get(index).getVpdEnable();
+                if (token.vpdEnabled) {
+                    if (pcdDynamicBuildDataArray.get(index).getDataOffset() == null) {
+                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, VpdEnable is true" +
+                                                                "but no <DataOffset> is found! Please fix the FPD file!",
+                                                                token.cName));
+                    }
+                    token.vpdOffset         = Integer.decode(pcdDynamicBuildDataArray.get(index).getDataOffset());
+                }
+
+                //
+                // For SkuData
+                // 
+                token.skuEnabled    = pcdDynamicBuildDataArray.get(index).getSkuEnable();
+                if (token.skuEnabled) {
+                    skuDataArray      = (PcdDynamicBuildDeclarations.PcdBuildData.SkuData[])pcdDynamicBuildDataArray.get(index).getSkuDataList().toArray();
+                    token.maxSkuCount = Integer.decode(pcdDynamicBuildDataArray.get(index).getMaxSku());
+                    if (skuDataArray == null) {
+                        exceptionString = String.format("In FPD file, the <SkuEnable> is true for PCD entry %s in module %s, But no any sku data.",
+                                                        token.cName, moduleName);
+                        throw new EntityException(exceptionString);
+                    }
+                    if (token.maxSkuCount != pcdDynamicBuildDataArray.get(index).sizeOfSkuDataArray()) {
+                        exceptionString = String.format("In FPD file, <MaxSku> is not equal to the size of <SkuDataArray> for PCD entry %s in module %s",
+                                                        token.cName, moduleName);
+                        throw new EntityException(exceptionString);
+                    }
+
+                    for (skuIndex = 0; skuIndex < pcdDynamicBuildDataArray.get(index).sizeOfSkuDataArray(); skuIndex ++) {
+                        skuInstance = new SkuInstance(skuDataArray[skuIndex].getId(),
+                                                      skuDataArray[skuIndex].getValue());
+                        token.skuData.add(skuInstance);
+                    }
+                }
+                break;
+            }
+        }
+        if (!isFound) {
+            exceptionString = String.format("In FPD file, No dynamic PCD data for PCD entry %s in module %s",
+                                            token.cName,
+                                            moduleName);
+            throw new EntityException(exceptionString);
+        }
+
+        return token;
+    }
+
+    /**
+       Translate the schema string to UUID instance.
+       
+       In schema, the string of UUID is defined as following two types string:
+        1) GuidArrayType: pattern = 0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},(
+        )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?
+       
+        2) GuidNamingConvention: pattern =
+        [a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+       
+       This function will convert string and create uuid instance.
+       
+       @param uuidString    UUID string in XML file
+       
+       @return UUID         UUID instance
+    **/
+    private UUID translateSchemaStringToUUID(String uuidString) 
+        throws EntityException {
+        String      temp;
+        String[]    splitStringArray;
+        int         index;
+        int         chIndex;
+        int         chLen;
+
+        if (uuidString == null) {
+            return null;
+        }
+
+        if (uuidString.length() == 0) {
+            return null;
+        }
+
+        //
+        // If the UUID schema string is GuidArrayType type then need translate 
+        // to GuidNamingConvention type at first.
+        // 
+        if ((uuidString.charAt(0) == '0') && ((uuidString.charAt(1) == 'x') || (uuidString.charAt(1) == 'X'))) {
+            splitStringArray = uuidString.split("," );
+            if (splitStringArray.length != 11) {
+                throw new EntityException ("Wrong format for UUID string: " + uuidString);
+            }
+
+            //
+            // Remove blank space from these string and remove header string "0x"
+            // 
+            for (index = 0; index < 11; index ++) {
+                splitStringArray[index] = splitStringArray[index].trim();
+                splitStringArray[index] = splitStringArray[index].substring(2, splitStringArray[index].length());
+            }
+
+            //
+            // Add heading '0' to normalize the string length
+            // 
+            for (index = 3; index < 11; index ++) {
+                chLen = splitStringArray[index].length();
+                for (chIndex = 0; chIndex < 2 - chLen; chIndex ++) {
+                    splitStringArray[index] = "0" + splitStringArray[index];
+                }
+            }
+
+            //
+            // construct the final GuidNamingConvention string
+            // 
+            temp = String.format("%s-%s-%s-%s%s-%s%s%s%s%s%s",
+                                 splitStringArray[0],
+                                 splitStringArray[1],
+                                 splitStringArray[2],
+                                 splitStringArray[3],
+                                 splitStringArray[4],
+                                 splitStringArray[5],
+                                 splitStringArray[6],
+                                 splitStringArray[7],
+                                 splitStringArray[8],
+                                 splitStringArray[9],
+                                 splitStringArray[10]);
+            uuidString = temp;
+        }
+
+        return UUID.fromString(uuidString);
     }
 
     /**
@@ -1837,11 +1848,11 @@ public class CollectPCDAction {
     **/
     public static void main(String argv[]) throws EntityException {
         CollectPCDAction ca = new CollectPCDAction();
-        ca.setWorkspacePath("G:/mdk");
-        ca.setFPDFilePath("G:/mdk/EdkNt32Pkg/build/Nt32.fpd");
+        ca.setWorkspacePath("M:/ForPcd/edk2");
+        ca.setFPDFilePath("M:/ForPcd/edk2/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "G:/mdk");
+                            "M:/ForPcd/edk2");
         ca.execute();
     }
 }
