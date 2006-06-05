@@ -42,10 +42,10 @@ typedef struct {
 // PPI definition
 //
 typedef struct {
-  UINTN                   FirstEntry;
-  UINTN                   LastEntry;
-  EFI_PHYSICAL_ADDRESS    Address;
-  UINTN                   Length;
+  UINT32                   FirstEntry;
+  UINT32                   LastEntry;
+  EFI_PHYSICAL_ADDRESS     Address;
+  UINT32                   Length;
 } PEI_STATUS_CODE_MEMORY_PPI;
 
 extern EFI_GUID gPeiStatusCodeMemoryPpiGuid;

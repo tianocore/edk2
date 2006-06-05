@@ -69,8 +69,8 @@ Returns:
   EFI_PEI_PROGRESS_CODE_PPI   *ReportStatusCodePpi;
   EFI_PHYSICAL_ADDRESS        Buffer;
   VOID                        *StartPointer;
-  UINTN                       Length;
-  UINTN                       LastEntry;
+  UINT32                      Length;
+  UINT32                      LastEntry;
   EFI_PEI_PPI_DESCRIPTOR      *ReportStatusCodeDescriptor;
   EFI_PEI_PPI_DESCRIPTOR      *StatusCodeMemoryDescriptor;
 
@@ -327,7 +327,7 @@ Returns:
   EFI_STATUS                  Status;
   PEI_STATUS_CODE_MEMORY_PPI  *StatusCodeMemoryPpi;
   EFI_STATUS_CODE_ENTRY       *CurrentEntry;
-  UINTN                       LastEntry;
+  UINT32                       LastEntry;
   MEMORY_STATUS_CODE_INSTANCE *PrivateData;
   EFI_PEI_PPI_DESCRIPTOR      *StatusCodeMemoryDescriptor;
   EFI_PEI_SERVICES            **PeiServices;
