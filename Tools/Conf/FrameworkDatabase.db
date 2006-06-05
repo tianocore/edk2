@@ -62,7 +62,6 @@
       <Path>Tools/</Path>
       <InstalledDate>2006-02-24 14:49</InstalledDate>
     </Package>
-    <!--
     <Package>
       <PackageName>EdkFatPkg</PackageName>
       <Guid>0x8EA68A2C, 0x99CB, 0x4332, 0x85, 0xc6, 0xdd, 0x58, 0x64, 0xea, 0xa6, 0x74</Guid>
@@ -70,7 +69,6 @@
       <Path>EdkFatPkg/</Path>
       <InstalledDate>2006-03-05 09:49</InstalledDate>
     </Package>
-    -->
   </PackageList>
   <PlatformList>
     <Platform PlatformName="NT32" PlatformGuid="eb216561-961f-47ee-9ef9-ca426ef547c2" PlatformVersion="0.3">
