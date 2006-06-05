@@ -31,13 +31,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiBootServicesTableLib</Library>
     <Library>UefiRuntimeServicesTableLib</Library>
     <Library>BaseLib</Library>
-    <Library>BaseDebugLibNull</Library>    
-    <Library>BaseMemoryLib</Library>
+    <Library>DxeReportStatusCodeLib</Library>
+    <Library>BaseDebugLibReportStatusCode</Library>
+    <Library>UefiMemoryLib</Library>
     <Library>BasePrintLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeMemoryAllocationLib</Library>
     <Library>EdkGraphicsLib</Library>
-    <Library>DxeReportStatusCodeLib</Library>
     <Library>HiiLib</Library>
   </Libraries>
 </ModuleBuildDescription>

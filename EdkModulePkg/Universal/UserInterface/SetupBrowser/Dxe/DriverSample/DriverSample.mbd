@@ -31,11 +31,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiBootServicesTableLib</Library>
     <Library>UefiRuntimeServicesTableLib</Library>
     <Library>BaseLib</Library>
-    <Library>BaseMemoryLib</Library>
+    <Library>UefiMemoryLib</Library>
     <Library>UefiLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeReportStatusCodeLib</Library>
-    <Library>BaseDebugLibNull</Library>
+    <Library>BaseDebugLibReportStatusCode</Library>
     <Library>BasePrintLib</Library>
     <Library>EdkGraphicsLib</Library>
     <Library>EdkIfrSupportLib</Library>

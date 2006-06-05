@@ -34,8 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeReportStatusCodeLib</Library>
-    <Library>BaseDebugLibNull</Library>
-    <Library>BasePrintLib</Library>
+    <Library>BaseDebugLibReportStatusCode</Library>
     <Library>EdkDxeRuntimeDriverLib</Library>
     <Library>UefiDriverModelLib</Library>
     <Library>DxeHobLib</Library>
