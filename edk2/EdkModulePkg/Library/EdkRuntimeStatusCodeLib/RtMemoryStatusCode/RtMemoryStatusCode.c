@@ -55,7 +55,7 @@ Returns:
 --*/
 {
   EFI_STATUS_CODE_ENTRY *CurrentEntry;
-  UINTN                 MaxEntry;
+  UINT32                 MaxEntry;
 
   //
   // We don't care to log debug codes.
