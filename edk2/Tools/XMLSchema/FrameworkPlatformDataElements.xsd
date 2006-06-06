@@ -232,21 +232,41 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="1">
-                <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <!-- DO NOT USE! REMOVE SourceFiles in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>
+                <!-- DO NOT USE! REMOVE Includes in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                <!-- Libraries stays in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Libraries"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="PPIs"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Variables"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>  <!-- DO NOT USE! REMOVE in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>  <!-- DO NOT USE! REMOVE in FINAL -->
+                <!-- DO NOT USE! REMOVE Protocols in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
+                <!-- DO NOT USE! REMOVE Events in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
+                <!-- DO NOT USE! REMOVE Hobs in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>
+                <!-- DO NOT USE! REMOVE PPIs in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="PPIs"/>
+                <!-- DO NOT USE! REMOVE Variables in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Variables"/>
+                <!-- DO NOT USE! REMOVE BootModes in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>
+                <!-- DO NOT USE! REMOVE SystemTables in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>
+                <!-- DO NOT USE! REMOVE DataHubs in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>
+                <!-- DO NOT USE! REMOVE Formsets in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>
+                <!-- DO NOT USE! REMOVE Guids in FINAL -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
+                <!-- EXTERNS stays in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
+                <xs:choice>
+                    <!-- DO NOT USE! REMOVE PcdBuildDeclarations in FINAL -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
+                    <!-- PcdBuildDefinition stays in FINAL -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDefinition"/>
+                </xs:choice>
+                <!-- BuildOptions stays in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
             </xs:sequence>
             <xs:attributeGroup ref="MsaAttributes"/>
