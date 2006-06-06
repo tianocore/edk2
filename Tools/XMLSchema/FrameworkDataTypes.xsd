@@ -190,6 +190,12 @@
             <xs:pattern value="[1-9][0-9][0-9][0-9]-[0-1][0-9]-[0-3][0-9] [0-2][0-9]:[0-5][0-9]"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="DatumSizeLimitation">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="16777215"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="DefaultValue">
         <xs:annotation>
             <xs:documentation xml:lang="en"> The DefaultValue is a union of a string and an integer. </xs:documentation>
@@ -862,6 +868,9 @@
                 </xs:annotation>
             </xs:enumeration>
         </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="SkuListType">
+        <xs:list itemType="HexByteDataType"/>
     </xs:simpleType>
     <xs:simpleType name="SupportedArchitectures">
         <xs:annotation>

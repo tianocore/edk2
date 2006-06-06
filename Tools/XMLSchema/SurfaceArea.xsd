@@ -44,8 +44,12 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="FrameworkModules"/>
                 <!-- DO NOT USE! removing PcdBuildDeclarations here, use PcdBuildDeclaratiion in ModuleSA instead. -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="PcdDynamicBuildDeclarations"/>
+                <xs:choice minOccurs="0">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="PcdDynamicBuildDeclarations"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="DynamicPcdBuildDefinitions"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -136,7 +140,10 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="MsaHeader"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDefinitions"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SourceFiles"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                <xs:choice minOccurs="0">
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>
@@ -151,9 +158,10 @@
                 <xs:choice minOccurs="0">
                     <!-- DO NOT USE! removing PCDs, use MsaPcdDeclarations instead -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="PCDs"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="MsaPcdDeclarations"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="PcdCoded"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -177,6 +185,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdDefinitions"/>
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdDeclarations"/>
                 </xs:choice>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
