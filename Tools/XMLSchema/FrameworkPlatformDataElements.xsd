@@ -74,8 +74,8 @@
                     <xs:element name="FlashDefinition" type="FlashData"/>
                     <xs:element name="FlashDefinitionFile" type="FileNameConvention"/>
                 </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImages"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Capsules"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FvImages"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Capsules"/>
             </xs:sequence>
             <xs:attribute name="MicrocodeFile" type="FileNameConvention" use="optional"/>
         </xs:complexType>
