@@ -82,8 +82,9 @@ PeiCore (
 
 Routine Description:
 
-  Main entry point to Pei Core. After switching stack in the PEI core, 
-  it will restart with the old core data.
+  The entry routine to Pei Core, invoked by PeiMain during transition
+  from SEC to PEI. After switching stack in the PEI core, it will restart
+  with the old core data.
 
 Arguments:
 
