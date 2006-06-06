@@ -39,7 +39,7 @@ case "`uname`" in
 esac
 
 # Now we need to build the tools.
-echo "If you have not done so, please build the tools by issuing 'ant -f \$WORKSPACE/Tools/build.xml'."
+(cd Tools; ant -noclasspath)
 fi
 fi
 fi
