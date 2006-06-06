@@ -1276,8 +1276,8 @@
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
                             <xs:group minOccurs="0" maxOccurs="1" ref="SkuGroup"/>
                             <xs:choice minOccurs="0" maxOccurs="1">
-                                <xs:group minOccurs="0" maxOccurs="1" ref="HiiGroup"/>
-                                <xs:group minOccurs="0" maxOccurs="1" ref="VpdGroup"/>
+                                <xs:group minOccurs="0" maxOccurs="1" ref="HiiEnable"/>
+                                <xs:group minOccurs="0" maxOccurs="1" ref="VpdEnable"/>
                             </xs:choice>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumSize" type="DatumSizeLimitation"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="Value" type="xs:normalizedString"/>
@@ -1303,8 +1303,8 @@
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
                             <xs:group minOccurs="0" maxOccurs="1" ref="SkuGroup"/>
                             <xs:choice minOccurs="0" maxOccurs="1">
-                                <xs:group minOccurs="0" maxOccurs="1" ref="HiiGroup"/>
-                                <xs:group minOccurs="0" maxOccurs="1" ref="VpdGroup"/>
+                                <xs:group minOccurs="0" maxOccurs="1" ref="HiiEnable"/>
+                                <xs:group minOccurs="0" maxOccurs="1" ref="VpdEnable"/>
                             </xs:choice>
                             <xs:element minOccurs="0" maxOccurs="1" name="DatumSize" type="DatumSizeLimitation"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:normalizedString"/>
@@ -1315,9 +1315,9 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:group name="HiiGroup">
+    <xs:group name="HiiEnable">
         <xs:annotation>
-            <xs:documentation xml:lang="en">If HiiGroup is specified, then HiiEnable is default true</xs:documentation>
+            <xs:documentation xml:lang="en">If HiiEnable group is specified, then HiiEnable is default true</xs:documentation>
         </xs:annotation>
         <xs:sequence>
             <xs:element minOccurs="0" maxOccurs="1" name="VariableName" type="xs:normalizedString"/>
@@ -1325,7 +1325,10 @@
             <xs:element minOccurs="0" maxOccurs="1" name="VariableOffset" type="Hex64BitDataType"/>
         </xs:sequence>
     </xs:group>
-    <xs:group name="VpdGroup">
+    <xs:group name="VpdEnable">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">If VpdEnable group is specified, then VpdEnable is default true</xs:documentation>
+        </xs:annotation>
         <xs:sequence>
             <xs:element minOccurs="0" maxOccurs="1" name="VpdOffset" type="Hex64BitDataType"/>
         </xs:sequence>
