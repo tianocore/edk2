@@ -110,6 +110,9 @@ BasePrintLibVSPrint (
   UINTN           Radix;
   RETURN_STATUS   Status;
 
+  ASSERT (Buffer != NULL);
+  ASSERT (Format != NULL);
+
   OriginalBuffer = Buffer;
 
   if ((Flags & OUTPUT_UNICODE) != 0) {
