@@ -28,7 +28,7 @@ LIST_ENTRY *mCallbackFnTable;
 
 VOID *
 GetWorker (
-  PCD_TOKEN_NUMBER  TokenNumber,
+  UINTN             TokenNumber,
   UINTN             GetSize
   )
 {
@@ -124,7 +124,7 @@ GetWorker (
 
 EFI_STATUS
 DxeRegisterCallBackWorker (
-  IN  PCD_TOKEN_NUMBER        TokenNumber,
+  IN  UINTN                   TokenNumber,
   IN  CONST GUID              *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 )
@@ -167,7 +167,7 @@ DxeRegisterCallBackWorker (
 
 EFI_STATUS
 DxeUnRegisterCallBackWorker (
-  IN  PCD_TOKEN_NUMBER        TokenNumber,
+  IN  UINTN                   TokenNumber,
   IN  CONST GUID              *Guid, OPTIONAL
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
 )
@@ -205,10 +205,10 @@ DxeUnRegisterCallBackWorker (
 
 
 
-PCD_TOKEN_NUMBER
+UINTN           
 ExGetNextTokeNumber (
   IN CONST EFI_GUID         *Guid,
-  IN PCD_TOKEN_NUMBER       TokenNumber,
+  IN UINTN                  TokenNumber,
   IN EFI_GUID               *GuidTable,
   IN UINTN                  SizeOfGuidTable,
   IN DYNAMICEX_MAPPING      *ExMapTable,
@@ -272,7 +272,7 @@ ExGetNextTokeNumber (
 VOID
 BuildPcdDxeDataBase (
   VOID
-)
+  )
 {
   PEI_PCD_DATABASE    *PeiDatabase;
   EFI_HOB_GUID_TYPE   *GuidHob;
@@ -312,7 +312,7 @@ BuildPcdDxeDataBase (
   //
 
   if (PCD_TOTAL_TOKEN_NUMBER != 0) {
-    mCallbackFnTable = AllocateZeroPool (PCD_TOTAL_TOKEN_NUMBER);
+    mCallbackFnTable = AllocateZeroPool (PCD_TOTAL_TOKEN_NUMBER * sizeof (LIST_ENTRY));
   }
   
   for (Idx = 0; Idx < PCD_TOTAL_TOKEN_NUMBER; Idx++) {
@@ -457,7 +457,7 @@ InvokeCallbackOnSet (
 
 EFI_STATUS
 SetWorker (
-  PCD_TOKEN_NUMBER        TokenNumber,
+  UINTN                   TokenNumber,
   VOID                    *Data,
   UINTN                   Size,
   BOOLEAN                 PtrType
@@ -592,14 +592,14 @@ ExGetWorker (
 
 EFI_STATUS
 ExSetWorker (
-  IN PCD_TOKEN_NUMBER     ExTokenNumber,
+  IN UINTN                ExTokenNumber,
   IN CONST EFI_GUID       *Guid,
   VOID                    *Data,
   UINTN                   SetSize,
   BOOLEAN                 PtrType
   )
 {
-  PCD_TOKEN_NUMBER        TokenNumber;
+  UINTN                   TokenNumber;
   
   TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
 
@@ -669,10 +669,10 @@ SetHiiVariable (
 
 
 
-PCD_TOKEN_NUMBER
+UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
-  IN PCD_TOKEN_NUMBER           ExTokenNumber
+  IN UINTN                      ExTokenNumber
   )
 {
   UINT32              i;

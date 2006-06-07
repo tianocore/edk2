@@ -42,7 +42,7 @@ GetPcdDatabase (
 
 EFI_STATUS
 SetWorker (
-  IN PCD_TOKEN_NUMBER   TokenNumber,
+  IN UINTN              TokenNumber,
   IN VOID               *Data,
   IN UINTN              Size,
   IN BOOLEAN            PtrType
@@ -51,7 +51,7 @@ SetWorker (
 
 EFI_STATUS
 ExSetWorker (
-  IN PCD_TOKEN_NUMBER     ExTokenNumber,
+  IN UINTN                ExTokenNumber,
   IN CONST EFI_GUID       *Guid,
   IN VOID                 *Data,
   IN UINTN                Size,
@@ -61,7 +61,7 @@ ExSetWorker (
 
 VOID *
 GetWorker (
-  IN PCD_TOKEN_NUMBER     TokenNumber,
+  IN UINTN                TokenNumber,
   IN UINTN                GetSize
   )
 ;
@@ -69,7 +69,7 @@ GetWorker (
 VOID *
 ExGetWorker (
   IN CONST EFI_GUID   *Guid,
-  IN PCD_TOKEN_NUMBER ExTokenNumber,
+  IN UINTN            ExTokenNumber,
   IN UINTN            GetSize
   )
 ;
@@ -81,10 +81,10 @@ typedef struct {
 } EX_PCD_ENTRY_ATTRIBUTE;
 
 
-PCD_TOKEN_NUMBER
+UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
-  IN PCD_TOKEN_NUMBER           ExTokenNumber
+  IN UINTN                      ExTokenNumber
   )
 ;
 
@@ -93,7 +93,7 @@ GetExPcdTokenNumber (
 
 EFI_STATUS
 PeiRegisterCallBackWorker (
-  IN  PCD_TOKEN_NUMBER   TokenNumber,
+  IN  UINTN              TokenNumber,
   IN  CONST GUID         *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK   CallBackFunction,
   IN  BOOLEAN            Register
@@ -115,7 +115,7 @@ BuildPcdDatabase (
 VOID
 EFIAPI
 PeiPcdSetSku (
-  IN  SKU_ID                  SkuId
+  IN  UINTN                  SkuId
   )
 ;
 
@@ -123,7 +123,7 @@ PeiPcdSetSku (
 UINT8
 EFIAPI
 PeiPcdGet8 (
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -131,7 +131,7 @@ PeiPcdGet8 (
 UINT16
 EFIAPI
 PeiPcdGet16 (
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -139,7 +139,7 @@ PeiPcdGet16 (
 UINT32
 EFIAPI
 PeiPcdGet32 (
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -147,7 +147,7 @@ PeiPcdGet32 (
 UINT64
 EFIAPI
 PeiPcdGet64 (
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -155,7 +155,7 @@ PeiPcdGet64 (
 VOID *
 EFIAPI
 PeiPcdGetPtr (
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -163,7 +163,7 @@ PeiPcdGetPtr (
 BOOLEAN
 EFIAPI
 PeiPcdGetBool (
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -171,7 +171,7 @@ PeiPcdGetBool (
 UINTN
 EFIAPI
 PeiPcdGetSize (
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -180,7 +180,7 @@ UINT8
 EFIAPI
 PeiPcdGet8Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -189,7 +189,7 @@ UINT16
 EFIAPI
 PeiPcdGet16Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -197,7 +197,7 @@ UINT32
 EFIAPI
 PeiPcdGet32Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -206,7 +206,7 @@ UINT64
 EFIAPI
 PeiPcdGet64Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -215,7 +215,7 @@ VOID *
 EFIAPI
 PeiPcdGetPtrEx (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -224,7 +224,7 @@ BOOLEAN
 EFIAPI
 PeiPcdGetBoolEx (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -233,7 +233,7 @@ UINTN
 EFIAPI
 PeiPcdGetSizeEx (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber
+  IN UINTN             TokenNumber
   )
 ;
 
@@ -241,7 +241,7 @@ PeiPcdGetSizeEx (
 EFI_STATUS
 EFIAPI
 PeiPcdSet8 (
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT8             Value
   )
 ;
@@ -250,7 +250,7 @@ PeiPcdSet8 (
 EFI_STATUS
 EFIAPI
 PeiPcdSet16 (
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT16            Value
   )
 ;
@@ -259,7 +259,7 @@ PeiPcdSet16 (
 EFI_STATUS
 EFIAPI
 PeiPcdSet32 (
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT32            Value
   )
 ;
@@ -268,7 +268,7 @@ PeiPcdSet32 (
 EFI_STATUS
 EFIAPI
 PeiPcdSet64 (
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT64            Value
   )
 ;
@@ -276,7 +276,7 @@ PeiPcdSet64 (
 EFI_STATUS
 EFIAPI
 PeiPcdSetPtr (
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINTN             SizeOfBuffer,
   IN VOID              *Buffer
   )
@@ -286,7 +286,7 @@ PeiPcdSetPtr (
 EFI_STATUS
 EFIAPI
 PeiPcdSetBool (
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN BOOLEAN           Value
   )
 ;
@@ -296,7 +296,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet8Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT8             Value
   )
 ;
@@ -305,7 +305,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet16Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT16            Value
   )
 ;
@@ -315,7 +315,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet32Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT32            Value
   )
 ;
@@ -325,7 +325,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSet64Ex (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINT64            Value
   )
 ;
@@ -335,7 +335,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSetPtrEx (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN UINTN             SizeOfBuffer,
   IN VOID              *Buffer
   )
@@ -346,7 +346,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdSetBoolEx (
   IN CONST EFI_GUID    *Guid,
-  IN PCD_TOKEN_NUMBER  TokenNumber,
+  IN UINTN             TokenNumber,
   IN BOOLEAN           Value
   )
 ;
@@ -356,7 +356,7 @@ PeiPcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 PeiRegisterCallBackOnSet (
-  IN  PCD_TOKEN_NUMBER        TokenNumber,
+  IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK        CallBackFunction
   )
@@ -366,7 +366,7 @@ PeiRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PcdUnRegisterCallBackOnSet (
-  IN  PCD_TOKEN_NUMBER        TokenNumber,
+  IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK        CallBackFunction
   )
@@ -377,7 +377,7 @@ EFI_STATUS
 EFIAPI
 PeiPcdGetNextToken (
   IN CONST EFI_GUID           *Guid, OPTIONAL
-  IN OUT  PCD_TOKEN_NUMBER    *TokenNumber
+  IN OUT  UINTN               *TokenNumber
   )
 ;
 

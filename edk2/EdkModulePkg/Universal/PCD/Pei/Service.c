@@ -30,7 +30,7 @@ Module Name: Service.c
 --*/
 EFI_STATUS
 PeiRegisterCallBackWorker (
-  IN  PCD_TOKEN_NUMBER            ExTokenNumber,
+  IN  UINTN                       ExTokenNumber,
   IN  CONST EFI_GUID              *Guid, OPTIONAL
   IN  PCD_PPI_CALLBACK            CallBackFunction,
   IN  BOOLEAN                     Register
@@ -41,7 +41,7 @@ PeiRegisterCallBackWorker (
   PCD_PPI_CALLBACK        Compare;
   PCD_PPI_CALLBACK        Assign;
   UINT32                  LocalTokenNumber;
-  PCD_TOKEN_NUMBER        TokenNumber;
+  UINTN                   TokenNumber;
   UINTN                   Idx;
 
   if (Guid == NULL) {
@@ -271,7 +271,7 @@ InvokeCallbackOnSet (
 
 EFI_STATUS
 SetWorker (
-  PCD_TOKEN_NUMBER    TokenNumber,
+  UINTN               TokenNumber,
   VOID                *Data,
   UINTN               Size,
   BOOLEAN             PtrType
@@ -367,14 +367,14 @@ SetWorker (
 
 EFI_STATUS
 ExSetWorker (
-  IN PCD_TOKEN_NUMBER     ExTokenNumber,
+  IN UINTN                ExTokenNumber,
   IN CONST EFI_GUID       *Guid,
   VOID                    *Data,
   UINTN                   Size,
   BOOLEAN                 PtrType
   )
 {
-  PCD_TOKEN_NUMBER          TokenNumber;
+  UINTN                     TokenNumber;
 
   TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
 
@@ -392,7 +392,7 @@ ExSetWorker (
 VOID *
 ExGetWorker (
   IN CONST  EFI_GUID  *Guid,
-  IN PCD_TOKEN_NUMBER ExTokenNumber,
+  IN UINTN            ExTokenNumber,
   IN UINTN            GetSize
   )
 {
@@ -404,7 +404,7 @@ ExGetWorker (
 
 VOID *
 GetWorker (
-  PCD_TOKEN_NUMBER    TokenNumber,
+  UINTN               TokenNumber,
   UINTN               GetSize
   )
 {
@@ -481,7 +481,7 @@ GetWorker (
 }
 
 
-PCD_TOKEN_NUMBER
+UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
   IN UINT32                     ExTokenNumber

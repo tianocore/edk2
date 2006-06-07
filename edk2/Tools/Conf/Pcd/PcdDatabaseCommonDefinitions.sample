@@ -5,6 +5,8 @@
 //
 // Common definitions
 //
+typedef UINT8 SKU_ID;
+
 #define PCD_TYPE_SHIFT        24
 
 
