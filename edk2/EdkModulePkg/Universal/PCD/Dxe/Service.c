@@ -83,7 +83,7 @@ GetWorker (
   switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
     case PCD_TYPE_VPD:
       VpdHead = (VPD_HEAD *) ((UINT8 *) PcdDb + Offset);
-      return (VOID *) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
+      return (VOID *) (UINTN) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
       
     case PCD_TYPE_HII:
       GuidTable   = IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
@@ -134,7 +134,7 @@ DxeRegisterCallBackWorker (
   LIST_ENTRY              *ListNode;
 
   if (Guid != NULL) {
-    TokenNumber = GetExPcdTokenNumber (Guid, TokenNumber);
+    TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) TokenNumber);
   }
 
   ListHead = &mCallbackFnTable[TokenNumber];
@@ -177,7 +177,7 @@ DxeUnRegisterCallBackWorker (
   LIST_ENTRY              *ListNode;
 
   if (Guid != NULL) {
-    TokenNumber = GetExPcdTokenNumber (Guid, TokenNumber);
+    TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) TokenNumber);
   }
 
   ListHead = &mCallbackFnTable[TokenNumber];
@@ -398,15 +398,15 @@ GetSkuEnabledTokenNumber (
   switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
     case PCD_TYPE_VPD:
       Value = (UINT8 *) &(((VPD_HEAD *) Value)[i]);
-      return ((Value - PcdDb) | PCD_TYPE_VPD);
+      return (UINT32) ((Value - PcdDb) | PCD_TYPE_VPD);
 
     case PCD_TYPE_HII:
       Value = (UINT8 *) &(((VARIABLE_HEAD *) Value)[i]);
-      return ((Value - PcdDb) | PCD_TYPE_HII);
+      return (UINT32) ((Value - PcdDb) | PCD_TYPE_HII);
       
     case PCD_TYPE_DATA:
       Value += Size * i;
-      return (Value - PcdDb);
+      return (UINT32) (Value - PcdDb);
       
     default:
       ASSERT (FALSE);
@@ -583,7 +583,7 @@ ExGetWorker (
   IN UINTN                  GetSize
   ) 
 {
-  return GetWorker(GetExPcdTokenNumber (Guid, ExTokenNumber), GetSize);
+  return GetWorker(GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber), GetSize);
 }
 
 
@@ -601,9 +601,9 @@ ExSetWorker (
 {
   UINTN                   TokenNumber;
   
-  TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
+  TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber);
 
-  InvokeCallbackOnSet (ExTokenNumber, Guid, TokenNumber, Data, SetSize);
+  InvokeCallbackOnSet ((UINT32) ExTokenNumber, Guid, TokenNumber, Data, SetSize);
 
   SetWorker (TokenNumber, Data, SetSize, PtrType);
 
@@ -672,7 +672,7 @@ SetHiiVariable (
 UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
-  IN UINTN                      ExTokenNumber
+  IN UINT32                     ExTokenNumber
   )
 {
   UINT32              i;

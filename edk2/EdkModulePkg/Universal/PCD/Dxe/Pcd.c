@@ -74,7 +74,7 @@ PcdDxeInit (
   //
   // Make sure the Pcd Protocol is not already installed in the system
   //
-  
+
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gPcdProtocolGuid);
   
   BuildPcdDxeDataBase ();
@@ -274,7 +274,7 @@ DxePcdGetSizeEx (
   IN UINTN                 ExTokenNumber
   )
 {
-  return DxePcdGetSize(GetExPcdTokenNumber (Guid, ExTokenNumber));
+  return DxePcdGetSize(GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber));
 }
 
 
