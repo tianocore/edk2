@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -31,7 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>PeimEntryPoint</Library>
     <Library>BaseLib</Library>
     <Library>PeiCoreLib</Library>
-    <Library>PeiServicesTablePointerLib</Library>
+    <Library OverrideID="4444">PeiServicesTablePointerLib</Library>
     <Library>PeiHobLib</Library>
     <Library>BaseDebugLibReportStatusCode</Library>
     <Library>PeiMemoryLib</Library>

@@ -119,7 +119,7 @@ BuildPcdDxeDataBase (
 UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
-  IN UINTN                      ExTokenNumber
+  IN UINT32                     ExTokenNumber
   )
 ;
 //
