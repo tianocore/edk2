@@ -48,7 +48,7 @@ prior to using the Edk 2.0.
 Compiler Tool Chain
       Microsoft* Visual Studio .NET 2003*  (http://www.microsoft.com)
     or
-      GCC version 4.x or later (http://gcc.gnu.org)
+      A special GCC version 4.x or later (http://gcc.gnu.org). See below.
 
 Assembler Tool Chain
       Microsoft Macro Assembler, version 6.15 or later
@@ -226,12 +226,15 @@ Pre-defined targets in the build.xml files include:
 
 A Word on GCC tool chain
 ------------------------
-You will find a script in the tree that will download, configure, compile, and
-install a gcc 4.0.2 tool chain for development. It has support for the ia32
-architecture.  It can be built and run on Cygwin, Linux, and many other POSIX
-compliant host environments. There are a few tools that you will need on your
-host computer in order to compile the tool chain. Among them are bash, gcc,
-gmake, curl (or wget).
+EDK2 will not compile with a standard Linux gcc tool chain. While Linux
+distributions are usually based on ELF, EDK2 requires a version of gcc that is
+configured to produce PE-COFF images. You will find a script in edk2/Tools/gcc
+that will download, configure, compile, and install a gcc 4.X cross-compile
+tool chain for EDK2 development. It has support for the ia32 architecture. It
+can be built and run on Cygwin, Linux, and many other POSIX compliant host
+operating environments. There are a few tools that you will need on your host
+computer in order to compile the tool chain. Among them are bash, gcc, gmake,
+curl (or wget).
 
 -------------------------------------------------------------------------------
 
