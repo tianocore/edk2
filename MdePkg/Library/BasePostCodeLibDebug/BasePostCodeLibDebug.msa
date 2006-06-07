@@ -11,10 +11,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
   <MsaLibHeader>
-    <BaseName>BasePrintLib</BaseName>
+    <BaseName>BasePostCodeLibDebug</BaseName>
     <ModuleType>BASE</ModuleType>
     <ComponentType>LIBRARY</ComponentType>
-    <Guid>a86fbfca-0183-4eeb-aa8a-762e3b7da1f3</Guid>
+    <Guid>55c61087-7367-4546-bc32-4937c5e6aff3</Guid>
     <Version>0</Version>
     <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
     <Description>FIX ME!</Description>
@@ -32,16 +32,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Specification>0</Specification>
   </MsaLibHeader>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">PrintLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_PRODUCED">PostCodeLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>PrintLib.c</Filename>
-    <Filename>PrintLibInternal.c</Filename>
-    <Filename>PrintLibInternal.h</Filename>
+    <Filename>PostCode.c</Filename>
   </SourceFiles>
   <Includes>
     <PackageName>MdePkg</PackageName>
   </Includes>
+  <PCDs>
+    <PcdData ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdPostCodePropertyMask</C_Name>
+      <Token>0x0000000b</Token>
+      <DatumType>UINT8</DatumType>
+    </PcdData>
+  </PCDs>
 </LibraryModuleSurfaceArea>

@@ -139,6 +139,10 @@
       <IncludeHeader>Include/Library/ReportStatusCodeLib.h</IncludeHeader>
     </LibraryClassDeclaration>
     <LibraryClassDeclaration>
+      <LibraryClass>PostCodeLib</LibraryClass>
+      <IncludeHeader>Include/Library/PostCodeLib.h</IncludeHeader>
+    </LibraryClassDeclaration>
+    <LibraryClassDeclaration>
       <LibraryClass>ResourcePublicationLib</LibraryClass>
       <IncludeHeader>Include/Library/ResourcePublicationLib.h</IncludeHeader>
     </LibraryClassDeclaration>
@@ -224,6 +228,15 @@
     </MsaFile>
     <MsaFile>
       <Filename>Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.msa</Filename>
+    </MsaFile>
+    <MsaFile>
+      <Filename>Library/BasePostCodeLib80/BasePostCodeLib80.msa</Filename>
+    </MsaFile>
+    <MsaFile>
+      <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>
+    </MsaFile>
+    <MsaFile>
+      <Filename>Library/BasePostCodeLibReportStatusCode/BasePostCodeLibReportStatusCode.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/BaseSmbusLib/BaseSmbusLib.msa</Filename>
@@ -1226,6 +1239,12 @@
       <Token>0x00000009</Token>
       <DatumType>UINT8</DatumType>
       <DefaultValue>0x0</DefaultValue>
+    </PcdEntry>
+    <PcdEntry ItemType="FIXED_AT_BUILD">
+      <C_Name>PcdPostCodePropertyMask</C_Name>
+      <Token>0x0000000b</Token>
+      <DatumType>UINT8</DatumType>
+      <DefaultValue>0</DefaultValue>
     </PcdEntry>
   </PcdDefinitions>
 </PackageSurfaceArea>

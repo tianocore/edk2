@@ -85,6 +85,11 @@
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLib80" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
+
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
   
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
@@ -154,6 +159,10 @@
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
   
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLib80" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
+
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
   
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiBootServicesTableLib" />
@@ -221,6 +230,10 @@
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLib80" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
   
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
   
@@ -290,6 +303,10 @@
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiIoLibCpuIo" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeReportStatusCodeLib" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
+
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLib80" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
   
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
   
@@ -1060,7 +1077,70 @@
             <DefaultValue>0x07</DefaultValue>
           </PcdBuildData>
         </PcdBuildDeclarations>
+      </ModuleSA>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLib80" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
       </ModuleSA>        
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>                
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" >
       </ModuleSA>        
 
@@ -1586,7 +1666,70 @@
             <DefaultValue>0x07</DefaultValue>
           </PcdBuildData>
         </PcdBuildDeclarations>
+      </ModuleSA>
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLib80" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
       </ModuleSA>        
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>                
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" >
       </ModuleSA>        
 
@@ -2112,7 +2255,70 @@
             <DefaultValue>0x07</DefaultValue>
           </PcdBuildData>
         </PcdBuildDeclarations>
+      </ModuleSA>       
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLib80" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
       </ModuleSA>        
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>         
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" >
       </ModuleSA>        
 
@@ -2636,6 +2842,69 @@
             <VariableName>L""</VariableName>
             <DataOffset>0</DataOffset>
             <DefaultValue>0x07</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLib80" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
+          </PcdBuildData>
+        </PcdBuildDeclarations>
+      </ModuleSA>        
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" >
+        <PcdBuildDeclarations>
+          <PcdBuildData ItemType="FIXED_AT_BUILD">
+            <C_Name>PcdPostCodePropertyMask</C_Name>
+            <Token>0x0000000b</Token>
+            <DatumType>UINT8</DatumType>
+            <HiiEnable>false</HiiEnable>
+            <VpdEnable>false</VpdEnable>
+            <AlternateNameSpaceEnable>false</AlternateNameSpaceEnable>
+            <SkuEnable>false</SkuEnable>
+            <SkuDataArrayEnable>false</SkuDataArrayEnable>
+            <MaxSku>0x00</MaxSku>
+            <SkuId>0x00</SkuId>
+            <DatumSize>1</DatumSize>
+            <VariableGuid>0</VariableGuid>
+            <VariableName>L""</VariableName>
+            <DataOffset>0</DataOffset>
+            <DefaultValue>0x00</DefaultValue>
           </PcdBuildData>
         </PcdBuildDeclarations>
       </ModuleSA>        
