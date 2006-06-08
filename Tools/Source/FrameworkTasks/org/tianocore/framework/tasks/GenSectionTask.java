@@ -59,11 +59,11 @@ public class GenSectionTask extends Task implements EfiDefine {
         //
         // absolute path of efi tools
         //
-        String path = project.getProperty("env.Framework_Tools_Path");
+        String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         if (path == null) {
-            command = "GenSection";
+            command = "gensection";
         } else {
-            command = path + "/" + "GenSection";
+            command = path + "/" + "gensection";
         }
         //
         // argument of tools
@@ -93,7 +93,7 @@ public class GenSectionTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                System.out.println("gensection succeeded!");
+                System.out.println("gensection successed!");
             } else {
                 //
                 // command execution fail

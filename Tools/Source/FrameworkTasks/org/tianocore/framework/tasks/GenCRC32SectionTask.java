@@ -59,12 +59,12 @@ public class GenCRC32SectionTask extends Task implements EfiDefine{
         ///
         /// absolute path of efi tools
         ///
-        String path = project.getProperty("env.Framework_Tools_Path"); 
+        String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH"); 
         String command;
         if (path == null) {
-            command = "GenCRC32Section";
+            command = "gencrc32section";
         } else {
-            command = path + "/" + "GenCRC32Section" ;
+            command = path + "/" + "gencrc32section" ;
         }
         // 
         // string line of input files 

@@ -153,7 +153,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      **/
     public void execute() throws BuildException {
         Project project = this.getProject();
-        String  toolPath= project.getProperty("env.Framework_Tools_Path");
+        String  toolPath= project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String  command;
         if (toolPath == null) {
             command = "VfrCompile";

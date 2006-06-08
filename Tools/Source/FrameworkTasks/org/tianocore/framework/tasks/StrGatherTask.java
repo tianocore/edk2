@@ -108,12 +108,12 @@ public class StrGatherTask extends Task implements EfiDefine {
         ///
         /// absolute path of efi tools
         ///
-        String path = project.getProperty("env.Framework_Tools_Path"); 
+        String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH"); 
         String command;
         if (path == null) {
-            command = "StrGather";
+            command = "strgather";
         } else {
-            command = path + "/" + "StrGather";
+            command = path + "/" + "strgather";
         }
 
         ///

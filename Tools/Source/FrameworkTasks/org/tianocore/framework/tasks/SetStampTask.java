@@ -46,7 +46,7 @@ public class SetStampTask extends Task implements EfiDefine {
         ///
         /// absolute path of edk tools
         ///
-        String path = project.getProperty("env.Framework_Tools_Path");
+        String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
             command = "setstamp";
@@ -82,7 +82,7 @@ public class SetStampTask extends Task implements EfiDefine {
                 ///
                 /// command execution success
                 ///
-                System.out.println("SetStamp execute succeeded!");
+                System.out.println("SetStamp execute successed!");
             } else {
                 ///
                 /// command execution fail
