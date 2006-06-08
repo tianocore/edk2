@@ -37,7 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">PerformanceLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiCoreLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">ReportStatusCodeLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">CacheMaintenanceLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">EdkPeCoffLoaderLib</LibraryClass>

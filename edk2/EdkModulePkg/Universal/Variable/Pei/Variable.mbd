@@ -32,7 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>BaseDebugLibReportStatusCode</Library>
     <Library>BaseLib</Library>
     <Library>PeiMemoryLib</Library>
-    <Library>PeiCoreLib</Library>
+    <Library>PeiServicesLib</Library>
     <Library OverrideID="4444">PeiServicesTablePointerLib</Library>
     <Library>PeiHobLib</Library>
     <Library>PeimEntryPoint</Library>

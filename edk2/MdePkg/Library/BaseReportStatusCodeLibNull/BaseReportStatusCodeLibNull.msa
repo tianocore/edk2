@@ -41,7 +41,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>ReportStatusCodeLib.c</Filename>
-    <Filename>PostCode.c</Filename>
   </SourceFiles>
   <Includes>
     <PackageName>MdePkg</PackageName>

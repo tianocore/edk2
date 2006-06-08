@@ -65,7 +65,7 @@ Returns:
   //
   // Try to find a PE32 section.
   //
-  Status = PeiCoreFfsFindSectionData (
+  Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_PE32,
              PeimFileHeader,
              &Pe32Data
@@ -74,7 +74,7 @@ Returns:
   // If we didn't find a PE32 section, try to find a TE section.
   //
   if (EFI_ERROR (Status)) {
-    Status = PeiCoreFfsFindSectionData (
+    Status = PeiServicesFfsFindSectionData (
                EFI_SECTION_TE,
                PeimFileHeader,
                (VOID **) &TEImageHeader
@@ -84,7 +84,7 @@ Returns:
       // There was not a PE32 or a TE section, so assume that it's a Compressed section
       // and use the LoadFile
       //
-      Status = PeiCoreLocatePpi (
+      Status = PeiServicesLocatePpi (
                 &gEfiPeiFvFileLoaderPpiGuid,
                 0,
                 NULL,

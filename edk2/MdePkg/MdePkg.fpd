@@ -62,7 +62,7 @@
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseSmbusLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiSmbusLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
 
@@ -709,7 +709,7 @@
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" >
       </ModuleSA>        
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" >
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesLib" >
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" >
       </ModuleSA>        

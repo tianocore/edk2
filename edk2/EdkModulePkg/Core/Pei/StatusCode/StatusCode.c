@@ -67,7 +67,7 @@ Returns:
   //
   //Locate StatusCode Ppi.
   //
-  Status = PeiCoreLocatePpi (
+  Status = PeiServicesLocatePpi (
              &gEfiPeiStatusCodePpiGuid,         
              0,                         
              NULL,                      

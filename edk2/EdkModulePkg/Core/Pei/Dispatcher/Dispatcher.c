@@ -230,7 +230,7 @@ Returns:
         // anymore FVs, then exit the PEIM search loop.
         //
         if (DispatchData->FindFv == NULL) {
-          Status = PeiCoreLocatePpi (
+          Status = PeiServicesLocatePpi (
                      &gEfiFindFvPpiGuid,
                      0,
                      NULL,
@@ -484,7 +484,7 @@ Returns:
   INT8        *DepexData;
   BOOLEAN     Runnable;
 
-  Status = PeiCoreFfsFindSectionData (
+  Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_PEI_DEPEX,
              CurrentPeimAddress,
              (VOID **)&DepexData

@@ -33,7 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </MsaLibHeader>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">ResourcePublicationLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiCoreLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>

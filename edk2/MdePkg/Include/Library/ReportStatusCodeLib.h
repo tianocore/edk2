@@ -21,8 +21,6 @@
 #define REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED          0x00000001
 #define REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED             0x00000002
 #define REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED             0x00000004
-#define REPORT_STATUS_CODE_PROPERTY_POST_CODE_ENABLED              0x00000008
-#define REPORT_STATUS_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED  0x00000010
 
 //
 // Extended Data structure definitions with EFI_STATUS_CODE_DATA headers removed
@@ -455,63 +453,6 @@ ReportStatusCodeEx (
 
 
 /**
-  Sends an 32-bit value to a POST card.
-
-  Sends the 32-bit value specified by Value to a POST card, and returns Value.  
-  Some implementations of this library function may perform I/O operations 
-  directly to a POST card device.  Other implementations may send Value to 
-  ReportStatusCode(), and the status code reporting mechanism will eventually 
-  display the 32-bit value on the status reporting device.
-  
-  PostCode() must actively prevent recursion.  If PostCode() is called while 
-  processing another any other Report Status Code Library function, then 
-  PostCode() must return Value immediately.
-
-  @param  Value  The 32-bit value to write to the POST card.
-
-  @return  Value
-
-**/
-UINT32
-EFIAPI
-PostCode (
-  IN UINT32  Value
-  );
-
-
-/**
-  Sends an 32-bit value to a POST and associated ASCII string.
-
-  Sends the 32-bit value specified by Value to a POST card, and returns Value.
-  If Description is not NULL, then the ASCII string specified by Description is 
-  also passed to the handler that displays the POST card value.  Some 
-  implementations of this library function may perform I/O operations directly 
-  to a POST card device.  Other implementations may send Value to ReportStatusCode(), 
-  and the status code reporting mechanism will eventually display the 32-bit 
-  value on the status reporting device.  
-
-  PostCodeWithDescription()must actively prevent recursion.  If 
-  PostCodeWithDescription() is called while processing another any other Report 
-  Status Code Library function, then PostCodeWithDescription() must return Value 
-  immediately.
-
-  @param  Value        The 32-bit value to write to the POST card.
-  @param  Description  Pointer to an ASCII string that is a description of the 
-                       POST code value.  This is an optional parameter that may 
-                       be NULL.
-
-  @return  Value
-
-**/
-UINT32
-EFIAPI
-PostCodeWithDescription (
-  IN UINT32       Value,
-  IN CONST CHAR8  *Description  OPTIONAL
-  );
-
-
-/**
   Returns TRUE if status codes of type EFI_PROGRESS_CODE are enabled
 
   This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_PROGRESS_CODE_ENABLED 
@@ -564,45 +505,6 @@ ReportErrorCodeEnabled (
 BOOLEAN
 EFIAPI
 ReportDebugCodeEnabled (
-  VOID
-  );
-
-
-/**
-  Returns TRUE if POST Codes are enabled.
-
-  This function returns TRUE if the REPORT_STATUS_CODE_PROPERTY_POST_CODE_ENABLED 
-  bit of PcdReportStatusCodeProperyMask is set.  Otherwise FALSE is returned.
-
-  @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_POST_CODE_ENABLED bit of 
-                  PcdReportStatusCodeProperyMask is set.
-  @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_POST_CODE_ENABLED bit of 
-                  PcdReportStatusCodeProperyMask is clear.
-
-**/
-BOOLEAN
-EFIAPI
-ReportPostCodeEnabled (
-  VOID
-  );
-
-
-/**
-  Returns TRUE if POST code descriptions are enabled.
-
-  This function returns TRUE if the 
-  REPORT_STATUS_CODE_PROPERTY_POST_CODE_DESCRIPTIONS_ENABLED bit of 
-  PcdReportStatusCodeProperyMask is set.  Otherwise FALSE is returned.
-
-  @retval  TRUE   The REPORT_STATUS_CODE_PROPERTY_POST_CODE_DESCRIPTIONS_ENABLED 
-                  bit of PcdReportStatusCodeProperyMask is set.
-  @retval  FALSE  The REPORT_STATUS_CODE_PROPERTY_POST_CODE_DESCRIPTIONS_ENABLED 
-                  bit of PcdReportStatusCodeProperyMask is clear.
-
-**/
-BOOLEAN
-EFIAPI
-ReportPostCodeDescriptionEnabled (
   VOID
   );
 
@@ -726,38 +628,5 @@ ReportPostCodeDescriptionEnabled (
   (ReportDebugCodeEnabled() && ((Type) & EFI_STATUS_CODE_TYPE_MASK) == EFI_DEBUG_CODE)                   ?  \
   ReportStatusCodeEx(Type,Value,Instance,CallerId,ExtendedDataGuid,ExtendedData,ExtendedDataSize)        :  \
   EFI_UNSUPPORTED
-
-/**
-  Sends an 32-bit value to a POST card.
-
-  If POST codes are enabled in PcdReportStatusCodeProperyMask, then call PostCode() 
-  passing in Value.  Value is returned.
-
-  @param  Value  The 32-bit value to write to the POST card.
-
-  @return  Value
-
-**/
-#define POST_CODE(Value)  ReportPostCodeEnabled() ? PostCode(Value) : Value
-
-/**
-  Sends an 32-bit value to a POST and associated ASCII string.
-
-  If POST codes and POST code descriptions are enabled in 
-  PcdReportStatusCodeProperyMask, then call PostCodeWithDescription() passing in 
-  Value and Description.  If only POST codes are enabled, then call PostCode() 
-  passing in Value.  Value is returned.
-
-  @param  Value        The 32-bit value to write to the POST card.
-  @param  Description  Pointer to an ASCII string that is a description of the 
-                       POST code value.
-
-**/
-#define POST_CODE_WITH_DESCRIPTION(Value,Description)  \
-  ReportPostCodeEnabled()                        ?     \
-    (ReportPostCodeDescriptionEnabled()          ?     \
-      PostCodeWithDescription(Value,Description) :     \
-      PostCode(Value))                           :     \
-    Value
 
 #endif

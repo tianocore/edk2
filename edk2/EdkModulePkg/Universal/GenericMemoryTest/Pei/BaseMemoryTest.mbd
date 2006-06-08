@@ -33,7 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>BaseDebugLibReportStatusCode</Library>
     <Library>PeiServicesTablePointerLib</Library>
     <Library>PeiMemoryLib</Library>
-    <Library>PeiCoreLib</Library>
+    <Library>PeiServicesLib</Library>
     <Library>BaseLib</Library>
   </Libraries>
 </ModuleBuildDescription>

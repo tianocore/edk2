@@ -76,7 +76,7 @@ PcdPeimInit (
 
   BuildPcdDatabase ();
   
-  Status = PeiCoreInstallPpi (&mPpiPCD);
+  Status = PeiServicesInstallPpi (&mPpiPCD);
 
   ASSERT_EFI_ERROR (Status);
   

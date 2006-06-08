@@ -72,7 +72,7 @@ Returns:
   //
   // Check if the PPI is installed.
   //
-  Status = PeiCoreLocatePpi(
+  Status = PeiServicesLocatePpi(
              &PpiGuid,        // GUID
              0,               // INSTANCE
              NULL,            // EFI_PEI_PPI_DESCRIPTOR

@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <Libraries>
     <Library>PeimEntryPoint</Library>
     <Library>BaseLib</Library>
-    <Library>PeiCoreLib</Library>
+    <Library>PeiServicesLib</Library>
     <Library>PeiServicesTablePointerLib</Library>
     <Library>BaseDebugLibReportStatusCode</Library>
     <Library>PeiMemoryLib</Library>

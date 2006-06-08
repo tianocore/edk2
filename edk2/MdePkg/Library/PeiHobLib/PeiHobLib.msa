@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">HobLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiCoreLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>

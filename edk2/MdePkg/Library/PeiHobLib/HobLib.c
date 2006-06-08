@@ -33,7 +33,7 @@ GetHobList (
   EFI_STATUS            Status;
   VOID                  *HobList;
 
-  Status = PeiCoreGetHobList (&HobList);
+  Status = PeiServicesGetHobList (&HobList);
   ASSERT_EFI_ERROR (Status);
   ASSERT (HobList != NULL);
 
@@ -187,7 +187,7 @@ InternalPeiCreateHob (
   EFI_STATUS        Status;
   VOID              *Hob;
 
-  Status = PeiCoreCreateHob (Type, Length, &Hob);
+  Status = PeiServicesCreateHob (Type, Length, &Hob);
   //
   // Assume the process of HOB building is always successful.
   //

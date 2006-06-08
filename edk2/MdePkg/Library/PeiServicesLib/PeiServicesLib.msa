@@ -9,11 +9,14 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<ModuleBuildDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
-  <MbdHeader>
-    <BaseName>BootMode</BaseName>
-    <Guid>B7611005-1F26-45ba-A3DB-01F39DDB2785</Guid>
+<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+  <MsaLibHeader>
+    <BaseName>PeiServicesLib</BaseName>
+    <ModuleType>PEIM</ModuleType>
+    <ComponentType>LIBRARY</ComponentType>
+    <Guid>a804239b-4155-446f-acc8-f0825d74908c</Guid>
     <Version>0</Version>
+    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>
@@ -24,19 +27,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <Created>2006-03-14 17:04</Created>
-    <Modified>2006-03-19 15:17</Modified>
-  </MbdHeader>
-  <Libraries>
-    <Library>PeimEntryPoint</Library>
-    <Library>PeiMemoryLib</Library>
-    <Library>PeiServicesLib</Library>
-    <Library>PeiServicesTablePointerLib</Library>
-    <Library>PeiReportStatusCodeLib</Library>
-    <Library>BaseDebugLibReportStatusCode</Library>
-    <Library>BaseLib</Library>
-  </Libraries>
-  <BuildOptions ToolChain="MSFT">
-    <ImageEntryPoint>_ModuleEntryPoint</ImageEntryPoint>
-  </BuildOptions>
-</ModuleBuildDescription>
+    <Created>2006-03-09 23:12</Created>
+    <Updated>2006-03-19 15:17</Updated>
+    <Specification>0</Specification>
+  </MsaLibHeader>
+  <LibraryClassDefinitions>
+    <LibraryClass Usage="ALWAYS_PRODUCED">PeiServicesLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesTablePointerLib</LibraryClass>
+  </LibraryClassDefinitions>
+  <SourceFiles>
+    <Filename>PeiServicesLib.c</Filename>
+  </SourceFiles>
+  <Includes>
+    <PackageName>MdePkg</PackageName>
+  </Includes>
+</LibraryModuleSurfaceArea>

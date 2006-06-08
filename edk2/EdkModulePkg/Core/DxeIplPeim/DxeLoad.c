@@ -119,11 +119,11 @@ Returns:
   EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader;
   EFI_BOOT_MODE                             BootMode;
 
-  Status = PeiCoreGetBootMode (&BootMode);
+  Status = PeiServicesGetBootMode (&BootMode);
 
   ASSERT_EFI_ERROR (Status);
 
-  Status = PeiCoreLocatePpi (
+  Status = PeiServicesLocatePpi (
              &gPeiInMemoryGuid,
              0,
              NULL,
@@ -154,7 +154,7 @@ Returns:
     //
     // Install LoadFile PPI
     //
-    Status = PeiCoreInstallPpi (&mPpiLoadFile);
+    Status = PeiServicesInstallPpi (&mPpiLoadFile);
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -163,7 +163,7 @@ Returns:
     //
     // Install DxeIpl PPI
     //
-    PeiCoreInstallPpi (&mPpiList);
+    PeiServicesInstallPpi (&mPpiList);
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -223,10 +223,10 @@ Returns:
   //
   // if in S3 Resume, restore configure
   //
-  Status = PeiCoreGetBootMode (&BootMode);
+  Status = PeiServicesGetBootMode (&BootMode);
 
   if (!EFI_ERROR (Status) && (BootMode == BOOT_ON_S3_RESUME)) {
-    Status = PeiCoreLocatePpi (
+    Status = PeiServicesLocatePpi (
                &gEfiPeiS3ResumePpiGuid,
                0,
                NULL,
@@ -307,11 +307,11 @@ Returns:
   //
   // See if we are in crisis recovery
   //
-  Status = PeiCoreGetBootMode (&BootMode);
+  Status = PeiServicesGetBootMode (&BootMode);
 
   if (!EFI_ERROR (Status) && (BootMode == BOOT_IN_RECOVERY_MODE)) {
 
-    Status = PeiCoreLocatePpi (
+    Status = PeiServicesLocatePpi (
                &gEfiPeiRecoveryModulePpiGuid,
                0,
                NULL,
@@ -373,7 +373,7 @@ Returns:
   //
 //  PERF_END (PeiServices, L"DxeIpl", NULL, 0);
 
-  Status = PeiCoreInstallPpi (&mPpiSignal);
+  Status = PeiServicesInstallPpi (&mPpiSignal);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -464,7 +464,7 @@ Returns:
   Hob.Raw = GetHobList ();
   while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_FV, Hob.Raw)) != NULL) {
     FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (Hob.FirmwareVolume->BaseAddress);
-    Status = PeiCoreFfsFindNextFile (
+    Status = PeiServicesFfsFindNextFile (
                Type,
                FwVolHeader,
                &FfsFileHeader
@@ -620,7 +620,7 @@ Returns:
     //
     // Install PeiInMemory to indicate the Dxeipl is shadowed
     //
-    Status = PeiCoreInstallPpi (&mPpiPeiInMemory);
+    Status = PeiServicesInstallPpi (&mPpiPeiInMemory);
 
     if (EFI_ERROR (Status)) {
       return Status;
@@ -757,7 +757,7 @@ Returns:
   EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
   EFI_COMPRESSION_SECTION         *CompressionSection;
 
-  Status = PeiCoreFfsFindSectionData (
+  Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_COMPRESSION,
              FfsFileHeader,
              &SectionData
@@ -795,7 +795,7 @@ Returns:
         //
         AuthenticationStatus = 0;
 
-        Status = PeiCoreLocatePpi (
+        Status = PeiServicesLocatePpi (
                    &gEfiPeiSectionExtractionPpiGuid,
                    0,
                    NULL,
@@ -828,7 +828,7 @@ Returns:
         // If not ask the Security PPI, if exists, for disposition
         //
         //
-        Status = PeiCoreLocatePpi (
+        Status = PeiServicesLocatePpi (
                    &gEfiPeiSecurityPpiGuid,
                    0,
                    NULL,
@@ -940,7 +940,7 @@ Returns:
           if (FvHeader->Signature == EFI_FVH_SIGNATURE) {
             FfsFileHeader = NULL;
             BuildFvHob ((EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader, FvHeader->FvLength);
-            Status = PeiCoreFfsFindNextFile (
+            Status = PeiServicesFfsFindNextFile (
                        EFI_FV_FILETYPE_DXE_CORE,
                        FvHeader,
                        &FfsFileHeader
@@ -986,14 +986,14 @@ Returns:
     //
   } else {
 
-    Status = PeiCoreFfsFindSectionData (
+    Status = PeiServicesFfsFindSectionData (
                EFI_SECTION_PE32,
                FfsFileHeader,
                &SectionData
                );
 
     if (EFI_ERROR (Status)) {
-      Status = PeiCoreFfsFindSectionData (
+      Status = PeiServicesFfsFindSectionData (
                  EFI_SECTION_TE,
                  FfsFileHeader,
                  &SectionData
