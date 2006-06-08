@@ -53,7 +53,7 @@ public class SectFile implements Section {
   
      @param   Buffer  buffer to contain the section file content with alignment
      **/
-    public void toBuffer (DataOutputStream Buffer){
+    public void toBuffer (DataOutputStream buffer, DataOutputStream orgBuffer){
         File   sectFile;
         byte   data;
         long   fileLen;
@@ -83,7 +83,11 @@ public class SectFile implements Section {
             int i = 0;
             while (i < fileLen) {
                 data = In.readByte();
-                Buffer.writeByte(data);
+                buffer.writeByte(data);
+                //
+                // Add data to org file 
+                //
+                orgBuffer.writeByte(data);
                 i++;
             }
 
@@ -92,7 +96,11 @@ public class SectFile implements Section {
             ///
             while ((fileLen & 0x03)!= 0) {
                 fileLen ++;
-                Buffer.writeByte(0);
+                buffer.writeByte(0);
+                //
+                // Add data to org file 
+                //
+                orgBuffer.writeByte(0);
             } 
 
             ///

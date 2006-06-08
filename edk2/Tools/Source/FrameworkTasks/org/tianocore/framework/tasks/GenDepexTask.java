@@ -51,12 +51,12 @@ public class GenDepexTask extends Task implements EfiDefine {
         //
         // absolute path of edk tools
         //
-        String path = project.getProperty("env.Framework_Tools_Path");
+        String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "GenDepex";
+            command = "gendepex";
         } else {
-            command = path + "/" + "GenDepex";
+            command = path + "/" + "gendepex";
         }
         //
         // argument of GenDepex tool
@@ -87,7 +87,7 @@ public class GenDepexTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                System.out.println("GenDepex execute succeeded!");
+                System.out.println("GenDepex execute successed!");
 
             } else {
                 //

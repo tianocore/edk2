@@ -74,7 +74,7 @@ public class MakeDeps extends Task {
         }
 
         Project prj  = this.getOwningTarget().getProject();
-        String  toolPath = prj.getProperty("env.Framework_Tools_Path");
+        String  toolPath = prj.getProperty("env.FRAMEWORK_TOOLS_PATH");
         ///
         /// compose full tool path
         ///

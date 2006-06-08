@@ -54,7 +54,7 @@ public class CompressSection implements Section, FfsTypes{
       @param Buffer     The point of output buffer
       
     **/
-    public void toBuffer (DataOutputStream Buffer){
+    public void toBuffer (DataOutputStream buffer, DataOutputStream orgBuffer){
         
         Section    sect;
         File       compressOut;
@@ -79,7 +79,7 @@ public class CompressSection implements Section, FfsTypes{
                 //  Call each section class's toBuffer function.
                 //
                 try {
-                    sect.toBuffer(Do);
+                    sect.toBuffer(Do, orgBuffer);
                 }
                 catch (BuildException e) {
                     System.out.print(e.getMessage());
@@ -121,7 +121,7 @@ public class CompressSection implements Section, FfsTypes{
             Ch.SectionHeader.type    = (byte) EFI_SECTION_COMPRESSION;
             
             //
-            //  Note: The compressName was not effective now. Using the
+            //  Note: The compressName was not efsfective now. Using the
             //  EFI_STANDARD_COMPRSSION for compressType .
             //  That is follow old Genffsfile tools. Some code will be added for 
             //  the different compressName;
@@ -138,19 +138,26 @@ public class CompressSection implements Section, FfsTypes{
             //
             //  First add CompressHeader to Buffer, then add Compress data.
             //
-            Buffer.write (headerBuffer);
-            Buffer.write(myCompress.outputBuffer);            
+            buffer.write (headerBuffer);
+            buffer.write(myCompress.outputBuffer);            
                 
             //
-            //  4 Byte aligment 
+            //  Buffer 4 Byte aligment 
             //
             int size = Ch.GetSize() + myCompress.outputBuffer.length;
             
             while ((size & 0x03) != 0){
                 size ++;
-                Buffer.writeByte(0);
+                buffer.writeByte(0);
             }
-            
+            //
+            // orgBuffer 4 Byte aligment
+            //
+            size = (int)compressOut.length();
+            while ((size & 0x03) != 0){
+                size ++;
+                orgBuffer.writeByte(0);
+            }
             //
             //  Delete temp file
             //

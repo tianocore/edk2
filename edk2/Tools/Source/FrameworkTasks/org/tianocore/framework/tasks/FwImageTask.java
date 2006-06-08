@@ -22,6 +22,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
+import org.tianocore.build.*;
 
 /**
   FwImageTask class.
@@ -65,12 +66,12 @@ public class FwImageTask extends Task implements EfiDefine{
         //
         // absolute path of efi tools
         //
-        String path = project.getProperty("env.Framework_Tools_Path");
+        String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "FwImage";
+            command = "fwimage";
         } else {
-            command = path + "/" + "FwImage";
+            command = path + "/" + "fwimage";
         }
         //
         // argument of tools
@@ -92,14 +93,15 @@ public class FwImageTask extends Task implements EfiDefine{
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
-            System.out.println(Commandline.toString(cmdline.getCommandline()));
-
+            //System.out.println(Commandline.toString(cmdline.getCommandline()));
+            //GenBuildTask.myLogger.log(Commandline.toString(cmdline.getCommandline()),0);
+            //getProject().log(Commandline.toString(cmdline.getCommandline()));
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                System.out.println("fwimage succeeded!");
+                System.out.println("fwimage successed!");
             } else {
                 //
                 // command execution fail

@@ -114,13 +114,17 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       
       GenFfsFileTask execute is to generate ffs file according to input section 
       dscriptive information.
-     */
+    **/
     public void execute() throws BuildException {
         Section           sect;
         int               fileSize;
+        int               orgFileSize;
         int               fileDataSize;
+        int               orgFileDataSize;
         File              ffsFile;
+        File              ffsOrgFile;
         FfsHeader         ffsHeader = new FfsHeader();  
+        FfsHeader         orgFfsHeader = new FfsHeader();
         String            ffsSuffix = "";
         String            outputPath = "";
 
@@ -128,7 +132,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         //  Get Fraemwork_Tools_Path
         //
         Project pj = this.getOwningTarget().getProject();
-        path       = pj.getProperty("env.Framework_Tools_Path");
+        path       = pj.getProperty("env.FRAMEWORK_TOOLS_PATH");
 
         //
         //  Check does the BaseName, Guid, FileType set value.
@@ -165,14 +169,26 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         System.out.print("General Ffs file: file name is:\n");
         System.out.print(outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix);
         System.out.print("\n");
-
+        
         //
-        //  Create file output stream -- dataBuffer.
-        //   
+        // Create ffs ORG file. fileName = FfsFileGuid + BaseName + ffsSuffix +
+        // ".org".
+        //
+        ffsOrgFile = new File(outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix + ".org");
+           
         try {
+            //
+            //  Create file output stream -- dataBuffer.
+            //
             FileOutputStream dataFs     = new FileOutputStream (ffsFile.getAbsolutePath());
             DataOutputStream dataBuffer = new DataOutputStream (dataFs);
-
+            
+            //
+            // Create org file output stream -- orgDataBuffer
+            //
+            FileOutputStream orgDataFs     = new FileOutputStream (ffsOrgFile.getAbsolutePath());
+            DataOutputStream orgDataBuffer = new DataOutputStream (orgDataFs);
+            
             //
             //  Search SectionList find earch section and call it's 
             //  ToBuffer function.
@@ -185,7 +201,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                     //
                     //  The last section don't need 4 byte ffsAligment.
                     //
-                    sect.toBuffer((DataOutputStream)dataBuffer);
+                    sect.toBuffer((DataOutputStream)dataBuffer, (DataOutputStream) orgDataBuffer);
                 } catch (Exception e) {
                     throw new BuildException (e.getMessage());
                 }
@@ -207,22 +223,40 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             FileInputStream fi = new FileInputStream (ffsFile.getAbsolutePath());
             DataInputStream di = new DataInputStream (fi);
             di.read(fileBuffer);
-            di.close(); 
-
+            di.close();
+            
+            //
+            // create input org stream to read file data
+            //
+            byte[] orgFileBuffer = new byte[(int)ffsOrgFile.length()];
+            FileInputStream ofi  = new FileInputStream (ffsOrgFile.getAbsolutePath());
+            DataInputStream odi  = new DataInputStream (ofi);
+            odi.read(orgFileBuffer);
+            odi.close();
 
             //
             //  Add GUID to header struct
             //
             if (this.ffsFileGuid != null) {
                 stringToGuid (this.ffsFileGuid, ffsHeader.name);
+                //
+                // Add Guid to org header struct
+                //
+                stringToGuid (this.ffsFileGuid, orgFfsHeader.name);
             }
 
             ffsHeader.ffsAttributes = this.attributes;
             if ((ffsHeader.fileType = stringToType(this.ffsFileType))== -1) {
                 throw new BuildException ("FFS_FILE_TYPE unknow!\n");
             }
-
-
+            
+            //
+            // Copy ffsHeader.ffsAttribute and fileType to orgFfsHeader.ffsAttribute
+            // and fileType
+            //            
+            orgFfsHeader.ffsAttributes = ffsHeader.ffsAttributes;
+            orgFfsHeader.fileType      = ffsHeader.fileType;
+            
             //
             //  Adjust file size. The function is used to tripe the last 
             //  section padding of 4 binary boundary. 
@@ -231,15 +265,21 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             if (ffsHeader.fileType != EFI_FV_FILETYPE_RAW) {
 
                 fileDataSize = adjustFileSize (fileBuffer);
+                orgFileDataSize = adjustFileSize (orgFileBuffer);
 
             } else {
                 fileDataSize = fileBuffer.length;
+                orgFileDataSize = orgFileBuffer.length;
             }
 
             //
             //  1. add header size to file size
             //
             fileSize = fileDataSize + ffsHeader.getSize();
+            //
+            //     add header size to org file size
+            //
+            orgFileSize = orgFileDataSize + ffsHeader.getSize();
 
             if ((ffsHeader.ffsAttributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
                 if (ffsHeader.fileType == EFI_FV_FILETYPE_FFS_PAD) {
@@ -256,6 +296,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                                              );            
                 }
                 fileSize = fileSize + 2;
+                orgFileSize = orgFileSize + 2;
             }
 
             //
@@ -264,7 +305,14 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             ffsHeader.ffsFileSize[0] = (byte)(fileSize & 0x00FF);
             ffsHeader.ffsFileSize[1] = (byte)((fileSize & 0x00FF00)>>8);
             ffsHeader.ffsFileSize[2] = (byte)(((int)fileSize & 0xFF0000)>>16);
-
+            
+            //
+            //     set file size to org header struct
+            //
+            orgFfsHeader.ffsFileSize[0] = (byte)(orgFileSize & 0x00FF);
+            orgFfsHeader.ffsFileSize[1] = (byte)((orgFileSize & 0x00FF00)>>8);
+            orgFfsHeader.ffsFileSize[2] = (byte)(((int)orgFileSize & 0xFF0000)>>16);
+            
             //
             //  Fill in checksums and state, these must be zero for checksumming
             //
@@ -272,21 +320,43 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                                                                  ffsHeader.structToBuffer(),
                                                                  ffsHeader.getSize()
                                                                  );
-
+            //
+            // Fill in org file's header check sum and state
+            //
+            orgFfsHeader.integrityCheck.header = calculateChecksum8 (
+                                                                    orgFfsHeader.structToBuffer(),
+                                                                    orgFfsHeader.getSize()
+                                                                    );
+            
             if ((this.attributes & FFS_ATTRIB_CHECKSUM) != 0) {
                 if ((this.attributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
                     ffsHeader.integrityCheck.file = calculateChecksum8 (
                                                                        fileBuffer, 
                                                                        fileDataSize
                                                                        );
+                    //
+                    // Add org file header
+                    //
+                    orgFfsHeader.integrityCheck.file = calculateChecksum8 (
+                                                                           orgFileBuffer,
+                                                                           orgFileDataSize
+                                                                           );
                 } else {
                     ffsHeader.integrityCheck.file = calculateChecksum8 (
                                                                        fileBuffer,
                                                                        fileDataSize
                                                                        );
+                    //
+                    // Add org file header
+                    //
+                    orgFfsHeader.integrityCheck.file = calculateChecksum8 (
+                                                                          orgFileBuffer,
+                                                                          orgFileDataSize
+                                                                          );
                 }
             } else {
                 ffsHeader.integrityCheck.file = FFS_FIXED_CHECKSUM;
+                orgFfsHeader.integrityCheck.file = FFS_FIXED_CHECKSUM;
             }
 
             //
@@ -295,20 +365,29 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             ffsHeader.ffsState = EFI_FILE_HEADER_CONSTRUCTION | 
                                  EFI_FILE_HEADER_VALID | 
                                  EFI_FILE_DATA_VALID;
-
-
+            orgFfsHeader.integrityCheck.file = ffsHeader.ffsState;
+            
             //
             // create output stream to first write header data in file, then write sect data in file.
             //
             FileOutputStream headerFfs = new FileOutputStream (ffsFile.getAbsolutePath());
             DataOutputStream ffsBuffer = new DataOutputStream (headerFfs);
-
+            
+            FileOutputStream orgHeaderFfs = new FileOutputStream (ffsOrgFile.getAbsolutePath());
+            DataOutputStream orgFfsBuffer = new DataOutputStream (orgHeaderFfs);
+            
             //
             //  Add header struct and file data to FFS file
             //
             ffsBuffer.write(ffsHeader.structToBuffer());
+            orgFfsBuffer.write(orgFfsHeader.structToBuffer());
+            
             for (int i = 0; i< fileDataSize; i++) {
                 ffsBuffer.write(fileBuffer[i]);
+            }
+            
+            for (int i = 0; i < orgFileDataSize; i++){
+                orgFfsBuffer.write(orgFileBuffer[i]);
             }
 
             //
@@ -333,6 +412,9 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                 tailByte[1] = (byte)((tailValue & 0xff00)>>8);  
                 ffsBuffer.write(tailByte[0]);
                 ffsBuffer.write(tailByte[1]);
+                
+                orgFfsBuffer.write(tailByte[0]);
+                orgFfsBuffer.write(tailByte[1]);
             }
 
             //
@@ -340,6 +422,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             //  the buffer can't be rewritten to file. 
             //
             ffsBuffer.close();
+            orgFfsBuffer.close();
             System.out.print ("Successful create ffs file!\n");
         } catch (Exception e) {
             throw new BuildException (e.getMessage());
@@ -672,7 +755,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         }
 
         if (ffsFileType.equals("EFI_FV_FILETYPE_FREEFORM")) {
-            return(byte)EFI_FV_FILETYPE_SECURITY_CORE;
+            return(byte)EFI_FV_FILETYPE_FREEFORM;
         }
 
         if (ffsFileType.equals("EFI_FV_FILETYPE_SECURITY_CORE")) {

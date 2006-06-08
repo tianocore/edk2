@@ -96,7 +96,7 @@ public class GuidChkTask extends Task implements EfiDefine{
     //   
     public void execute() throws BuildException {
         Project project = this.getOwningTarget().getProject();
-        String path = project.getProperty("env.Framework_Tools_Path");
+        String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
             command = "GuidChk";

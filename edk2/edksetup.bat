@@ -62,7 +62,7 @@ if not exist %XMLBEANS_HOME%\lib\saxon8.jar goto no_saxon8
 @REM
 set WORKSPACE=%CD%
 
-set Framework_Tools_Path=%WORKSPACE%\Tools\bin
+set FRAMEWORK_TOOLS_PATH=%WORKSPACE%\Tools\bin
 set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin;%Framework_Tools_Path%;%PATH%
 
 echo.
