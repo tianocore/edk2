@@ -472,9 +472,6 @@
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
                 <xs:element name="Formset">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">Describe the valid content of a Formset</xs:documentation>
-                    </xs:annotation>
                     <xs:complexType>
                         <xs:simpleContent>
                             <xs:extension base="C_Name">
@@ -586,11 +583,26 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="GuidValue" type="GuidType"/>
-    <xs:element name="HelpText" type="Paragraph">
+    <xs:element name="HelpText" type="Paragraph"/>
+    <xs:element name="HiiPackages">
         <xs:annotation>
-            <xs:documentation xml:lang="en">This section is used to describe how a GUID, PPI or PROTOCOL is to be used within the context of PCDs.</xs:documentation>
+            <xs:documentation xml:lang="en">Describe the list of a HiiPackage elements</xs:documentation>
         </xs:annotation>
+        <xs:complexType>
+            <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:element name="HiiPackage">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="C_Name">
+                                <xs:attributeGroup ref="FormsetAttributes"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
+
     <xs:element name="Hobs">
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
@@ -632,7 +644,8 @@
     <xs:element name="IncludeHeader">
         <xs:complexType>
             <xs:simpleContent>
-                <xs:extension base="FileNameConvention">
+                <xs:extension base="PathAndFilename">
+                    <!-- Need to use IncludeHeaderAttributes in final -->
                     <xs:attributeGroup ref="IncludeAttributes"/>
                 </xs:extension>
             </xs:simpleContent>
@@ -657,11 +670,21 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:element name="IndustryStdHeaders">
+    <xs:element name="IndustryStdIncludes">
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="unbounded" ref="IncludeHeader"/>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="IndustryStdHeader"/>
             </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="IndustryStdHeader">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="Header" type="UiNameType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="IncludeHeader" type="PathAndFilename"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="HelpText"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="IndustryStdHeaderAttributes"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="InstalledDate" type="DateType"/>
@@ -713,21 +736,19 @@
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
+    <!-- LAH This is LibraryClassDeclaration FINAL version -->
     <xs:element name="LibraryClassDeclaration">
         <xs:annotation>
             <xs:documentation xml:lang="en">This element defines a class of library, along with the path to the Include Header for this library</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence minOccurs="0">
+            <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" name="LibraryClass">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">Used in MSA and SPD files. This defines what class of library is being supported = produced (library module) or consumed by a module.</xs:documentation>
-                    </xs:annotation>
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="BaseNameConvention">
-                                <xs:attribute name="RecommendedInstance" type="xs:NCName" use="optional"/>
+                            <xs:extension base="xs:NCName">
                                 <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
+                                <xs:attribute name="RecommendedInstanceVersion" type="xs:decimal" use="optional"/>
                             </xs:extension>
                         </xs:simpleContent>
                     </xs:complexType>
@@ -736,13 +757,11 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <!-- LAH This is LibraryClassDeclarations FINAL version -->
     <xs:element name="LibraryClassDeclarations">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This section defines what Classes of Libraries that this library belongs to. A Library may belong to multiple different library classes.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType mixed="true">
-            <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                <xs:element ref="LibraryClassDeclaration"/>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="LibraryClassDeclaration"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -848,30 +867,6 @@
                             </xs:element>
                         </xs:sequence>
                         <xs:attribute name="ArchType" type="SupportedArchitectures"/>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="MsaPcdDeclarations">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Child of Module Surface Area Description (MSA)</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence minOccurs="1">
-                <xs:element maxOccurs="unbounded" name="PcdEntry">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">This is the valid content of the PCD table of a Module. The contents may not be wired at build time, and these only refer to Platform Build values, not modules.</xs:documentation>
-                        <xs:documentation xml:lang="en">This element is valid for PcdInfo.xml and FPD files.</xs:documentation>
-                    </xs:annotation>
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
-                        </xs:sequence>
-                        <!-- MSA file declares a single usage, and must match one of the entries in what the SPD file declares as the set of possible Item Types. -->
-                        <xs:attribute name="PcdItemType" type="PcdItemTypes" use="required"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1363,7 +1358,7 @@
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
+                            <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                         </xs:sequence>
                         <!-- MSA file declares a single usage, and must match one of the entries in what the SPD file declares as the set of possible Item Types. -->
                         <xs:attribute name="PcdItemType" type="PcdItemTypes" use="required"/>
@@ -1372,19 +1367,15 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <!-- LAH This is PcdDeclarations FINAL version -->
     <xs:element name="PcdDeclarations">
         <xs:annotation>
             <xs:documentation xml:lang="en">Child of Package Surface Area Description (SPD)</xs:documentation>
-            <xs:documentation xml:lang="en">This permits entering information about a package's PCD information</xs:documentation>
+            <xs:documentation xml:lang="en">This section is for entering information about a package's PCDs</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element maxOccurs="unbounded" name="PcdEntry">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">This is the valid content of the PCD table of a Module. The contents may not be wired at build time, and these only refer to Platform Build values, not modules.</xs:documentation>
-                        <xs:documentation xml:lang="en">This element is valid for PcdInfo.xml and FPD files.</xs:documentation>
-                        <xs:documentation xml:lang="en">There is ONE required Attribute, ItemType</xs:documentation>
-                    </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
@@ -1393,9 +1384,9 @@
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="ValidUsage" type="PcdListType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="HelpText" type="Paragraph"/>
+                            <xs:element minOccurs="1" maxOccurs="1" ref="HelpText"/>
                         </xs:sequence>
-                        <xs:attributeGroup ref="PcdAttributes"/>
+                        <xs:attributeGroup ref="PcdDeclarationAttributes"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1682,6 +1673,21 @@
                         <xs:attribute name="ArchType" type="SupportedArchitectures"/>
                     </xs:complexType>
                 </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="SkuInfo">
+        <xs:complexType>
+            <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:element name="UiSkuName">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="UiNameType">
+                                    <xs:attribute name="SkuID" type="xs:nonNegativeInteger" use="required"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

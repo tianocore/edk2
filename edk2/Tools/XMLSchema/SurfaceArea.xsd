@@ -23,11 +23,7 @@
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="FdbHeader"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="PackageList"/>
-                <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="PlatformList"/>
-                    <!-- DO NOT USE! removing PlatformDescriptions, use PlatformList instead. -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="PlatformDescriptions"/>
-                </xs:choice>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PlatformList"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -38,6 +34,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="PlatformHeader"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="SkuInfo"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Flash"/>
                 <!-- DO NOT USE! removing TianoImage, use FrameworkModules instead. -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="TianoImage"/>
@@ -45,6 +42,7 @@
                 <!-- DO NOT USE! removing PcdBuildDeclarations here, use PcdBuildDeclaratiion in ModuleSA instead. -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
                 <xs:choice minOccurs="0">
+                    <!-- DO NOT USE! removing PcdDynamicBuildDeclarations here, use DynamicPcdBuildDefinitions in ModuleSA instead. -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdDynamicBuildDeclarations"/>
                     <xs:element minOccurs="0" maxOccurs="1" ref="DynamicPcdBuildDefinitions"/>
                 </xs:choice>
@@ -89,6 +87,7 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDefinitions"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SourceFiles"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Libraries"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>
@@ -141,8 +140,9 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDefinitions"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SourceFiles"/>
                 <xs:choice minOccurs="0">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
+                  <!-- DO NOT USE! removing Includes, use PackageDependencies instead -->
+                  <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                  <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
@@ -152,11 +152,13 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>
+                <!-- DO NOT USE! removing Formsets, use HiiPackages instead -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="HiiPackages"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
                 <xs:choice minOccurs="0">
-                    <!-- DO NOT USE! removing PCDs, use MsaPcdDeclarations instead -->
+                    <!-- DO NOT USE! removing PCDs, use PcdCoded instead -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="PCDs"/>
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdCoded"/>
                 </xs:choice>
@@ -173,7 +175,8 @@
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SpdHeader"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDeclarations"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="IndustryStdHeaders"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="IndustryStdIncludes"/>
+                <!-- DO NOT USE removing PackageDependencies, this is moving to FDP installation process -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="MsaFiles"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageHeaders"/>
