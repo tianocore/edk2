@@ -179,7 +179,7 @@ Returns:
     // Alert any listeners that there is permanent memory available
     //
     PERF_START (NULL,"DisMem", NULL, 0);
-    Status = PeiCoreInstallPpi (&mMemoryDiscoveredPpi);
+    Status = PeiServicesInstallPpi (&mMemoryDiscoveredPpi);
     PERF_END (NULL,"DisMem", NULL, 0);
 
   } else {
@@ -201,7 +201,7 @@ Returns:
     // If SEC provided any PPI services to PEI, install them.
     //
     if (PeiStartupDescriptor->DispatchTable != NULL) {
-      Status = PeiCoreInstallPpi (PeiStartupDescriptor->DispatchTable);
+      Status = PeiServicesInstallPpi (PeiStartupDescriptor->DispatchTable);
       ASSERT_EFI_ERROR (Status);
     }
   }
@@ -220,7 +220,7 @@ Returns:
 
   PERF_END (NULL, "PostMem", NULL, 0);
 
-  Status = PeiCoreLocatePpi (
+  Status = PeiServicesLocatePpi (
              &gEfiDxeIplPpiGuid,
              0,
              NULL,

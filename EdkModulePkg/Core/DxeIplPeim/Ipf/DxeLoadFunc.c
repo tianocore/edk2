@@ -55,7 +55,7 @@ Returns:
   //
   // Allocate 16KB for the BspStore
   //
-  Status = PeiCoreAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (BSP_STORE_SIZE), BspStore);
+  Status = PeiServicesAllocatePages (EfiBootServicesData, EFI_SIZE_TO_PAGES (BSP_STORE_SIZE), BspStore);
   if (EFI_ERROR (Status)) {
     return Status;
   }

@@ -33,7 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </MsaLibHeader>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">PeCoffGetEntryPointLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiCoreLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PeCoffGetEntryPoint.c</Filename>

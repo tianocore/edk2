@@ -65,7 +65,7 @@
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseSmbusLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiSmbusLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
       
@@ -138,7 +138,7 @@
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseSmbusLib" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiSmbusLib" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeSmbusLib" />
-      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiServicesLib" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiMemoryLib" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
       
@@ -210,7 +210,7 @@
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseSmbusLib" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiSmbusLib" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeSmbusLib" />
-      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiServicesLib" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiMemoryLib" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
       
@@ -283,7 +283,7 @@
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseSmbusLib" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiSmbusLib" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeSmbusLib" />
-      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiCoreLib" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiServicesLib" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiMemoryLib" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiServicesTablePointerLib" />
       
@@ -931,7 +931,7 @@
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmbusLib" >
       </ModuleSA>        
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreLib" >
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesLib" >
       </ModuleSA>        
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMemoryLib" >
       </ModuleSA>        
@@ -1520,7 +1520,7 @@
       </ModuleSA>        
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeSmbusLib" >
       </ModuleSA>        
-      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiCoreLib" >
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiServicesLib" >
       </ModuleSA>        
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiMemoryLib" >
       </ModuleSA>        
@@ -2109,7 +2109,7 @@
       </ModuleSA>        
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="DxeSmbusLib" >
       </ModuleSA>        
-      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiCoreLib" >
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiServicesLib" >
       </ModuleSA>        
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiMemoryLib" >
       </ModuleSA>        
@@ -2698,7 +2698,7 @@
       </ModuleSA>        
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeSmbusLib" >
       </ModuleSA>        
-      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiCoreLib" >
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiServicesLib" >
       </ModuleSA>        
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiMemoryLib" >
       </ModuleSA>        

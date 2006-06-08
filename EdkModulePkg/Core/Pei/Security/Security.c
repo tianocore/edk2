@@ -58,7 +58,7 @@ Returns:
 --*/
 {
   if (OldCoreData == NULL) {
-    PeiCoreNotifyPpi (&mNotifyList);
+    PeiServicesNotifyPpi (&mNotifyList);
   }
   return;
 }

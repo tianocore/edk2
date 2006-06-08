@@ -451,7 +451,7 @@ Returns:
     // Locate all instances of FindFV
     // Alternately, could use FV HOBs, but the PPI is cleaner
     //
-    Status = PeiCoreLocatePpi (
+    Status = PeiServicesLocatePpi (
                &gEfiFindFvPpiGuid,
                0,
                NULL,

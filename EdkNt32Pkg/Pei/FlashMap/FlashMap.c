@@ -136,14 +136,14 @@ Returns:
   //
   // Install FlashMap PPI
   //
-  Status = PeiCoreInstallPpi (&mPpiListFlashMap);
+  Status = PeiServicesInstallPpi (&mPpiListFlashMap);
   ASSERT_EFI_ERROR (Status);
 
 
   //
   // Get the Fwh Information PPI
   //
-  Status = PeiCoreLocatePpi (
+  Status = PeiServicesLocatePpi (
             &gNtFwhPpiGuid, // GUID
             0,              // INSTANCE
             &PpiDescriptor, // EFI_PEI_PPI_DESCRIPTOR
@@ -249,7 +249,7 @@ GetAreaInfo (
   EFI_PEI_HOB_POINTERS          Hob;
   EFI_HOB_FLASH_MAP_ENTRY_TYPE  *FlashMapEntry;
 
-  Status = PeiCoreGetHobList (&Hob.Raw);
+  Status = PeiServicesGetHobList (&Hob.Raw);
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_GUID_EXTENSION && CompareGuid (&Hob.Guid->Name, &gEfiFlashMapHobGuid)) {
       FlashMapEntry = (EFI_HOB_FLASH_MAP_ENTRY_TYPE *) Hob.Raw;

@@ -115,8 +115,8 @@
       <IncludeHeader>Include/Library/PeiCoreEntryPoint.h</IncludeHeader>
     </LibraryClassDeclaration>
     <LibraryClassDeclaration>
-      <LibraryClass>PeiCoreLib</LibraryClass>
-      <IncludeHeader>Include/Library/PeiCoreLib.h</IncludeHeader>
+      <LibraryClass>PeiServicesLib</LibraryClass>
+      <IncludeHeader>Include/Library/PeiServicesLib.h</IncludeHeader>
     </LibraryClassDeclaration>
     <LibraryClassDeclaration>
       <LibraryClass>PeimEntryPoint</LibraryClass>
@@ -302,7 +302,7 @@
       <Filename>Library/PeiCoreEntryPoint/PeiCoreEntryPoint.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Library/PeiCoreLib/PeiCoreLib.msa</Filename>
+      <Filename>Library/PeiServicesLib/PeiServicesLib.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/PeiHobLib/PeiHobLib.msa</Filename>

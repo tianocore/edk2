@@ -43,7 +43,7 @@ PublishSystemMemory (
   ASSERT (MemoryLength > 0);
   ASSERT (MemoryLength <= (MAX_ADDRESS - MemoryBegin + 1));
 
-  Status      = PeiCoreInstallPeiMemory (MemoryBegin, MemoryLength);
+  Status      = PeiServicesInstallPeiMemory (MemoryBegin, MemoryLength);
      
   return (RETURN_STATUS) Status;
 }

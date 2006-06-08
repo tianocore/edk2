@@ -306,7 +306,7 @@ Returns:
  // it should use AllocatePages service instead.
  //
  ASSERT (Size < 0x10000 - sizeof (EFI_HOB_MEMORY_POOL));
- Status = PeiCoreCreateHob (
+ Status = PeiServicesCreateHob (
              EFI_HOB_TYPE_PEI_MEMORY_POOL,
              (UINT16)(sizeof (EFI_HOB_MEMORY_POOL) + Size),
              (VOID **)&Hob

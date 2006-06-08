@@ -144,7 +144,7 @@ GetHiiVariable (
   VOID       *Buffer;
   EFI_PEI_READ_ONLY_VARIABLE_PPI *VariablePpi;
 
-  Status = PeiCoreLocatePpi (&gEfiPeiReadOnlyVariablePpiGuid, 0, NULL, (VOID **) &VariablePpi);
+  Status = PeiServicesLocatePpi (&gEfiPeiReadOnlyVariablePpiGuid, 0, NULL, (VOID **) &VariablePpi);
   ASSERT_EFI_ERROR (Status);
 
   Size = 0;
@@ -159,7 +159,7 @@ GetHiiVariable (
                             );
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
 
-  Status = PeiCoreAllocatePool (Size, &Buffer);
+  Status = PeiServicesAllocatePool (Size, &Buffer);
   ASSERT_EFI_ERROR (Status);
 
   Status = VariablePpi->PeiGetVariable (

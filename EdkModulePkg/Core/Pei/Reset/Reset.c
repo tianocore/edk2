@@ -50,7 +50,7 @@ Returns:
   EFI_STATUS        Status;
   EFI_PEI_RESET_PPI *ResetPpi;
 
-  Status = PeiCoreLocatePpi (
+  Status = PeiServicesLocatePpi (
              &gEfiPeiResetPpiGuid,         
              0,                         
              NULL,                      

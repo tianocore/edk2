@@ -10,12 +10,12 @@
 	THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
 	WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-	Module Name:	PeiCoreLib.h
+	Module Name:	PeiServicesLib.h
 
 **/
 
-#ifndef __PEI_CORE_LIB_H__
-#define __PEI_CORE_LIB_H__
+#ifndef __PEI_SERVICES_LIB_H__
+#define __PEI_SERVICES_LIB_H__
 
 /**
 	This service enables a given PEIM to register an interface into the PEI Foundation. 
@@ -31,7 +31,7 @@
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreInstallPpi (
+PeiServicesInstallPpi (
   IN EFI_PEI_PPI_DESCRIPTOR           *PpiList
   )
 ;
@@ -52,7 +52,7 @@ PeiCoreInstallPpi (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreReinstallPpi (
+PeiServicesReinstallPpi (
   IN EFI_PEI_PPI_DESCRIPTOR           *OldPpi,
   IN EFI_PEI_PPI_DESCRIPTOR           *NewPpi
   )
@@ -72,7 +72,7 @@ PeiCoreReinstallPpi (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreLocatePpi (
+PeiServicesLocatePpi (
   IN EFI_GUID                         *Guid,
   IN UINTN                            Instance,
   IN OUT EFI_PEI_PPI_DESCRIPTOR       **PpiDescriptor,
@@ -95,7 +95,7 @@ PeiCoreLocatePpi (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreNotifyPpi (
+PeiServicesNotifyPpi (
   IN EFI_PEI_NOTIFY_DESCRIPTOR        *NotifyList
   )
 ;
@@ -111,7 +111,7 @@ PeiCoreNotifyPpi (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreGetBootMode (
+PeiServicesGetBootMode (
   IN OUT EFI_BOOT_MODE                *BootMode
   )
 ;
@@ -126,7 +126,7 @@ PeiCoreGetBootMode (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreSetBootMode (
+PeiServicesSetBootMode (
   IN EFI_BOOT_MODE                    BootMode
   )
 ;
@@ -142,7 +142,7 @@ PeiCoreSetBootMode (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreGetHobList (
+PeiServicesGetHobList (
   IN OUT VOID                         **HobList
   )
 ;
@@ -160,7 +160,7 @@ PeiCoreGetHobList (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreCreateHob (
+PeiServicesCreateHob (
   IN UINT16                           Type,
   IN UINT16                           Length,
   IN OUT VOID                         **Hob
@@ -181,7 +181,7 @@ PeiCoreCreateHob (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreFfsFindNextVolume (
+PeiServicesFfsFindNextVolume (
   IN UINTN                            Instance,
   IN OUT EFI_FIRMWARE_VOLUME_HEADER   **FwVolHeader
   )
@@ -202,7 +202,7 @@ PeiCoreFfsFindNextVolume (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreFfsFindNextFile (
+PeiServicesFfsFindNextFile (
   IN EFI_FV_FILETYPE                  SearchType,
   IN EFI_FIRMWARE_VOLUME_HEADER       *FwVolHeader,
   IN OUT EFI_FFS_FILE_HEADER          **FileHeader
@@ -222,7 +222,7 @@ PeiCoreFfsFindNextFile (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreFfsFindSectionData (
+PeiServicesFfsFindSectionData (
   IN EFI_SECTION_TYPE                 SectionType,
   IN EFI_FFS_FILE_HEADER              *FfsFileHeader,
   IN OUT VOID                         **SectionData
@@ -243,7 +243,7 @@ PeiCoreFfsFindSectionData (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreInstallPeiMemory (
+PeiServicesInstallPeiMemory (
   IN EFI_PHYSICAL_ADDRESS             MemoryBegin,
   IN UINT64                           MemoryLength
   )
@@ -264,7 +264,7 @@ PeiCoreInstallPeiMemory (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreAllocatePages (
+PeiServicesAllocatePages (
   IN EFI_MEMORY_TYPE                  MemoryType,
   IN UINTN                            Pages,
   IN OUT EFI_PHYSICAL_ADDRESS         *Memory
@@ -284,7 +284,7 @@ PeiCoreAllocatePages (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreAllocatePool (
+PeiServicesAllocatePool (
   IN UINTN                            Size,
   OUT VOID                            **Buffer
   )
@@ -298,7 +298,7 @@ PeiCoreAllocatePool (
 **/
 EFI_STATUS
 EFIAPI
-PeiCoreResetSystem (
+PeiServicesResetSystem (
   VOID
   )
 ;

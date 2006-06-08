@@ -54,7 +54,7 @@ Returns:
   UINT64                  ImageSize;
   EFI_PHYSICAL_ADDRESS    ImageEntryPoint;
 
-  Status = PeiCoreLocatePpi (
+  Status = PeiServicesLocatePpi (
              &gNtPeiLoadFilePpiGuid,
              0,
              &PpiDescriptor,
