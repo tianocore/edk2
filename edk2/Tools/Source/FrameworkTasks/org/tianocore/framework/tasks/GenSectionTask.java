@@ -93,7 +93,7 @@ public class GenSectionTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                System.out.println("gensection successed!");
+                System.out.println("gensection succeeded!");
             } else {
                 //
                 // command execution fail
