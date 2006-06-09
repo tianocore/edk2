@@ -82,7 +82,7 @@ public class SetStampTask extends Task implements EfiDefine {
                 ///
                 /// command execution success
                 ///
-                System.out.println("SetStamp execute successed!");
+                System.out.println("SetStamp execute succeeded!");
             } else {
                 ///
                 /// command execution fail
