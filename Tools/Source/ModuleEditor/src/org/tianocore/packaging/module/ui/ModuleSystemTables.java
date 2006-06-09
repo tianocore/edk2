@@ -208,8 +208,8 @@ public class ModuleSystemTables extends IInternalFrame {
         init(inSystemTables);
         this.location = index;
         if (this.systemTables.getSystemTableList().size() > 0) {
-            if (this.systemTables.getSystemTableArray(index).getEntry() != null) {
-                this.jTextFieldEntry.setText(this.systemTables.getSystemTableArray(index).getEntry());
+            if (this.systemTables.getSystemTableArray(index).getEntryList() != null) {
+                this.jTextFieldEntry.setText(this.systemTables.getSystemTableArray(index).getEntryList().get(0));
             }
             if (this.systemTables.getSystemTableArray(index).getUsage() != null) {
                 this.jComboBoxUsage.setSelectedItem(this.systemTables.getSystemTableArray(index).getUsage().toString());
@@ -374,7 +374,7 @@ public class ModuleSystemTables extends IInternalFrame {
             }
             SystemTablesDocument.SystemTables.SystemTable systemTable = SystemTablesDocument.SystemTables.SystemTable.Factory
                                                                                                                              .newInstance();
-            systemTable.setEntry(this.jTextFieldEntry.getText());
+            //systemTable.setEntry(this.jTextFieldEntry.getText());
 
             systemTable.setUsage(SystemTableUsage.Enum.forString(jComboBoxUsage.getSelectedItem().toString()));
             if (!isEmpty(this.jTextFieldOverrideID.getText())) {
