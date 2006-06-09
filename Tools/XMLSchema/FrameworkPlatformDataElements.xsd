@@ -259,8 +259,20 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>
                 <!-- DO NOT USE! REMOVE Guids in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
-                <!-- EXTERNS stays in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
+                <xs:choice minOccurs="0">
+                    <!-- DO NOT USE! REMOVE Externs stays in FINAL -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
+                    <xs:element minOccurs="0" maxOccurs="1" name="Extern">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">Only specification is allow here. We need to let this be an addtion OR, if the WORD portion exists, this entry takes precedence.</xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element minOccurs="1" maxOccurs="unbounded" ref="Specification"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
                 <xs:choice>
                     <!-- DO NOT USE! REMOVE PcdBuildDeclarations in FINAL -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
@@ -320,12 +332,17 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="1" name="SEC" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="PEI_CORE" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="PEIM" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="DXE_CORE" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="OTHER_COMPONENTS" type="Components"/>
+                <xs:choice>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" maxOccurs="1" name="SEC" type="Components"/>
+                        <xs:element minOccurs="0" maxOccurs="1" name="PEI_CORE" type="Components"/>
+                        <xs:element minOccurs="0" maxOccurs="1" name="PEIM" type="Components"/>
+                        <xs:element minOccurs="0" maxOccurs="1" name="DXE_CORE" type="Components"/>
+                        <xs:element minOccurs="0" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
+                        <xs:element minOccurs="0" maxOccurs="1" name="OTHER_COMPONENTS" type="Components"/>
+                    </xs:sequence>
+                    <xs:element minOccurs="1" maxOccurs="unbounded" ref="ModuleSA"/>
+                </xs:choice>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
