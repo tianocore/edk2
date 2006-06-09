@@ -108,32 +108,35 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="BaseName"/>
                     <!-- BaseName needs to be removed  -->
-                    <xs:element minOccurs="0" maxOccurs="1" name="ModuleName" type="xs:NCName"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="BaseName"/>
+                    <!-- ModuleName needs to be required -->
+                    <xs:element minOccurs="0" maxOccurs="1" name="ModuleName" type="UiNameType"/>
                 </xs:choice>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ModuleType"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ComponentType"/>
                 <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                     <!-- Guid needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                     <!-- GuidValue needs to be required -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 </xs:choice>
+                <!-- Version needs to be a decimal in final -->
                 <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
                 <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
                     <!-- Created needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                    <!-- CreatedDate needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                    <!-- CreatedDate needs to be required -->
                 </xs:choice>
                 <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
                     <!-- Updated needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                    <!-- ModifiedDate needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" name="SupportedArchitectures">
@@ -141,8 +144,9 @@
                         <xs:list itemType="SupportedArchitectures"/>
                     </xs:simpleType>
                 </xs:element>
+                <xs:element default="false" minOccurs="0" name="BinaryModule" type="xs:boolean"/>
+                <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
-                <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00090000 -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>
