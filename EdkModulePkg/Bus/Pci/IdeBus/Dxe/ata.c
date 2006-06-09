@@ -1,33 +1,25 @@
-/*++
+/** @file
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
+  @par Revision Reference:
+  2002-6: Add Atapi6 enhancement, support >120GB hard disk, including
+  update - ATAIdentity() func
+  update - AtaBlockIoReadBlocks() func
+  update - AtaBlockIoWriteBlocks() func
+  add    - AtaAtapi6Identify() func
+  add    - AtaReadSectorsExt() func
+  add    - AtaWriteSectorsExt() func
+  add    - AtaPioDataInExt() func
+  add    - AtaPioDataOutExt() func
 
-    ata.c
-    
-Abstract: 
-    
-Revision History
-
-    2002-6: Add Atapi6 enhancement, support >120GB hard disk, including
-            update - ATAIdentity() func
-            update - AtaBlockIoReadBlocks() func
-            update - AtaBlockIoWriteBlocks() func
-            add    - AtaAtapi6Identify() func
-            add    - AtaReadSectorsExt() func
-            add    - AtaWriteSectorsExt() func
-            add    - AtaPioDataInExt() func
-            add    - AtaPioDataOutExt() func
-            
---*/
+**/
 
 #include "idebus.h"
 
@@ -68,46 +60,34 @@ AtaPioDataOutExt (
   IN  UINT16          SectorCount
   );
 
+/**
+  Sends out an ATA Identify Command to the specified device.
+
+  This function is called by DiscoverIdeDevice() during its device
+  identification. It sends out the ATA Identify Command to the 
+  specified device. Only ATA device responses to this command. If 
+  the command succeeds, it returns the Identify data structure which 
+  contains information about the device. This function extracts the 
+  information it needs to fill the IDE_BLK_IO_DEV data structure, 
+  including device type, media block size, media capacity, and etc.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure,used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS Identify ATA device successfully.
+  
+  @retval EFI_DEVICE_ERROR ATA Identify Device Command failed or
+  device is not ATA device.
+
+  @note
+  parameter IdeDev will be updated in this function.
+
+**/
 EFI_STATUS
 ATAIdentify (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        ATAIdentify
-
-
-  Purpose: 
-        This function is called by DiscoverIdeDevice() during its device
-        identification. It sends out the ATA Identify Command to the 
-        specified device. Only ATA device responses to this command. If 
-        the command succeeds, it returns the Identify data structure which 
-        contains information about the device. This function extracts the 
-        information it needs to fill the IDE_BLK_IO_DEV data structure, 
-        including device type, media block size, media capacity, and etc.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure,used
-          to record all the information of the IDE device.
-
-
-  Returns:  
-        EFI_SUCCESS
-          Identify ATA device successfully.
-
-        EFI_DEVICE_ERROR
-          ATA Identify Device Command failed or device is not 
-          ATA device.
-
-
-  Notes:
-        parameter IdeDev will be updated in this function.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   EFI_STATUS        Status;
   EFI_IDENTIFY_DATA *AtaIdentifyPointer;
@@ -213,42 +193,30 @@ ATAIdentify (
 }
 
 
+/**
+  This function is called by ATAIdentify() to identity whether this disk
+  supports ATA/ATAPI6 48bit addressing, ie support >120G capacity
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval  EFI_SUCCESS The disk specified by IdeDev is a Atapi6 supported one
+  and 48-bit addressing must be used
+  
+  @retval  EFI_UNSUPPORTED The disk dosn't not support Atapi6 or it supports but
+  the capacity is below 120G, 48bit addressing is not
+  needed
+
+  @note
+  This function must be called after DEVICE_IDENTITY command has been 
+  successfully returned
+
+**/
 EFI_STATUS
 AtaAtapi6Identify (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-  
-        AtaAtapi6Identify
-
-  Purpose: 
-  
-        This function is called by ATAIdentify() to identity whether this disk
-        supports ATA/ATAPI6 48bit addressing, ie support >120G capacity
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-  
-        EFI_SUCCESS     - The disk specified by IdeDev is a Atapi6 supported one
-                          and 48-bit addressing must be used
-
-        EFI_UNSUPPORTED - The disk dosn't not support Atapi6 or it supports but
-                          the capacity is below 120G, 48bit addressing is not 
-                          needed
-                          
-  Notes:
-
-       This function must be called after DEVICE_IDENTITY command has been 
-       successfully returned
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   UINT8             Index;
   EFI_LBA           TmpLba;
@@ -304,33 +272,19 @@ AtaAtapi6Identify (
   return EFI_UNSUPPORTED;
 }
 
+/**
+  This function is called by ATAIdentify() or ATAPIIdentify()
+  to print device's module name. 
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+**/
 VOID
 PrintAtaModuleName (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        PrintAtaModuleName
-
-
-  Purpose: 
-        This function is called by ATAIdentify() or ATAPIIdentify()
-        to print device's module name. 
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        no returns.
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   if (IdeDev->pIdData == NULL) {
     return ;
@@ -340,6 +294,44 @@ PrintAtaModuleName (
   IdeDev->ModelName[40] = 0x00;
 }
 
+/**
+  This function is used to send out ATA commands conforms to the 
+  PIO Data In Protocol.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *Buffer
+  buffer contained data transferred from device to host.
+
+  @param[in] ByteCount
+  data size in byte unit of the buffer.
+
+  @param[in] AtaCommand
+  value of the Command Register
+
+  @param[in] Head
+  value of the Head/Device Register
+
+  @param[in] SectorCount
+  value of the Sector Count Register
+
+  @param[in] SectorNumber
+  value of the Sector Number Register
+
+  @param[in] CylinderLsb
+  value of the low byte of the Cylinder Register
+
+  @param[in] CylinderMsb
+  value of the high byte of the Cylinder Register
+
+  @retval EFI_SUCCESS send out the ATA command and device send required
+  data successfully.
+  
+  @retval EFI_DEVICE_ERROR command sent failed.
+
+**/
 EFI_STATUS
 AtaPioDataIn (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -352,66 +344,6 @@ AtaPioDataIn (
   IN  UINT8           CylinderLsb,
   IN  UINT8           CylinderMsb
   )
-/*++
-  Name:
-        AtaPioDataIn
-
-
-  Purpose: 
-        This function is used to send out ATA commands conforms to the 
-        PIO Data In Protocol.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *Buffer
-          buffer contained data transferred from device to host.
-
-        UINT32      IN    ByteCount
-          data size in byte unit of the buffer.
-
-        UINT8     IN    AtaCommand
-          value of the Command Register
-
-        UINT8     IN    Head
-          value of the Head/Device Register
-
-        UINT8     IN    SectorCount
-          value of the Sector Count Register
-
-        UINT8     IN    SectorNumber
-          value of the Sector Number Register
-
-        UINT8     IN    CylinderLsb
-          value of the low byte of the Cylinder Register
-
-        UINT8     IN    CylinderMsb
-          value of the high byte of the Cylinder Register
-
-
-  Returns:  
-        EFI_SUCCESS
-          send out the ATA command and device send required
-          data successfully.
-
-        EFI_DEVICE_ERROR
-          command sent failed.
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    ByteCount - add argument and description to function comment
-// TODO:    AtaCommand - add argument and description to function comment
-// TODO:    Head - add argument and description to function comment
-// TODO:    SectorCount - add argument and description to function comment
-// TODO:    SectorNumber - add argument and description to function comment
-// TODO:    CylinderLsb - add argument and description to function comment
-// TODO:    CylinderMsb - add argument and description to function comment
 {
   UINTN       WordCount;
   UINTN       Increment;
@@ -529,6 +461,29 @@ AtaPioDataIn (
   return CheckErrorStatus (IdeDev);
 }
 
+/**
+  This function is used to send out ATA commands conforms to the 
+  PIO Data Out Protocol.
+
+  @param *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param *Buffer      buffer contained data transferred from host to device.
+  @param ByteCount    data size in byte unit of the buffer.
+  @param AtaCommand   value of the Command Register
+  @param Head         value of the Head/Device Register
+  @param SectorCount  value of the Sector Count Register
+  @param SectorNumber value of the Sector Number Register
+  @param CylinderLsb  value of the low byte of the Cylinder Register
+  @param CylinderMsb  value of the high byte of the Cylinder Register
+
+  @retval EFI_SUCCESS send out the ATA command and device received required
+  data successfully.
+  
+  @retval EFI_DEVICE_ERROR command sent failed.
+
+**/
 EFI_STATUS
 AtaPioDataOut (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -541,67 +496,6 @@ AtaPioDataOut (
   IN  UINT8           CylinderLsb,
   IN  UINT8           CylinderMsb
   )
-/*++
-  Name:
-        AtaPioDataOut
-
-
-  Purpose: 
-        This function is used to send out ATA commands conforms to the 
-        PIO Data Out Protocol.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *Buffer
-          buffer contained data transferred from host to device.
-
-        UINT32      IN    ByteCount
-          data size in byte unit of the buffer.
-
-        UINT8     IN    AtaCommand
-          value of the Command Register
-
-        UINT8     IN    Head
-          value of the Head/Device Register
-
-        UINT8     IN    SectorCount
-          value of the Sector Count Register
-
-        UINT8     IN    SectorNumber
-          value of the Sector Number Register
-
-        UINT8     IN    CylinderLsb
-          value of the low byte of the Cylinder Register
-
-        UINT8     IN    CylinderMsb
-          value of the high byte of the Cylinder Register
-
-
-  Returns:  
-        EFI_SUCCESS
-          send out the ATA command and device received required
-          data successfully.
-
-        EFI_DEVICE_ERROR
-          command sent failed. 
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    ByteCount - add argument and description to function comment
-// TODO:    AtaCommand - add argument and description to function comment
-// TODO:    Head - add argument and description to function comment
-// TODO:    SectorCount - add argument and description to function comment
-// TODO:    SectorNumber - add argument and description to function comment
-// TODO:    CylinderLsb - add argument and description to function comment
-// TODO:    CylinderMsb - add argument and description to function comment
 {
   UINTN       WordCount;
   UINTN       Increment;
@@ -718,38 +612,23 @@ AtaPioDataOut (
   return CheckErrorStatus (IdeDev);
 }
 
+/**
+  This function is used to analyze the Status Register and print out 
+  some debug information and if there is ERR bit set in the Status
+  Register, the Error Register's value is also be parsed and print out.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS       No err information in the Status Register.
+  @retval EFI_DEVICE_ERROR  Any err information in the Status Register.
+
+**/
 EFI_STATUS
 CheckErrorStatus (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        CheckErrorStatus
-
-
-  Purpose: 
-        This function is used to analyze the Status Register and print out 
-        some debug information and if there is ERR bit set in the Status
-        Register, the Error Register's value is also be parsed and print out.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        EFI_SUCCESS
-          No err information in the Status Register.
-
-        EFI_DEVICE_ERROR
-          Any err information in the Status Register.
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   UINT8 StatusRegister;
 
@@ -841,6 +720,28 @@ CheckErrorStatus (
 
 }
 
+/**
+  This function is called by the AtaBlkIoReadBlocks() to perform
+  reading from media in block unit.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer
+  A pointer to the destination buffer for the data. 
+
+  @param[in] Lba
+  The starting logical block address to read from 
+  on the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+
+  @return return status is fully dependent on the return status
+  of AtaPioDataIn() function.
+
+**/
 EFI_STATUS
 AtaReadSectors (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -848,43 +749,6 @@ AtaReadSectors (
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-        AtaReadSectors
-
-
-  Purpose: 
-        This function is called by the AtaBlkIoReadBlocks() to perform
-        reading from media in block unit.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *DataBuffer
-          A pointer to the destination buffer for the data. 
-
-        EFI_LBA     IN    Lba
-          The starting logical block address to read from 
-          on the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-        return status is fully dependent on the return status
-        of AtaPioDataIn() function.
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    DataBuffer - add argument and description to function comment
-// TODO:    Lba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINTN       BlocksRemaining;
@@ -974,6 +838,28 @@ AtaReadSectors (
   return Status;
 }
 
+/**
+  This function is called by the AtaBlkIoWriteBlocks() to perform
+  writing onto media in block unit.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure,used
+  to record all the information of the IDE device.
+
+  @param[in] *BufferData
+  A pointer to the source buffer for the data. 
+
+  @param[in] Lba
+  The starting logical block address to write onto 
+  the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+
+  @return return status is fully dependent on the return status
+  of AtaPioDataOut() function.
+
+**/
 EFI_STATUS
 AtaWriteSectors (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -981,44 +867,6 @@ AtaWriteSectors (
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-        AtaWriteSectors
-
-
-  Purpose: 
-        This function is called by the AtaBlkIoWriteBlocks() to perform
-        writing onto media in block unit.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure,used
-          to record all the information of the IDE device.
-
-        VOID      IN    *BufferData
-          A pointer to the source buffer for the data. 
-
-        EFI_LBA     IN    Lba
-          The starting logical block address to write onto 
-          the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-
-  Returns:  
-        return status is fully dependent on the return status
-        of AtaPioDataOut() function.
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    BufferData - add argument and description to function comment
-// TODO:    Lba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINTN       BlocksRemaining;
@@ -1095,41 +943,34 @@ AtaWriteSectors (
   return Status;
 }
 
+/**
+  This function is used to implement the Soft Reset on the specified
+  device. But, the ATA Soft Reset mechanism is so strong a reset method 
+  that it will force resetting on both devices connected to the 
+  same cable.
+
+  It is called by IdeBlkIoReset(), a interface function of Block
+  I/O protocol.
+
+  This function can also be used by the ATAPI device to perform reset when
+  ATAPI Reset command is failed.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS       Soft reset completes successfully.
+  @retval EFI_DEVICE_ERROR  Any step during the reset process is failed.
+
+  @note
+  The registers initial values after ATA soft reset are different
+  to the ATA device and ATAPI device.
+
+**/
 EFI_STATUS
 AtaSoftReset (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        AtaSoftReset
-
-  Purpose: 
-        This function is used to implement the Soft Reset on the specified
-        device. But, the ATA Soft Reset mechanism is so strong a reset method 
-        that it will force resetting on both devices connected to the 
-        same cable.
-        It is called by IdeBlkIoReset(), a interface function of Block
-        I/O protocol.
-        This function can also be used by the ATAPI device to perform reset when
-        ATAPI Reset command is failed.
-            
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-  Returns:  
-        EFI_SUCCESS
-          Soft reset completes successfully.
-
-        EFI_DEVICE_ERROR
-          Any step during the reset process is failed.
-  Notes:
-        The registers initial values after ATA soft reset are different
-        to the ATA device and ATAPI device.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
 
   UINT8 DeviceControl;
@@ -1165,6 +1006,47 @@ AtaSoftReset (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is the ATA implementation for ReadBlocks in the
+  Block I/O Protocol interface.
+
+  @param[in] *IdeBlkIoDevice
+  Indicates the calling context.
+
+  @param[in] MediaId
+  The media id that the read request is for.
+
+  @param[in] LBA
+  The starting logical block address to read from 
+  on the device.
+
+  @param[in] BufferSize
+  The size of the Buffer in bytes. This must be a
+  multiple of the intrinsic block size of the device.
+
+  @param[out] *Buffer
+  A pointer to the destination buffer for the data. 
+  The caller is responsible for either having implicit
+  or explicit ownership of the memory that data is read into.
+
+  @retval EFI_SUCCESS       Read Blocks successfully.
+  @retval EFI_DEVICE_ERROR  Read Blocks failed.
+  @retval EFI_NO_MEDIA      There is no media in the device.
+  @retval EFI_MEDIA_CHANGE  The MediaId is not for the current media.
+  
+  @retval EFI_BAD_BUFFER_SIZE
+  The BufferSize parameter is not a multiple of the
+  intrinsic block size of the device.
+  
+  @retval EFI_INVALID_PARAMETER
+  The read request contains LBAs that are not valid,
+  or the data buffer is not valid.
+
+  @note
+  If Read Block error because of device error, this function will call
+  AtaSoftReset() function to reset device.
+
+**/
 EFI_STATUS
 AtaBlkIoReadBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
@@ -1173,69 +1055,6 @@ AtaBlkIoReadBlocks (
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   )
-/*++
-  Name:
-      AtaBlkIoReadBlocks
-
-
-  Purpose: 
-      This function is the ATA implementation for ReadBlocks in the
-      Block I/O Protocol interface.
-
-
-  Parameters:
-      IDE_BLK_IO_DEV    IN    *IdeBlkIoDevice
-        Indicates the calling context.
-
-      UINT32      IN    MediaId
-        The media id that the read request is for.
-
-      EFI_LBA     IN    LBA
-        The starting logical block address to read from 
-        on the device.
-
-      UINTN     IN    BufferSize
-        The size of the Buffer in bytes. This must be a
-        multiple of the intrinsic block size of the device.
-
-      VOID      OUT   *Buffer
-        A pointer to the destination buffer for the data. 
-        The caller is responsible for either having implicit
-        or explicit ownership of the memory that data is read into.
-
-  Returns:  
-      EFI_SUCCESS 
-        Read Blocks successfully.
-
-      EFI_DEVICE_ERROR
-        Read Blocks failed.
-
-      EFI_NO_MEDIA
-        There is no media in the device.
-
-      EFI_MEDIA_CHANGE
-        The MediaId is not for the current media.
-
-      EFI_BAD_BUFFER_SIZE
-        The BufferSize parameter is not a multiple of the 
-        intrinsic block size of the device.
-
-      EFI_INVALID_PARAMETER
-        The read request contains LBAs that are not valid,
-        or the data buffer is not valid.
-
-  Notes:
-      If Read Block error because of device error, this function will call
-      AtaSoftReset() function to reset device.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeBlkIoDevice - add argument and description to function comment
-// TODO:    MediaId - add argument and description to function comment
-// TODO:    LBA - add argument and description to function comment
-// TODO:    BufferSize - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    EFI_MEDIA_CHANGED - add return value to function comment
 {
   EFI_BLOCK_IO_MEDIA  *Media;
   UINTN               BlockSize;
@@ -1315,6 +1134,48 @@ AtaBlkIoReadBlocks (
 
 }
 
+/**
+  This function is the ATA implementation for WriteBlocks in the
+  Block I/O Protocol interface.
+
+  @param[in] *IdeBlkIoDevice
+  Indicates the calling context.
+
+  @param[in] MediaId
+  The media id that the write request is for.
+
+  @param[in] LBA
+  The starting logical block address to write onto 
+  the device.
+
+  @param[in] BufferSize
+  The size of the Buffer in bytes. This must be a
+  multiple of the intrinsic block size of the device.
+
+  @param[out] *Buffer
+  A pointer to the source buffer for the data. 
+  The caller is responsible for either having implicit
+  or explicit ownership of the memory that data is 
+  written from.
+
+  @retval EFI_SUCCESS       Write Blocks successfully.
+  @retval EFI_DEVICE_ERROR  Write Blocks failed.
+  @retval EFI_NO_MEDIA      There is no media in the device.
+  @retval EFI_MEDIA_CHANGE  The MediaId is not for the current media.
+  
+  @retval EFI_BAD_BUFFER_SIZE
+  The BufferSize parameter is not a multiple of the
+  intrinsic block size of the device.
+  
+  @retval EFI_INVALID_PARAMETER
+  The write request contains LBAs that are not valid,
+  or the data buffer is not valid.
+
+  @note
+  If Write Block error because of device error, this function will call
+  AtaSoftReset() function to reset device.
+
+**/
 EFI_STATUS
 AtaBlkIoWriteBlocks (
   IN  IDE_BLK_IO_DEV   *IdeBlkIoDevice,
@@ -1323,70 +1184,6 @@ AtaBlkIoWriteBlocks (
   IN  UINTN            BufferSize,
   OUT VOID             *Buffer
   )
-/*++
-  Name:
-        AtaBlkIoWriteBlocks
-
-
-  Purpose: 
-        This function is the ATA implementation for WriteBlocks in the
-        Block I/O Protocol interface.
-
-  Parameters:
-        IDE_BLK_IO_DEV   IN    *IdeBlkIoDevice
-          Indicates the calling context.
-
-        UINT32      IN    MediaId
-          The media id that the write request is for.
-
-        EFI_LBA     IN    LBA
-          The starting logical block address to write onto 
-          the device.
-
-        UINTN     IN    BufferSize
-          The size of the Buffer in bytes. This must be a
-          multiple of the intrinsic block size of the device.
-
-        VOID      OUT   *Buffer
-          A pointer to the source buffer for the data. 
-          The caller is responsible for either having implicit
-          or explicit ownership of the memory that data is 
-          written from.
-
-
-  Returns:  
-        EFI_SUCCESS 
-          Write Blocks successfully.
-
-        EFI_DEVICE_ERROR
-          Write Blocks failed.
-
-        EFI_NO_MEDIA
-          There is no media in the device.
-
-        EFI_MEDIA_CHANGE
-          The MediaId is not for the current media.
-
-        EFI_BAD_BUFFER_SIZE
-          The BufferSize parameter is not a multiple of the 
-          intrinsic block size of the device.
-
-        EFI_INVALID_PARAMETER
-          The write request contains LBAs that are not valid,
-          or the data buffer is not valid.
-
-  Notes:
-        If Write Block error because of device error, this function will call
-        AtaSoftReset() function to reset device.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeBlkIoDevice - add argument and description to function comment
-// TODO:    MediaId - add argument and description to function comment
-// TODO:    LBA - add argument and description to function comment
-// TODO:    BufferSize - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    EFI_MEDIA_CHANGED - add return value to function comment
 {
 
   EFI_BLOCK_IO_MEDIA  *Media;
@@ -1457,6 +1254,24 @@ AtaBlkIoWriteBlocks (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by the AtaBlkIoReadBlocks() to perform
+  reading from media in block unit. The function has been enhanced to 
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer    A pointer to the destination buffer for the data. 
+  @param[in] StartLba       The starting logical block address to read from 
+  on the device media.
+  @param[in] NumberOfBlocks The number of transfer data blocks.
+
+  @return return status is fully dependent on the return status
+  of AtaPioDataInExt() function.
+
+**/
 EFI_STATUS
 AtaReadSectorsExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1464,46 +1279,6 @@ AtaReadSectorsExt (
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-  
-        AtaReadSectorsExt
-
-  Purpose: 
-  
-        This function is called by the AtaBlkIoReadBlocks() to perform
-        reading from media in block unit. The function has been enhanced to 
-        support >120GB access and transfer at most 65536 blocks per command
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *DataBuffer
-          A pointer to the destination buffer for the data. 
-
-        EFI_LBA     IN    StartLba
-          The starting logical block address to read from 
-          on the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-  
-        return status is fully dependent on the return status
-        of AtaPioDataInExt() function.
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    DataBuffer - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
 {
   EFI_STATUS  Status;
   UINTN       BlocksRemaining;
@@ -1562,6 +1337,29 @@ AtaReadSectorsExt (
   return Status;
 }
 
+/**
+  This function is called by the AtaBlkIoWriteBlocks() to perform
+  writing onto media in block unit. The function has been enhanced to 
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure,used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer
+  A pointer to the source buffer for the data. 
+
+  @param[in] Lba
+  The starting logical block address to write onto 
+  the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+
+  @return status is fully dependent on the return status
+  of AtaPioDataOutExt() function.
+
+**/
 EFI_STATUS
 AtaWriteSectorsExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1569,46 +1367,6 @@ AtaWriteSectorsExt (
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-  
-        AtaWriteSectorsExt
-
-  Purpose: 
-  
-        This function is called by the AtaBlkIoWriteBlocks() to perform
-        writing onto media in block unit. The function has been enhanced to 
-        support >120GB access and transfer at most 65536 blocks per command
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure,used
-          to record all the information of the IDE device.
-
-        VOID      IN    *DataBuffer
-          A pointer to the source buffer for the data. 
-
-        EFI_LBA   IN    Lba
-          The starting logical block address to write onto 
-          the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-  
-        return status is fully dependent on the return status
-        of AtaPioDataOutExt() function.
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    DataBuffer - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
 {
   EFI_STATUS  Status;
   EFI_LBA     Lba64;
@@ -1668,6 +1426,32 @@ AtaWriteSectorsExt (
   return Status;
 }
 
+/**
+  This function is used to send out ATA commands conforms to the 
+  PIO Data In Protocol, supporting ATA/ATAPI-6 standard
+
+  Comparing with ATA-3 data in protocol, we have two differents here:<BR>
+  1. Do NOT wait for DRQ clear before sending command into IDE device.(the
+  wait will frequently fail... cause writing function return error)
+
+  2. Do NOT wait for DRQ clear after all data readed.(the wait greatly 
+  slow down writing performance by 100 times!)
+
+  @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in,out] *Buffer  buffer contained data transferred from device to host.
+  @param[in] ByteCount    data size in byte unit of the buffer.
+  @param[in] AtaCommand   value of the Command Register
+  @param[in] StartLba     the start LBA of this transaction
+  @param[in] SectorCount  the count of sectors to be transfered
+
+  @retval EFI_SUCCESS send out the ATA command and device send required
+  data successfully.
+  
+  @retval EFI_DEVICE_ERROR command sent failed.
+
+**/
 EFI_STATUS
 AtaPioDataInExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1677,63 +1461,6 @@ AtaPioDataInExt (
   IN  EFI_LBA         StartLba,
   IN  UINT16          SectorCount
   )
-/*++
-  Name:
-  
-        AtaPioDataInExt
-
-  Purpose: 
-  
-        This function is used to send out ATA commands conforms to the 
-        PIO Data In Protocol, supporting ATA/ATAPI-6 standard
-
-        Comparing with ATA-3 data in protocol, we have two differents here:
-        1. Do NOT wait for DRQ clear before sending command into IDE device.(the
-           wait will frequently fail... cause writing function return error)
-           
-        2. Do NOT wait for DRQ clear after all data readed.(the wait greatly 
-           slow down writing performance by 100 times!)
-
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN  OUT     *Buffer
-          buffer contained data transferred from device to host.
-
-        UINT32    IN    ByteCount
-          data size in byte unit of the buffer.
-
-        UINT8     IN    AtaCommand
-          value of the Command Register
-
-        EFI_LBA   IN    StartLba
-          the start LBA of this transaction
-          
-        UINT16    IN    SectorCount
-          the count of sectors to be transfered
-
-  Returns:  
-  
-        EFI_SUCCESS
-          send out the ATA command and device send required
-          data successfully.
-
-        EFI_DEVICE_ERROR
-          command sent failed.
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    ByteCount - add argument and description to function comment
-// TODO:    AtaCommand - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    SectorCount - add argument and description to function comment
 {
   UINT8       DevSel;
   UINT8       SectorCount8;
@@ -1864,6 +1591,33 @@ AtaPioDataInExt (
   return CheckErrorStatus (IdeDev);
 }
 
+/**
+  This function is used to send out ATA commands conforms to the 
+  PIO Data Out Protocol, supporting ATA/ATAPI-6 standard
+
+  Comparing with ATA-3 data out protocol, we have two differents here:<BR>
+  1. Do NOT wait for DRQ clear before sending command into IDE device.(the
+  wait will frequently fail... cause writing function return error)
+
+  2. Do NOT wait for DRQ clear after all data readed.(the wait greatly 
+  slow down writing performance by 100 times!)
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *Buffer      buffer contained data transferred from host to device.
+  @param[in] ByteCount    data size in byte unit of the buffer.
+  @param[in] AtaCommand   value of the Command Register
+  @param[in] StartLba     the start LBA of this transaction
+  @param[in] SectorCount  the count of sectors to be transfered
+
+  @retval EFI_SUCCESS send out the ATA command and device receive required
+  data successfully.
+  
+  @retval EFI_DEVICE_ERROR command sent failed.
+
+**/
 EFI_STATUS
 AtaPioDataOutExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1873,62 +1627,6 @@ AtaPioDataOutExt (
   IN  EFI_LBA         StartLba,
   IN  UINT16          SectorCount
   )
-/*++
-  Name:
-  
-        AtaPioDataOutExt
-
-  Purpose: 
-  
-        This function is used to send out ATA commands conforms to the 
-        PIO Data Out Protocol, supporting ATA/ATAPI-6 standard
-
-        Comparing with ATA-3 data out protocol, we have two differents here:
-        1. Do NOT wait for DRQ clear before sending command into IDE device.(the
-           wait will frequently fail... cause writing function return error)
-           
-        2. Do NOT wait for DRQ clear after all data readed.(the wait greatly 
-           slow down writing performance by 100 times!)
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *Buffer
-          buffer contained data transferred from host to device.
-
-        UINT32    IN    ByteCount
-          data size in byte unit of the buffer.
-
-        UINT8     IN    AtaCommand
-          value of the Command Register
-
-        EFI_LBA   IN    StartLba
-          the start LBA of this transaction
-          
-        UINT16    IN    SectorCount
-          the count of sectors to be transfered
-
-  Returns:  
-  
-        EFI_SUCCESS
-          send out the ATA command and device receive required
-          data successfully.
-
-        EFI_DEVICE_ERROR
-          command sent failed.
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    ByteCount - add argument and description to function comment
-// TODO:    AtaCommand - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    SectorCount - add argument and description to function comment
 {
   UINT8       DevSel;
   UINT8       SectorCount8;
@@ -2055,31 +1753,18 @@ AtaPioDataOutExt (
 }
 
 
+/**
+  Enable SMART of the disk if supported
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure,used
+  to record all the information of the IDE device.
+
+**/
 VOID
 AtaSMARTSupport (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:  
-        AtaSMARTSupport
-
-  Purpose: 
-
-        Enable SMART of the disk if supported
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure,used
-          to record all the information of the IDE device.
-
-  Returns:  
-  
-        NONE
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   EFI_STATUS        Status;
   BOOLEAN           SMARTSupported;
@@ -2213,6 +1898,20 @@ AtaSMARTSupport (
   return ;
 }
 
+/**
+  Send ATA Ext command into device with NON_DATA protocol
+
+  @param  IdeDev Standard IDE device private data structure
+  @param  AtaCommand The ATA command to be sent
+  @param  Device The value in Device register
+  @param  Feature The value in Feature register
+  @param  SectorCount The value in SectorCount register
+  @param  LbaAddress The LBA address in 48-bit mode
+
+  @retval  EFI_SUCCESS Reading succeed
+  @retval  EFI_DEVICE_ERROR Error executing commands on this device
+
+**/
 EFI_STATUS
 AtaCommandIssueExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -2222,27 +1921,6 @@ AtaCommandIssueExt (
   IN  UINT16          SectorCount,
   IN  EFI_LBA         LbaAddress
   )
-/*++
-
-Routine Description:
-
-  Send ATA Ext command into device with NON_DATA protocol
-
-Arguments:
-
-  IdeDev      - Standard IDE device private data structure
-  AtaCommand  - The ATA command to be sent
-  Device      - The value in Device register
-  Feature     - The value in Feature register
-  SectorCount - The value in SectorCount register 
-  LbaAddress - The LBA address in 48-bit mode
-
-Returns:
-
-  EFI_SUCCESS      - Reading succeed
-  EFI_DEVICE_ERROR - Error executing commands on this device 
-
---*/
 {
   EFI_STATUS  Status;
   UINT8       SectorCount8;
@@ -2332,6 +2010,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Send ATA Ext command into device with NON_DATA protocol
+
+  @param  IdeDev Standard IDE device private data structure
+  @param  AtaCommand The ATA command to be sent
+  @param  Device The value in Device register
+  @param  Feature The value in Feature register
+  @param  SectorCount The value in SectorCount register
+  @param  LbaAddress The LBA address in 48-bit mode
+
+  @retval  EFI_SUCCESS Reading succeed
+  @retval  EFI_DEVICE_ERROR Error executing commands on this device
+
+**/
 EFI_STATUS
 AtaCommandIssue (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -2341,27 +2033,6 @@ AtaCommandIssue (
   IN  UINT16          SectorCount,
   IN  EFI_LBA         LbaAddress
   )
-/*++
-
-Routine Description:
-
-  Send ATA Ext command into device with NON_DATA protocol
-
-Arguments:
-
-  IdeDev      - Standard IDE device private data structure
-  AtaCommand  - The ATA command to be sent
-  Device      - The value in Device register
-  Feature     - The value in Feature register
-  SectorCount - The value in SectorCount register 
-  LbaAddress - The LBA address in 48-bit mode
-
-Returns:
-
-  EFI_SUCCESS      - Reading succeed
-  EFI_DEVICE_ERROR - Error executing commands on this device 
-
---*/
 {
   EFI_STATUS  Status;
   UINT8       SectorCount8;
@@ -2437,6 +2108,29 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by the AtaBlkIoReadBlocks() to perform
+  reading from media in block unit. The function has been enhanced to 
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer A pointer to the destination buffer for the data. 
+
+  @param[in] StartLba The starting logical block address to read from 
+  on the device media.
+
+  @param[in] NumberOfBlocks The number of transfer data blocks.
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+  TODO:    EFI_UNSUPPORTED - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+**/
 EFI_STATUS
 AtaUdmaReadExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -2444,49 +2138,6 @@ AtaUdmaReadExt (
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-  
-        AtaUdmaReadExt
-
-  Purpose: 
-  
-        This function is called by the AtaBlkIoReadBlocks() to perform
-        reading from media in block unit. The function has been enhanced to 
-        support >120GB access and transfer at most 65536 blocks per command
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *DataBuffer
-          A pointer to the destination buffer for the data. 
-
-        EFI_LBA     IN    StartLba
-          The starting logical block address to read from 
-          on the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-
-        The device status of UDMA operation. If the operation is 
-         successful, return EFI_SUCCESS.
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    DataBuffer - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_DMA_PRD *PrdAddr;
   IDE_DMA_PRD *UsedPrdAddr;
@@ -2752,6 +2403,28 @@ AtaUdmaReadExt (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by the AtaBlkIoReadBlocks() to perform
+  reading from media in block unit. The function has been enhanced to 
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer    A pointer to the destination buffer for the data. 
+  @param[in] StartLba       The starting logical block address to read from 
+  on the device media.
+  @param[in] NumberOfBlocks The number of transfer data blocks.
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+  TODO:    EFI_UNSUPPORTED - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+**/
 EFI_STATUS
 AtaUdmaRead (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -2759,49 +2432,6 @@ AtaUdmaRead (
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-  
-        AtaUdmaRead
-
-  Purpose: 
-  
-        This function is called by the AtaBlkIoReadBlocks() to perform
-        reading from media in block unit. The function has been enhanced to 
-        support >120GB access and transfer at most 65536 blocks per command
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *DataBuffer
-          A pointer to the destination buffer for the data. 
-
-        EFI_LBA     IN    StartLba
-          The starting logical block address to read from 
-          on the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-
-        The device status of UDMA operation. If the operation is 
-         successful, return EFI_SUCCESS.
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    DataBuffer - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_DMA_PRD *PrdAddr;
   IDE_DMA_PRD *UsedPrdAddr;
@@ -3066,6 +2696,28 @@ AtaUdmaRead (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by the AtaBlkIoWriteBlocks() to perform
+  writing to media in block unit. The function has been enhanced to 
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer A pointer to the source buffer for the data. 
+
+  @param[in] StartLba The starting logical block address to write to 
+  on the device media.
+
+  @param[in] NumberOfBlocks The number of transfer data blocks.
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+  TODO:    EFI_UNSUPPORTED - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+**/
 EFI_STATUS
 AtaUdmaWriteExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -3073,48 +2725,6 @@ AtaUdmaWriteExt (
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-  
-        AtaUdmaWriteExt
-
-  Purpose: 
-  
-        This function is called by the AtaBlkIoWriteBlocks() to perform
-        writing to media in block unit. The function has been enhanced to 
-        support >120GB access and transfer at most 65536 blocks per command
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *DataBuffer
-          A pointer to the source buffer for the data. 
-
-        EFI_LBA     IN    StartLba
-          The starting logical block address to write to 
-          on the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-
-        The device status of UDMA operation. If the operation is 
-         successful, return EFI_SUCCESS.
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    DataBuffer - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_DMA_PRD *PrdAddr;
   IDE_DMA_PRD *UsedPrdAddr;
@@ -3377,6 +2987,32 @@ AtaUdmaWriteExt (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by the AtaBlkIoWriteBlocks() to perform
+  writing to media in block unit. The function has been enhanced to 
+  support >120GB access and transfer at most 65536 blocks per command
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *DataBuffer
+  A pointer to the source buffer for the data. 
+
+  @param[in] StartLba
+  The starting logical block address to write to 
+  on the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+
+  @return The device status of UDMA operation. If the operation is
+  successful, return EFI_SUCCESS.
+
+  TODO:    EFI_UNSUPPORTED - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+**/
 EFI_STATUS
 AtaUdmaWrite (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -3384,48 +3020,6 @@ AtaUdmaWrite (
   IN  EFI_LBA         StartLba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-  
-        AtaUdmaWrite
-
-  Purpose: 
-  
-        This function is called by the AtaBlkIoWriteBlocks() to perform
-        writing to media in block unit. The function has been enhanced to 
-        support >120GB access and transfer at most 65536 blocks per command
-
-  Parameters:
-  
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *DataBuffer
-          A pointer to the source buffer for the data. 
-
-        EFI_LBA     IN    StartLba
-          The starting logical block address to write to 
-          on the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-
-        The device status of UDMA operation. If the operation is 
-         successful, return EFI_SUCCESS.
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    DataBuffer - add argument and description to function comment
-// TODO:    StartLba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
-// TODO:    EFI_UNSUPPORTED - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_DMA_PRD *PrdAddr;
   IDE_DMA_PRD *UsedPrdAddr;

@@ -1,50 +1,34 @@
-/*++
+/** @file
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-    ide.c
-    
-Abstract: 
-    
-
-Revision History
---*/
+**/
 
 #include "idebus.h"
 
 BOOLEAN SlaveDeviceExist  = FALSE;
 BOOLEAN MasterDeviceExist = FALSE;
 
+/**
+  TODO: Add function description
+
+  @param  PciIo TODO: add argument description
+  @param  Port TODO: add argument description
+
+  TODO: add return values
+
+**/
 UINT8
 IDEReadPortB (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIo - TODO: add argument description
-  Port  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT8 Data;
 
@@ -63,6 +47,17 @@ Returns:
   return Data;
 }
 
+/**
+  Reads multiple words of data from the IDE data port. 
+  Call the IO abstraction once to do the complete read,
+  not one word at a time
+
+  @param  PciIo Pointer to the EFI_PCI_IO instance
+  @param  Port IO port to read
+  @param  Count No. of UINT16's to read
+  @param  Buffer Pointer to the data buffer for read
+
+**/
 VOID
 IDEReadPortWMultiple (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
@@ -70,23 +65,6 @@ IDEReadPortWMultiple (
   IN  UINTN                 Count,
   IN  VOID                  *Buffer
   )
-/*++
-
-Routine Description:
-  Reads multiple words of data from the IDE data port. 
-  Call the IO abstraction once to do the complete read,
-  not one word at a time
-  
-
-Arguments:
-  PciIo   - Pointer to the EFI_PCI_IO instance
-  Port    - IO port to read
-  Count   - No. of UINT16's to read
-  Buffer  - Pointer to the data buffer for read
-
-++*/
-// TODO: function comment should end with '--*/'
-// TODO: function comment is missing 'Returns:'
 {
   UINT16  *AlignedBuffer;
   UINT16  *WorkingBuffer;
@@ -127,29 +105,22 @@ Arguments:
   gBS->FreePool (WorkingBuffer);
 }
 
+/**
+  TODO: Add function description
+
+  @param  PciIo TODO: add argument description
+  @param  Port TODO: add argument description
+  @param  Data TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 IDEWritePortB (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port,
   IN  UINT8                 Data
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIo - TODO: add argument description
-  Port  - TODO: add argument description
-  Data  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   // perform 1-byte data write to register
@@ -165,29 +136,22 @@ Returns:
 
 }
 
+/**
+  TODO: Add function description
+
+  @param  PciIo TODO: add argument description
+  @param  Port TODO: add argument description
+  @param  Data TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 IDEWritePortW (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port,
   IN  UINT16                Data
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIo - TODO: add argument description
-  Port  - TODO: add argument description
-  Data  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   // perform 1-word data write to register
@@ -202,6 +166,17 @@ Returns:
               );
 }
 
+/**
+  Write multiple words of data to the IDE data port. 
+  Call the IO abstraction once to do the complete read,
+  not one word at a time
+
+  @param  PciIo Pointer to the EFI_PCI_IO instance
+  @param  Port IO port to read
+  @param  Count No. of UINT16's to read
+  @param  Buffer Pointer to the data buffer for read
+
+**/
 VOID
 IDEWritePortWMultiple (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
@@ -209,23 +184,6 @@ IDEWritePortWMultiple (
   IN  UINTN                 Count,
   IN  VOID                  *Buffer
   )
-/*++
-
-Routine Description:
-  Write multiple words of data to the IDE data port. 
-  Call the IO abstraction once to do the complete read,
-  not one word at a time
-  
-
-Arguments:
-  PciIo   - Pointer to the EFI_PCI_IO instance
-  Port    - IO port to read
-  Count   - No. of UINT16's to read
-  Buffer  - Pointer to the data buffer for read
-
-++*/
-// TODO: function comment should end with '--*/'
-// TODO: function comment is missing 'Returns:'
 {
   UINT16  *AlignedBuffer;
   UINT32  *WorkingBuffer;
@@ -267,25 +225,18 @@ Arguments:
   gBS->FreePool (WorkingBuffer);
 }
 
+/**
+  TODO: Add function description
+
+  @param  IdeDev TODO: add argument description
+
+  TODO: add return values
+
+**/
 BOOLEAN
 BadIdeDeviceCheck (
   IN IDE_BLK_IO_DEV *IdeDev
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  IdeDev  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   //
   //  check whether all registers return 0xff,
@@ -341,63 +292,62 @@ Returns:
 //
 // GetIdeRegistersBaseAddr
 //
+/**
+  Get IDE IO port registers' base addresses by mode. In 'Compatibility' mode,
+  use fixed addresses. In Native-PCI mode, get base addresses from BARs in
+  the PCI IDE controller's Configuration Space.
+
+  The steps to get IDE IO port registers' base addresses for each channel 
+  as follows:
+
+  1. Examine the Programming Interface byte of the Class Code fields in PCI IDE 
+  controller's Configuration Space to determine the operating mode.
+
+  2. a) In 'Compatibility' mode, use fixed addresses shown in the Table 1 below.
+  <pre>
+  ___________________________________________
+  |           | Command Block | Control Block |
+  |  Channel  |   Registers   |   Registers   |
+  |___________|_______________|_______________|
+  |  Primary  |  1F0h - 1F7h  |  3F6h - 3F7h  |
+  |___________|_______________|_______________|
+  | Secondary |  170h - 177h  |  376h - 377h  |
+  |___________|_______________|_______________|
+
+  Table 1. Compatibility resource mappings
+  </pre>
+
+  b) In Native-PCI mode, IDE registers are mapped into IO space using the BARs
+  in IDE controller's PCI Configuration Space, shown in the Table 2 below.
+  <pre>
+  ___________________________________________________
+  |           |   Command Block   |   Control Block   |
+  |  Channel  |     Registers     |     Registers     |
+  |___________|___________________|___________________|
+  |  Primary  | BAR at offset 0x10| BAR at offset 0x14|
+  |___________|___________________|___________________|
+  | Secondary | BAR at offset 0x18| BAR at offset 0x1C|
+  |___________|___________________|___________________|
+
+  Table 2. BARs for Register Mapping
+  </pre>
+  @note Refer to Intel ICH4 datasheet, Control Block Offset: 03F4h for 
+  primary, 0374h for secondary. So 2 bytes extra offset should be 
+  added to the base addresses read from BARs.
+
+  For more details, please refer to PCI IDE Controller Specification and Intel 
+  ICH4 Datasheet.
+
+  @param  PciIo Pointer to the EFI_PCI_IO_PROTOCOL instance
+  @param  IdeRegsBaseAddr Pointer to IDE_REGISTERS_BASE_ADDR to
+  receive IDE IO port registers' base addresses
+
+**/
 EFI_STATUS
 GetIdeRegistersBaseAddr (
   IN  EFI_PCI_IO_PROTOCOL         *PciIo,
   OUT IDE_REGISTERS_BASE_ADDR     *IdeRegsBaseAddr
   )
-/*++
-
-Routine Description:
-  Get IDE IO port registers' base addresses by mode. In 'Compatibility' mode,
-  use fixed addresses. In Native-PCI mode, get base addresses from BARs in
-  the PCI IDE controller's Configuration Space.
-  
-  The steps to get IDE IO port registers' base addresses for each channel 
-  as follows:
-
-  1. Examine the Programming Interface byte of the Class Code fields in PCI IDE 
-     controller's Configuration Space to determine the operating mode.
-     
-  2. a) In 'Compatibility' mode, use fixed addresses shown in the Table 1 below.
-                 ___________________________________________
-                |           | Command Block | Control Block |
-                |  Channel  |   Registers   |   Registers   |
-                |___________|_______________|_______________|
-                |  Primary  |  1F0h - 1F7h  |  3F6h - 3F7h  |
-                |___________|_______________|_______________|
-                | Secondary |  170h - 177h  |  376h - 377h  |
-                |___________|_______________|_______________|
-        
-                  Table 1. Compatibility resource mappings
-        
-     b) In Native-PCI mode, IDE registers are mapped into IO space using the BARs
-        in IDE controller's PCI Configuration Space, shown in the Table 2 below.
-               ___________________________________________________
-              |           |   Command Block   |   Control Block   |
-              |  Channel  |     Registers     |     Registers     |
-              |___________|___________________|___________________|
-              |  Primary  | BAR at offset 0x10| BAR at offset 0x14|
-              |___________|___________________|___________________|
-              | Secondary | BAR at offset 0x18| BAR at offset 0x1C|
-              |___________|___________________|___________________|
-      
-                        Table 2. BARs for Register Mapping
-        Note: Refer to Intel ICH4 datasheet, Control Block Offset: 03F4h for 
-              primary, 0374h for secondary. So 2 bytes extra offset should be 
-              added to the base addresses read from BARs.
-  
-  For more details, please refer to PCI IDE Controller Specification and Intel 
-  ICH4 Datasheet.
-  
-Arguments:
-  PciIo             - Pointer to the EFI_PCI_IO_PROTOCOL instance
-  IdeRegsBaseAddr   - Pointer to IDE_REGISTERS_BASE_ADDR to 
-                      receive IDE IO port registers' base addresses
-                      
-Returns:
-    
---*/
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -464,24 +414,19 @@ Returns:
   return EFI_SUCCESS;
 }
 
-EFI_STATUS
-ReassignIdeResources (
-  IN  IDE_BLK_IO_DEV  *IdeDev
-  )
-/*++
-
-Routine Description:
+/**
   This function is used to requery IDE resources. The IDE controller will 
   probably switch between native and legacy modes during the EFI->CSM->OS 
   transfer. We do this everytime before an BlkIo operation to ensure its
   succeess.
-  
-Arguments:
-  IdeDev - The BLK_IO private data which specifies the IDE device
-  
-++*/
-// TODO: function comment should end with '--*/'
-// TODO: function comment is missing 'Returns:'
+
+  @param  IdeDev The BLK_IO private data which specifies the IDE device
+
+**/
+EFI_STATUS
+ReassignIdeResources (
+  IN  IDE_BLK_IO_DEV  *IdeDev
+  )
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS              Status;
@@ -519,22 +464,16 @@ Arguments:
   return EFI_SUCCESS;
 }
 
+/**
+  Read SATA registers to detect SATA disks
+
+  @param  IdeDev The BLK_IO private data which specifies the IDE device
+
+**/
 EFI_STATUS
 CheckPowerMode (
   IDE_BLK_IO_DEV    *IdeDev
   )
-/*++
- Routine Description:
- 
-  Read SATA registers to detect SATA disks
-
- Arguments:
-
-  IdeDev - The BLK_IO private data which specifies the IDE device
-  
-++*/
-// TODO: function comment should end with '--*/'
-// TODO: function comment is missing 'Returns:'
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
@@ -579,22 +518,16 @@ CheckPowerMode (
 //
 // DiscoverIdeDevice
 //
+/**
+  Detect if there is disk connected to this port
+
+  @param  IdeDev The BLK_IO private data which specifies the IDE device
+
+**/
 EFI_STATUS
 DiscoverIdeDevice (
   IN IDE_BLK_IO_DEV *IdeDev
   )
-/*++
- Routine Description:
- 
-  Detect if there is disk connected to this port
-
- Arguments:
-
-  IdeDev - The BLK_IO private data which specifies the IDE device
-  
-++*/
-// TODO: function comment should end with '--*/'
-// TODO: function comment is missing 'Returns:'
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_NOT_FOUND - add return value to function comment
 // TODO:    EFI_SUCCESS - add return value to function comment
@@ -662,54 +595,42 @@ DiscoverIdeDevice (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by DiscoverIdeDevice(). It is used for detect 
+  whether the IDE device exists in the specified Channel as the specified 
+  Device Number.
+
+  There is two IDE channels: one is Primary Channel, the other is 
+  Secondary Channel.(Channel is the logical name for the physical "Cable".) 
+  Different channel has different register group.
+
+  On each IDE channel, at most two IDE devices attach, 
+  one is called Device 0 (Master device), the other is called Device 1 
+  (Slave device). The devices on the same channel co-use the same register 
+  group, so before sending out a command for a specified device via command 
+  register, it is a must to select the current device to accept the command 
+  by set the device number in the Head/Device Register.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval TRUE
+  successfully detects device.
+  
+  @retval FALSE
+  any failure during detection process will return this
+  value.
+
+  @note
+  TODO:    EFI_SUCCESS - add return value to function comment
+  TODO:    EFI_NOT_FOUND - add return value to function comment
+
+**/
 EFI_STATUS
 DetectIDEController (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  
-  Name: DetectIDEController
-
-
-  Purpose: 
-      This function is called by DiscoverIdeDevice(). It is used for detect 
-      whether the IDE device exists in the specified Channel as the specified 
-      Device Number.
-
-      There is two IDE channels: one is Primary Channel, the other is 
-      Secondary Channel.(Channel is the logical name for the physical "Cable".) 
-      Different channel has different register group.
-
-      On each IDE channel, at most two IDE devices attach, 
-      one is called Device 0 (Master device), the other is called Device 1 
-      (Slave device). The devices on the same channel co-use the same register 
-      group, so before sending out a command for a specified device via command 
-      register, it is a must to select the current device to accept the command 
-      by set the device number in the Head/Device Register.
- 
-            
-  Parameters:
-      IDE_BLK_IO_DEV  IN    *IdeDev
-            pointer pointing to IDE_BLK_IO_DEV data structure, used
-            to record all the information of the IDE device.
-
-
-  Returns:    
-      TRUE      
-            successfully detects device.
-
-      FALSE
-            any failure during detection process will return this
-            value.
-
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
-// TODO:    EFI_NOT_FOUND - add return value to function comment
 {
   EFI_STATUS  Status;
   UINT8       ErrorReg;
@@ -846,40 +767,33 @@ DetectIDEController (
 
 }
 
+/**
+  This function is used to poll for the DRQ bit clear in the Status 
+  Register. DRQ is cleared when the device is finished transferring data. 
+  So this function is called after data transfer is finished.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+  
+  @param[in] TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ clear.
+
+  @retval EFI_SUCCESS
+  DRQ bit clear within the time out.
+  
+  @retval EFI_TIMEOUT
+  DRQ bit not clear within the time out.
+
+  @note
+  Read Status Register will clear interrupt status.
+
+**/
 EFI_STATUS
 DRQClear (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
   )
-/*++
-  Name:   DRQClear
-
-
-  Purpose: 
-        This function is used to poll for the DRQ bit clear in the Status 
-        Register. DRQ is cleared when the device is finished transferring data. 
-        So this function is called after data transfer is finished.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-            pointer pointing to IDE_BLK_IO_DEV data structure, used
-            to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-            used to designate the timeout for the DRQ clear.
-
-  Returns:  
-        EFI_SUCCESS
-            DRQ bit clear within the time out.
-
-        EFI_TIMEOUT
-            DRQ bit not clear within the time out. 
-
-
-  Notes:
-        Read Status Register will clear interrupt status.
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -926,41 +840,34 @@ DRQClear (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to poll for the DRQ bit clear in the Alternate 
+  Status Register. DRQ is cleared when the device is finished 
+  transferring data. So this function is called after data transfer
+  is finished.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+  
+  @param[in] TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ clear.
+
+  @retval EFI_SUCCESS
+  DRQ bit clear within the time out.
+  
+  @retval EFI_TIMEOUT
+  DRQ bit not clear within the time out.
+
+  @note
+  Read Alternate Status Register will not clear interrupt status.
+
+**/
 EFI_STATUS
 DRQClear2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
   )
-/*++
-  Name:   DRQClear2
-
-
-  Purpose: 
-        This function is used to poll for the DRQ bit clear in the Alternate 
-        Status Register. DRQ is cleared when the device is finished 
-        transferring data. So this function is called after data transfer
-        is finished.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-          used to designate the timeout for the DRQ clear.
-
-  Returns:  
-        EFI_SUCCESS
-          DRQ bit clear within the time out.
-
-        EFI_TIMEOUT
-          DRQ bit not clear within the time out. 
-
-
-  Notes:
-        Read Alternate Status Register will not clear interrupt status.
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -1007,46 +914,38 @@ DRQClear2 (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to poll for the DRQ bit set in the 
+  Status Register.
+  DRQ is set when the device is ready to transfer data. So this function
+  is called after the command is sent to the device and before required 
+  data is transferred.
+
+  @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure,used
+  to record all the information of the IDE device.
+  
+  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ ready.
+
+  @retval EFI_SUCCESS
+  DRQ bit set within the time out.
+  
+  @retval EFI_TIMEOUT
+  DRQ bit not set within the time out.
+  
+  @retval EFI_ABORTED
+  DRQ bit not set caused by the command abort.
+
+  @note
+  Read Status Register will clear interrupt status.
+
+**/
 EFI_STATUS
 DRQReady (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
   )
-/*++
-  Name:   DRQReady
-
-  
-  Purpose: 
-        This function is used to poll for the DRQ bit set in the 
-        Status Register.
-        DRQ is set when the device is ready to transfer data. So this function
-        is called after the command is sent to the device and before required 
-        data is transferred.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-            pointer pointing to IDE_BLK_IO_DEV data structure,used
-            to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-            used to designate the timeout for the DRQ ready.
-
-
-  Returns:  
-        EFI_SUCCESS
-            DRQ bit set within the time out.
-
-        EFI_TIMEOUT
-            DRQ bit not set within the time out.
-            
-        EFI_ABORTED
-            DRQ bit not set caused by the command abort.
-
-  Notes:
-        Read Status Register will clear interrupt status.
-
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -1093,43 +992,37 @@ DRQReady (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to poll for the DRQ bit set in the 
+  Alternate Status Register. DRQ is set when the device is ready to 
+  transfer data. So this function is called after the command 
+  is sent to the device and before required data is transferred.
+
+  @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+  
+  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ ready.
+
+  @retval EFI_SUCCESS
+  DRQ bit set within the time out.
+  
+  @retval EFI_TIMEOUT
+  DRQ bit not set within the time out.
+  
+  @retval EFI_ABORTED
+  DRQ bit not set caused by the command abort.
+
+  @note
+  Read Alternate Status Register will not clear interrupt status.
+
+**/
 EFI_STATUS
 DRQReady2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
   )
-/*++
-  Name:   DRQReady2
-
-
-  Purpose: 
-        This function is used to poll for the DRQ bit set in the 
-        Alternate Status Register. DRQ is set when the device is ready to 
-        transfer data. So this function is called after the command 
-        is sent to the device and before required data is transferred.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-          used to designate the timeout for the DRQ ready.
-
-  Returns:  
-        EFI_SUCCESS
-          DRQ bit set within the time out.
-
-        EFI_TIMEOUT
-          DRQ bit not set within the time out. 
-        
-        EFI_ABORTED
-            DRQ bit not set caused by the command abort.
-
-  Notes:
-        Read Alternate Status Register will not clear interrupt status.
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -1176,41 +1069,33 @@ DRQReady2 (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to poll for the BSY bit clear in the 
+  Status Register. BSY is clear when the device is not busy.
+  Every command must be sent after device is not busy.
+
+  @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+  
+  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ ready.
+
+  @retval EFI_SUCCESS
+  BSY bit clear within the time out.
+  
+  @retval EFI_TIMEOUT
+  BSY bit not clear within the time out.
+
+  @note
+  Read Status Register will clear interrupt status.
+
+**/
 EFI_STATUS
 WaitForBSYClear (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
   )
-/*++
-  Name:
-        WaitForBSYClear
-
-
-  Purpose: 
-        This function is used to poll for the BSY bit clear in the 
-        Status Register. BSY is clear when the device is not busy.
-        Every command must be sent after device is not busy.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-          used to designate the timeout for the DRQ ready.
-
-  Returns:  
-        EFI_SUCCESS
-          BSY bit clear within the time out.
-
-        EFI_TIMEOUT
-          BSY bit not clear within the time out. 
-
-
-  Notes:
-        Read Status Register will clear interrupt status.
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -1245,41 +1130,33 @@ WaitForBSYClear (
 //
 // WaitForBSYClear2
 //
+/**
+  This function is used to poll for the BSY bit clear in the 
+  Alternate Status Register. BSY is clear when the device is not busy.
+  Every command must be sent after device is not busy.
+
+  @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+  
+  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ ready.
+
+  @retval EFI_SUCCESS
+  BSY bit clear within the time out.
+  
+  @retval EFI_TIMEOUT
+  BSY bit not clear within the time out.
+
+  @note
+  Read Alternate Status Register will not clear interrupt status.
+
+**/
 EFI_STATUS
 WaitForBSYClear2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           TimeoutInMilliSeconds
   )
-/*++
-  Name:
-        WaitForBSYClear2
-
-
-  Purpose: 
-        This function is used to poll for the BSY bit clear in the 
-        Alternate Status Register. BSY is clear when the device is not busy.
-        Every command must be sent after device is not busy.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-          used to designate the timeout for the DRQ ready.
-
-  Returns:  
-        EFI_SUCCESS
-          BSY bit clear within the time out.
-
-        EFI_TIMEOUT
-          BSY bit not clear within the time out. 
-
-
-  Notes:
-        Read Alternate Status Register will not clear interrupt status.
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -1311,42 +1188,34 @@ WaitForBSYClear2 (
 //
 // DRDYReady
 //
+/**
+  This function is used to poll for the DRDY bit set in the 
+  Status Register. DRDY bit is set when the device is ready 
+  to accept command. Most ATA commands must be sent after 
+  DRDY set except the ATAPI Packet Command.
+
+  @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+  
+  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ ready.
+
+  @retval EFI_SUCCESS
+  DRDY bit set within the time out.
+  
+  @retval EFI_TIMEOUT
+  DRDY bit not set within the time out.
+
+  @note
+  Read Status Register will clear interrupt status.
+
+**/
 EFI_STATUS
 DRDYReady (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           DelayInMilliSeconds
   )
-/*++
-  Name:
-        DRDYReady
-
-
-  Purpose: 
-        This function is used to poll for the DRDY bit set in the 
-        Status Register. DRDY bit is set when the device is ready 
-        to accept command. Most ATA commands must be sent after 
-        DRDY set except the ATAPI Packet Command.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-          used to designate the timeout for the DRQ ready.
-
-  Returns:  
-        EFI_SUCCESS
-          DRDY bit set within the time out.
-
-        EFI_TIMEOUT
-          DRDY bit not set within the time out. 
-
-
-  Notes:
-        Read Status Register will clear interrupt status.
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -1390,42 +1259,34 @@ DRDYReady (
 //
 // DRDYReady2
 //
+/**
+  This function is used to poll for the DRDY bit set in the 
+  Alternate Status Register. DRDY bit is set when the device is ready 
+  to accept command. Most ATA commands must be sent after 
+  DRDY set except the ATAPI Packet Command.
+
+  @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+  
+  @param[in] UINTN     IN    TimeoutInMilliSeconds
+  used to designate the timeout for the DRQ ready.
+
+  @retval EFI_SUCCESS
+  DRDY bit set within the time out.
+  
+  @retval EFI_TIMEOUT
+  DRDY bit not set within the time out.
+
+  @note
+  Read Alternate Status Register will clear interrupt status.
+
+**/
 EFI_STATUS
 DRDYReady2 (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  UINTN           DelayInMilliSeconds
   )
-/*++
-  Name:
-        DRDYReady2
-
-
-  Purpose: 
-        This function is used to poll for the DRDY bit set in the 
-        Alternate Status Register. DRDY bit is set when the device is ready 
-        to accept command. Most ATA commands must be sent after 
-        DRDY set except the ATAPI Packet Command.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        UINTN     IN    TimeoutInMilliSeconds
-          used to designate the timeout for the DRQ ready.
-
-  Returns:  
-        EFI_SUCCESS
-          DRDY bit set within the time out.
-
-        EFI_TIMEOUT
-          DRDY bit not set within the time out. 
-
-
-  Notes:
-        Read Alternate Status Register will clear interrupt status.
---*/
 // TODO: function comment is missing 'Routine Description:'
 // TODO: function comment is missing 'Arguments:'
 // TODO:    IdeDev - add argument and description to function comment
@@ -1469,52 +1330,34 @@ DRDYReady2 (
 //
 // SwapStringChars
 //
+/**
+  This function is a helper function used to change the char order in a 
+  string. It is designed specially for the PrintAtaModuleName() function.
+  After the IDE device is detected, the IDE driver gets the device module
+  name by sending ATA command called ATA Identify Command or ATAPI 
+  Identify Command to the specified IDE device. The module name returned 
+  is a string of ASCII characters: the first character is bit8--bit15 
+  of the first word, the second character is bit0--bit7 of the first word 
+  and so on. Thus the string can not be print directly before it is 
+  preprocessed by this func to change the order of characters in 
+  each word in the string.
+
+  @param[in] CHAR8 IN    *Destination
+  Indicates the destination string.
+  
+  @param[in] CHAR8 IN    *Source
+  Indicates the source string.
+  
+  @param[in] UINT8 IN    Size
+  the length of the string
+
+**/
 VOID
 SwapStringChars (
   IN CHAR8  *Destination,
   IN CHAR8  *Source,
   IN UINT32 Size
   )
-/*++
-  Name:
-        SwapStringChars
-
-
-  Purpose: 
-        This function is a helper function used to change the char order in a 
-        string. It is designed specially for the PrintAtaModuleName() function.
-        After the IDE device is detected, the IDE driver gets the device module
-        name by sending ATA command called ATA Identify Command or ATAPI 
-        Identify Command to the specified IDE device. The module name returned 
-        is a string of ASCII characters: the first character is bit8--bit15 
-        of the first word, the second character is bit0--bit7 of the first word 
-        and so on. Thus the string can not be print directly before it is 
-        preprocessed by this func to change the order of characters in 
-        each word in the string.
-
-
-  Parameters:
-        CHAR8 IN    *Destination
-          Indicates the destination string.
-
-        CHAR8 IN    *Source
-          Indicates the source string.
-
-        UINT8 IN    Size
-          the length of the string
-
-
-  Returns:  
-        none
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    Destination - add argument and description to function comment
-// TODO:    Source - add argument and description to function comment
-// TODO:    Size - add argument and description to function comment
 {
   UINT32  Index;
   CHAR8   Temp;
@@ -1530,26 +1373,16 @@ SwapStringChars (
 //
 // ReleaseIdeResources
 //
+/**
+  Release resources of an IDE device before stopping it.
+
+  @param[in] *IdeBlkIoDevice  Standard IDE device private data structure
+
+**/
 VOID
 ReleaseIdeResources (
   IN  IDE_BLK_IO_DEV  *IdeBlkIoDevice
   )
-/*++
-Routing Description:
-
-  Release resources of an IDE device before stopping it.
-
-Arguments:
-
-  IdeBlkIoDevice  --  Standard IDE device private data structure
-
-
-Returns:
-
-    NONE
-    
----*/
-// TODO: function comment is missing 'Routine Description:'
 {
   if (IdeBlkIoDevice == NULL) {
     return ;
@@ -1601,26 +1434,20 @@ Returns:
 //
 // SetDeviceTransferMode
 //
+/**
+  Set the calculated Best transfer mode to a detected device
+
+  @param[in] *IdeDev       Standard IDE device private data structure
+  @param[in] *TransferMode The device transfer mode to be set
+
+  @return Set transfer mode Command execute status
+
+**/
 EFI_STATUS
 SetDeviceTransferMode (
   IN IDE_BLK_IO_DEV       *IdeDev,
   IN ATA_TRANSFER_MODE    *TransferMode
   )
-/*++
-Routing Description:
-
-  Set the calculated Best transfer mode to a detected device
-
-Arguments:
-
-  IdeDev       --  Standard IDE device private data structure
-  TransferMode --  The device transfer mode to be set
-
-Returns:
-
-    Set transfer mode Command execute status
-    
----*/
 // TODO: function comment is missing 'Routine Description:'
 {
   EFI_STATUS  Status;
@@ -1648,6 +1475,23 @@ Returns:
   return Status;
 }
 
+/**
+  Send ATA command into device with NON_DATA protocol
+
+  @param  IdeDev Standard IDE device private data structure
+  @param  AtaCommand The ATA command to be sent
+  @param  Device The value in Device register
+  @param  Feature The value in Feature register
+  @param  SectorCount The value in SectorCount register
+  @param  LbaLow The value in LBA_LOW register
+  @param  LbaMiddle The value in LBA_MIDDLE register
+  @param  LbaHigh The value in LBA_HIGH register
+
+  @retval  EFI_SUCCESS Reading succeed
+  @retval  EFI_ABORTED Command failed
+  @retval  EFI_DEVICE_ERROR Device status error
+
+**/
 EFI_STATUS
 AtaNonDataCommandIn (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1659,30 +1503,6 @@ AtaNonDataCommandIn (
   IN  UINT8           LbaMiddle,
   IN  UINT8           LbaHigh
   )
-/*++
-
-Routine Description:
-
-  Send ATA command into device with NON_DATA protocol
-
-Arguments:
-
-  IdeDev      - Standard IDE device private data structure
-  AtaCommand  - The ATA command to be sent
-  Device      - The value in Device register
-  Feature     - The value in Feature register
-  SectorCount - The value in SectorCount register 
-  LbaLow      - The value in LBA_LOW register
-  LbaMiddle   - The value in LBA_MIDDLE register
-  LbaHigh     - The value in LBA_HIGH register
-
-Returns:
-
-  EFI_SUCCESS      - Reading succeed
-  EFI_ABORTED      - Command failed
-  EFI_DEVICE_ERROR - Device status error
-
---*/
 {
   EFI_STATUS  Status;
   UINT8       StatusRegister;
@@ -1743,6 +1563,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Send ATA Ext command into device with NON_DATA protocol
+
+  @param  IdeDev Standard IDE device private data structure
+  @param  AtaCommand The ATA command to be sent
+  @param  Device The value in Device register
+  @param  Feature The value in Feature register
+  @param  SectorCount The value in SectorCount register
+  @param  LbaAddress The LBA address in 48-bit mode
+
+  @retval  EFI_SUCCESS Reading succeed
+  @retval  EFI_ABORTED Command failed
+  @retval  EFI_DEVICE_ERROR Device status error
+
+**/
 EFI_STATUS
 AtaNonDataCommandInExt (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1752,28 +1587,6 @@ AtaNonDataCommandInExt (
   IN  UINT16          SectorCount,
   IN  EFI_LBA         LbaAddress
   )
-/*++
-
-Routine Description:
-
-  Send ATA Ext command into device with NON_DATA protocol
-
-Arguments:
-
-  IdeDev      - Standard IDE device private data structure
-  AtaCommand  - The ATA command to be sent
-  Device      - The value in Device register
-  Feature     - The value in Feature register
-  SectorCount - The value in SectorCount register 
-  LbaAddress - The LBA address in 48-bit mode
-
-Returns:
-
-  EFI_SUCCESS      - Reading succeed
-  EFI_ABORTED      - Command failed
-  EFI_DEVICE_ERROR - Device status error
-
---*/
 {
   EFI_STATUS  Status;
   UINT8       StatusRegister;
@@ -1872,26 +1685,20 @@ Returns:
 //
 // SetDriveParameters
 //
+/**
+  Set drive parameters for devices not support PACKETS command
+
+  @param[in] IdeDev       Standard IDE device private data structure
+  @param[in] DriveParameters The device parameters to be set into the disk
+
+  @return SetParameters Command execute status
+
+**/
 EFI_STATUS
 SetDriveParameters (
   IN IDE_BLK_IO_DEV       *IdeDev,
   IN ATA_DRIVE_PARMS      *DriveParameters
   )
-/*++
-Routine Description: 
-
-  Set drive parameters for devices not support PACKETS command
-
-Arguments:
-
-  IdeDev       --  Standard IDE device private data structure
-  DriveParameters --  The device parameters to be set into the disk
-
-Returns:
-
-  SetParameters Command execute status
-    
---*/
 {
   EFI_STATUS  Status;
   UINT8       DeviceSelect;
@@ -1932,25 +1739,18 @@ Returns:
   return Status;
 }
 
+/**
+  TODO: Add function description
+
+  @param  IdeDev TODO: add argument description
+
+  @retval  EFI_SUCCESS TODO: Add description for return value
+
+**/
 EFI_STATUS
 EnableInterrupt (
   IN IDE_BLK_IO_DEV       *IdeDev
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  IdeDev  - TODO: add argument description
-
-Returns:
-
-  EFI_SUCCESS - TODO: Add description for return value
-
---*/
 {
   UINT8 DeviceControl;
 

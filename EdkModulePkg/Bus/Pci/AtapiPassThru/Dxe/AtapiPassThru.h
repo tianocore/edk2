@@ -1,23 +1,16 @@
-/*++
+/** @file
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
+  Module Name:  AtapiPassThru.h
 
-    AtapiPassThru.h
-    
-Abstract: 
-    
-
-Revision History
---*/
+**/
 
 #ifndef _APT_H
 #define _APT_H
@@ -25,12 +18,13 @@ Revision History
 
 #include <IndustryStandard/pci22.h>
 
-//
-// bit definition
-//
+///
+/// bit definition
+///
 #define bit(a)        1 << (a)
 
 #define MAX_TARGET_ID 4
+
 //
 // IDE Registers
 //
@@ -49,9 +43,9 @@ typedef union {
   UINT16  DeviceControl;  /* when write */
 } IDE_AltStatus_OR_DeviceControl;
 
-//
-// IDE registers set
-//
+///
+/// IDE registers set
+///
 typedef struct {
   UINT16                          Data;
   IDE_ERROR_OR_FEATURE            Reg1;
@@ -167,21 +161,21 @@ typedef struct {
 //
 // ATA Err Reg bitmap
 //
-#define BBK_ERR   bit (7) /* Bad block detected */
-#define UNC_ERR   bit (6) /* Uncorrectable Data */
-#define MC_ERR    bit (5) /* Media Change */
-#define IDNF_ERR  bit (4) /* ID Not Found */
-#define MCR_ERR   bit (3) /* Media Change Requested */
-#define ABRT_ERR  bit (2) /* Aborted Command */
-#define TK0NF_ERR bit (1) /* Track 0 Not Found */
-#define AMNF_ERR  bit (0) /* Address Mark Not Found */
+#define BBK_ERR   bit (7) ///< Bad block detected
+#define UNC_ERR   bit (6) ///< Uncorrectable Data
+#define MC_ERR    bit (5) ///< Media Change
+#define IDNF_ERR  bit (4) ///< ID Not Found
+#define MCR_ERR   bit (3) ///< Media Change Requested
+#define ABRT_ERR  bit (2) ///< Aborted Command
+#define TK0NF_ERR bit (1) ///< Track 0 Not Found
+#define AMNF_ERR  bit (0) ///< Address Mark Not Found
 
 //
 // ATAPI Err Reg bitmap
 //
 #define SENSE_KEY_ERR (bit (7) | bit (6) | bit (5) | bit (4))
-#define EOM_ERR bit (1) /* End of Media Detected */
-#define ILI_ERR bit (0) /* Illegal Length Indication */
+#define EOM_ERR bit (1) ///< End of Media Detected
+#define ILI_ERR bit (0) ///< Illegal Length Indication
 
 //
 // Device/Head Reg
@@ -201,21 +195,21 @@ typedef struct {
 //
 // Status Reg
 //
-#define BSY   bit (7) /* Controller Busy */
-#define DRDY  bit (6) /* Drive Ready */
-#define DWF   bit (5) /* Drive Write Fault */
-#define DSC   bit (4) /* Disk Seek Complete */
-#define DRQ   bit (3) /* Data Request */
-#define CORR  bit (2) /* Corrected Data */
-#define IDX   bit (1) /* Index */
-#define ERR   bit (0) /* Error */
-#define CHECK bit (0) /* Check bit for ATAPI Status Reg */
+#define BSY   bit (7) ///< Controller Busy
+#define DRDY  bit (6) ///< Drive Ready
+#define DWF   bit (5) ///< Drive Write Fault
+#define DSC   bit (4) ///< Disk Seek Complete
+#define DRQ   bit (3) ///< Data Request
+#define CORR  bit (2) ///< Corrected Data
+#define IDX   bit (1) ///< Index
+#define ERR   bit (0) ///< Error
+#define CHECK bit (0) ///< Check bit for ATAPI Status Reg
 
 //
 // Device Control Reg
 //
-#define SRST  bit (2) /* Software Reset */
-#define IEN_L bit (1) /* Interrupt Enable #*/
+#define SRST  bit (2) ///< Software Reset
+#define IEN_L bit (1) ///< Interrupt Enable
 
 //
 // ATAPI Feature Register
@@ -242,55 +236,63 @@ typedef struct {
 //
 // function prototype
 //
+/**
+  AtapiScsiPassThruDriverEntryPoint
+
+  @param ImageHandle
+  @param SystemTable
+
+  @todo Add function description
+  @todo ImageHandle - add argument description
+  @todo SystemTable - add argument description
+  @todo add return values
+--*/
 EFI_STATUS
 EFIAPI
 AtapiScsiPassThruDriverEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
- /*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ImageHandle - TODO: add argument description
-  SystemTable - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
+/**
+  RegisterAtapiScsiPassThru
+
+  @param  This
+  @param  Controller
+  @param  PciIo
+
+  @todo Add function description
+  @todo This add argument description
+  @todo Controller add argument description
+  @todo PciIo add argument description
+  @todo add return values
+**/
 EFI_STATUS
 RegisterAtapiScsiPassThru (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN  EFI_HANDLE                  Controller,
   IN  EFI_PCI_IO_PROTOCOL         *PciIo
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  This        - TODO: add argument description
-  Controller  - TODO: add argument description
-  PciIo       - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
+/**
+  AtapiScsiPassThruFunction
+
+  @param  This
+  @param  Target
+  @param  Lun
+  @param  Packet
+  @param  Event
+
+  @todo Add function description
+  @todo  This - add argument description
+  @todo  Target - add argument description
+  @todo  Lun - add argument description
+  @todo  Packet - add argument description
+  @todo  Event - add argument description
+  @todo add return values
+**/
 EFI_STATUS
 EFIAPI
 AtapiScsiPassThruFunction (
@@ -300,27 +302,20 @@ AtapiScsiPassThruFunction (
   IN OUT EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET         *Packet,
   IN EFI_EVENT                                          Event OPTIONAL
   )
-/*++
+;
 
-Routine Description:
+/**
+  AtapiScsiPassThruGetNextDevice
 
   TODO: Add function description
 
-Arguments:
-
-  This    - TODO: add argument description
-  Target  - TODO: add argument description
-  Lun     - TODO: add argument description
-  Packet  - TODO: add argument description
-  Event   - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Target TODO: add argument description
+  @param  Lun TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 AtapiScsiPassThruGetNextDevice (
@@ -328,25 +323,21 @@ AtapiScsiPassThruGetNextDevice (
   IN OUT UINT32                      *Target,
   IN OUT UINT64                      *Lun
   )
-/*++
+;
 
-Routine Description:
+/**
+  AtapiScsiPassThruBuildDevicePath
 
   TODO: Add function description
 
-Arguments:
-
-  This    - TODO: add argument description
-  Target  - TODO: add argument description
-  Lun     - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Target TODO: add argument description
+  @param  Lun TODO: add argument description
+  @param  DevicePath TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 AtapiScsiPassThruBuildDevicePath (
@@ -355,26 +346,21 @@ AtapiScsiPassThruBuildDevicePath (
   IN     UINT64                         Lun,
   IN OUT EFI_DEVICE_PATH_PROTOCOL       **DevicePath
   )
-/*++
+;
 
-Routine Description:
+/**
+  AtapiScsiPassThruGetTargetLun
 
   TODO: Add function description
 
-Arguments:
-
-  This        - TODO: add argument description
-  Target      - TODO: add argument description
-  Lun         - TODO: add argument description
-  DevicePath  - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  DevicePath TODO: add argument description
+  @param  Target TODO: add argument description
+  @param  Lun TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 AtapiScsiPassThruGetTargetLun (
@@ -383,48 +369,37 @@ AtapiScsiPassThruGetTargetLun (
   OUT UINT32                         *Target,
   OUT UINT64                         *Lun
   )
-/*++
+;
 
-Routine Description:
+/**
+  AtapiScsiPassThruResetChannel
 
   TODO: Add function description
 
-Arguments:
-
-  This        - TODO: add argument description
-  DevicePath  - TODO: add argument description
-  Target      - TODO: add argument description
-  Lun         - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 AtapiScsiPassThruResetChannel (
   IN  EFI_SCSI_PASS_THRU_PROTOCOL   *This
   )
-/*++
+;
 
-Routine Description:
+/**
+  AtapiScsiPassThruResetTarget
 
   TODO: Add function description
 
-Arguments:
-
-  This  - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Target TODO: add argument description
+  @param  Lun TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 AtapiScsiPassThruResetTarget (
@@ -432,92 +407,74 @@ AtapiScsiPassThruResetTarget (
   IN UINT32                         Target,
   IN UINT64                         Lun
   )
-/*++
+;
 
-Routine Description:
+/**
+  CheckSCSIRequestPacket
 
   TODO: Add function description
 
-Arguments:
-
-  This    - TODO: add argument description
-  Target  - TODO: add argument description
-  Lun     - TODO: add argument description
-
-Returns:
+  @param  Packet TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 CheckSCSIRequestPacket (
   EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET      *Packet
   )
-/*++
+;
 
-Routine Description:
+/**
+  SubmitBlockingIoCommand
 
   TODO: Add function description
 
-Arguments:
-
-  Packet  - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  Target TODO: add argument description
+  @param  Packet TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 SubmitBlockingIoCommand (
   ATAPI_SCSI_PASS_THRU_DEV                  *AtapiScsiPrivate,
   UINT32                                    Target,
   EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET    *Packet
   )
-/*++
+;
 
-Routine Description:
+/**
+  IsCommandValid
 
   TODO: Add function description
 
-Arguments:
+  @param Packet  - TODO: add argument description
 
-  AtapiScsiPrivate  - TODO: add argument description
-  Target            - TODO: add argument description
-  Packet            - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
+  @return TODO: add return values
 
 --*/
-;
-
 BOOLEAN
 IsCommandValid (
   EFI_SCSI_PASS_THRU_SCSI_REQUEST_PACKET   *Packet
   )
- /*++
+;
 
-Routine Description:
+/**
+  RequestSenseCommand
 
   TODO: Add function description
 
-Arguments:
-
-  Packet  - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  Target TODO: add argument description
+  @param  Timeout TODO: add argument description
+  @param  SenseData TODO: add argument description
+  @param  SenseDataLength TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 RequestSenseCommand (
   ATAPI_SCSI_PASS_THRU_DEV    *AtapiScsiPrivate,
@@ -526,27 +483,24 @@ RequestSenseCommand (
   VOID                        *SenseData,
   UINT8                       *SenseDataLength
   )
-/*++
+;
 
-Routine Description:
+/**
+  AtapiPacketCommand
 
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate  - TODO: add argument description
-  Target            - TODO: add argument description
-  Timeout           - TODO: add argument description
-  SenseData         - TODO: add argument description
-  SenseDataLength   - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  Target TODO: add argument description
+  @param  PacketCommand TODO: add argument description
+  @param  Buffer TODO: add argument description
+  @param  ByteCount TODO: add argument description
+  @param  Direction TODO: add argument description
+  @param  TimeOutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 AtapiPacketCommand (
   ATAPI_SCSI_PASS_THRU_DEV                  *AtapiScsiPrivate,
@@ -557,313 +511,236 @@ AtapiPacketCommand (
   DATA_DIRECTION                            Direction,
   UINT64                                    TimeOutInMicroSeconds
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  Target                - TODO: add argument description
-  PacketCommand         - TODO: add argument description
-  Buffer                - TODO: add argument description
-  ByteCount             - TODO: add argument description
-  Direction             - TODO: add argument description
-  TimeOutInMicroSeconds - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 
+/**
+  ReadPortB
+
+  TODO: Add function description
+
+  @param  PciIo TODO: add argument description
+  @param  Port TODO: add argument description
+
+  TODO: add return values
+
+**/
 UINT8
 ReadPortB (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIo - TODO: add argument description
-  Port  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 
+/**
+  ReadPortW
+
+  TODO: Add function description
+
+  @param  PciIo TODO: add argument description
+  @param  Port TODO: add argument description
+
+  TODO: add return values
+
+**/
 UINT16
 ReadPortW (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIo - TODO: add argument description
-  Port  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 
+/**
+  WritePortB
+
+  TODO: Add function description
+
+  @param  PciIo TODO: add argument description
+  @param  Port TODO: add argument description
+  @param  Data TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 WritePortB (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port,
   IN  UINT8                 Data
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  PciIo - TODO: add argument description
-  Port  - TODO: add argument description
-  Data  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 
+/**
+  WritePortW
+
+  TODO: Add function description
+
+  @param  PciIo TODO: add argument description
+  @param  Port TODO: add argument description
+  @param  Data TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 WritePortW (
   IN  EFI_PCI_IO_PROTOCOL   *PciIo,
   IN  UINT16                Port,
   IN  UINT16                Data
   )
-/*++
+;
 
-Routine Description:
+/**
+  StatusDRQClear
 
   TODO: Add function description
 
-Arguments:
-
-  PciIo - TODO: add argument description
-  Port  - TODO: add argument description
-  Data  - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeOutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 StatusDRQClear (
   ATAPI_SCSI_PASS_THRU_DEV        *AtapiScsiPrivate,
   UINT64                          TimeOutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
+/**
+  AltStatusDRQClear
 
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeOutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeOutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 AltStatusDRQClear (
   ATAPI_SCSI_PASS_THRU_DEV        *AtapiScsiPrivate,
   UINT64                          TimeOutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
+/**
+  StatusDRQReady
 
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeOutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeOutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 StatusDRQReady (
   ATAPI_SCSI_PASS_THRU_DEV        *AtapiScsiPrivate,
   UINT64                          TimeOutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
+/**
+  AltStatusDRQReady
 
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeOutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeOutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 AltStatusDRQReady (
   ATAPI_SCSI_PASS_THRU_DEV        *AtapiScsiPrivate,
   UINT64                          TimeOutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeOutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeoutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 StatusWaitForBSYClear (
   ATAPI_SCSI_PASS_THRU_DEV    *AtapiScsiPrivate,
   UINT64                      TimeoutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeoutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeoutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 AltStatusWaitForBSYClear (
   ATAPI_SCSI_PASS_THRU_DEV    *AtapiScsiPrivate,
   UINT64                      TimeoutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeoutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeoutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 StatusDRDYReady (
   ATAPI_SCSI_PASS_THRU_DEV    *AtapiScsiPrivate,
   UINT64                      TimeoutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeoutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  TimeoutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 AltStatusDRDYReady (
   ATAPI_SCSI_PASS_THRU_DEV    *AtapiScsiPrivate,
   UINT64                      TimeoutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  TimeoutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
+  @param  Buffer TODO: add argument description
+  @param  ByteCount TODO: add argument description
+  @param  Direction TODO: add argument description
+  @param  TimeOutInMicroSeconds TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 AtapiPassThruPioReadWriteData (
   ATAPI_SCSI_PASS_THRU_DEV  *AtapiScsiPrivate,
@@ -872,45 +749,19 @@ AtapiPassThruPioReadWriteData (
   DATA_DIRECTION            Direction,
   UINT64                    TimeOutInMicroSeconds
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  AtapiScsiPrivate      - TODO: add argument description
-  Buffer                - TODO: add argument description
-  ByteCount             - TODO: add argument description
-  Direction             - TODO: add argument description
-  TimeOutInMicroSeconds - TODO: add argument description
-
-Returns:
+  @param  AtapiScsiPrivate TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 AtapiPassThruCheckErrorStatus (
   ATAPI_SCSI_PASS_THRU_DEV        *AtapiScsiPrivate
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  AtapiScsiPrivate  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 #endif

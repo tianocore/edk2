@@ -1,67 +1,50 @@
-/*++
+/** @file
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  atapi.c
-    
-Abstract: 
-    
-
-Revision History
---*/
+**/
 
 #include "idebus.h"
 
+/**
+  This function is used to get the current status of the media residing
+  in the LS-120 drive or ZIP drive. The media status is returned in the 
+  Error Status.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS
+  The media status is achieved successfully and the media
+  can be read/written.
+  
+  @retval EFI_DEVICE_ERROR
+  Get Media Status Command is failed.
+  
+  @retval EFI_NO_MEDIA
+  There is no media in the drive.
+  
+  @retval EFI_WRITE_PROTECTED
+  The media is writing protected.
+
+  @note
+  This function must be called after the LS120EnableMediaStatus() 
+  with second parameter set to TRUE 
+  (means enable media status notification) is called.
+
+**/
 STATIC
 EFI_STATUS
 LS120GetMediaStatus (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        LS120GetMediaStatus
-
-  Purpose: 
-        This function is used to get the current status of the media residing
-        in the LS-120 drive or ZIP drive. The media status is returned in the 
-        Error Status.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        EFI_SUCCESS
-          The media status is achieved successfully and the media
-          can be read/written.             
-    
-        EFI_DEVICE_ERROR
-          Get Media Status Command is failed.
-
-        EFI_NO_MEDIA
-          There is no media in the drive.
-
-        EFI_WRITE_PROTECTED
-          The media is writing protected. 
-
-  Notes:                
-        This function must be called after the LS120EnableMediaStatus() 
-        with second parameter set to TRUE 
-        (means enable media status notification) is called.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   UINT8       DeviceSelect;
   UINT8       StatusValue;
@@ -119,43 +102,31 @@ LS120GetMediaStatus (
   }
 }
 
+/**
+  This function is used to send Enable Media Status Notification Command
+  or Disable Media Status Notification Command.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] Enable
+  a flag that indicates whether enable or disable media
+  status notification.
+
+  @retval EFI_SUCCESS
+  If command completes successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  If command failed.
+
+**/
 STATIC
 EFI_STATUS
 LS120EnableMediaStatus (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   IN  BOOLEAN         Enable
   )
-/*++
-  Name:
-        LS120EnableMediaStatus
-
-  Purpose: 
-        This function is used to send Enable Media Status Notification Command
-        or Disable Media Status Notification Command.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        BOOLEAN     IN    Enable
-          a flag that indicates whether enable or disable media
-          status notification.
-
-  Returns:  
-        EFI_SUCCESS
-          If command completes successfully.
-
-        EFI_DEVICE_ERROR
-          If command failed.
-
-
-  Notes:                
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Enable - add argument and description to function comment
 {
   UINT8       DeviceSelect;
   EFI_STATUS  Status;
@@ -211,60 +182,51 @@ LS120EnableMediaStatus (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is called by DiscoverIdeDevice() during its device
+  identification.
+
+  Its main purpose is to get enough information for the device media
+  to fill in the Media data structure of the Block I/O Protocol interface.
+
+  There are 5 steps to reach such objective:
+
+  1. Sends out the ATAPI Identify Command to the specified device. 
+  Only ATAPI device responses to this command. If the command succeeds,
+  it returns the Identify data structure which filled with information 
+  about the device. Since the ATAPI device contains removable media, 
+  the only meaningful information is the device module name.
+
+  2. Sends out ATAPI Inquiry Packet Command to the specified device.
+  This command will return inquiry data of the device, which contains
+  the device type information.
+
+  3. Allocate sense data space for future use. We don't detect the media
+  presence here to improvement boot performance, especially when CD 
+  media is present. The media detection will be performed just before
+  each BLK_IO read/write
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS
+  Identify ATAPI device successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  ATAPI Identify Device Command failed or device type
+  is not supported by this IDE driver.
+
+  @note
+  Parameter "IdeDev" will be updated in this function.
+
+  TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
+  TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
+**/
 EFI_STATUS
 ATAPIIdentify (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        ATAPIIdentify
-
-
-  Purpose: 
-        This function is called by DiscoverIdeDevice() during its device
-        identification.
-
-        Its main purpose is to get enough information for the device media
-        to fill in the Media data structure of the Block I/O Protocol interface.
-
-        There are 5 steps to reach such objective:
-
-        1. Sends out the ATAPI Identify Command to the specified device. 
-           Only ATAPI device responses to this command. If the command succeeds,
-           it returns the Identify data structure which filled with information 
-           about the device. Since the ATAPI device contains removable media, 
-           the only meaningful information is the device module name.
-
-        2. Sends out ATAPI Inquiry Packet Command to the specified device.
-           This command will return inquiry data of the device, which contains
-           the device type information.
-
-        3. Allocate sense data space for future use. We don't detect the media
-           presence here to improvement boot performance, especially when CD 
-           media is present. The media detection will be performed just before
-           each BLK_IO read/write
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        EFI_SUCCESS
-          Identify ATAPI device successfully.
-
-        EFI_DEVICE_ERROR
-          ATAPI Identify Device Command failed or device type 
-          is not supported by this IDE driver.
-
-  Notes:
-        Parameter "IdeDev" will be updated in this function.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
-// TODO:    EFI_OUT_OF_RESOURCES - add return value to function comment
 {
   EFI_IDENTIFY_DATA *AtapiIdentifyPointer;
   UINT8             DeviceSelect;
@@ -409,35 +371,28 @@ ATAPIIdentify (
   return EFI_SUCCESS;
 }
 
+/**
+  Sends out ATAPI Inquiry Packet Command to the specified device.
+  This command will return INQUIRY data of the device.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS
+  Inquiry command completes successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  Inquiry command failed.
+
+  @note
+  Parameter "IdeDev" will be updated in this function.
+
+**/
 EFI_STATUS
 AtapiInquiry (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        AtapiInquiry
-
-  Purpose: 
-        Sends out ATAPI Inquiry Packet Command to the specified device.
-        This command will return INQUIRY data of the device.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        EFI_SUCCESS
-          Inquiry command completes successfully.
-
-        EFI_DEVICE_ERROR
-          Inquiry command failed.
-  Notes:
-        Parameter "IdeDev" will be updated in this function.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   ATAPI_PACKET_COMMAND  Packet;
   EFI_STATUS            Status;
@@ -476,6 +431,36 @@ AtapiInquiry (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is used to send out ATAPI commands conforms to the 
+  Packet Command with PIO Data In Protocol.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *Packet
+  pointer pointing to ATAPI_PACKET_COMMAND data structure
+  which contains the contents of the command.     
+
+  @param[in] *Buffer
+  buffer contained data transferred from device to host.
+
+  @param[in] ByteCount
+  data size in byte unit of the buffer.
+
+  @param[in] TimeOut
+  this parameter is used to specify the timeout 
+  value for the PioReadWriteData() function. 
+
+  @retval EFI_SUCCESS
+  send out the ATAPI packet command successfully
+  and device sends data successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  the device failed to send data.
+
+**/
 EFI_STATUS
 AtapiPacketCommandIn (
   IN  IDE_BLK_IO_DEV        *IdeDev,
@@ -484,50 +469,6 @@ AtapiPacketCommandIn (
   IN  UINT32                ByteCount,
   IN  UINTN                 TimeOut
   )
-/*++
-  Name:
-        AtapiPacketCommandIn
-
-  Purpose: 
-        This function is used to send out ATAPI commands conforms to the 
-        Packet Command with PIO Data In Protocol.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        ATAPI_PACKET_COMMAND  IN  *Packet
-          pointer pointing to ATAPI_PACKET_COMMAND data structure
-          which contains the contents of the command.     
-              
-        UINT16      IN    *Buffer
-          buffer contained data transferred from device to host.
-
-        UINT32      IN    ByteCount
-          data size in byte unit of the buffer.
-
-        UINTN     IN    TimeOut
-          this parameter is used to specify the timeout 
-          value for the PioReadWriteData() function. 
-
-  Returns:  
-        EFI_SUCCESS
-          send out the ATAPI packet command successfully 
-          and device sends data successfully.
-
-        EFI_DEVICE_ERROR
-          the device failed to send data.                 
-
-  Notes:
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Packet - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    ByteCount - add argument and description to function comment
-// TODO:    TimeOut - add argument and description to function comment
 {
   UINT16      *CommandIndex;
   EFI_STATUS  Status;
@@ -605,6 +546,36 @@ AtapiPacketCommandIn (
   return PioReadWriteData (IdeDev, Buffer, ByteCount, 1, TimeOut);
 }
 
+/**
+  This function is used to send out ATAPI commands conforms to the 
+  Packet Command with PIO Data Out Protocol.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *Packet
+  pointer pointing to ATAPI_PACKET_COMMAND data structure
+  which contains the contents of the command.
+
+  @param[in] *Buffer
+  buffer contained data transferred from host to device.
+
+  @param[in] ByteCount
+  data size in byte unit of the buffer.
+
+  @param[in] TimeOut
+  this parameter is used to specify the timeout 
+  value for the PioReadWriteData() function. 
+
+  @retval EFI_SUCCESS
+  send out the ATAPI packet command successfully
+  and device received data successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  the device failed to send data.
+
+**/
 EFI_STATUS
 AtapiPacketCommandOut (
   IN  IDE_BLK_IO_DEV        *IdeDev,
@@ -613,51 +584,6 @@ AtapiPacketCommandOut (
   IN  UINT32                ByteCount,
   IN  UINTN                 TimeOut
   )
-/*++
-  Name:
-        AtapiPacketCommandOut
-
-  Purpose: 
-        This function is used to send out ATAPI commands conforms to the 
-        Packet Command with PIO Data Out Protocol.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        ATAPI_PACKET_COMMAND  IN  *Packet
-          pointer pointing to ATAPI_PACKET_COMMAND data structure
-          which contains the contents of the command.
-
-        VOID      IN    *Buffer
-          buffer contained data transferred from host to device.
-
-        UINT32      IN    ByteCount
-          data size in byte unit of the buffer.
-
-        UINTN     IN    TimeOut
-          this parameter is used to specify the timeout 
-          value for the PioReadWriteData() function. 
-
-  Returns:  
-        EFI_SUCCESS
-          send out the ATAPI packet command successfully 
-          and device received data successfully.
-
-        EFI_DEVICE_ERROR
-          the device failed to send data. 
-
-  Notes:
-  
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Packet - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    ByteCount - add argument and description to function comment
-// TODO:    TimeOut - add argument and description to function comment
 {
   UINT16      *CommandIndex;
   EFI_STATUS  Status;
@@ -733,6 +659,38 @@ AtapiPacketCommandOut (
   return PioReadWriteData (IdeDev, Buffer, ByteCount, 0, TimeOut);
 }
 
+/**
+  This function is called by either AtapiPacketCommandIn() or 
+  AtapiPacketCommandOut(). It is used to transfer data between
+  host and device. The data direction is specified by the fourth
+  parameter.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *Buffer
+  buffer contained data transferred between host and device.
+
+  @param[in] ByteCount
+  data size in byte unit of the buffer.
+
+  @param[in] Read
+  flag used to determine the data transfer direction.
+  Read equals 1, means data transferred from device to host;
+  Read equals 0, means data transferred from host to device.
+
+  @param[in] TimeOut
+  timeout value for wait DRQ ready before each data 
+  stream's transfer.
+
+  @retval EFI_SUCCESS
+  data is transferred successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  the device failed to transfer data.
+
+**/
 EFI_STATUS
 PioReadWriteData (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -741,54 +699,6 @@ PioReadWriteData (
   IN  BOOLEAN         Read,
   IN  UINTN           TimeOut
   )
-/*++
-  Name:
-        PioReadWriteData
-
-  Purpose: 
-        This function is called by either AtapiPacketCommandIn() or 
-        AtapiPacketCommandOut(). It is used to transfer data between
-        host and device. The data direction is specified by the fourth
-        parameter.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *Buffer
-          buffer contained data transferred between host and device.
-
-        UINT32      IN    ByteCount
-          data size in byte unit of the buffer.
-
-        BOOLEAN     IN    Read
-          flag used to determine the data transfer direction.
-          Read equals 1, means data transferred from device to host;
-          Read equals 0, means data transferred from host to device.
-
-        UINTN     IN    TimeOut
-          timeout value for wait DRQ ready before each data 
-          stream's transfer.
-
-  Returns:  
-        EFI_SUCCESS
-          data is transferred successfully.  
-
-        EFI_DEVICE_ERROR
-          the device failed to transfer data.                 
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    ByteCount - add argument and description to function comment
-// TODO:    Read - add argument and description to function comment
-// TODO:    TimeOut - add argument and description to function comment
 {
   //
   // required transfer data in word unit.
@@ -888,36 +798,25 @@ PioReadWriteData (
   return CheckErrorStatus (IdeDev);
 }
 
+/**
+  Sends out ATAPI Test Unit Ready Packet Command to the specified device
+  to find out whether device is accessible.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS
+  device is accessible.
+  
+  @retval EFI_DEVICE_ERROR
+  device is not accessible.
+
+**/
 EFI_STATUS
 AtapiTestUnitReady (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        AtapiTestUnitReady
-
-  Purpose: 
-        Sends out ATAPI Test Unit Ready Packet Command to the specified device
-        to find out whether device is accessible.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        EFI_SUCCESS
-          device is accessible.
-
-        EFI_DEVICE_ERROR
-          device is not accessible.
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   ATAPI_PACKET_COMMAND  Packet;
   EFI_STATUS            Status;
@@ -935,50 +834,38 @@ AtapiTestUnitReady (
   return Status;
 }
 
+/**
+  Sends out ATAPI Request Sense Packet Command to the specified device.
+  This command will return all the current Sense data in the device. 
+  This function will pack all the Sense data in one single buffer.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[out] **SenseBuffers
+  allocated in this function, and freed by the calling function.
+  This buffer is used to accommodate all the sense data returned 
+  by the device.
+
+  @param[out] *BufUnit
+  record the unit size of the sense data block in the SenseBuffers,
+
+  @param[out] *BufNumbers
+  record the number of units in the SenseBuffers.
+
+  @retval EFI_SUCCESS
+  Request Sense command completes successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  Request Sense command failed.
+
+**/
 EFI_STATUS
 AtapiRequestSense (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   OUT UINTN           *SenseCounts
   )
-/*++
-  Name:
-        AtapiRequestSense
-
-  Purpose: 
-        Sends out ATAPI Request Sense Packet Command to the specified device.
-        This command will return all the current Sense data in the device. 
-        This function will pack all the Sense data in one single buffer.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        UINT16      OUT   **SenseBuffers
-          allocated in this function, and freed by the calling function.
-          This buffer is used to accommodate all the sense data returned 
-          by the device.
-
-        UINTN     OUT   *BufUnit
-          record the unit size of the sense data block in the SenseBuffers,
-
-        UINTN     OUT   *BufNumbers
-          record the number of units in the SenseBuffers.
-
-  Returns:  
-        EFI_SUCCESS
-          Request Sense command completes successfully.
-
-        EFI_DEVICE_ERROR
-          Request Sense command failed.
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    SenseCounts - add argument and description to function comment
 {
   EFI_STATUS            Status;
   REQUEST_SENSE_DATA    *Sense;
@@ -1053,45 +940,36 @@ AtapiRequestSense (
   return EFI_SUCCESS;
 }
 
+/**
+  Sends out ATAPI Read Capacity Packet Command to the specified device.
+  This command will return the information regarding the capacity of the
+  media in the device.
+
+  Current device status will impact device's response to the Read Capacity
+  Command. For example, if the device once reset, the Read Capacity
+  Command will fail. The Sense data record the current device status, so 
+  if the Read Capacity Command failed, the Sense data must be requested
+  and be analyzed to determine if the Read Capacity Command should retry.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS
+  Read Capacity Command finally completes successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  Read Capacity Command failed because of device error.
+
+  @note
+  parameter "IdeDev" will be updated in this function.
+
+  TODO:    EFI_NOT_READY - add return value to function comment
+**/
 EFI_STATUS
 AtapiReadCapacity (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        AtapiReadCapacity
-
-  Purpose: 
-        Sends out ATAPI Read Capacity Packet Command to the specified device.
-        This command will return the information regarding the capacity of the
-        media in the device.
-
-        Current device status will impact device's response to the Read Capacity
-        Command. For example, if the device once reset, the Read Capacity
-        Command will fail. The Sense data record the current device status, so 
-        if the Read Capacity Command failed, the Sense data must be requested
-        and be analyzed to determine if the Read Capacity Command should retry.
-
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        EFI_SUCCESS
-          Read Capacity Command finally completes successfully.
-
-        EFI_DEVICE_ERROR
-          Read Capacity Command failed because of device error.
-
-  Notes:
-        parameter "IdeDev" will be updated in this function.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    EFI_NOT_READY - add return value to function comment
 {
   //
   // status returned by Read Capacity Packet Command
@@ -1207,48 +1085,39 @@ AtapiReadCapacity (
   }
 }
 
+/**
+  Used before read/write blocks from/to ATAPI device media. 
+  Since ATAPI device media is removable, it is necessary to detect
+  whether media is present and get current present media's
+  information, and if media has been changed, Block I/O Protocol
+  need to be reinstalled.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[out] *MediaChange
+  return value that indicates if the media of the device has been
+  changed.
+
+  @retval EFI_SUCCESS
+  media found successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  any error encounters during media detection.
+  
+  @retval EFI_NO_MEDIA
+  media not found.
+
+  @note
+  parameter IdeDev may be updated in this function.
+
+**/
 EFI_STATUS
 AtapiDetectMedia (
   IN  IDE_BLK_IO_DEV  *IdeDev,
   OUT BOOLEAN         *MediaChange
   )
-/*++
-  Name:
-        AtapiDetectMedia
-
-  Purpose: 
-        Used before read/write blocks from/to ATAPI device media. 
-        Since ATAPI device media is removable, it is necessary to detect
-        whether media is present and get current present media's
-        information, and if media has been changed, Block I/O Protocol
-        need to be reinstalled.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        BOOLEAN         OUT   *MediaChange
-          return value that indicates if the media of the device has been
-          changed.
-
-  Returns:  
-        EFI_SUCCESS
-          media found successfully.
-
-        EFI_DEVICE_ERROR
-          any error encounters during media detection.
-          
-        EFI_NO_MEDIA
-          media not found.
-
-  Notes:
-        parameter IdeDev may be updated in this function.
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    MediaChange - add argument and description to function comment
 {
   EFI_STATUS          Status;
   EFI_STATUS          ReadCapacityStatus;
@@ -1558,6 +1427,35 @@ AtapiDetectMedia (
 
 }
 
+/**
+  This function is called by the AtapiBlkIoReadBlocks() to perform
+  read from media in block unit.
+
+  The main command used to access media here is READ(10) Command. 
+  READ(10) Command requests that the ATAPI device media transfer 
+  specified data to the host. Data is transferred in block(sector) 
+  unit. The maximum number of blocks that can be transferred once is
+  65536. This is the main difference between READ(10) and READ(12) 
+  Command. The maximum number of blocks in READ(12) is 2 power 32.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *Buffer
+  A pointer to the destination buffer for the data. 
+
+  @param[in] Lba
+  The starting logical block address to read from 
+  on the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+
+  @return status is fully dependent on the return status
+  of AtapiPacketCommandIn() function.
+
+**/
 EFI_STATUS
 AtapiReadSectors (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1565,49 +1463,6 @@ AtapiReadSectors (
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-        AtapiReadSectors
-
-  Purpose: 
-        This function is called by the AtapiBlkIoReadBlocks() to perform
-        read from media in block unit.
-
-        The main command used to access media here is READ(10) Command. 
-        READ(10) Command requests that the ATAPI device media transfer 
-        specified data to the host. Data is transferred in block(sector) 
-        unit. The maximum number of blocks that can be transferred once is
-        65536. This is the main difference between READ(10) and READ(12) 
-        Command. The maximum number of blocks in READ(12) is 2 power 32.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *Buffer
-          A pointer to the destination buffer for the data. 
-
-        EFI_LBA     IN    Lba
-          The starting logical block address to read from 
-          on the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-        return status is fully dependent on the return status
-        of AtapiPacketCommandIn() function.
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    Lba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
 {
 
   ATAPI_PACKET_COMMAND  Packet;
@@ -1699,6 +1554,33 @@ AtapiReadSectors (
   return Status;
 }
 
+/**
+  This function is called by the AtapiBlkIoWriteBlocks() to perform
+  write onto media in block unit.
+  The main command used to access media here is Write(10) Command. 
+  Write(10) Command requests that the ATAPI device media transfer 
+  specified data to the host. Data is transferred in block (sector) 
+  unit. The maximum number of blocks that can be transferred once is
+  65536. 
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @param[in] *Buffer
+  A pointer to the source buffer for the data. 
+
+  @param[in] Lba
+  The starting logical block address to write onto 
+  the device media.
+
+  @param[in] NumberOfBlocks
+  The number of transfer data blocks.
+
+  @return status is fully dependent on the return status
+  of AtapiPacketCommandOut() function.
+
+**/
 EFI_STATUS
 AtapiWriteSectors (
   IN  IDE_BLK_IO_DEV  *IdeDev,
@@ -1706,47 +1588,6 @@ AtapiWriteSectors (
   IN  EFI_LBA         Lba,
   IN  UINTN           NumberOfBlocks
   )
-/*++
-  Name:
-        AtapiWriteSectors
-
-  Purpose: 
-        This function is called by the AtapiBlkIoWriteBlocks() to perform
-        write onto media in block unit.
-        The main command used to access media here is Write(10) Command. 
-        Write(10) Command requests that the ATAPI device media transfer 
-        specified data to the host. Data is transferred in block (sector) 
-        unit. The maximum number of blocks that can be transferred once is
-        65536. 
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-        VOID      IN    *Buffer
-          A pointer to the source buffer for the data. 
-
-        EFI_LBA     IN    Lba
-          The starting logical block address to write onto 
-          the device media.
-
-        UINTN     IN    NumberOfBlocks
-          The number of transfer data blocks.
-
-  Returns:  
-        return status is fully dependent on the return status
-        of AtapiPacketCommandOut() function.
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    Lba - add argument and description to function comment
-// TODO:    NumberOfBlocks - add argument and description to function comment
 {
 
   ATAPI_PACKET_COMMAND  Packet;
@@ -1834,45 +1675,33 @@ AtapiWriteSectors (
   return Status;
 }
 
+/**
+  This function is used to implement the Soft Reset on the specified
+  ATAPI device. Different from the AtaSoftReset(), here reset is a ATA
+  Soft Reset Command special for ATAPI device, and it only take effects
+  on the specified ATAPI device, not on the whole IDE bus.
+  Since the ATAPI soft reset is needed when device is in exceptional
+  condition (such as BSY bit is always set ), I think the Soft Reset
+  command should be sent without waiting for the BSY clear and DRDY
+  set.
+  This function is called by IdeBlkIoReset(), 
+  a interface function of Block I/O protocol.
+
+  @param[in] *IdeDev
+  pointer pointing to IDE_BLK_IO_DEV data structure, used
+  to record all the information of the IDE device.
+
+  @retval EFI_SUCCESS
+  Soft reset completes successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  Any step during the reset process is failed.
+
+**/
 EFI_STATUS
 AtapiSoftReset (
   IN  IDE_BLK_IO_DEV  *IdeDev
   )
-/*++
-  Name:
-        AtapiSoftReset
-
-  Purpose: 
-        This function is used to implement the Soft Reset on the specified
-        ATAPI device. Different from the AtaSoftReset(), here reset is a ATA
-        Soft Reset Command special for ATAPI device, and it only take effects
-        on the specified ATAPI device, not on the whole IDE bus.
-        Since the ATAPI soft reset is needed when device is in exceptional
-        condition (such as BSY bit is always set ), I think the Soft Reset
-        command should be sent without waiting for the BSY clear and DRDY
-        set.
-        This function is called by IdeBlkIoReset(), 
-        a interface function of Block I/O protocol.
-
-            
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeDev
-          pointer pointing to IDE_BLK_IO_DEV data structure, used
-          to record all the information of the IDE device.
-
-  Returns:  
-        EFI_SUCCESS
-          Soft reset completes successfully.
-
-        EFI_DEVICE_ERROR
-          Any step during the reset process is failed.
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeDev - add argument and description to function comment
 {
   UINT8       Command;
   UINT8       DeviceSelect;
@@ -1906,6 +1735,50 @@ AtapiSoftReset (
   return EFI_SUCCESS;
 }
 
+/**
+  This function is the ATAPI implementation for ReadBlocks in the
+  Block I/O Protocol interface.
+
+  @param[in] *IdeBlkIoDev
+  Indicates the calling context.
+
+  @param[in] MediaId
+  The media id that the read request is for.
+
+  @param[in] LBA
+  The starting logical block address to read from 
+  on the device.
+
+  @param[in] BufferSize
+  The size of the Buffer in bytes. This must be a
+  multiple of the intrinsic block size of the device.
+
+  @param[out] *Buffer
+  A pointer to the destination buffer for the data. 
+  The caller is responsible for either having implicit
+  or explicit ownership of the memory that data is read into.
+
+  @retval EFI_SUCCESS
+  Read Blocks successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  Read Blocks failed.
+  
+  @retval EFI_NO_MEDIA
+  There is no media in the device.
+  
+  @retval EFI_MEDIA_CHANGED
+  The MediaId is not for the current media.
+  
+  @retval EFI_BAD_BUFFER_SIZE
+  The BufferSize parameter is not a multiple of the
+  intrinsic block size of the device.
+  
+  @retval EFI_INVALID_PARAMETER
+  The read request contains LBAs that are not valid,
+  or the data buffer is not valid.
+
+**/
 EFI_STATUS
 AtapiBlkIoReadBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
@@ -1914,65 +1787,6 @@ AtapiBlkIoReadBlocks (
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   )
-/*++
-  Name:
-        AtapiBlkIoReadBlocks
-
-  Purpose: 
-        This function is the ATAPI implementation for ReadBlocks in the
-        Block I/O Protocol interface.
-
-  Parameters:
-        IDE_BLK_IO_DEV  IN    *IdeBlkIoDev
-          Indicates the calling context.
-
-        UINT32      IN    MediaId
-          The media id that the read request is for.
-
-        EFI_LBA     IN    LBA
-          The starting logical block address to read from 
-          on the device.
-
-        UINTN     IN    BufferSize
-          The size of the Buffer in bytes. This must be a
-          multiple of the intrinsic block size of the device.
-
-        VOID      OUT   *Buffer
-          A pointer to the destination buffer for the data. 
-          The caller is responsible for either having implicit
-          or explicit ownership of the memory that data is read into.
-
-  Returns:  
-        EFI_SUCCESS 
-          Read Blocks successfully.
-
-        EFI_DEVICE_ERROR
-          Read Blocks failed.
-
-        EFI_NO_MEDIA
-          There is no media in the device.
-
-        EFI_MEDIA_CHANGED
-          The MediaId is not for the current media.
-
-        EFI_BAD_BUFFER_SIZE
-          The BufferSize parameter is not a multiple of the 
-          intrinsic block size of the device.
-
-        EFI_INVALID_PARAMETER
-          The read request contains LBAs that are not valid,
-          or the data buffer is not valid.
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeBlkIoDevice - add argument and description to function comment
-// TODO:    MediaId - add argument and description to function comment
-// TODO:    LBA - add argument and description to function comment
-// TODO:    BufferSize - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
 {
   EFI_BLOCK_IO_MEDIA  *Media;
   UINTN               BlockSize;
@@ -2074,6 +1888,53 @@ AtapiBlkIoReadBlocks (
 
 }
 
+/**
+  This function is the ATAPI implementation for WriteBlocks in the
+  Block I/O Protocol interface.
+
+  @param[in] *This
+  Indicates the calling context.
+
+  @param[in] MediaId
+  The media id that the write request is for.
+
+  @param[in] LBA
+  The starting logical block address to write onto 
+  the device.
+
+  @param[in] BufferSize
+  The size of the Buffer in bytes. This must be a
+  multiple of the intrinsic block size of the device.
+
+  @param[out] *Buffer
+  A pointer to the source buffer for the data. 
+  The caller is responsible for either having implicit
+  or explicit ownership of the memory that data is 
+  written from.
+
+  @retval EFI_SUCCESS
+  Write Blocks successfully.
+  
+  @retval EFI_DEVICE_ERROR
+  Write Blocks failed.
+  
+  @retval EFI_NO_MEDIA
+  There is no media in the device.
+  
+  @retval EFI_MEDIA_CHANGE
+  The MediaId is not for the current media.
+  
+  @retval EFI_BAD_BUFFER_SIZE
+  The BufferSize parameter is not a multiple of the
+  intrinsic block size of the device.
+  
+  @retval EFI_INVALID_PARAMETER
+  The write request contains LBAs that are not valid,
+  or the data buffer is not valid.
+
+  TODO:    EFI_MEDIA_CHANGED - add return value to function comment
+  TODO:    EFI_WRITE_PROTECTED - add return value to function comment
+**/
 EFI_STATUS
 AtapiBlkIoWriteBlocks (
   IN IDE_BLK_IO_DEV   *IdeBlkIoDevice,
@@ -2082,68 +1943,6 @@ AtapiBlkIoWriteBlocks (
   IN UINTN            BufferSize,
   OUT VOID            *Buffer
   )
-/*++
-  Name:
-        AtapiBlkIoWriteBlocks
-
-  Purpose: 
-        This function is the ATAPI implementation for WriteBlocks in the
-        Block I/O Protocol interface.
-
-  Parameters:
-        EFI_BLOCK_IO  IN    *This
-          Indicates the calling context.
-
-        UINT32      IN    MediaId
-          The media id that the write request is for.
-
-        EFI_LBA     IN    LBA
-          The starting logical block address to write onto 
-          the device.
-
-        UINTN     IN    BufferSize
-          The size of the Buffer in bytes. This must be a
-          multiple of the intrinsic block size of the device.
-
-        VOID      OUT   *Buffer
-          A pointer to the source buffer for the data. 
-          The caller is responsible for either having implicit
-          or explicit ownership of the memory that data is 
-          written from.
-
-  Returns:  
-        EFI_SUCCESS 
-          Write Blocks successfully.
-
-        EFI_DEVICE_ERROR
-          Write Blocks failed.
-
-        EFI_NO_MEDIA
-          There is no media in the device.
-
-        EFI_MEDIA_CHANGE
-          The MediaId is not for the current media.
-
-        EFI_BAD_BUFFER_SIZE
-          The BufferSize parameter is not a multiple of the 
-          intrinsic block size of the device.
-
-        EFI_INVALID_PARAMETER
-          The write request contains LBAs that are not valid,
-          or the data buffer is not valid. 
-
-  Notes:
-
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    IdeBlkIoDevice - add argument and description to function comment
-// TODO:    MediaId - add argument and description to function comment
-// TODO:    LBA - add argument and description to function comment
-// TODO:    BufferSize - add argument and description to function comment
-// TODO:    Buffer - add argument and description to function comment
-// TODO:    EFI_MEDIA_CHANGED - add return value to function comment
-// TODO:    EFI_WRITE_PROTECTED - add return value to function comment
 {
 
   EFI_BLOCK_IO_MEDIA  *Media;
@@ -2243,27 +2042,20 @@ AtapiBlkIoWriteBlocks (
 // which are used to parse sense key returned by the device.
 //
 
+/**
+  TODO: Add function description
+
+  @param  SenseData TODO: add argument description
+  @param  SenseCounts TODO: add argument description
+
+  TODO: add return values
+
+**/
 BOOLEAN
 IsNoMedia (
   IN  REQUEST_SENSE_DATA    *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   REQUEST_SENSE_DATA  *SensePointer;
   UINTN               Index;
@@ -2289,35 +2081,23 @@ Returns:
   return NoMedia;
 }
 
+/**
+  Test if the device meets a media error after media changed
+
+  @param[in] *SenseData
+  pointer pointing to ATAPI device sense data list.
+  @param[in] SenseCounts
+  sense data number of the list          
+
+  @retval TRUE Device meets a media error
+  @retval FALSE No media error
+
+**/
 BOOLEAN
 IsMediaError (
   IN  REQUEST_SENSE_DATA    *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-  Name:
-        IsMediaError
-
-  Purpose: 
-        Test if the device meets a media error after media changed
-
-  Parameters:
-        EQUEST_SENSE_DATA   IN  *SenseData
-          pointer pointing to ATAPI device sense data list.
-        UINTN               IN  SenseCounts
-          sense data number of the list          
-
-  Returns:  
-        TRUE
-          Device meets a media error
-
-        FALSE
-          No media error
---*/
-// TODO: function comment is missing 'Routine Description:'
-// TODO: function comment is missing 'Arguments:'
-// TODO:    SenseData - add argument and description to function comment
-// TODO:    SenseCounts - add argument and description to function comment
 {
   REQUEST_SENSE_DATA  *SensePointer;
   UINTN               Index;
@@ -2375,27 +2155,20 @@ IsMediaError (
   return IsError;
 }
 
+/**
+  TODO: Add function description
+
+  @param  SenseData TODO: add argument description
+  @param  SenseCounts TODO: add argument description
+
+  TODO: add return values
+
+**/
 BOOLEAN
 IsMediaChange (
   IN  REQUEST_SENSE_DATA    *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   REQUEST_SENSE_DATA  *SensePointer;
   UINTN               Index;
@@ -2420,29 +2193,22 @@ Returns:
   return IsMediaChange;
 }
 
+/**
+  TODO: Add function description
+
+  @param  SenseData TODO: add argument description
+  @param  SenseCounts TODO: add argument description
+  @param  NeedRetry TODO: add argument description
+
+  TODO: add return values
+
+**/
 BOOLEAN
 IsDriveReady (
   IN  REQUEST_SENSE_DATA    *SenseData,
   IN  UINTN                 SenseCounts,
   OUT BOOLEAN               *NeedRetry
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
-  NeedRetry   - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   REQUEST_SENSE_DATA  *SensePointer;
   UINTN               Index;
@@ -2496,27 +2262,20 @@ Returns:
   return IsReady;
 }
 
+/**
+  TODO: Add function description
+
+  @param  SenseData TODO: add argument description
+  @param  SenseCounts TODO: add argument description
+
+  TODO: add return values
+
+**/
 BOOLEAN
 HaveSenseKey (
   IN  REQUEST_SENSE_DATA    *SenseData,
   IN  UINTN                 SenseCounts
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  SenseData   - TODO: add argument description
-  SenseCounts - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   BOOLEAN Have;
 
@@ -2533,29 +2292,22 @@ Returns:
   return Have;
 }
 
+/**
+  TODO: Add function description
+
+  @param  IdeDev TODO: add argument description
+  @param  WriteProtected TODO: add argument description
+
+  @retval  EFI_DEVICE_ERROR TODO: Add description for return value
+  @retval  EFI_DEVICE_ERROR TODO: Add description for return value
+  @retval  EFI_SUCCESS TODO: Add description for return value
+
+**/
 EFI_STATUS
 IsLS120orZipWriteProtected (
   IN  IDE_BLK_IO_DEV    *IdeDev,
   OUT BOOLEAN           *WriteProtected
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  IdeDev          - TODO: add argument description
-  WriteProtected  - TODO: add argument description
-
-Returns:
-
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_DEVICE_ERROR - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-
---*/
 {
   EFI_STATUS  Status;
 

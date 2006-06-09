@@ -1,25 +1,16 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  CirrusLogic5430.h
-    
-Abstract:
-
+/** @file
   Cirrus Logic 5430 Controller Driver
 
-Revision History
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
---*/
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 //
 // Cirrus Logic 5430 Controller Driver
@@ -99,78 +90,67 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gCirrusLogic5430ComponentName;
 //
 // UGA Draw Hardware abstraction internal worker functions
 //
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+
+  TODO: add return values
+
+**/
 EFI_STATUS
 CirrusLogic5430UgaDrawConstructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  Private - TODO: add argument description
-
-Returns:
+  @param  Private TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 CirrusLogic5430UgaDrawDestructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 //
 // EFI 1.1 driver model prototypes for Cirrus Logic 5430 UGA Draw
 //
+/**
+  TODO: Add function description
+
+  @param  ImageHandle TODO: add argument description
+  @param  SystemTable TODO: add argument description
+
+  TODO: add return values
+
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430DriverEntryPoint (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  ImageHandle - TODO: add argument description
-  SystemTable - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 //
 // EFI_DRIVER_BINDING_PROTOCOL Protocol Interface
 //
+/**
+  TODO: Add function description
+
+  @param  This TODO: add argument description
+  @param  Controller TODO: add argument description
+  @param  RemainingDevicePath TODO: add argument description
+
+  TODO: add return values
+
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430ControllerDriverSupported (
@@ -178,25 +158,18 @@ CirrusLogic5430ControllerDriverSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This                - TODO: add argument description
-  Controller          - TODO: add argument description
-  RemainingDevicePath - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Controller TODO: add argument description
+  @param  RemainingDevicePath TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430ControllerDriverStart (
@@ -204,25 +177,19 @@ CirrusLogic5430ControllerDriverStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This                - TODO: add argument description
-  Controller          - TODO: add argument description
-  RemainingDevicePath - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Controller TODO: add argument description
+  @param  NumberOfChildren TODO: add argument description
+  @param  ChildHandleBuffer TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430ControllerDriverStop (
@@ -231,24 +198,6 @@ CirrusLogic5430ControllerDriverStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  This              - TODO: add argument description
-  Controller        - TODO: add argument description
-  NumberOfChildren  - TODO: add argument description
-  ChildHandleBuffer - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 #endif

@@ -1,25 +1,17 @@
-/*++
+/** @file
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Module Name:
-
-  idebus.c
-    
-Abstract: 
-    
-
-Revision History
+  @par Revision Reference:
   This module is modified from DXE\IDE module for Ide Contriller Init support
 
---*/
+**/
 
 #include "idebus.h"
 
@@ -44,6 +36,17 @@ EFI_DRIVER_BINDING_PROTOCOL gIDEBusDriverBinding = {
 // IDEBusDriverBindingSupported
 // ***********************************************************************************
 //
+/**
+  Register Driver Binding protocol for this driver.
+
+  @param[in] This   -- A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
+  @param[in] ControllerHandle    -- The handle of the controller to test.
+  @param[in] RemainingDevicePath -- A pointer to the remaining portion of a device path.
+
+  @retval  EFI_SUCCESS Driver loaded.
+  @retval  other Driver not loaded.
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBusDriverBindingSupported (
@@ -51,20 +54,6 @@ IDEBusDriverBindingSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-  
-Routine Description:
-  Register Driver Binding protocol for this driver.
-  
-Arguments:
-  This   -- A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  ControllerHandle    -- The handle of the controller to test.
-  RemainingDevicePath -- A pointer to the remaining portion of a device path.
-
-Returns: 
-  EFI_SUCCESS - Driver loaded.
-  other       - Driver not loaded.
---*/
 // TODO:    Controller - add argument and description to function comment
 // TODO:    EFI_UNSUPPORTED - add return value to function comment
 {
@@ -150,6 +139,19 @@ Returns:
 // IDEBusDriverBindingStart
 // ***********************************************************************************
 //
+/**
+  Start this driver on Controller by detecting all disks and installing 
+  BlockIo protocol on them.
+
+  @param  This Protocol instance pointer.
+  @param  Controller Handle of device to bind driver to.
+  @param  RemainingDevicePath Not used, always produce all possible children.
+
+  @retval  EFI_SUCCESS This driver is added to ControllerHandle.
+  @retval  EFI_ALREADY_STARTED This driver is already running on ControllerHandle.
+  @retval  other This driver does not support this device.
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBusDriverBindingStart (
@@ -157,23 +159,6 @@ IDEBusDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
-
-  Routine Description:
-    Start this driver on Controller by detecting all disks and installing 
-      BlockIo protocol on them.
-
-  Arguments:
-    This                - Protocol instance pointer.
-    Controller          - Handle of device to bind driver to.
-    RemainingDevicePath - Not used, always produce all possible children.
-
-  Returns:
-    EFI_SUCCESS         - This driver is added to ControllerHandle.
-    EFI_ALREADY_STARTED - This driver is already running on ControllerHandle.
-    other               - This driver does not support this device.
-
---*/
 {
   EFI_STATUS                        Status;
   EFI_STATUS                        SavedStatus;
@@ -791,6 +776,18 @@ ErrorExit:
 // IDEBusDriverBindingStop
 // ***********************************************************************************
 //
+/**
+  Stop this driver on Controller Handle. 
+
+  @param  This Protocol instance pointer.
+  @param  DeviceHandle Handle of device to stop driver on
+  @param  NumberOfChildren Not used
+  @param  ChildHandleBuffer Not used
+
+  @retval  EFI_SUCCESS This driver is removed DeviceHandle
+  @retval  other This driver was not removed from this device
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBusDriverBindingStop (
@@ -799,22 +796,6 @@ IDEBusDriverBindingStop (
   IN  UINTN                           NumberOfChildren,
   IN  EFI_HANDLE                      *ChildHandleBuffer
   )
-/*++
-  
-  Routine Description:
-    Stop this driver on Controller Handle. 
-
-  Arguments:
-    This              - Protocol instance pointer.
-    DeviceHandle      - Handle of device to stop driver on 
-    NumberOfChildren  - Not used
-    ChildHandleBuffer - Not used
-
-  Returns:
-    EFI_SUCCESS       - This driver is removed DeviceHandle
-    other             - This driver was not removed from this device
-  
---*/
 // TODO:    Controller - add argument and description to function comment
 // TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
@@ -912,29 +893,22 @@ IDEBusDriverBindingStop (
 // DeRegisterIdeDevice
 // ***********************************************************************************
 //
+/**
+  Deregister an IDE device and free resources
+
+  @param  This Protocol instance pointer.
+  @param  Controller Ide device handle
+  @param  Handle Handle of device to deregister driver on
+
+  @return EFI_STATUS
+
+**/
 EFI_STATUS
 DeRegisterIdeDevice (
   IN  EFI_DRIVER_BINDING_PROTOCOL    *This,
   IN  EFI_HANDLE                     Controller,
   IN  EFI_HANDLE                     Handle
   )
-/*++
-
-Routine Description:
-
-  Deregister an IDE device and free resources
-  
-Arguments:
-
-  This            - Protocol instance pointer.
-  Controller      - Ide device handle
-  Handle          - Handle of device to deregister driver on 
-  
-Returns:
-
-  EFI_STATUS
-
---*/
 // TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_STATUS            Status;
@@ -1015,26 +989,18 @@ Returns:
 // IDEBlkIoReset
 // ***********************************************************************************
 //
+/**
+  TODO:    This - add argument and description to function comment
+  TODO:    ExtendedVerification - add argument and description to function comment
+  TODO:    EFI_DEVICE_ERROR - add return value to function comment
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoReset (
   IN  EFI_BLOCK_IO_PROTOCOL   *This,
   IN  BOOLEAN                 ExtendedVerification
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
---*/
-// TODO:    This - add argument and description to function comment
-// TODO:    ExtendedVerification - add argument and description to function comment
-// TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
   EFI_STATUS      Status;
@@ -1067,6 +1033,18 @@ Returns:
   return Status;
 }
 
+/**
+  Read data from block io device
+
+  @param  This Protocol instance pointer.
+  @param  MediaId The media ID of the device
+  @param  LBA Starting LBA address to read data
+  @param  BufferSize The size of data to be read
+  @param  Buffer Caller supplied buffer to save data
+
+  @return read data status
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoReadBlocks (
@@ -1076,25 +1054,6 @@ IDEBlkIoReadBlocks (
   IN  UINTN                   BufferSize,
   OUT VOID                    *Buffer
   )
-/*++
-
-Routine Description:
-
-  Read data from block io device
-  
-Arguments:
-
-  This            - Protocol instance pointer.
-  MediaId         - The media ID of the device
-  LBA             - Starting LBA address to read data
-  BufferSize      - The size of data to be read
-  Buffer          - Caller supplied buffer to save data
-  
-Returns:
-
-  read data status
-
---*/
 // TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
@@ -1137,6 +1096,18 @@ Returns:
 
 }
 
+/**
+  Write data to block io device
+
+  @param  This Protocol instance pointer.
+  @param  MediaId The media ID of the device
+  @param  LBA Starting LBA address to write data
+  @param  BufferSize The size of data to be written
+  @param  Buffer Caller supplied buffer to save data
+
+  @return write data status
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoWriteBlocks (
@@ -1146,25 +1117,6 @@ IDEBlkIoWriteBlocks (
   IN  UINTN                   BufferSize,
   IN  VOID                    *Buffer
   )
-/*++
-
-Routine Description:
-
-  Write data to block io device
-  
-Arguments:
-
-  This            - Protocol instance pointer.
-  MediaId         - The media ID of the device
-  LBA             - Starting LBA address to write data
-  BufferSize      - The size of data to be written
-  Buffer          - Caller supplied buffer to save data
-  
-Returns:
-
-  write data status
-
---*/
 // TODO:    EFI_DEVICE_ERROR - add return value to function comment
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
@@ -1211,24 +1163,15 @@ Returns:
 // IDEBlkIoFlushBlocks
 // ***********************************************************************************
 //
+/**
+  TODO:    This - add argument and description to function comment
+  TODO:    EFI_SUCCESS - add return value to function comment
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL   *This
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
---*/
-// TODO:    This - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   //
   // return directly
@@ -1236,6 +1179,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Return the results of the Inquiry command to a drive in InquiryData.
+  Data format of Inquiry data is defined by the Interface GUID.
+
+  @param  This Protocol instance pointer.
+  @param  InquiryData Results of Inquiry command to device
+  @param  InquiryDataSize Size of InquiryData in bytes.
+
+  @retval  EFI_SUCCESS InquiryData valid
+  @retval  EFI_NOT_FOUND Device does not support this data class
+  @retval  EFI_DEVICE_ERROR Error reading InquiryData from device
+  @retval  EFI_BUFFER_TOO_SMALL IntquiryDataSize not big enough
+
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoInquiry (
@@ -1243,24 +1200,6 @@ IDEDiskInfoInquiry (
   IN OUT VOID                     *InquiryData,
   IN OUT UINT32                   *InquiryDataSize
   )
-/*++
-
-  Routine Description:
-    Return the results of the Inquiry command to a drive in InquiryData.
-    Data format of Inquiry data is defined by the Interface GUID.
-
-  Arguments:
-    This        - Protocol instance pointer.
-    InquiryData - Results of Inquiry command to device
-    InquiryDataSize - Size of InquiryData in bytes.
-
-  Returns:
-    EFI_SUCCESS       - InquiryData valid
-    EFI_NOT_FOUND     - Device does not support this data class
-    EFI_DEVICE_ERROR  - Error reading InquiryData from device 
-    EFI_BUFFER_TOO_SMALL - IntquiryDataSize not big enough
-
---*/
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
 
@@ -1281,6 +1220,20 @@ IDEDiskInfoInquiry (
   return EFI_SUCCESS;
 }
 
+/**
+  Return the results of the Identify command to a drive in IdentifyData.
+  Data format of Identify data is defined by the Interface GUID.
+
+  @param  This Protocol instance pointer.
+  @param  IdentifyData Results of Identify command to device
+  @param  IdentifyDataSize Size of IdentifyData in bytes.
+
+  @retval  EFI_SUCCESS IdentifyData valid
+  @retval  EFI_NOT_FOUND Device does not support this data class
+  @retval  EFI_DEVICE_ERROR Error reading IdentifyData from device
+  @retval  EFI_BUFFER_TOO_SMALL IdentifyDataSize not big enough
+
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoIdentify (
@@ -1288,24 +1241,6 @@ IDEDiskInfoIdentify (
   IN OUT VOID                     *IdentifyData,
   IN OUT UINT32                   *IdentifyDataSize
   )
-/*++
-
-  Routine Description:
-    Return the results of the Identify command to a drive in IdentifyData.
-    Data format of Identify data is defined by the Interface GUID.
-
-  Arguments:
-    This        - Protocol instance pointer.
-    IdentifyData - Results of Identify command to device
-    IdentifyDataSize - Size of IdentifyData in bytes.
-
-  Returns:
-    EFI_SUCCESS       - IdentifyData valid
-    EFI_NOT_FOUND     - Device does not support this data class
-    EFI_DEVICE_ERROR  - Error reading IdentifyData from device 
-    EFI_BUFFER_TOO_SMALL - IdentifyDataSize not big enough
-
---*/
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
 
@@ -1326,6 +1261,21 @@ IDEDiskInfoIdentify (
   return EFI_SUCCESS;
 }
 
+/**
+  Return the results of the Request Sense command to a drive in SenseData.
+  Data format of Sense data is defined by the Interface GUID.
+
+  @param  This Protocol instance pointer.
+  @param  SenseData Results of Request Sense command to device
+  @param  SenseDataSize Size of SenseData in bytes.
+  @param  SenseDataNumber Type of SenseData
+
+  @retval  EFI_SUCCESS InquiryData valid
+  @retval  EFI_NOT_FOUND Device does not support this data class
+  @retval  EFI_DEVICE_ERROR Error reading InquiryData from device
+  @retval  EFI_BUFFER_TOO_SMALL SenseDataSize not big enough
+
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoSenseData (
@@ -1334,29 +1284,22 @@ IDEDiskInfoSenseData (
   IN OUT UINT32                   *SenseDataSize,
   OUT    UINT8                    *SenseDataNumber
   )
-/*++
-
-  Routine Description:
-    Return the results of the Request Sense command to a drive in SenseData.
-    Data format of Sense data is defined by the Interface GUID.
-
-  Arguments:
-    This            - Protocol instance pointer.
-    SenseData       - Results of Request Sense command to device
-    SenseDataSize   - Size of SenseData in bytes.
-    SenseDataNumber - Type of SenseData
-
-  Returns:
-    EFI_SUCCESS       - InquiryData valid
-    EFI_NOT_FOUND     - Device does not support this data class
-    EFI_DEVICE_ERROR  - Error reading InquiryData from device 
-    EFI_BUFFER_TOO_SMALL - SenseDataSize not big enough
-
---*/
 {
   return EFI_NOT_FOUND;
 }
 
+/**
+  Return the results of the Request Sense command to a drive in SenseData.
+  Data format of Sense data is defined by the Interface GUID.
+
+  @param  This Protocol instance pointer.
+  @param  IdeChannel Primary or Secondary
+  @param  IdeDevice Master or Slave
+
+  @retval  EFI_SUCCESS IdeChannel and IdeDevice are valid
+  @retval  EFI_UNSUPPORTED This is not an IDE device
+
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoWhichIde (
@@ -1364,22 +1307,6 @@ IDEDiskInfoWhichIde (
   OUT UINT32                   *IdeChannel,
   OUT UINT32                   *IdeDevice
   )
-/*++
-
-  Routine Description:
-    Return the results of the Request Sense command to a drive in SenseData.
-    Data format of Sense data is defined by the Interface GUID.
-
-  Arguments:
-    This        - Protocol instance pointer.
-    IdeChannel  - Primary or Secondary
-    IdeDevice   - Master or Slave
-
-  Returns:
-    EFI_SUCCESS       - IdeChannel and IdeDevice are valid
-    EFI_UNSUPPORTED   - This is not an IDE device
-
---*/
 {
   IDE_BLK_IO_DEV  *IdeBlkIoDevice;
 
