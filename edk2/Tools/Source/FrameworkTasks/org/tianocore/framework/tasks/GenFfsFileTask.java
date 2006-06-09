@@ -207,6 +207,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                 }
             }
             dataBuffer.close();
+            orgDataBuffer.close();
         } catch (Exception e) {
             throw new BuildException (e.getMessage());
         }
