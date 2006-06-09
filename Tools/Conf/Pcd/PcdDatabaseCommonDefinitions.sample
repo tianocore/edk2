@@ -49,7 +49,7 @@ typedef struct {
   UINT16 Size;
 } SIZEINFO;
 
-#define offsetof(s,m)                 (UINT32)&(((s *)0)->m)
+#define offsetof(s,m)                 (UINT32) (UINTN) &(((s *)0)->m)
 
 
 
