@@ -34,10 +34,6 @@ public class GenFvImageTask extends Task implements EfiDefine{
     /// The name of input inf file
     ///
     private String infFile="";
-    ///
-    /// The target architecture.
-    ///
-    private String arch="";
     
     /**
       execute
@@ -56,25 +52,8 @@ public class GenFvImageTask extends Task implements EfiDefine{
             path = path + File.separatorChar;
         }
         
-        // FIXME arch should be passed via schema attributes.
-        arch=System.getenv("ARCH");
-        if (arch == null) {
-          arch = "";
-        }
-        // FIXME end
+        command = path + "GenFvImage";
 
-        if (arch.equalsIgnoreCase("IA32")){
-            command = path + "GenFvImage_Ia32";
-        }   
-        else if (arch.equalsIgnoreCase("X64")){
-            command = path + "GenFvImage_X64";
-        }
-        else if (arch.equalsIgnoreCase("IPF")){
-            command = path + "GenFvImage_Ipf";
-        }
-        else {
-            command = path + "GenFvImage";
-        }
         String argument = infFile;
         
         try {
@@ -138,24 +117,4 @@ public class GenFvImageTask extends Task implements EfiDefine{
         this.infFile = "-I " + infFile;
     }
     
-    /**
-      getArch
-      
-      This function is to get class member of arch.
-      @return           The target architecture.
-    **/
-    public String getArch() {
-        return arch;
-    }
-    
-    /**
-      setArch
-      
-      This function is to set class member of arch. 
-      
-      @param arch       The target architecture.
-    **/
-    public void setArch(String arch) {
-        this.arch = arch;
-    }   
 }
