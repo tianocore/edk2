@@ -19,6 +19,7 @@
     <xs:include schemaLocation="FrameworkDataAttributes.xsd"/>
     <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
     <xs:include schemaLocation="FrameworkDataElements.xsd"/>
+    <xs:include schemaLocation="FrameworkPlatformDataTypes.xsd"/>
     <xs:element name="Capsule">
         <xs:complexType>
             <xs:sequence>
@@ -343,62 +344,6 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-    <xs:simpleType name="EfiFvAttributeType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">The list of EFI_FLASH_AREA Attributes</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="UCNameType">
-            <xs:enumeration value="EFI_FLASH_AREA_FV"/>
-            <xs:enumeration value="EFI_FLASH_AREA_MEMMAPPED_FV"/>
-            <xs:enumeration value="EFI_FLASH_AREA_SUBFV"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="EfiFvAreaType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">The list of valid EFI Area Types</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="UCNameType">
-            <xs:enumeration value="EFI_FLASH_AREA_EFI_VARIABLES"/>
-            <xs:enumeration value="EFI_FLASH_AREA_UNUSED"/>
-            <xs:enumeration value="EFI_FLASH_AREA_MAIN_BIOS"/>
-            <xs:enumeration value="EFI_FLASH_AREA_GUID_DEFINED"/>
-            <xs:enumeration value="EFI_FLASH_AREA_FTW_STATE"/>
-            <xs:enumeration value="EFI_FLASH_AREA_FTW_BACKUP"/>
-            <xs:enumeration value="EFI_FLASH_AREA_RECOVERY_BIOS"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="EfiNameGuidType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Right now, only EFI_FLASH_MAP_HOB_GUID is defined</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="UCNameType">
-            <xs:enumeration value="EFI_FLASH_MAP_HOB_GUID"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="FlashSize">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="256KB"/>
-            <xs:enumeration value="512KB"/>
-            <xs:enumeration value="1MB"/>
-            <xs:enumeration value="2MB"/>
-            <xs:enumeration value="4MB"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="FvImageTypes">
-        <xs:restriction base="xs:NCName">
-            <xs:enumeration value="Attributes"/>
-            <xs:enumeration value="Options"/>
-            <xs:enumeration value="Components"/>
-            <xs:enumeration value="ValidImageNames"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="FvSubRegionTypes">
-        <xs:restriction base="UCNameType">
-            <xs:enumeration value="NV_VARIABLE_STORE"/>
-            <xs:enumeration value="MICROCODE"/>
-            <xs:enumeration value="NV_FTW_WORKING"/>
-        </xs:restriction>
-    </xs:simpleType>
     <xs:complexType name="Components">
         <xs:sequence minOccurs="1" maxOccurs="unbounded">
             <xs:element ref="ModuleSA"/>
@@ -465,47 +410,4 @@
             <xs:element minOccurs="1" maxOccurs="1" name="NameGuid" type="EfiNameGuidType"/>
         </xs:sequence>
     </xs:complexType>
-    <xs:attributeGroup name="BlockAttributes">
-        <xs:attribute name="Name" type="BlockNameType" use="required"/>
-        <xs:attribute name="Size" type="HexAddressType" use="required"/>
-        <xs:attribute name="Flags" type="HexAddressType" use="optional"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="FlashDeviceImageAttributes">
-        <xs:attribute name="Name" type="xs:string" use="required"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="FlashDeviceImageFileAttributes">
-        <xs:attribute name="Name" type="xs:string" use="required"/>
-        <xs:attribute name="Region" type="xs:string" use="required"/>
-        <xs:attribute name="SubRegion" type="xs:string" use="optional"/>
-        <xs:attribute name="Optional" type="xs:boolean" use="optional"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="FlashDeviceInfoAttributes">
-        <xs:attribute name="Name" type="xs:string" use="required"/>
-        <xs:attribute name="Size" type="HexAddressType" use="required"/>
-        <xs:attribute name="BaseAddress" type="HexAddressType" use="required"/>
-        <xs:attribute name="ErasePolarity" type="Polarity" use="required"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="RawDataAttributes">
-        <xs:attribute name="Name" type="xs:string" use="required"/>
-        <xs:attribute name="Region" type="xs:string" use="required"/>
-        <xs:attribute name="SubRegion" type="xs:string" use="required"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="RegionAttributes">
-        <xs:attribute name="Name" type="xs:string" use="required"/>
-        <xs:attribute name="Size" type="HexAddressType" use="required"/>
-        <xs:attribute name="Flags" type="HexAddressType" use="optional"/>
-        <xs:attribute name="Alignment" type="HexAddressType" use="optional"/>
-        <xs:attribute name="Attributes" type="xs:string" use="required"/>
-        <xs:attribute name="AreaType" type="EfiFvAreaType" use="required"/>
-    </xs:attributeGroup>
-    <xs:attributeGroup name="SubRegionAttributes">
-        <xs:attribute name="CreateHob" type="xs:boolean" use="required"/>
-        <xs:attribute name="Name" type="xs:string" use="required"/>
-        <xs:attribute name="Size" type="HexAddressType" use="required"/>
-        <xs:attribute name="Attributes" type="xs:string" use="required"/>
-        <xs:attribute name="AreaType" type="EfiFvAreaType" use="required"/>
-        <xs:attribute name="NameGuid" type="xs:string" use="required"/>
-        <xs:attribute name="AreaTypeGuid" type="xs:string" use="optional"/>
-        <xs:attribute name="FileSystemGuid" type="xs:string" use="optional"/>
-    </xs:attributeGroup>
 </xs:schema>

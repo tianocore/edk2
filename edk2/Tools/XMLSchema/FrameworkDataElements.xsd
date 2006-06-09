@@ -17,6 +17,7 @@
     </xs:annotation>
     <xs:include schemaLocation="NamingConvention.xsd"/>
     <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
+    <xs:include schemaLocation="FrameworkPlatformDataTypes.xsd"/>
     <xs:include schemaLocation="FrameworkDataAttributes.xsd"/>
     <xs:element name="Abstract">
         <xs:annotation>
@@ -516,6 +517,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="GuidDeclarations">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This is a child of PackageSurfaceArea (SPD) </xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
@@ -526,9 +530,9 @@
                                 <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                             </xs:choice>
-                            <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" ref="HelpText"/>
                         </xs:sequence>
-                        <xs:attribute name="Name" type="xs:normalizedString" use="required"/>
+                        <xs:attributeGroup ref="GuidDeclarationAttributes"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -602,7 +606,6 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
     <xs:element name="Hobs">
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
@@ -872,21 +875,14 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <!-- Use in Final -->
     <xs:element name="MsaFileList">
         <xs:annotation>
             <xs:documentation xml:lang="en">Surface Area Package Description (SPD) list of Module Surface Area files</xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="Filename">
-                    <xs:complexType>
-                        <xs:simpleContent>
-                            <xs:extension base="xs:anyURI">
-                                <xs:attributeGroup ref="ModuleNameSaAttributes"/>
-                            </xs:extension>
-                        </xs:simpleContent>
-                    </xs:complexType>
-                </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Filename" type="PathAndFilename"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -964,11 +960,23 @@
     </xs:element>
     <xs:element name="PackageHeaders">
         <xs:annotation>
-            <xs:documentation xml:lang="en">This defines the minimum header file needed to support a given ModuleType.</xs:documentation>
+            <xs:documentation xml:lang="en">This is a child of PackageSurfaceArea (SPD) </xs:documentation>
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="unbounded" ref="IncludeHeader"/>
+                <xs:choice>
+                    <!-- DO NOT USE! removing IncludeHeader, use IncludePkgHeader instead. -->
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="IncludeHeader"/>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" name="IncludePkgHeader">
+                        <xs:complexType>
+                            <xs:simpleContent>
+                                <xs:extension base="PathAndFilename">
+                                    <xs:attributeGroup ref="PackageHeaderAttributes"/>
+                                </xs:extension>
+                            </xs:simpleContent>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -1473,6 +1481,9 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="PpiDeclarations">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This is a child of PackageSurfaceArea (SPD) </xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
@@ -1480,12 +1491,13 @@
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
                             <xs:choice>
+                                <!-- DO NOT USE removing Guid in final, use GuidValue instead -->
                                 <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                             </xs:choice>
-                            <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="xs:normalizedString"/>
+                            <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                         </xs:sequence>
-                        <xs:attribute name="Name" type="xs:normalizedString" use="required"/>
+                        <xs:attributeGroup ref="PpiDeclarationAttributes"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1545,16 +1557,22 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="ProtocolDeclarations">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This is a child of PackageSurfaceArea (SPD) </xs:documentation>
+        </xs:annotation>
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
-                            <xs:element minOccurs="0" maxOccurs="unbounded" name="FeatureFlag" type="C_Name"/>
+                            <xs:choice>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
+                                <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
+                            </xs:choice>
+                            <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
                         </xs:sequence>
-                        <xs:attribute name="Name" type="xs:normalizedString" use="required"/>
+                        <xs:attributeGroup ref="ProtocolDeclarationAttributes"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1680,14 +1698,14 @@
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
                 <xs:element name="UiSkuName">
-                        <xs:complexType>
-                            <xs:simpleContent>
-                                <xs:extension base="UiNameType">
-                                    <xs:attribute name="SkuID" type="xs:nonNegativeInteger" use="required"/>
-                                </xs:extension>
-                            </xs:simpleContent>
-                        </xs:complexType>
-                    </xs:element>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="UiNameType">
+                                <xs:attribute name="SkuID" type="xs:nonNegativeInteger" use="required"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

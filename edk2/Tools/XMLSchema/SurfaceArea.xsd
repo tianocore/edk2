@@ -178,7 +178,9 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="IndustryStdIncludes"/>
                 <!-- DO NOT USE removing PackageDependencies, this is moving to FDP installation process -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
+                <!-- DO NOT USE removing MsaFiles, use MsaFileList instead , do not wrap in choice, too many entries to convert all at once. -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="MsaFiles"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="MsaFileList"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageHeaders"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidDeclarations"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="ProtocolDeclarations"/>

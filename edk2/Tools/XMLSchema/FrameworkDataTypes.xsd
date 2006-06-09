@@ -217,6 +217,19 @@
             <xs:enumeration value="USER_DEFINED"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="GuidTypes">
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="DATA_HUB_RECORD"/>
+            <xs:enumeration value="EFI_EVENT"/>
+            <xs:enumeration value="EFI_SYSTEM_CONFIGURATION_TABLE"/>
+            <xs:enumeration value="EFI_VARIABLE"/>
+            <xs:enumeration value="HII_PACKAGE_LIST"/>
+            <xs:enumeration value="HOB"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="GuidListType">
+      <xs:list itemType="GuidTypes"/>
+    </xs:simpleType>
     <xs:simpleType name="GuidUsage">
         <xs:restriction base="NameConvention">
             <xs:enumeration value="ALWAYS_CONSUMED"/>
