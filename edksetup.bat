@@ -15,6 +15,9 @@
 @REM set XMLBEANS_HOME=C:\xmlbeans
 @REM set CYGWIN_HOME=C:\cygwin
 
+@REM usage: edksetup.bat [skip]
+@REM if the argument, skip is present, only the paths and the
+@REM test and set of environment settings are performed. 
 
 @REM ##############################################################
 @REM # You should not have to modify anything below this line
@@ -25,6 +28,8 @@
 @REM
 @REM Check the required system environment variables
 @REM
+
+if "%1"=="skip" goto skipbuild
 
 :check_vc
 if defined VCINSTALLDIR goto check_cygwin
@@ -78,6 +83,7 @@ echo.
 @REM Start to build the Framework Tools
 @REM
 
+
 echo.
 echo Building the Framework Tools
 echo.
@@ -97,7 +103,7 @@ call ant -f %WORKSPACE%\Tools\build.xml SurfaceArea
 @REM Now we can make the other Java Programs
 @REM All of the remaining Java Programs require the SurfaceArea library to compile
 @REM
-set CLASSPATH=%CLASSPATH%;%WORKSPACE\%Tools\Jars\SurfaceArea.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\%Tools\Jars\SurfaceArea.jar
 
 call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 
@@ -105,7 +111,7 @@ call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 @REM We have all of the Java Programs and add-in classes created, so we can start
 @REM using the cpp-tasks to create our tools
 @REM
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 
 call ant -f %WORKSPACE%\Tools\build.xml C_Code
@@ -143,6 +149,28 @@ goto end
 echo.
 echo !!! Please copy saxon8.jar file to XMLBEANS_HOME\lib !!!
 echo.
+goto end
+
+:skipbuild
+@REM
+@REM This just sets up the CLASSPATH, the rest of the environment should have been set already.
+@REM
+set WORKSPACE=%CD%
+set FRAMEWORK_TOOLS_PATH=%WORKSPACE%\Tools\bin
+if exist c:\cygwin set CYGWIN_HOME=c:\cygwin
+echo.
+echo JAVA_HOME:     %JAVA_HOME%
+echo ANT_HOME:      %ANT_HOME%
+echo XMLBEANS_HOME: %XMLBEANS_HOME%
+echo CYGWIN_HOME:   %CYGWIN_HOME%
+echo WORKSPACE:     %WORKSPACE%
+echo PATH:          %PATH%
+echo.
+set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 goto end
 
 :end
