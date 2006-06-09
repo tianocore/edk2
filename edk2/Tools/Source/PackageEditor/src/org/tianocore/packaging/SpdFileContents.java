@@ -822,9 +822,7 @@ public class SpdFileContents {
             e.setName(entryName);
             e.setCName(cName);
             e.addNewGuid().setStringValue(guid);
-            if (featureFlag != null) {
-                e.addNewFeatureFlag().setStringValue(featureFlag);
-            }
+            
             return;
         }
         if (parent instanceof ProtocolDeclarationsDocument.ProtocolDeclarations) {
@@ -833,10 +831,7 @@ public class SpdFileContents {
             pe.setName(entryName);
             pe.setCName(cName);
             pe.addNewGuid().setStringValue(guid);
-            if (featureFlag != null) {
-                pe.addNewFeatureFlag().setStringValue(featureFlag);
-            }
-            return;
+            
         }
         if (parent instanceof PpiDeclarationsDocument.PpiDeclarations) {
             PpiDeclarationsDocument.PpiDeclarations.Entry ppe = ((PpiDeclarationsDocument.PpiDeclarations) parent)
@@ -844,9 +839,7 @@ public class SpdFileContents {
             ppe.setName(entryName);
             ppe.setCName(cName);
             ppe.addNewGuid().setStringValue(guid);
-            if (featureFlag != null) {
-                ppe.addNewFeatureFlag().setStringValue(featureFlag);
-            }
+            
             return;
         }
 
