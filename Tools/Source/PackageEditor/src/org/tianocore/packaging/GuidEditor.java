@@ -84,8 +84,7 @@ public class GuidEditor extends AbstractCellEditor implements TableCellEditor, A
         }
         else { //User pressed dialog's "OK" button.
             currentGuid = dialog.getGuid();
-//            button.setText(currentGuid);
-//            fireEditingStopped();
+
         }
 
     }

@@ -16,7 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.ListIterator;
-
+import java.math.*;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlCursor;
@@ -63,7 +63,7 @@ public class SpdFileContents {
 
     private SpdHeaderDocument.SpdHeader spdHdr = null;
 
-    private PackageNameDocument.PackageName spdHdrPkgName = null;
+    private String spdHdrPkgName = null;
 
     private GuidDocument.Guid spdHdrGuid = null;
 
@@ -209,7 +209,7 @@ public class SpdFileContents {
         if (getSpdHdr() == null) {
             spdHdr = psaRoot.addNewSpdHeader();
         }
-        s[0] = getSpdHdrPkgName().getStringValue();
+        s[0] = getSpdHdrPkgName();
         s[1] = getSpdHdrGuid().getStringValue();
         s[2] = getSpdHdrVer();
         s[3] = getSpdHdrAbs().getStringValue();
@@ -1097,7 +1097,7 @@ public class SpdFileContents {
    **/
     public String getSpdHdrVer() {
         if (spdHdr != null)
-            return spdHdr.getVersion();
+            return spdHdr.getVersion() + "";
         else
             return null;
     }
@@ -1109,7 +1109,7 @@ public class SpdFileContents {
    **/
     public void setSpdHdrVer(String ver) {
         if (spdHdr != null) {
-            spdHdr.setVersion(ver);
+            spdHdr.setVersion(new BigDecimal(ver.toCharArray()));
         }
 
     }
@@ -1171,7 +1171,7 @@ public class SpdFileContents {
     
     @return PackageNameDocument.PackageName
    **/
-    public PackageNameDocument.PackageName getSpdHdrPkgName() {
+    public String getSpdHdrPkgName() {
         if (spdHdrPkgName == null) {
             spdHdrPkgName = getSpdHdr().getPackageName();
         }
@@ -1186,10 +1186,9 @@ public class SpdFileContents {
     public void setSpdHdrPkgName(String pkgName) {
 
         if (getSpdHdrPkgName() != null) {
-            getSpdHdrPkgName().setStringValue(pkgName);
+            getSpdHdr().setPackageName(pkgName);
         } else {
-            spdHdrPkgName = getSpdHdr().addNewPackageName();
-            spdHdrPkgName.setStringValue(pkgName);
+            getSpdHdr().setPackageName(pkgName);
         }
     }
 
