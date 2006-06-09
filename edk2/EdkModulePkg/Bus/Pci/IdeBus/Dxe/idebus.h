@@ -1,25 +1,17 @@
-/*++
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+/** @file
+  Header file for IDE Bus Driver.
 
-Module Name:
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
-    idebus.h
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-Abstract:
+**/
 
-    Header file for IDE Bus Driver.
-
-Revision History
-++*/
-
-// TODO: fix comment to end with --*/
 #ifndef _IDE_BUS_H
 #define _IDE_BUS_H
 
@@ -94,30 +86,33 @@ extern EFI_DRIVER_BINDING_PROTOCOL  gIDEBusDriverBinding;
 // Prototypes
 // Driver model protocol interface
 //
+/**
+  TODO: Add function description
+
+  @param  ImageHandle TODO: add argument description
+  @param  SystemTable TODO: add argument description
+
+  TODO: add return values
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBusControllerDriverEntryPoint (
   IN EFI_HANDLE                   ImageHandle,
   IN EFI_SYSTEM_TABLE             *SystemTable
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  ImageHandle - TODO: add argument description
-  SystemTable - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Controller TODO: add argument description
+  @param  RemainingDevicePath TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEBusDriverBindingSupported (
@@ -125,25 +120,18 @@ IDEBusDriverBindingSupported (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This                - TODO: add argument description
-  Controller          - TODO: add argument description
-  RemainingDevicePath - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Controller TODO: add argument description
+  @param  RemainingDevicePath TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEBusDriverBindingStart (
@@ -151,25 +139,19 @@ IDEBusDriverBindingStart (
   IN EFI_HANDLE                   Controller,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This                - TODO: add argument description
-  Controller          - TODO: add argument description
-  RemainingDevicePath - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  Controller TODO: add argument description
+  @param  NumberOfChildren TODO: add argument description
+  @param  ChildHandleBuffer TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEBusDriverBindingStop (
@@ -178,53 +160,40 @@ IDEBusDriverBindingStop (
   IN  UINTN                       NumberOfChildren,
   IN  EFI_HANDLE                  *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  This              - TODO: add argument description
-  Controller        - TODO: add argument description
-  NumberOfChildren  - TODO: add argument description
-  ChildHandleBuffer - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 //
 // Block I/O Protocol Interface
 //
+/**
+  TODO: Add function description
+
+  @param  This TODO: add argument description
+  @param  ExtendedVerification TODO: add argument description
+
+  TODO: add return values
+
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoReset (
   IN  EFI_BLOCK_IO_PROTOCOL       *This,
   IN  BOOLEAN                     ExtendedVerification
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This                  - TODO: add argument description
-  ExtendedVerification  - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  MediaId TODO: add argument description
+  @param  LBA TODO: add argument description
+  @param  BufferSize TODO: add argument description
+  @param  Buffer TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoReadBlocks (
@@ -234,27 +203,20 @@ IDEBlkIoReadBlocks (
   IN  UINTN                       BufferSize,
   OUT VOID                        *Buffer
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This        - TODO: add argument description
-  MediaId     - TODO: add argument description
-  LBA         - TODO: add argument description
-  BufferSize  - TODO: add argument description
-  Buffer      - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  MediaId TODO: add argument description
+  @param  LBA TODO: add argument description
+  @param  BufferSize TODO: add argument description
+  @param  Buffer TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoWriteBlocks (
@@ -264,72 +226,49 @@ IDEBlkIoWriteBlocks (
   IN  UINTN                       BufferSize,
   IN  VOID                        *Buffer
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This        - TODO: add argument description
-  MediaId     - TODO: add argument description
-  LBA         - TODO: add argument description
-  BufferSize  - TODO: add argument description
-  Buffer      - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEBlkIoFlushBlocks (
   IN  EFI_BLOCK_IO_PROTOCOL       *This
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This  - TODO: add argument description
-
-Returns:
+  @param  PciIo TODO: add argument description
+  @param  Enable TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 IDERegisterDecodeEnableorDisable (
   IN  EFI_PCI_IO_PROTOCOL         *PciIo,
   IN  BOOLEAN                     Enable
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  PciIo   - TODO: add argument description
-  Enable  - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  InquiryData TODO: add argument description
+  @param  IntquiryDataSize TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoInquiry (
@@ -337,25 +276,18 @@ IDEDiskInfoInquiry (
   IN OUT VOID                     *InquiryData,
   IN OUT UINT32                   *IntquiryDataSize
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This              - TODO: add argument description
-  InquiryData       - TODO: add argument description
-  IntquiryDataSize  - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  IdentifyData TODO: add argument description
+  @param  IdentifyDataSize TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoIdentify (
@@ -363,25 +295,19 @@ IDEDiskInfoIdentify (
   IN OUT VOID                     *IdentifyData,
   IN OUT UINT32                   *IdentifyDataSize
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This              - TODO: add argument description
-  IdentifyData      - TODO: add argument description
-  IdentifyDataSize  - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  SenseData TODO: add argument description
+  @param  SenseDataSize TODO: add argument description
+  @param  SenseDataNumber TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoSenseData (
@@ -390,26 +316,18 @@ IDEDiskInfoSenseData (
   IN OUT UINT32                   *SenseDataSize,
   OUT UINT8                       *SenseDataNumber
   )
-/*++
+;
 
-Routine Description:
-
+/**
   TODO: Add function description
 
-Arguments:
-
-  This            - TODO: add argument description
-  SenseData       - TODO: add argument description
-  SenseDataSize   - TODO: add argument description
-  SenseDataNumber - TODO: add argument description
-
-Returns:
+  @param  This TODO: add argument description
+  @param  IdeChannel TODO: add argument description
+  @param  IdeDevice TODO: add argument description
 
   TODO: add return values
 
---*/
-;
-
+**/
 EFI_STATUS
 EFIAPI
 IDEDiskInfoWhichIde (
@@ -417,23 +335,6 @@ IDEDiskInfoWhichIde (
   OUT UINT32                      *IdeChannel,
   OUT UINT32                      *IdeDevice
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  This        - TODO: add argument description
-  IdeChannel  - TODO: add argument description
-  IdeDevice   - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 ;
 
 #endif

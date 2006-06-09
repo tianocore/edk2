@@ -1,31 +1,24 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  CirrusLogic5430UgaDraw.c
-
-Abstract:
-
+/** @file
   This file produces the graphics abstration of UGA Draw. It is called by 
   CirrusLogic5430.c file which deals with the EFI 1.1 driver model. 
   This file just does graphics.
 
---*/
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 #include "CirrusLogic5430.h"
 
-//
-// Video Mode structure
-//
+///
+/// Video Mode structure
+///
 typedef struct {
   UINT32  Width;
   UINT32  Height;
@@ -36,18 +29,18 @@ typedef struct {
   UINT8   MiscSetting;
 } CIRRUS_LOGIC_5430_VIDEO_MODES;
 
-//
-// Generic Attribute Controller Register Settings
-//
+///
+/// Generic Attribute Controller Register Settings
+///
 static UINT8                          AttributeController[21] = {
   0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 
   0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 
   0x41, 0x00, 0x0F, 0x00, 0x00
 };
 
-//
-// Generic Graphics Controller Register Settings
-//
+///
+/// Generic Graphics Controller Register Settings
+///
 static UINT8 GraphicsController[9] = {
   0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x05, 0x0F, 0xFF
 };
@@ -97,9 +90,9 @@ static UINT16                         Seq_1024_768_256_60[15] = {
   0x5b0c, 0x450d, 0x760e, 0x2b1b, 0x2f1c, 0x301d, 0x341e
 };
 
-//
-// Table of supported video modes
-//
+///
+/// Table of supported video modes
+///
 static CIRRUS_LOGIC_5430_VIDEO_MODES  CirrusLogic5430VideoModes[] = {
   {  640, 480, 8, 60, Crtc_640_480_256_60,  Seq_640_480_256_60,  0xe3 },
   {  800, 600, 8, 60, Crtc_800_600_256_60,  Seq_800_600_256_60,  0xef }, 
@@ -169,6 +162,20 @@ inw (
 //
 // UGA Draw Protocol Member Functions
 //
+/**
+  TODO: Add function description
+
+  @param  This TODO: add argument description
+  @param  HorizontalResolution TODO: add argument description
+  @param  VerticalResolution TODO: add argument description
+  @param  ColorDepth TODO: add argument description
+  @param  RefreshRate TODO: add argument description
+
+  @retval  EFI_NOT_STARTED TODO: Add description for return value
+  @retval  EFI_INVALID_PARAMETER TODO: Add description for return value
+  @retval  EFI_SUCCESS TODO: Add description for return value
+
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430UgaDrawGetMode (
@@ -178,27 +185,6 @@ CirrusLogic5430UgaDrawGetMode (
   OUT UINT32                *ColorDepth,
   OUT UINT32                *RefreshRate
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  This                  - TODO: add argument description
-  HorizontalResolution  - TODO: add argument description
-  VerticalResolution    - TODO: add argument description
-  ColorDepth            - TODO: add argument description
-  RefreshRate           - TODO: add argument description
-
-Returns:
-
-  EFI_NOT_STARTED - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-
---*/
 {
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
 
@@ -223,6 +209,20 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  TODO: Add function description
+
+  @param  This TODO: add argument description
+  @param  HorizontalResolution TODO: add argument description
+  @param  VerticalResolution TODO: add argument description
+  @param  ColorDepth TODO: add argument description
+  @param  RefreshRate TODO: add argument description
+
+  @retval  EFI_OUT_OF_RESOURCES TODO: Add description for return value
+  @retval  EFI_SUCCESS TODO: Add description for return value
+  @retval  EFI_NOT_FOUND TODO: Add description for return value
+
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430UgaDrawSetMode (
@@ -232,27 +232,6 @@ CirrusLogic5430UgaDrawSetMode (
   IN  UINT32                ColorDepth,
   IN  UINT32                RefreshRate
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  This                  - TODO: add argument description
-  HorizontalResolution  - TODO: add argument description
-  VerticalResolution    - TODO: add argument description
-  ColorDepth            - TODO: add argument description
-  RefreshRate           - TODO: add argument description
-
-Returns:
-
-  EFI_OUT_OF_RESOURCES - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-  EFI_NOT_FOUND - TODO: Add description for return value
-
---*/
 {
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
   UINTN                           Index;
@@ -299,6 +278,29 @@ Returns:
   return EFI_NOT_FOUND;
 }
 
+/**
+  TODO: Add function description
+
+  @param  This TODO: add argument description
+  @param  BltBuffer TODO: add argument description
+  @param  BltOperation TODO: add argument description
+  @param  SourceX TODO: add argument description
+  @param  SourceY TODO: add argument description
+  @param  DestinationX TODO: add argument description
+  @param  DestinationY TODO: add argument description
+  @param  Width TODO: add argument description
+  @param  Height TODO: add argument description
+  @param  Delta TODO: add argument description
+
+  @retval  EFI_INVALID_PARAMETER TODO: Add description for return value
+  @retval  EFI_INVALID_PARAMETER TODO: Add description for return value
+  @retval  EFI_INVALID_PARAMETER TODO: Add description for return value
+  @retval  EFI_INVALID_PARAMETER TODO: Add description for return value
+  @retval  EFI_INVALID_PARAMETER TODO: Add description for return value
+  @retval  EFI_INVALID_PARAMETER TODO: Add description for return value
+  @retval  EFI_SUCCESS TODO: Add description for return value
+
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430UgaDrawBlt (
@@ -313,36 +315,6 @@ CirrusLogic5430UgaDrawBlt (
   IN  UINTN                     Height,
   IN  UINTN                     Delta
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  This          - TODO: add argument description
-  BltBuffer     - TODO: add argument description
-  BltOperation  - TODO: add argument description
-  SourceX       - TODO: add argument description
-  SourceY       - TODO: add argument description
-  DestinationX  - TODO: add argument description
-  DestinationY  - TODO: add argument description
-  Width         - TODO: add argument description
-  Height        - TODO: add argument description
-  Delta         - TODO: add argument description
-
-Returns:
-
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_INVALID_PARAMETER - TODO: Add description for return value
-  EFI_SUCCESS - TODO: Add description for return value
-
---*/
 {
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
   EFI_TPL                         OriginalTPL;
@@ -597,23 +569,16 @@ Returns:
 // Construction and Destruction functions
 //
 
+/**
+  CirrusLogic5430UgaDrawConstructor
+
+  TODO:    Private - add argument and description to function comment
+  TODO:    EFI_SUCCESS - add return value to function comment
+**/
 EFI_STATUS
 CirrusLogic5430UgaDrawConstructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
---*/
-// TODO:    Private - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_UGA_DRAW_PROTOCOL *UgaDraw;
   UINTN                 Index;
@@ -657,50 +622,36 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  CirrusLogic5430UgaDrawDestructor
+
+  TODO:    Private - add argument and description to function comment
+  TODO:    EFI_SUCCESS - add return value to function comment
+**/
 EFI_STATUS
 CirrusLogic5430UgaDrawDestructor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-  None
-
---*/
-// TODO:    Private - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   return EFI_SUCCESS;
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+  @param  Address TODO: add argument description
+  @param  Data TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 outb (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
   UINTN                           Address,
   UINT8                           Data
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-  Address - TODO: add argument description
-  Data    - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   Private->PciIo->Io.Write (
                       Private->PciIo,
@@ -712,29 +663,22 @@ Returns:
                       );
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+  @param  Address TODO: add argument description
+  @param  Data TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 outw (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
   UINTN                           Address,
   UINT16                          Data
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-  Address - TODO: add argument description
-  Data    - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   Private->PciIo->Io.Write (
                       Private->PciIo,
@@ -746,27 +690,20 @@ Returns:
                       );
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+  @param  Address TODO: add argument description
+
+  TODO: add return values
+
+**/
 UINT8
 inb (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
   UINTN                           Address
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-  Address - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT8 Data;
 
@@ -781,27 +718,20 @@ Returns:
   return Data;
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+  @param  Address TODO: add argument description
+
+  TODO: add return values
+
+**/
 UINT16
 inw (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
   UINTN                           Address
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-  Address - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT16  Data;
 
@@ -816,6 +746,18 @@ Returns:
   return Data;
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+  @param  Index TODO: add argument description
+  @param  Red TODO: add argument description
+  @param  Green TODO: add argument description
+  @param  Blue TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 SetPaletteColor (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
@@ -824,25 +766,6 @@ SetPaletteColor (
   UINT8                           Green,
   UINT8                           Blue
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-  Index   - TODO: add argument description
-  Red     - TODO: add argument description
-  Green   - TODO: add argument description
-  Blue    - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   outb (Private, PALETTE_INDEX_REGISTER, (UINT8) Index);
   outb (Private, PALETTE_DATA_REGISTER, (UINT8) (Red >> 2));
@@ -850,25 +773,18 @@ Returns:
   outb (Private, PALETTE_DATA_REGISTER, (UINT8) (Blue >> 2));
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 SetDefaultPalette (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINTN Index;
   UINTN RedIndex;
@@ -886,26 +802,19 @@ Returns:
   }
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+
+  TODO: add return values
+
+**/
 STATIC
 VOID
 ClearScreen (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT32  Color;
 
@@ -920,25 +829,18 @@ Returns:
                         );
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 DrawLogo (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINTN Offset;
   UINTN X;
@@ -968,27 +870,20 @@ Returns:
   }
 }
 
+/**
+  TODO: Add function description
+
+  @param  Private TODO: add argument description
+  @param  ModeData TODO: add argument description
+
+  TODO: add return values
+
+**/
 VOID
 InitializeGraphicsMode (
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private,
   CIRRUS_LOGIC_5430_VIDEO_MODES   *ModeData
   )
-/*++
-
-Routine Description:
-
-  TODO: Add function description
-
-Arguments:
-
-  Private   - TODO: add argument description
-  ModeData  - TODO: add argument description
-
-Returns:
-
-  TODO: add return values
-
---*/
 {
   UINT8 Byte;
   UINTN Index;

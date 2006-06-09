@@ -1,20 +1,4 @@
-/*++
-
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-
-Module Name:
-
-  CirrusLogic5430.c
-    
-Abstract:
-
+/** @file
   Cirrus Logic 5430 Controller Driver.
   This driver is a sample implementation of the UGA Draw Protocol for the
   Cirrus Logic 5430 family of PCI video controllers.  This driver is only
@@ -25,9 +9,16 @@ Abstract:
   documentation on UGA for details on how to write a UGA driver that is able
   to function both in the EFI pre-boot environment and from the OS runtime.
 
-Revision History:
+  Copyright (c) 2006, Intel Corporation                                                         
+  All rights reserved. This program and the accompanying materials                          
+  are licensed and made available under the terms and conditions of the BSD License         
+  which accompanies this distribution.  The full text of the license may be found at        
+  http://opensource.org/licenses/bsd-license.php                                            
 
---*/
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+**/
 
 //
 // Cirrus Logic 5430 Controller Driver
@@ -44,6 +35,13 @@ EFI_DRIVER_BINDING_PROTOCOL gCirrusLogic5430DriverBinding = {
   NULL
 };
 
+/**
+  CirrusLogic5430ControllerDriverSupported
+
+  TODO:    This - add argument and description to function comment
+  TODO:    Controller - add argument and description to function comment
+  TODO:    RemainingDevicePath - add argument and description to function comment
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430ControllerDriverSupported (
@@ -51,20 +49,6 @@ CirrusLogic5430ControllerDriverSupported (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-    None
-
---*/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
 {
   EFI_STATUS          Status;
   EFI_PCI_IO_PROTOCOL *PciIo;
@@ -139,6 +123,13 @@ Done:
   return Status;
 }
 
+/**
+  CirrusLogic5430ControllerDriverStart
+
+  TODO:    This - add argument and description to function comment
+  TODO:    Controller - add argument and description to function comment
+  TODO:    RemainingDevicePath - add argument and description to function comment
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430ControllerDriverStart (
@@ -146,20 +137,6 @@ CirrusLogic5430ControllerDriverStart (
   IN EFI_HANDLE                     Controller,
   IN EFI_DEVICE_PATH_PROTOCOL       *RemainingDevicePath
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-    None
-
---*/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    RemainingDevicePath - add argument and description to function comment
 {
   EFI_STATUS                      Status;
   CIRRUS_LOGIC_5430_PRIVATE_DATA  *Private;
@@ -253,6 +230,15 @@ Error:
   return Status;
 }
 
+/**
+  CirrusLogic5430ControllerDriverStop
+
+  TODO:    This - add argument and description to function comment
+  TODO:    Controller - add argument and description to function comment
+  TODO:    NumberOfChildren - add argument and description to function comment
+  TODO:    ChildHandleBuffer - add argument and description to function comment
+  TODO:    EFI_SUCCESS - add return value to function comment
+**/
 EFI_STATUS
 EFIAPI
 CirrusLogic5430ControllerDriverStop (
@@ -261,22 +247,6 @@ CirrusLogic5430ControllerDriverStop (
   IN UINTN                          NumberOfChildren,
   IN EFI_HANDLE                     *ChildHandleBuffer
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
-    None
-
---*/
-// TODO:    This - add argument and description to function comment
-// TODO:    Controller - add argument and description to function comment
-// TODO:    NumberOfChildren - add argument and description to function comment
-// TODO:    ChildHandleBuffer - add argument and description to function comment
-// TODO:    EFI_SUCCESS - add return value to function comment
 {
   EFI_UGA_DRAW_PROTOCOL           *UgaDraw;
   EFI_STATUS                      Status;
