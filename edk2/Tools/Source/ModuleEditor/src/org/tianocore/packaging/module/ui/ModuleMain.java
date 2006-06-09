@@ -2126,7 +2126,7 @@ public class ModuleMain extends IFrame implements MouseListener, TreeSelectionLi
                 for (int indexI = 0; indexI < xmlst.getSystemTableList().size(); indexI++) {
                     dmtnSystemTables
                                     .add(new IDefaultMutableTreeNode(
-                                                                     xmlst.getSystemTableArray(indexI).getEntry(),
+                                                                     xmlst.getSystemTableArray(indexI).getEntryList().get(0),
                                                                      IDefaultMutableTreeNode.SYSTEMTABLES_SYSTEMTABLE_ITEM,
                                                                      IDefaultMutableTreeNode.OPERATION_UPDATE_DELETE,
                                                                      indexI));
