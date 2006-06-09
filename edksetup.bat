@@ -29,8 +29,6 @@
 @REM Check the required system environment variables
 @REM
 
-if "%1"=="skip" goto skipbuild
-
 :check_vc
 if defined VCINSTALLDIR goto check_cygwin
 if defined VS71COMNTOOLS (
@@ -68,14 +66,29 @@ if not exist %XMLBEANS_HOME%\lib\saxon8.jar goto no_saxon8
 set WORKSPACE=%CD%
 
 set FRAMEWORK_TOOLS_PATH=%WORKSPACE%\Tools\bin
-set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin;%Framework_Tools_Path%;%PATH%
+
+if defined WORKSPACE_TOOLS_PATH goto check_path
+set PATH=%FRAMEWORK_TOOLS_PATH%;%JAVA_HOME%\bin;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin;%PATH%
+set WORKSPACE_TOOLS_PATH=%FRAMEWORK_TOOLS_PATH%
+echo Setting the PATH variable to include the Framework_Tools_Path for this WORKSPACE
+goto path_ok
+
+:check_path
+if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto path_ok
+set PATH=%FRAMEWORK_TOOLS_PATH%;%PATH%
+set WORKSPACE_PATH=%WORKSPACE%
+echo Resetting the PATH variable to include the Framework_Tools_Path for this WORKSPACE
+
+:path_ok
+
+if "%1"=="skip" goto skipbuild
 
 echo.
+echo WORKSPACE:     %WORKSPACE%
 echo JAVA_HOME:     %JAVA_HOME%
 echo ANT_HOME:      %ANT_HOME%
 echo XMLBEANS_HOME: %XMLBEANS_HOME%
 echo CYGWIN_HOME:   %CYGWIN_HOME%
-echo WORKSPACE:     %WORKSPACE%
 echo PATH:          %PATH%
 echo.
 
@@ -155,15 +168,12 @@ goto end
 @REM
 @REM This just sets up the CLASSPATH, the rest of the environment should have been set already.
 @REM
-set WORKSPACE=%CD%
-set FRAMEWORK_TOOLS_PATH=%WORKSPACE%\Tools\bin
-if exist c:\cygwin set CYGWIN_HOME=c:\cygwin
 echo.
+echo WORKSPACE:     %WORKSPACE%
 echo JAVA_HOME:     %JAVA_HOME%
 echo ANT_HOME:      %ANT_HOME%
 echo XMLBEANS_HOME: %XMLBEANS_HOME%
 echo CYGWIN_HOME:   %CYGWIN_HOME%
-echo WORKSPACE:     %WORKSPACE%
 echo PATH:          %PATH%
 echo.
 set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
