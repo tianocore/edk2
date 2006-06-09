@@ -188,29 +188,32 @@
                     <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                     <!-- GuidValue needs to be required -->
                 </xs:choice>
+                <!-- Version needs to be xs:decimal in final -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="License"/>
                 <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
                     <!-- DO NOT USE Created needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
+                    <!-- DO NOT USE CreatedDate needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                    <!-- CreatedDate needs to be required -->
                 </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy"/>
                 <!-- DO NOT USE CreatedBy needs to be removed -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy"/>
                 <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
                     <!-- DO NOT USE Updated needs to be removed -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
+                    <!-- DO NOT USE ModifiedDate needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
                 </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
                 <!-- DO NOT USE PackageType needs to be removed -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
+                <!-- DO NOT USE BuildTarget needs to be removed -->
                 <xs:element minOccurs="0" maxOccurs="1" name="BuildTarget" type="BuildTargets"/>
+                <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
-                <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00090000 -->
             </xs:sequence>
         </xs:complexType>
     </xs:element>

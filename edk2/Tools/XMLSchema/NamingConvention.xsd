@@ -184,7 +184,7 @@
         <xs:annotation>
             <xs:documentation xml:lang="en"> This defines what a Platform Name is: Alphanumeric characters and optional underscore (_) or dash (-) characters, followed by a dot and more alphanumeric characters. </xs:documentation>
         </xs:annotation>
-        <xs:restriction base="xs:string">
+        <xs:restriction base="xs:NCName">
             <xs:pattern value="(([a-zA-Z][a-zA-Z0-9]*)(_)*(.)*)+"/>
         </xs:restriction>
     </xs:simpleType>

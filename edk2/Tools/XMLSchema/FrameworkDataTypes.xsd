@@ -429,6 +429,10 @@
     <xs:simpleType name="Token">
         <xs:union memberTypes="GuidArrayType GuidNamingConvention HexDoubleWordDataType"/>
     </xs:simpleType>
+    <!-- TokenDataType is xs:nonNegativeInteger in final -->
+    <xs:simpleType name="TokenDataType">
+        <xs:union memberTypes="HexDoubleWordDataType  xs:nonNegativeInteger"/>
+    </xs:simpleType>
     <xs:simpleType name="ToolChains">
         <xs:restriction base="UCNameType">
             <xs:enumeration value="MSFT"/>

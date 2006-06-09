@@ -1293,16 +1293,22 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="Token" type="HexDoubleWordDataType"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
-                            <xs:group minOccurs="0" maxOccurs="1" ref="SkuGroup"/>
-                            <xs:choice minOccurs="0" maxOccurs="1">
-                                <xs:group minOccurs="0" maxOccurs="1" ref="HiiEnable"/>
-                                <xs:group minOccurs="0" maxOccurs="1" ref="VpdEnable"/>
-                            </xs:choice>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DatumSize" type="DatumSizeLimitation"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="Value" type="xs:normalizedString"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="MaxDatumSize" type="DatumSizeLimitation"/>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" name="SkuInfo">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="1" name="SkuId" type="xs:nonNegativeInteger"/>
+                                        <xs:choice>
+                                            <xs:group minOccurs="0" maxOccurs="1" ref="HiiEnable"/>
+                                            <xs:group minOccurs="0" maxOccurs="1" ref="VpdEnable"/>
+                                            <xs:group minOccurs="0" maxOccurs="1" ref="DefaultGroup"/>
+                                        </xs:choice>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdAttributes"/>
                     </xs:complexType>
@@ -1320,23 +1326,22 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="Token" type="HexDoubleWordDataType"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
-                            <xs:group minOccurs="0" maxOccurs="1" ref="SkuGroup"/>
-                            <xs:choice minOccurs="0" maxOccurs="1">
-                                <xs:group minOccurs="0" maxOccurs="1" ref="HiiEnable"/>
-                                <xs:group minOccurs="0" maxOccurs="1" ref="VpdEnable"/>
-                            </xs:choice>
-                            <xs:element minOccurs="0" maxOccurs="1" name="DatumSize" type="DatumSizeLimitation"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:normalizedString"/>
+                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Value" type="xs:normalizedString"/>
                         </xs:sequence>
-                        <xs:attributeGroup ref="PcdAttributes"/>
+                        <xs:attributeGroup ref="PcdBuildDefinitionAttributes"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:group name="DefaultGroup">
+        <xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="1" name="Value" type="xs:normalizedString"/>
+        </xs:sequence>
+    </xs:group>
     <xs:group name="HiiEnable">
         <xs:annotation>
             <xs:documentation xml:lang="en">If HiiEnable group is specified, then HiiEnable is default true</xs:documentation>
@@ -1353,21 +1358,6 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element minOccurs="0" maxOccurs="1" name="VpdOffset" type="Hex64BitDataType"/>
-        </xs:sequence>
-    </xs:group>
-    <xs:group name="SkuGroup">
-        <xs:sequence>
-            <xs:element default="0x00" minOccurs="0" maxOccurs="1" name="SkuSet" type="SkuListType"/>
-            <xs:element default="0x00" minOccurs="0" maxOccurs="1" name="SkuList" type="SkuListType"/>
-            <xs:element default="false" minOccurs="0" maxOccurs="1" name="SkuDataArrayEnable" type="xs:boolean"/>
-            <xs:element minOccurs="0" maxOccurs="unbounded" name="SkuData">
-                <xs:complexType>
-                    <xs:sequence minOccurs="1">
-                        <xs:element name="Id" type="xs:int"/>
-                        <xs:element name="Value" type="xs:normalizedString"/>
-                    </xs:sequence>
-                </xs:complexType>
-            </xs:element>
         </xs:sequence>
     </xs:group>
     <xs:element name="PcdCoded">
@@ -1406,7 +1396,7 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="Token" type="Token"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="ValidUsage" type="PcdListType"/>

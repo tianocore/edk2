@@ -367,6 +367,10 @@
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
+    <xs:attributeGroup name="PcdBuildDefinitionAttributes">
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="ItemType" type="PcdItemTypes" use="required"/>
+    </xs:attributeGroup>
     <xs:attributeGroup name="PcdDeclarationAttributes">
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
