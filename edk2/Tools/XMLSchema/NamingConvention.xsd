@@ -74,6 +74,14 @@
             <xs:pattern value="0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="GuidC_NameType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="((_)*([a-zA-Z])+((_)*[a-zA-Z0-9]*))*"/>
+        </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="GuidNamingConvention">
         <xs:annotation>
             <xs:documentation xml:lang="en"> A GUID must contain five different Hexadecimal character sets that are separated by a dash (-) character. </xs:documentation>

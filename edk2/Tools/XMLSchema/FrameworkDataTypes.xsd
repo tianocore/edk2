@@ -228,7 +228,7 @@
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="GuidListType">
-      <xs:list itemType="GuidTypes"/>
+        <xs:list itemType="GuidTypes"/>
     </xs:simpleType>
     <xs:simpleType name="GuidUsage">
         <xs:restriction base="NameConvention">
@@ -452,6 +452,9 @@
         <xs:restriction base="xs:normalizedString">
             <xs:pattern value="L(:)?(&quot;)(\w+)*((\W*)*(\s*)*(\w*)*)*(&quot;)"/>
         </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="VariableNameDataType">
+        <xs:list itemType="HexWordDataType"/>
     </xs:simpleType>
     <xs:simpleType name="UsageTypes">
         <xs:restriction base="NameConvention">

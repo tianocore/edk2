@@ -140,9 +140,9 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDefinitions"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SourceFiles"/>
                 <xs:choice minOccurs="0">
-                  <!-- DO NOT USE! removing Includes, use PackageDependencies instead -->
-                  <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
-                  <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
+                    <!-- DO NOT USE! removing Includes, use PackageDependencies instead -->
+                    <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
+                    <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
@@ -176,7 +176,7 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="SpdHeader"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDeclarations"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="IndustryStdIncludes"/>
-                <!-- DO NOT USE removing PackageDependencies, this is moving to FDP installation process -->
+                <!-- DO NOT USE removing THIS INSTANCE of PackageDependencies, this is moving to FDP installation process -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
                 <!-- DO NOT USE removing MsaFiles, use MsaFileList instead , do not wrap in choice, too many entries to convert all at once. -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="MsaFiles"/>
