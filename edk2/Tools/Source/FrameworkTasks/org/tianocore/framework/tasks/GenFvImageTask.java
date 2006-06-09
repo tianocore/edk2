@@ -56,17 +56,24 @@ public class GenFvImageTask extends Task implements EfiDefine{
             path = path + File.separatorChar;
         }
         
-        if (arch.equalsIgnoreCase("")){
-            command = path + "GenFvImage";
+        // FIXME arch should be passed via schema attributes.
+        arch=System.getenv("ARCH");
+        if (arch == null) {
+          arch = "";
         }
-        if (arch.equalsIgnoreCase("ia32")){
-            command = path + "GenFvImage_IA32";
+        // FIXME end
+
+        if (arch.equalsIgnoreCase("IA32")){
+            command = path + "GenFvImage_Ia32";
         }   
-        if (arch.equalsIgnoreCase("x64")){
+        else if (arch.equalsIgnoreCase("X64")){
             command = path + "GenFvImage_X64";
         }
-        if (arch.equalsIgnoreCase("ipf")){
-            command = path + "GenFvImage_IPF";
+        else if (arch.equalsIgnoreCase("IPF")){
+            command = path + "GenFvImage_Ipf";
+        }
+        else {
+            command = path + "GenFvImage";
         }
         String argument = infFile;
         
