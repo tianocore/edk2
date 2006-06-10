@@ -49,7 +49,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Arch ArchType="IPF">
       <Filename>IpfCache.c</Filename>
       <Filename>Ipf/Cpu.s</Filename>
-      <Filename>Ipf/CallPalProc.s</Filename>
+      <Filename>Ipf/PalCallStatic.s</Filename>
     </Arch>
   </SourceFiles>
   <Includes>
