@@ -1351,6 +1351,7 @@
             <xs:element minOccurs="0" maxOccurs="1" name="VariableName" type="VariableNameDataType"/>
             <xs:element minOccurs="0" maxOccurs="1" name="VariableGuid" type="VariableGuidType"/>
             <xs:element minOccurs="0" maxOccurs="1" name="VariableOffset" type="Hex64BitDataType"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="HiiDefaultValue" type="xs:normalizedString"/>
         </xs:sequence>
     </xs:group>
     <xs:group name="VpdEnable">
