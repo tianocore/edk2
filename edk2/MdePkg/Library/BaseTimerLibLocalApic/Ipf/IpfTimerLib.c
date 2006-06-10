@@ -31,7 +31,8 @@ typedef struct {
 } PAL_PROC_RETURN;
 
 PAL_PROC_RETURN
-CallPalProcStatic (
+PalCallStatic (
+  IN      CONST VOID                *PalEntryPoint,
   IN      UINT64                    Arg1,
   IN      UINT64                    Arg2,
   IN      UINT64                    Arg3,
@@ -142,11 +143,11 @@ GetPerformanceCounterProperties (
   PAL_PROC_RETURN                   PalRet;
   UINT64                            BaseFrequence;
 
-  PalRet = CallPalProcStatic (13, 0, 0, 0);
+  PalRet = PalCallStatic (NULL, 13, 0, 0, 0);
   ASSERT (PalRet.Status == 0);
   BaseFrequence = PalRet.r9;
 
-  PalRet = CallPalProcStatic (14, 0, 0, 0);
+  PalRet = PalCallStatic (NULL, 14, 0, 0, 0);
   ASSERT (PalRet.Status == 0);
 
   *StartValue = 0;
