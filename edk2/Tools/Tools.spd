@@ -20,10 +20,6 @@
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <CreatedDate>2006-02-24 14:49</CreatedDate>
-    <ModifiedDate>2006-02-24 14:49</ModifiedDate>
-    <URL>http://www.TianoCore.org</URL>
-    <PackageType>MIXED</PackageType>
     <ReadOnly>false</ReadOnly>
     <RePackage>true</RePackage>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION     0x00000052</Specification>

@@ -4,8 +4,6 @@
     <DatabaseName>FrameworkDatabase</DatabaseName>
     <Guid>5ce32c23-6448-43ab-b509-a9deae3aae65</Guid>
     <Version>0.3</Version>
-    <Created>2006-03-04 22:14</Created>
-    <Updated>2006-03-06 16:56</Updated>
     <Abstract>The Framework Module Development Packaging System Database</Abstract>
     <Description>This Database tracks the Basename, Version, Guid and Path for all packages installed in this workspace.</Description>
     <Copyright>Copyright (c) 2006,  Intel Corporation.</Copyright>

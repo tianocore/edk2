@@ -254,7 +254,7 @@
                 <!-- URL needs to be removed -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="URL"/>
                 <!-- PackageType needs to be removed -->
-                <xs:element minOccurs="1" maxOccurs="1" ref="PackageType"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
                 <!-- ReadOnly and RePackage remain in final -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="ReadOnly"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="RePackage"/>
