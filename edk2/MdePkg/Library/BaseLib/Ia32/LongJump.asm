@@ -23,7 +23,7 @@
     .model  flat,C
     .code
 
-IntenralLongJump    PROC
+InternalLongJump    PROC
     pop     eax
     pop     edx
     pop     eax
@@ -33,6 +33,6 @@ IntenralLongJump    PROC
     mov     ebp, [edx + 12]
     mov     esp, [edx + 16]
     jmp     dword ptr [edx + 20]
-IntenralLongJump    ENDP
+InternalLongJump    ENDP
 
     END

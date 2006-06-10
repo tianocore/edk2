@@ -21,7 +21,7 @@
 
     .code
 
-IntenralLongJump    PROC
+InternalLongJump    PROC
     mov     rbx, [rcx]
     mov     rsp, [rcx + 8]
     mov     rbp, [rcx + 10h]
@@ -33,6 +33,6 @@ IntenralLongJump    PROC
     mov     r15, [rcx + 40h]
     mov     rax, rdx
     jmp     qword ptr [rcx + 48h]
-IntenralLongJump    ENDP
+InternalLongJump    ENDP
 
     END
