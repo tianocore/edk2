@@ -1348,7 +1348,7 @@
             <xs:documentation xml:lang="en">If HiiEnable group is specified, then HiiEnable is default true</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="1" name="VariableName" type="xs:normalizedString"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="VariableName" type="VariableNameDataType"/>
             <xs:element minOccurs="0" maxOccurs="1" name="VariableGuid" type="VariableGuidType"/>
             <xs:element minOccurs="0" maxOccurs="1" name="VariableOffset" type="Hex64BitDataType"/>
         </xs:sequence>
