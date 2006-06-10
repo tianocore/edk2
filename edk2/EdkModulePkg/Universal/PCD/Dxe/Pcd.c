@@ -76,7 +76,7 @@ PcdDxeInit (
   //
 
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gPcdProtocolGuid);
-  
+
   BuildPcdDxeDataBase ();
 
   //

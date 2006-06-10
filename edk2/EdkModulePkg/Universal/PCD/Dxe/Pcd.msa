@@ -47,13 +47,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <SourceFiles>
     <Filename>Service.c</Filename>
     <Filename>Pcd.c</Filename>
+    <Filename>Pcd.dxs</Filename>
   </SourceFiles>
   <Includes>
     <PackageName>MdePkg</PackageName>
     <PackageName>EdkModulePkg</PackageName>
   </Includes>
   <Protocols>
-    <Protocol Usage="ALWAYS_PRODUCED">Pcd</Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">PcdProtocol</Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">Variable</Protocol>
   </Protocols>
   <Hobs>

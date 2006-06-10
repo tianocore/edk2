@@ -57,7 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Protocol Usage="BY_START">WinNtIo</Protocol>
     <Protocol Usage="TO_START">WinNtThunk</Protocol>
     <Protocol Usage="TO_START">DevicePath</Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">Pcd</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PcdProtocol</Protocol>
   </Protocols>
   <Guids>
     <GuidEntry Usage="ALWAYS_CONSUMED">
