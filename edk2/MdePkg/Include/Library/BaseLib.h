@@ -638,6 +638,45 @@ AsciiStrnCat (
   IN      UINTN                     Length
   );
 
+/**
+  Converts an 8-bit value to an 8-bit BCD value.
+
+  Converts the 8-bit value specified by Value to BCD. The BCD value is
+  returned.
+
+  If Value >= 100, then ASSERT().
+
+  @param  Value The 8-bit value to convert to BCD. Range 0..99.
+
+  @return The BCD value
+
+**/
+UINT8
+EFIAPI
+DecimalToBcd8 (
+  IN      UINT8                     Value
+  );
+
+/**
+  Converts an 8-bit BCD value to an 8-bit value.
+
+  Converts the 8-bit BCD value specified by Value to an 8-bit value. The 8-bit
+  value is returned.
+
+  If Value >= 0xA0, then ASSERT().
+  If (Value & 0x0F) >= 0x0A, then ASSERT().
+
+  @param  Value The 8-bit BCD value to convert to an 8-bit value.
+
+  @return The 8-bit value is returned.
+
+**/
+UINT8
+EFIAPI
+BcdToDecimal8 (
+  IN      UINT8                     Value
+  );
+
 //
 // LIST_ENTRY definition
 //
@@ -2988,6 +3027,49 @@ UINT32
 EFIAPI
 AsmCpuid (
   IN      UINT32                    Index,
+  OUT     UINT32                    *Eax,  OPTIONAL
+  OUT     UINT32                    *Ebx,  OPTIONAL
+  OUT     UINT32                    *Ecx,  OPTIONAL
+  OUT     UINT32                    *Edx   OPTIONAL
+  );
+
+/**
+  Retrieves CPUID information using an extended leaf identifier.
+
+  Executes the CPUID instruction with EAX set to the value specified by Index
+  and ECX set to the value specified by SubIndex. This function always returns
+  Index. This function is only available on IA-32 and x64.
+
+  If Eax is not NULL, then the value of EAX after CPUID is returned in Eax.
+  If Ebx is not NULL, then the value of EBX after CPUID is returned in Ebx.
+  If Ecx is not NULL, then the value of ECX after CPUID is returned in Ecx.
+  If Edx is not NULL, then the value of EDX after CPUID is returned in Edx.
+
+  @param  Index     The 32-bit value to load into EAX prior to invoking the
+                    CPUID instruction.
+  @param  SubIndex  The 32-bit value to load into ECX prior to invoking the
+                    CPUID instruction.
+  @param  Eax       Pointer to the 32-bit EAX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+  @param  Ebx       Pointer to the 32-bit EBX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+  @param  Ecx       Pointer to the 32-bit ECX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+  @param  Edx       Pointer to the 32-bit EDX value returned by the CPUID
+                    instruction. This is an optional parameter that may be
+                    NULL.
+
+  @return Index
+
+**/
+UINT32
+EFIAPI
+AsmCpuidEx (
+  IN      UINT32                    Index,
+  IN      UINT32                    SubIndex,
   OUT     UINT32                    *Eax,  OPTIONAL
   OUT     UINT32                    *Ebx,  OPTIONAL
   OUT     UINT32                    *Ecx,  OPTIONAL

@@ -94,6 +94,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ia32/SetJump.asm</Filename>
       <Filename>Ia32/LongJump.asm</Filename>
       <Filename>Ia32/CpuId.asm</Filename>
+      <Filename>Ia32/CpuIdEx.asm</Filename>
       <Filename>Ia32/ReadEflags.asm</Filename>
       <Filename>Ia32/ReadMsr64.asm</Filename>
       <Filename>Ia32/WriteMsr32.asm</Filename>

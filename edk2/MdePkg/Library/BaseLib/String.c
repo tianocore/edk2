@@ -796,3 +796,51 @@ AsciiStrnCat (
   ASSERT (AsciiStrSize (Destination) != 0);
   return Destination;
 }
+
+/**
+  Converts an 8-bit value to an 8-bit BCD value.
+
+  Converts the 8-bit value specified by Value to BCD. The BCD value is
+  returned.
+
+  If Value >= 100, then ASSERT().
+
+  @param  Value The 8-bit value to convert to BCD. Range 0..99.
+
+  @return The BCD value
+
+**/
+UINT8
+EFIAPI
+DecimalToBcd8 (
+  IN      UINT8                     Value
+  )
+{
+  ASSERT (Value < 100);
+  return ((Value / 10) << 4) | (Value % 10);
+}
+
+/**
+  Converts an 8-bit BCD value to an 8-bit value.
+
+  Converts the 8-bit BCD value specified by Value to an 8-bit value. The 8-bit
+  value is returned.
+
+  If Value >= 0xA0, then ASSERT().
+  If (Value & 0x0F) >= 0x0A, then ASSERT().
+
+  @param  Value The 8-bit BCD value to convert to an 8-bit value.
+
+  @return The 8-bit value is returned.
+
+**/
+UINT8
+EFIAPI
+BcdToDecimal8 (
+  IN      UINT8                     Value
+  )
+{
+  ASSERT (Value < 0xa0);
+  ASSERT ((Value & 0xf) < 0xa);
+  return (Value >> 4) * 10 + (Value & 0xf);
+}
