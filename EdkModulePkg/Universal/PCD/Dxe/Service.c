@@ -57,7 +57,7 @@ GetWorker (
   ASSERT (GetSize == Size || GetSize == 0);
 
   
-  IsPeiDb = (TokenNumber <= PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
+  IsPeiDb = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
 
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
@@ -484,7 +484,7 @@ SetWorker (
     ASSERT (Size == DxePcdGetSize (TokenNumber));
   }
   
-  IsPeiDb = (TokenNumber <= PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
+  IsPeiDb = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
 
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;

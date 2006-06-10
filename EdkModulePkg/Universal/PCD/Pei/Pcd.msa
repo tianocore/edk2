@@ -64,7 +64,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </Hob>
   </Hobs>
   <PPIs>
-    <Ppi Usage="ALWAYS_PRODUCED">Pcd</Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">PcdPpi</Ppi>
     <Ppi Usage="ALWAYS_CONSUMED">ReadOnlyVariable</Ppi>
   </PPIs>
   <Guids>

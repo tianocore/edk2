@@ -43,7 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <PackageName>MdePkg</PackageName>
   </Includes>
   <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">Pcd</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">PcdProtocol</Protocol>
   </Protocols>
   <Externs>
     <Extern>

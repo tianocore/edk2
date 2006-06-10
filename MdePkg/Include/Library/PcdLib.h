@@ -60,7 +60,7 @@ Module Name: PcdLib.h
 #define PatchPcdSet32(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
 #define PatchPcdSet64(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
 #define PatchPcdSetBool(TokenName, Value)  (_gPcd_BinaryPatch_##TokenName = Value)
-#define PatchPcdSetPtr(TokenName, Value, Size)   CopyMem (_gPcd_BinaryPatch_##TokenName, Value, Size)
+#define PatchPcdSetPtr(TokenName, Size, Buffer)   CopyMem (_gPcd_BinaryPatch_##TokenName, Buffer, Size)
 
 //
 // Dynamic is via the protocol with only the TokenNumber as argument
