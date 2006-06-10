@@ -240,6 +240,11 @@
             <xs:enumeration value="PRIVATE"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="HexWordArrayType">
+      <xs:restriction base="xs:normalizedString">
+         <xs:pattern value="((( )?0x[a-fA-F0-9]{4})(,)?)+( )?"/>
+      </xs:restriction>
+    </xs:simpleType>
     <xs:simpleType name="HiiPackageUsage">
         <xs:restriction base="NameConvention">
             <xs:enumeration value="ALWAYS_PRODUCED"/>
@@ -458,7 +463,7 @@
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="VariableNameDataType">
-        <xs:list itemType="HexWordDataType"/>
+        <xs:list itemType="HexWordArrayType"/>
     </xs:simpleType>
     <xs:simpleType name="UsageTypes">
         <xs:restriction base="NameConvention">
