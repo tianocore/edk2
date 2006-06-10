@@ -1300,7 +1300,7 @@
                             <xs:element minOccurs="1" maxOccurs="unbounded" name="SkuInfo">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element minOccurs="1" name="SkuId" type="xs:nonNegativeInteger"/>
+                                        <xs:element minOccurs="1" maxOccurs="1" name="SkuId" type="xs:nonNegativeInteger"/>
                                         <xs:choice>
                                             <xs:group minOccurs="0" maxOccurs="1" ref="HiiEnable"/>
                                             <xs:group minOccurs="0" maxOccurs="1" ref="VpdEnable"/>
@@ -1329,7 +1329,8 @@
                             <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
-                            <xs:element minOccurs="0" maxOccurs="unbounded" name="Value" type="xs:normalizedString"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="MaxDatumSize" type="DatumSizeLimitation"/>                            
+                            <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:normalizedString"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdBuildDefinitionAttributes"/>
                     </xs:complexType>
