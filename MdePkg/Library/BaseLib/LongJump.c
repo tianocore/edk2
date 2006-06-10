@@ -1,5 +1,5 @@
 /** @file
-  Long Jump functions. 
+  Long Jump functions.
 
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -16,9 +16,15 @@
 
 VOID
 EFIAPI
-_LongJump (
-  IN BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
-  IN      UINTN                Value
+InternalAssertJumpBuffer (
+  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
+  );
+
+VOID
+EFIAPI
+InternalLongJump (
+  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+  IN      UINTN                     Value
   );
 
 /**
@@ -38,12 +44,10 @@ _LongJump (
 VOID
 EFIAPI
 LongJump (
-  IN BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
-  IN      UINTN                Value
+  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+  IN      UINTN                     Value
   )
 {
-  ASSERT (JumpBuffer != NULL);
-  ASSERT (Value != 0);
-  
-  _LongJump (JumpBuffer, Value);
+  InternalAssertJumpBuffer (JumpBuffer);
+  InternalLongJump (JumpBuffer, Value);
 }

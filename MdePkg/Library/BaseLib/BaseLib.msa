@@ -36,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">TimerLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>String.c</Filename>
@@ -65,15 +66,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>RRotU32.c</Filename>
     <Filename>RRotU64.c</Filename>
     <Filename>RShiftU64.c</Filename>
+    <Filename>SetJump.c</Filename>
+    <Filename>LongJump.c</Filename>
     <Filename>SwapBytes16.c</Filename>
     <Filename>SwapBytes32.c</Filename>
     <Filename>SwapBytes64.c</Filename>
+    <Filename>SwitchStack.c</Filename>
     <Arch ArchType="IA32">
       <Filename>x86LowLevel.c</Filename>
       <Filename>x86Thunk.c</Filename>
       <Filename>Unaligned.c</Filename>
-      <Filename>LongJump.c</Filename>
-      <Filename>SwitchStack.c</Filename>
       <Filename>Ia32/Non-existing.c</Filename>
       <Filename>Ia32/InternalSwitchStack.c</Filename>
       <Filename>Ia32/LShiftU64.asm</Filename>
@@ -175,104 +177,102 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ia32/Thunk16.asm</Filename>
     </Arch>
     <Arch ArchType="X64">
-      <Filename>x86LowLevel.c</Filename>
-      <Filename>x86Thunk.c</Filename>
+      <Filename>X86LowLevel.c</Filename>
+      <Filename>X86Thunk.c</Filename>
       <Filename>Unaligned.c</Filename>
       <Filename>Math64.c</Filename>
-      <Filename>LongJump.c</Filename>
-      <Filename>SwitchStack.c</Filename>
-      <Filename>x64/Non-existing.c</Filename>
-      <Filename>x64/SwitchStack.asm</Filename>
-      <Filename>x64/SetJump.asm</Filename>
-      <Filename>x64/LongJump.asm</Filename>
-      <Filename>x64/CpuId.asm</Filename>
-      <Filename>x64/ReadEflags.asm</Filename>
-      <Filename>x64/ReadMsr32.asm</Filename>
-      <Filename>x64/ReadMsr64.asm</Filename>
-      <Filename>x64/WriteMsr32.asm</Filename>
-      <Filename>x64/WriteMsr64.asm</Filename>
-      <Filename>x64/ReadCr0.asm</Filename>
-      <Filename>x64/ReadCr2.asm</Filename>
-      <Filename>x64/ReadCr3.asm</Filename>
-      <Filename>x64/ReadCr4.asm</Filename>
-      <Filename>x64/WriteCr0.asm</Filename>
-      <Filename>x64/WriteCr2.asm</Filename>
-      <Filename>x64/WriteCr3.asm</Filename>
-      <Filename>x64/WriteCr4.asm</Filename>
-      <Filename>x64/ReadDr0.asm</Filename>
-      <Filename>x64/ReadDr1.asm</Filename>
-      <Filename>x64/ReadDr2.asm</Filename>
-      <Filename>x64/ReadDr3.asm</Filename>
-      <Filename>x64/ReadDr4.asm</Filename>
-      <Filename>x64/ReadDr5.asm</Filename>
-      <Filename>x64/ReadDr6.asm</Filename>
-      <Filename>x64/ReadDr7.asm</Filename>
-      <Filename>x64/WriteDr0.asm</Filename>
-      <Filename>x64/WriteDr1.asm</Filename>
-      <Filename>x64/WriteDr2.asm</Filename>
-      <Filename>x64/WriteDr3.asm</Filename>
-      <Filename>x64/WriteDr4.asm</Filename>
-      <Filename>x64/WriteDr5.asm</Filename>
-      <Filename>x64/WriteDr6.asm</Filename>
-      <Filename>x64/WriteDr7.asm</Filename>
-      <Filename>x64/ReadCs.asm</Filename>
-      <Filename>x64/ReadDs.asm</Filename>
-      <Filename>x64/ReadEs.asm</Filename>
-      <Filename>x64/ReadFs.asm</Filename>
-      <Filename>x64/ReadGs.asm</Filename>
-      <Filename>x64/ReadSs.asm</Filename>
-      <Filename>x64/ReadTr.asm</Filename>
-      <Filename>x64/ReadGdtr.asm</Filename>
-      <Filename>x64/WriteGdtr.asm</Filename>
-      <Filename>x64/ReadIdtr.asm</Filename>
-      <Filename>x64/WriteIdtr.asm</Filename>
-      <Filename>x64/ReadLdtr.asm</Filename>
-      <Filename>x64/WriteLdtr.asm</Filename>
-      <Filename>x64/FxSave.asm</Filename>
-      <Filename>x64/FxRestore.asm</Filename>
-      <Filename>x64/ReadMm0.asm</Filename>
-      <Filename>x64/ReadMm1.asm</Filename>
-      <Filename>x64/ReadMm2.asm</Filename>
-      <Filename>x64/ReadMm3.asm</Filename>
-      <Filename>x64/ReadMm4.asm</Filename>
-      <Filename>x64/ReadMm5.asm</Filename>
-      <Filename>x64/ReadMm6.asm</Filename>
-      <Filename>x64/ReadMm7.asm</Filename>
-      <Filename>x64/WriteMm0.asm</Filename>
-      <Filename>x64/WriteMm1.asm</Filename>
-      <Filename>x64/WriteMm2.asm</Filename>
-      <Filename>x64/WriteMm3.asm</Filename>
-      <Filename>x64/WriteMm4.asm</Filename>
-      <Filename>x64/WriteMm5.asm</Filename>
-      <Filename>x64/WriteMm6.asm</Filename>
-      <Filename>x64/WriteMm7.asm</Filename>
-      <Filename>x64/ReadTsc.asm</Filename>
-      <Filename>x64/ReadPmc.asm</Filename>
-      <Filename>x64/Monitor.asm</Filename>
-      <Filename>x64/Mwait.asm</Filename>
-      <Filename>x64/DisablePaging64.asm</Filename>
-      <Filename>x64/Wbinvd.asm</Filename>
-      <Filename>x64/Invd.asm</Filename>
-      <Filename>x64/FlushCacheLine.asm</Filename>
-      <Filename>x64/InterlockedIncrement.asm</Filename>
-      <Filename>x64/InterlockedDecrement.asm</Filename>
-      <Filename>x64/InterlockedCompareExchange32.asm</Filename>
-      <Filename>x64/InterlockedCompareExchange64.asm</Filename>
-      <Filename>x64/EnableInterrupts.asm</Filename>
-      <Filename>x64/DisableInterrupts.asm</Filename>
-      <Filename>x64/EnableDisableInterrupts.asm</Filename>
-      <Filename>x64/CpuSleep.asm</Filename>
-      <Filename>x64/CpuPause.asm</Filename>
-      <Filename>x64/CpuBreakpoint.asm</Filename>
-      <Filename>x64/CpuFlushTlb.asm</Filename>
-      <Filename>x64/Thunk16.asm</Filename>
+      <Filename>X64/Non-existing.c</Filename>
+      <Filename>X64/SwitchStack.asm</Filename>
+      <Filename>X64/SetJump.asm</Filename>
+      <Filename>X64/LongJump.asm</Filename>
+      <Filename>X64/CpuId.asm</Filename>
+      <Filename>X64/CpuIdEx.asm</Filename>
+      <Filename>X64/ReadEflags.asm</Filename>
+      <Filename>X64/ReadMsr32.asm</Filename>
+      <Filename>X64/ReadMsr64.asm</Filename>
+      <Filename>X64/WriteMsr32.asm</Filename>
+      <Filename>X64/WriteMsr64.asm</Filename>
+      <Filename>X64/ReadCr0.asm</Filename>
+      <Filename>X64/ReadCr2.asm</Filename>
+      <Filename>X64/ReadCr3.asm</Filename>
+      <Filename>X64/ReadCr4.asm</Filename>
+      <Filename>X64/WriteCr0.asm</Filename>
+      <Filename>X64/WriteCr2.asm</Filename>
+      <Filename>X64/WriteCr3.asm</Filename>
+      <Filename>X64/WriteCr4.asm</Filename>
+      <Filename>X64/ReadDr0.asm</Filename>
+      <Filename>X64/ReadDr1.asm</Filename>
+      <Filename>X64/ReadDr2.asm</Filename>
+      <Filename>X64/ReadDr3.asm</Filename>
+      <Filename>X64/ReadDr4.asm</Filename>
+      <Filename>X64/ReadDr5.asm</Filename>
+      <Filename>X64/ReadDr6.asm</Filename>
+      <Filename>X64/ReadDr7.asm</Filename>
+      <Filename>X64/WriteDr0.asm</Filename>
+      <Filename>X64/WriteDr1.asm</Filename>
+      <Filename>X64/WriteDr2.asm</Filename>
+      <Filename>X64/WriteDr3.asm</Filename>
+      <Filename>X64/WriteDr4.asm</Filename>
+      <Filename>X64/WriteDr5.asm</Filename>
+      <Filename>X64/WriteDr6.asm</Filename>
+      <Filename>X64/WriteDr7.asm</Filename>
+      <Filename>X64/ReadCs.asm</Filename>
+      <Filename>X64/ReadDs.asm</Filename>
+      <Filename>X64/ReadEs.asm</Filename>
+      <Filename>X64/ReadFs.asm</Filename>
+      <Filename>X64/ReadGs.asm</Filename>
+      <Filename>X64/ReadSs.asm</Filename>
+      <Filename>X64/ReadTr.asm</Filename>
+      <Filename>X64/ReadGdtr.asm</Filename>
+      <Filename>X64/WriteGdtr.asm</Filename>
+      <Filename>X64/ReadIdtr.asm</Filename>
+      <Filename>X64/WriteIdtr.asm</Filename>
+      <Filename>X64/ReadLdtr.asm</Filename>
+      <Filename>X64/WriteLdtr.asm</Filename>
+      <Filename>X64/FxSave.asm</Filename>
+      <Filename>X64/FxRestore.asm</Filename>
+      <Filename>X64/ReadMm0.asm</Filename>
+      <Filename>X64/ReadMm1.asm</Filename>
+      <Filename>X64/ReadMm2.asm</Filename>
+      <Filename>X64/ReadMm3.asm</Filename>
+      <Filename>X64/ReadMm4.asm</Filename>
+      <Filename>X64/ReadMm5.asm</Filename>
+      <Filename>X64/ReadMm6.asm</Filename>
+      <Filename>X64/ReadMm7.asm</Filename>
+      <Filename>X64/WriteMm0.asm</Filename>
+      <Filename>X64/WriteMm1.asm</Filename>
+      <Filename>X64/WriteMm2.asm</Filename>
+      <Filename>X64/WriteMm3.asm</Filename>
+      <Filename>X64/WriteMm4.asm</Filename>
+      <Filename>X64/WriteMm5.asm</Filename>
+      <Filename>X64/WriteMm6.asm</Filename>
+      <Filename>X64/WriteMm7.asm</Filename>
+      <Filename>X64/ReadTsc.asm</Filename>
+      <Filename>X64/ReadPmc.asm</Filename>
+      <Filename>X64/Monitor.asm</Filename>
+      <Filename>X64/Mwait.asm</Filename>
+      <Filename>X64/DisablePaging64.asm</Filename>
+      <Filename>X64/Wbinvd.asm</Filename>
+      <Filename>X64/Invd.asm</Filename>
+      <Filename>X64/FlushCacheLine.asm</Filename>
+      <Filename>X64/InterlockedIncrement.asm</Filename>
+      <Filename>X64/InterlockedDecrement.asm</Filename>
+      <Filename>X64/InterlockedCompareExchange32.asm</Filename>
+      <Filename>X64/InterlockedCompareExchange64.asm</Filename>
+      <Filename>X64/EnableInterrupts.asm</Filename>
+      <Filename>X64/DisableInterrupts.asm</Filename>
+      <Filename>X64/EnableDisableInterrupts.asm</Filename>
+      <Filename>X64/CpuSleep.asm</Filename>
+      <Filename>X64/CpuPause.asm</Filename>
+      <Filename>X64/CpuBreakpoint.asm</Filename>
+      <Filename>X64/CpuFlushTlb.asm</Filename>
+      <Filename>X64/Thunk16.asm</Filename>
     </Arch>
     <Arch ArchType="IPF">
       <Filename>Math64.c</Filename>
-      <Filename>LongJump.c</Filename>
-      <Filename>SwitchStack.c</Filename>
       <Filename>Ipf/PalCallStatic.s</Filename>
       <Filename>Ipf/setjmp.s</Filename>
+      <Filename>Ipf/longjmp.s</Filename>
       <Filename>Ipf/SwitchStack.s</Filename>
       <Filename>Ipf/Unaligned.c</Filename>
       <Filename>Ipf/CpuBreakpoint.c</Filename>

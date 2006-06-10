@@ -22,7 +22,7 @@
 .type   PalCallStatic, @function
 .regstk 5, 0, 0, 0
 PalCallStatic::
-        cmp.ne              p6, p7 = r0, in0
+        cmp.eq              p6 = r0, in0
         mov                 r31 = in4
         mov                 r8  = ip
 (p6)    mov                 in0 = ar.k5
@@ -39,8 +39,9 @@ PalCallStatic::
         br.cond.sptk        b7
 PalProcReturn:
         mov                 psr.l = in3
-        cmp.eq              p6, p7 = in0, in1       // in1 == PAL_COPY_PAL?
-(p6)    cmp.eq              p6, p7 = r0, r8         // Status == Success?
+        cmp.eq              p6 = in0, in1           // in1 == PAL_COPY_PAL?
+(p6)    cmp.eq              p6 = r0, r8             // Status == Success?
+(p6)    add                 in2 = r9, in2
 (p6)    mov                 ar.k5 = in2
         mov                 b0  = in4
         br.ret.sptk.many    b0

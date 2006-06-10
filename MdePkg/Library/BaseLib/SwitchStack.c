@@ -47,5 +47,9 @@ SwitchStack (
 {
   ASSERT (EntryPoint != NULL && NewStack != NULL);
 
+#ifdef MDE_CPU_IPF
+  ASSERT (((UINTN)NewStack & 0xf) == 0);
+#endif
+
   InternalSwitchStack (EntryPoint, Context1, Context2, NewStack);
 }

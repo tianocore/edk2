@@ -20,10 +20,15 @@
 ;------------------------------------------------------------------------------
 
     .386
-    .model  flat
+    .model  flat,C
     .code
 
-_SetJump    PROC
+InternalAssertJumpBuffer    PROTO   C
+
+SetJump     PROC
+    push    [esp + 4]
+    call    InternalAssertJumpBuffer
+    pop     ecx
     pop     ecx
     mov     edx, [esp]
     mov     [edx], ebx
@@ -34,6 +39,6 @@ _SetJump    PROC
     mov     [edx + 20], ecx
     xor     eax, eax
     jmp     ecx
-_SetJump    ENDP
+SetJump     ENDP
 
     END

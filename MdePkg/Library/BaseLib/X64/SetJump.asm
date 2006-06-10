@@ -21,7 +21,14 @@
 
     .code
 
+EXTERNDEF   InternalAssertJumpBuffer:PROC
+
 SetJump     PROC
+    push    rcx
+    add     rsp, -20h
+    call    InternalAssertJumpBuffer
+    add     rsp, 20h
+    pop     rcx
     pop     rdx
     mov     [rcx], rbx
     mov     [rcx + 8], rsp
