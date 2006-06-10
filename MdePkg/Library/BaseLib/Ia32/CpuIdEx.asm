@@ -21,6 +21,8 @@
 ;
 ;------------------------------------------------------------------------------
 
+    .686
+    .model  flat,C
     .code
 
 ;------------------------------------------------------------------------------
@@ -35,29 +37,31 @@
 ;    OUT  UINT32  *RegisterOutEdx  OPTIONAL
 ;    )
 ;------------------------------------------------------------------------------
-AsmCpuidEx  PROC    USES    rbx
-    mov     eax, ecx
-    mov     ecx, edx
-    push    rax                         ; save Index on stack
+AsmCpuidEx  PROC    USES    ebx
+    push    ebp
+    mov     ebp, esp
+    mov     eax, [ebp + 12]
+    mov     ecx, [ebp + 16]
     cpuid
-    mov     r10, [rsp + 38h]
-    test    r10, r10
-    jz      @F
-    mov     [r10], ecx
+    push    ecx
+    mov     ecx, [ebp + 20]
+    jecxz   @F
+    mov     [ecx], eax
 @@:
-    mov     rcx, r8
-    jrcxz   @F
-    mov     [rcx], eax
+    mov     ecx, [ebp + 24]
+    jecxz   @F
+    mov     [ecx], ebx
 @@:
-    mov     rcx, r9
-    jrcxz   @F
-    mov     [rcx], ebx
+    mov     ecx, [ebp + 28]
+    jecxz   @F
+    pop     [ecx]
 @@:
-    mov     rcx, [rsp + 40h]
-    jrcxz   @F
-    mov     [rcx], edx
+    mov     edx, [ebp + 32]
+    jecxz   @F
+    mov     [ecx], edx
 @@:
-    pop     rax                         ; restore Index to rax as return value
+    mov     eax, [ebp + 12]
+    leave
     ret
 AsmCpuidEx  ENDP
 
