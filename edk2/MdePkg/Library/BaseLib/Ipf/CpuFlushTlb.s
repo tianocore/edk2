@@ -23,20 +23,21 @@
 .proc   CpuFlushTlb
 .type   CpuFlushTlb, @function
 CpuFlushTlb::
-        alloc               loc0 = ar.pfs, 0, 2, 5, 0
+        alloc               loc0 = ar.pfs, 0, 3, 5, 0
         mov                 out0 = 0
         mov                 out1 = 6
         mov                 out2 = 0
         mov                 out3 = 0
-        mov                 out4 = 0
         mov                 loc1 = b0
-        br.call.sptk        b0  = PalCallStatic
-        rsm                 1 << 14                 // Disable interrupts
+        mov                 out4 = 0
+        brl.call.sptk       b0  = PalCallStatic
+        mov                 loc2 = psr              // save PSR
         mov                 ar.pfs = loc0
         extr.u              r14 = r10, 32, 32       // r14 <- count1
+        rsm                 1 << 14                 // Disable interrupts
         extr.u              r15 = r11, 32, 32       // r15 <- stride1
         extr.u              r10 = r10, 0, 32        // r10 <- count2
-        mov                 loc0 = psr
+        add                 r10 = -1, r10
         extr.u              r11 = r11, 0, 32        // r11 <- stride2
         br.cond.sptk        LoopPredicate
 LoopOuter:
@@ -48,10 +49,10 @@ Loop:
         br.ctop.sptk        Loop
         add                 r9 = r15, r9            // r9 += stride1
 LoopPredicate:
-        cmp.ne              p6, p7 = r0, r14        // count1 == 0?
+        cmp.ne              p6 = r0, r14            // count1 == 0?
         add                 r14 = -1, r14
 (p6)    br.cond.sptk        LoopOuter
-        mov                 psr.l = loc0
+        mov                 psr.l = loc2
         mov                 b0  = loc1
         br.ret.sptk.many    b0
 .endp

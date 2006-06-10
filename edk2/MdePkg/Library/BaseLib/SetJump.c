@@ -1,5 +1,5 @@
 /** @file
-  Switch Stack functions.
+  Internal ASSERT () functions for SetJump.
 
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -18,24 +18,11 @@ VOID
 EFIAPI
 InternalAssertJumpBuffer (
   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
-  );
-
-UINTN
-EFIAPI
-SetJump (
-  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
   )
 {
-  InternalAssertJumpBuffer (JumpBuffer);
-  return 0;
-}
+  ASSERT (JumpBuffer != NULL);
 
-VOID
-EFIAPI
-InternalLongJump (
-  IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
-  IN      UINTN                     Value
-  )
-{
-  ASSERT (FALSE);
+#ifdef MDE_CPU_IPF
+  ASSERT (((UINTN)JumpBuffer & 0xf) == 0);
+#endif
 }

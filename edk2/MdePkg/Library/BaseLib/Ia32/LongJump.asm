@@ -20,10 +20,10 @@
 ;------------------------------------------------------------------------------
 
     .386
-    .model  flat
+    .model  flat,C
     .code
 
-__LongJump   PROC
+IntenralLongJump    PROC
     pop     eax
     pop     edx
     pop     eax
@@ -33,6 +33,6 @@ __LongJump   PROC
     mov     ebp, [edx + 12]
     mov     esp, [edx + 16]
     jmp     dword ptr [edx + 20]
-__LongJump   ENDP
+IntenralLongJump    ENDP
 
     END

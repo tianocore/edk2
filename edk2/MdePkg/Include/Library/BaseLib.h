@@ -45,65 +45,44 @@ typedef struct {
 // IPF context buffer used by SetJump() and LongJump()
 //
 typedef struct {
-  UINT64                            InitialUNAT;
-  UINT64                            AfterSpillUNAT;
-  UINT64                            PFS;
-  UINT64                            BSP;
-  UINT64                            RNAT;
-  UINT64                            Predicates;
-  UINT64                            LoopCount;
+  UINT64                            F2[2];
+  UINT64                            F3[2];
+  UINT64                            F4[2];
+  UINT64                            F5[2];
+  UINT64                            F16[2];
+  UINT64                            F17[2];
+  UINT64                            F18[2];
+  UINT64                            F19[2];
+  UINT64                            F20[2];
+  UINT64                            F21[2];
+  UINT64                            F22[2];
+  UINT64                            F23[2];
+  UINT64                            F24[2];
+  UINT64                            F25[2];
+  UINT64                            F26[2];
+  UINT64                            F27[2];
+  UINT64                            F28[2];
+  UINT64                            F29[2];
+  UINT64                            F30[2];
+  UINT64                            F31[2];
   UINT64                            R4;
   UINT64                            R5;
   UINT64                            R6;
   UINT64                            R7;
   UINT64                            SP;
-  UINT64                            F2Low;
-  UINT64                            F2High;
-  UINT64                            F3Low;
-  UINT64                            F3High;
-  UINT64                            F4Low;
-  UINT64                            F4High;
-  UINT64                            F5Low;
-  UINT64                            F5High;
-  UINT64                            F16Low;
-  UINT64                            F16High;
-  UINT64                            F17Low;
-  UINT64                            F17High;
-  UINT64                            F18Low;
-  UINT64                            F18High;
-  UINT64                            F19Low;
-  UINT64                            F19High;
-  UINT64                            F20Low;
-  UINT64                            F20High;
-  UINT64                            F21Low;
-  UINT64                            F21High;
-  UINT64                            F22Low;
-  UINT64                            F22High;
-  UINT64                            F23Low;
-  UINT64                            F23High;
-  UINT64                            F24Low;
-  UINT64                            F24High;
-  UINT64                            F25Low;
-  UINT64                            F25High;
-  UINT64                            F26Low;
-  UINT64                            F26High;
-  UINT64                            F27Low;
-  UINT64                            F27High;
-  UINT64                            F28Low;
-  UINT64                            F28High;
-  UINT64                            F29Low;
-  UINT64                            F29High;
-  UINT64                            F30Low;
-  UINT64                            F30High;
-  UINT64                            F31Low;
-  UINT64                            F31High;
-  UINT64                            FPSR;
   UINT64                            BR0;
   UINT64                            BR1;
   UINT64                            BR2;
   UINT64                            BR3;
   UINT64                            BR4;
   UINT64                            BR5;
+  UINT64                            InitialUNAT;
+  UINT64                            AfterSpillUNAT;
+  UINT64                            PFS;
+  UINT64                            BSP;
+  UINT64                            Predicates;
+  UINT64                            LoopCount;
+  UINT64                            FPSR;
 } BASE_LIBRARY_JUMP_BUFFER;
 
 #elif defined (MDE_CPU_X64)
@@ -2866,6 +2845,7 @@ typedef union {
 
 //
 // Byte packed structure for an IDTR, GDTR, LDTR descriptor
+/// @bug  How to make this structure byte-packed in a compiler independent way?
 //
 typedef struct {
   UINT16  Limit;
