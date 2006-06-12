@@ -60,11 +60,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <C_Name>StatusCodeSpecificData</C_Name>
     </GuidEntry>
   </Guids>
-  <PCDs>
-    <PcdData ItemType="FIXED_AT_BUILD">
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-      <Token>0x00000007</Token>
-      <DatumType>UINT8</DatumType>
-    </PcdData>
-  </PCDs>
+    </PcdEntry>
+  </PcdCoded>
 </LibraryModuleSurfaceArea>

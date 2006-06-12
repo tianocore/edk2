@@ -44,21 +44,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <Includes>
     <PackageName>MdePkg</PackageName>
   </Includes>
-  <PCDs>
-    <PcdData ItemType="FIXED_AT_BUILD">
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugPropertyMask</C_Name>
-      <Token>0x00000005</Token>
-      <DatumType>UINT8</DatumType>
-    </PcdData>
-    <PcdData ItemType="FIXED_AT_BUILD">
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugClearMemoryValue</C_Name>
-      <Token>0x00000008</Token>
-      <DatumType>UINT8</DatumType>
-    </PcdData>
-    <PcdData ItemType="PATCHABLE_IN_MODULE">
+    </PcdEntry>
+    <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
-      <Token>0x00000006</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-  </PCDs>
+    </PcdEntry>
+  </PcdCoded>
 </LibraryModuleSurfaceArea>

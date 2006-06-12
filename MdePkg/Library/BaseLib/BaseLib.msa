@@ -295,26 +295,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
  <Includes>
     <PackageName>MdePkg</PackageName>
   </Includes>
-  <PCDs>
-    <PcdData ItemType="FIXED_AT_BUILD">
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-      <Token>0x00000001</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-    <PcdData ItemType="FIXED_AT_BUILD">
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
-      <Token>0x00000002</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-    <PcdData ItemType="FIXED_AT_BUILD">
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumLinkedListLength</C_Name>
-      <Token>0x00000003</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-    <PcdData ItemType="FIXED_AT_BUILD">
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdSpinLockTimeout</C_Name>
-      <Token>0x00000004</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-  </PCDs>
+    </PcdEntry>
+  </PcdCoded>
 </LibraryModuleSurfaceArea>
