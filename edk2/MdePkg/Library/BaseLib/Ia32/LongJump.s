@@ -19,21 +19,20 @@
 #
 #------------------------------------------------------------------------------
 
+    .386: 
+    .code: 
 
-
-     
-
-.global __LongJump
-__LongJump: 
+.globl _InternalLongJump
+_InternalLongJump:
     popl    %eax
     popl    %edx
     popl    %eax
-    movl    (%edx),%ebx
-    movl    4(%edx),%esi
-    movl    8(%edx),%edi
-    movl    12(%edx),%ebp
-    movl    16(%edx),%esp
-    jmpl    *20(%edx)
-
+    movl    (%edx), %ebx
+    movl    4(%edx), %esi
+    movl    8(%edx), %edi
+    movl    12(%edx), %ebp
+    movl    16(%edx), %esp
+    jmp     20(%edx)
+#InternalLongJump ENDP
 
 
