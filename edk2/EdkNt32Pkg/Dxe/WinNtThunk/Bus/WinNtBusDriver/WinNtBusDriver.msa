@@ -97,71 +97,45 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ComponentName>gWinNtBusDriverComponentName</ComponentName>
     </Extern>
   </Externs>
-  <PCDs>
-    <PcdData ItemType="DYNAMIC">
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtConsole</C_Name>
-      <Token>0x0000100a</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtUga</C_Name>
-      <Token>0x00001003</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtSerialPort</C_Name>
-      <Token>0x00001002</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtFileSystem</C_Name>
-      <Token>0x00001004</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtVirtualDisk</C_Name>
-      <Token>0x00001001</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtPhysicalDisk</C_Name>
-      <Token>0x00001000</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuModel</C_Name>
-      <Token>0x00001007</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuSpeed</C_Name>
-      <Token>0x00001008</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySize</C_Name>
-      <Token>0x00001005</Token>
-      <DatumType>VOID*</DatumType>
-    </PcdData>
-    <PcdData ItemType="PATCHABLE_IN_MODULE">
+    </PcdEntry>
+    <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch1</C_Name>
-      <Token>0x0001000b</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-    <PcdData ItemType="PATCHABLE_IN_MODULE">
+    </PcdEntry>
+    <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch2</C_Name>
-      <Token>0x0001000c</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-    <PcdData ItemType="FEATURE_FLAG">
+    </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdWinNtFeatureFlag1</C_Name>
-      <Token>0x0001000d</Token>
-      <DatumType>BOOLEAN</DatumType>
-    </PcdData>
-    <PcdData ItemType="DYNAMIC">
+    </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtDynamicUINT32</C_Name>
-      <Token>0x0001000e</Token>
-      <DatumType>UINT32</DatumType>
-    </PcdData>
-  </PCDs>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>
