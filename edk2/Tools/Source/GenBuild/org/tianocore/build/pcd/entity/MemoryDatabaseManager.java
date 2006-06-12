@@ -145,8 +145,7 @@ public class MemoryDatabaseManager {
         ArrayList<Token>   al   =   new ArrayList<Token>();
 
         for (index = 0; index < tokenArray.length; index++) {
-            if (tokenArray[index].pcdType == Token.PCD_TYPE.DYNAMIC ||
-                tokenArray[index].pcdType == Token.PCD_TYPE.DYNAMIC_EX) {
+            if (tokenArray[index].isDynamicPCD) {
                 al.add(tokenArray[index]);
             }
         }

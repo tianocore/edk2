@@ -70,9 +70,16 @@ public class Token {
     public int              tokenNumber;
 
     ///
-    /// pcdType is the PCD item type defined by platform developer.
+    /// All supported PCD type, this value can be retrieved from SPD
+    /// Currently, only record all PCD type for this token in FPD file.
+    /// 
+    public List<PCD_TYPE>   supportedPcdType;
+
     ///
-    public PCD_TYPE         pcdType;
+    /// If the token's item type is Dynamic or DynamicEx type, isDynamicPCD
+    /// is true.
+    /// 
+    public boolean          isDynamicPCD;
 
     ///
     /// datumSize is to descript the fix size or max size for this token. 
@@ -82,76 +89,16 @@ public class Token {
 
     ///
     /// datum type is to descript what type can be expressed by a PCD token.
-    /// datumType is defined in SPD.
+    /// For same PCD used in different module, the datum type should be unique.
+    /// So it belong memeber to Token class.
     ///
     public DATUM_TYPE       datumType;
 
     ///
-    /// hiiEnabled is to indicate whether the token support Hii functionality.
-    /// hiiEnabled is defined in FPD.
-    ///
-    public boolean          hiiEnabled;
-
-    ///
-    /// variableName is valid only when this token support Hii functionality. variableName
-    /// indicates the value of token is associated with what variable.
-    /// variableName is defined in FPD.
-    ///
-    public String           variableName;
-
-    ///
-    /// variableGuid is the GUID this token associated with.
-    /// variableGuid is defined in FPD.
-    ///
-    public UUID             variableGuid;
-
-    ///
-    /// Variable offset indicate the associated variable's offset in NV storage.
-    /// variableOffset is defined in FPD.
-    ///
-    public int              variableOffset;
-
-    ///
-    /// skuEnabled is to indicate whether the token support Sku functionality.
-    /// skuEnabled is defined in FPD.
-    ///
-    public boolean          skuEnabled;
-
-    ///
     /// skuData contains all value for SkuNumber of token.
-    /// skuData is defined in FPD.
+    /// This field is for Dynamic or DynamicEx type PCD, 
     ///
     public List<SkuInstance> skuData;
-
-    ///
-    /// maxSkuCount indicate the max count of sku data.
-    /// maxSkuCount is defined in FPD.
-    ///
-    public int              maxSkuCount;
-
-    ///
-    /// SkuId is the id of current selected SKU.
-    /// SkuId is defined in FPD.
-    ///
-    public int              skuId;
-
-    ///
-    /// datum is the value set by platform developer.
-    /// datum is defined in FPD.
-    ///
-    public Object           datum;
-
-    ///
-    /// BUGBUG: fix comment
-    /// vpdEnabled is defined in FPD.
-    ///
-    public boolean          vpdEnabled;
-
-    ///
-    /// BUGBUG: fix comment
-    /// vpdOffset is defined in FPD.
-    ///
-    public long             vpdOffset;
 
     ///
     /// consumers array record all module private information who consume this PCD token.
@@ -164,22 +111,51 @@ public class Token {
         this.cName                  = cName;
         this.tokenSpaceName         = (tokenSpaceName == null) ? nullUUID : tokenSpaceName;
         this.tokenNumber            = 0;
-        this.pcdType                = PCD_TYPE.UNKNOWN;
         this.datumType              = DATUM_TYPE.UNKNOWN;
         this.datumSize              = -1;
-        this.datum                  = null;
-        this.hiiEnabled             = false;
-        this.variableGuid           = null;
-        this.variableName           = "";
-        this.variableOffset         = -1;
-        this.skuEnabled             = false;
-        this.skuId                  = -1;
-        this.maxSkuCount            = -1;
         this.skuData                = new ArrayList<SkuInstance>();
-        this.vpdEnabled             = false;
-        this.vpdOffset              = -1;
 
         this.consumers              = new HashMap<String, UsageInstance>();
+        this.supportedPcdType       = new ArrayList<PCD_TYPE>();
+    }
+
+    /**
+      updateSupportPcdType
+      
+      SupportPcdType should be gotten from SPD file actually, but now it just
+      record all PCD type for this token in FPD file.
+      
+      @param pcdType    new PCD type found in FPD file for this token.
+    **/
+    public void updateSupportPcdType(PCD_TYPE pcdType) {
+        int     index = 0;
+        boolean found = false;
+        for (index = 0; index < this.supportedPcdType.size(); index ++) {
+            if (this.supportedPcdType.get(index) == pcdType) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            this.supportedPcdType.add(pcdType);
+        }
+    }
+
+    /**
+       Judge whether pcdType is belong to dynamic type. Dynamic type includes
+       DYNAMIC and DYNAMIC_EX.
+       
+       @param pcdType
+       
+       @return boolean
+     */
+    public static boolean isDynamic(PCD_TYPE pcdType) {
+        if ((pcdType == PCD_TYPE.DYNAMIC   ) ||
+            (pcdType == PCD_TYPE.DYNAMIC_EX)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -199,6 +175,18 @@ public class Token {
         } else {
             return cName + "_" + tokenSpaceName.toString().replace('-', '_');
         }
+    }
+
+    /**
+       If skudata list contains more than one data, then Sku mechanism is enable.
+       
+       @return boolean
+     */
+    public boolean isSkuEnable() {
+        if (this.skuData.size() > 1) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -540,29 +528,69 @@ public class Token {
         return uuid;
     }
 
+    public DynamicTokenValue getDefaultSku() {
+        DynamicTokenValue dynamicData;
+        int               index;
+        for (index = 0; index < this.skuData.size(); index ++) {
+            if (skuData.get(index).id == 0) {
+                return skuData.get(index).value;
+            }
+        }
+
+        return null;
+    }
     //
     // BugBug: We need change this algorithm accordingly when schema is updated
     //          to support no default value.
     //
     public boolean hasDefaultValue () {
+        int               value         = 0;
+        boolean           isInteger     = true;
+        DynamicTokenValue dynamicValue  = null;
 
-        if (hiiEnabled) {
-            return true;
+        if (this.isDynamicPCD) {
+            dynamicValue = getDefaultSku();
+            switch (dynamicValue.type) {
+            case HII_TYPE:
+                try {
+                    value = Integer.decode(dynamicValue.hiiDefaultValue);
+                } catch (NumberFormatException nfEx) {
+                    isInteger = false;
+                }
+                
+                if (isInteger && (value == 0)) {
+                    return false;
+                } else {
+                    return true;
+                }
+
+            case VPD_TYPE:
+                return false;
+
+            case DEFAULT_TYPE:
+                try{
+                    value = Integer.decode(dynamicValue.value);
+                } catch (NumberFormatException nfEx) {
+                    isInteger = false;
+                }
+
+                if (isInteger && (value == 0)) {
+                    return false;
+                } else {
+                    return true;
+                }
+
+            }
         }
 
-        if (vpdEnabled) {
-            return true;
-        }
-
-        if (datum.toString().compareTo("NoDefault") == 0) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
+    //
+    // TODO: Need scott's confirmation
+    // 
     public boolean isStringType () {
-        String str = datum.toString();
+        String str = getDefaultSku().value;
 
         if (datumType == Token.DATUM_TYPE.POINTER &&
             str.startsWith("L\"") && 
@@ -574,7 +602,7 @@ public class Token {
     }
 
     public String getStringTypeString () {                       
-        return datum.toString().substring(2, datum.toString().length() - 1);
+        return getDefaultSku().value.substring(2, getDefaultSku().value.length() - 1);
     }
 }
 

@@ -21,11 +21,11 @@ public class SkuInstance {
     ///
     /// The id number of this SKU instance
     ///
-    public int    id;
+    public int              id;
     ///
     /// The value of this SKU instance
     ///
-    public Object value;
+    public DynamicTokenValue value;
 
     /**
       Constructure function
@@ -33,8 +33,13 @@ public class SkuInstance {
       @param id     sku id 
       @param value  sku value for this id.
     **/
-    public SkuInstance(int id, Object value) {
+    public SkuInstance(int id, DynamicTokenValue value) {
         this.id    = id;
         this.value = value;
+    }
+
+    public SkuInstance() {
+        this.id    = 0;
+        this.value = new DynamicTokenValue();
     }
 }
