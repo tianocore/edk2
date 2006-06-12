@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.pcd.action;
 
-import java.io.BufferedReader;
+import java.io.BufferedReader;                                                    
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -31,20 +31,21 @@ import java.util.UUID;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData;
 import org.tianocore.FrameworkModulesDocument;
 import org.tianocore.FrameworkPlatformDescriptionDocument;
 import org.tianocore.FrameworkPlatformDescriptionDocument.FrameworkPlatformDescription;
 import org.tianocore.ModuleSADocument;
 import org.tianocore.ModuleSADocument.ModuleSA;
 import org.tianocore.PackageSurfaceAreaDocument;
-import org.tianocore.PcdBuildDeclarationsDocument.PcdBuildDeclarations.PcdBuildData;
-import org.tianocore.PcdBuildDeclarationsDocument.PcdBuildDeclarations.PcdBuildData.SkuData;
-import org.tianocore.PcdDefinitionsDocument.PcdDefinitions;
-import org.tianocore.PcdDynamicBuildDeclarationsDocument.PcdDynamicBuildDeclarations;
-import org.tianocore.build.autogen.CommonDefinition;
+import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.pcd.action.ActionMessage;
+import org.tianocore.build.pcd.entity.DynamicTokenValue;
 import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.build.pcd.entity.SkuInstance;
 import org.tianocore.build.pcd.entity.Token;
@@ -421,8 +422,8 @@ class SkuIdTable {
 
         int index;
 
-        Integer [] skuIds = new Integer[token.maxSkuCount + 1];
-        skuIds[0] = new Integer(token.maxSkuCount);
+        Integer [] skuIds = new Integer[token.skuData.size() + 1];
+        skuIds[0] = new Integer(token.skuData.size());
         for (index = 1; index < skuIds.length; index++) {
             skuIds[index] = new Integer(token.skuData.get(index - 1).id);
         }
@@ -516,15 +517,15 @@ class LocalTokenNumberTable {
             str += " | PCD_TYPE_STRING";
         }
 
-        if (token.skuEnabled) {
+        if (token.isSkuEnable()) {
             str += " | PCD_TYPE_SKU_ENABLED";
         }
 
-        if (token.hiiEnabled) {
+        if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.HII_TYPE) {
             str += " | PCD_TYPE_HII";
         }
 
-        if (token.vpdEnabled) {
+        if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.VPD_TYPE) {
             str += " | PCD_TYPE_VPD";
         }
         
@@ -723,11 +724,11 @@ class PcdDatabase {
     }
 
     private int getAlignmentSize (Token token) {
-        if (token.hiiEnabled) {
+        if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.HII_TYPE) {
             return 2;
         }
 
-        if (token.vpdEnabled) {
+        if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.VPD_TYPE) {
             return 4;
         }
 
@@ -760,7 +761,8 @@ class PcdDatabase {
         return hString;
     }
 
-     public void genCode () {
+     public void genCode () 
+        throws EntityException {
 
         final String newLine                        = "\r\n";
         final String declNewLine                    = ";\r\n";
@@ -924,7 +926,8 @@ class PcdDatabase {
         return str;
     }
 
-    private HashMap<String, ArrayList<String>> processTokens (List<Token> alToken) {
+    private HashMap<String, ArrayList<String>> processTokens (List<Token> alToken) 
+        throws EntityException {
 
         HashMap <String, ArrayList<String>> map = new HashMap<String, ArrayList<String>>();
 
@@ -936,7 +939,7 @@ class PcdDatabase {
         for (int index = 0; index < alToken.size(); index++) {
             Token token = alToken.get(index);
 
-            if (token.skuEnabled) {
+            if (token.isSkuEnable()) {
                 //
                 // BugBug: Schema only support Data type now
                 //
@@ -955,10 +958,10 @@ class PcdDatabase {
                 }
 
             } else {
-                if (token.hiiEnabled) {
+                if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.HII_TYPE) {
                     decl.add(getVariableEnableTypeDeclaration(token));
                     inst.add(getVariableEnableInstantiation(token));
-                } else if (token.vpdEnabled) {
+                } else if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.VPD_TYPE) {
                     decl.add(getVpdEnableTypeDeclaration(token));
                     inst.add(getVpdEnableTypeInstantiation(token));
                 } else if (token.isStringType()) {
@@ -1011,10 +1014,10 @@ class PcdDatabase {
         } else if (token.datumType == Token.DATUM_TYPE.BOOLEAN) {
             typeStr = "BOOLEAN %s_%s[%d];\r\n";
         } else if (token.datumType == Token.DATUM_TYPE.POINTER) {
-            return String.format("UINT8 %s_s[%d];\r\n", token.getPrimaryKeyString(), "SkuDataTable", token.datumSize * token.maxSkuCount);
+            return String.format("UINT8 %s_%s[%d];\r\n", token.getPrimaryKeyString(), "SkuDataTable", token.datumSize * token.skuData.size());
         } 
 
-        return String.format(typeStr, token.getPrimaryKeyString(), "SkuDataTable", token.maxSkuCount);
+        return String.format(typeStr, token.getPrimaryKeyString(), "SkuDataTable", token.skuData.size());
 
     }
 
@@ -1022,12 +1025,12 @@ class PcdDatabase {
         String str = "";
 
         if (token.datumType == Token.DATUM_TYPE.POINTER) {
-            return String.format("UINT8 %s_s[%d]", token.getPrimaryKeyString(), "SkuDataTable", token.datumSize * token.maxSkuCount);
+            return String.format("UINT8 %s_%s[%d]", token.getPrimaryKeyString(), "SkuDataTable", token.datumSize * token.skuData.size());
         } else {
             str = "{ ";
-            for (int idx = 0; idx < token.maxSkuCount; idx++) {
+            for (int idx = 0; idx < token.skuData.size(); idx++) {
                 str += token.skuData.get(idx).toString();
-                if (idx != token.maxSkuCount - 1) {
+                if (idx != token.skuData.size() - 1) {
                     str += ", ";
                 }
             }
@@ -1041,9 +1044,9 @@ class PcdDatabase {
     private String getDataTypeInstantiation (Token token) {
 
         if (token.datumType == Token.DATUM_TYPE.POINTER) {
-            return String.format("%s /* %s */", token.datum.toString(), token.getPrimaryKeyString());
+            return String.format("%s /* %s */", token.getDefaultSku().value, token.getPrimaryKeyString());
         } else {
-            return String.format("%s /* %s */", token.datum.toString(), token.getPrimaryKeyString());
+            return String.format("%s /* %s */", token.getDefaultSku().value, token.getPrimaryKeyString());
         }
     }
 
@@ -1075,7 +1078,7 @@ class PcdDatabase {
     }
 
     private String getVpdEnableTypeInstantiation (Token token) {
-        return String.format("{ %d } /* %s */", token.vpdOffset,
+        return String.format("{ %s } /* %s */", token.getDefaultSku().vpdOffset,
                                                 token.getPrimaryKeyString());
     }
 
@@ -1093,10 +1096,14 @@ class PcdDatabase {
       return String.format("VARIABLE_HEAD  %s", token.getPrimaryKeyString());
     }
 
-    private String getVariableEnableInstantiation (Token token) {
-        return String.format("{ %d, %d, %d } /* %s */", guidTable.add(token.variableGuid, token.getPrimaryKeyString()),
-                                                        stringTable.add(token.variableName, token),
-                                                        token.variableOffset, 
+    private String getVariableEnableInstantiation (Token token) 
+        throws EntityException {
+        //
+        // Need scott fix
+        // 
+        return String.format("{ %d, %d, %s } /* %s */", guidTable.add(token.getDefaultSku().variableGuid, token.getPrimaryKeyString()),
+                                                        stringTable.add(token.getDefaultSku().getStringOfVariableName(), token),
+                                                        token.getDefaultSku().variableOffset, 
                                                         token.getPrimaryKeyString());
     }
 
@@ -1287,7 +1294,6 @@ public class CollectPCDAction {
         // memory database.
         //
         createTokenInDBFromFPD();
-
         
         //
         // Call Private function genPcdDatabaseSourceCode (void); ComponentTypeBsDriver
@@ -1436,25 +1442,29 @@ public class CollectPCDAction {
         int                                 index             = 0;
         int                                 index2            = 0;
         int                                 pcdIndex          = 0;
-        List<PcdBuildData>                  pcdBuildDataArray = new ArrayList<PcdBuildData>();
-        PcdBuildData                        pcdBuildData      = null;
+        List<PcdBuildDefinition.PcdData>    pcdBuildDataArray = new ArrayList<PcdBuildDefinition.PcdData>();
+        PcdBuildDefinition.PcdData          pcdBuildData      = null;
         Token                               token             = null;
-        UUID                                nullUUID          = new UUID(0,0);
-        UUID                                platformTokenSpace= nullUUID;
         SkuInstance                         skuInstance       = null;
         int                                 skuIndex          = 0;
         List<ModuleInfo>                    modules           = null;
         String                              primaryKey        = null;
-        PcdBuildData.SkuData[]              skuDataArray      = null;
         String                              exceptionString   = null;
         UsageInstance                       usageInstance     = null;
         String                              primaryKey1       = null;
         String                              primaryKey2       = null;
         boolean                             isDuplicate       = false;
-        java.util.List<java.lang.String>    tokenGuidStringArray = null;
+        Token.PCD_TYPE                      pcdType           = Token.PCD_TYPE.UNKNOWN;
+        Token.DATUM_TYPE                    datumType         = Token.DATUM_TYPE.UNKNOWN;
+        int                                 tokenNumber       = 0;
+        String                              moduleName        = null;
+        String                              datum             = null;
+        int                                 maxDatumSize      = 0;
 
         //
-        // Get all <ModuleSA> from FPD file.
+        // ----------------------------------------------
+        // 1), Get all <ModuleSA> from FPD file.
+        // ----------------------------------------------
         // 
         modules = getComponentsFromFPD();
 
@@ -1463,7 +1473,9 @@ public class CollectPCDAction {
         }
 
         //
-        // Loop all modules to process <PcdBuildDeclarations> for each module.
+        // -------------------------------------------------------------------
+        // 2), Loop all modules to process <PcdBuildDeclarations> for each module.
+        // -------------------------------------------------------------------
         // 
         for (index = 0; index < modules.size(); index ++) {
             isDuplicate =  false;
@@ -1494,52 +1506,122 @@ public class CollectPCDAction {
                 continue;
             }
 
-            if (modules.get(index).module.getPcdBuildDeclarations() == null) {
+    	    //
+    	    // It is legal for a module does not contains ANY pcd build definitions.
+    	    // 
+    	    if (modules.get(index).module.getPcdBuildDefinition() == null) {
                 continue;
-            }
-            pcdBuildDataArray = modules.get(index).module.getPcdBuildDeclarations().getPcdBuildDataList();
-            if (pcdBuildDataArray == null) {
-                continue;
-            }
-            if (pcdBuildDataArray.size() == 0) {
-                continue;
-            }
+    	    }
+    
+            pcdBuildDataArray = modules.get(index).module.getPcdBuildDefinition().getPcdDataList();
+
+            moduleName = modules.get(index).module.getModuleName();
 
             //
-            // Loop all Pcd entry for a module and add it into memory database.
+            // ----------------------------------------------------------------------
+            // 2.1), Loop all Pcd entry for a module and add it into memory database.
+            // ----------------------------------------------------------------------
             // 
             for (pcdIndex = 0; pcdIndex < pcdBuildDataArray.size(); pcdIndex ++) {
                 pcdBuildData = pcdBuildDataArray.get(pcdIndex);
                 primaryKey   = Token.getPrimaryKeyString(pcdBuildData.getCName(),
                                                          translateSchemaStringToUUID(pcdBuildData.getTokenSpaceGuid()));
+                pcdType      = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
+                datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
+                tokenNumber  = Integer.decode(pcdBuildData.getToken().toString());
+                datum        = pcdBuildData.getValue();
+                maxDatumSize = pcdBuildData.getMaxDatumSize();
 
+                //
+                // -------------------------------------------------------------------------------------------
+                // 2.1.1), Do some necessary checking work for FixedAtBuild, FeatureFlag and PatchableInModule
+                // -------------------------------------------------------------------------------------------
+                // 
+                if (!Token.isDynamic(pcdType)) {
+                     //
+                     // Value is required.
+                     // 
+                     if (datum == null) {
+                         exceptionString = String.format("There is no value for PCD entry %s in module %s!",
+                                                         pcdBuildData.getCName(),
+                                                         moduleName);
+                         throw new EntityException(exceptionString);
+                     }
 
+                     //
+                     // Check whether the datum size is matched datum type.
+                     // 
+                     if ((exceptionString = verifyDatumSize(pcdBuildData.getCName(), 
+                                                            moduleName,
+                                                            maxDatumSize, 
+                                                            datumType)) != null) {
+                         throw new EntityException(exceptionString);
+                     }
+                }
+
+                //
+                // ---------------------------------------------------------------------------------
+                // 2.1.2), Create token or update token information for current anaylized PCD data.
+                // ---------------------------------------------------------------------------------
+                // 
                 if (dbManager.isTokenInDatabase(primaryKey)) {
                     //
                     // If the token is already exist in database, do some necessary checking
                     // and add a usage instance into this token in database
                     // 
                     token = dbManager.getTokenByKey(primaryKey);
-
+    
                     //
-                    // Checking for DatumSize
+                    // checking for DatumType, DatumType should be unique for one PCD used in different
+                    // modules.
                     // 
-                    if (token.datumSize != pcdBuildData.getDatumSize()) {
-                        exceptionString = String.format("The datum size of PCD entry %s is %d, which is different with %d defined in before!",
-                                                        pcdBuildData.getCName(),  pcdBuildData.getDatumSize(), token.datumSize);
-                        throw new EntityException(exceptionString);
-                    }
-
-                    //
-                    // checking for DatumType
-                    // 
-                    if (token.datumType != Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString())) {
+                    if (token.datumType != datumType) {
                         exceptionString = String.format("The datum type of PCD entry %s is %s, which is different with  %s defined in before!",
                                                         pcdBuildData.getCName(), 
                                                         pcdBuildData.getDatumType().toString(), 
                                                         Token.getStringOfdatumType(token.datumType));
                         throw new EntityException(exceptionString);
                     }
+
+                    //
+                    // Check token number is valid
+                    // 
+                    if (tokenNumber != token.tokenNumber) {
+                        exceptionString = String.format("The token number of PCD entry %s in module %s is different with same PCD entry in other modules!",
+                                                        pcdBuildData.getCName(),
+                                                        moduleName);
+                        throw new EntityException(exceptionString);
+                    }
+
+                    //
+                    // For same PCD used in different modules, the PCD type should all be dynamic or non-dynamic.
+                    // 
+                    if (token.isDynamicPCD != Token.isDynamic(pcdType)) {
+                        exceptionString = String.format("For PCD entry %s in module %s, you define dynamic or non-dynamic PCD type which"+
+                                                        "is different with others module's",
+                                                        token.cName,
+                                                        moduleName);
+                        throw new EntityException(exceptionString);
+                    }
+
+                    if (token.isDynamicPCD) {
+                        //
+                        // Check datum is equal the datum in dynamic information.
+                        // For dynamic PCD, you can do not write <Value> in sperated every <PcdBuildDefinition> in different <ModuleSA>,
+                        // But if you write, the <Value> must be same as the value in <DynamicPcdBuildDefinitions>.
+                        // 
+                        if (!token.isSkuEnable() && 
+                            (token.skuData.get(0).value.type == DynamicTokenValue.VALUE_TYPE.DEFAULT_TYPE)) {
+                            if (!datum.equalsIgnoreCase(token.skuData.get(0).value.value)) {
+                                exceptionString = String.format("For dynamic PCD %s in module %s, the datum in <ModuleSA> is "+
+                                                                "not equal to the datum in <DynamicPcdBuildDefinitions>, it is "+
+                                                                "illega! You can choose no <Value> in <ModuleSA>!",
+                                                                token.cName,
+                                                                moduleName);
+                            }
+                        }
+                    }
+                    
                 } else {
                     //
                     // If the token is not in database, create a new token instance and add
@@ -1547,71 +1629,73 @@ public class CollectPCDAction {
                     // 
                     token = new Token(pcdBuildData.getCName(), 
                                       translateSchemaStringToUUID(pcdBuildData.getTokenSpaceGuid()));
-
-                    token.datum         = pcdBuildData.getDefaultValue();
-                    token.pcdType       = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
-                    token.datumType     = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
-                    token.datumSize     = pcdBuildData.getDatumSize();
-                    token.skuId         = Integer.decode(pcdBuildData.getSkuId());
-
-                    if (pcdBuildData.getToken() == null) {
-                        exceptionString = String.format("In FPD file, No <TokenNumber> defined for PCD entry %s in module %s",
-                                                        token.cName,
-                                                        modules.get(index).module.getModuleName());
-                        throw new EntityException(exceptionString);
+    
+                    token.datumType     = datumType;
+                    token.tokenNumber   = tokenNumber;
+                    token.isDynamicPCD  = Token.isDynamic(pcdType);
+                    token.datumSize     = maxDatumSize;
+                    
+                    if (token.isDynamicPCD) {
+                        //
+                        // For Dynamic and Dynamic Ex type, need find the dynamic information
+                        // in <DynamicPcdBuildDefinition> section in FPD file.
+                        // 
+                        updateDynamicInformation(moduleName, 
+                                                 token,
+                                                 datum,
+                                                 maxDatumSize);
                     }
-                    token.tokenNumber = Integer.decode(pcdBuildData.getToken().getStringValue());
-
-                    if ((token.pcdType == Token.PCD_TYPE.DYNAMIC) ||
-                        (token.pcdType == Token.PCD_TYPE.DYNAMIC_EX)) {
-                        updateDynamicInformation(modules.get(index).module.getModuleName(),  token);
-                    }
-
+    
                     dbManager.addTokenToDatabase(primaryKey, token);
                 }
 
                 //
-                // Create an usage instance for this token
+                // -----------------------------------------------------------------------------------
+                // 2.1.3), Add the PcdType in current module into this Pcd token's supported PCD type.
+                // -----------------------------------------------------------------------------------
+                // 
+                token.updateSupportPcdType(pcdType);
+
+                //
+                // ------------------------------------------------
+                // 2.1.4), Create an usage instance for this token.
+                // ------------------------------------------------
                 // 
                 usageInstance = new UsageInstance(token, 
-                                                  Token.getpcdTypeFromString(pcdBuildData.getItemType().toString()),
-                                                  modules.get(index).module.getModuleName(), 
+                                                  moduleName, 
                                                   translateSchemaStringToUUID(modules.get(index).module.getModuleGuid()),
                                                   modules.get(index).module.getPackageName(),
                                                   translateSchemaStringToUUID(modules.get(index).module.getPackageGuid()),
                                                   modules.get(index).type, 
-                                                  Token.getpcdTypeFromString(pcdBuildData.getItemType().toString()),
+                                                  pcdType,
                                                   modules.get(index).module.getArch().toString(), 
                                                   null,
-                                                  pcdBuildData.getDefaultValue());
+                                                  datum,
+                                                  maxDatumSize);
                 token.addUsageInstance(usageInstance);
             }
         }
     }
 
     /**
-       Update dynamic information for PCD entry.
+       Get dynamic information for a dynamic PCD from <DynamicPcdBuildDefinition> seciton in FPD file.
        
-       Dynamic information is retrieved from <PcdDynamicBuildDeclarations> in
-       FPD file.
+       This function should be implemented in GlobalData in future.
        
-       @param moduleName
-       @param token
+       @param token         The token instance which has hold module's PCD information
+       @param moduleName    The name of module who will use this Dynamic PCD.
        
-       @return Token
-    **/
-    private Token updateDynamicInformation(String moduleName, Token token) 
+       @return DynamicPcdBuildDefinitions.PcdBuildData
+     */
+    /***/
+    private DynamicPcdBuildDefinitions.PcdBuildData getDynamicInfoFromFPD(Token     token,
+                                                                          String    moduleName)
         throws EntityException {
-        PcdDynamicBuildDeclarations                pcdDynamicBuildDescriptions = null;
-        
-        boolean                                    isFound                     = false;            
-        int                                        index                       = 0;
-        String                                     primaryKey                  = null;
-        SkuInstance                                skuInstance                 = null;
-        int                                        skuIndex                    = 0;
-        String                                     exceptionString             = null;
-        PcdDynamicBuildDeclarations.PcdBuildData.SkuData[] skuDataArray             = null;
-        List<PcdDynamicBuildDeclarations.PcdBuildData>     pcdDynamicBuildDataArray = null;
+        int    index             = 0;
+        String exceptionString   = null;
+        String dynamicPrimaryKey = null;
+        DynamicPcdBuildDefinitions                    dynamicPcdBuildDefinitions = null;
+        List<DynamicPcdBuildDefinitions.PcdBuildData> dynamicPcdBuildDataArray   = null;
 
         //
         // If FPD document is not be opened, open and initialize it.
@@ -1626,107 +1710,236 @@ public class CollectPCDAction {
             }
         }
 
-        pcdDynamicBuildDescriptions = fpdDocInstance.getFrameworkPlatformDescription().getPcdDynamicBuildDeclarations();
-        if (pcdDynamicBuildDescriptions == null) {
-            throw new EntityException(String.format("There are no <PcdDynamicBuildDescriptions> in FPD file but contains Dynamic type "+
-                                                    "PCD entry %s in module %s!",
-                                                    token.cName,
-                                                    moduleName));
-        }
-
-        pcdDynamicBuildDataArray    = pcdDynamicBuildDescriptions.getPcdBuildDataList();
-        if (pcdDynamicBuildDataArray == null) {
-            throw new EntityException(String.format("There are no PcdDynamicBuildData in <PcdDynamicBuildDeclaration> section but contains Dynamic type"+
-                                                    "PCD entry %s in module %s.!",
-                                                    token.cName,
-                                                    moduleName));
-        }
-
-        isFound = false;
-        for (index = 0; index < pcdDynamicBuildDataArray.size(); index ++) {
-            if (pcdDynamicBuildDataArray.get(index).getTokenSpaceGuidList().size() != 0) {
-                primaryKey = Token.getPrimaryKeyString(pcdDynamicBuildDataArray.get(index).getCName(), 
-                                                       translateSchemaStringToUUID(pcdDynamicBuildDataArray.get(index).getTokenSpaceGuidList().get(0)));
-            } else {
-                primaryKey = Token.getPrimaryKeyString(pcdDynamicBuildDataArray.get(index).getCName(), 
-                                                       translateSchemaStringToUUID(null));
-            }
-
-            if (primaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
-                isFound = true;
-
-                //
-                // For Hii related value
-                // 
-                token.hiiEnabled    = pcdDynamicBuildDataArray.get(index).getHiiEnable();
-                if (token.hiiEnabled) {
-                    token.variableGuid      = Token.getGUIDFromSchemaObject(pcdDynamicBuildDataArray.get(index).getVariableGuid());
-                    if (token.variableGuid == null) {
-                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, HiiEnable is true" +
-                                                                "but no <VariableGuid> is found! Please fix the FPD file!",
-                                                                token.cName));
-
-                    }
-                    token.variableName      = pcdDynamicBuildDataArray.get(index).getVariableName();
-                    if (token.variableName == null) {
-                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, HiiEnable is true" +
-                                                                "but no <VariableName> is found! Please fix the FPD file!",
-                                                                token.cName));
-                    }
-
-                    if (pcdDynamicBuildDataArray.get(index).getDataOffset() == null) {
-                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, HiiEnable is true" +
-                                                                "but no <DataOffset> is found! Please fix the FPD file!",
-                                                                token.cName));
-                    }
-                    token.variableOffset    = Integer.decode(pcdDynamicBuildDataArray.get(index).getDataOffset());
-                }
-
-                //
-                // For Vpd related value
-                // 
-                token.vpdEnabled    = pcdDynamicBuildDataArray.get(index).getVpdEnable();
-                if (token.vpdEnabled) {
-                    if (pcdDynamicBuildDataArray.get(index).getDataOffset() == null) {
-                        throw new EntityException(String.format("In <PcdDynamicBuildDeclarations> for PCD entry %s, VpdEnable is true" +
-                                                                "but no <DataOffset> is found! Please fix the FPD file!",
-                                                                token.cName));
-                    }
-                    token.vpdOffset         = Integer.decode(pcdDynamicBuildDataArray.get(index).getDataOffset());
-                }
-
-                //
-                // For SkuData
-                // 
-                token.skuEnabled    = pcdDynamicBuildDataArray.get(index).getSkuEnable();
-                if (token.skuEnabled) {
-                    skuDataArray      = (PcdDynamicBuildDeclarations.PcdBuildData.SkuData[])pcdDynamicBuildDataArray.get(index).getSkuDataList().toArray();
-                    token.maxSkuCount = Integer.decode(pcdDynamicBuildDataArray.get(index).getMaxSku());
-                    if (skuDataArray == null) {
-                        exceptionString = String.format("In FPD file, the <SkuEnable> is true for PCD entry %s in module %s, But no any sku data.",
-                                                        token.cName, moduleName);
-                        throw new EntityException(exceptionString);
-                    }
-                    if (token.maxSkuCount != pcdDynamicBuildDataArray.get(index).sizeOfSkuDataArray()) {
-                        exceptionString = String.format("In FPD file, <MaxSku> is not equal to the size of <SkuDataArray> for PCD entry %s in module %s",
-                                                        token.cName, moduleName);
-                        throw new EntityException(exceptionString);
-                    }
-
-                    for (skuIndex = 0; skuIndex < pcdDynamicBuildDataArray.get(index).sizeOfSkuDataArray(); skuIndex ++) {
-                        skuInstance = new SkuInstance(skuDataArray[skuIndex].getId(),
-                                                      skuDataArray[skuIndex].getValue());
-                        token.skuData.add(skuInstance);
-                    }
-                }
-                break;
-            }
-        }
-        if (!isFound) {
-            exceptionString = String.format("In FPD file, No dynamic PCD data for PCD entry %s in module %s",
+        dynamicPcdBuildDefinitions = fpdDocInstance.getFrameworkPlatformDescription().getDynamicPcdBuildDefinitions();
+        if (dynamicPcdBuildDefinitions == null) {
+            exceptionString = String.format("There are no <PcdDynamicBuildDescriptions> in FPD file but contains Dynamic type "+
+                                            "PCD entry %s in module %s!",
                                             token.cName,
                                             moduleName);
             throw new EntityException(exceptionString);
+        }
+
+        dynamicPcdBuildDataArray = dynamicPcdBuildDefinitions.getPcdBuildDataList();
+        for (index = 0; index < dynamicPcdBuildDataArray.size(); index ++) {
+            dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
+                                                          translateSchemaStringToUUID(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuid()));
+            if (dynamicPrimaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
+                return dynamicPcdBuildDataArray.get(index);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+       Verify the maxDatumSize for a PCD data is matched to Datum type.
+       
+       @param token             The token instance
+       @param moduleName        The module name who use this PCD data.
+       @param maxDatumSize      The value of max datum size in FPD file
+       @param datumType         The datum type
+       
+       @return String           if is unmatched, set the exception information
+                                as return value, otherwice is null.
+    **/
+    private String verifyDatumSize(String           cName, 
+                                   String           moduleName,
+                                   int              maxDatumSize, 
+                                   Token.DATUM_TYPE datumType) {
+        String exceptionString = null;
+        switch (datumType) {
+        case UINT8:
+            if (maxDatumSize != 1) {
+                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                                                "is UINT8, but datum size is %d, they are not matched!",
+                                                cName,
+                                                moduleName,
+                                                maxDatumSize);
+            }
+            break;
+        case UINT16:
+            if (maxDatumSize != 2) {
+                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                                                "is UINT16, but datum size is %d, they are not matched!",
+                                                cName,
+                                                moduleName,
+                                                maxDatumSize);
+            }
+            break;
+        case UINT32:
+            if (maxDatumSize != 4) {
+                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                                                "is UINT32, but datum size is %d, they are not matched!",
+                                                cName,
+                                                moduleName,
+                                                maxDatumSize);
+            }
+            break;
+        case UINT64:
+            if (maxDatumSize != 8) {
+                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                                                "is UINT64, but datum size is %d, they are not matched!",
+                                                cName,
+                                                moduleName,
+                                                maxDatumSize);
+            }
+            break;
+        case BOOLEAN:
+            if (maxDatumSize != 1) {
+                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                                                "is BOOLEAN, but datum size is %d, they are not matched!",
+                                                cName,
+                                                moduleName,
+                                                maxDatumSize);
+            }
+            break;
+        }
+
+        return exceptionString;
+    }
+
+    /**
+       Update dynamic information for PCD entry.
+       
+       Dynamic information is retrieved from <PcdDynamicBuildDeclarations> in
+       FPD file.
+       
+       @param moduleName        The name of the module who use this PCD
+       @param token             The token instance
+       @param datum             The <datum> in module's PCD information
+       @param maxDatumSize      The <maxDatumSize> in module's PCD information
+       
+       @return Token
+     */
+    private Token updateDynamicInformation(String   moduleName, 
+                                           Token    token,
+                                           String   datum,
+                                           int      maxDatumSize) 
+        throws EntityException {
+        int                 index           = 0;
+        int                 offset;
+        String              exceptionString = null;
+        DynamicTokenValue   dynamicValue;
+        SkuInstance         skuInstance     = null;
+        String              temp;
+        boolean             hasSkuId0       = false;
+
+        List<DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo>   skuInfoList = null;
+        DynamicPcdBuildDefinitions.PcdBuildData                 dynamicInfo = null;
+
+        dynamicInfo = getDynamicInfoFromFPD(token, moduleName);
+        if (dynamicInfo == null) {
+            exceptionString = String.format("For Dynamic PCD %s used by module %s, "+
+                                            "there is no dynamic information in <DynamicPcdBuildDefinitions> "+
+                                            "in FPD file, but it is required!",
+                                            token.cName,
+                                            moduleName);
+            throw new EntityException(exceptionString);
+        }
+
+        skuInfoList = dynamicInfo.getSkuInfoList();
+
+        //
+        // Loop all sku data 
+        // 
+        for (index = 0; index < skuInfoList.size(); index ++) {
+            skuInstance = new SkuInstance();
+            //
+            // Although SkuId in schema is BigInteger, but in fact, sku id is 32 bit value.
+            // 
+            temp = skuInfoList.get(index).getSkuId().toString();
+            skuInstance.id = Integer.decode(temp);
+
+            if (skuInstance.id == 0) {
+                hasSkuId0 = true;
+            }
+            //
+            // Judge whether is DefaultGroup at first, because most case is DefautlGroup.
+            // 
+            if (skuInfoList.get(index).getValue() != null) {
+                skuInstance.value.setValue(skuInfoList.get(index).getValue());
+                token.skuData.add(skuInstance);
+
+                //
+                // Judege wether is same of datum between module's information
+                // and dynamic information.
+                // 
+                if (datum != null) {
+                    if ((skuInstance.id == 0)                                   &&
+                        !datum.equalsIgnoreCase(skuInfoList.get(index).getValue())) {
+                        exceptionString = String.format("For dynamic PCD %s, module %s give <datum> as %s which is different with "+
+                                                        "Sku 0's <datum> %s defined in <DynamicPcdBuildDefinitions>! Please sync them at first!",
+                                                        token.cName,
+                                                        datum,
+                                                        skuInfoList.get(index).getValue());
+                        throw new EntityException(exceptionString);
+                    }
+                }
+                continue;
+            }
+
+            //
+            // Judge whether is HII group case.
+            // 
+            if (skuInfoList.get(index).getVariableName() != null) {
+                exceptionString = null;
+                if (skuInfoList.get(index).getVariableGuid() == null) {
+                    exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                    "file, who use HII, but there is no <VariableGuid> defined for Sku %d data!",
+                                                    token.cName,
+                                                    index);
+                                                    
+                }
+
+                if (skuInfoList.get(index).getVariableOffset() == null) {
+                    exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                    "file, who use HII, but there is no <VariableOffset> defined for Sku %d data!",
+                                                    token.cName,
+                                                    index);
+                }
+
+                if (skuInfoList.get(index).getHiiDefaultValue() == null) {
+                    exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                    "file, who use HII, but there is no <HiiDefaultValue> defined for Sku %d data!",
+                                                    token.cName,
+                                                    index);
+                }
+
+                if (exceptionString != null) {
+                    throw new EntityException(exceptionString);
+                }
+                offset = Integer.decode(skuInfoList.get(index).getVariableOffset());
+                if (offset > 0xFFFF) {
+                    throw new EntityException(String.format("For dynamic PCD %s ,  the variable offset defined in sku %d data "+
+                                                            "exceed 64K, it is not allowed!",
+                                                            token.cName,
+                                                            index));
+                }
+
+                skuInstance.value.setHiiData(skuInfoList.get(index).getVariableName(),
+                                             translateSchemaStringToUUID(skuInfoList.get(index).getVariableGuid().toString()),
+                                             skuInfoList.get(index).getVariableOffset(),
+                                             skuInfoList.get(index).getHiiDefaultValue());
+                token.skuData.add(skuInstance);
+                continue;
+            }
+
+            if (skuInfoList.get(index).getVpdOffset() != null) {
+                skuInstance.value.setVpdData(skuInfoList.get(index).getVpdOffset());
+                token.skuData.add(skuInstance);
+                continue;
+            }
+
+            exceptionString = String.format("For dynamic PCD %s, the dynamic info must "+
+                                            "be one of 'DefaultGroup', 'HIIGroup', 'VpdGroup'.",
+                                            token.cName);
+            throw new EntityException(exceptionString);
+        }
+
+        if (!hasSkuId0) {
+            exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions>, there are "+
+                                            "no sku id = 0 data, which is required for every dynamic PCD",
+                                            token.cName);
         }
 
         return token;
@@ -1762,6 +1975,11 @@ public class CollectPCDAction {
 
         if (uuidString.length() == 0) {
             return null;
+        }
+
+        if (uuidString.equals("0") ||
+            uuidString.equalsIgnoreCase("0x0")) {
+            return new UUID(0, 0);
         }
 
         //
@@ -1848,11 +2066,11 @@ public class CollectPCDAction {
     **/
     public static void main(String argv[]) throws EntityException {
         CollectPCDAction ca = new CollectPCDAction();
-        ca.setWorkspacePath("M:/ForPcd/edk2");
-        ca.setFPDFilePath("M:/ForPcd/edk2/EdkNt32Pkg/Nt32.fpd");
+        ca.setWorkspacePath("m:/tianocore/edk2");
+        ca.setFPDFilePath("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "M:/ForPcd/edk2");
+                            "m:/tianocore/edk2");
         ca.execute();
     }
 }

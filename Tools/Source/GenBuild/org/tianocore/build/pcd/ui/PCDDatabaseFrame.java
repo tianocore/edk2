@@ -109,16 +109,8 @@ public class PCDDatabaseFrame extends JFrame {
             tokenNode = new DefaultMutableTreeNode(token.cName);
             tokenNode.add(new DefaultMutableTreeNode(String.format("TOKEN NUMBER: 0x%08x", token.tokenNumber)));
             tokenNode.add(new DefaultMutableTreeNode("TOKEN SPACE NAME: " + token.tokenSpaceName.toString()));
-            tokenNode.add(new DefaultMutableTreeNode("PCD TYPE: " + Token.getStringOfpcdType(token.pcdType)));
             tokenNode.add(new DefaultMutableTreeNode("DATUM TYPE: " +Token.getStringOfdatumType(token.datumType)));
-            tokenNode.add(new DefaultMutableTreeNode("DATUM: " + token.datum.toString()));
-            tokenNode.add(new DefaultMutableTreeNode("HIIENABLE: " +(token.hiiEnabled?"true":"false")));
-            tokenNode.add(new DefaultMutableTreeNode("VARIABLE NAME: " + token.variableName));
             //tokenNode.add(new DefaultMutableTreeNode("VARIABLE GUID: " + token.variableGuid.toString()));
-            tokenNode.add(new DefaultMutableTreeNode("SKUENABLE: " +(token.skuEnabled?"true":"false")));
-            tokenNode.add(new DefaultMutableTreeNode(String.format("SKUID: %d", token.skuId)));
-            tokenNode.add(new DefaultMutableTreeNode(String.format("MAX SKU COUNT: %d", token.maxSkuCount)));
-            tokenNode.add(new DefaultMutableTreeNode("VPDENABLE: " +(token.vpdEnabled?"true":"false")));
 
             usageNode = new DefaultMutableTreeNode("PRODUCER");
             tokenNode.add(usageNode);

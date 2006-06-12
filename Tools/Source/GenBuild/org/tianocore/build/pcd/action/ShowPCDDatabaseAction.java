@@ -124,7 +124,7 @@ public class ShowPCDDatabaseAction extends UIAction {
         ShowPCDDatabaseAction showAction = new ShowPCDDatabaseAction();
         //showAction.setWorkspacePath(argv[0]);
         //showAction.setFPDFilePath(argv[1]);
-        showAction.setWorkspacePath("M:/tianocore/edk2/trunk/edk2");
+        showAction.setWorkspacePath("e:/tianocore/edk2");
         showAction.setFPDFilePath("EdkNt32Pkg/Nt32.fpd");
         showAction.execute();
     }
