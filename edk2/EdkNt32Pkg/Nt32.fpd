@@ -4980,7 +4980,7 @@
       <C_Name>PcdWinNtSerialPort</C_Name>
       <Token>0x00001002</Token>
       <DatumType>VOID*</DatumType>
-      <MaxDatumSize>20</MaxDatumSize>
+      <MaxDatumSize>18</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
         <Value>L"COM1!COM2"</Value>

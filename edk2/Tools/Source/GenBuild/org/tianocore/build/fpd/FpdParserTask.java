@@ -783,20 +783,24 @@ public class FpdParserTask extends Task {
     }
 
     public void collectPCDInformation() {
-      CollectPCDAction collectAction = new CollectPCDAction ();
-      //
-      // Collect all PCD information from FPD to MSA, and get help information from SPD.
-      // These all information will be stored into memory database for future usage such 
-      // as autogen.
-      //
-      try {
-        collectAction.perform (
-          getProject().getProperty("WORKSPACE_DIR"),
-          fpdFilename.getPath(),
-          ActionMessage.MAX_MESSAGE_LEVEL
-          );
-      } catch (Exception exp) {
-        throw new BuildException (String.format("Fail to do PCD preprocess from FPD file,  the cause is %s", exp.getMessage()));
-      }
+        String           exceptionString = null;
+        CollectPCDAction collectAction   = new CollectPCDAction ();
+        //
+        // Collect all PCD information from FPD to MSA, and get help information from SPD.
+        // These all information will be stored into memory database for future usage such 
+        // as autogen.
+        //
+        try {
+            collectAction.perform (getProject().getProperty("WORKSPACE_DIR"),
+                                   fpdFilename.getPath(),
+                                   ActionMessage.MAX_MESSAGE_LEVEL
+                                   );
+        } catch (Exception exp) {
+            exceptionString = exp.getMessage();
+            if (exceptionString == null) {
+                exceptionString = "[Internal Error]Pcd tools catch a internel errors, Please report this bug into TianoCore or send email to Wang, scott or Lu, ken!";
+            }
+            throw new BuildException (String.format("Fail to do PCD preprocess from FPD file: %s", exceptionString));
+        }
     }
 }
