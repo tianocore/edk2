@@ -414,11 +414,11 @@ public class AutoGen {
                                                      null,
                                                      this.arch,
                                                      null,
-                                                     baseName.equalsIgnoreCase("PcdEmulatorPeim"),
-                                                     false);
+                                                     false,
+                                                     SurfaceAreaQuery.getModulePcdEntryNameArray());
             this.myPcdAutogen.execute();
         } catch (Exception e) {
-            throw new BuildException("PCD Autogen failed:" + e.getMessage());
+            throw new BuildException("PCD Autogen for module failed:" + e.getMessage());
         }
 
         if (this.myPcdAutogen != null) {
@@ -555,11 +555,11 @@ public class AutoGen {
                                                      null,
                                                      this.arch,
                                                      null,
-                                                     baseName.equalsIgnoreCase("PcdEmulatorPeim"), 
-                                                     true);
+                                                     true,
+                                                     SurfaceAreaQuery.getModulePcdEntryNameArray());
             this.myPcdAutogen.execute();
         } catch (Exception e) {
-            throw new BuildException(e.getMessage());
+            throw new BuildException("Pcd Autogen for library failed! " + e.getMessage());
         }
 
         if (this.myPcdAutogen != null) {

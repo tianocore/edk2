@@ -91,18 +91,14 @@ public class SurfaceAreaParser {
         msaMap.put("Variables", doc.getModuleSurfaceArea().getVariables());
         msaMap.put("BootModes", doc.getModuleSurfaceArea().getBootModes());
 
-        msaMap
-                        .put("SystemTables", doc.getModuleSurfaceArea()
-                                        .getSystemTables());
+        msaMap.put("SystemTables", doc.getModuleSurfaceArea().getSystemTables());
         msaMap.put("DataHubs", doc.getModuleSurfaceArea().getDataHubs());
         msaMap.put("Formsets", doc.getModuleSurfaceArea().getFormsets());
         msaMap.put("Guids", doc.getModuleSurfaceArea().getGuids());
         msaMap.put("Externs", doc.getModuleSurfaceArea().getExterns());
 
-        msaMap.put("PCDs", doc.getModuleSurfaceArea().getPCDs());
-        msaMap
-                        .put("BuildOptions", doc.getModuleSurfaceArea()
-                                        .getBuildOptions());
+        msaMap.put("PcdCoded", doc.getModuleSurfaceArea().getPcdCoded());
+        msaMap.put("BuildOptions", doc.getModuleSurfaceArea().getBuildOptions());
     }
 
     /**
@@ -132,7 +128,6 @@ public class SurfaceAreaParser {
         mbdMap.put("Guids", doc.getModuleBuildDescription().getGuids());
         mbdMap.put("Externs", doc.getModuleBuildDescription().getExterns());
 
-        mbdMap.put("PCDs", doc.getModuleBuildDescription().getPCDs());
         mbdMap.put("BuildOptions", doc.getModuleBuildDescription()
                         .getBuildOptions());
     }
@@ -168,7 +163,7 @@ public class SurfaceAreaParser {
         msaMap.put("Guids", doc.getLibraryModuleSurfaceArea().getGuids());
         msaMap.put("Externs", doc.getLibraryModuleSurfaceArea().getExterns());
 
-        msaMap.put("PCDs", doc.getLibraryModuleSurfaceArea().getPCDs());
+        msaMap.put("PcdCoded", doc.getLibraryModuleSurfaceArea().getPcdCoded());
         msaMap.put("BuildOptions", doc.getLibraryModuleSurfaceArea()
                         .getBuildOptions());
     }
@@ -211,7 +206,6 @@ public class SurfaceAreaParser {
         mbdMap.put("Externs", doc.getLibraryModuleBuildDescription()
                         .getExterns());
 
-        mbdMap.put("PCDs", doc.getLibraryModuleBuildDescription().getPCDs());
         mbdMap.put("BuildOptions", doc.getLibraryModuleBuildDescription()
                         .getBuildOptions());
     }

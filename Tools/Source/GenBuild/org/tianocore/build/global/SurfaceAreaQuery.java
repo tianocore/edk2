@@ -43,7 +43,7 @@ import org.tianocore.OutputDirectoryDocument;
 import org.tianocore.PPIsDocument;
 import org.tianocore.PackageNameDocument;
 import org.tianocore.ProtocolsDocument;
-import org.tianocore.PCDsDocument.PCDs;
+import org.tianocore.PcdCodedDocument.PcdCoded;
 
 /**
   SurfaceAreaQuery class is used to query Surface Area information from msa, mbd,
@@ -1029,81 +1029,27 @@ public class SurfaceAreaQuery {
     }
     
     /**
-     Retrieve PCD tokens
-
-     @returns   CName/ItemType pairs list   if elements are found at the known xpath
-     @returns   null                        if nothing is there
-     **/
-    public static String[][] getPcdTokenArray() {
-        String[] xPath = new String[] {"/PcdData"};
-        
-        XmlObject[] returns = get("PCDs", xPath);
-        if (returns == null || returns.length == 0) {
+       Get name array of PCD in a module. In one module, token space
+       is same, and token name should not be conflicted.
+       
+       @return String[]
+    **/
+    public static String[] getModulePcdEntryNameArray() {
+        PcdCoded.PcdEntry[] pcdEntries  = null;
+        String[]            results;
+        int                 index;
+        String[]            xPath       = new String[] {"/PcdEntry"};
+        XmlObject[]         returns     = get ("PcdCoded", xPath);
+        if (returns == null) {
             return null;
         }
+
+        pcdEntries = (PcdCoded.PcdEntry[])returns;
+        results    = new String[pcdEntries.length];
         
-        PCDs.PcdData[] pcds = (PCDs.PcdData[]) returns;
-        String[][] result = new String[pcds.length][2];
-        for (int i = 0; i < returns.length; ++i) {
-            if (pcds[i].getItemType() != null) {
-                result[i][1] = pcds[i].getItemType().toString();
-            } else {
-                result[i][1] = null;
-            }
-            result[i][0] = pcds[i].getCName();
+        for (index = 0; index < pcdEntries.length; index ++) {
+            results[index] = pcdEntries[index].getCName();
         }
-            
-        return result;
-    }
-
-    /**
-     Get the PcdToken array from module's surface area document.
-     The array should contains following data:
-     <p>-------------------------------------------------------------------</p>
-     <p>CName | ItemType | TokenspaceName | DefaultValue | Usage | HelpText</p>
-     <p>-------------------------------------------------------------------</p>
-     <p>Note: Until new schema applying, now we can only get CName, ItemType,</p>
-     
-     @return  2-array table contains all information of PCD token retrieved from MSA.
-     **/
-    public static Object[][] getModulePCDTokenArray () {
-      int             index;
-      Object[][]      result;
-      PCDs.PcdData[]  pcds;
-      String[]        xPath   = new String[] {"/PcdData"};
-      XmlObject[]     returns = get ("PCDs", xPath);
-
-      if ((returns == null) || (returns.length == 0)) {
-        return null;
-      }
-
-      pcds     = (PCDs.PcdData[]) returns;
-      result   = new Object[pcds.length][6];
-      for (index = 0; index < pcds.length; index ++) {
-        //
-        // Get CName
-        //
-        result [index][0] = pcds[index].getCName();
-        //
-        // Get ItemType: FEATURE_FLAG, FIXED_AT_BUILD, PATCHABLE_IN_MODLE, DYNAMIC, DYNAMIC_EX
-        //
-        if (pcds[index].getItemType() != null) {
-          result [index][1] = pcds[index].getItemType().toString();
-        } else {
-          result [index][1] = null;
-        }
-        
-        //
-        // BUGBUG: following field can *not* be got from current MSA until schema changed.
-        //
-        //result [index][2] = pcds[index].getTokenSpaceName();
-        result [index][2] = null;
-        result [index][3] = pcds[index].getDefaultValue();
-        //result [index][4] = pcds[index].getUsage ();
-        result [index][4] = null;
-        //result [index][5] = pcds[index].getHelpText ();
-        result [index][5] = null;
-      }
-      return result;
+        return results;
     }
 }
