@@ -23,6 +23,7 @@ GetPeiServicesTablePointer (
   VOID
   )
 {
+  ASSERT (gPeiServices != NULL);
   return gPeiServices;
 }
 

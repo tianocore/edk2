@@ -33,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </MsaLibHeader>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">PeiServicesTablePointerLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PeiServicesTablePointer.c</Filename>

@@ -45,48 +45,21 @@ InternalReportStatusCode (
   IN EFI_STATUS_CODE_TYPE     Type,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId OPTIONAL,
+  IN CONST EFI_GUID           *CallerId OPTIONAL,
   IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL  
   )
 {
   EFI_PEI_SERVICES  **PeiServices;
   
   PeiServices = GetPeiServicesTablePointer ();
-  return (*PeiServices)->PeiReportStatusCode (PeiServices, Type, Value, Instance, CallerId, Data);
-}
-
-
-/**
-  Computes and returns the size, in bytes, of a device path.
-
-  @param  DevicePath  A pointer to a device path.
-
-  @return  The size, in bytes, of DevicePath.
-
-**/
-UINTN
-InternalReportStatusCodeDevicePathSize (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL  *Start;
-
-  if (DevicePath == NULL) {
-    return 0;
-  }
-
-  //
-  // Search for the end of the device path structure
-  //
-  Start = DevicePath;
-  while (!EfiIsDevicePathEnd (DevicePath)) {
-    DevicePath = EfiNextDevicePathNode (DevicePath);
-  }
-
-  //
-  // Subtract the start node from the end node and add in the size of the end node
-  //
-  return ((UINTN) DevicePath - (UINTN) Start) + DevicePathNodeLength (DevicePath);
+  return (*PeiServices)->PeiReportStatusCode (
+                           PeiServices,
+                           Type,
+                           Value,
+                           Instance,
+                           (EFI_GUID *)CallerId,
+                           Data
+                           );
 }
 
 
@@ -173,12 +146,12 @@ CodeTypeToPostCode (
 BOOLEAN
 EFIAPI
 ReportStatusCodeExtractAssertInfo (
-  IN  EFI_STATUS_CODE_TYPE   CodeType,
-  IN  EFI_STATUS_CODE_VALUE  Value,  
-  IN  EFI_STATUS_CODE_DATA   *Data, 
-  OUT CHAR8                  **Filename,
-  OUT CHAR8                  **Description,
-  OUT UINT32                 *LineNumber
+  IN EFI_STATUS_CODE_TYPE        CodeType,
+  IN EFI_STATUS_CODE_VALUE       Value,  
+  IN CONST EFI_STATUS_CODE_DATA  *Data, 
+  OUT CHAR8                      **Filename,
+  OUT CHAR8                      **Description,
+  OUT UINT32                     *LineNumber
   )
 {
   EFI_DEBUG_ASSERT_DATA  *AssertData;
@@ -233,10 +206,10 @@ ReportStatusCodeExtractAssertInfo (
 BOOLEAN
 EFIAPI
 ReportStatusCodeExtractDebugInfo (
-  IN  EFI_STATUS_CODE_DATA  *Data,
-  OUT UINT32                *ErrorLevel,
-  OUT VA_LIST               *Marker,
-  OUT CHAR8                 **Format
+  IN CONST EFI_STATUS_CODE_DATA  *Data, 
+  OUT UINT32                     *ErrorLevel,
+  OUT VA_LIST                    *Marker,
+  OUT CHAR8                      **Format
   )
 {
   EFI_DEBUG_INFO  *DebugInfo;
@@ -334,18 +307,13 @@ ReportStatusCode (
 EFI_STATUS
 EFIAPI
 ReportStatusCodeWithDevicePath (
-  IN EFI_STATUS_CODE_TYPE      Type,
-  IN EFI_STATUS_CODE_VALUE     Value,
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  IN EFI_STATUS_CODE_TYPE            Type,
+  IN EFI_STATUS_CODE_VALUE           Value,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
   ASSERT (DevicePath != NULL);
-  return ReportStatusCodeWithExtendedData (
-           Type, 
-           Value, 
-           (VOID *)DevicePath, 
-           InternalReportStatusCodeDevicePathSize (DevicePath)
-           );
+  return EFI_UNSUPPORTED;
 }
 
 
@@ -387,7 +355,7 @@ EFIAPI
 ReportStatusCodeWithExtendedData (
   IN EFI_STATUS_CODE_TYPE   Type,
   IN EFI_STATUS_CODE_VALUE  Value,
-  IN VOID                   *ExtendedData,
+  IN CONST VOID             *ExtendedData,
   IN UINTN                  ExtendedDataSize
   )
 {
@@ -452,9 +420,9 @@ ReportStatusCodeEx (
   IN EFI_STATUS_CODE_TYPE   Type,
   IN EFI_STATUS_CODE_VALUE  Value,
   IN UINT32                 Instance,
-  IN EFI_GUID               *CallerId           OPTIONAL,
-  IN EFI_GUID               *ExtendedDataGuid   OPTIONAL,
-  IN VOID                   *ExtendedData       OPTIONAL,
+  IN CONST EFI_GUID         *CallerId          OPTIONAL,
+  IN CONST EFI_GUID         *ExtendedDataGuid  OPTIONAL,
+  IN CONST VOID             *ExtendedData      OPTIONAL,
   IN UINTN                  ExtendedDataSize
   )
 {

@@ -32,8 +32,8 @@ InternalMemSetMem64:
     movl    20(%esp),%edx
     movl    8(%esp),%edi
 L0: 
-    mov     %eax,-8(%edi,%ecx,4)
-    mov     %edx,-4(%edi,%ecx,4)
+    mov     %eax,-8(%edi,%ecx,8)
+    mov     %edx,-4(%edi,%ecx,8)
     loop    L0
     movl    %edi,%eax
     pop     %edi
