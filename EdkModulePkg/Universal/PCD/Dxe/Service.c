@@ -95,10 +95,16 @@ GetWorker (
       Name = &(StringTable[VariableHead->StringIndex]);
 
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
-      ASSERT_EFI_ERROR (Status);
-      ASSERT (DataSize >= (UINTN) (VariableHead->Offset + Size));
-
-      return (UINT8 *) Data + VariableHead->Offset;
+      if (Status == EFI_SUCCESS) {
+        ASSERT (DataSize >= (UINTN) (VariableHead->Offset + Size));
+        return (UINT8 *) Data + VariableHead->Offset;
+      } else {
+        //
+        // BugBug: Need to support default value. The current implementation
+        // will return a memory buffer with ALL ZERO.
+        // 
+        return AllocateZeroPool (Size);
+       }
 
     case PCD_TYPE_STRING:
       StringTableIdx = (UINT16) *((UINT8 *) PcdDb + Offset);
@@ -343,19 +349,22 @@ GetHiiVariable (
     &Size,
     NULL
     );
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
 
-  Buffer = AllocatePool (Size);
+    Buffer = AllocatePool (Size);
 
-  ASSERT (Buffer != NULL);
+    ASSERT (Buffer != NULL);
 
-  Status = EfiGetVariable (
-    VariableName,
-    VariableGuid,
-    NULL,
-    &Size,
-    Buffer
-    );
+    Status = EfiGetVariable (
+      VariableName,
+      VariableGuid,
+      NULL,
+      &Size,
+      Buffer
+      );
+
+    ASSERT (Status == EFI_SUCCESS);
+  }
 
   return Status;
 
@@ -470,6 +479,7 @@ SetWorker (
   UINT16              *StringTable;
   EFI_GUID            *Guid;
   UINT16              *Name;
+  UINTN               VariableOffset;
   VOID                *InternalData;
   VARIABLE_HEAD       *VariableHead;
   UINTN               Offset;
@@ -519,7 +529,7 @@ SetWorker (
     
     case PCD_TYPE_STRING:
       CopyMem (&StringTable[*((UINT16 *)InternalData)], Data, Size);
-      break;
+      return EFI_SUCCESS;
 
     case PCD_TYPE_HII:
       //
@@ -532,8 +542,9 @@ SetWorker (
       
       Guid = &(GuidTable[VariableHead->GuidTableIndex]);
       Name = &(StringTable[VariableHead->StringIndex]);
+      VariableOffset = VariableHead->Offset;
 
-      return EFI_SUCCESS;
+      return SetHiiVariable (Guid, Name, Data, Size, VariableOffset);
 
     case PCD_TYPE_DATA:
       if (PtrType) {
@@ -638,30 +649,41 @@ SetHiiVariable (
     NULL
     );
 
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
 
-  Buffer = AllocatePool (Size);
+    Buffer = AllocatePool (Size);
 
-  ASSERT (Buffer != NULL);
+    ASSERT (Buffer != NULL);
 
-  Status = EfiGetVariable (
-    VariableName,
-    VariableGuid,
-    &Attribute,
-    &Size,
-    Buffer
-    );
+    Status = EfiGetVariable (
+      VariableName,
+      VariableGuid,
+      &Attribute,
+      &Size,
+      Buffer
+      );
+    
+    ASSERT_EFI_ERROR (Status);
 
+    CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
 
-  CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
+  } else {
+
+    Attribute = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
+    Size = DataSize + Offset;
+    Buffer = AllocateZeroPool (Size);
+    ASSERT (Buffer != NULL);
+    CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
+    
+  }
 
   return EfiSetVariable (
-    VariableName,
-    VariableGuid,
-    Attribute,
-    Size,
-    Buffer
-    );
+            VariableName,
+            VariableGuid,
+            Attribute,
+            Size,
+            Buffer
+            );
 
 }
 

@@ -148,7 +148,6 @@ GetHiiVariable (
   ASSERT_EFI_ERROR (Status);
 
   Size = 0;
-
   Status = VariablePpi->PeiGetVariable (
                           GetPeiServicesTablePointer (),
                           VariableName,
@@ -157,25 +156,30 @@ GetHiiVariable (
                           &Size,
                           NULL
                             );
-  ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+  if (Status == EFI_BUFFER_TOO_SMALL) {
 
-  Status = PeiServicesAllocatePool (Size, &Buffer);
-  ASSERT_EFI_ERROR (Status);
 
-  Status = VariablePpi->PeiGetVariable (
-                            GetPeiServicesTablePointer (),
-                            (UINT16 *) VariableName,
-                            (EFI_GUID *) VariableGuid,
-                            NULL,
-                            &Size,
-                            Buffer
-                            );
-  ASSERT_EFI_ERROR (Status);
+    Status = PeiServicesAllocatePool (Size, &Buffer);
+    ASSERT_EFI_ERROR (Status);
 
-  *VariableSize = Size;
-  *VariableData = Buffer;
+    Status = VariablePpi->PeiGetVariable (
+                              GetPeiServicesTablePointer (),
+                              (UINT16 *) VariableName,
+                              (EFI_GUID *) VariableGuid,
+                              NULL,
+                              &Size,
+                              Buffer
+                              );
+    ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+    *VariableSize = Size;
+    *VariableData = Buffer;
+
+    return EFI_SUCCESS;
+  } else {
+    return EFI_NOT_FOUND;
+  }
+
 }
 
 
@@ -454,10 +458,17 @@ GetWorker (
       Name = &StringTable[VariableHead->StringIndex];
 
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
-      ASSERT_EFI_ERROR (Status);
-      ASSERT (DataSize >= (UINTN) (VariableHead->Offset + Size));
 
-      return (VOID *) ((UINT8 *) Data + VariableHead->Offset);
+      if (Status == EFI_SUCCESS) {
+        ASSERT (DataSize >= (UINTN) (VariableHead->Offset + Size));
+        return (VOID *) ((UINT8 *) Data + VariableHead->Offset);
+      } else {
+        //
+        // BugBug: Need to support default value. The current implementation
+        // will return a memory buffer with ALL ZERO.
+        // 
+        return AllocateZeroPool (Size);
+      }
     }
 
     case PCD_TYPE_DATA:
