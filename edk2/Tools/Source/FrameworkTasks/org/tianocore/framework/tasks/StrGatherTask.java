@@ -111,9 +111,9 @@ public class StrGatherTask extends Task implements EfiDefine {
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH"); 
         String command;
         if (path == null) {
-            command = "strgather";
+            command = "StrGather";
         } else {
-            command = path + "/" + "strgather";
+            command = path + "/" + "StrGather";
         }
 
         ///
