@@ -49,9 +49,9 @@ public class SetStampTask extends Task implements EfiDefine {
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "setstamp";
+            command = "SetStamp";
         } else {
-            command = path + "/" + "setstamp";
+            command = path + "/" + "SetStamp";
         }
         ///
         /// argument of SetStamp tool

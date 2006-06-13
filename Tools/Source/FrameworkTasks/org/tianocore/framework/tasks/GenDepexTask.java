@@ -54,9 +54,9 @@ public class GenDepexTask extends Task implements EfiDefine {
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "gendepex";
+            command = "GenDepex";
         } else {
-            command = path + "/" + "gendepex";
+            command = path + "/" + "GenDepex";
         }
         //
         // argument of GenDepex tool
