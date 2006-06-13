@@ -30,8 +30,8 @@
     .686: 
     .code: 
 
-.global InternalMemCompareMem
-InternalMemCompareMem:
+.global _InternalMemCompareMem
+_InternalMemCompareMem:
     push    %esi
     push    %edi
     movl    12(%esp),%esi

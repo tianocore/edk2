@@ -30,8 +30,8 @@
     .686: 
     .code: 
 
-.global InternalMemScanMem8
-InternalMemScanMem8:
+.global _InternalMemScanMem8
+_InternalMemScanMem8:
     push    %edi
     movl    12(%esp),%ecx
     movl    8(%esp),%edi

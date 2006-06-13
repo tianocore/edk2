@@ -24,8 +24,8 @@
     .386: 
     .code: 
 
-.global InternalMemCopyMem
-InternalMemCopyMem:
+.global _InternalMemCopyMem
+_InternalMemCopyMem:
     push    %esi
     push    %edi
     movl    16(%esp),%esi               # esi <- Source
