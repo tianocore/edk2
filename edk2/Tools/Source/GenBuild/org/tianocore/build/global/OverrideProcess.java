@@ -36,7 +36,7 @@ import org.tianocore.LibrariesDocument;
 import org.tianocore.LibraryClassDefinitionsDocument;
 import org.tianocore.MsaHeaderDocument;
 import org.tianocore.MsaLibHeaderDocument;
-import org.tianocore.PCDsDocument;
+import org.tianocore.PcdCodedDocument;
 import org.tianocore.PPIsDocument;
 import org.tianocore.ProtocolsDocument;
 import org.tianocore.SourceFilesDocument;
@@ -113,7 +113,7 @@ public class OverrideProcess {
                     "SourceFiles", "Includes", "Libraries", "Protocols",
                     "Events", "Hobs", "PPIs", "Variables", "BootModes",
                     "SystemTables", "DataHubs", "Formsets", "Guids", "Externs",
-                    "PCDs", "BuildOptions" };
+                    "PcdCoded", "BuildOptions" };
 
     ///
     /// list of exclusive elements
@@ -223,8 +223,8 @@ public class OverrideProcess {
             newMap.put("Externs", ((ExternsDocument) map.get("Externs"))
                             .getExterns());
         }
-        if (map.get("PCDs") != null) {
-            newMap.put("PCDs", ((PCDsDocument) map.get("PCDs")).getPCDs());
+        if (map.get("PcdCoded") != null) {
+            newMap.put("PcdCoded", ((PcdCodedDocument) map.get("PcdCoded")).getPcdCoded());
         }
         if (map.get("BuildOptions") != null) {
             newMap.put("BuildOptions", ((BuildOptionsDocument) map

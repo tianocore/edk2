@@ -18,9 +18,14 @@ package org.tianocore.build.pcd.action;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.ArrayList;
 
+import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.global.GlobalData;
+import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.build.pcd.entity.Token;
 import org.tianocore.build.pcd.entity.UsageInstance;
@@ -60,11 +65,6 @@ public class PCDAutoGenAction extends BuildAction {
     /// 
     private String                version;
     ///
-    /// Wheter current module is PCD emulated driver. It is only for 
-    /// emulated PCD driver and will be kept until PCD IMAGE tool ready.
-    ///
-    private boolean               isEmulatedPCDDriver;
-    ///
     /// Whether current autogen is for building library used by current module.
     /// 
     private boolean               isBuildUsedLibrary;
@@ -75,8 +75,11 @@ public class PCDAutoGenAction extends BuildAction {
     ///
     /// The generated string for C code file.
     ///
-    private String                cAutoGenString;       
-
+    private String                cAutoGenString;
+    ///
+    /// The name array of <PcdCoded> in a module.
+    /// 
+    private String[]              pcdNameArray;
     /**
       Set parameter ModuleName
   
@@ -86,37 +89,66 @@ public class PCDAutoGenAction extends BuildAction {
         this.moduleName = moduleName;
     }
 
+    /**
+       set the moduleGuid parameter.
+       
+       @param moduleGuid
+    **/
     public void setModuleGuid(UUID moduleGuid) {
         this.moduleGuid = moduleGuid;
     }
 
+    /**
+       set packageName parameter.
+       
+       @param packageName
+    **/
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
 
+    /**
+        set packageGuid parameter.
+       
+       @param packageGuid
+    **/
     public void setPackageGuid(UUID packageGuid) {
         this.packageGuid = packageGuid;
     }
 
+    /**
+       set Arch parameter.
+       
+       @param arch
+    **/
     public void setArch(String arch) {
         this.arch = arch;
     }
 
+    /**
+       set version parameter
+       
+       @param version
+     */
     public void setVersion(String version) {
         this.version = version;
     }
 
     /**
-      Set parameter isEmulatedPCDDriver
-  
-      @param isEmulatedPCDDriver  whether this module is PeiEmulatedPCD driver
-    **/
-    public void setIsEmulatedPCDDriver(boolean isEmulatedPCDDriver) {
-        this.isEmulatedPCDDriver = isEmulatedPCDDriver;
-    }
-
+       set isBuildUsedLibrary parameter.
+       
+       @param isBuildUsedLibrary
+     */
     public void setIsBuildUsedLibrary(boolean isBuildUsedLibrary) {
         this.isBuildUsedLibrary = isBuildUsedLibrary;
+    }
+    /**
+       set pcdNameArray parameter.
+       
+       @param pcdNameArray
+     */
+    public void setPcdNameArray(String[] pcdNameArray) {
+        this.pcdNameArray = pcdNameArray;
     }
 
     /**
@@ -145,23 +177,23 @@ public class PCDAutoGenAction extends BuildAction {
       @param moduleName            Parameter of this action class.
       @param isEmulatedPCDDriver   Parameter of this action class.
     **/
-    public PCDAutoGenAction(String  moduleName, 
-                            UUID    moduleGuid, 
-                            String  packageName,
-                            UUID    packageGuid,
-                            String  arch,
-                            String  version,
-                            boolean isEmulatedPCDDriver, 
-                            boolean isBuildUsedLibrary) {
+    public PCDAutoGenAction(String   moduleName, 
+                            UUID     moduleGuid, 
+                            String   packageName,
+                            UUID     packageGuid,
+                            String   arch,
+                            String   version,
+                            boolean  isBuildUsedLibrary,
+                            String[] pcdNameArray) {
         dbManager       = null;
         hAutoGenString  = "";
         cAutoGenString  = "";
 
-        setIsEmulatedPCDDriver(isEmulatedPCDDriver);
         setModuleName(moduleName);
         setModuleGuid(moduleGuid);
         setPackageName(packageName);
         setPackageGuid(packageGuid);
+        setPcdNameArray(pcdNameArray);
         setArch(arch);
         setVersion(version);
         setIsBuildUsedLibrary(isBuildUsedLibrary);
@@ -173,13 +205,7 @@ public class PCDAutoGenAction extends BuildAction {
       @throws BuildActionException Bad parameter.
     **/
     void checkParameter() throws BuildActionException {
-        if(!isEmulatedPCDDriver &&(moduleName == null)) {
-            throw new BuildActionException("Wrong module name parameter for PCDAutoGenAction tool!");
-        }
-
-        if(!isEmulatedPCDDriver && moduleName.length() == 0) {
-            throw new BuildActionException("Wrong module name parameter for PCDAutoGenAction tool!");
-        }
+        
     }
 
     /**
@@ -224,8 +250,8 @@ public class PCDAutoGenAction extends BuildAction {
     **/
     private void generateAutogenForModule()
     {
-        int                   index;
-        List<UsageInstance>   usageInstanceArray;
+        int                   index, index2;
+        List<UsageInstance>   usageInstanceArray, usageContext;
 
         if (!isBuildUsedLibrary) {
             usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleName,
@@ -237,20 +263,38 @@ public class PCDAutoGenAction extends BuildAction {
             dbManager.UsageInstanceContext = usageInstanceArray;
             dbManager.CurrentModuleName    = moduleName; 
         } else {
-            usageInstanceArray = dbManager.UsageInstanceContext;
+            usageContext = dbManager.UsageInstanceContext;
             //
             // For building MDE package, although all module are library, but PCD entries of 
             // these library should be used to autogen.
             // 
-            if (usageInstanceArray == null) {
+            if (usageContext == null) {
                 usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleName,
                                                                                   moduleGuid,
                                                                                   packageName,
                                                                                   packageGuid,
                                                                                   arch,
                                                                                   version);
+            } else {
+                usageInstanceArray = new ArrayList<UsageInstance>();
+                //
+                // Remove PCD entries which are not belong to this library.
+                // 
+                for (index = 0; index < usageContext.size(); index++) {
+                    if ((pcdNameArray == null) || (pcdNameArray.length == 0)){
+                        break;
+                    }
+
+                    for (index2 = 0; index2 < pcdNameArray.length; index2 ++) {
+                        if (pcdNameArray[index2].equalsIgnoreCase(usageContext.get(index).parentToken.cName)) {
+                            usageInstanceArray.add(usageContext.get(index));
+                            break;
+                        }
+                    }
+                }
             }
         }
+
 
         if(usageInstanceArray.size() != 0) {
             //
@@ -301,6 +345,7 @@ public class PCDAutoGenAction extends BuildAction {
 
         String WorkSpace = "M:/ForPcd/edk2";
         String logFilePath = WorkSpace  + "/MdePkg/MdePkg.fpd";
+        String[] nameArray = null;
 
         //
         // At first, CollectPCDAction should be invoked to collect
@@ -328,8 +373,7 @@ public class PCDAutoGenAction extends BuildAction {
                                                               null,
                                                               null,
                                                               false,
-                                                              false
-                                                              );
+                                                              nameArray);
         autogenAction.execute();
 
         System.out.println(autogenAction.OutputH());
