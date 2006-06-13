@@ -24,8 +24,8 @@
     .386: 
     .code: 
 
-.global InternalMemZeroMem
-InternalMemZeroMem:
+.global _InternalMemZeroMem
+_InternalMemZeroMem:
     push    %edi
     xorl    %eax,%eax
     movl    8(%esp),%edi

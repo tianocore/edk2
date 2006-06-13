@@ -30,7 +30,8 @@
     .686: 
     .code: 
 
-InternalMemScanMem64:
+.global _InternalMemScanMem64
+_InternalMemScanMem64:
     push    %edi
     movl    12(%esp),%ecx
     movl    16(%esp),%eax

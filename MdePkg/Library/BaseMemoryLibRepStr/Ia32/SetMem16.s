@@ -24,8 +24,8 @@
     .386: 
     .code: 
 
-.global InternalMemSetMem16
-InternalMemSetMem16:
+.global _InternalMemSetMem16
+_InternalMemSetMem16:
     push    %edi
     movl    16(%esp),%eax
     movl    8(%esp),%edi
