@@ -31,16 +31,6 @@
 #define PRECISION         0x800
 #define ARGUMENT_REVERSED 0x1000
 
-///
-/// Define the maximum number of characters that are required to encode
-/// a decimal, hexidecimal, GUID, or TIME value with a Nll terminator.
-///   Maximum Length Decimal String     = 28    "-9,223,372,036,854,775,808"
-///   Maximum Length Hexidecimal String = 17    "FFFFFFFFFFFFFFFF"
-///   Maximum Length GUID               = 37    "00000000-0000-0000-0000-000000000000"
-///   Maximum Length TIME               = 18    "12/12/2006  12:12"
-///
-#define MAXIMUM_VALUE_CHARACTERS  38
-
 //
 // Record date and time information
 //

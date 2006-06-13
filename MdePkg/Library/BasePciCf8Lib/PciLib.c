@@ -1299,8 +1299,6 @@ PciCf8ReadBuffer (
   UINTN                             EndAddress;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
-  ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
-  ASSERT ((StartAddress + Size - 1) <= 0x0FFFFFFF);
   ASSERT (Buffer != NULL);
 
   EndAddress = StartAddress + Size;
@@ -1388,8 +1386,6 @@ PciCf8WriteBuffer (
   UINTN                             EndAddress;
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
-  ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
-  ASSERT ((StartAddress + Size - 1) <= 0x0FFFFFFF);
   ASSERT (Buffer != NULL);
 
   EndAddress = StartAddress + Size;

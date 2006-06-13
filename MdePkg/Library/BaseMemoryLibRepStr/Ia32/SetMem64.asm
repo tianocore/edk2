@@ -31,8 +31,8 @@ InternalMemSetMem64 PROC    USES    edi
     mov     edx, [esp + 20]
     mov     edi, [esp + 8]
 @@:
-    mov     [edi + ecx*4 - 8], eax
-    mov     [edi + ecx*4 - 4], edx
+    mov     [edi + ecx*8 - 8], eax
+    mov     [edi + ecx*8 - 4], edx
     loop    @B
     mov     eax, edi
     ret

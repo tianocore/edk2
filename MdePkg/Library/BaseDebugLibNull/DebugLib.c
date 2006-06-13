@@ -61,7 +61,7 @@ DebugPrint (
   Prints an assert message containing a filename, line number, and description.  
   This may be followed by a breakpoint or a dead loop.
 
-  Print a message of the form “ASSERT <FileName>(<LineNumber>): <Description>\n” 
+  Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n" 
   to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of 
   PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if 
   DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
@@ -70,9 +70,9 @@ DebugPrint (
   DebugAssert() must actively prevent recusrsion.  If DebugAssert() is called while
   processing another DebugAssert(), then DebugAssert() must return immediately.
 
-  If FileName is NULL, then a <FileName> string of “(NULL) Filename” is printed.
+  If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
 
-  If Description is NULL, then a <Description> string of “(NULL) Description” is printed.
+  If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
 
   @param  FileName     Pointer to the name of the source file that generated the assert condition.
   @param  LineNumber   The line number in the source file that generated the assert condition

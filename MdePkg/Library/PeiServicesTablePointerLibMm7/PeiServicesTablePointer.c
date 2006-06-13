@@ -21,7 +21,11 @@ GetPeiServicesTablePointer (
   VOID
   )
 {
-  return (EFI_PEI_SERVICES **)(UINTN)AsmReadMm7 ();
+  EFI_PEI_SERVICES  **PeiServices;
+
+  PeiServices = (EFI_PEI_SERVICES **)(UINTN)AsmReadMm7 ();
+  ASSERT (PeiServices != NULL);
+  return PeiServices;
 }
 
 /**

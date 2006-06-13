@@ -72,7 +72,7 @@ DebugPrint (
   Prints an assert message containing a filename, line number, and description.  
   This may be followed by a breakpoint or a dead loop.
 
-  Print a message of the form “ASSERT <FileName>(<LineNumber>): <Description>\n?
+  Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n"
   to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of 
   PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if 
   DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
@@ -411,7 +411,7 @@ DebugClearMemoryEnabled (
   by TYPE is compared to TestSignature.  If the signatures match, then a pointer 
   to the pointer to a data structure of the type specified by TYPE is returned.  
   If the signatures do not match, then DebugAssert() is called with a description 
-  of “CR has a bad signature?and Record is returned.  
+  of "CR has a bad signature" and Record is returned.  
 
   If the data type specified by TYPE does not contain the field specified by Field, 
   then the module will not compile.

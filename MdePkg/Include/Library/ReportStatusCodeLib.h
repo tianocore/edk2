@@ -241,12 +241,12 @@ CodeTypeToPostCode (
 BOOLEAN
 EFIAPI
 ReportStatusCodeExtractAssertInfo (
-  IN  EFI_STATUS_CODE_TYPE   CodeType,
-  IN  EFI_STATUS_CODE_VALUE  Value,  
-  IN  EFI_STATUS_CODE_DATA   *Data, 
-  OUT CHAR8                  **Filename,
-  OUT CHAR8                  **Description,
-  OUT UINT32                 *LineNumber
+  IN EFI_STATUS_CODE_TYPE        CodeType,
+  IN EFI_STATUS_CODE_VALUE       Value,  
+  IN CONST EFI_STATUS_CODE_DATA  *Data, 
+  OUT CHAR8                      **Filename,
+  OUT CHAR8                      **Description,
+  OUT UINT32                     *LineNumber
   );
 
 
@@ -282,10 +282,10 @@ ReportStatusCodeExtractAssertInfo (
 BOOLEAN
 EFIAPI
 ReportStatusCodeExtractDebugInfo (
-  IN  EFI_STATUS_CODE_DATA  *Data,
-  OUT UINT32                *ErrorLevel,
-  OUT VA_LIST               *Marker,
-  OUT CHAR8                 **Format
+  IN CONST EFI_STATUS_CODE_DATA  *Data, 
+  OUT UINT32                     *ErrorLevel,
+  OUT VA_LIST                    *Marker,
+  OUT CHAR8                      **Format
   );
 
 
@@ -349,9 +349,9 @@ ReportStatusCode (
 EFI_STATUS
 EFIAPI
 ReportStatusCodeWithDevicePath (
-  IN EFI_STATUS_CODE_TYPE      Type,
-  IN EFI_STATUS_CODE_VALUE     Value,
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  IN EFI_STATUS_CODE_TYPE            Type,
+  IN EFI_STATUS_CODE_VALUE           Value,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   );
 
 
@@ -393,7 +393,7 @@ EFIAPI
 ReportStatusCodeWithExtendedData (
   IN EFI_STATUS_CODE_TYPE   Type,
   IN EFI_STATUS_CODE_VALUE  Value,
-  IN VOID                   *ExtendedData,
+  IN CONST VOID             *ExtendedData,
   IN UINTN                  ExtendedDataSize
   );
 
@@ -445,9 +445,9 @@ ReportStatusCodeEx (
   IN EFI_STATUS_CODE_TYPE   Type,
   IN EFI_STATUS_CODE_VALUE  Value,
   IN UINT32                 Instance,
-  IN EFI_GUID               *CallerId           OPTIONAL,
-  IN EFI_GUID               *ExtendedDataGuid   OPTIONAL,
-  IN VOID                   *ExtendedData       OPTIONAL,
+  IN CONST EFI_GUID         *CallerId          OPTIONAL,
+  IN CONST EFI_GUID         *ExtendedDataGuid  OPTIONAL,
+  IN CONST VOID             *ExtendedData      OPTIONAL,
   IN UINTN                  ExtendedDataSize
   );
 

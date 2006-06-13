@@ -45,7 +45,7 @@ InternalReportStatusCode (
   IN EFI_STATUS_CODE_TYPE     Type,
   IN EFI_STATUS_CODE_VALUE    Value,
   IN UINT32                   Instance,
-  IN EFI_GUID                 *CallerId OPTIONAL,
+  IN CONST EFI_GUID           *CallerId OPTIONAL,
   IN EFI_STATUS_CODE_DATA     *Data     OPTIONAL  
   )
 {
@@ -66,7 +66,7 @@ InternalReportStatusCode (
   // A Status Code Protocol is present in the handle database, so pass in all the  
   // parameters to the ReportStatusCode() service of the Status Code Protocol
   //
-  return gStatusCode->ReportStatusCode (Type, Value, Instance, CallerId, Data);
+  return gStatusCode->ReportStatusCode (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
 }
 
 
@@ -80,14 +80,10 @@ InternalReportStatusCode (
 **/
 UINTN
 InternalReportStatusCodeDevicePathSize (
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL  *Start;
-
-  if (DevicePath == NULL) {
-    return 0;
-  }
+  CONST EFI_DEVICE_PATH_PROTOCOL  *Start;
 
   //
   // Search for the end of the device path structure
@@ -187,12 +183,12 @@ CodeTypeToPostCode (
 BOOLEAN
 EFIAPI
 ReportStatusCodeExtractAssertInfo (
-  IN  EFI_STATUS_CODE_TYPE   CodeType,
-  IN  EFI_STATUS_CODE_VALUE  Value,  
-  IN  EFI_STATUS_CODE_DATA   *Data, 
-  OUT CHAR8                  **Filename,
-  OUT CHAR8                  **Description,
-  OUT UINT32                 *LineNumber
+  IN EFI_STATUS_CODE_TYPE        CodeType,
+  IN EFI_STATUS_CODE_VALUE       Value,  
+  IN CONST EFI_STATUS_CODE_DATA  *Data, 
+  OUT CHAR8                      **Filename,
+  OUT CHAR8                      **Description,
+  OUT UINT32                     *LineNumber
   )
 {
   EFI_DEBUG_ASSERT_DATA  *AssertData;
@@ -247,10 +243,10 @@ ReportStatusCodeExtractAssertInfo (
 BOOLEAN
 EFIAPI
 ReportStatusCodeExtractDebugInfo (
-  IN  EFI_STATUS_CODE_DATA  *Data,
-  OUT UINT32                *ErrorLevel,
-  OUT VA_LIST               *Marker,
-  OUT CHAR8                 **Format
+  IN CONST EFI_STATUS_CODE_DATA  *Data, 
+  OUT UINT32                     *ErrorLevel,
+  OUT VA_LIST                    *Marker,
+  OUT CHAR8                      **Format
   )
 {
   EFI_DEBUG_INFO  *DebugInfo;
@@ -348,9 +344,9 @@ ReportStatusCode (
 EFI_STATUS
 EFIAPI
 ReportStatusCodeWithDevicePath (
-  IN EFI_STATUS_CODE_TYPE      Type,
-  IN EFI_STATUS_CODE_VALUE     Value,
-  IN EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  IN EFI_STATUS_CODE_TYPE            Type,
+  IN EFI_STATUS_CODE_VALUE           Value,
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 {
   ASSERT (DevicePath != NULL);
@@ -401,7 +397,7 @@ EFIAPI
 ReportStatusCodeWithExtendedData (
   IN EFI_STATUS_CODE_TYPE   Type,
   IN EFI_STATUS_CODE_VALUE  Value,
-  IN VOID                   *ExtendedData,
+  IN CONST VOID             *ExtendedData,
   IN UINTN                  ExtendedDataSize
   )
 {
@@ -466,9 +462,9 @@ ReportStatusCodeEx (
   IN EFI_STATUS_CODE_TYPE   Type,
   IN EFI_STATUS_CODE_VALUE  Value,
   IN UINT32                 Instance,
-  IN EFI_GUID               *CallerId           OPTIONAL,
-  IN EFI_GUID               *ExtendedDataGuid   OPTIONAL,
-  IN VOID                   *ExtendedData       OPTIONAL,
+  IN CONST EFI_GUID         *CallerId          OPTIONAL,
+  IN CONST EFI_GUID         *ExtendedDataGuid  OPTIONAL,
+  IN CONST VOID             *ExtendedData      OPTIONAL,
   IN UINTN                  ExtendedDataSize
   )
 {

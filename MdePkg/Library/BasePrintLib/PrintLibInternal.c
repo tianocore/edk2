@@ -138,13 +138,20 @@ BasePrintLibConvertValueToString (
   UINTN  Digits;
   UINTN  Index;
 
+  ASSERT (Buffer != NULL);
+  ASSERT (Width < MAXIMUM_VALUE_CHARACTERS);
+  //
+  // Make sure Flags can only contain supported bits.
+  //
+  ASSERT ((Flags & ~(LEFT_JUSTIFY | COMMA_TYPE | PREFIX_ZERO)) == 0);
+
   OriginalBuffer = Buffer;
 
   if (Width == 0 || (Flags & COMMA_TYPE) != 0) {
     Flags &= (~PREFIX_ZERO);
   }
 
-  if (Width == 0 || Width > (MAXIMUM_VALUE_CHARACTERS - 1)) {
+  if (Width == 0) {
     Width = MAXIMUM_VALUE_CHARACTERS - 1;
   }
 

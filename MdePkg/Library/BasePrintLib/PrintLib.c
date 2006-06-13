@@ -66,7 +66,6 @@ static CONST STATUS_LOOKUP_TABLE_ENTRY  StatusString[] = {
   @param  Buffer      Character buffer to print the results of the parsing
                       of Format into.
   @param  BufferSize  Maximum number of characters to put into buffer.
-                      Zero means no limit.
   @param  Flags       Intial flags value.
                       Can only have FORMAT_UNICODE and OUTPUT_UNICODE set
   @param  Format      Null-terminated format string.
@@ -110,6 +109,9 @@ BasePrintLibVSPrint (
   UINTN           Radix;
   RETURN_STATUS   Status;
 
+  if (BufferSize == 0) {
+    return 0;
+  }
   ASSERT (Buffer != NULL);
   ASSERT (Format != NULL);
 
@@ -130,7 +132,6 @@ BasePrintLibVSPrint (
 
   //
   // Reserve space for the Null terminator.
-  // If BufferSize is 0, this will set BufferSize to the max unsigned value
   //
   BufferSize--;
 
@@ -338,7 +339,7 @@ BasePrintLibVSPrint (
         } else {
           BasePrintLibSPrint (
             ValueBuffer,
-            0, 
+            MAXIMUM_VALUE_CHARACTERS, 
             0,
             "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
             TmpGuid->Data1,
@@ -364,7 +365,7 @@ BasePrintLibVSPrint (
         } else {
           BasePrintLibSPrint (
             ValueBuffer,
-            0,
+            MAXIMUM_VALUE_CHARACTERS,
             0,
             "%02d/%02d/%04d  %02d:%02d",
             TmpTime->Month,
@@ -386,8 +387,12 @@ BasePrintLibVSPrint (
           }
         }
         if (ArgumentString == ValueBuffer) {
-          BasePrintLibSPrint ((CHAR8 *) ValueBuffer, 0, 0, "%08X", Status);
+          BasePrintLibSPrint ((CHAR8 *) ValueBuffer, MAXIMUM_VALUE_CHARACTERS, 0, "%08X", Status);
         }
+        break;
+
+      case '\n':
+        ArgumentString = "\r\n";
         break;
 
       case '%':
@@ -399,9 +404,6 @@ BasePrintLibVSPrint (
         Flags |= ARGUMENT_UNICODE;
         break;
       }
-      break;
-    case '\n':
-      ArgumentString = "\r\n";
       break;
     default:
       ArgumentString = (CHAR8 *)&FormatCharacter;
@@ -717,7 +719,7 @@ UnicodeSPrintAsciiFormat (
   VA_LIST Marker;
 
   VA_START (Marker, FormatString);
-  return UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize >> 1, FormatString, Marker);
+  return UnicodeVSPrintAsciiFormat (StartOfBuffer, BufferSize, FormatString, Marker);
 }
 
 /**
