@@ -97,6 +97,16 @@ GetHiiVariable (
 ;
 
 EFI_STATUS
+SetHiiVariable (
+  IN  EFI_GUID     *VariableGuid,
+  IN  UINT16       *VariableName,
+  IN  CONST VOID   *Data,
+  IN  UINTN        DataSize,
+  IN  UINTN        Offset
+  )
+;
+
+EFI_STATUS
 DxeRegisterCallBackWorker (
   IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
