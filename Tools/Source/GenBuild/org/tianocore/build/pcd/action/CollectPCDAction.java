@@ -1469,7 +1469,7 @@ public class CollectPCDAction {
         modules = getComponentsFromFPD();
 
         if (modules == null) {
-            throw new EntityException("No modules in FPD file, Please check whether there are elements in <FrameworkModules> in FPD file!");
+            throw new EntityException("[FPD file error] No modules in FPD file, Please check whether there are elements in <FrameworkModules> in FPD file!");
         }
 
         //
@@ -1542,7 +1542,7 @@ public class CollectPCDAction {
                      // Value is required.
                      // 
                      if (datum == null) {
-                         exceptionString = String.format("There is no value for PCD entry %s in module %s!",
+                         exceptionString = String.format("[FPD file error] There is no value for PCD entry %s in module %s!",
                                                          pcdBuildData.getCName(),
                                                          moduleName);
                          throw new EntityException(exceptionString);
@@ -1576,7 +1576,7 @@ public class CollectPCDAction {
                     // modules.
                     // 
                     if (token.datumType != datumType) {
-                        exceptionString = String.format("The datum type of PCD entry %s is %s, which is different with  %s defined in before!",
+                        exceptionString = String.format("[FPD file error] The datum type of PCD entry %s is %s, which is different with  %s defined in before!",
                                                         pcdBuildData.getCName(), 
                                                         pcdBuildData.getDatumType().toString(), 
                                                         Token.getStringOfdatumType(token.datumType));
@@ -1587,7 +1587,7 @@ public class CollectPCDAction {
                     // Check token number is valid
                     // 
                     if (tokenNumber != token.tokenNumber) {
-                        exceptionString = String.format("The token number of PCD entry %s in module %s is different with same PCD entry in other modules!",
+                        exceptionString = String.format("[FPD file error] The token number of PCD entry %s in module %s is different with same PCD entry in other modules!",
                                                         pcdBuildData.getCName(),
                                                         moduleName);
                         throw new EntityException(exceptionString);
@@ -1597,7 +1597,7 @@ public class CollectPCDAction {
                     // For same PCD used in different modules, the PCD type should all be dynamic or non-dynamic.
                     // 
                     if (token.isDynamicPCD != Token.isDynamic(pcdType)) {
-                        exceptionString = String.format("For PCD entry %s in module %s, you define dynamic or non-dynamic PCD type which"+
+                        exceptionString = String.format("[FPD file error] For PCD entry %s in module %s, you define dynamic or non-dynamic PCD type which"+
                                                         "is different with others module's",
                                                         token.cName,
                                                         moduleName);
@@ -1611,14 +1611,27 @@ public class CollectPCDAction {
                         // But if you write, the <Value> must be same as the value in <DynamicPcdBuildDefinitions>.
                         // 
                         if (!token.isSkuEnable() && 
-                            (token.skuData.get(0).value.type == DynamicTokenValue.VALUE_TYPE.DEFAULT_TYPE)) {
-                            if (!datum.equalsIgnoreCase(token.skuData.get(0).value.value)) {
-                                exceptionString = String.format("For dynamic PCD %s in module %s, the datum in <ModuleSA> is "+
+                            (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.DEFAULT_TYPE) &&
+                            (datum != null)) {
+                            if (!datum.equalsIgnoreCase(token.getDefaultSku().value)) {
+                                exceptionString = String.format("[FPD file error] For dynamic PCD %s in module %s, the datum in <ModuleSA> is "+
                                                                 "not equal to the datum in <DynamicPcdBuildDefinitions>, it is "+
-                                                                "illega! You can choose no <Value> in <ModuleSA>!",
+                                                                "illega! You could no set <Value> in <ModuleSA> for a dynamic PCD!",
                                                                 token.cName,
                                                                 moduleName);
+                                throw new EntityException(exceptionString);
                             }
+                        }
+
+                        if ((maxDatumSize != 0) &&
+                            (maxDatumSize != token.datumSize)){
+                            exceptionString = String.format("[FPD file error] For dynamic PCD %s in module %s, the max datum size is %d which "+
+                                                            "is different with <MaxDatumSize> %d defined in <DynamicPcdBuildDefinitions>!",
+                                                            token.cName,
+                                                            moduleName,
+                                                            maxDatumSize,
+                                                            token.datumSize);
+                            throw new EntityException(exceptionString);
                         }
                     }
                     
@@ -1712,7 +1725,7 @@ public class CollectPCDAction {
 
         dynamicPcdBuildDefinitions = fpdDocInstance.getFrameworkPlatformDescription().getDynamicPcdBuildDefinitions();
         if (dynamicPcdBuildDefinitions == null) {
-            exceptionString = String.format("There are no <PcdDynamicBuildDescriptions> in FPD file but contains Dynamic type "+
+            exceptionString = String.format("[FPD file error] There are no <PcdDynamicBuildDescriptions> in FPD file but contains Dynamic type "+
                                             "PCD entry %s in module %s!",
                                             token.cName,
                                             moduleName);
@@ -1747,10 +1760,18 @@ public class CollectPCDAction {
                                    int              maxDatumSize, 
                                    Token.DATUM_TYPE datumType) {
         String exceptionString = null;
+
+        if (maxDatumSize == 0) {
+            exceptionString = String.format("[FPD file error] You maybe miss <MaxDatumSize> for PCD %s in module %s",
+                                            cName,
+                                            moduleName);
+            return exceptionString;
+        }
+
         switch (datumType) {
         case UINT8:
             if (maxDatumSize != 1) {
-                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in module %s "+
                                                 "is UINT8, but datum size is %d, they are not matched!",
                                                 cName,
                                                 moduleName,
@@ -1759,7 +1780,7 @@ public class CollectPCDAction {
             break;
         case UINT16:
             if (maxDatumSize != 2) {
-                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in module %s "+
                                                 "is UINT16, but datum size is %d, they are not matched!",
                                                 cName,
                                                 moduleName,
@@ -1768,7 +1789,7 @@ public class CollectPCDAction {
             break;
         case UINT32:
             if (maxDatumSize != 4) {
-                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                exceptionString = String.format("[FPD file error] the datum type of PCD data %s in module %s "+
                                                 "is UINT32, but datum size is %d, they are not matched!",
                                                 cName,
                                                 moduleName,
@@ -1777,7 +1798,7 @@ public class CollectPCDAction {
             break;
         case UINT64:
             if (maxDatumSize != 8) {
-                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                exceptionString = String.format("[FPD file error] the datum type of PCD data %s in module %s "+
                                                 "is UINT64, but datum size is %d, they are not matched!",
                                                 cName,
                                                 moduleName,
@@ -1786,7 +1807,7 @@ public class CollectPCDAction {
             break;
         case BOOLEAN:
             if (maxDatumSize != 1) {
-                exceptionString = String.format("In FPD file, the datum type of PCD data %s in module %s "+
+                exceptionString = String.format("[FPD file error] the datum type of PCD data %s in module %s "+
                                                 "is BOOLEAN, but datum size is %d, they are not matched!",
                                                 cName,
                                                 moduleName,
@@ -1829,11 +1850,29 @@ public class CollectPCDAction {
 
         dynamicInfo = getDynamicInfoFromFPD(token, moduleName);
         if (dynamicInfo == null) {
-            exceptionString = String.format("For Dynamic PCD %s used by module %s, "+
+            exceptionString = String.format("[FPD file error] For Dynamic PCD %s used by module %s, "+
                                             "there is no dynamic information in <DynamicPcdBuildDefinitions> "+
                                             "in FPD file, but it is required!",
                                             token.cName,
                                             moduleName);
+            throw new EntityException(exceptionString);
+        }
+
+        token.datumSize = dynamicInfo.getMaxDatumSize();
+
+        exceptionString = verifyDatumSize(token.cName, moduleName, token.datumSize, token.datumType);
+        if (exceptionString != null) {
+            throw new EntityException(exceptionString);
+        }
+
+        if ((maxDatumSize != 0) && 
+            (maxDatumSize != token.datumSize)) {
+            exceptionString = String.format("FPD file error] For dynamic PCD %s, the datum size in module %s is %d, but "+
+                                            "the datum size in <DynamicPcdBuildDefinitions> is %d, they are not match!",
+                                            token.cName,
+                                            moduleName, 
+                                            maxDatumSize,
+                                            dynamicInfo.getMaxDatumSize());
             throw new EntityException(exceptionString);
         }
 
@@ -1849,7 +1888,6 @@ public class CollectPCDAction {
             // 
             temp = skuInfoList.get(index).getSkuId().toString();
             skuInstance.id = Integer.decode(temp);
-
             if (skuInstance.id == 0) {
                 hasSkuId0 = true;
             }
@@ -1867,11 +1905,9 @@ public class CollectPCDAction {
                 if (datum != null) {
                     if ((skuInstance.id == 0)                                   &&
                         !datum.equalsIgnoreCase(skuInfoList.get(index).getValue())) {
-                        exceptionString = String.format("For dynamic PCD %s, module %s give <datum> as %s which is different with "+
-                                                        "Sku 0's <datum> %s defined in <DynamicPcdBuildDefinitions>! Please sync them at first!",
-                                                        token.cName,
-                                                        datum,
-                                                        skuInfoList.get(index).getValue());
+                        exceptionString = "[FPD file error] For dynamic PCD " + token.cName + ", the value in module is " + datum.toString() + " but the "+
+                                          "value of sku 0 data in <DynamicPcdBuildDefinition> is " + skuInstance.value.value + ". They are must be same!"+
+                                          " or you could not define value for a dynamic PCD in every <ModuleSA>!"; 
                         throw new EntityException(exceptionString);
                     }
                 }
@@ -1884,7 +1920,7 @@ public class CollectPCDAction {
             if (skuInfoList.get(index).getVariableName() != null) {
                 exceptionString = null;
                 if (skuInfoList.get(index).getVariableGuid() == null) {
-                    exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                    exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
                                                     "file, who use HII, but there is no <VariableGuid> defined for Sku %d data!",
                                                     token.cName,
                                                     index);
@@ -1892,14 +1928,14 @@ public class CollectPCDAction {
                 }
 
                 if (skuInfoList.get(index).getVariableOffset() == null) {
-                    exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                    exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
                                                     "file, who use HII, but there is no <VariableOffset> defined for Sku %d data!",
                                                     token.cName,
                                                     index);
                 }
 
                 if (skuInfoList.get(index).getHiiDefaultValue() == null) {
-                    exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                    exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
                                                     "file, who use HII, but there is no <HiiDefaultValue> defined for Sku %d data!",
                                                     token.cName,
                                                     index);
@@ -1910,7 +1946,7 @@ public class CollectPCDAction {
                 }
                 offset = Integer.decode(skuInfoList.get(index).getVariableOffset());
                 if (offset > 0xFFFF) {
-                    throw new EntityException(String.format("For dynamic PCD %s ,  the variable offset defined in sku %d data "+
+                    throw new EntityException(String.format("[FPD file error] For dynamic PCD %s ,  the variable offset defined in sku %d data "+
                                                             "exceed 64K, it is not allowed!",
                                                             token.cName,
                                                             index));
@@ -1930,16 +1966,17 @@ public class CollectPCDAction {
                 continue;
             }
 
-            exceptionString = String.format("For dynamic PCD %s, the dynamic info must "+
+            exceptionString = String.format("[FPD file error] For dynamic PCD %s, the dynamic info must "+
                                             "be one of 'DefaultGroup', 'HIIGroup', 'VpdGroup'.",
                                             token.cName);
             throw new EntityException(exceptionString);
         }
 
         if (!hasSkuId0) {
-            exceptionString = String.format("For dynamic PCD %s in <DynamicPcdBuildDefinitions>, there are "+
+            exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions>, there are "+
                                             "no sku id = 0 data, which is required for every dynamic PCD",
                                             token.cName);
+            throw new EntityException(exceptionString);
         }
 
         return token;
@@ -1989,7 +2026,7 @@ public class CollectPCDAction {
         if ((uuidString.charAt(0) == '0') && ((uuidString.charAt(1) == 'x') || (uuidString.charAt(1) == 'X'))) {
             splitStringArray = uuidString.split("," );
             if (splitStringArray.length != 11) {
-                throw new EntityException ("Wrong format for UUID string: " + uuidString);
+                throw new EntityException ("[FPD file error] Wrong format for UUID string: " + uuidString);
             }
 
             //
