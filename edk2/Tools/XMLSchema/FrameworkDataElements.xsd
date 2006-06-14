@@ -858,6 +858,7 @@
     <xs:element name="ModuleUnloadImage" type="xs:normalizedString"/>
     <xs:element name="MsaFiles">
         <xs:complexType>
+          <xs:choice minOccurs="1" maxOccurs="unbounded">
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="MsaFile">
                     <xs:annotation>
@@ -892,6 +893,8 @@
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
+            <xs:element minOccurs="1" maxOccurs="unbounded" ref="Filename"/>
+          </xs:choice>
         </xs:complexType>
     </xs:element>
     <!-- Use in Final -->
