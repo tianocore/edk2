@@ -32,7 +32,7 @@ _InternalLongJump:
     movl    8(%edx), %edi
     movl    12(%edx), %ebp
     movl    16(%edx), %esp
-    jmp     20(%edx)
+    jmp     *20(%edx)
 #InternalLongJump ENDP
 
 
