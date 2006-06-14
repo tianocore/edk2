@@ -18,14 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.GuidDeclarationsDocument.GuidDeclarations;
 import org.tianocore.IncludeHeaderDocument.IncludeHeader;
 import org.tianocore.LibraryClassDeclarationDocument.LibraryClassDeclaration;
 import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations;
 import org.tianocore.PackageHeadersDocument.PackageHeaders;
+import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
 import org.tianocore.PpiDeclarationsDocument.PpiDeclarations;
+import org.tianocore.PpiDeclarationsDocument.PpiDeclarations.Entry;
 import org.tianocore.ProtocolDeclarationsDocument.ProtocolDeclarations;
 
 /**
@@ -125,15 +126,14 @@ public class Spd {
 
         if (packageHeader != null) {
             List<IncludeHeader> headerList = packageHeader.getIncludeHeaderList();
+            IncludeHeader       header;
+
             for (int i = 0; i < headerList.size(); i++) {
+                header = (IncludeHeader)headerList.get(i);
                 try {
-                    this.moduleInfo
-                                    .put(headerList.get(i).getModuleType()
-                                                    .toString(), headerList.get(i)
-                                                    .getStringValue());
+                    this.moduleInfo.put(header.getModuleType().toString(), header.getStringValue());
                 } catch (Exception e) {
-                    System.out
-                                    .print("can't find ModuleHeaders ModuleType & includeHeader!\n");
+                    System.out.print("can't find ModuleHeaders ModuleType & includeHeader!\n");
                 }
             }
         }
@@ -149,19 +149,26 @@ public class Spd {
   **/
     public void genPpiInfoList(PpiDeclarations ppiInfo) {
         String[] cNameGuid = new String[2];
+        String   guidString;
 
         if (ppiInfo != null) {
             List<PpiDeclarations.Entry> ppiEntryList = ppiInfo.getEntryList();
+            PpiDeclarations.Entry       ppiEntry;
+
             for (int i = 0; i < ppiEntryList.size(); i++) {
+                ppiEntry = (PpiDeclarations.Entry)ppiEntryList.get(i);
                 try {
-                    cNameGuid[0] = ppiEntryList.get(i).getCName();
-                    cNameGuid[1] = formatGuidName(ppiEntryList.get(i)
-                                    .getGuid().getStringValue());
-                    this.ppiInfo.put(ppiEntryList.get(i).getName(), new String[] {
-                                    cNameGuid[0], cNameGuid[1] });
+                    if (ppiEntry.isSetGuidValue()) {
+                        guidString = ppiEntry.getGuidValue();
+                    } else {
+                        guidString = ppiEntry.getGuid().getStringValue();
+                    }
+
+                    cNameGuid[0] = ppiEntry.getCName();
+                    cNameGuid[1] = formatGuidName(guidString);
+                    this.ppiInfo.put(ppiEntry.getName(), new String[] { cNameGuid[0], cNameGuid[1] });
                 } catch (Exception e) {
-                    System.out
-                                    .print("can't find GuidDeclarations C_Name & Guid!\n");
+                    System.out.print("can't find GuidDeclarations C_Name & Guid!\n");
                 }
             }
         }
@@ -177,20 +184,26 @@ public class Spd {
     **/
     public void genProtocolInfoList(ProtocolDeclarations proInfo) {
         String[] cNameGuid = new String[2];
+        String   guidString;
+
         if (proInfo != null) {
             List<ProtocolDeclarations.Entry> protocolEntryList = proInfo.getEntryList();
+            ProtocolDeclarations.Entry       protocolEntry;
             for (int i = 0; i < protocolEntryList.size(); i++) {
+                protocolEntry = (ProtocolDeclarations.Entry)protocolEntryList.get(i);
                 try {
-                    cNameGuid[0] = protocolEntryList.get(i).getCName();
-                    cNameGuid[1] = formatGuidName(protocolEntryList.get(i)
-                                    .getGuid().getStringValue());
+                    if (protocolEntry.isSetGuidValue()) {
+                        guidString = protocolEntry.getGuidValue();
+                    } else {
+                        guidString = protocolEntry.getGuid().getStringValue();
+                    }
+                    cNameGuid[0] = protocolEntry.getCName();
+                    cNameGuid[1] = formatGuidName(guidString);
 
-                    String temp = new String(protocolEntryList.get(i).getName());
-                    this.protocolInfo.put(temp, new String[] { cNameGuid[0],
-                                    cNameGuid[1] });
+                    String temp = new String(protocolEntry.getName());
+                    this.protocolInfo.put(temp, new String[] { cNameGuid[0], cNameGuid[1] });
                 } catch (Exception e) {
-                    System.out
-                                    .print("can't find ProtocolDeclarations C_Name & Guid!\n");
+                    System.out.print("can't find ProtocolDeclarations C_Name & Guid!\n");
                 }
             }
         }
@@ -207,15 +220,23 @@ public class Spd {
     **/
     public void genGuidInfoList(GuidDeclarations guidInfo) {
         String[] cNameGuid = new String[2];
+        String   guidString;
+
         if (guidInfo != null) {
             
-            List<GuidDeclarations.Entry> guidEntryList = guidInfo.getEntryList();
+            List<GuidDeclarations.Entry>    guidEntryList = guidInfo.getEntryList();
+            GuidDeclarations.Entry          guidEntry;
             for (int i = 0; i < guidEntryList.size(); i++) {
-                cNameGuid[0] = guidEntryList.get(i).getCName();
-                cNameGuid[1] = formatGuidName(guidEntryList.get(i)
-                                .getGuid().getStringValue());
-                this.guidInfo.put(guidEntryList.get(i).getName(), new String[] {
-                                cNameGuid[0], cNameGuid[1] });
+                guidEntry = (GuidDeclarations.Entry)guidEntryList.get(i);
+                if (guidEntry.isSetGuidValue()) {
+                    guidString = guidEntry.getGuidValue();
+                } else {
+                    guidString = guidEntry.getGuid().getStringValue();
+                }
+                    
+                cNameGuid[0] = guidEntry.getCName();
+                cNameGuid[1] = formatGuidName(guidString);
+                this.guidInfo.put(guidEntry.getName(), new String[] {cNameGuid[0], cNameGuid[1] });
             }
         }
     }

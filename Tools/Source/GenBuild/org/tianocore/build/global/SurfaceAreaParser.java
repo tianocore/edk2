@@ -83,6 +83,7 @@ public class SurfaceAreaParser {
                         .getLibraryClassDefinitions());
         msaMap.put("SourceFiles", doc.getModuleSurfaceArea().getSourceFiles());
         msaMap.put("Includes", doc.getModuleSurfaceArea().getIncludes());
+        msaMap.put("PackageDependencies", doc.getModuleSurfaceArea().getPackageDependencies());
         msaMap.put("Protocols", doc.getModuleSurfaceArea().getProtocols());
 
         msaMap.put("Events", doc.getModuleSurfaceArea().getEvents());

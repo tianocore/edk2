@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.global;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,15 +27,18 @@ import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.xmlbeans.XmlObject;
+import org.tianocore.FilenameDocument;
+import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.MsaFilesDocument;
-import org.tianocore.PackageListDocument;
-import org.tianocore.PackageSurfaceAreaDocument;
+import org.tianocore.MsaFilesDocument.MsaFiles.MsaFile;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.MsaLibHeaderDocument.MsaLibHeader;
-import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
+import org.tianocore.PackageListDocument;
+import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.fpd.FpdParserTask;
+import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
 
 /**
   GlobalData provide initializing, instoring, querying and update global data.
@@ -291,27 +295,44 @@ public class GlobalData {
         File packageFile = new File(packageFilename);
         try {
             PackageSurfaceAreaDocument spd = (PackageSurfaceAreaDocument) XmlObject.Factory.parse(packageFile);
+            List<FilenameDocument.Filename> msaFilenameList;
+
             List<MsaFilesDocument.MsaFiles.MsaFile> msasList = spd.getPackageSurfaceArea().getMsaFiles()
                                                                   .getMsaFileList();
-            Iterator msasIter = msasList.iterator();
-            while (msasIter.hasNext()) {
-                MsaFilesDocument.MsaFiles.MsaFile msas = (MsaFilesDocument.MsaFiles.MsaFile) msasIter.next();
-                String msaFilename = msas.getFilename().getStringValue();
+            if (msasList.size() == 0) {
+                msaFilenameList = spd.getPackageSurfaceArea().getMsaFiles().getFilenameList();
+            } else {
+                msaFilenameList = new ArrayList<FilenameDocument.Filename>(msasList.size());
+                Iterator msasIter = msasList.iterator();
+                while (msasIter.hasNext()) {
+                    MsaFilesDocument.MsaFiles.MsaFile msaFile = (MsaFilesDocument.MsaFiles.MsaFile)msasIter.next();
+                    msaFilenameList.add(msaFile.getFilename());
+                }
+            }
+
+            Iterator msaFilenameIter = msaFilenameList.iterator();
+            while (msaFilenameIter.hasNext()) {
+                FilenameDocument.Filename msaFilename = (FilenameDocument.Filename)msaFilenameIter.next();
+                String filename = msaFilename.getStringValue();
                 File msaFile = new File(workspaceDir + File.separatorChar + GlobalData.getPackagePath(packageName)
-                                        + File.separatorChar + msaFilename);
+                                        + File.separatorChar + filename);
                 SurfaceAreaParser surfaceAreaParser = new SurfaceAreaParser();
                 Map<String, XmlObject> map = surfaceAreaParser.parseFile(msaFile);
                 String baseName = "";
                 XmlObject header = null;
                 if ((header = map.get("MsaHeader")) != null) {
-                    baseName = ((MsaHeader) header).getBaseName().getStringValue();
+                    if (((MsaHeader) header).isSetBaseName()) {
+                        baseName = ((MsaHeader) header).getBaseName().getStringValue();
+                    } else {
+                        baseName = ((MsaHeader) header).getModuleName();
+                    }
                 } else if ((header = map.get("MsaLibHeader")) != null) {
                     baseName = ((MsaLibHeader) header).getBaseName().getStringValue();
                 } else {
                     continue;
                 }
                 nativeMsa.put(baseName, map);
-                String[] info = { msaFilename, packageName };
+                String[] info = { filename, packageName };
                 moduleInfo.put(baseName, info);
             }
         } catch (Exception e) {
@@ -472,7 +493,8 @@ public class GlobalData {
         String mbdFilename = getMbdFilename(moduleName);
         File mbdFile = new File(mbdFilename);
         if (!mbdFile.exists()) {
-            throw new BuildException("Info: Surface Area file [" + mbdFile.getPath() + "] can't found.");
+            return null;
+            //throw new BuildException("Info: Surface Area file [" + mbdFile.getPath() + "] can't found.");
         }
         SurfaceAreaParser surfaceAreaParser = new SurfaceAreaParser();
         Map<String, XmlObject> map = surfaceAreaParser.parseFile(mbdFile);

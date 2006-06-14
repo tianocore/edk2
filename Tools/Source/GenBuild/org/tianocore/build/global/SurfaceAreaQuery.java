@@ -44,6 +44,8 @@ import org.tianocore.PPIsDocument;
 import org.tianocore.PackageNameDocument;
 import org.tianocore.ProtocolsDocument;
 import org.tianocore.PcdCodedDocument.PcdCoded;
+import org.tianocore.MsaHeaderDocument;
+import org.tianocore.MsaHeaderDocument.MsaHeader;
 
 /**
   SurfaceAreaQuery class is used to query Surface Area information from msa, mbd,
@@ -233,7 +235,8 @@ public class SurfaceAreaQuery {
                 };
         } else {
             xPath = new String[] {
-                "/Filename[not(@ArchType) or @ArchType='ALL' or @ArchType='" + arch + "']",
+                "/Filename[not(@SupArchList) and not(@ArchType) or @SupArchList='ALL' or @SupArchList='" + arch + "' or @ArchType='ALL' or @ArchType='" + arch + "']",
+                "/Filename[not(@SupArchList) and not(@ArchType) or @ArchType='ALL' or @ArchType='" + arch + "']",
                 "/Arch[@ArchType='ALL' or @ArchType='" + arch + "']/Filename"
                 };
         }
@@ -300,6 +303,7 @@ public class SurfaceAreaQuery {
         } else {
             xPath = new String[] {
                 "/Option",
+                "/Option[@SupArchList='ALL' or @SupArchList='" + arch + "']",
                 "/Arch[@ArchType='ALL' or @ArchType='" + arch + "']/Option"
                 };
         }
@@ -341,6 +345,17 @@ public class SurfaceAreaQuery {
         return result;
     }
     
+    public static String getModuleName() {
+        String[] xPath = new String[] { "/ModuleName", "/BaseName" };
+
+        XmlObject[] returns = get(xPath);
+        if (returns != null && returns.length > 0) {
+            return returns[0].toString();
+        }
+
+        return null;
+    }
+
     /**
      Retrieve <xxxHeader>/ModuleType
 
@@ -396,13 +411,18 @@ public class SurfaceAreaQuery {
         } else {
             xPath = new String[] {
                 "/PackageName",
+                "/PackageName[@SupArchList='ALL' or @SupArchList='" + arch + "']",
+                "/PackageName[@Arch='ALL' or @Arch='" + arch + "']",
                 "/Arch[@ArchType='ALL' or @ArchType='" + arch + "']/PackageName"
                 };
         }
         
         XmlObject[] returns = get("Includes", xPath);
         if (returns == null || returns.length == 0) {
-            return null;
+            returns = get("PackageDependencies", xPath);
+            if (returns == null || returns.length == 0) {
+                return null;
+            }
         }
 
         List<String> packageNames = new ArrayList<String>();
@@ -471,12 +491,34 @@ public class SurfaceAreaQuery {
      @returns   null                    if nothing is there
      **/
     public static String getModuleGuid() {
-        String[] xPath = new String[] { "/Guid" };
+        String[] xPath = new String[] { "" };
 
-        XmlObject[] returns = get(xPath);
+        XmlObject[] returns = get("MsaHeader", xPath);
         if (returns != null && returns.length > 0) {
-            GuidDocument.Guid guid = (GuidDocument.Guid) returns[0];
-            return guid.getStringValue();
+            MsaHeaderDocument.MsaHeader moduleHeader = (MsaHeaderDocument.MsaHeader) returns[0];
+            if (moduleHeader.isSetGuid()) {
+                return moduleHeader.getGuid().getStringValue();
+            } else if (moduleHeader.isSetGuidValue()) {
+                return moduleHeader.getGuidValue();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     Retrieve module Guid string
+ 
+     @returns   GUILD string            if elements are found at the known xpath
+     @returns   null                    if nothing is there
+     **/
+    public static String getModuleGuidValue() {
+        String[] xPath = new String[] { "" };
+
+        XmlObject[] returns = get("MsaHeader", xPath);
+        if (returns != null && returns.length > 0) {            
+            MsaHeaderDocument.MsaHeader moduleHeader = (MsaHeaderDocument.MsaHeader) returns[0];
+            return moduleHeader.getGuidValue();
         }
 
         return null;
@@ -676,7 +718,8 @@ public class SurfaceAreaQuery {
         }
         
         xPath = new String[] {
-                "/Library" + usageAttribute,
+                "/Library" + archAttribute, //usageAttribute,
+                "/Library[not(@SupArchList) or @SupArchList='" + arch + "']",
                 "/Arch" + archAttribute + "/Library" + usageAttribute
                 };
 
@@ -832,6 +875,11 @@ public class SurfaceAreaQuery {
 
         XmlObject[] result = get("FrameworkPlatformDescription", xPath);
         if (result == null) {
+            xPath = new String[] { "/FrameworkModules/*/ModuleSA" };
+            result = get("FrameworkPlatformDescription", xPath);
+            if (result != null) {
+                return (ModuleSADocument.ModuleSA[]) result;
+            }
             return new ModuleSADocument.ModuleSA[0];
         }
 
