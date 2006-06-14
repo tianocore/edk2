@@ -246,6 +246,9 @@ public class SpdFileContents {
      @param libClass Caller allocated two-dimentional String array
     **/
     public void getSpdLibClassDeclarations(String[][] libClass) {
+        if (psaRoot.getLibraryClassDeclarations() == null){
+            return;
+        }
         List<LibraryClassDeclarationDocument.LibraryClassDeclaration> l = psaRoot.getLibraryClassDeclarations()
                                                                                  .getLibraryClassDeclarationList();
         int i = 0;
@@ -283,6 +286,9 @@ public class SpdFileContents {
     @param msaFile Caller allocated two-dimentional String array
    **/
     public void getSpdMsaFiles(String[][] msaFile) {
+        if (psaRoot.getMsaFiles() == null) {
+            return;
+        }
         List<MsaFilesDocument.MsaFiles.MsaFile> l = psaRoot.getMsaFiles().getMsaFileList();
         int i = 0;
         ListIterator li = l.listIterator();
@@ -314,6 +320,10 @@ public class SpdFileContents {
     @param pkgHeader Caller allocated two-dimentional String array
    **/
     public void getSpdPackageHeaders(String[][] pkgHeader) {
+        if (psaRoot.getPackageHeaders() == null) {
+            return;
+        }
+
         List<IncludeHeaderDocument.IncludeHeader> l = psaRoot.getPackageHeaders().getIncludeHeaderList();
         int i = 0;
         ListIterator li = l.listIterator();
@@ -346,6 +356,10 @@ public class SpdFileContents {
     @param guid Caller allocated two-dimentional String array
    **/
     public void getSpdGuidDeclarations(String[][] guid) {
+        if (psaRoot.getGuidDeclarations() == null) {
+            return;
+        }
+        
         List<GuidDeclarationsDocument.GuidDeclarations.Entry> l = psaRoot.getGuidDeclarations().getEntryList();
         int i = 0;
         ListIterator li = l.listIterator();
@@ -379,6 +393,10 @@ public class SpdFileContents {
     @param protocol Caller allocated two-dimentional String array
    **/
     public void getSpdProtocolDeclarations(String[][] protocol) {
+        if (psaRoot.getProtocolDeclarations() == null) {
+            return;
+        }
+        
         List<ProtocolDeclarationsDocument.ProtocolDeclarations.Entry> l = psaRoot.getProtocolDeclarations()
                                                                                  .getEntryList();
         int i = 0;
@@ -413,6 +431,10 @@ public class SpdFileContents {
     @param ppi Caller allocated two-dimentional String array
    **/
     public void getSpdPpiDeclarations(String[][] ppi) {
+        if (psaRoot.getPpiDeclarations() == null) {
+            return;
+        }
+        
         List<PpiDeclarationsDocument.PpiDeclarations.Entry> l = psaRoot.getPpiDeclarations().getEntryList();
         int i = 0;
         ListIterator li = l.listIterator();
@@ -446,6 +468,10 @@ public class SpdFileContents {
     @param pcd Caller allocated two-dimentional String array
    **/
     public void getSpdPcdDefinitions(String[][] pcd) {
+        if (psaRoot.getPcdDefinitions() == null) {
+            return;
+        }
+        
         List<PcdDefinitionsDocument.PcdDefinitions.PcdEntry> l = psaRoot.getPcdDefinitions().getPcdEntryList();
         int i = 0;
         ListIterator li = l.listIterator();
