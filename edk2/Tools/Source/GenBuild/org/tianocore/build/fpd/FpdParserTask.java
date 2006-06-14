@@ -352,6 +352,7 @@ public class FpdParserTask extends Task {
             }
             Map<String, XmlObject> msaMap = GlobalData.getNativeMsa(baseName);
             Map<String, XmlObject> mbdMap = GlobalData.getNativeMbd(baseName);
+            Map<String, XmlObject> fpdMap = new HashMap<String, XmlObject>();
             Map<String, XmlObject> map = new HashMap<String, XmlObject>();
             //
             // Whether the Module SA has parsed before or not
@@ -363,9 +364,13 @@ public class FpdParserTask extends Task {
                 // Here we can also put platform Build override
                 //
                 map = op.override(mbdMap, msaMap);
-                Map<String, XmlObject> overrideMap = op.override(
-                                getPlatformOverrideInfo(moduleSAs[i]),
-                                OverrideProcess.deal(map));
+                fpdMap = getPlatformOverrideInfo(moduleSAs[i]);
+                XmlObject buildOption = (XmlObject)fpdMap.get("BuildOptions");
+                buildOption = (XmlObject)fpdMap.get("PackageDependencies");
+                buildOption = (XmlObject)fpdMap.get("BuildOptions");
+                buildOption = op.override(buildOption, platformBuildOptions);
+                fpdMap.put("BuildOptions", ((BuildOptionsDocument)buildOption).getBuildOptions());
+                Map<String, XmlObject> overrideMap = op.override(fpdMap, OverrideProcess.deal(map));
                 GlobalData.registerModule(baseName, overrideMap);
             } else {
                 map = GlobalData.getDoc(baseName);
@@ -460,6 +465,7 @@ public class FpdParserTask extends Task {
         Map<String, XmlObject> map = new HashMap<String, XmlObject>();
         map.put("SourceFiles", sa.getSourceFiles());
         map.put("Includes", sa.getIncludes());
+        map.put("PackageDependencies", null);
         map.put("Libraries", sa.getLibraries());
         map.put("Protocols", sa.getProtocols());
         map.put("Events", sa.getEvents());
@@ -472,7 +478,7 @@ public class FpdParserTask extends Task {
         map.put("Formsets", sa.getFormsets());
         map.put("Guids", sa.getGuids());
         map.put("Externs", sa.getExterns());
-        map.put("BuildOptions", platformBuildOptions);
+        map.put("BuildOptions", sa.getBuildOptions());//platformBuildOptions);
         return map;
     }
 

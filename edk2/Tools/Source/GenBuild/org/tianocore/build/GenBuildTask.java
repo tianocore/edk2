@@ -1063,10 +1063,13 @@ public class GenBuildTask extends Task {
         getProject().setProperty("SDB_FILES", "");
         getProject().setProperty("BASE_NAME", baseName);
         if (map.get("MsaHeader") != null) {
-            flag = GlobalData.MSA_AND_MBD;
-            MsaHeaderDocument.MsaHeader header = ((MsaHeaderDocument) map.get("MsaHeader")).getMsaHeader();
-            guid = header.getGuid().getStringValue();
-            componentType = header.getComponentType().toString();
+            guid = SurfaceAreaQuery.getModuleGuid();//header.getGuid().getStringValue();
+            componentType = SurfaceAreaQuery.getComponentType();//header.getComponentType().toString();
+            if (!componentType.equalsIgnoreCase("LIBRARY")) {
+                flag = GlobalData.MSA_AND_MBD;
+            } else {
+                flag = GlobalData.LIBMSA_AND_LIBMBD;
+            }
         } 
         
         else if (map.get("MsaLibHeader") != null) {
@@ -1080,7 +1083,7 @@ public class GenBuildTask extends Task {
         if (componentType != null) {
             getProject().setProperty("COMPONENT_TYPE", componentType);
         }
-        
+
         if (guid != null) {
             getProject().setProperty("FILE_GUID", guid);
         }

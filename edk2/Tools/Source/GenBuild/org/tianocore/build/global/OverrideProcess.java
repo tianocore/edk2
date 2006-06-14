@@ -42,6 +42,7 @@ import org.tianocore.ProtocolsDocument;
 import org.tianocore.SourceFilesDocument;
 import org.tianocore.SystemTablesDocument;
 import org.tianocore.VariablesDocument;
+import org.tianocore.PackageDependenciesDocument;
 
 /**
   This class is used to override surface area information. For example, MBD can
@@ -110,7 +111,7 @@ public class OverrideProcess {
     /// list of top elements of surface area
     ///
     public static String[] topElements = { "LibraryClassDefinitions",
-                    "SourceFiles", "Includes", "Libraries", "Protocols",
+                    "SourceFiles", "Includes", "PackageDependencies", "Libraries", "Protocols",
                     "Events", "Hobs", "PPIs", "Variables", "BootModes",
                     "SystemTables", "DataHubs", "Formsets", "Guids", "Externs",
                     "PcdCoded", "BuildOptions" };
@@ -177,6 +178,10 @@ public class OverrideProcess {
         if (map.get("Includes") != null) {
             newMap.put("Includes", ((IncludesDocument) map.get("Includes"))
                             .getIncludes());
+        }
+        if (map.get("PackageDependencies") != null) {
+            newMap.put("PackageDependencies", ((PackageDependenciesDocument) map.get("PackageDependencies"))
+                            .getPackageDependencies());
         }
         if (map.get("Libraries") != null) {
             newMap.put("Libraries", ((LibrariesDocument) map.get("Libraries"))
@@ -285,8 +290,11 @@ public class OverrideProcess {
         result.put("MsaHeader", override(l.get("MsaHeader"), null));
         result.put("MsaLibHeader", override(l.get("MsaLibHeader"), null));
         for (int i = 0; i < topElements.length; i++) {
-            result.put(topElements[i], override(h.get(topElements[i]), l
-                            .get(topElements[i])));
+            if (h != null) {
+                result.put(topElements[i], override(h.get(topElements[i]), l.get(topElements[i])));
+            } else {
+                result.put(topElements[i], override(l.get(topElements[i]), null));
+            }
         }
         return result;
     }
@@ -310,8 +318,7 @@ public class OverrideProcess {
         }
         XmlCursor hc = h.newCursor();
         if (h.getClass() != l.getClass()) {
-            System.out
-                            .println("Error: Two XmlObject does not with compliant format.");
+            System.out.println("Error: Two XmlObject does not with compliant format.");
             return null;
         }
         if (!hc.toFirstChild()) {
