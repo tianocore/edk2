@@ -81,9 +81,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       outputfileproperty="result"
       >
       <fileset dir="${ToolName}" includes="${LibFileSet}" defaultexcludes="TRUE" excludes="*.xml *.inf"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
+      <includepath path="${PACKAGE_DIR}/Include"/>
+      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
+      <includepath path="${PACKAGE_DIR}/Include/Common"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <includepath path="${env.JAVA_HOME}/include"/>
       <includepath path="${env.JAVA_HOME}/include/win32" if="windows"/>
