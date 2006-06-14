@@ -132,6 +132,9 @@
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="ModuleName" type="xs:NCName" use="optional"/>
+        <xs:attribute name="ModuleVersion" type="VersionDataType" use="optional"/>
+        <xs:attribute name="ModuleGuid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
