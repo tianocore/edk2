@@ -1485,15 +1485,15 @@ public class CollectPCDAction {
                 // <ModuleSAs>, It is work around code.
                 // 
                 primaryKey1 = UsageInstance.getPrimaryKey(modules.get(index).module.getModuleName(), 
-                                                          translateSchemaStringToUUID(modules.get(index).module.getModuleGuid()),
-                                                          modules.get(index).module.getPackageName(), 
-                                                          translateSchemaStringToUUID(modules.get(index).module.getPackageGuid()), 
+                                                          null,
+                                                          null, 
+                                                          null, 
                                                           modules.get(index).module.getArch().toString(),
                                                           null);
                 primaryKey2 = UsageInstance.getPrimaryKey(modules.get(index2).module.getModuleName(), 
-                                                          translateSchemaStringToUUID(modules.get(index2).module.getModuleGuid()), 
-                                                          modules.get(index2).module.getPackageName(), 
-                                                          translateSchemaStringToUUID(modules.get(index2).module.getPackageGuid()), 
+                                                          null, 
+                                                          null, 
+                                                          null, 
                                                           modules.get(index2).module.getArch().toString(), 
                                                           null);
                 if (primaryKey1.equalsIgnoreCase(primaryKey2)) {
@@ -1531,6 +1531,17 @@ public class CollectPCDAction {
                 tokenNumber  = Integer.decode(pcdBuildData.getToken().toString());
                 datum        = pcdBuildData.getValue();
                 maxDatumSize = pcdBuildData.getMaxDatumSize();
+
+                //
+                // Check <TokenSpaceGuid> is exist? In future, because all schema verification will tools
+                // will check that, following checking code could be removed.
+                // 
+                if (pcdBuildData.getTokenSpaceGuid() == null) {
+                    exceptionString = String.format("[FPD file error] There is no <TokenSpaceGuid> for PCD %s in module %s! This is required!",
+                                                    pcdBuildData.getCName(),
+                                                    moduleName);
+                    throw new EntityException(exceptionString);
+                }
 
                 //
                 // -------------------------------------------------------------------------------------------
@@ -1676,9 +1687,9 @@ public class CollectPCDAction {
                 // 
                 usageInstance = new UsageInstance(token, 
                                                   moduleName, 
-                                                  translateSchemaStringToUUID(modules.get(index).module.getModuleGuid()),
-                                                  modules.get(index).module.getPackageName(),
-                                                  translateSchemaStringToUUID(modules.get(index).module.getPackageGuid()),
+                                                  null,
+                                                  null,
+                                                  null,
                                                   modules.get(index).type, 
                                                   pcdType,
                                                   modules.get(index).module.getArch().toString(), 
@@ -1734,6 +1745,16 @@ public class CollectPCDAction {
 
         dynamicPcdBuildDataArray = dynamicPcdBuildDefinitions.getPcdBuildDataList();
         for (index = 0; index < dynamicPcdBuildDataArray.size(); index ++) {
+            //
+            // Check <TokenSpaceGuid> is exist? In future, because all schema verification will tools
+            // will check that, following checking code could be removed.
+            // 
+            if (dynamicPcdBuildDataArray.get(index).getTokenSpaceGuid() == null) {
+                exceptionString = String.format("[FPD file error] There is no <TokenSpaceGuid> for PCD %s in <DynamicPcdBuildDefinitions>! This is required!",
+                                                dynamicPcdBuildDataArray.get(index).getCName());
+                throw new EntityException(exceptionString);
+            }
+
             dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
                                                           translateSchemaStringToUUID(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuid()));
             if (dynamicPrimaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
