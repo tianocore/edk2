@@ -131,6 +131,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -146,6 +147,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -191,6 +193,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -206,6 +209,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -251,6 +255,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -266,6 +271,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -311,6 +317,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -326,6 +333,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -371,6 +379,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -386,6 +395,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -393,6 +403,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -400,6 +411,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdVpdBaseAddress</C_Name>
             <Token>0x00010010</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x0</Value>
@@ -443,6 +455,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -458,6 +471,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -465,6 +479,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -510,6 +525,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -525,6 +541,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -568,6 +585,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -575,6 +593,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -590,6 +609,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -633,6 +653,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -640,6 +661,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -655,6 +677,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -698,6 +721,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -705,6 +729,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -720,6 +745,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -763,6 +789,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -770,6 +797,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -785,6 +813,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -828,6 +857,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -835,6 +865,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -850,6 +881,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -893,6 +925,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -900,6 +933,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -915,6 +949,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -922,6 +957,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
             <Token>0x00000009</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0</Value>
@@ -965,6 +1001,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -972,6 +1009,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -987,6 +1025,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -994,6 +1033,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
             <Token>0x00000009</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0</Value>
@@ -1037,6 +1077,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1044,6 +1085,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1059,6 +1101,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1102,6 +1145,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1109,6 +1153,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1124,6 +1169,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1167,6 +1213,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1174,6 +1221,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1189,6 +1237,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1232,6 +1281,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1239,6 +1289,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1254,6 +1305,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1297,6 +1349,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1304,6 +1357,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1319,6 +1373,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1362,6 +1417,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1369,6 +1425,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1384,6 +1441,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1427,6 +1485,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1434,6 +1493,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1449,6 +1509,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1492,6 +1553,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1499,6 +1561,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1514,6 +1577,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1525,6 +1589,7 @@
             <PcdData ItemType="FIXED_AT_BUILD">
               <C_Name>PcdMaxPeiPcdCallBackNumberPerPcdEntry</C_Name>
               <Token>0x0001000f</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
               <DatumType>UINT32</DatumType>
               <MaxDatumSize>4</MaxDatumSize>
               <Value>0x08</Value>
@@ -1532,6 +1597,7 @@
             <PcdData ItemType="FIXED_AT_BUILD">
              <C_Name>PcdVpdBaseAddress</C_Name>
                 <Token>0x00010010</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
                 <DatumType>UINT32</DatumType>
                 <MaxDatumSize>4</MaxDatumSize>
                 <Value>0x10000000</Value>
@@ -1571,6 +1637,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1578,6 +1645,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1593,6 +1661,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1636,6 +1705,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1643,6 +1713,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1658,6 +1729,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1701,6 +1773,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1708,6 +1781,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1723,6 +1797,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1766,6 +1841,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1773,6 +1849,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1788,6 +1865,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1831,6 +1909,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1838,6 +1917,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1853,6 +1933,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1896,6 +1977,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1903,6 +1985,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1918,6 +2001,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -1961,6 +2045,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -1968,6 +2053,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -1983,6 +2069,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2026,6 +2113,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2033,6 +2121,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2048,6 +2137,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2091,6 +2181,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2098,6 +2189,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2113,6 +2205,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2156,6 +2249,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2163,6 +2257,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2178,6 +2273,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2221,6 +2317,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2228,6 +2325,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2243,6 +2341,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2286,6 +2385,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2293,6 +2393,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2308,6 +2409,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2351,6 +2453,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2358,6 +2461,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2373,6 +2477,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2416,6 +2521,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2423,6 +2529,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2438,6 +2545,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2481,6 +2589,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2488,6 +2597,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2503,6 +2613,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2546,6 +2657,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2553,6 +2665,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2568,6 +2681,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2611,6 +2725,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2618,6 +2733,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2633,6 +2749,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2676,6 +2793,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2683,6 +2801,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2698,6 +2817,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2741,6 +2861,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2748,6 +2869,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2763,6 +2885,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2806,6 +2929,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2813,6 +2937,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2828,6 +2953,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2871,6 +2997,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2878,6 +3005,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2893,6 +3021,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2936,6 +3065,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -2943,6 +3073,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -2958,6 +3089,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -2965,6 +3097,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
             <Token>0x00000009</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0</Value>
@@ -3008,6 +3141,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3015,6 +3149,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3030,6 +3165,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3073,6 +3209,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3080,6 +3217,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3095,6 +3233,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3138,6 +3277,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3145,6 +3285,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3160,6 +3301,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3203,6 +3345,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3210,6 +3353,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3225,6 +3369,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3268,6 +3413,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3275,6 +3421,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3290,6 +3437,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3333,6 +3481,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3340,6 +3489,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3355,6 +3505,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3398,6 +3549,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3405,6 +3557,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3420,6 +3573,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3463,6 +3617,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3470,6 +3625,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3485,6 +3641,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3528,6 +3685,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3535,6 +3693,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3550,6 +3709,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
@@ -3593,6 +3753,7 @@
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdDebugPrintErrorLevel</C_Name>
             <Token>0x00000006</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT32</DatumType>
             <MaxDatumSize>4</MaxDatumSize>
             <Value>0x80000000</Value>
@@ -3600,6 +3761,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdReportStatusCodePropertyMask</C_Name>
             <Token>0x00000007</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0x07</Value>
@@ -3615,6 +3777,7 @@
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugClearMemoryValue</C_Name>
             <Token>0x00000008</Token>
+            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>UINT8</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
             <Value>0xAF</Value>
