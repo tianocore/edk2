@@ -89,9 +89,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}" />
 
-      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
+      <includepath path="${PACKAGE_DIR}/Include"/>
+      <includepath path="${PACKAGE_DIR}/Include/Common"/>
+      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
 			<libset dir="${LIB_DIR}" libs="CommonTools"/>
     </cc>

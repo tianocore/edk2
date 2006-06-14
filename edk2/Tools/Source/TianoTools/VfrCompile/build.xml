@@ -123,10 +123,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         includes="${FileSetPccts}" />
 
       <includepath path="${env.WORKSPACE}/Tools/Source/TianoTools/Pccts/h"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Ia32"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Common"/>
-      <includepath path="${env.WORKSPACE}/MdePkg/Include/Protocol"/>
+      <includepath path="${PACKAGE_DIR}/Include"/>
+      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
+      <includepath path="${PACKAGE_DIR}/Include/Common"/>
+      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
       <syslibset libs="${gxx_extra_libs}" if="gcc"/>
