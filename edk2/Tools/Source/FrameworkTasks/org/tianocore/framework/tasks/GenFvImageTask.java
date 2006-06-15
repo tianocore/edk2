@@ -94,7 +94,7 @@ public class GenFvImageTask extends Task implements EfiDefine{
             throw new BuildException(e.getMessage());
         } finally {
             if (exitCode != 0) {
-                throw new BuildException("GenFvImage: failed to generate FV file!");
+                //throw new BuildException("GenFvImage: failed to generate FV file!");
             }
         }
 
