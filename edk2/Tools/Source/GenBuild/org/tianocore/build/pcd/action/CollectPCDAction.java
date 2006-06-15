@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,8 +34,8 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions;
-import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo;
 import org.tianocore.FrameworkModulesDocument;
 import org.tianocore.FrameworkPlatformDescriptionDocument;
 import org.tianocore.FrameworkPlatformDescriptionDocument.FrameworkPlatformDescription;
@@ -1562,10 +1563,11 @@ public class CollectPCDAction {
                      //
                      // Check whether the datum size is matched datum type.
                      // 
-                     if ((exceptionString = verifyDatumSize(pcdBuildData.getCName(), 
-                                                            moduleName,
-                                                            maxDatumSize, 
-                                                            datumType)) != null) {
+                     if ((exceptionString = verifyDatum(pcdBuildData.getCName(), 
+                                                        moduleName,
+                                                        datum,
+                                                        datumType,
+                                                        maxDatumSize)) != null) {
                          throw new EntityException(exceptionString);
                      }
                 }
@@ -1702,6 +1704,304 @@ public class CollectPCDAction {
     }
 
     /**
+       Verify the datum value according its datum size and datum type, this
+       function maybe moved to FPD verification tools in future.
+       
+       @param cName
+       @param moduleName
+       @param datum
+       @param datumType
+       @param maxDatumSize
+       
+       @return String
+     */
+    /***/
+    public String verifyDatum(String            cName,
+                              String            moduleName,
+                              String            datum, 
+                              Token.DATUM_TYPE  datumType, 
+                              int               maxDatumSize) {
+        String      exceptionString = null;
+        int         value;
+        BigInteger  value64;
+        String      subStr;
+
+        if (moduleName == null) {
+            moduleName = "section <DynamicPcdBuildDefinitions>";
+        } else {
+            moduleName = "module " + moduleName;
+        }
+
+        if (maxDatumSize == 0) {
+            exceptionString = String.format("[FPD file error] You maybe miss <MaxDatumSize> for PCD %s in %s",
+                                            cName,
+                                            moduleName);
+            return exceptionString;
+        }
+
+        switch (datumType) {
+        case UINT8:
+            if (maxDatumSize != 1) {
+                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in %s "+
+                                                "is UINT8, but datum size is %d, they are not matched!",
+                                                 cName,
+                                                 moduleName,
+                                                 maxDatumSize);
+                return exceptionString;
+            }
+
+            if (datum != null) {
+                try {
+                    value = Integer.decode(datum);
+                } catch (NumberFormatException nfeExp) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is not valid "+
+                                                    "digital format of UINT8",
+                                                    cName,
+                                                    moduleName);
+                    return exceptionString;
+                }
+                if (value > 0xFF) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is %s exceed"+
+                                                    " the max size of UINT8 - 0xFF",
+                                                    cName, 
+                                                    moduleName,
+                                                    datum);
+                    return exceptionString;
+                }
+            }
+            break;
+        case UINT16:
+            if (maxDatumSize != 2) {
+                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in %s "+
+                                                "is UINT16, but datum size is %d, they are not matched!",
+                                                 cName,
+                                                 moduleName,
+                                                 maxDatumSize);
+                return exceptionString;
+            }
+            if (datum != null) {
+                try {
+                    value = Integer.decode(datum);
+                } catch (NumberFormatException nfeExp) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is "+
+                                                    "not valid digital of UINT16",
+                                                    cName,
+                                                    moduleName);
+                    return exceptionString;
+                }
+                if (value > 0xFFFF) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is %s "+
+                                                    "which exceed the range of UINT16 - 0xFFFF",
+                                                    cName, 
+                                                    moduleName,
+                                                    datum);
+                    return exceptionString;
+                }
+            }
+            break;
+        case UINT32:
+            if (maxDatumSize != 4) {
+                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in %s "+
+                                                "is UINT32, but datum size is %d, they are not matched!",
+                                                 cName,
+                                                 moduleName,
+                                                 maxDatumSize);
+                return exceptionString;
+            }
+
+            if (datum != null) {
+                try {
+                    if (datum.length() > 2) {
+                        if ((datum.charAt(0) == '0')        && 
+                            ((datum.charAt(1) == 'x') || (datum.charAt(1) == 'X'))){
+                            subStr = datum.substring(2, datum.length());
+                            value64 = new BigInteger(subStr, 16);
+                        } else {
+                            value64 = new BigInteger(datum);
+                        }
+                    } else {
+                        value64 = new BigInteger(datum);
+                    }
+                } catch (NumberFormatException nfeExp) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is not "+
+                                                    "valid digital of UINT32",
+                                                    cName,
+                                                    moduleName);
+                    return exceptionString;
+                }
+
+                if (value64.bitLength() > 32) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is %s which "+
+                                                    "exceed the range of UINT32 - 0xFFFFFFFF",
+                                                    cName, 
+                                                    moduleName,
+                                                    datum);
+                    return exceptionString;
+                }
+            }
+            break;
+        case UINT64:
+            if (maxDatumSize != 8) {
+                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in %s "+
+                                                "is UINT64, but datum size is %d, they are not matched!",
+                                                 cName,
+                                                 moduleName,
+                                                 maxDatumSize);
+                return exceptionString;
+            }
+
+            if (datum != null) {
+                try {
+                    if (datum.length() > 2) {
+                        if ((datum.charAt(0) == '0')        && 
+                            ((datum.charAt(1) == 'x') || (datum.charAt(1) == 'X'))){
+                            subStr = datum.substring(2, datum.length());
+                            value64 = new BigInteger(subStr, 16);
+                        } else {
+                            value64 = new BigInteger(datum);
+                        }
+                    } else {
+                        value64 = new BigInteger(datum);
+                    }
+                } catch (NumberFormatException nfeExp) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is not valid"+
+                                                    " digital of UINT64",
+                                                    cName,
+                                                    moduleName);
+                    return exceptionString;
+                }
+
+                if (value64.bitLength() > 64) {
+                    exceptionString = String.format("[FPD file error] The datum for PCD %s in %s is %s "+
+                                                    "exceed the range of UINT64 - 0xFFFFFFFFFFFFFFFF",
+                                                    cName, 
+                                                    moduleName,
+                                                    datum);
+                    return exceptionString;
+                }
+            }
+            break;
+        case BOOLEAN:
+            if (maxDatumSize != 1) {
+                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in %s "+
+                                                "is BOOLEAN, but datum size is %d, they are not matched!",
+                                                 cName,
+                                                 moduleName,
+                                                 maxDatumSize);
+                return exceptionString;
+            }
+
+            if (datum != null) {
+                if (!(datum.equalsIgnoreCase("TRUE") ||
+                     datum.equalsIgnoreCase("FALSE"))) {
+                    exceptionString = String.format("[FPD file error] The datum type of PCD data %s in %s "+
+                                                    "is BOOELAN, but value is not 'true'/'TRUE' or 'FALSE'/'false'",
+                                                    cName,
+                                                    moduleName);
+                    return exceptionString;
+                }
+
+            }
+            break;
+        case POINTER:
+            if (datum == null) {
+                break;
+            }
+
+            char    ch     = datum.charAt(0);
+            int     start, end;
+            String  strValue;
+            //
+            // For void* type PCD, only three datum is support:
+            // 1) Unicode: string with start char is "L"
+            // 2) Ansci: String start char is ""
+            // 3) byte array: String start char "{"
+            // 
+            if (ch == 'L') {
+                start       = datum.indexOf('\"');
+                end         = datum.lastIndexOf('\"');
+                if ((start > end)           || 
+                    (end   > datum.length())||
+                    ((start == end) && (datum.length() > 0))) {
+                    exceptionString = String.format("The datum type of PCD %s in %s is VOID* and datum is "+
+                                                    "a UNICODE string because start with L\", but format maybe"+
+                                                    "is not right, correct UNICODE string is L\"...\"!",
+                                                    cName,
+                                                    moduleName);
+                    return exceptionString;
+                }
+
+                strValue    = datum.substring(start + 1, end);
+                if ((strValue.length() * 2) > maxDatumSize) {
+                    exceptionString = String.format("The datum type of PCD %s in %s is VOID*, and datum is "+
+                                                    "a UNICODE string, but the datum size is %d exceed to <MaxDatumSize> : %d",
+                                                    cName,
+                                                    moduleName,
+                                                    strValue.length() * 2, 
+                                                    maxDatumSize);
+                    return exceptionString;
+                }
+            } else if (ch == '\"'){
+                start       = datum.indexOf('\"');
+                end         = datum.lastIndexOf('\"');
+                if ((start > end)           || 
+                    (end   > datum.length())||
+                    ((start == end) && (datum.length() > 0))) {
+                    exceptionString = String.format("The datum type of PCD %s in %s is VOID* and datum is "+
+                                                    "a ANSCII string because start with \", but format maybe"+
+                                                    "is not right, correct ANSIC string is \"...\"!",
+                                                    cName,
+                                                    moduleName);
+                    return exceptionString;
+                }
+                strValue    = datum.substring(start + 1, end);
+                if ((strValue.length()) > maxDatumSize) {
+                    exceptionString = String.format("The datum type of PCD %s in %s is VOID*, and datum is "+
+                                                    "a ANSCI string, but the datum size is %d which exceed to <MaxDatumSize> : %d",
+                                                    cName,
+                                                    moduleName,
+                                                    strValue.length(),
+                                                    maxDatumSize);
+                    return exceptionString;
+                }
+            } else if (ch =='{') {
+                String[]  strValueArray;
+
+                start           = datum.indexOf('{');
+                end             = datum.lastIndexOf('}');
+                strValue        = datum.substring(start, end);
+                strValueArray   = strValue.split(",");
+                if (strValueArray.length > maxDatumSize) {
+                    exceptionString = String.format("The datum type of PCD %s in %s is VOID*, and datum is byte"+
+                                                    "array, but the number of bytes is %d which exceed to <MaxDatumSzie> : %d!",
+                                                    cName,
+                                                    moduleName,
+                                                    strValueArray.length,
+                                                    maxDatumSize);
+                    return exceptionString;
+                }
+            } else {
+                exceptionString = String.format("The datum type of PCD %s in %s is VOID*. For VOID* type, you have three format choise:\n "+
+                                                "1) UNICODE string: like L\"xxxx\";\r\n"+
+                                                "2) ANSIC string: like \"xxx\";\r\n"+
+                                                "3) Byte array: like {0x2, 0x45, 0x23}\r\n"+
+                                                "But the datum in seems does not following above format!",
+                                                cName, 
+                                                moduleName);
+                return exceptionString;
+            }
+            break;
+        default:
+            exceptionString = String.format("[FPD file error] For PCD entry %s in %s, datum type is unknown, it should be one of "+
+                                            "UINT8, UINT16, UINT32, UINT64, VOID*, BOOLEAN",
+                                            cName,
+                                            moduleName);
+            return exceptionString;
+        }
+        return null;
+    }
+
+    /**
        Get dynamic information for a dynamic PCD from <DynamicPcdBuildDefinition> seciton in FPD file.
        
        This function should be implemented in GlobalData in future.
@@ -1766,81 +2066,6 @@ public class CollectPCDAction {
     }
 
     /**
-       Verify the maxDatumSize for a PCD data is matched to Datum type.
-       
-       @param token             The token instance
-       @param moduleName        The module name who use this PCD data.
-       @param maxDatumSize      The value of max datum size in FPD file
-       @param datumType         The datum type
-       
-       @return String           if is unmatched, set the exception information
-                                as return value, otherwice is null.
-    **/
-    private String verifyDatumSize(String           cName, 
-                                   String           moduleName,
-                                   int              maxDatumSize, 
-                                   Token.DATUM_TYPE datumType) {
-        String exceptionString = null;
-
-        if (maxDatumSize == 0) {
-            exceptionString = String.format("[FPD file error] You maybe miss <MaxDatumSize> for PCD %s in module %s",
-                                            cName,
-                                            moduleName);
-            return exceptionString;
-        }
-
-        switch (datumType) {
-        case UINT8:
-            if (maxDatumSize != 1) {
-                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in module %s "+
-                                                "is UINT8, but datum size is %d, they are not matched!",
-                                                cName,
-                                                moduleName,
-                                                maxDatumSize);
-            }
-            break;
-        case UINT16:
-            if (maxDatumSize != 2) {
-                exceptionString = String.format("[FPD file error] The datum type of PCD data %s in module %s "+
-                                                "is UINT16, but datum size is %d, they are not matched!",
-                                                cName,
-                                                moduleName,
-                                                maxDatumSize);
-            }
-            break;
-        case UINT32:
-            if (maxDatumSize != 4) {
-                exceptionString = String.format("[FPD file error] the datum type of PCD data %s in module %s "+
-                                                "is UINT32, but datum size is %d, they are not matched!",
-                                                cName,
-                                                moduleName,
-                                                maxDatumSize);
-            }
-            break;
-        case UINT64:
-            if (maxDatumSize != 8) {
-                exceptionString = String.format("[FPD file error] the datum type of PCD data %s in module %s "+
-                                                "is UINT64, but datum size is %d, they are not matched!",
-                                                cName,
-                                                moduleName,
-                                                maxDatumSize);
-            }
-            break;
-        case BOOLEAN:
-            if (maxDatumSize != 1) {
-                exceptionString = String.format("[FPD file error] the datum type of PCD data %s in module %s "+
-                                                "is BOOLEAN, but datum size is %d, they are not matched!",
-                                                cName,
-                                                moduleName,
-                                                maxDatumSize);
-            }
-            break;
-        }
-
-        return exceptionString;
-    }
-
-    /**
        Update dynamic information for PCD entry.
        
        Dynamic information is retrieved from <PcdDynamicBuildDeclarations> in
@@ -1881,7 +2106,11 @@ public class CollectPCDAction {
 
         token.datumSize = dynamicInfo.getMaxDatumSize();
 
-        exceptionString = verifyDatumSize(token.cName, moduleName, token.datumSize, token.datumType);
+        exceptionString = verifyDatum(token.cName, 
+                                      moduleName,
+                                      null, 
+                                      token.datumType, 
+                                      token.datumSize);
         if (exceptionString != null) {
             throw new EntityException(exceptionString);
         }
@@ -1917,6 +2146,14 @@ public class CollectPCDAction {
             // 
             if (skuInfoList.get(index).getValue() != null) {
                 skuInstance.value.setValue(skuInfoList.get(index).getValue());
+                if ((exceptionString = verifyDatum(token.cName, 
+                                                   null, 
+                                                   skuInfoList.get(index).getValue(), 
+                                                   token.datumType, 
+                                                   token.datumSize)) != null) {
+                    throw new EntityException(exceptionString);
+                }
+
                 token.skuData.add(skuInstance);
 
                 //
@@ -1926,7 +2163,7 @@ public class CollectPCDAction {
                 if (datum != null) {
                     if ((skuInstance.id == 0)                                   &&
                         !datum.equalsIgnoreCase(skuInfoList.get(index).getValue())) {
-                        exceptionString = "[FPD file error] For dynamic PCD " + token.cName + ", the value in module is " + datum.toString() + " but the "+
+                        exceptionString = "[FPD file error] For dynamic PCD " + token.cName + ", the value in module " + moduleName + " is " + datum.toString() + " but the "+
                                           "value of sku 0 data in <DynamicPcdBuildDefinition> is " + skuInstance.value.value + ". They are must be same!"+
                                           " or you could not define value for a dynamic PCD in every <ModuleSA>!"; 
                         throw new EntityException(exceptionString);
@@ -1965,6 +2202,15 @@ public class CollectPCDAction {
                 if (exceptionString != null) {
                     throw new EntityException(exceptionString);
                 }
+
+                if ((exceptionString = verifyDatum(token.cName, 
+                                                   null, 
+                                                   skuInfoList.get(index).getHiiDefaultValue(), 
+                                                   token.datumType, 
+                                                   token.datumSize)) != null) {
+                    throw new EntityException(exceptionString);
+                }
+
                 offset = Integer.decode(skuInfoList.get(index).getVariableOffset());
                 if (offset > 0xFFFF) {
                     throw new EntityException(String.format("[FPD file error] For dynamic PCD %s ,  the variable offset defined in sku %d data "+
@@ -2124,11 +2370,11 @@ public class CollectPCDAction {
     **/
     public static void main(String argv[]) throws EntityException {
         CollectPCDAction ca = new CollectPCDAction();
-        ca.setWorkspacePath("m:/tianocore/edk2");
-        ca.setFPDFilePath("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
+        ca.setWorkspacePath("m:/tianocore_latest/edk2");
+        ca.setFPDFilePath("m:/tianocore_latest/edk2/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "m:/tianocore/edk2");
+                            "m:/tianocore_latest/edk2");
         ca.execute();
     }
 }

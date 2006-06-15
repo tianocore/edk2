@@ -298,7 +298,7 @@
             <Token>0x00001009</Token>
             <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>VOID*</DatumType>
-            <MaxDatumSize>44</MaxDatumSize>
+            <MaxDatumSize>52</MaxDatumSize>
             <Value>L"..\\..\\Fv\\Fv_Recovery.fd"</Value>
           </PcdData>
           <PcdData ItemType="FIXED_AT_BUILD">
@@ -621,7 +621,7 @@
             <Token>0x00011004</Token>
             <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>BOOLEAN</DatumType>
-            <Value>0</Value>
+            <Value>FALSE</Value>
           </PcdData>
         </PcdBuildDefinition>      
       </ModuleSA>
@@ -4973,7 +4973,7 @@
             <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
             <DatumType>BOOLEAN</DatumType>
             <MaxDatumSize>1</MaxDatumSize>
-            <Value>0x1</Value>
+            <Value>TRUE</Value>
           </PcdData>
           <PcdData ItemType="PATCHABLE_IN_MODULE">
             <C_Name>PcdWinNtBinaryPatch1</C_Name>
@@ -5690,7 +5690,7 @@
       <MaxDatumSize>1</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
-        <Value>0</Value>
+        <Value>FALSE</Value>
       </SkuInfo>
     </PcdBuildData>
     <PcdBuildData ItemType="DYNAMIC">
