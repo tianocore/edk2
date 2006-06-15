@@ -15,11 +15,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/  
 package org.tianocore.build.pcd.entity;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.tianocore.build.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.exception.EntityException;
@@ -552,49 +553,76 @@ public class Token {
             dynamicValue = getDefaultSku();
             switch (dynamicValue.type) {
             case HII_TYPE:
-                try {
-                    value = Integer.decode(dynamicValue.hiiDefaultValue);
-                } catch (NumberFormatException nfEx) {
-                    isInteger = false;
-                }
-                
-                if (isInteger && (value == 0)) {
-                    return false;
-                } else {
-                    return true;
-                }
-
+                return !isValidNullValue(dynamicValue.hiiDefaultValue);
             case VPD_TYPE:
                 return false;
-
             case DEFAULT_TYPE:
-                try{
-                    value = Integer.decode(dynamicValue.value);
-                } catch (NumberFormatException nfEx) {
-                    isInteger = false;
-                }
-
-                if (isInteger && (value == 0)) {
-                    return false;
-                } else {
-                    return true;
-                }
-
+                return !isValidNullValue(dynamicValue.value);
             }
         }
 
         return false;
     }
 
-    //
-    // TODO: Need scott's confirmation
-    // 
+    public boolean isValidNullValue(String judgedValue) {
+        int         intValue;
+        BigInteger  bigIntValue;
+
+        switch (datumType) {
+        case UINT8:
+        case UINT16:
+        case UINT32:
+            intValue = Integer.decode(judgedValue);
+            if (intValue == 0) {
+                return true;
+            }
+            break;
+        case UINT64:
+            if (judgedValue.length() > 2){
+                if ((judgedValue.charAt(0) == '0') && 
+                    ((judgedValue.charAt(1) == 'x') ||
+                     (judgedValue.charAt(1) == 'X'))) {
+                    bigIntValue = new BigInteger(judgedValue.substring(2, judgedValue.length()),  16);
+                    if (bigIntValue.bitCount() == 0) {
+                        return true;
+                    }
+                } else {
+                    bigIntValue = new BigInteger(judgedValue);
+                    if (bigIntValue.bitCount() == 0) {
+                        return true;
+                    }
+                }
+            } else  {
+                bigIntValue = new BigInteger(judgedValue);
+                if (bigIntValue.bitCount() == 0) {
+                    return true;
+                }
+            }
+            break;
+        case BOOLEAN:
+            if (judgedValue.equalsIgnoreCase("false")) {
+                return true;
+            }
+            break;
+        case POINTER:
+            if (judgedValue.equalsIgnoreCase("")        ||
+                judgedValue.equalsIgnoreCase("\"\"")   ||
+                judgedValue.equalsIgnoreCase("L\"\"")   ||
+                (judgedValue.length() == 0)             ||
+                judgedValue.equalsIgnoreCase("{}")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isStringType () {
         String str = getDefaultSku().value;
 
-        if (datumType == Token.DATUM_TYPE.POINTER &&
-            str.startsWith("L\"") && 
-            str.endsWith("\"")) {
+        //
+        // BUGBUG: need scott confirmation.
+        // 
+        if (datumType == Token.DATUM_TYPE.POINTER) {
             return true;
         }
 
