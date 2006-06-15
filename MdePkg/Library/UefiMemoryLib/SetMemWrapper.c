@@ -47,6 +47,9 @@ SetMem (
   IN      UINT8                     Value
   )
 {
-  ASSERT (Size <= MAX_ADDRESS - (UINTN)Buffer + 1);
+  if (Size == 0) {
+    return Buffer;
+  }
+  ASSERT (Size - 1 <= MAX_ADDRESS - (UINTN)Buffer);
   return InternalMemSetMem (Buffer, Size, Value);
 }
