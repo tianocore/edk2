@@ -87,7 +87,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <includepath path="${env.JAVA_HOME}/include"/>
       <includepath path="${env.JAVA_HOME}/include/win32" if="windows"/>
-      <includepath path="${env.JAVA_HOME}/include/linux" if="linux"/>
+      <includepath path="${env.JAVA_HOME}/include/linux" if="gcc"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
       <syslibset libs="kernel32" unless="gcc"/>
     </cc>
