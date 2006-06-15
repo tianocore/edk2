@@ -295,9 +295,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             </command>
           </cc>
           <replaceregexp file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.i"
-                         match="^(#line\ +1\ +.*@{FILEPATH}/@{FILENAME}\.@{FILEEXT}&quot;).+\1"
+                         match="^(#line +1 +.*@{FILEPATH}/@{FILENAME}\.@{FILEEXT}&quot;).+\1"
                          replace="; Source: ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"
                          flags="gs"/>
+          <replaceregexp file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.i"
+                         match="^(#line .*)$"
+                         replace="; \1"
+                         byline="true"/>
           <replaceregexp file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.i"
                          match="([^_a-zA-Z])0x([0-9a-fA-F]+)"
                          replace="\10\2h"
@@ -799,6 +803,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
+          <if>
+            <equals arg1="${COMPONENT_TYPE}" arg2="SEC"/>
+            <then>
+              <var name="COMPONENT_TYPE" value="SECURITY_CORE"/>
+            </then>
+          </if>
           <fwimage componenttype="${COMPONENT_TYPE}" outImage="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"
                    peImage="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" time="0"/>
           <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />
