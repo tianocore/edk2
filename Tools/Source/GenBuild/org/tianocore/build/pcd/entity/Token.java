@@ -540,6 +540,28 @@ public class Token {
 
         return null;
     }
+
+    /**
+       Get default value for a token, For HII type, HiiDefaultValue of default
+       SKU 0 will be returned; For Default type, the defaultvalue of default SKU
+       0 will be returned.
+       
+       @return String
+     */
+    public String getDynamicDefaultValue() {
+        DynamicTokenValue dynamicData = getDefaultSku();
+        if (hasDefaultValue()) {
+            switch (dynamicData.type) {
+            case HII_TYPE:
+                return dynamicData.hiiDefaultValue;
+            case DEFAULT_TYPE:
+                return dynamicData.value;
+            }
+        }
+
+        return null;
+    }
+
     //
     // BugBug: We need change this algorithm accordingly when schema is updated
     //          to support no default value.
@@ -616,13 +638,20 @@ public class Token {
         return false;
     }
 
-    public boolean isStringType () {
-        String str = getDefaultSku().value;
+    /**
+       Judege whether current value is UNICODE string type.
+       @return boolean
+     */
+    public boolean isUnicodeStringType () {
+        String str = getDynamicDefaultValue();
 
-        //
-        // BUGBUG: need scott confirmation.
-        // 
-        if (datumType == Token.DATUM_TYPE.POINTER) {
+        if (str == null) {
+            return false;
+        }
+
+        if (datumType == Token.DATUM_TYPE.POINTER &&
+            str.startsWith("L\"") && 
+            str.endsWith("\"")) {
             return true;
         }
 

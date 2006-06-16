@@ -514,7 +514,7 @@ class LocalTokenNumberTable {
 
         str =  String.format(PcdDatabase.offsetOfStrTemplate, phase, token.hasDefaultValue() ? "Init" : "Uninit", token.getPrimaryKeyString());
 
-        if (token.isStringType()) {
+        if (token.isUnicodeStringType()) {
             str += " | PCD_TYPE_STRING";
         }
 
@@ -733,7 +733,7 @@ class PcdDatabase {
             return 4;
         }
 
-        if (token.isStringType()) {
+        if (token.isUnicodeStringType()) {
             return 2;
         }
 
@@ -965,7 +965,7 @@ class PcdDatabase {
                 } else if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.VPD_TYPE) {
                     decl.add(getVpdEnableTypeDeclaration(token));
                     inst.add(getVpdEnableTypeInstantiation(token));
-                } else if (token.isStringType()) {
+                } else if (token.isUnicodeStringType()) {
                     decl.add(getStringTypeDeclaration(token));
                     inst.add(getStringTypeInstantiation(stringTable.add(token.getStringTypeString(), token), token));
                 }
@@ -1725,6 +1725,7 @@ public class CollectPCDAction {
         int         value;
         BigInteger  value64;
         String      subStr;
+        int         index;
 
         if (moduleName == null) {
             moduleName = "section <DynamicPcdBuildDefinitions>";
@@ -1923,7 +1924,7 @@ public class CollectPCDAction {
                 if ((start > end)           || 
                     (end   > datum.length())||
                     ((start == end) && (datum.length() > 0))) {
-                    exceptionString = String.format("The datum type of PCD %s in %s is VOID* and datum is "+
+                    exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID* and datum is "+
                                                     "a UNICODE string because start with L\", but format maybe"+
                                                     "is not right, correct UNICODE string is L\"...\"!",
                                                     cName,
@@ -1933,7 +1934,7 @@ public class CollectPCDAction {
 
                 strValue    = datum.substring(start + 1, end);
                 if ((strValue.length() * 2) > maxDatumSize) {
-                    exceptionString = String.format("The datum type of PCD %s in %s is VOID*, and datum is "+
+                    exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*, and datum is "+
                                                     "a UNICODE string, but the datum size is %d exceed to <MaxDatumSize> : %d",
                                                     cName,
                                                     moduleName,
@@ -1947,7 +1948,7 @@ public class CollectPCDAction {
                 if ((start > end)           || 
                     (end   > datum.length())||
                     ((start == end) && (datum.length() > 0))) {
-                    exceptionString = String.format("The datum type of PCD %s in %s is VOID* and datum is "+
+                    exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID* and datum is "+
                                                     "a ANSCII string because start with \", but format maybe"+
                                                     "is not right, correct ANSIC string is \"...\"!",
                                                     cName,
@@ -1956,7 +1957,7 @@ public class CollectPCDAction {
                 }
                 strValue    = datum.substring(start + 1, end);
                 if ((strValue.length()) > maxDatumSize) {
-                    exceptionString = String.format("The datum type of PCD %s in %s is VOID*, and datum is "+
+                    exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*, and datum is "+
                                                     "a ANSCI string, but the datum size is %d which exceed to <MaxDatumSize> : %d",
                                                     cName,
                                                     moduleName,
@@ -1969,10 +1970,36 @@ public class CollectPCDAction {
 
                 start           = datum.indexOf('{');
                 end             = datum.lastIndexOf('}');
-                strValue        = datum.substring(start, end);
+                strValue        = datum.substring(start + 1, end);
+                strValue        = strValue.trim();
+                if (strValue.length() == 0) {
+                    break;
+                }
                 strValueArray   = strValue.split(",");
+                for (index = 0; index < strValueArray.length; index ++) {
+                    try{
+                        value = Integer.decode(strValueArray[index]);
+                    } catch (NumberFormatException nfeEx) {
+                        exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*, and "+
+                                                         "it is byte array in fact. For every byte in array should be a valid"+
+                                                         "byte digital, but element %s is not a valid byte digital!",
+                                                         cName,
+                                                         moduleName,
+                                                         strValueArray[index]);
+                        return exceptionString;
+                    }
+                    if (value > 0xFF) {
+                        exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*, "+
+                                                        "it is byte array in fact. But the element of %s exceed the byte range",
+                                                        cName,
+                                                        moduleName,
+                                                        strValueArray[index]);
+                        return exceptionString;
+                    }
+                }
+
                 if (strValueArray.length > maxDatumSize) {
-                    exceptionString = String.format("The datum type of PCD %s in %s is VOID*, and datum is byte"+
+                    exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*, and datum is byte"+
                                                     "array, but the number of bytes is %d which exceed to <MaxDatumSzie> : %d!",
                                                     cName,
                                                     moduleName,
@@ -1981,7 +2008,7 @@ public class CollectPCDAction {
                     return exceptionString;
                 }
             } else {
-                exceptionString = String.format("The datum type of PCD %s in %s is VOID*. For VOID* type, you have three format choise:\n "+
+                exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*. For VOID* type, you have three format choise:\n "+
                                                 "1) UNICODE string: like L\"xxxx\";\r\n"+
                                                 "2) ANSIC string: like \"xxx\";\r\n"+
                                                 "3) Byte array: like {0x2, 0x45, 0x23}\r\n"+
