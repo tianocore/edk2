@@ -470,12 +470,12 @@ Returns:
                &FfsFileHeader
                );
     if (!EFI_ERROR (Status)) {
-      CopyMem (FileName, &FfsFileHeader->Name, sizeof (EFI_GUID));
       Status = PeiProcessFile (
                  SectionType,
-                 FfsFileHeader,
+                 &FfsFileHeader,
                  Pe32Data
                  );
+      CopyMem (FileName, &FfsFileHeader->Name, sizeof (EFI_GUID));
       return Status;
     }
     Hob.Raw = GET_NEXT_HOB (Hob);
@@ -683,7 +683,7 @@ Returns:
   //
   Status = PeiProcessFile (
             EFI_SECTION_PE32,
-            FfsHeader,
+            &FfsHeader,
             &Pe32Data
             );
 
@@ -706,9 +706,9 @@ Returns:
 
 EFI_STATUS
 PeiProcessFile (
-  IN  UINT16                 SectionType,
-  IN  EFI_FFS_FILE_HEADER    *FfsFileHeader,
-  OUT VOID                   **Pe32Data
+  IN      UINT16                 SectionType,
+  IN OUT  EFI_FFS_FILE_HEADER    **RealFfsFileHeader,
+  OUT     VOID                   **Pe32Data
   )
 /*++
 
@@ -756,6 +756,9 @@ Returns:
   EFI_GUID                        TempGuid;
   EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
   EFI_COMPRESSION_SECTION         *CompressionSection;
+  EFI_FFS_FILE_HEADER             *FfsFileHeader;
+  
+  FfsFileHeader = *RealFfsFileHeader;
 
   Status = PeiServicesFfsFindSectionData (
              EFI_SECTION_COMPRESSION,
@@ -950,7 +953,11 @@ Returns:
               return EFI_NOT_FOUND;
             }
 
-            return PeiProcessFile (SectionType, FfsFileHeader, Pe32Data);
+            //
+            // Reture the FfsHeader that contain Pe32Data.
+            //
+            *RealFfsFileHeader = FfsFileHeader;
+            return PeiProcessFile (SectionType, RealFfsFileHeader, Pe32Data);
           }
         }
         //
