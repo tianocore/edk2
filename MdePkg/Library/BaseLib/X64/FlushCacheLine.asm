@@ -24,7 +24,7 @@
     .code
 
 ;------------------------------------------------------------------------------
-; VOID
+; VOID *
 ; EFIAPI
 ; AsmFlushCacheLine (
 ;   IN      VOID                      *LinearAddress
@@ -32,6 +32,7 @@
 ;------------------------------------------------------------------------------
 AsmFlushCacheLine   PROC
     clflush [rcx]
+    mov     rax, rcx
     ret
 AsmFlushCacheLine   ENDP
 
