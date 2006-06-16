@@ -326,7 +326,7 @@ SetWorker (
     case PCD_TYPE_STRING:
       StringTableIdx = *((UINT16 *)InternalData);
       CopyMem (&PeiPcdDb->Init.StringTable[StringTableIdx], Data, Size);
-      break;
+      return EFI_SUCCESS;
 
     case PCD_TYPE_DATA:
     {
