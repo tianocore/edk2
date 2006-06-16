@@ -99,13 +99,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="Antlr" depends="init" unless="CheckDepends">
-    <exec dir="${basedir}/${ToolName}" executable="antlr" failonerror="TRUE">
+    <exec dir="${basedir}/${ToolName}" executable="${env.FRAMEWORK_TOOLS_PATH}/antlr" failonerror="TRUE">
       <arg line="-CC -e3 -ck 3 -o . VfrCompile.g"/>
     </exec>
   </target>
 
   <target name="Dlg" depends="Antlr" unless="CheckDepends">
-    <exec dir="${basedir}/${ToolName}" executable="dlg" failonerror="TRUE">
+    <exec dir="${basedir}/${ToolName}" executable="${env.FRAMEWORK_TOOLS_PATH}/dlg" failonerror="TRUE">
       <arg line="-C2 -i -CC -o . parser.dlg"/>
     </exec>
   </target>
