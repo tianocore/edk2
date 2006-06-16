@@ -32,14 +32,14 @@ JNIEXPORT jbyteArray JNICALL  Java_org_tianocore_framework_tasks_Compress_CallCo
    //
 
    Result = Compress (
-			  (char*) InputBuffer, 
-			  SourceSize,  
-			  DestBuffer,
-			  &DestSize
-			  );
+        (char*) InputBuffer, 
+        SourceSize,  
+        DestBuffer,
+        &DestSize
+        );
 
    if (Result = EFI_BUFFER_TOO_SMALL) {
-	   DestBuffer = malloc (DestSize);
+     DestBuffer = malloc (DestSize);
    }
 
    //
@@ -47,10 +47,10 @@ JNIEXPORT jbyteArray JNICALL  Java_org_tianocore_framework_tasks_Compress_CallCo
    //
    Result = Compress(
               (char*) InputBuffer, 
-			  SourceSize,  
-			  DestBuffer,
-			  &DestSize  
-	   );
+        SourceSize,  
+        DestBuffer,
+        &DestSize  
+     );
 
    //
    // new a MV array to store the return compressed buffer
@@ -80,7 +80,7 @@ DllMainCRTStartup(
     void*   Reserved    
 )
 {
-	return TRUE;
+  return TRUE;
 }
 #else
 #ifdef __GNUC__

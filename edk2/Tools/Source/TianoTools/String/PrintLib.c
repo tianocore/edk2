@@ -14,10 +14,10 @@
 
 **/
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <PrintLib.h>
-#include <CommonLib.h>
+#include <Common/UefiBaseTypes.h>
+#include <Library/PrintLib.h>
+
+#include "CommonLib.h"
 #include "PrintLibInternal.h"
 
 typedef struct {

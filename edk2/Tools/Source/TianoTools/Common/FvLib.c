@@ -25,14 +25,6 @@ Abstract:
 #include "FvLib.h"
 #include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
-#include "MultiPhase.h"
-/*
-#include <CommonBuild.h>
-*/
-
-/*
-#include EFI_GUID_DEFINITION (FirmwareFileSystem)
-*/
 
 //
 // Module global variables

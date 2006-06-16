@@ -26,7 +26,9 @@ Abstract:
 //
 // Include files
 //
-// #include "Efi2WinNT.h"
+#include <Common/UefiBaseTypes.h>
+#include <Common/MultiPhase.h>
+
 #include "ParseInf.h"
 
 //

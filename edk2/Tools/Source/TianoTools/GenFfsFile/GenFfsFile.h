@@ -28,9 +28,9 @@ Abstract:
 //
 // External Files Referenced
 //
-#include "Base.h"
-#include "UefiBaseTypes.h"
-#include "FirmwareVolumeImageFormat.h"
+#include <Common/UefiBaseTypes.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+
 #include "MyAlloc.h"
 
 #endif

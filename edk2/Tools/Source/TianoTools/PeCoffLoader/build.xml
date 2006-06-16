@@ -125,11 +125,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/${LibName}"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
-      <includepath path="${PACKAGE_DIR}/Include/Library"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
     </cc>
   </target>
@@ -150,11 +146,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/${LibName}"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
-      <includepath path="${PACKAGE_DIR}/Include/Library"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
     </cc>
   </target>
@@ -175,11 +167,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/${LibName}"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
-      <includepath path="${PACKAGE_DIR}/Include/Library"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
     </cc>
   </target>

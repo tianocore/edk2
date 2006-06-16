@@ -19,11 +19,10 @@ Abstract:
   
 --*/
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-
 #ifndef _EFI_UTILITY_MSGS_H_
 #define _EFI_UTILITY_MSGS_H_
+
+#include <Common/UefiBaseTypes.h>
 
 //
 // Status codes returned by EFI utility programs and functions

@@ -24,9 +24,9 @@ Abstract:
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <CommonLib.h>
+#include <Common/UefiBaseTypes.h>
+
+#include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
 #include "StrGather.h"
 #include "StringDB.h"

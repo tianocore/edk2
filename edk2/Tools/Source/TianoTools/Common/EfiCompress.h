@@ -19,13 +19,14 @@ Abstract:
   
 --*/
 
-#include <string.h>
-#include <stdlib.h>
-#include <Base.h>
-#include <UefiBaseTypes.h>
-
 #ifndef _EFICOMPRESS_H
 #define _EFICOMPRESS_H
+
+#include <string.h>
+#include <stdlib.h>
+
+#include <Common/UefiBaseTypes.h>
+
 EFI_STATUS
 Compress (
   IN      UINT8   *SrcBuffer,

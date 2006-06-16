@@ -29,10 +29,9 @@ Abstract:
 //
 #include <ctype.h>
 
-#include <UefiBaseTypes.h>
-#include <Base.h>
-#include <CommonLib.h>
+#include <Common/UefiBaseTypes.h>
 
+#include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
 #include "Symbols.h"
 

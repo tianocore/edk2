@@ -25,24 +25,15 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 
-//
-// Includes for EFI 1.1 build
-//
-// #include "Tiano.h"        // required defines for Compress.h
-// #include "EfiImage.h"   // for PE32 structure definitions
-// #include "Compress.h"   // for compression function
-// Includes for Tiano build
-//
-#include <UefiBaseTypes.h>
-#include <EfiImage.h> // for PE32 structure definitions
-#include <EfiCompress.h>
-#include <CommonLib.h>
-#include <MultiPhase.h>
+#include <Common/UefiBaseTypes.h>
+#include <Common/EfiImage.h>  // for PE32 structure definitions
+#include <Common/MultiPhase.h>
 
-//
-// END include differences
-//
-#include "pci22.h"  // for option ROM header structures
+#include <IndustryStandard/pci22.h>  // for option ROM header structures
+
+#include "EfiCompress.h"
+#include "CommonLib.h"
+
 //
 // Version of this utility
 //

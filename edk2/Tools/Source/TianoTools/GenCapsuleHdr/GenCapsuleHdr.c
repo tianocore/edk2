@@ -28,18 +28,18 @@ Abstract:
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <UefiBaseTypes.h>
-#include <Base.h>
-#include <CommonLib.h>
+#include <Common/UefiBaseTypes.h>
+#include <Common/MultiPhase.h>
+#include <Common/Capsule.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+#include <Common/FirmwareVolumeHeader.h>
+#include <Common/FirmwareFileSystem.h>  // for FV header GUID
+#include <Guid/Capsule.h>
+#include <Guid/FirmwareFileSystem.h>  // for FV header GUID
 
+#include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
-#include "MultiPhase.h"
-#include "Capsule.h"
-#include "Guid/Capsule.h"
-#include "FirmwareVolumeImageFormat.h"
-#include "FirmwareVolumeHeader.h"
-#include "FirmwareFileSystem.h"  // for FV header GUID
-#include "Guid/FirmwareFileSystem.h"  // for FV header GUID
+
 #define MAX_PATH                  256
 #define PROGRAM_NAME              "GenCapsuleHdr"
 

@@ -24,8 +24,8 @@ Abstract:
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "Base.h"
-#include "UefiBaseTypes.h"
+#include <Common/UefiBaseTypes.h>
+
 #include "EfiUtilityMsgs.h"
 #include "SimpleFileParsing.h"
 

@@ -123,14 +123,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/${ToolName}"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
-      <includepath path="${PACKAGE_DIR}/Include/Library"/>
-      <includepath path="${PACKAGE_DIR}/Include/ToBeRemoved"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
+      <libset dir="${LIB_DIR}" libs="CommonTools"/>
+
       <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
       <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
       <syslibset libs="RpcRT4" unless="gcc"/>

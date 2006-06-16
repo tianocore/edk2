@@ -19,11 +19,11 @@ Abstract:
 
 --*/
 
-#include "ParseInf.h"
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include "ParseInf.h"
 
 #ifndef _MAX_PATH
 #define _MAX_PATH 500

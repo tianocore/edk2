@@ -22,11 +22,9 @@ Revision History
 --*/
 
 
-#define EFI_SPECIFICATION_VERSION    0x00000000
-#define EDK_RELEASE_VERSION          0x00020000
-#include <Base.h>
+#include <Common/UefiBaseTypes.h>
+#include <Common/EfiImage.h>
 #include <Library/PeCoffLib.h>
-#include <Library/BaseMemoryLib.h>
 
 STATIC
 RETURN_STATUS
@@ -600,11 +598,11 @@ Returns:
     //
     RelocDir = &TeHdr->DataDirectory[0];
     RelocBase = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(
-		                                ImageContext->ImageAddress + 
-		                                RelocDir->VirtualAddress +
-		                                sizeof(EFI_TE_IMAGE_HEADER) - 
-		                                TeHdr->StrippedSize
-		                                );
+                                    ImageContext->ImageAddress + 
+                                    RelocDir->VirtualAddress +
+                                    sizeof(EFI_TE_IMAGE_HEADER) - 
+                                    TeHdr->StrippedSize
+                                    );
     RelocBaseEnd = (EFI_IMAGE_BASE_RELOCATION *) ((UINTN) RelocBase + (UINTN) RelocDir->Size - 1);
   }
   
@@ -620,10 +618,10 @@ Returns:
       FixupBase = PeCoffLoaderImageAddress (ImageContext, RelocBase->VirtualAddress);
     } else {
       FixupBase = (CHAR8 *)(UINTN)(ImageContext->ImageAddress +
-	  	              RelocBase->VirtualAddress +
-	  	              sizeof(EFI_TE_IMAGE_HEADER) - 
-	  	              TeHdr->StrippedSize
-	  	              );
+                    RelocBase->VirtualAddress +
+                    sizeof(EFI_TE_IMAGE_HEADER) - 
+                    TeHdr->StrippedSize
+                    );
     }
 
     if ((CHAR8 *) RelocEnd < (CHAR8 *) ((UINTN) ImageContext->ImageAddress) ||
@@ -836,9 +834,9 @@ Returns:
     TeHdr             = (EFI_TE_IMAGE_HEADER *) (UINTN) (ImageContext->ImageAddress);
 
     FirstSection = (EFI_IMAGE_SECTION_HEADER *) (
-		      (UINTN)ImageContext->ImageAddress +
-		      sizeof(EFI_TE_IMAGE_HEADER)
-		      );
+          (UINTN)ImageContext->ImageAddress +
+          sizeof(EFI_TE_IMAGE_HEADER)
+          );
     NumberOfSections  = (UINTN) (TeHdr->NumberOfSections);
 
   }
@@ -933,9 +931,9 @@ Returns:
                                                                 );
   } else {
     ImageContext->EntryPoint =  (PHYSICAL_ADDRESS) (
-		                   (UINTN)ImageContext->ImageAddress +
-		                   (UINTN)TeHdr->AddressOfEntryPoint +
-		                   (UINTN)sizeof(EFI_TE_IMAGE_HEADER) -
+                       (UINTN)ImageContext->ImageAddress +
+                       (UINTN)TeHdr->AddressOfEntryPoint +
+                       (UINTN)sizeof(EFI_TE_IMAGE_HEADER) -
           (UINTN) TeHdr->StrippedSize
       );
   }
@@ -976,11 +974,11 @@ Returns:
                     );
     } else {
       DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *)(UINTN)(
-	  	                                         ImageContext->ImageAddress +
-	  	                                         ImageContext->DebugDirectoryEntryRva +
-	  	                                         sizeof(EFI_TE_IMAGE_HEADER) -
-	  	                                         TeHdr->StrippedSize
-	  	                                         );
+                                               ImageContext->ImageAddress +
+                                               ImageContext->DebugDirectoryEntryRva +
+                                               sizeof(EFI_TE_IMAGE_HEADER) -
+                                               TeHdr->StrippedSize
+                                               );
     }
 
     if (DebugEntry != NULL) {
@@ -999,9 +997,9 @@ Returns:
           ImageContext->CodeView = PeCoffLoaderImageAddress (ImageContext, TempDebugEntryRva);
         } else {
           ImageContext->CodeView = (VOID *)(
-		  	              (UINTN)ImageContext->ImageAddress +
-		  	              (UINTN)TempDebugEntryRva +
-		  	              (UINTN)sizeof(EFI_TE_IMAGE_HEADER) -
+                      (UINTN)ImageContext->ImageAddress +
+                      (UINTN)TempDebugEntryRva +
+                      (UINTN)sizeof(EFI_TE_IMAGE_HEADER) -
                 (UINTN) TeHdr->StrippedSize
             );
         }

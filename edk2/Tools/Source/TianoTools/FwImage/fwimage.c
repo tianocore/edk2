@@ -19,7 +19,8 @@ Abstract:
 
 --*/
 
-#include <WinNtInclude.h>
+#include "WinNtInclude.h"
+
 #ifndef __GNUC__
 #include <windows.h>
 #endif
@@ -28,11 +29,11 @@ Abstract:
 #include <string.h>
 #include <time.h>
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <CommonLib.h>
-#include <EfiImage.h>
-#include <EfiUtilityMsgs.c>
+#include <Common/UefiBaseTypes.h>
+#include <Common/EfiImage.h>
+
+#include "CommonLib.h"
+#include "EfiUtilityMsgs.c"
 
 #define UTILITY_NAME  "FwImage"
 

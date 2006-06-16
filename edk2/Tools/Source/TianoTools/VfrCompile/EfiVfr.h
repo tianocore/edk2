@@ -23,10 +23,10 @@ Abstract:
 #ifndef _EFI_VFR_H_
 #define _EFI_VFR_H_
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include "InternalFormRepresentation.h"
 #include <string.h>
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/InternalFormRepresentation.h>
 
 //
 // This number should be incremented with each change to the VFR compiler.

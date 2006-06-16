@@ -23,8 +23,8 @@ Abstract:
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "UefiBaseTypes.h"
-#include "Base.h"
+
+#include <Common/UefiBaseTypes.h>
 
 #define PROGRAM_NAME  "CreateMtFile"
 

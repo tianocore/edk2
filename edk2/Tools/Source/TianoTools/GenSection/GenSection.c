@@ -19,22 +19,21 @@ Abstract:
 
 --*/
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include "FirmwareVolumeImageFormat.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+#include <Protocol/GuidedSectionExtraction.h>
+
 #include "CommonLib.h"
 #include "EfiCompress.h"
 #include "EfiCustomizedCompress.h"
 #include "Crc32.h"
 #include "EfiUtilityMsgs.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "GenSection.h"
 
-#include <GuidedSectionExtraction.h>
 
 #define UTILITY_NAME            "GenSection"
 

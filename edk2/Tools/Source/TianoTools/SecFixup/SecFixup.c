@@ -28,12 +28,11 @@ Abstract:
 
 #include <stdio.h>
 
-#include <UefiBaseTypes.h>
-#include <Base.h>
-#include "EfiImage.h"
-#include "FirmwareVolumeImageFormat.h"
-#include "EfiUtilityMsgs.c"
+#include <Common/UefiBaseTypes.h>
+#include <Common/EfiImage.h>
+#include <Common/FirmwareVolumeImageFormat.h>
 
+#include "EfiUtilityMsgs.c"
 #include "SecFixup.h"
 
 VOID

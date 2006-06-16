@@ -25,12 +25,13 @@ Abstract:
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <UefiBaseTypes.h>
-#include <Base.h>
-#include "EfiImage.h"
-#include <FirmwareVolumeImageFormat.h>
-#include "FirmwareFileSystem.h"
-#include "FirmwareVolumeHeader.h"
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/EfiImage.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+#include <Common/FirmwareFileSystem.h>
+#include <Common/FirmwareVolumeHeader.h>
+
 #include "EfiUtilityMsgs.c"
 #include "CommonLib.h"
 

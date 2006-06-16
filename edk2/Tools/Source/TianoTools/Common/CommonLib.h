@@ -22,13 +22,7 @@ Abstract:
 #ifndef _EFI_COMMON_LIB_H
 #define _EFI_COMMON_LIB_H
 
-/*
-#include "TianoCommon.h"
-#include "TianoCommon.h"
-#include "PeiHob.h"
-*/
-#include <Base.h>
-#include <UefiBaseTypes.h>
+#include <Common/UefiBaseTypes.h>
 
 #ifndef _MAX_PATH
 #define _MAX_PATH 500

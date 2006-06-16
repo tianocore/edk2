@@ -23,10 +23,10 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 
-#include <UefiBaseTypes.h>
-#include <Base.h>
-#include <CommonLib.h>
-#include "EfiImage.h" // for PE32 structure definitions
+#include <Common/UefiBaseTypes.h>
+#include <Common/EfiImage.h> // for PE32 structure definitions
+
+#include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
 
 //

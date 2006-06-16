@@ -25,8 +25,8 @@ Abstract:
 #include <ctype.h>
 #include <stdarg.h>
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
+#include <Common/UefiBaseTypes.h>
+
 #include "EfiUtilityMsgs.h"
 
 #define MAX_LINE_LEN  200

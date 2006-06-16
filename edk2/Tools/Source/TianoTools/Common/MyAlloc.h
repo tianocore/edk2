@@ -25,11 +25,8 @@ Abstract:
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Base.h>
 
-/*
-#include "Tiano.h"
-*/
+#include <Common/BaseTypes.h>
 
 //
 // Default operation is to use the memory allocation tracking functions.

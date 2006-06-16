@@ -25,10 +25,10 @@ Abstract:
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
+#include <Common/UefiBaseTypes.h>
+
 #include "EfiUtilityMsgs.h"
-#include <CommonLib.h>
+#include "CommonLib.h"
 
 //
 // Structure to maintain a linked list of strings

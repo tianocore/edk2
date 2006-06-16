@@ -26,12 +26,11 @@ Intel Corporation.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-// #include <io.h>
 #include <assert.h>
-#include "UefiBaseTypes.h"
-#include "Base.h"
+
+#include <Common/UefiBaseTypes.h>
+
 #include "GenFdImage.h"
-// #include "GenFvImage.h"
 #include "ParseInf.h"
 
 //

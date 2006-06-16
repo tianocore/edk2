@@ -24,8 +24,8 @@ Abstract:
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <UefiBaseTypes.h>
-#include <Base.h>
+
+#include <Common/UefiBaseTypes.h>
 
 #include "EfiUtilityMsgs.h"
 #include "Microcode.h"

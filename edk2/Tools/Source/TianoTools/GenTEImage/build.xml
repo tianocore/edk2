@@ -61,22 +61,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </echo>
     </else>
     </if>
-		<if>
-		  <equals arg1="${ToolChain}" arg2="msvc"/>
-			<then>
+    <if>
+      <equals arg1="${ToolChain}" arg2="msvc"/>
+      <then>
         <property name="ext_static" value=".lib"/>
         <property name="ext_dynamic" value=".dll"/>
         <property name="ext_exe" value=".exe"/>
-			</then>
-			<elseif>
-			  <equals arg1="${ToolChain}" arg2="gcc"/>
-				<then>
+      </then>
+      <elseif>
+        <equals arg1="${ToolChain}" arg2="gcc"/>
+        <then>
           <property name="ext_static" value=".a"/>
           <property name="ext_dynamic" value=".so"/>
           <property name="ext_exe" value=""/>
-				</then>
-			</elseif>
-		</if>
+        </then>
+      </elseif>
+    </if>
   </target>
 
   <target name="Tool" depends="init">
@@ -93,10 +93,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-			<libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
+      <libset dir="${LIB_DIR}" libs="CommonTools"/>
     </cc>
   </target>
 

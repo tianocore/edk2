@@ -82,7 +82,7 @@ Returns:
 
   fseek (InFile, 0, SEEK_SET);
 
-  Buffer = malloc (FileSize);
+  Buffer = (char *) malloc (FileSize);
   if (Buffer == NULL) {
     printf ("Error: Out of resources.\n");
     return -1;
