@@ -366,7 +366,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             ffsHeader.ffsState = EFI_FILE_HEADER_CONSTRUCTION | 
                                  EFI_FILE_HEADER_VALID | 
                                  EFI_FILE_DATA_VALID;
-            orgFfsHeader.integrityCheck.file = ffsHeader.ffsState;
+            orgFfsHeader.ffsState = ffsHeader.ffsState;
             
             //
             // create output stream to first write header data in file, then write sect data in file.
