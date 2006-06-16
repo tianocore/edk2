@@ -102,9 +102,9 @@ DxeLoadCore (
 
 EFI_STATUS
 PeiProcessFile (
-  IN  UINT16                 SectionType,
-  IN  EFI_FFS_FILE_HEADER    *FfsFileHeader,
-  OUT VOID                   **Pe32Data
+  IN      UINT16                 SectionType,
+  IN OUT  EFI_FFS_FILE_HEADER    **RealFfsFileHeader,
+  OUT     VOID                   **Pe32Data
   );
 
 EFI_STATUS
