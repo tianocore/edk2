@@ -20,17 +20,6 @@ Abstract:
 
 --*/
 
-#include "Base.h"
-#include "UefiBaseTypes.h"
-#include "FirmwareVolumeImageFormat.h"
-#include "FirmwareFileSystem.h"
-#include "FirmwareVolumeHeader.h"
-#include "FirmwareVolumeImageFormat.h"
-#include "ParseInf.h"
-#include "EfiCompress.h"
-#include "EfiCustomizedCompress.h"
-#include "Crc32.h"
-#include "GenFfsFile.h"
 #include <stdio.h>
 #include <ctype.h>  // for isalpha()
 //
@@ -41,6 +30,18 @@ Abstract:
 #endif
 #include <stdlib.h>
 #include <string.h>
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+#include <Common/FirmwareFileSystem.h>
+#include <Common/FirmwareVolumeHeader.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+
+#include "ParseInf.h"
+#include "EfiCompress.h"
+#include "EfiCustomizedCompress.h"
+#include "Crc32.h"
+#include "GenFfsFile.h"
 #include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
 #include "SimpleFileParsing.h"

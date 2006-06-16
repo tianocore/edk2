@@ -14,11 +14,10 @@
 
 **/
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <PrintLib.h>
-#include <BaseLib.h>
-#include <CommonLib.h>
+#include <Common/UefiBaseTypes.h>
+#include <Library/PrintLib.h>
+
+#include "CommonLib.h"
 #include "PrintLibInternal.h"
 
 static CONST CHAR8 mHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};

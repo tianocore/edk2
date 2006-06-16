@@ -19,8 +19,7 @@ Abstract:
   
 --*/
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
+#include <Common/UefiBaseTypes.h>
 
 EFI_STATUS
 SetCustomizedCompressionType (

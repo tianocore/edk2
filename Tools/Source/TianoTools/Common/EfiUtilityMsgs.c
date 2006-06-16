@@ -25,9 +25,6 @@ Abstract:
 #include <ctype.h>
 #include <stdarg.h>
 
-/*
-#include "Tiano.h"
-*/
 #include "EfiUtilityMsgs.h"
 
 #define MAX_LINE_LEN  200

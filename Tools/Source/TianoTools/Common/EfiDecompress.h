@@ -18,11 +18,12 @@ Abstract:
   Header file for compression routine
   
 --*/
-#include <Base.h>
-#include <UefiBaseTypes.h>
 
 #ifndef _EFI_DECOMPRESS_H
 #define _EFI_DECOMPRESS_H
+
+#include <Common/UefiBaseTypes.h>
+
 EFI_STATUS
 GetInfo (
   IN      VOID    *Source,

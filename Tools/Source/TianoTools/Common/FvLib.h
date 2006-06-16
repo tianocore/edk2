@@ -25,18 +25,14 @@ Abstract:
 //
 // Include files
 //
-#include <Base.h>
-#include <UefiBaseTypes.h>
+#include <string.h>
+
+#include <Common/UefiBaseTypes.h>
 #include <Common/EfiImage.h>
 #include <Common/FirmwareVolumeImageFormat.h>
 #include <Common/FirmwareFileSystem.h>
 #include <Common/FirmwareVolumeHeader.h>
-/*
-#include "TianoCommon.h"
-#include "EfiFirmwareVolumeHeader.h"
-#include "EfiFirmwareFileSystem.h"
-*/
-#include <string.h>
+#include <Common/MultiPhase.h>
 
 EFI_STATUS
 InitializeFvLib (

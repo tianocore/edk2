@@ -21,15 +21,7 @@ Revision History
 
 --*/
 
-
-#define EFI_SPECIFICATION_VERSION    0x00000000
-#define EDK_RELEASE_VERSION          0x00020000
-#include <Base.h>
-#include <Library/PeCoffLib.h>
-#include <Library/BaseMemoryLib.h>
-
-
-
+#include <Common/UefiBaseTypes.h>
 
 RETURN_STATUS
 PeCoffLoaderRelocateImageEx (

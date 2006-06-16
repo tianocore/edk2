@@ -15,13 +15,10 @@
 **/
 
 #include <assert.h>
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <BaseLib.h>
-#include <PcdLib.h>
-#include <CommonLib.h>
-#define _gPcd_FixedAtBuild_PcdMaximumUnicodeStringLength   0
-#define _gPcd_FixedAtBuild_PcdMaximumAsciiStringLength   0
+
+#include <Common/UefiBaseTypes.h>
+
+#include "CommonLib.h"
 
 /**
   Copies one Null-terminated Unicode string to another Null-terminated Unicode
@@ -34,8 +31,6 @@
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -87,8 +82,6 @@ StrCpy (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -130,7 +123,6 @@ StrnCpy (
     Length--;
   }
 
-  // ZeroMem (Destination, Length * sizeof (*Destination));
   memset (Destination, 0, Length * sizeof (*Destination));
   return ReturnValue;
 }
@@ -142,8 +134,6 @@ StrnCpy (
   Unicode string specified by String.
 
   If String is NULL, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  String  Pointer to a Null-terminated Unicode string.
 
@@ -161,13 +151,7 @@ StrLen (
   ASSERT (String != NULL);
 
   for (Length = 0; *String != L'\0'; String++, Length++) {
-    //
-    // If PcdMaximumUnicodeStringLength is not zero,
-    // length should not more than PcdMaximumUnicodeStringLength
-    //
-    if (FixedPcdGet32 (PcdMaximumUnicodeStringLength) != 0) {
-      ASSERT (Length < FixedPcdGet32 (PcdMaximumUnicodeStringLength));
-    }
+    ;
   }
   return Length;
 }
@@ -180,8 +164,6 @@ StrLen (
   string specified by String.
 
   If String is NULL, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and String contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  String  Pointer to a Null-terminated Unicode string.
 
@@ -209,10 +191,6 @@ StrSize (
 
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and FirstString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and SecondString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated Unicode string.
   @param  SecondString  Pointer to a Null-terminated Unicode string.
@@ -229,7 +207,7 @@ StrCmp (
   )
 {
   //
-  // ASSERT both strings are less long than PcdMaximumUnicodeStringLength
+  // ASSERT both strings should never be zero
   //
   ASSERT (StrSize (FirstString) != 0);
   ASSERT (StrSize (SecondString) != 0);
@@ -254,10 +232,6 @@ StrCmp (
 
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and FirstString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and SecondString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated Unicode string.
   @param  SecondString  Pointer to a Null-terminated Unicode string.
@@ -280,8 +254,7 @@ StrnCmp (
   }
 
   //
-  // ASSERT both strings are less long than PcdMaximumUnicodeStringLength.
-  // Length tests are performed inside StrLen().
+  // ASSERT both strings should never be zero
   //
   ASSERT (StrSize (FirstString) != 0);
   ASSERT (StrSize (SecondString) != 0);
@@ -310,13 +283,6 @@ StrnCmp (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and Destination contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and concatenating Destination
-  and Source results in a Unicode string with more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -335,7 +301,6 @@ StrCat (
 
   //
   // Size of the resulting string should never be zero.
-  // PcdMaximumUnicodeStringLength is tested inside StrLen().
   //
   ASSERT (StrSize (Destination) != 0);
   return Destination;
@@ -357,13 +322,6 @@ StrCat (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and Destination contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
-  If PcdMaximumUnicodeStringLength is not zero, and concatenating Destination
-  and Source results in a Unicode string with more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -385,7 +343,6 @@ StrnCat (
 
   //
   // Size of the resulting string should never be zero.
-  // PcdMaximumUnicodeStringLength is tested inside StrLen().
   //
   ASSERT (StrSize (Destination) != 0);
   return Destination;
@@ -402,8 +359,6 @@ StrnCat (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated ASCII string.
   @param  Source      Pointer to a Null-terminated ASCII string.
@@ -454,8 +409,6 @@ AsciiStrCpy (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated ASCII string.
   @param  Source      Pointer to a Null-terminated ASCII string.
@@ -508,8 +461,6 @@ AsciiStrnCpy (
   ASCII string specified by String.
 
   If String is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and String contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
 
   @param  String  Pointer to a Null-terminated ASCII string.
 
@@ -527,13 +478,7 @@ AsciiStrLen (
   ASSERT (String != NULL);
 
   for (Length = 0; *String != '\0'; String++, Length++) {
-    //
-    // If PcdMaximumUnicodeStringLength is not zero,
-    // length should not more than PcdMaximumUnicodeStringLength
-    //
-    if (FixedPcdGet32 (PcdMaximumAsciiStringLength) != 0) {
-      ASSERT (Length < FixedPcdGet32 (PcdMaximumAsciiStringLength));
-    }
+    ;
   }
   return Length;
 }
@@ -546,8 +491,6 @@ AsciiStrLen (
   specified by String.
 
   If String is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and String contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
 
   @param  String  Pointer to a Null-terminated ASCII string.
 
@@ -575,10 +518,6 @@ AsciiStrSize (
 
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and FirstString contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and SecondString contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
@@ -595,7 +534,7 @@ AsciiStrCmp (
   )
 {
   //
-  // ASSERT both strings are less long than PcdMaximumAsciiStringLength
+  // ASSERT both strings should never be zero
   //
   ASSERT (AsciiStrSize (FirstString));
   ASSERT (AsciiStrSize (SecondString));
@@ -631,10 +570,6 @@ AsciiToUpper (
 
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and FirstString contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and SecondString contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
@@ -653,7 +588,7 @@ AsciiStriCmp (
   )
 {
   //
-  // ASSERT both strings are less long than PcdMaximumAsciiStringLength
+  // ASSERT both strings should never be zero
   //
   ASSERT (AsciiStrSize (FirstString));
   ASSERT (AsciiStrSize (SecondString));
@@ -680,10 +615,6 @@ AsciiStriCmp (
 
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and FirstString contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and SecondString contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
@@ -701,7 +632,7 @@ AsciiStrnCmp (
   )
 {
   //
-  // ASSERT both strings are less long than PcdMaximumAsciiStringLength
+  // ASSERT both strings should never be zero
   //
   ASSERT (AsciiStrSize (FirstString));
   ASSERT (AsciiStrSize (SecondString));
@@ -727,13 +658,6 @@ AsciiStrnCmp (
 
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and Destination contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and concatenating Destination and
-  Source results in a ASCII string with more than PcdMaximumAsciiStringLength
-  ASCII characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated ASCII string.
   @param  Source      Pointer to a Null-terminated ASCII string.
@@ -752,7 +676,6 @@ AsciiStrCat (
 
   //
   // Size of the resulting string should never be zero.
-  // PcdMaximumUnicodeStringLength is tested inside StrLen().
   //
   ASSERT (AsciiStrSize (Destination) != 0);
   return Destination;
@@ -774,13 +697,6 @@ AsciiStrCat (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and Destination contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and concatenating Destination and
-  Source results in a ASCII string with more than PcdMaximumAsciiStringLength
-  ASCII characters, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated ASCII string.
   @param  Source      Pointer to a Null-terminated ASCII string.
@@ -802,7 +718,6 @@ AsciiStrnCat (
 
   //
   // Size of the resulting string should never be zero.
-  // PcdMaximumUnicodeStringLength is tested inside StrLen().
   //
   ASSERT (AsciiStrSize (Destination) != 0);
   return Destination;

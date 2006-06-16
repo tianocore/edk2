@@ -31,8 +31,7 @@ Abstract:
 #include <assert.h>
 
 /* MDE Headers */
-#include <Base.h>
-#include <UefiBaseTypes.h>
+#include <Common/UefiBaseTypes.h>
 #include <Common/EfiImage.h>
 #include <Common/FirmwareVolumeImageFormat.h>
 #include <Common/FirmwareFileSystem.h>
@@ -40,11 +39,11 @@ Abstract:
 #include <Protocol/GuidedSectionExtraction.h>
 
 /* Tool Headers */
-#include <CommonLib.h>
-#include <Crc32.h>
-#include <EfiCompress.h>
-#include <EfiUtilityMsgs.h>
-#include <ParseInf.h>
+#include "CommonLib.h"
+#include "Crc32.h"
+#include "EfiCompress.h"
+#include "EfiUtilityMsgs.h"
+#include "ParseInf.h"
 
 //
 // Module Coded to Tiano Coding Conventions

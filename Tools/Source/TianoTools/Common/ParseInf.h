@@ -22,11 +22,10 @@ Abstract:
 #ifndef _EFI_PARSE_INF_H
 #define _EFI_PARSE_INF_H
 
-/* #include "TianoCommon.h" */
-#include <Base.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <UefiBaseTypes.h>
+
+#include <Common/UefiBaseTypes.h>
 
 //
 // Common data structures

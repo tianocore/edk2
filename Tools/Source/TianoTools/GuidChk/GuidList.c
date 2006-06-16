@@ -39,14 +39,12 @@ Notes:
 #include <stdlib.h>
 #include <ctype.h>
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <UgaDraw.h>
+#include <Common/UefiBaseTypes.h>
+#include <Guid/Apriori.h>
+#include <Guid/AcpiTableStorage.h>
+
 #include "EfiUtilityMsgs.h"
 
-#include <Apriori.h>
-#include <AcpiTableStorage.h>
-// #include <Bmp.h>
 
 #define GUID_XREF(varname, guid) { \
     #varname, #guid, guid \

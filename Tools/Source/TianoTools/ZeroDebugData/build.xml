@@ -93,10 +93,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
-      <libset dir="${LIB_DIR}" libs="CommonTools CustomizedCompress"/>
     </cc>
   </target>
 

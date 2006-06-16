@@ -23,18 +23,17 @@ Abstract:
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>  // for tolower()
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <MultiPhase.h>
-#include <BaseLib.h>
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/MultiPhase.h>
+#include <Common/InternalFormRepresentation.h>
+#include <Protocol/UgaDraw.h>  // for EFI_UGA_PIXEL definition
+#include <Protocol/Hii.h>
+
 #include "EfiUtilityMsgs.h"
 #include "StrGather.h"
 #include "StringDB.h"
-#include "InternalFormRepresentation.h"
 
-// #include EFI_PROTOCOL_DEFINITION (Hii)
-#include <UgaDraw.h>
-#include <Hii.h>
 
 #define STRING_OFFSET RELOFST
 

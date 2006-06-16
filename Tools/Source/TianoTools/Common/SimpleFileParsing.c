@@ -24,9 +24,6 @@ Abstract:
 #include <stdlib.h>
 #include <ctype.h>
 
-/*
-#include "Tiano.h"
-*/
 #include "EfiUtilityMsgs.h"
 #include "SimpleFileParsing.h"
 

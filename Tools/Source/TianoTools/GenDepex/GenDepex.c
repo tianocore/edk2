@@ -728,11 +728,11 @@ Returns:
         Ptrx++;
       }
 
-	  Ptrx++;
+    Ptrx++;
       while (*Ptrx != '}') {
         Ptrx++;
       }
-	  //
+    //
       // Absorb the closing }
       //
       Ptrx++;

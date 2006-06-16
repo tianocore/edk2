@@ -77,25 +77,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </then>
       </elseif>
     </if>
-		<condition property="CheckDepends">
-		  <uptodate targetfile="${WORKSPACE}/Tools/bin/VfrCompile${ext_exe}">
-			  <srcfiles dir="${WORKSPACE}/Tools/Source/TianoTools/VfrCompile" 
+    <condition property="CheckDepends">
+      <uptodate targetfile="${WORKSPACE}/Tools/bin/VfrCompile${ext_exe}">
+        <srcfiles dir="${WORKSPACE}/Tools/Source/TianoTools/VfrCompile" 
         includes="EfiVfrParser.cpp DLGLexer.cpp VfrCompile.cpp VfrCompile.g VfrServices.cpp parser.dlg"/>
-			</uptodate>
-		</condition>
+      </uptodate>
+    </condition>
 
     <condition property="gxx_extra_libs" value="stdc++ System gcc_s.10.4 gcc">
       <os family="mac"/>
-	</condition>
-		
+  </condition>
+    
     <condition property="gxx_extra_libs" value="stdc++">
       <os name="linux"/>
-	</condition>
-		
+  </condition>
+    
     <condition property="gxx_extra_libs" value="stdc++">
       <os family="windows"/>
-	</condition>
-		
+  </condition>
+    
   </target>
 
   <target name="Antlr" depends="init" unless="CheckDepends">
@@ -122,11 +122,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <fileset dir="${basedir}/Pccts/h" 
         includes="${FileSetPccts}" />
 
-      <includepath path="${env.WORKSPACE}/Tools/Source/TianoTools/Pccts/h"/>
+      <includepath path="${PACKAGE_DIR}/Pccts/h"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
-      <includepath path="${PACKAGE_DIR}/Include/Protocol"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
       <syslibset libs="${gxx_extra_libs}" if="gcc"/>

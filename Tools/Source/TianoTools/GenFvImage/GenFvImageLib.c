@@ -23,8 +23,6 @@ Abstract:
 //
 // Include files
 //
-#define EFI_SPECIFICATION_VERSION 0x00020000
-#define EDK_RELEASE_VERSION       0x00020000
 #ifdef __GNUC__
 #include <uuid/uuid.h>
 #include <sys/stat.h>
@@ -34,19 +32,21 @@ Abstract:
 #include <io.h>
 #endif
 #include <assert.h>
-#include <Dxe.h>
-#include <Library/PeCoffLib.h>
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+#include <Common/Variable.h>
+#include <Common/WorkingBlockHeader.h>
+#include <Guid/FirmwareFileSystem.h>
+
 #include "GenFvImageLib.h"
 #include "GenFvImageLibInternal.h"
-#include <CommonLib.h>
-#include <FirmwareVolumeImageFormat.h>
-#include <Crc32.h>
-#include <EfiUtilityMsgs.h>
-#include <FvLib.h>
-#include <EfiCompress.h>
-#include <Variable.h>
-#include <WinNtInclude.h>
-#include <WorkingBlockHeader.h>
+#include "CommonLib.h"
+#include "Crc32.h"
+#include "EfiUtilityMsgs.h"
+#include "FvLib.h"
+#include "EfiCompress.h"
+#include "WinNtInclude.h"
 
 
 //

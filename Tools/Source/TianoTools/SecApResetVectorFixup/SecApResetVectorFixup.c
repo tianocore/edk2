@@ -314,7 +314,7 @@ Returns:
     Error (NULL, 0, 0, "The position to place Ap reset vector is not in E and F segment!", NULL);
     free ((VOID *)FileBufferRaw);
     return STATUS_ERROR; 
-  }  	
+  }    
   //
   // Fix up Ap reset vector and calculate the IPI vector
   //

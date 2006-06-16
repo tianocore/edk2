@@ -26,10 +26,12 @@ Abstract:
 //
 // Include files
 //
-#include "GenFvImageLib.h"
 #include <stdlib.h>
-#include <CommonLib.h>
-#include "FirmwareVolumeHeader.h"
+
+#include <Common/FirmwareVolumeHeader.h>
+
+#include "CommonLib.h"
+#include "GenFvImageLib.h"
 
 //
 // Private data declarations

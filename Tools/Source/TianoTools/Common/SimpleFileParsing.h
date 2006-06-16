@@ -19,11 +19,10 @@ Abstract:
 
 --*/
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-
 #ifndef _SIMPLE_FILE_PARSING_H_
 #define _SIMPLE_FILE_PARSING_H_
+
+#include <Common/UefiBaseTypes.h>
 
 #define T_CHAR  char
 

@@ -59,23 +59,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       </echo>
     </else>
     </if>
-		<property name="HOST_ARCH" value="IA32" />
-		<ToolChainSetup confPath="${WORKSPACE}/Tools/Conf" />
-    <echo message="Compiler: ${CC}"/>
-		<if>
-		  <equals arg1="${ToolChain}" arg2="msvc"/>
-			<then>
+
+    <echo message="ToolChain: ${ToolChain}"/>
+    <if>
+      <equals arg1="${ToolChain}" arg2="msvc"/>
+      <then>
         <property name="ext_static" value=".lib"/>
         <property name="ext_dynamic" value=".dll"/>
-			</then>
-			<elseif>
-			  <equals arg1="${ToolChain}" arg2="gcc"/>
-				<then>
+      </then>
+      <elseif>
+        <equals arg1="${ToolChain}" arg2="gcc"/>
+        <then>
           <property name="ext_static" value=".a"/>
           <property name="ext_dynamic" value=".so"/>
-				</then>
-			</elseif>
-		</if>
+        </then>
+      </elseif>
+    </if>
   </target>
 
   <target name="ToolsLibrary" depends="init">
@@ -91,7 +90,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         excludes="*.xml *.inf"/>
 
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include/Common"/>
       <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
     </cc>
     <if>

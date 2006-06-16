@@ -19,11 +19,11 @@ Abstract:
   
 --*/
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-
 #ifndef _EFICUSTOMIZEDCOMPRESS_H
 #define _EFICUSTOMIZEDCOMPRESS_H
+
+#include <Common/UefiBaseTypes.h>
+
 EFI_STATUS
 SetCustomizedCompressionType (
   IN  CHAR8   *Type

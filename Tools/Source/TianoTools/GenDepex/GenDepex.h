@@ -30,9 +30,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __GNUC__
 #include <malloc.h>
 #endif
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <Dependency.h>
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/Dependency.h>
 
 #define DEPENDENCY_START            "DEPENDENCY_START"
 #define OPERATOR_BEFORE             "BEFORE"

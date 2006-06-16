@@ -23,9 +23,6 @@ Abstract:
 
 --*/
 
-/*
-#include "TianoCommon.h"
-*/
 #include "EfiCompress.h"
 
 //

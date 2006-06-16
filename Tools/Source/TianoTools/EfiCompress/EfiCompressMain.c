@@ -25,8 +25,9 @@ Abstract:
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <UefiBaseTypes.h>
-#include <Base.h>
+
+#include <Common/UefiBaseTypes.h>
+
 #include "EfiCompress.h"
 
 int

@@ -22,19 +22,18 @@ Abstract:
 
 --*/
 
-#include <UefiBaseTypes.h>
-#include <Base.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "CommonLib.h"
+
+#include <Common/UefiBaseTypes.h>
+#include <Common/FirmwareVolumeImageFormat.h>
+#include <Common/FirmwareFileSystem.h>
+#include <Library/PeCoffLib.h>
+
 #include "ParseInf.h"
 #include "FvLib.h"
-
 #include "EfiUtilityMsgs.h"
-#include "FirmwareFileSystem.h"
-#include "PeCoffLib.h"
-
 #include "PeiRebaseExe.h"
 
 EFI_STATUS

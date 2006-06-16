@@ -22,15 +22,16 @@ Abstract:
 #include <stdio.h>    // for FILE routines
 #include <stdlib.h>   // for malloc() and free()
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <MultiPhase.h>
+#include <Common/UefiBaseTypes.h>
+#include <Common/MultiPhase.h>
+#include <Common/InternalFormRepresentation.h>
+#include <Protocol/UgaDraw.h>  // for EFI_UGA_PIXEL definition
+#include <Protocol/Hii.h>
+
 #include "EfiUtilityMsgs.h"
 #include "EfiVfr.h"
 #include "VfrServices.h"
 
-#include <UgaDraw.h>
-#include <Hii.h>
 
 static const char *mSourceFileHeader[] = {
   "//",

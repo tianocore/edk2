@@ -23,10 +23,10 @@ Abstract:
 #ifndef _EFI_PEIM_FIXUP_EXE_H
 #define _EFI_PEIM_FIXUP_EXE_H
 
-// #include "Efi2WinNt.h"
-#include "FirmwareFileSystem.h"
-#include "FirmwareVolumeHeader.h"
-#include "MultiPhase.h"
+#include <Common/FirmwareVolumeImageFormat.h>
+#include <Common/FirmwareFileSystem.h>
+#include <Common/FirmwareVolumeHeader.h>
+#include <Common/MultiPhase.h>
 
 //
 // Utility Name

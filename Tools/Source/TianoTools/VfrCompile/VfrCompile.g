@@ -21,15 +21,16 @@ Abstract:
 
 #header<<
 
-#include <Base.h>
-#include <UefiBaseTypes.h>
-#include <CommonLib.h>
-#include <MultiPhase.h>
+#include <Common/UefiBaseTypes.h>
+#include <Common/MultiPhase.h>
+#include <Common/InternalFormRepresentation.h>
+#include <Protocol/UgaDraw.h>
+#include <Protocol/Hii.h>
+
+#include "CommonLib.h"
 #include "EfiUtilityMsgs.h"
 #include "EfiVfr.h"
 #include "VfrServices.h"
-#include <UgaDraw.h>
-#include <Hii.h>
 
 #include <ctype.h>
 #ifndef __GNUC__
