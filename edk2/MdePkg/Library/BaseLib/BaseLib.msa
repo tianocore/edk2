@@ -175,7 +175,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ia32/CpuPause.asm</Filename>
       <Filename>Ia32/CpuBreakpoint.asm</Filename>
       <Filename>Ia32/CpuFlushTlb.asm</Filename>
-      <Filename FileType="x86_asm_autogen">Ia32/Thunk16.asm</Filename>
+      <Filename>Ia32/Thunk16.asm</Filename>
     </Arch>
     <Arch ArchType="X64">
       <Filename>X86LowLevel.c</Filename>
