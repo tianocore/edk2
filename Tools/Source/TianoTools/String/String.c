@@ -21,6 +21,64 @@
 #include "CommonLib.h"
 
 /**
+  Returns the length of a Null-terminated Unicode string.
+
+  This function returns the number of Unicode characters in the Null-terminated
+  Unicode string specified by String.
+
+  If String is NULL, then ASSERT().
+
+  @param  String  Pointer to a Null-terminated Unicode string.
+
+  @return The length of String.
+
+**/
+UINTN
+EFIAPI
+StrLen (
+  IN      CONST CHAR16              *String
+  )
+{
+  UINTN                             Length;
+
+  ASSERT (String != NULL);
+
+  for (Length = 0; *String != L'\0'; String++, Length++) {
+    ;
+  }
+  return Length;
+}
+
+/**
+  Returns the length of a Null-terminated ASCII string.
+
+  This function returns the number of ASCII characters in the Null-terminated
+  ASCII string specified by String.
+
+  If String is NULL, then ASSERT().
+
+  @param  String  Pointer to a Null-terminated ASCII string.
+
+  @return The length of String.
+
+**/
+UINTN
+EFIAPI
+AsciiStrLen (
+  IN      CONST CHAR8               *String
+  )
+{
+  UINTN                             Length;
+
+  ASSERT (String != NULL);
+
+  for (Length = 0; *String != '\0'; String++, Length++) {
+    ;
+  }
+  return Length;
+}
+
+/**
   Copies one Null-terminated Unicode string to another Null-terminated Unicode
   string and returns the new Unicode string.
 
@@ -125,35 +183,6 @@ StrnCpy (
 
   memset (Destination, 0, Length * sizeof (*Destination));
   return ReturnValue;
-}
-
-/**
-  Returns the length of a Null-terminated Unicode string.
-
-  This function returns the number of Unicode characters in the Null-terminated
-  Unicode string specified by String.
-
-  If String is NULL, then ASSERT().
-
-  @param  String  Pointer to a Null-terminated Unicode string.
-
-  @return The length of String.
-
-**/
-UINTN
-EFIAPI
-StrLen (
-  IN      CONST CHAR16              *String
-  )
-{
-  UINTN                             Length;
-
-  ASSERT (String != NULL);
-
-  for (Length = 0; *String != L'\0'; String++, Length++) {
-    ;
-  }
-  return Length;
 }
 
 /**
@@ -452,35 +481,6 @@ AsciiStrnCpy (
   // ZeroMem (Destination, Length * sizeof (*Destination));
   memset (Destination, 0, Length * sizeof (*Destination));
   return ReturnValue;
-}
-
-/**
-  Returns the length of a Null-terminated ASCII string.
-
-  This function returns the number of ASCII characters in the Null-terminated
-  ASCII string specified by String.
-
-  If String is NULL, then ASSERT().
-
-  @param  String  Pointer to a Null-terminated ASCII string.
-
-  @return The length of String.
-
-**/
-UINTN
-EFIAPI
-AsciiStrLen (
-  IN      CONST CHAR8               *String
-  )
-{
-  UINTN                             Length;
-
-  ASSERT (String != NULL);
-
-  for (Length = 0; *String != '\0'; String++, Length++) {
-    ;
-  }
-  return Length;
 }
 
 /**

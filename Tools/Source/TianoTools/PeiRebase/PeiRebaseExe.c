@@ -31,6 +31,7 @@ Abstract:
 #include <Common/FirmwareFileSystem.h>
 #include <Library/PeCoffLib.h>
 
+#include "CommonLib.h"
 #include "ParseInf.h"
 #include "FvLib.h"
 #include "EfiUtilityMsgs.h"
