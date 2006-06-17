@@ -203,6 +203,7 @@ public class UsageInstance {
     throws EntityException {
         String guidStringArray[] = null;
         String guidString        = null;
+        boolean isByteArray      = false;
 
         hAutogenStr = "";
         cAutogenStr = "";
@@ -215,6 +216,12 @@ public class UsageInstance {
         } else {
             hAutogenStr += String.format("#define _PCD_TOKEN_%s   0x%016x\r\n", 
                                          parentToken.cName, parentToken.tokenNumber);
+        }
+
+        if (!isBuildUsedLibrary && !parentToken.isDynamicPCD) {
+            if (datum.trim().charAt(0) == '{') {
+                isByteArray = true;
+            }
         }
 
         switch (modulePcdType) {
@@ -254,17 +261,29 @@ public class UsageInstance {
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
                                              parentToken.cName, 
                                              datum.toString());
-                hAutogenStr += String.format("extern const %s _gPcd_FixedAtBuild_%s;\r\n",
-                                             Token.getAutogendatumTypeString(parentToken.datumType),
-                                             parentToken.cName);
-                cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
-                                             Token.getAutogendatumTypeString(parentToken.datumType),
-                                             parentToken.cName,
-                                             parentToken.cName);
-                hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
-                                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                                             parentToken.cName,
-                                             parentToken.cName);
+                if (isByteArray) {
+                    cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_%s[] = _PCD_VALUE_%s;\r\n",
+                                                 parentToken.cName,
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("extern const UINT8 _gPcd_FixedAtBuild_%s[];\r\n",
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("#define _PCD_MODE_%s_%s  &_gPcd_FixedAtBuild_%s\r\n",
+                                                 Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                                 parentToken.cName,
+                                                 parentToken.cName);
+                } else {
+                    cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                                 Token.getAutogendatumTypeString(parentToken.datumType),
+                                                 parentToken.cName,
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("extern const %s _gPcd_FixedAtBuild_%s;\r\n",
+                                                 Token.getAutogendatumTypeString(parentToken.datumType),
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _PCD_VALUE_%s\r\n",
+                                                 Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                                 parentToken.cName,
+                                                 parentToken.cName);
+                }
             }
             break;
         case PATCHABLE_IN_MODULE:
@@ -280,17 +299,29 @@ public class UsageInstance {
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
                                              parentToken.cName, 
                                              datum.toString());
-                hAutogenStr += String.format("extern %s _gPcd_BinaryPatch_%s;\r\n",
-                                             Token.getAutogendatumTypeString(parentToken.datumType),
-                                             parentToken.cName);
-                cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED %s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;\r\n",
-                                             Token.getAutogendatumTypeString(parentToken.datumType),
-                                             parentToken.cName,
-                                             parentToken.cName);
-                hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
-                                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                                             parentToken.cName,
-                                             parentToken.cName);
+                if (isByteArray) {
+                    cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_%s[] = _PCD_VALUE_%s;\r\n",
+                                                 parentToken.cName,
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("extern UINT8 _gPcd_BinaryPatch_%s[];\r\n",
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("#define _PCD_MODE_%s_%s  &_gPcd_BinaryPatch_%s\r\n",
+                                                 Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                                 parentToken.cName,
+                                                 parentToken.cName);  
+                } else {
+                    cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED %s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;\r\n",
+                                                 Token.getAutogendatumTypeString(parentToken.datumType),
+                                                 parentToken.cName,
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("extern %s _gPcd_BinaryPatch_%s;\r\n",
+                                                 Token.getAutogendatumTypeString(parentToken.datumType),
+                                                 parentToken.cName);
+                    hAutogenStr += String.format("#define _PCD_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
+                                                 Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                                 parentToken.cName,
+                                                 parentToken.cName);                
+                }
             }
 
             break;
