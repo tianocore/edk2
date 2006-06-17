@@ -77,12 +77,12 @@ Module Name: PcdLib.h
 //
 // Dynamic Ex is to support binary distribution
 //
-#define PcdGetEx8(Guid, TokenName)     LibPcdGetEx8 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetEx16(Guid, TokenName)    LibPcdGetEx16 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetEx32(Guid, TokenName)    LibPcdGetEx32 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetEx64(Guid, TokenName)    LibPcdGetEx64 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetExPtr(Guid, TokenName)   LibPcdGetExPtr (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetExBool(Guid, TokenName)  LibPcdGetExBool (Guid, _PCD_TOKEN_##TokenName)
+#define PcdGetEx8(TokenName)     LibPcdGetEx8 (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName)
+#define PcdGetEx16(TokenName)    LibPcdGetEx16 (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName)
+#define PcdGetEx32(TokenName)    LibPcdGetEx32 (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName)
+#define PcdGetEx64(TokenName)    LibPcdGetEx64 (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName)
+#define PcdGetExPtr(TokenName)   LibPcdGetExPtr (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName)
+#define PcdGetExBool(TokenName)  LibPcdGetExBool (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName)
 
 
 //
@@ -99,12 +99,12 @@ Module Name: PcdLib.h
 //
 // Dynamic Set Ex
 //
-#define PcdSetEx8(Guid, TokenName, Value)      LibPcdSetEx8   (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx16(Guid, TokenName, Value)     LibPcdSetEx16  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx32(Guid, TokenName, Value)     LibPcdSetEx32  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx64(Guid, TokenName, Value)     LibPcdSetEx64  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetExPtr(Guid, TokenName, SizeOfBuffer, Buffer)    LibPcdSetExPtr (Guid, _PCD_TOKEN_##TokenName, SizeOfBuffer, Buffer)
-#define PcdSetExBool(Guid, TokenName, Value)   LibPcdSetExBool(Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx8(TokenName, Value)      LibPcdSetEx8   (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx16(TokenName, Value)     LibPcdSetEx16  (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx32(TokenName, Value)     LibPcdSetEx32  (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx64(TokenName, Value)     LibPcdSetEx64  (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetExPtr(TokenName, SizeOfBuffer, Buffer)    LibPcdSetExPtr (&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName, SizeOfBuffer, Buffer)
+#define PcdSetExBool(TokenName, Value)   LibPcdSetExBool(&_gPcd_DynamicEx_TokenSpaceGuid_##TokenName, _PCD_TOKEN_##TokenName, Value)
 
 
 /**
