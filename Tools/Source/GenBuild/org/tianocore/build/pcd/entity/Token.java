@@ -65,10 +65,15 @@ public class Token {
 
     ///
     /// tokenNumber is allocated by platform. tokenNumber indicate an index for this token in
-    /// platform token space.
-    /// tokenNumber is defined in SPD, FPD.
+    /// platform token space. For Dynamic, dynamicEx type, this number will be re-adjust by
+    /// PCD run-time database autogen tools.
     ///
     public int              tokenNumber;
+
+    ///
+    /// This token number is retrieved from FPD file for DynamicEx type. 
+    /// 
+    public int              dynamicExTokenNumber;
 
     ///
     /// All supported PCD type, this value can be retrieved from SPD

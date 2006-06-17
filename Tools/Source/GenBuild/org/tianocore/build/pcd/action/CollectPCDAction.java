@@ -2117,6 +2117,8 @@ public class CollectPCDAction {
         SkuInstance         skuInstance     = null;
         String              temp;
         boolean             hasSkuId0       = false;
+        Token.PCD_TYPE      pcdType         = Token.PCD_TYPE.UNKNOWN;
+        int                 tokenNumber     = 0;
 
         List<DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo>   skuInfoList = null;
         DynamicPcdBuildDefinitions.PcdBuildData                 dynamicInfo = null;
@@ -2151,6 +2153,21 @@ public class CollectPCDAction {
                                             maxDatumSize,
                                             dynamicInfo.getMaxDatumSize());
             throw new EntityException(exceptionString);
+        }
+        tokenNumber = Integer.decode(dynamicInfo.getToken().toString());
+        if (tokenNumber != token.tokenNumber) {
+            exceptionString = String.format("[FPD file error] For dynamic PCD %s, the token number in module %s is 0x%x, but"+
+                                            "in <DynamicPcdBuildDefinictions>, the token number is 0x%x, they are not match!",
+                                            token.cName,
+                                            moduleName,
+                                            token.tokenNumber,
+                                            tokenNumber);
+            throw new EntityException(exceptionString);
+        }
+
+        pcdType = Token.getpcdTypeFromString(dynamicInfo.getItemType().toString());
+        if (pcdType == Token.PCD_TYPE.DYNAMIC_EX) {
+            token.dynamicExTokenNumber = tokenNumber;
         }
 
         skuInfoList = dynamicInfo.getSkuInfoList();
