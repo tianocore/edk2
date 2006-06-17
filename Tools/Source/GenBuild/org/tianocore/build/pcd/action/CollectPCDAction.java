@@ -1978,7 +1978,7 @@ public class CollectPCDAction {
                 strValueArray   = strValue.split(",");
                 for (index = 0; index < strValueArray.length; index ++) {
                     try{
-                        value = Integer.decode(strValueArray[index]);
+                        value = Integer.decode(strValueArray[index].trim());
                     } catch (NumberFormatException nfeEx) {
                         exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*, and "+
                                                          "it is byte array in fact. For every byte in array should be a valid"+
