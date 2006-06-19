@@ -1533,6 +1533,15 @@ public class CollectPCDAction {
                 datum        = pcdBuildData.getValue();
                 maxDatumSize = pcdBuildData.getMaxDatumSize();
 
+                if ((pcdType    == Token.PCD_TYPE.FEATURE_FLAG) &&
+                    (datumType  != Token.DATUM_TYPE.BOOLEAN)){
+                    exceptionString = String.format("[FPD file error] For PCD %s in module %s, the PCD type is FEATRUE_FLAG but "+
+                                                    "datum type of this PCD entry is not BOOLEAN!",
+                                                    pcdBuildData.getCName(),
+                                                    moduleName);
+                    throw new EntityException(exceptionString);
+                }
+
                 //
                 // Check <TokenSpaceGuid> is exist? In future, because all schema verification will tools
                 // will check that, following checking code could be removed.
