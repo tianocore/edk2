@@ -1,7 +1,7 @@
 /** @file
-  Report Status Code Library public .h file
+  Report Status Code Library Post Code functions for DXE Phase.
 
-  Copyright (c) 2006, Intel Corporation                                                         
+  Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -12,11 +12,6 @@
 
 **/
 
-#ifndef __POST_CODE_LIB_H__
-#define __POST_CODE_LIB_H__
-
-#define POST_CODE_PROPERTY_POST_CODE_ENABLED              0x00000008
-#define POST_CODE_PROPERTY_POST_CODE_DESCRIPTION_ENABLED  0x00000010
 
 /**
   Sends an 32-bit value to a POST card.
@@ -40,7 +35,11 @@ UINT32
 EFIAPI
 PostCode (
   IN UINT32  Value
-  );
+  )
+{
+  IoWrite8 (0x80, (UINT8)(Value));
+  return Value;
+}
 
 
 /**
@@ -72,7 +71,11 @@ EFIAPI
 PostCodeWithDescription (
   IN UINT32       Value,
   IN CONST CHAR8  *Description  OPTIONAL
-  );
+  )
+{
+  IoWrite8 (0x80, (UINT8)(Value));
+  return Value;
+}
 
 
 /**
@@ -91,7 +94,10 @@ BOOLEAN
 EFIAPI
 PostCodeEnabled (
   VOID
-  );
+  )
+{
+  return ((PcdGet8(PcdPostCodePropertyMask) & POST_CODE_PROPERTY_POST_CODE_ENABLED) != 0);
+}
 
 
 /**
@@ -111,40 +117,7 @@ BOOLEAN
 EFIAPI
 PostCodeDescriptionEnabled (
   VOID
-  );
-
-
-/**
-  Sends an 32-bit value to a POST card.
-
-  If POST codes are enabled in PcdPostCodeProperyMask, then call PostCode() 
-  passing in Value.  Value is returned.
-
-  @param  Value  The 32-bit value to write to the POST card.
-
-  @return  Value
-
-**/
-#define POST_CODE(Value)  PostCodeEnabled() ? PostCode(Value) : Value
-
-/**
-  Sends an 32-bit value to a POST and associated ASCII string.
-
-  If POST codes and POST code descriptions are enabled in 
-  PcdPostCodeProperyMask, then call PostCodeWithDescription() passing in 
-  Value and Description.  If only POST codes are enabled, then call PostCode() 
-  passing in Value.  Value is returned.
-
-  @param  Value        The 32-bit value to write to the POST card.
-  @param  Description  Pointer to an ASCII string that is a description of the 
-                       POST code value.
-
-**/
-#define POST_CODE_WITH_DESCRIPTION(Value,Description)  \
-  PostCodeEnabled()                              ?     \
-    (PostCodeDescriptionEnabled()                ?     \
-      PostCodeWithDescription(Value,Description) :     \
-      PostCode(Value))                           :     \
-    Value
-
-#endif
+  )
+{
+  return ((PcdGet8(PcdPostCodePropertyMask) & POST_CODE_PROPERTY_POST_CODE_ENABLED) != 0);
+}

@@ -114,7 +114,7 @@ VOID
 EFIAPI
 DebugAssert (
   IN CONST CHAR8  *FileName,
-  IN INTN         LineNumber,
+  IN UINTN        LineNumber,
   IN CONST CHAR8  *Description
   )
 {
