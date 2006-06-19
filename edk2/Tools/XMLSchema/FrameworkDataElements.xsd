@@ -103,6 +103,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="Ffs"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Sections"/>
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="Filenames"/>
+                <xs:element ref="Options" minOccurs="0" maxOccurs="1"/>
                 <xs:sequence minOccurs="0">
                     <xs:element minOccurs="0" maxOccurs="unbounded" name="Option">
                         <xs:complexType>
@@ -131,10 +132,56 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>                
             </xs:sequence>
             <xs:attribute name="ToolChain" type="ToolChains"/>
         </xs:complexType>
     </xs:element>
+    <xs:element name="Options">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" ref="Option"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Option">
+        <!-- This element is used to store flags from the Tools -->
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="xs:normalizedString">
+                    <xs:attributeGroup ref="OptionAttributes"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>    
+    <xs:element name="ModuleBuildOptions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" namespace="##local"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ModuleSaBuildOptions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" name="FvBinding" type="FfsNameType"/>
+                <!-- The FfsFileNameGuid allows the Platform Integrator to specify a GUID for the FFS File Name GUID -->
+                <xs:element minOccurs="0" maxOccurs="1" name="FfsFileNameGuid" type="GuidType"/>
+                <!-- If binding is specified, you MUST specify the FfsFormatKey -->
+                <xs:element minOccurs="0" maxOccurs="1" name="FfsFormatKey" type="FfsNameType"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="Options"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ModuleDefinitions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="SupportedArchitectures" type="ArchListType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="BinaryModule" type="xs:boolean" default="false"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="OutputFileBasename" type="FileNameConvention"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
     <xs:element name="C_Name" type="C_Name">
         <xs:annotation>
             <xs:documentation xml:lang="en">C_Name is valid for all Description Files</xs:documentation>
@@ -336,6 +383,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="1" name="PcdIsDriver" type="PcdDriverTypes"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Extern">
                     <xs:complexType>
                         <xs:choice minOccurs="1">
@@ -375,7 +423,6 @@
                         <xs:attributeGroup ref="ExternAttributes"/>
                     </xs:complexType>
                 </xs:element>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
                 <!-- Remove Arch and use Arch Attribute in above. -->
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Arch">
                     <xs:complexType>
@@ -554,7 +601,7 @@
                     <xs:annotation>
                         <xs:documentation xml:lang="en">Describe the valid content of a GUID element in and MSA file.</xs:documentation>
                     </xs:annotation>
-                    <xs:complexType>
+                    <xs:complexType mixed="true">
                         <xs:sequence minOccurs="0" maxOccurs="1">
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
                             <!-- DO NOT USE removing GuidValue from use -->
@@ -702,7 +749,7 @@
     <xs:element name="IndustryStdHeader">
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" name="Header" type="UiNameType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Header" type="UiNameType"/>
                 <xs:element minOccurs="1" maxOccurs="1" name="IncludeHeader" type="PathAndFilename"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="HelpText"/>
             </xs:sequence>
@@ -717,7 +764,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Library">
-                    <xs:complexType>
+                    <xs:complexType mixed="true">
                         <xs:simpleContent>
                             <xs:extension base="xs:NCName">
                                 <xs:attributeGroup ref="LibraryAttributes"/>
@@ -775,7 +822,10 @@
                         </xs:simpleContent>
                     </xs:complexType>
                 </xs:element>
-                <xs:element minOccurs="1" maxOccurs="1" ref="IncludeHeader"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="IncludeHeader"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="RecommendedInstanceGuid" type="GuidType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="RecommendedInstanceVersion" type="xs:decimal"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -784,6 +834,15 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="unbounded" ref="LibraryClassDeclaration"/>
+                <xs:element name="LibraryClass" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="IncludeHeader" type="PathAndFilename" minOccurs="1" maxOccurs="1"/>
+                            <xs:element ref="HelpText" minOccurs="1" maxOccurs="1"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="LibraryClassAttributes"/>
+                    </xs:complexType>
+                </xs:element>            
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -927,6 +986,42 @@
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
+    <xs:element name="ProcessStep">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="ToolName" type="xs:string"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="ToolArgs" type="xs:string"/>
+                <!-- Input patterns  to be processed by the tool above -->
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="InputPattern" type="xs:string"/>
+                <!-- A pattern to match for the output -->
+                <xs:element minOccurs="1" maxOccurs="1" name="OutputPattern" type="xs:string"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="SectionAttributes"/>
+        </xs:complexType>
+    </xs:element>    
+    <xs:element name="FfsFormatDeclarations">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="FfsFormatDeclaration">
+                    <!-- Required Attributes are the FfsFormatKeyword and SupModuleList -->
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element minOccurs="1" maxOccurs="unbounded" ref="ProcessStep"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref="FfsAttributes"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="PackageDefinitions">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="ReadOnly" type="xs:boolean" default="false"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="RePackage" type="xs:boolean" default="false"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
     <xs:element name="PCDs">
         <!-- PCDs section is going away to be replaced by something else TB Named later -->
         <xs:annotation>
@@ -975,7 +1070,10 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence maxOccurs="unbounded">
-                <xs:element minOccurs="1" maxOccurs="unbounded" ref="PackageName"/>
+                <xs:choice>
+                    <xs:element minOccurs="1" maxOccurs="unbounded" ref="Package"/>
+                    <xs:element minOccurs="1" maxOccurs="unbounded" ref="PackageName"/>                    
+                </xs:choice>
             </xs:sequence>
             <xs:attributeGroup ref="PackageNameAttributes"/>
         </xs:complexType>
@@ -1008,7 +1106,7 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence maxOccurs="unbounded">
-                <xs:element minOccurs="1" name="Package">
+                <xs:element minOccurs="0" name="Package">
                     <xs:annotation>
                         <xs:documentation xml:lang="en">This tag is used in the Framework Package Database File to track individual package information. The Path is a relative path to the SPD File.</xs:documentation>
                     </xs:annotation>
@@ -1033,7 +1131,20 @@
                         <xs:attributeGroup ref="PackageAttributes"/>
                     </xs:complexType>
                 </xs:element>
+                <xs:element name="Filename" type="PathAndFilename" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="Package">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This tag is used in the Package Surface Area Description File to track package dependencies for a module (SPD) </xs:documentation>
+        </xs:annotation>
+        <xs:complexType mixed="true">
+            <xs:simpleContent>
+                <xs:extension base="UiNameType">
+                    <xs:attributeGroup ref="PackageAttributes"/>
+                </xs:extension>
+            </xs:simpleContent>
         </xs:complexType>
     </xs:element>
     <xs:element name="PackageName">
@@ -1742,13 +1853,10 @@
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
                 <xs:element name="SystemTable">
-                    <xs:complexType>
+                    <xs:complexType mixed="true">
                         <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                            <xs:choice>
-                                <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="GuidC_NameType"/>
-                                <!-- Remove Entry from Use -->
-                                <xs:element minOccurs="0" maxOccurs="1" name="Entry" type="xs:normalizedString"/>
-                            </xs:choice>
+                            <!-- Remove Entry from Use -->
+                            <xs:element minOccurs="0" maxOccurs="1" name="Entry" type="xs:normalizedString"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="SystemTableAttributes"/>
                     </xs:complexType>
@@ -1890,4 +1998,14 @@
         </xs:complexType>
     </xs:element>
     <xs:element name="Version" type="xs:normalizedString"/>
+    <xs:element name="FarList">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This tag is used in the Framework Package Database File to track all DISTRIBUTION packages (FAR files) installed in a workspace. (Database)</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="Filename" type="PathAndFilename"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
 </xs:schema>
