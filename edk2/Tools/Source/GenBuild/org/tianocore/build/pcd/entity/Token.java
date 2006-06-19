@@ -593,14 +593,25 @@ public class Token {
 
     public boolean isValidNullValue(String judgedValue) {
         int         intValue;
+        String      subStr;
         BigInteger  bigIntValue;
 
         switch (datumType) {
         case UINT8:
         case UINT16:
         case UINT32:
-            intValue = Integer.decode(judgedValue);
-            if (intValue == 0) {
+            if (judgedValue.length() > 2) {
+                if ((judgedValue.charAt(0) == '0')        && 
+                    ((judgedValue.charAt(1) == 'x') || (judgedValue.charAt(1) == 'X'))){
+                    subStr      = judgedValue.substring(2, judgedValue.length());
+                    bigIntValue = new BigInteger(subStr, 16);
+                } else {
+                    bigIntValue = new BigInteger(judgedValue);
+                }
+            } else {
+                bigIntValue = new BigInteger(judgedValue);
+            }
+            if (bigIntValue.bitCount() == 0) {
                 return true;
             }
             break;
