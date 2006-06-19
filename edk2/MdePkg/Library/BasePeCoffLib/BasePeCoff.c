@@ -34,7 +34,7 @@ PeCoffLoaderCheckImageType (
   );
 
 STATIC
-VOID                            *
+VOID *
 PeCoffLoaderImageAddress (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
   IN     UINTN                         Address
@@ -53,15 +53,12 @@ PeCoffLoaderRelocateImageEx (
 /**
   Retrieves the PE or TE Header from a PE/COFF or TE image.
 
-  @param  ImageContext The context of the image being loaded.
-  
-  @param  PeHdr The buffer in which to return the PE header.
-  
-  @param  TeHdr The buffer in which to return the TE header.
+  @param  ImageContext    The context of the image being loaded.
+  @param  PeHdr           The buffer in which to return the PE header.
+  @param  TeHdr           The buffer in which to return the TE header.
 
-  @return
-  RETURN_SUCCESS if the PE or TE Header is read,
-  Otherwise, the error status from reading the PE/COFF or TE image using the ImageRead function.
+  @retval RETURN_SUCCESS  The PE or TE Header is read.
+  @retval Other           The error status from reading the PE/COFF or TE image using the ImageRead function.
 
 **/
 STATIC
@@ -72,7 +69,7 @@ PeCoffLoaderGetPeHeader (
   OUT    EFI_TE_IMAGE_HEADER           *TeHdr
   )
 {
-  RETURN_STATUS            Status;
+  RETURN_STATUS         Status;
   EFI_IMAGE_DOS_HEADER  DosHdr;
   UINTN                 Size;
 
@@ -82,11 +79,11 @@ PeCoffLoaderGetPeHeader (
   //
   Size = sizeof (EFI_IMAGE_DOS_HEADER);
   Status = ImageContext->ImageRead (
-                          ImageContext->Handle,
-                          0,
-                          &Size,
-                          &DosHdr
-                          );
+                           ImageContext->Handle,
+                           0,
+                           &Size,
+                           &DosHdr
+                           );
   if (RETURN_ERROR (Status)) {
     ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
     return Status;
@@ -104,11 +101,11 @@ PeCoffLoaderGetPeHeader (
   //
   Size = sizeof (EFI_IMAGE_NT_HEADERS);
   Status = ImageContext->ImageRead (
-                          ImageContext->Handle,
-                          ImageContext->PeCoffHeaderOffset,
-                          &Size,
-                          PeHdr
-                          );
+                           ImageContext->Handle,
+                           ImageContext->PeCoffHeaderOffset,
+                           &Size,
+                           PeHdr
+                           );
   if (RETURN_ERROR (Status)) {
     ImageContext->ImageError = IMAGE_ERROR_IMAGE_READ;
     return Status;
@@ -119,11 +116,11 @@ PeCoffLoaderGetPeHeader (
   if (PeHdr->Signature != EFI_IMAGE_NT_SIGNATURE) {
     Size = sizeof (EFI_TE_IMAGE_HEADER);
     Status = ImageContext->ImageRead (
-                            ImageContext->Handle,
-                            0,
-                            &Size,
-                            TeHdr
-                            );
+                             ImageContext->Handle,
+                             0,
+                             &Size,
+                             TeHdr
+                             );
     if (TeHdr->Signature != EFI_TE_IMAGE_HEADER_SIGNATURE) {
       return RETURN_UNSUPPORTED;
     }
@@ -137,14 +134,12 @@ PeCoffLoaderGetPeHeader (
 /**
   Checks the PE or TE header of a PE/COFF or TE image to determine if it supported.
 
-  @param  ImageContext The context of the image being loaded.
-  
-  @param  PeHdr The buffer in which to return the PE header.
-  
-  @param  TeHdr The buffer in which to return the TE header.
+  @param  ImageContext        The context of the image being loaded.
+  @param  PeHdr               The buffer in which to return the PE header.
+  @param  TeHdr               The buffer in which to return the TE header.
 
-  @retval RETURN_SUCCESS if the PE/COFF or TE image is supported
-  @retval RETURN_UNSUPPORTED of the PE/COFF or TE image is not supported.
+  @retval RETURN_SUCCESS      The PE/COFF or TE image is supported.
+  @retval RETURN_UNSUPPORTED  The PE/COFF or TE image is not supported.
 
 **/
 STATIC
@@ -185,16 +180,24 @@ PeCoffLoaderCheckImageType (
 }
 
 /**
-  Retrieves information on a PE/COFF image.
+  Retrieves information about a PE/COFF image.
 
-  @param  This Calling context
-  @param  ImageContext The context of the image being loaded
+  Computes the PeCoffHeaderOffset, ImageAddress, ImageSize, DestinationAddress, CodeView,
+  PdbPointer, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva
+  fields of the ImageContext structure.  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
+  If the PE/COFF image accessed through the ImageRead service in the ImageContext structure is not
+  a supported PE/COFF image type, then return RETURN_UNSUPPORTED.  If any errors occur while
+  computing the fields of ImageContext, then the error status is returned in the ImageError field of
+  ImageContext. 
 
-  @retval  RETURN_SUCCESS The information on the PE/COFF image was collected.
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image that needs to be examined by this function.
+
+  @retval  RETURN_SUCCESS           The information on the PE/COFF image was collected.
   @retval  RETURN_INVALID_PARAMETER ImageContext is NULL.
-  @retval  RETURN_UNSUPPORTED The PE/COFF image is not supported.
-  @retval  Otherwise The error status from reading the PE/COFF image using the
-  ImageContext->ImageRead() function
+  @retval  RETURN_UNSUPPORTED       The PE/COFF image is not supported.
+  @retval  Others                   The error status from reading the PE/COFF image
+                                    using the ImageContext->ImageRead() function.
 
 **/
 RETURN_STATUS
@@ -203,7 +206,7 @@ PeCoffLoaderGetImageInfo (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT           *ImageContext
   )
 {
-  RETURN_STATUS                      Status;
+  RETURN_STATUS                   Status;
   EFI_IMAGE_NT_HEADERS            PeHdr;
   EFI_TE_IMAGE_HEADER             TeHdr;
   EFI_IMAGE_DATA_DIRECTORY        *DebugDirectoryEntry;
@@ -368,7 +371,7 @@ PeCoffLoaderGetImageInfo (
       //
       // Read section header from file
       //
-      Size = sizeof (EFI_IMAGE_SECTION_HEADER);
+      Size   = sizeof (EFI_IMAGE_SECTION_HEADER);
       Status = ImageContext->ImageRead (
                                ImageContext->Handle,
                                SectionHeaderOffset,
@@ -383,10 +386,10 @@ PeCoffLoaderGetImageInfo (
       if (DebugDirectoryEntryRva >= SectionHeader.VirtualAddress &&
           DebugDirectoryEntryRva < SectionHeader.VirtualAddress + SectionHeader.Misc.VirtualSize) {
         DebugDirectoryEntryFileOffset = DebugDirectoryEntryRva -
-          SectionHeader.VirtualAddress +
-          SectionHeader.PointerToRawData +
-          sizeof (EFI_TE_IMAGE_HEADER) -
-          TeHdr.StrippedSize;
+                                        SectionHeader.VirtualAddress +
+                                        SectionHeader.PointerToRawData +
+                                        sizeof (EFI_TE_IMAGE_HEADER) -
+                                        TeHdr.StrippedSize;
 
         //
         // File offset of the debug directory was found, if this is not the last
@@ -448,11 +451,10 @@ PeCoffLoaderGetImageInfo (
 /**
   Converts an image address to the loaded address.
 
-  @param  ImageContext The context of the image being loaded.
-  
-  @param  Address The address to be converted to the loaded address.
+  @param  ImageContext  The context of the image being loaded.
+  @param  Address       The address to be converted to the loaded address.
 
-  @return NULL if the address can not be converted, otherwise, the converted address
+  @return The converted address or NULL if the address can not be converted.
 
 **/
 STATIC
@@ -471,15 +473,23 @@ PeCoffLoaderImageAddress (
 }
 
 /**
-  Relocates a PE/COFF image in memory.
+  Applies relocation fixups to a PE/COFF image that was loaded with PeCoffLoaderLoadImage().
 
-  @param  This Calling context.
-  
-  @param  ImageContext Contains information on the loaded image to relocate.
+  If the DestinationAddress field of ImageContext is 0, then use the ImageAddress field of
+  ImageContext as the relocation base address.  Otherwise, use the DestinationAddress field
+  of ImageContext as the relocation base address.  The caller must allocate the relocation
+  fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.  
+  If ImageContext is NULL, then ASSERT().
 
-  @retval RETURN_SUCCESS      if the PE/COFF image was relocated.
-  @retval RETURN_LOAD_ERROR   if the image is not a valid PE/COFF image.
-  @retval RETURN_UNSUPPORTED  not support.
+  @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
+                              image that is being relocated.
+
+  @retval RETURN_SUCCESS      The PE/COFF image was relocated.
+                              Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_LOAD_ERROR   The image in not a valid PE/COFF image.
+                              Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_UNSUPPORTED  A relocation record type is not supported.
+                              Extended status information is in the ImageError field of ImageContext.
 
 **/
 RETURN_STATUS
@@ -504,6 +514,8 @@ PeCoffLoaderRelocateImage (
   CHAR8                     *FixupData;
   PHYSICAL_ADDRESS          BaseAddress;
 
+  ASSERT (ImageContext != NULL);
+
   PeHdr = NULL;
   TeHdr = NULL;
   //
@@ -522,7 +534,7 @@ PeCoffLoaderRelocateImage (
   // If the destination address is not 0, use that rather than the
   // image address as the relocation target.
   //
-  if (ImageContext->DestinationAddress) {
+  if (ImageContext->DestinationAddress != 0) {
     BaseAddress = ImageContext->DestinationAddress;
   } else {
     BaseAddress = ImageContext->ImageAddress;
@@ -531,6 +543,7 @@ PeCoffLoaderRelocateImage (
   if (!(ImageContext->IsTeImage)) {
     PeHdr = (EFI_IMAGE_NT_HEADERS *)((UINTN)ImageContext->ImageAddress + 
                                             ImageContext->PeCoffHeaderOffset);
+   
     Adjust = (UINT64) BaseAddress - PeHdr->OptionalHeader.ImageBase;
     PeHdr->OptionalHeader.ImageBase = (UINTN)BaseAddress;
 
@@ -670,14 +683,23 @@ PeCoffLoaderRelocateImage (
 /**
   Loads a PE/COFF image into memory.
 
-  @param  This Calling context.
-  
-  @param  ImageContext Contains information on image to load into memory.
+  Loads the PE/COFF image accessed through the ImageRead service of ImageContext into the buffer
+  specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
+  the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
+  The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
 
-  @retval RETURN_SUCCESS            if the PE/COFF image was loaded.
-  @retval RETURN_BUFFER_TOO_SMALL   if the caller did not provide a large enough buffer.
-  @retval RETURN_LOAD_ERROR         if the image is a runtime driver with no relocations.
-  @retval RETURN_INVALID_PARAMETER  if the image address is invalid.
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image that is being loaded.
+
+  @retval RETURN_SUCCESS            The PE/COFF image was loaded into the buffer specified by
+                                    the ImageAddress and ImageSize fields of ImageContext.
+                                    Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_BUFFER_TOO_SMALL   The caller did not provide a large enough buffer.
+                                    Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_LOAD_ERROR         The PE/COFF image is an EFI Runtime image with no relocations.
+                                    Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_INVALID_PARAMETER  The image address is invalid.
+                                    Extended status information is in the ImageError field of ImageContext.
 
 **/
 RETURN_STATUS
@@ -686,10 +708,10 @@ PeCoffLoaderLoadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 {
-  RETURN_STATUS                            Status;
+  RETURN_STATUS                         Status;
   EFI_IMAGE_NT_HEADERS                  *PeHdr;
   EFI_TE_IMAGE_HEADER                   *TeHdr;
-  PE_COFF_LOADER_IMAGE_CONTEXT  CheckContext;
+  PE_COFF_LOADER_IMAGE_CONTEXT          CheckContext;
   EFI_IMAGE_SECTION_HEADER              *FirstSection;
   EFI_IMAGE_SECTION_HEADER              *Section;
   UINTN                                 NumberOfSections;

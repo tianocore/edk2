@@ -94,7 +94,7 @@ VOID
 EFIAPI
 DebugAssert (
   IN CONST CHAR8  *FileName,
-  IN INTN         LineNumber,
+  IN UINTN        LineNumber,
   IN CONST CHAR8  *Description
   );
 
@@ -311,21 +311,21 @@ DebugClearMemoryEnabled (
   @param  Guid    Pointer to a protocol GUID.
 
 **/
-#define ASSERT_PROTOCOL_ALREADY_INSTALLED(Handle, Guid)                    \
-  do {                                                                     \
-    if (DebugAssertEnabled ()) {                                           \
-      VOID  *Instance;                                                     \
-      ASSERT (Guid != NULL);                                               \
-      if (Handle == NULL) {                                                \
-        if (!EFI_ERROR (gBS->LocateProtocol (Guid, NULL, &Instance))) {    \
-          _ASSERT (Guid already installed in database);                    \
-        }                                                                  \
-      } else {                                                             \
-        if (!EFI_ERROR (gBS->HandleProtocol (Handle, Guid, &Instance))) {  \
-          _ASSERT (Guid already installed on Handle);                      \
-        }                                                                  \
-      }                                                                    \
-    }                                                                      \
+#define ASSERT_PROTOCOL_ALREADY_INSTALLED(Handle, Guid)                               \
+  do {                                                                                \
+    if (DebugAssertEnabled ()) {                                                      \
+      VOID  *Instance;                                                                \
+      ASSERT (Guid != NULL);                                                          \
+      if (Handle == NULL) {                                                           \
+        if (!EFI_ERROR (gBS->LocateProtocol ((EFI_GUID *)Guid, NULL, &Instance))) {   \
+          _ASSERT (Guid already installed in database);                               \
+        }                                                                             \
+      } else {                                                                        \
+        if (!EFI_ERROR (gBS->HandleProtocol (Handle, (EFI_GUID *)Guid, &Instance))) { \
+          _ASSERT (Guid already installed on Handle);                                 \
+        }                                                                             \
+      }                                                                               \
+    }                                                                                 \
   } while (FALSE)
 
 

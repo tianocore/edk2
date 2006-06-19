@@ -226,7 +226,7 @@
       <Filename>Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Library/BasePostCodeLib80/BasePostCodeLib80.msa</Filename>
+      <Filename>Library/BasePostCodeLibPort80/BasePostCodeLibPort80.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>

@@ -66,7 +66,7 @@ VOID
 EFIAPI
 DebugAssert (
   IN CHAR8  *FileName,
-  IN INTN   LineNumber,
+  IN UINTN  LineNumber,
   IN CHAR8  *Description
   )
 /*++

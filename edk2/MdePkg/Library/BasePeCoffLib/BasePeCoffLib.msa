@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">PeCoffLib</LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>BasePeCoff.c</Filename>
@@ -44,10 +45,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>x64/PeCoffLoaderEx.c</Filename>
     </Arch>
     <Arch ArchType="IPF">
-      <Filename>ipf/PeCoffLoaderEx.c</Filename>
+      <Filename>Ipf/PeCoffLoaderEx.c</Filename>
     </Arch>
     <Arch ArchType="EBC">
-      <Filename>ebc/PeCoffLoaderEx.c</Filename>
+      <Filename>Ebc/PeCoffLoaderEx.c</Filename>
     </Arch>
   </SourceFiles>
   <Includes>
