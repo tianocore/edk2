@@ -24,6 +24,8 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="FdbHeader"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="PackageList"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PlatformList"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="FarList"/>                
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -34,6 +36,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="PlatformHeader"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PlatformDefinitions"/>                
                 <xs:element minOccurs="0" maxOccurs="1" ref="SkuInfo"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Flash"/>
                 <!-- DO NOT USE! removing TianoImage, use FrameworkModules instead. -->
@@ -138,6 +141,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="MsaHeader"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="ModuleDefinitions"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDefinitions"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SourceFiles"/>
                 <xs:choice minOccurs="0">
@@ -164,6 +168,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdCoded"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="ModuleBuildOptions"/>
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
             </xs:sequence>
         </xs:complexType>
@@ -175,13 +180,13 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="SpdHeader"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PackageDefinitions"/>                
                 <xs:element minOccurs="0" maxOccurs="1" ref="LibraryClassDeclarations"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="IndustryStdIncludes"/>
                 <!-- DO NOT USE removing THIS INSTANCE of PackageDependencies, this is moving to FDP installation process -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageDependencies"/>
                 <!-- DO NOT USE removing MsaFiles, use MsaFileList instead , do not wrap in choice, too many entries to convert all at once. -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="MsaFiles"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="MsaFileList"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PackageHeaders"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidDeclarations"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="ProtocolDeclarations"/>

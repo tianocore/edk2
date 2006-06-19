@@ -47,6 +47,15 @@
             <xs:enumeration value="SOMETIMES_PRODUCED"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="ModuleListType">
+        <xs:list itemType="FrameworkModuleTypes"/>
+    </xs:simpleType>    
+    <xs:simpleType name="IntermediateOutputType">
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="MODULE"/>
+            <xs:enumeration value="UNIFIED"/>
+        </xs:restriction>
+    </xs:simpleType>    
     <xs:simpleType name="BuildTargets">
         <xs:restriction base="xs:NCName">
             <xs:enumeration value="DEBUG"/>
@@ -54,6 +63,19 @@
             <xs:enumeration value="BOTH"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="BuildTargetList">
+        <xs:union memberTypes="UCNameType DEBUG RELEASE"/>
+    </xs:simpleType>
+    <xs:simpleType name="DEBUG">
+        <xs:restriction base="UCNameType">
+            <xs:pattern value="DEBUG"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="RELEASE">
+        <xs:restriction base="UCNameType">
+            <xs:pattern value="RELEASE"/>
+        </xs:restriction>
+    </xs:simpleType>    
     <xs:simpleType name="ComponentExecutionPhase">
         <xs:restriction base="UCNameType">
             <xs:enumeration value="MDE"/>
@@ -503,4 +525,12 @@
             <xs:element name="ToolArgs" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
+    <xs:simpleType name="FfsNameType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> This defines what an FFS Name can consist of.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[a-zA-Z][_\-a-zA-Z0-9]*(.)?[a-zA-Z0-9]*"/>
+        </xs:restriction>
+    </xs:simpleType>    
 </xs:schema>

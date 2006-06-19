@@ -236,6 +236,7 @@
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="ModuleTypeList" type="ModuleTypeList" use="optional"/>
+        <xs:attribute name="Name" type="KeywordType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="LibraryAttributes">
         <!-- LibraryAttributes is used for Libraries / Library elements in FPD files -->
@@ -275,6 +276,7 @@
         <xs:attribute name="RecommendedInstanceVersion" type="xs:decimal" use="optional"/>
         <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="LibraryUsage" use="required"/>
+        <xs:attribute name="Name" type="xs:normalizedString" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="MsaGuidAttributes">
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
@@ -298,6 +300,10 @@
         <!-- DO NOT USE remove Version from use, Start using ModuleVersion instead -->
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
     </xs:attributeGroup>
+    <xs:attributeGroup name="FfsAttributes">
+        <xs:attribute name="FfsFormatKeyword" type="FfsNameType" use="required"/>
+        <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
+    </xs:attributeGroup>    
     <xs:attributeGroup name="MsaAttributes">
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>

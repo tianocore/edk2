@@ -273,6 +273,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:choice>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
                 <xs:choice>
                     <!-- DO NOT USE! REMOVE PcdBuildDeclarations in FINAL -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
@@ -281,6 +282,7 @@
                 </xs:choice>
                 <!-- BuildOptions stays in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="ModuleSaBuildOptions"/>
             </xs:sequence>
             <xs:attributeGroup ref="MsaAttributes"/>
         </xs:complexType>
@@ -323,6 +325,7 @@
         <xs:complexType>
             <xs:sequence maxOccurs="unbounded">
                 <xs:element ref="Platform"/>
+                <xs:element name="Filename" type="PathAndFilename" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -361,6 +364,32 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="FlashDeviceDefinitions">
+        <xs:complexType>
+            <xs:annotation>
+                <xs:documentation xml:lang="en">We allow specifying the Flash layout in this directory, or we allow specifying a flashmap filename</xs:documentation>
+            </xs:annotation>
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="1" name="FlashDefinition" type="FlashData"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FvImages"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
+    <xs:element name="PlatformDefinitions">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- This is the list of ALL architectures that are supported by this Platform -->
+                <xs:element minOccurs="1" maxOccurs="1" name="SupportedArchitectures" type="ArchListType"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="BuildTargets" type="BuildTargetList"/>
+                <xs:element default="UNIFIED" name="IntermediateDirectories" type="IntermediateOutputType"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory" type="xs:anyURI"/>
+                <!-- SkuInfo is only defined if Sku enabled -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="SkuInfo"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceDefinitions"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FfsFormatDeclarations"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
     <xs:complexType name="Components">
         <xs:sequence minOccurs="1" maxOccurs="unbounded">
             <xs:element ref="ModuleSA"/>

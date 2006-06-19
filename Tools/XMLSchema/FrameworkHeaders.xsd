@@ -114,7 +114,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" name="ModuleName" type="UiNameType"/>
                 </xs:choice>
                 <xs:element minOccurs="1" maxOccurs="1" ref="ModuleType"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="ComponentType"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="ComponentType"/>
                 <xs:choice>
                     <!-- Guid needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
@@ -139,11 +139,6 @@
                     <!-- ModifiedDate needs to be removed -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
                 </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="1" name="SupportedArchitectures">
-                    <xs:simpleType>
-                        <xs:list itemType="SupportedArchitectures"/>
-                    </xs:simpleType>
-                </xs:element>
                 <xs:element default="false" minOccurs="0" name="BinaryModule" type="xs:boolean"/>
                 <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
