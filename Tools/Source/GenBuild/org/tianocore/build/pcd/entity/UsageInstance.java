@@ -204,6 +204,7 @@ public class UsageInstance {
         String guidStringArray[] = null;
         String guidString        = null;
         boolean isByteArray      = false;
+        String  printDatum       = null;
 
         hAutogenStr = "";
         cAutogenStr = "";
@@ -224,6 +225,12 @@ public class UsageInstance {
             }
         }
 
+        if (parentToken.datumType == Token.DATUM_TYPE.UINT64) {
+            printDatum = this.datum + "ULL";
+        } else {
+            printDatum = this.datum;
+        }
+
         switch (modulePcdType) {
         case FEATURE_FLAG:
             if (isBuildUsedLibrary) {
@@ -236,7 +243,7 @@ public class UsageInstance {
             } else {
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
                                              parentToken.cName, 
-                                             datum.toString());
+                                             printDatum);
                 hAutogenStr += String.format("extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n", 
                                              parentToken.cName);
                 cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const BOOLEAN _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
@@ -260,7 +267,7 @@ public class UsageInstance {
             } else {
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
                                              parentToken.cName, 
-                                             datum.toString());
+                                             printDatum);
                 if (isByteArray) {
                     cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_%s[] = _PCD_VALUE_%s;\r\n",
                                                  parentToken.cName,
@@ -298,7 +305,7 @@ public class UsageInstance {
             } else {
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
                                              parentToken.cName, 
-                                             datum.toString());
+                                             printDatum);
                 if (isByteArray) {
                     cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_%s[] = _PCD_VALUE_%s;\r\n",
                                                  parentToken.cName,
