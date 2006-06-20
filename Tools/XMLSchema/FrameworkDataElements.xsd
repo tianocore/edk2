@@ -1881,12 +1881,11 @@
     </xs:element>
     <xs:element name="UserExtensions">
         <xs:complexType>
-            <xs:complexContent mixed="true">
-                <xs:extension base="xs:anyType">
-                    <xs:attribute name="UserID" type="xs:NCName" use="required"/>
-                    <xs:attribute name="Identifier" type="xs:integer" use="required"/>
-                </xs:extension>
-            </xs:complexContent>
+            <xs:sequence>
+                <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" namespace="##local"/>
+            </xs:sequence>
+            <xs:attribute name="UserID" type="xs:NCName" use="required"/>
+            <xs:attribute name="Identifier" type="xs:integer" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="Variables">
