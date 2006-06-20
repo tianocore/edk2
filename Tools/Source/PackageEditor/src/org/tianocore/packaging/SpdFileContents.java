@@ -67,11 +67,7 @@ public class SpdFileContents {
 
     private GuidDocument.Guid spdHdrGuid = null;
 
-    private AbstractDocument.Abstract spdHdrAbs = null;
-
     private LicenseDocument.License spdHdrLicense = null;
-
-    private SpecificationDocument.Specification spdHdrSpec = null;
 
     private OutputDirectoryDocument.OutputDirectory spdHdrOutDir = null;
 
@@ -212,7 +208,7 @@ public class SpdFileContents {
         s[0] = getSpdHdrPkgName();
         s[1] = getSpdHdrGuid().getStringValue();
         s[2] = getSpdHdrVer();
-        s[3] = getSpdHdrAbs().getStringValue();
+       s[3] = getSpdHdrAbs();
         s[4] = getSpdHdr().getDescription();
         s[5] = getSpdHdr().getCopyright();
         s[6] = getSpdHdrLicense().getStringValue();
@@ -1030,11 +1026,9 @@ public class SpdFileContents {
      
      @return AbstractDocument.Abstract
     **/
-    public AbstractDocument.Abstract getSpdHdrAbs() {
-        if (spdHdrAbs == null) {
-            spdHdrAbs = getSpdHdr().getAbstract();
-        }
-        return spdHdrAbs;
+    public String getSpdHdrAbs() {
+        
+        return getSpdHdr().getAbstract();
     }
 
     /**
@@ -1043,13 +1037,7 @@ public class SpdFileContents {
      @param abs The value set to Abstract element
     **/
     public void setSpdHdrAbs(String abs) {
-
-        if (getSpdHdrAbs() != null) {
-            getSpdHdrAbs().setStringValue(abs);
-        } else {
-            spdHdrAbs = getSpdHdr().addNewAbstract();
-            spdHdrAbs.setStringValue(abs);
-        }
+           getSpdHdr().setAbstract(abs);
     }
 
     /**
@@ -1128,7 +1116,7 @@ public class SpdFileContents {
    **/
     public void setSpdHdrVer(String ver) {
         if (spdHdr != null) {
-            spdHdr.setVersion(new BigDecimal(ver.toCharArray()));
+            spdHdr.setVersion(ver);
         }
 
     }
@@ -1211,15 +1199,7 @@ public class SpdFileContents {
         }
     }
 
-    /**
-    Reserved method
-    
-    @return SpecificationDocument.Specification
-   **/
-    public SpecificationDocument.Specification getSpdHdrSpec() {
-        return spdHdrSpec;
-    }
-
+  
     /**
     Reserved method
     
@@ -1229,12 +1209,9 @@ public class SpdFileContents {
         if (spec == null) {
             return;
         }
-        if (getSpdHdrSpec() != null) {
-            getSpdHdrSpec().setStringValue(spec);
-        } else {
-            spdHdrSpec = getSpdHdr().addNewSpecification();
-            spdHdrSpec.setStringValue(spec);
-        }
+        
+        getSpdHdr().setSpecification(spec);
+        
     }
 
     /**

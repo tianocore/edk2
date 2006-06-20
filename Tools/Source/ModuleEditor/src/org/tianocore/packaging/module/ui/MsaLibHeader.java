@@ -434,11 +434,10 @@ public class MsaLibHeader extends IInternalFrame {
                 this.jTextAreaDescription.setText(this.msaLibHeader.getDescription());
             }
             if (this.msaLibHeader.getSpecification() != null) {
-                this.jTextFieldSpecification.setText(this.msaLibHeader.getSpecification().getStringValue());
+                this.jTextFieldSpecification.setText(this.msaLibHeader.getSpecification());
             }
             if (this.msaLibHeader.getAbstract() != null) {
-                this.jTextFieldAbstract.setText(this.msaLibHeader.getAbstract().getStringValue());
-                this.jTextFieldAbstractURL.setText(this.msaLibHeader.getAbstract().getURL());
+                this.jTextFieldAbstract.setText(this.msaLibHeader.getAbstract());
             }
             if (this.msaLibHeader.getModuleType() != null) {
                 this.jComboBoxModuleType.setSelectedItem(this.msaLibHeader.getModuleType().toString());
@@ -704,22 +703,16 @@ public class MsaLibHeader extends IInternalFrame {
             this.msaLibHeader.setDescription(this.jTextAreaDescription.getText());
 
             if (this.msaLibHeader.getSpecification() != null) {
-                this.msaLibHeader.getSpecification().setStringValue(this.jTextFieldSpecification.getText());
+                this.msaLibHeader.setSpecification(this.jTextFieldSpecification.getText());
             } else {
-                SpecificationDocument.Specification mSpecification = SpecificationDocument.Specification.Factory
-                                                                                                                .newInstance();
-                mSpecification.setStringValue(this.jTextFieldSpecification.getText());
-                this.msaLibHeader.setSpecification(mSpecification);
+                this.msaLibHeader.setSpecification(this.jTextFieldSpecification.getText());
             }
 
             if (this.msaLibHeader.getAbstract() != null) {
-                this.msaLibHeader.getAbstract().setStringValue(this.jTextFieldAbstract.getText());
-                this.msaLibHeader.getAbstract().setURL(this.jTextFieldAbstractURL.getText());
+                this.msaLibHeader.setAbstract(this.jTextFieldAbstract.getText());
             } else {
-                AbstractDocument.Abstract mAbstract = AbstractDocument.Abstract.Factory.newInstance();
-                mAbstract.setStringValue(this.jTextFieldAbstract.getText());
-                mAbstract.setURL(this.jTextFieldAbstractURL.getText());
-                this.msaLibHeader.setAbstract(mAbstract);
+                
+                this.msaLibHeader.setAbstract(this.jTextFieldAbstract.getText());
             }
 
             this.msaLibHeader.setModuleType(ModuleTypeDef.Enum.forString(this.jComboBoxModuleType.getSelectedItem()
