@@ -19,18 +19,11 @@
     <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
     <xs:include schemaLocation="FrameworkPlatformDataTypes.xsd"/>
     <xs:include schemaLocation="FrameworkDataAttributes.xsd"/>
-    <xs:element name="Abstract">
+    <xs:element name="Abstract" type="Sentence">
         <xs:annotation>
             <xs:documentation xml:lang="en">Abstract is valid for all Description Files</xs:documentation>
             <xs:documentation xml:lang="en">This section is required. This is a single sentence to describe the module and will be used in sample files as the abstract data in the header comment section.</xs:documentation>
         </xs:annotation>
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="Sentence">
-                    <xs:attribute name="URL" type="xs:anyURI" use="optional"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
     </xs:element>
     <xs:element name="AntCmd">
         <xs:annotation>
@@ -46,7 +39,6 @@
                     </xs:simpleType>
                 </xs:element>
             </xs:sequence>
-            <xs:attributeGroup ref="SectionAttributes"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="AntTask">
@@ -223,7 +215,7 @@
                 <xs:element name="DataHubRecord">
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="xs:normalizedString">
+                            <xs:extension base="C_NameType">
                                 <xs:attributeGroup ref="DataHubAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
@@ -294,7 +286,7 @@
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:choice>
-                                            <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="GuidC_NameType"/>
+                                            <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="C_NameType"/>
                                             <!-- DO NOT USE, removing C_Name in final -->
                                             <xs:element minOccurs="0" maxOccurs="1" ref="C_Name"/>
                                         </xs:choice>
@@ -340,7 +332,7 @@
                                 <xs:complexType>
                                     <xs:sequence>
                                         <xs:choice>
-                                            <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="GuidC_NameType"/>
+                                            <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="C_NameType"/>
                                             <!-- DO NOT USE, removing C_Name in final -->
                                             <xs:element minOccurs="0" maxOccurs="1" ref="C_Name"/>
                                         </xs:choice>
@@ -383,7 +375,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="1" name="PcdIsDriver" type="PcdDriverTypes"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification" type="Sentence"/>
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Extern">
                     <xs:complexType>
                         <xs:choice minOccurs="1">
@@ -497,7 +489,7 @@
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
-                <xs:extension base="VariableConvention">
+                <xs:extension base="PathAndFilename">
                     <xs:attributeGroup ref="FilenameAttributes"/>
                 </xs:extension>
             </xs:simpleContent>
@@ -581,12 +573,12 @@
                 <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
                             <xs:choice minOccurs="1">
                                 <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                             </xs:choice>
-                            <xs:element minOccurs="0" maxOccurs="unbounded" ref="HelpText"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="GuidDeclarationAttributes"/>
                     </xs:complexType>
@@ -597,11 +589,23 @@
     <xs:element name="Guids">
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="GuidCName">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">Describe the valid content of a GUID element in and MSA file.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="C_NameType">
+                                <xs:attributeGroup ref="GuidAttributes"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>                
                 <xs:element name="GuidEntry">
                     <xs:annotation>
                         <xs:documentation xml:lang="en">Describe the valid content of a GUID element in and MSA file.</xs:documentation>
                     </xs:annotation>
-                    <xs:complexType mixed="true">
+                    <xs:complexType>
                         <xs:sequence minOccurs="0" maxOccurs="1">
                             <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
                             <!-- DO NOT USE removing GuidValue from use -->
@@ -657,7 +661,7 @@
                 <xs:element name="HiiPackage">
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="C_Name">
+                            <xs:extension base="C_NameType">
                                 <xs:attributeGroup ref="HiiPackageAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
@@ -675,7 +679,7 @@
                             <xs:choice>
                                 <!-- Remove Name from use -->
                                 <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:normalizedString"/>
-                                <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="GuidC_NameType"/>
+                                <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="C_NameType"/>
                             </xs:choice>
                             <!-- Remove C_Name from use -->
                             <xs:element minOccurs="0" maxOccurs="1" ref="C_Name"/>
@@ -751,7 +755,7 @@
             <xs:sequence>
                 <xs:element minOccurs="0" maxOccurs="1" name="Header" type="UiNameType"/>
                 <xs:element minOccurs="1" maxOccurs="1" name="IncludeHeader" type="PathAndFilename"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="HelpText"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="HelpText" type="Paragraph"/>
             </xs:sequence>
             <xs:attributeGroup ref="IndustryStdHeaderAttributes"/>
         </xs:complexType>
@@ -764,7 +768,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1">
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Library">
-                    <xs:complexType mixed="true">
+                    <xs:complexType>
                         <xs:simpleContent>
                             <xs:extension base="xs:NCName">
                                 <xs:attributeGroup ref="LibraryAttributes"/>
@@ -790,6 +794,11 @@
                     </xs:complexType>
                 </xs:element>
                 <!-- /remove Arch Element -->
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Instance">
+                    <xs:complexType>
+                        <xs:attributeGroup ref="LibraryAttributes"/>
+                    </xs:complexType>
+                </xs:element>                
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -799,7 +808,7 @@
         </xs:annotation>
         <xs:complexType>
             <xs:simpleContent>
-                <xs:extension base="xs:NCName">
+                <xs:extension base="KeywordType">
                     <xs:attributeGroup ref="LibraryClassAttributes"/>
                 </xs:extension>
             </xs:simpleContent>
@@ -837,8 +846,8 @@
                 <xs:element name="LibraryClass" minOccurs="0" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="IncludeHeader" type="PathAndFilename" minOccurs="1" maxOccurs="1"/>
-                            <xs:element ref="HelpText" minOccurs="1" maxOccurs="1"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="IncludeHeader" type="PathAndFilename"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="HelpText" type="Paragraph"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="LibraryClassAttributes"/>
                     </xs:complexType>
@@ -952,7 +961,7 @@
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
-            <xs:element minOccurs="1" maxOccurs="unbounded" ref="Filename"/>
+              <xs:element minOccurs="0" maxOccurs="unbounded" name="Filename" type="PathAndFilename"/>
           </xs:choice>
         </xs:complexType>
     </xs:element>
@@ -996,7 +1005,7 @@
                 <!-- A pattern to match for the output -->
                 <xs:element minOccurs="1" maxOccurs="1" name="OutputPattern" type="xs:string"/>
             </xs:sequence>
-            <xs:attributeGroup ref="SectionAttributes"/>
+            <xs:attributeGroup ref="ProcessStepAttributes"/>
         </xs:complexType>
     </xs:element>    
     <xs:element name="FfsFormatDeclarations">
@@ -1139,12 +1148,8 @@
         <xs:annotation>
             <xs:documentation xml:lang="en">This tag is used in the Package Surface Area Description File to track package dependencies for a module (SPD) </xs:documentation>
         </xs:annotation>
-        <xs:complexType mixed="true">
-            <xs:simpleContent>
-                <xs:extension base="UiNameType">
-                    <xs:attributeGroup ref="PackageAttributes"/>
-                </xs:extension>
-            </xs:simpleContent>
+        <xs:complexType>
+            <xs:attributeGroup ref="PackageAttributes"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="PackageName">
@@ -1614,13 +1619,13 @@
                 <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
                             <xs:choice>
                                 <!-- DO NOT USE removing Guid in final, use GuidValue instead -->
                                 <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                             </xs:choice>
-                            <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PpiDeclarationAttributes"/>
                     </xs:complexType>
@@ -1637,7 +1642,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Ppi">
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="C_Name">
+                            <xs:extension base="C_NameType">
                                 <xs:attributeGroup ref="PpiAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
@@ -1646,7 +1651,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="PpiNotify">
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="C_Name">
+                            <xs:extension base="C_NameType">
                                 <xs:attributeGroup ref="PpiNotifyAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
@@ -1690,12 +1695,12 @@
                 <xs:element minOccurs="1" maxOccurs="unbounded" name="Entry">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
                             <xs:choice>
                                 <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
                                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                             </xs:choice>
-                            <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="ProtocolDeclarationAttributes"/>
                     </xs:complexType>
@@ -1712,7 +1717,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Protocol">
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="C_Name">
+                            <xs:extension base="C_NameType">
                                 <xs:attributeGroup ref="ProtocolAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
@@ -1721,7 +1726,7 @@
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="ProtocolNotify">
                     <xs:complexType>
                         <xs:simpleContent>
-                            <xs:extension base="C_Name">
+                            <xs:extension base="C_NameType">
                                 <xs:attributeGroup ref="ProtocolNotifyAttributes"/>
                             </xs:extension>
                         </xs:simpleContent>
@@ -1734,7 +1739,7 @@
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="Protocol">
                                 <xs:complexType>
                                     <xs:simpleContent>
-                                        <xs:extension base="C_Name">
+                                        <xs:extension base="C_NameType">
                                             <xs:attributeGroup ref="ProtocolAttributes"/>
                                         </xs:extension>
                                     </xs:simpleContent>
@@ -1743,7 +1748,7 @@
                             <xs:element minOccurs="0" maxOccurs="unbounded" name="ProtocolNotify">
                                 <xs:complexType>
                                     <xs:simpleContent>
-                                        <xs:extension base="C_Name">
+                                        <xs:extension base="C_NameType">
                                             <xs:attributeGroup ref="ProtocolNotifyAttributes"/>
                                         </xs:extension>
                                     </xs:simpleContent>
@@ -1821,8 +1826,8 @@
     </xs:element>
     <xs:element name="SkuInfo">
         <xs:complexType>
-            <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                <xs:element name="UiSkuName">
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="UiSkuName">
                     <xs:complexType>
                         <xs:simpleContent>
                             <xs:extension base="UiNameType">
@@ -1853,7 +1858,7 @@
         <xs:complexType>
             <xs:sequence minOccurs="1" maxOccurs="unbounded">
                 <xs:element name="SystemTable">
-                    <xs:complexType mixed="true">
+                    <xs:complexType>
                         <xs:sequence minOccurs="1" maxOccurs="unbounded">
                             <!-- Remove Entry from Use -->
                             <xs:element minOccurs="0" maxOccurs="1" name="Entry" type="xs:normalizedString"/>
@@ -1861,6 +1866,15 @@
                         <xs:attributeGroup ref="SystemTableAttributes"/>
                     </xs:complexType>
                 </xs:element>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="SystemTableCName">
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="C_NameType">
+                                <xs:attributeGroup ref="SystemTableAttributes"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+                </xs:element>                
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -1885,7 +1899,7 @@
                 <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" namespace="##local"/>
             </xs:sequence>
             <xs:attribute name="UserID" type="xs:NCName" use="required"/>
-            <xs:attribute name="Identifier" type="xs:integer" use="required"/>
+            <xs:attribute name="Identifier" type="xs:nonNegativeInteger" use="required"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="Variables">
@@ -1912,7 +1926,7 @@
                                 <!-- DO NOT USE, use GuidC_Name instead -->
                                 <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                                 <!-- Make GuidC_Name required -->
-                                <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="GuidC_NameType"/>
+                                <xs:element minOccurs="0" maxOccurs="1" name="GuidC_Name" type="C_NameType"/>
                             </xs:choice>
                             <!-- DO NOT USE, removiing  ByteOffset, Bit Offset and OffsetBitSize-->
                             <xs:element minOccurs="0" maxOccurs="1" name="ByteOffset" type="HexWordDataType">

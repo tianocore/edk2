@@ -221,11 +221,23 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImage"/>
+                <xs:choice>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImage"/>
+                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvRegionName"/>
+                </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImageName"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="FvRegionName">
+        <xs:complexType>
+            <xs:simpleContent>
+                <xs:extension base="KeywordType">
+                    <xs:attributeGroup ref="FvRegionNameAttributes"/>
+                </xs:extension>
+            </xs:simpleContent>
+        </xs:complexType>
+    </xs:element>    
     <xs:element name="ModuleSA">
         <xs:annotation>
             <xs:documentation xml:lang="en">This element is used to specify information in the Platform Description File.</xs:documentation>
@@ -273,7 +285,7 @@
                         </xs:complexType>
                     </xs:element>
                 </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification" type="Sentence"/>
                 <xs:choice>
                     <!-- DO NOT USE! REMOVE PcdBuildDeclarations in FINAL -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
@@ -367,14 +379,14 @@
     <xs:element name="FlashDeviceDefinitions">
         <xs:complexType>
             <xs:annotation>
-                <xs:documentation xml:lang="en">We allow specifying the Flash layout in this directory, or we allow specifying a flashmap filename</xs:documentation>
+                <xs:documentation xml:lang="en">We allow specifying the FlashMap filename</xs:documentation>
             </xs:annotation>
             <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="1" name="FlashDefinition" type="FlashData"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="FlashDefinitionFile" type="PathAndFilename"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="FvImages"/>
             </xs:sequence>
         </xs:complexType>
-    </xs:element>    
+    </xs:element>
     <xs:element name="PlatformDefinitions">
         <xs:complexType>
             <xs:sequence>

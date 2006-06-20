@@ -31,6 +31,14 @@
             <xs:pattern value="((_)*([a-zA-Z])+((_)*[a-zA-Z0-9]*))*"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="C_NameType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="((_)*([a-zA-Z])+((_)*[a-zA-Z0-9]*))*"/>
+        </xs:restriction>
+    </xs:simpleType>    
     <xs:simpleType name="DirectoryNamingConvention">
         <xs:annotation>
             <xs:documentation xml:lang="en"> Directory naming convention is a UNION of DOS an UNIX directory path names </xs:documentation>
@@ -172,7 +180,7 @@
         <xs:annotation>
             <xs:documentation xml:lang="en">This describes the normal text of a paragraph that can be used in a license or description tag.</xs:documentation>
         </xs:annotation>
-        <xs:restriction base="xs:normalizedString"/>
+        <xs:restriction base="xs:string"/>
     </xs:simpleType>
     <xs:simpleType name="PathAndFilename">
         <xs:annotation>
@@ -212,6 +220,14 @@
             <xs:pattern value="[a-zA-Z][a-zA-Z0-9]*(_*-*.*[a-zA-Z0-9])*"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="ToolsNameConvention">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">This data type is used for ToolCommand, ToolChainFamily and TagName.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:NCName">
+            <xs:pattern value="[a-zA-Z][a-zA-Z0-9]*"/>
+        </xs:restriction>
+    </xs:simpleType>    
     <xs:simpleType name="UCLetterType">
         <xs:annotation>
             <xs:documentation xml:lang="en"> Definition of a UpperCase Letter type, which can be any combination of upper case characters followed by zero or more underscore and/or uppercase alphanumeric characters </xs:documentation>
@@ -304,10 +320,10 @@
     </xs:simpleType>
     <xs:simpleType name="VersionDataType">
         <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a Version Number, which can be any combination of a number followed by zero or more alphanumeric-dot-alphanumeric characters </xs:documentation>
+            <xs:documentation xml:lang="en"> Definition of a Version Number, which must be a decimal number (or Zero) </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string">
-            <xs:pattern value="xs:normalizedString"/>
+            <xs:pattern value="(\d)+(.)?(\d)+"/>
         </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="Zero">
@@ -330,5 +346,5 @@
         <xs:restriction base="xs:normalizedString">
             <xs:pattern value="[a-zA-Z]+(_*[a-zA-Z0-9]*)*"/>
         </xs:restriction>
-    </xs:simpleType>    
+    </xs:simpleType>   
 </xs:schema>

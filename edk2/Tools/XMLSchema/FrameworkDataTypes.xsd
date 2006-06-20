@@ -532,5 +532,10 @@
         <xs:restriction base="xs:string">
             <xs:pattern value="[a-zA-Z][_\-a-zA-Z0-9]*(.)?[a-zA-Z0-9]*"/>
         </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FeatureFlagExpressionType">
+        <xs:restriction base="xs:normalizedString">
+            <xs:pattern value="(\w*\W*)*"/>
+        </xs:restriction>
     </xs:simpleType>    
 </xs:schema>
