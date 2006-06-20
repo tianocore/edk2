@@ -69,7 +69,7 @@ BitFieldAndUint (
   If 8-bit operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -103,7 +103,7 @@ BitFieldRead8 (
   If 8-bit operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -140,7 +140,7 @@ BitFieldWrite8 (
   If 8-bit operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -177,7 +177,7 @@ BitFieldOr8 (
   If 8-bit operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -215,7 +215,7 @@ BitFieldAnd8 (
   If 8-bit operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -256,7 +256,7 @@ BitFieldAndThenOr8 (
   If 16-bit operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -290,7 +290,7 @@ BitFieldRead16 (
   If 16-bit operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -327,7 +327,7 @@ BitFieldWrite16 (
   If 16-bit operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -364,7 +364,7 @@ BitFieldOr16 (
   If 16-bit operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -402,7 +402,7 @@ BitFieldAnd16 (
   If 16-bit operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -443,7 +443,7 @@ BitFieldAndThenOr16 (
   If 32-bit operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -477,7 +477,7 @@ BitFieldRead32 (
   If 32-bit operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -514,7 +514,7 @@ BitFieldWrite32 (
   If 32-bit operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -551,7 +551,7 @@ BitFieldOr32 (
   If 32-bit operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -589,7 +589,7 @@ BitFieldAnd32 (
   If 32-bit operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -630,7 +630,7 @@ BitFieldAndThenOr32 (
   If 64-bit operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -664,7 +664,7 @@ BitFieldRead64 (
   If 64-bit operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -701,7 +701,7 @@ BitFieldWrite64 (
   If 64-bit operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -739,7 +739,7 @@ BitFieldOr64 (
   If 64-bit operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -778,7 +778,7 @@ BitFieldAnd64 (
   If 64-bit operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Operand   Operand on which to perform the bitfield operation.
   @param  StartBit  The ordinal of the least significant bit in the bit field.

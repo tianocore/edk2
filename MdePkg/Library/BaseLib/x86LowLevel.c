@@ -122,7 +122,7 @@ AsmMsrAndThenOr32 (
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -157,7 +157,7 @@ AsmMsrBitFieldRead32 (
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -197,7 +197,7 @@ AsmMsrBitFieldWrite32 (
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -237,7 +237,7 @@ AsmMsrBitFieldOr32 (
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -279,7 +279,7 @@ AsmMsrBitFieldAnd32 (
 
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -412,7 +412,7 @@ AsmMsrAndThenOr64 (
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -446,7 +446,7 @@ AsmMsrBitFieldRead64 (
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -487,7 +487,7 @@ AsmMsrBitFieldWrite64 (
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -528,7 +528,7 @@ AsmMsrBitFieldOr64 (
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -570,7 +570,7 @@ AsmMsrBitFieldAnd64 (
 
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Index     The 32-bit MSR index to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -740,7 +740,13 @@ AsmFxSave (
 {
   ASSERT (Buffer != NULL);
   ASSERT (((UINTN)Buffer & 0xf) == 0);
+
   InternalX86FxSave (Buffer);
+  
+  //
+  // Mark one flag at end of Buffer, it will be check by AsmFxRestor()
+  //
+  *(UINT32 *) (&Buffer[sizeof (IA32_FX_BUFFER) - 4]) = 0xAA5555AA; 
 }
 
 /**
@@ -765,6 +771,12 @@ AsmFxRestore (
 {
   ASSERT (Buffer != NULL);
   ASSERT (((UINTN)Buffer & 0xf) == 0);
+
+  //
+  // Check the flag recorded by AsmFxSave()
+  //
+  ASSERT (*(UINT32 *) (&Buffer[sizeof (IA32_FX_BUFFER) - 4]) == 0xAA5555AA);
+
   InternalX86FxRestore (Buffer);
 }
 

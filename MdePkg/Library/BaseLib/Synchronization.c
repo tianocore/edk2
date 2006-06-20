@@ -278,7 +278,7 @@ InterlockedDecrement (
 UINT32
 EFIAPI
 InterlockedCompareExchange32 (
-  IN      UINT32                    *Value,
+  IN OUT  UINT32                    *Value,
   IN      UINT32                    CompareValue,
   IN      UINT32                    ExchangeValue
   )
@@ -301,7 +301,7 @@ InterlockedCompareExchange32 (
 UINT64
 EFIAPI
 InterlockedCompareExchange64 (
-  IN      UINT64                    *Value,
+  IN OUT  UINT64                    *Value,
   IN      UINT64                    CompareValue,
   IN      UINT64                    ExchangeValue
   )
@@ -330,7 +330,7 @@ InterlockedCompareExchange64 (
 VOID *
 EFIAPI
 InterlockedCompareExchangePointer (
-  IN      VOID                      **Value,
+  IN OUT  VOID                      **Value,
   IN      VOID                      *CompareValue,
   IN      VOID                      *ExchangeValue
   )
