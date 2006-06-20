@@ -17,11 +17,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.pcd.action;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.global.GlobalData;
@@ -252,6 +254,10 @@ public class PCDAutoGenAction extends BuildAction {
     {
         int                   index, index2;
         List<UsageInstance>   usageInstanceArray, usageContext;
+        String[]              guidStringArray = null;
+        String                guidStringCName = null;
+        String                guidString      = null;
+        UsageInstance         usageInstance   = null;
 
         if (!isBuildUsedLibrary) {
             usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleName,
@@ -295,7 +301,6 @@ public class PCDAutoGenAction extends BuildAction {
             }
         }
 
-
         if(usageInstanceArray.size() != 0) {
             //
             // Add "#include 'PcdLib.h'" for Header file
@@ -303,16 +308,63 @@ public class PCDAutoGenAction extends BuildAction {
             hAutoGenString = "#include <MdePkg/Include/Library/PcdLib.h>\r\n";
         }
 
+        //
+        // Generate all PCD entry for a module.
+        // 
         for(index = 0; index < usageInstanceArray.size(); index ++) {
             ActionMessage.debug(this,
                                 "Module " + moduleName + "'s PCD [" + Integer.toHexString(index) + 
                                 "]: " + usageInstanceArray.get(index).parentToken.cName);
             try {
-                usageInstanceArray.get(index).generateAutoGen(isBuildUsedLibrary);
-                hAutoGenString += usageInstanceArray.get(index).getHAutogenStr() + "\r\n";
-                cAutoGenString += usageInstanceArray.get(index).getCAutogenStr() + "\r\n";
+                usageInstance = usageInstanceArray.get(index);
+                //
+                // Before generate any PCD information into autogen.h/autogen.c for a module,
+                // generate TokenSpaceGuid array variable firstly. For every dynamicEx type
+                // PCD in this module the token, they are all reference to TokenSpaceGuid 
+                // array.
+                // 
+                if (usageInstanceArray.get(index).modulePcdType == Token.PCD_TYPE.DYNAMIC_EX) {
+                    guidStringArray = usageInstance.parentToken.tokenSpaceName.toString().split("-");
+                    guidStringCName = "_gPcd_TokenSpaceGuid_" + 
+                                      usageInstance.parentToken.tokenSpaceName.toString().replaceAll("-", "_");
+                    guidString      = String.format("{ 0x%s, 0x%s, 0x%s, {0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s}}",
+                                                    guidStringArray[0],
+                                                    guidStringArray[1],
+                                                    guidStringArray[2],
+                                                    (guidStringArray[3].substring(0, 2)),
+                                                    (guidStringArray[3].substring(2, 4)),
+                                                    (guidStringArray[4].substring(0, 2)),
+                                                    (guidStringArray[4].substring(2, 4)),
+                                                    (guidStringArray[4].substring(4, 6)),
+                                                    (guidStringArray[4].substring(6, 8)),
+                                                    (guidStringArray[4].substring(8, 10)),
+                                                    (guidStringArray[4].substring(10, 12)));
+                    if (!isBuildUsedLibrary) {
+                        Pattern pattern = Pattern.compile("(" + guidStringCName + ")+?");
+                        Matcher matcher = pattern.matcher(cAutoGenString + " ");
+                        //
+                        // Find whether this guid array variable has been generated into autogen.c
+                        // For different DyanmicEx pcd token who use same token space guid, the token space
+                        // guid array should be only generated once.
+                        // 
+                        if (!matcher.find()) {
+                            cAutoGenString += String.format("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID %s = %s;\r\n",
+                                                            guidStringCName,
+                                                            guidString);
+                        }
+                    }
+                }
+
+                usageInstance.generateAutoGen(isBuildUsedLibrary);
+                //
+                // For every PCD entry for this module(usage instance), autogen string would
+                // be appand.
+                // 
+                hAutoGenString += usageInstance.getHAutogenStr() + "\r\n";
+                cAutoGenString += usageInstance.getCAutogenStr();
+
             } catch(EntityException exp) {
-                throw new BuildActionException(exp.getMessage());
+                throw new BuildActionException("[PCD Autogen Error]: " + exp.getMessage());
             }
         }
 
@@ -343,8 +395,8 @@ public class PCDAutoGenAction extends BuildAction {
     **/
     public static void main(String argv[]) {
 
-        String WorkSpace = "M:/ForPcd/edk2";
-        String logFilePath = WorkSpace  + "/MdePkg/MdePkg.fpd";
+        String WorkSpace = "M:/tianocore/edk2";
+        String logFilePath = WorkSpace  + "/EdkNt32Pkg/Nt32.fpd";
         String[] nameArray = null;
 
         //
@@ -366,11 +418,11 @@ public class PCDAutoGenAction extends BuildAction {
         //
         // Then execute the PCDAuotoGenAction to get generated Autogen.h and Autogen.c
         //
-        PCDAutoGenAction autogenAction = new PCDAutoGenAction("BaseLib",
+        PCDAutoGenAction autogenAction = new PCDAutoGenAction("MonoStatusCode",
                                                               null,
                                                               null,
                                                               null,
-                                                              null,
+                                                              "IA32",
                                                               null,
                                                               false,
                                                               nameArray);
@@ -379,10 +431,5 @@ public class PCDAutoGenAction extends BuildAction {
         System.out.println(autogenAction.OutputH());
         System.out.println("WQWQWQWQWQ");
         System.out.println(autogenAction.OutputC());
-
-
-        System.out.println (autogenAction.hAutoGenString);
-        System.out.println (autogenAction.cAutoGenString);
-
     }
 }
