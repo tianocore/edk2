@@ -46,7 +46,7 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
                 <!-- Specificatoin needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00090000 -->
             </xs:sequence>
         </xs:complexType>
@@ -64,7 +64,7 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
                 <xs:choice minOccurs="1" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
                     <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
@@ -89,7 +89,7 @@
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
                 <xs:choice minOccurs="1" maxOccurs="1">
                     <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
                     <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
@@ -141,7 +141,7 @@
                 </xs:choice>
                 <xs:element default="false" minOccurs="0" name="BinaryModule" type="xs:boolean"/>
                 <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -166,7 +166,7 @@
                     <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -208,7 +208,7 @@
                 <!-- DO NOT USE BuildTarget needs to be removed -->
                 <xs:element minOccurs="0" maxOccurs="1" name="BuildTarget" type="BuildTargets"/>
                 <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -227,7 +227,7 @@
                     <!-- GuidValue needs to be required -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 </xs:choice>
-                <xs:element minOccurs="1" maxOccurs="1" name="Version" type="xs:decimal"/>
+                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
@@ -254,7 +254,7 @@
                 <xs:element minOccurs="0" maxOccurs="1" ref="ReadOnly"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="RePackage"/>
                 <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Specification"/>
+                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
                 <!-- OutputDirectory needs to be removed -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="OutputDirectory"/>
             </xs:sequence>
