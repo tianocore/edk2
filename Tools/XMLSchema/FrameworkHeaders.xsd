@@ -227,7 +227,7 @@
                     <!-- GuidValue needs to be required -->
                     <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
                 </xs:choice>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
+                <xs:element minOccurs="1" maxOccurs="1" name="Version" type="xs:decimal"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
                 <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
