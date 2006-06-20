@@ -73,4 +73,26 @@
             <xs:enumeration value="NV_FTW_WORKING"/>
         </xs:restriction>
     </xs:simpleType>
+    <xs:simpleType name="EfiFfsFileTypes">
+        <xs:restriction base="UCNameType">
+            <xs:enumeration value="EFI_FV_FILETYPE"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_ALL"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_RAW"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_FREEFORM"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_SECURITY_CORE"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_PEI_CORE"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_DXE_CORE"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_PEIM"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_DRIVER"/>
+            <xs:enumeration value="EFI_VF_FILETYPE_COMBINED_PEIM_DRIVER"/>
+            <xs:enumeration value="EFI_VF_FILETYPE_APPLICATION"/>
+            <xs:enumeration value="EFI_VF_FILETYPE_FIRMWARE_VOLUME_IMAGE"/>
+            <xs:enumeration value="EFI_FV_FILETYPE_FFS_PAD"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="FfsDataAlignmentType">
+        <xs:restriction base="xs:nonNegativeInteger">
+            <xs:pattern value="[0-7]{1}"/>
+        </xs:restriction>
+    </xs:simpleType>    
 </xs:schema>

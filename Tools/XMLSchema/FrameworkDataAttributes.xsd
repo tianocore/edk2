@@ -66,15 +66,15 @@
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="BootModeAttributes">
+        <!-- Make Usage REQUIRED in final -->
+        <xs:attribute name="BootModeName" type="BootModeNames" use="required"/>
+        <xs:attribute name="Usage" type="BootModeUsage" use="required"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="BootModeName" type="BootModeNames" use="required"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <!-- DO NOT USE, remove Guid from use -->
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
-        <!-- Make Usage REQUIRED in final -->
-        <xs:attribute name="Usage" type="BootModeUsage" use="required"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
@@ -84,16 +84,16 @@
         <xs:attribute default="Unicode" name="OutputFiletype" type="xs:string" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="DataHubAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE, remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="DataHubUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE, remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
@@ -101,43 +101,46 @@
         <xs:attribute name="Separator" type="ToothPick"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="EventAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- Make EventGroup Required in final -->
-        <xs:attribute name="EventGroup" type="EventTypes" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE, remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="EventUsage" use="optional"/>
+        <!-- Make EventGroup Required in final -->
+        <xs:attribute name="EventGroup" type="EventTypes" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE, remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ExternAttributes">
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="ExternUsage" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="FilenameAttributes">
+        <xs:attribute name="TagName" type="ToolsNameConvention" use="optional"/>
+        <xs:attribute name="ToolCode" type="ToolsNameConvention" use="optional"/>
+        <xs:attribute name="ToolChainFamily" type="ToolsNameConvention" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <xs:attribute name="ModuleName" type="xs:NCName" use="optional"/>
         <xs:attribute name="ModuleVersion" type="VersionDataType" use="optional"/>
         <xs:attribute name="ModuleGuid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="FileType" type="xs:string" use="optional"/>
         <!-- DO NOT USE, remove Guid from use -->
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
@@ -145,9 +148,6 @@
         <xs:attribute name="Path" type="DirectoryNamingConvention" use="optional"/>
         <!-- DO NOT USE, remove ToolChain from use, use ToolChainFamily -->
         <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
-        <xs:attribute name="TagName" type="xs:NCName" use="optional"/>
-        <xs:attribute name="ToolCode" type="xs:NCName" use="optional"/>
-        <xs:attribute name="ToolChainFamily" type="xs:NCName" use="optional"/>
         <!-- DO NOT USE, remove Usage from use -->
         <xs:attribute name="Usage" type="FileNameUsage" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
@@ -159,50 +159,50 @@
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="Usage" type="FormSetUsage" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="GuidAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="GuidUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="GuidDeclarationAttributes">
-        <xs:attribute name="Name" type="xs:NCName" use="required"/>
+        <xs:attribute name="Name" type="UiNameType" use="required"/>
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <xs:attribute name="ModuleTypeList" type="ModuleTypeList" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
         <xs:attribute name="GuidTypeList" type="GuidListType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="HiiPackageAttributes">
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
         <xs:attribute name="Usage" type="HiiPackageUsage" use="required"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="HobAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
-        <xs:attribute name="HobType" type="HobTypes" use="required"/>
-        <!-- DO NOT USE remove HobEnabled from use -->
-        <xs:attribute default="true" name="HobEnabled" type="xs:boolean" use="optional"/>
         <!-- USAGE is required in final -->
         <xs:attribute name="Usage" type="HobUsage" use="optional"/>
+        <xs:attribute name="HobType" type="HobTypes" use="required"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
+        <!-- DO NOT USE remove HobEnabled from use -->
+        <xs:attribute default="true" name="HobEnabled" type="xs:boolean" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
@@ -215,7 +215,7 @@
         <xs:attribute name="Class" type="BaseNameConvention" use="optional"/>
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove Guid from use -->
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <xs:attribute name="ModuleType" type="ModuleTypeDef" use="optional"/>
@@ -229,14 +229,14 @@
     </xs:attributeGroup>
     <xs:attributeGroup name="IncludeHeaderAttributes">
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <xs:attribute name="ModuleTypeList" type="ModuleTypeList" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="IndustryStdHeaderAttributes">
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <xs:attribute name="ModuleTypeList" type="ModuleTypeList" use="optional"/>
         <xs:attribute name="Name" type="KeywordType" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="LibraryAttributes">
         <!-- LibraryAttributes is used for Libraries / Library elements in FPD files -->
@@ -246,7 +246,7 @@
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <!-- LAH Does a LibraryInstance need to have FeatureFlag Attribute? -->
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove Guid from use, Start using ModuleGuid instead -->
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove ClassGuid from use, Start using LibraryClassGuid instead -->
@@ -269,18 +269,18 @@
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="LibraryClassAttributes">
+        <xs:attribute name="Usage" type="LibraryUsage" use="required"/>
+        <xs:attribute name="RecommendedInstanceVersion" type="VersionDataType" use="optional"/>
+        <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <xs:attribute name="Name" type="KeywordType" use="optional"/>
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <xs:attribute name="RecommendedInstanceVersion" type="xs:decimal" use="optional"/>
-        <xs:attribute name="RecommendedInstanceGuid" type="GuidType" use="optional"/>
-        <xs:attribute name="Usage" type="LibraryUsage" use="required"/>
-        <xs:attribute name="Name" type="xs:normalizedString" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="MsaGuidAttributes">
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <xs:attribute name="Usage" type="GuidUsage" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ModuleNameAttributes">
@@ -302,8 +302,13 @@
     </xs:attributeGroup>
     <xs:attributeGroup name="FfsAttributes">
         <xs:attribute name="FfsFormatKeyword" type="FfsNameType" use="required"/>
+        <xs:attribute name="FfsFileType" type="EfiFfsFileTypes" use="optional"/>
+        <xs:attribute name="FfsAttribTailPresent" type="xs:boolean" use="optional"/>
+        <xs:attribute name="FfsAttribRecovery" type="xs:boolean" use="optional" default="false"/>
+        <xs:attribute name="FfsAttribDataAlignment" type="FfsDataAlignmentType" use="optional"/>
+        <xs:attribute name="FfsAttribChecksumRequired" type="xs:boolean" use="optional" default="true"/>
         <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
-    </xs:attributeGroup>    
+    </xs:attributeGroup>
     <xs:attributeGroup name="MsaAttributes">
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
@@ -312,21 +317,24 @@
         <xs:attribute name="FvBinding" type="xs:string" use="optional"/>
         <xs:attribute name="ModuleName" type="xs:NCName" use="optional"/>
         <xs:attribute name="ModuleGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="ModuleVersion" type="VersionDataType" use="optional"/>
+        <xs:attribute name="PackageVersion" type="VersionDataType" use="optional"/>
         <xs:attribute name="PackageName" type="BaseNameConvention" use="optional"/>
         <xs:attribute name="PackageGuid" type="GuidType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="OptionAttributes">
+        <xs:attribute name="BuildTargets" type="BuildTargetList" use="optional"/>
+        <xs:attribute name="ToolChainFamily" type="ToolsNameConvention" use="optional"/>
+        <xs:attribute name="TagName" type="ToolsNameConvention" use="optional"/>
+        <xs:attribute name="ToolCommand" type="ToolsNameConvention" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="BuildTarget" type="BuildTargets" use="optional"/>
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <!-- LAH Does an Option need to have FeatureFlag Attribute? -->
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <xs:attribute name="Platform" type="PlatformNamingConvention" use="optional"/>
-        <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
-        <xs:attribute name="ToolChainTag" type="xs:NCName" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
@@ -334,12 +342,13 @@
         <xs:attribute name="ModuleType" type="ModuleTypeDef" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PackageAttributes">
+        <xs:attribute name="PackageGuid" type="GuidType" use="optional"/>
+        <xs:attribute name="PackageVersion" type="VersionDataType" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
         <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="PackageGuid" type="GuidType" use="optional"/>
         <xs:attribute name="PackageType" type="PackageType" use="optional"/>
-        <xs:attribute name="PackageVersion" type="xs:string" use="optional"/>
         <xs:attribute name="UpdatedDate" type="DateType" use="optional"/>
         <xs:attribute name="Usage" type="PackageUsage" use="optional"/>
     </xs:attributeGroup>
@@ -370,7 +379,7 @@
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <xs:attribute name="ItemType" type="PcdItemTypes" use="required"/>
         <xs:attribute name="PcdUsage" type="PcdUsage" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
@@ -382,7 +391,7 @@
     </xs:attributeGroup>
     <xs:attributeGroup name="PcdDeclarationAttributes">
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <xs:attribute name="SupModuleTypes" type="ModuleTypeList" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PlatformAttributes">
@@ -400,68 +409,68 @@
         <xs:attribute name="Version" type="VersionDataType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PpiDeclarationAttributes">
-        <xs:attribute name="Name" type="xs:NCName" use="required"/>
+        <xs:attribute name="Name" type="UiNameType" use="required"/>
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <xs:attribute name="ModuleTypeList" type="ModuleTypeList" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PpiAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="PpiUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="PpiNotifyAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="PpiNotifyUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ProtocolAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead-->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="ProtocolUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead-->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ProtocolDeclarationAttributes">
-        <xs:attribute name="Name" type="xs:NCName" use="required"/>
+        <xs:attribute name="Name" type="UiNameType" use="required"/>
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <xs:attribute name="ModuleTypeList" type="ModuleTypeList" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ProtocolNotifyAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="ProtocolNotifyUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
@@ -474,7 +483,7 @@
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <!-- LAH Does a Section need to have FeatureFlag Attribute? -->
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <xs:attribute name="SectionType" type="EfiSectionType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
@@ -488,21 +497,21 @@
         <!-- DO NOT USE remove EnableFeature from use -->
         <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
         <!-- LAH Does a Filename need to have FeatureFlag Attribute? -->
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="SystemTableAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="SystemTableUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
@@ -510,17 +519,28 @@
         <xs:attribute name="Url" type="xs:anyURI"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="VariableAttributes">
-        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
-        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
-        <!-- DO NOT USE remove EnableFeature from use -->
-        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
-        <xs:attribute name="FeatureFlag" type="xs:normalizedString" use="optional"/>
-        <!-- DO NOT USE remove Guid from use -->
-        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="VariableUsage" use="optional"/>
+        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+        <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+        <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
+        <xs:attribute name="Arch" type="SupportedArchitectures" use="optional"/>
+        <!-- DO NOT USE remove EnableFeature from use -->
+        <xs:attribute default="true" name="EnableFeature" type="xs:boolean" use="optional"/>
+        <!-- DO NOT USE remove Guid from use -->
+        <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
+    <xs:attributeGroup name="ProcessStepAttributes">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Attributes are either compressable and/or sequence order binding</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="BindingOrder" type="xs:int" use="optional"/>
+        <xs:attribute name="SectionType" type="EfiSectionType" use="optional"/>
+    </xs:attributeGroup>
+    <xs:attributeGroup name="FvRegionNameAttributes">
+        <xs:attribute name="BaseAddressPcdCName" type="C_NameType" use="required"/>
+        <xs:attribute name="BaseAddressPcdTokenSpaceGuid" type="GuidType" use="optional"/>
+    </xs:attributeGroup>    
 </xs:schema>
