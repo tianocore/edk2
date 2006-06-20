@@ -295,25 +295,24 @@ public class GlobalData {
         File packageFile = new File(packageFilename);
         try {
             PackageSurfaceAreaDocument spd = (PackageSurfaceAreaDocument) XmlObject.Factory.parse(packageFile);
-            List<FilenameDocument.Filename> msaFilenameList;
+            List<String> msaFilenameList;
 
             List<MsaFilesDocument.MsaFiles.MsaFile> msasList = spd.getPackageSurfaceArea().getMsaFiles()
                                                                   .getMsaFileList();
             if (msasList.size() == 0) {
                 msaFilenameList = spd.getPackageSurfaceArea().getMsaFiles().getFilenameList();
             } else {
-                msaFilenameList = new ArrayList<FilenameDocument.Filename>(msasList.size());
+                msaFilenameList = new ArrayList<String>(msasList.size());
                 Iterator msasIter = msasList.iterator();
                 while (msasIter.hasNext()) {
                     MsaFilesDocument.MsaFiles.MsaFile msaFile = (MsaFilesDocument.MsaFiles.MsaFile)msasIter.next();
-                    msaFilenameList.add(msaFile.getFilename());
+                    msaFilenameList.add(msaFile.getFilename().getStringValue());
                 }
             }
 
             Iterator msaFilenameIter = msaFilenameList.iterator();
             while (msaFilenameIter.hasNext()) {
-                FilenameDocument.Filename msaFilename = (FilenameDocument.Filename)msaFilenameIter.next();
-                String filename = msaFilename.getStringValue();
+                String filename = (String)msaFilenameIter.next();
                 File msaFile = new File(workspaceDir + File.separatorChar + GlobalData.getPackagePath(packageName)
                                         + File.separatorChar + filename);
                 SurfaceAreaParser surfaceAreaParser = new SurfaceAreaParser();
