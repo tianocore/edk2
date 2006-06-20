@@ -50,10 +50,12 @@ import org.w3c.dom.Node;
 import org.tianocore.build.autogen.AutoGen;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.fpd.FpdParserTask;
+import org.tianocore.build.global.GenBuildLogger;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.toolchain.ToolChainFactory;
+import org.tianocore.logger.EdkLog;
 import org.tianocore.FilenameDocument;
 import org.tianocore.MsaHeaderDocument;
 import org.tianocore.MsaLibHeaderDocument;
@@ -200,6 +202,13 @@ public class GenBuildTask extends Task {
     **/
     public void execute() throws BuildException {
         System.out.println("Module [" + baseName + "] start.");
+        //
+        // Inital GenBuild log  method 
+        //
+        GenBuildLogger logger = new GenBuildLogger(getProject());
+        EdkLog.setLogger(logger);
+        EdkLog.setLogLevel(1);
+        
         OutputManager.update(getProject());
         GlobalData.initInfo("Tools" + File.separatorChar + "Conf" + File.separatorChar + "FrameworkDatabase.db",
                             getProject().getProperty("WORKSPACE_DIR"));

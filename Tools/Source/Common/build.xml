@@ -9,23 +9,17 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<project name="GenBuild" default="all" basedir=".">
+<project name="Common" default="all" basedir=".">
 
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
   <property name="WORKSPACE" value="${env.WORKSPACE}"/>
-  <path id="classpath">
-    <fileset dir="${WORKSPACE}/Tools/Jars" includes="SurfaceArea.jar"/>
-    <fileset dir="${WORKSPACE}/Tools/Jars" includes="Common.jar"/>
-    <fileset dir="${env.XMLBEANS_HOME}/lib" includes="*.jar"/>
-  </path>
   <property name="buildDir" value="build"/>
   <property name="installLocation" value="${WORKSPACE}/Tools/Jars"/>
   <target name="all" depends="install"/>
   <target name="source">
     <mkdir dir="${buildDir}"/>
     <javac srcdir="." destdir="${buildDir}">
-      <classpath refid="classpath"/>
       <compilerarg value="-Xlint"/>
     </javac>
   </target>
@@ -35,16 +29,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <target name="cleanall">
     <delete dir="${buildDir}"/>
     <if>
-      <available file="${installLocation}/GenBuild.jar"/>
+      <available file="${installLocation}/Common.jar"/>
       <then>
-        <echo message="You must manually remove the file: ${installLocation}/GenBuild.jar"/>
+        <echo message="You must manually remove the file: ${installLocation}/Common.jar"/>
         <echo message="Java has already loaded the file, and cannot remove it within ANT!"/>
       </then>
     </if>
   </target>
   <target name="install" depends="source">
-    <copy file="GenBuild.tasks" toDir="${buildDir}"/>
-    <jar destfile="${installLocation}/GenBuild.jar"
+    <jar destfile="${installLocation}/Common.jar"
       basedir="${buildDir}"
       includes="**"
     />
