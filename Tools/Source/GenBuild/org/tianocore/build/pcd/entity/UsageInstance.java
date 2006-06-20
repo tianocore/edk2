@@ -201,8 +201,7 @@ public class UsageInstance {
      */
     public void generateAutoGen(boolean isBuildUsedLibrary) 
     throws EntityException {
-        String guidStringArray[] = null;
-        String guidString        = null;
+        String  guidStringCName  = null;
         boolean isByteArray      = false;
         String  printDatum       = null;
 
@@ -210,8 +209,6 @@ public class UsageInstance {
         cAutogenStr = "";
 
         if (this.modulePcdType == Token.PCD_TYPE.DYNAMIC_EX) {
-            hAutogenStr += String.format("#define _PCD_LOCAL_TOKEN_%s   0x%016x\r\n", 
-                                         parentToken.cName, parentToken.tokenNumber);
             hAutogenStr += String.format("#define _PCD_TOKEN_%s   0x%016x\r\n", 
                                          parentToken.cName, parentToken.dynamicExTokenNumber);
         } else {
@@ -340,23 +337,12 @@ public class UsageInstance {
                                          parentToken.cName);
             break;
         case DYNAMIC_EX:
-            guidStringArray = parentToken.tokenSpaceName.toString().split("-");
-            guidString      = String.format("{ 0x%s, 0x%s, 0x%s, {0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s}}",
-                                            guidStringArray[0],
-                                            guidStringArray[1],
-                                            guidStringArray[2],
-                                            (guidStringArray[3].substring(0, 2)),
-                                            (guidStringArray[3].substring(2, 4)),
-                                            (guidStringArray[4].substring(0, 2)),
-                                            (guidStringArray[4].substring(2, 4)),
-                                            (guidStringArray[4].substring(4, 6)),
-                                            (guidStringArray[4].substring(6, 8)),
-                                            (guidStringArray[4].substring(8, 10)),
-                                            (guidStringArray[4].substring(10, 12)));
+            guidStringCName = "_gPcd_TokenSpaceGuid_" +
+                              parentToken.tokenSpaceName.toString().replaceAll("-", "_");
                                             
-            hAutogenStr += String.format("extern EFI_GUID _gPcd_DynamicEx_TokenSpaceGuid_%s;\r\n",
+            hAutogenStr += String.format("extern const EFI_GUID *_gPcd_DynamicEx_TokenSpaceGuid_%s;\r\n",
                                          parentToken.cName);
-            hAutogenStr += String.format("#define _PCD_MODE_%s_%s LibPcdGet%s(_PCD_LOCAL_TOKEN_%s)\r\n",
+            hAutogenStr += String.format("#define _PCD_MODE_%s_%s LibPcdGetEx%s(_gPcd_DynamicEx_TokenSpaceGuid_%s, _PCD_TOKEN_%s)\r\n",
                                          Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName,
                                          Token.getAutogenLibrarydatumTypeString(parentToken.datumType),
@@ -364,9 +350,9 @@ public class UsageInstance {
                                          parentToken.cName);
 
             if (!isBuildUsedLibrary) {
-                cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID _gPcd_DynamicEx_TokenSpaceGuid_%s = %s;\r\n",
+                cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const EFI_GUID *_gPcd_DynamicEx_TokenSpaceGuid_%s = &%s;\r\n",
                                              parentToken.cName,
-                                             guidString);
+                                             guidStringCName);
             }
             break;
         }
