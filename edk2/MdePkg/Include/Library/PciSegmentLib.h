@@ -168,7 +168,7 @@ PciSegmentAndThenOr8 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -198,7 +198,7 @@ PciSegmentBitFieldRead8 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -258,7 +258,7 @@ PciSegmentBitFieldOr8 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -293,7 +293,7 @@ PciSegmentBitFieldAnd8 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -442,7 +442,7 @@ PciSegmentAndThenOr16 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -472,7 +472,7 @@ PciSegmentBitFieldRead16 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -532,7 +532,7 @@ PciSegmentBitFieldOr16 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -567,7 +567,7 @@ PciSegmentBitFieldAnd16 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -716,7 +716,7 @@ PciSegmentAndThenOr32 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -746,7 +746,7 @@ PciSegmentBitFieldRead32 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -806,7 +806,7 @@ PciSegmentBitFieldOr32 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -841,7 +841,7 @@ PciSegmentBitFieldAnd32 (
   If any reserved bits in Address are set, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   Address that encodes the PCI Segment, Bus, Device, Function, and Register.
   @param  StartBit  The ordinal of the least significant bit in the bit field.

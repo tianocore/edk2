@@ -149,7 +149,7 @@ IoAndThenOr8 (
   If 8-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -179,7 +179,7 @@ IoBitFieldRead8 (
   If 8-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -213,7 +213,7 @@ IoBitFieldWrite8 (
   If 8-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -247,7 +247,7 @@ IoBitFieldOr8 (
   If 8-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -283,7 +283,7 @@ IoBitFieldAnd8 (
   If 8-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -435,7 +435,7 @@ IoAndThenOr16 (
   If 16-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -465,7 +465,7 @@ IoBitFieldRead16 (
   If 16-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -499,7 +499,7 @@ IoBitFieldWrite16 (
   If 16-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -533,7 +533,7 @@ IoBitFieldOr16 (
   If 16-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -569,7 +569,7 @@ IoBitFieldAnd16 (
   If 16-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -721,7 +721,7 @@ IoAndThenOr32 (
   If 32-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -751,7 +751,7 @@ IoBitFieldRead32 (
   If 32-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -785,7 +785,7 @@ IoBitFieldWrite32 (
   If 32-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -819,7 +819,7 @@ IoBitFieldOr32 (
   If 32-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -855,7 +855,7 @@ IoBitFieldAnd32 (
   If 32-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1007,7 +1007,7 @@ IoAndThenOr64 (
   If 64-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1037,7 +1037,7 @@ IoBitFieldRead64 (
   If 64-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1071,7 +1071,7 @@ IoBitFieldWrite64 (
   If 64-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1105,7 +1105,7 @@ IoBitFieldOr64 (
   If 64-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1141,7 +1141,7 @@ IoBitFieldAnd64 (
   If 64-bit I/O port operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Port      The I/O port to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1292,7 +1292,7 @@ MmioAndThenOr8 (
   If 8-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1321,7 +1321,7 @@ MmioBitFieldRead8 (
   If 8-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1356,7 +1356,7 @@ MmioBitFieldWrite8 (
   If 8-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1391,7 +1391,7 @@ MmioBitFieldOr8 (
   If 8-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1427,7 +1427,7 @@ MmioBitFieldAnd8 (
   If 8-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1578,7 +1578,7 @@ MmioAndThenOr16 (
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1607,7 +1607,7 @@ MmioBitFieldRead16 (
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1642,7 +1642,7 @@ MmioBitFieldWrite16 (
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1677,7 +1677,7 @@ MmioBitFieldOr16 (
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1713,7 +1713,7 @@ MmioBitFieldAnd16 (
   If 16-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1864,7 +1864,7 @@ MmioAndThenOr32 (
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1893,7 +1893,7 @@ MmioBitFieldRead32 (
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1928,7 +1928,7 @@ MmioBitFieldWrite32 (
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1963,7 +1963,7 @@ MmioBitFieldOr32 (
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -1999,7 +1999,7 @@ MmioBitFieldAnd32 (
   If 32-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -2150,7 +2150,7 @@ MmioAndThenOr64 (
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -2179,7 +2179,7 @@ MmioBitFieldRead64 (
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -2214,7 +2214,7 @@ MmioBitFieldWrite64 (
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -2249,7 +2249,7 @@ MmioBitFieldOr64 (
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -2285,7 +2285,7 @@ MmioBitFieldAnd64 (
   If 64-bit MMIO register operations are not supported, then ASSERT().
   If StartBit is greater than 63, then ASSERT().
   If EndBit is greater than 63, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   MMIO register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.

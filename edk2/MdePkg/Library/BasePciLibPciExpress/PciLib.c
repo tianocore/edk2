@@ -167,7 +167,7 @@ PciAndThenOr8 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -200,7 +200,7 @@ PciBitFieldRead8 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -238,7 +238,7 @@ PciBitFieldWrite8 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -276,7 +276,7 @@ PciBitFieldOr8 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -316,7 +316,7 @@ PciBitFieldAnd8 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 7, then ASSERT().
   If EndBit is greater than 7, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -495,7 +495,7 @@ PciAndThenOr16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -528,7 +528,7 @@ PciBitFieldRead16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -566,7 +566,7 @@ PciBitFieldWrite16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -604,7 +604,7 @@ PciBitFieldOr16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -644,7 +644,7 @@ PciBitFieldAnd16 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 15, then ASSERT().
   If EndBit is greater than 15, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -823,7 +823,7 @@ PciAndThenOr32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to read.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -856,7 +856,7 @@ PciBitFieldRead32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -894,7 +894,7 @@ PciBitFieldWrite32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -932,7 +932,7 @@ PciBitFieldOr32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.
@@ -972,7 +972,7 @@ PciBitFieldAnd32 (
   If Address > 0x0FFFFFFF, then ASSERT().
   If StartBit is greater than 31, then ASSERT().
   If EndBit is greater than 31, then ASSERT().
-  If EndBit is less than or equal to StartBit, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
 
   @param  Address   PCI configuration register to write.
   @param  StartBit  The ordinal of the least significant bit in the bit field.

@@ -49,5 +49,7 @@ LongJump (
   )
 {
   InternalAssertJumpBuffer (JumpBuffer);
+  ASSERT (Value != 0);
+
   InternalLongJump (JumpBuffer, Value);
 }
