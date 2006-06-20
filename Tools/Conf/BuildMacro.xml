@@ -376,7 +376,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <macrodef name="Build_GCC_Assembly_Code">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="s"/>
+    <attribute name="FILEEXT" default="S"/>
 
     <element name="EXTRA.INC" optional="yes"/>
     <element name="EXTRA.ARG" optional="yes"/>
