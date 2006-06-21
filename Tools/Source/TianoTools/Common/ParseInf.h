@@ -43,7 +43,7 @@ CHAR8 *
 ReadLine (
   IN MEMORY_FILE    *InputFile,
   IN OUT CHAR8      *InputBuffer,
-  IN UINT32         MaxLength
+  IN UINTN          MaxLength
   )
 ;
 

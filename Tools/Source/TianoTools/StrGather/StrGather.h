@@ -67,7 +67,7 @@ typedef CHAR16  WCHAR;
 
 typedef struct _TEXT_STRING_LIST {
   struct _TEXT_STRING_LIST  *Next;
-  UINT8                     *Str;
+  CHAR8                     *Str;
 } TEXT_STRING_LIST;
 
 typedef struct _WCHAR_STRING_LIST {

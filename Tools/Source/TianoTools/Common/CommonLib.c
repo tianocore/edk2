@@ -280,7 +280,7 @@ Returns:
 UINT8
 CalculateSum8 (
   IN UINT8  *Buffer,
-  IN UINT32 Size
+  IN UINTN  Size
   )
 /*++
   
