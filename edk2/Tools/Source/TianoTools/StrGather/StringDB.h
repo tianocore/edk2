@@ -70,7 +70,7 @@ StringDBAddStringIdentifier (
 
 STATUS
 StringDBReadDatabase (
-  INT8    *DBFileName,
+  CHAR8   *DBFileName,
   BOOLEAN IgnoreIfNotExist,
   BOOLEAN Verbose
   )
@@ -78,15 +78,15 @@ StringDBReadDatabase (
 
 STATUS
 StringDBWriteDatabase (
-  INT8    *DBFileName,
+  CHAR8   *DBFileName,
   BOOLEAN Verbose
   )
 ;
 
 STATUS
 StringDBDumpDatabase (
-  INT8                *DBFileName,
-  INT8                *OutputFileName,
+  CHAR8               *DBFileName,
+  CHAR8               *OutputFileName,
   BOOLEAN             Verbose
   )
 ;
@@ -100,8 +100,8 @@ StringDBAddLanguage (
 
 STATUS
 StringDBDumpCStrings (
-  INT8                        *FileName,
-  INT8                        *BaseName,
+  CHAR8                       *FileName,
+  CHAR8                       *BaseName,
   WCHAR_STRING_LIST           *LanguagesOfInterest,
   WCHAR_MATCHING_STRING_LIST  *IndirectionList
   )
@@ -109,8 +109,8 @@ StringDBDumpCStrings (
 
 STATUS
 StringDBDumpStringDefines (
-  INT8                *FileName,
-  INT8                *BaseName
+  CHAR8               *FileName,
+  CHAR8               *BaseName
   )
 ;
 
@@ -122,7 +122,7 @@ StringDBSetCurrentLanguage (
 
 STATUS
 StringDBSetStringReferenced (
-  INT8      *StringIdentifierName,
+  CHAR8     *StringIdentifierName,
   BOOLEAN   IgnoreNotFound
   )
 ;

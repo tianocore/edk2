@@ -175,7 +175,7 @@ StringDBWriteStandardFileHeader (
 static
 WCHAR                 *
 AsciiToWchar (
-  INT8 *Str
+  CHAR8 *Str
   );
 
 static
@@ -376,8 +376,8 @@ Notes:
 --*/
 STATUS
 StringDBDumpCStrings (
-  INT8                        *FileName,
-  INT8                        *BaseName,
+  CHAR8                       *FileName,
+  CHAR8                       *BaseName,
   WCHAR_STRING_LIST           *LanguagesOfInterest,
   WCHAR_MATCHING_STRING_LIST  *IndirectionList
   )
@@ -793,16 +793,16 @@ Returns:
 --*/
 STATUS
 StringDBDumpStringDefines (
-  INT8 *FileName,
-  INT8 *BaseName
+  CHAR8 *FileName,
+  CHAR8 *BaseName
   )
 {
   FILE              *Fptr;
   STRING_IDENTIFIER *Identifier;
-  INT8              CopyBaseName[100];
+  CHAR8             CopyBaseName[100];
   WCHAR             Line[200];
   UINT32            Index;
-  const INT8        *StrDefHeader[] = {
+  const CHAR8       *StrDefHeader[] = {
     "#ifndef _%s_STRINGS_DEFINE_H_\n",
     "#define _%s_STRINGS_DEFINE_H_\n\n",
     NULL
@@ -1485,7 +1485,7 @@ StringDBFormatString (
 /*****************************************************************************/
 STATUS
 StringDBReadDatabase (
-  INT8    *DBFileName,
+  CHAR8   *DBFileName,
   BOOLEAN IgnoreIfNotExist,
   BOOLEAN Verbose
   )
@@ -1596,7 +1596,7 @@ Returns:
 --*/
 STATUS
 StringDBWriteDatabase (
-  INT8    *DBFileName,
+  CHAR8   *DBFileName,
   BOOLEAN Verbose
   )
 {
@@ -1684,7 +1684,7 @@ StringDBWriteDatabase (
 
 STATUS
 StringDBSetStringReferenced (
-  INT8      *StringIdentifierName,
+  CHAR8     *StringIdentifierName,
   BOOLEAN   IgnoreNotFound
   )
 {
@@ -1738,8 +1738,8 @@ Notes:
 --*/
 STATUS
 StringDBDumpDatabase (
-  INT8                *DBFileName,
-  INT8                *OutputFileName,
+  CHAR8               *DBFileName,
+  CHAR8               *OutputFileName,
   BOOLEAN             Verbose
   )
 {
@@ -2422,7 +2422,7 @@ DuplicateString (
 static
 WCHAR *
 AsciiToWchar (
-  INT8 *Str
+  CHAR8 *Str
   )
 {
   UINT32  Len;
@@ -2459,7 +2459,7 @@ Returns:
 --*/
 STATUS
 StringDBCreateHiiExportPack (
-  INT8                        *FileName
+  CHAR8                       *FileName
   )
 {
   FILE                        *Fptr;

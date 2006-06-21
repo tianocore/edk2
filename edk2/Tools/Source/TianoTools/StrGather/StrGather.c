@@ -57,7 +57,7 @@ typedef struct _SOURCE_FILE {
   WCHAR               *FileBuffer;
   WCHAR               *FileBufferPtr;
   UINT32              FileSize;
-  INT8                FileName[MAX_PATH];
+  CHAR8               FileName[MAX_PATH];
   UINT32              LineNum;
   BOOLEAN             EndOfFile;
   BOOLEAN             SkipToHash;
@@ -96,19 +96,19 @@ static struct {
   BOOLEAN                     IgnoreNotFound;                   // when scanning
   BOOLEAN                     VerboseScan;
   BOOLEAN                     UnquotedStrings;                  // -uqs option
-  INT8                        OutputDatabaseFileName[MAX_PATH];
-  INT8                        StringHFileName[MAX_PATH];
-  INT8                        StringCFileName[MAX_PATH];        // output .C filename
-  INT8                        DumpUFileName[MAX_PATH];          // output unicode dump file name
-  INT8                        HiiExportPackFileName[MAX_PATH];  // HII export pack file name
-  INT8                        BaseName[MAX_PATH];               // base filename of the strings file
+  CHAR8                       OutputDatabaseFileName[MAX_PATH];
+  CHAR8                       StringHFileName[MAX_PATH];
+  CHAR8                       StringCFileName[MAX_PATH];        // output .C filename
+  CHAR8                       DumpUFileName[MAX_PATH];          // output unicode dump file name
+  CHAR8                       HiiExportPackFileName[MAX_PATH];  // HII export pack file name
+  CHAR8                       BaseName[MAX_PATH];               // base filename of the strings file
   UINT32                      Mode;
 } mGlobals;
 
 static
 BOOLEAN
 IsValidIdentifierChar (
-  INT8      Char,
+  CHAR8     Char,
   BOOLEAN   FirstChar
   );
 
@@ -176,7 +176,7 @@ GetPrintableLanguageName (
 static
 STATUS
 AddCommandLineLanguage (
-  IN INT8          *Language
+  IN CHAR8         *Language
   );
 
 static
@@ -202,8 +202,8 @@ ParseFile (
 static
 FILE  *
 FindFile (
-  IN INT8     *FileName,
-  OUT INT8    *FoundFileName,
+  IN CHAR8    *FileName,
+  OUT CHAR8   *FoundFileName,
   IN UINT32   FoundFileNameLen
   );
 
@@ -283,7 +283,7 @@ ParseIndirectionFiles (
 
 STATUS
 StringDBCreateHiiExportPack (
-  INT8                *OutputFileName
+  CHAR8               *OutputFileName
   );
 
 int
@@ -448,7 +448,7 @@ Returns:
 --*/
 {
   static UINT32 NestDepth = 0;
-  INT8          FoundFileName[MAX_PATH];
+  CHAR8         FoundFileName[MAX_PATH];
   STATUS        Status;
 
   Status = STATUS_SUCCESS;
@@ -1055,8 +1055,8 @@ ProcessTokenInclude (
   SOURCE_FILE *SourceFile
   )
 {
-  INT8        IncludeFileName[MAX_PATH];
-  INT8        *To;
+  CHAR8       IncludeFileName[MAX_PATH];
+  CHAR8       *To;
   UINT32      Len;
   BOOLEAN     ReportedError;
   SOURCE_FILE IncludedSourceFile;
@@ -1443,8 +1443,8 @@ wstrcmp (
 static
 FILE *
 FindFile (
-  IN INT8    *FileName,
-  OUT INT8   *FoundFileName,
+  IN CHAR8   *FileName,
+  OUT CHAR8  *FoundFileName,
   IN UINT32  FoundFileNameLen
   )
 {
@@ -1901,7 +1901,7 @@ ProcessArgs (
       }
 
       memset (NewList, 0, sizeof (TEXT_STRING_LIST));
-      NewList->Str = (UINT8 *) malloc (strlen (Argv[0]) + 1);
+      NewList->Str = (CHAR8 *) malloc (strlen (Argv[0]) + 1);
       if (NewList->Str == NULL) {
         Error (PROGRAM_NAME, 0, 0, "memory allocation failure", NULL);
         return STATUS_ERROR;
@@ -1940,7 +1940,7 @@ ProcessArgs (
 static
 STATUS
 AddCommandLineLanguage (
-  IN INT8          *Language
+  IN CHAR8         *Language
   )
 {
   WCHAR_STRING_LIST *WNewList;
@@ -2040,10 +2040,10 @@ ParseIndirectionFiles (
   )
 {
   FILE                        *Fptr;
-  INT8                        Line[200];
-  INT8                        *StringName;
-  INT8                        *ScopeName;
-  INT8                        *End;
+  CHAR8                       Line[200];
+  CHAR8                       *StringName;
+  CHAR8                       *ScopeName;
+  CHAR8                       *End;
   UINT32                      LineCount;
   WCHAR_MATCHING_STRING_LIST  *NewList;
 
@@ -2390,7 +2390,7 @@ FreeLists (
 static
 BOOLEAN
 IsValidIdentifierChar (
-  INT8      Char,
+  CHAR8     Char,
   BOOLEAN   FirstChar
   )
 {
