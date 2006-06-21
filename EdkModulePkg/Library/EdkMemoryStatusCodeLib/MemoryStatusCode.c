@@ -486,7 +486,7 @@ Returns:
 #ifdef EFI_NT_EMULATOR
     gRunningFromMemory = TRUE;
 #else
-    * (BOOLEAN *) ((UINTN) &gRunningFromMemory + (UINTN) EntryPoint - (UINTN) InstallMonoStatusCode) = TRUE;
+    * (BOOLEAN *) ((UINTN) &gRunningFromMemory + (UINTN) EntryPoint - (UINTN) _ModuleEntryPoint) = TRUE;
 #endif
     Status = ((EFI_PEIM_ENTRY_POINT )(UINTN) EntryPoint) (PrivateData->FfsHeader, PeiServices);
     if (EFI_ERROR (Status)) {
