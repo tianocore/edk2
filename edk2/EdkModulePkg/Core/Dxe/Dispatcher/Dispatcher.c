@@ -1019,11 +1019,13 @@ Returns:
             if (gDxeCoreLoadedImage->FilePath == NULL) {
               if (CompareGuid (&NameGuid, gDxeCoreFileName)) {
                 //
-                // Because mFvDevicePath has been initialized when discoveried 
-                // EFI_FV_FILETYPE_DRIVER file. So only need to update the name 
-                // guid of device path.
+                // Maybe One specail Fv cantains only one DXE_CORE module, so its device path must
+                // be initialized completely.
                 //
-                CopyGuid (&mFvDevicePath.File.NameGuid, &NameGuid);
+                EfiInitializeFwVolDevicepathNode (&mFvDevicePath.File, &NameGuid);
+                mFvDevicePath.End.Type = EFI_END_ENTIRE_DEVICE_PATH;
+                mFvDevicePath.End.SubType = END_ENTIRE_DEVICE_PATH_SUBTYPE;
+                SetDevicePathNodeLength (&mFvDevicePath.End, sizeof (EFI_DEVICE_PATH_PROTOCOL));
 
                 gDxeCoreLoadedImage->FilePath = CoreDuplicateDevicePath (
                                                   (EFI_DEVICE_PATH_PROTOCOL *)&mFvDevicePath
