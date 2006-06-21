@@ -114,9 +114,9 @@
             <xs:maxInclusive value="16777215"/>
         </xs:restriction>
     </xs:simpleType>
-    <xs:simpleType name="DefaultValue">
-        <xs:union memberTypes="xs:normalizedString xs:int UnicodeString"/>
-    </xs:simpleType>
+    <xs:simpleType name="DefaultValueType">
+      <xs:union memberTypes="xs:normalizedString Hex64BitDataType UnicodeString HexByteArrayType"/>
+    </xs:simpleType>    
     <xs:simpleType name="EfiSectionType">
         <xs:restriction base="UCNameType">
             <xs:enumeration value="EFI_SECTION_FREEFORM_SUBTYPE_GUID"/>
@@ -261,6 +261,14 @@
             <xs:enumeration value="DEFAULT"/>
             <xs:enumeration value="PRIVATE"/>
         </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="HexByteArrayType">
+      <xs:list itemType="HexByteDataType"/>
+    </xs:simpleType>
+    <xs:simpleType name="HexByteArrayListType">
+      <xs:restriction base="xs:normalizedString">
+        <xs:pattern value="((( )?0x[a-fA-F0-9]{2})(,)?)+( )?"/>
+      </xs:restriction>
     </xs:simpleType>
     <xs:simpleType name="HexWordArrayType">
       <xs:restriction base="xs:normalizedString">

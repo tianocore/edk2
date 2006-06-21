@@ -385,10 +385,20 @@
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
     </xs:attributeGroup>
+    <xs:attributeGroup name="DynamicBuildPcdAttributes">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">These attributes are for the Pcds listed in PcdData, PcdEntry and/or PcdBuildData entries.</xs:documentation>
+      </xs:annotation>
+      <xs:attribute name="ItemType" type="PcdItemTypes" use="required"/>
+    </xs:attributeGroup>
     <xs:attributeGroup name="PcdBuildDefinitionAttributes">
-        <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <xs:attribute name="ItemType" type="PcdItemTypes" use="required"/>
     </xs:attributeGroup>
+    <xs:attributeGroup name="PcdCodedAttributes">
+      <xs:attribute name="PcdItemType" type="PcdItemTypes" use="required"/>
+      <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
+      <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
+    </xs:attributeGroup>    
     <xs:attributeGroup name="PcdDeclarationAttributes">
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>

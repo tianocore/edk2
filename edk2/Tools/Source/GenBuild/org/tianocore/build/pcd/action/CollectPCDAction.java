@@ -1530,7 +1530,11 @@ public class CollectPCDAction {
                 pcdType      = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
                 datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
                 tokenNumber  = Integer.decode(pcdBuildData.getToken().toString());
-                datum        = pcdBuildData.getValue();
+                if (pcdBuildData.getValue() != null) {
+                    datum = pcdBuildData.getValue().toString();
+                } else {
+                    datum = null;
+                }
                 maxDatumSize = pcdBuildData.getMaxDatumSize();
 
                 if ((pcdType    == Token.PCD_TYPE.FEATURE_FLAG) &&
@@ -2128,6 +2132,7 @@ public class CollectPCDAction {
         boolean             hasSkuId0       = false;
         Token.PCD_TYPE      pcdType         = Token.PCD_TYPE.UNKNOWN;
         int                 tokenNumber     = 0;
+        String              hiiDefaultValue = null;
 
         List<DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo>   skuInfoList = null;
         DynamicPcdBuildDefinitions.PcdBuildData                 dynamicInfo = null;
@@ -2198,10 +2203,10 @@ public class CollectPCDAction {
             // Judge whether is DefaultGroup at first, because most case is DefautlGroup.
             // 
             if (skuInfoList.get(index).getValue() != null) {
-                skuInstance.value.setValue(skuInfoList.get(index).getValue());
+                skuInstance.value.setValue(skuInfoList.get(index).getValue().toString());
                 if ((exceptionString = verifyDatum(token.cName, 
                                                    null, 
-                                                   skuInfoList.get(index).getValue(), 
+                                                   skuInfoList.get(index).getValue().toString(), 
                                                    token.datumType, 
                                                    token.datumSize)) != null) {
                     throw new EntityException(exceptionString);
@@ -2215,7 +2220,7 @@ public class CollectPCDAction {
                 // 
                 if (datum != null) {
                     if ((skuInstance.id == 0)                                   &&
-                        !datum.equalsIgnoreCase(skuInfoList.get(index).getValue())) {
+                        !datum.toString().equalsIgnoreCase(skuInfoList.get(index).getValue().toString())) {
                         exceptionString = "[FPD file error] For dynamic PCD " + token.cName + ", the value in module " + moduleName + " is " + datum.toString() + " but the "+
                                           "value of sku 0 data in <DynamicPcdBuildDefinition> is " + skuInstance.value.value + ". They are must be same!"+
                                           " or you could not define value for a dynamic PCD in every <ModuleSA>!"; 
@@ -2255,10 +2260,16 @@ public class CollectPCDAction {
                 if (exceptionString != null) {
                     throw new EntityException(exceptionString);
                 }
+                
+                if (skuInfoList.get(index).getHiiDefaultValue() != null) {
+                    hiiDefaultValue = skuInfoList.get(index).getHiiDefaultValue().toString();
+                } else {
+                    hiiDefaultValue = null;
+                }
 
                 if ((exceptionString = verifyDatum(token.cName, 
                                                    null, 
-                                                   skuInfoList.get(index).getHiiDefaultValue(), 
+                                                   hiiDefaultValue, 
                                                    token.datumType, 
                                                    token.datumSize)) != null) {
                     throw new EntityException(exceptionString);
@@ -2275,7 +2286,7 @@ public class CollectPCDAction {
                 skuInstance.value.setHiiData(skuInfoList.get(index).getVariableName(),
                                              translateSchemaStringToUUID(skuInfoList.get(index).getVariableGuid().toString()),
                                              skuInfoList.get(index).getVariableOffset(),
-                                             skuInfoList.get(index).getHiiDefaultValue());
+                                             skuInfoList.get(index).getHiiDefaultValue().toString());
                 token.skuData.add(skuInstance);
                 continue;
             }

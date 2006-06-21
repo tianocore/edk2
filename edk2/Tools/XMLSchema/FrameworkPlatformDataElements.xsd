@@ -286,12 +286,7 @@
                     </xs:element>
                 </xs:choice>
                 <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification" type="Sentence"/>
-                <xs:choice>
-                    <!-- DO NOT USE! REMOVE PcdBuildDeclarations in FINAL -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
-                    <!-- PcdBuildDefinition stays in FINAL -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDefinition"/>
-                </xs:choice>
+                <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDefinition"/>
                 <!-- BuildOptions stays in FINAL -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="ModuleSaBuildOptions"/>

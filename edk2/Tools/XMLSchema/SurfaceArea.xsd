@@ -37,18 +37,11 @@
             <xs:sequence>
                 <xs:element minOccurs="1" maxOccurs="1" ref="PlatformHeader"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="PlatformDefinitions"/>                
-                <xs:element minOccurs="0" maxOccurs="1" ref="SkuInfo"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="Flash"/>
                 <!-- DO NOT USE! removing TianoImage, use FrameworkModules instead. -->
                 <xs:element minOccurs="0" maxOccurs="1" ref="TianoImage"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="FrameworkModules"/>
-                <!-- DO NOT USE! removing PcdBuildDeclarations here, use PcdBuildDeclaratiion in ModuleSA instead. -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDeclarations"/>
-                <xs:choice minOccurs="0">
-                    <!-- DO NOT USE! removing PcdDynamicBuildDeclarations here, use DynamicPcdBuildDefinitions in ModuleSA instead. -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="PcdDynamicBuildDeclarations"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="DynamicPcdBuildDefinitions"/>
-                </xs:choice>
+                <xs:element minOccurs="0" maxOccurs="1" ref="DynamicPcdBuildDefinitions"/>
                 <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
                 <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
             </xs:sequence>
