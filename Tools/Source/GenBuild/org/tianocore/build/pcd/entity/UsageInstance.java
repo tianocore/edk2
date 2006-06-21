@@ -200,7 +200,7 @@ public class UsageInstance {
        @param isBuildUsedLibrary  whether the autogen is for library.
      */
     public void generateAutoGen(boolean isBuildUsedLibrary) 
-    throws EntityException {
+        throws EntityException {
         String  guidStringCName  = null;
         boolean isByteArray      = false;
         String  printDatum       = null;
@@ -340,20 +340,13 @@ public class UsageInstance {
             guidStringCName = "_gPcd_TokenSpaceGuid_" +
                               parentToken.tokenSpaceName.toString().replaceAll("-", "_");
                                             
-            hAutogenStr += String.format("extern const EFI_GUID *_gPcd_DynamicEx_TokenSpaceGuid_%s;\r\n",
-                                         parentToken.cName);
-            hAutogenStr += String.format("#define _PCD_MODE_%s_%s LibPcdGetEx%s(_gPcd_DynamicEx_TokenSpaceGuid_%s, _PCD_TOKEN_%s)\r\n",
+            hAutogenStr += String.format("#define _PCD_MODE_%s_%s LibPcdGetEx%s(&%s, _PCD_TOKEN_%s)\r\n",
                                          Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName,
                                          Token.getAutogenLibrarydatumTypeString(parentToken.datumType),
-                                         parentToken.cName,
+                                         guidStringCName,
                                          parentToken.cName);
 
-            if (!isBuildUsedLibrary) {
-                cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const EFI_GUID *_gPcd_DynamicEx_TokenSpaceGuid_%s = &%s;\r\n",
-                                             parentToken.cName,
-                                             guidStringCName);
-            }
             break;
         }
     }

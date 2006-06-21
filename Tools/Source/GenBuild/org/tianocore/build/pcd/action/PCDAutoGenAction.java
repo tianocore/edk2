@@ -339,19 +339,22 @@ public class PCDAutoGenAction extends BuildAction {
                                                     (guidStringArray[4].substring(6, 8)),
                                                     (guidStringArray[4].substring(8, 10)),
                                                     (guidStringArray[4].substring(10, 12)));
-                    if (!isBuildUsedLibrary) {
-                        Pattern pattern = Pattern.compile("(" + guidStringCName + ")+?");
-                        Matcher matcher = pattern.matcher(cAutoGenString + " ");
-                        //
-                        // Find whether this guid array variable has been generated into autogen.c
-                        // For different DyanmicEx pcd token who use same token space guid, the token space
-                        // guid array should be only generated once.
-                        // 
-                        if (!matcher.find()) {
+                    
+                    Pattern pattern = Pattern.compile("(" + guidStringCName + ")+?");
+                    Matcher matcher = pattern.matcher(cAutoGenString + " ");
+                    //
+                    // Find whether this guid array variable has been generated into autogen.c
+                    // For different DyanmicEx pcd token who use same token space guid, the token space
+                    // guid array should be only generated once.
+                    // 
+                    if (!matcher.find()) {
+                        hAutoGenString += String.format("extern EFI_GUID %s;\r\n",
+                                                        guidStringCName);
+                        if (!isBuildUsedLibrary) {
                             cAutoGenString += String.format("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID %s = %s;\r\n",
                                                             guidStringCName,
                                                             guidString);
-                        }
+                        } 
                     }
                 }
 
