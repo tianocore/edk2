@@ -1177,230 +1177,6 @@
             </xs:simpleContent>
         </xs:complexType>
     </xs:element>
-    <xs:element name="PcdBuildDeclarations">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">NEW: Will become a child of ModuleSA in the FPD</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:choice minOccurs="1">
-                <xs:element minOccurs="0" maxOccurs="1" ref="Filename"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="PcdBuildData">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">Child of PcdBuildDeclarations</xs:documentation>
-                        <xs:documentation xml:lang="en">This is date element is used in the platform build description file and contains valid data for a Platform Build</xs:documentation>
-                        <xs:documentation xml:lang="en">There is ONE required Attribute, ItemType</xs:documentation>
-                    </xs:annotation>
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="Token">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This as a unique identifier defined for either this name space.</xs:documentation>
-                                    <xs:documentation xml:lang="en">The Target Attribute may be used to define a Target name space, such as PCI.</xs:documentation>
-                                </xs:annotation>
-                                <xs:complexType>
-                                    <xs:simpleContent>
-                                        <xs:extension base="HexDoubleWordDataType">
-                                            <xs:attribute name="Target" type="C_Name" use="optional"/>
-                                        </xs:extension>
-                                    </xs:simpleContent>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This specifies the size of the Pcd Datum. It is either 8, 16, 32 or 64 bits for values, 1 bit for BOOLEAN and variable length for elements defined as VOID*</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="HiiEnable" type="xs:boolean">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This Bit means that the Variable data is associated with HII</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="VpdEnable" type="xs:boolean">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This bit enables the Vital Product Data area within flash for maintaining PCD information</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="AlternateNameSpaceEnable" type="xs:boolean">
-                                <xs:annotation>
-                                    <xs:documentation>This is only applicable to ItemType DYNAMIC_EX</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="SkuEnable" type="xs:boolean"/>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="SkuDataArrayEnable" type="xs:boolean"/>
-                            <xs:choice minOccurs="0">
-                                <xs:element minOccurs="0" maxOccurs="1" name="SkuDataArray">
-                                    <xs:annotation>
-                                        <xs:documentation xml:lang="en">This element is a list of two entries per line, the first should be an integer, while the second entry should be a string value</xs:documentation>
-                                    </xs:annotation>
-                                    <xs:simpleType>
-                                        <xs:list itemType="xs:normalizedString"/>
-                                    </xs:simpleType>
-                                </xs:element>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="SkuData">
-                                    <xs:annotation>
-                                        <xs:documentation xml:lang="en">This section is for a list of SkuData Elements, ID and Value</xs:documentation>
-                                    </xs:annotation>
-                                    <xs:complexType>
-                                        <xs:sequence minOccurs="1">
-                                            <xs:element name="Id" type="xs:int"/>
-                                            <xs:element name="Value" type="xs:normalizedString"/>
-                                        </xs:sequence>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:choice>
-                            <xs:element default="0x00" minOccurs="1" maxOccurs="1" name="MaxSku" type="HexByteDataType">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This value comes from a production line database, and has nothing to do with the number of SkuData IDs that have been defined.</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element default="0x00" minOccurs="1" maxOccurs="1" name="SkuId" type="HexByteDataType">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This is the specific Sku ID for this build.</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DatumSize">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">Max Number of Bytes of the data.</xs:documentation>
-                                </xs:annotation>
-                                <xs:simpleType>
-                                    <xs:restriction base="xs:int">
-                                        <xs:minInclusive value="1"/>
-                                        <xs:maxInclusive value="16777215"/>
-                                    </xs:restriction>
-                                </xs:simpleType>
-                            </xs:element>
-                            <xs:element minOccurs="1" maxOccurs="1" name="VariableGuid" type="VariableGuidType">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This is the Variable's GUID if and only if HII is enabled.</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element minOccurs="1" maxOccurs="1" name="VariableName" type="xs:normalizedString">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This is the C Name for the Variable, and is valid if and only HII is enabled.</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="VariableValueDefault" type="xs:normalizedString"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DataOffset" type="Hex64BitDataType">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">If HII is enabled, This is the offset into the variable data entry, If Vpd is enabled, then it's the Offset into the VPD area of the image defined by platform manufacturer, if neither HII nor Vpd are enabled, it's the offset into the PCD Data Area. HII and VPD can never be enabled at the same time (as of the date of this document.)</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="GuidOffset" type="Hex64BitDataType">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">FIELD IS NOT USED! REMOVE in FINAL!</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DefaultValue" type="xs:normalizedString"/>
-                        </xs:sequence>
-                        <xs:attributeGroup ref="PcdAttributes"/>
-                        <xs:attribute name="PcdIsDriver">
-                            <xs:simpleType>
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This is an enumerated data type that will be used for DYNAMIC_EX, PEIM or DXE only</xs:documentation>
-                                </xs:annotation>
-                                <xs:restriction base="UCNameType">
-                                    <xs:enumeration value="PEI_PCD_DRIVER"/>
-                                    <xs:enumeration value="DXE_PCD_DRIVER"/>
-                                </xs:restriction>
-                            </xs:simpleType>
-                        </xs:attribute>
-                    </xs:complexType>
-                </xs:element>
-            </xs:choice>
-        </xs:complexType>
-    </xs:element>
-    <!-- PcdBuildDeclarations -->
-    <xs:element name="PcdDynamicBuildDeclarations">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Child of Framework Platform Description (FPD)</xs:documentation>
-            <xs:documentation xml:lang="en">We permit the FPD to use an external XML file for PCD information or else the information must be contained within the XML data element, PcdBuildData.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="PcdBuildData">
-                    <xs:annotation>
-                        <xs:documentation xml:lang="en">Child of PcdBuildDeclarations</xs:documentation>
-                        <xs:documentation xml:lang="en">This is date element is used in the platform build description file and contains valid data for a Platform Build</xs:documentation>
-                        <xs:documentation xml:lang="en">There is ONE required Attribute, ItemType</xs:documentation>
-                    </xs:annotation>
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="Token">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This as a unique identifier defined for either this name space.</xs:documentation>
-                                    <xs:documentation xml:lang="en">The Target Attribute may be used to define a Target name space, such as PCI.</xs:documentation>
-                                </xs:annotation>
-                                <xs:complexType>
-                                    <xs:simpleContent>
-                                        <xs:extension base="HexDoubleWordDataType">
-                                            <xs:attribute name="Target" type="C_Name" use="optional"/>
-                                        </xs:extension>
-                                    </xs:simpleContent>
-                                </xs:complexType>
-                            </xs:element>
-                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="HiiEnable" type="xs:boolean"/>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="VpdEnable" type="xs:boolean"/>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="AlternateNameSpaceEnable" type="xs:boolean"/>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="SkuEnable" type="xs:boolean"/>
-                            <xs:element default="false" minOccurs="1" maxOccurs="1" name="SkuDataArrayEnable" type="xs:boolean"/>
-                            <xs:choice minOccurs="0">
-                                <xs:element minOccurs="0" maxOccurs="1" name="SkuDataArray">
-                                    <xs:annotation>
-                                        <xs:documentation xml:lang="en">This element is a list of two entries per line, the first should be an integer, while the second entry should be a string value</xs:documentation>
-                                    </xs:annotation>
-                                    <xs:simpleType>
-                                        <xs:list itemType="xs:normalizedString"/>
-                                    </xs:simpleType>
-                                </xs:element>
-                                <xs:element minOccurs="0" maxOccurs="unbounded" name="SkuData">
-                                    <xs:annotation>
-                                        <xs:documentation xml:lang="en">This section is for a list of SkuData Elements, ID and Value</xs:documentation>
-                                    </xs:annotation>
-                                    <xs:complexType>
-                                        <xs:sequence minOccurs="1">
-                                            <xs:element name="Id" type="xs:int"/>
-                                            <xs:element name="Value" type="xs:normalizedString"/>
-                                        </xs:sequence>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:choice>
-                            <xs:element default="0x00" minOccurs="1" maxOccurs="1" name="MaxSku" type="HexByteDataType">
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This value comes from a production line database, and has nothing to do with the number of SkuData IDs that have been defined.</xs:documentation>
-                                </xs:annotation>
-                            </xs:element>
-                            <xs:element default="0x00" minOccurs="1" maxOccurs="1" name="SkuId" type="HexByteDataType"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DatumSize" type="DatumSizeLimitation"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="VariableGuid" type="VariableGuidType"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="VariableName" type="xs:normalizedString"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="VariableValueDefault" type="xs:normalizedString"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DataOffset" type="Hex64BitDataType"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="GuidOffset" type="Hex64BitDataType"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="DefaultValue" type="xs:normalizedString"/>
-                        </xs:sequence>
-                        <xs:attributeGroup ref="PcdAttributes"/>
-                        <xs:attribute name="PcdIsDriver">
-                            <xs:simpleType>
-                                <xs:annotation>
-                                    <xs:documentation xml:lang="en">This is an enumerated data type that will be used for DYNAMIC_EX, PEIM or DXE only</xs:documentation>
-                                </xs:annotation>
-                                <xs:restriction base="UCNameType">
-                                    <xs:enumeration value="PEI_PCD_DRIVER"/>
-                                    <xs:enumeration value="DXE_PCD_DRIVER"/>
-                                </xs:restriction>
-                            </xs:simpleType>
-                        </xs:attribute>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
     <xs:element name="DynamicPcdBuildDefinitions">
         <xs:annotation>
             <xs:documentation xml:lang="en">Child of Framework Platform Description (FPD)</xs:documentation>
@@ -1408,10 +1184,10 @@
         </xs:annotation>
         <xs:complexType>
             <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="PcdBuildData">
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="PcdBuildData">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
@@ -1429,7 +1205,7 @@
                                 </xs:complexType>
                             </xs:element>
                         </xs:sequence>
-                        <xs:attributeGroup ref="PcdAttributes"/>
+                        <xs:attributeGroup ref="DynamicBuildPcdAttributes"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1440,16 +1216,17 @@
             <xs:documentation xml:lang="en">Child of FPD ModuleSA element for FIXED_AT_BUILD, PATCHABLE_IN_MODULE, and FEATURE_FLAG PCDS Only!</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence minOccurs="1">
-                <xs:element maxOccurs="unbounded" name="PcdData">
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="PcdData">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
+                            <!-- MaxDatumSize is only required if the DatumType is VOID* -->
                             <xs:element minOccurs="0" maxOccurs="1" name="MaxDatumSize" type="DatumSizeLimitation"/>                            
-                            <xs:element minOccurs="0" maxOccurs="1" name="Value" type="xs:normalizedString"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="Value" type="DefaultValueType"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdBuildDefinitionAttributes"/>
                     </xs:complexType>
@@ -1459,7 +1236,7 @@
     </xs:element>
     <xs:group name="DefaultGroup">
         <xs:sequence>
-            <xs:element minOccurs="1" maxOccurs="1" name="Value" type="xs:normalizedString"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="Value" type="DefaultValueType"/>
         </xs:sequence>
     </xs:group>
     <xs:group name="HiiEnable">
@@ -1467,10 +1244,10 @@
             <xs:documentation xml:lang="en">If HiiEnable group is specified, then HiiEnable is default true</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="1" name="VariableName" type="VariableNameDataType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="VariableName" type="VariableNameDataType"/>
             <xs:element minOccurs="0" maxOccurs="1" name="VariableGuid" type="VariableGuidType"/>
-            <xs:element minOccurs="0" maxOccurs="1" name="VariableOffset" type="Hex64BitDataType"/>
-            <xs:element minOccurs="0" maxOccurs="1" name="HiiDefaultValue" type="xs:normalizedString"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="VariableOffset" type="Hex64BitDataType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="HiiDefaultValue" type="DefaultValueType"/>
         </xs:sequence>
     </xs:group>
     <xs:group name="VpdEnable">
@@ -1478,7 +1255,7 @@
             <xs:documentation xml:lang="en">If VpdEnable group is specified, then VpdEnable is default true</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="1" name="VpdOffset" type="Hex64BitDataType"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="VpdOffset" type="Hex64BitDataType"/>
         </xs:sequence>
     </xs:group>
     <xs:element name="PcdCoded">
@@ -1486,20 +1263,20 @@
             <xs:documentation xml:lang="en">Child of Module Surface Area Description (MSA)</xs:documentation>
         </xs:annotation>
         <xs:complexType>
-            <xs:sequence minOccurs="1">
-                <xs:element maxOccurs="unbounded" name="PcdEntry">
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="unbounded" name="PcdEntry">
                     <xs:annotation>
                         <xs:documentation xml:lang="en">This is the valid content of the PCD table of a Module. The contents may not be wired at build time, and these only refer to Platform Build values, not modules.</xs:documentation>
                         <xs:documentation xml:lang="en">This element is valid for PcdInfo.xml and FPD files.</xs:documentation>
                     </xs:annotation>
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
-                            <xs:element minOccurs="0" maxOccurs="1" ref="HelpText"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValueType"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
                         </xs:sequence>
                         <!-- MSA file declares a single usage, and must match one of the entries in what the SPD file declares as the set of possible Item Types. -->
-                        <xs:attribute name="PcdItemType" type="PcdItemTypes" use="required"/>
+                        <xs:attributeGroup ref="PcdCodedAttributes"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
@@ -1516,13 +1293,13 @@
                 <xs:element maxOccurs="unbounded" name="PcdEntry">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="C_Name"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="ValidUsage" type="PcdListType"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
-                            <xs:element minOccurs="1" maxOccurs="1" ref="HelpText"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValueType"/>
+                            <xs:element minOccurs="1" maxOccurs="1" name="HelpText" type="Paragraph"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdDeclarationAttributes"/>
                     </xs:complexType>
@@ -1572,7 +1349,7 @@
                             <xs:element minOccurs="0" maxOccurs="1" name="VariableGuid" type="VariableGuidType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="DataOffset" type="Hex64BitDataType"/>
                             <xs:element default="0" minOccurs="0" maxOccurs="1" name="GuidOffset" type="Hex64BitDataType"/>
-                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValue"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValueType"/>
                         </xs:sequence>
                         <xs:attributeGroup ref="PcdAttributes"/>
                     </xs:complexType>
