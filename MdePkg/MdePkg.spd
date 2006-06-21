@@ -1181,66 +1181,96 @@
       <Guid>0x1f4c6f90, 0xb06b, 0x48d8, 0xa2, 0x01, 0xba, 0xe5, 0xf1, 0xcd, 0x7d, 0x56</Guid>
     </Entry>
   </PpiDeclarations>
-  <PcdDefinitions>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+  <PcdDeclarations>
+    <PcdEntry>
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
       <Token>0x00000001</Token>
+      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
       <Token>0x00000002</Token>
+      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdMaximumLinkedListLength</C_Name>
       <Token>0x00000003</Token>
+      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdSpinLockTimeout</C_Name>
       <Token>0x00000004</Token>
+      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>10000000</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdDebugPropertyMask</C_Name>
       <Token>0x00000005</Token>
+      <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
       <DatumType>UINT8</DatumType>
-      <DefaultValue>0</DefaultValue>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x0f</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="PATCHABLE_IN_MODULE">
+    <PcdEntry>
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
       <Token>0x00000006</Token>
+      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
       <DatumType>UINT32</DatumType>
+      <ValidUsage>PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>0x80000000</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
       <Token>0x00000007</Token>
+      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
       <DatumType>UINT8</DatumType>
-      <DefaultValue>0</DefaultValue>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x07</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdDebugClearMemoryValue</C_Name>
       <Token>0x00000008</Token>
+      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
       <DatumType>UINT8</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0xAF</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
       <Token>0x00000009</Token>
+      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
       <DatumType>UINT8</DatumType>
-      <DefaultValue>0x0</DefaultValue>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry ItemType="FIXED_AT_BUILD">
+    <PcdEntry>
       <C_Name>PcdPostCodePropertyMask</C_Name>
       <Token>0x0000000b</Token>
+      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
       <DatumType>UINT8</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0</DefaultValue>
+      <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-  </PcdDefinitions>
+  </PcdDeclarations>
 </PackageSurfaceArea>
