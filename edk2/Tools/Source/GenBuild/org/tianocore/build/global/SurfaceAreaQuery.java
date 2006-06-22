@@ -887,6 +887,22 @@ public class SurfaceAreaQuery {
     }
 
     /**
+     Retrieve all <ModuleSA> documents from FPD file.
+
+     @returns   ModuleSA objects list   if elements are found at the known xpath
+     @returns   Empty ModuleSA list     if nothing is there
+     **/
+    public static ModuleSADocument.ModuleSA[] getFpdModuleSAs() {
+        String[] xPath = new String[] { "/FrameworkModules/*/ModuleSA" };
+
+        XmlObject[] result = get("FrameworkPlatformDescription", xPath);
+        if (result != null) {
+            return (ModuleSADocument.ModuleSA[]) result;
+        }
+        return new ModuleSADocument.ModuleSA[0];
+    }
+
+    /**
      Retrieve variables for FV images
 
      @returns   name/value list        if elements are found at the known xpath

@@ -19,7 +19,7 @@ package org.tianocore.build.pcd.entity;
 
 
 import java.util.UUID;
-
+import org.tianocore.ModuleTypeDef;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.exception.EntityException;
@@ -30,11 +30,6 @@ import org.tianocore.build.pcd.exception.EntityException;
   is an usage instance for this PCD token.
 **/
 public class UsageInstance {
-    ///
-    /// The module type of usage instance.
-    /// 
-    public enum MODULE_TYPE {SEC, PEI_CORE, PEIM, DXE_CORE, DXE_DRIVERS, OTHER_COMPONENTS}
-
     ///
     /// This parent that this usage instance belongs to.
     ///
@@ -78,7 +73,7 @@ public class UsageInstance {
     ///
     /// The module type for this usage instance.
     ///
-    public MODULE_TYPE      moduleType;
+    public ModuleTypeDef.Enum    moduleType;
 
     ///
     /// The value of the PCD in this usage instance. 
@@ -122,7 +117,7 @@ public class UsageInstance {
                           UUID              moduleGUID,
                           String            packageName,
                           UUID              packageGUID,
-                          MODULE_TYPE       moduleType,
+                          ModuleTypeDef.Enum moduleType,
                           Token.PCD_TYPE    modulePcdType,
                           String            arch,
                           String            version,
@@ -185,8 +180,8 @@ public class UsageInstance {
        @return boolean
      */
     public boolean isPeiPhaseComponent() {
-        if ((moduleType == MODULE_TYPE.PEI_CORE) ||
-            (moduleType == MODULE_TYPE.PEIM)) {
+        if ((moduleType == ModuleTypeDef.PEI_CORE) ||
+            (moduleType == ModuleTypeDef.PEIM)) {
             return true;
         }
         return false;

@@ -52,6 +52,7 @@ import org.tianocore.build.pcd.entity.SkuInstance;
 import org.tianocore.build.pcd.entity.Token;
 import org.tianocore.build.pcd.entity.UsageInstance;
 import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.ModuleTypeDef;
 
 class StringTable {
     private ArrayList<String>   al; 
@@ -1185,9 +1186,9 @@ class PcdDatabase {
 
 class ModuleInfo {
     public ModuleSADocument.ModuleSA module;
-    public UsageInstance.MODULE_TYPE type;
+    public ModuleTypeDef.Enum        type;
 
-    public ModuleInfo (ModuleSADocument.ModuleSA module, UsageInstance.MODULE_TYPE type) {
+    public ModuleInfo (ModuleSADocument.ModuleSA module, ModuleTypeDef.Enum type) {
         this.module = module;
         this.type   = type;
     }
@@ -1345,14 +1346,13 @@ public class CollectPCDAction {
      */
     private List<ModuleInfo> getComponentsFromFPD() 
         throws EntityException {
-        HashMap<String, XmlObject>  map         = new HashMap<String, XmlObject>();
         List<ModuleInfo>            allModules  = new ArrayList<ModuleInfo>();
         ModuleInfo                  current     = null;
         int                         index       = 0;
         org.tianocore.Components    components  = null;
         FrameworkModulesDocument.FrameworkModules fModules = null;
-        java.util.List<ModuleSADocument.ModuleSA> modules  = null;
-        
+        ModuleSADocument.ModuleSA[]               modules  = null;
+        HashMap<String, XmlObject>                map      = new HashMap<String, XmlObject>();
 
         if (fpdDocInstance == null) {
             try {
@@ -1365,64 +1365,13 @@ public class CollectPCDAction {
 
         }
 
-        //
-        // Check whether FPD contians <FramworkModules>
-        // 
-        fModules = fpdDocInstance.getFrameworkPlatformDescription().getFrameworkModules();
-        if (fModules == null) {
-            return null;
-        }
-
-        //
-        // BUGBUG: The following is work around code, the final component type should be get from
-        // GlobalData class.
-        // 
-        components = fModules.getSEC();
-        if (components != null) {
-            modules = components.getModuleSAList();
-            for (index = 0; index < modules.size(); index ++) {
-                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.SEC));
-            }
-        }
-
-        components = fModules.getPEICORE();
-        if (components != null) {
-            modules = components.getModuleSAList();
-            for (index = 0; index < modules.size(); index ++) {
-                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.PEI_CORE));
-            }
-        }
-
-        components = fModules.getPEIM();
-        if (components != null) {
-            modules = components.getModuleSAList();
-            for (index = 0; index < modules.size(); index ++) {
-                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.PEIM));
-            }
-        }
-
-        components = fModules.getDXECORE();
-        if (components != null) {
-            modules = components.getModuleSAList();
-            for (index = 0; index < modules.size(); index ++) {
-                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.DXE_CORE));
-            }
-        }
-
-        components = fModules.getDXEDRIVERS();
-        if (components != null) {
-            modules = components.getModuleSAList();
-            for (index = 0; index < modules.size(); index ++) {
-                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.DXE_DRIVERS));
-            }
-        }
-
-        components = fModules.getOTHERCOMPONENTS();
-        if (components != null) {
-            modules = components.getModuleSAList();
-            for (index = 0; index < modules.size(); index ++) {
-                allModules.add(new ModuleInfo(modules.get(index), UsageInstance.MODULE_TYPE.OTHER_COMPONENTS));
-            }
+        map.put("FrameworkPlatformDescription", fpdDocInstance);
+        SurfaceAreaQuery.setDoc(map); 
+        modules = SurfaceAreaQuery.getFpdModuleSAs();
+        for (index = 0; index < modules.length; index ++) {
+            SurfaceAreaQuery.setDoc(GlobalData.getDoc(modules[index].getModuleName()));
+            allModules.add(new ModuleInfo(modules[index], 
+                                          ModuleTypeDef.Enum.forString(SurfaceAreaQuery.getModuleType())));
         }
         
         return allModules;
