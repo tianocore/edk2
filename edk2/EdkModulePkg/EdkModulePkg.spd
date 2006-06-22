@@ -172,7 +172,7 @@
       <Filename>Library/EdkDxePeCoffLoaderFromHobLib/EdkDxePeCoffLoaderFromHobLib.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Library/EdkDxePerformanceLib/EdkDxePerformanceLib.msa</Filename>
+      <Filename>Library/DxePerformanceLib/DxePerformanceLib.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/EdkDxePrintLib/EdkDxePrintLib.msa</Filename>
@@ -208,7 +208,7 @@
       <Filename>Library/EdkPeCoffLoaderX64Lib/EdkPeCoffLoaderX64Lib.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Library/EdkPeiPerformanceLib/EdkPeiPerformanceLib.msa</Filename>
+      <Filename>Library/PeiPerformanceLib/PeiPerformanceLib.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/EdkRuntimeStatusCodeLib/BsDataHubStatusCode/BsDataHubStatusCode.msa</Filename>

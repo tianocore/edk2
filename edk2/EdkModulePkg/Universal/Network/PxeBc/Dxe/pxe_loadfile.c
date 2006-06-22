@@ -1456,15 +1456,12 @@ Returns:
                   (VOID *) &LoadfilePtr->Private->CallbackProtocolPtr
                   );
 
-  switch (Status) {
-  case EFI_SUCCESS:
+  if (Status == EFI_SUCCESS) {
     //
     // There is already a callback routine.  Do nothing.
     //
     DEBUG ((EFI_D_WARN, "\nLoadFile()  BC callback exists."));
-    break;
-
-  case EFI_UNSUPPORTED:
+  } else if (Status == EFI_UNSUPPORTED) {
     //
     // No BaseCode Callback protocol found.  Add our own.
     //
@@ -1490,10 +1487,7 @@ Returns:
                                     &NewMakeCallback
                                     );
     }
-
-    break;
-
-  default:
+  } else {
     DEBUG ((EFI_D_WARN, "\nLoadFile()  Callback check status == %xh", Status));
   }
   //
@@ -1578,11 +1572,11 @@ Returns:
 
   DEBUG ((EFI_D_WARN, "\nBC.Loadfile()  Status == %xh\n", Status));
 
-  switch (Status) {
-  case EFI_SUCCESS:           /* 0 */
+  if (Status == EFI_SUCCESS) {
+    /* 0 */
     return EFI_SUCCESS;
-
-  case EFI_BUFFER_TOO_SMALL:  /* 5 */
+  } else if (Status == EFI_BUFFER_TOO_SMALL) {
+    /* 5 */
     //
     // Error is only displayed when we are actually trying to
     // download the boot image.
@@ -1590,104 +1584,81 @@ Returns:
     if (Buffer == NULL) {
       return EFI_BUFFER_TOO_SMALL;
     }
-
     AsciiPrint ("\nPXE-E05: Download buffer is smaller than requested file.\n");
-    break;
-
-  case EFI_DEVICE_ERROR:      /* 7 */
+  } else if (Status == EFI_DEVICE_ERROR) {
+    /* 7 */
     AsciiPrint ("\nPXE-E07: Network device error.  Check network connection.\n");
-    break;
-
-  case EFI_OUT_OF_RESOURCES:  /* 9 */
+  } else if (Status == EFI_OUT_OF_RESOURCES) {
+    /* 9 */
     AsciiPrint ("\nPXE-E09: Could not allocate I/O buffers.\n");
-    break;
-
-  case EFI_NO_MEDIA:          /* 12 */
+  } else if (Status == EFI_NO_MEDIA) {
+    /* 12 */
     AsciiPrint ("\nPXE-E12: Could not detect network connection.  Check cable.\n");
-    break;
-
-  case EFI_NO_RESPONSE:       /* 16 */
+  } else if (Status == EFI_NO_RESPONSE) {
+    /* 16 */
     AsciiPrint ("\nPXE-E16: Valid PXE offer not received.\n");
-    break;
-
-  case EFI_TIMEOUT:           /* 18 */
+  } else if (Status == EFI_TIMEOUT) {
+    /* 18 */
     AsciiPrint ("\nPXE-E18: Timeout.  Server did not respond.\n");
-    break;
-
-  case EFI_ABORTED:           /* 21 */
+  } else if (Status == EFI_ABORTED) {
+    /* 21 */
     AsciiPrint ("\nPXE-E21: Remote boot cancelled.\n");
-    break;
-
-  case EFI_ICMP_ERROR:        /* 22 */
+  } else if (Status == EFI_ICMP_ERROR) {
+    /* 22 */
     AsciiPrint ("\nPXE-E22: Client received ICMP error from server.\n");
 
-    if (LoadfilePtr->Private->EfiBc.Mode == NULL) {
-      break;
-    }
+    if ((LoadfilePtr->Private->EfiBc.Mode != NULL) && LoadfilePtr->Private->EfiBc.Mode->IcmpErrorReceived) {
+      AsciiPrint (
+        "PXE-E98: Type: %xh  Code: %xh  ",
+        LoadfilePtr->Private->EfiBc.Mode->IcmpError.Type,
+        LoadfilePtr->Private->EfiBc.Mode->IcmpError.Code
+        );
 
-    if (!LoadfilePtr->Private->EfiBc.Mode->IcmpErrorReceived) {
-      break;
-    }
+      switch (LoadfilePtr->Private->EfiBc.Mode->IcmpError.Type) {
+      case 0x03:
+        switch (LoadfilePtr->Private->EfiBc.Mode->IcmpError.Code) {
+        case 0x00:              /* net unreachable */
+          AsciiPrint ("Net unreachable");
+          break;
 
-    AsciiPrint (
-      "PXE-E98: Type: %xh  Code: %xh  ",
-      LoadfilePtr->Private->EfiBc.Mode->IcmpError.Type,
-      LoadfilePtr->Private->EfiBc.Mode->IcmpError.Code
-      );
+        case 0x01:              /* host unreachable */
+          AsciiPrint ("Host unreachable");
+          break;
 
-    switch (LoadfilePtr->Private->EfiBc.Mode->IcmpError.Type) {
-    case 0x03:
-      switch (LoadfilePtr->Private->EfiBc.Mode->IcmpError.Code) {
-      case 0x00:              /* net unreachable */
-        AsciiPrint ("Net unreachable");
-        break;
+        case 0x02:              /* protocol unreachable */
+          AsciiPrint ("Protocol unreachable");
+          break;
 
-      case 0x01:              /* host unreachable */
-        AsciiPrint ("Host unreachable");
-        break;
+        case 0x03:              /* port unreachable */
+          AsciiPrint ("Port unreachable");
+          break;
 
-      case 0x02:              /* protocol unreachable */
-        AsciiPrint ("Protocol unreachable");
-        break;
+        case 0x04:              /* Fragmentation needed */
+          AsciiPrint ("Fragmentation needed");
+          break;
 
-      case 0x03:              /* port unreachable */
-        AsciiPrint ("Port unreachable");
-        break;
+        case 0x05:              /* Source route failed */
+          AsciiPrint ("Source route failed");
+          break;
+        }
 
-      case 0x04:              /* Fragmentation needed */
-        AsciiPrint ("Fragmentation needed");
-        break;
-
-      case 0x05:              /* Source route failed */
-        AsciiPrint ("Source route failed");
         break;
       }
 
-      break;
+      AsciiPrint ("\n");
     }
-
-    AsciiPrint ("\n");
-
-    break;
-
-  case EFI_TFTP_ERROR:        /* 23 */
+  } else if (Status == EFI_TFTP_ERROR) {
+    /* 23 */
     AsciiPrint ("\nPXE-E23: Client received TFTP error from server.\n");
 
-    if (LoadfilePtr->Private->EfiBc.Mode == NULL) {
-      break;
-    }
-
-    if (LoadfilePtr->Private->EfiBc.Mode->TftpErrorReceived) {
+    if ((LoadfilePtr->Private->EfiBc.Mode != NULL) && (LoadfilePtr->Private->EfiBc.Mode->TftpErrorReceived)) {
       AsciiPrint (
         "PXE-E98: Code: %xh  %a\n",
         LoadfilePtr->Private->EfiBc.Mode->TftpError.ErrorCode,
         LoadfilePtr->Private->EfiBc.Mode->TftpError.ErrorString
         );
     }
-
-    break;
-
-  default:
+  } else {
     AsciiPrint ("\nPXE-E99: Unexpected network error: %xh\n", Status);
   }
 

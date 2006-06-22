@@ -21,15 +21,12 @@
 /**
   Performs an IA-32 specific relocation fixup.
 
-  @param  Reloc Pointer to the relocation record.
+  @param  Reloc       Pointer to the relocation record.
+  @param  Fixup       Pointer to the address to fix up.
+  @param  FixupData   Pointer to a buffer to log the fixups.
+  @param  Adjust      The offset to adjust the fixup.
 
-  @param  Fixup Pointer to the address to fix up.
-
-  @param  FixupData Pointer to a buffer to log the fixups.
-
-  @param  Adjust The offset to adjust the fixup.
-
-  @retval  EFI_UNSUPPORTED Unsupported now.
+  @retval EFI_UNSUPPORTED Unsupported now.
 
 **/
 RETURN_STATUS

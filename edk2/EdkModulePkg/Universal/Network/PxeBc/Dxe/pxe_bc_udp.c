@@ -463,12 +463,7 @@ Returns:
       }
     }
 
-    switch (StatCode) {
-    case EFI_SUCCESS:
-    case EFI_TIMEOUT:
-      break;
-
-    default:
+    if ((StatCode != EFI_SUCCESS) && (StatCode != EFI_TIMEOUT)) {
       DEBUG (
         (EFI_D_INFO,
         "\nUdpRead()  Exit #3  %Xh %r",

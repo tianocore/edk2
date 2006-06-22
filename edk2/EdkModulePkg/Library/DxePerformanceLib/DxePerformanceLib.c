@@ -1,26 +1,53 @@
-/** @file
-  Library that provides services to measure module execution performance
+/*++
 
-  Copyright (c) 2004, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+Copyright (c) 2006, Intel Corporation                                                         
+All rights reserved. This program and the accompanying materials                          
+are licensed and made available under the terms and conditions of the BSD License         
+which accompanies this distribution.  The full text of the license may be found at        
+http://opensource.org/licenses/bsd-license.php                                            
+                                                                                          
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Module Name:
 
-  Module Name:  PerformanceLib.h
+  DxePerformanceLib.c
+
+Abstract:
+
+  Performance Library
+
+--*/
+
+STATIC PERFORMANCE_PROTOCOL    *mPerformance = NULL;
+
+/**
+  The constructor function caches the pointer to Performance protocol.
+  
+  The constructor function locates Performance protocol from protocol database.
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
+
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
+EFI_STATUS
+EFIAPI
+PerformanceLibConstructor (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
+  )
+{
+  EFI_STATUS            Status;
 
-#ifndef __PERFORMANCE_LIB_H__
-#define __PERFORMANCE_LIB_H__
+  Status = gBS->LocateProtocol (&gPerformanceProtocolGuid, NULL, (VOID **) &mPerformance);
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (mPerformance != NULL);
 
-//
-// Performance library propery mask bits
-//
-#define PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED  0x00000001
+  return Status;
+}
 
 /**
   Creates a record for the beginning of a performance measurement. 
@@ -49,7 +76,14 @@ StartPerformanceMeasurement (
   IN CONST CHAR8  *Token,   OPTIONAL
   IN CONST CHAR8  *Module,  OPTIONAL
   IN UINT64       TimeStamp
-  );
+  )
+{
+  EFI_STATUS  Status;
+  
+  Status = mPerformance->StartGauge (Handle, Token, Module, TimeStamp);
+
+  return (RETURN_STATUS) Status;
+}
 
 /**
   Fills in the end time of a performance measurement. 
@@ -81,7 +115,14 @@ EndPerformanceMeasurement (
   IN CONST CHAR8  *Token,   OPTIONAL
   IN CONST CHAR8  *Module,  OPTIONAL
   IN UINT64       TimeStamp
-  );
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = mPerformance->EndGauge (Handle, Token, Module, TimeStamp);
+
+  return (RETURN_STATUS) Status;
+}
 
 /**
   Attempts to retrieve a performance measurement log entry from the performance measurement log. 
@@ -129,7 +170,41 @@ GetPerformanceMeasurement (
   OUT CONST CHAR8 **Module,
   OUT UINT64      *StartTimeStamp,
   OUT UINT64      *EndTimeStamp
-  );
+  )
+{
+  EFI_STATUS        Status;
+  GAUGE_DATA_ENTRY  *GaugeData;
+
+  ASSERT (Handle != NULL);
+  ASSERT (Token != NULL);
+  ASSERT (Module != NULL);
+  ASSERT (StartTimeStamp != NULL);
+  ASSERT (EndTimeStamp != NULL);
+
+  Status = mPerformance->GetGauge (LogEntryKey++, &GaugeData);
+  
+  //
+  // Make sure that LogEntryKey is a valid log entry key,
+  //
+  ASSERT (Status != EFI_INVALID_PARAMETER);
+
+  if (EFI_ERROR (Status)) {
+    //
+    // The LogEntryKey is the last entry (equals to the total entry number).
+    //
+    return 0;
+  }
+
+  ASSERT (GaugeData != NULL);
+
+  *Handle         = (VOID *) (UINTN) GaugeData->Handle;
+  *Token          = GaugeData->Token;
+  *Module         = GaugeData->Module;
+  *StartTimeStamp = GaugeData->StartTimeStamp;
+  *EndTimeStamp   = GaugeData->EndTimeStamp;
+
+  return LogEntryKey;  
+}
 
 /**
   Returns TRUE if the performance measurement macros are enabled. 
@@ -147,70 +222,7 @@ BOOLEAN
 EFIAPI
 PerformanceMeasurementEnabled (
   VOID
-  );
-
-/**
-  Macro that calls EndPerformanceMeasurement().
-
-  If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  then EndPerformanceMeasurement() is called.
-
-**/
-#define PERF_END(Handle, Token, Module, TimeStamp)                    \
-  do {                                                                \
-    if (PerformanceMeasurementEnabled ()) {                           \
-      EndPerformanceMeasurement (Handle, Token, Module, TimeStamp);   \
-    }                                                                 \
-  } while (FALSE)
-
-/**
-  Macro that calls StartPerformanceMeasurement().
-
-  If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  then StartPerformanceMeasurement() is called.
-
-**/
-#define PERF_START(Handle, Token, Module, TimeStamp)                  \
-  do {                                                                \
-    if (PerformanceMeasurementEnabled ()) {                           \
-      StartPerformanceMeasurement (Handle, Token, Module, TimeStamp); \
-    }                                                                 \
-  } while (FALSE)
-
-/**
-  Macro that marks the beginning of performance measurement source code.
-
-  If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  then this macro marks the beginning of source code that is included in a module.
-  Otherwise, the source lines between PERF_CODE_BEGIN() and PERF_CODE_END() are not included in a module.
-
-**/
-#define PERF_CODE_BEGIN()  do { if (PerformanceMeasurementEnabled ()) { UINT8  __PerformanceCodeLocal
-
-/**
-  Macro that marks the end of performance measurement source code.
-
-  If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  then this macro marks the end of source code that is included in a module.
-  Otherwise, the source lines between PERF_CODE_BEGIN() and PERF_CODE_END() are not included in a module.
-
-**/
-#define PERF_CODE_END()    __PerformanceCodeLocal = 0; } } while (FALSE)
-
-/**
-  Macro that declares a section of performance measurement source code.
-
-  If the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set,
-  then the source code specified by Expression is included in a module.
-  Otherwise, the source specified by Expression is not included in a module.
-
-  @param  Expression              Performance measurement source code to include in a module.
-
-**/
-#define PERF_CODE(Expression)  \
-  PERF_CODE_BEGIN ();          \
-  Expression                   \
-  PERF_CODE_END ()
-
-
-#endif
+  )
+{
+  return ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
+}

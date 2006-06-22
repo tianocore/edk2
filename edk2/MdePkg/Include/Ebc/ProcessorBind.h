@@ -54,15 +54,13 @@ typedef unsigned long         UINTN;
 //
 // Scalable macro to set the most significant bit in a natural number
 //
-#define MAX_BIT     0x8000000000000000ULL 
-#define MAX_2_BITS  0xC000000000000000ULL
-
+#define MAX_BIT     (1ULL << (sizeof (INTN) * 8 - 1)) 
+#define MAX_2_BITS  (3ULL << (sizeof (INTN) * 8 - 2))
 
 //
 // Maximum legal EBC address
 //
-#define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
-
+#define MAX_ADDRESS   ((UINTN) ~0)
 //
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and

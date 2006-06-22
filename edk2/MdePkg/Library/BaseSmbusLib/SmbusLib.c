@@ -18,9 +18,9 @@
 
 #define SMBUS_LIB_SLAVE_ADDRESS(SmBusAddress)      (((SmBusAddress) >> 1)  & 0x7f)
 #define SMBUS_LIB_COMMAND(SmBusAddress)            (((SmBusAddress) >> 8)  & 0xff)
-#define SMBUS_LIB_LENGTH(SmBusAddress)             (((SmBusAddress) >> 16) & 0x1f)
+#define SMBUS_LIB_LENGTH(SmBusAddress)             (((SmBusAddress) >> 16) & 0x3f)
 #define SMBUS_LIB_PEC(SmBusAddress)     ((BOOLEAN) (((SmBusAddress) & SMBUS_LIB_PEC_BIT) != 0))
-#define SMBUS_LIB_RESEARVED(SmBusAddress)          ((SmBusAddress) & ~(((1 << 21) - 2) | SMBUS_LIB_PEC_BIT))
+#define SMBUS_LIB_RESEARVED(SmBusAddress)          ((SmBusAddress) & ~(((1 << 22) - 2) | SMBUS_LIB_PEC_BIT))
 
 //
 // Replaced by PCD
@@ -639,14 +639,14 @@ SmBusProcessCall (
   Bytes are read from the SMBUS and stored in Buffer.
   The number of bytes read is returned, and will never return a value larger than 32-bytes.
   If Status is not NULL, then the status of the executed command is returned in Status.
-  It is the caller¡¯s responsibility to make sure Buffer is large enough for the total number of bytes read.
+  It is the caller's responsibility to make sure Buffer is large enough for the total number of bytes read.
   SMBUS supports a maximum transfer size of 32 bytes, so Buffer does not need to be any larger than 32 bytes.
 
   @param  HostControl     The value of Host Control Register to set.  
   @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
-  @param  OutBuffer       Pointer to the buffer of bytes to write to the SMBUS.
-  @param  InBuffer        Pointer to the buffer of bytes to read from the SMBUS.
+  @param  WriteBuffer     Pointer to the buffer of bytes to write to the SMBUS.
+  @param  ReadBuffer      Pointer to the buffer of bytes to read from the SMBUS.
   @param  Status          Return status for the executed command.
                           This is an optional parameter and may be NULL.
 
@@ -657,8 +657,8 @@ UINTN
 InternalSmBusBlock (
   IN  UINT8                     HostControl,
   IN  UINTN                     SmBusAddress,
-  IN  UINT8                     *OutBuffer,
-  OUT UINT8                     *InBuffer,
+  IN  UINT8                     *WriteBuffer,
+  OUT UINT8                     *ReadBuffer,
   OUT RETURN_STATUS             *Status
   )
 {
@@ -667,7 +667,7 @@ InternalSmBusBlock (
   UINTN                         BytesCount;
   UINT8                         AuxiliaryControl;
 
-  BytesCount = SMBUS_LIB_LENGTH (SmBusAddress) + 1;
+  BytesCount = SMBUS_LIB_LENGTH (SmBusAddress);
 
   ReturnStatus = InternalSmBusAcquire ();
   if (RETURN_ERROR (ReturnStatus)) {
@@ -684,9 +684,9 @@ InternalSmBusBlock (
 
   InternalSmBusIoWrite8 (SMBUS_R_HST_D0, (UINT8) BytesCount);
 
-  if (OutBuffer != NULL) {
+  if (WriteBuffer != NULL) {
     for (Index = 0; Index < BytesCount; Index++) {
-      InternalSmBusIoWrite8 (SMBUS_R_HOST_BLOCK_DB, OutBuffer[Index]);
+      InternalSmBusIoWrite8 (SMBUS_R_HOST_BLOCK_DB, WriteBuffer[Index]);
     }
   }
   //
@@ -711,9 +711,9 @@ InternalSmBusBlock (
   }
 
   BytesCount = InternalSmBusIoRead8 (SMBUS_R_HST_D0);
-  if (InBuffer != NULL) {
+  if (ReadBuffer != NULL) {
     for (Index = 0; Index < BytesCount; Index++) {
-      InBuffer[Index] = InternalSmBusIoRead8 (SMBUS_R_HOST_BLOCK_DB);
+      ReadBuffer[Index] = InternalSmBusIoRead8 (SMBUS_R_HOST_BLOCK_DB);
     }
   }
 
@@ -738,7 +738,7 @@ Done:
   Bytes are read from the SMBUS and stored in Buffer.
   The number of bytes read is returned, and will never return a value larger than 32-bytes.
   If Status is not NULL, then the status of the executed command is returned in Status.
-  It is the caller¡¯s responsibility to make sure Buffer is large enough for the total number of bytes read.
+  It is the caller's responsibility to make sure Buffer is large enough for the total number of bytes read.
   SMBUS supports a maximum transfer size of 32 bytes, so Buffer does not need to be any larger than 32 bytes.
   If Length in SmBusAddress is not zero, then ASSERT().
   If Buffer is NULL, then ASSERT().
@@ -804,6 +804,8 @@ SmBusWriteBlock (
   )
 {
   ASSERT (Buffer != NULL);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) >= 1);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) <= 32);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
   return InternalSmBusBlock (
@@ -820,18 +822,19 @@ SmBusWriteBlock (
 
   Executes an SMBUS block process call command on the SMBUS device specified by SmBusAddress.
   The SMBUS slave address, SMBUS command, and SMBUS length fields of SmBusAddress are required.
-  Bytes are written to the SMBUS from OutBuffer.  Bytes are then read from the SMBUS into InBuffer.
+  Bytes are written to the SMBUS from WriteBuffer.  Bytes are then read from the SMBUS into ReadBuffer.
   If Status is not NULL, then the status of the executed command is returned in Status.
-  It is the caller¡¯s responsibility to make sure InBuffer is large enough for the total number of bytes read.
+  It is the caller's responsibility to make sure ReadBuffer is large enough for the total number of bytes read.
   SMBUS supports a maximum transfer size of 32 bytes, so Buffer does not need to be any larger than 32 bytes.
-  If OutBuffer is NULL, then ASSERT().
-  If InBuffer is NULL, then ASSERT().
+  If Length in SmBusAddress is zero or greater than 32, then ASSERT().
+  If WriteBuffer is NULL, then ASSERT().
+  If ReadBuffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
 
   @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
-  @param  OutBuffer       Pointer to the buffer of bytes to write to the SMBUS.
-  @param  InBuffer        Pointer to the buffer of bytes to read from the SMBUS.
+  @param  WriteBuffer     Pointer to the buffer of bytes to write to the SMBUS.
+  @param  ReadBuffer      Pointer to the buffer of bytes to read from the SMBUS.
   @param  Status          Return status for the executed command.
                           This is an optional parameter and may be NULL.
 
@@ -842,20 +845,22 @@ UINTN
 EFIAPI
 SmBusBlockProcessCall (
   IN  UINTN          SmBusAddress,
-  IN  VOID           *OutBuffer,
-  OUT VOID           *InBuffer,
+  IN  VOID           *WriteBuffer,
+  OUT VOID           *ReadBuffer,
   OUT RETURN_STATUS  *Status        OPTIONAL
   )
 {
-  ASSERT (InBuffer  != NULL);
-  ASSERT (OutBuffer != NULL);
+  ASSERT (WriteBuffer != NULL);
+  ASSERT (ReadBuffer  != NULL);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) >= 1);
+  ASSERT (SMBUS_LIB_LENGTH (SmBusAddress) <= 32);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
   return InternalSmBusBlock (
            SMBUS_V_SMB_CMD_BLOCK_PROCESS,
            SmBusAddress | SMBUS_B_WRITE,
-           OutBuffer,
-           InBuffer,
+           WriteBuffer,
+           ReadBuffer,
            Status
            );
 }

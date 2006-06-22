@@ -82,34 +82,46 @@ EndPerformanceMeasurement (
 }
 
 /**
-  Retrieves a previously logged performance measurement. 
+  Attempts to retrieve a performance measurement log entry from the performance measurement log. 
   
-  Retrieves the performance log entry from the performance log
-  that immediately follows the log entry specified by LogEntryKey.
-  If LogEntryKey is zero, then the first entry from the performance log is returned.
-  If the log entry specified by LogEntryKey is the last entry in the performance log,
-  then 0 is returned.  Otherwise, the performance log entry is returned in Handle,
-  Token, Module, StartTimeStamp, and EndTimeStamp.
-  The key for the current performance log entry is returned. 
+  Attempts to retrieve the performance log entry specified by LogEntryKey.  If LogEntryKey is
+  zero on entry, then an attempt is made to retrieve the first entry from the performance log,
+  and the key for the second entry in the log is returned.  If the performance log is empty,
+  then no entry is retrieved and zero is returned.  If LogEntryKey is not zero, then the performance
+  log entry associated with LogEntryKey is retrieved, and the key for the next entry in the log is
+  returned.  If LogEntryKey is the key for the last entry in the log, then the last log entry is
+  retrieved and an implementation specific non-zero key value that specifies the end of the performance
+  log is returned.  If LogEntryKey is equal this implementation specific non-zero key value, then no entry
+  is retrieved and zero is returned.  In the cases where a performance log entry can be returned,
+  the log entry is returned in Handle, Token, Module, StartTimeStamp, and EndTimeStamp.
+  If LogEntryKey is not a valid log entry key for the performance measurement log, then ASSERT().
+  If Handle is NULL, then ASSERT().
+  If Token is NULL, then ASSERT().
+  If Module is NULL, then ASSERT().
+  If StartTimeStamp is NULL, then ASSERT().
+  If EndTimeStamp is NULL, then ASSERT().
 
-  @param  LogEntryKey             The key for the previous performance measurement log entry.
-                                  If 0, then the first performance measurement log entry is retrieved.
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  StartTimeStamp          The 64-bit time stamp that was recorded when the measurement was started.
-  @param  EndTimeStamp            The 64-bit time stamp that was recorded when the measurement was ended.
+  @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
+                                  0, then the first performance measurement log entry is retrieved.
+                                  On exit, the key of the next performance lof entry entry.
+  @param  Handle                  Pointer to environment specific context used to identify the component
+                                  being measured.  
+  @param  Token                   Pointer to a Null-terminated ASCII string that identifies the component
+                                  being measured. 
+  @param  Module                  Pointer to a Null-terminated ASCII string that identifies the module
+                                  being measured.
+  @param  StartTimeStamp          Pointer to the 64-bit time stamp that was recorded when the measurement
+                                  was started.
+  @param  EndTimeStamp            Pointer to the 64-bit time stamp that was recorded when the measurement
+                                  was ended.
 
-  @return The key for the current performance log entry.
+  @return The key for the next performance log entry (in general case).
 
 **/
 UINTN
 EFIAPI
 GetPerformanceMeasurement (
-  UINTN           LogEntryKey, 
+  IN  UINTN       LogEntryKey, 
   OUT CONST VOID  **Handle,
   OUT CONST CHAR8 **Token,
   OUT CONST CHAR8 **Module,

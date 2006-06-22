@@ -448,12 +448,7 @@ Returns:
   // Check if the total number of PEIMs exceed the bitmap.
   // CurrentPeim is 0-based
   //
-  DEBUG_CODE (
-    if (CurrentPeim > (sizeof (*DispatchedPeimBitMap) * 8 - 1)) {
-      ASSERT_EFI_ERROR (EFI_OUT_OF_RESOURCES);
-    }
-  );
-
+  ASSERT (CurrentPeim < (sizeof (*DispatchedPeimBitMap) * 8));
   *DispatchedPeimBitMap |= (1 << CurrentPeim);
   return;
 }
