@@ -2133,6 +2133,7 @@ public class CollectPCDAction {
         Token.PCD_TYPE      pcdType         = Token.PCD_TYPE.UNKNOWN;
         int                 tokenNumber     = 0;
         String              hiiDefaultValue = null;
+        String[]            variableGuidString = null;
 
         List<DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo>   skuInfoList = null;
         DynamicPcdBuildDefinitions.PcdBuildData                 dynamicInfo = null;
@@ -2240,7 +2241,9 @@ public class CollectPCDAction {
                                                     "file, who use HII, but there is no <VariableGuid> defined for Sku %d data!",
                                                     token.cName,
                                                     index);
-                                                    
+                    if (exceptionString != null) {
+                        throw new EntityException(exceptionString);
+                    }                                                    
                 }
 
                 if (skuInfoList.get(index).getVariableOffset() == null) {
@@ -2248,6 +2251,9 @@ public class CollectPCDAction {
                                                     "file, who use HII, but there is no <VariableOffset> defined for Sku %d data!",
                                                     token.cName,
                                                     index);
+                    if (exceptionString != null) {
+                        throw new EntityException(exceptionString);
+                    }
                 }
 
                 if (skuInfoList.get(index).getHiiDefaultValue() == null) {
@@ -2255,12 +2261,11 @@ public class CollectPCDAction {
                                                     "file, who use HII, but there is no <HiiDefaultValue> defined for Sku %d data!",
                                                     token.cName,
                                                     index);
+                    if (exceptionString != null) {
+                        throw new EntityException(exceptionString);
+                    }
                 }
 
-                if (exceptionString != null) {
-                    throw new EntityException(exceptionString);
-                }
-                
                 if (skuInfoList.get(index).getHiiDefaultValue() != null) {
                     hiiDefaultValue = skuInfoList.get(index).getHiiDefaultValue().toString();
                 } else {
@@ -2283,8 +2288,18 @@ public class CollectPCDAction {
                                                             index));
                 }
 
+                //
+                // Get variable guid string according to the name of guid which will be mapped into a GUID in SPD file.
+                // 
+                variableGuidString = GlobalData.getGuidInfoGuid(skuInfoList.get(index).getVariableGuid().toString());
+                if (variableGuidString == null) {
+                    throw new EntityException(String.format("[GUID Error] For dynamic PCD %s,  the variable guid %s can be found in all SPD file!",
+                                                            token.cName, 
+                                                            skuInfoList.get(index).getVariableGuid().toString()));
+                }
+
                 skuInstance.value.setHiiData(skuInfoList.get(index).getVariableName(),
-                                             translateSchemaStringToUUID(skuInfoList.get(index).getVariableGuid().toString()),
+                                             translateSchemaStringToUUID(variableGuidString[1]),
                                              skuInfoList.get(index).getVariableOffset(),
                                              skuInfoList.get(index).getHiiDefaultValue().toString());
                 token.skuData.add(skuInstance);
@@ -2349,6 +2364,9 @@ public class CollectPCDAction {
             uuidString.equalsIgnoreCase("0x0")) {
             return new UUID(0, 0);
         }
+
+        uuidString = uuidString.replaceAll("\\{", "");
+        uuidString = uuidString.replaceAll("\\}", "");
 
         //
         // If the UUID schema string is GuidArrayType type then need translate 
@@ -2434,11 +2452,11 @@ public class CollectPCDAction {
     **/
     public static void main(String argv[]) throws EntityException {
         CollectPCDAction ca = new CollectPCDAction();
-        ca.setWorkspacePath("m:/tianocore_latest/edk2");
-        ca.setFPDFilePath("m:/tianocore_latest/edk2/EdkNt32Pkg/Nt32.fpd");
+        ca.setWorkspacePath("m:/tianocore/edk2");
+        ca.setFPDFilePath("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "m:/tianocore_latest/edk2");
+                            "m:/tianocore/edk2");
         ca.execute();
     }
 }
