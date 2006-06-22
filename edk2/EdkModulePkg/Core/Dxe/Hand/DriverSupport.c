@@ -411,10 +411,10 @@ Returns:
   // Sort the remaining DriverBinding Protocol based on their Version field from
   // highest to lowest.
   //
-  for ( ; SortIndex < DriverBindingHandleCount; SortIndex++) {
+  for ( ; SortIndex < NumberOfSortedDriverBindingProtocols; SortIndex++) {
     HighestVersion = SortedDriverBindingProtocols[SortIndex]->Version;
     HighestIndex   = SortIndex;
-    for (Index = SortIndex + 1; Index < DriverBindingHandleCount; Index++) {
+    for (Index = SortIndex + 1; Index < NumberOfSortedDriverBindingProtocols; Index++) {
       if (SortedDriverBindingProtocols[Index]->Version > HighestVersion) {
         HighestVersion = SortedDriverBindingProtocols[Index]->Version;
         HighestIndex   = Index;

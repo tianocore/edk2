@@ -82,4 +82,40 @@ typedef RETURN_STATUS EFI_STATUS;
 
 #define EFI_PAGES_TO_SIZE(a)   ( (a) << EFI_PAGE_SHIFT)
 
+//
+// EFI Time Abstraction:
+//  Year:       2000 - 20XX
+//  Month:      1 - 12
+//  Day:        1 - 31
+//  Hour:       0 - 23
+//  Minute:     0 - 59
+//  Second:     0 - 59
+//  Nanosecond: 0 - 999,999,999
+//  TimeZone:   -1440 to 1440 or 2047
+//
+typedef struct {
+  UINT16  Year;
+  UINT8   Month;
+  UINT8   Day;
+  UINT8   Hour;
+  UINT8   Minute;
+  UINT8   Second;
+  UINT8   Pad1;
+  UINT32  Nanosecond;
+  INT16   TimeZone;
+  UINT8   Daylight;
+  UINT8   Pad2;
+} EFI_TIME;
+
+//
+// Bit definitions for EFI_TIME.Daylight
+//
+#define EFI_TIME_ADJUST_DAYLIGHT  0x01
+#define EFI_TIME_IN_DAYLIGHT      0x02
+
+//
+// Value definition for EFI_TIME.TimeZone
+//
+#define EFI_UNSPECIFIED_TIMEZONE  0x07FF
+
 #endif
