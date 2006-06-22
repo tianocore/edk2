@@ -155,8 +155,8 @@ StrLen (
     // If PcdMaximumUnicodeStringLength is not zero,
     // length should not more than PcdMaximumUnicodeStringLength
     //
-    if (FixedPcdGet32 (PcdMaximumUnicodeStringLength) != 0) {
-      ASSERT (Length < FixedPcdGet32 (PcdMaximumUnicodeStringLength));
+    if (PcdGet32 (PcdMaximumUnicodeStringLength) != 0) {
+      ASSERT (Length < PcdGet32 (PcdMaximumUnicodeStringLength));
     }
   }
   return Length;
@@ -520,8 +520,8 @@ AsciiStrLen (
     // If PcdMaximumUnicodeStringLength is not zero,
     // length should not more than PcdMaximumUnicodeStringLength
     //
-    if (FixedPcdGet32 (PcdMaximumAsciiStringLength) != 0) {
-      ASSERT (Length < FixedPcdGet32 (PcdMaximumAsciiStringLength));
+    if (PcdGet32 (PcdMaximumAsciiStringLength) != 0) {
+      ASSERT (Length < PcdGet32 (PcdMaximumAsciiStringLength));
     }
   }
   return Length;
