@@ -5724,7 +5724,7 @@
       <SkuInfo>
         <SkuId>0</SkuId>
         <VariableName>0x0062 0x006F 0x006F 0x0074 0x006D 0x006F 0x0064 0x0065</VariableName>
-        <VariableGuid>0</VariableGuid>
+        <VariableGuid>WinNPassThrough</VariableGuid>
         <VariableOffset>0x123</VariableOffset>
         <HiiDefaultValue>0x123</HiiDefaultValue>
         </SkuInfo>
