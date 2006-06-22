@@ -33,7 +33,7 @@ IsNodeInList (
   ASSERT (List->BackLink != NULL);
   ASSERT (Node != NULL);
 
-  Count = FixedPcdGet32 (PcdMaximumLinkedListLength);
+  Count = PcdGet32 (PcdMaximumLinkedListLength);
   if (Count != 0) {
     Count++;
   }
@@ -45,7 +45,7 @@ IsNodeInList (
   } while ((Ptr != List) && (Ptr != Node) && (Count > 0));
   Found = (BOOLEAN)(Ptr == Node);
 
-  if (FixedPcdGet32 (PcdMaximumLinkedListLength) > 0) {
+  if (PcdGet32 (PcdMaximumLinkedListLength) > 0) {
     while ((Count > 0) && (Ptr != List)) {
       Ptr = Ptr->ForwardLink;
       Count--;

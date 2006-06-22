@@ -26,23 +26,23 @@ Module Name: PcdLib.h
 //
 // Feature Flag is in the form of a global constant
 //
-#define FeaturePcdGet(TokenName)     _gPcd_FixedAtBuild_##TokenName
+#define FeaturePcdGet(TokenName)     _PCD_VALUE_##TokenName
 
 
 //
 // Fixed is fixed at build time
 //
-#define FixedPcdGet8(TokenName)     _gPcd_FixedAtBuild_##TokenName
-#define FixedPcdGet16(TokenName)    _gPcd_FixedAtBuild_##TokenName
-#define FixedPcdGet32(TokenName)    _gPcd_FixedAtBuild_##TokenName
-#define FixedPcdGet64(TokenName)    _gPcd_FixedAtBuild_##TokenName
-#define FixedPcdGetBool(TokenName)  _gPcd_FixedAtBuild_##TokenName
+#define FixedPcdGet8(TokenName)     _PCD_VALUE_##TokenName
+#define FixedPcdGet16(TokenName)    _PCD_VALUE_##TokenName
+#define FixedPcdGet32(TokenName)    _PCD_VALUE_##TokenName
+#define FixedPcdGet64(TokenName)    _PCD_VALUE_##TokenName
+#define FixedPcdGetBool(TokenName)  _PCD_VALUE_##TokenName
 
 
 //
 // BugBug: This works for strings, but not constants.
 //
-#define FixedPcdGetPtr(TokenName)    ((VOID *)_gPcd_FixedAtBuild_##TokenName)
+#define FixedPcdGetPtr(TokenName)    ((VOID *)_PCD_VALUE_##TokenName)
 
 
 //

@@ -131,12 +131,12 @@ AcquireSpinLock (
   Tick = 0;
   Start = 0;
   End = 0;
-  if (FixedPcdGet32 (PcdSpinLockTimeout) > 0) {
+  if (PcdGet32 (PcdSpinLockTimeout) > 0) {
     Tick = GetPerformanceCounter ();
     Timeout = DivU64x32 (
                 MultU64x32 (
                   GetPerformanceCounterProperties (&Start, &End),
-                  FixedPcdGet32 (PcdSpinLockTimeout)
+                  PcdGet32 (PcdSpinLockTimeout)
                   ),
                 1000000
                 );
