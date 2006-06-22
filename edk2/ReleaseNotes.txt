@@ -188,6 +188,25 @@ Once this is completed, you are ready to test the Build, by executing:
 
 This command builds all of the packages, including the NT32 reference platform.
 
+------------------------------------
+Build Architectures other than IA32.
+------------------------------------
+
+By default, we are set up to build the ia32 architecture. If you would like to
+build for IPF, x64 and EBC, please copy MdePkg/MdePkg-All-Arch.fpd to
+MdePkg/MdePkg.fpd. For EdkModulePkg, copy EdkModulePkg-All-Archs.fpd to
+EdkModulePkg.fpd. Note, you may also add only the architecture you want from
+the -All-Archs files to the main fpd file. This is preferred if you do not have
+all the compilers installed.
+
+Optionally, you may modify the path to the compiler in
+Tools/Conf/msft_tools_def.txt. The flags for the ARCH tool chain are set in the
+file names by Tools/Conf/VENDOR_tools.txt, where VENDOR is set in
+Tools/Conf/msft_tools.txt.
+
+For example, if IPF_VENDOR = WINDDK, then the flags for the IPF DDK compiler
+will be specified in Tools/Conf/winddk_tools.txt.
+
 -------------------------
 Individual Package Builds
 -------------------------
