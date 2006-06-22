@@ -1245,7 +1245,7 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element minOccurs="1" maxOccurs="1" name="VariableName" type="VariableNameDataType"/>
-            <xs:element minOccurs="0" maxOccurs="1" name="VariableGuid" type="VariableGuidType"/>
+            <xs:element minOccurs="0" maxOccurs="1" name="VariableGuid" type="C_NameType"/>
             <xs:element minOccurs="1" maxOccurs="1" name="VariableOffset" type="Hex64BitDataType"/>
             <xs:element minOccurs="1" maxOccurs="1" name="HiiDefaultValue" type="DefaultValueType"/>
         </xs:sequence>
