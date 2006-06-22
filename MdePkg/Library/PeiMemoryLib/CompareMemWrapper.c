@@ -26,26 +26,25 @@
 #include "MemLibInternals.h"
 
 /**
-  Compares two memory buffers of a given length.
+  Compares the contents of two buffers.
 
-  This function compares Length bytes of SourceBuffer to Length bytes of
-  DestinationBuffer. If all Length bytes of the two buffers are identical, then
-  0 is returned. Otherwise, the value returned is the first mismatched byte in
-  SourceBuffer subtracted from the first mismatched byte in DestinationBuffer.
+  This function compares Length bytes of SourceBuffer to Length bytes of DestinationBuffer.
+  If all Length bytes of the two buffers are identical, then 0 is returned.  Otherwise, the
+  value returned is the first mismatched byte in SourceBuffer subtracted from the first
+  mismatched byte in DestinationBuffer.
+  If Length > 0 and DestinationBuffer is NULL and Length > 0, then ASSERT().
+  If Length > 0 and SourceBuffer is NULL and Length > 0, then ASSERT().
+  If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT(). 
 
-  If DestinationBuffer is NULL and Length > 0, then ASSERT().
-  If SourceBuffer is NULL and Length > 0, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - DestinationBuffer + 1), then
-  ASSERT().
-  If Length is greater than (MAX_ADDRESS - SourceBuffer + 1), then ASSERT().
 
-  @param  DestinationBuffer First memory buffer
-  @param  SourceBuffer      Second memory buffer
-  @param  Length            Length of DestinationBuffer and SourceBuffer memory
-                            regions to compare
+  @param  DestinationBuffer Pointer to the destination buffer to compare.
+  @param  SourceBuffer      Pointer to the source buffer to compare.
+  @param  Length            Number of bytes to compare.
 
-  @retval 0         if DestinationBuffer == SourceBuffer
-  @retval Non-zero  if DestinationBuffer != SourceBuffer
+  @return 0                 All Length bytes of the two buffers are identical.
+  @retval Non-zero          The first mismatched byte in SourceBuffer subtracted from the first
+                            mismatched byte in DestinationBuffer.
 
 **/
 INTN
@@ -56,12 +55,13 @@ CompareMem (
   IN      UINTN                     Length
   )
 {
-  ASSERT (DestinationBuffer != NULL);
-  ASSERT (SourceBuffer != NULL);
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)DestinationBuffer + 1);
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)SourceBuffer + 1);
   if (Length == 0) {
     return 0;
   }
+  ASSERT (DestinationBuffer != NULL);
+  ASSERT (SourceBuffer != NULL);
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)DestinationBuffer));
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)SourceBuffer));
+
   return InternalMemCompareMem (DestinationBuffer, SourceBuffer, Length);
 }

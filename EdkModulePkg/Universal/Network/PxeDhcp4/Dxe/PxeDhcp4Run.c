@@ -126,14 +126,9 @@ PxeDhcp4Run (
     //
     efi_status = PxeDhcp4Init (This, timeout, &offers, &offer_list);
 
-    switch (efi_status) {
-    case EFI_NO_RESPONSE:
-    case EFI_TIMEOUT:
-    case EFI_SUCCESS:
-      break;
-
-    case EFI_ABORTED:
-    default:
+    if ((efi_status != EFI_NO_RESPONSE) &&
+        (efi_status != EFI_TIMEOUT) &&
+        (efi_status != EFI_SUCCESS)) {
       return efi_status;
     }
     //

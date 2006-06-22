@@ -32,7 +32,7 @@
   Value, and returns Buffer. Value is repeated every 64-bits in for Length
   bytes of Buffer.
 
-  If Buffer is NULL and Length > 0, then ASSERT().
+  If Length > 0 and Buffer is NULL and Length > 0, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
   If Length is not aligned on a 64-bit boundary, then ASSERT().
@@ -52,13 +52,14 @@ SetMem64 (
   IN      UINT64                    Value
   )
 {
-  ASSERT (!(Buffer == NULL && Length > 0));
-  ASSERT (Length <= MAX_ADDRESS - (UINTN)Buffer + 1);
+  if (Length == 0) {
+    return Buffer;
+  }
+
+  ASSERT (Buffer != NULL);
+  ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
   ASSERT ((((UINTN)Buffer) & (sizeof (Value) - 1)) == 0);
   ASSERT ((Length & (sizeof (Value) - 1)) == 0);
 
-  if ((Length /= sizeof (Value)) == 0) {
-    return Buffer;
-  }
-  return InternalMemSetMem64 (Buffer, Length, Value);
+  return InternalMemSetMem64 (Buffer, Length / sizeof (Value), Value);
 }

@@ -702,15 +702,11 @@ Returns:
   //
   // Add code to correctly handle expected errors from CoreLocateHandle().
   //
-  if (EFI_ERROR(Status)) {
-    switch (Status) {
-    case EFI_BUFFER_TOO_SMALL:
-      break;
-    case EFI_INVALID_PARAMETER:
-      return Status;
-    default:
-      return EFI_NOT_FOUND;
+  if (EFI_ERROR(Status) && Status != EFI_BUFFER_TOO_SMALL) {
+    if (Status != EFI_INVALID_PARAMETER) {
+      Status = EFI_NOT_FOUND;
     }
+    return Status;
   }
 
   *Buffer = CoreAllocateBootServicesPool (BufferSize);

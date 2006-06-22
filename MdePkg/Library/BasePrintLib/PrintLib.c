@@ -16,44 +16,40 @@
 
 #include "PrintLibInternal.h"
 
-typedef struct {
-  RETURN_STATUS  Status;
-  CHAR8          *String;
-} STATUS_LOOKUP_TABLE_ENTRY;
+#define WARNING_STATUS_NUMBER          4
+#define ERROR_STATUS_NUMBER            24
 
-static CONST STATUS_LOOKUP_TABLE_ENTRY  StatusString[] = {
-  { RETURN_SUCCESS,               "Success" },
-  { RETURN_LOAD_ERROR,            "Load Error" },
-  { RETURN_INVALID_PARAMETER,     "Invalid Parameter" },
-  { RETURN_UNSUPPORTED,           "Unsupported" },
-  { RETURN_BAD_BUFFER_SIZE,       "Bad Buffer Size" },
-  { RETURN_BUFFER_TOO_SMALL,      "Buffer Too Small" },
-  { RETURN_NOT_READY,             "Not Ready" },
-  { RETURN_DEVICE_ERROR,          "Device Error" },
-  { RETURN_WRITE_PROTECTED,       "Write Protected" },
-  { RETURN_OUT_OF_RESOURCES,      "Out of Resources" },
-  { RETURN_VOLUME_CORRUPTED,      "Volume Corrupt" },
-  { RETURN_VOLUME_FULL,           "Volume Full" },
-  { RETURN_NO_MEDIA,              "No Media" },
-  { RETURN_MEDIA_CHANGED,         "Media changed" },
-  { RETURN_NOT_FOUND,             "Not Found" },
-  { RETURN_ACCESS_DENIED,         "Access Denied" },
-  { RETURN_NO_RESPONSE,           "No Response" },
-  { RETURN_NO_MAPPING,            "No mapping" },
-  { RETURN_TIMEOUT,               "Time out" },
-  { RETURN_NOT_STARTED,           "Not started" },
-  { RETURN_ALREADY_STARTED,       "Already started" },
-  { RETURN_ABORTED,               "Aborted" },
-  { RETURN_ICMP_ERROR,            "ICMP Error" },
-  { RETURN_TFTP_ERROR,            "TFTP Error" },
-  { RETURN_PROTOCOL_ERROR,        "Protocol Error" },
-  { RETURN_WARN_UNKNOWN_GLYPH,    "Warning Unknown Glyph" },
-  { RETURN_WARN_DELETE_FAILURE,   "Warning Delete Failure" },
-  { RETURN_WARN_WRITE_FAILURE,    "Warning Write Failure" },
-  { RETURN_WARN_BUFFER_TOO_SMALL, "Warning Buffer Too Small" },
-  { 0,                              NULL                     }
+STATIC CONST CHAR8 *StatusString [] = {
+  "Success",                      //  RETURN_SUCCESS                = 0
+  "Warning Unknown Glyph",        //  RETURN_WARN_UNKNOWN_GLYPH     = 1
+  "Warning Delete Failure",       //  RETURN_WARN_DELETE_FAILURE    = 2
+  "Warning Write Failure",        //  RETURN_WARN_WRITE_FAILURE     = 3
+  "Warning Buffer Too Small",     //  RETURN_WARN_BUFFER_TOO_SMALL  = 4
+  "Load Error",                   //  RETURN_LOAD_ERROR             = 1  | MAX_BIT
+  "Invalid Parameter",            //  RETURN_INVALID_PARAMETER      = 2  | MAX_BIT
+  "Unsupported",                  //  RETURN_UNSUPPORTED            = 3  | MAX_BIT
+  "Bad Buffer Size",              //  RETURN_BAD_BUFFER_SIZE        = 4  | MAX_BIT
+  "Buffer Too Small",             //  RETURN_BUFFER_TOO_SMALL,      = 5  | MAX_BIT
+  "Not Ready",                    //  RETURN_NOT_READY              = 6  | MAX_BIT
+  "Device Error",                 //  RETURN_DEVICE_ERROR           = 7  | MAX_BIT
+  "Write Protected",              //  RETURN_WRITE_PROTECTED        = 8  | MAX_BIT
+  "Out of Resources",             //  RETURN_OUT_OF_RESOURCES       = 9  | MAX_BIT
+  "Volume Corrupt",               //  RETURN_VOLUME_CORRUPTED       = 10 | MAX_BIT
+  "Volume Full",                  //  RETURN_VOLUME_FULL            = 11 | MAX_BIT
+  "No Media",                     //  RETURN_NO_MEDIA               = 12 | MAX_BIT
+  "Media changed",                //  RETURN_MEDIA_CHANGED          = 13 | MAX_BIT
+  "Not Found",                    //  RETURN_NOT_FOUND              = 14 | MAX_BIT
+  "Access Denied",                //  RETURN_ACCESS_DENIED          = 15 | MAX_BIT
+  "No Response",                  //  RETURN_NO_RESPONSE            = 16 | MAX_BIT
+  "No mapping",                   //  RETURN_NO_MAPPING             = 17 | MAX_BIT
+  "Time out",                     //  RETURN_TIMEOUT                = 18 | MAX_BIT
+  "Not started",                  //  RETURN_NOT_STARTED            = 19 | MAX_BIT
+  "Already started",              //  RETURN_ALREADY_STARTED        = 20 | MAX_BIT
+  "Aborted",                      //  RETURN_ABORTED                = 21 | MAX_BIT
+  "ICMP Error",                   //  RETURN_ICMP_ERROR             = 22 | MAX_BIT
+  "TFTP Error",                   //  RETURN_TFTP_ERROR             = 23 | MAX_BIT
+  "Protocol Error"                //  RETURN_PROTOCOL_ERROR         = 24 | MAX_BIT
 };
-
 
 /**
   Worker function that produces a Null-terminated string in an output buffer 
@@ -92,7 +88,7 @@ BasePrintLibVSPrint (
   UINTN           Width;
   UINTN           Precision;
   INT64           Value;
-  CHAR8           *ArgumentString;
+  CONST CHAR8     *ArgumentString;
   UINTN           Character;
   GUID            *TmpGuid;
   TIME            *TmpTime;
@@ -113,7 +109,6 @@ BasePrintLibVSPrint (
     return 0;
   }
   ASSERT (Buffer != NULL);
-  ASSERT (Format != NULL);
 
   OriginalBuffer = Buffer;
 
@@ -123,9 +118,19 @@ BasePrintLibVSPrint (
     BytesPerOutputCharacter = 1;
   }
   if ((Flags & FORMAT_UNICODE) != 0) {
+    //
+    // Make sure format string cannot contain more than PcdMaximumUnicodeStringLength
+    // Unicode characters if PcdMaximumUnicodeStringLength is not zero. 
+    //
+    ASSERT (StrSize ((CHAR16 *) Format) != 0);
     BytesPerFormatCharacter = 2;
     FormatMask = 0xffff;
   } else {
+    //
+    // Make sure format string cannot contain more than PcdMaximumUnicodeStringLength
+    // Ascii characters if PcdMaximumUnicodeStringLength is not zero. 
+    //
+    ASSERT (AsciiStrSize (Format) != 0);
     BytesPerFormatCharacter = 1;
     FormatMask = 0xff;
   }
@@ -381,9 +386,18 @@ BasePrintLibVSPrint (
       case 'r':
         Status = VA_ARG (Marker, RETURN_STATUS);
         ArgumentString = ValueBuffer;
-        for (Index = 0; StatusString[Index].String != NULL; Index++) {
-          if (Status == StatusString[Index].Status) {
-            ArgumentString = StatusString[Index].String;
+        if (RETURN_ERROR (Status)) {
+          //
+          // Clear error bit
+          //
+          Index = Status & ~MAX_BIT;
+          if (Index > 0 && Index <= ERROR_STATUS_NUMBER) {
+            ArgumentString = StatusString [Index + WARNING_STATUS_NUMBER];
+          }
+        } else {
+          Index = Status;
+          if (Index <= WARNING_STATUS_NUMBER) {
+            ArgumentString = StatusString [Index];
           }
         }
         if (ArgumentString == ValueBuffer) {
@@ -392,7 +406,7 @@ BasePrintLibVSPrint (
         break;
 
       case '\n':
-        ArgumentString = "\r\n";
+        ArgumentString = "\n\r";
         break;
 
       case '%':
@@ -405,6 +419,11 @@ BasePrintLibVSPrint (
         break;
       }
       break;
+ 
+    case '\n':
+      ArgumentString = "\n\r";
+      break;
+
     default:
       ArgumentString = (CHAR8 *)&FormatCharacter;
       Flags |= ARGUMENT_UNICODE;
@@ -521,7 +540,18 @@ BasePrintLibVSPrint (
   // Null terminate the Unicode or ASCII string
   //
   Buffer = BasePrintLibFillBuffer (Buffer, 1, 0, BytesPerOutputCharacter);
+  //
+  // Make sure output buffer cannot contain more than PcdMaximumUnicodeStringLength
+  // Unicode characters if PcdMaximumUnicodeStringLength is not zero. 
+  //
+  ASSERT ((((Flags & OUTPUT_UNICODE) == 0)) || (StrSize ((CHAR16 *) OriginalBuffer) != 0));
+  //
+  // Make sure output buffer cannot contain more than PcdMaximumUnicodeStringLength
+  // Ascii characters if PcdMaximumUnicodeStringLength is not zero. 
+  //
+  ASSERT ((((Flags & OUTPUT_UNICODE) != 0)) || (AsciiStrSize (OriginalBuffer) != 0));
    
+
   return ((Buffer - OriginalBuffer) / BytesPerOutputCharacter);
 }
 

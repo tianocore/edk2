@@ -132,7 +132,6 @@ InternalMemCompareMem (
   IN      UINTN                     Length
   )
 {
-  ASSERT (Length > 0);
   while ((--Length != 0) &&
          (*(INT8*)DestinationBuffer == *(INT8*)SourceBuffer)) {
     DestinationBuffer = (INT8*)DestinationBuffer + 1;

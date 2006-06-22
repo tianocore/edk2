@@ -75,15 +75,22 @@ typedef struct {
 
 
 /**
-	Retrieves information on a PE/COFF image
+  Retrieves information about a PE/COFF image.
 
-	@param	ImageContext The context of the image being loaded
+  Computes the PeCoffHeaderOffset, ImageAddress, ImageSize, DestinationAddress, CodeView,
+  PdbPointer, RelocationsStripped, SectionAlignment, SizeOfHeaders, and DebugDirectoryEntryRva
+  fields of the ImageContext structure.  If ImageContext is NULL, then return RETURN_INVALID_PARAMETER.
+  If the PE/COFF image accessed through the ImageRead service in the ImageContext structure is not
+  a supported PE/COFF image type, then return RETURN_UNSUPPORTED.  If any errors occur while
+  computing the fields of ImageContext, then the error status is returned in the ImageError field of
+  ImageContext. 
 
-	@retval	EFI_SUCCESS The information on the PE/COFF image was collected.
-	@retval	EFI_INVALID_PARAMETER ImageContext is NULL.
-	@retval	EFI_UNSUPPORTED The PE/COFF image is not supported.
-	@retval	Otherwise The error status from reading the PE/COFF image using the
-	ImageContext->ImageRead() function
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image that needs to be examined by this function.
+
+  @retval RETURN_SUCCESS            The information on the PE/COFF image was collected.
+  @retval RETURN_INVALID_PARAMETER  ImageContext is NULL.
+  @retval RETURN_UNSUPPORTED        The PE/COFF image is not supported.
 
 **/
 RETURN_STATUS
@@ -94,13 +101,23 @@ PeCoffLoaderGetImageInfo (
 ;
 
 /**
-	Relocates a PE/COFF image in memory
+  Applies relocation fixups to a PE/COFF image that was loaded with PeCoffLoaderLoadImage().
 
-	@param	ImageContext Contains information on the loaded image to relocate
+  If the DestinationAddress field of ImageContext is 0, then use the ImageAddress field of
+  ImageContext as the relocation base address.  Otherwise, use the DestinationAddress field
+  of ImageContext as the relocation base address.  The caller must allocate the relocation
+  fixup log buffer and fill in the FixupData field of ImageContext prior to calling this function.  
+  If ImageContext is NULL, then ASSERT().
 
-	@retval EFI_SUCCESS      if the PE/COFF image was relocated
-	@retval EFI_LOAD_ERROR   if the image is not a valid PE/COFF image
-	@retval EFI_UNSUPPORTED  not support
+  @param  ImageContext        Pointer to the image context structure that describes the PE/COFF
+                              image that is being relocated.
+
+  @retval RETURN_SUCCESS      The PE/COFF image was relocated.
+                              Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_LOAD_ERROR   The image in not a valid PE/COFF image.
+                              Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_UNSUPPORTED  A relocation record type is not supported.
+                              Extended status information is in the ImageError field of ImageContext.
 
 **/
 RETURN_STATUS
@@ -111,14 +128,26 @@ PeCoffLoaderRelocateImage (
 ;
 
 /**
-	Loads a PE/COFF image into memory
+  Loads a PE/COFF image into memory.
 
-	@param	ImageContext Contains information on image to load into memory
+  Loads the PE/COFF image accessed through the ImageRead service of ImageContext into the buffer
+  specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
+  the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
+  The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
+  If ImageContext is NULL, then ASSERT().
 
-	@retval EFI_SUCCESS            if the PE/COFF image was loaded
-	@retval EFI_BUFFER_TOO_SMALL   if the caller did not provide a large enough buffer
-	@retval EFI_LOAD_ERROR         if the image is a runtime driver with no relocations
-	@retval EFI_INVALID_PARAMETER  if the image address is invalid
+  @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
+                                    image that is being loaded.
+
+  @retval RETURN_SUCCESS            The PE/COFF image was loaded into the buffer specified by
+                                    the ImageAddress and ImageSize fields of ImageContext.
+                                    Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_BUFFER_TOO_SMALL   The caller did not provide a large enough buffer.
+                                    Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_LOAD_ERROR         The PE/COFF image is an EFI Runtime image with no relocations.
+                                    Extended status information is in the ImageError field of ImageContext.
+  @retval RETURN_INVALID_PARAMETER  The image address is invalid.
+                                    Extended status information is in the ImageError field of ImageContext.
 
 **/
 RETURN_STATUS

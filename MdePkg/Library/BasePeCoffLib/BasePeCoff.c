@@ -14,32 +14,17 @@
 
 **/
 
+/**
+  Performs an Itanium-based specific relocation fixup.
 
+  @param  Reloc       Pointer to the relocation record.
+  @param  Fixup       Pointer to the address to fix up.
+  @param  FixupData   Pointer to a buffer to log the fixups.
+  @param  Adjust      The offset to adjust the fixup.
 
+  @return Status code.
 
-STATIC
-RETURN_STATUS
-PeCoffLoaderGetPeHeader (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
-  OUT    EFI_IMAGE_NT_HEADERS          *PeHdr,
-  OUT    EFI_TE_IMAGE_HEADER           *TeHdr
-  );
-
-STATIC
-RETURN_STATUS
-PeCoffLoaderCheckImageType (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
-  IN     EFI_IMAGE_NT_HEADERS          *PeHdr,
-  IN     EFI_TE_IMAGE_HEADER           *TeHdr
-  );
-
-STATIC
-VOID *
-PeCoffLoaderImageAddress (
-  IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext,
-  IN     UINTN                         Address
-  );
-
+**/
 RETURN_STATUS
 PeCoffLoaderRelocateImageEx (
   IN UINT16      *Reloc,
@@ -193,11 +178,9 @@ PeCoffLoaderCheckImageType (
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.
 
-  @retval  RETURN_SUCCESS           The information on the PE/COFF image was collected.
-  @retval  RETURN_INVALID_PARAMETER ImageContext is NULL.
-  @retval  RETURN_UNSUPPORTED       The PE/COFF image is not supported.
-  @retval  Others                   The error status from reading the PE/COFF image
-                                    using the ImageContext->ImageRead() function.
+  @retval RETURN_SUCCESS            The information on the PE/COFF image was collected.
+  @retval RETURN_INVALID_PARAMETER  ImageContext is NULL.
+  @retval RETURN_UNSUPPORTED        The PE/COFF image is not supported.
 
 **/
 RETURN_STATUS
@@ -687,6 +670,7 @@ PeCoffLoaderRelocateImage (
   specified by the ImageAddress and ImageSize fields of ImageContext.  The caller must allocate
   the load buffer and fill in the ImageAddress and ImageSize fields prior to calling this function.
   The EntryPoint, FixupDataSize, CodeView, and PdbPointer fields of ImageContext are computed.
+  If ImageContext is NULL, then ASSERT().
 
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that is being loaded.
@@ -724,8 +708,11 @@ PeCoffLoaderLoadImage (
   UINTN                                 Size;
   UINT32                                TempDebugEntryRva;
 
+  ASSERT (ImageContext != NULL);
+
   PeHdr = NULL;
   TeHdr = NULL;
+
   //
   // Assume success
   //
@@ -750,7 +737,13 @@ PeCoffLoaderLoadImage (
     ImageContext->ImageError = IMAGE_ERROR_INVALID_IMAGE_SIZE;
     return RETURN_BUFFER_TOO_SMALL;
   }
-
+  if (ImageContext->ImageAddress == 0) {
+    //
+    // Image cannot be loaded into 0 address.
+    //
+    ImageContext->ImageError = IMAGE_ERROR_INVALID_IMAGE_ADDRESS;
+    return RETURN_INVALID_PARAMETER;
+  }
   //
   // If there's no relocations, then make sure it's not a runtime driver,
   // and that it's being loaded at the linked address.
