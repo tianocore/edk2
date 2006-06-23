@@ -256,6 +256,12 @@ EFI_STATUS
   IN OUT  UINTN               *TokenNumber
   );
 
+typedef
+EFI_STATUS
+(EFIAPI *PCD_PPI_GET_NEXT_TOKENSPACE) (
+  IN OUT CONST EFI_GUID         **Guid
+  );
+
 typedef struct {
   PCD_PPI_SET_SKU              SetSku;
 
@@ -292,6 +298,7 @@ typedef struct {
   PCD_PPI_CALLBACK_ONSET       CallbackOnSet;
   PCD_PPI_CANCEL_CALLBACK      CancelCallback;
   PCD_PPI_GET_NEXT_TOKEN       GetNextToken;
+  PCD_PPI_GET_NEXT_TOKENSPACE  GetNextTokenSpace;
 } PCD_PPI;
 
 

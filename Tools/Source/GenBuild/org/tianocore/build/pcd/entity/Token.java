@@ -707,6 +707,23 @@ public class Token {
 
         return false;
     }
+    
+    public boolean isByteStreamType () {
+        String str = getDynamicDefaultValue();
+
+        if (str == null) {
+            return false;
+        }
+
+        if (datumType == Token.DATUM_TYPE.POINTER &&
+            str.startsWith("{") && 
+            str.endsWith("}")) {
+            return true;
+        }
+
+        return false;
+        
+    }
 
     public String getStringTypeString () {                       
         return getDefaultSku().value.substring(2, getDefaultSku().value.length() - 1);

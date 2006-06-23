@@ -263,7 +263,7 @@ ExGetNextTokeNumber (
     if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
       return ExMapTable[Idx].ExTokenNumber;
     }
-    
+
     for ( ; Idx < SizeOfExMapTable; Idx++) {
       if (ExMapTable[Idx].ExTokenNumber == TokenNumber) {
         Idx++;

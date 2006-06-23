@@ -553,7 +553,9 @@ DxePcdGetNextToken (
                         );
   }
 
-  if (!DXE_EXMAP_TABLE_EMPTY) {
+  if ((ExTokenNumber == PCD_INVALID_TOKEN_NUMBER) &&
+      !DXE_EXMAP_TABLE_EMPTY
+    ) {
     ExTokenNumber = ExGetNextTokeNumber (
                         Guid,
                         ExTokenNumber,
@@ -568,4 +570,120 @@ DxePcdGetNextToken (
 
   return EFI_SUCCESS;
 }
+
+
+EFI_GUID **
+GetDistinctTokenSpace (
+  IN OUT    UINTN             *ExMapTableSize,
+  IN        DYNAMICEX_MAPPING *ExMapTable,
+  IN        EFI_GUID          *GuidTable
+  )
+{
+  EFI_GUID  **DistinctTokenSpace;
+  UINTN     OldGuidIndex;
+  UINTN     TsIdx;
+  UINTN     Idx;
+
+
+  DistinctTokenSpace = AllocateZeroPool (*ExMapTableSize * sizeof (EFI_GUID *));
+  ASSERT (DistinctTokenSpace != NULL);
+
+  TsIdx = 0;
+  OldGuidIndex = ExMapTable[0].ExGuidIndex;
+  DistinctTokenSpace[TsIdx] = &GuidTable[OldGuidIndex];
+  for (Idx = 1; Idx < PEI_EXMAPPING_TABLE_SIZE; Idx++) {
+    if (ExMapTable[Idx].ExGuidIndex != OldGuidIndex) {
+      OldGuidIndex = ExMapTable[Idx].ExGuidIndex;
+      DistinctTokenSpace[++TsIdx] = &GuidTable[OldGuidIndex];
+    }
+  }
+
+  *ExMapTableSize = TsIdx;
+  return DistinctTokenSpace;
+    
+}
+  
+
+STATIC EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZE] = { 0 };
+
+EFI_STATUS
+EFIAPI
+DxePcdGetNextTokenSpace (
+  IN OUT CONST EFI_GUID               **Guid
+  )
+{
+  UINTN               Idx;
+  UINTN               Idx2;
+  UINTN               Idx3;
+  UINTN               PeiTokenSpaceTableSize;
+  UINTN               DxeTokenSpaceTableSize;
+  EFI_GUID            **PeiTokenSpaceTable;
+  EFI_GUID            **DxeTokenSpaceTable;
+  BOOLEAN             Match;
+
+  ASSERT (Guid != NULL);
+  
+  if (PEI_EXMAP_TABLE_EMPTY && DXE_EXMAP_TABLE_EMPTY) {
+    if (*Guid != NULL) {
+      return EFI_NOT_FOUND;
+    } else {
+      return EFI_SUCCESS;
+    }
+  }
+  
+  
+  if (TmpTokenSpaceBuffer[0] != NULL) {
+    PeiTokenSpaceTableSize = 0;
+
+    if (!PEI_EXMAP_TABLE_EMPTY) {
+      PeiTokenSpaceTableSize = PEI_EXMAPPING_TABLE_SIZE;
+      PeiTokenSpaceTable = GetDistinctTokenSpace (&PeiTokenSpaceTableSize,
+                            mPcdDatabase->PeiDb.Init.ExMapTable,
+                            mPcdDatabase->PeiDb.Init.GuidTable
+                            );
+      CopyMem (TmpTokenSpaceBuffer, PeiTokenSpaceTable, sizeof (EFI_GUID*) * PeiTokenSpaceTableSize);
+    }
+
+    if (!DXE_EXMAP_TABLE_EMPTY) {
+      DxeTokenSpaceTableSize = DXE_EXMAPPING_TABLE_SIZE;
+      DxeTokenSpaceTable = GetDistinctTokenSpace (&DxeTokenSpaceTableSize,
+                            mPcdDatabase->DxeDb.Init.ExMapTable,
+                            mPcdDatabase->DxeDb.Init.GuidTable
+                            );
+
+      //
+      // Make sure EFI_GUID in DxeTokenSpaceTable does not exist in PeiTokenSpaceTable
+      //
+      for (Idx2 = 0, Idx3 = PeiTokenSpaceTableSize; Idx2 < DxeTokenSpaceTableSize; Idx2++) {
+        Match = FALSE;
+        for (Idx = 0; Idx < PeiTokenSpaceTableSize; Idx++) {
+          if (CompareGuid (TmpTokenSpaceBuffer[Idx], DxeTokenSpaceTable[Idx2])) {
+            Match = TRUE;
+            break;
+          }
+        }
+        if (!Match) {
+          TmpTokenSpaceBuffer[Idx3++] = DxeTokenSpaceTable[Idx2];
+        }
+      }
+    }
+  }
+
+  if (*Guid == NULL) {
+    *Guid = TmpTokenSpaceBuffer[0];
+    return EFI_SUCCESS;
+  }
+  
+  for (Idx = 0; Idx < (PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZE); Idx++) {
+    if(CompareGuid (*Guid, TmpTokenSpaceBuffer[Idx])) {
+      Idx++;
+      *Guid = TmpTokenSpaceBuffer[Idx];
+      return EFI_SUCCESS;
+    }
+  }
+
+  return EFI_NOT_FOUND;
+
+}
+
 
