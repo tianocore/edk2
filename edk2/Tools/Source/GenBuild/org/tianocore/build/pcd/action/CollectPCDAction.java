@@ -116,7 +116,7 @@ class StringTable {
                                         );  
             declaList.add(decl);
 
-            cInstCode = tab + " { 0 } " + String.format("/* %s */", stringTable) + commaNewLine;
+            cInstCode = " { 0 } " + String.format("/* %s */", stringTable);
             instTable.put(stringTable, cInstCode);
         } else {
 
@@ -1195,6 +1195,7 @@ class PcdDatabase {
         //
         // Generate code for every alignment size
         //
+        boolean uinitDatabaseEmpty = true;
         for (int align = 8; align > 0; align >>= 1) {
             ArrayList<String> declaListBasedOnAlignment = alignmentInitDecl.get(new Integer(align));
             ArrayList<String> instListBasedOnAlignment = alignmentInitInst.get(new Integer(align));
@@ -1215,14 +1216,23 @@ class PcdDatabase {
             }
             
             declaListBasedOnAlignment = alignmentUninitDecl.get(new Integer(align));
+            
+            if (declaListBasedOnAlignment.size() != 0) {
+                uinitDatabaseEmpty = false;
+            }
+            
             for (Object d : declaListBasedOnAlignment) {
                 String s = (String)d;
                 uninitDeclStr += tab + s;
             }
         }
         
+        if (uinitDatabaseEmpty) {
+            uninitDeclStr += tab + "	UINT8        dummy; /* PCD_DATABASE_UNINIT is emptry */\r\n";
+        }
+        
         initDeclStr += String.format("} %s_PCD_DATABASE_INIT;", phase) + newLine + newLine;
-        initInstStr += "};";
+        initInstStr += "};" + newLine;
         uninitDeclStr += String.format("} %s_PCD_DATABASE_UNINIT;", phase) + newLine + newLine;
         
         result.put("initDeclStr", initDeclStr);
