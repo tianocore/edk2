@@ -18,7 +18,7 @@ Module Name: PcdLib.h
 #ifndef __PCD_LIB_H__
 #define __PCD_LIB_H__
 
-#define PCD_INVALID_TOKEN_NUMBER ((UINTN) -1)
+#define PCD_INVALID_TOKEN_NUMBER ((UINTN) 0)
 
 #define PcdToken(TokenName)  _PCD_TOKEN_##TokenName
 

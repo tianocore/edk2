@@ -22,7 +22,7 @@ extern EFI_GUID gPcdPpiGuid;
 #define PCD_PPI_GUID \
   { 0x6e81c58, 0x4ad7, 0x44bc, { 0x83, 0x90, 0xf1, 0x2, 0x65, 0xf7, 0x24, 0x80 } }
 
-#define PCD_INVALID_TOKEN_NUMBER ((UINTN) -1)
+#define PCD_INVALID_TOKEN_NUMBER ((UINTN) 0)
 
 typedef 
 VOID

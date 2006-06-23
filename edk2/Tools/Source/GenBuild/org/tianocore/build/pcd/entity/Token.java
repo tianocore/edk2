@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.tianocore.build.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.exception.EntityException;
 
 /** This class is to descript a PCD token object. The information of a token mainly 
@@ -164,6 +163,17 @@ public class Token {
         return false;
     }
 
+    public boolean isDynamicEx() {
+        
+        for (int i = 0; i < supportedPcdType.size(); i++) {
+            if (supportedPcdType.get(i) == PCD_TYPE.DYNAMIC_EX) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     /**
       Use "TokencName + "-" + SpaceTokenName" as primary key when adding token into database
       
@@ -190,6 +200,20 @@ public class Token {
      */
     public boolean isSkuEnable() {
         if (this.skuData.size() > 1) {
+            return true;
+        }
+        return false;
+    }
+    
+    public boolean isHiiEnable() {
+        if (getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.HII_TYPE) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isVpdEnable() {
+        if (getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.VPD_TYPE) {
             return true;
         }
         return false;
@@ -471,6 +495,7 @@ public class Token {
 
       @return string of datum type.
     **/
+
     public static String getAutogendatumTypeString(DATUM_TYPE datumType) {
         switch (datumType) {
         case UINT8:
@@ -545,6 +570,11 @@ public class Token {
 
         return null;
     }
+    
+    public int getSkuIdCount () {
+        return this.skuData.size();
+    }
+    
 
     /**
        Get default value for a token, For HII type, HiiDefaultValue of default
@@ -576,13 +606,17 @@ public class Token {
         boolean           isInteger     = true;
         DynamicTokenValue dynamicValue  = null;
 
+        if (isSkuEnable()) {
+            return true;
+        }
+        
         if (this.isDynamicPCD) {
             dynamicValue = getDefaultSku();
             switch (dynamicValue.type) {
             case HII_TYPE:
-                return !isValidNullValue(dynamicValue.hiiDefaultValue);
+                return true;
             case VPD_TYPE:
-                return false;
+                return true;
             case DEFAULT_TYPE:
                 return !isValidNullValue(dynamicValue.value);
             }

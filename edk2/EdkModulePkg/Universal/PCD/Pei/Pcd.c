@@ -169,6 +169,13 @@ PeiPcdGetSize (
   IN UINTN             TokenNumber
   )
 {
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+
   ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
 
   return GetPcdDatabase()->Init.SizeTable[TokenNumber];
@@ -559,10 +566,10 @@ PeiPcdGetNextToken (
   return EFI_SUCCESS;
 }
 
-EFI_GUID *
+EFI_STATUS
 EFIAPI
 PeiPcdGetNextTokenSpaceGuid (
-  IN CONST EFI_GUID               *Guid
+  IN OUT CONST EFI_GUID               **Guid
   )
 {
   UINTN               GuidTableIdx;
@@ -572,9 +579,17 @@ PeiPcdGetNextTokenSpaceGuid (
   UINTN               i;
   BOOLEAN             Found;
 
-  if (PEI_EXMAP_TABLE_EMPTY) {
-    return NULL;
-  }
+   if (*Guid == NULL) {
+    if (PEI_EXMAP_TABLE_EMPTY) {
+      return EFI_SUCCESS;
+    } else {
+      //
+      // return the first Token Space Guid.
+      //
+      *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[0].ExGuidIndex];
+      return EFI_SUCCESS;
+    }
+   }
 
   //
   // Assume PCD Database AutoGen tool is sorting the ExMap based on the following order
@@ -583,10 +598,10 @@ PeiPcdGetNextTokenSpaceGuid (
   //
   PeiPcdDb = GetPcdDatabase ();
 
-  MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), Guid);
+  MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), *Guid);
 
   if (MatchGuid == NULL) {
-    return NULL;
+    return EFI_NOT_FOUND;
   }
   
   GuidTableIdx = MatchGuid - PeiPcdDb->Init.GuidTable;
@@ -604,16 +619,13 @@ PeiPcdGetNextTokenSpaceGuid (
   if (Found) {
     for ( ; i < PEI_EXMAPPING_TABLE_SIZE; i++ ) {
       if (ExMapTable[i].ExGuidIndex != GuidTableIdx ) {
-        if (i < PEI_EXMAPPING_TABLE_SIZE) {
-          return &PeiPcdDb->Init.GuidTable[ExMapTable[i].ExGuidIndex];
-        } else {
-          return NULL;
-        }
+        *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[i].ExGuidIndex];
+        return EFI_SUCCESS;
       }
     }
   }
 
-  return NULL;
+  return EFI_NOT_FOUND;
 
 }
 

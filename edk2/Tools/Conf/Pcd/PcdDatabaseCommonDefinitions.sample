@@ -33,15 +33,18 @@ typedef struct {
 
 
 typedef struct {
-  UINT16  GuidTableIndex;   // Offset in Guid Table in units of GUID.
-  UINT16  StringIndex;           // Offset in String Table in units of UINT16.
-  UINT16  Offset;           // Offset in Variable
+  UINT16  GuidTableIndex;     // Offset in Guid Table in units of GUID.
+  UINT16  StringIndex;        // Offset in String Table in units of UINT16.
+  UINT16  Offset;             // Offset in Variable
+  UINT16  DefaultValueOffset; // Offset of the Default Value
 } VARIABLE_HEAD  ;
 
 
 typedef  struct {
   UINT32  Offset;
 } VPD_HEAD;
+
+typedef UINT16 STRING_HEAD;
 
 typedef struct {
   UINT32 LocalTokenNumber;

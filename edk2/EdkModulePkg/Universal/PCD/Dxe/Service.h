@@ -22,7 +22,7 @@ Module Name: Service.h
 // Please make sure the PCD Serivce PEIM Version is consistent with
 // the version of PCD Database generation tool
 //
-#define PCD_DXE_SERVICE_DRIVER_VERSION      1
+#define PCD_DXE_SERVICE_DRIVER_VERSION      2
 
 //
 // PCD_DXE_DATABASE_GENTOOL_VERSION is defined in Autogen.h

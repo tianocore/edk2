@@ -19,15 +19,11 @@ package org.tianocore.build.pcd.action;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.global.GlobalData;
-import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.build.pcd.entity.Token;
 import org.tianocore.build.pcd.entity.UsageInstance;
@@ -398,7 +394,7 @@ public class PCDAutoGenAction extends BuildAction {
     **/
     public static void main(String argv[]) {
 
-        String WorkSpace = "M:/tianocore/edk2";
+        String WorkSpace = "X:/edk2";
         String logFilePath = WorkSpace  + "/EdkNt32Pkg/Nt32.fpd";
         String[] nameArray = null;
 
@@ -421,13 +417,13 @@ public class PCDAutoGenAction extends BuildAction {
         //
         // Then execute the PCDAuotoGenAction to get generated Autogen.h and Autogen.c
         //
-        PCDAutoGenAction autogenAction = new PCDAutoGenAction("MonoStatusCode",
+        PCDAutoGenAction autogenAction = new PCDAutoGenAction("PcdPeim",
                                                               null,
                                                               null,
                                                               null,
                                                               "IA32",
                                                               null,
-                                                              false,
+                                                              true,
                                                               nameArray);
         autogenAction.execute();
 
