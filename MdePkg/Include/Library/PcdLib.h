@@ -20,91 +20,92 @@ Module Name: PcdLib.h
 
 #define PCD_INVALID_TOKEN_NUMBER ((UINTN) 0)
 
-#define PcdToken(TokenName)  _PCD_TOKEN_##TokenName
+#define PcdToken(TokenName)                 _PCD_TOKEN_##TokenName
 
 
 //
 // Feature Flag is in the form of a global constant
 //
-#define FeaturePcdGet(TokenName)     _PCD_VALUE_##TokenName
+#define FeaturePcdGet(TokenName)            _PCD_VALUE_##TokenName
 
 
 //
 // Fixed is fixed at build time
 //
-#define FixedPcdGet8(TokenName)     _PCD_VALUE_##TokenName
-#define FixedPcdGet16(TokenName)    _PCD_VALUE_##TokenName
-#define FixedPcdGet32(TokenName)    _PCD_VALUE_##TokenName
-#define FixedPcdGet64(TokenName)    _PCD_VALUE_##TokenName
-#define FixedPcdGetBool(TokenName)  _PCD_VALUE_##TokenName
+#define FixedPcdGet8(TokenName)             _PCD_VALUE_##TokenName
+#define FixedPcdGet16(TokenName)            _PCD_VALUE_##TokenName
+#define FixedPcdGet32(TokenName)            _PCD_VALUE_##TokenName
+#define FixedPcdGet64(TokenName)            _PCD_VALUE_##TokenName
+#define FixedPcdGetBool(TokenName)          _PCD_VALUE_##TokenName
 
 
 //
 // BugBug: This works for strings, but not constants.
 //
-#define FixedPcdGetPtr(TokenName)    ((VOID *)_PCD_VALUE_##TokenName)
+#define FixedPcdGetPtr(TokenName)           ((VOID *)_PCD_VALUE_##TokenName)
 
 
 //
 // (Binary) Patch is in the form of a global variable
 //
-#define PatchPcdGet8(TokenName)     _gPcd_BinaryPatch_##TokenName
-#define PatchPcdGet16(TokenName)    _gPcd_BinaryPatch_##TokenName
-#define PatchPcdGet32(TokenName)    _gPcd_BinaryPatch_##TokenName
-#define PatchPcdGet64(TokenName)    _gPcd_BinaryPatch_##TokenName
-#define PatchPcdGetBool(TokenName)  _gPcd_BinaryPatch_##TokenName
-#define PatchPcdGetPtr(TokenName)   ((VOID *)_gPcd_BinaryPatch_##TokenName)
+#define PatchPcdGet8(TokenName)             _gPcd_BinaryPatch_##TokenName
+#define PatchPcdGet16(TokenName)            _gPcd_BinaryPatch_##TokenName
+#define PatchPcdGet32(TokenName)            _gPcd_BinaryPatch_##TokenName
+#define PatchPcdGet64(TokenName)            _gPcd_BinaryPatch_##TokenName
+#define PatchPcdGetBool(TokenName)          _gPcd_BinaryPatch_##TokenName
+#define PatchPcdGetPtr(TokenName)           ((VOID *)_gPcd_BinaryPatch_##TokenName)
 
-#define PatchPcdSet8(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = Value)
-#define PatchPcdSet16(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
-#define PatchPcdSet32(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
-#define PatchPcdSet64(TokenName, Value)    (_gPcd_BinaryPatch_##TokenName = Value)
-#define PatchPcdSetBool(TokenName, Value)  (_gPcd_BinaryPatch_##TokenName = Value)
-#define PatchPcdSetPtr(TokenName, Size, Buffer)   CopyMem (_gPcd_BinaryPatch_##TokenName, Buffer, Size)
+#define PatchPcdSet8(TokenName, Value)      (_gPcd_BinaryPatch_##TokenName = (Value))
+#define PatchPcdSet16(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = (Value))
+#define PatchPcdSet32(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = (Value))
+#define PatchPcdSet64(TokenName, Value)     (_gPcd_BinaryPatch_##TokenName = (Value))
+#define PatchPcdSetBool(TokenName, Value)   (_gPcd_BinaryPatch_##TokenName = (Value))
+#define PatchPcdSetPtr(TokenName, Size, Buffer) \
+                                            CopyMem (_gPcd_BinaryPatch_##TokenName, (Buffer), (Size))
 
 //
 // Dynamic is via the protocol with only the TokenNumber as argument
 //  It can also be Patch or Fixed type based on a build option
 //
-#define PcdGet8(TokenName)          _PCD_MODE_8_##TokenName
-#define PcdGet16(TokenName)         _PCD_MODE_16_##TokenName
-#define PcdGet32(TokenName)         _PCD_MODE_32_##TokenName
-#define PcdGet64(TokenName)         _PCD_MODE_64_##TokenName
-#define PcdGetPtr(TokenName)        _PCD_MODE_PTR_##TokenName
-#define PcdGetBool(TokenName)       _PCD_MODE_BOOL_##TokenName
-
-
-//
-// Dynamic Ex is to support binary distribution
-//
-#define PcdGetEx8(Guid, TokenName)     LibPcdGetEx8 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetEx16(Guid, TokenName)    LibPcdGetEx16 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetEx32(Guid, TokenName)    LibPcdGetEx32 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetEx64(Guid, TokenName)    LibPcdGetEx64 (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetExPtr(Guid, TokenName)   LibPcdGetExPtr (Guid, _PCD_TOKEN_##TokenName)
-#define PcdGetExBool(Guid, TokenName)  LibPcdGetExBool (Guid, _PCD_TOKEN_##TokenName)
-
+#define PcdGet8(TokenName)                  _PCD_GET_MODE_8_##TokenName
+#define PcdGet16(TokenName)                 _PCD_GET_MODE_16_##TokenName
+#define PcdGet32(TokenName)                 _PCD_GET_MODE_32_##TokenName
+#define PcdGet64(TokenName)                 _PCD_GET_MODE_64_##TokenName
+#define PcdGetPtr(TokenName)                _PCD_GET_MODE_PTR_##TokenName
+#define PcdGetBool(TokenName)               _PCD_GET_MODE_BOOL_##TokenName
 
 //
 // Dynamic Set
 //
-#define PcdSet8(TokenName, Value)       LibPcdSet8   (_PCD_TOKEN_##TokenName, Value)
-#define PcdSet16(TokenName, Value)      LibPcdSet16  (_PCD_TOKEN_##TokenName, Value)
-#define PcdSet32(TokenName, Value)      LibPcdSet32  (_PCD_TOKEN_##TokenName, Value)
-#define PcdSet64(TokenName, Value)      LibPcdSet64  (_PCD_TOKEN_##TokenName, Value)
-#define PcdSetPtr(TokenName, SizeOfBuffer, Buffer)     LibPcdSetPtr (_PCD_TOKEN_##TokenName, SizeOfBuffer, Buffer)
-#define PcdSetBool(TokenName, Value)    LibPcdSetBool(_PCD_TOKEN_##TokenName, Value)
+#define PcdSet8(TokenName, Value)           _PCD_SET_MODE_8_##TokenName     ((Value))
+#define PcdSet16(TokenName, Value)          _PCD_SET_MODE_16_##TokenName    ((Value))
+#define PcdSet32(TokenName, Value)          _PCD_SET_MODE_32_##TokenName    ((Value))
+#define PcdSet64(TokenName, Value)          _PCD_SET_MODE_64_##TokenName    ((Value))
+#define PcdSetPtr(TokenName, SizeOfBuffer, Buffer) \
+                                            _PCD_SET_MODE_PTR_##TokenName   ((SizeOfBuffer), (Buffer))
+#define PcdSetBool(TokenName, Value)        _PCD_SET_MODE_BOOL_##TokenName  ((Value))
 
+//
+// Dynamic Ex is to support binary distribution
+//
+#define PcdGetEx8(Guid, TokenName)          LibPcdGetEx8    ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetEx16(Guid, TokenName)         LibPcdGetEx16   ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetEx32(Guid, TokenName)         LibPcdGetEx32   ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetEx64(Guid, TokenName)         LibPcdGetEx64   ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetExPtr(Guid, TokenName)        LibPcdGetExPtr  ((Guid), _PCD_TOKEN_##TokenName)
+#define PcdGetExBool(Guid, TokenName)       LibPcdGetExBool ((Guid), _PCD_TOKEN_##TokenName)
 
 //
 // Dynamic Set Ex
 //
-#define PcdSetEx8(Guid, TokenName, Value)      LibPcdSetEx8   (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx16(Guid, TokenName, Value)     LibPcdSetEx16  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx32(Guid, TokenName, Value)     LibPcdSetEx32  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetEx64(Guid, TokenName, Value)     LibPcdSetEx64  (Guid, _PCD_TOKEN_##TokenName, Value)
-#define PcdSetExPtr(Guid, TokenName, SizeOfBuffer, Buffer)    LibPcdSetExPtr (Guid, _PCD_TOKEN_##TokenName, SizeOfBuffer, Buffer)
-#define PcdSetExBool(Guid, TokenName, Value)   LibPcdSetExBool(Guid, _PCD_TOKEN_##TokenName, Value)
+#define PcdSetEx8(Guid, TokenName, Value)   LibPcdSetEx8   ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetEx16(Guid, TokenName, Value)  LibPcdSetEx16  ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetEx32(Guid, TokenName, Value)  LibPcdSetEx32  ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetEx64(Guid, TokenName, Value)  LibPcdSetEx64  ((Guid), _PCD_TOKEN_##TokenName, (Value))
+#define PcdSetExPtr(Guid, TokenName, SizeOfBuffer, Buffer) \
+                                            LibPcdSetExPtr ((Guid), _PCD_TOKEN_##TokenName, (SizeOfBuffer), (Buffer))
+#define PcdSetExBool(Guid, TokenName, Value) \
+                                            LibPcdSetExBool((Guid), _PCD_TOKEN_##TokenName, (Value))
 
 
 /**
