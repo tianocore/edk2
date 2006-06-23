@@ -46,11 +46,26 @@ PeiRegisterCallBackWorker (
 
   if (Guid == NULL) {
     TokenNumber = ExTokenNumber;
+
+    //
+    // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+    // We have to decrement TokenNumber by 1 to make it usable
+    // as the array index.
+    //
+    TokenNumber--;
     ASSERT (TokenNumber < PEI_NEX_TOKEN_NUMBER);
   } else {
     TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
+
+    //
+    // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+    // We have to decrement TokenNumber by 1 to make it usable
+    // as the array index.
+    //
+    TokenNumber--;
     ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
   }
+
 
   LocalTokenNumber = GetPcdDatabase()->Init.LocalTokenNumberTable[TokenNumber];
 
@@ -248,6 +263,13 @@ InvokeCallbackOnSet (
   PCD_PPI_CALLBACK    *CallbackTable;
   UINTN               Idx;
 
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+  
   if (Guid == NULL)
     ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
 
@@ -287,6 +309,13 @@ SetWorker (
   UINTN               Offset;
   VOID                *InternalData;
 
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+
   ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
     
   PeiPcdDb = GetPcdDatabase ();
@@ -305,7 +334,7 @@ SetWorker (
   // type PCD entry in ExSetWorker.
   //
   if (TokenNumber < PEI_NEX_TOKEN_NUMBER) {
-    InvokeCallbackOnSet (0, NULL, TokenNumber, Data, Size);
+    InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, Size);
   }
 
   if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
@@ -425,9 +454,16 @@ GetWorker (
   UINT32              LocalTokenNumber;
   UINTN               Size;
 
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+
   ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
 
-  Size = PeiPcdGetSize(TokenNumber);
+  Size = PeiPcdGetSize(TokenNumber + 1);
   
   ASSERT (GetSize == Size || GetSize == 0);
 
@@ -464,16 +500,14 @@ GetWorker (
         return (VOID *) ((UINT8 *) Data + VariableHead->Offset);
       } else {
         //
-        // BugBug: Need to support default value. The current implementation
-        // will return a memory buffer with ALL ZERO.
-        // 
-        return AllocateZeroPool (Size);
+        // Return the default value specified by Platform Integrator 
+        //
+        return (VOID *) ((UINT8 *) PeiPcdDb + VariableHead->DefaultValueOffset);
       }
     }
 
     case PCD_TYPE_DATA:
       return (VOID *) ((UINT8 *)PeiPcdDb + Offset);
-      break;
 
     case PCD_TYPE_STRING:
       StringTableIdx = (UINT16) *((UINT8 *) PeiPcdDb + Offset);

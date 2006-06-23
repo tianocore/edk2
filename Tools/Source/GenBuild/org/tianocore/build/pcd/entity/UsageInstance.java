@@ -20,8 +20,6 @@ package org.tianocore.build.pcd.entity;
 
 import java.util.UUID;
 import org.tianocore.ModuleTypeDef;
-import org.tianocore.build.autogen.CommonDefinition;
-import org.tianocore.build.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.exception.EntityException;
 
 /**
@@ -186,6 +184,23 @@ public class UsageInstance {
         }
         return false;
     }
+  
+  public boolean isDxePhaseComponent() {
+      //
+      // BugBug: May need confirmation on which type of module can
+      //         make use of Dynamic(EX) PCD entry.
+      //
+      if ((moduleType == ModuleTypeDef.DXE_DRIVER) ||
+          (moduleType == ModuleTypeDef.DXE_RUNTIME_DRIVER) ||
+          (moduleType == ModuleTypeDef.DXE_SAL_DRIVER) ||
+          (moduleType == ModuleTypeDef.DXE_SMM_DRIVER) ||
+          (moduleType == ModuleTypeDef.UEFI_DRIVER) ||
+          (moduleType == ModuleTypeDef.UEFI_APPLICATION)
+          ) {
+          return true;
+      }
+      return false;
+  }
 
     /**
        Generate autogen string for header file and C code file.

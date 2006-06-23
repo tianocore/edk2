@@ -183,7 +183,13 @@ DxePcdGetSize (
   )
 {
   UINT16 * SizeTable;
-
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+  
   SizeTable = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? mPcdDatabase->PeiDb.Init.SizeTable :
                                                     mPcdDatabase->DxeDb.Init.SizeTable;
 
@@ -493,7 +499,7 @@ DxeUnRegisterCallBackOnSet (
 {
   ASSERT (CallBackFunction != NULL);
   
-  return DxeRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
+  return DxeUnRegisterCallBackWorker (TokenNumber, Guid, CallBackFunction);
 }
 
 

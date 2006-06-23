@@ -15,20 +15,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.pcd.entity;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.tianocore.build.pcd.action.ActionMessage;
+import org.tianocore.build.pcd.exception.EntityException;
 
 /** Database hold all PCD information comes from SPD, MSA, FPD file in memory.
 **/
@@ -141,7 +134,6 @@ public class MemoryDatabaseManager {
     private ArrayList getDynamicRecordArray() {
         Token[]     tokenArray  =   getRecordArray();
         int         index       =   0;
-        int         count       =   0;
         ArrayList<Token>   al   =   new ArrayList<Token>();
 
         for (index = 0; index < tokenArray.length; index++) {
@@ -159,8 +151,10 @@ public class MemoryDatabaseManager {
           The output array is sorted based on descending order of the size of alignment for each feilds.
 
       @return the token record array contained all PCD token referenced in PEI phase.
+     * @throws EntityException 
     **/
-    public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe) {
+    public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe) 
+        throws EntityException {
         int                     usageInstanceIndex  =   0;
         int                     index               =   0;
         ArrayList               tokenArrayList      =   getDynamicRecordArray();
@@ -185,10 +179,30 @@ public class MemoryDatabaseManager {
                 }
             }
 
-            // If no PEI components reference the PCD entry, we insert it to DXE list
+            //
+            // If no PEI components reference the PCD entry, 
+            // we check if it is referenced in DXE driver. 
             //
             if (!found) {
-                dxe.add(token);
+                if (token.consumers != null) {
+                    usageInstanceArray = token.consumers.entrySet().toArray();
+                    for (usageInstanceIndex = 0; usageInstanceIndex < token.consumers.size(); usageInstanceIndex ++) {
+                        usageInstance =(UsageInstance) (((Map.Entry)usageInstanceArray[usageInstanceIndex]).getValue());
+                        if (usageInstance.isDxePhaseComponent()) {
+                            dxe.add(token);
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!found) {
+                    //
+                    // We only support Dynamice(EX) type for PEI and DXE phase.
+                    // If it is not referenced in either PEI or DXE, throw exception now.
+                    //
+                    throw new EntityException("Dynamic(EX) PCD Entries are referenced in module that is not in PEI phase nor in DXE phase.");
+                }
             }
         }
 

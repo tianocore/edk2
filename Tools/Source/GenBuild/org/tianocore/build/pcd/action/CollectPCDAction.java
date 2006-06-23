@@ -23,25 +23,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.tianocore.DynamicPcdBuildDefinitionsDocument;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions;
-import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData;
-import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo;
 import org.tianocore.FrameworkModulesDocument;
 import org.tianocore.FrameworkPlatformDescriptionDocument;
-import org.tianocore.FrameworkPlatformDescriptionDocument.FrameworkPlatformDescription;
 import org.tianocore.ModuleSADocument;
-import org.tianocore.ModuleSADocument.ModuleSA;
-import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
@@ -54,21 +46,31 @@ import org.tianocore.build.pcd.entity.UsageInstance;
 import org.tianocore.build.pcd.exception.EntityException;
 import org.tianocore.ModuleTypeDef;
 
+class CStructTypeDeclaration {
+    String key;
+    int alignmentSize;
+    String cCode;
+    boolean initTable;
+    
+    public CStructTypeDeclaration (String key, int alignmentSize, String cCode, boolean initTable) {
+        this.key = key;
+        this.alignmentSize = alignmentSize;
+        this.cCode = cCode;
+        this.initTable = initTable;
+    }
+}
+
 class StringTable {
     private ArrayList<String>   al; 
     private ArrayList<String>   alComments;
     private String              phase;
     int                         len; 
-    int                         bodyStart;
-    int                         bodyLineNum;
 
     public StringTable (String phase) {
         this.phase = phase;
         al = new ArrayList<String>();
         alComments = new ArrayList<String>();
         len = 0;
-        bodyStart = 0;
-        bodyLineNum = 0;
     }
 
     public String getSizeMacro () {
@@ -88,6 +90,74 @@ class StringTable {
 
     public String getExistanceMacro () {
         return String.format(PcdDatabase.StringTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+    
+    public void genCodeNew (ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable) {
+        final String stringTable = "StringTable";
+        final String tab         = "\t";
+        final String newLine     = "\r\n";
+        final String commaNewLine = ",\r\n";
+        
+        CStructTypeDeclaration decl;
+
+        String cDeclCode = "";
+        String cInstCode = "";
+
+        //
+        // If we have a empty StringTable
+        //
+        if (al.size() == 0) {
+            cDeclCode += tab + String.format("UINT16             %s[1]; /* StringTable is Empty */", stringTable) + newLine; 
+            decl = new CStructTypeDeclaration (
+                                                stringTable,
+                                                2,
+                                                cDeclCode,
+                                                true
+                                        );  
+            declaList.add(decl);
+
+            cInstCode = tab + " { 0 } " + String.format("/* %s */", stringTable) + commaNewLine;
+            instTable.put(stringTable, cInstCode);
+        } else {
+
+            //
+            // If there is any String in the StringTable
+            //
+            for (int i = 0; i < al.size(); i++) {
+                String str = al.get(i);
+                String stringTableName;
+                
+                if (i == 0) {
+                    //
+                    // StringTable is a well-known name in the PCD DXE driver
+                    //
+                    stringTableName = stringTable;
+    
+                } else {
+                    stringTableName = String.format("%s_%d", stringTable, i);
+                    cDeclCode += tab;
+                }
+                cDeclCode += String.format("UINT16              %s[%d]; /* %s */", stringTableName, str.length() + 1, alComments.get(i)) + newLine;
+                
+                if (i == 0) {
+                    cInstCode = "/* StringTable */" + newLine;
+                }
+                cInstCode += tab + String.format("L\"%s\" /* %s */", al.get(i), alComments.get(i));
+                if (i != al.size() - 1) {
+                    cInstCode += commaNewLine;
+                }
+            }
+            
+            decl = new CStructTypeDeclaration (
+                    stringTable,
+                    2,
+                    cDeclCode,
+                    true
+            );  
+            declaList.add(decl);
+    
+            instTable.put(stringTable, cInstCode);
+        }
     }
 
     public String getTypeDeclaration () {
@@ -143,9 +213,33 @@ class StringTable {
         return output;
     }
 
-    public int add (String str, Token token) {
+    public int add (String inputStr, Token token) {
         int i;
+        int pos;
 
+        String str = inputStr;
+        
+        //
+        // The input can be two types:
+        // "L\"Bootmode\"" or "Bootmode". 
+        // We drop the L\" and \" for the first type. 
+        if (str.startsWith("L\"") && str.endsWith("\"")) {
+            str = str.substring(2, str.length() - 1);
+        }
+        //
+        // Check if StringTable has this String already.
+        // If so, return the current pos.
+        //
+        for (i = 0, pos = 0; i < al.size(); i++) {
+            String s = al.get(i);;
+
+            if (str.equals(s)) {
+                return pos;
+            }
+            pos = s.length() + 1;
+            
+        }
+        
         i = len;
         //
         // Include the NULL character at the end of String
@@ -163,16 +257,32 @@ class SizeTable {
     private ArrayList<String>   alComments;
     private String              phase;
     private int                 len;
-    private int             bodyStart;
-    private int             bodyLineNum;
-
+    
     public SizeTable (String phase) {
         this.phase = phase;
         al = new ArrayList<Integer>();
         alComments = new ArrayList<String>();
         len = 0;
-        bodyStart = 0;
-        bodyLineNum = 0;
+    }
+
+    public void genCodeNew (ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable, String phase) {
+        final String name = "SizeTable";
+        
+        CStructTypeDeclaration decl;
+        String cCode;
+
+        cCode = String.format(PcdDatabase.SizeTableDeclaration, phase); 
+        decl = new CStructTypeDeclaration (
+                                            name,
+                                            2,
+                                            cCode,
+                                            true
+                                           );  
+        declaList.add(decl);
+
+
+        cCode = PcdDatabase.genInstantiationStr(getInstantiation());
+        instTable.put(name, cCode);
     }
 
     public String getTypeDeclaration () {
@@ -184,14 +294,12 @@ class SizeTable {
 
         Output.add("/* SizeTable */");
         Output.add("{");
-        bodyStart = 2;
-
         if (al.size() == 0) {
             Output.add("0");
         } else {
             for (int index = 0; index < al.size(); index++) {
                 Integer n = al.get(index);
-                String str = n.toString();
+                String str = "\t" + n.toString();
 
                 if (index != (al.size() - 1)) {
                     str += ",";
@@ -199,21 +307,12 @@ class SizeTable {
 
                 str += " /* " + alComments.get(index) + " */"; 
                 Output.add(str);
-                bodyLineNum++;
     
             }
         }
         Output.add("}");
 
         return Output;
-    }
-
-    public int getBodyStart() {
-        return bodyStart;
-    }
-
-    public int getBodyLineNum () {
-        return bodyLineNum;
     }
 
     public int add (Token token) {
@@ -226,18 +325,6 @@ class SizeTable {
         return index;
     }
     
-    private int getDatumSize(Token token) {
-        /*
-        switch (token.datumType) {
-        case Token.DATUM_TYPE.UINT8:
-            return 1;
-        default:
-            return 0;
-        }
-        */
-        return 0;
-    }
-
     public int getTableLen () {
         return al.size() == 0 ? 1 : al.size();
     }
@@ -249,7 +336,6 @@ class GuidTable {
     private ArrayList<String> alComments;
     private String          phase;
     private int             len;
-    private int             bodyStart;
     private int             bodyLineNum;
 
     public GuidTable (String phase) {
@@ -257,7 +343,6 @@ class GuidTable {
         al = new ArrayList<UUID>();
         alComments = new ArrayList<String>();
         len = 0;
-        bodyStart = 0;
         bodyLineNum = 0;
     }
 
@@ -271,6 +356,26 @@ class GuidTable {
 
     public String getExistanceMacro () {
         return String.format(PcdDatabase.GuidTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+
+    public void genCodeNew (ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable, String phase) {
+        final String name = "GuidTable";
+        
+        CStructTypeDeclaration decl;
+        String cCode = "";
+
+        cCode += String.format(PcdDatabase.GuidTableDeclaration, phase); 
+        decl = new CStructTypeDeclaration (
+                                            name,
+                                            8,
+                                            cCode,
+                                            true
+                                           );  
+        declaList.add(decl);
+
+
+        cCode = PcdDatabase.genInstantiationStr(getInstantiation());
+        instTable.put(name, cCode);
     }
 
     public String getTypeDeclaration () {
@@ -302,17 +407,15 @@ class GuidTable {
 
         Output.add("/* GuidTable */");
         Output.add("{");
-        bodyStart = 2;
-
         if (al.size() == 0) {
             Output.add(getUuidCString(new UUID(0, 0)));
         }
         
-        for (Object u : al) {
-            UUID uuid = (UUID)u;
-            String str = getUuidCString(uuid);
+        for (int i = 0; i < al.size(); i++) {
+            String str = "\t" + getUuidCString(al.get(i));
 
-            if (al.indexOf(u) != (al.size() - 1)) {
+            str += "/* " + alComments.get(i) +  " */";
+            if (i != (al.size() - 1)) {
                 str += ",";
             }
             Output.add(str);
@@ -324,23 +427,25 @@ class GuidTable {
         return Output;
     }
 
-    public int getBodyStart() {
-        return bodyStart;
-    }
-
-    public int getBodyLineNum () {
-        return bodyLineNum;
-    }
-
     public int add (UUID uuid, String name) {
-        int index = len;
         //
-        // Include the NULL character at the end of String
+        // Check if GuidTable has this entry already.
+        // If so, return the GuidTable index.
         //
+        for (int i = 0; i < al.size(); i++) {
+            if (al.get(i).equals(uuid)) {
+                return i;
+            }
+        }
+        
         len++; 
         al.add(uuid);
+        alComments.add(name);
 
-        return index;
+        //
+        // Return the previous Table Index
+        //
+        return len - 1;
     }
 
     public int getTableLen () {
@@ -354,15 +459,11 @@ class SkuIdTable {
     private ArrayList<String>    alComment;
     private String               phase;
     private int                  len;
-    private int                   bodyStart;
-    private int                   bodyLineNum;
 
     public SkuIdTable (String phase) {
         this.phase = phase;
         al = new ArrayList<Integer[]>();
         alComment = new ArrayList<String>();
-        bodyStart = 0;
-        bodyLineNum = 0;
         len = 0;
     }
 
@@ -371,11 +472,47 @@ class SkuIdTable {
     }
 
     private int getSize () {
-        return (al.size() == 0)? 1 : al.size();
+        return (len == 0)? 1 : len;
     }
 
     public String getExistanceMacro () {
         return String.format(PcdDatabase.SkuTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
+    }
+
+    public void genCodeNew (ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable, String phase) {
+        final String name = "SkuIdTable";
+        
+        CStructTypeDeclaration decl;
+        String cCode = "";
+
+        cCode += String.format(PcdDatabase.SkuIdTableDeclaration, phase); 
+        decl = new CStructTypeDeclaration (
+                                            name,
+                                            1,
+                                            cCode,
+                                            true
+                                           );  
+        declaList.add(decl);
+
+
+        cCode = PcdDatabase.genInstantiationStr(getInstantiation());
+        instTable.put(name, cCode);
+
+        //
+        // SystemSkuId is in PEI phase PCD Database
+        //
+        if (phase.equalsIgnoreCase("PEI")) {
+            decl = new CStructTypeDeclaration (
+                                                "SystemSkuId",
+                                                1,
+                                                "SKU_ID          SystemSkuId;\r\n",
+                                                true
+                                              );
+            declaList.add(decl);
+            
+            instTable.put("SystemSkuId", "0");
+        }
+
     }
 
     public String getTypeDeclaration () {
@@ -387,10 +524,9 @@ class SkuIdTable {
 
         Output.add("/* SkuIdTable */");
         Output.add("{");
-        bodyStart = 2;
 
         if (al.size() == 0) {
-            Output.add("0");
+            Output.add("\t0");
         }
         
         for (int index = 0; index < al.size(); index++) {
@@ -402,16 +538,15 @@ class SkuIdTable {
 
             Integer[] ia = al.get(index);
 
-            str += ia[0].toString() + ", ";
+            str += "\t" + ia[0].toString() + ", ";
             for (int index2 = 1; index2 < ia.length; index2++) {
                str += ia[index2].toString();
-               if (index != al.size() - 1) {
+               if (!((index2 == ia.length - 1) && (index == al.size() - 1))) {
                    str += ", ";
                }
             }
 
             Output.add(str);
-            bodyLineNum++;
 
         }
 
@@ -423,6 +558,31 @@ class SkuIdTable {
     public int add (Token token) {
 
         int index;
+        int pos;
+        
+        //
+        // Check if this SKU_ID Array is already in the table
+        //
+        pos = 0;
+        for (Object o: al) {
+            Integer [] s = (Integer[]) o;
+            boolean different = false;
+            if (s[0] == token.getSkuIdCount()) {
+                for (index = 1; index < s.length; index++) {
+                    if (s[index] != token.skuData.get(index-1).id) {
+                        different = true;
+                        break;
+                    }
+                }
+            } else {
+                different = true;
+            }
+            if (different) {
+                pos += s[0] + 1;
+            } else {
+                return pos;
+            }
+        }
 
         Integer [] skuIds = new Integer[token.skuData.size() + 1];
         skuIds[0] = new Integer(token.skuData.size());
@@ -472,6 +632,25 @@ class LocalTokenNumberTable {
         return String.format(PcdDatabase.DatabaseExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
     }
 
+    public void genCodeNew (ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable, String phase) {
+        final String name = "LocalTokenNumberTable";
+        
+        CStructTypeDeclaration decl;
+        String cCode = "";
+
+        cCode += String.format(PcdDatabase.LocalTokenNumberTableDeclaration, phase); 
+        decl = new CStructTypeDeclaration (
+                                            name,
+                                            4,
+                                            cCode,
+                                            true
+                                           );  
+        declaList.add(decl);
+
+        cCode = PcdDatabase.genInstantiationStr(getInstantiation());
+        instTable.put(name, cCode);
+    }
+
     public String getTypeDeclaration () {
         return String.format(PcdDatabase.LocalTokenNumberTableDeclaration, phase);
     }
@@ -489,7 +668,7 @@ class LocalTokenNumberTable {
         for (int index = 0; index < al.size(); index++) {
             String str;
 
-            str = (String)al.get(index);
+            str = "\t" + (String)al.get(index);
 
             str += " /* " + alComment.get(index) + " */ ";
 
@@ -556,15 +735,12 @@ class ExMapTable {
     private ArrayList<String>    alComment;
     private String               phase;
     private int                  len;
-    private int                   bodyStart;
     private int                   bodyLineNum;
-    private int                   base;
-
+    
     public ExMapTable (String phase) {
         this.phase = phase;
         al = new ArrayList<ExTriplet>();
         alComment = new ArrayList<String>();
-        bodyStart = 0;
         bodyLineNum = 0;
         len = 0;
     }
@@ -574,14 +750,32 @@ class ExMapTable {
              + String.format(PcdDatabase.ExTokenNumber, phase, al.size());
     }
 
-    private int getSize () {
-        return (al.size() == 0)? 1 : al.size();
-    }
-
     public String getExistanceMacro () {
         return String.format(PcdDatabase.ExMapTableExistenceMacro, phase, (al.size() == 0)? "TRUE":"FALSE");
     }
 
+    public void genCodeNew (ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable, String phase) {
+        final String exMapTableName = "ExMapTable";
+        
+        sortTable();
+        
+        CStructTypeDeclaration decl;
+        String cCode = "";
+
+        cCode += String.format(PcdDatabase.ExMapTableDeclaration, phase); 
+        decl = new CStructTypeDeclaration (
+                                            exMapTableName,
+                                            4,
+                                            cCode,
+                                            true
+                                           );  
+        declaList.add(decl);
+
+
+        cCode = PcdDatabase.genInstantiationStr(getInstantiation());
+        instTable.put(exMapTableName, cCode);
+    }
+    
     public String getTypeDeclaration () {
         return String.format(PcdDatabase.ExMapTableDeclaration, phase);
     }
@@ -591,10 +785,8 @@ class ExMapTable {
 
         Output.add("/* ExMapTable */");
         Output.add("{");
-        bodyStart = 2;
-
         if (al.size() == 0) {
-            Output.add("{0, 0, 0}");
+            Output.add("\t{0, 0, 0}");
         }
         
         int index;
@@ -603,11 +795,11 @@ class ExMapTable {
 
             ExTriplet e = (ExTriplet)al.get(index);
 
-            str = "{ " + e.exTokenNumber.toString() + ", ";
+            str = "\t" + "{ " + String.format("0x%08X", e.exTokenNumber) + ", ";
             str += e.localTokenIdx.toString() + ", ";
             str += e.guidTableIdx.toString();
 
-            str += " /* " + alComment.get(index) + " */";
+            str += "}" + " /* " + alComment.get(index) + " */" ;
 
             if (index != al.size() - 1) {
                 str += ",";
@@ -637,21 +829,52 @@ class ExMapTable {
         return al.size() == 0 ? 1 : al.size();
     }
 
+    //
+    // To simplify the algorithm for GetNextToken and GetNextTokenSpace in
+    // PCD PEIM/Driver, we need to sort the ExMapTable according to the
+    // following order:
+    // 1) ExGuid
+    // 2) ExTokenNumber
+    // 
+    class ExTripletComp implements Comparator<ExTriplet> {
+        public int compare (ExTriplet a, ExTriplet b) {
+            if (a.guidTableIdx == b.guidTableIdx ) {
+                if (a.exTokenNumber > b.exTokenNumber) {
+                    return 1;
+                } else if (a.exTokenNumber > b.exTokenNumber) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+            
+            return a.guidTableIdx - b.guidTableIdx;
+        }
+    }
+
+    private void sortTable () {
+        java.util.Comparator<ExTriplet> comparator = new ExTripletComp();
+        java.util.Collections.sort(al, comparator);
+    }
 }
 
 class PcdDatabase {
 
+    private final static int    SkuHeadAlignmentSize             = 4;
+    private final String        newLine                         = "\r\n";
+    private final String        commaNewLine                    = ",\r\n";
+    private final String        tab                             = "\t";
     public final static String ExMapTableDeclaration            = "DYNAMICEX_MAPPING ExMapTable[%s_EXMAPPING_TABLE_SIZE];\r\n";
     public final static String GuidTableDeclaration             = "EFI_GUID          GuidTable[%s_GUID_TABLE_SIZE];\r\n";
     public final static String LocalTokenNumberTableDeclaration = "UINT32            LocalTokenNumberTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
     public final static String StringTableDeclaration           = "UINT16            StringTable[%s_STRING_TABLE_SIZE];\r\n";
     public final static String SizeTableDeclaration             = "UINT16            SizeTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
-    public final static String SkuIdTableDeclaration              = "UINT8             SkuIdTable[%s_SKUID_TABLE_SIZE];\r\n";
+    public final static String SkuIdTableDeclaration            = "UINT8             SkuIdTable[%s_SKUID_TABLE_SIZE];\r\n";
 
 
     public final static String ExMapTableSizeMacro              = "#define %s_EXMAPPING_TABLE_SIZE  %d\r\n";
     public final static String ExTokenNumber                    = "#define %s_EX_TOKEN_NUMBER       %d\r\n";
-    public final static String GuidTableSizeMacro               = "#define %s_GUID_TABLE_SIZE         %d\r\n";
+    public final static String GuidTableSizeMacro               = "#define %s_GUID_TABLE_SIZE         %d\r\n"; 
     public final static String LocalTokenNumberTableSizeMacro   = "#define %s_LOCAL_TOKEN_NUMBER_TABLE_SIZE            %d\r\n";
     public final static String LocalTokenNumberSizeMacro   		= "#define %s_LOCAL_TOKEN_NUMBER            %d\r\n";
     public final static String StringTableSizeMacro             = "#define %s_STRING_TABLE_SIZE       %d\r\n";
@@ -665,7 +888,11 @@ class PcdDatabase {
     public final static String SkuTableExistenceMacro           = "#define %s_SKUID_TABLE_EMPTY    %s\r\n";
 
     public final static String offsetOfSkuHeadStrTemplate       = "offsetof(%s_PCD_DATABASE, %s.%s_SkuDataTable)";
+    public final static String offsetOfVariableEnabledDefault   = "offsetof(%s_PCD_DATABASE, %s.%s_VariableDefault_%d)";
     public final static String offsetOfStrTemplate              = "offsetof(%s_PCD_DATABASE, %s.%s)";
+    
+    private final static String  skuDataTableTemplate           = "SkuDataTable";
+
 
     private StringTable stringTable;
     private GuidTable   guidTable;
@@ -679,13 +906,19 @@ class PcdDatabase {
     private int assignedTokenNumber;
     
     //
+    // Use two class global variable to store
+    // temperary 
+    //
+    private String      privateGlobalName;
+    private String      privateGlobalCCode;
+    //
     // After Major changes done to the PCD
     // database generation class PcdDatabase
     // Please increment the version and please
     // also update the version number in PCD
     // service PEIM and DXE driver accordingly.
     //
-    private final int version = 1;
+    private final int version = 2;
 
     private String hString;
     private String cString;
@@ -697,7 +930,7 @@ class PcdDatabase {
                     - getAlignmentSize(a);
         }
     }
-
+    
     public PcdDatabase (ArrayList<Token> alTokens, String exePhase, int startLen) {
        phase = exePhase;
 
@@ -708,8 +941,21 @@ class PcdDatabase {
        sizeTable = new SizeTable(phase);
        exMapTable = new ExMapTable(phase); 
 
-       assignedTokenNumber = startLen;
+       assignedTokenNumber = startLen + 1;
        this.alTokens = alTokens;
+    }
+
+    private void getNonExAndExTokens (ArrayList<Token> alTokens, List<Token> nexTokens, List<Token> exTokens) {
+        for (int i = 0; i < alTokens.size(); i++) {
+            Token t = (Token)alTokens.get(i);
+            if (t.isDynamicEx()) {
+                exTokens.add(t);
+            } else {
+                nexTokens.add(t);
+            }
+        }
+
+        return;
     }
 
     private void getTwoGroupsOfTokens (ArrayList<Token> alTokens, List<Token> initTokens, List<Token> uninitTokens) {
@@ -725,6 +971,25 @@ class PcdDatabase {
         return;
     }
 
+    private int getDataTypeAlignmentSize (Token token) {
+        switch (token.datumType) {
+        case UINT8:
+            return 1;
+        case UINT16:
+            return 2;
+        case UINT32:
+            return 4;
+        case UINT64:
+            return 8;
+        case POINTER:
+            return 1;
+        case BOOLEAN:
+            return 1;
+        default:
+            return 1;
+        }
+    }
+    
     private int getAlignmentSize (Token token) {
         if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.HII_TYPE) {
             return 2;
@@ -737,22 +1002,8 @@ class PcdDatabase {
         if (token.isUnicodeStringType()) {
             return 2;
         }
-
-        switch (token.datumType) {
-            case UINT8:
-                return 1;
-            case UINT16:
-                return 2;
-            case UINT32:
-                return 4;
-            case UINT64:
-                return 8;
-            case POINTER:
-                return 1;
-            case BOOLEAN:
-                return 1;
-            }
-            return 1;
+        
+        return getDataTypeAlignmentSize(token);
      }
 
     public String getCString () {
@@ -761,6 +1012,224 @@ class PcdDatabase {
 
     public String getHString () {
         return hString;
+    }
+    
+    private void genCodeWorker(Token t,
+            ArrayList<CStructTypeDeclaration> declaList,
+            HashMap<String, String> instTable, String phase)
+            throws EntityException {
+
+        CStructTypeDeclaration decl;
+
+        //
+        // Insert SKU_HEAD if isSkuEnable is true
+        //
+        if (t.isSkuEnable()) {
+            int tableIdx;
+            tableIdx = skuIdTable.add(t);
+            decl = new CStructTypeDeclaration(t.getPrimaryKeyString(),
+                    SkuHeadAlignmentSize, getSkuEnabledTypeDeclaration(t), true);
+            declaList.add(decl);
+            instTable.put(t.getPrimaryKeyString(),
+                    getSkuEnabledTypeInstantiaion(t, tableIdx));
+        }
+
+        //
+        // Insert PCD_ENTRY declaration and instantiation
+        //
+        getCDeclarationString(t);
+
+        decl = new CStructTypeDeclaration(privateGlobalName,
+                getAlignmentSize(t), privateGlobalCCode, t.hasDefaultValue());
+        declaList.add(decl);
+
+        if (t.hasDefaultValue()) {
+            instTable.put(privateGlobalName, 
+                          getTypeInstantiation(t, declaList, instTable, phase)
+                          );
+        }
+
+    }
+
+    private void ProcessTokensNew (List<Token> tokens, 
+                                   ArrayList<CStructTypeDeclaration> cStructDeclList,
+                                   HashMap<String, String> cStructInstTable,
+                                   String phase
+                                   ) 
+    throws EntityException {
+        
+        for (int idx = 0; idx < tokens.size(); idx++) {
+            Token t = tokens.get(idx);
+            
+            genCodeWorker (t, cStructDeclList, cStructInstTable, phase);
+            
+            sizeTable.add(t);
+            localTokenNumberTable.add(t);
+            t.tokenNumber = assignedTokenNumber++;
+            
+            //
+            // Add a mapping if this dynamic PCD entry is a EX type
+            //
+            if (t.isDynamicEx()) {
+                exMapTable.add(t.tokenNumber, 
+                                t.dynamicExTokenNumber, 
+                                guidTable.add(t.tokenSpaceName, t.getPrimaryKeyString()), 
+                                t.getPrimaryKeyString()
+                                );
+            }
+        }
+
+    }
+    
+    public void genCodeNew () throws EntityException {
+        
+        ArrayList<CStructTypeDeclaration> cStructDeclList = new ArrayList<CStructTypeDeclaration>();
+        HashMap<String, String> cStructInstTable = new HashMap<String, String>();
+        
+        List<Token> nexTokens = new ArrayList<Token> ();
+        List<Token> exTokens = new ArrayList<Token> ();
+
+        getNonExAndExTokens (alTokens, nexTokens, exTokens);
+
+        //
+        // We have to process Non-Ex type PCD entry first. The reason is
+        // that our optimization assumes that the Token Number of Non-Ex 
+        // PCD entry start from 1 (for PEI phase) and grows continously upwards.
+        // 
+        // EX type token number starts from the last Non-EX PCD entry and
+        // grows continously upwards.
+        //
+        ProcessTokensNew (nexTokens, cStructDeclList, cStructInstTable, phase);
+        ProcessTokensNew (exTokens, cStructDeclList, cStructInstTable, phase);
+        
+        stringTable.genCodeNew(cStructDeclList, cStructInstTable);
+        skuIdTable.genCodeNew(cStructDeclList, cStructInstTable, phase);
+        exMapTable.genCodeNew(cStructDeclList, cStructInstTable, phase);
+        localTokenNumberTable.genCodeNew(cStructDeclList, cStructInstTable, phase);
+        sizeTable.genCodeNew(cStructDeclList, cStructInstTable, phase);
+        guidTable.genCodeNew(cStructDeclList, cStructInstTable, phase);
+        
+        hString = genCMacroCode ();
+        
+        HashMap <String, String> result;
+        
+        result = genCStructCode(cStructDeclList, 
+                cStructInstTable, 
+                phase
+                );
+        
+        hString += result.get("initDeclStr");
+        hString += result.get("uninitDeclStr");
+        
+        hString += String.format("#define PCD_%s_SERVICE_DRIVER_VERSION         %d", phase, version);
+        
+        cString = newLine + newLine + result.get("initInstStr");
+        
+    }
+    
+    private String genCMacroCode () {
+        String macroStr   = "";
+
+        //
+        // Generate size info Macro for all Tables
+        //
+        macroStr += guidTable.getSizeMacro();
+        macroStr += stringTable.getSizeMacro();
+        macroStr += skuIdTable.getSizeMacro();
+        macroStr += localTokenNumberTable.getSizeMacro();
+        macroStr += exMapTable.getSizeMacro();
+
+        //
+        // Generate existance info Macro for all Tables
+        //
+        macroStr += guidTable.getExistanceMacro();
+        macroStr += stringTable.getExistanceMacro();
+        macroStr += skuIdTable.getExistanceMacro();
+        macroStr += localTokenNumberTable.getExistanceMacro();
+        macroStr += exMapTable.getExistanceMacro();
+
+        macroStr += newLine;
+        
+        return macroStr;
+    }
+    
+    private HashMap <String, String> genCStructCode(
+                                            ArrayList<CStructTypeDeclaration> declaList, 
+                                            HashMap<String, String> instTable, 
+                                            String phase
+                                            ) {
+        
+        int i;
+        HashMap <String, String> result = new HashMap<String, String>();
+        HashMap <Integer, ArrayList<String>>    alignmentInitDecl = new HashMap<Integer, ArrayList<String>>();
+        HashMap <Integer, ArrayList<String>>    alignmentUninitDecl = new HashMap<Integer, ArrayList<String>>();
+        HashMap <Integer, ArrayList<String>>    alignmentInitInst = new HashMap<Integer, ArrayList<String>>();
+        
+        //
+        // Initialize the storage for each alignment
+        //
+        for (i = 8; i > 0; i>>=1) {
+            alignmentInitDecl.put(new Integer(i), new ArrayList<String>());
+            alignmentInitInst.put(new Integer(i), new ArrayList<String>());
+            alignmentUninitDecl.put(new Integer(i), new ArrayList<String>());
+        }
+        
+        String initDeclStr   = "typedef struct {" + newLine;
+        String initInstStr   = String.format("%s_PCD_DATABASE_INIT g%sPcdDbInit = { ", phase.toUpperCase(), phase.toUpperCase()) + newLine;
+        String uninitDeclStr = "typedef struct {" + newLine;
+
+        //
+        // Sort all C declaration and instantiation base on Alignment Size 
+        //
+        for (Object d : declaList) {
+            CStructTypeDeclaration decl = (CStructTypeDeclaration) d;
+            
+            if (decl.initTable) {
+                alignmentInitDecl.get(new Integer(decl.alignmentSize)).add(decl.cCode);
+                alignmentInitInst.get(new Integer(decl.alignmentSize)).add(instTable.get(decl.key));
+            } else {
+                alignmentUninitDecl.get(new Integer(decl.alignmentSize)).add(decl.cCode);
+            }
+        }
+
+        //
+        // Generate code for every alignment size
+        //
+        for (int align = 8; align > 0; align >>= 1) {
+            ArrayList<String> declaListBasedOnAlignment = alignmentInitDecl.get(new Integer(align));
+            ArrayList<String> instListBasedOnAlignment = alignmentInitInst.get(new Integer(align));
+            for (i = 0; i < declaListBasedOnAlignment.size(); i++) {
+                initDeclStr += tab + declaListBasedOnAlignment.get(i);
+                initInstStr += tab + instListBasedOnAlignment.get(i);
+                
+                //
+                // We made a assumption that both PEI_PCD_DATABASE and DXE_PCD_DATABASE
+                // has a least one data memember with alignment size of 1. So we can
+                // remove the last "," in the C structure instantiation string.
+                //
+                if ((align == 1) && (i == declaListBasedOnAlignment.size() - 1)) {
+                    initInstStr += newLine;
+                } else {
+                    initInstStr += commaNewLine;
+                }
+            }
+            
+            declaListBasedOnAlignment = alignmentUninitDecl.get(new Integer(align));
+            for (Object d : declaListBasedOnAlignment) {
+                String s = (String)d;
+                uninitDeclStr += tab + s;
+            }
+        }
+        
+        initDeclStr += String.format("} %s_PCD_DATABASE_INIT;", phase) + newLine + newLine;
+        initInstStr += "};";
+        uninitDeclStr += String.format("} %s_PCD_DATABASE_UNINIT;", phase) + newLine + newLine;
+        
+        result.put("initDeclStr", initDeclStr);
+        result.put("initInstStr", initInstStr);
+        result.put("uninitDeclStr", uninitDeclStr);
+
+        return result;
     }
 
      public void genCode () 
@@ -916,10 +1385,13 @@ class PcdDatabase {
 
     }
 
-    private String genInstantiationStr (ArrayList<String> alStr) {
+    public static String genInstantiationStr (ArrayList<String> alStr) {
         String str = "";
         for (int i = 0; i< alStr.size(); i++) {
-            str += "\t" + alStr.get(i);
+            if (i != 0) {
+                str += "\t";
+            }
+            str += alStr.get(i);
             if (i != alStr.size() - 1) {
                 str += "\r\n";
             }
@@ -999,7 +1471,7 @@ class PcdDatabase {
     private String getSkuEnabledTypeInstantiaion (Token token, int SkuTableIdx) {
 
         String offsetof = String.format(PcdDatabase.offsetOfSkuHeadStrTemplate, phase, token.hasDefaultValue()? "Init" : "Uninit", token.getPrimaryKeyString());
-        return String.format("{ %s, %d }", offsetof, SkuTableIdx);
+        return String.format("{ %s, %d } /* SKU_ENABLED: %s */", offsetof, SkuTableIdx, token.getPrimaryKeyString());
     }
 
     private String getDataTypeDeclarationForSkuEnabled (Token token) {
@@ -1043,6 +1515,10 @@ class PcdDatabase {
 
     }
 
+    private String getDataTypeInstantiationForVariableDefault_new (Token token, String cName, int skuId) {
+        return String.format("%s /* %s */", token.skuData.get(skuId).value.hiiDefaultValue, cName);
+    }
+
     private String getDataTypeInstantiation (Token token) {
 
         if (token.datumType == Token.DATUM_TYPE.POINTER) {
@@ -1052,7 +1528,82 @@ class PcdDatabase {
         }
     }
 
+    private String getCType (Token t) 
+        throws EntityException {
+        
+        if (t.isHiiEnable()) {
+            return "VARIABLE_HEAD";
+        }
+        
+        if (t.isVpdEnable()) {
+            return "VPD_HEAD";
+        }
+        
+        if (t.isUnicodeStringType()) {
+            return "STRING_HEAD";
+        }
+        
+        switch (t.datumType) {
+        case UINT64:
+            return "UINT64";
+        case UINT32:
+            return "UINT32";
+        case UINT16:
+            return "UINT16";
+        case UINT8:
+            return "UINT8";
+        case BOOLEAN:
+            return "BOOLEAN";
+        case POINTER:
+            return "UINT8";
+        default:
+            throw new EntityException("Unknown type in getDataTypeCDeclaration");
+        }
+    }
+    
+    private void getCDeclarationString(Token t) 
+        throws EntityException {
+        
+        if (t.isSkuEnable()) {
+            privateGlobalName = String.format("%s_%s", t.getPrimaryKeyString(), skuDataTableTemplate);
+        } else {
+            privateGlobalName = t.getPrimaryKeyString();
+        }
 
+        if (t.isUnicodeStringType()) {
+            privateGlobalCCode = String.format("STRING_HEAD              %s[%d];\r\n", t.getPrimaryKeyString(), t.getSkuIdCount());
+        } else {
+            String type = getCType(t);
+            if (t.datumType == Token.DATUM_TYPE.POINTER) {
+                privateGlobalCCode = String.format("%s              %s[%d][%d];\r\n", type, privateGlobalName, t.getSkuIdCount(), t.datumSize);
+            } else {
+                privateGlobalCCode = String.format("%s              %s[%d];\r\n", type, privateGlobalName, t.getSkuIdCount());
+            }
+        }
+    }
+    
+    private String getDataTypeDeclarationForVariableDefault_new (Token token, String cName, int skuId) {
+
+        String typeStr = "";
+
+        if (token.datumType == Token.DATUM_TYPE.UINT8) {
+            typeStr = "UINT8";
+        } else if (token.datumType == Token.DATUM_TYPE.UINT16) {
+            typeStr = "UINT16";
+        } else if (token.datumType == Token.DATUM_TYPE.UINT32) {
+            typeStr = "UINT32";
+        } else if (token.datumType == Token.DATUM_TYPE.UINT64) {
+            typeStr = "UINT64";
+        } else if (token.datumType == Token.DATUM_TYPE.BOOLEAN) {
+            typeStr = "BOOLEAN";
+        } else if (token.datumType == Token.DATUM_TYPE.POINTER) {
+            return String.format("UINT8 %s[%d]", cName, token.datumSize);
+        } else {
+        }
+
+        return String.format("%s             %s;\r\n", typeStr, cName);
+    }
+    
     private String getDataTypeDeclaration (Token token) {
 
         String typeStr = "";
@@ -1078,7 +1629,67 @@ class PcdDatabase {
     private String getVpdEnableTypeDeclaration (Token token) {
         return String.format("VPD_HEAD %s", token.getPrimaryKeyString());
     }
+    
+    private String getTypeInstantiation (Token t, ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable, String phase) throws EntityException {
+      
+        int     i;
 
+        String s;
+        s = String.format("/* %s */", t.getPrimaryKeyString()) + newLine;
+        s += tab + "{" + newLine;
+
+        for (i = 0; i < t.skuData.size(); i++) {
+            if (t.isUnicodeStringType() && !t.isHiiEnable()) {
+                s += tab + tab + String.format("{ %d }", stringTable.add(t.skuData.get(i).value.value, t));
+            } else if (t.isHiiEnable()) {
+                /* VPD_HEAD definition
+                   typedef struct {
+                      UINT16  GuidTableIndex;   // Offset in Guid Table in units of GUID.
+                      UINT16  StringIndex;      // Offset in String Table in units of UINT16.
+                      UINT16  Offset;           // Offset in Variable
+                    } VARIABLE_HEAD  ;
+                 */
+                String variableDefaultName = String.format("%s_VariableDefault_%d", t.getPrimaryKeyString(), i); 
+                
+                s += tab + tab + String.format("{ %d, %d, %s, %s }", guidTable.add(t.skuData.get(i).value.variableGuid, t.getPrimaryKeyString()),
+                                                          stringTable.add(t.skuData.get(i).value.getStringOfVariableName(), t),
+                                                          t.skuData.get(i).value.variableOffset,
+                                                          String.format("offsetof(%s_PCD_DATABASE, Init.%s)", phase, variableDefaultName)
+                                                          );
+                //
+                // We need to support the default value, so we add the declaration and
+                // the instantiation for the default value.
+                //
+                CStructTypeDeclaration decl = new CStructTypeDeclaration (variableDefaultName,
+                                                        getDataTypeAlignmentSize(t),
+                                                        getDataTypeDeclarationForVariableDefault_new(t, variableDefaultName, i),
+                                                        true
+                                                        ); 
+                declaList.add(decl);
+                instTable.put(variableDefaultName, getDataTypeInstantiationForVariableDefault_new (t, variableDefaultName, i));
+            } else if (t.isVpdEnable()) {
+                    /* typedef  struct {
+                        UINT32  Offset;
+                      } VPD_HEAD;
+                    */
+                s += tab + tab + String.format("{ %s }", t.skuData.get(i).value.vpdOffset);
+            } else {
+                s += tab + tab + String.format("{ %s }", t.skuData.get(i).value.value);
+            }
+            
+            if (i != t.skuData.size() - 1) {
+                s += commaNewLine;
+            } else {
+                s += newLine;
+            }
+
+        }
+        
+        s += tab + "}";
+        
+        return s;
+    }
+    
     private String getVpdEnableTypeInstantiation (Token token) {
         return String.format("{ %s } /* %s */", token.getDefaultSku().vpdOffset,
                                                 token.getPrimaryKeyString());
@@ -1321,19 +1932,19 @@ public class CollectPCDAction {
 
         dbManager.getTwoPhaseDynamicRecordArray(alPei, alDxe);
         PcdDatabase pcdPeiDatabase = new PcdDatabase (alPei, "PEI", 0);
-        pcdPeiDatabase.genCode();
-        dbManager.PcdPeimHString        = PcdCommonHeaderString + pcdPeiDatabase.getHString()
+        pcdPeiDatabase.genCodeNew();
+        MemoryDatabaseManager.PcdPeimHString        = PcdCommonHeaderString + pcdPeiDatabase.getHString()
                                             + PcdDatabase.getPcdPeiDatabaseDefinitions();
-        dbManager.PcdPeimCString        = pcdPeiDatabase.getCString();
+        MemoryDatabaseManager.PcdPeimCString        = pcdPeiDatabase.getCString();
 
         PcdDatabase pcdDxeDatabase = new PcdDatabase (alDxe, 
                                                       "DXE",
                                                       alPei.size()
                                                       );
-        pcdDxeDatabase.genCode();
-        dbManager.PcdDxeHString   = dbManager.PcdPeimHString + pcdDxeDatabase.getHString()
+        pcdDxeDatabase.genCodeNew();
+        MemoryDatabaseManager.PcdDxeHString   = MemoryDatabaseManager.PcdPeimHString + pcdDxeDatabase.getHString()
                                       + PcdDatabase.getPcdDxeDatabaseDefinitions();
-        dbManager.PcdDxeCString   = pcdDxeDatabase.getCString();
+        MemoryDatabaseManager.PcdDxeCString   = pcdDxeDatabase.getCString();
     }
 
     /**

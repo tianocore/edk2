@@ -317,26 +317,6 @@ Returns:
   CHAR16                          *PcdTempStr;
   UINTN                           TempStrSize;
 
-  //
-  // Test Feature Set and Binary Patchable Case
-  //
-  if (FeaturePcdGet (PcdWinNtFeatureFlag1)) {
-  	TempStrSize = PatchPcdGet32(PcdWinNtBinaryPatch1) + PatchPcdGet32(PcdWinNtBinaryPatch2);
-  }
-  
-  if (0) {
-    //
-    // Test Dynamic and DynamicEx 
-    // (Please add PcdWinNtConsole in "WinNtBusDriver.inf" before enable this code!!!)
-    //
-    PcdTempStr = PcdGetPtr (PcdWinNtConsole);
-  }
-
-  //
-  // Test Dynamic Set and Dynamic Set Ex
-  //
-  PcdSet32 (PcdWinNtDynamicUINT32, 2006);
-
   Status = EFI_UNSUPPORTED;
 
   //

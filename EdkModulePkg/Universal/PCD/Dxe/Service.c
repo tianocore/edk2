@@ -50,10 +50,16 @@ GetWorker (
   UINT16              StringTableIdx;      
   UINT32              LocalTokenNumber;
 
-
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+  
   ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
 
-  Size = DxePcdGetSize (TokenNumber);
+  Size = DxePcdGetSize (TokenNumber + 1);
   ASSERT (GetSize == Size || GetSize == 0);
 
   
@@ -100,11 +106,10 @@ GetWorker (
         return (UINT8 *) Data + VariableHead->Offset;
       } else {
         //
-        // BugBug: Need to support default value. The current implementation
-        // will return a memory buffer with ALL ZERO.
-        // 
-        return AllocateZeroPool (Size);
-       }
+        // Return the default value specified by Platform Integrator 
+        //
+        return (VOID *) ((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);
+     }
 
     case PCD_TYPE_STRING:
       StringTableIdx = (UINT16) *((UINT8 *) PcdDb + Offset);
@@ -142,6 +147,13 @@ DxeRegisterCallBackWorker (
   if (Guid != NULL) {
     TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) TokenNumber);
   }
+
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
 
   ListHead = &mCallbackFnTable[TokenNumber];
   ListNode = GetFirstNode (ListHead);
@@ -185,6 +197,13 @@ DxeUnRegisterCallBackWorker (
   if (Guid != NULL) {
     TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) TokenNumber);
   }
+
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
 
   ListHead = &mCallbackFnTable[TokenNumber];
   ListNode = GetFirstNode (ListHead);
@@ -342,13 +361,17 @@ GetHiiVariable (
   EFI_STATUS Status;
   VOID       *Buffer;
 
+  Size = 0;
+  Buffer = NULL;
+  
   Status = EfiGetVariable (
     (UINT16 *)VariableName,
     VariableGuid,
     NULL,
     &Size,
-    NULL
+    Buffer
     );
+  
   if (Status == EFI_BUFFER_TOO_SMALL) {
 
     Buffer = AllocatePool (Size);
@@ -365,6 +388,9 @@ GetHiiVariable (
 
     ASSERT (Status == EFI_SUCCESS);
   }
+
+  *VariableData = Buffer;
+  *VariableSize = Size;
 
   return Status;
 
@@ -444,6 +470,13 @@ InvokeCallbackOnSet (
   LIST_ENTRY              *ListHead;
   LIST_ENTRY              *ListNode;
 
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+  
   ListHead = &mCallbackFnTable[TokenNumber];
   ListNode = GetFirstNode (ListHead);
 
@@ -485,13 +518,19 @@ SetWorker (
   UINTN               Offset;
   UINT8               *PcdDb;
 
-
+  //
+  // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
+  // We have to decrement TokenNumber by 1 to make it usable
+  // as the array index.
+  //
+  TokenNumber--;
+  
   ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
 
   if (PtrType) {
-    ASSERT (Size <= DxePcdGetSize (TokenNumber));
+    ASSERT (Size <= DxePcdGetSize (TokenNumber + 1));
   } else {
-    ASSERT (Size == DxePcdGetSize (TokenNumber));
+    ASSERT (Size == DxePcdGetSize (TokenNumber + 1));
   }
   
   IsPeiDb = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
@@ -501,7 +540,7 @@ SetWorker (
 
   if ((TokenNumber < PEI_NEX_TOKEN_NUMBER) ||
       (TokenNumber >= PEI_LOCAL_TOKEN_NUMBER || TokenNumber < (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER))) {
-    InvokeCallbackOnSet (0, NULL, TokenNumber, Data, Size);
+    InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, Size);
   }
 
   TokenNumber = IsPeiDb ? TokenNumber
