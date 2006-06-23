@@ -50,10 +50,6 @@ Returns:
   EFI_STATUS                  Status;
   VOID                        *Pe32Data;
   EFI_PEI_FV_FILE_LOADER_PPI  *FvLoadFilePpi;
-//#ifdef EFI_NT_EMULATOR
-//  EFI_PEI_PPI_DESCRIPTOR      *PpiDescriptor;
-//  NT_PEI_LOAD_FILE_PPI        *PeiNtService;
-//#endif
   EFI_PHYSICAL_ADDRESS        ImageAddress;
   UINT64                      ImageSize;
   EFI_PHYSICAL_ADDRESS        ImageEntryPoint;
@@ -107,12 +103,10 @@ Returns:
       }
 
       //
-      // Retrieve the entry point from the PE/COFF image header
+      // Got the entry point from ImageEntryPoint
       //
-      Status = PeCoffLoaderGetEntryPoint ((VOID *)(UINTN)ImageAddress, EntryPoint);
-      if (EFI_ERROR (Status)) {
-        return EFI_NOT_FOUND;
-      }
+      *EntryPoint = (VOID *) ((UINTN) ImageEntryPoint);
+      return EFI_SUCCESS;
     } else {
       //
       // Retrieve the entry point from the TE image header
