@@ -555,10 +555,20 @@ LibPcdSet64 (
 
 /**
   Sets a buffer for the token specified by TokenNumber to 
-  the value specified by Value. Value is returned.
-  If Value is NULL, then ASSERT().
+  the value specified by Buffer and SizeOfValue.  Buffer to
+  be set is returned. The content of the buffer could be 
+  overwritten if a Callback on SET is registered with this
+  TokenNumber.
+  
+  If SizeOfValue is greater than the maximum 
+  size support by TokenNumber, then set SizeOfValue to the 
+  maximum size supported by TokenNumber and return NULL to 
+  indicate that the set operation was not actually performed. 
+  
+  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]  TokenNumber The PCD token number to set a current value for.
+  @param[in,out] SizeOfBuffer The size, in bytes, of Buffer.
   @param[in]  Value A pointer to the buffer to set.
 
   @retval VOID* Return the pointer for the buffer been set.
@@ -567,18 +577,27 @@ LibPcdSet64 (
 VOID *
 EFIAPI
 LibPcdSetPtr (
-  IN UINTN             TokenNumber,
-  IN UINTN             SizeOfBuffer,
-  IN VOID              *Buffer
+  IN      UINTN             TokenNumber,
+  IN OUT  UINTN             *SizeOfBuffer,
+  IN      VOID              *Buffer
   )
 {
   EFI_STATUS Status;
-  PCD_PPI * PcdPpi;
+  PCD_PPI    *PcdPpi;
+  UINTN      Size;
 
   PcdPpi = GetPcdPpiPtr ();
+  
+  ASSERT ((*SizeOfBuffer > 0) && Buffer == NULL);
 
+  Size = LibPcdGetSize (TokenNumber);
+  
+  if (*SizeOfBuffer > Size) {
+    *SizeOfBuffer = Size;
+    return NULL;
+  }
 
-  Status = PcdPpi->SetPtr (TokenNumber, SizeOfBuffer, Buffer);
+  Status = PcdPpi->SetPtr (TokenNumber, *SizeOfBuffer, Buffer);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -764,34 +783,45 @@ LibPcdSetEx64 (
 
 
 /**
-  Sets a buffer for the token specified by TokenNumber and 
-  Guid to the value specified by Value. Value is returned.
-  If Guid is NULL, then ASSERT().
-  If Value is NULL, then ASSERT().
+  Sets a buffer for the token specified by TokenNumber to the value specified by 
+  Buffer and SizeOfValue.  Buffer is returned.  If SizeOfValue is greater than 
+  the maximum size support by TokenNumber, then set SizeOfValue to the maximum size 
+  supported by TokenNumber and return NULL to indicate that the set operation 
+  was not actually performed. 
+  
+  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]  Guid Pointer to a 128-bit unique value that 
               designates which namespace to set a value from.
   @param[in]  TokenNumber The PCD token number to set a current value for.
-  @param[in]  Value The 8-bit value to set.
+  @param[in, out] SizeOfBuffer The size, in bytes, of Buffer.
+  @param[in]  Buffer A pointer to the buffer to set.
 
-  @retval VOID * Return the value been set.
+  @retval VOID * Return the pinter to the buffer been set.
 
 **/
 VOID *
 EFIAPI
 LibPcdSetExPtr (
-  IN CONST GUID        *Guid,
-  IN UINTN             TokenNumber,
-  IN UINTN             SizeOfBuffer,
-  IN VOID              *Buffer
+  IN      CONST GUID        *Guid,
+  IN      UINTN             TokenNumber,
+  IN OUT  UINTN             *SizeOfBuffer,
+  IN      VOID              *Buffer
   )
 {
-  EFI_STATUS Status;
-  PCD_PPI * PcdPpi;
+  EFI_STATUS      Status;
+  PCD_PPI         *PcdPpi;
+  UINTN           Size;
 
   PcdPpi = GetPcdPpiPtr ();
 
-  Status = PcdPpi->SetPtrEx (Guid, TokenNumber, SizeOfBuffer, Buffer);
+  Size = LibPcdGetExSize (Guid, TokenNumber);
+  if (*SizeOfBuffer > Size) {
+    *SizeOfBuffer = Size;
+    return NULL;
+  }
+
+  Status = PcdPpi->SetPtrEx (Guid, TokenNumber, *SizeOfBuffer, Buffer);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -944,3 +974,41 @@ LibPcdGetNextToken (
 
   return TokenNumber;
 }
+
+
+/**
+  Retrieves the next PCD token space from a token space specified by Guid.
+  Guid of NULL is reserved to mark the default local token namespace on the current
+  platform. If Guid is NULL, then the GUID of the first non-local token space of the 
+  current platform is returned. If Guid is the last non-local token space, 
+  then NULL is returned. 
+
+  If Guid is not NULL and is not a valid token space in the current platform, then ASSERT().
+
+
+  
+  @param[in]  Pointer to a 128-bit unique value that designates from which namespace 
+              to start the search.
+
+  @retval CONST GUID *  The next valid token namespace.
+
+**/
+CONST GUID*           
+EFIAPI
+LibPcdGetNextTokenSpace (
+  IN CONST GUID  *Guid
+  )
+{
+  EFI_STATUS Status;
+  PCD_PPI * PcdPpi;
+
+  PcdPpi = GetPcdPpiPtr ();
+
+
+  Status = PcdPpi->GetNextTokenSpace (&Guid);
+
+  ASSERT_EFI_ERROR (Status);
+
+  return Guid;
+}
+

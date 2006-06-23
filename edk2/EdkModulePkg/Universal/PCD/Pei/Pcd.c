@@ -52,7 +52,8 @@ PCD_PPI mPcdPpiInstance = {
 
   PeiRegisterCallBackOnSet,
   PcdUnRegisterCallBackOnSet,
-  PeiPcdGetNextToken
+  PeiPcdGetNextToken,
+  PeiPcdGetNextTokenSpace
 };
 
 
@@ -568,7 +569,7 @@ PeiPcdGetNextToken (
 
 EFI_STATUS
 EFIAPI
-PeiPcdGetNextTokenSpaceGuid (
+PeiPcdGetNextTokenSpace (
   IN OUT CONST EFI_GUID               **Guid
   )
 {
@@ -579,17 +580,15 @@ PeiPcdGetNextTokenSpaceGuid (
   UINTN               i;
   BOOLEAN             Found;
 
-   if (*Guid == NULL) {
-    if (PEI_EXMAP_TABLE_EMPTY) {
-      return EFI_SUCCESS;
+  ASSERT (Guid != NULL);
+
+  if (PEI_EXMAP_TABLE_EMPTY) {
+    if (*Guid != NULL) {
+      return EFI_NOT_FOUND;
     } else {
-      //
-      // return the first Token Space Guid.
-      //
-      *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[0].ExGuidIndex];
       return EFI_SUCCESS;
     }
-   }
+  }
 
   //
   // Assume PCD Database AutoGen tool is sorting the ExMap based on the following order
@@ -598,6 +597,16 @@ PeiPcdGetNextTokenSpaceGuid (
   //
   PeiPcdDb = GetPcdDatabase ();
 
+  ExMapTable = PeiPcdDb->Init.ExMapTable;
+
+  if (*Guid == NULL) {
+    //
+    // return the first Token Space Guid.
+    //
+    *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[0].ExGuidIndex];
+    return EFI_SUCCESS;
+  }
+
   MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), *Guid);
 
   if (MatchGuid == NULL) {
@@ -605,8 +614,6 @@ PeiPcdGetNextTokenSpaceGuid (
   }
   
   GuidTableIdx = MatchGuid - PeiPcdDb->Init.GuidTable;
-
-  ExMapTable = PeiPcdDb->Init.ExMapTable;
 
   Found = FALSE;
   for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
@@ -617,12 +624,15 @@ PeiPcdGetNextTokenSpaceGuid (
   }
 
   if (Found) {
+    i++;
     for ( ; i < PEI_EXMAPPING_TABLE_SIZE; i++ ) {
       if (ExMapTable[i].ExGuidIndex != GuidTableIdx ) {
         *Guid = &PeiPcdDb->Init.GuidTable[ExMapTable[i].ExGuidIndex];
         return EFI_SUCCESS;
       }
     }
+    *Guid = NULL;
+    return EFI_SUCCESS;
   }
 
   return EFI_NOT_FOUND;

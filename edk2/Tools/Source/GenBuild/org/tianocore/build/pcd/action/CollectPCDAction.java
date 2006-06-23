@@ -1684,7 +1684,14 @@ class PcdDatabase {
                     */
                 s += tab + tab + String.format("{ %s }", t.skuData.get(i).value.vpdOffset);
             } else {
-                s += tab + tab + String.format("{ %s }", t.skuData.get(i).value.value);
+                if (t.isByteStreamType()) {
+                    //
+                    // Byte stream type input has their own "{" "}", so we won't help to insert.
+                    //
+                    s += tab + tab + String.format(" %s ", t.skuData.get(i).value.value);
+                } else {
+                    s += tab + tab + String.format("{ %s }", t.skuData.get(i).value.value);
+                }
             }
             
             if (i != t.skuData.size() - 1) {

@@ -381,6 +381,14 @@ PeiPcdGetNextToken (
   )
 ;
 
+
+EFI_STATUS
+EFIAPI
+PeiPcdGetNextTokenSpace (
+  IN CONST EFI_GUID           **Guid
+  )
+;
+
 extern EFI_GUID gPcdDataBaseHobGuid;
 
 extern EFI_GUID gPcdPeiCallbackFnTableHobGuid;
