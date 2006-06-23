@@ -42,9 +42,6 @@
       <Filename>Dxe/Nt32Platform/MiscSubclass/MiscSubclassDriver.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Dxe/PcdEmulator/PcdEmulator.msa</Filename>
-    </MsaFile>
-    <MsaFile>
       <Filename>Dxe/PlatformBds/PlatformBds.msa</Filename>
     </MsaFile>
     <MsaFile>
@@ -112,9 +109,6 @@
     </MsaFile>
     <MsaFile>
       <Filename>Pei/MonoStatusCode/Nt32/MonoStatusCode.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Pei/PcdEmulator/PcdEmulator.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Pei/WinNtStuff/WinNtStuff.msa</Filename>
