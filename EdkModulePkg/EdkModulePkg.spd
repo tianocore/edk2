@@ -295,9 +295,6 @@
       <Filename>Universal/PCD/Pei/Pcd.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Universal/PCD/Test/PeiPcdTest.msa</Filename>
-    </MsaFile>
-    <MsaFile>
       <Filename>Universal/PCD/Dxe/Pcd.msa</Filename>
     </MsaFile>
     <MsaFile>
