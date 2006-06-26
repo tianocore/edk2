@@ -20,7 +20,7 @@ static PCD_PROTOCOL  *mPcd;
 /**
   The constructor function caches the PCD_PROTOCOL pointer.
 
-  @param[in] ImageHandle The firmware allocated handle for the EFI image.	
+  @param[in] ImageHandle The firmware allocated handle for the EFI image.  
   @param[in] SystemTable A pointer to the EFI System Table.
   
   @retval EFI_SUCCESS The constructor always return EFI_SUCCESS.

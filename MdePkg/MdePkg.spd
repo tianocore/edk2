@@ -187,7 +187,7 @@
       <Filename>Library/BaseDebugLibNull/BaseDebugLibNull.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Library/BaseDebugLibReportStatusCode/BaseDebugLibReportStatusCode.msa</Filename>
+      <Filename>Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/BasePerformanceLibNull/BasePerformanceLibNull.msa</Filename>
@@ -232,7 +232,7 @@
       <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Library/BasePostCodeLibReportStatusCode/BasePostCodeLibReportStatusCode.msa</Filename>
+      <Filename>Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Library/BaseSmbusLib/BaseSmbusLib.msa</Filename>

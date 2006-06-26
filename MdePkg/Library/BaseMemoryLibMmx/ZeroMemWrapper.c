@@ -26,24 +26,23 @@
 #include "MemLibInternals.h"
 
 /**
-  Set Buffer to 0 for Size bytes.
+  Fills a target buffer with zeros, and returns the target buffer.
 
   This function fills Length bytes of Buffer with zeros, and returns Buffer.
+  If Length > 0 and Buffer is NULL, then ASSERT().
+  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
-  If Buffer is NULL and Length > 0, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
+  @param  Buffer      Pointer to the target buffer to fill with zeros.
+  @param  Length      Number of bytes in Buffer to fill with zeros.
 
-  @param  Buffer Memory to set.
-  @param  Size Number of bytes to set
-
-  @return Buffer
+  @return Buffer.
 
 **/
 VOID *
 EFIAPI
 ZeroMem (
-  IN      VOID                      *Buffer,
-  IN      UINTN                     Length
+  OUT VOID  *Buffer,
+  IN UINTN  Length
   )
 {
   ASSERT (!(Buffer == NULL && Length > 0));

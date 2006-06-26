@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>BaseMemoryLib</Library>
     <Library>EdkDxeRuntimeDriverLib</Library>
     <Library>UefiDriverEntryPoint</Library>
-    <Library>BaseDebugLibReportStatusCode</Library>
+    <Library>PeiDxeDebugLibReportStatusCode</Library>
     <Library>DxeReportStatusCodeLib</Library>
     <Arch ArchType="IPF">
       <Library>EdkDxeSalLib</Library>

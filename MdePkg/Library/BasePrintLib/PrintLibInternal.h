@@ -148,7 +148,7 @@ BasePrintLibValueToString (
   @param  Flags     The bitmask of flags that specify left justification, zero pad,
                     and commas.
   @param  Value     The 64-bit signed value to convert to a string.
-  @param  Width	    The maximum number of characters to place in Buffer.
+  @param  Width      The maximum number of characters to place in Buffer.
   @param  Increment Character increment in Buffer.
   
   @return Total number of characters required to perform the conversion.

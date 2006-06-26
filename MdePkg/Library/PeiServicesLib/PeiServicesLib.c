@@ -54,7 +54,7 @@ PeiServicesInstallPpi (
 **/
 EFI_STATUS
 EFIAPI
-PeiServicesReinstallPpi (
+PeiServicesReInstallPpi (
   IN EFI_PEI_PPI_DESCRIPTOR           *OldPpi,
   IN EFI_PEI_PPI_DESCRIPTOR           *NewPpi
   )

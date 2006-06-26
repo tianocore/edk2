@@ -36,7 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiMemoryLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeReportStatusCodeLib</Library>
-    <Library>BaseDebugLibReportStatusCode</Library>
+    <Library>PeiDxeDebugLibReportStatusCode</Library>
     <Library>DxeMemoryAllocationLib</Library>
     <Library>EdkDxeRuntimeDriverLib</Library>
   </Libraries>

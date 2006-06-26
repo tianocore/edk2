@@ -50,9 +50,9 @@
 INTN
 EFIAPI
 CompareMem (
-  IN      CONST VOID                *DestinationBuffer,
-  IN      CONST VOID                *SourceBuffer,
-  IN      UINTN                     Length
+  IN CONST VOID  *DestinationBuffer,
+  IN CONST VOID  *SourceBuffer,
+  IN UINTN       Length
   )
 {
   if (Length == 0) {

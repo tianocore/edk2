@@ -71,7 +71,7 @@
       
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeimEntryPoint" />
       
@@ -88,7 +88,7 @@
 
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibPort80" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" />
 
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
   
@@ -144,7 +144,7 @@
       
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
-      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeimEntryPoint" />
       
@@ -161,7 +161,7 @@
   
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibPort80" />
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
-      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" />
 
       <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
   
@@ -216,7 +216,7 @@
       
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
-      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeimEntryPoint" />
       
@@ -233,7 +233,7 @@
 
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibPort80" />
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
-      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" />
   
       <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
   
@@ -289,7 +289,7 @@
       
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
-      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeimEntryPoint" />
       
@@ -306,7 +306,7 @@
 
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibPort80" />
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
-      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" />
   
       <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
   
@@ -680,7 +680,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>        
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" >
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
@@ -764,7 +764,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPostCodePropertyMask</C_Name>
@@ -1040,7 +1040,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>        
-      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" >
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
@@ -1124,7 +1124,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>
-      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+      <ModuleSA Arch="IPF" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPostCodePropertyMask</C_Name>
@@ -1400,7 +1400,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>        
-      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" >
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
@@ -1484,7 +1484,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>
-      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+      <ModuleSA Arch="X64" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPostCodePropertyMask</C_Name>
@@ -1760,7 +1760,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>        
-      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" >
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
@@ -1844,7 +1844,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>
-      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+      <ModuleSA Arch="EBC" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPostCodePropertyMask</C_Name>

@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </MbdHeader>
   <Libraries>
     <Library>UefiBootServicesTableLib</Library>
-    <Library>BaseDebugLibReportStatusCode</Library>
+    <Library>PeiDxeDebugLibReportStatusCode</Library>
     <Library>DxeHobLib</Library>
     <Library>BaseLib</Library>
     <Library>UefiLib</Library>

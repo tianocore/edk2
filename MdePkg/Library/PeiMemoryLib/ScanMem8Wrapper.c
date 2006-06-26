@@ -46,9 +46,9 @@
 VOID *
 EFIAPI
 ScanMem8 (
-  IN      CONST VOID                *Buffer,
-  IN      UINTN                     Length,
-  IN      UINT8                     Value
+  IN CONST VOID  *Buffer,
+  IN UINTN       Length,
+  IN UINT8       Value
   )
 {
   if (Length == 0) {
@@ -57,5 +57,5 @@ ScanMem8 (
   ASSERT (Buffer != NULL);
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
  
-  return (VOID*)InternalMemScanMem8 (Buffer, Length / sizeof (Value), Value);
+  return (VOID*)InternalMemScanMem8 (Buffer, Length, Value);
 }

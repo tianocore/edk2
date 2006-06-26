@@ -24,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <Library>BaseLib</Library>
         <Library>BaseCacheMaintenanceLib</Library>
         <Library>DxeReportStatusCodeLib</Library>
-        <Library>BaseDebugLibReportStatusCode</Library>
+        <Library>PeiDxeDebugLibReportStatusCode</Library>
         <Library OverrideID="1111">DxeCoreUefiDecompressLibFromHob</Library>
         <Library OverrideID="1111">DxeCoreTianoDecompressLibFromHob</Library>
         <Library OverrideID="3333">DxeCoreCustomDecompressLibFromHob</Library>

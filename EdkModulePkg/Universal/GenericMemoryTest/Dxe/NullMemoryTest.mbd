@@ -35,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeServicesTableLib</Library>
     <Library>DxeReportStatusCodeLib</Library>
-    <Library>BaseDebugLibReportStatusCode</Library>    
+    <Library>PeiDxeDebugLibReportStatusCode</Library>    
     <Library>DxeMemoryAllocationLib</Library>
   </Libraries>
   <BuildOptions ToolChain="MSFT">
