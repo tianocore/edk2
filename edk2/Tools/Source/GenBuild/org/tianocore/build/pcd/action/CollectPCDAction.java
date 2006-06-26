@@ -1071,7 +1071,7 @@ class PcdDatabase {
             // Add a mapping if this dynamic PCD entry is a EX type
             //
             if (t.isDynamicEx()) {
-                exMapTable.add(t.tokenNumber, 
+                exMapTable.add((int)t.tokenNumber, 
                                 t.dynamicExTokenNumber, 
                                 guidTable.add(t.tokenSpaceName, t.getPrimaryKeyString()), 
                                 t.getPrimaryKeyString()
@@ -2045,7 +2045,7 @@ public class CollectPCDAction {
         boolean                             isDuplicate       = false;
         Token.PCD_TYPE                      pcdType           = Token.PCD_TYPE.UNKNOWN;
         Token.DATUM_TYPE                    datumType         = Token.DATUM_TYPE.UNKNOWN;
-        int                                 tokenNumber       = 0;
+        long                                 tokenNumber       = 0;
         String                              moduleName        = null;
         String                              datum             = null;
         int                                 maxDatumSize      = 0;
@@ -2117,7 +2117,8 @@ public class CollectPCDAction {
                                                          translateSchemaStringToUUID(pcdBuildData.getTokenSpaceGuid()));
                 pcdType      = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
                 datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
-                tokenNumber  = Integer.decode(pcdBuildData.getToken().toString());
+                tokenNumber  = Long.decode(pcdBuildData.getToken().toString());
+                
                 if (pcdBuildData.getValue() != null) {
                     datum = pcdBuildData.getValue().toString();
                 } else {
@@ -2719,7 +2720,7 @@ public class CollectPCDAction {
         String              temp;
         boolean             hasSkuId0       = false;
         Token.PCD_TYPE      pcdType         = Token.PCD_TYPE.UNKNOWN;
-        int                 tokenNumber     = 0;
+        long                tokenNumber     = 0;
         String              hiiDefaultValue = null;
         String[]            variableGuidString = null;
 
@@ -2757,7 +2758,7 @@ public class CollectPCDAction {
                                             dynamicInfo.getMaxDatumSize());
             throw new EntityException(exceptionString);
         }
-        tokenNumber = Integer.decode(dynamicInfo.getToken().toString());
+        tokenNumber = Long.decode(dynamicInfo.getToken().toString());
         if (tokenNumber != token.tokenNumber) {
             exceptionString = String.format("[FPD file error] For dynamic PCD %s, the token number in module %s is 0x%x, but"+
                                             "in <DynamicPcdBuildDefinictions>, the token number is 0x%x, they are not match!",

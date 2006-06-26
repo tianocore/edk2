@@ -211,21 +211,23 @@ public class UsageInstance {
      */
     public void generateAutoGen(boolean isBuildUsedLibrary) 
         throws EntityException {
-        String  guidStringCName  = null;
-        boolean isByteArray      = false;
-        String  printDatum       = null;
+        String  guidStringCName     = null;
+        boolean isByteArray         = false;
+        String  printDatum          = null;
+        String  tokenNumberString   = null;
 
         hAutogenStr = "";
         cAutogenStr = "";
 
         if (this.modulePcdType == Token.PCD_TYPE.DYNAMIC_EX) {
-            hAutogenStr += String.format("#define _PCD_TOKEN_%s   0x%016x\r\n", 
-                                         parentToken.cName, parentToken.dynamicExTokenNumber);
+            tokenNumberString =  Long.toString(parentToken.dynamicExTokenNumber, 16);
         } else {
-            hAutogenStr += String.format("#define _PCD_TOKEN_%s   0x%016x\r\n", 
-                                         parentToken.cName, parentToken.tokenNumber);
+            tokenNumberString = Long.toString(parentToken.tokenNumber, 16);
         }
 
+        hAutogenStr += String.format("#define _PCD_TOKEN_%s  0x%s\r\n", 
+                                     parentToken.cName, tokenNumberString);
+        
         if (!isBuildUsedLibrary && !parentToken.isDynamicPCD) {
             if (datum.trim().charAt(0) == '{') {
                 isByteArray = true;
