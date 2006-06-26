@@ -461,7 +461,9 @@ LibPcdSetPtr (
   IN      VOID              *Buffer
   )
 {
-  ASSERT (Buffer != NULL);
+  if (*SizeOfBuffer > 0) {
+    ASSERT (Buffer != NULL);
+  }
 
   return Buffer;
 }
@@ -630,7 +632,10 @@ LibPcdSetExPtr (
   )
 {
   ASSERT (Guid != NULL);
-  ASSERT (Buffer != NULL);
+
+  if (*SizeOfBuffer > 0) {
+    ASSERT (Buffer != NULL);
+  }
 
   return Buffer;
 }

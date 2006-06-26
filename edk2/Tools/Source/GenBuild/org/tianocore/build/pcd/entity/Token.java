@@ -708,6 +708,22 @@ public class Token {
         return false;
     }
     
+    public boolean isASCIIStringType () {
+        String str = getDynamicDefaultValue();
+
+        if (str == null) {
+            return false;
+        }
+
+        if (datumType == Token.DATUM_TYPE.POINTER &&
+            str.startsWith("\"") && 
+            str.endsWith("\"")) {
+            return true;
+        }
+
+        return false;
+    }
+
     public boolean isByteStreamType () {
         String str = getDynamicDefaultValue();
 
