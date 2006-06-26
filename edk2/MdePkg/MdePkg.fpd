@@ -68,7 +68,7 @@
 
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiServicesTablePointerLibMm7" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiReportStatusCodeLib" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiCoreEntryPoint" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeimEntryPoint" />
 
@@ -84,7 +84,7 @@
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseReportStatusCodeLibNull" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibPort80" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibDebug" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" />
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" />
 
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="UefiDriverEntryPoint" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeSmmDriverEntryPoint" />
@@ -458,7 +458,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>        
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BaseDebugLibReportStatusCode" >
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxeDebugLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdDebugPropertyMask</C_Name>
@@ -542,7 +542,7 @@
           </PcdData>
         </PcdBuildDefinition>
       </ModuleSA>
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="BasePostCodeLibReportStatusCode" >
+      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiDxePostCodeLibReportStatusCode" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">
             <C_Name>PcdPostCodePropertyMask</C_Name>

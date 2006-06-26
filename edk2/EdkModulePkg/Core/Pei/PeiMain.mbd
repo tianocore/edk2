@@ -35,7 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>PeiServicesLib</Library>
     <Library>PeiHobLib</Library>
     <Library>PeiReportStatusCodeLib</Library>
-    <Library>BaseDebugLibReportStatusCode</Library>
+    <Library>PeiDxeDebugLibReportStatusCode</Library>
     <Library>BasePerformanceLibNull</Library>
     <Arch ArchType="IA32">
       <Library OverrideID="6666">BasePeCoffGetEntryPointLib</Library>

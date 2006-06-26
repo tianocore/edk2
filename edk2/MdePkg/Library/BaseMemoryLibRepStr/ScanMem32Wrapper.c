@@ -47,12 +47,15 @@
 VOID *
 EFIAPI
 ScanMem32 (
-  IN      CONST VOID                *Buffer,
-  IN      UINTN                     Length,
-  IN      UINT32                    Value
+  IN CONST VOID  *Buffer,
+  IN UINTN       Length,
+  IN UINT32      Value
   )
 {
-  if (Length == 0) {
+  UINTN     Stride;
+  
+  Stride = Length / sizeof (Value);
+  if (Stride == 0) {
     return NULL;
   }
 
@@ -60,5 +63,5 @@ ScanMem32 (
   ASSERT (((UINTN)Buffer & (sizeof (Value) - 1)) == 0);
   ASSERT ((Length - 1) <= (MAX_ADDRESS - (UINTN)Buffer));
 
-  return (VOID*)InternalMemScanMem32 (Buffer, Length / sizeof (Value), Value);
+  return (VOID*)InternalMemScanMem32 (Buffer, Stride, Value);
 }

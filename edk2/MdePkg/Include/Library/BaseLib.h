@@ -1,16 +1,16 @@
 /** @file
-	Memory-only library functions with no library constructor/destructor
+  Memory-only library functions with no library constructor/destructor
 
-	Copyright (c) 2006, Intel Corporation
-	All rights reserved. This program and the accompanying materials
-	are licensed and made available under the terms and conditions of the BSD License
-	which accompanies this distribution.  The full text of the license may be found at
-	http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-	THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-	WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-	Module Name:	BaseLib.h
+  Module Name:  BaseLib.h
 
 **/
 
@@ -873,7 +873,7 @@ IsListEmpty (
   If Node is not a node in List and Node is not equal to List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
-  @param  Node	A pointer to a node in the doubly linked list.
+  @param  Node  A pointer to a node in the doubly linked list.
 
   @retval TRUE  Node is one of the nodes in the doubly linked list.
   @retval FALSE Node is not one of the nodes in the doubly linked list.
@@ -901,7 +901,7 @@ IsNull (
   If Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
-  @param  Node	A pointer to a node in the doubly linked list.
+  @param  Node  A pointer to a node in the doubly linked list.
 
   @retval TRUE  Node is the last node in the linked list.
   @retval FALSE Node is not the last node in the linked list.

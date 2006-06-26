@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </MbdHeader>
   <Libraries>
     <Library>PeiReportStatusCodeLib</Library>
-    <Library>BaseDebugLibReportStatusCode</Library>
+    <Library>PeiDxeDebugLibReportStatusCode</Library>
     <Library>BaseLib</Library>
     <Library>PeiMemoryLib</Library>
     <Library>PeiServicesLib</Library>

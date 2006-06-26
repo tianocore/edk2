@@ -22,16 +22,16 @@
   If TimeStamp is zero, then this function reads the current time stamp
   and adds that time stamp value to the record as the start time.
 
-	@param  Handle                  Pointer to environment specific context used
+  @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
-	@param  Token                   Pointer to a Null-terminated ASCII string
+  @param  Token                   Pointer to a Null-terminated ASCII string
                                   that identifies the component being measured.
-	@param  Module                  Pointer to a Null-terminated ASCII string
+  @param  Module                  Pointer to a Null-terminated ASCII string
                                   that identifies the module being measured.
-	@param  TimeStamp               64-bit time stamp.
+  @param  TimeStamp               64-bit time stamp.
 
   @retval RETURN_SUCCESS          The start of the measurement was recorded.
-	@retval RETURN_OUT_OF_RESOURCES There are not enough resources to record the measurement.
+  @retval RETURN_OUT_OF_RESOURCES There are not enough resources to record the measurement.
 
 **/
 RETURN_STATUS
@@ -57,16 +57,16 @@ StartPerformanceMeasurement (
   the current time stamp and adds that time stamp value to the record as the end time.
   If this function is called multiple times for the same record, then the end time is overwritten.
 
-	@param  Handle                  Pointer to environment specific context used
+  @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
-	@param  Token                   Pointer to a Null-terminated ASCII string
+  @param  Token                   Pointer to a Null-terminated ASCII string
                                   that identifies the component being measured.
-	@param  Module                  Pointer to a Null-terminated ASCII string
+  @param  Module                  Pointer to a Null-terminated ASCII string
                                   that identifies the module being measured.
-	@param  TimeStamp               64-bit time stamp.
+  @param  TimeStamp               64-bit time stamp.
 
   @retval RETURN_SUCCESS          The end of  the measurement was recorded.
-	@retval RETURN_NOT_FOUND        The specified measurement record could not be found.
+  @retval RETURN_NOT_FOUND        The specified measurement record could not be found.
 
 **/
 RETURN_STATUS
@@ -146,7 +146,7 @@ GetPerformanceMeasurement (
 
   @retval TRUE                    The PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of
                                   PcdPerformanceLibraryPropertyMask is set.
-	@retval FALSE                   The PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of
+  @retval FALSE                   The PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of
                                   PcdPerformanceLibraryPropertyMask is clear.
 
 **/

@@ -278,7 +278,7 @@ IsListEmpty (
   If Node is not a node in List and Node is not equal to List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
-  @param  Node	A pointer to a node in the doubly linked list.
+  @param  Node  A pointer to a node in the doubly linked list.
 
   @retval TRUE  Node is one of the nodes in the doubly linked list.
   @retval FALSE Node is not one of the nodes in the doubly linked list.
@@ -314,7 +314,7 @@ IsNull (
   If Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
-  @param  Node	A pointer to a node in the doubly linked list.
+  @param  Node  A pointer to a node in the doubly linked list.
 
   @retval TRUE  Node is the last node in the linked list.
   @retval FALSE Node is not the last node in the linked list.

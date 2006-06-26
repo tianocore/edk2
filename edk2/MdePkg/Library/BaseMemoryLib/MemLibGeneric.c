@@ -161,7 +161,6 @@ InternalMemScanMem8 (
 {
   CONST UINT8                       *Pointer;
 
-  ASSERT (Length > 0);
   Pointer = (CONST UINT8*)Buffer;
   do {
     if (*(Pointer++) == Value) {
@@ -192,7 +191,6 @@ InternalMemScanMem16 (
 {
   CONST UINT16                      *Pointer;
 
-  ASSERT (Length > 0);
   Pointer = (CONST UINT16*)Buffer;
   do {
     if (*(Pointer++) == Value) {
@@ -223,7 +221,6 @@ InternalMemScanMem32 (
 {
   CONST UINT32                      *Pointer;
 
-  ASSERT (Length > 0);
   Pointer = (CONST UINT32*)Buffer;
   do {
     if (*(Pointer++) == Value) {
@@ -254,7 +251,6 @@ InternalMemScanMem64 (
 {
   CONST UINT64                      *Pointer;
 
-  ASSERT (Length > 0);
   Pointer = (CONST UINT64*)Buffer;
   do {
     if (*(Pointer++) == Value) {

@@ -24,25 +24,24 @@
 **/
 
 /**
-  This function copies a source GUID to a destination GUID.
+  Copies a source GUID to a destination GUID.
 
-  This function copies the contents of the 128-bit GUID specified by SourceGuid
-  to DestinationGuid, and returns DestinationGuid.
-
+  This function copies the contents of the 128-bit GUID specified by SourceGuid to
+  DestinationGuid, and returns DestinationGuid.
   If DestinationGuid is NULL, then ASSERT().
   If SourceGuid is NULL, then ASSERT().
 
-  @param  DestinationGuid Pointer to the destination GUID.
-  @param  SourceGuid Pointer to the source GUID.
+  @param  DestinationGuid   Pointer to the destination GUID.
+  @param  SourceGuid        Pointer to the source GUID.
 
-  @return DestinationGuid
+  @return DestinationGuid.
 
 **/
 GUID *
 EFIAPI
 CopyGuid (
-  OUT     GUID                      *DestinationGuid,
-  IN      CONST GUID                *SourceGuid
+  OUT GUID       *DestinationGuid,
+  IN CONST GUID  *SourceGuid
   )
 {
   WriteUnaligned64 (
@@ -57,27 +56,25 @@ CopyGuid (
 }
 
 /**
-  Compares two GUIDs
+  Compares two GUIDs.
 
-  This function compares Guid1 to Guid2. If the GUIDs are identical then TRUE
-  is returned. If there are any bit differences in the two GUIDs, then FALSE is
-  returned.
-
+  This function compares Guid1 to Guid2.  If the GUIDs are identical then TRUE is returned.
+  If there are any bit differences in the two GUIDs, then FALSE is returned.
   If Guid1 is NULL, then ASSERT().
   If Guid2 is NULL, then ASSERT().
 
-  @param  Guid1 guid to compare
-  @param  Guid2 guid to compare
+  @param  Guid1       A pointer to a 128 bit GUID.
+  @param  Guid2       A pointer to a 128 bit GUID.
 
-  @retval TRUE  if Guid1 == Guid2
-  @retval FALSE if Guid1 != Guid2
+  @retval TRUE        Guid1 and Guid2 are identical.
+  @retval FALSE       Guid1 and Guid2 are not identical.
 
 **/
 BOOLEAN
 EFIAPI
 CompareGuid (
-  IN      CONST GUID                *Guid1,
-  IN      CONST GUID                *Guid2
+  IN CONST GUID  *Guid1,
+  IN CONST GUID  *Guid2
   )
 {
   return (BOOLEAN)(
@@ -93,28 +90,27 @@ CompareGuid (
   in the target buffer.
 
   This function searches target the buffer specified by Buffer and Length from
-  the lowest address to the highest address at 128-bit increments for the
-  128-bit GUID value that matches Guid. If a match is found, then a pointer to
-  the matching GUID in the target buffer is returned. If no match is found,
-  then NULL is returned. If Length is 0, then NULL is returned.
-
-  If Buffer is NULL, then ASSERT().
+  the lowest address to the highest address at 128-bit increments for the 128-bit
+  GUID value that matches Guid.  If a match is found, then a pointer to the matching
+  GUID in the target buffer is returned.  If no match is found, then NULL is returned.
+  If Length is 0, then NULL is returned.
+  If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 64-bit boundary, then ASSERT().
-  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
+  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
   @param  Buffer  Pointer to the target buffer to scan.
   @param  Length  Number of bytes in Buffer to scan.
   @param  Guid    Value to search for in the target buffer.
 
-  @return Pointer to the first occurrence.
-  @retval NULL  if Length == 0 or Guid was not found.
+  @return A pointer to the matching Guid in the target buffer or NULL otherwise.
+
 **/
 VOID *
 EFIAPI
 ScanGuid (
-  IN      CONST VOID                *Buffer,
-  IN      UINTN                     Length,
-  IN      CONST GUID                *Guid
+  IN CONST VOID  *Buffer,
+  IN UINTN       Length,
+  IN CONST GUID  *Guid
   )
 {
   CONST GUID                        *GuidPtr;

@@ -32,7 +32,7 @@
   Value, and returns Buffer. Value is repeated every 32-bits in for Length
   bytes of Buffer.
 
-  If Length > 0 and Buffer is NULL and Length > 0, then ASSERT().
+  If Length > 0 and Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
   If Length is not aligned on a 32-bit boundary, then ASSERT().
@@ -41,15 +41,15 @@
   @param  Length  Number of bytes in Buffer to fill.
   @param  Value   Value with which to fill Length bytes of Buffer.
 
-  @return Buffer
+  @return Buffer.
 
 **/
 VOID *
 EFIAPI
 SetMem32 (
-  OUT     VOID                      *Buffer,
-  IN      UINTN                     Length,
-  IN      UINT32                    Value
+  OUT VOID   *Buffer,
+  IN UINTN   Length,
+  IN UINT32  Value
   )
 {
   if (Length == 0) {
