@@ -586,10 +586,12 @@ LibPcdSetPtr (
   PCD_PPI    *PcdPpi;
   UINTN      Size;
 
+  if (*SizeOfBuffer > 0) {
+    ASSERT (Buffer != NULL);
+  }
+
   PcdPpi = GetPcdPpiPtr ();
   
-  ASSERT ((*SizeOfBuffer > 0) && Buffer == NULL);
-
   Size = LibPcdGetSize (TokenNumber);
   
   if (*SizeOfBuffer > Size) {
@@ -812,6 +814,10 @@ LibPcdSetExPtr (
   EFI_STATUS      Status;
   PCD_PPI         *PcdPpi;
   UINTN           Size;
+
+  if (*SizeOfBuffer > 0) {
+    ASSERT (Buffer != NULL);
+  }
 
   PcdPpi = GetPcdPpiPtr ();
 

@@ -107,7 +107,7 @@ class StringTable {
         // If we have a empty StringTable
         //
         if (al.size() == 0) {
-            cDeclCode += tab + String.format("UINT16             %s[1]; /* StringTable is Empty */", stringTable) + newLine; 
+            cDeclCode += String.format("%-20s%s[1]; /* StringTable is empty */", "UINT16", stringTable) + newLine; 
             decl = new CStructTypeDeclaration (
                                                 stringTable,
                                                 2,
@@ -116,7 +116,7 @@ class StringTable {
                                         );  
             declaList.add(decl);
 
-            cInstCode = " { 0 } " + String.format("/* %s */", stringTable);
+            cInstCode = String.format("/* %s */", stringTable) + newLine + tab + "{ 0 }";
             instTable.put(stringTable, cInstCode);
         } else {
 
@@ -137,7 +137,7 @@ class StringTable {
                     stringTableName = String.format("%s_%d", stringTable, i);
                     cDeclCode += tab;
                 }
-                cDeclCode += String.format("UINT16              %s[%d]; /* %s */", stringTableName, str.length() + 1, alComments.get(i)) + newLine;
+                cDeclCode += String.format("%-20s%s[%d]; /* %s */", "UINT16", stringTableName, str.length() + 1, alComments.get(i)) + newLine;
                 
                 if (i == 0) {
                     cInstCode = "/* StringTable */" + newLine;
@@ -295,7 +295,7 @@ class SizeTable {
         Output.add("/* SizeTable */");
         Output.add("{");
         if (al.size() == 0) {
-            Output.add("0");
+            Output.add("\t0");
         } else {
             for (int index = 0; index < al.size(); index++) {
                 Integer n = al.get(index);
@@ -387,7 +387,7 @@ class GuidTable {
 
         guidStrArray =(uuid.toString()).split("-");
 
-        return String.format("{ 0x%s, 0x%s, 0x%s, { 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s } }",
+        return String.format("{0x%s, 0x%s, 0x%s, {0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s}}",
                                          guidStrArray[0],
                                          guidStrArray[1],
                                          guidStrArray[2],
@@ -408,7 +408,7 @@ class GuidTable {
         Output.add("/* GuidTable */");
         Output.add("{");
         if (al.size() == 0) {
-            Output.add(getUuidCString(new UUID(0, 0)));
+            Output.add("\t" + getUuidCString(new UUID(0, 0)));
         }
         
         for (int i = 0; i < al.size(); i++) {
@@ -505,7 +505,7 @@ class SkuIdTable {
             decl = new CStructTypeDeclaration (
                                                 "SystemSkuId",
                                                 1,
-                                                "SKU_ID          SystemSkuId;\r\n",
+                                                String.format("%-20sSystemSkuId;\r\n", "SKU_ID"),
                                                 true
                                               );
             declaList.add(decl);
@@ -662,7 +662,7 @@ class LocalTokenNumberTable {
         output.add("{");
 
         if (al.size() == 0) {
-            output.add("0");
+            output.add("\t0");
         }
         
         for (int index = 0; index < al.size(); index++) {
@@ -864,12 +864,12 @@ class PcdDatabase {
     private final String        newLine                         = "\r\n";
     private final String        commaNewLine                    = ",\r\n";
     private final String        tab                             = "\t";
-    public final static String ExMapTableDeclaration            = "DYNAMICEX_MAPPING ExMapTable[%s_EXMAPPING_TABLE_SIZE];\r\n";
-    public final static String GuidTableDeclaration             = "EFI_GUID          GuidTable[%s_GUID_TABLE_SIZE];\r\n";
-    public final static String LocalTokenNumberTableDeclaration = "UINT32            LocalTokenNumberTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
-    public final static String StringTableDeclaration           = "UINT16            StringTable[%s_STRING_TABLE_SIZE];\r\n";
-    public final static String SizeTableDeclaration             = "UINT16            SizeTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
-    public final static String SkuIdTableDeclaration            = "UINT8             SkuIdTable[%s_SKUID_TABLE_SIZE];\r\n";
+    public final static String ExMapTableDeclaration            = "DYNAMICEX_MAPPING   ExMapTable[%s_EXMAPPING_TABLE_SIZE];\r\n";
+    public final static String GuidTableDeclaration             = "EFI_GUID            GuidTable[%s_GUID_TABLE_SIZE];\r\n";
+    public final static String LocalTokenNumberTableDeclaration = "UINT32              LocalTokenNumberTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
+    public final static String StringTableDeclaration           = "UINT16              StringTable[%s_STRING_TABLE_SIZE];\r\n";
+    public final static String SizeTableDeclaration             = "UINT16              SizeTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
+    public final static String SkuIdTableDeclaration            = "UINT8               SkuIdTable[%s_SKUID_TABLE_SIZE];\r\n";
 
 
     public final static String ExMapTableSizeMacro              = "#define %s_EXMAPPING_TABLE_SIZE  %d\r\n";
@@ -1206,7 +1206,8 @@ class PcdDatabase {
                 //
                 // We made a assumption that both PEI_PCD_DATABASE and DXE_PCD_DATABASE
                 // has a least one data memember with alignment size of 1. So we can
-                // remove the last "," in the C structure instantiation string.
+                // remove the last "," in the C structure instantiation string. Luckily,
+                // this is true as both data structure has SKUID_TABLE anyway.
                 //
                 if ((align == 1) && (i == declaListBasedOnAlignment.size() - 1)) {
                     initInstStr += newLine;
@@ -1228,7 +1229,7 @@ class PcdDatabase {
         }
         
         if (uinitDatabaseEmpty) {
-            uninitDeclStr += tab + "	UINT8        dummy; /* PCD_DATABASE_UNINIT is emptry */\r\n";
+            uninitDeclStr += tab + String.format("%-20sdummy; /* PCD_DATABASE_UNINIT is emptry */\r\n", "UINT8");
         }
         
         initDeclStr += String.format("} %s_PCD_DATABASE_INIT;", phase) + newLine + newLine;
@@ -1475,7 +1476,7 @@ class PcdDatabase {
     }
 
     private String getSkuEnabledTypeDeclaration (Token token) {
-        return String.format("SKU_HEAD %s;\r\n", token.getPrimaryKeyString());
+        return String.format("%-20s%s;\r\n", "SKU_HEAD", token.getPrimaryKeyString());
     }
 
     private String getSkuEnabledTypeInstantiaion (Token token, int SkuTableIdx) {
@@ -1581,20 +1582,29 @@ class PcdDatabase {
         }
 
         if (t.isUnicodeStringType()) {
-            privateGlobalCCode = String.format("STRING_HEAD              %s[%d];\r\n", t.getPrimaryKeyString(), t.getSkuIdCount());
+            privateGlobalCCode = String.format("%-20s%s[%d];\r\n", "STRING_HEAD", t.getPrimaryKeyString(), t.getSkuIdCount());
         } else {
             String type = getCType(t);
             if (t.datumType == Token.DATUM_TYPE.POINTER) {
-                privateGlobalCCode = String.format("%s              %s[%d][%d];\r\n", type, privateGlobalName, t.getSkuIdCount(), t.datumSize);
+                int bufferSize;
+                if (t.isASCIIStringType()) {
+                    //
+                    // Build tool will add a NULL string at the end of the ASCII string
+                    //
+                    bufferSize = t.datumSize + 1;
+                } else {
+                    bufferSize = t.datumSize;
+                }
+                privateGlobalCCode = String.format("%-20s%s[%d][%d];\r\n", type, privateGlobalName, t.getSkuIdCount(), bufferSize);
             } else {
-                privateGlobalCCode = String.format("%s              %s[%d];\r\n", type, privateGlobalName, t.getSkuIdCount());
+                privateGlobalCCode = String.format("%-20s%s[%d];\r\n", type, privateGlobalName, t.getSkuIdCount());
             }
         }
     }
     
     private String getDataTypeDeclarationForVariableDefault_new (Token token, String cName, int skuId) {
 
-        String typeStr = "";
+        String typeStr;
 
         if (token.datumType == Token.DATUM_TYPE.UINT8) {
             typeStr = "UINT8";
@@ -1607,11 +1617,12 @@ class PcdDatabase {
         } else if (token.datumType == Token.DATUM_TYPE.BOOLEAN) {
             typeStr = "BOOLEAN";
         } else if (token.datumType == Token.DATUM_TYPE.POINTER) {
-            return String.format("UINT8 %s[%d]", cName, token.datumSize);
+            return String.format("%-20s%s[%d];\r\n", cName, token.datumSize);
         } else {
+            typeStr = "";
         }
 
-        return String.format("%s             %s;\r\n", typeStr, cName);
+        return String.format("%-20s%s;\r\n", typeStr, cName);
     }
     
     private String getDataTypeDeclaration (Token token) {

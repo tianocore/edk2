@@ -513,8 +513,10 @@ LibPcdSetPtr (
 {
   EFI_STATUS Status;
   UINTN      Size;
-  
-  ASSERT ((*SizeOfBuffer > 0) && Buffer == NULL);
+
+  if (*SizeOfBuffer > 0) {
+    ASSERT (Buffer != NULL);
+  }
 
   Size = LibPcdGetSize (TokenNumber);
   
@@ -726,8 +728,9 @@ LibPcdSetExPtr (
   EFI_STATUS  Status;
   UINTN       Size;
 
-  ASSERT (Guid != NULL);
-  ASSERT (Buffer != NULL);
+  if (*SizeOfBuffer > 0) {
+    ASSERT (Buffer != NULL);
+  }
 
   Size = LibPcdGetExSize (Guid, TokenNumber);
   if (*SizeOfBuffer > Size) {
