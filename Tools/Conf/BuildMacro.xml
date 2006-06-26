@@ -283,6 +283,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
+          <pathconvert property="ModuleDirUnixName" targetos="unix">
+            <path path="${MODULE_DIR}"/>
+            <mapper>
+              <chainedmapper>
+                <filtermapper>
+                  <replacestring from="\" to="/"/>
+                </filtermapper>
+              </chainedmapper>
+            </mapper>
+          </pathconvert>
           <cc userdefine="on">
             <command type="CC" workdir="${DEST_DIR_DEBUG}/@{FILEPATH}">
               <includepath path="${WORKSPACE_DIR}"/>
@@ -296,7 +306,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
           <replaceregexp file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.i"
                          match="^(#line +1 +.*@{FILEPATH}/@{FILENAME}\.@{FILEEXT}&quot;).+\1"
-                         replace="; Source: ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"
+                         replace="; Source: ${ModuleDirUnixName}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"
                          flags="gs"/>
           <replaceregexp file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.i"
                          match="^(#line .*)$"
