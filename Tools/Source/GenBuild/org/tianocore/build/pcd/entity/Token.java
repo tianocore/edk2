@@ -67,12 +67,12 @@ public class Token {
     /// platform token space. For Dynamic, dynamicEx type, this number will be re-adjust by
     /// PCD run-time database autogen tools.
     ///
-    public int              tokenNumber;
+    public long              tokenNumber;
 
     ///
     /// This token number is retrieved from FPD file for DynamicEx type. 
     /// 
-    public int              dynamicExTokenNumber;
+    public long              dynamicExTokenNumber;
 
     ///
     /// All supported PCD type, this value can be retrieved from SPD
