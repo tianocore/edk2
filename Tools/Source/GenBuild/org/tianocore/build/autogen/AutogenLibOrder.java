@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.LibraryClassDocument.LibraryClass;
 
@@ -81,7 +80,8 @@ public class AutogenLibOrder {
             if (libClassConsmList != null) {
                 String[] classStr = new String[libClassConsmList.length];
                 for (int k = 0; k < libClassConsmList.length; k++) {
-                    classStr[k] = libClassConsmList[k].getStringValue();
+                    //classStr[k] = libClassConsmList[k].getStringValue();
+                    classStr[k] = getStringValue((XmlObject)libClassConsmList[k]);
                 }
                 if (this.libInstanceMap.containsKey(libInstance[0])) {
                     throw new Exception(
@@ -99,17 +99,17 @@ public class AutogenLibOrder {
                     .getLibraryClassArray(CommonDefinition.AlwaysProduced);
             if (libClassDeclList != null) {
                 for (int j = 0; j < libClassDeclList.length; j++) {
-                    if (this.libClassMap.containsKey(libClassDeclList[j]
-                            .getStringValue())) {
-                        System.out.println(libClassDeclList[j].getStringValue()
+                    //if (this.libClassMap.containsKey(libClassDeclList[j]
+                    //        .getStringValue())) {
+                    String libClassName = getStringValue((XmlObject)libClassDeclList[j]);
+                    if (this.libClassMap.containsKey(libClassName)) {
+                        System.out.println(libClassName
                                 + " class is already implement by "
-                                + this.libClassMap.get(libClassDeclList[j]
-                                        .getStringValue()));
+                                + this.libClassMap.get(libClassName));
                         throw new Exception(libClassDeclList
                                 + " is already have library instance!");
                     } else {
-                        this.libClassMap.put(libClassDeclList[j]
-                                .getStringValue(), libInstance[0]);
+                        this.libClassMap.put(libClassName, libInstance[0]);
                     }
                 }
             }
@@ -285,6 +285,10 @@ public class AutogenLibOrder {
             }
         }
         return false;
+    }
+
+    private String getStringValue(XmlObject xmlDoc) {
+        return xmlDoc.getDomNode().getFirstChild().getNodeValue();
     }
 }
 

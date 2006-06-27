@@ -591,8 +591,7 @@ public class AutoGen {
         // library class name.
         //
         for (int i = 0; i < libClassList.length; i++) {
-            includerName = GlobalData.getLibClassIncluder(libClassList[i]
-                    .getStringValue());
+            includerName = GlobalData.getLibClassIncluder(getStringValue((XmlObject)libClassList[i]));
             if (includerName != null) {
                 str = CommonDefinition.include + " " + "<";
                 str = str + includerName + ">\r\n";
@@ -1095,14 +1094,14 @@ public class AutoGen {
         if (ppiList != null) {
             for (int i = 0; i < ppiList.length; i++) {
                 isEqual = false;
+                String ppiName = getStringValue((XmlObject)ppiList[i]);
                 for (int j = 0; j < this.mPpiList.size(); j++) {
-                    if (this.mPpiList.get(j).equalsIgnoreCase(
-                            ppiList[i].getStringValue())) {
+                    if (this.mPpiList.get(j).equalsIgnoreCase(ppiName)) {
                         isEqual = true;
                     }
                 }
                 if (!isEqual) {
-                    this.mPpiList.add(ppiList[i].getStringValue());
+                    this.mPpiList.add(ppiName);
                 }
             }
         }
@@ -1112,14 +1111,14 @@ public class AutoGen {
         if (ppiNotifyList != null) {
             for (int i = 0; i < ppiNotifyList.length; i++) {
                 isEqual = false;
+                String ppiNotifyName = getStringValue((XmlObject)ppiNotifyList[i]);
                 for (int j = 0; j < this.mPpiList.size(); j++) {
-                    if (this.mPpiList.get(j).equalsIgnoreCase(
-                            ppiNotifyList[i].getStringValue())) {
+                    if (this.mPpiList.get(j).equalsIgnoreCase(ppiNotifyName)) {
                         isEqual = true;
                     }
                 }
                 if (!isEqual) {
-                    this.mPpiList.add(ppiNotifyList[i].getStringValue());
+                    this.mPpiList.add(ppiNotifyName);
                 }
             }
         }
@@ -1159,14 +1158,14 @@ public class AutoGen {
         if (protocolList != null) {
             for (int i = 0; i < protocolList.length; i++) {
                 isEqual = false;
+                String protocolName = getStringValue((XmlObject)protocolList[i]);
                 for (int j = 0; j < this.mProtocolList.size(); j++) {
-                    if (this.mProtocolList.get(j).equalsIgnoreCase(
-                            protocolList[i].getStringValue())) {
+                    if (this.mProtocolList.get(j).equalsIgnoreCase(protocolName)) {
                         isEqual = true;
                     }
                 }
                 if (!isEqual) {
-                    this.mProtocolList.add(protocolList[i].getStringValue());
+                    this.mProtocolList.add(protocolName);
 
                 }
             }
@@ -1177,15 +1176,14 @@ public class AutoGen {
         if (protocolNotifyList != null) {
             for (int i = 0; i < protocolNotifyList.length; i++) {
                 isEqual = false;
+                String protocolNotifyName = getStringValue((XmlObject)protocolNotifyList[i]);
                 for (int j = 0; j < this.mProtocolList.size(); j++) {
-                    if (this.mProtocolList.get(j).equalsIgnoreCase(
-                            protocolNotifyList[i].getStringValue())) {
+                    if (this.mProtocolList.get(j).equalsIgnoreCase(protocolNotifyName)) {
                         isEqual = true;
                     }
                 }
                 if (!isEqual) {
-                    this.mProtocolList.add(protocolNotifyList[i]
-                            .getStringValue());
+                    this.mProtocolList.add(protocolNotifyName);
 
                 }
             }
@@ -1330,66 +1328,56 @@ public class AutoGen {
                         if (ppiList != null) {
                             for (index = 0; index < ppiList.length; index++) {
                                 isEqual = false;
+                                String name = getStringValue((XmlObject)ppiList[index]);
                                 for (int j = 0; j < this.mPpiList.size(); j++) {
-                                    if (this.mPpiList.get(j).equalsIgnoreCase(
-                                            ppiList[index].getStringValue())) {
+                                    if (this.mPpiList.get(j).equalsIgnoreCase(name)) {
                                         isEqual = true;
                                     }
                                 }
                                 if (!isEqual) {
-                                    this.mPpiList.add(ppiList[index]
-                                            .getStringValue());
+                                    this.mPpiList.add(name);
                                 }
                             }
                         }
                         if (ppiNotifyList != null) {
                             for (index = 0; index < ppiNotifyList.length; index++) {
                                 isEqual = false;
+                                String name = getStringValue((XmlObject)ppiNotifyList[index]);
                                 for (int j = 0; j < this.mPpiList.size(); j++) {
-                                    if (this.mPpiList.get(j).equalsIgnoreCase(
-                                            ppiNotifyList[index]
-                                                    .getStringValue())) {
+                                    if (this.mPpiList.get(j).equalsIgnoreCase(name)) {
                                         isEqual = true;
                                     }
                                 }
                                 if (!isEqual) {
-                                    this.mPpiList.add(ppiNotifyList[index]
-                                            .getStringValue());
+                                    this.mPpiList.add(name);
                                 }
                             }
                         }
                         if (protocolList != null) {
                             for (index = 0; index < protocolList.length; index++) {
                                 isEqual = false;
+                                String name = getStringValue((XmlObject)protocolList[index]);
                                 for (int j = 0; j < this.mProtocolList.size(); j++) {
-                                    if (this.mProtocolList.get(j)
-                                            .equalsIgnoreCase(
-                                                    protocolList[index]
-                                                            .getStringValue())) {
+                                    if (this.mProtocolList.get(j).equalsIgnoreCase(name)) {
                                         isEqual = true;
                                     }
                                 }
                                 if (!isEqual) {
-                                    this.mProtocolList.add(protocolList[index]
-                                            .getStringValue());
+                                    this.mProtocolList.add(name);
                                 }
                             }
                         }
                         if (protocolNotifyList != null) {
                             for (index = 0; index < protocolNotifyList.length; index++) {
                                 isEqual = false;
+                                String name = getStringValue((XmlObject)protocolNotifyList[index]);
                                 for (int j = 0; j < this.mProtocolList.size(); j++) {
-                                    if (this.mProtocolList.get(j)
-                                            .equalsIgnoreCase(
-                                                    protocolNotifyList[index]
-                                                            .getStringValue())) {
+                                    if (this.mProtocolList.get(j).equalsIgnoreCase(name)) {
                                         isEqual = true;
                                     }
                                 }
                                 if (!isEqual) {
-                                    this.mProtocolList
-                                            .add(protocolNotifyList[index]
-                                                    .getStringValue());
+                                    this.mProtocolList.add(name);
                                 }
                             }
                         }
@@ -2015,4 +2003,7 @@ public class AutoGen {
 
     }
 
+    private String getStringValue(XmlObject xmlDoc) {
+        return xmlDoc.getDomNode().getFirstChild().getNodeValue();
+    }
 }
