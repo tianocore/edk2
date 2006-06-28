@@ -158,6 +158,7 @@ BasePrintLibConvertValueToString (
   if (Value < 0) {
     Value = -Value;
     Buffer = BasePrintLibFillBuffer (Buffer, 1, '-', Increment);
+    Width--;
   }
 
   Count = BasePrintLibValueToString (ValueBuffer, Value, 10);
@@ -166,7 +167,10 @@ BasePrintLibConvertValueToString (
     Buffer = BasePrintLibFillBuffer (Buffer, Width - Count, '0', Increment);
   }
 
-  Digits = 3 - (Count % 3);
+  Digits = Count % 3;
+  if (Digits != 0) {
+    Digits = 3 - Digits;
+  }
   for (Index = 0; Index < Count; Index++) {
     Buffer = BasePrintLibFillBuffer (Buffer, 1, ValueBuffer[Count - Index], Increment);
     if ((Flags & COMMA_TYPE) != 0) {

@@ -227,6 +227,17 @@ BasePrintLibVSPrint (
             Precision = Count;
           }
           break;
+       
+        case '\0':
+          //
+          // Make no output if Format string terminates unexpectedly when
+          // looking up for flag, width, precision and type. 
+          //
+          Format   -= BytesPerFormatCharacter;
+          Precision = 0;
+          //
+          // break skiped on purpose.
+          //
         default:
           Done = TRUE;
           break;
@@ -299,19 +310,26 @@ BasePrintLibVSPrint (
           Count = 0;
         }
         ArgumentString = (CHAR8 *)ValueBuffer + Count;
-        Digits = 3 - (Count % 3);
+        
+        Digits = Count % 3;
+        if (Digits != 0) {
+          Digits = 3 - Digits;
+        }
         if (Comma && Count != 0) {
           Count += ((Count - 1) / 3);
         }
         if (Prefix != 0) {
           Count++;
+          Precision++;
         }
         Flags |= ARGUMENT_REVERSED;
         ZeroPad = TRUE;
         if ((Flags & PREFIX_ZERO) != 0) {
-          if ((Flags & PAD_TO_WIDTH) != 0) {
-            if ((Flags & PRECISION) == 0) {
-              Precision = Width;
+          if ((Flags & LEFT_JUSTIFY) == 0) {
+            if ((Flags & PAD_TO_WIDTH) != 0) {
+              if ((Flags & PRECISION) == 0) {
+                Precision = Width;
+              }
             }
           }
         }
