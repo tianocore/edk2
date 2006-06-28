@@ -36,19 +36,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>MemLibGuid.c</Filename>
+    <Filename>CopyMemWrapper.c</Filename>
+    <Filename>SetMemWrapper.c</Filename>
+    <Filename>SetMem16Wrapper.c</Filename>
+    <Filename>SetMem32Wrapper.c</Filename>
+    <Filename>SetMem64Wrapper.c</Filename>
+    <Filename>CompareMemWrapper.c</Filename>
+    <Filename>ZeroMemWrapper.c</Filename>
+    <Filename>ScanMem8Wrapper.c</Filename>
+    <Filename>ScanMem16Wrapper.c</Filename>
+    <Filename>ScanMem32Wrapper.c</Filename>
+    <Filename>ScanMem64Wrapper.c</Filename>
     <Arch ArchType="IA32">
-      <Filename>MemLibGuid.c</Filename>
-      <Filename>CopyMemWrapper.c</Filename>
-      <Filename>SetMemWrapper.c</Filename>
-      <Filename>SetMem16Wrapper.c</Filename>
-      <Filename>SetMem32Wrapper.c</Filename>
-      <Filename>SetMem64Wrapper.c</Filename>
-      <Filename>CompareMemWrapper.c</Filename>
-      <Filename>ZeroMemWrapper.c</Filename>
-      <Filename>ScanMem8Wrapper.c</Filename>
-      <Filename>ScanMem16Wrapper.c</Filename>
-      <Filename>ScanMem32Wrapper.c</Filename>
-      <Filename>ScanMem64Wrapper.c</Filename>
       <Filename>Ia32/CopyMem.asm</Filename>
       <Filename>Ia32/SetMem.asm</Filename>
       <Filename>Ia32/ZeroMem.asm</Filename>
@@ -60,6 +60,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Filename>Ia32/ScanMem16.asm</Filename>
       <Filename>Ia32/ScanMem32.asm</Filename>
       <Filename>Ia32/ScanMem64.asm</Filename>
+    </Arch>
+    <Arch ArchType="X64">
+      <Filename>X64/CopyMem.asm</Filename>
+      <Filename>X64/SetMem.asm</Filename>
+      <Filename>X64/SetMem16.asm</Filename>
+      <Filename>X64/SetMem32.asm</Filename>
+      <Filename>X64/SetMem64.asm</Filename>
+      <Filename>X64/CompareMem.asm</Filename>
+      <Filename>X64/ScanMem8.asm</Filename>
+      <Filename>X64/ScanMem16.asm</Filename>
+      <Filename>X64/ScanMem32.asm</Filename>
+      <Filename>X64/ScanMem64.asm</Filename>
     </Arch>
   </SourceFiles>
   <Includes>
