@@ -24,8 +24,8 @@
     .code
 
 ;------------------------------------------------------------------------------
-; VOID
-; EFIAPI
+; VOID *
+; EFIAPI 
 ; AsmFlushCacheLine (
 ;   IN      VOID                      *LinearAddress
 ;   );
