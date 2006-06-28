@@ -148,10 +148,10 @@ public class CommonDefinition {
                     new MyEnum("PEI_CORE", ModuleTypePeiCore),
                     new MyEnum("PEIM", ModuleTypePeim),
                     new MyEnum("DXE_CORE", ModuleTypeDxeCore),
-                    new MyEnum("DXE_DRIVER", ModuleTypeDxeRuntimeDriver),
+                    new MyEnum("DXE_DRIVER", ModuleTypeDxeDriver),
                     new MyEnum("DXE_RUNTIME_DRIVER", ModuleTypeDxeRuntimeDriver),
-                    new MyEnum("DXE_SAL_DRIVER", ModuleTypeDxeSmmDriver),
-                    new MyEnum("DXE_SMM_DRIVER", ModuleTypeDxeSalDriver),
+                    new MyEnum("DXE_SMM_DRIVER", ModuleTypeDxeSmmDriver),
+                    new MyEnum("DXE_SAL_DRIVER", ModuleTypeDxeSalDriver),
                     new MyEnum("UEFI_DRIVER", ModuleTypeUefiDriver),
                     new MyEnum("UEFI_APPLICATION", ModuleTypeUefiApplication) };
     

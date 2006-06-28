@@ -751,7 +751,7 @@ public class AutoGen {
                     if (!entryPointList[i].equals("")) {
                         fileBuffer.append("  Status = ");
                         fileBuffer.append(entryPointList[i]);
-                        fileBuffer.append(" (FfsHeader, PeiServices)\r\n");
+                        fileBuffer.append(" (FfsHeader, PeiServices);\r\n");
                         fileBuffer
                                 .append("  if (!EFI_ERROR (Status) || EFI_ERROR (CombinedStatus)) {\r\n");
                         fileBuffer.append("    CombinedStatus = Status;\r\n");
