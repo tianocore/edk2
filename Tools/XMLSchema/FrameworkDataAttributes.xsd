@@ -104,7 +104,7 @@
         <!-- Make Usage REQUIRED in final -->
         <xs:attribute name="Usage" type="EventUsage" use="optional"/>
         <!-- Make EventGroup Required in final -->
-        <xs:attribute name="EventGroup" type="EventTypes" use="optional"/>
+        <xs:attribute name="EventGuidCName" type="C_NameType" use="optional"/>        
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
         <!-- DO NOT USE remove Arch from use, use SupArchList instead -->
@@ -115,6 +115,7 @@
         <xs:attribute name="Guid" type="GuidType" use="optional"/>
         <!-- DO NOT USE remove OverrideID from use -->
         <xs:attribute name="OverrideID" type="xs:int" use="optional"/>
+        <xs:attribute name="EventGroup" type="EventTypes" use="optional"/>
     </xs:attributeGroup>
     <xs:attributeGroup name="ExternAttributes">
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
@@ -192,6 +193,7 @@
     <xs:attributeGroup name="HobAttributes">
         <!-- USAGE is required in final -->
         <xs:attribute name="Usage" type="HobUsage" use="optional"/>
+        <xs:attribute name="HobGuidCName" type="C_NameType" use="optional"/>        
         <xs:attribute name="HobType" type="HobTypes" use="required"/>
         <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
         <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>

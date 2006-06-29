@@ -47,6 +47,21 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+    <xs:element name="PlatformSurfaceArea">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" ref="PlatformHeader"/>
+                <!-- This section will be for new definitions of how we put together the Framework Binary Images -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="PlatformDefinitions"/>
+                <!-- The Flash section is the legacy implementation of Flash -->
+                <xs:element minOccurs="0" maxOccurs="1" ref="Flash"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="FrameworkModules"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="DynamicPcdBuildDefinitions"/>
+                <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
     <xs:annotation>
         <xs:documentation xml:lang="en">DO NOT USE removing all Library Module files - PUT IN PLATFORM DESCRIPTION FILE, FPD</xs:documentation>
     </xs:annotation>

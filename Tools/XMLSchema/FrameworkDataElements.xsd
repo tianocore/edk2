@@ -1302,6 +1302,7 @@
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuidCName" type="C_NameType"/>                            
                             <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValueType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="HelpText" type="Paragraph"/>
                         </xs:sequence>
@@ -1325,7 +1326,8 @@
                         <xs:sequence>
                             <xs:element minOccurs="1" maxOccurs="1" name="C_Name" type="C_NameType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="Token" type="TokenDataType"/>
-                            <xs:element minOccurs="1" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
+                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuidCName" type="C_NameType"/>                            
+                            <xs:element minOccurs="0" maxOccurs="1" name="TokenSpaceGuid" type="GuidType"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="DatumType" type="PcdDataTypes"/>
                             <xs:element minOccurs="1" maxOccurs="1" name="ValidUsage" type="PcdListType"/>
                             <xs:element minOccurs="0" maxOccurs="1" name="DefaultValue" type="DefaultValueType"/>
