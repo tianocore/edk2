@@ -136,6 +136,10 @@
     </xs:simpleType>
     <xs:simpleType name="EventTypes">
         <xs:restriction base="NameConvention">
+            <xs:enumeration value="EVENT_GROUP_GUID"/>
+            <xs:enumeration value="EVENT_TYPE_PERIODIC_TIMER"/>
+            <xs:enumeration value="EVENT_TYPE_RELATIVE_TIMER"/>
+            <!-- DON'T USE! TO BE REMOVED -->
             <xs:enumeration value="EVENT_GROUP_EXIT_BOOT_SERVICES"/>
             <xs:enumeration value="EVENT_GROUP_VIRTUAL_ADDRESS_CHANGE"/>
             <xs:enumeration value="EVENT_GROUP_MEMORY_MAP_CHANGE"/>
