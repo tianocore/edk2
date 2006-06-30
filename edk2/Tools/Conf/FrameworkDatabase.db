@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FrameworkDatabase xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+<FrameworkDatabase xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <FdbHeader>
     <DatabaseName>FrameworkDatabase</DatabaseName>
-    <Guid>5ce32c23-6448-43ab-b509-a9deae3aae65</Guid>
+    <GuidValue>5ce32c23-6448-43ab-b509-a9deae3aae65</GuidValue>
     <Version>0.3</Version>
     <Abstract>The Framework Module Development Packaging System Database</Abstract>
     <Description>This Database tracks the Basename, Version, Guid and Path for all packages installed in this workspace.</Description>
@@ -15,89 +15,31 @@
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
       OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION     0x00000052</Specification>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </FdbHeader>
   <PackageList>
-    <Package>
-      <PackageName>EdkFatBinPkg</PackageName>
-      <Guid>0fd7197b-9bde-44fe-a7e4-d2177a9922e5</Guid>
-      <Version>0.3</Version>
-      <Path>EdkFatBinPkg/</Path>
-      <InstalledDate>2006-03-05 09:49</InstalledDate>
-    </Package>
-    <Package>
-      <PackageName>EdkModulePkg</PackageName>
-      <Guid>0xb6ec423c, 0x21d2, 0x490d, 0x85, 0xc6, 0xdd, 0x58, 0x64, 0xea, 0xa6, 0x74</Guid>
-      <Version>0.3</Version>
-      <Path>EdkModulePkg/</Path>
-      <InstalledDate>2006-02-21 17:43</InstalledDate>
-    </Package>
-    <Package>
-      <PackageName>EdkNt32Pkg</PackageName>
-      <Guid>0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3</Guid>
-      <Version>0.3</Version>
-      <Path>EdkNt32Pkg/</Path>
-      <InstalledDate>2006-02-22 13:25</InstalledDate>
-    </Package>
-    <Package>
-      <PackageName>EdkShellBinPkg</PackageName>
-      <Guid>d4266a1b-1d38-4116-93ae-60dc3e2012a6</Guid>
-      <Version>0.3</Version>
-      <Path>EdkShellBinPkg/</Path>
-      <InstalledDate>2006-03-05 10:13</InstalledDate>
-    </Package>
-    <Package>
-      <PackageName>MdePkg</PackageName>
-      <Guid>5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec</Guid>
-      <Version>0.3</Version>
-      <Path>MdePkg/</Path>
-      <InstalledDate>2006-03-18 19:02</InstalledDate>
-    </Package>
-    <Package>
-      <PackageName>Tools</PackageName>
-      <Guid>53f84ca0-53fe-4412-b4e7-dcec602e1d49</Guid>
-      <Version>0.3</Version>
-      <Path>Tools/</Path>
-      <InstalledDate>2006-02-24 14:49</InstalledDate>
-    </Package>
-    <Package>
-      <PackageName>EdkFatPkg</PackageName>
-      <Guid>0x8EA68A2C, 0x99CB, 0x4332, 0x85, 0xc6, 0xdd, 0x58, 0x64, 0xea, 0xa6, 0x74</Guid>
-      <Version>1.0</Version>
-      <Path>EdkFatPkg/</Path>
-      <InstalledDate>2006-03-05 09:49</InstalledDate>
-    </Package>
+    <Filename>EdkFatBinPkg/EdkFatBinPkg.spd</Filename>
+    <Filename>EdkFatPkg/EdkFatPkg.spd</Filename>
+    <Filename>EdkModulePkg/EdkModulePkg.spd</Filename>
+
+    <Filename>EdkNt32Pkg/EdkNt32Pkg.spd</Filename>
+    <Filename>EdkShellBinPkg/EdkShellBinPkg.spd</Filename>
+    <Filename>MdePkg/MdePkg.spd</Filename>
+    <!--
+    <Filename>Tools/Tools.spd</Filename>
+    -->
   </PackageList>
   <PlatformList>
-    <Platform PlatformName="NT32" PlatformGuid="eb216561-961f-47ee-9ef9-ca426ef547c2" PlatformVersion="0.3">
-      <Filename>EdkNt32Pkg/Nt32.fpd</Filename>
-      <InstalledDate>2006-02-23 18:21</InstalledDate>
-      <ModifiedDate>2006-06-03 20:20</ModifiedDate>
-    </Platform>
-    <Platform PlatformName="NT32Test" PlatformGuid="b23bda70-806b-4c2c-85f3-1d7139cb9f12" PlatformVersion="0.3">
-      <Filename>EdkNt32Pkg/Nt32Test.fpd</Filename>
-      <InstalledDate>2006-02-24 14:49</InstalledDate>
-      <ModifiedDate>2006-05-14 09:49</ModifiedDate>
-    </Platform>
-    <Platform PlatformName="MdePkgAll" PlatformGuid="0fe7dd3e-0969-48c3-8cd2-de9a190088e2" PlatformVersion="0.3">
-      <Filename>MdePkg/MdePkg-All-Archs.fpd</Filename>
-      <InstalledDate>2006-02-24 14:49</InstalledDate>
-      <ModifiedDate>2006-05-14 09:49</ModifiedDate>
-    </Platform>
-    <Platform PlatformName="MdePkg" PlatformGuid="1123e1a9-4d9b-499f-843c-b2297ff61a11" PlatformVersion="0.3">
-      <Filename>MdePkg/MdePkg.fpd</Filename>
-      <InstalledDate>2006-02-24 14:49</InstalledDate>
-      <ModifiedDate>2006-05-14 09:49</ModifiedDate>
-    </Platform>
-    <Platform PlatformName="EdkModuleAll" PlatformGuid="dc967761-e6e9-4d1a-b02c-818102db4cc6" PlatformVersion="0.3">
-      <Filename>EdkModulePkg/EdkModulePkg-All-Archs.fpd</Filename>
-      <InstalledDate>2006-02-24 14:49</InstalledDate>
-      <ModifiedDate>2006-06-03 22:14</ModifiedDate>
-    </Platform>
-    <Platform PlatformName="EdkModule" PlatformGuid="dbb0551f-a04b-4038-9303-e60998023c8d" PlatformVersion="0.3">
-      <Filename>EdkModulePkg/EdkModulePkg.fpd</Filename>
-      <InstalledDate>2006-02-24 14:49</InstalledDate>
-      <ModifiedDate>2006-06-01 17:59</ModifiedDate>
-    </Platform>
+    <Filename>EdkNt32Pkg/Nt32.fpd</Filename>
+    <!--
+    <Filename>EdkModulePkg/EdkModulePkg-All-Archs.fpd</Filename>
+    <Filename>EdkModulePkg/EdkModulePkg.fpd</Filename>
+    -->
+  <!--
+    <Filename>MdePkg/MdePkg.fpd</Filename>
+  -->
   </PlatformList>
+  <FarList>
+    <Filename>hello.world</Filename>
+  </FarList>
 </FrameworkDatabase>
