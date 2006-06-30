@@ -128,12 +128,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>FlashMapHob</GuidCName>
     </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
+    <!--<GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>Hob</GuidCName>
-    </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
+    </GuidCNames>-->
+    <!--<GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>SystemNvData</GuidCName>
-    </GuidCNames>
+    </GuidCNames>-->
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>AlternateFvBlock</GuidCName>
     </GuidCNames>

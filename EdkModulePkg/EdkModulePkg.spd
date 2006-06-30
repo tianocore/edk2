@@ -171,6 +171,7 @@
     <IncludePkgHeader ModuleType="DXE_SMM_DRIVER">Include/EdkDxe.h</IncludePkgHeader>
     <IncludePkgHeader ModuleType="DXE_SAL_DRIVER">Include/EdkDxe.h</IncludePkgHeader>
     <IncludePkgHeader ModuleType="UEFI_DRIVER">Include/EdkDxe.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="USER_DEFINED">Include/EdkPeim.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
     <Entry Name="PcdDataBaseHob">

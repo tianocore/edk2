@@ -223,9 +223,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>PeiPeCoffLoader</GuidCName>
     </GuidCNames>
-    <GuidCNames Usage="ALWAYS_CONSUMED">
+    <!--<GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>LoadPeImage</GuidCName>
-    </GuidCNames>
+    </GuidCNames>-->
     <GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>EventExitBootServices</GuidCName>
     </GuidCNames>
