@@ -31,13 +31,10 @@
   </PackageList>
   <PlatformList>
     <Filename>EdkNt32Pkg/Nt32.fpd</Filename>
-    <!--
     <Filename>EdkModulePkg/EdkModulePkg-All-Archs.fpd</Filename>
     <Filename>EdkModulePkg/EdkModulePkg.fpd</Filename>
-    -->
-  <!--
     <Filename>MdePkg/MdePkg.fpd</Filename>
-  -->
+    <Filename>MdePkg/MdePkg-All-Archs.fpd</Filename>
   </PlatformList>
   <FarList>
     <Filename>hello.world</Filename>
