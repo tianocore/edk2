@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PackageSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<PackageSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <SpdHeader>
     <PackageName>EdkShellBinPkg</PackageName>
     <GuidValue>d4266a1b-1d38-4116-93ae-60dc3e2012a6</GuidValue>

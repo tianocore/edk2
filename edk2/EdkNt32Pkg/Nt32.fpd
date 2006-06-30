@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
-  <PlatformHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PlatformHeader>
     <PlatformName>NT32</PlatformName>
     <GuidValue>eb216561-961f-47ee-9ef9-ca426ef547c2</GuidValue>
     <Version>0.3</Version>
@@ -17,13 +17,13 @@
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </PlatformHeader>
-  <PlatformDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PlatformDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BuildTargets>DEBUG</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
     <OutputDirectory/>
   </PlatformDefinitions>
-  <Flash xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Flash>
     <FlashDefinitionFile>FlashMap.fdf</FlashDefinitionFile>
     <!-- FlashDefinitionFile -->
     <FvImages>
@@ -129,7 +129,7 @@
       </FvImage>
     </FvImages>
   </Flash>
-  <FrameworkModules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <FrameworkModules>
     <ModuleSA SupArchList="IA32" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3" ModuleGuid="4b837b03-6587-4d19-b82b-edfad836c0a0">
       <Libraries>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -6412,7 +6412,7 @@
       </ModuleSaBuildOptions>
     </ModuleSA>
   </FrameworkModules>
-  <DynamicPcdBuildDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <DynamicPcdBuildDefinitions>
     <PcdBuildData ItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySize</C_Name>
       <Token>0x00001005</Token>

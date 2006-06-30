@@ -8,7 +8,7 @@
     <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
@@ -21,7 +21,7 @@
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>BasePostCodeLibPort80</OutputFileBasename>
   </ModuleDefinitions>
-  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">
       <Keyword>PostCodeLib</Keyword>
     </LibraryClass>
@@ -32,7 +32,7 @@
       <Keyword>IoLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFiles>
     <Filename>PostCode.c</Filename>
   </SourceFiles>
   <PackageDependencies>
@@ -42,7 +42,7 @@
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
   </Externs>
-  <PcdCoded xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdPostCodePropertyMask</C_Name>
       <TokenSpaceGuidCName>FIX_ME_PcdPostCodePropertyMask</TokenSpaceGuidCName>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PackageSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<PackageSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <SpdHeader>
     <PackageName>EdkNt32Pkg</PackageName>
     <GuidValue>0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3</GuidValue>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
-  <PlatformHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PlatformHeader>
     <PlatformName>MdePkg</PlatformName>
     <GuidValue>1123e1a9-4d9b-499f-843c-b2297ff61a11</GuidValue>
     <Version>0.3</Version>
@@ -16,16 +16,16 @@
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </PlatformHeader>
-  <PlatformDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PlatformDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BuildTargets>DEBUG</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
     <OutputDirectory/>
   </PlatformDefinitions>
-  <Flash xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Flash>
     <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>
   </Flash>
-  <FrameworkModules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <FrameworkModules>
     <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30">
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -815,7 +815,7 @@
       </ModuleSaBuildOptions>
     </ModuleSA>
   </FrameworkModules>
-  <BuildOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BuildOptions>
     <!-- UserDefiendAntTasks -->
     <Options>
       <!-- MSFT tool chain options definition : IA32 -->
