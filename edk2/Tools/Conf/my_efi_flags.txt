@@ -1,2 +1,0 @@
-EFI_DEBUG              = NO
-EFI_DEBUG_CLEAR_MEMORY = NO

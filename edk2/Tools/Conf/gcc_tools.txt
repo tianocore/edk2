@@ -1,7 +1,0 @@
-IA32_CC = "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c"
-IA32_LIB = 
-IA32_LINK = "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols"
-IA32_ASM = "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32"
-IA32_ASMLINK = 
-IA32_PP = "-E"
-
