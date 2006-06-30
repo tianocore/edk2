@@ -1,47 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
+<!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <BaseName>Shell</BaseName>
+    <ModuleName>Shell</ModuleName>
     <ModuleType>UEFI_APPLICATION</ModuleType>
-    <ComponentType>APPLICATION</ComponentType>
-    <Guid>c57ad6b7-0515-40a8-9d21-551652854e37</Guid>
-    <Version>0x00090000</Version>
+    <GuidValue>c57ad6b7-0515-40a8-9d21-551652854e37</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for EFI Shell module.</Abstract>
-    <Description>
-		  This is a binary package containing multiple binary files, however there is
-			only a single MSA and MBD file.
-    </Description>
+    <Description>This is a binary package containing multiple binary files, however there is
+			only a single MSA and MBD file.</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-17 20:56</Created>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>Shell</OutputFileBasename>
+  </ModuleDefinitions>
   <SourceFiles>
-    <Arch ArchType="IA32">
-      <Filename>ia32/Shell_Full.efi</Filename>
-    </Arch>
-    <Arch ArchType="IPF">
-      <Filename>ipf/Shell_Full.efi</Filename>
-    </Arch>
-    <Arch ArchType="X64">
-      <Filename>x64/Shell.efi</Filename>
-    </Arch>
+    <Filename SupArchList="IA32">ia32/Shell_Full.efi</Filename>
+    <Filename SupArchList="IPF">ipf/Shell_Full.efi</Filename>
+    <Filename SupArchList="X64">x64/Shell.efi</Filename>
   </SourceFiles>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00000000</Specification>
+  </Externs>
 </ModuleSurfaceArea>

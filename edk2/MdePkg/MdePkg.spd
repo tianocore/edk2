@@ -1,1191 +1,1274 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>MdePkg</PackageName>
-    <Guid>5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec</Guid>
+    <GuidValue>5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec</GuidValue>
     <Version>0.3</Version>
     <Abstract>Framework Module Development Environment Industry Standards</Abstract>
     <Description>This Package provides headers and libraries that conform to EFI/Framework Industry standards.</Description>
     <Copyright>Copyright (c) 2006,  Intel Corporation.</Copyright>
-    <License>
-      All rights reserved.
+    <License>All rights reserved.
       This program and the accompanying materials are licensed and made available under 
       the terms and conditions of the BSD License which accompanies this distribution. 
       The full text of the license may be found at 
       http://opensource.org/licenses/bsd-license.php 
 
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-     </License>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </SpdHeader>
+  <PackageDefinitions>
     <ReadOnly>true</ReadOnly>
     <RePackage>false</RePackage>
-    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION     0x00000052</Specification>
-  </SpdHeader>
+  </PackageDefinitions>
   <LibraryClassDeclarations>
-    <LibraryClassDeclaration>
-      <LibraryClass>BaseLib</LibraryClass>
+    <LibraryClass Name="BaseLib">
       <IncludeHeader>Include/Library/BaseLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>BaseMemoryLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="BaseMemoryLib">
       <IncludeHeader>Include/Library/BaseMemoryLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>CacheMaintenanceLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="CacheMaintenanceLib">
       <IncludeHeader>Include/Library/CacheMaintenanceLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>CpuLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="CpuLib">
       <IncludeHeader>Include/Library/CpuLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>DebugLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="DebugLib">
       <IncludeHeader>Include/Library/DebugLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>DevicePathLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="DevicePathLib">
       <IncludeHeader>Include/Library/DevicePathLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>DxeCoreEntryPoint</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="DxeCoreEntryPoint">
       <IncludeHeader>Include/Library/DxeCoreEntryPoint.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>DxeRuntimeDriverLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="DxeRuntimeDriverLib">
       <IncludeHeader>Include/Library/DxeRuntimeDriverLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>DxeServicesTableLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="DxeServicesTableLib">
       <IncludeHeader>Include/Library/DxeServicesTableLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>DxeSmmDriverEntryPoint</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="DxeSmmDriverEntryPoint">
       <IncludeHeader>Include/Library/DxeSmmDriverEntryPoint.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>HiiLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="HiiLib">
       <IncludeHeader>Include/Library/HiiLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>HobLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="HobLib">
       <IncludeHeader>Include/Library/HobLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>IoLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="IoLib">
       <IncludeHeader>Include/Library/IoLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>MemoryAllocationLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="MemoryAllocationLib">
       <IncludeHeader>Include/Library/MemoryAllocationLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PcdLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PcdLib">
       <IncludeHeader>Include/Library/PcdLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PciCf8Lib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PciCf8Lib">
       <IncludeHeader>Include/Library/PciCf8Lib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PciExpressLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PciExpressLib">
       <IncludeHeader>Include/Library/PciExpressLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PciLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PciLib">
       <IncludeHeader>Include/Library/PciLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PciSegmentLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PciSegmentLib">
       <IncludeHeader>Include/Library/PciSegmentLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PeCoffGetEntryPointLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PeCoffGetEntryPointLib">
       <IncludeHeader>Include/Library/PeCoffGetEntryPointLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PeCoffLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PeCoffLib">
       <IncludeHeader>Include/Library/PeCoffLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PeiCoreEntryPoint</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PeiCoreEntryPoint">
       <IncludeHeader>Include/Library/PeiCoreEntryPoint.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PeiServicesLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PeiServicesLib">
       <IncludeHeader>Include/Library/PeiServicesLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PeimEntryPoint</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PeimEntryPoint">
       <IncludeHeader>Include/Library/PeimEntryPoint.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PeiServicesTablePointerLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PeiServicesTablePointerLib">
       <IncludeHeader>Include/Library/PeiServicesTablePointerLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PerformanceLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PerformanceLib">
       <IncludeHeader>Include/Library/PerformanceLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PrintLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PrintLib">
       <IncludeHeader>Include/Library/PrintLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>ReportStatusCodeLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="ReportStatusCodeLib">
       <IncludeHeader>Include/Library/ReportStatusCodeLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>PostCodeLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="PostCodeLib">
       <IncludeHeader>Include/Library/PostCodeLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>ResourcePublicationLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="ResourcePublicationLib">
       <IncludeHeader>Include/Library/ResourcePublicationLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>SmbusLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="SmbusLib">
       <IncludeHeader>Include/Library/SmbusLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>TimerLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="TimerLib">
       <IncludeHeader>Include/Library/TimerLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>Uefi2PortLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="Uefi2PortLib">
       <IncludeHeader>Include/Library/Uefi2PortLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>UefiBootServicesTableLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="UefiBootServicesTableLib">
       <IncludeHeader>Include/Library/UefiBootServicesTableLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>UefiDecompressLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="UefiDecompressLib">
       <IncludeHeader>Include/Library/UefiDecompressLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>UefiDriverEntryPoint</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="UefiDriverEntryPoint">
       <IncludeHeader>Include/Library/UefiDriverEntryPoint.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>UefiDriverModelLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="UefiDriverModelLib">
       <IncludeHeader>Include/Library/UefiDriverModelLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>UefiLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="UefiLib">
       <IncludeHeader>Include/Library/UefiLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
-    <LibraryClassDeclaration>
-      <LibraryClass>UefiRuntimeServicesTableLib</LibraryClass>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="UefiRuntimeServicesTableLib">
       <IncludeHeader>Include/Library/UefiRuntimeServicesTableLib.h</IncludeHeader>
-    </LibraryClassDeclaration>
+      <HelpText/>
+    </LibraryClass>
   </LibraryClassDeclarations>
   <MsaFiles>
-    <MsaFile>
-      <Filename>Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseDebugLibNull/BaseDebugLibNull.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePerformanceLibNull/BasePerformanceLibNull.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePcdLibNull/BasePcdLibNull.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseLib/BaseLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseMemoryLib/BaseMemoryLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseMemoryLibMmx/BaseMemoryLibMmx.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseMemoryLibSse2/BaseMemoryLibSse2.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePeCoffLib/BasePeCoffLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePrintLib/BasePrintLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePostCodeLibPort80/BasePostCodeLibPort80.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseSmbusLib/BaseSmbusLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiSmbusLib/PeiSmbusLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeSmbusLib/DxeSmbusLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseUefiDecompressLib/BaseUefiDecompressLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePciCf8Lib/BasePciCf8Lib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePciExpressLib/BasePciExpressLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePciLibCf8/BasePciLibCf8.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BasePciLibPciExpress/BasePciLibPciExpress.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/BaseTimerLibLocalApic/BaseTimerLibLocalApic.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeCoreEntryPoint/DxeCoreEntryPoint.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeCoreHobLib/DxeCoreHobLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeHobLib/DxeHobLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeIoLibCpuIo/DxeIoLibCpuIo.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiIoLibCpuIo/PeiIoLibCpuIo.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxePcdLib/DxePcdLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeServicesTableLib/DxeServicesTableLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/HiiLib/HiiLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiCoreEntryPoint/PeiCoreEntryPoint.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiServicesLib/PeiServicesLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiHobLib/PeiHobLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiMemoryLib/PeiMemoryLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeimEntryPoint/PeimEntryPoint.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiPcdLib/PeiPcdLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiResourcePublicationLib/PeiResourcePublicationLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiBootServicesTableLib/UefiBootServicesTableLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiDebugLibConOut/UefiDebugLibConOut.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiDebugLibStdErr/UefiDebugLibStdErr.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiDevicePathLib/UefiDevicePathLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiDriverEntryPoint/UefiDriverEntryPoint.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiDriverModelLib/UefiDriverModelLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiLib/UefiLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiMemoryLib/UefiMemoryLib.msa</Filename>
-    </MsaFile>
-    <MsaFile>
-      <Filename>Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.msa</Filename>
-    </MsaFile>
+    <Filename>Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.msa</Filename>
+    <Filename>Library/BaseDebugLibNull/BaseDebugLibNull.msa</Filename>
+    <Filename>Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.msa</Filename>
+    <Filename>Library/BasePerformanceLibNull/BasePerformanceLibNull.msa</Filename>
+    <Filename>Library/BasePcdLibNull/BasePcdLibNull.msa</Filename>
+    <Filename>Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.msa</Filename>
+    <Filename>Library/BaseLib/BaseLib.msa</Filename>
+    <Filename>Library/BaseMemoryLib/BaseMemoryLib.msa</Filename>
+    <Filename>Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.msa</Filename>
+    <Filename>Library/BaseMemoryLibMmx/BaseMemoryLibMmx.msa</Filename>
+    <Filename>Library/BaseMemoryLibSse2/BaseMemoryLibSse2.msa</Filename>
+    <Filename>Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.msa</Filename>
+    <Filename>Library/BasePeCoffLib/BasePeCoffLib.msa</Filename>
+    <Filename>Library/BasePrintLib/BasePrintLib.msa</Filename>
+    <Filename>Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.msa</Filename>
+    <Filename>Library/BasePostCodeLibPort80/BasePostCodeLibPort80.msa</Filename>
+    <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>
+    <Filename>Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.msa</Filename>
+    <Filename>Library/BaseSmbusLib/BaseSmbusLib.msa</Filename>
+    <Filename>Library/PeiSmbusLib/PeiSmbusLib.msa</Filename>
+    <Filename>Library/DxeSmbusLib/DxeSmbusLib.msa</Filename>
+    <Filename>Library/BaseUefiDecompressLib/BaseUefiDecompressLib.msa</Filename>
+    <Filename>Library/BasePciCf8Lib/BasePciCf8Lib.msa</Filename>
+    <Filename>Library/BasePciExpressLib/BasePciExpressLib.msa</Filename>
+    <Filename>Library/BasePciLibCf8/BasePciLibCf8.msa</Filename>
+    <Filename>Library/BasePciLibPciExpress/BasePciLibPciExpress.msa</Filename>
+    <Filename>Library/BaseTimerLibLocalApic/BaseTimerLibLocalApic.msa</Filename>
+    <Filename>Library/DxeCoreEntryPoint/DxeCoreEntryPoint.msa</Filename>
+    <Filename>Library/DxeCoreHobLib/DxeCoreHobLib.msa</Filename>
+    <Filename>Library/DxeHobLib/DxeHobLib.msa</Filename>
+    <Filename>Library/DxeIoLibCpuIo/DxeIoLibCpuIo.msa</Filename>
+    <Filename>Library/PeiIoLibCpuIo/PeiIoLibCpuIo.msa</Filename>
+    <Filename>Library/DxeMemoryAllocationLib/DxeMemoryAllocationLib.msa</Filename>
+    <Filename>Library/DxePcdLib/DxePcdLib.msa</Filename>
+    <Filename>Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.msa</Filename>
+    <Filename>Library/DxeServicesTableLib/DxeServicesTableLib.msa</Filename>
+    <Filename>Library/DxeSmmDriverEntryPoint/DxeSmmDriverEntryPoint.msa</Filename>
+    <Filename>Library/HiiLib/HiiLib.msa</Filename>
+    <Filename>Library/PeiCoreEntryPoint/PeiCoreEntryPoint.msa</Filename>
+    <Filename>Library/PeiServicesLib/PeiServicesLib.msa</Filename>
+    <Filename>Library/PeiHobLib/PeiHobLib.msa</Filename>
+    <Filename>Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.msa</Filename>
+    <Filename>Library/PeiMemoryLib/PeiMemoryLib.msa</Filename>
+    <Filename>Library/PeimEntryPoint/PeimEntryPoint.msa</Filename>
+    <Filename>Library/PeiPcdLib/PeiPcdLib.msa</Filename>
+    <Filename>Library/PeiReportStatusCodeLib/PeiReportStatusCodeLib.msa</Filename>
+    <Filename>Library/PeiResourcePublicationLib/PeiResourcePublicationLib.msa</Filename>
+    <Filename>Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.msa</Filename>
+    <Filename>Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.msa</Filename>
+    <Filename>Library/UefiBootServicesTableLib/UefiBootServicesTableLib.msa</Filename>
+    <Filename>Library/UefiDebugLibConOut/UefiDebugLibConOut.msa</Filename>
+    <Filename>Library/UefiDebugLibStdErr/UefiDebugLibStdErr.msa</Filename>
+    <Filename>Library/UefiDevicePathLib/UefiDevicePathLib.msa</Filename>
+    <Filename>Library/UefiDevicePathLibDevicePathProtocol/UefiDevicePathLibDevicePathProtocol.msa</Filename>
+    <Filename>Library/UefiDriverEntryPoint/UefiDriverEntryPoint.msa</Filename>
+    <Filename>Library/UefiDriverModelLib/UefiDriverModelLib.msa</Filename>
+    <Filename>Library/UefiLib/UefiLib.msa</Filename>
+    <Filename>Library/UefiMemoryLib/UefiMemoryLib.msa</Filename>
+    <Filename>Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
-    <IncludeHeader ModuleType="BASE">Include/Base.h</IncludeHeader>
-    <IncludeHeader ModuleType="SEC">Include/Peim.h</IncludeHeader>
-    <IncludeHeader ModuleType="PEI_CORE">Include/PeiCore.h</IncludeHeader>
-    <IncludeHeader ModuleType="PEIM">Include/Peim.h</IncludeHeader>
-    <IncludeHeader ModuleType="DXE_CORE">Include/DxeCore.h</IncludeHeader>
-    <IncludeHeader ModuleType="DXE_DRIVER">Include/Dxe.h</IncludeHeader>
-    <IncludeHeader ModuleType="DXE_RUNTIME_DRIVER">Include/Dxe.h</IncludeHeader>
-    <IncludeHeader ModuleType="DXE_SMM_DRIVER">Include/Dxe.h</IncludeHeader>
-    <IncludeHeader ModuleType="DXE_SAL_DRIVER">Include/Dxe.h</IncludeHeader>
-    <IncludeHeader ModuleType="UEFI_DRIVER">Include/Uefi.h</IncludeHeader>
-    <IncludeHeader ModuleType="UEFI_APPLICATION">Include/Uefi.h</IncludeHeader>
+    <IncludePkgHeader ModuleType="BASE">Include/Base.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="SEC">Include/Peim.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="PEI_CORE">Include/PeiCore.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="PEIM">Include/Peim.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_CORE">Include/DxeCore.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_DRIVER">Include/Dxe.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_RUNTIME_DRIVER">Include/Dxe.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_SMM_DRIVER">Include/Dxe.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="DXE_SAL_DRIVER">Include/Dxe.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="UEFI_DRIVER">Include/Uefi.h</IncludePkgHeader>
+    <IncludePkgHeader ModuleType="UEFI_APPLICATION">Include/Uefi.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
     <Entry Name="Acpi10Table">
       <C_Name>gEfiAcpi10TableGuid</C_Name>
-      <Guid>0xeb9d2d30, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>EB9D2D30-2D88-11D3-9A16-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Acpi20Table">
       <C_Name>gEfiAcpi20TableGuid</C_Name>
-      <Guid>0x8868e871, 0xe4f1, 0x11d3, 0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>8868E871-E4F1-11D3-BC22-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Acpi30Table">
       <C_Name>gEfiAcpi30TableGuid</C_Name>
-      <Guid>0x8868e871, 0xe4f1, 0x11d3, 0xbc, 0x22, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>8868E871-E4F1-11D3-BC22-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DebugImageInfoTable">
       <C_Name>gEfiDebugImageInfoTableGuid</C_Name>
-      <Guid>0x49152e77, 0x1ada, 0x4764, 0xb7, 0xa2, 0x7a, 0xfe, 0xfe, 0xd9, 0x5e, 0x8b</Guid>
+      <GuidValue>49152E77-1ADA-4764-B7A2-7AFEFED95E8B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="GlobalVariable">
       <C_Name>gEfiGlobalVariableGuid</C_Name>
-      <Guid>0x8BE4DF61, 0x93CA, 0x11d2, 0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C</Guid>
+      <GuidValue>8BE4DF61-93CA-11D2-AA0D-00E098032B8C</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PartTypeUnused">
       <C_Name>gEfiPartTypeUnusedGuid</C_Name>
-      <Guid>0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00</Guid>
+      <GuidValue>00000000-0000-0000-0000-000000000000</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PartTypeSystemPart">
       <C_Name>gEfiPartTypeSystemPartGuid</C_Name>
-      <Guid>0xc12a7328, 0xf81f, 0x11d2, 0xba, 0x4b, 0x00, 0xa0, 0xc9, 0x3e, 0xc9, 0x3b</Guid>
+      <GuidValue>C12A7328-F81F-11D2-BA4B-00A0C93EC93B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PartTypeLegacyMbr">
       <C_Name>gEfiPartTypeLegacyMbrGuid</C_Name>
-      <Guid>0x024dee41, 0x33e7, 0x11d3, 0x9d, 0x69, 0x00, 0x08, 0xc7, 0x81, 0xf3, 0x9f</Guid>
+      <GuidValue>024DEE41-33E7-11D3-9D69-0008C781F39F</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MpsTable">
       <C_Name>gEfiMpsTableGuid</C_Name>
-      <Guid>0xeb9d2d2f, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>EB9D2D2F-2D88-11D3-9A16-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PcAnsi">
       <C_Name>gEfiPcAnsiGuid</C_Name>
-      <Guid>0xe0c14753, 0xf9be, 0x11d2, 0x9a, 0x0c, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>E0C14753-F9BE-11D2-9A0C-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="VT100">
       <C_Name>gEfiVT100Guid</C_Name>
-      <Guid>0xdfa66065, 0xb419, 0x11d3, 0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>DFA66065-B419-11D3-9A2D-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="VT100Plus">
       <C_Name>gEfiVT100PlusGuid</C_Name>
-      <Guid>0x7baec70b, 0x57e0, 0x4c76, 0x8e, 0x87, 0x2f, 0x9e, 0x28, 0x08, 0x83, 0x43</Guid>
+      <GuidValue>7BAEC70B-57E0-4C76-8E87-2F9E28088343</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="VTUTF8">
       <C_Name>gEfiVTUTF8Guid</C_Name>
-      <Guid>0xad15a0d6, 0x8bec, 0x4acf, 0xa0, 0x73, 0xd0, 0x1d, 0xe7, 0x7e, 0x2d, 0x88</Guid>
+      <GuidValue>AD15A0D6-8BEC-4ACF-A073-D01DE77E2D88</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SalSystemTable">
       <C_Name>gEfiSalSystemTableGuid</C_Name>
-      <Guid>0xeb9d2d32, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>EB9D2D32-2D88-11D3-9A16-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmbiosTable">
       <C_Name>gEfiSmbiosTableGuid</C_Name>
-      <Guid>0xeb9d2d31, 0x2d88, 0x11d3, 0x9a, 0x16, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>EB9D2D31-2D88-11D3-9A16-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Apriori">
       <C_Name>gAprioriGuid</C_Name>
-      <Guid>0xfc510ee7, 0xffdc, 0x11d4, 0xbd, 0x41, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>FC510EE7-FFDC-11D4-BD41-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DxeServicesTable">
       <C_Name>gEfiDxeServicesTableGuid</C_Name>
-      <Guid>0x5ad34ba, 0x6f02, 0x4214, 0x95, 0x2e, 0x4d, 0xa0, 0x39, 0x8e, 0x2b, 0xb9</Guid>
+      <GuidValue>05AD34BA-6F02-4214-952E-4DA0398E2BB9</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FirmwareFileSystem">
       <C_Name>gEfiFirmwareFileSystemGuid</C_Name>
-      <Guid>0x7A9354D9, 0x0468, 0x444a, 0x81, 0xCE, 0x0B, 0xF6, 0x17, 0xD8, 0x90, 0xDF</Guid>
+      <GuidValue>7A9354D9-0468-444A-81CE-0BF617D890DF</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FirmwareVolumeTopFile">
       <C_Name>gEfiFirmwareVolumeTopFileGuid</C_Name>
-      <Guid>0x1BA0062E, 0xC779, 0x4582, 0x85, 0x66, 0x33, 0x6A, 0xE8, 0xF7, 0x8F, 0x09</Guid>
+      <GuidValue>1BA0062E-C779-4582-8566-336AE8F78F09</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HobList">
       <C_Name>gEfiHobListGuid</C_Name>
-      <Guid>0x7739f24c, 0x93d7, 0x11d4, 0x9a, 0x3a, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>7739F24C-93D7-11D4-9A3A-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HobMemoryAllocBspStore">
       <C_Name>gEfiHobMemoryAllocBspStoreGuid</C_Name>
-      <Guid>0x564b33cd, 0xc92a, 0x4593, 0x90, 0xbf, 0x24, 0x73, 0xe4, 0x3c, 0x63, 0x22</Guid>
+      <GuidValue>564B33CD-C92A-4593-90BF-2473E43C6322</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HobMemoryAllocStack">
       <C_Name>gEfiHobMemoryAllocStackGuid</C_Name>
-      <Guid>0x4ed4bf27, 0x4092, 0x42e9, 0x80, 0x7d, 0x52, 0x7b, 0x1d, 0x00, 0xc9, 0xbd</Guid>
+      <GuidValue>4ED4BF27-4092-42E9-807D-527B1D00C9BD</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HobMemoryAllocModule">
       <C_Name>gEfiHobMemoryAllocModuleGuid</C_Name>
-      <Guid>0xf8e21975, 0x0899, 0x4f58, 0xa4, 0xbe, 0x55, 0x25, 0xa9, 0xc6, 0xd7, 0x7a</Guid>
+      <GuidValue>F8E21975-0899-4F58-A4BE-5525A9C6D77A</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FileInfo">
       <C_Name>gEfiFileInfoGuid</C_Name>
-      <Guid>0x9576e92, 0x6d3f, 0x11d2, 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>09576E92-6D3F-11D2-8E39-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FileSystemInfo">
       <C_Name>gEfiFileSystemInfoGuid</C_Name>
-      <Guid>0x9576e93, 0x6d3f, 0x11d2, 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>09576E93-6D3F-11D2-8E39-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FileSystemVolumeLabelInfoId">
       <C_Name>gEfiFileSystemVolumeLabelInfoIdGuid</C_Name>
-      <Guid>0xDB47D7D3, 0xFE81, 0x11d3, 0x9A, 0x35, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D</Guid>
+      <GuidValue>DB47D7D3-FE81-11D3-9A35-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ProcessorProducer">
       <C_Name>gEfiProcessorProducerGuid</C_Name>
-      <Guid>0x1bf06aea, 0x5bec, 0x4a8d, 0x95, 0x76, 0x74, 0x9b, 0x09, 0x56, 0x2d, 0x30</Guid>
+      <GuidValue>1BF06AEA-5BEC-4A8D-9576-749B09562D30</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ProcessorSubClass">
       <C_Name>gEfiProcessorSubClassGuid</C_Name>
-      <Guid>0x26fdeb7e, 0xb8af, 0x4ccf, 0xaa, 0x97, 0x02, 0x63, 0x3c, 0xe4, 0x8c, 0xa7</Guid>
+      <GuidValue>26FDEB7E-B8AF-4CCF-AA97-02633CE48CA7</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="CacheSubClass">
       <C_Name>gEfiCacheSubClassGuid</C_Name>
-      <Guid>0x7f0013a7, 0xdc79, 0x4b22, 0x80, 0x99, 0x11, 0xf7, 0x5f, 0xdc, 0x82, 0x9d</Guid>
+      <GuidValue>7F0013A7-DC79-4B22-8099-11F75FDC829D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MemoryProducer">
       <C_Name>gEfiMemoryProducerGuid</C_Name>
-      <Guid>0x772484B2, 0x7482, 0x4b91, 0x9F, 0x9A, 0xAD, 0x43, 0xF8, 0x1C, 0x58, 0x81</Guid>
+      <GuidValue>772484B2-7482-4B91-9F9A-AD43F81C5881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MemorySubClass">
       <C_Name>gEfiMemorySubClassGuid</C_Name>
-      <Guid>0x4E8F4EBB, 0x64B9, 0x4e05, 0x9B, 0x18, 0x4C, 0xFE, 0x49, 0x23, 0x50, 0x97</Guid>
+      <GuidValue>4E8F4EBB-64B9-4E05-9B18-4CFE49235097</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MiscProducer">
       <C_Name>gEfiMiscProducerGuid</C_Name>
-      <Guid>0x62512c92, 0x63c4, 0x4d80, 0x82, 0xb1, 0xc1, 0xa4, 0xdc, 0x44, 0x80, 0xe5</Guid>
+      <GuidValue>62512C92-63C4-4D80-82B1-C1A4DC4480E5</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MiscSubClass">
       <C_Name>gEfiMiscSubClassGuid</C_Name>
-      <Guid>0x772484B2, 0x7482, 0x4b91, 0x9F, 0x9A, 0xAD, 0x43, 0xF8, 0x1C, 0x58, 0x81</Guid>
+      <GuidValue>772484B2-7482-4B91-9F9A-AD43F81C5881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCodeDataTypeString">
       <C_Name>gEfiStatusCodeDataTypeStringGuid</C_Name>
-      <Guid>0x92D11080, 0x496F, 0x4D95, 0xBE, 0x7E, 0x03, 0x74, 0x88, 0x38, 0x2B, 0x0A</Guid>
+      <GuidValue>92D11080-496F-4D95-BE7E-037488382B0A</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCodeSpecificData">
       <C_Name>gEfiStatusCodeSpecificDataGuid</C_Name>
-      <Guid>0x335984bd, 0xe805, 0x409a, 0xb8, 0xf8, 0xd2, 0x7e, 0xce, 0x5f, 0xf7, 0xa6</Guid>
+      <GuidValue>335984BD-E805-409A-B8F8-D27ECE5FF7A6</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCodeDataTypeAssert">
       <C_Name>gEfiStatusCodeDataTypeAssertGuid</C_Name>
-      <Guid>0xDA571595, 0x4D99, 0x487C, 0x82, 0x7C, 0x26, 0x22, 0x67, 0x7D, 0x33, 0x07</Guid>
+      <GuidValue>DA571595-4D99-487C-827C-2622677D3307</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCodeDataTypeExceptionHandler">
       <C_Name>gEfiStatusCodeDataTypeExceptionHandlerGuid</C_Name>
-      <Guid>0x3BC2BD12, 0xAD2E, 0x11D5, 0x87, 0xDD, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9</Guid>
+      <GuidValue>3BC2BD12-AD2E-11D5-87DD-00062945C3B9</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCodeDataTypeDebug">
       <C_Name>gEfiStatusCodeDataTypeDebugGuid</C_Name>
-      <Guid>0x9A4E9246, 0xD553, 0x11D5, 0x87, 0xE2, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xb9</Guid>
+      <GuidValue>9A4E9246-D553-11D5-87E2-00062945C3B9</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCodeDataTypeError">
       <C_Name>gEfiStatusCodeDataTypeErrorGuid</C_Name>
-      <Guid>0xAB359CE3, 0x99B3, 0xAE18, 0xC8, 0x9D, 0x95, 0xD3, 0xB0, 0x72, 0xE1, 0x9B</Guid>
+      <GuidValue>AB359CE3-99B3-AE18-C89D-95D3B072E19B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCodeDataTypeProgressCode">
       <C_Name>gEfiStatusCodeDataTypeProgressCodeGuid</C_Name>
-      <Guid>0xA356AB39, 0x35C4, 0x35DA, 0xB3, 0x7A, 0xF8, 0xEA, 0x9E, 0x8B, 0x36, 0xA3</Guid>
+      <GuidValue>A356AB39-35C4-35DA-B37A-F8EA9E8B36A3</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="AuthenticationChapRadius">
       <C_Name>gEfiAuthenticationChapRadiusGuid</C_Name>
-      <Guid>0xd6062b50, 0x15ca, 0x11da, 0x92, 0x19, 0x00, 0x10, 0x83, 0xff, 0xca, 0x4d</Guid>
+      <GuidValue>D6062B50-15CA-11DA-9219-001083FFCA4D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="AuthenticationChapLocal">
       <C_Name>gEfiAuthenticationChapLocalGuid</C_Name>
-      <Guid>0xc280c73e, 0x15ca, 0x11da, 0xb0, 0xca, 0x00, 0x10, 0x83, 0xff, 0xca, 0x4d</Guid>
+      <GuidValue>C280C73E-15CA-11DA-B0CA-001083FFCA4D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HashAlgorithmSha1">
       <C_Name>gEfiHashAlgorithmSha1Guid</C_Name>
-      <Guid>0x2ae9d80f, 0x3fb2, 0x4095, 0xb7, 0xb1, 0xe9, 0x31, 0x57, 0xb9, 0x46, 0xb6</Guid>
+      <GuidValue>2AE9D80F-3FB2-4095-B7B1-E93157B946B6</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HashAlgorithmSha224">
       <C_Name>gEfiHashAlgorithmSha224Guid</C_Name>
-      <Guid>0x8df01a06, 0x9bd5, 0x4bf7, 0xb0, 0x21, 0xdb, 0x4f, 0xd9, 0xcc, 0xf4, 0x5b</Guid>
+      <GuidValue>8DF01A06-9BD5-4BF7-B021-DB4FD9CCF45B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HashAlgorithmSha256">
       <C_Name>gEfiHashAlgorithmSha256Guid</C_Name>
-      <Guid>0x51aa59de, 0xfdf2, 0x4ea3, 0xbc, 0x63, 0x87, 0x5f, 0xb7, 0x84, 0x2e, 0xe9</Guid>
+      <GuidValue>51AA59DE-FDF2-4EA3-BC63-875FB7842EE9</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HashAlgorithmSha384">
       <C_Name>gEfiHashAlgorithmSha384Guid</C_Name>
-      <Guid>0xefa96432, 0xde33, 0x4dd2, 0xae, 0xe6, 0x32, 0x8c, 0x33, 0xdf, 0x77, 0x7a</Guid>
+      <GuidValue>EFA96432-DE33-4DD2-AEE6-328C33DF777A</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HashAlgorithmSha512">
       <C_Name>gEfiHashAlgorithmSha512Guid</C_Name>
-      <Guid>0xcaa4381e, 0x750c, 0x4770, 0xb8, 0x70, 0x7a, 0x23, 0xb4, 0xe4, 0x21, 0x30</Guid>
+      <GuidValue>CAA4381E-750C-4770-B870-7A23B4E42130</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HashAlgorithmMD5">
       <C_Name>gEfiHashAlgorithmMD5Guid</C_Name>
-      <Guid>0xaf7c79c, 0x65b5, 0x4319, 0xb0, 0xae, 0x44, 0xec, 0x48, 0x4e, 0x4a, 0xd7</Guid>
+      <GuidValue>0AF7C79C-65B5-4319-B0AE-44EC484E4AD7</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="BootObjectAuthorizationParmset">
       <C_Name>gBootObjectAuthorizationParmsetGuid</C_Name>
-      <Guid>0xedd35e31, 0x7b9, 0x11d2, 0x83, 0xa3, 0x00, 0xa0, 0xc9, 0x1f, 0xad, 0xcf</Guid>
+      <GuidValue>EDD35E31-07B9-11D2-83A3-00A0C91FADCF</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="AcpiTableStorage">
       <C_Name>gEfiAcpiTableStorageGuid</C_Name>
-      <Guid>0x7e374e25, 0x8e01, 0x4fee, 0x87, 0xf2, 0x39, 0x0c, 0x23, 0xc6, 0x06, 0xcd</Guid>
+      <GuidValue>7E374E25-8E01-4FEE-87F2-390C23C606CD</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmPeiSmramMemoryReserve">
       <C_Name>gEfiSmmPeiSmramMemoryReserve</C_Name>
-      <Guid>0x6dadf1d1, 0xd4cc, 0x4910, 0xbb, 0x6e, 0x82, 0xb1, 0xfd, 0x80, 0xff, 0x3d</Guid>
+      <GuidValue>6DADF1D1-D4CC-4910-BB6E-82B1FD80FF3D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmCpuIo">
       <C_Name>gEfiSmmCpuIoGuid</C_Name>
-      <Guid>0x5f439a0b, 0x45d8, 0x4682, 0xa4, 0xf4, 0xf0, 0x57, 0x6b, 0x51, 0x34, 0x41</Guid>
+      <GuidValue>5F439A0B-45D8-4682-A4F4-F0576B513441</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmCommunicateHeader">
       <C_Name>gSmmCommunicateHeaderGuid</C_Name>
-      <Guid>0xf328e36c, 0x23b6, 0x4a95, 0x85, 0x4b, 0x32, 0xe1, 0x95, 0x34, 0xcd, 0x75</Guid>
+      <GuidValue>F328E36C-23B6-4A95-854B-32E19534CD75</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Capsule">
       <C_Name>gEfiCapsuleGuid</C_Name>
-      <Guid>0x3B6686BD, 0x0D76, 0x4030, 0xB7, 0x0E, 0xB5, 0x51, 0x9E, 0x2F, 0xC5, 0xA0</Guid>
+      <GuidValue>3B6686BD-0D76-4030-B70E-B5519E2FC5A0</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ConfigFileName">
       <C_Name>gEfiConfigFileNameGuid</C_Name>
-      <Guid>0x98B8D59B, 0xE8BA, 0x48EE, 0x98, 0xDD, 0xC2, 0x95, 0x39, 0x2F, 0x1E, 0xDB</Guid>
+      <GuidValue>98B8D59B-E8BA-48EE-98DD-C295392F1EDB</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EventLegacyBoot">
       <C_Name>gEfiEventLegacyBootGuid</C_Name>
-      <Guid>0x2a571201, 0x4966, 0x47f6, 0x8b, 0x86, 0xf3, 0x1e, 0x41, 0xf3, 0x2f, 0x10</Guid>
+      <GuidValue>2A571201-4966-47F6-8B86-F31E41F32F10</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EventExitBootServices">
       <C_Name>gEfiEventExitBootServicesGuid</C_Name>
-      <Guid>0x27abf055, 0xb1b8, 0x4c26, 0x80, 0x48, 0x74, 0x8f, 0x37, 0xba, 0xa2, 0xdf</Guid>
+      <GuidValue>27ABF055-B1B8-4C26-8048-748F37BAA2DF</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EventVirtualAddressChange">
       <C_Name>gEfiEventVirtualAddressChangeGuid</C_Name>
-      <Guid>0x13fa7698, 0xc831, 0x49c7, 0x87, 0xea, 0x8f, 0x43, 0xfc, 0xc2, 0x51, 0x96</Guid>
+      <GuidValue>13FA7698-C831-49C7-87EA-8F43FCC25196</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EventMemoryMapChange">
       <C_Name>gEfiEventMemoryMapChangeGuid</C_Name>
-      <Guid>0x78bee926, 0x692f, 0x48fd, 0x9e, 0xdb, 0x01, 0x42, 0x2e, 0xf0, 0xd7, 0xab</Guid>
+      <GuidValue>78BEE926-692F-48FD-9EDB-01422EF0D7AB</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EventReadyToBoot">
       <C_Name>gEfiEventReadyToBootGuid</C_Name>
-      <Guid>0x7ce88fb3, 0x4bd7, 0x4679, 0x87, 0xa8, 0xa8, 0xd8, 0xde, 0xe5, 0x0d, 0x2b</Guid>
+      <GuidValue>7CE88FB3-4BD7-4679-87A8-A8D8DEE50D2B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FrameworkDevicePath">
       <C_Name>gEfiFrameworkDevicePathGuid</C_Name>
-      <Guid>0xb7084e63, 0x46b7, 0x4d1a, 0x86, 0x77, 0xe3, 0x0b, 0x53, 0xdb, 0xf0, 0x50</Guid>
+      <GuidValue>B7084E63-46B7-4D1A-8677-E30B53DBF050</GuidValue>
+      <HelpText/>
     </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
     <Entry Name="Bds">
       <C_Name>gEfiBdsArchProtocolGuid</C_Name>
-      <Guid>0x665E3FF6, 0x46CC, 0x11d4, 0x9A, 0x38, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D</Guid>
+      <GuidValue>665E3FF6-46CC-11D4-9A38-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Cpu">
       <C_Name>gEfiCpuArchProtocolGuid</C_Name>
-      <Guid>0x26baccb1, 0x6f42, 0x11d4, 0xbc, 0xe7, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>26BACCB1-6F42-11D4-BCE7-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Metronome">
       <C_Name>gEfiMetronomeArchProtocolGuid</C_Name>
-      <Guid>0x26baccb2, 0x6f42, 0x11d4, 0xbc, 0xe7, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>26BACCB2-6F42-11D4-BCE7-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MonotonicCounter">
       <C_Name>gEfiMonotonicCounterArchProtocolGuid</C_Name>
-      <Guid>0x1da97072, 0xbddc, 0x4b30, 0x99, 0xf1, 0x72, 0xa0, 0xb5, 0x6f, 0xff, 0x2a</Guid>
+      <GuidValue>1DA97072-BDDC-4B30-99F1-72A0B56FFF2A</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="RealTimeClock">
       <C_Name>gEfiRealTimeClockArchProtocolGuid</C_Name>
-      <Guid>0x27CFAC87, 0x46CC, 0x11d4, 0x9A, 0x38, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D</Guid>
+      <GuidValue>27CFAC87-46CC-11D4-9A38-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Reset">
       <C_Name>gEfiResetArchProtocolGuid</C_Name>
-      <Guid>0x27CFAC88, 0x46CC, 0x11d4, 0x9A, 0x38, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D</Guid>
+      <GuidValue>27CFAC88-46CC-11D4-9A38-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Runtime">
       <C_Name>gEfiRuntimeArchProtocolGuid</C_Name>
-      <Guid>0x96d08253, 0x8483, 0x11d4, 0xbc, 0xf1, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>96D08253-8483-11D4-BCF1-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Security">
       <C_Name>gEfiSecurityArchProtocolGuid</C_Name>
-      <Guid>0xA46423E3, 0x4617, 0x49f1, 0xB9, 0xFF, 0xD1, 0xBF, 0xA9, 0x11, 0x58, 0x39</Guid>
+      <GuidValue>A46423E3-4617-49F1-B9FF-D1BFA9115839</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCode">
       <C_Name>gEfiStatusCodeRuntimeProtocolGuid</C_Name>
-      <Guid>0xd2b2b828, 0x826, 0x48a7, 0xb3, 0xdf, 0x98, 0x3c, 0x0, 0x60, 0x24, 0xf0</Guid>
+      <GuidValue>D2B2B828-0826-48A7-B3DF-983C006024F0</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Timer">
       <C_Name>gEfiTimerArchProtocolGuid</C_Name>
-      <Guid>0x26baccb3, 0x6f42, 0x11d4, 0xbc, 0xe7, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>26BACCB3-6F42-11D4-BCE7-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Variable">
       <C_Name>gEfiVariableArchProtocolGuid</C_Name>
-      <Guid>0x1e5668e2, 0x8481, 0x11d4, 0xbc, 0xf1, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>1E5668E2-8481-11D4-BCF1-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="VariableWrite">
       <C_Name>gEfiVariableWriteArchProtocolGuid</C_Name>
-      <Guid>0x6441f818, 0x6362, 0x4e44, 0xb5, 0x70, 0x7d, 0xba, 0x31, 0xdd, 0x24, 0x53</Guid>
+      <GuidValue>6441F818-6362-4E44-B570-7DBA31DD2453</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="WatchdogTimer">
       <C_Name>gEfiWatchdogTimerArchProtocolGuid</C_Name>
-      <Guid>0x665E3FF5, 0x46CC, 0x11d4, 0x9A, 0x38, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D</Guid>
+      <GuidValue>665E3FF5-46CC-11D4-9A38-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="CpuIo">
       <C_Name>gEfiCpuIoProtocolGuid</C_Name>
-      <Guid>0xB0732526, 0x38C8, 0x4b40, 0x88, 0x77, 0x61, 0xC7, 0xB0, 0x6A, 0xAC, 0x45</Guid>
+      <GuidValue>B0732526-38C8-4B40-8877-61C7B06AAC45</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DataHub">
       <C_Name>gEfiDataHubProtocolGuid</C_Name>
-      <Guid>0xae80d021, 0x618e, 0x11d4, 0xbc, 0xd7, 0x00, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
+      <GuidValue>AE80D021-618E-11D4-BCD7-0080C73C8881</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FirmwareVolume">
       <C_Name>gEfiFirmwareVolumeProtocolGuid</C_Name>
-      <Guid>0x389F751F, 0x1838, 0x4388, 0x83, 0x90, 0xCD, 0x81, 0x54, 0xBD, 0x27, 0xF8</Guid>
+      <GuidValue>389F751F-1838-4388-8390-CD8154BD27F8</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FirmwareVolumeBlock">
       <C_Name>gEfiFirmwareVolumeBlockProtocolGuid</C_Name>
-      <Guid>0xDE28BC59, 0x6228, 0x41BD, 0xBD, 0xF6, 0xA3, 0xB9, 0xAD, 0xB5, 0x8D, 0xA1</Guid>
+      <GuidValue>DE28BC59-6228-41BD-BDF6-A3B9ADB58DA1</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FirmwareVolumeDispatch">
       <C_Name>gEfiFirmwareVolumeDispatchProtocolGuid</C_Name>
-      <Guid>0x7aa35a69, 0x506c, 0x444f, 0xa7, 0xaf, 0x69, 0x4b, 0xf5, 0x6f, 0x71, 0xc8</Guid>
+      <GuidValue>7AA35A69-506C-444F-A7AF-694BF56F71C8</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FormBrowser">
       <C_Name>gEfiFormBrowserProtocolGuid</C_Name>
-      <Guid>0xe5a1333e, 0xe1b4, 0x4d55, 0xce, 0xeb, 0x35, 0xc3, 0xef, 0x13, 0x34, 0x43</Guid>
+      <GuidValue>E5A1333E-E1B4-4D55-CEEB-35C3EF133443</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FormCallback">
       <C_Name>gEfiFormCallbackProtocolGuid</C_Name>
-      <Guid>0xf3e4543d, 0xcf35, 0x6cef, 0x35, 0xc4, 0x4f, 0xe6, 0x34, 0x4d, 0xfc, 0x54</Guid>
+      <GuidValue>F3E4543D-CF35-6CEF-35C4-4FE6344DFC54</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Crc32GuidedSectionExtraction">
       <C_Name>gEfiCrc32GuidedSectionExtractionProtocolGuid</C_Name>
-      <Guid>0xFC1BCDB0, 0x7D31, 0x49aa, 0x93, 0x6A, 0xA4, 0x60, 0x0D, 0x9D, 0xD0, 0x83</Guid>
+      <GuidValue>FC1BCDB0-7D31-49AA-936A-A4600D9DD083</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Hii">
       <C_Name>gEfiHiiProtocolGuid</C_Name>
-      <Guid>0xea816d2c, 0xcee5, 0x4f02, 0x99, 0xb5, 0xd3, 0x90, 0x5c, 0xbb, 0xd0, 0x77</Guid>
+      <GuidValue>EA816D2C-CEE5-4F02-99B5-D3905CBBD077</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PcdProtocol">
       <C_Name>gPcdProtocolGuid</C_Name>
-      <Guid>0x11b34006, 0xd85b, 0x4d0a, 0xa2, 0x90, 0xd5, 0xa5, 0x71, 0x31, 0x0e, 0xf7</Guid>
+      <GuidValue>11B34006-D85B-4D0A-A290-D5A571310EF7</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SectionExtraction">
       <C_Name>gEfiSectionExtractionProtocolGuid</C_Name>
-      <Guid>0x448F5DA4, 0x6DD7, 0x4FE1, 0x93, 0x07, 0x69, 0x22, 0x41, 0x92, 0x21, 0x5D</Guid>
+      <GuidValue>448F5DA4-6DD7-4FE1-9307-69224192215D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Bis">
       <C_Name>gEfiBisProtocolGuid</C_Name>
-      <Guid>0x0b64aab0, 0x5429, 0x11d4, 0x98, 0x16, 0x00, 0xa0, 0xc9, 0x1f, 0xad, 0xcf</Guid>
+      <GuidValue>0B64AAB0-5429-11D4-9816-00A0C91FADCF</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="BlockIo">
       <C_Name>gEfiBlockIoProtocolGuid</C_Name>
-      <Guid>0x964e5b21, 0x6459, 0x11d2, 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>964E5B21-6459-11D2-8E39-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="BusSpecificDriverOverride">
       <C_Name>gEfiBusSpecificDriverOverrideProtocolGuid</C_Name>
-      <Guid>0x3bc1b285, 0x8a15, 0x4a82, 0xaa, 0xbf, 0x4d, 0x7d, 0x13, 0xfb, 0x32, 0x65</Guid>
+      <GuidValue>3BC1B285-8A15-4A82-AABF-4D7D13FB3265</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ComponentName">
       <C_Name>gEfiComponentNameProtocolGuid</C_Name>
-      <Guid>0x107a772c, 0xd5e1, 0x11d4, 0x9a, 0x46, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>107A772C-D5E1-11D4-9A46-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DebugPort">
       <C_Name>gEfiDebugPortProtocolGuid</C_Name>
-      <Guid>0xEBA4E8D2, 0x3858, 0x41EC, 0xA2, 0x81, 0x26, 0x47, 0xBA, 0x96, 0x60, 0xD0</Guid>
+      <GuidValue>EBA4E8D2-3858-41EC-A281-2647BA9660D0</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DebugSupport">
       <C_Name>gEfiDebugSupportProtocolGuid</C_Name>
-      <Guid>0x2755590C, 0x6F3C, 0x42FA, 0x9E, 0xA4, 0xA3, 0xBA, 0x54, 0x3C, 0xDA, 0x25</Guid>
+      <GuidValue>2755590C-6F3C-42FA-9EA4-A3BA543CDA25</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Decompress">
       <C_Name>gEfiDecompressProtocolGuid</C_Name>
-      <Guid>0xd8117cfe, 0x94a6, 0x11d4, 0x9a, 0x3a, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>D8117CFE-94A6-11D4-9A3A-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DevicePath">
       <C_Name>gEfiDevicePathProtocolGuid</C_Name>
-      <Guid>0x9576e91, 0x6d3f, 0x11d2, 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>09576E91-6D3F-11D2-8E39-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DiskIo">
       <C_Name>gEfiDiskIoProtocolGuid</C_Name>
-      <Guid>0xce345171, 0xba0b, 0x11d2, 0x8e, 0x4f, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>CE345171-BA0B-11D2-8E4F-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DriverBinding">
       <C_Name>gEfiDriverBindingProtocolGuid</C_Name>
-      <Guid>0x18a031ab, 0xb443, 0x4d1a, 0xa5, 0xc0, 0x0c, 0x09, 0x26, 0x1e, 0x9f, 0x71</Guid>
+      <GuidValue>18A031AB-B443-4D1A-A5C0-0C09261E9F71</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DriverConfiguration">
       <C_Name>gEfiDriverConfigurationProtocolGuid</C_Name>
-      <Guid>0x107a772b, 0xd5e1, 0x11d4, 0x9a, 0x46, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>107A772B-D5E1-11D4-9A46-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="UefiDriverConfiguration">
       <C_Name>gUefiDriverConfigurationProtocolGuid</C_Name>
-      <Guid>0xbfd7dc1d, 0x24f1, 0x40d9, 0x82, 0xe7, 0x2e, 0x09, 0xbb, 0x6b, 0x4e, 0xbe</Guid>
+      <GuidValue>BFD7DC1D-24F1-40D9-82E7-2E09BB6B4EBE</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DriverDiagnostics">
       <C_Name>gEfiDriverDiagnosticsProtocolGuid</C_Name>
-      <Guid>0x0784924f, 0xe296, 0x11d4, 0x9a, 0x49, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>0784924F-E296-11D4-9A49-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="UefiDriverDiagnostics">
       <C_Name>gUefiDriverDiagnosticsProtocolGuid</C_Name>
-      <Guid>0x4d330321, 0x025f, 0x4aac, 0x90, 0xd8, 0x5e, 0xd9, 0x00, 0x17, 0x3b, 0x63</Guid>
+      <GuidValue>4D330321-025F-4AAC-90D8-5ED900173B63</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Ebc">
       <C_Name>gEfiEbcProtocolGuid</C_Name>
-      <Guid>0x13AC6DD1, 0x73D0, 0x11D4, 0xB0, 0x6B, 0x00, 0xAA, 0x00, 0xBD, 0x6D, 0xE7</Guid>
+      <GuidValue>13AC6DD1-73D0-11D4-B06B-00AA00BD6DE7</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="NetworkInterfaceIdentifier">
       <C_Name>gEfiNetworkInterfaceIdentifierProtocolGuid</C_Name>
-      <Guid>0xE18541CD, 0xF755, 0x4f73, 0x92, 0x8D, 0x64, 0x3C, 0x8A, 0x79, 0xB2, 0x29</Guid>
+      <GuidValue>E18541CD-F755-4F73-928D-643C8A79B229</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="NetworkInterfaceIdentifier31">
       <C_Name>gEfiNetworkInterfaceIdentifierProtocolGuid_31</C_Name>
-      <Guid>0x1ACED566, 0x76ED, 0x4218, 0xBC, 0x81, 0x76, 0x7F, 0x1F, 0x97, 0x7A, 0x89</Guid>
+      <GuidValue>1ACED566-76ED-4218-BC81-767F1F977A89</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="NetworkInterfaceIdentifier2">
       <C_Name>gEfiNetworkInterfaceIdentifierProtocolGuid_31</C_Name>
-      <Guid>0x1ACED566, 0x76ED, 0x4218, 0xBC, 0x81, 0x76, 0x7F, 0x1F, 0x97, 0x7A, 0x89</Guid>
+      <GuidValue>1ACED566-76ED-4218-BC81-767F1F977A89</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="LoadedImage">
       <C_Name>gEfiLoadedImageProtocolGuid</C_Name>
-      <Guid>0x5B1B31A1, 0x9562, 0x11d2, 0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B</Guid>
+      <GuidValue>5B1B31A1-9562-11D2-8E3F-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="LoadFile">
       <C_Name>gEfiLoadFileProtocolGuid</C_Name>
-      <Guid>0x56EC3091, 0x954C, 0x11d2, 0x8E, 0x3F, 0x00, 0xA0, 0xC9, 0x69, 0x72, 0x3B</Guid>
+      <GuidValue>56EC3091-954C-11D2-8E3F-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PciIo">
       <C_Name>gEfiPciIoProtocolGuid</C_Name>
-      <Guid>0x4cf5b200, 0x68b8, 0x4ca5, 0x9e, 0xec, 0xb2, 0x3e, 0x3f, 0x50, 0x02, 0x9a</Guid>
+      <GuidValue>4CF5B200-68B8-4CA5-9EEC-B23E3F50029A</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PciRootBridgeIo">
       <C_Name>gEfiPciRootBridgeIoProtocolGuid</C_Name>
-      <Guid>0x2f707ebb, 0x4a1a, 0x11d4, 0x9a, 0x38, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>2F707EBB-4A1A-11D4-9A38-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PlatformDriverOverride">
       <C_Name>gEfiPlatformDriverOverrideProtocolGuid</C_Name>
-      <Guid>0x6b30c738, 0xa391, 0x11d4, 0x9a, 0x3b, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>6B30C738-A391-11D4-9A3B-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PxeBaseCode">
       <C_Name>gEfiPxeBaseCodeProtocolGuid</C_Name>
-      <Guid>0x03c4e603, 0xac28, 0x11d3, 0x9a, 0x2d, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>03C4E603-AC28-11D3-9A2D-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PxeBaseCodeCallBack">
       <C_Name>gEfiPxeBaseCodeCallbackProtocolGuid</C_Name>
-      <Guid>0x245dca21, 0xfb7b, 0x11d3, 0x8f, 0x01, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>245DCA21-FB7B-11D3-8F01-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ScsiPassThru">
       <C_Name>gEfiScsiPassThruProtocolGuid</C_Name>
-      <Guid>0xa59e8fcf, 0xbda0, 0x43bb, 0x90, 0xb1, 0xd3, 0x73, 0x2e, 0xca, 0xa8, 0x77</Guid>
+      <GuidValue>A59E8FCF-BDA0-43BB-90B1-D3732ECAA877</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SerialIo">
       <C_Name>gEfiSerialIoProtocolGuid</C_Name>
-      <Guid>0xBB25CF6F, 0xF1D4, 0x11D2, 0x9A, 0x0C, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0xFD</Guid>
+      <GuidValue>BB25CF6F-F1D4-11D2-9A0C-0090273FC1FD</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SimpleFileSystem">
       <C_Name>gEfiSimpleFileSystemProtocolGuid</C_Name>
-      <Guid>0x964e5b22, 0x6459, 0x11d2, 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>964E5B22-6459-11D2-8E39-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SimpleNetwork">
       <C_Name>gEfiSimpleNetworkProtocolGuid</C_Name>
-      <Guid>0xA19832B9, 0xAC25, 0x11D3, 0x9A, 0x2D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D</Guid>
+      <GuidValue>A19832B9-AC25-11D3-9A2D-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SimplePointer">
       <C_Name>gEfiSimplePointerProtocolGuid</C_Name>
-      <Guid>0x31878c87, 0x0b75, 0x11d5, 0x9a, 0x4f, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>31878C87-0B75-11D5-9A4F-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SimpleTextIn">
       <C_Name>gEfiSimpleTextInProtocolGuid</C_Name>
-      <Guid>0x387477c1, 0x69c7, 0x11d2, 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>387477C1-69C7-11D2-8E39-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SimpleTextOut">
       <C_Name>gEfiSimpleTextOutProtocolGuid</C_Name>
-      <Guid>0x387477c2, 0x69c7, 0x11d2, 0x8e, 0x39, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>387477C2-69C7-11D2-8E39-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="UgaDraw">
       <C_Name>gEfiUgaDrawProtocolGuid</C_Name>
-      <Guid>0x982c298b, 0xf4fa, 0x41cb, 0xb8, 0x38, 0x77, 0xaa, 0x68, 0x8f, 0xb8, 0x39</Guid>
+      <GuidValue>982C298B-F4FA-41CB-B838-77AA688FB839</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="UnicodeCollation">
       <C_Name>gEfiUnicodeCollationProtocolGuid</C_Name>
-      <Guid>0x1d85cd7f, 0xf43d, 0x11d2, 0x9a, 0x0c, 0x00, 0x90, 0x27, 0x3f, 0xc1, 0x4d</Guid>
+      <GuidValue>1D85CD7F-F43D-11D2-9A0C-0090273FC14D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="UsbHc">
       <C_Name>gEfiUsbHcProtocolGuid</C_Name>
-      <Guid>0xf5089266, 0x1aa0, 0x4953, 0x97, 0xd8, 0x56, 0x2f, 0x8a, 0x73, 0xb5, 0x19</Guid>
+      <GuidValue>F5089266-1AA0-4953-97D8-562F8A73B519</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PciPlatform">
       <C_Name>gEfiPciPlatformProtocolGuid</C_Name>
-      <Guid>0x7d75280, 0x27d4, 0x4d69, 0x90, 0xd0, 0x56, 0x43, 0xe2, 0x38, 0xb3, 0x41</Guid>
+      <GuidValue>07D75280-27D4-4D69-90D0-5643E238B341</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="IncompatiblePciDeviceSupport">
       <C_Name>gEfiIncompatiblePciDeviceSupportProtocolGuid</C_Name>
-      <Guid>0xeb23f55a, 0x7863, 0x4ac2, 0x8d, 0x3d, 0x95, 0x65, 0x35, 0xde, 0x03, 0x75</Guid>
+      <GuidValue>EB23F55A-7863-4AC2-8D3D-956535DE0375</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PciHotPlugInit">
       <C_Name>gEfiPciHotPlugInitProtocolGuid</C_Name>
-      <Guid>0xaa0e8bc1, 0xdabc, 0x46b0, 0xa8, 0x44, 0x37, 0xb8, 0x16, 0x9b, 0x2b, 0xea</Guid>
+      <GuidValue>AA0E8BC1-DABC-46B0-A844-37B8169B2BEA</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PciHostBridgeResourceAllocation">
       <C_Name>gEfiPciHostBridgeResourceAllocationProtocolGuid</C_Name>
-      <Guid>0xCF8034BE, 0x6768, 0x4d8b, 0xb7, 0x39, 0x7c, 0xce, 0x68, 0x3a, 0x9f, 0xbe</Guid>
+      <GuidValue>CF8034BE-6768-4D8B-B739-7CCE683A9FBE</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="IdeControllerInit">
       <C_Name>gEfiIdeControllerInitProtocolGuid</C_Name>
-      <Guid>0xa1e37052, 0x80d9, 0x4e65, 0xa3, 0x17, 0x3e, 0x9a, 0x55, 0xc4, 0x3e, 0xc9</Guid>
+      <GuidValue>A1E37052-80D9-4E65-A317-3E9A55C43EC9</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="UsbIo">
       <C_Name>gEfiUsbIoProtocolGuid</C_Name>
-      <Guid>0x2B2F68D6, 0x0CD2, 0x44cf, 0x8E, 0x8B, 0xBB, 0xA2, 0x0B, 0x1B, 0x5B, 0x75</Guid>
+      <GuidValue>2B2F68D6-0CD2-44CF-8E8B-BBA20B1B5B75</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Arp">
       <C_Name>gEfiArpProtocolGuid</C_Name>
-      <Guid>0xf4b427bb, 0xba21, 0x4f16, 0xbc, 0x4e, 0x43, 0xe4, 0x16, 0xab, 0x61, 0x9c</Guid>
+      <GuidValue>F4B427BB-BA21-4F16-BC4E-43E416AB619C</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ArpServiceBinding">
       <C_Name>gEfiArpServiceBindingProtocolGuid</C_Name>
-      <Guid>0xf44c00ee, 0x1f2c, 0x4a00, 0xaa, 0x09, 0x1c, 0x9f, 0x3e, 0x08, 0x00, 0xa3</Guid>
+      <GuidValue>F44C00EE-1F2C-4A00-AA09-1C9F3E0800A3</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Dhcp4">
       <C_Name>gEfiDhcp4ProtocolGuid</C_Name>
-      <Guid>0x8a219718, 0x4ef5, 0x4761, 0x91, 0xc8, 0xc0, 0xf0, 0x4b, 0xda, 0x9e, 0x56</Guid>
+      <GuidValue>8A219718-4EF5-4761-91C8-C0F04BDA9E56</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Dhcp4ServiceBinding">
       <C_Name>gEfiDhcp4ServiceBindingProtocolGuid</C_Name>
-      <Guid>0x9d9a39d8, 0xbd42, 0x4a73, 0xa4, 0xd5, 0x8e, 0xe9, 0x4b, 0xe1, 0x13, 0x80</Guid>
+      <GuidValue>9D9A39D8-BD42-4A73-A4D5-8EE94BE11380</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Ip4">
       <C_Name>gEfiIp4ProtocolGuid</C_Name>
-      <Guid>0x41d94cd2, 0x35b6, 0x455a, 0x82, 0x58, 0xd4, 0xe5, 0x13, 0x34, 0xaa, 0xdd</Guid>
+      <GuidValue>41D94CD2-35B6-455A-8258-D4E51334AADD</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Ip4ServiceBinding">
       <C_Name>gEfiIp4ServiceBindingProtocolGuid</C_Name>
-      <Guid>0xc51711e7, 0xb4bf, 0x404a, 0xbf, 0xb8, 0x0a, 0x04, 0x8e, 0xf1, 0xff, 0xe4</Guid>
+      <GuidValue>C51711E7-B4BF-404A-BFB8-0A048EF1FFE4</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Ip4Config">
       <C_Name>gEfiIp4ConfigProtocolGuid</C_Name>
-      <Guid>0x3b95aa31, 0x3793, 0x434b, 0x86, 0x67, 0xc8, 0x07, 0x08, 0x92, 0xe0, 0x5e</Guid>
+      <GuidValue>3B95AA31-3793-434B-8667-C8070892E05E</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ManagedNetwork">
       <C_Name>gEfiManagedNetworkProtocolGuid</C_Name>
-      <Guid>0x3b95aa31, 0x3793, 0x434b, 0x86, 0x67, 0xc8, 0x07, 0x08, 0x92, 0xe0, 0x5e</Guid>
+      <GuidValue>3B95AA31-3793-434B-8667-C8070892E05E</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ManagedNetworkServiceBinding">
       <C_Name>gEfiManagedNetworkServiceBindingProtocolGuid</C_Name>
-      <Guid>0xf36ff770, 0xa7e1, 0x42cf, 0x9e, 0xd2, 0x56, 0xf0, 0xf2, 0x71, 0xf4, 0x4c</Guid>
+      <GuidValue>F36FF770-A7E1-42CF-9ED2-56F0F271F44C</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Mtftp4">
       <C_Name>gEfiMtftp4ProtocolGuid</C_Name>
-      <Guid>0x3ad9df29, 0x4501, 0x478d, 0xb1, 0xf8, 0x7f, 0x7f, 0xe7, 0x0e, 0x50, 0xf3</Guid>
+      <GuidValue>3AD9DF29-4501-478D-B1F8-7F7FE70E50F3</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Mtftp4ServiceBinding">
       <C_Name>gEfiMtftp4ServiceBindingProtocolGuid</C_Name>
-      <Guid>0x2FE800BE, 0x8F01, 0x4aa6, 0x94, 0x6B, 0xD7, 0x13, 0x88, 0xE1, 0x83, 0x3F</Guid>
+      <GuidValue>2FE800BE-8F01-4AA6-946B-D71388E1833F</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Tcp4">
       <C_Name>gEfiTcp4ProtocolGuid</C_Name>
-      <Guid>0x65530BC7, 0xA359, 0x410f, 0xB0, 0x10, 0x5A, 0xAD, 0xC7, 0xEC, 0x2B, 0x62</Guid>
+      <GuidValue>65530BC7-A359-410F-B010-5AADC7EC2B62</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Tcp4ServiceBinding">
       <C_Name>gEfiTcp4ServiceBindingProtocolGuid</C_Name>
-      <Guid>0x00720665, 0x67EB, 0x4a99, 0xBA, 0xF7, 0xD3, 0xC3, 0x3A, 0x1C, 0x7C, 0xC9</Guid>
+      <GuidValue>00720665-67EB-4A99-BAF7-D3C33A1C7CC9</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Udp4">
       <C_Name>gEfiUdp4ProtocolGuid</C_Name>
-      <Guid>0x3ad9df29, 0x4501, 0x478d, 0xb1, 0xf8, 0x7f, 0x7f, 0xe7, 0x0e, 0x50, 0xf3</Guid>
+      <GuidValue>3AD9DF29-4501-478D-B1F8-7F7FE70E50F3</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Udp4ServiceBinding">
       <C_Name>gEfiUdp4ServiceBindingProtocolGuid</C_Name>
-      <Guid>0x83f01464, 0x99bd, 0x45e5, 0xb3, 0x83, 0xaf, 0x63, 0x05, 0xd8, 0xe9, 0xe6</Guid>
+      <GuidValue>83F01464-99BD-45E5-B383-AF6305D8E9E6</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="AuthenticationInfo">
       <C_Name>gEfiAuthenticationInfoProtocolGuid</C_Name>
-      <Guid>0x7671d9d0, 0x53db, 0x4173, 0xaa, 0x69, 0x23, 0x27, 0xf2, 0x1f, 0x0b, 0xc7</Guid>
+      <GuidValue>7671D9D0-53DB-4173-AA69-2327F21F0BC7</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DevicePathFromText">
       <C_Name>gEfiDevicePathFromTextProtocolGuid</C_Name>
-      <Guid>0x5c99a21, 0xc70f, 0x4ad2, 0x8a, 0x5f, 0x35, 0xdf, 0x33, 0x43, 0xf5, 0x1e</Guid>
+      <GuidValue>05C99A21-C70F-4AD2-8A5F-35DF3343F51E</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DevicePathToText">
       <C_Name>gEfiDevicePathToTextProtocolGuid</C_Name>
-      <Guid>0x8b843e20, 0x8132, 0x4852, 0x90, 0xcc, 0x55, 0x1a, 0x4e, 0x4a, 0x7f, 0x1c</Guid>
+      <GuidValue>8B843E20-8132-4852-90CC-551A4E4A7F1C</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DevicePathUtilities">
       <C_Name>gEfiDevicePathUtilitiesProtocolGuid</C_Name>
-      <Guid>0x379be4e, 0xd706, 0x437d, 0xb0, 0x37, 0xed, 0xb8, 0x2f, 0xb7, 0x72, 0xa4</Guid>
+      <GuidValue>0379BE4E-D706-437D-B037-EDB82FB772A4</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EdidActive">
       <C_Name>gEfiEdidActiveProtocolGuid</C_Name>
-      <Guid>0xbd8c1056, 0x9f36, 0x44ec, 0x92, 0xa8, 0xa6, 0x33, 0x7f, 0x81, 0x79, 0x86</Guid>
+      <GuidValue>BD8C1056-9F36-44EC-92A8-A6337F817986</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EdidDiscovered">
       <C_Name>gEfiEdidDiscoveredProtocolGuid</C_Name>
-      <Guid>0x1c0c34f6, 0xd380, 0x41fa, 0xa0, 0x49, 0x8a, 0xd0, 0x6c, 0x1a, 0x66, 0xaa</Guid>
+      <GuidValue>1C0C34F6-D380-41FA-A049-8AD06C1A66AA</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EdidOverride">
       <C_Name>gEfiEdidOverrideProtocolGuid</C_Name>
-      <Guid>0x48ecb431, 0xfb72, 0x45c0, 0xa9, 0x22, 0xf4, 0x58, 0xfe, 0x04, 0x0b, 0xd5</Guid>
+      <GuidValue>48ECB431-FB72-45C0-A922-F458FE040BD5</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="GraphicsOutput">
       <C_Name>gEfiGraphicsOutputProtocolGuid</C_Name>
-      <Guid>0x9042a9de, 0x23dc, 0x4a38, 0x96, 0xfb, 0x7a, 0xde, 0xd0, 0x80, 0x51, 0x6a</Guid>
+      <GuidValue>9042A9DE-23DC-4A38-96FB-7ADED080516A</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Hash">
       <C_Name>gEfiHashProtocolGuid</C_Name>
-      <Guid>0xc5184932, 0xdba5, 0x46db, 0xa5, 0xba, 0xcc, 0x0b, 0xda, 0x9c, 0x14, 0x35</Guid>
+      <GuidValue>C5184932-DBA5-46DB-A5BA-CC0BDA9C1435</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="HashServiceBinding">
       <C_Name>gEfiHashServiceBindingProtocolGuid</C_Name>
-      <Guid>0x42881c98, 0xa4f3, 0x44b0, 0xa3, 0x9d, 0xdf, 0xa1, 0x86, 0x67, 0xd8, 0xcd</Guid>
+      <GuidValue>42881C98-A4F3-44B0-A39D-DFA18667D8CD</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="IScsiInitiatorName">
       <C_Name>gEfiIScsiInitiatorNameProtocolGuid</C_Name>
-      <Guid>0xa6a72875, 0x2962, 0x4c18, 0x9f, 0x46, 0x8d, 0xa6, 0x44, 0xcc, 0xfe, 0x00</Guid>
+      <GuidValue>A6A72875-2962-4C18-9F46-8DA644CCFE00</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ScsiIo">
       <C_Name>gEfiScsiIoProtocolGuid</C_Name>
-      <Guid>0x932f4736, 0x2362, 0x4002, 0x80, 0x3e, 0x3c, 0xd5, 0x4b, 0x13, 0x8f, 0x85</Guid>
+      <GuidValue>932F4736-2362-4002-803E-3CD54B138F85</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ExtScsiPassThru">
       <C_Name>gEfiExtScsiPassThruProtocolGuid</C_Name>
-      <Guid>0x1d3de7f0, 0x0807, 0x424f, 0xaa, 0x69, 0x11, 0xa5, 0x4e, 0x19, 0xa4, 0x6f</Guid>
+      <GuidValue>1D3DE7F0-0807-424F-AA69-11A54E19A46F</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="TapeIo">
       <C_Name>gEfiTapeIoProtocolGuid</C_Name>
-      <Guid>0x1e93e633, 0xd65a, 0x459e, 0xab, 0x84, 0x93, 0xd9, 0xec, 0x26, 0x6d, 0x18</Guid>
+      <GuidValue>1E93E633-D65A-459E-AB84-93D9EC266D18</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Usb2Hc">
       <C_Name>gEfiUsb2HcProtocolGuid</C_Name>
-      <Guid>0x3e745226, 0x9818, 0x45b6, 0xa2, 0xac, 0xd7, 0xcd, 0x0e, 0x8b, 0xa2, 0xbc</Guid>
+      <GuidValue>3E745226-9818-45B6-A2AC-D7CD0E8BA2BC</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SecurityPolicy">
       <C_Name>gEfiSecurityPolicyProtocolGuid</C_Name>
-      <Guid>0x78E4D245, 0xCD4D, 0x4a05, 0xA2, 0xBA, 0x47, 0x43, 0xE8, 0x6C, 0xFC, 0xAB</Guid>
+      <GuidValue>78E4D245-CD4D-4A05-A2BA-4743E86CFCAB</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="AcpiSupport">
       <C_Name>gEfiAcpiSupportProtocolGuid</C_Name>
-      <Guid>0xdbff9d55, 0x89b7, 0x46da, 0xbd, 0xdf, 0x67, 0x7d, 0x3d, 0xc0, 0x24, 0x1d</Guid>
+      <GuidValue>DBFF9D55-89B7-46DA-BDDF-677D3DC0241D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="BootScriptSave">
       <C_Name>gEfiBootScriptSaveProtocolGuid</C_Name>
-      <Guid>0x470e1529, 0xb79e, 0x4e32, 0xa0, 0xfe, 0x6a, 0x15, 0x6d, 0x29, 0xf9, 0xb2</Guid>
+      <GuidValue>470E1529-B79E-4E32-A0FE-6A156D29F9B2</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Smbus">
       <C_Name>gEfiSmbusProtocolGuid</C_Name>
-      <Guid>0xe49d33ed, 0x513d, 0x4634, 0xb6, 0x98, 0x6f, 0x55, 0xaa, 0x75, 0x1c, 0x1b</Guid>
+      <GuidValue>E49D33ED-513D-4634-B698-6F55AA751C1B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="LegacyBios">
       <C_Name>gEfiLegacyBiosProtocolGuid</C_Name>
-      <Guid>0xdb9a1e3d, 0x45cb, 0x4abb, 0x85, 0x3b, 0xe5, 0x38, 0x7f, 0xdb, 0x2e, 0x2d</Guid>
+      <GuidValue>DB9A1E3D-45CB-4ABB-853B-E5387FDB2E2D</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Legacy8259">
       <C_Name>gEfiLegacy8259ProtocolGuid</C_Name>
-      <Guid>0x38321dba, 0x4fe0, 0x4e17, 0x8a, 0xec, 0x41, 0x30, 0x55, 0xea, 0xed, 0xc1</Guid>
+      <GuidValue>38321DBA-4FE0-4E17-8AEC-413055EAEDC1</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="LegacyBiosPlatform">
       <C_Name>gEfiLegacyBiosPlatformProtocolGuid</C_Name>
-      <Guid>0x783658a3, 0x4172, 0x4421, 0xa2, 0x99, 0xe0, 0x09, 0x07, 0x9c, 0x0c, 0xb4</Guid>
+      <GuidValue>783658A3-4172-4421-A299-E009079C0CB4</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="LegacyInterrupt">
       <C_Name>gEfiLegacyInterruptProtocolGuid</C_Name>
-      <Guid>0x31ce593d, 0x108a, 0x485d, 0xad, 0xb2, 0x78, 0xf2, 0x1f, 0x29, 0x66, 0xbe</Guid>
+      <GuidValue>31CE593D-108A-485D-ADB2-78F21F2966BE</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="LegacyRegion">
       <C_Name>gEfiLegacyRegionProtocolGuid</C_Name>
-      <Guid>0xfc9013a, 0x0568, 0x4ba9, 0x9b, 0x7e, 0xc9, 0xc3, 0x90, 0xa6, 0x60, 0x9b</Guid>
+      <GuidValue>0FC9013A-0568-4BA9-9B7E-C9C390A6609B</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmAccess">
       <C_Name>gEfiSmmAccessProtocolGuid</C_Name>
-      <Guid>0x3792095a, 0xe309, 0x4c1e, 0xaa, 0x01, 0x85, 0xf5, 0x65, 0x5a, 0x17, 0xf1</Guid>
+      <GuidValue>3792095A-E309-4C1E-AA01-85F5655A17F1</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmBase">
       <C_Name>gEfiSmmBaseProtocolGuid</C_Name>
-      <Guid>0x1390954D, 0xda95, 0x4227, 0x93, 0x28, 0x72, 0x82, 0xc2, 0x17, 0xda, 0xa8</Guid>
+      <GuidValue>1390954D-DA95-4227-9328-7282C217DAA8</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmControl">
       <C_Name>gEfiSmmControlProtocolGuid</C_Name>
-      <Guid>0x8d12e231, 0xc667, 0x4fd1, 0x98, 0xf2, 0x24, 0x49, 0xa7, 0xe7, 0xb2, 0xe5</Guid>
+      <GuidValue>8D12E231-C667-4FD1-98F2-2449A7E7B2E5</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmGpiDispatch">
       <C_Name>gEfiSmmGpiDispatchProtocolGuid</C_Name>
-      <Guid>0xe0744b81, 0x9513, 0x49cd, 0x8c, 0xea, 0xe9, 0x24, 0x5e, 0x70, 0x39, 0xda</Guid>
+      <GuidValue>E0744B81-9513-49CD-8CEA-E9245E7039DA</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmIchnDispatch">
       <C_Name>gEfiSmmIchnDispatchProtocolGuid</C_Name>
-      <Guid>0xc50b323e, 0x9075, 0x4f2a, 0xac, 0x8e, 0xd2, 0x59, 0x6a, 0x10, 0x85, 0xcc</Guid>
+      <GuidValue>C50B323E-9075-4F2A-AC8E-D2596A1085CC</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmPeriodicTimerDispatch">
       <C_Name>gEfiSmmPeriodicTimerDispatchProtocolGuid</C_Name>
-      <Guid>0x9cca03fc, 0x4c9e, 0x4a19, 0x9b, 0x06, 0xed, 0x7b, 0x47, 0x9b, 0xde, 0x55</Guid>
+      <GuidValue>9CCA03FC-4C9E-4A19-9B06-ED7B479BDE55</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmPowerButtonDispatch">
       <C_Name>gEfiSmmPowerButtonDispatchProtocolGuid</C_Name>
-      <Guid>0xb709efa0, 0x47a6, 0x4b41, 0xb9, 0x31, 0x12, 0xec, 0xe7, 0xa8, 0xee, 0x56</Guid>
+      <GuidValue>B709EFA0-47A6-4B41-B931-12ECE7A8EE56</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmStandbyButtonDispatch">
       <C_Name>gEfiSmmStandbyButtonDispatchProtocolGuid</C_Name>
-      <Guid>0x78965b98, 0xb0bf, 0x449e, 0x8b, 0x22, 0xd2, 0x91, 0x4e, 0x49, 0x8a, 0x98</Guid>
+      <GuidValue>78965B98-B0BF-449E-8B22-D2914E498A98</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmStatusCode">
       <C_Name>gEfiSmmStatusCodeProtocolGuid</C_Name>
-      <Guid>0x6afd2b77, 0x98c1, 0x4acd, 0xa6, 0xf9, 0x8a, 0x94, 0x39, 0xde, 0x0f, 0xb1</Guid>
+      <GuidValue>6AFD2B77-98C1-4ACD-A6F9-8A9439DE0FB1</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmSwDispatch">
       <C_Name>gEfiSmmSwDispatchProtocolGuid</C_Name>
-      <Guid>0xe541b773, 0xdd11, 0x420c, 0xb0, 0x26, 0xdf, 0x99, 0x36, 0x53, 0xf8, 0xbf</Guid>
+      <GuidValue>E541B773-DD11-420C-B026-DF993653F8BF</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmSxDispatch">
       <C_Name>gEfiSmmSxDispatchProtocolGuid</C_Name>
-      <Guid>0x14fc52be, 0x01dc, 0x426c, 0x91, 0xae, 0xa2, 0x3c, 0x3e, 0x22, 0x0a, 0xe8</Guid>
+      <GuidValue>14FC52BE-01DC-426C-91AE-A23C3E220AE8</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SmmUsbDispatch">
       <C_Name>gEfiSmmUsbDispatchProtocolGuid</C_Name>
-      <Guid>0xa05b6ffd, 0x87af, 0x4e42, 0x95, 0xc9, 0x62, 0x28, 0xb6, 0x3c, 0xf3, 0xf3</Guid>
+      <GuidValue>A05B6FFD-87AF-4E42-95C9-6228B63CF3F3</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DeviceIo">
       <C_Name>gEfiDeviceIoProtocolGuid</C_Name>
-      <Guid>0xaf6ac311, 0x84c3, 0x11d2, 0x8e, 0x3c, 0x00, 0xa0, 0xc9, 0x69, 0x72, 0x3b</Guid>
+      <GuidValue>AF6AC311-84C3-11D2-8E3C-00A0C969723B</GuidValue>
+      <HelpText/>
     </Entry>
   </ProtocolDeclarations>
   <PpiDeclarations>
     <Entry Name="BootInRecoveryMode">
       <C_Name>gEfiPeiBootInRecoveryModePpiGuid</C_Name>
-      <Guid>0x17ee496a, 0xd8e4, 0x4b9a, 0x94, 0xd1, 0xce, 0x82, 0x72, 0x30, 0x08, 0x50</Guid>
+      <GuidValue>17EE496A-D8E4-4B9A-94D1-CE8272300850</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="CpuIo">
       <C_Name>gEfiPeiCpuIoPpiInServiceTableGuid</C_Name>
-      <Guid>0xe6af1f7b, 0xfc3f, 0x46da, 0xa8, 0x28, 0xa3, 0xb4, 0x57, 0xa4, 0x42, 0x82</Guid>
+      <GuidValue>E6AF1F7B-FC3F-46DA-A828-A3B457A44282</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DxeIpl">
       <C_Name>gEfiDxeIplPpiGuid</C_Name>
-      <Guid>0xae8ce5d, 0xe448, 0x4437, 0xa8, 0xd7, 0xeb, 0xf5, 0xf1, 0x94, 0xf7, 0x31</Guid>
+      <GuidValue>0AE8CE5D-E448-4437-A8D7-EBF5F194F731</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="EndOfPeiSignal">
       <C_Name>gEfiEndOfPeiSignalPpiGuid</C_Name>
-      <Guid>0x605EA650, 0xC65C, 0x42e1, 0xBA, 0x80, 0x91, 0xA5, 0x2A, 0xB6, 0x18, 0xC6</Guid>
+      <GuidValue>605EA650-C65C-42E1-BA80-91A52AB618C6</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FindFv">
       <C_Name>gEfiFindFvPpiGuid</C_Name>
-      <Guid>0x36164812, 0xa023, 0x44e5, 0xbd, 0x85, 0x05, 0xbf, 0x3c, 0x77, 0x00, 0xaa</Guid>
+      <GuidValue>36164812-A023-44E5-BD85-05BF3C7700AA</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="FvFileLoader">
       <C_Name>gEfiPeiFvFileLoaderPpiGuid</C_Name>
-      <Guid>0x7e1f0d85, 0x04ff, 0x4bb2, 0x86, 0x6a, 0x31, 0xa2, 0x99, 0x6a, 0x48, 0xa8</Guid>
+      <GuidValue>7E1F0D85-04FF-4BB2-866A-31A2996A48A8</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MasterBootMode">
       <C_Name>gEfiPeiMasterBootModePpiGuid</C_Name>
-      <Guid>0x7408d748, 0xfc8c, 0x4ee6, 0x92, 0x88, 0xc4, 0xbe, 0xc0, 0x92, 0xa4, 0x10</Guid>
+      <GuidValue>7408D748-FC8C-4EE6-9288-C4BEC092A410</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="MemoryDiscovered">
       <C_Name>gEfiPeiMemoryDiscoveredPpiGuid</C_Name>
-      <Guid>0xf894643d, 0xc449, 0x42d1, 0x8e, 0xa8, 0x85, 0xbd, 0xd8, 0xc6, 0x5b, 0xde</Guid>
+      <GuidValue>F894643D-C449-42D1-8EA8-85BDD8C65BDE</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PciCfg">
       <C_Name>gEfiPciCfgPpiInServiceTableGuid</C_Name>
-      <Guid>0xe1f2eba0, 0xf7b9, 0x4a26, 0x86, 0x20, 0x13, 0x12, 0x21, 0x64, 0x2a, 0x90</Guid>
+      <GuidValue>E1F2EBA0-F7B9-4A26-8620-131221642A90</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="ReadOnlyVariable">
       <C_Name>gEfiPeiReadOnlyVariablePpiGuid</C_Name>
-      <Guid>0x3cdc90c6, 0x13fb, 0x4a75, 0x9e, 0x79, 0x59, 0xe9, 0xdd, 0x78, 0xb9, 0xfa</Guid>
+      <GuidValue>3CDC90C6-13FB-4A75-9E79-59E9DD78B9FA</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="RecoveryModule">
       <C_Name>gEfiPeiRecoveryModulePpiGuid</C_Name>
-      <Guid>0xFB6D9542, 0x612D, 0x4f45, 0x87, 0x2F, 0x5C, 0xFF, 0x52, 0xE9, 0x3D, 0xCF</Guid>
+      <GuidValue>FB6D9542-612D-4F45-872F-5CFF52E93DCF</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Reset">
       <C_Name>gEfiPeiResetPpiGuid</C_Name>
-      <Guid>0xef398d58, 0x9dfd, 0x4103, 0xbf, 0x94, 0x78, 0xc6, 0xf4, 0xfe, 0x71, 0x2f</Guid>
+      <GuidValue>EF398D58-9DFD-4103-BF94-78C6F4FE712F</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="S3Resume">
       <C_Name>gEfiPeiS3ResumePpiGuid</C_Name>
-      <Guid>0x4426CCB2, 0xE684, 0x4a8a, 0xAE, 0x40, 0x20, 0xD4, 0xB0, 0x25, 0xB7, 0x10</Guid>
+      <GuidValue>4426CCB2-E684-4A8A-AE40-20D4B025B710</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SecPlatformInformation">
       <C_Name>gEfiSecPlatformInformationPpiGuid</C_Name>
-      <Guid>0x6f8c2b35, 0xfef4, 0x448d, 0x82, 0x56, 0xe1, 0x1b, 0x19, 0xd6, 0x10, 0x77</Guid>
+      <GuidValue>6F8C2B35-FEF4-448D-8256-E11B19D61077</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="SectionExtraction">
       <C_Name>gEfiPeiSectionExtractionPpiGuid</C_Name>
-      <Guid>0x4F89E208, 0xE144, 0x4804, 0x9E, 0xC8, 0x0F, 0x89, 0x4F, 0x7E, 0x36, 0xD7</Guid>
+      <GuidValue>4F89E208-E144-4804-9EC8-0F894F7E36D7</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Security">
       <C_Name>gEfiPeiSecurityPpiGuid</C_Name>
-      <Guid>0x1388066e, 0x3a57, 0x4efa, 0x98, 0xf3, 0xc1, 0x2f, 0x3a, 0x95, 0x8a, 0x29</Guid>
+      <GuidValue>1388066E-3A57-4EFA-98F3-C12F3A958A29</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="StatusCode">
       <C_Name>gEfiPeiStatusCodePpiGuid</C_Name>
-      <Guid>0x229832d3, 0x7a30, 0x4b36, 0xb8, 0x27, 0xf4, 0x0c, 0xb7, 0xd4, 0x54, 0x36</Guid>
+      <GuidValue>229832D3-7A30-4B36-B827-F40CB7D45436</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="PcdPpi">
       <C_Name>gPcdPpiGuid</C_Name>
-      <Guid>0x6e81c58, 0x4ad7, 0x44bc, 0x83, 0x90, 0xf1, 0x2, 0x65, 0xf7, 0x24, 0x80</Guid>
+      <GuidValue>06E81C58-4AD7-44BC-8390-F10265F72480</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="BootScriptExecuter">
       <C_Name>gEfiPeiBootScriptExecuterPpiGuid</C_Name>
-      <Guid>0xabd42895, 0x78cf, 0x4872, 0x84, 0x44, 0x1b, 0x5c, 0x18, 0x0b, 0xfb, 0xff</Guid>
+      <GuidValue>ABD42895-78CF-4872-8444-1B5C180BFBFF</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Smbus">
       <C_Name>gEfiPeiSmbusPpiGuid</C_Name>
-      <Guid>0xabd42895, 0x78cf, 0x4872, 0x84, 0x44, 0x1b, 0x5c, 0x18, 0x0b, 0xfb, 0xda</Guid>
+      <GuidValue>ABD42895-78CF-4872-8444-1B5C180BFBDA</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="BlockIo">
       <C_Name>gEfiPeiBlockIoPpiGuid</C_Name>
-      <Guid>0x695d8aa1, 0x42ee, 0x4c46, 0x80, 0x5c, 0x6e, 0xa6, 0xbc, 0xe7, 0x99, 0xe3</Guid>
+      <GuidValue>695D8AA1-42EE-4C46-805C-6EA6BCE799E3</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="DeviceRecoveryModule">
       <C_Name>gEfiPeiDeviceRecoveryModulePpiGuid</C_Name>
-      <Guid>0x0DE2CE25, 0x446A, 0x45a7, 0xBF, 0xC9, 0x37, 0xDA, 0x26, 0x34, 0x4B, 0x37</Guid>
+      <GuidValue>0DE2CE25-446A-45A7-BFC9-37DA26344B37</GuidValue>
+      <HelpText/>
     </Entry>
     <Entry Name="Stall">
       <C_Name>gEfiPeiStallPpiGuid</C_Name>
-      <Guid>0x1f4c6f90, 0xb06b, 0x48d8, 0xa2, 0x01, 0xba, 0xe5, 0xf1, 0xcd, 0x7d, 0x56</Guid>
+      <GuidValue>1F4C6F90-B06B-48D8-A201-BAE5F1CD7D56</GuidValue>
+      <HelpText/>
     </Entry>
   </PpiDeclarations>
   <PcdDeclarations>
     <PcdEntry>
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
       <Token>0x00000001</Token>
-      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdMaximumUnicodeStringLength</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -1194,7 +1277,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
       <Token>0x00000002</Token>
-      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdMaximumAsciiStringLength</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -1203,7 +1286,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumLinkedListLength</C_Name>
       <Token>0x00000003</Token>
-      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdMaximumLinkedListLength</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -1212,7 +1295,7 @@
     <PcdEntry>
       <C_Name>PcdSpinLockTimeout</C_Name>
       <Token>0x00000004</Token>
-      <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdSpinLockTimeout</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>10000000</DefaultValue>
@@ -1221,7 +1304,7 @@
     <PcdEntry>
       <C_Name>PcdDebugPropertyMask</C_Name>
       <Token>0x00000005</Token>
-      <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdDebugPropertyMask</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x0f</DefaultValue>
@@ -1230,7 +1313,7 @@
     <PcdEntry>
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
       <Token>0x00000006</Token>
-      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdDebugPrintErrorLevel</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>0x80000000</DefaultValue>
@@ -1239,7 +1322,7 @@
     <PcdEntry>
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
       <Token>0x00000007</Token>
-      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdReportStatusCodePropertyMask</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x07</DefaultValue>
@@ -1248,7 +1331,7 @@
     <PcdEntry>
       <C_Name>PcdDebugClearMemoryValue</C_Name>
       <Token>0x00000008</Token>
-      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdDebugClearMemoryValue</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0xAF</DefaultValue>
@@ -1257,7 +1340,7 @@
     <PcdEntry>
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
       <Token>0x00000009</Token>
-      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdPerformanceLibraryPropertyMask</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0</DefaultValue>
@@ -1266,7 +1349,7 @@
     <PcdEntry>
       <C_Name>PcdPostCodePropertyMask</C_Name>
       <Token>0x0000000b</Token>
-      <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
+      <TokenSpaceGuidCName>FIX_ME_PcdPostCodePropertyMask</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0</DefaultValue>

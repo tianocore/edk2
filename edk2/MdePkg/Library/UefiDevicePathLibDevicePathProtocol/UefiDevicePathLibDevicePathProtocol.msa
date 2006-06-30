@@ -1,55 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
-  <MsaLibHeader>
-    <BaseName>UefiDevicePathLibDevicePathProtocol</BaseName>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>UefiDevicePathLibDevicePathProtocol</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
-    <ComponentType>LIBRARY</ComponentType>
-    <Guid>050EB8C6-C12E-4b86-892B-40985E8B3137</Guid>
-    <Version>EDK_RELEASE_VERSION        0x00020000</Version>
+    <GuidValue>050EB8C6-C12E-4b86-892B-40985E8B3137</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Device Path Library</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-30 10:05</Created>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
-  </MsaLibHeader>
-  <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">DevicePathLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>UefiDevicePathLibDevicePathProtocol</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>DevicePathLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles>
+  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Filename>UefiDevicePathLib.c</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-  </Includes>
-  <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">DevicePathUtilities</Protocol>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Protocols xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>DevicePathUtilities</ProtocolCName>
+    </Protocol>
   </Protocols>
-  <Externs>
+  <Externs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
       <Constructor>DevicePathLibConstructor</Constructor>
     </Extern>
   </Externs>
-</LibraryModuleSurfaceArea>
+</ModuleSurfaceArea>

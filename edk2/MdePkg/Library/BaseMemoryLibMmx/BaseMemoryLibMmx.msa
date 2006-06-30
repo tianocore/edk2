@@ -1,41 +1,38 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
-  <MsaLibHeader>
-    <BaseName>BaseMemoryLibMmx</BaseName>
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>BaseMemoryLibMmx</ModuleName>
     <ModuleType>BASE</ModuleType>
-    <ComponentType>LIBRARY</ComponentType>
-    <Guid>d458a654-f64c-49db-b8d1-3821306bf1f6</Guid>
-    <Version>EDK_RELEASE_VERSION        0x00090000</Version>
+    <GuidValue>d458a654-f64c-49db-b8d1-3821306bf1f6</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Memory-only library functions with no library constructor/destructor</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-04-12 19:53</Created>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
-  </MsaLibHeader>
-  <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">BaseMemoryLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>BaseMemoryLibMmx</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles>
+  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Filename>MemLibGuid.c</Filename>
     <Filename>CopyMemWrapper.c</Filename>
     <Filename>SetMemWrapper.c</Filename>
@@ -48,33 +45,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>ScanMem16Wrapper.c</Filename>
     <Filename>ScanMem32Wrapper.c</Filename>
     <Filename>ScanMem64Wrapper.c</Filename>
-    <Arch ArchType="IA32">
-      <Filename>Ia32/CopyMem.asm</Filename>
-      <Filename>Ia32/SetMem.asm</Filename>
-      <Filename>Ia32/ZeroMem.asm</Filename>
-      <Filename>Ia32/SetMem16.asm</Filename>
-      <Filename>Ia32/SetMem32.asm</Filename>
-      <Filename>Ia32/SetMem64.asm</Filename>
-      <Filename>Ia32/CompareMem.asm</Filename>
-      <Filename>Ia32/ScanMem8.asm</Filename>
-      <Filename>Ia32/ScanMem16.asm</Filename>
-      <Filename>Ia32/ScanMem32.asm</Filename>
-      <Filename>Ia32/ScanMem64.asm</Filename>
-    </Arch>
-    <Arch ArchType="X64">
-      <Filename>X64/CopyMem.asm</Filename>
-      <Filename>X64/SetMem.asm</Filename>
-      <Filename>X64/SetMem16.asm</Filename>
-      <Filename>X64/SetMem32.asm</Filename>
-      <Filename>X64/SetMem64.asm</Filename>
-      <Filename>X64/CompareMem.asm</Filename>
-      <Filename>X64/ScanMem8.asm</Filename>
-      <Filename>X64/ScanMem16.asm</Filename>
-      <Filename>X64/ScanMem32.asm</Filename>
-      <Filename>X64/ScanMem64.asm</Filename>
-    </Arch>
+    <Filename SupArchList="IA32">Ia32/CopyMem.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/ZeroMem.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem16.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem32.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem64.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/CompareMem.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem8.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem16.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem32.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem64.asm</Filename>
+    <Filename SupArchList="X64">X64/CopyMem.asm</Filename>
+    <Filename SupArchList="X64">X64/SetMem.asm</Filename>
+    <Filename SupArchList="X64">X64/SetMem16.asm</Filename>
+    <Filename SupArchList="X64">X64/SetMem32.asm</Filename>
+    <Filename SupArchList="X64">X64/SetMem64.asm</Filename>
+    <Filename SupArchList="X64">X64/CompareMem.asm</Filename>
+    <Filename SupArchList="X64">X64/ScanMem8.asm</Filename>
+    <Filename SupArchList="X64">X64/ScanMem16.asm</Filename>
+    <Filename SupArchList="X64">X64/ScanMem32.asm</Filename>
+    <Filename SupArchList="X64">X64/ScanMem64.asm</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-  </Includes>
-</LibraryModuleSurfaceArea>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
+  </Externs>
+</ModuleSurfaceArea>
