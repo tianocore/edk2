@@ -1,99 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
+<!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <BaseName>PeiFlashMap</BaseName>
+    <ModuleName>PeiFlashMap</ModuleName>
     <ModuleType>PEIM</ModuleType>
-    <ComponentType>PE32_PEIM</ComponentType>
-    <Guid>681F3771-6F1D-42DE-9AA2-F82BBCDBC5F9</Guid>
-    <Version>0</Version>
+    <GuidValue>681F3771-6F1D-42DE-9AA2-F82BBCDBC5F9</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for FlashMap PEI module</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-14 17:04</Created>
-    <Updated>2006-03-23 10:43</Updated>
-    <Specification>0</Specification>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>PeiFlashMap</OutputFileBasename>
+  </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeimEntryPoint</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesTablePointerLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeimEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeiServicesLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeiServicesTablePointerLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>FlashMap.c</Filename>
     <Filename>FlashMap.dxs</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-    <PackageName>EdkModulePkg</PackageName>
-    <PackageName>EdkNt32Pkg</PackageName>
-  </Includes>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+    <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
+  </PackageDependencies>
   <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">FirmwareVolumeBlock</Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+    </Protocol>
   </Protocols>
-  <Hobs>
-    <Hob Usage="ALWAYS_PRODUCED" HobType="GUID_EXTENSION">
-      <Name>VariableArea</Name>
-      <C_Name>gEfiFlashMapHobGuid</C_Name>
-      <Guid>0xb091e7d2, 0x5a0, 0x4198, 0x94, 0xf0, 0x74, 0xb7, 0xb8, 0xc5, 0x54, 0x59</Guid>
-    </Hob>
-    <Hob Usage="ALWAYS_PRODUCED" HobType="GUID_EXTENSION">
-      <Name>FtwBackupBlock</Name>
-      <C_Name>gEfiFlashMapHobGuid</C_Name>
-      <Guid>0xb091e7d2, 0x5a0, 0x4198, 0x94, 0xf0, 0x74, 0xb7, 0xb8, 0xc5, 0x54, 0x59</Guid>
-    </Hob>
-    <Hob Usage="ALWAYS_PRODUCED" HobType="GUID_EXTENSION">
-      <Name>FtwStateArea</Name>
-      <C_Name>gEfiFlashMapHobGuid</C_Name>
-      <Guid>0xb091e7d2, 0x5a0, 0x4198, 0x94, 0xf0, 0x74, 0xb7, 0xb8, 0xc5, 0x54, 0x59</Guid>
-    </Hob>
-    <Hob Usage="ALWAYS_PRODUCED" HobType="GUID_EXTENSION">
-      <Name>RecoveryBios</Name>
-      <C_Name>gEfiFlashMapHobGuid</C_Name>
-      <Guid>0xb091e7d2, 0x5a0, 0x4198, 0x94, 0xf0, 0x74, 0xb7, 0xb8, 0xc5, 0x54, 0x59</Guid>
-    </Hob>
-    <Hob Usage="ALWAYS_PRODUCED" HobType="GUID_EXTENSION">
-      <Name>SystemNvDataHob</Name>
-      <C_Name>gEfiFlashMapHobGuid</C_Name>
-      <Guid>0xb091e7d2, 0x5a0, 0x4198, 0x94, 0xf0, 0x74, 0xb7, 0xb8, 0xc5, 0x54, 0x59</Guid>
-    </Hob>
-  </Hobs>
   <PPIs>
-    <Ppi Usage="ALWAYS_PRODUCED">FlashMap</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">NtFwh</Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">
+      <PpiCName>FlashMap</PpiCName>
+    </Ppi>
+    <Ppi Usage="ALWAYS_CONSUMED">
+      <PpiCName>NtFwh</PpiCName>
+    </Ppi>
   </PPIs>
   <Guids>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>FlashMapHob</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>FirmwareFileSystem</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>SystemNvDataHob</C_Name>
-    </GuidEntry>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>FlashMapHob</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>FirmwareFileSystem</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>SystemNvDataHob</GuidCName>
+    </GuidCNames>
   </Guids>
   <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00000000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
       <ModuleEntryPoint>PeimInitializeFlashMap</ModuleEntryPoint>
     </Extern>

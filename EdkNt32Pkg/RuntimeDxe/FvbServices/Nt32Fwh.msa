@@ -1,89 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
+<!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <BaseName>FwBlockService</BaseName>
+    <ModuleName>FwBlockService</ModuleName>
     <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
-    <ComponentType>RT_DRIVER</ComponentType>
-    <Guid>BDFE5FAA-2A35-44bb-B17A-8084D4E2B9E9</Guid>
-    <Version>0</Version>
+    <GuidValue>BDFE5FAA-2A35-44bb-B17A-8084D4E2B9E9</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for DiskIo module.</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-14 17:04</Created>
-    <Updated>2006-03-19 15:17</Updated>
-    <Specification>0</Specification>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>FwBlockService</OutputFileBasename>
+  </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DxeServicesTableLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DxeRuntimeDriverLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DxeServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DxeRuntimeDriverLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Nt32Fwh.dxs</Filename>
-    <Arch ArchType="IA32">
-      <Filename>nt32\FwBlockService.c</Filename>
-      <Filename>nt32\FwBlockService.h</Filename>
-      <Filename>nt32\FvbInfo.c</Filename>
-    </Arch>
+    <Filename SupArchList="IA32">nt32\FwBlockService.c</Filename>
+    <Filename SupArchList="IA32">nt32\FwBlockService.h</Filename>
+    <Filename SupArchList="IA32">nt32\FvbInfo.c</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-    <PackageName>EdkModulePkg</PackageName>
-    <PackageName>EdkNt32Pkg</PackageName>
-  </Includes>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+    <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
+  </PackageDependencies>
   <Protocols>
-    <Protocol Usage="SOMETIMES_PRODUCED">DevicePath</Protocol>
-    <Protocol Usage="SOMETIMES_PRODUCED">FirmwareVolumeBlock</Protocol>
-    <Protocol Usage="ALWAYS_PRODUCED">FvbExtension</Protocol>
+    <Protocol Usage="SOMETIMES_PRODUCED">
+      <ProtocolCName>DevicePath</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="SOMETIMES_PRODUCED">
+      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>FvbExtension</ProtocolCName>
+    </Protocol>
   </Protocols>
   <Events>
     <CreateEvents>
-      <Event Usage="ALWAYS_CONSUMED" EventGroup="EVENT_GROUP_VIRTUAL_ADDRESS_CHANGE">
-        <C_Name>gEfiEventVirtualAddressChangeGuid</C_Name>
-        <Guid>0x13fa7698, 0xc831, 0x49c7, 0x87, 0xea, 0x8f, 0x43, 0xfc, 0xc2, 0x51, 0x96</Guid>
-      </Event>
+      <EventTypes EventGuidCName="gEfiEventVirtualAddressChangeGuid" Usage="ALWAYS_CONSUMED">
+        <EventType>EVENT_GROUP_GUID</EventType>
+      </EventTypes>
     </CreateEvents>
   </Events>
-  <Hobs>
-    <Hob Usage="ALWAYS_CONSUMED" HobType="FIRMWARE_VOLUME"></Hob>
-  </Hobs>
   <Guids>
-    <GuidEntry Usage="ALWAYS_PRODUCED">
-      <C_Name>AlternateFvBlock</C_Name>
-    </GuidEntry>
+    <GuidCNames Usage="ALWAYS_PRODUCED">
+      <GuidCName>AlternateFvBlock</GuidCName>
+    </GuidCNames>
   </Guids>
   <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
       <ModuleEntryPoint>FvbInitialize</ModuleEntryPoint>
-    </Extern>
-    <Extern>
-      <SetVirtualAddressMapCallBack></SetVirtualAddressMapCallBack>
-      <ExitBootServicesCallBack></ExitBootServicesCallBack>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>
