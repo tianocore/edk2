@@ -1,68 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
-  <MsaLibHeader>
-    <BaseName>DxeCorePerformanceLib</BaseName>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>DxeCorePerformanceLib</ModuleName>
     <ModuleType>DXE_CORE</ModuleType>
-    <ComponentType>LIBRARY</ComponentType>
-    <Guid>D0F78BBF-0A30-4c63-8A48-0F618A4AFACD</Guid>
-    <Version>EDK_RELEASE_VERSION        0x00020000</Version>
+    <GuidValue>D0F78BBF-0A30-4c63-8A48-0F618A4AFACD</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for the Tiano Decompress Library</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-04-04 11:10</Created>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
-  </MsaLibHeader>
-  <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">PerformanceLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">TimerLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>DxeCorePerformanceLib</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>PerformanceLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>TimerLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles>
+  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Filename>DxeCorePerformanceLib.c</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-    <PackageName>EdkModulePkg</PackageName>
-  </Includes>
-  <Protocols>
-    <Protocol Usage="ALWAYS_PRODUCED">Performance</Protocol>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+  </PackageDependencies>
+  <Protocols xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>Performance</ProtocolCName>
+    </Protocol>
   </Protocols>
-  <Guids>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>PeiPerformanceHob</C_Name>
-    </GuidEntry>
+  <Guids xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>PeiPerformanceHob</GuidCName>
+    </GuidCNames>
   </Guids>
-  <Externs>
+  <Externs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
       <Constructor>DxeCorePerformanceLibConstructor</Constructor>
     </Extern>
   </Externs>
-  <PcdCoded>
+  <PcdCoded xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdPerformanceLibraryPropertyMask</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
   </PcdCoded>
-</LibraryModuleSurfaceArea>
+</ModuleSurfaceArea>
