@@ -11,7 +11,8 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
-package org.tianocore.build.fpd;
+package org.tianocore.build.id;
+
 
 /**
   This class is used to identify a module with BaseName, GUID, Version, PackageName
@@ -23,30 +24,27 @@ public class FpdModuleIdentification {
     
     private String arch;
     
-    private String fvBinding;
+    private String fvBinding = "NULL"; // Optional
     
-    private String baseName;
+    private String sequence = "0"; // Optional
     
-    private String packageName;
+    private ModuleIdentification module;
     
-    private String guid;
+    private String target; // Optional
     
-    private String version;
+    private String toolchain; // Optional
     
-    private String sequence;
-    
-    /**
-      
-      @param baseName the base name of the module
-      @param guid the GUID of the module
-      @param arch the ARCH of the module
-    **/
-    public FpdModuleIdentification(String baseName, String guid, String arch){
-        this.baseName = baseName;
-        this.guid = guid;
+    public FpdModuleIdentification(String arch, String fvBinding, String sequence, ModuleIdentification module){
         this.arch = arch;
+        this.fvBinding = fvBinding;
+        this.sequence = sequence;
+        this.module = module;
     }
     
+    public FpdModuleIdentification(ModuleIdentification module, String arch){
+        this.arch = arch;
+        this.module = module;
+    }
     /**
       Override java.lang.Object#equals. 
       
@@ -58,19 +56,14 @@ public class FpdModuleIdentification {
     public boolean equals(Object obj) {
         if (obj instanceof FpdModuleIdentification) {
             FpdModuleIdentification moduleIdObj = (FpdModuleIdentification)obj;
-            if ( baseName.equalsIgnoreCase(moduleIdObj.baseName) && arch.equalsIgnoreCase(moduleIdObj.arch)) {
+            if ( module.equals(moduleIdObj.module) && arch.equalsIgnoreCase(moduleIdObj.arch)) {
                 return true;
             }
-            // TBD
             return false;
         }
         else {
-            return super.equals(obj);
+            return false;
         }
-    }
-    
-    public void setArch(String arch) {
-        this.arch = arch;
     }
 
     public void setFvBinding(String fvBinding) {
@@ -82,50 +75,34 @@ public class FpdModuleIdentification {
     }
 
     public String toString(){
-        return arch + ":" + guid + "_" + baseName;
-    }
-
-    public void setBaseName(String baseName) {
-        this.baseName = baseName;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public String getArch() {
-        return arch;
-    }
-
-    public String getBaseName() {
-        return baseName;
+        return arch + ":" + module;
     }
 
     public String getFvBinding() {
         return fvBinding;
     }
 
-    public String getGuid() {
-        return guid;
-    }
-
-    public String getPackageName() {
-        return packageName;
-    }
-
     public String getSequence() {
         return sequence;
     }
 
-    public String getVersion() {
-        return version;
+    public ModuleIdentification getModule() {
+        return module;
+    }
+
+    public void setModule(ModuleIdentification module) {
+        this.module = module;
+    }
+
+    public String getArch() {
+        return arch;
+    }
+
+    public void setArch(String arch) {
+        this.arch = arch;
+    }
+    
+    public int hashCode(){
+        return module.hashCode();
     }
 }

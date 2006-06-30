@@ -15,6 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
+import java.io.File;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
@@ -25,7 +27,13 @@ import org.apache.tools.ant.Task;
   @since GenBuild 1.0
 **/
 public class ToolChainTask extends Task{
-
+    ///
+    /// environment variable name of toolchain
+    ///
+    static private String toolsEnv = "env.TOOLS_DEF";
+    ///
+    /// configuration file path
+    ///
     private String confPath = ".";
     
     /**
@@ -43,10 +51,9 @@ public class ToolChainTask extends Task{
               Config files are invalid.
     **/
     public void execute() throws BuildException {
-        String toolChain = getProject().getProperty("env.TOOL_CHAIN");
-        ToolChainFactory toolchain = new ToolChainFactory(confPath, toolChain);
-        toolchain.setupToolChain();
-        getProject().setProperty("TARGET", toolchain.getCurrentTarget());
+        String toolChain = getProject().getProperty(toolsEnv);
+//        ToolChainConfig toolchain = new ToolChainConfig(new File(confPath + File.separatorChar + toolChain));
+        //getProject().setProperty("TARGET", toolchain.getCurrentTarget());
     }
 
     /**

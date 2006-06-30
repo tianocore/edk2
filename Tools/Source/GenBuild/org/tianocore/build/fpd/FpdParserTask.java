@@ -1,18 +1,18 @@
 /** @file
-  This file is ANT task FpdParserTask. 
+ This file is ANT task FpdParserTask. 
  
-  FpdParserTask is used to parse FPD (Framework Platform Description) and generate
-  build.out.xml. It is for Package or Platform build use. 
+ FpdParserTask is used to parse FPD (Framework Platform Description) and generate
+ build.out.xml. It is for Package or Platform build use. 
  
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+ Copyright (c) 2006, Intel Corporation
+ All rights reserved. This program and the accompanying materials
+ are licensed and made available under the terms and conditions of the BSD License
+ which accompanies this distribution.  The full text of the license may be found at
+ http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-**/
+ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ **/
 package org.tianocore.build.fpd;
 
 import java.io.BufferedWriter;
@@ -25,67 +25,67 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import java.util.TreeMap;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
-import org.w3c.dom.Comment;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
+import org.tianocore.build.exception.EdkException;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
-import org.tianocore.build.global.OverrideProcess;
 import org.tianocore.build.global.SurfaceAreaQuery;
-import org.tianocore.build.pcd.action.CollectPCDAction;
-import org.tianocore.build.pcd.action.ActionMessage;
-import org.tianocore.BuildOptionsDocument;
-import org.tianocore.FrameworkPlatformDescriptionDocument;
-import org.tianocore.ModuleSADocument;
-
+import org.tianocore.build.id.FpdModuleIdentification;
+import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.build.id.PlatformIdentification;
+import org.tianocore.build.toolchain.ToolChainAttribute;
+import org.tianocore.build.toolchain.ToolChainElement;
+import org.tianocore.build.toolchain.ToolChainMap;
 
 /**
-  <code>FpdParserTask</code> is an ANT task. The main function is parsing FPD
-  XML file and generating its ANT build script for Platform or Package. 
+  <code>FpdParserTask</code> is an ANT task. The main function is parsing Framework
+  Platform Descritpion (FPD) XML file and generating its ANT build script for 
+  corresponding platform.  
+
+  <p>The task sets global properties PLATFORM, PLATFORM_DIR, PLATFORM_RELATIVE_DIR
+  and BUILD_DIR. </p>
+  
+  <p>The task generates ${PLATFORM}_build.xml file which will be called by top level
+  build.xml. The task also generate Fv.inf files (File is for Tool GenFvImage) 
+  and flash definition file (File is for Tool FlashMap) if necessary. </p>
+  
+  <p>FpdParserTask task stores all FPD information to GlobalData. And parse
+  tools definition file to set up compiler options for different Target and
+  different ToolChainTag. </p>
+  
+  <p>The method parseFpdFile is also prepared for single module build. </p>
   
   <p>The usage is (take NT32 Platform for example):</p>
-  
+
   <pre>
-    &lt;FPDParser fpdfilename="Build\Nt32.fpd" /&gt;
+  &lt;FPDParser platformName="Nt32" /&gt;
   </pre>
-  
+
   <p>The task will initialize all information through parsing Framework Database, 
   SPD, Tool chain configuration files. </p>
-  
+
   @since GenBuild 1.0
 **/
 public class FpdParserTask extends Task {
+    
+    private String platformName;
 
+    private File fpdFile = null;
+    
+    private PlatformIdentification platformId;
+    
     ///
-    /// FV dir: ${PLATFORM_DIR}/Build/FV
+    /// 
     ///
-    public static final String FV_OUTPUT_DIR = "${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "FV";
-
-    private File fpdFilename;
-
-    private File guiddatabase;
-
-    ///
-    /// Keep platform buildoption information
-    ///
-    public static XmlObject platformBuildOptions = null;
-
+    private String type;
+    
     ///
     /// Mapping from modules identification to out put file name
     ///
@@ -94,102 +94,138 @@ public class FpdParserTask extends Task {
     ///
     /// Mapping from FV name to its modules
     ///
-    private Map<String, Set<FpdModuleIdentification> > fvs = new HashMap<String, Set<FpdModuleIdentification> >();
+    private Map<String, Set<FpdModuleIdentification>> fvs = new HashMap<String, Set<FpdModuleIdentification>>();
 
     ///
-    /// Mapping from sequence number to its modules
+    /// Mapping from sequence number to FV names
     ///
-    private Map<String, Set<FpdModuleIdentification> > sequences = new HashMap<String, Set<FpdModuleIdentification> >();
+    private Map<String, Set<String>> sequences = new TreeMap<String, Set<String>>();
 
     ///
     /// FpdParserTask can specify some ANT properties. 
     ///
     private Vector<Property> properties = new Vector<Property>();
+    
+    private boolean isUnified = true;
 
-    private String info = "====================================================================\n"
-                    + "DO NOT EDIT \n"
-                    + "File auto-generated by build utility\n"
-                    + "\n"
-                    + "Abstract:\n"
-                    + "Auto-generated ANT build file for building of EFI Modules/Platforms\n"
-                    + "=====================================================================";
 
     /**
       Public construct method. It is necessary for ANT task.
     **/
-    public FpdParserTask () {
+    public FpdParserTask() {
     }
 
     /**
-      ANT task's entry method. The main steps is described as following: 
-      
-      <ul>
-        <li>Initialize global information (Framework DB, SPD files and all MSA files 
-        listed in SPD). This step will execute only once in whole build process;</li>
-        <li>Parse specified FPD file; </li>
-        <li>Generate FV.inf files; </li>
-        <li>Generate build.out.xml file for Flatform or Package build; </li>
-        <li>Collect PCD information. </li>
-      </ul>
-      
-      @throws BuildException
-                  Surface area is not valid. 
+     ANT task's entry method. The main steps is described as following: 
+     
+     <ul>
+     <li>Initialize global information (Framework DB, SPD files and all MSA files 
+     listed in SPD). This step will execute only once in whole build process;</li>
+     <li>Parse specified FPD file; </li>
+     <li>Generate FV.inf files; </li>
+     <li>Generate PlatformName_build.xml file for Flatform build; </li>
+     <li>Collect PCD information. </li>
+     </ul>
+     
+     @throws BuildException
+     Surface area is not valid. 
     **/
     public void execute() throws BuildException {
-        OutputManager.update(getProject());
-        //
-        // Parse DB and SPDs files. Initialize Global Data
-        //
-        GlobalData.initInfo("Tools" + File.separatorChar + "Conf" + File.separatorChar + "FrameworkDatabase.db", getProject()
-                        .getProperty("WORKSPACE_DIR"));
+        // Remove !!
+        if ( fpdFile == null) {
+            if (platformName == null) {
+                throw new BuildException("FpdParserTask parameter error. Please specify platform name or FPD file. ");
+            }
+            platformId = GlobalData.getPlatform(platformName);
+            fpdFile = platformId.getFpdFile();
+        }
+        
         //
         // Parse FPD file
         //
         parseFpdFile();
+        
         //
-        // Gen Fv.inf files
+        // Prepare BUILD_DIR
         //
-        genFvInfFiles();
+        isUnified = OutputManager.getInstance().prepareBuildDir(getProject());
+        
+        //
+        // Generate FDF (Flash Definition File) file
+        //
+
+        //
+        // For every Target and ToolChain
+        //
+        String[] targetList = GlobalData.getToolChainInfo().getTargets();
+        for (int i = 0; i < targetList.length; i++){
+            String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
+            for(int j = 0; j < toolchainList.length; j++){
+                //
+                // Prepare FV_DIR
+                //
+                String ffsCommonDir = getProject().getProperty("BUILD_DIR") + File.separatorChar 
+                                + targetList[i] + File.separatorChar 
+                                + toolchainList[j];
+                File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
+                fvDir.mkdirs();
+                getProject().setProperty("FV_DIR", fvDir.getPath().replaceAll("(\\\\)", "/"));
+                
+                //
+                // Gen Fv.inf files
+                //
+                genFvInfFiles(ffsCommonDir);
+            }
+        }
+
         //
         // Gen build.xml
         //
-        genBuildFile();
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, sequences, isUnified);
+        fileGenerator.genBuildFile();
+        
         //
-        // Collect PCD information 
-        // 
-        collectPCDInformation (); 
+        // Ant call ${PLATFORM}_build.xml
+        //
+        Ant ant = new Ant();
+        ant.setProject(getProject());
+        ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
+        ant.setTarget(type);
+        ant.setInheritAll(true);
+        ant.init();
+        ant.execute();
+        
+//        GlobalData.log.info("Fpd build end. ");
     }
-    
+
     /**
       Generate Fv.inf files. The Fv.inf file is composed with four 
       parts: Options, Attributes, Components and Files. The Fv.inf files 
-      will be under ${PLATFOMR_DIR}\Build\Fv.
-      
+      will be under FV_DIR.
+     
       @throws BuildException
-              File write FV.inf files error. 
+                  File write FV.inf files error. 
     **/
-    private void genFvInfFiles() throws BuildException{
+    private void genFvInfFiles(String ffsCommonDir) throws BuildException {
         String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
         for (int i = 0; i < validFv.length; i++) {
-            getProject().setProperty("FV_FILENAME", validFv[i].toUpperCase());
             //
             // Get all global variables from FPD and set them to properties
             //
-            String[][] globalVariables = SurfaceAreaQuery
-                            .getFpdGlobalVariable();
+            String[][] globalVariables = SurfaceAreaQuery.getFpdGlobalVariable();
             for (int j = 0; j < globalVariables.length; j++) {
-                getProject().setProperty(globalVariables[j][0],
-                                globalVariables[j][1]);
+                getProject().setProperty(globalVariables[j][0], globalVariables[j][1]);
             }
 
-            File fvFile = new File(getProject().replaceProperties(
-                            FV_OUTPUT_DIR + File.separatorChar + validFv[i].toUpperCase()
-                                            + ".inf"));
+            getProject().setProperty("FV_FILENAME", validFv[i].toUpperCase());
+            
+            File fvFile = new File(getProject().replaceProperties( getProject().getProperty("FV_DIR") + File.separatorChar + validFv[i].toUpperCase() + ".inf"));
             fvFile.getParentFile().mkdirs();
 
             try {
                 FileWriter fw = new FileWriter(fvFile);
                 BufferedWriter bw = new BufferedWriter(fw);
+                
                 //
                 // Options
                 //
@@ -210,11 +246,11 @@ public class FpdParserTask extends Task {
                     }
                     bw.newLine();
                 }
+                
                 //
                 // Attributes;
                 //
-                String[][] attributes = SurfaceAreaQuery
-                                .getFpdAttributes(validFv[i]);
+                String[][] attributes = SurfaceAreaQuery.getFpdAttributes(validFv[i]);
                 if (attributes.length > 0) {
                     bw.write("[attributes]");
                     bw.newLine();
@@ -226,18 +262,16 @@ public class FpdParserTask extends Task {
                         }
                         str.append("=  ");
                         str.append(attributes[j][1]);
-                        bw
-                                        .write(getProject().replaceProperties(
-                                                        str.toString()));
+                        bw.write(getProject().replaceProperties(str.toString()));
                         bw.newLine();
                     }
                     bw.newLine();
                 }
+                
                 //
                 // Components
                 //
-                String[][] components = SurfaceAreaQuery
-                                .getFpdComponents(validFv[i]);
+                String[][] components = SurfaceAreaQuery.getFpdComponents(validFv[i]);
                 if (components.length > 0) {
                     bw.write("[components]");
                     bw.newLine();
@@ -249,26 +283,23 @@ public class FpdParserTask extends Task {
                         }
                         str.append("=  ");
                         str.append(components[j][1]);
-                        bw
-                                        .write(getProject().replaceProperties(
-                                                        str.toString()));
+                        bw.write(getProject().replaceProperties(str.toString()));
                         bw.newLine();
                     }
                     bw.newLine();
                 }
+                
                 //
                 // Files
                 //
                 Set<FpdModuleIdentification> filesSet = fvs.get(validFv[i].toUpperCase());
                 if (filesSet != null) {
-                    FpdModuleIdentification[] files = filesSet.toArray(new FpdModuleIdentification[filesSet
-                                    .size()]);
+                    FpdModuleIdentification[] files = filesSet.toArray(new FpdModuleIdentification[filesSet.size()]);
                     bw.write("[files]");
                     bw.newLine();
                     for (int j = 0; j < files.length; j++) {
-                        String str = outfiles.get(files[j]);
-                        bw.write(getProject().replaceProperties(
-                                        "EFI_FILE_NAME = " + str));
+                        String str = ffsCommonDir + File.separatorChar + outfiles.get(files[j]);
+                        bw.write(getProject().replaceProperties("EFI_FILE_NAME = " + str));
                         bw.newLine();
                     }
                 }
@@ -276,537 +307,286 @@ public class FpdParserTask extends Task {
                 bw.close();
                 fw.close();
             } catch (Exception e) {
-                throw new BuildException("Generate Fv.inf file failed. \n" + e.getMessage());
+                e.printStackTrace();
+                throw new BuildException("Generate FV file [" + fvFile.getPath() + "] failed. \n" + e.getMessage());
             }
         }
+    }
+    /**
+      This method is used for Single Module Build.
+      
+      
+      @throws BuildException
+                  FPD file is not valid. 
+    **/
+    public void parseFpdFile(File fpdFile) throws BuildException {
+        this.fpdFile = fpdFile;
+        parseFpdFile();
     }
 
     /**
       Parse FPD file. 
-    
+     
       @throws BuildException
-              FPD file is not valid. 
-    **/
+                  FPD file is not valid. 
+     **/
     private void parseFpdFile() throws BuildException {
         try {
-            FrameworkPlatformDescriptionDocument doc = (FrameworkPlatformDescriptionDocument) XmlObject.Factory
-                            .parse(fpdFilename);
-            if ( ! doc.validate() ){
-                throw new BuildException("FPD file is invalid.");
+            XmlObject doc = XmlObject.Factory.parse(fpdFile);
+            
+            if (!doc.validate()) {
+                throw new BuildException("Platform Surface Area file [" + fpdFile.getPath() + "] is invalid.");
             }
-            platformBuildOptions = doc.getFrameworkPlatformDescription()
-                            .getBuildOptions();
-            HashMap<String, XmlObject> map = new HashMap<String, XmlObject>();
-            map.put("FrameworkPlatformDescription", doc);
+            
+            Map<String, XmlObject> map = new HashMap<String, XmlObject>();
+            map.put("PlatformSurfaceArea", doc);
             SurfaceAreaQuery.setDoc(map);
+            
+            //
+            // Initialize
+            //
+            platformId = SurfaceAreaQuery.getFpdHeader();
+            platformId.setFpdFile(fpdFile);
+            getProject().setProperty("PLATFORM", platformId.getName());
+            getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
+            getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
+
+            //
+            // Build mode. User-defined output dir. 
+            //
+            String buildMode = SurfaceAreaQuery.getFpdIntermediateDirectories();
+            String userDefinedOutputDir = SurfaceAreaQuery.getFpdOutputDirectory();
+
+            OutputManager.getInstance().setup(userDefinedOutputDir, buildMode);
+
+            //
+            // TBD. Deal PCD and BuildOption related Info
+            //
+            GlobalData.setFpdBuildOptions(SurfaceAreaQuery.getFpdBuildOptions());
+            
+            GlobalData.setToolChainPlatformInfo(SurfaceAreaQuery.getFpdToolChainInfo());
+            
             //
             // Parse all list modules SA
             //
             parseModuleSAFiles();
+
+            //
+            // TBD. Deal PCD and BuildOption related Info
+            //
+            parseToolChainFamilyOptions();
+            parseToolChainOptions();
+
             SurfaceAreaQuery.setDoc(map);
         } catch (Exception e) {
-            throw new BuildException("Load FPD file [" + fpdFilename.getPath()
-                            + "] error. \n" + e.getMessage());
+            e.printStackTrace();
+            throw new BuildException("Load FPD file [" + fpdFile.getPath() + "] error. \n" + e.getMessage());
         }
     }
 
+
+    
     /**
       Parse all modules listed in FPD file. 
     **/
-    private void parseModuleSAFiles() {
-        ModuleSADocument.ModuleSA[] moduleSAs = SurfaceAreaQuery
-                        .getFpdModules();
+    private void parseModuleSAFiles() throws EdkException{
+        Map<FpdModuleIdentification, Map<String, XmlObject>> moduleSAs = SurfaceAreaQuery.getFpdModules();
+        System.out.println("Nubmer: ##" + moduleSAs.size());
         //
         // For every Module lists in FPD file.
         //
-        for (int i = 0; i < moduleSAs.length; i++) {
-            String defaultFv = "NULL";
-            String defaultArch = "IA32";
-            String baseName = moduleSAs[i].getModuleName();
+        Set<FpdModuleIdentification> keys = moduleSAs.keySet();
+        Iterator iter = keys.iterator();
+        while (iter.hasNext()) {
+            FpdModuleIdentification fpdModuleId = (FpdModuleIdentification) iter.next();
+            
+            //
+            // Judge if Module is existed? 
+            // TBD
+            
+            GlobalData.registerFpdModuleSA(fpdModuleId, moduleSAs.get(fpdModuleId));
+
+            //
+            // Put fpdModuleId to the corresponding FV
+            //
+            SurfaceAreaQuery.push(GlobalData.getDoc(fpdModuleId));
+            String fvBinding = SurfaceAreaQuery.getModuleFvBindingKeyword();
+            SurfaceAreaQuery.pop();
+
+            fpdModuleId.setFvBinding(fvBinding);
+            String fvSequence = fpdModuleId.getSequence();
+            updateFvs(fvSequence, fvBinding, fpdModuleId);
+            
+            //
+            // Prepare for out put file name
+            //
+            ModuleIdentification moduleId = fpdModuleId.getModule();
+            SurfaceAreaQuery.push(GlobalData.getDoc(fpdModuleId));
+            String baseName = SurfaceAreaQuery.getModuleOutputFileBasename();
+            SurfaceAreaQuery.pop();
             if (baseName == null) {
-                System.out.println("Warning: Module Name is not specified.");
-                continue;
+                baseName = moduleId.getName();
             }
-            String fvBinding = moduleSAs[i].getFvBinding();
+            outfiles.put(fpdModuleId, fpdModuleId.getArch() + File.separatorChar 
+                         + moduleId.getGuid() + "-" + baseName 
+                         + getSuffix(moduleId.getModuleType()));
+
             //
-            // If the module do not specify any FvBinding, use the default value.
-            // Else update the default FvBinding value to this value.
-            //
-            if (fvBinding == null) {
-                fvBinding = defaultFv;
-            }
-            else {
-                defaultFv = fvBinding;
-            }
-            String arch;
-            //
-            // If the module do not specify any Arch, use the default value.
-            // Else update the default Arch value to this value.
-            //
-            if (moduleSAs[i].getArch() == null ){
-                arch = defaultArch;
-            }
-            else {
-                arch = moduleSAs[i].getArch().toString();
-                defaultArch = arch;
-            }
-            Map<String, XmlObject> msaMap = GlobalData.getNativeMsa(baseName);
-            Map<String, XmlObject> mbdMap = GlobalData.getNativeMbd(baseName);
-            Map<String, XmlObject> fpdMap = new HashMap<String, XmlObject>();
-            Map<String, XmlObject> map = new HashMap<String, XmlObject>();
-            //
-            // Whether the Module SA has parsed before or not
-            //
-            if (!GlobalData.isModuleParsed(baseName)) {
-                OverrideProcess op = new OverrideProcess();
-                //
-                // using overriding rules
-                // Here we can also put platform Build override
-                //
-                map = op.override(mbdMap, msaMap);
-                fpdMap = getPlatformOverrideInfo(moduleSAs[i]);
-                XmlObject buildOption = (XmlObject)fpdMap.get("BuildOptions");
-                buildOption = (XmlObject)fpdMap.get("PackageDependencies");
-                buildOption = (XmlObject)fpdMap.get("BuildOptions");
-                buildOption = op.override(buildOption, platformBuildOptions);
-                fpdMap.put("BuildOptions", ((BuildOptionsDocument)buildOption).getBuildOptions());
-                Map<String, XmlObject> overrideMap = op.override(fpdMap, OverrideProcess.deal(map));
-                GlobalData.registerModule(baseName, overrideMap);
-            } else {
-                map = GlobalData.getDoc(baseName);
-            }
-            SurfaceAreaQuery.setDoc(map);
-            String guid = SurfaceAreaQuery.getModuleGuid();
-            String componentType = SurfaceAreaQuery.getComponentType();
-            FpdModuleIdentification moduleId = new FpdModuleIdentification(baseName, guid, arch);
-            updateFvs(fvBinding, moduleId);
-            outfiles.put(moduleId, "${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar 
-                            + "${TARGET}" + File.separatorChar + arch
-                            + File.separatorChar + guid + "-" + baseName
-                            + getSuffix(componentType));
+            // parse module build options, if any
+            // 
+            SurfaceAreaQuery.push(GlobalData.getDoc(fpdModuleId));
+            GlobalData.addModuleToolChainOption(fpdModuleId, parseModuleBuildOptions(false));
+            GlobalData.addModuleToolChainFamilyOption(fpdModuleId, parseModuleBuildOptions(true));
+            SurfaceAreaQuery.pop();
         }
+    }
+
+    private ToolChainMap parseModuleBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
+        String[][] options = SurfaceAreaQuery.getModuleBuildOptions(toolChainFamilyFlag);
+        if (options == null || options.length == 0) {
+            return null;
+        }
+        return parseOptions(options);
+    }
+    
+    private ToolChainMap parsePlatformBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
+        String[][] options = SurfaceAreaQuery.getPlatformBuildOptions(toolChainFamilyFlag);
+        if (options == null || options.length == 0) {
+            return null;
+        }
+        return parseOptions(options);
+    }
+
+    private ToolChainMap parseOptions(String[][] options) throws EdkException {
+        ToolChainMap map = new ToolChainMap();
+        int flagIndex = ToolChainElement.ATTRIBUTE.value;
+
+        for (int i = 0; i < options.length; ++i) {
+            String flagString = options[i][flagIndex];
+            if (flagString == null) {
+                flagString = "";
+            }
+            options[i][flagIndex] = ToolChainAttribute.FLAGS + "";
+            map.put(options[i], flagString.trim());
+        }
+
+        return map;
+    }
+    
+    private void parseToolChainFamilyOptions() throws EdkException {
+        GlobalData.setPlatformToolChainFamilyOption(parsePlatformBuildOptions(true));
+    }
+
+    private void parseToolChainOptions() throws EdkException {
+        GlobalData.setPlatformToolChainOption(parsePlatformBuildOptions(false));
     }
 
     /**
       Add the current module to corresponding FV. 
-    
+     
       @param fvName current FV name
       @param moduleName current module identification
     **/
-    private void updateFvs(String fvName, FpdModuleIdentification moduleName) {
+    private void updateFvs(String fvSequence, String fvName, FpdModuleIdentification fpdModuleId) {
         String upcaseFvName = fvName.toUpperCase();
-        if (fvs.containsKey(upcaseFvName)) {
-            Set<FpdModuleIdentification> set = fvs.get(upcaseFvName);
-            set.add(moduleName);
-        } else {
-            Set<FpdModuleIdentification> set = new LinkedHashSet<FpdModuleIdentification>();
-            set.add(moduleName);
-            fvs.put(upcaseFvName, set);
+        String[] fvNameArray = upcaseFvName.split("[, \t]+");
+        for (int i = 0; i < fvNameArray.length; i++) {
+            //
+            // Put module to corresponding fvName
+            //
+            if (fvs.containsKey(fvNameArray[i])) {
+                Set<FpdModuleIdentification> set = fvs.get(fvNameArray[i]);
+                set.add(fpdModuleId);
+            }
+            else {
+                Set<FpdModuleIdentification> set = new LinkedHashSet<FpdModuleIdentification>();
+                set.add(fpdModuleId);
+                fvs.put(fvNameArray[i], set);
+            }
+            
+            //
+            // Put fvName to corresponding fvSequence
+            //
+            if (sequences.containsKey(fvSequence)) {
+                Set<String> set = sequences.get(fvSequence);
+                set.add(fvNameArray[i]);
+            }
+            else {
+                Set<String> set = new LinkedHashSet<String>();
+                set.add(fvNameArray[i]);
+                sequences.put(fvSequence, set);
+            }
         }
     }
 
     /**
-      Get the suffix based on component type. Current relationship are listed:  
+      Get the suffix based on module type. Current relationship are listed:  
       
       <pre>
-        <b>ComponentType</b>   <b>Suffix</b>
-           APPLICATION          .APP
-           SEC                  .SEC
-           PEI_CORE             .PEI
-           PE32_PEIM            .PEI
-           RELOCATABLE_PEIM     .PEI
-           PIC_PEIM             .PEI
-           COMBINED_PEIM_DRIVER .PEI
-           TE_PEIM              .PEI
-           LOGO                 .FFS
-           others               .DXE
+      <b>ModuleType</b>     <b>Suffix</b>
+      BASE                 .FFS
+      SEC                  .SEC
+      PEI_CORE             .PEI
+      PEIM                 .PEI
+      DXE_CORE             .DXE
+      DXE_DRIVER           .DXE
+      DXE_RUNTIME_DRIVER   .DXE
+      DXE_SAL_DRIVER       .DXE
+      DXE_SMM_DRIVER       .DXE
+      TOOL                 .FFS
+      UEFI_DRIVER          .DXE
+      UEFI_APPLICATION     .APP
+      USER_DEFINED         .FFS
       </pre>
-    
-      @param componentType component type
+     
+      @param moduleType module type
       @return
       @throws BuildException
-              If component type is null
+      If module type is null
     **/
-    public static String getSuffix(String componentType) throws BuildException{
-        if (componentType == null) {
-            throw new BuildException("Component type is not specified.");
+    public static String getSuffix(String moduleType) throws BuildException {
+        if (moduleType == null) {
+            throw new BuildException("Module type is not specified.");
         }
-        String str = ".DXE";
-        if (componentType.equalsIgnoreCase("APPLICATION")) {
-            str = ".APP";
-        } else if (componentType.equalsIgnoreCase("SEC")) {
-            str = ".SEC";
-        } else if (componentType.equalsIgnoreCase("PEI_CORE")) {
-            str = ".PEI";
-        } else if (componentType.equalsIgnoreCase("PE32_PEIM")) {
-            str = ".PEI";
-        } else if (componentType.equalsIgnoreCase("RELOCATABLE_PEIM")) {
-            str = ".PEI";
-        } else if (componentType.equalsIgnoreCase("PIC_PEIM")) {
-            str = ".PEI";
-        } else if (componentType.equalsIgnoreCase("COMBINED_PEIM_DRIVER")) {
-            str = ".PEI";
-        } else if (componentType.equalsIgnoreCase("TE_PEIM")) {
-            str = ".PEI";
-        } else if (componentType.equalsIgnoreCase("LOGO")) {
-            str = ".FFS";
+
+        String[][] suffix = { { "BASE", ".FFS"},
+                              { "SEC", ".SEC" }, { "PEI_CORE", ".PEI" }, 
+                              { "PEIM", ".PEI" }, { "DXE_CORE", ".DXE" },
+                              { "DXE_DRIVER", ".DXE" }, { "DXE_RUNTIME_DRIVER", ".DXE" }, 
+                              { "DXE_SAL_DRIVER", ".DXE" }, { "DXE_SMM_DRIVER", ".DXE" }, 
+                              { "TOOL", ".FFS" }, { "UEFI_DRIVER", ".DXE" },
+                              { "UEFI_APPLICATION", ".APP" }, { "USER_DEFINED", ".FFS" } };
+        
+        for (int i = 0; i < suffix.length; i++) {
+            if (suffix[i][0].equalsIgnoreCase(moduleType)) {
+                return suffix[i][1];
+            }
         }
-        return str;
+        //
+        // Default is '.FFS'
+        //
+        return ".FFS";
     }
-
     /**
-      Parse module surface are info described in FPD file and put them into map. 
-      
-      @param sa module surface area info descibed in FPD file
-      @return map list with top level elements
-    **/
-    private Map<String, XmlObject> getPlatformOverrideInfo(
-                    ModuleSADocument.ModuleSA sa) {
-        Map<String, XmlObject> map = new HashMap<String, XmlObject>();
-        map.put("SourceFiles", sa.getSourceFiles());
-        map.put("Includes", sa.getIncludes());
-        map.put("PackageDependencies", null);
-        map.put("Libraries", sa.getLibraries());
-        map.put("Protocols", sa.getProtocols());
-        map.put("Events", sa.getEvents());
-        map.put("Hobs", sa.getHobs());
-        map.put("PPIs", sa.getPPIs());
-        map.put("Variables", sa.getVariables());
-        map.put("BootModes", sa.getBootModes());
-        map.put("SystemTables", sa.getSystemTables());
-        map.put("DataHubs", sa.getDataHubs());
-        map.put("Formsets", sa.getFormsets());
-        map.put("Guids", sa.getGuids());
-        map.put("Externs", sa.getExterns());
-        map.put("BuildOptions", sa.getBuildOptions());//platformBuildOptions);
-        return map;
-    }
-
-    /**
-      Generate build.out.xml file.
-      
-      @throws BuildException
-              build.out.xml XML document create error
-    **/
-    private void genBuildFile() throws BuildException {
-        DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
-        try {
-            DocumentBuilder dombuilder = domfac.newDocumentBuilder();
-            Document document = dombuilder.newDocument();
-            Comment rootComment = document.createComment(info);
-            //
-            // create root element and its attributes
-            //
-            Element root = document.createElement("project");
-            root.setAttribute("name", getProject().getProperty("PLATFORM"));
-            root.setAttribute("default", "main");
-            root.setAttribute("basedir", ".");
-            //
-            // element for External ANT tasks
-            //
-            root.appendChild(document.createComment("Apply external ANT tasks"));
-            Element ele = document.createElement("taskdef");
-            ele.setAttribute("resource", "GenBuild.tasks");
-            root.appendChild(ele);
-
-            ele = document.createElement("taskdef");
-            ele.setAttribute("resource", "frameworktasks.tasks");
-            root.appendChild(ele);
-
-            ele = document.createElement("property");
-            ele.setAttribute("environment", "env");
-            root.appendChild(ele);
-            //
-            // Default Target
-            //
-            root.appendChild(document.createComment("Default target"));
-            ele = document.createElement("target");
-            ele.setAttribute("name", "main");
-            ele.setAttribute("depends", "modules, fvs");
-            root.appendChild(ele);
-            //
-            // Modules Target
-            //
-            root.appendChild(document.createComment("Modules target"));
-            ele = document.createElement("target");
-            ele.setAttribute("name", "modules");
-
-            Set set = outfiles.keySet();
-            Iterator iter = set.iterator();
-            while (iter.hasNext()) {
-                FpdModuleIdentification moduleId = (FpdModuleIdentification) iter.next();
-                String baseName = moduleId.getBaseName();
-                Element moduleEle = document.createElement("ant");
-                moduleEle.setAttribute("antfile", GlobalData
-                                .getModulePath(baseName)
-                                + File.separatorChar + "build.xml");
-                moduleEle.setAttribute("target", baseName);
-                //
-                // ARCH
-                //
-                Element property = document.createElement("property");
-                property.setAttribute("name", "ARCH");
-                property.setAttribute("value", moduleId.getArch());
-                moduleEle.appendChild(property);
-                //
-                // PACKAGE_DIR
-                //
-                property = document.createElement("property");
-                property.setAttribute("name", "PACKAGE_DIR");
-                property.setAttribute("value", "${WORKSPACE_DIR}" + File.separatorChar
-                                + GlobalData.getPackagePathForModule(baseName));
-                moduleEle.appendChild(property);
-                //
-                // PACKAGE
-                //
-                property = document.createElement("property");
-                property.setAttribute("name", "PACKAGE");
-                property.setAttribute("value", GlobalData
-                                .getPackageNameForModule(baseName));
-                moduleEle.appendChild(property);
-                ele.appendChild(moduleEle);
-            }
-            root.appendChild(ele);
-            //
-            // FVS Target
-            //
-            root.appendChild(document.createComment("FVs target"));
-            ele = document.createElement("target");
-            ele.setAttribute("name", "fvs");
-
-            String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
-            for (int i = 0; i < validFv.length; i++) {
-                String inputFile = FV_OUTPUT_DIR + "" + File.separatorChar
-                                + validFv[i].toUpperCase() + ".inf";
-                Element fvEle = document.createElement("genfvimage");
-                fvEle.setAttribute("infFile", inputFile);
-                ele.appendChild(fvEle);
-                Element moveEle = document.createElement("move");
-                moveEle.setAttribute("file", validFv[i].toUpperCase() + ".fv");
-                moveEle.setAttribute("todir", FV_OUTPUT_DIR);
-                ele.appendChild(moveEle);
-            }
-            root.appendChild(ele);
-            
-            boolean isUnified = false;
-            BuildOptionsDocument.BuildOptions buildOptions = (BuildOptionsDocument.BuildOptions)platformBuildOptions;
-            if (buildOptions.getOutputDirectory() != null){
-                if (buildOptions.getOutputDirectory().getIntermediateDirectories() != null){
-                    if (buildOptions.getOutputDirectory().getIntermediateDirectories().toString().equalsIgnoreCase("UNIFIED")){
-                        isUnified = true;
-                    }
-                }
-            }
-            //
-            // Clean Target
-            //
-            root.appendChild(document.createComment("Clean target"));
-            ele = document.createElement("target");
-            ele.setAttribute("name", "clean");
-            
-            if (isUnified) {
-                Element cleanEle = document.createElement("delete");
-                cleanEle.setAttribute("includeemptydirs", "true");
-                Element filesetEle = document.createElement("fileset");
-                filesetEle.setAttribute("dir", getProject().getProperty("PLATFORM_DIR") + File.separatorChar + "Build" + File.separatorChar + "${TARGET}");
-                filesetEle.setAttribute("includes", "**/OUTPUT/**");
-                cleanEle.appendChild(filesetEle);
-                ele.appendChild(cleanEle);
-            }
-            else {
-                set = outfiles.keySet();
-                iter = set.iterator();
-                while (iter.hasNext()) {
-                    FpdModuleIdentification moduleId = (FpdModuleIdentification) iter.next();
-                    String baseName = moduleId.getBaseName();
-    
-                    Element ifEle = document.createElement("if");
-                    Element availableEle = document.createElement("available");
-                    availableEle.setAttribute("file", GlobalData
-                                    .getModulePath(baseName)
-                                    + File.separatorChar + "build.xml");
-                    ifEle.appendChild(availableEle);
-                    Element elseEle = document.createElement("then");
-    
-                    Element moduleEle = document.createElement("ant");
-                    moduleEle.setAttribute("antfile", GlobalData
-                                    .getModulePath(baseName)
-                                    + File.separatorChar + "build.xml");
-                    moduleEle.setAttribute("target", baseName + "_clean");
-                    //
-                    // ARCH
-                    //
-                    Element property = document.createElement("property");
-                    property.setAttribute("name", "ARCH");
-                    property.setAttribute("value", moduleId.getArch());
-                    moduleEle.appendChild(property);
-                    //
-                    // PACKAGE_DIR
-                    //
-                    property = document.createElement("property");
-                    property.setAttribute("name", "PACKAGE_DIR");
-                    property.setAttribute("value", "${WORKSPACE_DIR}" + File.separatorChar
-                                    + GlobalData.getPackagePathForModule(baseName));
-                    moduleEle.appendChild(property);
-                    //
-                    // PACKAGE
-                    //
-                    property = document.createElement("property");
-                    property.setAttribute("name", "PACKAGE");
-                    property.setAttribute("value", GlobalData
-                                    .getPackageNameForModule(baseName));
-                    moduleEle.appendChild(property);
-                    elseEle.appendChild(moduleEle);
-                    ifEle.appendChild(elseEle);
-                    ele.appendChild(ifEle);
-                }
-            }
-            root.appendChild(ele);
-            //
-            // Deep Clean Target
-            //
-            root.appendChild(document.createComment("Clean All target"));
-            ele = document.createElement("target");
-            ele.setAttribute("name", "cleanall");
-
-            if (isUnified) {
-                Element cleanAllEle = document.createElement("delete");
-                cleanAllEle.setAttribute("dir", getProject().getProperty("PLATFORM_DIR") + File.separatorChar + "Build" + File.separatorChar + "${TARGET}");
-                ele.appendChild(cleanAllEle);
-            }
-            else {
-                set = outfiles.keySet();
-                iter = set.iterator();
-                while (iter.hasNext()) {
-                    FpdModuleIdentification moduleId = (FpdModuleIdentification) iter.next();
-                    String baseName = moduleId.getBaseName();
-    
-                    Element ifEle = document.createElement("if");
-                    Element availableEle = document.createElement("available");
-                    availableEle.setAttribute("file", GlobalData
-                                    .getModulePath(baseName)
-                                    + File.separatorChar + "build.xml");
-                    ifEle.appendChild(availableEle);
-                    Element elseEle = document.createElement("then");
-    
-                    Element moduleEle = document.createElement("ant");
-                    moduleEle.setAttribute("antfile", GlobalData
-                                    .getModulePath(baseName)
-                                    + File.separatorChar + "build.xml");
-                    moduleEle.setAttribute("target", baseName + "_cleanall");
-                    //
-                    // ARCH
-                    //
-                    Element property = document.createElement("property");
-                    property.setAttribute("name", "ARCH");
-                    property.setAttribute("value", moduleId.getArch());
-                    moduleEle.appendChild(property);
-                    //
-                    // PACKAGE_DIR
-                    //
-                    property = document.createElement("property");
-                    property.setAttribute("name", "PACKAGE_DIR");
-                    property.setAttribute("value", "${WORKSPACE_DIR}" + File.separatorChar
-                                    + GlobalData.getPackagePathForModule(baseName));
-                    moduleEle.appendChild(property);
-                    //
-                    // PACKAGE
-                    //
-                    property = document.createElement("property");
-                    property.setAttribute("name", "PACKAGE");
-                    property.setAttribute("value", GlobalData
-                                    .getPackageNameForModule(baseName));
-                    moduleEle.appendChild(property);
-                    elseEle.appendChild(moduleEle);
-                    ifEle.appendChild(elseEle);
-                    ele.appendChild(ifEle);
-                }
-            }
-            root.appendChild(ele);
-            
-            document.appendChild(rootComment);
-            document.appendChild(root);
-            //
-            // Prepare the DOM document for writing
-            //
-            Source source = new DOMSource(document);
-            //
-            // Prepare the output file
-            //
-            File file = new File(getProject().getProperty("PLATFORM_DIR")
-                            + File.separatorChar + "build.out.xml");
-            //
-            // generate all directory path
-            //
-            (new File(file.getParent())).mkdirs();
-            Result result = new StreamResult(file);
-            //
-            // Write the DOM document to the file
-            //
-            Transformer xformer = TransformerFactory.newInstance()
-                            .newTransformer();
-            xformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-            xformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            xformer.transform(source, result);
-        } catch (Exception ex) {
-            throw new BuildException("Generate build.out.xml failed. \n" + ex.getMessage());
-        }
-    }
-
-    /**
-      Add a property. 
-      
-      @param p property
-    **/
+     Add a property. 
+     
+     @param p property
+     **/
     public void addProperty(Property p) {
         properties.addElement(p);
     }
 
-    /**
-      Get FPD file name.
-       
-      @return FPD file name.
-    **/
-    public File getFpdFilename() {
-        return fpdFilename;
+    public void setPlatformName(String platformName) {
+        this.platformName = platformName;
     }
 
-    /**
-      Set FPD file name.
-      
-      @param fpdFilename FPD file name
-    **/
-    public void setFpdFilename(File fpdFilename) {
-        this.fpdFilename = fpdFilename;
+    public void setFpdFile(File fpdFile) {
+        this.fpdFile = fpdFile;
     }
 
-    public File getGuiddatabase() {
-        return guiddatabase;
+    public void setType(String type) {
+        this.type = type;
     }
+    
 
-    public void setGuiddatabase(File guiddatabase) {
-        this.guiddatabase = guiddatabase;
-    }
-
-    public void collectPCDInformation() {
-        String           exceptionString = null;
-        CollectPCDAction collectAction   = new CollectPCDAction ();
-        //
-        // Collect all PCD information from FPD to MSA, and get help information from SPD.
-        // These all information will be stored into memory database for future usage such 
-        // as autogen.
-        //
-        try {
-            collectAction.perform (getProject().getProperty("WORKSPACE_DIR"),
-                                   fpdFilename.getPath(),
-                                   ActionMessage.MAX_MESSAGE_LEVEL
-                                   );
-        } catch (Exception exp) {
-            exceptionString = exp.getMessage();
-            if (exceptionString == null) {
-                exceptionString = "[Internal Error]Pcd tools catch a internel errors, Please report this bug into TianoCore or send email to Wang, scott or Lu, ken!";
-            }
-            throw new BuildException (String.format("Fail to do PCD preprocess from FPD file: %s", exceptionString));
-        }
-    }
 }

@@ -20,11 +20,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.LibraryClassDocument.LibraryClass;
 
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
+import org.tianocore.build.id.ModuleIdentification;
 
 /**
   This class This class is to reorder library instance sequence according to
@@ -34,18 +36,18 @@ public class AutogenLibOrder {
     ///
     /// The map of library class and its library instance.
     ///
-    private Map<String, String> libClassMap = new HashMap<String, String>();
+    private Map<String, ModuleIdentification> libClassMap = new HashMap<String, ModuleIdentification>();
 
     ///
-    /// The map of library instance and its implemet instance.
+    /// The map of library instance and its implemet libraryClass.
     ///
-    private Map<String, String[]> libInstanceMap = new HashMap<String, String[]>();
+    private Map<ModuleIdentification, String[]> libInstanceMap = new HashMap<ModuleIdentification, String[]>();
 
     ///
     /// List of library instance. It is String[3] list, String[0] is libraryName,
     /// String[1] is libraryConstructor name, String[2] is libDestructor name.
     ///
-    private List<String[]> libInstanceList = new ArrayList<String[]>();
+    private List<LibraryInstanceNode> libInstanceList = new ArrayList<LibraryInstanceNode>();
     
     /**
       Constructor function
@@ -55,40 +57,37 @@ public class AutogenLibOrder {
       @param  libraryList   List of the library instance.
       @throws Exception
     **/
-    AutogenLibOrder(List<String> libraryList) throws Exception {
-        String[]       libInstance = new String[3];
-        LibraryClass[] libClassDeclList = null;
-        LibraryClass[] libClassConsmList = null;
+    AutogenLibOrder(ModuleIdentification[] libraryList, String arch) throws Exception {
+        LibraryInstanceNode libInstanceNode;
+        String[]       libClassDeclList = null;
+        String[]       libClassConsmList = null;
         
-        for (int i = 0; i < libraryList.size(); i++) {
+        for (int i = 0; i < libraryList.length; i++) {
             //
             // Add libraryInstance in to libInstanceList.
-            //
-            libInstance[0] = libraryList.get(i);
-            Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstance[0]);
+            // 
+            Map<String, XmlObject> libDoc = GlobalData.getDoc(libraryList[i], arch);
             SurfaceAreaQuery.push(libDoc);
-            libInstance[1] = SurfaceAreaQuery.getLibConstructorName();
-            libInstance[2] = SurfaceAreaQuery.getLibDestructorName();
-            libInstanceList.add(libInstance.clone());
+            libInstanceNode = new LibraryInstanceNode (libraryList[i],SurfaceAreaQuery.getLibConstructorName(), SurfaceAreaQuery.getLibDestructorName());
+            libInstanceList.add(libInstanceNode);
             
             //
             // Add library instance and consumed library class list to
             // libInstanceMap.
             //
             libClassConsmList = SurfaceAreaQuery
-                    .getLibraryClassArray(CommonDefinition.AlwaysConsumed);
+                    .getLibraryClasses(CommonDefinition.AlwaysConsumed);
             if (libClassConsmList != null) {
                 String[] classStr = new String[libClassConsmList.length];
                 for (int k = 0; k < libClassConsmList.length; k++) {
-                    //classStr[k] = libClassConsmList[k].getStringValue();
-                    classStr[k] = getStringValue((XmlObject)libClassConsmList[k]);
+                    classStr[k] = libClassConsmList[k];
                 }
-                if (this.libInstanceMap.containsKey(libInstance[0])) {
+                if (this.libInstanceMap.containsKey(libraryList[i])) {
                     throw new Exception(
-                            libInstance[0]
+                            libraryList[i].getName()
                                     + "this library instance is already exist, please check you library instance list!");
                 } else {
-                    this.libInstanceMap.put(libInstance[0], classStr);
+                    this.libInstanceMap.put(libraryList[i], classStr);
                 }
             }
 
@@ -96,20 +95,17 @@ public class AutogenLibOrder {
             // Add library class and library instance map.
             //
             libClassDeclList = SurfaceAreaQuery
-                    .getLibraryClassArray(CommonDefinition.AlwaysProduced);
+                    .getLibraryClasses(CommonDefinition.AlwaysProduced);
             if (libClassDeclList != null) {
                 for (int j = 0; j < libClassDeclList.length; j++) {
-                    //if (this.libClassMap.containsKey(libClassDeclList[j]
-                    //        .getStringValue())) {
-                    String libClassName = getStringValue((XmlObject)libClassDeclList[j]);
-                    if (this.libClassMap.containsKey(libClassName)) {
-                        System.out.println(libClassName
+                    if (this.libClassMap.containsKey(libClassDeclList[j])) {
+                        System.out.println(libClassDeclList[j]
                                 + " class is already implement by "
-                                + this.libClassMap.get(libClassName));
+                                + this.libClassMap.get(libClassDeclList[j]));
                         throw new Exception(libClassDeclList
                                 + " is already have library instance!");
                     } else {
-                        this.libClassMap.put(libClassName, libInstance[0]);
+                        this.libClassMap.put(libClassDeclList[j], libraryList[i]);
                     }
                 }
             }
@@ -149,15 +145,15 @@ public class AutogenLibOrder {
       
       @return     List which content the ordered library instance.
     **/
-    List orderLibInstance() {
-        List<String> orderList = new ArrayList<String>();
+    List<ModuleIdentification> orderLibInstance() {
+        List<ModuleIdentification> orderList = new ArrayList<ModuleIdentification>();
         //
         // Stack of node which track the library instance name ant its visiting
         // flag.
         //
         List<Node> stackList = new ArrayList<Node>();
         int stackSize = 0;
-        String libInstance = null;
+        ModuleIdentification libInstanceId = null;
         if (libInstanceList.size() < 0) {
             return null;
         }
@@ -169,11 +165,11 @@ public class AutogenLibOrder {
             //
             // If library instance is already in the order list skip it.
             //
-            if (isInLibInstance(orderList, libInstanceList.get(i)[0])) {
+            if (isInLibInstance(orderList, libInstanceList.get(i).libId)) {
                 continue;
             }
             
-            Node node = new Node(libInstanceList.get(i)[0], false);
+            Node node = new Node(libInstanceList.get(i).libId, false);
             //
             // Use stack to reorder library instance.
             // Push node to stack.
@@ -187,8 +183,8 @@ public class AutogenLibOrder {
                 //
                 if (stackList.get(stackSize).isVisit) {
                     if (!isInLibInstance(orderList,
-                            stackList.get(stackSize).nodeName)) {
-                        orderList.add(stackList.get(stackSize).nodeName);
+                            stackList.get(stackSize).nodeId)) {
+                        orderList.add(stackList.get(stackSize).nodeId);
                         stackList.remove(stackSize);
                     }
                     
@@ -198,15 +194,15 @@ public class AutogenLibOrder {
                     //
                     stackList.get(stackList.size() - 1).isVisit = true;
                     String[] libClassList = this.libInstanceMap.get(stackList
-                            .get(stackSize).nodeName);
+                            .get(stackSize).nodeId);
                     //
                     // Push the node dependence library instance to the stack.
                     //
                     if (libClassList != null) {
                         for (int j = 0; j < libClassList.length; j++) {
-                            libInstance = this.libClassMap.get(libClassList[j]);
-                            if (libInstance != null
-                                    && !isInLibInstance(orderList, libInstance)) {
+                            libInstanceId = this.libClassMap.get(libClassList[j]);
+                            if (libInstanceId != null
+                                    && !isInLibInstance(orderList, libInstanceId)) {
                                 //
                                 // If and only if the currently library instance
                                 // is not in stack and it have constructor or 
@@ -214,7 +210,7 @@ public class AutogenLibOrder {
                                 // instacne in stack.
                                 //
                                 if (!isInStackList(stackList, this.libClassMap
-                                        .get(libClassList[j])) && isHaveConsDestructor(libInstance)) {
+                                        .get(libClassList[j])) && isHaveConsDestructor(libInstanceId)) {
                                     stackList.add(new Node(this.libClassMap
                                             .get(libClassList[j]), false));
                                 }
@@ -237,9 +233,10 @@ public class AutogenLibOrder {
       @return                 "true" the library instance in list |
                               "false" the library instance is not in list.
     **/
-    private boolean isInLibInstance(List list, String instanceName) {
+    private boolean isInLibInstance(List<ModuleIdentification> list, ModuleIdentification instanceId) {
         for (int i = 0; i < list.size(); i++) {
-            if (instanceName.equalsIgnoreCase(list.get(i).toString())) {
+            
+            if (instanceId.equals(list.get(i))) {
                 return true;
             }
         }
@@ -256,9 +253,9 @@ public class AutogenLibOrder {
       @return            "true" if node have in stack |
                          "false" if node don't in stack.
     **/ 
-    private boolean isInStackList(List<Node> list, String nodeName) {
+    private boolean isInStackList(List<Node> list, ModuleIdentification instanceId) {
         for (int i = 0; i < list.size(); i++) {
-            if (nodeName.equalsIgnoreCase(list.get(i).nodeName)) {
+            if (instanceId.equals(list.get(i).nodeId)) {
                 return true;
             }
         }
@@ -276,19 +273,15 @@ public class AutogenLibOrder {
                          "false" if library don't have constructor 
                          and desconstructor.
     **/
-    private boolean isHaveConsDestructor (String libName){
+    private boolean isHaveConsDestructor (ModuleIdentification libNode){
         for (int i = 0; i < libInstanceList.size(); i++){
-            if (libInstanceList.get(i)[0].equalsIgnoreCase(libName)){
-                if (libInstanceList.get(i)[1] != null || libInstanceList.get(i)[2] != null){
+            if (libInstanceList.get(i).libId.equals(libNode)){
+                if (libInstanceList.get(i).constructorName != null || libInstanceList.get(i).deconstructorName != null){
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    private String getStringValue(XmlObject xmlDoc) {
-        return xmlDoc.getDomNode().getFirstChild().getNodeValue();
     }
 }
 
@@ -299,12 +292,29 @@ public class AutogenLibOrder {
  
  **/
 class Node {
-    String nodeName;
+    ModuleIdentification nodeId;
 
     boolean isVisit;
 
-    Node(String name, boolean isVisit) {
-        this.nodeName = name;
+    Node(ModuleIdentification nodeId, boolean isVisit) {
+        this.nodeId = nodeId;
         this.isVisit = false;
+    }
+}  
+/**
+  LibraryInstance Node   
+  
+  This class is used to store LibrayInstance and it's deconstructor and constructor
+**/
+    
+class LibraryInstanceNode {
+    ModuleIdentification libId;
+    String deconstructorName;
+    String constructorName;
+    
+    LibraryInstanceNode (ModuleIdentification libId, String deconstructor, String constructor){
+        this.libId = libId;
+        this.deconstructorName = deconstructor;
+        this.constructorName   = constructor;
     }
 }

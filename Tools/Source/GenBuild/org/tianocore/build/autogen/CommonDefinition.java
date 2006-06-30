@@ -44,6 +44,7 @@ public class CommonDefinition {
     public final static String autoGenHReleaseDefault = "#define EDK_RELEASE_VERSION        0x00000000\r\n";
 
     public final static String includeAutogenH        = "#include    <AutoGen.h>\r\n" ;
+    public final static String marcDefineStr          = "#define ";
 
     public final static String gEfi = "gEfi";
     public final static String protocolGuid = "ProtocolGuid";
@@ -148,10 +149,10 @@ public class CommonDefinition {
                     new MyEnum("PEI_CORE", ModuleTypePeiCore),
                     new MyEnum("PEIM", ModuleTypePeim),
                     new MyEnum("DXE_CORE", ModuleTypeDxeCore),
-                    new MyEnum("DXE_DRIVER", ModuleTypeDxeDriver),
+                    new MyEnum("DXE_DRIVER", ModuleTypeDxeRuntimeDriver),
                     new MyEnum("DXE_RUNTIME_DRIVER", ModuleTypeDxeRuntimeDriver),
-                    new MyEnum("DXE_SMM_DRIVER", ModuleTypeDxeSmmDriver),
                     new MyEnum("DXE_SAL_DRIVER", ModuleTypeDxeSalDriver),
+                    new MyEnum("DXE_SMM_DRIVER", ModuleTypeDxeSmmDriver),
                     new MyEnum("UEFI_DRIVER", ModuleTypeUefiDriver),
                     new MyEnum("UEFI_APPLICATION", ModuleTypeUefiApplication) };
     
@@ -254,29 +255,64 @@ public class CommonDefinition {
       }
       return false;
     }
+    
+    /**
+     * formateGuidName
+     * 
+     * This function is to formate GUID to ANSI c form.
+     * 
+     * @param guidNameCon
+     *            String of GUID.
+     * @return Formated GUID.
+     */
+    public static String formatGuidName(String guidNameConv) {
+        String[] strList;
+        String guid = "";
+        int index = 0;
+        if (guidNameConv
+                .matches("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")) {
+            strList = guidNameConv.split("-");
+            guid = "0x" + strList[0] + ", ";
+            guid = guid + "0x" + strList[1] + ", ";
+            guid = guid + "0x" + strList[2] + ", ";
+            guid = guid + "{";
+            guid = guid + "0x" + strList[3].substring(0, 2) + ", ";
+            guid = guid + "0x" + strList[3].substring(2, 4);
 
-		static public boolean isPeiPhaseComponent (int componentType) {
-			if (ComponentTypePe32Peim == componentType
-					|| ComponentTypePicPeim == componentType
-					|| ComponentTypeCombinedPeimDriver == componentType
-					|| ComponentTypePeiCore == componentType) {
-				return true;
-			}
-			return false;
-		}
+            while (index < strList[4].length()) {
+                guid = guid + ", ";
+                guid = guid + "0x" + strList[4].substring(index, index + 2);
+                index = index + 2;
+            }
+            guid = guid + "}";
+            return guid;
+        } else if (guidNameConv
+                .matches("0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\\})?")) {
+            strList = guidNameConv.split(",");
 
-		static public boolean isPe32PeimComponent (int componentType) {
-			if (ComponentTypePe32Peim == componentType) {
-				return true;
-			}
-			return false;
-		}
+            //
+            // chang Microsoft specific form to ANSI c form
+            //
+            for (int i = 0; i < 3; i++) {
+                guid = guid + strList[i] + ",";
+            }
+            guid = guid + "{";
 
-		static public boolean isBsDriverComponent (int componentType) {
-			if (ComponentTypeBsDriver == componentType) {
-				return true;
-			}
-			return false;
-		}
-		
+            for (int i = 3; i < strList.length; i++) {
+                if (i == strList.length - 1) {
+                    guid = guid + strList[i];
+                } else {
+                    guid = guid + strList[i] + ",";
+                }
+            }
+            guid = guid + "}";
+            return guid;
+        } else {
+            System.out
+                    .println("Check GUID Value, it don't conform to the schema!!!");
+            return "0";
+
+        }
+    }
+    
 }

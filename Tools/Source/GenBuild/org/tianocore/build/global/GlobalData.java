@@ -16,29 +16,34 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.global;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.xmlbeans.XmlObject;
+import org.tianocore.DbPathAndFilename;
+import org.tianocore.FrameworkDatabaseDocument;
+import org.tianocore.ModuleSurfaceAreaDocument;
+import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
+import org.tianocore.build.exception.EdkException;
+import org.tianocore.build.id.FpdModuleIdentification;
+import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.build.id.PackageIdentification;
+import org.tianocore.build.id.PlatformIdentification;
+import org.tianocore.build.toolchain.ToolChainAttribute;
+import org.tianocore.build.toolchain.ToolChainConfig;
+import org.tianocore.build.toolchain.ToolChainElement;
+import org.tianocore.build.toolchain.ToolChainInfo;
+import org.tianocore.build.toolchain.ToolChainKey;
+import org.tianocore.build.toolchain.ToolChainMap;
+//import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
+//import org.tianocore.logger.EdkLog;
+
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.xmlbeans.XmlObject;
-import org.tianocore.FilenameDocument;
-import org.tianocore.FilenameDocument.Filename;
-import org.tianocore.FrameworkDatabaseDocument;
-import org.tianocore.MsaFilesDocument;
-import org.tianocore.MsaFilesDocument.MsaFiles.MsaFile;
-import org.tianocore.MsaHeaderDocument.MsaHeader;
-import org.tianocore.MsaLibHeaderDocument.MsaLibHeader;
-import org.tianocore.PackageListDocument;
-import org.tianocore.PackageSurfaceAreaDocument;
-import org.tianocore.build.autogen.CommonDefinition;
-import org.tianocore.build.fpd.FpdParserTask;
-import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
+import java.util.logging.Logger;
 
 /**
   GlobalData provide initializing, instoring, querying and update global data.
@@ -46,408 +51,321 @@ import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
   PCD and so on. 
   
   <p>Note that all global information are initialized incrementally. All data will 
-  parse and record only it is necessary during build time. </p>
+  parse and record only of necessary during build time. </p>
   
   @since GenBuild 1.0
 **/
 public class GlobalData {
 
-    ///
-    /// means no surface area information for module
-    ///
-    public static final int NO_SA = 0;
-
-    ///
-    /// means only MSA
-    ///
-    public static final int ONLY_MSA = 1;
-
-    ///
-    /// means only Library MSA
-    ///
-    public static final int ONLY_LIBMSA = 2;
-
-    ///
-    /// means both MSA and MBD
-    ///
-    public static final int MSA_AND_MBD = 3;
-
-    ///
-    /// means both Library MSA and Library MBD
-    ///
-    public static final int LIBMSA_AND_LIBMBD = 4;
-
-    ///
-    /// Be used to ensure Global data will be initialized only once.
-    ///
-    public static boolean globalFlag = false;
-
+    public static Logger log = Logger.getAnonymousLogger();
+    
     ///
     /// Record current WORKSPACE Directory
     ///
     private static String workspaceDir = "";
+    
+    ///
+    /// Be used to ensure Global data will be initialized only once.
+    ///
+    private static boolean globalFlag = false;
+    
+    ///
+    /// Framework Database information: package list and platform list
+    ///
+    private static Set<PackageIdentification> packageList = new HashSet<PackageIdentification>();  
+
+    private static Set<PlatformIdentification> platformList = new HashSet<PlatformIdentification>();
 
     ///
-    /// Two columns: Package Name (Key), Package Path(ralative to WORKSPACE)
+    /// Every detail SPD informations: Module list, Library class definition,
+    ///   Package header file, GUID/PPI/Protocol definitions
     ///
-    private static final Map<String, String> packageInfo = new HashMap<String, String>();
+    private static final Map<PackageIdentification, Spd> spdTable = new HashMap<PackageIdentification, Spd>();
 
     ///
-    /// spdTable
-    /// Key: Package Name, Value: SPD detail info
+    /// Build informations are divided into three parts:
+    /// 1. From MSA 2. From FPD 3. From FPD' ModuleSA
     ///
-    private static final Map<String, Spd> spdTable = new HashMap<String, Spd>();
+    private static Map<ModuleIdentification, Map<String, XmlObject>> nativeMsa = new HashMap<ModuleIdentification, Map<String, XmlObject>>();
 
-    ///
-    /// Three columns:
-    /// 1. Module Name | BaseName (Key)
-    /// 2. Module Path + Msa file name (relative to Package)
-    /// 3. Package Name (This module belong to which package)
-    ///
-    private static final Map<String, String[]> moduleInfo = new HashMap<String, String[]>();
+    private static Map<FpdModuleIdentification, Map<String, XmlObject>> fpdModuleSA= new HashMap<FpdModuleIdentification, Map<String, XmlObject>>();
 
-    ///
-    /// List all libraries for current build module
-    /// Key: Library BaseName, Value: output library path+name
-    ///
-    private static final Map<String, String> libraries = new HashMap<String, String>();
+    private static XmlObject fpdBuildOptions;
 
+    private static XmlObject fpdDynamicPcds;
+    
     ///
-    /// Store every module's relative library instances BaseName
-    /// Key: Module BaseName, Value: All library instances module depends on.
+    /// Parsed modules list
     ///
-    private static final Map<String, Set<String> > moduleLibraryMap = new HashMap<String, Set<String> >();
-
+    private static Map<FpdModuleIdentification, Map<String, XmlObject>> parsedModules = new HashMap<FpdModuleIdentification, Map<String, XmlObject>>();
+    
     ///
-    /// Key: Module BaseName, Value: original MSA info
+    /// built modules list with ARCH, TARGET, TOOLCHAIN
     ///
-    private static final Map<String, Map<String, XmlObject> > nativeMsa = new HashMap<String, Map<String, XmlObject> >();
-
-    ///
-    /// Key: Module BaseName, Value: original MBD info
-    ///
-    private static final Map<String, Map<String, XmlObject> > nativeMbd = new HashMap<String, Map<String, XmlObject> >();
-
-    ///
-    /// Two columns: Module Name or Base Name as Key
-    /// Value is a HashMap with overridden data from MSA/MBD or/and Platform
-    ///
-    private static final Map<String, Map<String, XmlObject> > parsedModules = new HashMap<String, Map<String, XmlObject> >();
-
-    ///
-    /// List all built Module; Value is Module BaseName + Arch. TBD
-    ///
-    private static final Set<String> builtModules = new HashSet<String>();
-
-    ///
-    /// Library instance information table which recored the library and it's
-    /// constructor and distructor function
-    ///
-    private static final Map<String, String[]> libInstanceInfo = new HashMap<String, String[]>();
-
+    private static Set<FpdModuleIdentification> builtModules = new HashSet<FpdModuleIdentification>();
+    
     ///
     /// PCD memory database stored all PCD information which collected from FPD,MSA and SPD.
     ///
-    private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
+//    private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
 
-    /**
-      Query the module's absolute path with module base name. 
-      
-      @param moduleName the base name of the module
-      @return the absolute module path
-    **/
-    public synchronized static String getModulePath(String moduleName) {
-        String[] info = moduleInfo.get(moduleName);
-        String packagePath = (String) packageInfo.get(info[1]);
-        File convertFile = new File(workspaceDir + File.separatorChar + packagePath + File.separatorChar + info[0]);
-        return convertFile.getParent();
-    }
+    ///
+    /// build target + tool chain family/tag name + arch + command types + command options
+    ///
+    ///
+    /// Tool Chain Data
+    /// toolsDef - build tool program information
+    /// fpdBuildOption - all modules's build options for tool tag or tool chain families
+    /// moduleSaBuildOption - build options for a specific module
+    /// 
+    private static ToolChainConfig toolsDef;
 
-    /**
-      Query the module's absolute MSA file path with module base name. 
+    private static ToolChainInfo toolChainInfo;
+    private static ToolChainInfo toolChainEnvInfo;
+    private static ToolChainInfo toolChainPlatformInfo;
+
+    private static ToolChainMap platformToolChainOption;
+    private static ToolChainMap platformToolChainFamilyOption;
+
+    private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
+    private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainFamilyOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
+
+//    private static final MemoryDatabasseManager pcdDbManager = new MemoryDatabaseManager();
+
     
-      @param moduleName the base name of the module
-      @return the absolute MSA file name
-      @throws BuildException
-              Base name is not registered in any SPD files
-    **/
-    private synchronized static String getMsaFilename(String moduleName) throws BuildException {
-        String[] info = moduleInfo.get(moduleName);
-        if (info == null) {
-            throw new BuildException("Module base name [" + moduleName + "] can't found in all SPD.");
-        }
-        String packagePath = (String) packageInfo.get(info[1]);
-        File convertFile = new File(workspaceDir + File.separatorChar + packagePath + File.separatorChar + info[0]);
-        return convertFile.getPath();
-    }
 
     /**
-      Query the module's absolute MBD file path with module base name. 
+      Parse framework database (DB) and all SPD files listed in DB to initialize
+      the environment for next build. This method will only be executed only once
+      in the whole build process.  
     
-      @param moduleName the base name of the module
-      @return the absolute MBD file name
+      @param workspaceDatabaseFile the file name of framework database
+      @param workspaceDir current workspace directory path
       @throws BuildException
-              Base name is not registered in any SPD files
+            Framework Dababase or SPD or MSA file is not valid
     **/
-    private synchronized static String getMbdFilename(String moduleName) throws BuildException {
-        String[] info = moduleInfo.get(moduleName);
-        if (info == null) {
-            throw new BuildException("Info: Module base name [" + moduleName + "] can't found in all SPD.");
+    public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir, String toolsDefFilename) throws BuildException {
+        //
+        // ensure this method will be revoked only once
+        //
+        if (globalFlag) {
+            return;
         }
-        String packagePath = (String) packageInfo.get(info[1]);
-        File convertFile = new File(workspaceDir + File.separatorChar + packagePath + File.separatorChar + info[0]);
-        return convertFile.getPath().substring(0, convertFile.getPath().length() - 4) + ".mbd";
-    }
+        globalFlag = true;
+        
+        //
+        // Backup workspace directory. It will be used by other method
+        //
+        GlobalData.workspaceDir = workspaceDir.replaceAll("(\\\\)", "/");
+        
+        //
+        // Parse tools definition file
+        //
+        //
+        // If ToolChain has been set up before, do nothing.
+        // CONF dir + tools definition file name
+        //
+        String confDir = GlobalData.workspaceDir + File.separatorChar + "Tools" + File.separatorChar + "Conf";
+        File toolsDefFile = new File(confDir + File.separatorChar + toolsDefFilename);
+        System.out.println("Using file [" + toolsDefFile.getPath() + "] as tools definition file. ");
+        toolsDef = new ToolChainConfig(toolsDefFile);
+        
+        //
+        // Parse Framework Database
+        //
+        File dbFile = new File(workspaceDir + File.separatorChar + workspaceDatabaseFile);
+        try {
+            FrameworkDatabaseDocument db = (FrameworkDatabaseDocument) XmlObject.Factory.parse(dbFile);
+            //
+            // validate FrameworkDatabaseFile
+            //
+            if (! db.validate()) {
+                throw new BuildException("Framework Database file [" + dbFile.getPath() + "] is invalid.");
+            }
+            //
+            // Get package list
+            //
+            if (db.getFrameworkDatabase().getPackageList() != null ) {
+                List<DbPathAndFilename> packages = db.getFrameworkDatabase().getPackageList().getFilenameList();
+                Iterator<DbPathAndFilename> iter = packages.iterator();
+                while (iter.hasNext()) {
+                    String fileName = iter.next().getStringValue();
+                    Spd spd = new Spd(new File(workspaceDir + File.separatorChar + fileName));
+                    packageList.add(spd.getPackageId());
+                    spdTable.put(spd.getPackageId(), spd);
+                }
+            }
 
+            //
+            // Get platform list
+            //
+            if (db.getFrameworkDatabase().getPlatformList() != null) {
+                List<DbPathAndFilename> platforms = db.getFrameworkDatabase().getPlatformList().getFilenameList();
+                Iterator<DbPathAndFilename> iter = platforms.iterator();
+                while (iter.hasNext()) {
+                    String fileName = iter.next().getStringValue();
+                    File fpdFile = new File(workspaceDir + File.separatorChar + fileName);
+                    if ( ! fpdFile.exists() ) {
+                        throw new BuildException("Platform file [" + fpdFile.getPath() + "] not exists. ");
+                    }
+                    XmlObject fpdDoc = XmlObject.Factory.parse(fpdFile);
+                    //
+                    // Verify FPD file, if is invalid, throw Exception
+                    //
+                    if (! fpdDoc.validate()) {
+                        throw new BuildException("Framework Platform Surface Area file [" + fpdFile.getPath() + "] is invalid. ");
+                    }
+                    //
+                    // We can change Map to XmlObject
+                    //
+                    //
+                    // TBD check SPD or FPD is existed in FS
+                    //
+                    Map<String, XmlObject> fpdDocMap = new HashMap<String, XmlObject>();
+                    fpdDocMap.put("PlatformSurfaceArea", fpdDoc);
+                    SurfaceAreaQuery.setDoc(fpdDocMap);
+                    PlatformIdentification platformId = SurfaceAreaQuery.getFpdHeader();
+                    platformId.setFpdFile(fpdFile);
+                    platformList.add(platformId);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BuildException("Parse workspace Database [" + dbFile.getPath() + "] Error.\n" + e.getMessage());
+        }
+    }
+    
     /**
       Get the current WORKSPACE Directory. 
+      
       @return current workspace directory
     **/
     public synchronized static String getWorkspacePath() {
         return workspaceDir;
     }
 
-    /**
-      Query package relative path to WORKSPACE_DIR with package name. 
-      
-      @param packageName the name of the package
-      @return the path relative to WORKSPACE_DIR 
-    **/
-    public synchronized static String getPackagePath(String packageName) {
-        return (String) packageInfo.get(packageName);
-    }
 
     /**
-      Query package (which the module belongs to) relative path to WORSPACE_DIR.  
-    
-      @param moduleName the base name of the module
-      @return the relative path to WORKSPACE_DIR of the package which the module belongs to
-    **/
-    public synchronized static String getPackagePathForModule(String moduleName) {
-        String[] info = moduleInfo.get(moduleName);
-        String packagePath = (String) packageInfo.get(info[1]);
-        return packagePath;
-    }
-
-    /**
-      Query the package name which the module belongs to with the module's base name.
-    
-      @param moduleName the base name of the module
-      @return the package name which the module belongs to
-    **/
-    public synchronized static String getPackageNameForModule(String moduleName) {
-        return moduleInfo.get(moduleName)[1];
-    }
-
-    /**
-      Parse framework database (DB) and all SPD files listed in DB to initialize
-      the environment for next build. This method will only be executed only once
-      in the whole build process.  
-      
-      @param workspaceDatabaseFile the file name of framework database
-      @param workspaceDir current workspace directory path
-      @throws BuildException
-              Framework Dababase or SPD or MSA file is not valid
-    **/
-    public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir) throws BuildException {
-        if (globalFlag) {
-            return;
-        }
-        globalFlag = true;
-        GlobalData.workspaceDir = workspaceDir;
-        File dbFile = new File(workspaceDir + File.separatorChar + workspaceDatabaseFile);
-        try {
-            FrameworkDatabaseDocument db = (FrameworkDatabaseDocument) XmlObject.Factory.parse(dbFile);
-            List<PackageListDocument.PackageList.Package> packages = db.getFrameworkDatabase().getPackageList()
-                                                                       .getPackageList();
-            Iterator iter = packages.iterator();
-            while (iter.hasNext()) {
-                PackageListDocument.PackageList.Package packageItem = (PackageListDocument.PackageList.Package) iter
-                                                                                                                    .next();
-                String name = packageItem.getPackageNameArray(0).getStringValue();
-                String path = packageItem.getPathArray(0).getStringValue();
-                packageInfo.put(name, path);
-                File spdFile = new File(workspaceDir + File.separatorChar + path + File.separatorChar + name + ".spd");
-                initPackageInfo(spdFile.getPath(), name);
-                // 
-                // SPD Parse.
-                //
-                PackageSurfaceAreaDocument spdDoc = (PackageSurfaceAreaDocument) XmlObject.Factory.parse(spdFile);
-                Spd spd = new Spd(spdDoc, path);
-                spdTable.put(name, spd);
-
+      Get the MSA file name with absolute path
+     */
+    public synchronized static File getMsaFile(ModuleIdentification moduleId) throws BuildException {
+        File msaFile = null;
+        //
+        // TBD. Do only when package is null. 
+        //
+        Iterator iter = packageList.iterator();
+        while (iter.hasNext()) {
+            PackageIdentification packageId = (PackageIdentification)iter.next();
+            Spd spd = spdTable.get(packageId);
+            msaFile = spd.getModuleFile(moduleId);
+            if (msaFile != null ) {
+                break ;
             }
-        } catch (Exception e) {
-            throw new BuildException("Parse workspace Database [" + dbFile.getPath() + "] Error.\n" + e.getMessage());
+        }
+        if (msaFile == null){
+            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in all packages. ");
+        }
+        else {
+            return msaFile;
         }
     }
 
-    /**
-      Parse every MSA files, get base name from MSA Header. And record those
-      values to ModuleInfo.
-      
-      @param packageFilename the file name of the package
-      @param packageName the name of the package
-      @throws BuildException
-              SPD or MSA file is not valid
-    **/
-    private synchronized static void initPackageInfo(String packageFilename, String packageName) throws BuildException {
-        File packageFile = new File(packageFilename);
-        try {
-            PackageSurfaceAreaDocument spd = (PackageSurfaceAreaDocument) XmlObject.Factory.parse(packageFile);
-            List<String> msaFilenameList;
-
-            List<MsaFilesDocument.MsaFiles.MsaFile> msasList = spd.getPackageSurfaceArea().getMsaFiles()
-                                                                  .getMsaFileList();
-            if (msasList.size() == 0) {
-                msaFilenameList = spd.getPackageSurfaceArea().getMsaFiles().getFilenameList();
-            } else {
-                msaFilenameList = new ArrayList<String>(msasList.size());
-                Iterator msasIter = msasList.iterator();
-                while (msasIter.hasNext()) {
-                    MsaFilesDocument.MsaFiles.MsaFile msaFile = (MsaFilesDocument.MsaFiles.MsaFile)msasIter.next();
-                    msaFilenameList.add(msaFile.getFilename().getStringValue());
-                }
+    public synchronized static PackageIdentification getPackageForModule(ModuleIdentification moduleId) {
+        //
+        // If package already defined in module
+        //
+        if (moduleId.getPackage() != null) {
+            return moduleId.getPackage();
+        }
+        
+        PackageIdentification packageId = null;
+        Iterator iter = packageList.iterator();
+        while (iter.hasNext()) {
+            packageId = (PackageIdentification)iter.next();
+            moduleId.setPackage(packageId);
+            Spd spd = spdTable.get(packageId);
+            if (spd.getModuleFile(moduleId) != null ) {
+                break ;
             }
-
-            Iterator msaFilenameIter = msaFilenameList.iterator();
-            while (msaFilenameIter.hasNext()) {
-                String filename = (String)msaFilenameIter.next();
-                File msaFile = new File(workspaceDir + File.separatorChar + GlobalData.getPackagePath(packageName)
-                                        + File.separatorChar + filename);
-                SurfaceAreaParser surfaceAreaParser = new SurfaceAreaParser();
-                Map<String, XmlObject> map = surfaceAreaParser.parseFile(msaFile);
-                String baseName = "";
-                XmlObject header = null;
-                if ((header = map.get("MsaHeader")) != null) {
-                    if (((MsaHeader) header).isSetBaseName()) {
-                        baseName = ((MsaHeader) header).getBaseName().getStringValue();
-                    } else {
-                        baseName = ((MsaHeader) header).getModuleName();
-                    }
-                } else if ((header = map.get("MsaLibHeader")) != null) {
-                    baseName = ((MsaLibHeader) header).getBaseName().getStringValue();
-                } else {
-                    continue;
-                }
-                nativeMsa.put(baseName, map);
-                String[] info = { filename, packageName };
-                moduleInfo.put(baseName, info);
-            }
-        } catch (Exception e) {
-            throw new BuildException("Parse package description file [" + packageFile.getPath() + "] Error.\n"
-                                     + e.getMessage());
+        }
+        if (packageId == null){
+            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in all packages. ");
+        }
+        else {
+            return packageId;
         }
     }
-
-    /**
-      Query the libraries which the module depends on.
     
-      @param moduleName the base name of the module
-      @return the libraries which the module depends on
-    **/
-    public synchronized static String[] getModuleLibrary(String moduleName, String arch) {
-        Set<String> set = moduleLibraryMap.get(moduleName + "-" + arch);
-        return set.toArray(new String[set.size()]);
-    }
-
     /**
-      Register module's library list which it depends on for later use. 
-      
-      @param moduleName the base name of the module
-      @param libraryList the libraries which the module depends on
+      Difference between build and parse: ToolChain and Target
     **/
-    public synchronized static void addModuleLibrary(String moduleName, String arch, Set<String> libraryList) {
-        moduleLibraryMap.put(moduleName + "-" + arch, libraryList);
+    public synchronized static boolean isModuleBuilt(FpdModuleIdentification moduleId) {
+        return builtModules.contains(moduleId);
     }
-
-    /**
-      Query the library absolute file name with library name. 
-      
-      @param library the base name of the library
-      @return the library absolute file name
-    **/
-    public synchronized static String getLibrary(String library, String arch) {
-        return libraries.get(library + "-" + arch);
-    }
-
-    /**
-      Register library absolute file name for later use.
-      
-      @param library the base name of the library
-      @param resultPath the library absolute file name
-    **/
-    public synchronized static void addLibrary(String library, String arch, String resultPath) {
-        libraries.put(library + "-" + arch, resultPath);
-    }
-
-    /**
-      Whether the module with ARCH has built in the previous build. 
-      
-      @param moduleName the base name of the module
-      @param arch current build ARCH
-      @return true if the module has built in previous, otherwise return false
-    **/
-    public synchronized static boolean isModuleBuilt(String moduleName, String arch) {
-        return builtModules.contains(moduleName + "-" + arch);
-    }
-
-    /**
-      Register the module with ARCH has built. 
     
-      @param moduleName the base name of the module
-      @param arch current build ARCH
-    **/
-    public synchronized static void registerBuiltModule(String moduleName, String arch) {
-        builtModules.add(moduleName + "-" + arch);
+    public synchronized static void registerBuiltModule(FpdModuleIdentification fpdModuleId) {
+        builtModules.add(fpdModuleId);
     }
 
-    /**
-      Whether the module's surface area has parsed in the previous build.
-      
-      @param moduleName the base name of the module
-      @return true if the module's surface area has parsed in previous, otherwise
-      return false
-    **/
-    public synchronized static boolean isModuleParsed(String moduleName) {
-        return parsedModules.containsKey(moduleName);
+    
+    public synchronized static void registerFpdModuleSA(FpdModuleIdentification fpdModuleId, Map<String, XmlObject> doc) {
+        Map<String, XmlObject> result = new HashMap<String, XmlObject>();
+        Set keySet = doc.keySet();
+        Iterator iter = keySet.iterator();
+        while (iter.hasNext()){
+            String key = (String)iter.next();
+            XmlObject item = cloneXmlObject(doc.get(key), true);
+            result.put(key, item);
+        }
+        fpdModuleSA.put(fpdModuleId, result);
     }
-
+    
     /**
       Query overrided module surface area information. If current is Package
       or Platform build, also include the information from FPD file. 
       
       <p>Note that surface area parsing is incremental. That means the method will 
-      only to parse the MSA and MBD files when never parsed before. </p>
+      only parse the MSA and MBD files if necessary. </p>
     
       @param moduleName the base name of the module
       @return the overrided module surface area information
       @throws BuildException
               MSA or MBD is not valid
     **/
-    public synchronized static Map<String, XmlObject> getDoc(String moduleName) throws BuildException {
-        if (parsedModules.containsKey(moduleName)) {
-            return parsedModules.get(moduleName);
+    public synchronized static Map<String, XmlObject> getDoc(FpdModuleIdentification fpdModuleId) throws BuildException {
+        if (parsedModules.containsKey(fpdModuleId)) {
+            return parsedModules.get(fpdModuleId);
         }
-        Map<String, XmlObject> msaMap = getNativeMsa(moduleName);
-        Map<String, XmlObject> mbdMap = getNativeMbd(moduleName);
-        OverrideProcess op = new OverrideProcess();
-        Map<String, XmlObject> map = op.override(mbdMap, msaMap);
+        Map<String, XmlObject> doc = new HashMap<String, XmlObject>();
+        ModuleIdentification moduleId = fpdModuleId.getModule();
         //
-        // IF IT IS A PALTFORM BUILD, OVERRIDE FROM PLATFORM
+        // First part: get the MSA files info
         //
-        if (FpdParserTask.platformBuildOptions != null) {
-            Map<String, XmlObject> platformMap = new HashMap<String, XmlObject>();
-            platformMap.put("BuildOptions", FpdParserTask.platformBuildOptions);
-            Map<String, XmlObject> overrideMap = op.override(platformMap, OverrideProcess.deal(map));
-            GlobalData.registerModule(moduleName, overrideMap);
-            return overrideMap;
-        } else {
-            parsedModules.put(moduleName, map);
-            return map;
+        doc = getNativeMsa(moduleId);
+        
+        //
+        // Second part: put build options
+        //
+        doc.put("BuildOptions", fpdBuildOptions);
+        
+        //
+        // Third part: get Module info from FPD, such as Library instances, PCDs
+        //
+        if (fpdModuleSA.containsKey(fpdModuleId)){
+            //
+            // merge module info in FPD to final Doc
+            // For Library Module, do nothing here
+            //
+            doc.putAll(fpdModuleSA.get(fpdModuleId));
         }
+        parsedModules.put(fpdModuleId, doc);
+        return doc;
     }
 
+    public synchronized static Map<String, XmlObject> getDoc(ModuleIdentification moduleId, String arch) throws BuildException {
+        FpdModuleIdentification fpdModuleId = new FpdModuleIdentification(moduleId, arch);
+        return getDoc(fpdModuleId);
+    }
     /**
       Query the native MSA information with module base name. 
       
@@ -459,200 +377,425 @@ public class GlobalData {
       @throws BuildException
               MSA file is not valid
     **/
-    public synchronized static Map<String, XmlObject> getNativeMsa(String moduleName) throws BuildException {
-        if (nativeMsa.containsKey(moduleName)) {
-            return nativeMsa.get(moduleName);
+    public synchronized static Map<String, XmlObject> getNativeMsa(ModuleIdentification moduleId) throws BuildException {
+        if (nativeMsa.containsKey(moduleId)) {
+            return nativeMsa.get(moduleId);
         }
-        String msaFilename = getMsaFilename(moduleName);
-        File msaFile = new File(msaFilename);
-        if (!msaFile.exists()) {
-            throw new BuildException("Info: Surface Area file [" + msaFile.getPath() + "] can't found.");
+        File msaFile = getMsaFile(moduleId);
+        Map<String, XmlObject> msaMap = getNativeMsa(msaFile);
+        nativeMsa.put(moduleId, msaMap);
+        return msaMap;
+    }
+    
+    public synchronized static Map<String, XmlObject> getNativeMsa(File msaFile) throws BuildException {
+        if (! msaFile.exists()) {
+            throw new BuildException("Surface Area file [" + msaFile.getPath() + "] can't found.");
         }
-        SurfaceAreaParser surfaceAreaParser = new SurfaceAreaParser();
-        Map<String, XmlObject> map = surfaceAreaParser.parseFile(msaFile);
-        nativeMsa.put(moduleName, map);
+        try {
+            ModuleSurfaceAreaDocument doc = (ModuleSurfaceAreaDocument)XmlObject.Factory.parse(msaFile);
+            //
+            // Validate File if they accord with XML Schema
+            //
+            if ( ! doc.validate()){
+                throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] is invalid.");
+            }
+            //
+            // parse MSA file
+            //
+            ModuleSurfaceArea msa= doc.getModuleSurfaceArea();
+            Map<String, XmlObject> msaMap = new HashMap<String, XmlObject>();
+            msaMap.put("MsaHeader", cloneXmlObject(msa.getMsaHeader(), true));
+            msaMap.put("ModuleDefinitions", cloneXmlObject(msa.getModuleDefinitions(), true));
+            msaMap.put("LibraryClassDefinitions", cloneXmlObject(msa.getLibraryClassDefinitions(), true));
+            msaMap.put("SourceFiles", cloneXmlObject(msa.getSourceFiles(), true));
+            msaMap.put("PackageDependencies", cloneXmlObject(msa.getPackageDependencies(), true));
+            msaMap.put("Protocols", cloneXmlObject(msa.getProtocols(), true));
+            msaMap.put("PPIs", cloneXmlObject(msa.getPPIs(), true));
+            msaMap.put("Guids", cloneXmlObject(msa.getGuids(), true));
+            msaMap.put("Externs", cloneXmlObject(msa.getExterns(), true));
+            return msaMap;
+        }
+        catch (Exception ex){
+            throw new BuildException(ex.getMessage());
+        }
+    }
+    
+    public static Map<String, XmlObject> getFpdBuildOptions() {
+        Map<String, XmlObject> map = new HashMap<String, XmlObject>();
+        map.put("BuildOptions", fpdBuildOptions);
         return map;
     }
     
-    /**
-      Query the native MBD information with module base name. 
-      
-      <p>Note that MBD parsing is incremental. That means the method will 
-      only to parse the MBD files when never parsed before. </p>
+    public static void setFpdBuildOptions(XmlObject fpdBuildOptions) {
+        GlobalData.fpdBuildOptions = cloneXmlObject(fpdBuildOptions, true);
+    }
+
+    public static XmlObject getFpdDynamicPcds() {
+        return fpdDynamicPcds;
+    }
+
+    public static void setFpdDynamicPcds(XmlObject fpdDynamicPcds) {
+        GlobalData.fpdDynamicPcds = fpdDynamicPcds;
+    }
+
+    //////////////////////////////////////////////
+    //////////////////////////////////////////////
     
-      @param moduleName the base name of the module
-      @return the native MBD information
-      @throws BuildException
-              MBD file is not valid
-    **/
-    public synchronized static Map<String, XmlObject> getNativeMbd(String moduleName) throws BuildException {
-        if (nativeMbd.containsKey(moduleName)) {
-            return nativeMbd.get(moduleName);
+    public static Set<ModuleIdentification> getModules(PackageIdentification packageId){
+        Spd spd = spdTable.get(packageId);
+        if (spd == null ) {
+            Set<ModuleIdentification> dummy = new HashSet<ModuleIdentification>();
+            return dummy;
         }
-        String mbdFilename = getMbdFilename(moduleName);
-        File mbdFile = new File(mbdFilename);
-        if (!mbdFile.exists()) {
-            return null;
-            //throw new BuildException("Info: Surface Area file [" + mbdFile.getPath() + "] can't found.");
+        else {
+            return spd.getModules();
         }
-        SurfaceAreaParser surfaceAreaParser = new SurfaceAreaParser();
-        Map<String, XmlObject> map = surfaceAreaParser.parseFile(mbdFile);
-        nativeMbd.put(moduleName, map);
-        return map;
     }
 
     /**
-      Register module overrided surface area information. If has existed, then update.
-      
-      @param moduleName the base name of the module
-      @param map the overrided surface area information
-    **/
-    public synchronized static void registerModule(String moduleName, Map<String, XmlObject> map) {
-        parsedModules.put(moduleName, map);
-    }
-
-    /**
-     * 
-     * @param protocolName
-     * @return
+     * The header file path is relative to workspace dir
      */
-    public synchronized static String[] getProtocolInfoGuid(String protocolName) {
-        Set set = spdTable.keySet();
-        Iterator iter = set.iterator();
-        String[] cNameGuid = null;
-
-        while (iter.hasNext()) {
-            Spd spd = (Spd) spdTable.get(iter.next());
-            cNameGuid = spd.getProtocolNameGuidArray(protocolName);
-            if (cNameGuid != null) {
-                break;
+    public static String[] getLibraryClassHeaderFiles(
+            PackageIdentification[] packages, String name)
+            throws BuildException {
+        if (packages == null) {
+            // throw Exception or not????
+            return new String[0];
+        }
+        String[] result = null;
+        for (int i = 0; i < packages.length; i++) {
+            Spd spd = spdTable.get(packages[i]);
+            //
+            // If find one package defined the library class
+            //
+            if ((result = spd.getLibClassIncluder(name)) != null) {
+                return result;
             }
         }
-        return cNameGuid;
+        //
+        // If can't find library class declaration in every package
+        //
+        throw new BuildException("Can not find library class [" + name
+                + "] declaration in every packages. ");
     }
 
-    public synchronized static String[] getPpiInfoGuid(String ppiName) {
-        Set set = spdTable.keySet();
-        Iterator iter = set.iterator();
-        String[] cNameGuid = null;
+    /**
+     * The header file path is relative to workspace dir
+     */
+    public static String getPackageHeaderFiles(PackageIdentification packages,
+            String moduleType) throws BuildException {
+        if (packages == null) {
+            return new String("");
+        }
+        Spd spd = spdTable.get(packages);
+        //
+        // If can't find package header file, skip it
+        //
+        String temp = null;
+        if (spd != null) {
+            if ((temp = spd.getPackageIncluder(moduleType)) != null) {
+                return temp;
+            } else {
+                temp = "";
+                return temp;
+            }
+        } else {
+            return null;
+        }
+    }
 
-        while (iter.hasNext()) {
-            Spd spd = (Spd) spdTable.get(iter.next());
-            cNameGuid = spd.getPpiCnameGuidArray(ppiName);
-
-            if (cNameGuid != null) {
-                break;
+    /**
+     * return two values: {cName, GuidValue}
+     */
+    public static String[] getGuid(PackageIdentification[] packages, String name)
+            throws BuildException {
+        if (packages == null) {
+            // throw Exception or not????
+            return new String[0];
+        }
+        String[] result = null;
+        for (int i = 0; i < packages.length; i++) {
+            Spd spd = spdTable.get(packages[i]);
+            //
+            // If find one package defined the GUID
+            //
+            if ((result = spd.getGuid(name)) != null) {
+                return result;
             }
         }
-        return cNameGuid;
+        return null;
     }
 
+    /**
+     * return two values: {cName, GuidValue}
+     */
+    public static String[] getPpiGuid(PackageIdentification[] packages,
+            String name) throws BuildException {
+        if (packages == null) {
+            return new String[0];
+        }
+        String[] result = null;
+        for (int i = 0; i < packages.length; i++) {
+            Spd spd = spdTable.get(packages[i]);
+            //
+            // If find one package defined the Ppi GUID
+            //
+            if ((result = spd.getPpi(name)) != null) {
+                return result;
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * return two values: {cName, GuidValue}
+     */
+    public static String[] getProtocolGuid(PackageIdentification[] packages,
+            String name) throws BuildException {
+        if (packages == null) {
+            return new String[0];
+        }
+        String[] result = null;
+        for (int i = 0; i < packages.length; i++) {
+            Spd spd = spdTable.get(packages[i]);
+            //
+            // If find one package defined the protocol GUID
+            //
+            if ((result = spd.getProtocol(name)) != null) {
+                return result;
+            }
+        }
+        return null;
+
+    }
+    
+    /////////////////////////// Update!! Update!! Update!!
+//    public synchronized static MemoryDatabaseManager getPCDMemoryDBManager() {
+//        return pcdDbManager;
+//    }
+    ///////////////////////////
+    public synchronized static PlatformIdentification getPlatform(String name) throws BuildException {
+        Iterator iter = platformList.iterator();
+        while(iter.hasNext()){
+            PlatformIdentification platformId = (PlatformIdentification)iter.next();
+            if (platformId.getName().equalsIgnoreCase(name)) {
+//                GlobalData.log.info("Platform: " + platformId + platformId.getFpdFile());
+                return platformId;
+            }
+        }
+        throw new BuildException("Can't find platform [" + name + "] in current workspace. ");
+    }
+    
+    public synchronized static PackageIdentification refreshPackageIdentification(PackageIdentification packageId) throws BuildException {
+        Iterator iter = packageList.iterator();
+        while(iter.hasNext()){
+            PackageIdentification packageItem = (PackageIdentification)iter.next();
+            if (packageItem.equals(packageId)) {
+                packageId.setName(packageItem.getName());
+                packageId.setSpdFile(packageItem.getSpdFile());
+                return packageId;
+            }
+        }
+        throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " under current workspace. ");
+    }
+    
+    public synchronized static ModuleIdentification refreshModuleIdentification(ModuleIdentification moduleId) throws BuildException {
+//        System.out.println("1");
+//        System.out.println("##" + moduleId.getGuid());
+        PackageIdentification packageId = getPackageForModule(moduleId);
+//        System.out.println("" + packageId.getGuid());
+        moduleId.setPackage(packageId);
+        Spd spd = spdTable.get(packageId);
+        if (spd == null) {
+            throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " under current workspace. ");
+        }
+        Set<ModuleIdentification> modules = spd.getModules();
+        Iterator<ModuleIdentification> iter = modules.iterator();
+        while (iter.hasNext()) {
+            ModuleIdentification item = iter.next();
+            if (item.equals(moduleId)) {
+                moduleId.setName(item.getName());
+                moduleId.setModuleType(item.getModuleType());
+                moduleId.setMsaFile(item.getMsaFile());
+                return moduleId;
+            }
+        }
+        throw new BuildException("Can't find module GUID value " + moduleId.getGuid() + " in " + packageId + " under current workspace. ");
+    }
+    
+    public synchronized static Set<PackageIdentification> getPackageList(){
+        return packageList;
+    }
+    ///// remove!!
+    private static XmlObject cloneXmlObject(XmlObject object, boolean deep) throws BuildException {
+        if ( object == null) {
+            return null;
+        }
+        XmlObject result = null;
+        try {
+            result = XmlObject.Factory.parse(object.getDomNode()
+                            .cloneNode(deep));
+        } catch (Exception ex) {
+            throw new BuildException(ex.getMessage());
+        }
+        return result;
+    }
+
+    ////// Tool Chain Related, try to refine and put some logic process to ToolChainFactory
+
+    public static ToolChainInfo getToolChainInfo() {
+//        GlobalData.log.info(toolsDef.getConfigInfo() + "" + toolChainEnvInfo + toolChainPlatformInfo);
+        if (toolChainInfo == null) {
+            toolChainInfo = toolsDef.getConfigInfo().intersection(toolChainEnvInfo);
+            if (toolChainPlatformInfo != null) {
+                toolChainInfo = toolChainInfo.intersection(toolChainPlatformInfo);
+            }
+            toolChainInfo.addCommands(toolsDef.getConfigInfo().getCommands());
+            toolChainInfo.normalize();
+            GlobalData.log.info(toolChainInfo + "");
+        }
+        return toolChainInfo;
+    }
+
+
+
+    public static void setPlatformToolChainFamilyOption(ToolChainMap map) {
+        platformToolChainFamilyOption = map;
+    }
+
+    public static void setPlatformToolChainOption(ToolChainMap map) {
+        platformToolChainOption = map;
+    }
+
+    public static void addModuleToolChainOption(FpdModuleIdentification fpdModuleId,
+        ToolChainMap toolChainOption) {
+        moduleToolChainOption.put(fpdModuleId, toolChainOption);
+    }
+
+    public static void addModuleToolChainFamilyOption(FpdModuleIdentification fpdModuleId,
+        ToolChainMap toolChainOption) {
+        moduleToolChainFamilyOption.put(fpdModuleId, toolChainOption);
+    }
+
+    public static String getCommandSetting(String[] commandDescription, FpdModuleIdentification fpdModuleId) throws EdkException {
+        ToolChainKey toolChainKey = new ToolChainKey(commandDescription);
+        ToolChainMap toolChainConfig = toolsDef.getConfig(); 
+        String setting = null;
+
+        if (!commandDescription[ToolChainElement.ATTRIBUTE.value].equals(ToolChainAttribute.FLAGS.toString())) {
+            setting = toolChainConfig.get(toolChainKey);
+            if (setting == null) {
+                setting = "";
+            }
+            return setting;
+        }
+
+        //
+        // get module specific options, if any
+        //
+        // tool tag first
+        ToolChainMap option = moduleToolChainOption.get(fpdModuleId);
+        ToolChainKey toolChainFamilyKey = null;
+
+        if ((option == null) || (option != null && (setting = option.get(toolChainKey)) == null)) {
+            //
+            // then tool chain family
+            //
+            toolChainFamilyKey = new ToolChainKey(commandDescription);
+            toolChainFamilyKey.setKey(ToolChainAttribute.FAMILY.toString(), ToolChainElement.ATTRIBUTE.value);
+            String family = toolChainConfig.get(toolChainFamilyKey);
+            toolChainFamilyKey.setKey(family, ToolChainElement.TOOLCHAIN.value);
+            toolChainFamilyKey.setKey(ToolChainAttribute.FLAGS.toString(), ToolChainElement.ATTRIBUTE.value);
+
+            option = moduleToolChainFamilyOption.get(fpdModuleId);
+            if (option != null) {                
+                setting = option.get(toolChainFamilyKey);
+            }
+        }
+
+        //
+        // get platform options, if any
+        //
+        if (setting == null) {
+            // tool tag first
+            if (platformToolChainOption == null || (setting = platformToolChainOption.get(toolChainKey)) == null) {
+                // then tool chain family
+                if (toolChainFamilyKey == null) {
+                    toolChainFamilyKey = new ToolChainKey(commandDescription);
+                    toolChainFamilyKey.setKey(ToolChainAttribute.FAMILY.toString(), ToolChainElement.ATTRIBUTE.value);
+                    String family = toolChainConfig.get(toolChainFamilyKey);
+                    toolChainFamilyKey.setKey(family, ToolChainElement.TOOLCHAIN.value);
+                    toolChainFamilyKey.setKey(ToolChainAttribute.FLAGS.toString(), ToolChainElement.ATTRIBUTE.value);
+                }
+
+                setting = platformToolChainFamilyOption.get(toolChainFamilyKey);
+            }
+        }
+
+        if (setting == null) {
+            setting = "";
+        }
+
+        return setting;
+    }
+    
+    public static void setToolChainEnvInfo(ToolChainInfo envInfo) {
+        toolChainEnvInfo = envInfo;
+    }
+    public static void setToolChainPlatformInfo(ToolChainInfo platformInfo) {
+        toolChainPlatformInfo = platformInfo;
+    }
+
+    //
+    // for PCD
+    //
+//    public synchronized static MemoryDatabaseManager getPCDMemoryDBManager() {
+//        return pcdDbManager;
+//    }
+
+    //
+    // For PCD
+    //
     /**
      * 
      * @param guidName
      * @return
      */
-    public synchronized static String[] getGuidInfoGuid(String guidName) {
-        String[] cNameGuid = null;
-        Set set = spdTable.keySet();
-        Iterator iter = set.iterator();
+//    public synchronized static String[] getGuidInfoGuid(String guidName) {
+//        String[] cNameGuid = null;
+//        Set set = spdTable.keySet();
+//        Iterator iter = set.iterator();
+//
+//        while (iter.hasNext()) {
+//            Spd spd = (Spd) spdTable.get(iter.next());
+//            cNameGuid = spd.getGuidNameArray(guidName);
+//            if (cNameGuid != null) {
+//                break;
+//            }
+//        }
+//        return cNameGuid;
+//    }
 
-        while (iter.hasNext()) {
-            Spd spd = (Spd) spdTable.get(iter.next());
-            cNameGuid = spd.getGuidNameArray(guidName);
-            if (cNameGuid != null) {
-                break;
-            }
-        }
-        return cNameGuid;
-    }
-
-    public synchronized static String getLibClassIncluder(String libName) {
-        String libIncluder = null;
-        Set set = spdTable.keySet();
-        Iterator iter = set.iterator();
-
-        while (iter.hasNext()) {
-            String packageName = (String) iter.next();
-            Spd spd = (Spd) spdTable.get(packageName);
-            libIncluder = spd.getLibClassIncluder(libName);
-            String packagePath = spd.packagePath;
-            if (packagePath != null) {
-                packagePath = packagePath.replace('\\', File.separatorChar);
-                packagePath = packagePath.replace('/', File.separatorChar);
-            } else {
-                packagePath = packageName;
-            }
-            if (libIncluder != null) {
-                libIncluder = libIncluder.replace('\\', File.separatorChar);
-                libIncluder = libIncluder.replace('/', File.separatorChar);
-                libIncluder = packageName + File.separatorChar + libIncluder;
-                break;
-            }
-        }
-        return libIncluder;
-    }
-
-    public synchronized static String getModuleInfoByPackageName(String packageName, String moduleType) {
-        Spd spd;
-        String includeFile = null;
-        String includeStr = "";
-        String cleanPath = "";
-
-        spd = (Spd) spdTable.get(packageName);
-        includeFile = spd.getModuleTypeIncluder(moduleType);
-        if (includeFile != null) {
-            includeFile = includeFile.replace('\\', File.separatorChar);
-            includeFile = includeFile.replace('/', File.separatorChar);
-            includeStr = CommonDefinition.include + " <" + includeStr;
-            cleanPath = spd.packagePath;
-            cleanPath = cleanPath.replace('\\', File.separatorChar);
-            cleanPath = cleanPath.replace('/', File.separatorChar);
-
-            if (cleanPath.charAt(spd.packagePath.length() - 1) != File.separatorChar) {
-                cleanPath = cleanPath + File.separatorChar;
-            }
-            includeStr = includeStr + cleanPath;
-            includeStr = includeStr + includeFile;
-            includeStr = includeStr + ">\r\n";
-        }
-
-        return includeStr;
-    }
-
-    public synchronized static void setLibInstanceInfo(String libName, String libConstructor, String libDesturctor) {
-        String[] libConsDes = new String[2];
-        libConsDes[0] = libConstructor;
-        libConsDes[1] = libDesturctor;
-
-        libInstanceInfo.put(libName, libConsDes);
-    }
-
-    public synchronized static boolean isHaveLibInstance(String libName) {
-        return libInstanceInfo.containsKey(libName);
-    }
-
-    public synchronized static String getLibInstanceConstructor(String libName) {
-        String[] libInstanceValue;
-        libInstanceValue = libInstanceInfo.get(libName);
-        if (libInstanceValue != null) {
-            return libInstanceValue[0];
-        } else {
-            return null;
-        }
-    }
-
-    public synchronized static String getLibInstanceDestructor(String libName) {
-        String[] libInstanceValue;
-        libInstanceValue = libInstanceInfo.get(libName);
-        if (libInstanceValue != null) {
-            return libInstanceValue[1];
-        } else {
-            return null;
-        }
-    }
-
-    public synchronized static MemoryDatabaseManager getPCDMemoryDBManager() {
-        return pcdDbManager;
-    }
+    //
+    // For PCD
+    //
+//    public synchronized static Map<FpdModuleIdentification, XmlObject> getFpdModuleSaXmlObject(
+//            String xmlObjectName) {
+//        Set<FpdModuleIdentification> fpdModuleSASet = fpdModuleSA.keySet();
+//        Iterator item = fpdModuleSASet.iterator();
+//
+//        Map<FpdModuleIdentification, XmlObject> SAPcdBuildDef = new HashMap<FpdModuleIdentification, XmlObject>();
+//        Map<String, XmlObject> SANode = new HashMap<String, XmlObject>();
+//        FpdModuleIdentification moduleId;
+//        while (item.hasNext()) {
+//            moduleId = (FpdModuleIdentification) item.next();
+//            SANode = fpdModuleSA.get(item.next());
+//            SAPcdBuildDef.put(moduleId,
+//                    (PcdBuildDefinitionDocument.PcdBuildDefinition) SANode
+//                            .get(xmlObjectName));
+//        }
+//        return SAPcdBuildDef;
+//    }
 }
+
