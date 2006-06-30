@@ -9,37 +9,29 @@
 @REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 @REM
 
-@echo off
+@echo on
 
 :check_java
 if "%JAVA_HOME%"=="" goto no_jdk
-
 :check_wks
 if "%WORKSPACE%"=="" goto no_wks
-
 :check_ant
 if "%ANT_HOME%"=="" goto no_ant
-@REM set ANT_HOME=%WORKSPACE%\Tools\bin\apache-ant
-
 :check_xmlbeans
-if "%XMLBEANS_HOME"=="" goto no_xmlbeans
-@REM set XMLBEANS_HOME=%WORKSPACE%\Tools\bin\xmlbeans
-
-set Framework_Tools_Path=%WORKSPACE%\Tools\bin
+if "%XMLBEANS_HOME%"=="" goto no_xmlbeans
 
 set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%WORKSPACE%\Tools\bin;%XMLBEANS_HOME%\bin;%PATH%
 
-set CLASSPATH=%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\saxon8-jdom.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8-sql.jar;%XMLBEANS_HOME%\lib\resolver.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\bin\PackageEditor.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar;%WORKSPACE%\Tools\bin\FrameworkWizard.jar;.
 
-call "ant" -f %WORKSPACE%\Tools\Source\PackageEditor\build.xml
+@REM Build SurfaceArea first
+call "ant" -f %WORKSPACE%\Tools\build.xml SurfaceArea
 
-call "java" org.tianocore.packaging.PackagingMain
+@REM Build ModuleEditor
+call "ant" -f %WORKSPACE%\Tools\Source\FrameworkWizard\build.xml
+
+@REM Run ModuleEditor
+call "java" org.tianocore.frameworkwizard.FrameworkWizardUI
 
 goto end
 
