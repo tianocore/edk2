@@ -134,7 +134,8 @@ typedef struct {
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  Null-terminator, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -148,7 +149,6 @@ StrCpy (
   OUT     CHAR16                    *Destination,
   IN      CONST CHAR16              *Source
   );
-
 /**
   Copies one Null-terminated Unicode string with a maximum length to another
   Null-terminated Unicode string with a maximum length and returns the new
@@ -166,7 +166,8 @@ StrCpy (
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  Null-terminator, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -182,7 +183,6 @@ StrnCpy (
   IN      CONST CHAR16              *Source,
   IN      UINTN                     Length
   );
-
 /**
   Returns the length of a Null-terminated Unicode string.
 
@@ -191,7 +191,8 @@ StrnCpy (
 
   If String is NULL, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  Null-terminator, then ASSERT().
 
   @param  String  Pointer to a Null-terminated Unicode string.
 
@@ -203,7 +204,6 @@ EFIAPI
 StrLen (
   IN      CONST CHAR16              *String
   );
-
 /**
   Returns the size of a Null-terminated Unicode string in bytes, including the
   Null terminator.
@@ -213,7 +213,8 @@ StrLen (
 
   If String is NULL, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  Null-terminator, then ASSERT().
 
   @param  String  Pointer to a Null-terminated Unicode string.
 
@@ -225,7 +226,6 @@ EFIAPI
 StrSize (
   IN      CONST CHAR16              *String
   );
-
 /**
   Compares two Null-terminated Unicode strings, and returns the difference
   between the first mismatched Unicode characters.
@@ -239,9 +239,11 @@ StrSize (
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FirstString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  than PcdMaximumUnicodeStringLength Unicode characters not including the 
+  Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and SecondString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  than PcdMaximumUnicodeStringLength Unicode characters not including the 
+  Null-terminator, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated Unicode string.
   @param  SecondString  Pointer to a Null-terminated Unicode string.
@@ -256,7 +258,6 @@ StrCmp (
   IN      CONST CHAR16              *FirstString,
   IN      CONST CHAR16              *SecondString
   );
-
 /**
   Compares two Null-terminated Unicode strings with maximum lengths, and
   returns the difference between the first mismatched Unicode characters.
@@ -271,9 +272,11 @@ StrCmp (
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FirstString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  than PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and SecondString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  than PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated Unicode string.
   @param  SecondString  Pointer to a Null-terminated Unicode string.
@@ -290,7 +293,6 @@ StrnCmp (
   IN      CONST CHAR16              *SecondString,
   IN      UINTN                     Length
   );
-
 /**
   Concatenates one Null-terminated Unicode string to another Null-terminated
   Unicode string, and returns the concatenated Unicode string.
@@ -305,12 +307,15 @@ StrnCmp (
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Destination contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  than PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and concatenating Destination
   and Source results in a Unicode string with more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -324,7 +329,6 @@ StrCat (
   IN OUT  CHAR16                    *Destination,
   IN      CONST CHAR16              *Source
   );
-
 /**
   Concatenates one Null-terminated Unicode string with a maximum length to the
   end of another Null-terminated Unicode string, and returns the concatenated
@@ -342,12 +346,15 @@ StrCat (
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Destination contains more
-  than PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  than PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and concatenating Destination
   and Source results in a Unicode string with more than
-  PcdMaximumUnicodeStringLength Unicode characters, then ASSERT().
+  PcdMaximumUnicodeStringLength Unicode characters not including the
+  Null-terminator, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
   @param  Source      Pointer to a Null-terminated Unicode string.
@@ -364,7 +371,6 @@ StrnCat (
   IN      CONST CHAR16              *Source,
   IN      UINTN                     Length
   );
-
 /**
   Copies one Null-terminated ASCII string to another Null-terminated ASCII
   string and returns the new ASCII string.
@@ -377,7 +383,8 @@ StrnCat (
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
 
   @param  Destination Pointer to a Null-terminated ASCII string.
   @param  Source      Pointer to a Null-terminated ASCII string.
@@ -391,7 +398,6 @@ AsciiStrCpy (
   OUT     CHAR8                     *Destination,
   IN      CONST CHAR8               *Source
   );
-
 /**
   Copies one Null-terminated ASCII string with a maximum length to another
   Null-terminated ASCII string with a maximum length and returns the new ASCII
@@ -408,7 +414,8 @@ AsciiStrCpy (
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
 
   @param  Destination Pointer to a Null-terminated ASCII string.
   @param  Source      Pointer to a Null-terminated ASCII string.
@@ -424,7 +431,6 @@ AsciiStrnCpy (
   IN      CONST CHAR8               *Source,
   IN      UINTN                     Length
   );
-
 /**
   Returns the length of a Null-terminated ASCII string.
 
@@ -433,7 +439,8 @@ AsciiStrnCpy (
 
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and String contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
 
   @param  String  Pointer to a Null-terminated ASCII string.
 
@@ -445,7 +452,6 @@ EFIAPI
 AsciiStrLen (
   IN      CONST CHAR8               *String
   );
-
 /**
   Returns the size of a Null-terminated ASCII string in bytes, including the
   Null terminator.
@@ -455,7 +461,8 @@ AsciiStrLen (
 
   If String is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and String contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
 
   @param  String  Pointer to a Null-terminated ASCII string.
 
@@ -467,7 +474,6 @@ EFIAPI
 AsciiStrSize (
   IN      CONST CHAR8               *String
   );
-
 /**
   Compares two Null-terminated ASCII strings, and returns the difference
   between the first mismatched ASCII characters.
@@ -481,9 +487,11 @@ AsciiStrSize (
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and FirstString contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and SecondString contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  than PcdMaximumAsciiStringLength ASCII characters not including the
+  Null-terminator, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
@@ -498,7 +506,6 @@ AsciiStrCmp (
   IN      CONST CHAR8               *FirstString,
   IN      CONST CHAR8               *SecondString
   );
-
 /**
   Performs a case insensitive comparison of two Null-terminated ASCII strings,
   and returns the difference between the first mismatched ASCII characters.
@@ -513,9 +520,11 @@ AsciiStrCmp (
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and FirstString contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and SecondString contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  than PcdMaximumAsciiStringLength ASCII characters not including the
+  Null-terminator, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
@@ -532,7 +541,6 @@ AsciiStriCmp (
   IN      CONST CHAR8               *FirstString,
   IN      CONST CHAR8               *SecondString
   );
-
 /**
   Compares two Null-terminated ASCII strings with maximum lengths, and returns
   the difference between the first mismatched ASCII characters.
@@ -547,9 +555,11 @@ AsciiStriCmp (
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and FirstString contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero and SecondString contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero and SecondString contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated ASCII string.
   @param  SecondString  Pointer to a Null-terminated ASCII string.
@@ -565,7 +575,6 @@ AsciiStrnCmp (
   IN      CONST CHAR8               *SecondString,
   IN      UINTN                     Length
   );
-
 /**
   Concatenates one Null-terminated ASCII string to another Null-terminated
   ASCII string, and returns the concatenated ASCII string.
@@ -578,9 +587,11 @@ AsciiStrnCmp (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and Destination contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
   If PcdMaximumAsciiStringLength is not zero and concatenating Destination and
   Source results in a ASCII string with more than PcdMaximumAsciiStringLength
   ASCII characters, then ASSERT().
@@ -594,10 +605,9 @@ AsciiStrnCmp (
 CHAR8 *
 EFIAPI
 AsciiStrCat (
-  IN OUT  CHAR8                     *Destination,
-  IN      CONST CHAR8               *Source
+  IN OUT CHAR8    *Destination,
+  IN CONST CHAR8  *Source
   );
-
 /**
   Concatenates one Null-terminated ASCII string with a maximum length to the
   end of another Null-terminated ASCII string, and returns the concatenated
@@ -614,13 +624,15 @@ AsciiStrCat (
   If Destination is NULL, then ASSERT().
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
-  If PcdMaximumAsciiStringLength is not zero, and Destination contains more
-  than PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  If PcdMaximumAsciiStringLength is not zero, and Destination contains more than
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and Source contains more than
-  PcdMaximumAsciiStringLength ASCII characters, then ASSERT().
+  PcdMaximumAsciiStringLength ASCII characters not including the Null-terminator,
+  then ASSERT().
   If PcdMaximumAsciiStringLength is not zero, and concatenating Destination and
   Source results in a ASCII string with more than PcdMaximumAsciiStringLength
-  ASCII characters, then ASSERT().
+  ASCII characters not including the Null-terminator, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated ASCII string.
   @param  Source      Pointer to a Null-terminated ASCII string.
@@ -637,7 +649,6 @@ AsciiStrnCat (
   IN      CONST CHAR8               *Source,
   IN      UINTN                     Length
   );
-
 /**
   Converts an 8-bit value to an 8-bit BCD value.
 
@@ -739,8 +750,9 @@ InitializeListHead (
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
   If ListHead was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and ListHead contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
+  of nodes in ListHead, including the ListHead node, is greater than or 
+  equal to PcdMaximumLinkedListLength, then ASSERT().
 
   @param  ListHead  A pointer to the head node of a doubly linked list.
   @param  Entry     A pointer to a node that is to be inserted at the beginning
@@ -766,8 +778,9 @@ InsertHeadList (
   If ListHead is NULL, then ASSERT().
   If Entry is NULL, then ASSERT().
   If ListHead was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and ListHead contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
+  of nodes in ListHead, including the ListHead node, is greater than or 
+  equal to PcdMaximumLinkedListLength, then ASSERT().
 
   @param  ListHead  A pointer to the head node of a doubly linked list.
   @param  Entry     A pointer to a node that is to be added at the end of the
@@ -792,8 +805,9 @@ InsertTailList (
 
   If List is NULL, then ASSERT().
   If List was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and List contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
+  in List, including the List node, is greater than or equal to 
+  PcdMaximumLinkedListLength, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
 
@@ -843,8 +857,9 @@ GetNextNode (
 
   If ListHead is NULL, then ASSERT().
   If ListHead was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and List contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
+  in List, including the List node, is greater than or equal to 
+  PcdMaximumLinkedListLength, then ASSERT().
 
   @param  ListHead  A pointer to the head node of a doubly linked list.
 
@@ -868,8 +883,9 @@ IsListEmpty (
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
   If List was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and List contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
+  in List, including the List node, is greater than or equal to 
+  PcdMaximumLinkedListLength, then ASSERT().
   If Node is not a node in List and Node is not equal to List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
@@ -896,8 +912,9 @@ IsNull (
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
   If List was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and List contains more than
-  PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
+  in List, including the List node, is greater than or equal to 
+  PcdMaximumLinkedListLength, then ASSERT().
   If Node is not a node in List, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
@@ -928,9 +945,10 @@ IsNodeAtEnd (
   If FirstEntry is NULL, then ASSERT().
   If SecondEntry is NULL, then ASSERT().
   If SecondEntry and FirstEntry are not in the same linked list, then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the linked list containing
-  FirstEntry and SecondEntry contains more than PcdMaximumLinkedListLenth
-  nodes, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
+  linked list containing the FirstEntry and SecondEntry nodes, including
+  the FirstEntry and SecondEntry nodes, is greater than or equal to 
+  PcdMaximumLinkedListLength, then ASSERT().
 
   @param  FirstEntry  A pointer to a node in a linked list.
   @param  SecondEntry A pointer to another node in the same linked list.
@@ -955,8 +973,9 @@ SwapListEntries (
 
   If Entry is NULL, then ASSERT().
   If Entry is the head node of an empty list, then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the linked list containing
-  Entry contains more than PcdMaximumLinkedListLenth nodes, then ASSERT().
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes in the 
+  linked list containing Entry, including the Entry node, is greater than 
+  or equal to PcdMaximumLinkedListLength, then ASSERT().
 
   @param  Entry A pointer to a node in a linked list
 
