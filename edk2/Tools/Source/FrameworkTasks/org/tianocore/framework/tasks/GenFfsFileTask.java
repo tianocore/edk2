@@ -58,6 +58,10 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
     ///
     String  baseName        = "";
     ///
+    /// 
+    /// 
+    String moduleType;
+    ///
     /// module Guid
     ///
     String  ffsFileGuid        = "";
@@ -153,7 +157,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         //  Create ffs file. File name = FfsFileGuid + BaseName + ffsSuffix.
         //  If outputDir's value was set,  file will output to the outputDir.
         //
-        ffsSuffix = TypeToSuffix (this.ffsFileType);
+        ffsSuffix = TypeToSuffix (this.moduleType);
         if (!this.outputDir.equals("")) {
             String temp;
             outputPath = this.outputDir;
@@ -698,43 +702,21 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       @return                The suffix of ffs file
     **/
     private String TypeToSuffix (String ffsFileType){
-        if (ffsFileType.equals("EFI_FV_FILETYPE_ALL")) {
-            return "";
+        String[][] suffix = { { "BASE", ".FFS"},
+                              { "SEC", ".SEC" }, { "PEI_CORE", ".PEI" }, 
+                              { "PEIM", ".PEI" }, { "DXE_CORE", ".DXE" },
+                              { "DXE_DRIVER", ".DXE" }, { "DXE_RUNTIME_DRIVER", ".DXE" }, 
+                              { "DXE_SAL_DRIVER", ".DXE" }, { "DXE_SMM_DRIVER", ".DXE" }, 
+                              { "TOOL", ".FFS" }, { "UEFI_DRIVER", ".DXE" },
+                              { "UEFI_APPLICATION", ".APP" }, { "USER_DEFINED", ".FFS" } };
+
+        for (int i = 0; i < suffix.length; i++) {
+            if (suffix[i][0].equalsIgnoreCase(moduleType)) {
+                return suffix[i][1];
+            }
         }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_RAW")) {
-            return EFI_FV_FFS_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_FREEFORM")) {
-            return EFI_FV_FFS_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_SECURITY_CORE")) {
-            return EFI_FV_SEC_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_PEI_CORE")) {
-            return EFI_FV_PEI_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_DXE_CORE")) {
-            return EFI_FV_DXE_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_PEIM")) {
-            return EFI_FV_PEI_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_DRIVER")) {
-            return  EFI_FV_DXE_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER")) {
-            return EFI_FV_PEI_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_APPLICATION")) {
-            return EFI_FV_APP_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE")) {
-            return EFI_FV_FVI_FILETYPE_STR;
-        }
-        if (ffsFileType.equals("EFI_FV_FILETYPE_FFS_PAD")) {
-            return EFI_FV_FFS_FILETYPE_STR;
-        }
-        return "";
+
+        return ".FFS";
     }
 
 
@@ -958,5 +940,13 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    public String getModuleType() {
+        return this.moduleType;
+    }
+
+    public void setModuleType(String moduleType) {
+        this.moduleType = moduleType;
     }
 }
