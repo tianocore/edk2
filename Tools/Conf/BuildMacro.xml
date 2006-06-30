@@ -493,7 +493,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}" vfrFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}">
+          <vfrcompile createIfrBinFile="on" createListFile="on" outPutDir="${DEST_DIR_DEBUG}/@{FILEPATH}" vfrFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}">
             <EXTRA.INC/>
           </vfrcompile>
     

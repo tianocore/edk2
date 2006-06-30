@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.toolchain;
 
 import org.apache.tools.ant.BuildException;
-import org.tianocore.build.exception.EdkException;
+import org.tianocore.exception.EdkException;
 import org.tianocore.build.toolchain.ToolChainKey;
 import org.tianocore.build.toolchain.ToolChainMap;
 

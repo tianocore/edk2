@@ -66,6 +66,12 @@ public class Spd {
     Map<String, String[]> guidInfo = new HashMap<String, String[]>();
 
     ///
+    /// Map of Guid info
+    /// Key: GuidCName
+    /// value: String Guid's GUID
+    ///
+    Map<String, String> guidCnameInfo = new HashMap<String, String>();
+    
     /// Map of library class and its exposed header file.
     /// Key : library class name
     /// value : library class corresponding header file
@@ -140,7 +146,7 @@ public class Spd {
                 // Change path seperator to system-dependent path separator
                 //
                 File file = new File (header);
-                header = file.getParent();
+                header = file.getPath();
                 packageHeaderInfo.put(moduleType, header);
             }
             
@@ -148,6 +154,17 @@ public class Spd {
             // initialize Guid Info
             //
             guidInfo.putAll(SurfaceAreaQuery.getSpdGuid());
+            
+            //
+            // For Pcd get TokenSpaceGuid
+            //
+            Set<String> key = guidInfo.keySet();
+            Iterator item = key.iterator();
+            String [] nameValue = new String[2];
+            while(item.hasNext()){
+                nameValue = guidInfo.get(item.next());
+                guidCnameInfo.put(nameValue[0], nameValue[1]);
+            }
             
             //
             // initialize PPI info
@@ -221,6 +238,13 @@ public class Spd {
     }
 
     /**
+     * return Guid Value. 
+     */
+    public String getGuidFromCname(String cName){
+        return guidCnameInfo.get(cName);
+    }
+    
+    /**
      getLibClassInclude 
      
      This function is to get the library exposed header file name according 
@@ -246,17 +270,5 @@ public class Spd {
         return packageHeaderInfo.get(moduleType);
     }
     
-    /**
-           getGuidNameArray
-    
-           This function is to get the GUID's CName and it's GUID according to
-           GUID's name
-    
-           @param   guidName     Name of GUID
-           @return               CName and GUID.
-         **/
-         public String[] getGuidNameArray(String guidName) {
-             return this.guidInfo.get(guidName);
-         }
 
 }

@@ -35,9 +35,9 @@
     <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
   <PPIs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <Ppi Usage="ALWAYS_CONSUMED">
+    <!--<Ppi Usage="ALWAYS_CONSUMED">
       <PpiCName>PeCoffLoader</PpiCName>
-    </Ppi>
+    </Ppi>-->
   </PPIs>
   <Externs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>

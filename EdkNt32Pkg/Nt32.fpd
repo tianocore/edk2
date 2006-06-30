@@ -5733,14 +5733,6 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x5678</Value>
         </PcdData>
-        <PcdData ItemType="DYNAMIC">
-          <C_Name>PcdWinNtDynamicUINT32</C_Name>
-          <Token>0x0001000e</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>0x0</Value>
-        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>FV_RECOVERY</FvBinding>
@@ -6576,17 +6568,6 @@
       </SkuInfo>
     </PcdBuildData>
     <PcdBuildData ItemType="DYNAMIC">
-      <C_Name>PcdWinNtDynamicUINT32</C_Name>
-      <Token>0x0001000e</Token>
-      <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <MaxDatumSize>4</MaxDatumSize>
-      <SkuInfo>
-        <SkuId>0</SkuId>
-        <Value>0x0</Value>
-      </SkuInfo>
-    </PcdBuildData>
-    <PcdBuildData ItemType="DYNAMIC">
       <C_Name>PcdKentTestDynamicUINT32</C_Name>
       <Token>0x0001000e</Token>
       <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
@@ -6594,10 +6575,7 @@
       <MaxDatumSize>4</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
-        <VariableName>0x0062 0x006F 0x006F 0x0074 0x006D 0x006F 0x0064 0x0065</VariableName>
-        <VariableGuid>WinNPassThrough</VariableGuid>
-        <VariableOffset>0x123</VariableOffset>
-        <HiiDefaultValue>0x123</HiiDefaultValue>
+	<Value>0x2</Value>
       </SkuInfo>
     </PcdBuildData>
   </DynamicPcdBuildDefinitions>

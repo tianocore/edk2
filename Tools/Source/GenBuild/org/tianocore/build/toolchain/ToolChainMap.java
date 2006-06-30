@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.tianocore.build.exception.EdkException;
+import org.tianocore.exception.EdkException;
 
 public class ToolChainMap {
 

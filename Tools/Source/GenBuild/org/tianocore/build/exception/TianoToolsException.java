@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/   
 package org.tianocore.build.exception;
 
-import org.tianocore.build.exception.EdkException;
+import org.tianocore.exception.EdkException;
 
 /**
   The class handle the exception throwed by entity class.
@@ -36,6 +36,6 @@ public class TianoToolsException extends EdkException {
     }
     
     public TianoToolsException (Exception e, String message){
-//        super(e, message);
+        super(e, message);
     }
 }
