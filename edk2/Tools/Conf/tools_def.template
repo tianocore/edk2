@@ -2,7 +2,7 @@
 
 #Default values
 *_MSFT_*_*_FAMILY = MSFT
-*_MSFT_*_ASL_FAMILY = MSFT
+*_MSFT_*_ASL_FAMILY = INTEL
 
 *_MSFT_*_CC_NAME = cl.exe
 *_MSFT_*_SLINK_NAME = lib.exe
@@ -38,7 +38,7 @@
 
 # EBC definitions
 *_MSFT_EBC_*_FAMILY = INTEL
-*_MSFT_EBC_*_PATH = C:\Intel\EBC\Bin
-*_MSFT_EBC_*_SPATH = C:\Intel\EBC\Lib\EbcLib.lib
+*_MSFT_EBC_*_PATH = C:\Program Files\Intel\EBC\Bin
+*_MSFT_EBC_*_SPATH = C:\Program Files\Intel\EBC\Lib\EbcLib.lib
 *_MSFT_EBC_CC_NAME = iec.exe
 *_MSFT_EBC_SLINK_NAME = link.exe
