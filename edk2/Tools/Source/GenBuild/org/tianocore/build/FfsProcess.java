@@ -26,6 +26,10 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
+import org.tianocore.BuildOptionsDocument;
+import org.tianocore.build.global.GlobalData;
+import org.tianocore.build.global.SurfaceAreaQuery;
+import org.tianocore.build.id.FpdModuleIdentification;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -60,6 +64,8 @@ public class FfsProcess {
     /// Xml Document Node for corresponding FFS layout
     ///
     private Node ffs;
+    
+    private BuildOptionsDocument.BuildOptions.Ffs ffsXmlObject;
 
     ///
     /// ANT script to call GenFfs
@@ -131,11 +137,31 @@ public class FfsProcess {
       @throws BuildException
               If specified COMMON_FILE XML file is not valide.
     **/
-    public boolean initSections(String buildType, Project project) throws BuildException {
+    public boolean initSections(String buildType, Project project, FpdModuleIdentification fpdModuleId) throws BuildException {
         //
-        // first try to sections defined in PLATFORM level
+        // Firstly, try to find in ModuleSA
         //
-
+//        BuildOptionsDocument.BuildOptions.Ffs[] ffsArray = SurfaceAreaQuery.getModuleFfs();
+//        for (int i = 0; i < ffsArray.length; i++) {
+//            if (isMatch(ffsArray[i].getFfsKey(), buildType)) {
+//                ffsXmlObject = ffsArray[i];
+//                return true;
+//            }
+//        }
+        
+        //
+        // secondly, try to sections defined in PLATFORM level
+        //
+        SurfaceAreaQuery.push(GlobalData.getFpdBuildOptions());
+        BuildOptionsDocument.BuildOptions.Ffs[] ffsArray = SurfaceAreaQuery.getFpdFfs();
+        SurfaceAreaQuery.pop();
+        for (int i = 0; i < ffsArray.length; i++) {
+            if (isMatch(ffsArray[i].getFfsKey(), buildType)) {
+                ffsXmlObject = ffsArray[i];
+                return true;
+            }
+        }
+        
         //
         // if module specify sections itself, it's okay
         // otherwise find sections from WORKSPACE default setting with
@@ -194,22 +220,30 @@ public class FfsProcess {
     **/
     public String[] getGenSectionElements(Document document, String basename, String guid, String targetFilename) {
         this.basename = basename;
-        if (ffs == null) {
+        if (ffs == null && ffsXmlObject == null) {
             return new String[0];
         }
         Vector<String> sectionList = new Vector<String>();
         XmlCursor cursor = null;
         try {
-            cursor = XmlObject.Factory.parse(ffs).newCursor();
+            if (ffsXmlObject == null) {
+                cursor = XmlObject.Factory.parse(ffs).newCursor();
+            }
+            else {
+                cursor = ffsXmlObject.newCursor();
+            }
         } catch (Exception e) {
             return null;
         }
         int mode = MODE_NONE;
         Element root = document.createElement("genffsfile");
         root.setAttribute("outputDir", "${BIN_DIR}");
+        root.setAttribute("moduleType", "${MODULE_TYPE}");
         root.setAttribute("BaseName", basename);
         root.setAttribute("fileGuid", guid);
-        cursor.toFirstChild();
+        if (ffsXmlObject == null) {
+            cursor.toFirstChild();
+        }
         if (cursor.toFirstChild()) {
             do {
                 if (cursor.getName().getLocalPart().equalsIgnoreCase("Attribute")) {
@@ -315,7 +349,7 @@ public class FfsProcess {
             // outputPath = "${DEST_DIR_OUTPUT}">
             //
             ele = doc.createElement("tool");
-            ele.setAttribute("toolName", "${WORKSPACE_DIR}" + File.separatorChar + "Tools" + File.separatorChar + "bin"
+            ele.setAttribute("toolName", "${WORKSPACE_DIR}" + File.separatorChar + "Tools" + File.separatorChar + "Bin"
                                          + File.separatorChar + "GenCRC32Section");
             ele.setAttribute("outputPath", "${DEST_DIR_OUTPUT}");
         }
@@ -365,7 +399,7 @@ public class FfsProcess {
     }
 
     /**
-       Get the corresponding section file suffix.
+      Get the corresponding section file suffix.
        
       @param type Section type
       @return Corresponding section file extension

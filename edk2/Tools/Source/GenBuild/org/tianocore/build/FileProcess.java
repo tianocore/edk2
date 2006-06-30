@@ -16,6 +16,7 @@ package org.tianocore.build;
 import java.io.File;
 import java.util.Set;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -29,17 +30,24 @@ import org.w3c.dom.Node;
   by its extension. Following is the current supported extensions. </p>
   
   <pre>   
-          .c         |      C_Code
-          .asm       |      Assembly
-          .s         |      IPF_Assembly_Code
-          .h         |      Header
-          .lib       |      Static_Library
-          .i         |      IPF_PP_Code
-          .vfr       |      Vfr
-          .uni       |      Unicode
-          .dxs       |      Dependency_File
-          .bmp       |      Graphics
-          .efi       |      EFI
+ Source File Suffix     File Type       Description
+    .h                   CHeader      C header file
+    .c                   CCode        C source file
+    .inc                 ASMHeader    Assembly header file
+    .asm                 ASM          Assembly source file, usually for IA32 and X64 Arch and MSFT tool chain
+    .S                   ASM          Assembly source file, usually for IPF Arch
+    .s                   ASM          Assembly source file, usually for IA32 and X64 Arch and GCC tool chain
+    .uni                 UNI          Unicode file
+    .vfr                 VFR          Visual Forms Representation File
+    .fv                  FV           Firmware Volume
+    .SEC                 FFS          Firmware File System file
+    .PEI                 FFS          Firmware File System file
+    .DXE                 FFS          Firmware File System file
+    .APP                 FFS          Firmware File System file
+    .FVI                 FFS          Firmware File System file
+    .FFS                 FFS          Firmware File System file
+    .bmp                 BMP          Graphic File
+    .i                   PPCode       IPF PreProcessor Code
   </pre>
   
   @since GenBuild 1.0
@@ -48,13 +56,25 @@ public class FileProcess {
     ///
     ///  The mapping information about source suffix, result suffix, file type.
     ///
-    public final String[][] fileTypes = { { ".c", ".obj", "C_Code" }, { ".asm", ".obj", "Assembly" },
-                                         { ".s", ".obj", "IPF_Assembly_Code" }, { ".h", "", "Header" },
-                                         { ".lib", "", "Static_Library" }, { ".src", ".c", "" },
-                                         { ".i", ".obj", "IPF_PP_Code" }, { ".vfr", ".obj", "Vfr" },
-                                         { ".uni", "", "Unicode" }, { ".dxs", "", "Dependency_File" },
-                                         { ".bmp", "", "Graphics" }, { ".efi", "", "EFI" } };
-
+    public final String[][] fileTypes = { {".h", "", "CHeader" }, 
+                                          {".c", "", "CCode" },
+                                          {".inc", "", "ASMHeader" },
+                                          {".asm", "", "ASM" }, 
+                                          {".S", "", "ASM" },
+                                          {".s", "", "ASM" },
+                                          {".uni", "", "UNI" },
+                                          {".vfr", "", "VFR" },
+                                          {".dxs", "", "DPX"},
+                                          {".fv", "", "FV" },
+                                          {".efi", "", "EFI" },
+                                          {".SEC", "", "FFS" },
+                                          {".PEI", "", "FFS" },
+                                          {".DXE", "", "FFS" },
+                                          {".APP", "", "FFS" },
+                                          {".FYI", "", "FFS" },
+                                          {".FFS", "", "FFS" },
+                                          {".bmp", "", "BMP" },
+                                          {".i", "", "PPCode"}};
     ///
     /// Current ANT context. 
     ///
@@ -64,11 +84,6 @@ public class FileProcess {
     /// Current module's include pathes
     ///
     private Set<String> includes;
-
-    ///
-    /// Current source files. 
-    ///
-    private Set<String> sourceFiles;
     
     ///
     /// Xml Document.
@@ -93,11 +108,10 @@ public class FileProcess {
       @param sourceFiles Modules source files
       @param document XML document
     **/
-    public void init(Project project, Set<String> includes, Set<String> sourceFiles, Document document) {
+    public void init(Project project, Set<String> includes, Document document) {
         this.document = document;
         this.includes = includes;
         this.project = project;
-        this.sourceFiles = sourceFiles;
     }
 
     /**
@@ -140,16 +154,16 @@ public class FileProcess {
       @param filename Source file name
       @param root Root node
     **/
-    public synchronized void parseFile(String filename, Node root) {
+    public synchronized void parseFile(String filename, Node root) throws BuildException {
         boolean flag = false;
         for (int i = 0; i < fileTypes.length; i++) {
-            if (filename.toLowerCase().endsWith(fileTypes[i][0])) {
+            if (filename.endsWith(fileTypes[i][0])) {
                 flag = true;
                 parseFile(filename, fileTypes[i][2], root);
             }
         }
         if (!flag) {
-            System.out.println("Warning: File " + filename + " is not known from its suffix.");
+            throw new BuildException("File [" + filename + "] is not known from its suffix.");
         }
     }
 
@@ -167,31 +181,58 @@ public class FileProcess {
     **/
     public synchronized void parseFile(String filename, String filetype, Node root) {
         if (unicodeFirst) {
-            if ( ! filetype.equalsIgnoreCase("Unicode")){
+            if ( ! filetype.equalsIgnoreCase("UNI")){
                 return ;
             }
             unicodeExist= true;
         } else {
-            if (filetype.equalsIgnoreCase("Unicode")){
+            if (filetype.equalsIgnoreCase("UNI")){
                 return ;
             }
         }
-        sourceFiles.add(filename);
-        if (filetype.equalsIgnoreCase("Header")) {
+        
+        //
+        // If file is C or ASM header file, skip it
+        //
+        if (filetype.equalsIgnoreCase("CHeader") || filetype.equalsIgnoreCase("ASMHeader")) {
             return;
         }
-        if (filetype.equalsIgnoreCase("IPF_PP_Code")) {
+        
+        //
+        // If file is pre-processor file, skip it
+        // 
+        if (filetype.equalsIgnoreCase("PPCode")) {
             return;
         }
+        
+        //
+        // If define CC_EXT in tools_def.txt file, the source file with 
+        // different suffix is skipped
+        //
+        String toolsDefExtName = project.getProperty(filetype + "_EXT");
+        if (toolsDefExtName != null) {
+            String[] exts = toolsDefExtName.split(" ");
+            for (int i = 0; i < exts.length; i++) {
+                if ( ! filename.endsWith(exts[i])) {
+                    return ;
+                }
+            }
+        }
+        
         String module_path = project.getProperty("MODULE_DIR");
         File moduleFile = new File(module_path);
         File sourceFile = new File(filename);
+        
+        //
         // If source file is AutoGen.c, then Filepath is .
-        String sourceFilepath;
-        String sourceFilename;
+        //
+        String sourceFilepath = "";
+        String sourceFilename = "";
+        String sourceFileext = "";
         if (sourceFile.getPath().endsWith("AutoGen.c")) {
             sourceFilepath = ".";
             sourceFilename = "AutoGen";
+            sourceFileext = ".c";
             filetype = "AUTOGEN";
         } else {
             // sourceFile.
@@ -206,12 +247,14 @@ public class FileProcess {
             index = str.lastIndexOf('.');
             if (index > 0) {
                 sourceFilename = str.substring(0, index);
+                sourceFileext = str.substring(index);
             }
         }
         // <Build_filetype FILEPATH="" FILENAME="" />
         Element ele = document.createElement("Build_" + filetype);
         ele.setAttribute("FILEPATH", sourceFilepath);
         ele.setAttribute("FILENAME", sourceFilename);
+        ele.setAttribute("FILEEXT", sourceFileext.substring(1));
         String[] includePaths = includes.toArray(new String[includes.size()]);
         Element includesEle = document.createElement("EXTRA.INC");
         for (int i = 0; i < includePaths.length; i++) {

@@ -19,158 +19,180 @@ import java.io.File;
 
 /**
   OutputManager class is used to setup output directories (BIN_DIR, DEST_DIR_OUTPUT, 
-  DEST_DIR_DEBUG) according to BUILD_MODE. 
+  DEST_DIR_DEBUG). 
   
   @since GenBuild 1.0
 **/
 public class OutputManager {
-    
-    ///
-    /// Single Module build
-    ///
-    public static final String MODULE_BUILD = "MODULE";
 
-    ///
-    /// Package build
-    ///
-    public static final String PACKAGE_BUILD = "PACKAGE";
-
-    ///
-    /// Platform build
-    ///
-    public static final String PLATFORM_BUILD = "PLATFORM";
-    
-    public static String buildMode = MODULE_BUILD;
-    
-    ///
-    /// For Package build, PLATFORM represent PACKAGE
-    ///
-    public static String PLATFORM;
-    
-    ///
-    /// For Platform build, PLATFORM_DIR represent PACKAGE_DIR
-    ///
-    public static String PLATFORM_DIR;
-    
     ///
     /// means intermediate files will put under Module's dir
     ///
-    public static final String MODULE = "MODULE";
+    private String MODULE = "MODULE";
     
     ///
     /// mean intermediate files will put under a unify dir
     ///
-    public static final String UNIFIED = "UNIFIED";
+    private String UNIFIED = "UNIFIED";
     
-    ///
-    /// Flag to ensure the function <code>update</code> will be called only one in the whole build.
-    ///
-    private static boolean flag = true;
     
-    /**
-      If BUILD_MODE is PLATFORM or PACKAGE, record PLATFORM and PLARFORM_DIR.
-      Reminder that for PACKAGE build, here set value PACKAGE to PLATFORM and
-      PACKAGE_DIR to PLARFORM_DIR, and also update the ant properties. 
-      
-      <p>Note that this function will be called only once in the whole build.</p> 
-      
-      @param project current ANT build Project
-    **/
-    public synchronized static void update(Project project) {
-        if (flag){
-            flag = false;
-            String str = project.getProperty("BUILD_MODE");
-            if (str != null){
-                if (str.equals(PLATFORM_BUILD)) {
-                    buildMode = PLATFORM_BUILD;
-                    PLATFORM = project.getProperty("PLATFORM");
-                    PLATFORM_DIR = project.getProperty("PLATFORM_DIR");
-                }
-                else if (str.equals(PACKAGE_BUILD)) {
-                    buildMode = PACKAGE_BUILD;
-                    PLATFORM = project.getProperty("PACKAGE");
-                    PLATFORM_DIR = project.getProperty("PACKAGE_DIR");
-                    project.setProperty("PLATFORM", PLATFORM);
-                    project.setProperty("PLATFORM_DIR", PLATFORM_DIR);
-                }
-            }
+    private String userdir;
+    
+    private String type;
+    ///
+    /// Singleton Design Pattern
+    ///
+    private static OutputManager object;
+    
+    public synchronized static OutputManager getInstance() {
+        if ( object == null ) {
+            object = new OutputManager();
         }
+        return object;
+    }
+    
+    public void setup(String userdir, String type) {
+        this.userdir = userdir;
+        this.type = type;
     }
     
     /**
       Setup BIN_DIR, DEST_DIR_OUTPUT and DEST_DIR_OUTPUT, following are the rules:
       
-      <pre>
-        Those three variables are defined as following
-        DEST_DIR_OUTPUT (intermediate files)
-        DEST_DIR_DEBUG (intermediate debug files)
-        BIN_DIR (final files)
-        
-        Output Dir (MODULE or UNIFIED):
-        For <b>Module</b> build: 
-        All intermediate files are at ${MODULE_DIR}/Build/${TARGET}/${ARCH}/DEBUG|OUTPUT
-        All final files are at ${MODULE_DIR}/Build/${TARGET}/${ARCH}
-        
-        For <b>Platform</b> build:
-        If specified with MODULE
-        Intermediate files->${MODULE_DIR}/Build/${PLATFORM}/${TARGET}/${ARCH}/DEBUG|OUTPUT
-        Final files -> ${PLARFORM_DIR}/Build/${TARGET}/${ARCH}
-        
-        Else if specified with UNIFIED
-        Intermediate files->${PLARFORM_DIR}/Build/${TARGET}/${ARCH}/${PACKAGE}/${SOURCE_RELATIVE_PATH}/DEBUG|OUTPUT
-        Final files -> ${PLARFORM_DIR}/Build/${TARGET}/${ARCH}
-        
-        For <b>Package</b> build:
-        If specified with MODULE
-        Intermediate files->${MODULE_DIR}/Build/${PACKAGE}/${TARGET}/${ARCH}/DEBUG|OUTPUT
-        Final files -> ${PACKAGE_DIR}/Build/${TARGET}/${ARCH}
-        
-        Else if specified with UNIFIED
-        Intermediate files->${PACKAGE_DIR}/Build/${TARGET}/${ARCH}/${PACKAGE}/${SOURCE_RELATIVE_PATH}/DEBUG|OUTPUT
-        Final files -> ${PACKAGE_DIR}/Build/${TARGET}/${ARCH}
-      </pre>
+      <p>Divide all output files into two types: one is final files, such as FFS 
+      file for driver module while LIB file for library module; another is 
+      intermediate files, such AutoGen.c, OBJ files, Section files and so on. 
+      
+      <p>In FPD, OutputDirectory element is used to specify where to put the output 
+      files to. There are two mode (MODULE | UNIFIED). MODULE mode means that all 
+      output files will put to the module directory while UNIFIED mode means that 
+      all output files will put together. Default is UNIFIED mode. 
+      
+      <p>BUILD_DIR is the base directory for current module build. By default, 
+      BUILD_DIR is PLATFORM_DIR/Build in UNIFIED mode while is MODULE_DIR/Build 
+      in MODULE mode. Of course, user can customize BUILD_DIR. If user-defined 
+      BUILD_DIR is relative path, then look as related to WORKSPACE_DIR. 
+      
+      <p>Then, BIN_DIR is BUILD_DIR/TARGET/TOOLCHAIN/ARCH;
+      
+      <p>FV_DIR is BUILD_DIR/TARGET/TOOLCHAIN/FV;
+      
+      <p>DEST_DIR_DEBUG | DEST_DIR_OUTPUT is: 
+      BIN_DIR/PACKAGE_RELATIVE_DIR/MODULE_RELATIVE_DIR/DEBUG | OUTPUT
+
       
       @param project current ANT build Project
       @param userdir user-defined directory
       @param type the module build type (MODULE or UNIFIED)
     **/
-    public synchronized static void update(Project project, String userdir, String type) {
+    public void update(Project project) {
+//        GlobalData.log.info("" + userdir + ":" + type);
         //
-        // userdir TBD
+        // Default mode is UNIFIED. 
         //
-       if(  type == null || ! type.equals(MODULE)){
-           type = UNIFIED;
-       }
-       if (buildMode.equals(MODULE_BUILD)){
-           project.setProperty("DEST_DIR_OUTPUT", project.replaceProperties("${MODULE_DIR}"
-                        + File.separatorChar + "Build" + File.separatorChar + "${TARGET}"
-                        + File.separatorChar + "${ARCH}" + File.separatorChar + "OUTPUT"));
-           project.setProperty("DEST_DIR_DEBUG", project.replaceProperties("${MODULE_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "DEBUG"));
-           project.setProperty("BIN_DIR", project.replaceProperties("${MODULE_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}"));
-       }
-       else if (buildMode.equals(PLATFORM_BUILD)) {
-           if (type.equals(MODULE)) {
-               project.setProperty("DEST_DIR_OUTPUT", project.replaceProperties("${MODULE_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${PLATFORM}" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "OUTPUT"));
-               project.setProperty("DEST_DIR_DEBUG", project.replaceProperties("${MODULE_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${PLATFORM}" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "DEBUG"));
-               project.setProperty("BIN_DIR", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}"));
-           }
-           else if (type.equals(UNIFIED)){
-               project.setProperty("DEST_DIR_OUTPUT", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "${PACKAGE}" + File.separatorChar + "${MODULE_RELATIVE_PATH}" + File.separatorChar + "OUTPUT"));
-               project.setProperty("DEST_DIR_DEBUG", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "${PACKAGE}" + File.separatorChar + "${MODULE_RELATIVE_PATH}" + File.separatorChar + "DEBUG"));
-               project.setProperty("BIN_DIR", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}"));
-           }
-       }
-       else if (buildMode.equals(PACKAGE_BUILD)) {
-           if (type.equals(MODULE)) {
-               project.setProperty("DEST_DIR_OUTPUT", project.replaceProperties("${MODULE_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${PLATFORM}" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "OUTPUT"));
-               project.setProperty("DEST_DIR_DEBUG", project.replaceProperties("${MODULE_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${PLATFORM}" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "DEBUG"));
-               project.setProperty("BIN_DIR", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}"));
-           }
-           else if (type.equals(UNIFIED)){
-               project.setProperty("DEST_DIR_OUTPUT", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "${PACKAGE}" + File.separatorChar + "${MODULE_RELATIVE_PATH}" + File.separatorChar + "OUTPUT"));
-               project.setProperty("DEST_DIR_DEBUG", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}" + File.separatorChar + "${PACKAGE}" + File.separatorChar + "${MODULE_RELATIVE_PATH}" + File.separatorChar + "DEBUG"));
-               project.setProperty("BIN_DIR", project.replaceProperties("${PLATFORM_DIR}" + File.separatorChar + "Build" + File.separatorChar + "${TARGET}" + File.separatorChar + "${ARCH}"));
-           }
-       }
+        if (type != null && type.equalsIgnoreCase(MODULE)) {
+            type = MODULE;
+        }
+        else {
+            type = UNIFIED;
+        }
+        
+        //
+        // default BUILD_DIR value
+        //
+        String buildDir;
+        if(type.equals(MODULE)){
+            buildDir = project.getProperty("MODULE_DIR") + File.separatorChar + "Build";
+        }
+        else {
+            buildDir = project.getProperty("PLATFORM_DIR") + File.separatorChar + "Build";
+        }
+        
+        //
+        // If user define BUILD_DIR
+        //
+        if (userdir != null && ! userdir.equals("")) {
+            File buildFile = new File(userdir);
+            if (buildFile.isAbsolute()){
+                buildDir = userdir;
+            }
+            //
+            // If path is not absolute, then look as related to WORKSPACE_DIR
+            //
+            else {
+                buildDir = GlobalData.getWorkspacePath() + File.separatorChar + userdir;
+            }
+        }
+        
+        //
+        // Define BIN_DIR and FV_DIR
+        //
+        String binDir = buildDir + File.separatorChar + project.getProperty("TARGET")
+                                 + File.separatorChar + project.getProperty("TOOLCHAIN") 
+                                 + File.separatorChar + project.getProperty("ARCH") ;
+        
+        String fvDir = buildDir + File.separatorChar + project.getProperty("TARGET")
+                                + File.separatorChar + project.getProperty("TOOLCHAIN") 
+                                + File.separatorChar + "FV";
+        
+        //
+        // Define DEST_DIR_OUTPUT and DEST_DIR_DEBUG
+        //
+        String destDir = binDir + File.separatorChar + project.getProperty("PACKAGE_RELATIVE_DIR")
+                                + File.separatorChar + project.getProperty("MODULE_RELATIVE_DIR");
+        
+        //
+        // Set properties
+        //
+        project.setProperty("BUILD_DIR", buildDir.replaceAll("(\\\\)", "/"));
+        project.setProperty("FV_DIR", fvDir.replaceAll("(\\\\)", "/"));
+        project.setProperty("BIN_DIR", binDir.replaceAll("(\\\\)", "/"));
+        project.setProperty("DEST_DIR_DEBUG", (destDir + File.separatorChar + "DEBUG").replaceAll("(\\\\)", "/"));
+        project.setProperty("DEST_DIR_OUTPUT", (destDir + File.separatorChar + "OUTPUT").replaceAll("(\\\\)", "/"));
+        
+        //
+        // Create all directory if necessary
+        //
+        (new File(buildDir)).mkdirs();
+        (new File(fvDir)).mkdirs();
+        (new File(binDir)).mkdirs();
+        (new File(destDir + File.separatorChar + "DEBUG")).mkdirs();
+        (new File(destDir + File.separatorChar + "OUTPUT")).mkdirs();
     }
+    
+    public boolean prepareBuildDir(Project project){
+        boolean isUnified = true;
+        
+        if (type.equalsIgnoreCase("MODULE")) {
+            isUnified = false;
+        }
+        
+        String buildDir = project.getProperty("PLATFORM_DIR") + File.separatorChar + "Build";
+        //
+        // If user define BUILD_DIR
+        //
+        if (userdir != null && ! userdir.equals("")) {
+            File buildFile = new File(userdir);
+            if (buildFile.isAbsolute()){
+                buildDir = userdir;
+            }
+            //
+            // If path is not absolute, then look as related to WORKSPACE_DIR
+            //
+            else {
+                buildDir = GlobalData.getWorkspacePath() + File.separatorChar + userdir;
+            }
+        }
+        //
+        // Set to property
+        //
+        project.setProperty("BUILD_DIR", buildDir.replaceAll("(\\\\)", "/"));
+        
+        //
+        // Create all directory if necessary
+        //
+        (new File(buildDir)).mkdirs();
+        return isUnified;
+    }
+
 }

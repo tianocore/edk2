@@ -14,40 +14,35 @@
 
  **/
 package org.tianocore.build.global;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.tianocore.GuidDeclarationsDocument.GuidDeclarations;
-import org.tianocore.IncludeHeaderDocument.IncludeHeader;
-import org.tianocore.LibraryClassDeclarationDocument.LibraryClassDeclaration;
-import org.tianocore.LibraryClassDeclarationsDocument.LibraryClassDeclarations;
-import org.tianocore.PackageHeadersDocument.PackageHeaders;
-import org.tianocore.PackageSurfaceAreaDocument;
-import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
-import org.tianocore.PpiDeclarationsDocument.PpiDeclarations;
-import org.tianocore.PpiDeclarationsDocument.PpiDeclarations.Entry;
-import org.tianocore.ProtocolDeclarationsDocument.ProtocolDeclarations;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.xmlbeans.XmlObject;
+import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.build.id.PackageIdentification;
 
 /**
  
-  This class is to generate a global table for the content of spd file.
-  
-**/
+ This class is to generate a global table for the content of spd file.
+ 
+ **/
 public class Spd {
     ///
-    /// Map of module name and package it belongs to.
-    /// Key : Module BaseName
-    /// Value: Relative Path to Package
     ///
-    Map<String, String[]> msaInfo = new HashMap<String, String[]>();
+    ///
+    Map<ModuleIdentification, File> msaInfo = new HashMap<ModuleIdentification, File>();
 
     ///
     /// Map of module info. 
     /// Key : moduletype
     /// Value: moduletype related include file
     ///
-    Map<String, String> moduleInfo = new HashMap<String, String>();
+    Map<String, String> packageHeaderInfo = new HashMap<String, String>();
 
     ///
     /// Map of PPI info.
@@ -70,366 +65,198 @@ public class Spd {
     ///
     Map<String, String[]> guidInfo = new HashMap<String, String[]>();
 
-
     ///
     /// Map of library class and its exposed header file.
     /// Key : library class name
     /// value : library class corresponding header file
     ///
-    Map<String, String> libClassHeaderList = new HashMap<String, String>();
+    Map<String, String[]> libClassHeaderList = new HashMap<String, String[]>();
 
     ///
     /// Package path.
     ///
-    String packagePath = null;
+    PackageIdentification packageId;
 
     /**
-      Constructor function
-      
-      This function mainly initialize some member variables. 
-   
-      @param spdDoc      Handle of spd document.
-      @param spdPath     Path of spd file.
-     **/
-    Spd (PackageSurfaceAreaDocument spdDoc, String spdPath) {
-
-        PackageSurfaceArea spd = spdDoc.getPackageSurfaceArea();
-        this.packagePath = spdPath;
-
-        GuidDeclarations spdGuidInfo = spd.getGuidDeclarations();
-        genGuidInfoList(spdGuidInfo);
-
-        PpiDeclarations spdPpiInfo = spd.getPpiDeclarations();
-        genPpiInfoList(spdPpiInfo);
-
-        ProtocolDeclarations spdProtocolInfo = spd.getProtocolDeclarations();
-        genProtocolInfoList(spdProtocolInfo);
-
-        LibraryClassDeclarations spdLibClassDeclare = spd
-                        .getLibraryClassDeclarations();
-        genLibClassDeclare(spdLibClassDeclare);
-
-        PackageHeaders spdPackageHeaderInfo = spd.getPackageHeaders();
-        genModuleInfoList(spdPackageHeaderInfo);
-
-    }
-
-    /**
-      genModuleInfoList
-      
-      This function is to generate Module info map.
-      
-      @param packageHeader   The information of packageHeader which descripted
-                             in spd file.    
+     Constructor function
+     
+     This function mainly initialize some member variables. 
     **/
-    public void genModuleInfoList(PackageHeaders packageHeader) {
-
-        if (packageHeader != null) {
-            List<IncludeHeader> headerList = packageHeader.getIncludeHeaderList();
-            IncludeHeader       header;
-
-            for (int i = 0; i < headerList.size(); i++) {
-                header = (IncludeHeader)headerList.get(i);
-                try {
-                    this.moduleInfo.put(header.getModuleType().toString(), header.getStringValue());
-                } catch (Exception e) {
-                    System.out.print("can't find ModuleHeaders ModuleType & includeHeader!\n");
-                }
-            }
+    Spd(File packageFile) throws BuildException {
+        //
+        // If specified package file not exists
+        //
+        if ( ! packageFile.exists()) {
+            throw new BuildException("Package file [" + packageFile.getPath() + "] not exists. ");
         }
-    }
-
-  /**
-    genPpiInfoList
-    
-    This function is to generate Ppi info map.
-    
-    @param  ppiInfo           The information of PpiDeclarations which descripted
-                              in spd file.    
-  **/
-    public void genPpiInfoList(PpiDeclarations ppiInfo) {
-        String[] cNameGuid = new String[2];
-        String   guidString;
-
-        if (ppiInfo != null) {
-            List<PpiDeclarations.Entry> ppiEntryList = ppiInfo.getEntryList();
-            PpiDeclarations.Entry       ppiEntry;
-
-            for (int i = 0; i < ppiEntryList.size(); i++) {
-                ppiEntry = (PpiDeclarations.Entry)ppiEntryList.get(i);
-                try {
-                    if (ppiEntry.isSetGuidValue()) {
-                        guidString = ppiEntry.getGuidValue();
-                    } else {
-                        guidString = ppiEntry.getGuid().getStringValue();
-                    }
-
-                    cNameGuid[0] = ppiEntry.getCName();
-                    cNameGuid[1] = formatGuidName(guidString);
-                    this.ppiInfo.put(ppiEntry.getName(), new String[] { cNameGuid[0], cNameGuid[1] });
-                } catch (Exception e) {
-                    System.out.print("can't find GuidDeclarations C_Name & Guid!\n");
-                }
+        try {
+            XmlObject spdDoc = XmlObject.Factory.parse(packageFile);
+            //
+            // Verify SPD file, if is invalid, throw Exception
+            //
+            if (! spdDoc.validate()) {
+                throw new BuildException("Package Surface Area file [" + packageFile.getPath() + "] is invalid. ");
             }
-        }
-    }
-
-    /**
-      genProtocolInfoList 
-      
-      This function is to generate Protocol info map.
-      
-      @param   proInfo    The information of ProtocolDeclarations which 
-                          descripted in spd file.
-    **/
-    public void genProtocolInfoList(ProtocolDeclarations proInfo) {
-        String[] cNameGuid = new String[2];
-        String   guidString;
-
-        if (proInfo != null) {
-            List<ProtocolDeclarations.Entry> protocolEntryList = proInfo.getEntryList();
-            ProtocolDeclarations.Entry       protocolEntry;
-            for (int i = 0; i < protocolEntryList.size(); i++) {
-                protocolEntry = (ProtocolDeclarations.Entry)protocolEntryList.get(i);
-                try {
-                    if (protocolEntry.isSetGuidValue()) {
-                        guidString = protocolEntry.getGuidValue();
-                    } else {
-                        guidString = protocolEntry.getGuid().getStringValue();
-                    }
-                    cNameGuid[0] = protocolEntry.getCName();
-                    cNameGuid[1] = formatGuidName(guidString);
-
-                    String temp = new String(protocolEntry.getName());
-                    this.protocolInfo.put(temp, new String[] { cNameGuid[0], cNameGuid[1] });
-                } catch (Exception e) {
-                    System.out.print("can't find ProtocolDeclarations C_Name & Guid!\n");
-                }
-            }
-        }
-    }
-
-    /**
-      genGuidInfoList
-      
-      This function is to generate GUID inf map.
-      
-      @param guidInfo     The information of GuidDeclarations which descripted
-                          in spd file.
-      
-    **/
-    public void genGuidInfoList(GuidDeclarations guidInfo) {
-        String[] cNameGuid = new String[2];
-        String   guidString;
-
-        if (guidInfo != null) {
+            // We can change Map to XmlObject
+            Map<String, XmlObject> spdDocMap = new HashMap<String, XmlObject>();
+            spdDocMap.put("PackageSurfaceArea", spdDoc);
+            SurfaceAreaQuery.setDoc(spdDocMap);
+            //
+            //
+            //
+            packageId = SurfaceAreaQuery.getSpdHeader();
+            packageId.setSpdFile(packageFile);
             
-            List<GuidDeclarations.Entry>    guidEntryList = guidInfo.getEntryList();
-            GuidDeclarations.Entry          guidEntry;
-            for (int i = 0; i < guidEntryList.size(); i++) {
-                guidEntry = (GuidDeclarations.Entry)guidEntryList.get(i);
-                if (guidEntry.isSetGuidValue()) {
-                    guidString = guidEntry.getGuidValue();
-                } else {
-                    guidString = guidEntry.getGuid().getStringValue();
+            //
+            // initialize Msa Files
+            // MSA file is absolute file path
+            //
+            String[] msaFilenames = SurfaceAreaQuery.getSpdMsaFile();
+            for (int i = 0; i < msaFilenames.length; i++){
+                File msaFile = new File(packageId.getPackageDir() + File.separatorChar + msaFilenames[i]);
+                Map<String, XmlObject> msaDoc = GlobalData.getNativeMsa( msaFile );
+                SurfaceAreaQuery.push(msaDoc);
+                ModuleIdentification moduleId = SurfaceAreaQuery.getMsaHeader();
+                SurfaceAreaQuery.pop();
+                moduleId.setPackage(packageId);
+                moduleId.setMsaFile(msaFile);
+                if (msaInfo.containsKey(moduleId)) {
+                    throw new BuildException("Find two modules with the same GUID and Version in " + packageId + ". They are [" + msaInfo.get(moduleId) + "] and [" + msaFile + "] ");
                 }
+                msaInfo.put(moduleId, msaFile);
+            }
+            
+            //
+            // initialize Package header files
+            //
+            Map<String, String> packageHeaders = SurfaceAreaQuery.getSpdPackageHeaderFiles();
+            Set keys = packageHeaders.keySet();
+            Iterator iter = keys.iterator();
+            while (iter.hasNext()){
+                String moduleType = (String)iter.next();
+                String header = packageId.getPackageRelativeDir() + File.separatorChar + packageHeaders.get(moduleType);
+                
+                //
+                // Change path seperator to system-dependent path separator
+                //
+                File file = new File (header);
+                header = file.getParent();
+                packageHeaderInfo.put(moduleType, header);
+            }
+            
+            //
+            // initialize Guid Info
+            //
+            guidInfo.putAll(SurfaceAreaQuery.getSpdGuid());
+            
+            //
+            // initialize PPI info
+            //
+            ppiInfo.putAll(SurfaceAreaQuery.getSpdPpi());
+            
+            //
+            // initialize Protocol info
+            //
+            protocolInfo.putAll(SurfaceAreaQuery.getSpdProtocol());
+            
+            //
+            // initialize library class declaration
+            //
+            Map<String, String[]> libraryClassHeaders = SurfaceAreaQuery.getSpdLibraryClasses();
+            keys = libraryClassHeaders.keySet();
+            iter = keys.iterator();
+            while (iter.hasNext()){
+                String libraryClassName = (String)iter.next();
+                String[] headerFiles = libraryClassHeaders.get(libraryClassName);
+                for (int i = 0; i < headerFiles.length; i++){
+                    headerFiles[i] = packageId.getPackageRelativeDir() + File.separatorChar + headerFiles[i];
                     
-                cNameGuid[0] = guidEntry.getCName();
-                cNameGuid[1] = formatGuidName(guidString);
-                this.guidInfo.put(guidEntry.getName(), new String[] {cNameGuid[0], cNameGuid[1] });
-            }
-        }
-    }
-
-    /**
-      genLibClassDeclare
-      
-      This function is to generate the libClassHeader list.
-      
-      @param libClassDeclares  The information of LibraryClassDeclarations which
-                               descripted in spd file.
-    **/
-    public void genLibClassDeclare(LibraryClassDeclarations libClassDeclares) {
-        if (libClassDeclares != null && libClassDeclares.getLibraryClassDeclarationList() != null) {
-            if (libClassDeclares.getLibraryClassDeclarationList().size() > 0) {
-                List<LibraryClassDeclaration> libDeclareList = libClassDeclares.getLibraryClassDeclarationList();
-                for (int i = 0; i < libDeclareList.size(); i++) {
-                    libClassHeaderList.put(libDeclareList.get(i).getLibraryClass()
-                                    .getStringValue(), libDeclareList.get(i)
-                                    .getIncludeHeader().getStringValue());
+                    //
+                    // Change path separator to system system-dependent path separator. 
+                    //
+                    File file = new File (headerFiles[i]);
+                    headerFiles[i] = file.getPath();
                 }
+                libClassHeaderList.put(libraryClassName, headerFiles);
             }
         }
+        catch (Exception e) {
+            e.setStackTrace(e.getStackTrace());
+            throw new BuildException("Parse package description file [" + packageId.getSpdFile() + "] Error.\n"
+                                     + e.getMessage());
+        }
     }
 
-    /**
-      getPpiGuid
-      
-      This function is to get ppi GUID according ppi name.
+    public PackageIdentification getPackageId() {
+        return packageId;
+    }
+
+    public File getModuleFile(ModuleIdentification moduleId) {
+        return msaInfo.get(moduleId);
+    }
     
-      @param   ppiStr    Name of ppi.
-      @return            PPi's GUID.
-    **/
-    public String getPpiGuid(String ppiStr) {
-        if (ppiInfo.get(ppiStr) != null) {
-            return ppiInfo.get(ppiStr)[1];
-        } else {
-            return null;
-        }
-
+    public Set<ModuleIdentification> getModules(){
+        return msaInfo.keySet();
     }
 
     /**
-      getPpiCnameGuidArray
-      
-      This function is to get the ppi CName and it's GUID according to ppi name.
-      
-      @param   ppiName      Name of ppi.
-      @return               Ppi CName and it's GUID.
-    **/
-    public String[] getPpiCnameGuidArray(String ppiName) {
-        return this.ppiInfo.get(ppiName);
+       return two value {CName, Guid}. If not found, return null.
+     **/
+    public String[] getPpi(String ppiName) {
+        return ppiInfo.get(ppiName);
     }
 
     /**
-      getProtocolGuid
-      
-      This function is to get the protocol GUID according to protocol's name.
-      
-      @param   protocolStr    Name of protocol.
-      @return                 Protocol's GUID.
+        return two value {CName, Guid}. If not found, return null.
     **/
-    public String getProtocolGuid(String protocolStr) {
-        if (protocolInfo.get(protocolStr) != null) {
-            return this.protocolInfo.get(protocolStr)[0];
-        } else {
-            return null;
-        }
+    public String[] getProtocol(String protocolName) {
+        return protocolInfo.get(protocolName);
     }
 
     /**
-      getProtocolNameGuidArray
-      
-      This function is to get the protocol's CName ant it's GUID according to
-      protocol's namej.
-      
-      @param  protocolName   Name of protocl.
-      @return                Protocol's CName and it's GUID.
+      return two value {CName, Guid}. If not found, return null.
     **/
-    public String[] getProtocolNameGuidArray(String protocolName) {
-        return this.protocolInfo.get(protocolName);
+    public String[] getGuid(String guidName) {
+        return guidInfo.get(guidName);
     }
 
     /**
-      getGUIDGuid
-      
-      This function is to get the GUID according to GUID's name
-      
-      @param  guidStr        Name of GUID
-      @return                GUID.
+     getLibClassInclude 
+     
+     This function is to get the library exposed header file name according 
+     library class name.
+     
+     @param     libName    Name of library class   
+     @return               Name of header file
     **/
-    public String getGUIDGuid(String guidStr) {
-        if (guidInfo.get(guidStr) != null) {
-            return guidInfo.get(guidStr)[1];
-        } else {
-            return null;
-        }
-
-    }
-
-    /**
-      getGuidNameArray
-      
-      This function is to get the GUID's CName and it's GUID according to 
-      GUID's name
-      
-      @param   guidName     Name of GUID
-      @return               CName and GUID.
-    **/
-    public String[] getGuidNameArray(String guidName) {
-        return this.guidInfo.get(guidName);
-    }
-
-    /**
-      getLibClassInclude 
-      
-      This function is to get the library exposed header file name according 
-      library class name.
-      
-      @param     libName    Name of library class   
-      @return               Name of header file
-    **/
-    String getLibClassIncluder(String libName) {
+    String[] getLibClassIncluder(String libName) {
         return libClassHeaderList.get(libName);
     }
 
     /**
       getModuleTypeIncluder
-      
+    
       This function is to get the header file name from module info map 
       according to module type.
-     
+    
       @param   moduleType    Module type.
       @return                Name of header file.
     **/
-    String getModuleTypeIncluder(String moduleType) {
-        return moduleInfo.get(moduleType);
+    String getPackageIncluder(String moduleType) {
+        return packageHeaderInfo.get(moduleType);
     }
-
+    
     /**
-      formateGuidName
-      
-      This function is to formate GUID to ANSI c form.
-     
-      @param  guidNameCon      String of GUID.
-      @return                  Formated GUID.
-    **/
-    public static String formatGuidName (String guidNameConv) {
-        String[] strList;
-        String guid = "";
-        int index = 0;
-        if (guidNameConv
-                        .matches("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}")) {
-            strList = guidNameConv.split("-");
-            guid = "0x" + strList[0] + ", ";
-            guid = guid + "0x" + strList[1] + ", ";
-            guid = guid + "0x" + strList[2] + ", ";
-            guid = guid + "{";
-            guid = guid + "0x" + strList[3].substring(0, 2) + ", ";
-            guid = guid + "0x" + strList[3].substring(2, 4);
+           getGuidNameArray
+    
+           This function is to get the GUID's CName and it's GUID according to
+           GUID's name
+    
+           @param   guidName     Name of GUID
+           @return               CName and GUID.
+         **/
+         public String[] getGuidNameArray(String guidName) {
+             return this.guidInfo.get(guidName);
+         }
 
-            while (index < strList[4].length()) {
-                guid = guid + ", ";
-                guid = guid + "0x" + strList[4].substring(index, index + 2);
-                index = index + 2;
-            }
-            guid = guid + "}";
-            return guid;
-        } else if (guidNameConv
-                        .matches("0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\\})?")) {
-            strList = guidNameConv.split(",");
-            
-            //
-            // chang Microsoft specific form to ANSI c form
-            //
-            for (int i = 0; i < 3; i++){
-                guid = guid + strList[i] + ",";
-            }
-            guid = guid + "{";
-            
-            for (int i = 3; i < strList.length; i++){
-                if (i == strList.length - 1){
-                    guid = guid + strList[i];
-                } else {
-                    guid = guid + strList[i] + ",";
-                }
-            }
-            guid = guid + "}";            
-            return guid;
-        } else {
-            System.out.println("Check GUID Value, it don't conform to the schema!!!");
-            return "0";
-
-        }
-    }
 }
