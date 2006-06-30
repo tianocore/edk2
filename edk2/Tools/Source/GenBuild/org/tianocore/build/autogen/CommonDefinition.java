@@ -15,6 +15,10 @@
  **/
 package org.tianocore.build.autogen;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 /**
   CommonDefinition
   
@@ -149,7 +153,7 @@ public class CommonDefinition {
                     new MyEnum("PEI_CORE", ModuleTypePeiCore),
                     new MyEnum("PEIM", ModuleTypePeim),
                     new MyEnum("DXE_CORE", ModuleTypeDxeCore),
-                    new MyEnum("DXE_DRIVER", ModuleTypeDxeRuntimeDriver),
+                    new MyEnum("DXE_DRIVER", ModuleTypeDxeDriver),
                     new MyEnum("DXE_RUNTIME_DRIVER", ModuleTypeDxeRuntimeDriver),
                     new MyEnum("DXE_SAL_DRIVER", ModuleTypeDxeSalDriver),
                     new MyEnum("DXE_SMM_DRIVER", ModuleTypeDxeSmmDriver),
@@ -313,6 +317,34 @@ public class CommonDefinition {
             return "0";
 
         }
+    }
+    
+    /**
+     * Remove deuplicat string in list
+     * 
+     * This function is to duplicat string in list
+     * 
+     * @param String[]
+     *            String list.
+     * @return String[] String list which remove the duplicate string.
+     */
+    public static String[] remDupString (String[] orgList){
+        Set<String> strList = new HashSet<String>();
+        String[] desList ;
+        if (orgList == null){
+            return new String[0];
+        }
+        for (int i = 0; i < orgList.length; i++){
+            strList.add(orgList[i]);
+        }
+        desList = new String[strList.size()];
+        Iterator item = strList.iterator();
+        int index = 0;
+        while (item.hasNext()){
+            desList[index] = (String)item.next();
+            index++;
+        }
+        return desList;
     }
     
 }

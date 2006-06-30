@@ -33,16 +33,19 @@ import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
 
-import org.tianocore.build.exception.EdkException;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PlatformIdentification;
+import org.tianocore.build.pcd.action.ActionMessage;
+import org.tianocore.build.pcd.action.CollectPCDAction;
+import org.tianocore.build.pcd.exception.EntityException;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainMap;
+import org.tianocore.exception.EdkException;
 
 /**
   <code>FpdParserTask</code> is an ANT task. The main function is parsing Framework
@@ -146,6 +149,18 @@ public class FpdParserTask extends Task {
         parseFpdFile();
         
         //
+        // Pcd Collection. Call CollectPCDAction to collect pcd info.
+        //
+        try {
+            System.out.println("Begin PCD collecttion!");
+            CollectPCDAction ca = new CollectPCDAction();
+            ca.perform(GlobalData.getWorkspacePath(),platformId.getFpdFile().getPath(),ActionMessage.NULL_MESSAGE_LEVEL);
+            System.out.println("End PCD collection!"); 
+        } catch (Exception e){
+            throw new BuildException(e.getMessage());
+        }
+        
+        //
         // Prepare BUILD_DIR
         //
         isUnified = OutputManager.getInstance().prepareBuildDir(getProject());
@@ -187,6 +202,7 @@ public class FpdParserTask extends Task {
         //
         // Ant call ${PLATFORM}_build.xml
         //
+        
         Ant ant = new Ant();
         ant.setProject(getProject());
         ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
@@ -391,7 +407,7 @@ public class FpdParserTask extends Task {
     **/
     private void parseModuleSAFiles() throws EdkException{
         Map<FpdModuleIdentification, Map<String, XmlObject>> moduleSAs = SurfaceAreaQuery.getFpdModules();
-        System.out.println("Nubmer: ##" + moduleSAs.size());
+
         //
         // For every Module lists in FPD file.
         //

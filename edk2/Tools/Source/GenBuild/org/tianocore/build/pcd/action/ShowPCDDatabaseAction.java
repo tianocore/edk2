@@ -92,7 +92,7 @@ public class ShowPCDDatabaseAction extends UIAction {
         // Initialize global data.
         //
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            workspacePath);
+                            workspacePath,null);
 
         //
         // Collect PCD information.

@@ -21,20 +21,21 @@ import org.apache.xmlbeans.XmlObject;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
+import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
-import org.tianocore.build.exception.EdkException;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
+import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainConfig;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.build.toolchain.ToolChainKey;
 import org.tianocore.build.toolchain.ToolChainMap;
-//import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
-//import org.tianocore.logger.EdkLog;
+import org.tianocore.exception.EdkException;
+import org.tianocore.logger.EdkLog;
 
 import java.io.File;
 import java.util.HashMap;
@@ -130,7 +131,7 @@ public class GlobalData {
     private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
     private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainFamilyOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
 
-//    private static final MemoryDatabasseManager pcdDbManager = new MemoryDatabaseManager();
+    private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
 
     
 
@@ -341,7 +342,7 @@ public class GlobalData {
         //
         // First part: get the MSA files info
         //
-        doc = getNativeMsa(moduleId);
+        doc.putAll(getNativeMsa(moduleId));
         
         //
         // Second part: put build options
@@ -413,6 +414,7 @@ public class GlobalData {
             msaMap.put("PPIs", cloneXmlObject(msa.getPPIs(), true));
             msaMap.put("Guids", cloneXmlObject(msa.getGuids(), true));
             msaMap.put("Externs", cloneXmlObject(msa.getExterns(), true));
+            msaMap.put("PcdCoded", cloneXmlObject(msa.getPcdCoded(), true));
             return msaMap;
         }
         catch (Exception ex){
@@ -507,15 +509,16 @@ public class GlobalData {
     /**
      * return two values: {cName, GuidValue}
      */
-    public static String[] getGuid(PackageIdentification[] packages, String name)
+    public static String[] getGuid(List<PackageIdentification> packages, String name)
             throws BuildException {
         if (packages == null) {
             // throw Exception or not????
             return new String[0];
         }
         String[] result = null;
-        for (int i = 0; i < packages.length; i++) {
-            Spd spd = spdTable.get(packages[i]);
+        Iterator item = packages.iterator();
+        while (item.hasNext()){
+            Spd spd = spdTable.get(item.next());
             //
             // If find one package defined the GUID
             //
@@ -523,20 +526,22 @@ public class GlobalData {
                 return result;
             }
         }
+
         return null;
     }
 
     /**
      * return two values: {cName, GuidValue}
      */
-    public static String[] getPpiGuid(PackageIdentification[] packages,
+    public static String[] getPpiGuid(List<PackageIdentification> packages,
             String name) throws BuildException {
         if (packages == null) {
             return new String[0];
         }
         String[] result = null;
-        for (int i = 0; i < packages.length; i++) {
-            Spd spd = spdTable.get(packages[i]);
+        Iterator item = packages.iterator();
+        while (item.hasNext()){
+            Spd spd = spdTable.get(item.next());
             //
             // If find one package defined the Ppi GUID
             //
@@ -551,18 +556,19 @@ public class GlobalData {
     /**
      * return two values: {cName, GuidValue}
      */
-    public static String[] getProtocolGuid(PackageIdentification[] packages,
+    public static String[] getProtocolGuid(List<PackageIdentification> packages,
             String name) throws BuildException {
         if (packages == null) {
             return new String[0];
         }
         String[] result = null;
-        for (int i = 0; i < packages.length; i++) {
-            Spd spd = spdTable.get(packages[i]);
+        Iterator item = packages.iterator();
+        while (item.hasNext()){
+            Spd spd = spdTable.get(item.next());
             //
             // If find one package defined the protocol GUID
             //
-            if ((result = spd.getProtocol(name)) != null) {
+            if ((result = spd.getProtocol(name))!= null){
                 return result;
             }
         }
@@ -750,52 +756,61 @@ public class GlobalData {
     //
     // for PCD
     //
-//    public synchronized static MemoryDatabaseManager getPCDMemoryDBManager() {
-//        return pcdDbManager;
-//    }
+    public synchronized static MemoryDatabaseManager getPCDMemoryDBManager() {
+        return pcdDbManager;
+    }
+
+    //
+    // For PCD get tokenSpaceGUid
+    //
+    public synchronized static String[] getGuidInfoFromCname(String cName){
+        String cNameGuid[] = null;
+        String guid = null;
+        Set set = spdTable.keySet();
+        Iterator iter = set.iterator();
+        
+        while (iter.hasNext()){
+            Spd spd = (Spd) spdTable.get(iter.next());
+            guid = spd.getGuidFromCname(cName);
+            if (guid != null){
+                cNameGuid[0] = new String(cName);
+                cNameGuid[1] = new String(guid);
+                break;
+            }
+        }
+        return cNameGuid;
+    }
 
     //
     // For PCD
     //
-    /**
-     * 
-     * @param guidName
-     * @return
-     */
-//    public synchronized static String[] getGuidInfoGuid(String guidName) {
-//        String[] cNameGuid = null;
-//        Set set = spdTable.keySet();
-//        Iterator iter = set.iterator();
-//
-//        while (iter.hasNext()) {
-//            Spd spd = (Spd) spdTable.get(iter.next());
-//            cNameGuid = spd.getGuidNameArray(guidName);
-//            if (cNameGuid != null) {
-//                break;
-//            }
-//        }
-//        return cNameGuid;
-//    }
+    public synchronized static Map<FpdModuleIdentification, XmlObject> getFpdModuleSaXmlObject(
+            String xmlObjectName) {
+        Set<FpdModuleIdentification> fpdModuleSASet = fpdModuleSA.keySet();
+        Iterator item = fpdModuleSASet.iterator();
+        
 
-    //
-    // For PCD
-    //
-//    public synchronized static Map<FpdModuleIdentification, XmlObject> getFpdModuleSaXmlObject(
-//            String xmlObjectName) {
-//        Set<FpdModuleIdentification> fpdModuleSASet = fpdModuleSA.keySet();
-//        Iterator item = fpdModuleSASet.iterator();
-//
-//        Map<FpdModuleIdentification, XmlObject> SAPcdBuildDef = new HashMap<FpdModuleIdentification, XmlObject>();
-//        Map<String, XmlObject> SANode = new HashMap<String, XmlObject>();
-//        FpdModuleIdentification moduleId;
-//        while (item.hasNext()) {
-//            moduleId = (FpdModuleIdentification) item.next();
-//            SANode = fpdModuleSA.get(item.next());
-//            SAPcdBuildDef.put(moduleId,
-//                    (PcdBuildDefinitionDocument.PcdBuildDefinition) SANode
-//                            .get(xmlObjectName));
-//        }
-//        return SAPcdBuildDef;
-//    }
+        Map<FpdModuleIdentification, XmlObject> SAPcdBuildDef = new HashMap<FpdModuleIdentification, XmlObject>();
+        Map<String, XmlObject> SANode = new HashMap<String, XmlObject>();
+        FpdModuleIdentification moduleId;
+        while (item.hasNext()) {
+            
+            moduleId = (FpdModuleIdentification) item.next();
+            SANode = fpdModuleSA.get(moduleId);
+            try{
+                if (SANode.get(xmlObjectName)!= null){
+                    SAPcdBuildDef.put(moduleId,
+                            (XmlObject) SANode
+                                    .get(xmlObjectName));
+
+                }
+                            
+                
+            } catch (Exception e){
+                EdkLog.log(EdkLog.EDK_INFO, e.getMessage());
+            }
+            }
+        return SAPcdBuildDef;
+    }
 }
 

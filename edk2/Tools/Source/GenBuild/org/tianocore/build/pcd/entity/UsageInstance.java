@@ -20,6 +20,7 @@ package org.tianocore.build.pcd.entity;
 
 import java.util.UUID;
 import org.tianocore.ModuleTypeDef;
+import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.pcd.exception.EntityException;
 
 /**
@@ -71,7 +72,7 @@ public class UsageInstance {
     ///
     /// The module type for this usage instance.
     ///
-    public ModuleTypeDef.Enum    moduleType;
+    public int              moduleType;
 
     ///
     /// The value of the PCD in this usage instance. 
@@ -115,7 +116,7 @@ public class UsageInstance {
                           UUID              moduleGUID,
                           String            packageName,
                           UUID              packageGUID,
-                          ModuleTypeDef.Enum moduleType,
+                          int               moduleType,
                           Token.PCD_TYPE    modulePcdType,
                           String            arch,
                           String            version,
@@ -178,8 +179,8 @@ public class UsageInstance {
        @return boolean
      */
     public boolean isPeiPhaseComponent() {
-        if ((moduleType == ModuleTypeDef.PEI_CORE) ||
-            (moduleType == ModuleTypeDef.PEIM)) {
+        if ((moduleType == CommonDefinition.ModuleTypePeiCore) ||
+            (moduleType == CommonDefinition.ModuleTypePeim)) {
             return true;
         }
         return false;
@@ -190,12 +191,12 @@ public class UsageInstance {
       // BugBug: May need confirmation on which type of module can
       //         make use of Dynamic(EX) PCD entry.
       //
-      if ((moduleType == ModuleTypeDef.DXE_DRIVER) ||
-          (moduleType == ModuleTypeDef.DXE_RUNTIME_DRIVER) ||
-          (moduleType == ModuleTypeDef.DXE_SAL_DRIVER) ||
-          (moduleType == ModuleTypeDef.DXE_SMM_DRIVER) ||
-          (moduleType == ModuleTypeDef.UEFI_DRIVER) ||
-          (moduleType == ModuleTypeDef.UEFI_APPLICATION)
+      if ((moduleType == CommonDefinition.ModuleTypeDxeDriver) ||
+          (moduleType == CommonDefinition.ModuleTypeDxeRuntimeDriver) ||
+          (moduleType == CommonDefinition.ModuleTypeDxeSalDriver) ||
+          (moduleType == CommonDefinition.ModuleTypeDxeSmmDriver) ||
+          (moduleType == CommonDefinition.ModuleTypeUefiDriver) ||
+          (moduleType == CommonDefinition.ModuleTypeUefiApplication)
           ) {
           return true;
       }

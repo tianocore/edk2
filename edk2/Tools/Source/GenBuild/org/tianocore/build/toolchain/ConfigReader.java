@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
-import org.tianocore.build.exception.EdkException;
+import org.tianocore.exception.EdkException;
 
 import java.io.BufferedReader;
 import java.io.File;

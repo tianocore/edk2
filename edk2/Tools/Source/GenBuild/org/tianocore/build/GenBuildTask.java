@@ -32,8 +32,9 @@ import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
 
-import org.tianocore.build.exception.EdkException;
+import org.tianocore.build.autogen.AutoGen;
 import org.tianocore.build.fpd.FpdParserTask;
+import org.tianocore.build.global.GenBuildLogger;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
@@ -42,6 +43,8 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.tools.ModuleItem;
+import org.tianocore.exception.EdkException;
+import org.tianocore.logger.EdkLog;
 
 /**
   <p>
@@ -115,7 +118,14 @@ public class GenBuildTask extends Ant {
               From module build, exception from module surface area invalid.
     **/
     public void execute() throws BuildException {
-        try{
+    	//
+        // set Logger
+        //
+        GenBuildLogger logger = new GenBuildLogger(getProject());
+        EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
+        EdkLog.setLogger(logger);
+        // remove !!
+        try {
         pushProperties();
         //
         // Enable all specified properties
@@ -524,8 +534,9 @@ public class GenBuildTask extends Ant {
         //
         // AutoGen
         //
-//        AutoGen autogen = new AutoGen(getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId);
-//        autogen.genAutogen();
+        
+        AutoGen autogen = new AutoGen(getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch());
+        autogen.genAutogen();
         
         
         //

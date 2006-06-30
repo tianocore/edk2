@@ -19,11 +19,15 @@ package org.tianocore.build.pcd.action;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.global.GlobalData;
+import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.build.pcd.entity.Token;
 import org.tianocore.build.pcd.entity.UsageInstance;
@@ -167,36 +171,167 @@ public class PCDAutoGenAction extends BuildAction {
         return cAutoGenString;
     }
 
+//    /**
+//      Construct function
+//  
+//      This function mainly initialize some member variable.
+//     
+//      @param moduleName            Parameter of this action class.
+//      @param isEmulatedPCDDriver   Parameter of this action class.
+//    **/
+//    public PCDAutoGenAction(String   moduleName, 
+//                            UUID     moduleGuid, 
+//                            String   packageName,
+//                            UUID     packageGuid,
+//                            String   arch,
+//                            String   version,
+//                            boolean  isBuildUsedLibrary,
+//                            String[] pcdNameArray) {
+//        dbManager       = null;
+//        hAutoGenString  = "";
+//        cAutoGenString  = "";
+//
+//        setModuleName(moduleName);
+//        setModuleGuid(moduleGuid);
+//        setPackageName(packageName);
+//        setPackageGuid(packageGuid);
+//        setPcdNameArray(pcdNameArray);
+//        setArch(arch);
+//        setVersion(version);
+//        setIsBuildUsedLibrary(isBuildUsedLibrary);
+//    }
+
+    
     /**
-      Construct function
+    Construct function
+
+    This function mainly initialize some member variable.
+   
+    @param moduleName            Parameter of this action class.
+    @param isEmulatedPCDDriver   Parameter of this action class.
+  **/
+  public PCDAutoGenAction(String   moduleName, 
+                          String   moduleGuidString, 
+                          String   packageName,
+                          String   packageGuidString,
+                          String   arch,
+                          String   version,
+                          boolean  isBuildUsedLibrary,
+                          String[] pcdNameArray) 
+  	throws BuildActionException {
+      dbManager       = null;
+      hAutoGenString  = "";
+      cAutoGenString  = "";
+      try {
+      setModuleName(moduleName);
+      setModuleGuid(translateSchemaStringToUUID(moduleGuidString));
+      setPackageName(packageName);
+      setPackageGuid(translateSchemaStringToUUID(packageGuidString));
+      setPcdNameArray(pcdNameArray);
+      setArch(arch);
+      setVersion(version);
+      setIsBuildUsedLibrary(isBuildUsedLibrary);
+      
+      if (isBuildUsedLibrary) {
+          System.out.println("Build for library");
+          for (int index = 0; index < pcdNameArray.length; index ++) {
+              System.out.println(pcdNameArray[index]);
+          }
+      }
+      } catch (EntityException e){
+    	  throw new BuildActionException(e.getMessage());
+      }
+  }
+
+  /**
+  Translate the schema string to UUID instance.
   
-      This function mainly initialize some member variable.
-     
-      @param moduleName            Parameter of this action class.
-      @param isEmulatedPCDDriver   Parameter of this action class.
-    **/
-    public PCDAutoGenAction(String   moduleName, 
-                            UUID     moduleGuid, 
-                            String   packageName,
-                            UUID     packageGuid,
-                            String   arch,
-                            String   version,
-                            boolean  isBuildUsedLibrary,
-                            String[] pcdNameArray) {
-        dbManager       = null;
-        hAutoGenString  = "";
-        cAutoGenString  = "";
+  In schema, the string of UUID is defined as following two types string:
+   1) GuidArrayType: pattern = 0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},(
+   )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?
+  
+   2) GuidNamingConvention: pattern =
+   [a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}
+  
+  This function will convert string and create uuid instance.
+  
+  @param uuidString    UUID string in XML file
+  
+  @return UUID         UUID instance
+**/
+private UUID translateSchemaStringToUUID(String uuidString) 
+   throws EntityException {
+   String      temp;
+   String[]    splitStringArray;
+   int         index;
+   int         chIndex;
+   int         chLen;
 
-        setModuleName(moduleName);
-        setModuleGuid(moduleGuid);
-        setPackageName(packageName);
-        setPackageGuid(packageGuid);
-        setPcdNameArray(pcdNameArray);
-        setArch(arch);
-        setVersion(version);
-        setIsBuildUsedLibrary(isBuildUsedLibrary);
-    }
+   if (uuidString == null) {
+       return null;
+   }
 
+   if (uuidString.length() == 0) {
+       return null;
+   }
+
+   if (uuidString.equals("0") ||
+       uuidString.equalsIgnoreCase("0x0")) {
+       return new UUID(0, 0);
+   }
+
+   uuidString = uuidString.replaceAll("\\{", "");
+   uuidString = uuidString.replaceAll("\\}", "");
+
+   //
+   // If the UUID schema string is GuidArrayType type then need translate 
+   // to GuidNamingConvention type at first.
+   // 
+   if ((uuidString.charAt(0) == '0') && ((uuidString.charAt(1) == 'x') || (uuidString.charAt(1) == 'X'))) {
+       splitStringArray = uuidString.split("," );
+       if (splitStringArray.length != 11) {
+           throw new EntityException ("[FPD file error] Wrong format for UUID string: " + uuidString);
+       }
+
+       //
+       // Remove blank space from these string and remove header string "0x"
+       // 
+       for (index = 0; index < 11; index ++) {
+           splitStringArray[index] = splitStringArray[index].trim();
+           splitStringArray[index] = splitStringArray[index].substring(2, splitStringArray[index].length());
+       }
+
+       //
+       // Add heading '0' to normalize the string length
+       // 
+       for (index = 3; index < 11; index ++) {
+           chLen = splitStringArray[index].length();
+           for (chIndex = 0; chIndex < 2 - chLen; chIndex ++) {
+               splitStringArray[index] = "0" + splitStringArray[index];
+           }
+       }
+
+       //
+       // construct the final GuidNamingConvention string
+       // 
+       temp = String.format("%s-%s-%s-%s%s-%s%s%s%s%s%s",
+                            splitStringArray[0],
+                            splitStringArray[1],
+                            splitStringArray[2],
+                            splitStringArray[3],
+                            splitStringArray[4],
+                            splitStringArray[5],
+                            splitStringArray[6],
+                            splitStringArray[7],
+                            splitStringArray[8],
+                            splitStringArray[9],
+                            splitStringArray[10]);
+       uuidString = temp;
+   }
+
+   return UUID.fromString(uuidString);
+	}
+  
     /**
       check the parameter for action class.
       
@@ -265,12 +400,14 @@ public class PCDAutoGenAction extends BuildAction {
             dbManager.UsageInstanceContext = usageInstanceArray;
             dbManager.CurrentModuleName    = moduleName; 
         } else {
+            System.out.println(String.format("Generate %s 's library", dbManager.CurrentModuleName));
             usageContext = dbManager.UsageInstanceContext;
             //
             // For building MDE package, although all module are library, but PCD entries of 
             // these library should be used to autogen.
             // 
             if (usageContext == null) {
+                System.out.println("context is null");
                 usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleName,
                                                                                   moduleGuid,
                                                                                   packageName,
@@ -279,6 +416,7 @@ public class PCDAutoGenAction extends BuildAction {
                                                                                   version);
             } else {
                 usageInstanceArray = new ArrayList<UsageInstance>();
+                System.out.println("context is not null!");
                 //
                 // Remove PCD entries which are not belong to this library.
                 // 
@@ -289,6 +427,7 @@ public class PCDAutoGenAction extends BuildAction {
 
                     for (index2 = 0; index2 < pcdNameArray.length; index2 ++) {
                         if (pcdNameArray[index2].equalsIgnoreCase(usageContext.get(index).parentToken.cName)) {
+                            System.out.println("Found! for PCD entry " + pcdNameArray[index2]);
                             usageInstanceArray.add(usageContext.get(index));
                             break;
                         }
@@ -404,7 +543,7 @@ public class PCDAutoGenAction extends BuildAction {
         //
         CollectPCDAction collectionAction = new CollectPCDAction();
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            WorkSpace);
+                            WorkSpace,null);
 
         try {
             collectionAction.perform(WorkSpace, 
@@ -417,18 +556,18 @@ public class PCDAutoGenAction extends BuildAction {
         //
         // Then execute the PCDAuotoGenAction to get generated Autogen.h and Autogen.c
         //
-        PCDAutoGenAction autogenAction = new PCDAutoGenAction("PcdPeim",
-                                                              null,
-                                                              null,
-                                                              null,
-                                                              "IA32",
-                                                              null,
-                                                              true,
-                                                              nameArray);
-        autogenAction.execute();
-
-        System.out.println(autogenAction.OutputH());
-        System.out.println("WQWQWQWQWQ");
-        System.out.println(autogenAction.OutputC());
+//        PCDAutoGenAction autogenAction = new PCDAutoGenAction("MonoStatusCode",
+//                                                              null,
+//                                                              null,
+//                                                              null,
+//                                                              "IA32",
+//                                                              null,
+//                                                              false,
+//                                                              nameArray);
+//        autogenAction.execute();
+//
+//        System.out.println(autogenAction.OutputH());
+//        System.out.println("WQWQWQWQWQ");
+//        System.out.println(autogenAction.OutputC());
     }
 }

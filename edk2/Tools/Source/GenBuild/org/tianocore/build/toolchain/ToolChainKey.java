@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.tianocore.build.exception.EdkException;
+import org.tianocore.exception.EdkException;
 
 public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainKey> {
 

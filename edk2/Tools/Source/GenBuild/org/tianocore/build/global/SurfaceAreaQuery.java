@@ -27,6 +27,7 @@ import org.apache.xmlbeans.XmlNormalizedString;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.tianocore.BuildOptionsDocument;
+import org.tianocore.CNameType;
 import org.tianocore.DataIdDocument;
 import org.tianocore.ExternsDocument;
 import org.tianocore.FileNameConvention;
@@ -48,9 +49,11 @@ import org.tianocore.OptionDocument;
 import org.tianocore.PPIsDocument;
 import org.tianocore.PackageDependenciesDocument;
 import org.tianocore.PackageHeadersDocument;
+import org.tianocore.PcdCodedDocument;
 import org.tianocore.PlatformDefinitionsDocument;
 import org.tianocore.PpiDeclarationsDocument;
 import org.tianocore.ProtocolDeclarationsDocument;
+import org.tianocore.Sentence;
 import org.tianocore.SpdHeaderDocument;
 import org.tianocore.SupportedArchitectures;
 import org.tianocore.FilenameDocument.Filename;
@@ -63,6 +66,7 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
+import org.tianocore.logger.EdkLog;
 
 /**
  * SurfaceAreaQuery class is used to query Surface Area information from msa,
@@ -624,8 +628,7 @@ public class SurfaceAreaQuery {
             String[] entryPoints = new String[returns.length];
 
             for (int i = 0; i < returns.length; ++i) {
-                entryPoints[i] = ((XmlNormalizedString) returns[i])
-                        .getStringValue();
+                entryPoints[i] = ((CNameType) returns[i]).getStringValue();
             }
 
             return entryPoints;
@@ -689,7 +692,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            xPath = new String[] { "/Protocol[@SupArchList='" + arch + "']" };
+            xPath = new String[] { "/Protocol" };
         }
 
         Object[] returns = get("Protocols", xPath);
@@ -700,7 +703,10 @@ public class SurfaceAreaQuery {
 
         String[] protocolArray = new String[returns.length];
         for (int i = 0; i < returns.length; i++) {
-            protocolArray[i] = protocolList[i].getProtocolCName();
+            List<String> archList = protocolList[i].getSupArchList();
+            if (archList == null || archList.contains(arch)){
+                protocolArray[i] = protocolList[i].getProtocolCName(); 
+            }
         }
         return protocolArray;
     }
@@ -720,8 +726,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            xPath = new String[] { "/ProtocolNotify[@SupArchList='" + arch
-                    + "']" };
+            xPath = new String[] { "/ProtocolNotify" };
         }
 
         Object[] returns = get("Protocols", xPath);
@@ -731,7 +736,11 @@ public class SurfaceAreaQuery {
 
         String[] protocolNotifyList = new String[returns.length];
         for (int i = 0; i < returns.length; i++) {
-            protocolNotifyList[i] = ((ProtocolNotify) returns[i]).getProtocolNotifyCName();
+            List<String> archList = ((ProtocolNotify) returns[i]).getSupArchList();
+            if (archList == null || archList.contains(arch)){
+                protocolNotifyList[i] = ((ProtocolNotify) returns[i]).getProtocolNotifyCName();
+            }
+            
         }
 
         return protocolNotifyList;
@@ -790,7 +799,7 @@ public class SurfaceAreaQuery {
         Object[] returns = get("Externs", xPath);
         if (returns != null && returns.length > 0) {
             String[] stringArray = new String[returns.length];
-            XmlNormalizedString[] doc = (XmlNormalizedString[]) returns;
+            CNameType[] doc = (CNameType[]) returns;
 
             for (int i = 0; i < returns.length; ++i) {
                 stringArray[i] = doc[i].getStringValue();
@@ -834,7 +843,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            xPath = new String[] { "/PpiNotify[@SupArchList='" + arch + "']" };
+            xPath = new String[] { "/PpiNotify" };
         }
 
         Object[] returns = get("PPIs", xPath);
@@ -844,7 +853,11 @@ public class SurfaceAreaQuery {
 
         String[] ppiNotifyList = new String[returns.length];
         for (int i = 0; i < returns.length; i++) {
-            ppiNotifyList[i] = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName();
+            List<String> archList = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getSupArchList();
+            if (archList == null || archList.contains(arch)){
+                ppiNotifyList[i] = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName();    
+            }
+            
         }
 
         return ppiNotifyList;
@@ -869,7 +882,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            archXpath = "/PpiNotify[@SupArchList='" + arch + "']";
+            archXpath = "/PpiNotify";
             if (usage != null && !usage.equals("")) {
                 usageXpath = "/PpiNotify[@Usage='" + arch + "']";
                 xPath = new String[] { archXpath, usageXpath };
@@ -906,7 +919,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            xPath = new String[] { "/Ppi[@SupArchList='" + arch + "']" };
+            xPath = new String[] { "/Ppi" };
         }
 
         Object[] returns = get("PPIs", xPath);
@@ -916,7 +929,11 @@ public class SurfaceAreaQuery {
 
         String[] ppiList = new String[returns.length];
         for (int i = 0; i < returns.length; i++) {
-            ppiList[i] = ((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName();
+            List<String> archList = ((PPIsDocument.PPIs.Ppi) returns[i]).getSupArchList();
+            if (archList == null || archList.contains(arch)){
+                ppiList[i] = ((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName();    
+            }
+            
         }
         return ppiList;
     }
@@ -940,7 +957,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            archXpath = "/Ppi[@SupArchList='" + arch + "']";
+            archXpath = "/Ppi";
             if (usage != null && !usage.equals("")) {
                 usageXpath = "/Ppi[@Usage='" + arch + "']";
                 xPath = new String[] { archXpath, usageXpath };
@@ -975,9 +992,9 @@ public class SurfaceAreaQuery {
         String[] xPath;
 
         if (arch == null || arch.equals("")) {
-            xPath = new String[] { "/GuidName" };
+            xPath = new String[] { "/GuidCNames" };
         } else {
-            xPath = new String[] { "/GuidName[@SupArchList='" + arch + "']" };
+            xPath = new String[] { "/GuidCNames" };
         }
 
         Object[] returns = get("Guids", xPath);
@@ -986,7 +1003,11 @@ public class SurfaceAreaQuery {
         }
         String[] guidList = new String[returns.length];
         for (int i = 0; i < returns.length; i++) {
-            guidList[i] = ((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName();
+            List<String> archList = ((GuidsDocument.Guids.GuidCNames) returns[i]).getSupArchList();
+            if (archList == null || archList.contains(arch)){
+                guidList[i] = ((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName();    
+            }
+            
         }
         return guidList;
 
@@ -1009,7 +1030,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            archXpath = "/GuidEntry[@SupArchList='" + arch + "']";
+            archXpath = "/GuidEntry";
             if (usage != null && !usage.equals("")) {
                 usageXpath = "/GuidEntry[@Usage='" + arch + "']";
                 xPath = new String[] { archXpath, usageXpath };
@@ -1096,7 +1117,7 @@ public class SurfaceAreaQuery {
         String[] strings = new String[returns.length];
         for (int i = 0; i < returns.length; ++i) {
             // TBD
-            // strings[i] = ((CName) returns[i]).getStringValue();
+             strings[i] = ((CNameType) returns[i]).getStringValue();
         }
 
         return strings;
@@ -1113,8 +1134,8 @@ public class SurfaceAreaQuery {
 
         Object[] returns = get("Externs", xPath);
         if (returns != null && returns.length > 0) {
-            // CName constructor = (CName) returns[0];
-            // return constructor.getStringValue();
+            CNameType constructor = ((CNameType) returns[0]);
+            return constructor.getStringValue();
         }
 
         return null;
@@ -1131,8 +1152,11 @@ public class SurfaceAreaQuery {
 
         Object[] returns = get("Externs", xPath);
         if (returns != null && returns.length > 0) {
-            // CName destructor = (CName) returns[0];
-            // return destructor.getStringValue();
+            //
+            // Only support one Destructor function.
+            //
+             CNameType destructor = (CNameType) returns[0];
+             return destructor.getStringValue();
         }
 
         return null;
@@ -1646,9 +1670,8 @@ public class SurfaceAreaQuery {
 
         String[] specificationList = new String[queryResult.length];
         for (int i = 0; i < queryResult.length; i++) {
-            // specificationList[i] = ((SpecificationDocument.Specification)
-            // queryResult[i])
-            // .getStringValue();
+             specificationList[i] = ((Sentence)queryResult[i])
+             .getStringValue();
         }
         return specificationList;
     }
@@ -1765,6 +1788,9 @@ public class SurfaceAreaQuery {
             guidPair[0] = entry.getCName();
             guidPair[1] = entry.getGuidValue();
             guidDeclMap.put(entry.getName(), guidPair);
+            EdkLog.log(EdkLog.EDK_VERBOSE, entry.getName());
+            EdkLog.log(EdkLog.EDK_VERBOSE, guidPair[0]);
+            EdkLog.log(EdkLog.EDK_VERBOSE, guidPair[1]);
         }
         return guidDeclMap;
     }
@@ -1793,6 +1819,9 @@ public class SurfaceAreaQuery {
             protocolPair[0] = entry.getCName();
             protocolPair[1] = entry.getGuidValue();
             protoclMap.put(entry.getName(), protocolPair);
+            EdkLog.log(EdkLog.EDK_VERBOSE, entry.getName());
+            EdkLog.log(EdkLog.EDK_VERBOSE, protocolPair[0]);
+            EdkLog.log(EdkLog.EDK_VERBOSE, protocolPair[1]);
         }
         return protoclMap;
     }
@@ -1885,4 +1914,29 @@ public class SurfaceAreaQuery {
         return new ModuleSADocument.ModuleSA[0];
 
     }
+    /**
+    Get name array of PCD in a module. In one module, token space
+    is same, and token name should not be conflicted.
+    
+    @return String[]
+ **/
+ public static String[] getModulePcdEntryNameArray() {
+     PcdCodedDocument.PcdCoded.PcdEntry[] pcdEntries  = null;
+     String[]            results;
+     int                 index;
+     String[]            xPath       = new String[] {"/PcdEntry"};
+     Object[]         returns     = get ("PcdCoded", xPath);
+     
+     if (returns == null) {
+         return new String[0];
+     }
+     
+     pcdEntries = (PcdCodedDocument.PcdCoded.PcdEntry[])returns;
+     results    = new String[pcdEntries.length];
+     
+     for (index = 0; index < pcdEntries.length; index ++) {
+         results[index] = pcdEntries[index].getCName();
+     }
+     return results;
+ }
 }

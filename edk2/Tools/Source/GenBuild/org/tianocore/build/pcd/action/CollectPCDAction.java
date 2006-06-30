@@ -23,20 +23,36 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData;
+import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo;
 import org.tianocore.FrameworkModulesDocument;
-import org.tianocore.FrameworkPlatformDescriptionDocument;
+import org.tianocore.PcdDeclarationsDocument;
+import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.PcdBuildDefinitionDocument;
+import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.ModuleSADocument;
+import org.tianocore.ModuleSADocument.ModuleSA;
+import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition;
+import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
+import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.entity.DynamicTokenValue;
 import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
@@ -44,6 +60,7 @@ import org.tianocore.build.pcd.entity.SkuInstance;
 import org.tianocore.build.pcd.entity.Token;
 import org.tianocore.build.pcd.entity.UsageInstance;
 import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.logger.EdkLog;
 import org.tianocore.ModuleTypeDef;
 
 class CStructTypeDeclaration {
@@ -407,6 +424,7 @@ class GuidTable {
 
         Output.add("/* GuidTable */");
         Output.add("{");
+
         if (al.size() == 0) {
             Output.add("\t" + getUuidCString(new UUID(0, 0)));
         }
@@ -1824,12 +1842,25 @@ class PcdDatabase {
 }
 
 class ModuleInfo {
-    public ModuleSADocument.ModuleSA module;
-    public ModuleTypeDef.Enum        type;
+    private String                  type;
+    private FpdModuleIdentification moduleId;
+    private PcdBuildDefinitionDocument.PcdBuildDefinition pcdBuildDef;
+    
+    
 
-    public ModuleInfo (ModuleSADocument.ModuleSA module, ModuleTypeDef.Enum type) {
-        this.module = module;
+    public ModuleInfo (FpdModuleIdentification moduleId, String type, XmlObject pcdDef) {
+        this.moduleId = moduleId;
         this.type   = type;
+        this.pcdBuildDef = ((PcdBuildDefinitionDocument)pcdDef).getPcdBuildDefinition();
+    }
+    public String getModuleType (){
+    	return this.type;
+    }
+    public FpdModuleIdentification getModuleId (){
+    	return this.moduleId;
+    }
+    public PcdBuildDefinitionDocument.PcdBuildDefinition getPcdBuildDef(){
+    	return this.pcdBuildDef;
     }
 }
 
@@ -1851,8 +1882,11 @@ public class CollectPCDAction {
     private int                   originalMessageLevel;
 
     /// Cache the fpd docment instance for private usage.
-    private FrameworkPlatformDescriptionDocument fpdDocInstance;
-
+    private PlatformSurfaceAreaDocument fpdDocInstance;
+    
+    /// xmlObject name
+    private static String xmlObjectName = "PcdBuildDefinition"; 
+    	
     /**
       Set WorkspacePath parameter for this action class.
 
@@ -1919,7 +1953,7 @@ public class CollectPCDAction {
       @throws  EntityException Exception indicate failed to execute this action.
       
     **/
-    private void execute() throws EntityException {
+    public void execute() throws EntityException {
         //
         // Get memoryDatabaseManager instance from GlobalData.
         // The memoryDatabaseManager should be initialized for whatever build
@@ -1988,14 +2022,13 @@ public class CollectPCDAction {
         List<ModuleInfo>            allModules  = new ArrayList<ModuleInfo>();
         ModuleInfo                  current     = null;
         int                         index       = 0;
-        org.tianocore.Components    components  = null;
         FrameworkModulesDocument.FrameworkModules fModules = null;
         ModuleSADocument.ModuleSA[]               modules  = null;
         HashMap<String, XmlObject>                map      = new HashMap<String, XmlObject>();
 
         if (fpdDocInstance == null) {
             try {
-                fpdDocInstance = (FrameworkPlatformDescriptionDocument)XmlObject.Factory.parse(new File(fpdFilePath));
+                fpdDocInstance = (PlatformSurfaceAreaDocument)XmlObject.Factory.parse(new File(fpdFilePath));
             } catch(IOException ioE) {
                 throw new EntityException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
             } catch(XmlException xmlE) {
@@ -2004,14 +2037,28 @@ public class CollectPCDAction {
 
         }
 
-        map.put("FrameworkPlatformDescription", fpdDocInstance);
-        SurfaceAreaQuery.setDoc(map); 
-        modules = SurfaceAreaQuery.getFpdModuleSAs();
-        for (index = 0; index < modules.length; index ++) {
-            SurfaceAreaQuery.setDoc(GlobalData.getDoc(modules[index].getModuleName()));
-            allModules.add(new ModuleInfo(modules[index], 
-                                          ModuleTypeDef.Enum.forString(SurfaceAreaQuery.getModuleType())));
+        //map.put("FrameworkPlatformDescription", fpdDocInstance);
+        //SurfaceAreaQuery.setDoc(map); 
+        Map<FpdModuleIdentification,XmlObject>pcdBuildDef = GlobalData.getFpdModuleSaXmlObject(CollectPCDAction.xmlObjectName);
+        Set<FpdModuleIdentification> pcdBuildKeySet = pcdBuildDef.keySet();
+        Iterator item = pcdBuildKeySet.iterator();
+        while (item.hasNext()){
+        	FpdModuleIdentification id = (FpdModuleIdentification)item.next();
+            try {
+                allModules.add(new ModuleInfo(id, id.getModule().getModuleType(),pcdBuildDef.get(id)));    
+            } catch (Exception e){
+                System.out.println(e.getMessage());
+                //EdkLog.log(EdkLog.EDK_INFO,e.getMessage());
+            }
+        	
+        	
         }
+//        //modules = SurfaceAreaQuery.getFpdModuleSAs();
+//        for (index = 0; index < modules.length; index ++) {
+//            //SurfaceAreaQuery.setDoc(GlobalData.getDoc(modules[index].getModuleName()));
+//            allModules.add(new ModuleInfo(modules[index], 
+//                                          ModuleTypeDef.Enum.forString(SurfaceAreaQuery.getModuleType())));
+//        }
         
         return allModules;
     }
@@ -2049,7 +2096,8 @@ public class CollectPCDAction {
         String                              moduleName        = null;
         String                              datum             = null;
         int                                 maxDatumSize      = 0;
-
+        String								tokenSpaceGuidString = null;
+        
         //
         // ----------------------------------------------
         // 1), Get all <ModuleSA> from FPD file.
@@ -2073,17 +2121,17 @@ public class CollectPCDAction {
                 // BUGBUG: For transition schema, we can *not* get module's version from 
                 // <ModuleSAs>, It is work around code.
                 // 
-                primaryKey1 = UsageInstance.getPrimaryKey(modules.get(index).module.getModuleName(), 
+                primaryKey1 = UsageInstance.getPrimaryKey(modules.get(index).getModuleId().getModule().getName(), 
+                                                          null,
                                                           null,
                                                           null, 
-                                                          null, 
-                                                          modules.get(index).module.getArch().toString(),
+                                                          modules.get(index).getModuleId().getArch(),
                                                           null);
-                primaryKey2 = UsageInstance.getPrimaryKey(modules.get(index2).module.getModuleName(), 
+                primaryKey2 = UsageInstance.getPrimaryKey(modules.get(index2).getModuleId().getModule().getName(), 
                                                           null, 
                                                           null, 
                                                           null, 
-                                                          modules.get(index2).module.getArch().toString(), 
+                                                          modules.get(index2).getModuleId().getArch(), 
                                                           null);
                 if (primaryKey1.equalsIgnoreCase(primaryKey2)) {
                     isDuplicate = true;
@@ -2098,13 +2146,13 @@ public class CollectPCDAction {
     	    //
     	    // It is legal for a module does not contains ANY pcd build definitions.
     	    // 
-    	    if (modules.get(index).module.getPcdBuildDefinition() == null) {
+    	    if (modules.get(index).getPcdBuildDef() == null) {
                 continue;
     	    }
     
-            pcdBuildDataArray = modules.get(index).module.getPcdBuildDefinition().getPcdDataList();
+            pcdBuildDataArray = modules.get(index).getPcdBuildDef().getPcdDataList();
 
-            moduleName = modules.get(index).module.getModuleName();
+            moduleName = modules.get(index).getModuleId().getModule().getName();
 
             //
             // ----------------------------------------------------------------------
@@ -2112,13 +2160,14 @@ public class CollectPCDAction {
             // ----------------------------------------------------------------------
             // 
             for (pcdIndex = 0; pcdIndex < pcdBuildDataArray.size(); pcdIndex ++) {
+            	//tokenSpaceGuidString = GlobalData.getGuidInfoFromCname(pcdBuildData.getTokenSpaceGuidCName())[1];
+                tokenSpaceGuidString = null;
                 pcdBuildData = pcdBuildDataArray.get(pcdIndex);
                 primaryKey   = Token.getPrimaryKeyString(pcdBuildData.getCName(),
-                                                         translateSchemaStringToUUID(pcdBuildData.getTokenSpaceGuid()));
+                                                         translateSchemaStringToUUID(tokenSpaceGuidString));
                 pcdType      = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
                 datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
                 tokenNumber  = Long.decode(pcdBuildData.getToken().toString());
-                
                 if (pcdBuildData.getValue() != null) {
                     datum = pcdBuildData.getValue().toString();
                 } else {
@@ -2130,17 +2179,6 @@ public class CollectPCDAction {
                     (datumType  != Token.DATUM_TYPE.BOOLEAN)){
                     exceptionString = String.format("[FPD file error] For PCD %s in module %s, the PCD type is FEATRUE_FLAG but "+
                                                     "datum type of this PCD entry is not BOOLEAN!",
-                                                    pcdBuildData.getCName(),
-                                                    moduleName);
-                    throw new EntityException(exceptionString);
-                }
-
-                //
-                // Check <TokenSpaceGuid> is exist? In future, because all schema verification will tools
-                // will check that, following checking code could be removed.
-                // 
-                if (pcdBuildData.getTokenSpaceGuid() == null) {
-                    exceptionString = String.format("[FPD file error] There is no <TokenSpaceGuid> for PCD %s in module %s! This is required!",
                                                     pcdBuildData.getCName(),
                                                     moduleName);
                     throw new EntityException(exceptionString);
@@ -2255,8 +2293,10 @@ public class CollectPCDAction {
                     // If the token is not in database, create a new token instance and add
                     // a usage instance into this token in database.
                     // 
+                	//String tokenSpaceString = GlobalData.getGuidInfoFromCname(pcdBuildData.getTokenSpaceGuidCName())[1];
+                    String tokenSpaceString = null;
                     token = new Token(pcdBuildData.getCName(), 
-                                      translateSchemaStringToUUID(pcdBuildData.getTokenSpaceGuid()));
+                                      translateSchemaStringToUUID(tokenSpaceString));
     
                     token.datumType     = datumType;
                     token.tokenNumber   = tokenNumber;
@@ -2294,9 +2334,9 @@ public class CollectPCDAction {
                                                   null,
                                                   null,
                                                   null,
-                                                  modules.get(index).type, 
+                                                  CommonDefinition.getModuleType(modules.get(index).getModuleType()), 
                                                   pcdType,
-                                                  modules.get(index).module.getArch().toString(), 
+                                                  modules.get(index).getModuleId().getArch(), 
                                                   null,
                                                   datum,
                                                   maxDatumSize);
@@ -2655,15 +2695,15 @@ public class CollectPCDAction {
         // 
         if (fpdDocInstance == null) {
             try {
-                fpdDocInstance = (FrameworkPlatformDescriptionDocument)XmlObject.Factory.parse(new File(fpdFilePath));
+                fpdDocInstance = (PlatformSurfaceAreaDocument)XmlObject.Factory.parse(new File(fpdFilePath));
             } catch(IOException ioE) {
                 throw new EntityException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
             } catch(XmlException xmlE) {
                 throw new EntityException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
             }
         }
-
-        dynamicPcdBuildDefinitions = fpdDocInstance.getFrameworkPlatformDescription().getDynamicPcdBuildDefinitions();
+        
+        dynamicPcdBuildDefinitions = fpdDocInstance.getPlatformSurfaceArea().getDynamicPcdBuildDefinitions();
         if (dynamicPcdBuildDefinitions == null) {
             exceptionString = String.format("[FPD file error] There are no <PcdDynamicBuildDescriptions> in FPD file but contains Dynamic type "+
                                             "PCD entry %s in module %s!",
@@ -2674,18 +2714,10 @@ public class CollectPCDAction {
 
         dynamicPcdBuildDataArray = dynamicPcdBuildDefinitions.getPcdBuildDataList();
         for (index = 0; index < dynamicPcdBuildDataArray.size(); index ++) {
-            //
-            // Check <TokenSpaceGuid> is exist? In future, because all schema verification will tools
-            // will check that, following checking code could be removed.
-            // 
-            if (dynamicPcdBuildDataArray.get(index).getTokenSpaceGuid() == null) {
-                exceptionString = String.format("[FPD file error] There is no <TokenSpaceGuid> for PCD %s in <DynamicPcdBuildDefinitions>! This is required!",
-                                                dynamicPcdBuildDataArray.get(index).getCName());
-                throw new EntityException(exceptionString);
-            }
-
+            //String tokenSpaceGuidString = GlobalData.getGuidInfoFromCname(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName())[1];
+            String tokenSpaceGuidString = null;
             dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
-                                                          translateSchemaStringToUUID(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuid()));
+                                                          translateSchemaStringToUUID(tokenSpaceGuidString));
             if (dynamicPrimaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
                 return dynamicPcdBuildDataArray.get(index);
             }
@@ -2880,14 +2912,22 @@ public class CollectPCDAction {
                 //
                 // Get variable guid string according to the name of guid which will be mapped into a GUID in SPD file.
                 // 
-                variableGuidString = GlobalData.getGuidInfoGuid(skuInfoList.get(index).getVariableGuid().toString());
+                variableGuidString = GlobalData.getGuidInfoFromCname(skuInfoList.get(index).getVariableGuid().toString());
                 if (variableGuidString == null) {
                     throw new EntityException(String.format("[GUID Error] For dynamic PCD %s,  the variable guid %s can be found in all SPD file!",
                                                             token.cName, 
                                                             skuInfoList.get(index).getVariableGuid().toString()));
                 }
-
-                skuInstance.value.setHiiData(skuInfoList.get(index).getVariableName(),
+                String variableStr = skuInfoList.get(index).getVariableName();
+                Pattern pattern = Pattern.compile("0x([a-fA-F0-9]){4}");
+                Matcher matcher = pattern.matcher(variableStr);
+                List<String> varNameList = new ArrayList<String>();
+                while (matcher.find()){
+                	String str = variableStr.substring(matcher.start(),matcher.end());
+                	varNameList.add(str);
+                }
+                
+                skuInstance.value.setHiiData(varNameList,
                                              translateSchemaStringToUUID(variableGuidString[1]),
                                              skuInfoList.get(index).getVariableOffset(),
                                              skuInfoList.get(index).getHiiDefaultValue().toString());
@@ -3044,8 +3084,8 @@ public class CollectPCDAction {
         ca.setWorkspacePath("m:/tianocore/edk2");
         ca.setFPDFilePath("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
-        GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "m:/tianocore/edk2");
-        ca.execute();
+//        GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
+//                            "m:/tianocore/edk2");
+//        ca.execute();
     }
 }

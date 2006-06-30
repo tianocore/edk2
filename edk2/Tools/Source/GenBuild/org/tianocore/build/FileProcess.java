@@ -64,6 +64,7 @@ public class FileProcess {
                                           {".s", "", "ASM" },
                                           {".uni", "", "UNI" },
                                           {".vfr", "", "VFR" },
+                                          {".Vfr", "", "VFR" },
                                           {".dxs", "", "DPX"},
                                           {".fv", "", "FV" },
                                           {".efi", "", "EFI" },
