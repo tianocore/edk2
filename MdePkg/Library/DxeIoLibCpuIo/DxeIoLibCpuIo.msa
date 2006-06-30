@@ -8,7 +8,7 @@
     <Abstract>I/O Library implemented with Framework CPU I/O Protocol</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
@@ -21,7 +21,7 @@
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>DxeIoLibCpuIo</OutputFileBasename>
   </ModuleDefinitions>
-  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">
       <Keyword>IoLib</Keyword>
     </LibraryClass>
@@ -35,19 +35,19 @@
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFiles>
     <Filename>IoLib.c</Filename>
     <Filename>IoHighLevel.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
   </PackageDependencies>
-  <Protocols xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>CpuIo</ProtocolCName>
     </Protocol>
   </Protocols>
-  <Externs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>

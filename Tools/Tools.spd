@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" >
   <SpdHeader>
     <PackageName>Tools</PackageName>
     <Guid>53f84ca0-53fe-4412-b4e7-dcec602e1d49</Guid>

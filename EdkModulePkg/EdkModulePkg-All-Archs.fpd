@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
-  <PlatformHeader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PlatformHeader>
     <PlatformName>EdkModuleAll</PlatformName>
     <GuidValue>dc967761-e6e9-4d1a-b02c-818102db4cc6</GuidValue>
     <Version>0.3</Version>
@@ -16,16 +16,16 @@
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </PlatformHeader>
-  <PlatformDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PlatformDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BuildTargets>DEBUG</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
     <OutputDirectory/>
   </PlatformDefinitions>
-  <Flash xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Flash>
     <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>
   </Flash>
-  <FrameworkModules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <FrameworkModules>
     <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="6987936E-ED34-44db-AE97-1FA5E4ED2116">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -14837,7 +14837,7 @@
       </ModuleSaBuildOptions>
     </ModuleSA>
   </FrameworkModules>
-  <BuildOptions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BuildOptions>
     <Options>
       <!-- MSFT tool chain options definition : IA32 -->
       <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="CC">

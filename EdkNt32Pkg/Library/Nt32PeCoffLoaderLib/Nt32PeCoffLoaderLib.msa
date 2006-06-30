@@ -8,7 +8,7 @@
     <Abstract>Component description file for the PEI library.</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004 - 2005, Intel Corporation</Copyright>
-    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
@@ -21,12 +21,12 @@
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>Nt32PeCoffLoaderLib</OutputFileBasename>
   </ModuleDefinitions>
-  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">
       <Keyword>EdkPeCoffLoaderLib</Keyword>
     </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFiles>
     <Filename>Nt32PeCoffLoader.c</Filename>
   </SourceFiles>
   <PackageDependencies>
@@ -34,12 +34,12 @@
     <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
     <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
   </PackageDependencies>
-  <PPIs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PPIs>
     <!--<Ppi Usage="ALWAYS_CONSUMED">
       <PpiCName>PeCoffLoader</PpiCName>
     </Ppi>-->
   </PPIs>
-  <Externs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
