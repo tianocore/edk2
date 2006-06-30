@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.TianoCore.org/2006/Edk2.0" xmlns="http://www.TianoCore.org/2006/Edk2.0">
-    <!--
+  <!--
     Filename: NamingConvention.xsd
     
     Copyright (c) 2006, Intel Corp.
@@ -12,339 +12,169 @@
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     
   -->
+  <xs:annotation>
+    <xs:documentation xml:lang="en"> This schema defines various data types and naming conventions including: base name, filename and directory naming conventions. These are all simple data types.</xs:documentation>
+  </xs:annotation>
+  <xs:simpleType name="C_NameType">
     <xs:annotation>
-        <xs:documentation xml:lang="en"> This schema defines various data types and naming conventions including: base name, filename and directory naming conventions. These are all simple data types.</xs:documentation>
+      <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
     </xs:annotation>
-    <xs:simpleType name="BaseNameConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Base Names must start with an upper case character, followed by one or more alphanumeric characters and/or an optional underscore (_) character followed by one or more alphanumeric characters. Examples: Base_name3, BASE_NAME3, BaseName3 </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[A-Z]([a-zA-Z0-9])*(_)?([a-zA-Z0-9])*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="C_Name">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="((_)*([a-zA-Z])+((_)*[a-zA-Z0-9]*))*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="C_NameType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="((_)*([a-zA-Z])+((_)*[a-zA-Z0-9]*))*"/>
-        </xs:restriction>
-    </xs:simpleType>    
-    <xs:simpleType name="DirectoryNamingConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Directory naming convention is a UNION of DOS an UNIX directory path names </xs:documentation>
-        </xs:annotation>
-        <xs:union memberTypes="Directory_DOS Directory_UNIX"/>
-    </xs:simpleType>
-    <xs:simpleType name="Directory_DOS">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Directory naming convention for Windows backslash (\) directory path name </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="([a-zA-Z]:\\)?(((\\?_*-*.*[a-zA-Z0-9]*)*(_*-*.*[a-zA-Z0-9])*)+(\\)?)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Directory_UNIX">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Directory naming convention for UNIX forwardslash (/) directory path name </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="(\/)?(((_*-*.*[a-zA-Z0-9]*)*(_*-*.*[a-zA-Z0-9])*)+(\/)?)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="E-Mail">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[a-zA-Z]+(( )*.?-?[a-zA-Z]*)*@[a-zA-Z]+(( )*.?-?[a-zA-Z]*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="FileNameConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> This defines what a Filename is: Alphanumeric characters and optional underscore (_) or dash (-) characters, followed by a optional dot and more alphanumeric characters. </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[a-zA-Z][a-zA-Z0-9]*((_)*(-)*(.)*[a-zA-Z0-9]*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="GuidArrayType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> This defines the minimum specification for a GUID Array which is 8 Hex Digits - 4 Hex Digits - 4 Hex Digits - 8 Hex Bytes, the last 16 Hex Digits can be enclosed in sqiggle {} brackets.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="GuidC_NameType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> C_Names must start with either an underscore (_) character followed by one or more alpha characters, followed by any combination of underscore or alphanumeric characters.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="((_)*([a-zA-Z])+((_)*[a-zA-Z0-9]*))*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="GuidNamingConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> A GUID must contain five different Hexadecimal character sets that are separated by a dash (-) character. </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="GuidType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> The GUID data is union of GuidNaming Convetion and GuidArrayType. </xs:documentation>
-        </xs:annotation>
-        <xs:union memberTypes="GuidArrayType GuidNamingConvention"/>
-    </xs:simpleType>
-    <xs:simpleType name="Hex64BitDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define a Hex 64 Bit Value to be 0x[a-f0-9]{16}</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="(0x)?[a-fA-F0-9]{1,16}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="HexAddressType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define a Hex Address, 0x[a-fA-F0-9]{1,16}</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="0x[a-fA-F0-9]{1,16}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="HexByteDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define a Hex Byte Value to be 0x[a-f0-9]{2}</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="(0x)?[a-fA-F0-9]{1,2}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="HexDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define a Hex Value to be 0x[a-f0-9]+</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="0x[a-fA-F0-9]+"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="HexDigitType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define a Hex Diget to be 0x[a-f0-9]</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[a-fA-F0-9]{1}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="HexDoubleWordDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define a Hex Double Word Value to be 0x[a-f0-9]{8}</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="0x[a-fA-F0-9]{1,8}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="HexWordDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define a Hex Word Value to be 0x[a-f0-9]{4}</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="0x[a-fA-F0-9]{1,4}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="LibraryNameConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> This defines what a Library name is: alphanumeric characters and optional underscore (_) characters. </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[A-Z][a-zA-Z0-9]*(_*[a-zA-Z0-9])*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="NameConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">What is a name, any series of alphanumeric characters and one or more underline characters that may occur in any position</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:normalizedString">
-            <xs:pattern value="(_*[a-zA-Z0-9]*_*)+"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Paragraph">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This describes the normal text of a paragraph that can be used in a license or description tag.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string"/>
-    </xs:simpleType>
-    <xs:simpleType name="PathAndFilename">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Naming convention for a path and file name</xs:documentation>
-        </xs:annotation>
-        <xs:union memberTypes="Directory_DOS Directory_UNIX"/>
-    </xs:simpleType>
-    <xs:simpleType name="PlatformNamingConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> This defines what a Platform Name is: Alphanumeric characters and optional underscore (_) or dash (-) characters, followed by a dot and more alphanumeric characters. </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:NCName">
-            <xs:pattern value="(([a-zA-Z][a-zA-Z0-9]*)(_)*(.)*)+"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Polarity">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Limit Polarity vaild values to -1, 0 and 1</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:int">
-            <xs:pattern value="-1|0|1"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Sentence">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> This data type requires two or more words </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:normalizedString">
-            <xs:pattern value="(\w+\W*)+( )+(\W*\w*\W*\s*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="ToolNameConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> This defines what a Tool name is: Alphanumeric characters and optional underscore (_) or dash (-) characters, optionally followed by a dot and more alphanumeric characters. </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[a-zA-Z][a-zA-Z0-9]*(_*-*.*[a-zA-Z0-9])*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="ToolsNameConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This data type is used for ToolCommand, ToolChainFamily and TagName.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:NCName">
-            <xs:pattern value="[a-zA-Z][a-zA-Z0-9]*"/>
-        </xs:restriction>
-    </xs:simpleType>    
-    <xs:simpleType name="UCLetterType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a UpperCase Letter type, which can be any combination of upper case characters followed by zero or more underscore and/or uppercase alphanumeric characters </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[A-Z]{1}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="UCNameType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a UpperCase Name, which can be any combination of upper case characters followed by zero or more underscore and/or uppercase alphanumeric characters </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[A-Z]+(_*[A-Z0-9]*( )*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="UserName">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Specify a User Name</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="[a-zA-Z]+(( )*.?-?[a-zA-Z]*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="V1">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">%VAR%(Directory)*(File_Names)*</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="((%[A-Z](_*[A-Z0-9]*)*%)+((((\\)?_*-*.*[a-zA-Z0-9]*)*(_*-*.*[a-zA-Z0-9])*)+(\\)?)*)"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="V2">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">($VAR | $( VAR) | ${VAR})(Directory)*(File_Names)</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="(($[A-Z](_*[A-Z0-9]*)*)+||($\([A-Z](_*[A-Z0-9]*)*\))+||($\{[A-Z](_*[A-Z0-9]*)*\})+)+(\/)?(((((_*-*.*[a-zA-Z0-9]*)*(_*-*.*[a-zA-Z0-9])*)+(\/)?)*)*)"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="VariableConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">VariableConvention is a UNION of: $VAR, $( VAR), ${VAR} and %VAR% and Directory and File Names</xs:documentation>
-        </xs:annotation>
-        <xs:union memberTypes="V1 V2"/>
-    </xs:simpleType>
-    <xs:simpleType name="VariableGuidType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> The GUID data is union of GuidNaming Convetion and GuidArrayType. </xs:documentation>
-        </xs:annotation>
-        <xs:union memberTypes="GuidArrayType GuidNamingConvention Zero"/>
-    </xs:simpleType>
-    <xs:simpleType name="VariableNamingConvention">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">VariableConvention is a UNION of: $VAR, $( VAR), ${VAR} and %VAR%</xs:documentation>
-        </xs:annotation>
-        <xs:union memberTypes="Variable_DOS Variable_UNIX Variable_UNIX_Scope1 Variable_UNIX_Scope2"/>
-    </xs:simpleType>
-    <xs:simpleType name="Variable_DOS">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a DOS Variable Name: %VAR% It must start with an Upper Case character.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="%[A-Z](_*[A-Z0-9]*)*%"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Variable_UNIX">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a UNIX Variable Name: $VAR It must start with an Upper Case character.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="$[A-Z](_*[A-Z0-9]*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Variable_UNIX_Scope1">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a UNIX Variable Name: $( VAR1) It must start with an Upper Case character.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="$\([A-Z](_*[A-Z0-9]*)*\)"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Variable_UNIX_Scope2">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a UNIX Variable Name: ${ VAR1} It must start with an Upper Case character.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="$\{[A-Z](_*[A-Z0-9]*)*\}"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="VersionDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a Version Number, which must be a decimal number (or Zero) </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="(\d)+(.)?(\d)+"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="Zero">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define Zero as a vaild value</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:int">
-            <xs:pattern value="0"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="OldVersionDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Definition of a Version Number, which can be any combination of a number followed by zero or more alphanumeric-dot-alphanumeric characters </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:pattern value="([0-9])+[a-zA-Z0-9]*(-?.?([a-zA-Z0-9])*)*"/>
-        </xs:restriction>
-    </xs:simpleType>
-    <xs:simpleType name="KeywordType">
-        <xs:restriction base="xs:normalizedString">
-            <xs:pattern value="[a-zA-Z]+(_*[a-zA-Z0-9]*)*"/>
-        </xs:restriction>
-    </xs:simpleType>   
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(_)*[a-zA-Z]+((_)*[a-zA-Z0-9]*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="FileNameConvention">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> This defines what a Filename is: Alphanumeric characters and optional underscore (_) or dash (-) characters, followed by a optional dot and more alphanumeric characters. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z](\.?[-_a-zA-Z0-9]+)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GuidType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> The GUID data was a union of GuidType1 and GuidType2; standardizing on GuidType2. </xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="GuidType2"/>
+  </xs:simpleType>
+  <xs:simpleType name="GuidType1">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> This defines the minimum specification for a GUID Array which is 8 Hex Digits - 4 Hex Digits - 4 Hex Digits - 8 Hex Bytes, the last 16 Hex Digits can be enclosed in sqiggle {} brackets.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\})?"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="GuidType2">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> A GUID must contain five different Hexadecimal character sets that are separated by a dash (-) character. </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Hex64BitDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex 64 Bit Value to be 0x[a-f0-9]{16}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(0x)?[a-fA-F0-9]{1,16}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexAddressType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Address, 0x[a-fA-F0-9]{1,16}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[a-fA-F0-9]{1,16}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexByteDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Byte Value to be 0x[a-f0-9]{2}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="(0x)?[a-fA-F0-9]{1,2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Value to be 0x[a-f0-9]+</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[a-fA-F0-9]+"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexDigitType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Diget to be 0x[a-f0-9]</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-fA-F0-9]{1}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexDoubleWordDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Double Word Value to be 0x[a-f0-9]{8}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[a-fA-F0-9]{1,8}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="HexWordDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define a Hex Word Value to be 0x[a-f0-9]{4}</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="0x[a-fA-F0-9]{1,4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="KeywordType">
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="[a-zA-Z]+(_*[a-zA-Z0-9]*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Paragraph">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This describes the normal text of a paragraph that can be used in a license or description tag.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:simpleType name="PathAndFilename">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Naming convention for a path and file name</xs:documentation>
+    </xs:annotation>
+    <xs:union memberTypes="xs:normalizedString xs:anyURI"/>
+  </xs:simpleType>
+  <xs:simpleType name="Polarity">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Limit Polarity vaild values to 0 and 1</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int">
+      <xs:pattern value="0|1"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Sentence">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> This data type requires two or more words </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:normalizedString">
+      <xs:pattern value="(\w+\W*)+( )+(\W*\w*\W*\s*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="ToolsNameConvention">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This data type is used for ToolCommand, ToolChainFamily and TagName.</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:NCName">
+      <xs:pattern value="[a-zA-Z][a-zA-Z0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="UCNameType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Definition of a UpperCase Name, which can be any combination of upper case characters followed by zero or more underscore and/or uppercase alphanumeric characters </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z]+(_*[A-Z0-9]*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="VersionDataType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"> Definition of a Version Number, which is one or more strings of decimal digits separated by dots. </xs:documentation>
+      <xs:documentation>
+        The algorithm to compare two versions A and B is as follows. if A==B, then A is the same version as B. Otherwise, say A is a1.a2.a3...an and B is b1.b2.b3...bn. For the first pair (ai, bi), for i less than n and i less than m, where ai is not equal to bi, if ai is less than bi, then A is less than B. If ai is greater than bi, then A is greater than B.   
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\d+(\.\d+)*"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="Zero">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">Define Zero as a vaild value</xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:int">
+      <xs:pattern value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
 </xs:schema>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.TianoCore.org/2006/Edk2.0" xmlns="http://www.TianoCore.org/2006/Edk2.0">
-    <!--
+  <!--
     Filename: FrameworkHeaders.xsd
     
     Copyright (c) 2006, Intel Corp.
+
     All rights reserved. This program and the accompanying materials
     are licensed and made available under the terms and conditions of the BSD License
     which may be found at http://opensource.org/licenses/bsd-license.php
@@ -11,253 +12,101 @@
     THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     
+    APPROVED: 14-Jun-2006
   -->
-    <xs:include schemaLocation="FrameworkDataElements.xsd"/>
-    <xs:element name="FdbHeader">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This is the header for the Framework Package Database file.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" ref="DatabaseName"/>
-                <!-- Value fixed during initialization: FrameworkDatabase -->
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
-                    <!-- Guid needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
-                    <!-- GuidValue needs to be required -->
-                </xs:choice>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
-                <!-- Version is the version of this file -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Path"/>
-                <!-- Path needs to be removed -->
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                    <!-- Created needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                    <!-- CreatedDate needs to be required -->
-                </xs:choice>
-                <xs:choice minOccurs="0">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
-                    <!-- Updated needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="UpdatedDate"/>
-                </xs:choice>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
-                <!-- Specificatoin needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00090000 -->
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="MbdHeader">
-        <!-- MbdHeader needs to be removed -->
-        <xs:annotation>
-            <xs:documentation xml:lang="en">DO NOT USE! This is the header for the Component Module Build Description (MBD) file. NOTE: The GUID may be different from the GUID in the MSA file, as the Guid is updated every time the file is changed, as the Guid may change if the contents of the file are changed.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" ref="BaseName"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                </xs:choice>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Modified"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
-                </xs:choice>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="MbdLibHeader">
-        <!-- MbdLibHeader needs to be removed -->
-        <xs:annotation>
-            <xs:documentation xml:lang="en">DO NOT USE! This is the header for the Library Module Build Description (MBD) file. NOTE: The Guid may be different from the Guid in the MSA file, as the Guid may change when the contents of the file are changed..</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" ref="BaseName"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                </xs:choice>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Modified"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
-                </xs:choice>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="MsaHeader">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This is the Component Module Surface Area Description Header - a replacement for INF files. The GUID may change when the contents of the file are changed.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:choice>
-                    <!-- BaseName needs to be removed  -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="BaseName"/>
-                    <!-- ModuleName needs to be required -->
-                    <xs:element minOccurs="0" maxOccurs="1" name="ModuleName" type="UiNameType"/>
-                </xs:choice>
-                <xs:element minOccurs="1" maxOccurs="1" ref="ModuleType"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="ComponentType"/>
-                <xs:choice>
-                    <!-- Guid needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
-                    <!-- GuidValue needs to be required -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
-                </xs:choice>
-                <!-- Version needs to be a decimal in final -->
-                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <!-- Created needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                    <!-- CreatedDate needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                </xs:choice>
-                <xs:choice>
-                    <!-- Updated needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
-                    <!-- ModifiedDate needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
-                </xs:choice>
-                <xs:element default="false" minOccurs="0" name="BinaryModule" type="xs:boolean"/>
-                <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
-                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="MsaLibHeader">
-        <!-- MsaLibHeader needs to be removed -->
-        <xs:annotation>
-            <xs:documentation xml:lang="en">DO NOT USE! This is the Library Module Surface Area Description Header - a replacement for INF files. The Guid may change when the contents of the file are changed.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" ref="BaseName"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="ModuleType"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="ComponentType"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Guid"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="PlatformHeader">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This head is for the Framework Platform Description file (FPD.)</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" name="PlatformName" type="PlatformNamingConvention"/>
-                <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
-                    <!-- DO NOT USE Guid needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
-                    <!-- GuidValue needs to be required -->
-                </xs:choice>
-                <!-- Version needs to be xs:decimal in final -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Version"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Copyright"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="License"/>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <!-- DO NOT USE Created needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                    <!-- DO NOT USE CreatedDate needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                </xs:choice>
-                <!-- DO NOT USE CreatedBy needs to be removed -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="CreatedBy"/>
-                <xs:choice>
-                    <!-- DO NOT USE Updated needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
-                    <!-- DO NOT USE ModifiedDate needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
-                </xs:choice>
-                <!-- DO NOT USE PackageType needs to be removed -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
-                <!-- DO NOT USE BuildTarget needs to be removed -->
-                <xs:element minOccurs="0" maxOccurs="1" name="BuildTarget" type="BuildTargets"/>
-                <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
-                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="SpdHeader">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This head is for the Surface Area Package Description file (SPD)</xs:documentation>
-            <xs:documentation xml:lang="en">The Guid MUST change when the contents of the file undergo MAJOR FUNCTIONALITY changes.</xs:documentation>
-            <xs:documentation xml:lang="en">The Version MUST change when the contents of the file undergo MINOR FUNCTIONALITY changes.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" name="PackageName" type="UiNameType"/>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <!-- DO NOT USE! Guid needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Guid"/>
-                    <!-- GuidValue needs to be required -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="GuidValue"/>
-                </xs:choice>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
-                <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-                <xs:choice minOccurs="1" maxOccurs="1">
-                    <!-- Created needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Created"/>
-                    <!-- CreatedDate needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="CreatedDate"/>
-                </xs:choice>
-                <!-- E_Mail needs to be removed -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="E-Mail"/>
-                <xs:choice minOccurs="0" maxOccurs="1">
-                    <!-- Updated needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Updated"/>
-                    <!-- UpdatedDate needs to be removed -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="ModifiedDate"/>
-                </xs:choice>
-                <!-- URL needs to be removed -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="URL"/>
-                <!-- PackageType needs to be removed -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="PackageType"/>
-                <!-- ReadOnly and RePackage remain in final -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="ReadOnly"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="RePackage"/>
-                <!-- Specification needs to be required - FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052 -->
-                <xs:element minOccurs="0" maxOccurs="1" name="Specification" type="xs:string"/>
-                <!-- OutputDirectory needs to be removed -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="OutputDirectory"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+  <xs:include schemaLocation="FrameworkDataElements.xsd"/>
+  <xs:element name="FdbHeader">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This is the header for the Framework Package Database (DB) file.</xs:documentation>
+      <xs:documentation xml:lang="en">The Guid MUST change if backward compatibility breaks caused by a new release of XML Schema.</xs:documentation>
+      <xs:documentation xml:lang="en">The Version will change if a minor change to XML Schema has been made, but backward compatiblity is maintained.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="DatabaseName" type="UiNameType" fixed="FrameworkDatabase"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue" type="GuidType"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FarHeader">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This is the header for the Framework Archive Manifest file.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="FarName" type="UiNameType"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue" type="GuidType"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="MsaHeader">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This header is for the Module Surface Area Description (MSA) files</xs:documentation>
+      <xs:documentation xml:lang="en">The Guid MUST change if the Module changes break backward compatibility.</xs:documentation>
+      <xs:documentation xml:lang="en">The Version MUST change if the Module changes, however, backward compatiblity is maintained.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="ModuleName" type="UiNameType"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="ModuleType"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue" type="GuidType"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PlatformHeader">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This header is for the Framework Platform Description (FPD) files.</xs:documentation>
+      <xs:documentation xml:lang="en">The Guid MUST change if the FPD changes break backward compatibility.</xs:documentation>
+      <xs:documentation xml:lang="en">The Version MUST change if the FPD changes, however, backward compatiblity is maintained.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="PlatformName" type="UiNameType"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue" type="GuidType"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SpdHeader">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This head is for the Surface Area Package Description file (SPD)</xs:documentation>
+      <xs:documentation xml:lang="en">The Guid MUST change when the contents of the file undergo MAJOR FUNCTIONALITY changes.</xs:documentation>
+      <xs:documentation xml:lang="en">The Version MUST change when the contents of the file undergo MINOR FUNCTIONALITY changes.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" name="PackageName" type="UiNameType"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="GuidValue" type="GuidType"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Version"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Abstract"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" xmlns="http://www.TianoCore.org/2006/Edk2.0" targetNamespace="http://www.TianoCore.org/2006/Edk2.0">
-    <!--
+  <!--
     Filename: FrameworkPlatformDataElements.xsd
     
     Copyright (c) 2006, Intel Corp.
@@ -12,455 +12,426 @@
     WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     
   -->
+  <xs:annotation>
+    <xs:documentation xml:lang="en"> This schema defines EFI and Framework Platform Data Elements that are specific to platform creation.</xs:documentation>
+  </xs:annotation>
+  <xs:include schemaLocation="NamingConvention.xsd"/>
+  <xs:include schemaLocation="FrameworkDataAttributes.xsd"/>
+  <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
+  <xs:include schemaLocation="FrameworkDataElements.xsd"/>
+  <xs:include schemaLocation="FrameworkPlatformDataTypes.xsd"/>
+  <xs:element name="DataArray">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="HexByteArrayType">
+          <xs:attribute name="Name" type="xs:normalizedString" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DataId">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="xs:NCName">
+          <xs:attribute name="Seq" type="xs:nonNegativeInteger" use="required"/>
+          <xs:attribute name="SubRegion" type="UCNameType" use="required"/>
+          <xs:attribute name="DataSource" type="xs:normalizedString" use="required"/>
+          <xs:attribute name="SourceType" type="xs:NCName" use="required"/>
+          <xs:attribute name="DataSize" type="HexAddressType" use="optional"/>
+          <xs:attribute name="Alignment" type="xs:positiveInteger" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DataRegions">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" name="FvDataRegion">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="1" maxOccurs="unbounded" ref="DataId"/>
+              <xs:element minOccurs="0" maxOccurs="unbounded" ref="DataArray"/>
+            </xs:sequence>
+            <xs:attribute name="Name" type="UCNameType" use="required"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Flash">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="FlashDefinitionFile"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="FvImages"/>
+      </xs:sequence>
+      <xs:attribute name="MicrocodeFile" type="PathAndFilename" use="optional"/>
+    </xs:complexType>
+  </xs:element>
+  <!-- Valid Flash Definition Files that can be used for a platform The UiName and Perferred tags are optional, for use with  Wizards.-->
+  <xs:element name="FlashDefinitionFile">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="PathAndFilename">
+          <!-- Id will be required eventually. -->
+          <xs:attribute name="Id" type="KeywordType" use="optional"/>
+          <xs:attribute name="UiName" type="UiNameType" use="optional"/>
+          <xs:attribute name="Preferred" type="xs:boolean" use="optional" default="false"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <!-- For Future Use! -->
+  <!-- This describes the physical layout of the hardware device, used by tools to verify different regions fit within a given number of blocks. -->
+  <!-- An EFI Region MUST start on a block boundary.  A region may span multiple blocks. -->
+  <xs:element name="FlashDevice">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="PartNumber" type="xs:NCName"/>
+        <xs:choice>
+          <xs:sequence minOccurs="0">
+            <!-- Use this sequence for a part with fixed block sizes -->
+            <xs:element minOccurs="1" maxOccurs="1" name="NumBlocks" type="xs:positiveInteger"/>
+            <xs:element minOccurs="1" maxOccurs="1" name="BlockSize" type="HexAddressType"/>
+          </xs:sequence>
+          <xs:sequence minOccurs="0">
+            <!-- Use this sequence for a part with variable block sizes -->
+            <xs:element maxOccurs="unbounded" name="VariableBlockSize">
+              <xs:complexType>
+                <xs:simpleContent>
+                  <xs:extension base="HexAddressType">
+                    <xs:attribute name="BlockNum" type="xs:nonNegativeInteger" use="required"/>
+                  </xs:extension>
+                </xs:simpleContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FlashDeviceDefinitions">
+    <xs:complexType>
+      <xs:annotation>
+        <xs:documentation xml:lang="en">We allow specifying the FlashMap filename</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="FlashDefinitionFile"/>
+        <xs:element minOccurs="1" maxOccurs="1" ref="FvImages"/>
+        <!-- DataRegions is for Future Use! -->
+        <xs:element minOccurs="0" maxOccurs="1" ref="DataRegions"/>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="FvImageBindingSequence"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FrameworkModules">
     <xs:annotation>
-        <xs:documentation xml:lang="en"> This schema defines EFI and Framework Platform Data Elements that are specific to platform creation.</xs:documentation>
+      <xs:documentation xml:lang="en">This is used in a Framework Platform Description (FPD) file</xs:documentation>
     </xs:annotation>
-    <xs:include schemaLocation="NamingConvention.xsd"/>
-    <xs:include schemaLocation="FrameworkDataAttributes.xsd"/>
-    <xs:include schemaLocation="FrameworkDataTypes.xsd"/>
-    <xs:include schemaLocation="FrameworkDataElements.xsd"/>
-    <xs:include schemaLocation="FrameworkPlatformDataTypes.xsd"/>
-    <xs:element name="Capsule">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="1" name="CapsuleId" type="xs:string"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="CapsuleOptions"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="CapsuleAttributes"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="CapsuleAttributes">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This element is used specify different name value pairs.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Enable"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Disable"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="CapsuleOptions">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This element is used specify different name value pairs.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Enable"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Disable"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="Capsules">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Permit multiple Capsule Sections</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                <xs:element ref="Capsule"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="Disable" type="xs:string"/>
-    <xs:element name="Enable" type="xs:string"/>
-    <xs:element name="Flash">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:documentation xml:lang="en">We allow specifying the Flash layout in this directory, or we allow specifying a flashmap filename</xs:documentation>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:choice>
-                    <xs:element name="FlashDefinition" type="FlashData"/>
-                    <xs:element name="FlashDefinitionFile" type="FileNameConvention"/>
-                </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="1" ref="FvImages"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="Capsules"/>
-            </xs:sequence>
-            <xs:attribute name="MicrocodeFile" type="FileNameConvention" use="optional"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FlashDeviceImage">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define contents of the regions in flash. The files and data are placed in the output image in the order they are encountered in this definition. Multiple FlashDeviceImage sections may be defined. Which one the tool should use is specified by Name on the command line.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:all>
-                <xs:element minOccurs="0" maxOccurs="1" name="RawData">
-                    <xs:complexType>
-                        <xs:sequence minOccurs="0" maxOccurs="1">
-                            <xs:element name="Data" type="xs:string"/>
-                        </xs:sequence>
-                        <xs:attributeGroup ref="RawDataAttributes"/>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element minOccurs="0" maxOccurs="1" name="File">
-                    <xs:complexType>
-                        <xs:attributeGroup ref="FlashDeviceImageFileAttributes"/>
-                    </xs:complexType>
-                </xs:element>
-            </xs:all>
-            <xs:attributeGroup ref="FlashDeviceImageAttributes"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FlashDeviceInfo">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This is the Flash Devcie definition List</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="Blocks">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="255" name="Block">
-                                <xs:complexType>
-                                    <xs:simpleContent>
-                                        <xs:extension base="BlockNameType">
-                                            <xs:attributeGroup ref="BlockAttributes"/>
-                                        </xs:extension>
-                                    </xs:simpleContent>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-                <xs:element name="Regions">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element minOccurs="1" maxOccurs="unbounded" name="Region">
-                                <xs:complexType>
-                                    <xs:all>
-                                        <xs:element name="SubRegions">
-                                            <xs:complexType>
-                                                <xs:sequence minOccurs="0" maxOccurs="unbounded">
-                                                    <xs:element name="SubRegion">
-                                                        <xs:complexType>
-                                                            <xs:simpleContent>
-                                                                <xs:extension base="xs:string">
-                                                                    <xs:attributeGroup ref="SubRegionAttributes"/>
-                                                                </xs:extension>
-                                                            </xs:simpleContent>
-                                                        </xs:complexType>
-                                                    </xs:element>
-                                                </xs:sequence>
-                                            </xs:complexType>
-                                        </xs:element>
-                                    </xs:all>
-                                    <xs:attributeGroup ref="RegionAttributes"/>
-                                </xs:complexType>
-                            </xs:element>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
-            <xs:attributeGroup ref="FlashDeviceInfoAttributes"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FlashDeviceOverrideImage">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define OVERRIDE contents of the regions in flash. Only what is different here from what may defined in other areas (or files) is needed </xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="1" name="Name" type="NameConvention"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="File" type="FvImageOverrideFileType"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FlashDeviceOverrideInfo">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This is the Flash Devcie Override Definition list. Only what is different from the previously defined stuff needs to be included.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="1" name="Name" type="UCNameType"/>
-                <xs:element default="512KB" minOccurs="0" maxOccurs="1" name="FlashSize" type="FlashSize"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="BaseAddress" type="HexAddressType"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory" type="DirectoryNamingConvention"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="MicrocodeFile" type="FileNameConvention"/>
-                <xs:element minOccurs="0" maxOccurs="255" name="Block" type="BlockNameType"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="Region" type="RegionDataType"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FvImage">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="1" maxOccurs="unbounded" ref="FvImageNames"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="FvImageOptions"/>
-            </xs:sequence>
-            <xs:attribute name="Type" type="FvImageTypes" use="optional"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FvImageName">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="FvImageOptions"/>
-            </xs:sequence>
-            <xs:attribute name="Name" type="FvRegionTypes" use="required"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FvImageNames" type="xs:NCName"/>
-    <xs:element name="FvImageOptions">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This element is used specify different name value pairs.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Enable"/>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="Disable"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FvImages">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This section allows the user to define specific information regarding the FvImage</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="NameValue"/>
-                <xs:choice>
-                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImage"/>
-                    <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvRegionName"/>
-                </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvImageName"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FvRegionName">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="KeywordType">
-                    <xs:attributeGroup ref="FvRegionNameAttributes"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>    
-    <xs:element name="ModuleSA">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This element is used to specify information in the Platform Description File.</xs:documentation>
-            <xs:documentation xml:lang="en">This is a mixed element, allowing the user to specify the name of the MSA file, as well as to optionally specify additional override information.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence minOccurs="1">
-                <!-- DO NOT USE! REMOVE SourceFiles in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="SourceFiles"/>
-                <!-- DO NOT USE! REMOVE Includes in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Includes"/>
-                <!-- Libraries stays in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Libraries"/>
-                <!-- DO NOT USE! REMOVE Protocols in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Protocols"/>
-                <!-- DO NOT USE! REMOVE Events in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Events"/>
-                <!-- DO NOT USE! REMOVE Hobs in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Hobs"/>
-                <!-- DO NOT USE! REMOVE PPIs in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="PPIs"/>
-                <!-- DO NOT USE! REMOVE Variables in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Variables"/>
-                <!-- DO NOT USE! REMOVE BootModes in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="BootModes"/>
-                <!-- DO NOT USE! REMOVE SystemTables in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="SystemTables"/>
-                <!-- DO NOT USE! REMOVE DataHubs in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="DataHubs"/>
-                <!-- DO NOT USE! REMOVE Formsets in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Formsets"/>
-                <!-- DO NOT USE! REMOVE Guids in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="Guids"/>
-                <xs:choice minOccurs="0">
-                    <!-- DO NOT USE! REMOVE Externs stays in FINAL -->
-                    <xs:element minOccurs="0" maxOccurs="1" ref="Externs"/>
-                    <xs:element minOccurs="0" maxOccurs="1" name="Extern">
-                        <xs:annotation>
-                            <xs:documentation xml:lang="en">Only specification is allow here. We need to let this be an addtion OR, if the WORD portion exists, this entry takes precedence.</xs:documentation>
-                        </xs:annotation>
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element minOccurs="1" maxOccurs="unbounded" ref="Specification"/>
-                            </xs:sequence>
-                        </xs:complexType>
-                    </xs:element>
-                </xs:choice>
-                <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification" type="Sentence"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDefinition"/>
-                <!-- BuildOptions stays in FINAL -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="BuildOptions"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="ModuleSaBuildOptions"/>
-            </xs:sequence>
-            <xs:attributeGroup ref="MsaAttributes"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="NameValue">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" type="xs:string" use="required"/>
-                    <xs:attribute name="Value" type="xs:string" use="required"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="Overrides">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">DO NOT USE! - Removing this from Schema</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceOverrideInfo"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceOverrideImage"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="PlatformDescriptions">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">DO NOT USE! - Use PlatformList instead</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence maxOccurs="unbounded">
-                <xs:element ref="Platform"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="PlatformList">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This is used in the Framework Database file</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence maxOccurs="unbounded">
-                <xs:element ref="Platform"/>
-                <xs:element name="Filename" type="PathAndFilename" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FrameworkModules">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">This is used in a Framework Platform Description (FPD) file</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:choice>
-                    <xs:sequence>
-                        <xs:element minOccurs="0" maxOccurs="1" name="SEC" type="Components"/>
-                        <xs:element minOccurs="0" maxOccurs="1" name="PEI_CORE" type="Components"/>
-                        <xs:element minOccurs="0" maxOccurs="1" name="PEIM" type="Components"/>
-                        <xs:element minOccurs="0" maxOccurs="1" name="DXE_CORE" type="Components"/>
-                        <xs:element minOccurs="0" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
-                        <xs:element minOccurs="0" maxOccurs="1" name="OTHER_COMPONENTS" type="Components"/>
-                    </xs:sequence>
-                    <xs:element minOccurs="1" maxOccurs="unbounded" ref="ModuleSA"/>
-                </xs:choice>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="TianoImage">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">DO NOT USE - Use FrameworkModules Instead.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="1" name="SEC" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="PEI_CORE" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="PEIM" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="DXE_CORE" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="DXE_DRIVERS" type="Components"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="OTHER_COMPONENTS" type="Components"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="FlashDeviceDefinitions">
-        <xs:complexType>
-            <xs:annotation>
-                <xs:documentation xml:lang="en">We allow specifying the FlashMap filename</xs:documentation>
-            </xs:annotation>
-            <xs:sequence>
-                <xs:element minOccurs="0" maxOccurs="1" name="FlashDefinitionFile" type="PathAndFilename"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="FvImages"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="PlatformDefinitions">
-        <xs:complexType>
-            <xs:sequence>
-                <!-- This is the list of ALL architectures that are supported by this Platform -->
-                <xs:element minOccurs="1" maxOccurs="1" name="SupportedArchitectures" type="ArchListType"/>
-                <xs:element minOccurs="1" maxOccurs="1" name="BuildTargets" type="BuildTargetList"/>
-                <xs:element default="UNIFIED" name="IntermediateDirectories" type="IntermediateOutputType"/>
-                <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory" type="xs:anyURI"/>
-                <!-- SkuInfo is only defined if Sku enabled -->
-                <xs:element minOccurs="0" maxOccurs="1" ref="SkuInfo"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceDefinitions"/>
-                <xs:element minOccurs="0" maxOccurs="1" ref="FfsFormatDeclarations"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>    
-    <xs:complexType name="Components">
-        <xs:sequence minOccurs="1" maxOccurs="unbounded">
-            <xs:element ref="ModuleSA"/>
-        </xs:sequence>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" ref="ModuleSA"/>
+      </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="FlashData">
-        <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="unbounded" name="UserDefinedFvRegion" type="NameConvention"/>
-            <xs:choice minOccurs="0" maxOccurs="1">
+  </xs:element>
+  <xs:element name="FvAttribute">
+    <xs:complexType>
+      <xs:attribute name="Name" type="xs:NCName" use="required"/>
+      <xs:attribute name="Value" type="xs:normalizedString" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FwImage">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="1" ref="FvRegionName"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvOption"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="FvAttribute"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FvImageBindingSequence">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="ValidRegionNameListType">
+          <xs:attribute name="PartId" type="KeywordType" use="required"/>
+          <xs:attribute name="OutputFile" type="PathAndFilename" use="required"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FvImages">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This section allows the user to define specific information regarding the FvImage</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:choice>
+        <xs:sequence minOccurs="0">
+          <!-- This is the current style -->
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="NameValue">
+            <xs:complexType>
+              <xs:attribute name="Name" type="xs:string" use="required"/>
+              <xs:attribute name="Value" type="xs:string" use="required"/>
+            </xs:complexType>
+          </xs:element>
+          <xs:choice>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="FvImage">
+              <xs:complexType>
                 <xs:sequence>
-                    <xs:element minOccurs="1" maxOccurs="1" ref="FlashDeviceInfo"/>
-                    <xs:element minOccurs="1" maxOccurs="1" ref="FlashDeviceImage"/>
+                  <xs:element minOccurs="1" maxOccurs="unbounded" name="FvImageNames" type="xs:NCName"/>
+                  <xs:element minOccurs="0" maxOccurs="1" name="FvImageOptions">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:element minOccurs="0" maxOccurs="unbounded" name="NameValue">
+                          <xs:complexType>
+                            <xs:attribute name="Name" type="xs:string" use="required"/>
+                            <xs:attribute name="Value" type="xs:string" use="required"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                    </xs:complexType>
+                  </xs:element>
                 </xs:sequence>
-            </xs:choice>
-            <xs:element minOccurs="0" maxOccurs="1" ref="Overrides"/>
+                <xs:attribute name="Type" type="FvImageTypes" use="optional"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:choice>
+          <xs:element minOccurs="0" maxOccurs="unbounded" name="FvImageName">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element minOccurs="1" maxOccurs="1" name="FvImageOptions">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element minOccurs="0" maxOccurs="unbounded" name="NameValue">
+                        <xs:complexType>
+                          <xs:attribute name="Name" type="xs:string" use="required"/>
+                          <xs:attribute name="Value" type="xs:string" use="required"/>
+                        </xs:complexType>
+                      </xs:element>
+                    </xs:sequence>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:attribute name="Name" type="FvRegionTypes" use="required"/>
+            </xs:complexType>
+          </xs:element>
         </xs:sequence>
+      </xs:choice>
     </xs:complexType>
-    <xs:complexType name="FvImageFileType">
-        <xs:sequence>
-            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="FileNameConvention"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="Region" type="FvRegionTypes"/>
-            <xs:element minOccurs="1" maxOccurs="unbounded" name="RawData" type="RawDataType"/>
-        </xs:sequence>
+  </xs:element>
+  <xs:element name="FvRegionName">
+    <xs:complexType>
+      <xs:simpleContent>
+        <xs:extension base="KeywordType">
+          <xs:attributeGroup ref="FvRegionNameAttributes"/>
+        </xs:extension>
+      </xs:simpleContent>
     </xs:complexType>
-    <xs:complexType name="FvImageOverrideFileType">
-        <xs:sequence>
-            <xs:element minOccurs="0" maxOccurs="1" name="Name" type="FileNameConvention"/>
-            <xs:element minOccurs="0" maxOccurs="1" name="Region" type="FvRegionTypes"/>
-            <xs:element minOccurs="0" maxOccurs="1" name="UserDefinedFvRegion" type="NameConvention"/>
-            <xs:element minOccurs="0" maxOccurs="unbounded" name="RawData" type="RawDataType"/>
-        </xs:sequence>
+  </xs:element>
+  <xs:element name="ModuleSA">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This element is used to specify information in the FPD ModuleSA section.</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="1" ref="Libraries"/>
+        <!-- Only specification is allow here. We need to let this be an addtion OR, if the WORD portion MATCHES, this entry takes precedence.</xs:documentation -->
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification" type="Sentence"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="PcdBuildDefinition"/>
+        <xs:element minOccurs="0" maxOccurs="1" ref="ModuleSaBuildOptions"/>
+        <!-- The following BuildOptions Sections is for Legacy Ffs -->
+        <xs:element minOccurs="0" maxOccurs="1" name="BuildOptions">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element minOccurs="0" maxOccurs="1" ref="UserDefinedAntTasks"/>
+              <xs:element minOccurs="0" maxOccurs="1" name="ImageEntryPoint" type="C_NameType"/>
+              <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:anyURI">
+                      <xs:attribute default="UNIFIED" name="IntermediateDirectories" use="optional">
+                        <xs:simpleType>
+                          <xs:restriction base="UCNameType">
+                            <xs:enumeration value="MODULE"/>
+                            <xs:enumeration value="UNIFIED"/>
+                          </xs:restriction>
+                        </xs:simpleType>
+                      </xs:attribute>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+              <xs:element minOccurs="0" maxOccurs="1" name="Ffs">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element minOccurs="0" maxOccurs="1" name="Attribute">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element minOccurs="1" maxOccurs="1" name="Name" type="C_NameType"/>
+                          <xs:element minOccurs="1" maxOccurs="1" name="Value" type="C_NameType"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element minOccurs="0" maxOccurs="1" name="Sections">
+                      <xs:complexType>
+                        <xs:sequence minOccurs="1">
+                          <xs:element name="Section" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element ref=" Filenames " minOccurs="0"/>
+                                <xs:element name="Args" type=" ArgsType " minOccurs="0"/>
+                                <xs:element name="OutFile" type=" FileNameConvention " minOccurs="0"/>
+                                <xs:element name="OutputFileExtension" type=" xs:string " minOccurs="0"/>
+                                <xs:element name="ToolName" type=" ToolType " minOccurs="0"/>
+                              </xs:sequence>
+                              <xs:attributeGroup ref=" SectionsAttributes "/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="Sections" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                              <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                                <xs:element name="Section">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element ref=" Filenames " minOccurs="0"/>
+                                      <xs:element name="Args" type=" ArgsType " minOccurs="0"/>
+                                      <xs:element name="OutFile" type=" FileNameConvention " minOccurs="0"/>
+                                      <xs:element name="OutputFileExtension" type=" xs:string " minOccurs="0"/>
+                                      <xs:element name="ToolName" type=" ToolType " minOccurs="0"/>
+                                    </xs:sequence>
+                                    <xs:attributeGroup ref="SectionsAttributes"/>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                              <xs:attributeGroup ref=" SectionsAttributes "/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attributeGroup ref=" SectionsAttributes "/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Sections">
+                <xs:complexType>
+                  <xs:sequence minOccurs="1">
+                    <xs:element name="Section" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref=" Filenames " minOccurs="0"/>
+                          <xs:element name="Args" type=" ArgsType " minOccurs="0"/>
+                          <xs:element name="OutFile" type=" FileNameConvention " minOccurs="0"/>
+                          <xs:element name="OutputFileExtension" type=" xs:string " minOccurs="0"/>
+                          <xs:element name="ToolName" type=" ToolType " minOccurs="0"/>
+                        </xs:sequence>
+                        <xs:attributeGroup ref=" SectionsAttributes "/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Sections" minOccurs="0" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                          <xs:element name="Section">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element ref=" Filenames " minOccurs="0"/>
+                                <xs:element name="Args" type=" ArgsType " minOccurs="0"/>
+                                <xs:element name="OutFile" type=" FileNameConvention " minOccurs="0"/>
+                                <xs:element name="OutputFileExtension" type=" xs:string " minOccurs="0"/>
+                                <xs:element name="ToolName" type=" ToolType " minOccurs="0"/>
+                              </xs:sequence>
+                              <xs:attributeGroup ref=" SectionsAttributes "/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attributeGroup ref=" SectionsAttributes "/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                  <xs:attributeGroup ref=" SectionsAttributes "/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Options">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name=" Option " minOccurs="1" maxOccurs="unbounded">
+                      <xs:complexType>
+                        <xs:simpleContent>
+                          <xs:extension base=" xs:normalizedString ">
+                            <xs:attribute name="BuildTargets" type=" BuildTargetList " use="optional"/>
+                            <xs:attribute name="ToolChainFamily" type=" ToolsNameConvention " use="optional"/>
+                            <xs:attribute name="TagName" type=" ToolsNameConvention " use="optional"/>
+                            <xs:attribute name="ToolCommand" type=" ToolsNameConvention " use="optional"/>
+                            <xs:attribute name="SupArchList" type=" ArchListType " use="optional"/>
+                            <xs:attribute name="Platform" type=" UiNameType " use="optional"/>
+                          </xs:extension>
+                        </xs:simpleContent>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <!-- Do not use ToolChain - it is a legacy value -->
+            <xs:attribute name="ToolChain" type="ToolChains" use="optional"/>
+            <xs:attribute name="BuildTargets" type=" BuildTargetList " use="optional"/>
+            <xs:attribute name="ToolChainFamily" type=" ToolsNameConvention " use="optional"/>
+            <xs:attribute name="TagName" type=" ToolsNameConvention " use="optional"/>
+            <xs:attribute name="ToolCommand" type=" ToolsNameConvention " use="optional"/>
+            <xs:attribute name="SupArchList" type=" ArchListType " use="optional"/>
+          </xs:complexType>
+        </xs:element>
+        <!-- The following Externs Section is for Legacy Ffs  -->
+        <xs:element minOccurs="0" maxOccurs="1" name="Externs">
+          <xs:complexType>
+            <xs:sequence minOccurs="1">
+              <xs:element name="PcdIsDriver" type=" PcdDriverTypes " minOccurs="0" maxOccurs="1"/>
+              <xs:element name="Specification" type=" Sentence " minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element name="Extern" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:choice minOccurs="1">
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                      <xs:element name=" ModuleEntryPoint " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                      <xs:element name=" ModuleUnloadImage " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                      <xs:element name=" Constructor " type=" C_NameType " minOccurs="0" maxOccurs="1"/>
+                      <xs:element name=" Destructor " type=" C_NameType " minOccurs="0" maxOccurs="1"/>
+                    </xs:sequence>
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                      <xs:element name=" DriverBinding " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                      <xs:element name=" ComponentName " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                      <xs:element name=" DriverConfig " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                      <xs:element name=" DriverDiag " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:sequence minOccurs="0" maxOccurs="1">
+                      <xs:element name=" SetVirtualAddressMapCallBack " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                      <xs:element name=" ExitBootServicesCallBack " type=" C_NameType " minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                  </xs:choice>
+                  <xs:attributeGroup ref=" ExternAttributes "/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attributeGroup ref="MsaAttributes"/>
     </xs:complexType>
-    <xs:complexType name="RawDataType">
-        <xs:sequence>
-            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="NameConvention"/>
-            <xs:element minOccurs="0" maxOccurs="1" name="Region" type="FvRegionTypes"/>
-            <xs:element minOccurs="0" maxOccurs="1" name="UserDefinedFvRegion" type="NameConvention"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="SubRegion" type="FvSubRegionTypes"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="Data" type="HexDataType"/>
-        </xs:sequence>
+  </xs:element>
+  <xs:element name="FvOption">
+    <xs:complexType>
+      <xs:attribute name="Name" type="xs:NCName" use="required"/>
+      <xs:attribute name="Value" type="xs:normalizedString" use="required"/>
     </xs:complexType>
-    <xs:complexType name="RegionDataType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define the regions and their uses for the device</xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="UCNameType"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="Size" type="HexAddressType"/>
-            <xs:element minOccurs="1" maxOccurs="unbounded" name="Attributes" type="EfiFvAttributeType"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="AreaType" type="EfiFvAreaType"/>
-            <xs:element minOccurs="0" maxOccurs="unbounded" name="SubRegion" type="SubRegionType"/>
-        </xs:sequence>
+  </xs:element>
+  <xs:element name="PlatformList">
+    <!-- Valid for DB usage only! -->
+    <xs:annotation>
+      <xs:documentation xml:lang="en">This is used in the FrameworkDatabase file</xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="1" maxOccurs="unbounded" name="Filename" type="DbPathAndFilename"/>
+      </xs:sequence>
     </xs:complexType>
-    <xs:complexType name="SubRegionType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Define the regions and their uses for the device</xs:documentation>
-        </xs:annotation>
-        <xs:sequence>
-            <xs:element default="true" minOccurs="1" maxOccurs="1" name="CreateHob" type="xs:boolean"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="Name" type="UCNameType"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="Size" type="HexAddressType"/>
-            <xs:element minOccurs="1" maxOccurs="unbounded" name="Attributes" type="EfiFvAttributeType"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="AreaType" type="EfiFvAreaType"/>
-            <xs:element minOccurs="1" maxOccurs="1" name="NameGuid" type="EfiNameGuidType"/>
-        </xs:sequence>
-    </xs:complexType>
+  </xs:element>
 </xs:schema>
