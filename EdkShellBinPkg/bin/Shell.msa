@@ -34,14 +34,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
   </MsaHeader>
   <SourceFiles>
-    <Filename Path="ia32" FileType="EFI">Shell_Full.efi</Filename>
-    <!--
     <Arch ArchType="IA32">
-      <Filename Path="ia32" FileType="EFI">Shell_Full.efi</Filename>
+      <Filename>ia32/Shell_Full.efi</Filename>
     </Arch>
-    -->
     <Arch ArchType="IPF">
-      <Filename Path="ipf">Shell_Full.efi</Filename>
+      <Filename>ipf/Shell_Full.efi</Filename>
+    </Arch>
+    <Arch ArchType="X64">
+      <Filename>x64/Shell.efi</Filename>
     </Arch>
   </SourceFiles>
 </ModuleSurfaceArea>
