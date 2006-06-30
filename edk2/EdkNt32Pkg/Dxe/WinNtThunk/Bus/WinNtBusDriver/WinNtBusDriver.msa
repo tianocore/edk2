@@ -1,141 +1,194 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <BaseName>WinNtBusDriver</BaseName>
+    <ModuleName>WinNtBusDriver</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
-    <ComponentType>BS_DRIVER</ComponentType>
-    <Guid>BD7E9A27-D6C5-416a-B245-5F507D95B2BD</Guid>
-    <Version>0</Version>
+    <GuidValue>BD7E9A27-D6C5-416a-B245-5F507D95B2BD</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for WinNtBusDriver module.</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-13 17:02</Created>
-    <Updated>2006-03-19 15:17</Updated>
-    <Specification>0</Specification>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>WinNtBusDriver</OutputFileBasename>
+  </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverModelLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverModelLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DevicePathLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>WinNtBusDriver.h</Filename>
     <Filename>WinNtBusDriver.c</Filename>
     <Filename>ComponentName.c</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-    <PackageName>EdkModulePkg</PackageName>
-    <PackageName>EdkNt32Pkg</PackageName>
-  </Includes>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+    <Package PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
+  </PackageDependencies>
   <Protocols>
-    <Protocol Usage="BY_START">WinNtIo</Protocol>
-    <Protocol Usage="TO_START">WinNtThunk</Protocol>
-    <Protocol Usage="TO_START">DevicePath</Protocol>
-    <Protocol Usage="ALWAYS_CONSUMED">PcdProtocol</Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>WinNtIo</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>WinNtThunk</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>DevicePath</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>PcdProtocol</ProtocolCName>
+    </Protocol>
   </Protocols>
   <Guids>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtVirtualDisks</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtPhysicalDisks</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtFileSystem</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtSerialPort</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtUga</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtConsole</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtMemory</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtCPUModel</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>WinNtCPUSpeed</C_Name>
-    </GuidEntry>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtVirtualDisks</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtPhysicalDisks</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtFileSystem</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtSerialPort</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtUga</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtConsole</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtMemory</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtCPUModel</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>WinNtCPUSpeed</GuidCName>
+    </GuidCNames>
   </Guids>
   <Externs>
-    <Extern>
-      <ModuleEntryPoint></ModuleEntryPoint>
-    </Extern>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00000000</Specification>
     <Extern>
       <DriverBinding>gWinNtBusDriverBinding</DriverBinding>
+    </Extern>
+    <Extern>
       <ComponentName>gWinNtBusDriverComponentName</ComponentName>
     </Extern>
   </Externs>
   <PcdCoded>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtConsole</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtConsole</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtUga</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtUga</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtSerialPort</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtSerialPort</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtFileSystem</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFileSystem</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtVirtualDisk</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtVirtualDisk</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtPhysicalDisk</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtPhysicalDisk</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuModel</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtCpuModel</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuSpeed</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtCpuSpeed</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySize</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtMemorySize</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch1</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBinaryPatch1</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch2</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBinaryPatch2</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdWinNtFeatureFlag1</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFeatureFlag1</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtDynamicUINT32</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdWinNtDynamicUINT32</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

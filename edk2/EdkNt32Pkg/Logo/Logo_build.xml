@@ -55,12 +55,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <file name="${DEST_DIR_OUTPUT}\Logo.bin"/>
       </sourcefiles>
       <targetfiles>
-        <file name="${BIN_DIR}\7BB28B99-61BB-11D5-9A5D-0090273FC14D-Logo.FFS"/>
+        <file name="${BIN_DIR}\${FILE_GUID}-Logo.FFS"/>
       </targetfiles>
       
       <sequential>
         <genffsfile BaseName="Logo" ffsATTRIBCHECKSUM="TRUE"
-          ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" fileGuid="7BB28B99-61BB-11D5-9A5D-0090273FC14D"
+          ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" fileGuid="${FILE_GUID}"
           outputDir="${BIN_DIR}">
           <compress compressName="dummy">
             <tool outputPath="${DEST_DIR_OUTPUT}" toolName="${WORKSPACE_DIR}\Tools\Bin\GenCRC32Section">
