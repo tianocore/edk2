@@ -466,7 +466,7 @@ public class FpdPlatformDefs extends IInternalFrame {
     private JTextField getJTextField() {
         if (jTextField == null) {
             jTextField = new JTextField();
-            jTextField.setPreferredSize(new Dimension(280, 20));
+            jTextField.setPreferredSize(new java.awt.Dimension(350,20));
         }
         return jTextField;
     }

@@ -66,14 +66,11 @@ public class FpdBuildOptions extends IInternalFrame {
     private JPanel jPanel9 = null;
     private JPanel jPanel10 = null;
     private JPanel jPanel11 = null;
-    private JRadioButton jRadioButton = null;
     private JTextField jTextField2 = null;
     private JLabel jLabel3 = null;
     private JTextField jTextField3 = null;
     private JButton jButton4 = null;
     private JButton jButton5 = null;
-    private JRadioButton jRadioButton1 = null;
-    private JLabel jLabel4 = null;
     private JTextField jTextField4 = null;
     private JScrollPane jScrollPane2 = null;
     private JTable jTable2 = null;
@@ -147,6 +144,8 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTextField jTextField13 = null;
     private JLabel jLabel15 = null;
     private int selectedRow = -1;
+    private JLabel jLabel = null;
+    private JLabel jLabel1 = null;
     /**
      * This method initializes jPanel	
      * 	
@@ -223,9 +222,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanel8.add(getJPanel9(), java.awt.BorderLayout.NORTH);
             jPanel8.add(getJPanel10(), java.awt.BorderLayout.SOUTH);
             jPanel8.add(getJPanel11(), java.awt.BorderLayout.CENTER);
-            ButtonGroup bg = new ButtonGroup();
-            bg.add(jRadioButton);
-            bg.add(jRadioButton1);
+
         }
         return jPanel8;
     }
@@ -237,18 +234,19 @@ public class FpdBuildOptions extends IInternalFrame {
      */
     private JPanel getJPanel9() {
         if (jPanel9 == null) {
+            jLabel = new JLabel();
+            jLabel.setText("ANT Task File");
+            jLabel.setPreferredSize(new java.awt.Dimension(80,20));
             FlowLayout flowLayout8 = new FlowLayout();
             flowLayout8.setAlignment(java.awt.FlowLayout.LEFT);
             jLabel3 = new JLabel();
             jLabel3.setText("ID");
             jPanel9 = new JPanel();
             jPanel9.setLayout(flowLayout8);
-            jPanel9.add(getJRadioButton(), null);
+            jPanel9.add(jLabel, null);
             jPanel9.add(getJTextField2(), null);
             jPanel9.add(jLabel3, null);
             jPanel9.add(getJTextField3(), null);
-            jPanel9.add(getJButton4(), null);
-            jPanel9.add(getJButton5(), null);
         }
         return jPanel9;
     }
@@ -272,41 +270,21 @@ public class FpdBuildOptions extends IInternalFrame {
      */
     private JPanel getJPanel11() {
         if (jPanel11 == null) {
+            jLabel1 = new JLabel();
+            jLabel1.setText("ANT Command Options");
+            jLabel1.setPreferredSize(new java.awt.Dimension(131,20));
             FlowLayout flowLayout3 = new FlowLayout();
             flowLayout3.setHgap(5);
             flowLayout3.setAlignment(java.awt.FlowLayout.LEFT);
-            jLabel4 = new JLabel();
-            jLabel4.setText("Execution Order");
-            jLabel4.setEnabled(false);
-            jLabel4.setPreferredSize(new java.awt.Dimension(100,16));
             jPanel11 = new JPanel();
             jPanel11.setLayout(flowLayout3);
-            jPanel11.add(getJRadioButton1(), null);
-            jPanel11.add(jLabel4, null);
+            jPanel11.add(jLabel1, null);
             jPanel11.add(getJTextField4(), null);
+            jPanel11.add(getJButton4(), null);
+            jPanel11.add(getJButton5(), null);
             jPanel11.add(getJScrollPane2(), null);
         }
         return jPanel11;
-    }
-
-    /**
-     * This method initializes jRadioButton	
-     * 	
-     * @return javax.swing.JRadioButton	
-     */
-    private JRadioButton getJRadioButton() {
-        if (jRadioButton == null) {
-            jRadioButton = new JRadioButton();
-            jRadioButton.setText("ANT tasks File");
-            jRadioButton.setSelected(true);
-            jRadioButton.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent arg0) {
-                    boolean selected = jRadioButton.isSelected();
-                    jTextField2.setEnabled(selected);
-                }
-            });
-        }
-        return jRadioButton;
     }
 
     /**
@@ -343,19 +321,14 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton getJButton4() {
         if (jButton4 == null) {
             jButton4 = new JButton();
-            jButton4.setPreferredSize(new java.awt.Dimension(70,20));
+            jButton4.setPreferredSize(new java.awt.Dimension(90,20));
             jButton4.setText("Add");
             jButton4.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     Object[] o = {jTextField3.getText(), null, null};
-                    if (jRadioButton.isSelected()) {
                         o[1] = jTextField2.getText();
-                        ffc.genBuildOptionsUserDefAntTask(o[0]+"", o[1]+"", null);
-                    }
-                    if (jRadioButton1.isSelected()) {
                         o[2] = jTextField4.getText();
                         ffc.genBuildOptionsUserDefAntTask(o[0]+"", null, o[2]+"");
-                    }
                     antTaskTableModel.addRow(o);
                     
                 }
@@ -372,7 +345,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton getJButton5() {
         if (jButton5 == null) {
             jButton5 = new JButton();
-            jButton5.setPreferredSize(new java.awt.Dimension(70,20));
+            jButton5.setPreferredSize(new java.awt.Dimension(90,20));
             jButton5.setText("Delete");
             jButton5.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -387,27 +360,6 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
-     * This method initializes jRadioButton1	
-     * 	
-     * @return javax.swing.JRadioButton	
-     */
-    private JRadioButton getJRadioButton1() {
-        if (jRadioButton1 == null) {
-            jRadioButton1 = new JRadioButton();
-            jRadioButton1.setText("ANT Command");
-            jRadioButton1.setPreferredSize(new java.awt.Dimension(180,24));
-            jRadioButton1.addItemListener(new ItemListener() {
-                public void itemStateChanged(ItemEvent arg0) {
-                    boolean selected = jRadioButton1.isSelected();
-                    jLabel4.setEnabled(selected);
-                    jTextField4.setEnabled(selected);
-                }
-            });
-        }
-        return jRadioButton1;
-    }
-
-    /**
      * This method initializes jTextField4	
      * 	
      * @return javax.swing.JTextField	
@@ -415,8 +367,8 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTextField getJTextField4() {
         if (jTextField4 == null) {
             jTextField4 = new JTextField();
-            jTextField4.setPreferredSize(new java.awt.Dimension(100,20));
-            jTextField4.setEnabled(false);
+            jTextField4.setPreferredSize(new java.awt.Dimension(270,20));
+            jTextField4.setEnabled(true);
         }
         return jTextField4;
     }
@@ -446,7 +398,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jTable2 = new JTable(antTaskTableModel);
             antTaskTableModel.addColumn("ID");
             antTaskTableModel.addColumn("Filename");
-            antTaskTableModel.addColumn("ExecutionOrder");
+            antTaskTableModel.addColumn("ANT Command Options");
             
             jTable2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable2.getSelectionModel().addListSelectionListener(new ListSelectionListener(){

@@ -1005,7 +1005,7 @@ public class FpdFileContents {
         if (fileName != null){
             at.setFilename(fileName);
         }
-        else {
+        if (execOrder != null) {
             at.setAntCmdOptions(execOrder);
         }
     }

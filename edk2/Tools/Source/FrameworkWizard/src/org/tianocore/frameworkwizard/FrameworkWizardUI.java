@@ -2370,6 +2370,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     **/
     private void showPlatformElement(int elementType, OpeningPlatformType fpd) {
         this.cleanDesktopPanePlatform();
+        fpd.setSaved(false);
         switch (elementType) {
         case IDefaultMutableTreeNode.FPD_PLATFORMDEFINITIONS:
             FpdPlatformDefs frmFpdPlatformDefs = new FpdPlatformDefs(fpd.getXmlFpd());
@@ -2412,6 +2413,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     private void showPackageElement(int elementType, OpeningPackageType spd) {
         this.cleanDesktopPanePackage();
         Tools.dirForNewSpd = spd.getId().getPath();
+        spd.setSaved(false);
         switch (elementType) {
         case IDefaultMutableTreeNode.SPD_HEADER:
             SpdHeader frmSpdHeader = new SpdHeader(spd.getXmlSpd());

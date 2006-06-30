@@ -1341,34 +1341,34 @@ public class FpdFlash extends IInternalFrame {
             if (k.equals("EFI_ERASE_POLARITY") && m.get(k).equals("1")) {
                 boolArray[0] = t;
             }
-            if (k.equals("EFI_READ_STATUS") && m.get(k).equals("1")) {
+            if (k.equals("EFI_READ_STATUS") && m.get(k).equals("TRUE")) {
                 boolArray[1] = t;
             }
-            if (k.equals("EFI_WRITE_STATUS") && m.get(k).equals("1")) {
+            if (k.equals("EFI_WRITE_STATUS") && m.get(k).equals("TRUE")) {
                 boolArray[2] = t;
             }
-            if (k.equals("EFI_LOCK_STATUS") && m.get(k).equals("1")) {
+            if (k.equals("EFI_LOCK_STATUS") && m.get(k).equals("TRUE")) {
                 boolArray[3] = t;
             }
-            if (k.equals("EFI_MEMORY_MAPPED") && m.get(k).equals("1")) {
+            if (k.equals("EFI_MEMORY_MAPPED") && m.get(k).equals("TRUE")) {
                 boolArray[4] = t;
             }
-            if (k.equals("EFI_STICKY_WRITE") && m.get(k).equals("1")) {
+            if (k.equals("EFI_STICKY_WRITE") && m.get(k).equals("TRUE")) {
                 boolArray[5] = t;
             }
-            if (k.equals("EFI_READ_DISABLED_CAP") && m.get(k).equals("1")) {
+            if (k.equals("EFI_READ_DISABLED_CAP") && m.get(k).equals("TRUE")) {
                 boolArray[6] = t;
             }
-            if (k.equals("EFI_READ_ENABLED_CAP") && m.get(k).equals("1")) {
+            if (k.equals("EFI_READ_ENABLED_CAP") && m.get(k).equals("TRUE")) {
                 boolArray[7] = t;
             }
-            if (k.equals("EFI_WRITE_DISABLED_CAP") && m.get(k).equals("1")) {
+            if (k.equals("EFI_WRITE_DISABLED_CAP") && m.get(k).equals("TRUE")) {
                 boolArray[8] = t;
             }
-            if (k.equals("EFI_WRITE_ENABLED_CAP") && m.get(k).equals("1")) {
+            if (k.equals("EFI_WRITE_ENABLED_CAP") && m.get(k).equals("TRUE")) {
                 boolArray[9] = t;
             }
-            if (k.equals("EFI_LOCK_CAP") && m.get(k).equals("1")) {
+            if (k.equals("EFI_LOCK_CAP") && m.get(k).equals("TRUE")) {
                 boolArray[10] = t;
             }
         }
@@ -1382,64 +1382,64 @@ public class FpdFlash extends IInternalFrame {
             m.put("EFI_ERASE_POLARITY", "0");
         }
         if (boolArray[1]) {
-            m.put("EFI_READ_STATUS", "1");
+            m.put("EFI_READ_STATUS", "TRUE");
         }
         else {
-            m.put("EFI_READ_STATUS", "0");
+            m.put("EFI_READ_STATUS", "FALSE");
         }
         if (boolArray[2]) {
-            m.put("EFI_WRITE_STATUS", "1");
+            m.put("EFI_WRITE_STATUS", "TRUE");
         }
         else {
-            m.put("EFI_WRITE_STATUS", "0");
+            m.put("EFI_WRITE_STATUS", "FALSE");
         }
         if (boolArray[3]) {
-            m.put("EFI_LOCK_STATUS", "1");
+            m.put("EFI_LOCK_STATUS", "TRUE");
         }
         else {
-            m.put("EFI_LOCK_STATUS", "0");
+            m.put("EFI_LOCK_STATUS", "FALSE");
         }
         if (boolArray[4]) {
-            m.put("EFI_MEMORY_MAPPED", "1");
+            m.put("EFI_MEMORY_MAPPED", "TRUE");
         }
         else {
-            m.put("EFI_MEMORY_MAPPED", "0");
+            m.put("EFI_MEMORY_MAPPED", "FALSE");
         }
         if (boolArray[5]) {
-            m.put("EFI_STICKY_WRITE", "1");
+            m.put("EFI_STICKY_WRITE", "TRUE");
         }
         else {
-            m.put("EFI_STICKY_WRITE", "0");
+            m.put("EFI_STICKY_WRITE", "FALSE");
         }
         if (boolArray[6]) {
-            m.put("EFI_READ_DISABLED_CAP", "1");
+            m.put("EFI_READ_DISABLED_CAP", "TRUE");
         }
         else {
-            m.put("EFI_READ_DISABLED_CAP", "0");
+            m.put("EFI_READ_DISABLED_CAP", "FALSE");
         }
         if (boolArray[7]) {
-            m.put("EFI_READ_ENABLED_CAP", "1");
+            m.put("EFI_READ_ENABLED_CAP", "TRUE");
         }
         else {
-            m.put("EFI_READ_ENABLED_CAP", "0");
+            m.put("EFI_READ_ENABLED_CAP", "FALSE");
         }
         if (boolArray[8]) {
-            m.put("EFI_WRITE_DISABLED_CAP", "1");
+            m.put("EFI_WRITE_DISABLED_CAP", "TRUE");
         }
         else {
-            m.put("EFI_WRITE_DISABLED_CAP", "0");
+            m.put("EFI_WRITE_DISABLED_CAP", "FALSE");
         }
         if (boolArray[9]) {
-            m.put("EFI_WRITE_ENABLED_CAP", "1");
+            m.put("EFI_WRITE_ENABLED_CAP", "TRUE");
         }
         else {
-            m.put("EFI_WRITE_ENABLED_CAP", "0");
+            m.put("EFI_WRITE_ENABLED_CAP", "FALSE");
         }
         if (boolArray[10]) {
-            m.put("EFI_LOCK_CAP", "1");
+            m.put("EFI_LOCK_CAP", "TRUE");
         }
         else {
-            m.put("EFI_LOCK_CAP", "0");
+            m.put("EFI_LOCK_CAP", "FALSE");
         }
     }
     /**
