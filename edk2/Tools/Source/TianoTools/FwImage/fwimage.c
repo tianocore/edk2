@@ -49,7 +49,7 @@ Usage (
   VOID
   )
 {
-  printf ("Usage: " UTILITY_NAME "  {-t time-date} [APPLICATION|BS_DRIVER|RT_DRIVER|SAL_RT_DRIVER|COMBINED_PEIM_DRIVER|SECURITY_CORE|PEI_CORE|PE32_PEIM|RELOCATABLE_PEIM] peimage [outimage]");
+  printf ("Usage: " UTILITY_NAME "  {-t time-date} [BASE|SEC|PEI_CORE|PEIM|DXE_CORE|DXE_DRIVER|DXE_RUNTIME_DRIVER|DXE_SAL_DRIVER|DXE_SMM_DRIVER|TOOL|UEFI_DRIVER|UEFI_APPLICATION|USER_DEFINED] peimage [outimage]");
 }
 
 static
@@ -201,33 +201,39 @@ Returns:
     p += 1;
   }
 
-  if (stricmp (p, "app") == 0 || stricmp (p, "APPLICATION") == 0) {
+  if (stricmp (p, "app") == 0 || stricmp (p, "UEFI_APPLICATION") == 0) {
     Type  = EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION;
     Ext   = ".efi";
 
-  } else if (stricmp (p, "bsdrv") == 0 || stricmp (p, "BS_DRIVER") == 0) {
+  } else if (stricmp (p, "bsdrv") == 0 || stricmp (p, "DXE_DRIVER") == 0) {
     Type  = EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER;
     Ext   = ".efi";
 
-  } else if (stricmp (p, "rtdrv") == 0 || stricmp (p, "RT_DRIVER") == 0) {
+  } else if (stricmp (p, "rtdrv") == 0 || stricmp (p, "DXE_RUNTIME_DRIVER") == 0) {
     Type  = EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER;
     Ext   = ".efi";
 
-  } else if (stricmp (p, "rtdrv") == 0 || stricmp (p, "SAL_RT_DRIVER") == 0) {
+  } else if (stricmp (p, "rtdrv") == 0 || stricmp (p, "DXE_SAL_DRIVER") == 0) {
     Type  = EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER;
     Ext   = ".efi";
-  } else if (stricmp (p, "SECURITY_CORE") == 0) {
+  } else if (stricmp (p, "SEC") == 0) {
     Type  = EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER;
     Ext   = ".sec";
   } else if (stricmp (p, "peim") == 0 ||
+           stricmp (p, "BASE") == 0 ||
            stricmp (p, "PEI_CORE") == 0 ||
-           stricmp (p, "PE32_PEIM") == 0 ||
-           stricmp (p, "RELOCATABLE_PEIM") == 0 ||
-           stricmp (p, "combined_peim_driver") == 0
+           stricmp (p, "PEIM") == 0 ||
+           stricmp (p, "DXE_SMM_DRIVER") == 0 ||
+           stricmp (p, "TOOL") == 0 ||
+           stricmp (p, "UEFI_APPLICATION") == 0 ||
+           stricmp (p, "USER_DEFINED") == 0 ||
+           stricmp (p, "UEFI_DRIVER") == 0 ||
+           stricmp (p, "DXE_CORE") == 0
           ) {
     Type  = EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER;
     Ext   = ".pei";
   } else {
+  	printf ("%s", p);
     Usage ();
     return STATUS_ERROR;
   }
