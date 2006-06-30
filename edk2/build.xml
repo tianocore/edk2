@@ -10,40 +10,46 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <project name="mdk" default="all" basedir=".">
-  <description>
-This is the highest-level build file.
-It can build all packages or clean up the build products.
-  </description>
-  <property environment="env"/>
-  <!-- Note: this is an ordered list. The projects have dependencies between them. -->
-  <filelist
-      id="Pkg.Dirs"
-      dir="."
-      files="Tools,MdePkg,EdkModulePkg,EdkNt32Pkg"/>
+  <!-- Apply external ANT tasks -->
+  <taskdef resource="net/sf/antcontrib/antlib.xml" />
+  <taskdef resource="GenBuild.tasks" />
+  
+  <property environment="env" />
+  
+  <property name="WORKSPACE_DIR" value="${env.WORKSPACE}" />
+  
+  <!--property name="COMMON_FILE" value="${WORKSPACE_DIR}/Tools/Conf/Common.xml" /-->
+  
+  <import file="${WORKSPACE_DIR}/Tools/Conf/BuildMacro.xml" />
+  
+  <target name="all" depends="init, build" />
+  
+  <target name="init">
+    <if>
+      <not>
+        <isset property="env.WORKSPACE" />
+      </not>
+      <then>
+        <fail message="WORKSPACE environmental variable not set." />
+      </then>
+    </if>
+    <!--
+    <ToolChainSetup confPath="${WORKSPACE_DIR}/Tools/Conf" />
+    -->
+  </target>
+  
+  <target name="build">
+    <FrameworkBuild />
+  </target>
 
-  <target name="all" description="Issue a warning.">
-    <echo>
-Top-level builds may not be functional.
-Please build each package individually from its own directory.
-If you would like to try anyway, type
-ant All
-    </echo>
+  <target name="clean" depends="init">
+    <echo message="Clean all intermidiate files. " />
+    <FrameworkBuild type="clean" />
   </target>
-  <target name="All" description="Build all packages.">
-    <subant target="" inheritall="false">
-      <filelist refid="Pkg.Dirs"/>
-    </subant>
+  
+  <target name="cleanall" depends="init">
+    <echo message="Clean all generated files. " />
+    <FrameworkBuild type="cleanall" />
   </target>
-
-  <target name="clean" description="Remove compile and assembly artifacts.">
-    <subant target="clean" inheritall="false">
-      <filelist refid="Pkg.Dirs"/>
-    </subant>
-  </target>
-
-  <target name="cleanall" description="Remove everything not in the distribution.">
-    <subant target="cleanall" inheritall="false">
-      <filelist refid="Pkg.Dirs"/>
-    </subant>
-  </target>
+  
 </project>
