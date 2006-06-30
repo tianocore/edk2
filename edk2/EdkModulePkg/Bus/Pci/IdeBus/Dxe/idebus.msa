@@ -1,49 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
+<!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <BaseName>IdeBus</BaseName>
+    <ModuleName>IdeBus</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
-    <ComponentType>BS_DRIVER</ComponentType>
-    <Guid>69FD8E47-A161-4550-B01A-5594CEB2B2B2</Guid>
-    <Version>0</Version>
+    <GuidValue>69FD8E47-A161-4550-B01A-5594CEB2B2B2</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for PS2 keyboard module.</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-12 17:09</Created>
-    <Updated>2006-03-22 16:27</Updated>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>IdeBus</OutputFileBasename>
+  </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverModelLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiDriverEntryPoint</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">ReportStatusCodeLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PerformanceLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiRuntimeServicesTableLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DevicePathLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverModelLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiDriverEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>ReportStatusCodeLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PerformanceLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiRuntimeServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DevicePathLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>idebus.h</Filename>
@@ -56,34 +78,45 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>ComponentName.c</Filename>
     <Filename>ComponentName.h</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-    <PackageName>EdkModulePkg</PackageName>
-  </Includes>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+  </PackageDependencies>
   <Protocols>
-    <Protocol Usage="TO_START">DevicePath</Protocol>
-    <Protocol Usage="TO_START">PciIo</Protocol>
-    <Protocol Usage="TO_START">IdeControllerInit</Protocol>
-    <Protocol Usage="BY_START">BlockIo</Protocol>
-    <Protocol Usage="BY_START">DiskInfo</Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>DevicePath</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>PciIo</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="TO_START">
+      <ProtocolCName>IdeControllerInit</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>BlockIo</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="BY_START">
+      <ProtocolCName>DiskInfo</ProtocolCName>
+    </Protocol>
   </Protocols>
   <Variables>
     <Variable Usage="ALWAYS_CONSUMED">
-      <String>Configuration</String>
-      <Guid>0x69fd8e47, 0xa161, 0x4550, 0xb0, 0x1a, 0x55, 0x94, 0xce, 0xb2, 0xb2, 0xb2</Guid>
+      <VariableName>0x0043 0x006F 0x006E 0x0066 0x0069 0x0067 0x0075 0x0072 0x0061 0x0074 0x0069 0x006F 0x006E</VariableName>
+      <GuidC_Name>gConfigurationGuid</GuidC_Name>
     </Variable>
   </Variables>
   <Guids>
-    <GuidEntry Usage="SOMETIMES_CONSUMED">
-      <C_Name>DiskInfoIde</C_Name>
-    </GuidEntry>
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
+      <GuidCName>DiskInfoIde</GuidCName>
+    </GuidCNames>
   </Guids>
   <Externs>
-    <Extern>
-      <ModuleEntryPoint></ModuleEntryPoint>
-    </Extern>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
       <DriverBinding>gIDEBusDriverBinding</DriverBinding>
+    </Extern>
+    <Extern>
       <ComponentName>gIDEBusComponentName</ComponentName>
     </Extern>
   </Externs>

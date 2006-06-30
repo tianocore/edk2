@@ -1,81 +1,91 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
+<ModuleSurfaceArea xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd" xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <MsaHeader>
-    <BaseName>PcdPeim</BaseName>
+    <ModuleName>PcdPeim</ModuleName>
     <ModuleType>PEIM</ModuleType>
-    <ComponentType>PE32_PEIM</ComponentType>
-    <Guid>9B3ADA4F-AE56-4c24-8DEA-F03B7558AE50</Guid>
-    <Version>EDK_RELEASE_VERSION        0x00020000</Version>
+    <GuidValue>9B3ADA4F-AE56-4c24-8DEA-F03B7558AE50</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for Pcd Database PEIM module</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-14 17:04</Created>
-    <Updated>2006-03-24 18:54</Updated>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>PcdPeim</OutputFileBasename>
+  </ModuleDefinitions>
   <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeimEntryPoint</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PeiServicesTablePointerLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">MemoryAllocationLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeimEntryPoint</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>HobLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeiServicesLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PeiServicesTablePointerLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>MemoryAllocationLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Pcd.dxs</Filename>
     <Filename>Pcd.c</Filename>
     <Filename>Service.c</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-    <PackageName>EdkModulePkg</PackageName>
-  </Includes>
-  <Hobs>
-    <Hob Usage="ALWAYS_PRODUCED" HobType="GUID_EXTENSION">
-      <Name>PcdDataBaseHob</Name>
-      <C_Name>gPcdDataBaseHobGuid</C_Name>
-      <Guid>0xea296d92, 0xb69,  0x423c, 0x8c, 0x28, 0x33, 0xb4, 0xe0, 0xa9, 0x12, 0x68</Guid>
-    </Hob>
-    <Hob Usage="ALWAYS_PRODUCED" HobType="GUID_EXTENSION">
-      <Name>PcdPeiCallbackFnTable</Name>
-      <C_Name>gPcdPeiCallbackFnTableHobGuid</C_Name>
-      <Guid>0xc625f4b2, 0xea09, 0x4675, 0x82, 0xd7, 0xba, 0x36, 0x82, 0x15, 0x7a, 0x14</Guid>
-    </Hob>
-  </Hobs>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+  </PackageDependencies>
   <PPIs>
-    <Ppi Usage="ALWAYS_PRODUCED">PcdPpi</Ppi>
-    <Ppi Usage="ALWAYS_CONSUMED">ReadOnlyVariable</Ppi>
+    <Ppi Usage="ALWAYS_PRODUCED">
+      <PpiCName>PcdPpi</PpiCName>
+    </Ppi>
+    <Ppi Usage="ALWAYS_CONSUMED">
+      <PpiCName>ReadOnlyVariable</PpiCName>
+    </Ppi>
   </PPIs>
   <Guids>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>PcdDataBaseHob</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>PcdPeiCallbackFnTable</C_Name>
-    </GuidEntry>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>PcdDataBaseHob</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>PcdPeiCallbackFnTable</GuidCName>
+    </GuidCNames>
   </Guids>
   <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00000000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
       <ModuleEntryPoint>PcdPeimInit</ModuleEntryPoint>
     </Extern>
@@ -83,9 +93,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaxPeiPcdCallBackNumberPerPcdEntry</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdMaxPeiPcdCallBackNumberPerPcdEntry</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdVpdBaseAddress</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdVpdBaseAddress</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
