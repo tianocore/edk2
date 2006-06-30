@@ -27,5 +27,4 @@ public class UserDefineArgument extends CommandLineArgument {
         throw new org.apache.tools.ant.BuildException(
                 "Not an actual task, but looks like one for documentation purposes");
     }
-
 }
