@@ -1,2 +1,0 @@
-WORKSPACE_TARGET    =   DEBUG
-TARGET_ARCH         =   IA32, x64, IPF, EBC
