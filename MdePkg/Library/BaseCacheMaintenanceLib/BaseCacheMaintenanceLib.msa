@@ -1,58 +1,50 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://nwlxweb02.jf.intel.com/2006/Edk2.0/SurfaceArea.xsd">
-  <MsaLibHeader>
-    <BaseName>BaseCacheMaintenanceLib</BaseName>
+<?xml version="1.0" encoding="UTF-8"?>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>BaseCacheMaintenanceLib</ModuleName>
     <ModuleType>BASE</ModuleType>
-    <ComponentType>LIBRARY</ComponentType>
-    <Guid>123dd843-57c9-4158-8418-ce68b3944ce7</Guid>
-    <Version>0</Version>
+    <GuidValue>123dd843-57c9-4158-8418-ce68b3944ce7</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Library Dependencies:BaseLib</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-09 23:16</Created>
-    <Updated>2006-03-19 15:17</Updated>
-    <Specification>0</Specification>
-  </MsaLibHeader>
-  <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">CacheMaintenanceLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>BaseCacheMaintenanceLib</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>CacheMaintenanceLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles>
-    <Arch ArchType="IA32">
-      <Filename>x86Cache.c</Filename>
-    </Arch>
-    <Arch ArchType="X64">
-      <Filename>x86Cache.c</Filename>
-    </Arch>
-    <Arch ArchType="EBC">
-      <Filename>EbcCache.c</Filename>
-    </Arch>
-    <Arch ArchType="IPF">
-      <Filename>IpfCache.c</Filename>
-      <Filename>Ipf/Cpu.s</Filename>
-      <Filename>Ipf/PalCallStatic.s</Filename>
-    </Arch>
+  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Filename SupArchList="IA32">x86Cache.c</Filename>
+    <Filename SupArchList="X64">x86Cache.c</Filename>
+    <Filename SupArchList="EBC">EbcCache.c</Filename>
+    <Filename SupArchList="IPF">IpfCache.c</Filename>
+    <Filename SupArchList="IPF">Ipf/Cpu.s</Filename>
+    <Filename SupArchList="IPF">Ipf/PalCallStatic.s</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-  </Includes>
-</LibraryModuleSurfaceArea>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
+  </Externs>
+</ModuleSurfaceArea>

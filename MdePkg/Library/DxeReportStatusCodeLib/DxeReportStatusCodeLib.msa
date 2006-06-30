@@ -1,68 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<LibraryModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
-  <MsaLibHeader>
-    <BaseName>DxeReportStatusCodeLib</BaseName>
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+  <MsaHeader>
+    <ModuleName>DxeReportStatusCodeLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
-    <ComponentType>LIBRARY</ComponentType>
-    <Guid>3ddc3b12-99ea-4364-b315-6310a2050be5</Guid>
-    <Version>0</Version>
+    <GuidValue>3ddc3b12-99ea-4364-b315-6310a2050be5</GuidValue>
+    <Version>1.0</Version>
     <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
-    <License>
-      All rights reserved. This program and the accompanying materials
+    <License xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
-    <Created>2006-03-09 23:16</Created>
-    <Updated>2006-03-19 15:17</Updated>
-    <Specification>0</Specification>
-  </MsaLibHeader>
-  <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_PRODUCED">ReportStatusCodeLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">DebugLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">UefiBootServicesTableLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">BaseMemoryLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">PcdLib</LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">IoLib</LibraryClass>
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
+  </MsaHeader>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>DxeReportStatusCodeLib</OutputFileBasename>
+  </ModuleDefinitions>
+  <LibraryClassDefinitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <LibraryClass Usage="ALWAYS_PRODUCED">
+      <Keyword>ReportStatusCodeLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>DebugLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>UefiBootServicesTableLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>IoLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
-  <SourceFiles>
+  <SourceFiles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Filename>ReportStatusCodeLib.c</Filename>
   </SourceFiles>
-  <Includes>
-    <PackageName>MdePkg</PackageName>
-  </Includes>
-  <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">StatusCode</Protocol>
+  <PackageDependencies>
+    <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+  </PackageDependencies>
+  <Protocols xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>StatusCode</ProtocolCName>
+    </Protocol>
   </Protocols>
-  <Guids>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>StatusCodeDataTypeAssert</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>StatusCodeDataTypeDebug</C_Name>
-    </GuidEntry>
-    <GuidEntry Usage="ALWAYS_CONSUMED">
-      <C_Name>StatusCodeSpecificData</C_Name>
-    </GuidEntry>
+  <Guids xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>StatusCodeDataTypeAssert</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>StatusCodeDataTypeDebug</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>StatusCodeSpecificData</GuidCName>
+    </GuidCNames>
   </Guids>
-  <PcdCoded>
+  <Externs>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
+  </Externs>
+  <PcdCoded xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdReportStatusCodePropertyMask</TokenSpaceGuidCName>
+      <HelpText/>
     </PcdEntry>
   </PcdCoded>
-</LibraryModuleSurfaceArea>
+</ModuleSurfaceArea>
