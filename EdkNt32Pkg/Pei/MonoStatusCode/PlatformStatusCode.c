@@ -19,7 +19,7 @@ Abstract:
 
 --*/
 
-#include "../MonoStatusCode.h"
+#include "MonoStatusCode.h"
 
 
 BOOLEAN gRunningFromMemory = FALSE;

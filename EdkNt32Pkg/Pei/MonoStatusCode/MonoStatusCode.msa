@@ -38,10 +38,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <LibraryClass Usage="ALWAYS_CONSUMED">HobLib</LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>..\MonoStatusCode.c</Filename>
-    <Filename>..\MonoStatusCode.h</Filename>
+    <Filename>MonoStatusCode.dxs</Filename>
+    <Filename>MonoStatusCode.c</Filename>
     <Filename>PlatformStatusCode.c</Filename>
-    <Filename>..\MonoStatusCode.dxs</Filename>
   </SourceFiles>
   <Includes>
     <PackageName>MdePkg</PackageName>
