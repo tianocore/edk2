@@ -43,7 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <arg value="-out"/>
       <arg value="${WORKSPACE}/Tools/Jars/SurfaceArea.jar"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsd"/>
-      <arg value="${WORKSPACE}/Tools/XMLSchema/FDPManifest.xsd"/>
+      <arg value="${WORKSPACE}/Tools/XMLSchema/FarManifest.xsd"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsdconfig"/>
     </java>
   </target>
@@ -59,14 +59,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <arg value="-src"/>
       <arg value="${WORKSPACE}/Tools/Source/SurfaceArea"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsd"/>
-      <arg value="${WORKSPACE}/Tools/XMLSchema/FDPManifest.xsd"/>
+      <arg value="${WORKSPACE}/Tools/XMLSchema/FarManifest.xsd"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsdconfig"/>
     </java>
   </target>
   
   <target name="SurfaceArea" depends="init" unless="jar.newer">
     <antcall target="SurfaceArea.java.clean"/>
-    <java classname="org.apache.xmlbeans.impl.tool.SchemaCompiler" fork="true">
+    <java classname="org.apache.xmlbeans.impl.tool.SchemaCompiler">
       <classpath refid="classpath"/>
       <arg value="-javasource"/>
       <arg value="1.5"/>
@@ -76,7 +76,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <arg value="-out"/>
       <arg value="${WORKSPACE}/Tools/Jars/SurfaceArea.jar"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsd"/>
-      <arg value="${WORKSPACE}/Tools/XMLSchema/FDPManifest.xsd"/>
+      <arg value="${WORKSPACE}/Tools/XMLSchema/FarManifest.xsd"/>
       <arg value="${WORKSPACE}/Tools/XMLSchema/SurfaceArea.xsdconfig"/>
     </java>
   </target>
