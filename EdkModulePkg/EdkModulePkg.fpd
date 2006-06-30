@@ -46,7 +46,6 @@
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="Partition" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="English" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DiskIo" />
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DiskIoPartition" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="SecurityStub" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DxeMain" />
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="PeiMain" />
@@ -751,75 +750,7 @@
             <Value>0xAF</Value>
           </PcdData>
         </PcdBuildDefinition>
-      </ModuleSA>      
-      <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="DiskIoPartition" >
-        <PcdBuildDefinition>
-          <PcdData ItemType="FIXED_AT_BUILD">
-            <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-            <Token>0x00000001</Token>
-            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
-            <DatumType>UINT32</DatumType>
-            <MaxDatumSize>4</MaxDatumSize>
-            <Value>1000000</Value>
-          </PcdData>
-          <PcdData ItemType="FIXED_AT_BUILD">
-            <C_Name>PcdMaximumAsciiStringLength</C_Name>
-            <Token>0x00000002</Token>
-            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
-            <DatumType>UINT32</DatumType>
-            <MaxDatumSize>4</MaxDatumSize>
-            <Value>1000000</Value>
-          </PcdData>
-          <PcdData ItemType="FIXED_AT_BUILD">
-            <C_Name>PcdDebugPropertyMask</C_Name>
-            <Token>0x00000005</Token>
-            <TokenSpaceGuid>866baf87-e00c-4dc6-9733-1e23af2115ee</TokenSpaceGuid>
-            <DatumType>UINT8</DatumType>
-            <MaxDatumSize>1</MaxDatumSize>
-            <Value>0x0f</Value>
-          </PcdData>
-          <PcdData ItemType="FIXED_AT_BUILD">
-            <C_Name>PcdSpinLockTimeout</C_Name>
-            <Token>0x00000004</Token>
-            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
-            <DatumType>UINT32</DatumType>
-            <MaxDatumSize>4</MaxDatumSize>
-            <Value>10000000</Value>
-          </PcdData>
-          <PcdData ItemType="PATCHABLE_IN_MODULE">
-            <C_Name>PcdDebugPrintErrorLevel</C_Name>
-            <Token>0x00000006</Token>
-            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
-            <DatumType>UINT32</DatumType>
-            <MaxDatumSize>4</MaxDatumSize>
-            <Value>0x80000000</Value>
-          </PcdData>
-          <PcdData ItemType="FIXED_AT_BUILD">
-            <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-            <Token>0x00000007</Token>
-            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
-            <DatumType>UINT8</DatumType>
-            <MaxDatumSize>1</MaxDatumSize>
-            <Value>0x07</Value>
-          </PcdData>
-          <PcdData ItemType="FIXED_AT_BUILD">
-            <C_Name>PcdMaximumLinkedListLength</C_Name>
-            <Token>0x00000003</Token>
-            <TokenSpaceGuid>f1a9de0d-f005-45c4-bdb5-5ec0fb468316</TokenSpaceGuid>
-            <DatumType>UINT32</DatumType>
-            <MaxDatumSize>4</MaxDatumSize>
-            <Value>1000000</Value>
-          </PcdData>
-          <PcdData ItemType="FIXED_AT_BUILD">
-            <C_Name>PcdDebugClearMemoryValue</C_Name>
-            <Token>0x00000008</Token>
-            <TokenSpaceGuid>00000000-0000-0000-0000-000000000000</TokenSpaceGuid>
-            <DatumType>UINT8</DatumType>
-            <MaxDatumSize>1</MaxDatumSize>
-            <Value>0xAF</Value>
-          </PcdData>
-        </PcdBuildDefinition>
-      </ModuleSA>      
+      </ModuleSA>
       <ModuleSA Arch="IA32" FvBinding="NULL" ModuleName="SecurityStub" >
         <PcdBuildDefinition>
           <PcdData ItemType="FIXED_AT_BUILD">

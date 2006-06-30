@@ -108,7 +108,7 @@
       <Filename>Pei/FlashMap/FlashMap.msa</Filename>
     </MsaFile>
     <MsaFile>
-      <Filename>Pei/MonoStatusCode/Nt32/MonoStatusCode.msa</Filename>
+      <Filename>Pei/MonoStatusCode/MonoStatusCode.msa</Filename>
     </MsaFile>
     <MsaFile>
       <Filename>Pei/WinNtStuff/WinNtStuff.msa</Filename>
