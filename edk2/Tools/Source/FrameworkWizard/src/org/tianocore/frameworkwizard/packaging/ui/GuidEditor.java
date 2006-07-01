@@ -20,11 +20,9 @@ import java.awt.event.ActionListener;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
-import org.tianocore.frameworkwizard.common.Tools;
 
 /**
  Editor for table cell with GUID value.
@@ -32,6 +30,10 @@ import org.tianocore.frameworkwizard.common.Tools;
  **/
 public class GuidEditor extends AbstractCellEditor implements TableCellEditor, ActionListener {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     String currentGuid;
     JButton button;
     static JFrame frame;
