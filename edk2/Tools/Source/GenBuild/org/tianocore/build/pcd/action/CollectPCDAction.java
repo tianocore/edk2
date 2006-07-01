@@ -2077,12 +2077,12 @@ public class CollectPCDAction {
         boolean                             isDuplicate       = false;
         Token.PCD_TYPE                      pcdType           = Token.PCD_TYPE.UNKNOWN;
         Token.DATUM_TYPE                    datumType         = Token.DATUM_TYPE.UNKNOWN;
-        long                                 tokenNumber       = 0;
+        long                                tokenNumber       = 0;
         String                              moduleName        = null;
         String                              datum             = null;
         int                                 maxDatumSize      = 0;
-        String								tokenSpaceGuidString = null;
-        
+        String[]                            tokenSpaceStrRet  = null;
+
         //
         // ----------------------------------------------
         // 1), Get all <ModuleSA> from FPD file.
@@ -2145,11 +2145,20 @@ public class CollectPCDAction {
             // ----------------------------------------------------------------------
             // 
             for (pcdIndex = 0; pcdIndex < pcdBuildDataArray.size(); pcdIndex ++) {
-            	//tokenSpaceGuidString = GlobalData.getGuidInfoFromCname(pcdBuildData.getTokenSpaceGuidCName())[1];
-                tokenSpaceGuidString = null;
                 pcdBuildData = pcdBuildDataArray.get(pcdIndex);
+                
+                try {
+                    tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(pcdBuildData.getTokenSpaceGuidCName());
+                } catch ( Exception e ) {
+                    throw new EntityException ("Faile get Guid for token " + pcdBuildData.getCName() + ":" + e.getMessage());
+                }
+
+                if (tokenSpaceStrRet == null) {
+                    throw new EntityException ("Fail to get Token space guid for token" + pcdBuildData.getCName());
+                } 
+
                 primaryKey   = Token.getPrimaryKeyString(pcdBuildData.getCName(),
-                                                         translateSchemaStringToUUID(tokenSpaceGuidString));
+                                                         translateSchemaStringToUUID(tokenSpaceStrRet[1]));
                 pcdType      = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
                 datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
                 tokenNumber  = Long.decode(pcdBuildData.getToken().toString());
@@ -2278,10 +2287,18 @@ public class CollectPCDAction {
                     // If the token is not in database, create a new token instance and add
                     // a usage instance into this token in database.
                     // 
-                	//String tokenSpaceString = GlobalData.getGuidInfoFromCname(pcdBuildData.getTokenSpaceGuidCName())[1];
-                    String tokenSpaceString = null;
+                    try {
+                        tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(pcdBuildData.getTokenSpaceGuidCName());
+                    } catch (Exception e) {
+                        throw new EntityException("Fail to get token space guid for token " + token.cName);
+                    }
+
+                    if (tokenSpaceStrRet == null) {
+                        throw new EntityException("Fail to get token space guid for token " + token.cName);
+                    }
+
                     token = new Token(pcdBuildData.getCName(), 
-                                      translateSchemaStringToUUID(tokenSpaceString));
+                                      translateSchemaStringToUUID(tokenSpaceStrRet[1]));
     
                     token.datumType     = datumType;
                     token.tokenNumber   = tokenNumber;
@@ -2674,6 +2691,7 @@ public class CollectPCDAction {
         String dynamicPrimaryKey = null;
         DynamicPcdBuildDefinitions                    dynamicPcdBuildDefinitions = null;
         List<DynamicPcdBuildDefinitions.PcdBuildData> dynamicPcdBuildDataArray   = null;
+        String[]                                      tokenSpaceStrRet           = null;
 
         //
         // If FPD document is not be opened, open and initialize it.
@@ -2701,8 +2719,18 @@ public class CollectPCDAction {
         for (index = 0; index < dynamicPcdBuildDataArray.size(); index ++) {
             //String tokenSpaceGuidString = GlobalData.getGuidInfoFromCname(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName())[1];
             String tokenSpaceGuidString = null;
+            try {
+                tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName());
+            } catch (Exception e) {
+                throw new EntityException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
+            }
+            
+            if (tokenSpaceStrRet == null) {
+                throw new EntityException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
+            }
+
             dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
-                                                          translateSchemaStringToUUID(tokenSpaceGuidString));
+                                                          translateSchemaStringToUUID(tokenSpaceStrRet[1]));
             if (dynamicPrimaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
                 return dynamicPcdBuildDataArray.get(index);
             }

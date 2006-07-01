@@ -768,13 +768,18 @@ public class GlobalData {
         String guid = null;
         Set set = spdTable.keySet();
         Iterator iter = set.iterator();
-        
+
+        if (iter == null) {
+            return null;
+        }
+
         while (iter.hasNext()){
             Spd spd = (Spd) spdTable.get(iter.next());
             guid = spd.getGuidFromCname(cName);
             if (guid != null){
-                cNameGuid[0] = new String(cName);
-                cNameGuid[1] = new String(guid);
+                cNameGuid = new String[2];
+                cNameGuid[0] = cName;
+                cNameGuid[1] = guid;
                 break;
             }
         }
