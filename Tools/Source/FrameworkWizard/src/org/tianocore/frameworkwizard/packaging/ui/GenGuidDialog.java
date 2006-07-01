@@ -42,6 +42,11 @@ import java.awt.event.WindowEvent;
 **/
 public class GenGuidDialog extends JDialog implements ActionListener{
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public static final String guidArrayPat = "0x[a-fA-F0-9]{1,8},( )*0x[a-fA-F0-9]{1,4},( )*0x[a-fA-F0-9]{1,4}(,( )*\\{)?(,?( )*0x[a-fA-F0-9]{1,2}){8}( )*(\\})?";
     
     public static final String guidRegistryPat = "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}";

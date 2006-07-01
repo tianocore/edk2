@@ -25,7 +25,6 @@ import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlCursor;
 
-import org.tianocore.FilenameDocument;
 import org.tianocore.GuidDeclarationsDocument;
 
 import org.tianocore.LibraryClassDeclarationsDocument;
@@ -37,12 +36,10 @@ import org.tianocore.PackageHeadersDocument;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.PcdDataTypes;
 import org.tianocore.PcdDeclarationsDocument;
-import org.tianocore.PcdItemTypes;
 import org.tianocore.PpiDeclarationsDocument;
 import org.tianocore.ProtocolDeclarationsDocument;
 import org.tianocore.SpdHeaderDocument;
 import org.tianocore.GuidDeclarationsDocument.GuidDeclarations;
-import org.tianocore.PackageHeadersDocument.PackageHeaders.IncludePkgHeader;
 
 /**
  This class processes spd file contents such as add remove xml elements.

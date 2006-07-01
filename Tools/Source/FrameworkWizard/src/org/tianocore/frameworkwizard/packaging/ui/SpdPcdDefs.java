@@ -13,17 +13,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.frameworkwizard.packaging.ui;
 
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -41,7 +37,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
-import org.tianocore.frameworkwizard.common.DataType;
 
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -58,6 +53,11 @@ import java.util.Vector;
  @since PackageEditor 1.0
 **/
 public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
     static JFrame frame;
     
@@ -926,7 +926,12 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 } //  @jve:decl-index=0:visual-constraint="22,11"
 
 class CheckboxTableModel extends DefaultTableModel {
-    public Class getColumnClass (int c) {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public Class<?> getColumnClass (int c) {
         if (getValueAt(0, c) != null){
             return getValueAt(0, c).getClass();
         }
