@@ -39,6 +39,8 @@ import javax.swing.JTable;
 import javax.swing.JComboBox;
 import javax.swing.JRadioButton;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -46,12 +48,10 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
-import javax.swing.JList;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import java.awt.CardLayout;
-import javax.swing.JTree;
 
 public class FpdBuildOptions extends IInternalFrame {
 
@@ -74,18 +74,14 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTextField jTextField4 = null;
     private JScrollPane jScrollPane2 = null;
     private JTable jTable2 = null;
-    private DefaultTableModel fileNameTableModel = null;
+    private DefaultTableModel ffsTableModel = null;
     private DefaultTableModel imageEntryPointTableModel = null;
     private DefaultTableModel outputDirectoryTableModel = null;
     private DefaultTableModel antTaskTableModel = null;
     private DefaultTableModel ffsAttributesTableModel = null;
     private DefaultTableModel optionsTableModel = null;
     private JPanel jPanel13 = null;
-    private JPanel jPanel14 = null;
     private JPanel jPanel18 = null;
-    private JScrollPane jScrollPane4 = null;
-    private JLabel jLabel6 = null;
-    private JList jList = null;
     private JPanel jPanel15 = null;
     private JPanel jPanel16 = null;
     private JPanel jPanel17 = null;
@@ -127,8 +123,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton jButton15 = null;
     private JButton jButton16 = null;
     private DefaultListModel listModel = new DefaultListModel();
-    private JScrollPane jScrollPane7 = null;
-    private JTree jTree = null;
     private JButton jButton17 = null;
     private JButton jButton18 = null;
     private FpdFileContents ffc = null;
@@ -146,6 +140,8 @@ public class FpdBuildOptions extends IInternalFrame {
     private int selectedRow = -1;
     private JLabel jLabel = null;
     private JLabel jLabel1 = null;
+    private JScrollPane jScrollPane = null;
+    private JTable jTable = null;
     /**
      * This method initializes jPanel	
      * 	
@@ -457,27 +453,10 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jPanel13 == null) {
             jPanel13 = new JPanel();
             jPanel13.setLayout(new BorderLayout());
-            jPanel13.add(getJPanel14(), java.awt.BorderLayout.WEST);
             jPanel13.add(getJPanel18(), java.awt.BorderLayout.CENTER);
+            jPanel13.add(getJScrollPane(), java.awt.BorderLayout.WEST);
         }
         return jPanel13;
-    }
-
-    /**
-     * This method initializes jPanel14	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel14() {
-        if (jPanel14 == null) {
-            jLabel6 = new JLabel();
-            jLabel6.setText("FFS Types");
-            jPanel14 = new JPanel();
-            jPanel14.setPreferredSize(new java.awt.Dimension(120,300));
-            jPanel14.add(jLabel6, null);
-            jPanel14.add(getJScrollPane4(), null);
-        }
-        return jPanel14;
     }
 
     /**
@@ -495,32 +474,6 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanel18.add(getJPanel19(), java.awt.BorderLayout.CENTER);
         }
         return jPanel18;
-    }
-
-    /**
-     * This method initializes jScrollPane4	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
-    private JScrollPane getJScrollPane4() {
-        if (jScrollPane4 == null) {
-            jScrollPane4 = new JScrollPane();
-            jScrollPane4.setPreferredSize(new java.awt.Dimension(120,330));
-            jScrollPane4.setViewportView(getJList());
-        }
-        return jScrollPane4;
-    }
-
-    /**
-     * This method initializes jList	
-     * 	
-     * @return javax.swing.JList	
-     */
-    private JList getJList() {
-        if (jList == null) {
-            jList = new JList(listModel);
-        }
-        return jList;
     }
 
     /**
@@ -573,7 +526,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JPanel getJPanel17() {
         if (jPanel17 == null) {
             jPanel17 = new JPanel();
-            jPanel17.add(getJScrollPane7(), null);
         }
         return jPanel17;
     }
@@ -602,6 +554,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton8.setPreferredSize(new java.awt.Dimension(70,20));
             jButton8.setText("Add");
             jButton8.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = -2923720717273384221L;
+
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (jTextField6.getText().length() > 0) {
                         listModel.addElement(jTextField6.getText());
@@ -623,8 +580,12 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton9.setPreferredSize(new java.awt.Dimension(70,20));
             jButton9.setText("Delete");
             jButton9.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = -4002678939178194476L;
+
                 public void actionPerformed(ActionEvent arg0){
-                    listModel.remove(jList.getSelectedIndex());
                 }
             });
         }
@@ -869,6 +830,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton10.setText("Add");
             jButton10.setPreferredSize(new java.awt.Dimension(70,20));
             jButton10.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     boolean[] boolArray = {jCheckBox9.isSelected(),jCheckBox10.isSelected(),jCheckBox11.isSelected(),
                                            jCheckBox12.isSelected(),jCheckBox13.isSelected(),jCheckBox14.isSelected()};
@@ -918,6 +884,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton11.setText("Delete");
             jButton11.setPreferredSize(new java.awt.Dimension(70,20));
             jButton11.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (selectedRow >= 0) {
                         optionsTableModel.removeRow(selectedRow);
@@ -964,6 +935,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton12.setText("Add Sections");
             jButton12.setPreferredSize(new java.awt.Dimension(109,20));
             jButton12.addActionListener(new AbstractAction(){
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(ActionEvent arg0){
                 }
             });
@@ -982,6 +958,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton13.setText("Add Section");
             jButton13.setPreferredSize(new java.awt.Dimension(102,20));
             jButton13.addActionListener(new AbstractAction(){
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(ActionEvent arg0){
                     CardLayout cl = (CardLayout)jPanel19.getLayout();
                     cl.last(jPanel19);
@@ -1152,6 +1133,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton14.setText("Add");
             jButton14.setPreferredSize(new java.awt.Dimension(70,20));
             jButton14.addActionListener(new AbstractAction(){
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(ActionEvent arg0){
                 }
             });
@@ -1188,32 +1174,6 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
-     * This method initializes jScrollPane7	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
-    private JScrollPane getJScrollPane7() {
-        if (jScrollPane7 == null) {
-            jScrollPane7 = new JScrollPane();
-            jScrollPane7.setPreferredSize(new java.awt.Dimension(110,200));
-            jScrollPane7.setViewportView(getJTree());
-        }
-        return jScrollPane7;
-    }
-
-    /**
-     * This method initializes jTree	
-     * 	
-     * @return javax.swing.JTree	
-     */
-    private JTree getJTree() {
-        if (jTree == null) {
-            jTree = new JTree();
-        }
-        return jTree;
-    }
-
-    /**
      * This method initializes jButton17	
      * 	
      * @return javax.swing.JButton	
@@ -1224,6 +1184,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton17.setPreferredSize(new java.awt.Dimension(70,20));
             jButton17.setText("Add");
             jButton17.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(ActionEvent arg0){
                     Object[] o = {"", ""};
                     ffsAttributesTableModel.addRow(o);
@@ -1244,6 +1209,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton18.setPreferredSize(new java.awt.Dimension(70,20));
             jButton18.setText("Delete");
             jButton18.addActionListener(new AbstractAction(){
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(ActionEvent arg0){
                     if (jTable4.getSelectedRow() >= 0){
                         ffsAttributesTableModel.removeRow(jTable4.getSelectedRow());
@@ -1380,6 +1350,36 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
+     * This method initializes jScrollPane	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPane() {
+        if (jScrollPane == null) {
+            jScrollPane = new JScrollPane();
+            jScrollPane.setPreferredSize(new java.awt.Dimension(150,419));
+            jScrollPane.setViewportView(getJTable());
+        }
+        return jScrollPane;
+    }
+
+    /**
+     * This method initializes jTable	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTable() {
+        if (jTable == null) {
+            ffsTableModel = new DefaultTableModel();
+            ffsTableModel.addColumn("FFS Type");
+            jTable = new JTable(ffsTableModel);
+            jTable.setShowGrid(false);
+            jTable.setRowHeight(20);
+        }
+        return jTable;
+    }
+
+    /**
      * @param args
      */
     public static void main(String[] args) {
@@ -1405,6 +1405,28 @@ public class FpdBuildOptions extends IInternalFrame {
     private void init(FpdFileContents ffc) {
         initOptionTable();
         initAntTaskTable();
+        this.addInternalFrameListener(new InternalFrameAdapter(){
+            public void internalFrameDeactivated(InternalFrameEvent e){
+                if (jTable.isEditing()) {
+                    jTable.getCellEditor().stopCellEditing();
+                }
+//                if (jTable1.isEditing()) {
+//                    jTable1.getCellEditor().stopCellEditing();
+//                }
+                if (jTable2.isEditing()) {
+                    jTable2.getCellEditor().stopCellEditing();
+                }
+//                if (jTable3.isEditing()) {
+//                    jTable3.getCellEditor().stopCellEditing();
+//                }
+                if (jTable4.isEditing()) {
+                    jTable4.getCellEditor().stopCellEditing();
+                }
+                if (jTable5.isEditing()) {
+                    jTable5.getCellEditor().stopCellEditing();
+                }
+            }
+        });
     }
     
     private void initOptionTable() {

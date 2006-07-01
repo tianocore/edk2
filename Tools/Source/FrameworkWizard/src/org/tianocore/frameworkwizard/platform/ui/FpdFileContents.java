@@ -33,10 +33,8 @@ import org.tianocore.AntTaskDocument;
 import org.tianocore.BuildOptionsDocument;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument;
 import org.tianocore.FlashDefinitionFileDocument;
-import org.tianocore.FlashDeviceDefinitionsDocument;
 import org.tianocore.FlashDocument;
 import org.tianocore.FrameworkModulesDocument;
-import org.tianocore.FvRegionNameDocument;
 import org.tianocore.LibrariesDocument;
 import org.tianocore.ModuleSADocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
@@ -1306,13 +1304,209 @@ public class FpdFileContents {
         Set<String> key = options.keySet();
         Iterator<String> i = key.iterator();
         while (i.hasNext()) {
+            
             FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = fio.addNewNameValue();
             String k = (String)i.next();
+            if (k.equals("EFI_ALIGNMENT_CAP")) {
+                nv.setName(k);
+                nv.setValue("TRUE");
+                setFvImageOptionsAlign((String)options.get(k), fio);
+                continue;
+            }
             nv.setName(k);
             nv.setValue((String)options.get(k));
             
         }
         
+    }
+    
+    private void setFvImageOptionsAlign(String alignValue, FvImagesDocument.FvImages.FvImage.FvImageOptions fio) {
+        int numForm = -1;
+        if (alignValue.endsWith("K")) {
+            alignValue = alignValue.substring(0, alignValue.length()-1);
+            numForm = new Integer(alignValue).intValue() * 1024;
+        }
+        else {
+            numForm = new Integer(alignValue).intValue();
+        }
+        
+        FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = null;
+        if (numForm / (64*1024) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_64K");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_64K");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (32*1024) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_32K");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_32K");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (16*1024) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_16K");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_16K");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (8*1024) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_8K");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_8K");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (4*1024) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_4K");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_4K");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (2*1024) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_2K");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_2K");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (1*1024) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_1K");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_1K");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (512) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_512");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_512");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (256) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_256");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_256");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (128) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_128");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_128");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (64) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_64");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_64");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (32) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_32");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_32");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (16) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_16");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_16");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (8) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_8");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_8");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (4) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_4");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_4");
+            nv.setValue("FALSE");
+        }
+        
+        if (numForm / (2) >= 1) {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_2");
+            nv.setValue("TRUE");
+        }
+        else {
+            nv = fio.addNewNameValue();
+            nv.setName("EFI_ALIGNMENT_2");
+            nv.setValue("FALSE");
+        }
+            
     }
     
     public void removeFvImagesFvImage(int i) {

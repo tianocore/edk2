@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
-import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -23,6 +22,10 @@ import javax.swing.JTextField;
 
 public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private JPanel jContentPane = null;
     private JPanel jPanel = null;
     private JPanel jPanel1 = null;
@@ -465,7 +468,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                     }
                     else{
                         int selected = lsm.getMinSelectionIndex();
-                        
+                        displaySkuInfoDetails(selected);
                     }
                 }
             });
@@ -662,6 +665,11 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
 class DynPcdTableModel extends DefaultTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public boolean isCellEditable(int row, int col) {
         
         return false;
