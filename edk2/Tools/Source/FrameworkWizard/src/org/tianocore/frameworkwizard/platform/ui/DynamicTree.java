@@ -31,6 +31,10 @@ import javax.swing.event.TreeModelListener;
 
 
 public class DynamicTree extends JPanel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     protected DefaultMutableTreeNode rootNode;
     protected DefaultTreeModel treeModel;
     protected JTree tree;

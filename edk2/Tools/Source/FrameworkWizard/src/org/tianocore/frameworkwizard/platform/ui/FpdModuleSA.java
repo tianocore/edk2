@@ -2,8 +2,6 @@ package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.BorderLayout;
 
-import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -12,7 +10,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 import javax.swing.JTextArea;
 import javax.swing.JSplitPane;
 import javax.swing.JButton;
@@ -22,7 +19,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.apache.xmlbeans.XmlObject;
@@ -43,6 +39,10 @@ import java.util.Set;
 
 public class FpdModuleSA extends JDialog implements ActionListener {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     static JFrame frame;
     private JPanel jContentPane = null;
     private JTabbedPane jTabbedPane = null;
@@ -83,11 +83,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private LibraryTableModel model3 = null;
     private FpdFileContents ffc = null;
     private String moduleKey = null;
-//    private int selectedRow = -1;
-    private HashMap<String, String> instancePreferMap = null;
     private HashMap<String, ArrayList<String>> classInstanceMap = null;
     private ArrayList<String> classProduced = null;
-//    private ArrayList<String> classConsumed = null;
     private HashMap<String, ArrayList<String>> classConsumed = null;
     /**
      * This is the default constructor
@@ -481,7 +478,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
-                    int selectedRow = -1;
+                    
                     if (e.getValueIsAdjusting()){
                         return;
                     }
@@ -490,7 +487,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         return;
                     }
                     else{
-                        selectedRow = lsm.getMinSelectionIndex();
+//                        int selectedRow = lsm.getMinSelectionIndex();
                         
                         
                     }
@@ -970,6 +967,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
 class PartialEditableTableModel extends DefaultTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public boolean isCellEditable(int row, int col) {
         switch (col){
         case 2:
@@ -982,6 +984,11 @@ class PartialEditableTableModel extends DefaultTableModel {
 }
 
 class LibraryTableModel extends DefaultTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public boolean isCellEditable(int row, int col) {
         return false;
     }

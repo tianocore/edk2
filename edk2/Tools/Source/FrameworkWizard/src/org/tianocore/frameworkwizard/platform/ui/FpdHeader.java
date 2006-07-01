@@ -16,14 +16,12 @@
 package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -31,12 +29,9 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 
-import org.tianocore.LicenseDocument;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
-import org.tianocore.PlatformHeaderDocument;
 
-import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
@@ -452,6 +447,9 @@ public class FpdHeader extends IInternalFrame {
         }
         if (ffc.getFpdHdrLicense() != null) {
             jTextAreaLicense.setText(ffc.getFpdHdrLicense());
+        }
+        if (ffc.getFpdHdrAbs() != null) {
+            jTextFieldAbstract.setText(ffc.getFpdHdrAbs());
         }
         if (ffc.getFpdHdrUrl() != null) {
             jTextField.setText(ffc.getFpdHdrUrl());

@@ -15,50 +15,26 @@ package org.tianocore.frameworkwizard.platform.ui;
 import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
-import javax.swing.AbstractAction;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
-import javax.swing.ListSelectionModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
-import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
-import org.tianocore.frameworkwizard.common.ui.StarLabel;
 
 
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+
 
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
-import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JList;
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -74,6 +50,10 @@ import java.awt.CardLayout;
 
 public class FpdPlatformDefs extends IInternalFrame {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     static JFrame frame;
     private JPanel jContentPane = null;
     private JPanel jPanel = null;
@@ -265,6 +245,17 @@ public class FpdPlatformDefs extends IInternalFrame {
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         this.setContentPane(getJContentPane());
         this.setTitle("FPD Platform Definitions");
+        this.addInternalFrameListener(new InternalFrameAdapter(){
+            public void internalFrameDeactivated(InternalFrameEvent e){
+                if (jTable.isEditing()) {
+                    jTable.getCellEditor().stopCellEditing();
+                }
+                if (jTable2.isEditing()) {
+                    jTable2.getCellEditor().stopCellEditing();
+                }
+               
+            }
+        });
     }
 
     private void init(FpdFileContents ffc) {

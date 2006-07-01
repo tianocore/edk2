@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JDialog;
 import javax.swing.JSplitPane;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -30,6 +29,10 @@ import java.util.Set;
 
 public class FpdFrameworkModules extends IInternalFrame {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     static JFrame frame;
     private JSplitPane jSplitPane = null;
     private JPanel jPanel = null;
@@ -432,6 +435,11 @@ public class FpdFrameworkModules extends IInternalFrame {
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
 class NonEditableTableModel extends DefaultTableModel {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     public boolean isCellEditable(int row, int col) {
         return false;
     }
