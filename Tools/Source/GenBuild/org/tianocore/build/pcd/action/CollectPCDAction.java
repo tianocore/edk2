@@ -2037,28 +2037,13 @@ public class CollectPCDAction {
 
         }
 
-        //map.put("FrameworkPlatformDescription", fpdDocInstance);
-        //SurfaceAreaQuery.setDoc(map); 
         Map<FpdModuleIdentification,XmlObject>pcdBuildDef = GlobalData.getFpdModuleSaXmlObject(CollectPCDAction.xmlObjectName);
         Set<FpdModuleIdentification> pcdBuildKeySet = pcdBuildDef.keySet();
         Iterator item = pcdBuildKeySet.iterator();
         while (item.hasNext()){
-        	FpdModuleIdentification id = (FpdModuleIdentification)item.next();
-            try {
-                allModules.add(new ModuleInfo(id, id.getModule().getModuleType(),pcdBuildDef.get(id)));    
-            } catch (Exception e){
-                System.out.println(e.getMessage());
-                //EdkLog.log(EdkLog.EDK_INFO,e.getMessage());
-            }
-        	
-        	
+            FpdModuleIdentification id = (FpdModuleIdentification)item.next();
+            allModules.add(new ModuleInfo(id, id.getModule().getModuleType(),pcdBuildDef.get(id)));    
         }
-//        //modules = SurfaceAreaQuery.getFpdModuleSAs();
-//        for (index = 0; index < modules.length; index ++) {
-//            //SurfaceAreaQuery.setDoc(GlobalData.getDoc(modules[index].getModuleName()));
-//            allModules.add(new ModuleInfo(modules[index], 
-//                                          ModuleTypeDef.Enum.forString(SurfaceAreaQuery.getModuleType())));
-//        }
         
         return allModules;
     }

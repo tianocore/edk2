@@ -223,21 +223,14 @@ public class PCDAutoGenAction extends BuildAction {
       hAutoGenString  = "";
       cAutoGenString  = "";
       try {
-      setModuleName(moduleName);
-      setModuleGuid(translateSchemaStringToUUID(moduleGuidString));
-      setPackageName(packageName);
-      setPackageGuid(translateSchemaStringToUUID(packageGuidString));
-      setPcdNameArray(pcdNameArray);
-      setArch(arch);
-      setVersion(version);
-      setIsBuildUsedLibrary(isBuildUsedLibrary);
-      
-      if (isBuildUsedLibrary) {
-          System.out.println("Build for library");
-          for (int index = 0; index < pcdNameArray.length; index ++) {
-              System.out.println(pcdNameArray[index]);
-          }
-      }
+          setModuleName(moduleName);
+          setModuleGuid(translateSchemaStringToUUID(moduleGuidString));
+          setPackageName(packageName);
+          setPackageGuid(translateSchemaStringToUUID(packageGuidString));
+          setPcdNameArray(pcdNameArray);
+          setArch(arch);
+          setVersion(version);
+          setIsBuildUsedLibrary(isBuildUsedLibrary);
       } catch (EntityException e){
     	  throw new BuildActionException(e.getMessage());
       }
@@ -400,14 +393,12 @@ private UUID translateSchemaStringToUUID(String uuidString)
             dbManager.UsageInstanceContext = usageInstanceArray;
             dbManager.CurrentModuleName    = moduleName; 
         } else {
-            System.out.println(String.format("Generate %s 's library", dbManager.CurrentModuleName));
             usageContext = dbManager.UsageInstanceContext;
             //
             // For building MDE package, although all module are library, but PCD entries of 
             // these library should be used to autogen.
             // 
             if (usageContext == null) {
-                System.out.println("context is null");
                 usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleName,
                                                                                   moduleGuid,
                                                                                   packageName,
@@ -416,7 +407,6 @@ private UUID translateSchemaStringToUUID(String uuidString)
                                                                                   version);
             } else {
                 usageInstanceArray = new ArrayList<UsageInstance>();
-                System.out.println("context is not null!");
                 //
                 // Remove PCD entries which are not belong to this library.
                 // 
@@ -427,7 +417,6 @@ private UUID translateSchemaStringToUUID(String uuidString)
 
                     for (index2 = 0; index2 < pcdNameArray.length; index2 ++) {
                         if (pcdNameArray[index2].equalsIgnoreCase(usageContext.get(index).parentToken.cName)) {
-                            System.out.println("Found! for PCD entry " + pcdNameArray[index2]);
                             usageInstanceArray.add(usageContext.get(index));
                             break;
                         }
