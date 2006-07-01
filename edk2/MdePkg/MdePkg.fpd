@@ -31,7 +31,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -39,7 +39,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -47,7 +47,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -55,7 +55,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -71,7 +71,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -79,7 +79,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -87,7 +87,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -95,7 +95,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -111,7 +111,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -119,7 +119,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -127,7 +127,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -135,7 +135,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -151,7 +151,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -159,7 +159,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -167,7 +167,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -175,7 +175,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -191,7 +191,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -199,7 +199,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -207,7 +207,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -215,7 +215,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -231,7 +231,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -239,7 +239,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -247,7 +247,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -255,7 +255,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -331,7 +331,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -339,7 +339,7 @@
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -347,7 +347,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -363,7 +363,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
           <Token>0x00000009</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
@@ -385,7 +385,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -413,7 +413,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -471,7 +471,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -487,7 +487,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -495,7 +495,7 @@
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -503,7 +503,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -573,7 +573,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -589,7 +589,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -605,7 +605,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -621,7 +621,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -637,7 +637,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -701,7 +701,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -709,7 +709,7 @@
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -717,7 +717,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -733,7 +733,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -741,7 +741,7 @@
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -749,7 +749,7 @@
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>Fix_Me</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>

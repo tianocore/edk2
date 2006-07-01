@@ -255,6 +255,11 @@
     <IncludePkgHeader ModuleType="USER_DEFINED">Include/Peim.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
+    <Entry Name="MdePkgTokenSpace">
+      <C_Name>gEfiMdePkgTokenSpaceGuid</C_Name>
+      <GuidValue>914AEBE7-4635-459b-AA1C-11E219B03A10</GuidValue>
+      <HelpText>All PCD define in MdePkg is in this token space scope</HelpText>
+    </Entry>
     <Entry Name="Acpi10Table">
       <C_Name>gEfiAcpi10TableGuid</C_Name>
       <GuidValue>EB9D2D30-2D88-11D3-9A16-0090273FC14D</GuidValue>
