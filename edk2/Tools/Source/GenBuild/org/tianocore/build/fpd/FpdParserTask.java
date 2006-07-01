@@ -152,10 +152,8 @@ public class FpdParserTask extends Task {
         // Pcd Collection. Call CollectPCDAction to collect pcd info.
         //
         try {
-            System.out.println("Begin PCD collecttion!");
             CollectPCDAction ca = new CollectPCDAction();
             ca.perform(GlobalData.getWorkspacePath(),platformId.getFpdFile().getPath(),ActionMessage.NULL_MESSAGE_LEVEL);
-            System.out.println("End PCD collection!"); 
         } catch (Exception e){
             throw new BuildException(e.getMessage());
         }
