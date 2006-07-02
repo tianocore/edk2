@@ -23,6 +23,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
 
+import org.tianocore.FvImagesDocument;
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -90,6 +91,7 @@ public class FpdFlash extends IInternalFrame {
     private DefaultTableModel fvPropertyTableModel = null;
     private DefaultTableModel fvImageNameTableModel = null;
     private ImageParaTableModel fvImageParaTableModel = null;
+    private DefaultTableModel fvOptionTableModel = null;
     private JPanel jPanelFvImageC = null;
     private JCheckBox jCheckBox2 = null;
     private JLabel jLabel2 = null;
@@ -107,18 +109,6 @@ public class FpdFlash extends IInternalFrame {
     private JTable jTable2 = null;
     private JButton jButton6 = null;
     private JCheckBox jCheckBox3 = null;
-    private JLabel jLabel5 = null;
-    private JComboBox jComboBox1 = null;
-    private JCheckBox jCheckBox4 = null;
-    private JCheckBox jCheckBox5 = null;
-    private JCheckBox jCheckBox6 = null;
-    private JCheckBox jCheckBox7 = null;
-    private JCheckBox jCheckBox8 = null;
-    private JCheckBox jCheckBox9 = null;
-    private JCheckBox jCheckBox10 = null;
-    private JCheckBox jCheckBox11 = null;
-    private JCheckBox jCheckBox12 = null;
-    private JCheckBox jCheckBox13 = null;
     private JPanel jPanel6 = null;
     
     private FpdFileContents ffc = null;
@@ -126,8 +116,16 @@ public class FpdFlash extends IInternalFrame {
     private JCheckBox jCheckBox = null;
     private JTextField jTextField3 = null;
     private JButton jButton5 = null;
+    private JLabel jLabel5 = null;
+    private JTextField jTextField4 = null;
     private JLabel jLabel6 = null;
-    private JComboBox jComboBox2 = null;
+    private JTextField jTextField5 = null;
+    private JPanel jPanel8 = null;
+    private JButton jButton7 = null;
+    private JButton jButton8 = null;
+    private JScrollPane jScrollPane = null;
+    private JTable jTable3 = null;
+    private JButton jButton9 = null;
     public FpdFlash() {
         super();
         // TODO Auto-generated constructor stub
@@ -721,37 +719,29 @@ public class FpdFlash extends IInternalFrame {
  if (jPanel5 == null) {
      //ToDo add ButtonGroup for RadioButtons
             jLabel6 = new JLabel();
-            jLabel6.setText("EFI Alignment CAP");
             jLabel6.setEnabled(false);
+            jLabel6.setText("Value");
+            jLabel6.setPreferredSize(new Dimension(38, 20));
+            jLabel5 = new JLabel();
+            jLabel5.setEnabled(false);
+            jLabel5.setText("Name");
+            jLabel5.setPreferredSize(new Dimension(38, 20));
             jPanel5 = new JPanel();
             jPanel5.setPreferredSize(new java.awt.Dimension(480,150));
             
-            GridLayout gridLayout = new GridLayout();
-            gridLayout.setRows(6);
-            gridLayout.setColumns(3);
-            jPanel5.setLayout(gridLayout);
-            jPanel5.add(getJCheckBox3(), null);
+            jPanel5.setLayout(new FlowLayout());
             
-            jLabel5 = new JLabel();
-            jLabel5.setText("EFI_ERASE_POLARITY");
-            jLabel5.setEnabled(false);
-			jPanel5.add(jLabel5, null);
-			jPanel5.add(getJComboBox1(), null);
-			jPanel5.add(getJCheckBox4(), null);
-			jPanel5.add(getJCheckBox5(), null);
-			jPanel5.add(getJCheckBox6(), null);
-			jPanel5.add(getJCheckBox7(), null);
-			jPanel5.add(getJCheckBox8(), null);
-			jPanel5.add(getJCheckBox9(), null);
-			jPanel5.add(getJCheckBox10(), null);
-			jPanel5.add(getJCheckBox11(), null);
-			jPanel5.add(getJCheckBox12(), null);
-			jPanel5.add(getJCheckBox13(), null);
 			jPanel5.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
+			jPanel5.add(getJCheckBox3(), null);
+			jPanel5.add(jLabel5, null);
+			jPanel5.add(getJTextField4(), null);
 			jPanel5.add(jLabel6, null);
-			jPanel5.add(getJComboBox2(), null);
+			jPanel5.add(getJTextField5(), null);
+			jPanel5.add(getJScrollPane(), null);
+			jPanel5.add(getJPanel8(), null);
 			jPanel5.add(getJButton4(), null);
 			jPanel5.add(getJButton6(), null);
+			jPanel5.add(getJButton9(), null);
             
             
             			
@@ -770,7 +760,7 @@ public class FpdFlash extends IInternalFrame {
     private JButton getJButton4() {
         if (jButton4 == null) {
             jButton4 = new JButton();
-            jButton4.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton4.setPreferredSize(new java.awt.Dimension(120,20));
 //            jButton4.setEnabled(false);
             jButton4.setText("Add FV Image");
             jButton4.addActionListener(new AbstractAction() {
@@ -780,6 +770,12 @@ public class FpdFlash extends IInternalFrame {
                 private static final long serialVersionUID = 1L;
 
                 public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable2.isEditing()) {
+                        jTable2.getCellEditor().stopCellEditing();
+                    }
+                    if (jTable3.isEditing()) {
+                        jTable3.getCellEditor().stopCellEditing();
+                    }
                     if (jTable1.getRowCount()== 0){
                         return;
                     }
@@ -798,22 +794,12 @@ public class FpdFlash extends IInternalFrame {
                     LinkedHashMap<String, String> m = null;
                     if (jCheckBox3.isSelected()) {
                         m = new LinkedHashMap<String, String>();
-                        boolean[] boolArray = {jComboBox1.getSelectedIndex()==0 ? true: false, jCheckBox6.isSelected(), jCheckBox9.isSelected(),
-                                                                            jCheckBox11.isSelected(), jCheckBox12.isSelected(),
-                                                                            jCheckBox13.isSelected(),jCheckBox4.isSelected(),
-                                                                            jCheckBox5.isSelected(), jCheckBox7.isSelected(),
-                                                                            jCheckBox8.isSelected(),jCheckBox10.isSelected()};
-                        booleanToNameValue(boolArray, m);
+                        getOptionNameValue(m);
                     }
                     ffc.genFvImagesFvImage(imageName.split(" "), jComboBox.getSelectedItem()+"", m);
                     
-                    Object[] o = {imageName, jComboBox.getSelectedItem(), jComboBox1.getSelectedIndex()==0 ? true: false, 
-                                  jCheckBox6.isSelected(), jCheckBox9.isSelected(),
-                                  jCheckBox11.isSelected(), jCheckBox12.isSelected(),
-                                  jCheckBox13.isSelected(),jCheckBox4.isSelected(),
-                                  jCheckBox5.isSelected(), jCheckBox7.isSelected(),
-                                  jCheckBox8.isSelected(),jCheckBox10.isSelected()};
-                   fvImageParaTableModel.addRow(o); 
+                    Object[] row = {imageName, jComboBox.getSelectedItem()};
+                    fvImageParaTableModel.addRow(row); 
                 }
             });
         }
@@ -845,21 +831,9 @@ public class FpdFlash extends IInternalFrame {
         if (jTable2 == null) {
             fvImageParaTableModel = new ImageParaTableModel();
             jTable2 = new JTable(fvImageParaTableModel);
-            jTable2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             fvImageParaTableModel.addColumn("FvImageNames");
             fvImageParaTableModel.addColumn("Type");
-            fvImageParaTableModel.addColumn("ErasePolarity");
-            fvImageParaTableModel.addColumn("ReadStatus");
-            fvImageParaTableModel.addColumn("WriteStatus");
-            fvImageParaTableModel.addColumn("LockStatus");
-            fvImageParaTableModel.addColumn("MemoryMapped");
-            fvImageParaTableModel.addColumn("StickyWrite");
-            fvImageParaTableModel.addColumn("ReadDisableCap");
-            fvImageParaTableModel.addColumn("ReadEnableCap");
-            fvImageParaTableModel.addColumn("WriteDisableCap");
-            fvImageParaTableModel.addColumn("WriteEnableCap");
-            fvImageParaTableModel.addColumn("LockCap");
-            fvImageParaTableModel.addColumn("Alignment");
+            
             
             TableColumn typeCol = jTable2.getColumnModel().getColumn(1);
             JComboBox cb = new JComboBox();
@@ -868,26 +842,6 @@ public class FpdFlash extends IInternalFrame {
             cb.addItem("Options");
             cb.addItem("Components");
             typeCol.setCellEditor(new DefaultCellEditor(cb));
-            
-            TableColumn alignCol = jTable2.getColumnModel().getColumn(13);
-            JComboBox cb1 = new JComboBox();
-            cb1.addItem("64K");
-            cb1.addItem("32K");
-            cb1.addItem("16K");
-            cb1.addItem("8K");
-            cb1.addItem("4K");
-            cb1.addItem("2K");
-            cb1.addItem("1K");
-            cb1.addItem("512");
-            cb1.addItem("256");
-            cb1.addItem("128");
-            cb1.addItem("64");
-            cb1.addItem("32");
-            cb1.addItem("16");
-            cb1.addItem("8");
-            cb1.addItem("4");
-            cb1.addItem("2");
-            alignCol.setCellEditor(new DefaultCellEditor(cb1));
             
             jTable2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable2.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -900,32 +854,27 @@ public class FpdFlash extends IInternalFrame {
                         return;
                     }
                     else{
-//                        selectedRow = lsm.getMinSelectionIndex();
+                        int selectedRow = lsm.getMinSelectionIndex();
+                        LinkedHashMap<String, String> optionMap = new LinkedHashMap<String, String>();
+                        ffc.getFvImagesFvImageOptions(selectedRow, optionMap);
+                        if (optionMap.size() > 0){
+                            fvOptionTableModel.setRowCount(0);
+                            Set<String> key = optionMap.keySet();
+                            Iterator<String> i = key.iterator();
+                            while (i.hasNext()) {
+                                
+                                String k = (String)i.next();
+                                String[] row = {k, optionMap.get(k)};
+                                
+                                fvOptionTableModel.addRow(row);
+                            }
+                        }
+                        
                     }
                 }
             });
             
-            jTable2.getModel().addTableModelListener(new TableModelListener(){
-                public void tableChanged(TableModelEvent arg0) {
-                    // TODO Auto-generated method stub
-                    int row = arg0.getFirstRow();
-                    TableModel m = (TableModel)arg0.getSource();
-                    if (arg0.getType() == TableModelEvent.UPDATE){
-                        //ToDo Check data validity before update
-                        String name = m.getValueAt(row, 0) + "";
-                        String type = m.getValueAt(row, 1) + "";
-                        boolean[] boolArray = new boolean[11];
-                        for (int i = 2; i < 13; ++i) {
-                            boolArray[i-2] = (Boolean)m.getValueAt(row, i);
-                        }
-                        LinkedHashMap<String, String> lhm = new LinkedHashMap<String, String>();
-                        booleanToNameValue(boolArray, lhm);
-                        lhm.put("EFI_ALIGNMENT_CAP", m.getValueAt(row, 13)+"");
-
-                        ffc.updateFvImagesFvImage(row, name.split(" "), type, lhm);
-                    }
-                }
-            });
+            
         }
         return jTable2;
     }
@@ -939,7 +888,7 @@ public class FpdFlash extends IInternalFrame {
     private JButton getJButton6() {
         if (jButton6 == null) {
             jButton6 = new JButton();
-            jButton6.setPreferredSize(new java.awt.Dimension(150,20));
+            jButton6.setPreferredSize(new java.awt.Dimension(120,20));
 //            jButton6.setEnabled(false);
             jButton6.setText("Delete Row");
             jButton6.addActionListener(new AbstractAction() {
@@ -975,202 +924,24 @@ public class FpdFlash extends IInternalFrame {
 
                 public void itemStateChanged(ItemEvent arg0) {
                     // TODO Auto-generated method stub
-                    boolean seleted = jCheckBox3.isSelected();
+                    boolean selected = jCheckBox3.isSelected();
                     
                         if (!jCheckBox2.isSelected() || jComboBox.getSelectedIndex() == 0) {
                             return;
                         }
                         
-                        jLabel5.setEnabled(seleted);
-                        jComboBox1.setEnabled(seleted);
-                        
-                        jCheckBox4.setEnabled(seleted);
-                        jCheckBox5.setEnabled(seleted);
-                        jCheckBox6.setEnabled(seleted);
-                        jCheckBox7.setEnabled(seleted);
-                        jCheckBox8.setEnabled(seleted);
-                        jCheckBox9.setEnabled(seleted);
-                        jCheckBox10.setEnabled(seleted);
-                        jCheckBox11.setEnabled(seleted);
-                        jCheckBox12.setEnabled(seleted);
-                        jCheckBox13.setEnabled(seleted);
-                        jLabel6.setEnabled(seleted);
-                        jComboBox2.setEnabled(seleted);
-//                        jButton4.setEnabled(seleted);
-//                        jButton6.setEnabled(seleted);
+//                        jLabel5.setEnabled(selected);
+//                        jTextField4.setEnabled(selected);
+//                        jLabel6.setEnabled(selected);
+//                        jTextField5.setEnabled(selected);
+//                        jButton7.setEnabled(selected);
+//                        jButton8.setEnabled(selected);
+
                 }
                 
             });
         }
         return jCheckBox3;
-    }
-
-
-    /**
-     * This method initializes jComboBox1	
-     * 	
-     * @return javax.swing.JComboBox	
-     */
-    private JComboBox getJComboBox1() {
-        if (jComboBox1 == null) {
-            jComboBox1 = new JComboBox();
-            jComboBox1.setPreferredSize(new java.awt.Dimension(20,20));
-            jComboBox1.setEnabled(false);
-            jComboBox1.addItem("1");
-            jComboBox1.addItem("0");
-            jComboBox1.setSelectedIndex(0);
-        }
-        return jComboBox1;
-    }
-
-
-    /**
-     * This method initializes jCheckBox4	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox4() {
-        if (jCheckBox4 == null) {
-            jCheckBox4 = new JCheckBox();
-            jCheckBox4.setText("Read Disable CAP");
-            jCheckBox4.setEnabled(false);
-        }
-        return jCheckBox4;
-    }
-
-
-    /**
-     * This method initializes jCheckBox5	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox5() {
-        if (jCheckBox5 == null) {
-            jCheckBox5 = new JCheckBox();
-            jCheckBox5.setText("Read Enable CAP");
-            jCheckBox5.setEnabled(false);
-        }
-        return jCheckBox5;
-    }
-
-
-    /**
-     * This method initializes jCheckBox6	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox6() {
-        if (jCheckBox6 == null) {
-            jCheckBox6 = new JCheckBox();
-            jCheckBox6.setText("Read Status");
-            jCheckBox6.setEnabled(false);
-        }
-        return jCheckBox6;
-    }
-
-
-    /**
-     * This method initializes jCheckBox7	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox7() {
-        if (jCheckBox7 == null) {
-            jCheckBox7 = new JCheckBox();
-            jCheckBox7.setText("Write Disable CAP");
-            jCheckBox7.setEnabled(false);
-        }
-        return jCheckBox7;
-    }
-
-
-    /**
-     * This method initializes jCheckBox8	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox8() {
-        if (jCheckBox8 == null) {
-            jCheckBox8 = new JCheckBox();
-            jCheckBox8.setText("Write Enable CAP");
-            jCheckBox8.setEnabled(false);
-        }
-        return jCheckBox8;
-    }
-
-
-    /**
-     * This method initializes jCheckBox9	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox9() {
-        if (jCheckBox9 == null) {
-            jCheckBox9 = new JCheckBox();
-            jCheckBox9.setText("Write Status");
-            jCheckBox9.setEnabled(false);
-        }
-        return jCheckBox9;
-    }
-
-
-    /**
-     * This method initializes jCheckBox10	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox10() {
-        if (jCheckBox10 == null) {
-            jCheckBox10 = new JCheckBox();
-            jCheckBox10.setText("Lock CAP");
-            jCheckBox10.setEnabled(false);
-        }
-        return jCheckBox10;
-    }
-
-
-    /**
-     * This method initializes jCheckBox11	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox11() {
-        if (jCheckBox11 == null) {
-            jCheckBox11 = new JCheckBox();
-            jCheckBox11.setText("Lock Status");
-            jCheckBox11.setEnabled(false);
-        }
-        return jCheckBox11;
-    }
-
-
-    /**
-     * This method initializes jCheckBox12	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox12() {
-        if (jCheckBox12 == null) {
-            jCheckBox12 = new JCheckBox();
-            jCheckBox12.setText("Memory Mapped");
-            jCheckBox12.setEnabled(false);
-        }
-        return jCheckBox12;
-    }
-
-
-    /**
-     * This method initializes jCheckBox13	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox13() {
-        if (jCheckBox13 == null) {
-            jCheckBox13 = new JCheckBox();
-            jCheckBox13.setText("Sticky Write");
-            jCheckBox13.setEnabled(false);
-        }
-        return jCheckBox13;
     }
 
 
@@ -1308,33 +1079,171 @@ public class FpdFlash extends IInternalFrame {
     }
 
     /**
-     * This method initializes jComboBox2	
+     * This method initializes jTextField4	
      * 	
-     * @return javax.swing.JComboBox	
+     * @return javax.swing.JTextField	
      */
-    private JComboBox getJComboBox2() {
-        if (jComboBox2 == null) {
-            jComboBox2 = new JComboBox();
-            jComboBox2.setEnabled(false);
-            jComboBox2.addItem("64K");
-            jComboBox2.addItem("32K");
-            jComboBox2.addItem("16K");
-            jComboBox2.addItem("8K");
-            jComboBox2.addItem("4K");
-            jComboBox2.addItem("2K");
-            jComboBox2.addItem("1K");
-            jComboBox2.addItem("512");
-            jComboBox2.addItem("256");
-            jComboBox2.addItem("128");
-            jComboBox2.addItem("64");
-            jComboBox2.addItem("32");
-            jComboBox2.addItem("16");
-            jComboBox2.addItem("8");
-            jComboBox2.addItem("4");
-            jComboBox2.addItem("2");
-            jComboBox2.setSelectedIndex(0);
+    private JTextField getJTextField4() {
+        if (jTextField4 == null) {
+            jTextField4 = new JTextField();
+            jTextField4.setEnabled(false);
+            jTextField4.setPreferredSize(new Dimension(100, 20));
         }
-        return jComboBox2;
+        return jTextField4;
+    }
+
+    /**
+     * This method initializes jTextField5	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextField5() {
+        if (jTextField5 == null) {
+            jTextField5 = new JTextField();
+            jTextField5.setEnabled(false);
+            jTextField5.setPreferredSize(new Dimension(100, 20));
+        }
+        return jTextField5;
+    }
+
+    /**
+     * This method initializes jPanel8	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanel8() {
+        if (jPanel8 == null) {
+            jPanel8 = new JPanel();
+            jPanel8.setPreferredSize(new Dimension(80, 55));
+            jPanel8.add(getJButton7(), null);
+            jPanel8.add(getJButton8(), null);
+        }
+        return jPanel8;
+    }
+
+    /**
+     * This method initializes jButton7	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton7() {
+        if (jButton7 == null) {
+            jButton7 = new JButton();
+            jButton7.setEnabled(true);
+            jButton7.setText("Add");
+            jButton7.setPreferredSize(new Dimension(80, 20));
+            jButton7.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
+                public void actionPerformed(ActionEvent e) {
+                    if (jTextField4.getText().length() > 0 && jTextField5.getText().length() > 0){
+                        String[] row = {jTextField4.getText(), jTextField5.getText()};                        
+                        fvOptionTableModel.addRow(row);
+                    }
+                }
+            });
+        }
+        return jButton7;
+    }
+
+    /**
+     * This method initializes jButton8	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton8() {
+        if (jButton8 == null) {
+            jButton8 = new JButton();
+            jButton8.setEnabled(true);
+            jButton8.setText("Delete");
+            jButton8.setPreferredSize(new Dimension(80, 20));
+            jButton8.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
+                public void actionPerformed(ActionEvent e) {
+                    if (jTable3.getSelectedRow() >= 0){
+                        fvOptionTableModel.removeRow(jTable.getSelectedRow());
+                    }
+                }
+            });
+        }
+        return jButton8;
+    }
+
+    /**
+     * This method initializes jScrollPane	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPane() {
+        if (jScrollPane == null) {
+            jScrollPane = new JScrollPane();
+            jScrollPane.setPreferredSize(new java.awt.Dimension(350,80));
+            jScrollPane.setViewportView(getJTable3());
+        }
+        return jScrollPane;
+    }
+
+    /**
+     * This method initializes jTable3	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTable3() {
+        if (jTable3 == null) {
+            fvOptionTableModel = new DefaultTableModel();
+            fvOptionTableModel.addColumn("Name");
+            fvOptionTableModel.addColumn("Value");
+            jTable3 = new JTable(fvOptionTableModel);
+
+            jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable3.setRowHeight(20);
+            
+        }
+        return jTable3;
+    }
+
+    /**
+     * This method initializes jButton9	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton9() {
+        if (jButton9 == null) {
+            jButton9 = new JButton();
+            jButton9.setPreferredSize(new Dimension(120, 20));
+            jButton9.setActionCommand("Update");
+            jButton9.setText("Update FV");
+            jButton9.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    int row = jTable2.getSelectedRow();
+                    if (jTable2.isEditing()) {
+                        jTable2.getCellEditor().stopCellEditing();
+                    }
+                    if (jTable3.isEditing()) {
+                        jTable3.getCellEditor().stopCellEditing();
+                    }
+                    
+                        //ToDo Check data validity before update
+                        String name = fvImageParaTableModel.getValueAt(row, 0) + "";
+                        String type = fvImageParaTableModel.getValueAt(row, 1) + "";
+                        
+                        LinkedHashMap<String, String> lhm = new LinkedHashMap<String, String>();
+                        getOptionNameValue(lhm);
+                        
+
+                        ffc.updateFvImagesFvImage(row, name.split(" "), type, lhm);
+                    
+                }
+            });
+        }
+        return jButton9;
     }
 
     /**
@@ -1375,247 +1284,25 @@ public class FpdFlash extends IInternalFrame {
             return;
         }
         String[][] saa = new String[ffc.getFvImagesFvImageCount()][2];
-        ArrayList<LinkedHashMap<String, String>> options = new ArrayList<LinkedHashMap<String, String>>(ffc.getFvImagesFvImageCount());
-
-        for (int j = 0; j < ffc.getFvImagesFvImageCount(); ++j){
-            options.add(new LinkedHashMap<String, String>());
-        }
-        ffc.getFvImagesFvImages(saa, options);
+//        ArrayList<LinkedHashMap<String, String>> options = new ArrayList<LinkedHashMap<String, String>>(ffc.getFvImagesFvImageCount());
+//
+//        for (int j = 0; j < ffc.getFvImagesFvImageCount(); ++j){
+//            options.add(new LinkedHashMap<String, String>());
+//        }
+        ffc.getFvImagesFvImages(saa);
         
-        Object[] rowData = new Object[14];
+       
         int i = 0;
-        Boolean f = new Boolean("false");
         while (i < saa.length) {
-            rowData[0] = saa[i][0];
-            rowData[1] = saa[i][1];
             
-            
-            //ToDo: add alignment settings
-            Boolean[] boolArray = new Boolean[11];
-            int k = 0;
-            while (k < 11){
-                boolArray[k] = f;
-                ++k;
-            }
-            namevalueToBoolean(options.get(i), boolArray);
-            for (k = 2; k < 13; ++k) {
-                rowData[k] = boolArray[k-2];
-            }
-            rowData[13] = getAlign(options.get(i));
-            fvImageParaTableModel.addRow(rowData);
+            fvImageParaTableModel.addRow(saa[i]);
             ++i;
         }
     }
     
-    private String getAlign(Map<String, String> m){
-        String s = "64K";
-        if (m.get("EFI_ALIGNMENT_64K") != null) {
-            if (m.get("EFI_ALIGNMENT_64K").equals("TRUE")) {
-                s = "64K";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_32K") != null) {
-            if (m.get("EFI_ALIGNMENT_32K").equals("TRUE")) {
-                s = "32K";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_16K") != null) {
-            if (m.get("EFI_ALIGNMENT_16K").equals("TRUE")) {
-                s = "16K";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_8K") != null) {
-            if (m.get("EFI_ALIGNMENT_8K").equals("TRUE")) {
-                s = "8K";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_4K") != null) {
-            if (m.get("EFI_ALIGNMENT_4K").equals("TRUE")) {
-                s = "4K";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_2K") != null) {
-            if (m.get("EFI_ALIGNMENT_2K").equals("TRUE")) {
-                s = "2K";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_1K") != null) {
-            if (m.get("EFI_ALIGNMENT_1K").equals("TRUE")) {
-                s = "1K";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_512") != null) {
-            if (m.get("EFI_ALIGNMENT_512").equals("TRUE")) {
-                s = "512";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_256") != null) {
-            if (m.get("EFI_ALIGNMENT_256").equals("TRUE")) {
-                s = "256";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_128") != null) {
-            if (m.get("EFI_ALIGNMENT_128").equals("TRUE")) {
-                s = "128";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_64") != null) {
-            if (m.get("EFI_ALIGNMENT_64").equals("TRUE")) {
-                s = "64";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_32") != null) {
-            if (m.get("EFI_ALIGNMENT_32").equals("TRUE")) {
-                s = "32";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_16") != null) {
-            if (m.get("EFI_ALIGNMENT_16").equals("TRUE")) {
-                s = "16";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_8") != null) {
-            if (m.get("EFI_ALIGNMENT_8").equals("TRUE")) {
-                s = "8";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_4") != null) {
-            if (m.get("EFI_ALIGNMENT_4").equals("TRUE")) {
-                s = "4";
-                return s;
-            }
-        }
-        if (m.get("EFI_ALIGNMENT_2") != null) {
-            if (m.get("EFI_ALIGNMENT_2").equals("TRUE")) {
-                s = "2";
-                return s;
-            }
-        }
-        return s;
-    }
-    
-    private void namevalueToBoolean(Map<String, String> m, Boolean[] boolArray){
-        Set<String> key = m.keySet();
-        Iterator<String> ki= key.iterator();
-        Boolean t = new Boolean("true");
-        while(ki.hasNext()) {
-            String k = ki.next();
-            if (k.equals("EFI_ERASE_POLARITY") && m.get(k).equals("1")) {
-                boolArray[0] = t;
-            }
-            if (k.equals("EFI_READ_STATUS") && m.get(k).equals("TRUE")) {
-                boolArray[1] = t;
-            }
-            if (k.equals("EFI_WRITE_STATUS") && m.get(k).equals("TRUE")) {
-                boolArray[2] = t;
-            }
-            if (k.equals("EFI_LOCK_STATUS") && m.get(k).equals("TRUE")) {
-                boolArray[3] = t;
-            }
-            if (k.equals("EFI_MEMORY_MAPPED") && m.get(k).equals("TRUE")) {
-                boolArray[4] = t;
-            }
-            if (k.equals("EFI_STICKY_WRITE") && m.get(k).equals("TRUE")) {
-                boolArray[5] = t;
-            }
-            if (k.equals("EFI_READ_DISABLED_CAP") && m.get(k).equals("TRUE")) {
-                boolArray[6] = t;
-            }
-            if (k.equals("EFI_READ_ENABLED_CAP") && m.get(k).equals("TRUE")) {
-                boolArray[7] = t;
-            }
-            if (k.equals("EFI_WRITE_DISABLED_CAP") && m.get(k).equals("TRUE")) {
-                boolArray[8] = t;
-            }
-            if (k.equals("EFI_WRITE_ENABLED_CAP") && m.get(k).equals("TRUE")) {
-                boolArray[9] = t;
-            }
-            if (k.equals("EFI_LOCK_CAP") && m.get(k).equals("TRUE")) {
-                boolArray[10] = t;
-            }
-        }
-    }
-    
-    private void booleanToNameValue(boolean[] boolArray, Map<String, String> m){
-        if (boolArray[0]) {
-            m.put("EFI_ERASE_POLARITY", "1");
-        }
-        else {
-            m.put("EFI_ERASE_POLARITY", "0");
-        }
-        if (boolArray[1]) {
-            m.put("EFI_READ_STATUS", "TRUE");
-        }
-        else {
-            m.put("EFI_READ_STATUS", "FALSE");
-        }
-        if (boolArray[2]) {
-            m.put("EFI_WRITE_STATUS", "TRUE");
-        }
-        else {
-            m.put("EFI_WRITE_STATUS", "FALSE");
-        }
-        if (boolArray[3]) {
-            m.put("EFI_LOCK_STATUS", "TRUE");
-        }
-        else {
-            m.put("EFI_LOCK_STATUS", "FALSE");
-        }
-        if (boolArray[4]) {
-            m.put("EFI_MEMORY_MAPPED", "TRUE");
-        }
-        else {
-            m.put("EFI_MEMORY_MAPPED", "FALSE");
-        }
-        if (boolArray[5]) {
-            m.put("EFI_STICKY_WRITE", "TRUE");
-        }
-        else {
-            m.put("EFI_STICKY_WRITE", "FALSE");
-        }
-        if (boolArray[6]) {
-            m.put("EFI_READ_DISABLED_CAP", "TRUE");
-        }
-        else {
-            m.put("EFI_READ_DISABLED_CAP", "FALSE");
-        }
-        if (boolArray[7]) {
-            m.put("EFI_READ_ENABLED_CAP", "TRUE");
-        }
-        else {
-            m.put("EFI_READ_ENABLED_CAP", "FALSE");
-        }
-        if (boolArray[8]) {
-            m.put("EFI_WRITE_DISABLED_CAP", "TRUE");
-        }
-        else {
-            m.put("EFI_WRITE_DISABLED_CAP", "FALSE");
-        }
-        if (boolArray[9]) {
-            m.put("EFI_WRITE_ENABLED_CAP", "TRUE");
-        }
-        else {
-            m.put("EFI_WRITE_ENABLED_CAP", "FALSE");
-        }
-        if (boolArray[10]) {
-            m.put("EFI_LOCK_CAP", "TRUE");
-        }
-        else {
-            m.put("EFI_LOCK_CAP", "FALSE");
+    private void getOptionNameValue(Map<String, String> m){
+        for (int i = 0; i < jTable3.getRowCount(); ++i) {
+            m.put(fvOptionTableModel.getValueAt(i, 0)+"", fvOptionTableModel.getValueAt(i, 1)+"");
         }
     }
     /**
@@ -1640,17 +1327,7 @@ public class FpdFlash extends IInternalFrame {
 
 class ImageParaTableModel extends DefaultTableModel {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
-
-    public Class<?> getColumnClass (int c) {
-        if (getValueAt(0, c) != null) {
-            return getValueAt(0, c).getClass();
-        }
-        return String.class;
-    }
     
    public boolean isCellEditable(int row, int col) {
         if (getValueAt(row, 1).equals("ImageName") && col >=1) {
@@ -1659,3 +1336,4 @@ class ImageParaTableModel extends DefaultTableModel {
         return true;
     }
 }
+
