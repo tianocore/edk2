@@ -1307,12 +1307,7 @@ public class FpdFileContents {
             
             FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = fio.addNewNameValue();
             String k = (String)i.next();
-            if (k.equals("EFI_ALIGNMENT_CAP")) {
-                nv.setName(k);
-                nv.setValue("TRUE");
-                setFvImageOptionsAlign((String)options.get(k), fio);
-                continue;
-            }
+            
             nv.setName(k);
             nv.setValue((String)options.get(k));
             
@@ -1320,194 +1315,6 @@ public class FpdFileContents {
         
     }
     
-    private void setFvImageOptionsAlign(String alignValue, FvImagesDocument.FvImages.FvImage.FvImageOptions fio) {
-        int numForm = -1;
-        if (alignValue.endsWith("K")) {
-            alignValue = alignValue.substring(0, alignValue.length()-1);
-            numForm = new Integer(alignValue).intValue() * 1024;
-        }
-        else {
-            numForm = new Integer(alignValue).intValue();
-        }
-        
-        FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = null;
-        if (numForm / (64*1024) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_64K");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_64K");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (32*1024) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_32K");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_32K");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (16*1024) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_16K");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_16K");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (8*1024) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_8K");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_8K");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (4*1024) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_4K");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_4K");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (2*1024) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_2K");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_2K");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (1*1024) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_1K");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_1K");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (512) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_512");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_512");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (256) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_256");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_256");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (128) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_128");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_128");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (64) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_64");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_64");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (32) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_32");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_32");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (16) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_16");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_16");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (8) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_8");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_8");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (4) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_4");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_4");
-            nv.setValue("FALSE");
-        }
-        
-        if (numForm / (2) >= 1) {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_2");
-            nv.setValue("TRUE");
-        }
-        else {
-            nv = fio.addNewNameValue();
-            nv.setName("EFI_ALIGNMENT_2");
-            nv.setValue("FALSE");
-        }
-            
-    }
     
     public void removeFvImagesFvImage(int i) {
       
@@ -1575,7 +1382,10 @@ public class FpdFileContents {
         return getfpdFlash().getFvImages().getFvImageList().size();
     }
     
-    public void getFvImagesFvImages(String[][] saa, ArrayList<LinkedHashMap<String, String>> options) {
+    /**Only Get Fv image setting - name and type.
+     * @param saa
+     */
+    public void getFvImagesFvImages(String[][] saa) {
     
         if (getfpdFlash().getFvImages() == null) {
             return;
@@ -1602,27 +1412,33 @@ public class FpdFileContents {
             
             saa[i][1] = fi.getType()+"";
             
-            //
-            // get FvImageOptions into Map[i]
-            //
-            FvImagesDocument.FvImages.FvImage.FvImageOptions fo = fi.getFvImageOptions();
-            if (fo == null) {
-                ++i;
-                continue;
+            ++i;
+        }
+    }
+    
+    /**Get FvImage Options for FvImage i
+     * @param i the ith FvImage
+     */
+    public void getFvImagesFvImageOptions(int i, Map<String, String> m) {
+        XmlObject o = getfpdFlash().getFvImages();
+        if (o == null) {
+            return;
+        }
+        XmlCursor cursor = o.newCursor();
+        QName qFvImage = new QName(xmlNs, "FvImage");
+        if (cursor.toChild(qFvImage)) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling(qFvImage);
             }
-            List<FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue> lnv = fo.getNameValueList();
-            if (lnv == null || lnv.isEmpty()) {
-                ++i;
-                continue;
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)cursor.getObject();
+            if (fi.getFvImageOptions() == null || fi.getFvImageOptions().getNameValueList() == null){
+                return;
             }
-            ListIterator lnvi = lnv.listIterator();
-            while (lnvi.hasNext()) {
-                FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = (FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue)lnvi.next();
-                Map<String, String> m = options.get(i);
+            ListIterator<FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue> li = fi.getFvImageOptions().getNameValueList().listIterator();
+            while(li.hasNext()){
+                FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = li.next();
                 m.put(nv.getName(), nv.getValue());
             }
-            
-            ++i;
         }
     }
     
