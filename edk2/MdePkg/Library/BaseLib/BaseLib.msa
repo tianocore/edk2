@@ -294,22 +294,22 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumUnicodeStringLength</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumAsciiStringLength</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaximumLinkedListLength</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumLinkedListLength</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdSpinLockTimeout</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdSpinLockTimeout</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

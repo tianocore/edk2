@@ -45,7 +45,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdPciExpressBaseAddress</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdPciExpressBaseAddress</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

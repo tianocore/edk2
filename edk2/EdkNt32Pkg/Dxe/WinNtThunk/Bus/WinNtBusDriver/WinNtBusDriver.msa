@@ -127,67 +127,67 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <PcdCoded>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtConsole</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtConsole</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtUga</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtUga</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtSerialPort</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtSerialPort</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtFileSystem</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFileSystem</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtVirtualDisk</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtVirtualDisk</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtPhysicalDisk</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtPhysicalDisk</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuModel</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtCpuModel</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuSpeed</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtCpuSpeed</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySize</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtMemorySize</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch1</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBinaryPatch1</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch2</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBinaryPatch2</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdWinNtFeatureFlag1</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFeatureFlag1</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtDynamicUINT32</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtDynamicUINT32</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

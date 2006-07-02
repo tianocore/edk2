@@ -92,17 +92,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtMemorySizeForSecMain</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtFirmwareVolume</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFirmwareVolume</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtBootMode</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBootMode</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

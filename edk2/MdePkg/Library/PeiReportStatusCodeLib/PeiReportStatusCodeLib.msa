@@ -68,7 +68,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdReportStatusCodePropertyMask</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>
