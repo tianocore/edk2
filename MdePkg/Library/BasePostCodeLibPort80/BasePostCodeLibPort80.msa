@@ -45,7 +45,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdPostCodePropertyMask</C_Name>
-      <TokenSpaceGuidCName>FIX_ME_PcdPostCodePropertyMask</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>
