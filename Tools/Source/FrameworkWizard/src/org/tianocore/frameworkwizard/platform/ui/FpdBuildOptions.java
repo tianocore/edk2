@@ -52,6 +52,10 @@ import javax.swing.table.TableModel;
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import java.awt.CardLayout;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class FpdBuildOptions extends IInternalFrame {
 
@@ -75,8 +79,9 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane jScrollPane2 = null;
     private JTable jTable2 = null;
     private DefaultTableModel ffsTableModel = null;
-    private DefaultTableModel imageEntryPointTableModel = null;
-    private DefaultTableModel outputDirectoryTableModel = null;
+    private DefaultTableModel sectionsTableModel = null;
+    private DefaultTableModel sectionTableModel = null;
+    private DefaultTableModel subsectionsTableModel = null;
     private DefaultTableModel antTaskTableModel = null;
     private DefaultTableModel ffsAttributesTableModel = null;
     private DefaultTableModel optionsTableModel = null;
@@ -89,7 +94,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTextField jTextField6 = null;
     private JButton jButton8 = null;
     private JButton jButton9 = null;
-    private JCheckBox jCheckBox5 = null;
     private JScrollPane jScrollPane5 = null;
     private JTable jTable4 = null;
     private JPanel jPanel19 = null;
@@ -105,23 +109,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTable jTable5 = null;
     private JButton jButton10 = null;
     private JButton jButton11 = null;
-    private JPanel jPanel21 = null;
-    private JButton jButton12 = null;
-    private JButton jButton13 = null;
-    private JLabel jLabel8 = null;
-    private JTextField jTextField9 = null;
-    private JLabel jLabel13 = null;
-    private JTextField jTextField10 = null;
-    private JPanel jPanel22 = null;
-    private JCheckBox jCheckBox6 = null;
-    private JComboBox jComboBox4 = null;
-    private JCheckBox jCheckBox7 = null;
-    private JComboBox jComboBox5 = null;
-    private JCheckBox jCheckBox8 = null;
-    private JTextField jTextField11 = null;
-    private JButton jButton14 = null;
-    private JButton jButton15 = null;
-    private JButton jButton16 = null;
     private DefaultListModel listModel = new DefaultListModel();
     private JButton jButton17 = null;
     private JButton jButton18 = null;
@@ -142,6 +129,25 @@ public class FpdBuildOptions extends IInternalFrame {
     private JLabel jLabel1 = null;
     private JScrollPane jScrollPane = null;
     private JTable jTable = null;
+    private JLabel jLabel2 = null;
+    private JScrollPane jScrollPane1 = null;
+    private JTable jTable1 = null;
+    private JLabel jLabel4 = null;
+    private JScrollPane jScrollPane3 = null;
+    private JTable jTable3 = null;
+    private JLabel jLabel5 = null;
+    private JTextField jTextField = null;
+    private JPanel jPanel4 = null;
+    private JLabel jLabel6 = null;
+    private JButton jButton = null;
+    private JButton jButton1 = null;
+    private JButton jButton2 = null;
+    private JButton jButton3 = null;
+    private JLabel jLabel8 = null;
+    private JButton jButton6 = null;
+    private JButton jButton7 = null;
+    private JScrollPane jScrollPane4 = null;
+    private JTable jTable6 = null;
     /**
      * This method initializes jPanel	
      * 	
@@ -483,14 +489,18 @@ public class FpdBuildOptions extends IInternalFrame {
      */
     private JPanel getJPanel15() {
         if (jPanel15 == null) {
+            jLabel5 = new JLabel();
+            jLabel5.setText("Encapsulation Type");
             FlowLayout flowLayout5 = new FlowLayout();
             flowLayout5.setAlignment(java.awt.FlowLayout.RIGHT);
             jLabel7 = new JLabel();
-            jLabel7.setText("Type");
+            jLabel7.setText("FFS Key");
             jPanel15 = new JPanel();
             jPanel15.setLayout(flowLayout5);
             jPanel15.add(jLabel7, null);
             jPanel15.add(getJTextField6(), null);
+            jPanel15.add(jLabel5, null);
+            jPanel15.add(getJTextField(), null);
             jPanel15.add(getJButton8(), null);
             jPanel15.add(getJButton9(), null);
         }
@@ -504,16 +514,18 @@ public class FpdBuildOptions extends IInternalFrame {
      */
     private JPanel getJPanel16() {
         if (jPanel16 == null) {
+            jLabel6 = new JLabel();
+            jLabel6.setText("Attributes");
             FlowLayout flowLayout6 = new FlowLayout();
             flowLayout6.setHgap(5);
-            flowLayout6.setAlignment(java.awt.FlowLayout.LEFT);
+            flowLayout6.setVgap(20);
+            flowLayout6.setAlignment(java.awt.FlowLayout.CENTER);
             jPanel16 = new JPanel();
             jPanel16.setPreferredSize(new java.awt.Dimension(491,130));
             jPanel16.setLayout(flowLayout6);
-            jPanel16.add(getJCheckBox5(), null);
-            jPanel16.add(getJButton17(), null);
-            jPanel16.add(getJButton18(), null);
+            jPanel16.add(jLabel6, null);
             jPanel16.add(getJScrollPane5(), null);
+            jPanel16.add(getJPanel4(), null);
         }
         return jPanel16;
     }
@@ -538,7 +550,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTextField getJTextField6() {
         if (jTextField6 == null) {
             jTextField6 = new JTextField();
-            jTextField6.setPreferredSize(new java.awt.Dimension(150,20));
+            jTextField6.setPreferredSize(new java.awt.Dimension(100,20));
         }
         return jTextField6;
     }
@@ -561,7 +573,9 @@ public class FpdBuildOptions extends IInternalFrame {
 
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (jTextField6.getText().length() > 0) {
-                        listModel.addElement(jTextField6.getText());
+                        String[] row = {jTextField6.getText()};
+                        ffsTableModel.addRow(row);
+                        ffc.genBuildOptionsFfs(jTextField6.getText(), jTextField.getText());
                     }
                 }
             });
@@ -586,24 +600,14 @@ public class FpdBuildOptions extends IInternalFrame {
                 private static final long serialVersionUID = -4002678939178194476L;
 
                 public void actionPerformed(ActionEvent arg0){
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
+                    ffc.removeBuildOptionsFfs(jTable.getSelectedRow());
                 }
             });
         }
         return jButton9;
-    }
-
-    /**
-     * This method initializes jCheckBox5	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox5() {
-        if (jCheckBox5 == null) {
-            jCheckBox5 = new JCheckBox();
-            jCheckBox5.setText("Attributes");
-            jCheckBox5.setPreferredSize(new java.awt.Dimension(81,20));
-        }
-        return jCheckBox5;
     }
 
     /**
@@ -632,6 +636,28 @@ public class FpdBuildOptions extends IInternalFrame {
             jTable4.setPreferredSize(new java.awt.Dimension(400,80));
             ffsAttributesTableModel.addColumn("Name");
             ffsAttributesTableModel.addColumn("Value");
+            
+            jTable4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable4.getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    int row = arg0.getFirstRow();
+                    TableModel m = (TableModel)arg0.getSource();
+                    if (arg0.getType() == TableModelEvent.UPDATE){
+                        //ToDo Data Validition check.
+                        String name = m.getValueAt(row, 0) + "";
+                        String value = m.getValueAt(row, 1) + "";
+                        
+                        if (name.length() == 0) {
+                            return;
+                        }
+                        if (value.length() == 0){
+                            return;
+                        }
+                        ffc.updateBuildOptionsFfsAttribute(jTable.getSelectedRow(), row, name, value);
+                    }
+                }
+            });
         }
         return jTable4;
     }
@@ -643,10 +669,26 @@ public class FpdBuildOptions extends IInternalFrame {
      */
     private JPanel getJPanel19() {
         if (jPanel19 == null) {
+            jLabel8 = new JLabel();
+            jLabel8.setText("Sections");
+            jLabel4 = new JLabel();
+            jLabel4.setText("Sub-Sections");
+            jLabel2 = new JLabel();
+            jLabel2.setText("Section");
             jPanel19 = new JPanel();
-            jPanel19.setLayout(new CardLayout());
-            jPanel19.add(getJPanel21(), getJPanel21().getName());
-            jPanel19.add(getJPanel22(), getJPanel22().getName());
+            jPanel19.setLayout(new FlowLayout());
+            jPanel19.add(jLabel2, null);
+            jPanel19.add(getJButton(), null);
+            jPanel19.add(getJButton1(), null);
+            jPanel19.add(getJScrollPane1(), null);
+            jPanel19.add(jLabel8, null);
+            jPanel19.add(getJButton6(), null);
+            jPanel19.add(getJButton7(), null);
+            jPanel19.add(getJScrollPane4(), null);
+            jPanel19.add(jLabel4, null);
+            jPanel19.add(getJButton2(), null);
+            jPanel19.add(getJButton3(), null);
+            jPanel19.add(getJScrollPane3(), null);
         }
         return jPanel19;
     }
@@ -901,279 +943,6 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanel21	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel21() {
-        if (jPanel21 == null) {
-            jLabel13 = new JLabel();
-            jLabel13.setText("EncapsulationTag");
-            jLabel8 = new JLabel();
-            jLabel8.setText("EncapsulationType");
-            jPanel21 = new JPanel();
-            jPanel21.setName("jPanel21");
-            jPanel21.add(jLabel8, null);
-            jPanel21.add(getJTextField9(), null);
-            jPanel21.add(jLabel13, null);
-            jPanel21.add(getJTextField10(), null);
-            jPanel21.add(getJButton12(), null);
-            jPanel21.add(getJButton13(), null);
-            jPanel21.add(getJButton16(), null);
-        }
-        return jPanel21;
-    }
-
-    /**
-     * This method initializes jButton12	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton12() {
-        if (jButton12 == null) {
-            jButton12 = new JButton();
-            jButton12.setText("Add Sections");
-            jButton12.setPreferredSize(new java.awt.Dimension(109,20));
-            jButton12.addActionListener(new AbstractAction(){
-                /**
-                 * 
-                 */
-                private static final long serialVersionUID = 1L;
-
-                public void actionPerformed(ActionEvent arg0){
-                }
-            });
-        }
-        return jButton12;
-    }
-
-    /**
-     * This method initializes jButton13	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton13() {
-        if (jButton13 == null) {
-            jButton13 = new JButton();
-            jButton13.setText("Add Section");
-            jButton13.setPreferredSize(new java.awt.Dimension(102,20));
-            jButton13.addActionListener(new AbstractAction(){
-                /**
-                 * 
-                 */
-                private static final long serialVersionUID = 1L;
-
-                public void actionPerformed(ActionEvent arg0){
-                    CardLayout cl = (CardLayout)jPanel19.getLayout();
-                    cl.last(jPanel19);
-                }
-            });
-        }
-        return jButton13;
-    }
-
-    /**
-     * This method initializes jTextField9	
-     * 	
-     * @return javax.swing.JTextField	
-     */
-    private JTextField getJTextField9() {
-        if (jTextField9 == null) {
-            jTextField9 = new JTextField();
-            jTextField9.setPreferredSize(new java.awt.Dimension(250,20));
-        }
-        return jTextField9;
-    }
-
-    /**
-     * This method initializes jTextField10	
-     * 	
-     * @return javax.swing.JTextField	
-     */
-    private JTextField getJTextField10() {
-        if (jTextField10 == null) {
-            jTextField10 = new JTextField();
-            jTextField10.setPreferredSize(new java.awt.Dimension(250,20));
-        }
-        return jTextField10;
-    }
-
-    /**
-     * This method initializes jPanel22	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel22() {
-        if (jPanel22 == null) {
-            FlowLayout flowLayout7 = new FlowLayout();
-            flowLayout7.setAlignment(java.awt.FlowLayout.LEFT);
-            jPanel22 = new JPanel();
-            jPanel22.setLayout(flowLayout7);
-            jPanel22.setName("jPanel22");
-            jPanel22.add(getJCheckBox6(), null);
-            jPanel22.add(getJComboBox4(), null);
-            jPanel22.add(getJCheckBox7(), null);
-            jPanel22.add(getJComboBox5(), null);
-            jPanel22.add(getJCheckBox8(), null);
-            jPanel22.add(getJTextField11(), null);
-            jPanel22.add(getJButton14(), null);
-            jPanel22.add(getJButton15(), null);
-        }
-        return jPanel22;
-    }
-
-    /**
-     * This method initializes jCheckBox6	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox6() {
-        if (jCheckBox6 == null) {
-            jCheckBox6 = new JCheckBox();
-            jCheckBox6.setText("Section Type");
-            jCheckBox6.setPreferredSize(new java.awt.Dimension(98,20));
-        }
-        return jCheckBox6;
-    }
-
-    /**
-     * This method initializes jComboBox4	
-     * 	
-     * @return javax.swing.JComboBox	
-     */
-    private JComboBox getJComboBox4() {
-        if (jComboBox4 == null) {
-            jComboBox4 = new JComboBox();
-            jComboBox4.setPreferredSize(new java.awt.Dimension(260,20));
-            
-            jComboBox4.addItem("EFI_SECTION_FREEFORM_SUBTYPE_GUID");
-            jComboBox4.addItem("EFI_SECTION_VERSION");
-            jComboBox4.addItem("EFI_SECTION_USER_INTERFACE");
-            jComboBox4.addItem("EFI_SECTION_DXE_DEPEX");
-            jComboBox4.addItem("EFI_SECTION_PEI_DEPEX");
-            jComboBox4.addItem("EFI_SECTION_PE32");
-            jComboBox4.addItem("EFI_SECTION_PIC");
-            jComboBox4.addItem("EFI_SECTION_TE");
-            jComboBox4.addItem("EFI_SECTION_RAW");
-            jComboBox4.addItem("EFI_SECTION_COMPRESSION");
-            jComboBox4.addItem("EFI_SECTION_GUID_DEFINED");
-            jComboBox4.addItem("EFI_SECTION_COMPATIBILITY16");
-            jComboBox4.addItem("EFI_SECTION_FIRMWARE_VOLUME_IMAGE");
-            jComboBox4.setSelectedIndex(0);
-        }
-        return jComboBox4;
-    }
-
-    /**
-     * This method initializes jCheckBox7	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox7() {
-        if (jCheckBox7 == null) {
-            jCheckBox7 = new JCheckBox();
-            jCheckBox7.setPreferredSize(new java.awt.Dimension(120,20));
-            jCheckBox7.setText("Compressible");
-        }
-        return jCheckBox7;
-    }
-
-    /**
-     * This method initializes jComboBox5	
-     * 	
-     * @return javax.swing.JComboBox	
-     */
-    private JComboBox getJComboBox5() {
-        if (jComboBox5 == null) {
-            jComboBox5 = new JComboBox();
-            jComboBox5.setPreferredSize(new java.awt.Dimension(80,20));
-            
-            jComboBox5.addItem("false");
-            jComboBox5.addItem("true");
-            jComboBox5.setSelectedIndex(0);
-        }
-        return jComboBox5;
-    }
-
-    /**
-     * This method initializes jCheckBox8	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBox8() {
-        if (jCheckBox8 == null) {
-            jCheckBox8 = new JCheckBox();
-            jCheckBox8.setText("Binding Order");
-            jCheckBox8.setPreferredSize(new java.awt.Dimension(103,20));
-        }
-        return jCheckBox8;
-    }
-
-    /**
-     * This method initializes jTextField11	
-     * 	
-     * @return javax.swing.JTextField	
-     */
-    private JTextField getJTextField11() {
-        if (jTextField11 == null) {
-            jTextField11 = new JTextField();
-            jTextField11.setPreferredSize(new java.awt.Dimension(150,20));
-        }
-        return jTextField11;
-    }
-
-    /**
-     * This method initializes jButton14	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton14() {
-        if (jButton14 == null) {
-            jButton14 = new JButton();
-            jButton14.setText("Add");
-            jButton14.setPreferredSize(new java.awt.Dimension(70,20));
-            jButton14.addActionListener(new AbstractAction(){
-                /**
-                 * 
-                 */
-                private static final long serialVersionUID = 1L;
-
-                public void actionPerformed(ActionEvent arg0){
-                }
-            });
-        }
-        return jButton14;
-    }
-
-    /**
-     * This method initializes jButton15	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton15() {
-        if (jButton15 == null) {
-            jButton15 = new JButton();
-            jButton15.setPreferredSize(new java.awt.Dimension(70,20));
-            jButton15.setText("Delete");
-        }
-        return jButton15;
-    }
-
-    /**
-     * This method initializes jButton16	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton16() {
-        if (jButton16 == null) {
-            jButton16 = new JButton();
-            jButton16.setText("Delete");
-            jButton16.setPreferredSize(new java.awt.Dimension(70,20));
-        }
-        return jButton16;
-    }
-
-    /**
      * This method initializes jButton17	
      * 	
      * @return javax.swing.JButton	
@@ -1181,8 +950,8 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton getJButton17() {
         if (jButton17 == null) {
             jButton17 = new JButton();
-            jButton17.setPreferredSize(new java.awt.Dimension(70,20));
-            jButton17.setText("Add");
+            jButton17.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton17.setText("New");
             jButton17.addActionListener(new AbstractAction() {
                 /**
                  * 
@@ -1190,8 +959,12 @@ public class FpdBuildOptions extends IInternalFrame {
                 private static final long serialVersionUID = 1L;
 
                 public void actionPerformed(ActionEvent arg0){
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
                     Object[] o = {"", ""};
                     ffsAttributesTableModel.addRow(o);
+                    ffc.genBuildOptionsFfsAttribute(jTable.getSelectedRow(), "", "");
                 }
             });
         }
@@ -1206,8 +979,8 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton getJButton18() {
         if (jButton18 == null) {
             jButton18 = new JButton();
-            jButton18.setPreferredSize(new java.awt.Dimension(70,20));
-            jButton18.setText("Delete");
+            jButton18.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton18.setText("Remove");
             jButton18.addActionListener(new AbstractAction(){
                 /**
                  * 
@@ -1215,8 +988,12 @@ public class FpdBuildOptions extends IInternalFrame {
                 private static final long serialVersionUID = 1L;
 
                 public void actionPerformed(ActionEvent arg0){
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
                     if (jTable4.getSelectedRow() >= 0){
                         ffsAttributesTableModel.removeRow(jTable4.getSelectedRow());
+                        ffc.removeBuildOptionsFfsAttribute(jTable.getSelectedRow(), jTable4.getSelectedRow());
                     }
                 }
             });
@@ -1375,8 +1152,314 @@ public class FpdBuildOptions extends IInternalFrame {
             jTable = new JTable(ffsTableModel);
             jTable.setShowGrid(false);
             jTable.setRowHeight(20);
+            
+            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+                public void valueChanged(ListSelectionEvent e) {
+                    
+                    if (e.getValueIsAdjusting()){
+                        return;
+                    }
+                    ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+                    if (lsm.isSelectionEmpty()) {
+                        return;
+                    }
+                    else{
+                        int row = lsm.getMinSelectionIndex();
+                        sectionTableModel.setRowCount(0);
+                        sectionsTableModel.setRowCount(0);
+                        subsectionsTableModel.setRowCount(0);
+                        ffsAttributesTableModel.setRowCount(0);
+                        String[] sArray = {"", ""};
+                        LinkedHashMap<String, String> lhm = new LinkedHashMap<String, String>();
+                        ArrayList<String> alSections = new ArrayList<String>();
+                        ArrayList<String> alSection = new ArrayList<String>();
+                        ffc.getBuildOptionsFfs(row, sArray, lhm, alSections, alSection);
+                        jTextField6.setText(sArray[0]);
+                        jTextField.setText(sArray[1]);
+                        for (int i = 0; i < alSection.size(); ++i) {
+                            String[] sectionRow = {alSection.get(i)};
+                            sectionTableModel.addRow(sectionRow);
+                        }
+                        for (int j = 0; j < alSections.size(); ++j) {
+                            String[] sectionsRow = {alSections.get(j)};
+                            sectionsTableModel.addRow(sectionsRow);
+                        }
+                        if (lhm.size() <= 0 ) {
+                            return;
+                        }
+                        Set<String> keySet = lhm.keySet();
+                        Iterator<String> is = keySet.iterator();
+                        while(is.hasNext()) {
+                            String key = is.next();
+                            String[] attribRow = {key, lhm.get(key)};
+                            ffsAttributesTableModel.addRow(attribRow);
+                        }
+                    }
+                }
+            });
+            
+            jTable.getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    int row = arg0.getFirstRow();
+                    TableModel m = (TableModel)arg0.getSource();
+                    if (arg0.getType() == TableModelEvent.UPDATE){
+                        //ToDo Data Validition check.
+                        String id = m.getValueAt(row, 0) + "";
+                        
+                        if (id.length() == 0) {
+                            return;
+                        }
+                       
+//                        ffc.updateBuildOptionsUserDefAntTask(row, id, file, execOrder);
+                        
+                    }
+                }
+            });
         }
         return jTable;
+    }
+
+    /**
+     * This method initializes jScrollPane1	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPane1() {
+        if (jScrollPane1 == null) {
+            jScrollPane1 = new JScrollPane();
+            jScrollPane1.setPreferredSize(new java.awt.Dimension(500,80));
+            jScrollPane1.setViewportView(getJTable1());
+        }
+        return jScrollPane1;
+    }
+
+    /**
+     * This method initializes jTable1	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTable1() {
+        if (jTable1 == null) {
+            sectionTableModel = new DefaultTableModel();
+            sectionTableModel.addColumn("SectionType");
+            
+            jTable1 = new JTable(sectionsTableModel);
+        }
+        return jTable1;
+    }
+
+    /**
+     * This method initializes jScrollPane3	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPane3() {
+        if (jScrollPane3 == null) {
+            jScrollPane3 = new JScrollPane();
+            jScrollPane3.setPreferredSize(new java.awt.Dimension(500,90));
+            jScrollPane3.setViewportView(getJTable3());
+        }
+        return jScrollPane3;
+    }
+
+    /**
+     * This method initializes jTable3	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTable3() {
+        if (jTable3 == null) {
+            subsectionsTableModel = new DefaultTableModel();
+            subsectionsTableModel.addColumn("SectionType");
+            jTable3 = new JTable(subsectionsTableModel);
+        }
+        return jTable3;
+    }
+
+    /**
+     * This method initializes jTextField	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextField() {
+        if (jTextField == null) {
+            jTextField = new JTextField();
+            jTextField.setPreferredSize(new java.awt.Dimension(100,20));
+        }
+        return jTextField;
+    }
+
+    /**
+     * This method initializes jPanel4	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanel4() {
+        if (jPanel4 == null) {
+            jPanel4 = new JPanel();
+            jPanel4.setPreferredSize(new java.awt.Dimension(100,100));
+            jPanel4.add(getJButton17(), null);
+            jPanel4.add(getJButton18(), null);
+        }
+        return jPanel4;
+    }
+
+    /**
+     * This method initializes jButton	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton() {
+        if (jButton == null) {
+            jButton = new JButton();
+            jButton.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton.setText("New");
+        }
+        return jButton;
+    }
+
+    /**
+     * This method initializes jButton1	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton1() {
+        if (jButton1 == null) {
+            jButton1 = new JButton();
+            jButton1.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton1.setText("Remove");
+        }
+        return jButton1;
+    }
+
+    /**
+     * This method initializes jButton2	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton2() {
+        if (jButton2 == null) {
+            jButton2 = new JButton();
+            jButton2.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton2.setText("New");
+        }
+        return jButton2;
+    }
+
+    /**
+     * This method initializes jButton3	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton3() {
+        if (jButton3 == null) {
+            jButton3 = new JButton();
+            jButton3.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton3.setText("Remove");
+        }
+        return jButton3;
+    }
+
+    /**
+     * This method initializes jButton6	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton6() {
+        if (jButton6 == null) {
+            jButton6 = new JButton();
+            jButton6.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton6.setText("New");
+        }
+        return jButton6;
+    }
+
+    /**
+     * This method initializes jButton7	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton7() {
+        if (jButton7 == null) {
+            jButton7 = new JButton();
+            jButton7.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton7.setText("Remove");
+        }
+        return jButton7;
+    }
+
+    /**
+     * This method initializes jScrollPane4	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPane4() {
+        if (jScrollPane4 == null) {
+            jScrollPane4 = new JScrollPane();
+            jScrollPane4.setPreferredSize(new java.awt.Dimension(500,80));
+            jScrollPane4.setViewportView(getJTable6());
+        }
+        return jScrollPane4;
+    }
+
+    /**
+     * This method initializes jTable6	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTable6() {
+        if (jTable6 == null) {
+            sectionsTableModel = new DefaultTableModel();
+            sectionsTableModel.addColumn("EncapsulationType");
+            jTable6 = new JTable(sectionsTableModel);
+            
+            jTable6.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable6.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+                public void valueChanged(ListSelectionEvent e) {
+                    if (e.getValueIsAdjusting()){
+                        return;
+                    }
+                    ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+                    if (lsm.isSelectionEmpty()) {
+                        return;
+                    }
+                    else{
+                        int sectionsRow = lsm.getMinSelectionIndex();
+                        if (jTable.getSelectedRow() < 0) {
+                            return;
+                        }
+                        subsectionsTableModel.setRowCount(0);
+                        ArrayList<String> al = new ArrayList<String>();
+                        ffc.getBuildOptionsFfsSectionsSectionsSection(jTable.getSelectedRow(), sectionsRow, al);
+                        for (int i = 0; i < al.size(); ++i) {
+                            String[] subsectionRow = {al.get(i)};
+                            subsectionsTableModel.addRow(subsectionRow);
+                        }
+                    }
+                }
+            });
+            
+            jTable6.getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    int row = arg0.getFirstRow();
+                    TableModel m = (TableModel)arg0.getSource();
+                    if (arg0.getType() == TableModelEvent.UPDATE){
+                        //ToDo Data Validition check.
+//                        String targetName = m.getValueAt(row, 0) + "";
+//                        String toolChain = m.getValueAt(row, 1) + "";
+//                        String supArch = m.getValueAt(row, 2) + "";
+//                        String toolCmd = m.getValueAt(row, 3) + "";
+//                        String tagName = m.getValueAt(row, 4) + "";
+//                        String contents = m.getValueAt(row, 5) + "";
+//                        ffc.updateBuildOptionsOpt(row, targetName, toolChain, tagName, toolCmd, supArch, contents);
+                    }
+                }
+            });
+        }
+        return jTable6;
     }
 
     /**
@@ -1405,20 +1488,21 @@ public class FpdBuildOptions extends IInternalFrame {
     private void init(FpdFileContents ffc) {
         initOptionTable();
         initAntTaskTable();
+        initFfsTable();
         this.addInternalFrameListener(new InternalFrameAdapter(){
             public void internalFrameDeactivated(InternalFrameEvent e){
                 if (jTable.isEditing()) {
                     jTable.getCellEditor().stopCellEditing();
                 }
-//                if (jTable1.isEditing()) {
-//                    jTable1.getCellEditor().stopCellEditing();
-//                }
+                if (jTable1.isEditing()) {
+                    jTable1.getCellEditor().stopCellEditing();
+                }
                 if (jTable2.isEditing()) {
                     jTable2.getCellEditor().stopCellEditing();
                 }
-//                if (jTable3.isEditing()) {
-//                    jTable3.getCellEditor().stopCellEditing();
-//                }
+                if (jTable3.isEditing()) {
+                    jTable3.getCellEditor().stopCellEditing();
+                }
                 if (jTable4.isEditing()) {
                     jTable4.getCellEditor().stopCellEditing();
                 }
@@ -1451,13 +1535,25 @@ public class FpdBuildOptions extends IInternalFrame {
             antTaskTableModel.addRow(saa[i]);
         }
     }
+    
+    private void initFfsTable(){
+        int ffsCount = ffc.getBuildOptionsFfsCount();
+        if (ffsCount < 0) {
+            return;
+        }
+        String[][] saa = new String[ffsCount][1];
+        ffc.getBuildOptionsFfsKey(saa);
+        for (int i = 0; i < saa.length; ++i) {
+            ffsTableModel.addRow(saa[i]);
+        }
+    }
     /**
      * This method initializes this
      * 
      * @return void
      */
     private void initialize() {
-        this.setSize(722, 439);
+        this.setSize(722, 577);
         this.setTitle("FPD Build Options");
         this.setContentPane(getJContentPane());
     }

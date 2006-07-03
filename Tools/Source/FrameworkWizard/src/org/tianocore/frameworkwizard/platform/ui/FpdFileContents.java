@@ -32,6 +32,7 @@ import org.apache.xmlbeans.XmlOptions;
 import org.tianocore.AntTaskDocument;
 import org.tianocore.BuildOptionsDocument;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument;
+import org.tianocore.EfiSectionType;
 import org.tianocore.FlashDefinitionFileDocument;
 import org.tianocore.FlashDocument;
 import org.tianocore.FrameworkModulesDocument;
@@ -1144,16 +1145,13 @@ public class FpdFileContents {
         int i = 0;
         while(li.hasNext()) {
             OptionDocument.Option opt = (OptionDocument.Option)li.next();
-//            saa[i][0] = opt.getBuildTargets();
+            if (opt.getBuildTargets() != null) {
+                saa[i][0] = listToString(opt.getBuildTargets());
+            }
             saa[i][1] = opt.getToolChainFamily();
             if (opt.getSupArchList() != null){
-                Object[] archs = opt.getSupArchList().toArray();
-                saa[i][2] = " ";
-                for (int j = 0; j < archs.length; ++j){
-                    saa[i][2] += archs[j];
-                    saa[i][2] += " ";
-                }
-                saa[i][2] = saa[i][2].trim();
+                saa[i][2] = listToString(opt.getSupArchList());
+
             }
             saa[i][3] = opt.getToolCode();
             saa[i][4] = opt.getTagName();
@@ -1161,6 +1159,210 @@ public class FpdFileContents {
              
             ++i;
         }
+    }
+    
+    public void genBuildOptionsFfs(String ffsKey, String type) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getfpdBuildOpts().addNewFfs();
+        ffs.setFfsKey(ffsKey);
+        if (type != null) {
+            ffs.addNewSections().setEncapsulationType(type);
+        }
+    }
+    
+    public void genBuildOptionsFfsAttribute(int i, String name, String value) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        BuildOptionsDocument.BuildOptions.Ffs.Attribute attrib = ffs.addNewAttribute();
+        attrib.setName(name);
+        attrib.setValue(value);
+    }
+    
+    /**update jth attribute of ith ffs.
+     * @param i
+     * @param j
+     */
+    public void updateBuildOptionsFfsAttribute(int i, int j, String name, String value){
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        XmlCursor cursor = ffs.newCursor();
+        QName qAttrib = new QName(xmlNs, "Attribute");
+        if (cursor.toChild(qAttrib)) {
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qAttrib);
+            }
+            BuildOptionsDocument.BuildOptions.Ffs.Attribute attrib = (BuildOptionsDocument.BuildOptions.Ffs.Attribute)cursor.getObject();
+            attrib.setName(name);
+            attrib.setValue(value);
+        }
+        cursor.dispose();
+    }
+    
+    public void removeBuildOptionsFfsAttribute(int i, int j){
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        XmlCursor cursor = ffs.newCursor();
+        QName qAttrib = new QName(xmlNs, "Attribute");
+        if (cursor.toChild(qAttrib)) {
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qAttrib);
+            }
+            cursor.removeXml();
+        }
+        cursor.dispose();
+    }
+    
+    public void genBuildOptionsFfsSectionsSection(int i, String sectionType) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        if (ffs == null) {
+            return;
+        }
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        
+        if (sections == null){
+            sections = ffs.addNewSections();
+        }
+        sections.addNewSection().setSectionType(EfiSectionType.Enum.forString(sectionType));
+    }
+    
+    public void genBuildOptionsFfsSectionsSections(int i, String encapType) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        if (ffs == null) {
+            return;
+        }
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        
+        if (sections == null){
+            sections = ffs.addNewSections();
+        }
+        sections.addNewSections().setEncapsulationType(encapType);
+    }
+    
+    public void genBuildOptionsFfsSectionsSectionsSection(int i, int j, String type) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        if (ffs == null) {
+            return;
+        }
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        XmlCursor cursor = sections.newCursor();
+        QName qSections = new QName(xmlNs, "Sections");
+        if (cursor.toChild(qSections)){
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qSections);
+            }
+            BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2 sections2 = (BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2)cursor.getObject();
+            sections2.addNewSection().setSectionType(EfiSectionType.Enum.forString(type));
+        }
+        cursor.dispose();
+    }
+    
+    public void getBuildOptionsFfsSectionsSectionsSection(int i, int j, ArrayList<String> al) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        if (ffs == null) {
+            return;
+        }
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        XmlCursor cursor = sections.newCursor();
+        QName qSections = new QName(xmlNs, "Sections");
+        if (cursor.toChild(qSections)){
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qSections);
+            }
+            BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2 sections2 = (BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2)cursor.getObject();
+            if (sections2.getSectionList() == null){
+                cursor.dispose();
+                return;
+            }
+            ListIterator<BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section> li = sections2.getSectionList().listIterator();
+            while(li.hasNext()) {
+                BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section section = li.next();
+                al.add(section.getSectionType().toString());
+            }
+        }
+        cursor.dispose();
+        
+    }
+    
+    public int getBuildOptionsFfsCount(){
+        if (getfpdBuildOpts().getFfsList() == null) {
+            return 0;
+        }
+        return getfpdBuildOpts().getFfsList().size();
+    }
+    
+    public void getBuildOptionsFfsKey(String[][] saa) {
+        if (getfpdBuildOpts().getFfsList() == null) {
+            return;
+        }
+        ListIterator<BuildOptionsDocument.BuildOptions.Ffs> li = getfpdBuildOpts().getFfsList().listIterator();
+        int i = 0;
+        while(li.hasNext()){
+            BuildOptionsDocument.BuildOptions.Ffs ffs = li.next();
+            saa[i][0] = ffs.getFfsKey();
+            ++i;
+        }
+    }
+    
+    /**Get ith FFS key and contents.
+     * @param saa
+     */
+    public void getBuildOptionsFfs(int i, String[] sa, LinkedHashMap<String, String> ffsAttribMap, ArrayList<String> firstLevelSections, ArrayList<String> firstLevelSection) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+     
+        if (ffs != null) {
+         
+            sa[0] = ffs.getFfsKey();
+            if (ffs.getSections() != null) {
+                if(ffs.getSections().getEncapsulationType() != null){
+                    sa[1] = ffs.getSections().getEncapsulationType();
+                }
+                if (ffs.getSections().getSectionList() != null){
+                    ListIterator<BuildOptionsDocument.BuildOptions.Ffs.Sections.Section> li = ffs.getSections().getSectionList().listIterator();
+                    while (li.hasNext()) {
+                        firstLevelSection.add(li.next().getSectionType().toString());
+                    }
+                }
+                if (ffs.getSections().getSectionsList() != null) {
+                    ListIterator<BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2> li = ffs.getSections().getSectionsList().listIterator();
+                    while(li.hasNext()) {
+                        firstLevelSections.add(li.next().getEncapsulationType());
+                    }
+                }
+            }
+            if (ffs.getAttributeList() != null) {
+                ListIterator<BuildOptionsDocument.BuildOptions.Ffs.Attribute> li = ffs.getAttributeList().listIterator();
+                while(li.hasNext()) {
+                    BuildOptionsDocument.BuildOptions.Ffs.Attribute attrib = li.next();
+                    ffsAttribMap.put(attrib.getName(), attrib.getValue());
+                }
+                
+            }
+        }
+
+        
+    }
+    
+    private BuildOptionsDocument.BuildOptions.Ffs getFfs(int i) {
+        XmlObject o = getfpdBuildOpts();
+        BuildOptionsDocument.BuildOptions.Ffs ffs = null;
+        
+        XmlCursor cursor = o.newCursor();
+        QName qFfs = new QName(xmlNs, "Ffs");
+        if (cursor.toChild(qFfs)) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling(qFfs);
+            }
+            ffs = (BuildOptionsDocument.BuildOptions.Ffs)cursor.getObject();
+        }
+        cursor.dispose();
+        return ffs;
+    }
+    
+    public void removeBuildOptionsFfs(int i) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        if (ffs == null){
+            return;
+        }
+        
+        XmlCursor cursor = ffs.newCursor();
+        cursor.removeXml();
+        cursor.dispose();
     }
     
     public PlatformDefinitionsDocument.PlatformDefinitions getfpdPlatformDefs(){
