@@ -1169,6 +1169,13 @@ public class FpdFileContents {
         }
     }
     
+    public void updateBuildOptionsFfsSectionsType(int i, String type) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getfpdBuildOpts().addNewFfs();
+        if (type != null) {
+            ffs.addNewSections().setEncapsulationType(type);
+        }
+    }
+    
     public void genBuildOptionsFfsAttribute(int i, String name, String value) {
         BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
         BuildOptionsDocument.BuildOptions.Ffs.Attribute attrib = ffs.addNewAttribute();
@@ -1221,6 +1228,41 @@ public class FpdFileContents {
         sections.addNewSection().setSectionType(EfiSectionType.Enum.forString(sectionType));
     }
     
+    public void removeBuildOptionsFfsSectionsSection(int i, int j) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        if (sections == null) {
+            return;
+        }
+        XmlCursor cursor = sections.newCursor();
+        QName qSection = new QName(xmlNs, "Section");
+        if (cursor.toChild(qSection)) {
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qSection);
+            }
+            cursor.removeXml();
+        }
+        cursor.dispose();
+    }
+    
+    public void updateBuildOptionsFfsSectionsSection(int i, int j, String type){
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        if (sections == null) {
+            return;
+        }
+        XmlCursor cursor = sections.newCursor();
+        QName qSection = new QName(xmlNs, "Section");
+        if (cursor.toChild(qSection)) {
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qSection);
+            }
+            BuildOptionsDocument.BuildOptions.Ffs.Sections.Section section = (BuildOptionsDocument.BuildOptions.Ffs.Sections.Section)cursor.getObject();
+            section.setSectionType(EfiSectionType.Enum.forString(type));
+        }
+        cursor.dispose();
+    } 
+    
     public void genBuildOptionsFfsSectionsSections(int i, String encapType) {
         BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
         if (ffs == null) {
@@ -1232,6 +1274,41 @@ public class FpdFileContents {
             sections = ffs.addNewSections();
         }
         sections.addNewSections().setEncapsulationType(encapType);
+    }
+    
+    public void removeBuildOptionsFfsSectionsSections(int i, int j) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        if (sections == null) {
+            return;
+        }
+        XmlCursor cursor = sections.newCursor();
+        QName qSections = new QName(xmlNs, "Sections");
+        if (cursor.toChild(qSections)) {
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qSections);
+            }
+            cursor.removeXml();
+        }
+        cursor.dispose();
+    }
+    
+    public void updateBuildOptionsFfsSectionsSections(int i, int j, String type) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        if (sections == null) {
+            return;
+        }
+        XmlCursor cursor = sections.newCursor();
+        QName qSections = new QName(xmlNs, "Sections");
+        if (cursor.toChild(qSections)) {
+            for (int k = 0; k < j; ++k) {
+                cursor.toNextSibling(qSections);
+            }
+            BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2 sections2 = (BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2)cursor.getObject();
+            sections2.setEncapsulationType(type);
+        }
+        cursor.dispose();
     }
     
     public void genBuildOptionsFfsSectionsSectionsSection(int i, int j, String type) {
@@ -1248,6 +1325,51 @@ public class FpdFileContents {
             }
             BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2 sections2 = (BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2)cursor.getObject();
             sections2.addNewSection().setSectionType(EfiSectionType.Enum.forString(type));
+        }
+        cursor.dispose();
+    }
+    
+    public void removeBuildOptionsFfsSectionsSectionsSection(int i, int j, int k) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        if (sections == null) {
+            return;
+        }
+        XmlCursor cursor = sections.newCursor();
+        QName qSections = new QName(xmlNs, "Sections");
+        if (cursor.toChild(qSections)) {
+            for (int l = 0; l < j; ++l) {
+                cursor.toNextSibling(qSections);
+            }
+            if (cursor.toFirstChild()) {
+                for (int m = 0; m < k; ++m) {
+                    cursor.toNextSibling();
+                }
+                cursor.removeXml();
+            }
+        }
+        cursor.dispose();
+    }
+    
+    public void updateBuildOptionsFfsSectionsSectionsSection(int i, int j, int k, String type) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        BuildOptionsDocument.BuildOptions.Ffs.Sections sections = ffs.getSections();
+        if (sections == null) {
+            return;
+        }
+        XmlCursor cursor = sections.newCursor();
+        QName qSections = new QName(xmlNs, "Sections");
+        if (cursor.toChild(qSections)) {
+            for (int l = 0; l < j; ++l) {
+                cursor.toNextSibling(qSections);
+            }
+            if (cursor.toFirstChild()) {
+                for (int m = 0; m < k; ++m) {
+                    cursor.toNextSibling();
+                }
+                BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section section = (BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section)cursor.getObject();
+                section.setSectionType(EfiSectionType.Enum.forString(type));
+            }
         }
         cursor.dispose();
     }
@@ -1272,7 +1394,10 @@ public class FpdFileContents {
             ListIterator<BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section> li = sections2.getSectionList().listIterator();
             while(li.hasNext()) {
                 BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section section = li.next();
+                if (section.isSetSectionType()) {
                 al.add(section.getSectionType().toString());
+            }
+                
             }
         }
         cursor.dispose();
@@ -1297,6 +1422,11 @@ public class FpdFileContents {
             saa[i][0] = ffs.getFfsKey();
             ++i;
         }
+    }
+    
+    public void updateBuildOptionsFfsKey(int i, String key) {
+        BuildOptionsDocument.BuildOptions.Ffs ffs = getFfs(i);
+        ffs.setFfsKey(key);
     }
     
     /**Get ith FFS key and contents.
@@ -1364,6 +1494,8 @@ public class FpdFileContents {
         cursor.removeXml();
         cursor.dispose();
     }
+    
+    
     
     public PlatformDefinitionsDocument.PlatformDefinitions getfpdPlatformDefs(){
         if (fpdPlatformDefs == null){
