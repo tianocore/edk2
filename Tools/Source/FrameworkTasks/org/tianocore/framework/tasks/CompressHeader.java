@@ -17,7 +17,6 @@
 package org.tianocore.framework.tasks;
 
 import org.apache.tools.ant.BuildException;
-
 /**
   
   Internal class: This class is to generate the compressed section header.
