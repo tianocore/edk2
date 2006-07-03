@@ -551,6 +551,15 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jTextField6 == null) {
             jTextField6 = new JTextField();
             jTextField6.setPreferredSize(new java.awt.Dimension(100,20));
+            jTextField6.setEditable(false);
+            jTextField6.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
+//                    ffc.updateBuildOptionsFfsKey(jTable.getSelectedRow(), jTextField6.getText());
+                }
+            });
         }
         return jTextField6;
     }
@@ -1212,8 +1221,7 @@ public class FpdBuildOptions extends IInternalFrame {
                             return;
                         }
                        
-//                        ffc.updateBuildOptionsUserDefAntTask(row, id, file, execOrder);
-                        
+                        ffc.updateBuildOptionsFfsKey(row, id);
                     }
                 }
             });
@@ -1245,7 +1253,41 @@ public class FpdBuildOptions extends IInternalFrame {
             sectionTableModel = new DefaultTableModel();
             sectionTableModel.addColumn("SectionType");
             
-            jTable1 = new JTable(sectionsTableModel);
+            jTable1 = new JTable(sectionTableModel);
+            JComboBox cb = new JComboBox();
+            cb.addItem("EFI_SECTION_FREEFORM_SUBTYPE_GUID");
+            cb.addItem("EFI_SECTION_VERSION");
+            cb.addItem("EFI_SECTION_USER_INTERFACE");
+            cb.addItem("EFI_SECTION_DXE_DEPEX");
+            cb.addItem("EFI_SECTION_PEI_DEPEX");
+            cb.addItem("EFI_SECTION_PE32");
+            cb.addItem("EFI_SECTION_PIC");
+            cb.addItem("EFI_SECTION_TE");
+            cb.addItem("EFI_SECTION_RAW");
+            cb.addItem("EFI_SECTION_COMPRESSION");
+            cb.addItem("EFI_SECTION_GUID_DEFINED");
+            cb.addItem("EFI_SECTION_COMPATIBILITY16");
+            cb.addItem("EFI_SECTION_FIRMWARE_VOLUME_IMAGE");
+            jTable1.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(cb));
+            
+            jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            jTable1.getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
+                    int row = arg0.getFirstRow();
+                    TableModel m = (TableModel)arg0.getSource();
+                    if (arg0.getType() == TableModelEvent.UPDATE){
+                        //ToDo Data Validition check.
+                        String type = m.getValueAt(row, 0) + "";
+                        
+                       ffc.updateBuildOptionsFfsSectionsSection(jTable.getSelectedRow(), row, type);
+                    }
+                }
+            });
         }
         return jTable1;
     }
@@ -1274,6 +1316,38 @@ public class FpdBuildOptions extends IInternalFrame {
             subsectionsTableModel = new DefaultTableModel();
             subsectionsTableModel.addColumn("SectionType");
             jTable3 = new JTable(subsectionsTableModel);
+            JComboBox cb = new JComboBox();
+            cb.addItem("EFI_SECTION_FREEFORM_SUBTYPE_GUID");
+            cb.addItem("EFI_SECTION_VERSION");
+            cb.addItem("EFI_SECTION_USER_INTERFACE");
+            cb.addItem("EFI_SECTION_DXE_DEPEX");
+            cb.addItem("EFI_SECTION_PEI_DEPEX");
+            cb.addItem("EFI_SECTION_PE32");
+            cb.addItem("EFI_SECTION_PIC");
+            cb.addItem("EFI_SECTION_TE");
+            cb.addItem("EFI_SECTION_RAW");
+            cb.addItem("EFI_SECTION_COMPRESSION");
+            cb.addItem("EFI_SECTION_GUID_DEFINED");
+            cb.addItem("EFI_SECTION_COMPATIBILITY16");
+            cb.addItem("EFI_SECTION_FIRMWARE_VOLUME_IMAGE");
+            jTable3.getColumnModel().getColumn(0).setCellEditor(new DefaultCellEditor(cb));
+            jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            
+            jTable3.getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    if (jTable.getSelectedRow() < 0 || jTable6.getSelectedRow() < 0) {
+                        return;
+                    }
+                    int row = arg0.getFirstRow();
+                    TableModel m = (TableModel)arg0.getSource();
+                    if (arg0.getType() == TableModelEvent.UPDATE){
+                        //ToDo Data Validition check.
+                        String type = m.getValueAt(row, 0) + "";
+                        ffc.updateBuildOptionsFfsSectionsSectionsSection(jTable.getSelectedRow(), jTable6.getSelectedRow(), row, type);
+                    }
+                }
+            });
         }
         return jTable3;
     }
@@ -1287,6 +1361,14 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jTextField == null) {
             jTextField = new JTextField();
             jTextField.setPreferredSize(new java.awt.Dimension(100,20));
+            jTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
+                    ffc.updateBuildOptionsFfsSectionsType(jTable.getSelectedRow(), jTextField.getText());
+                }
+            });
         }
         return jTextField;
     }
@@ -1316,6 +1398,16 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton = new JButton();
             jButton.setPreferredSize(new java.awt.Dimension(80,20));
             jButton.setText("New");
+            jButton.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
+                    String[] row = {"EFI_SECTION_RAW"};
+                    sectionTableModel.addRow(row);
+                    ffc.genBuildOptionsFfsSectionsSection(jTable.getSelectedRow(), row[0]);
+                }
+            });
         }
         return jButton;
     }
@@ -1330,6 +1422,16 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton1 = new JButton();
             jButton1.setPreferredSize(new java.awt.Dimension(80,20));
             jButton1.setText("Remove");
+          
+            jButton1.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable.getSelectedRow() < 0 || jTable1.getSelectedRow() < 0) {
+                        return;
+                    }
+                    sectionTableModel.removeRow(jTable1.getSelectedRow());
+                    ffc.removeBuildOptionsFfsSectionsSection(jTable.getSelectedRow(), jTable1.getSelectedRow());
+                }
+            });
         }
         return jButton1;
     }
@@ -1344,6 +1446,17 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton2 = new JButton();
             jButton2.setPreferredSize(new java.awt.Dimension(80,20));
             jButton2.setText("New");
+            jButton2.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable.getSelectedRow() < 0 || jTable6.getSelectedRow() < 0) {
+                        return;
+                    }
+                    String[] row = {"EFI_SECTION_RAW"};
+                    subsectionsTableModel.addRow(row);
+                    ffc.genBuildOptionsFfsSectionsSectionsSection(jTable.getSelectedRow(), jTable6.getSelectedRow(), row[0]);
+                    
+                }
+            });
         }
         return jButton2;
     }
@@ -1358,6 +1471,15 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton3 = new JButton();
             jButton3.setPreferredSize(new java.awt.Dimension(80,20));
             jButton3.setText("Remove");
+            jButton3.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable.getSelectedRow() < 0 || jTable6.getSelectedRow() < 0 || jTable3.getSelectedRow() < 0) {
+                        return;
+                    }
+                    subsectionsTableModel.removeRow(jTable3.getSelectedRow());
+                    ffc.removeBuildOptionsFfsSectionsSectionsSection(jTable.getSelectedRow(), jTable6.getSelectedRow(), jTable3.getSelectedRow());
+                }
+            });
         }
         return jButton3;
     }
@@ -1372,6 +1494,16 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton6 = new JButton();
             jButton6.setPreferredSize(new java.awt.Dimension(80,20));
             jButton6.setText("New");
+            jButton6.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable.getSelectedRow() < 0) {
+                        return;
+                    }
+                    String[] row = {""};
+                    sectionsTableModel.addRow(row);
+                    ffc.genBuildOptionsFfsSectionsSections(jTable.getSelectedRow(), "");
+                }
+            });
         }
         return jButton6;
     }
@@ -1386,6 +1518,15 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton7 = new JButton();
             jButton7.setPreferredSize(new java.awt.Dimension(80,20));
             jButton7.setText("Remove");
+            jButton7.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable.getSelectedRow() < 0 || jTable6.getSelectedRow() < 0) {
+                        return;
+                    }
+                    sectionsTableModel.removeRow(jTable6.getSelectedRow());
+                    ffc.removeBuildOptionsFfsSectionsSections(jTable.getSelectedRow(), jTable6.getSelectedRow());
+                }
+            });
         }
         return jButton7;
     }
@@ -1448,13 +1589,8 @@ public class FpdBuildOptions extends IInternalFrame {
                     TableModel m = (TableModel)arg0.getSource();
                     if (arg0.getType() == TableModelEvent.UPDATE){
                         //ToDo Data Validition check.
-//                        String targetName = m.getValueAt(row, 0) + "";
-//                        String toolChain = m.getValueAt(row, 1) + "";
-//                        String supArch = m.getValueAt(row, 2) + "";
-//                        String toolCmd = m.getValueAt(row, 3) + "";
-//                        String tagName = m.getValueAt(row, 4) + "";
-//                        String contents = m.getValueAt(row, 5) + "";
-//                        ffc.updateBuildOptionsOpt(row, targetName, toolChain, tagName, toolCmd, supArch, contents);
+                        String encapType = m.getValueAt(row, 0) + "";
+                        ffc.updateBuildOptionsFfsSectionsSections(jTable.getSelectedRow(), row, encapType);
                     }
                 }
             });
