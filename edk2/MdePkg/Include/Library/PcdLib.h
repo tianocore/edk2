@@ -435,17 +435,16 @@ LibPcdSet64 (
 
 
 /**
-  Sets a buffer for the token specified by TokenNumber to 
-  the value specified by Buffer and SizeOfValue.  Buffer to
-  be set is returned. The content of the buffer could be 
-  overwritten if a Callback on SET is registered with this
-  TokenNumber.
+  Sets a buffer for the token specified by TokenNumber to the value 
+  specified by Buffer and SizeOfValue.  Buffer is returned.  
+  If SizeOfValue is greater than the maximum size support by TokenNumber, 
+  then set SizeOfValue to the maximum size supported by TokenNumber and 
+  return NULL to indicate that the set operation was not actually performed.  
+
+  If SizeOfValue is set to MAX_ADDRESS, then SizeOfValue must be set to the 
+  maximum size supported by TokenName and NULL must be returned.
   
-  If SizeOfValue is greater than the maximum 
-  size support by TokenNumber, then set SizeOfValue to the 
-  maximum size supported by TokenNumber and return NULL to 
-  indicate that the set operation was not actually performed. 
-  
+  If SizeOfValue is NULL, then ASSERT().
   If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]  TokenNumber The PCD token number to set a current value for.
@@ -577,6 +576,8 @@ LibPcdSetEx64 (
   supported by TokenNumber and return NULL to indicate that the set operation 
   was not actually performed. 
   
+  If Guid is NULL, then ASSERT().
+  If SizeOfValue is NULL, then ASSERT().
   If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
   
   @param[in]  Guid Pointer to a 128-bit unique value that 
@@ -731,7 +732,7 @@ LibPcdGetNextToken (
 
 **/
 
-CONST GUID*           
+GUID *           
 EFIAPI
 LibPcdGetNextTokenSpace (
   IN CONST GUID  *Guid

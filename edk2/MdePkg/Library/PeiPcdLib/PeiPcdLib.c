@@ -68,6 +68,8 @@ LibPcdSetSku (
   )
 {
 
+  ASSERT (SkuId < 0x100);
+
   GetPcdPpiPtr()->SetSku (SkuId);;
 
   return SkuId;
@@ -586,6 +588,8 @@ LibPcdSetPtr (
   PCD_PPI    *PcdPpi;
   UINTN      Size;
 
+  ASSERT (SizeOfBuffer != NULL);
+
   if (*SizeOfBuffer > 0) {
     ASSERT (Buffer != NULL);
   }
@@ -999,7 +1003,7 @@ LibPcdGetNextToken (
   @retval CONST GUID *  The next valid token namespace.
 
 **/
-CONST GUID*           
+GUID *           
 EFIAPI
 LibPcdGetNextTokenSpace (
   IN CONST GUID  *Guid
@@ -1015,6 +1019,6 @@ LibPcdGetNextTokenSpace (
 
   ASSERT_EFI_ERROR (Status);
 
-  return Guid;
+  return (GUID *)Guid;
 }
 

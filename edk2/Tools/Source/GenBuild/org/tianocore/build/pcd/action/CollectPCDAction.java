@@ -1008,6 +1008,30 @@ class PcdDatabase {
         }
     }
     
+    private int getHiiPtrTypeAlignmentSize(Token token) {
+        switch (token.datumType) {
+        case UINT8:
+            return 1;
+        case UINT16:
+            return 2;
+        case UINT32:
+            return 4;
+        case UINT64:
+            return 8;
+        case POINTER:
+            if (token.isHiiEnable()) {
+                if (token.isHiiDefaultValueUnicodeStringType()) {
+                    return 2;
+                }
+            }
+            return 1;
+        case BOOLEAN:
+            return 1;
+        default:
+            return 1;
+        }
+    }
+    
     private int getAlignmentSize (Token token) {
         if (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.HII_TYPE) {
             return 2;
@@ -1599,28 +1623,25 @@ class PcdDatabase {
             privateGlobalName = t.getPrimaryKeyString();
         }
 
-        if (t.isUnicodeStringType()) {
-            privateGlobalCCode = String.format("%-20s%s[%d];\r\n", "STRING_HEAD", t.getPrimaryKeyString(), t.getSkuIdCount());
-        } else {
-            String type = getCType(t);
-            if (t.datumType == Token.DATUM_TYPE.POINTER) {
-                int bufferSize;
-                if (t.isASCIIStringType()) {
-                    //
-                    // Build tool will add a NULL string at the end of the ASCII string
-                    //
-                    bufferSize = t.datumSize + 1;
-                } else {
-                    bufferSize = t.datumSize;
-                }
-                privateGlobalCCode = String.format("%-20s%s[%d][%d];\r\n", type, privateGlobalName, t.getSkuIdCount(), bufferSize);
+        String type = getCType(t);
+        if ((t.datumType == Token.DATUM_TYPE.POINTER) && (!t.isHiiEnable())) {
+            int bufferSize;
+            if (t.isASCIIStringType()) {
+                //
+                // Build tool will add a NULL string at the end of the ASCII string
+                //
+                bufferSize = t.datumSize + 1;
             } else {
-                privateGlobalCCode = String.format("%-20s%s[%d];\r\n", type, privateGlobalName, t.getSkuIdCount());
+                bufferSize = t.datumSize;
             }
+            privateGlobalCCode = String.format("%-20s%s[%d][%d];\r\n", type, privateGlobalName, t.getSkuIdCount(), bufferSize);
+        } else {
+            privateGlobalCCode = String.format("%-20s%s[%d];\r\n", type, privateGlobalName, t.getSkuIdCount());
         }
     }
     
-    private String getDataTypeDeclarationForVariableDefault_new (Token token, String cName, int skuId) {
+    private String getDataTypeDeclarationForVariableDefault_new (Token token, String cName, int skuId) 
+    throws EntityException {
 
         String typeStr;
 
@@ -1635,9 +1656,27 @@ class PcdDatabase {
         } else if (token.datumType == Token.DATUM_TYPE.BOOLEAN) {
             typeStr = "BOOLEAN";
         } else if (token.datumType == Token.DATUM_TYPE.POINTER) {
-            return String.format("%-20s%s[%d];\r\n", cName, token.datumSize);
+            int size;
+            if (token.isHiiDefaultValueUnicodeStringType()) {
+                typeStr = "UINT16";
+                //
+                // Include the NULL charactor
+                //
+                size = token.datumSize / 2 + 1;
+            } else {
+                typeStr = "UINT8";
+                if (token.isHiiDefaultValueASCIIStringType()) {
+                    //
+                    // Include the NULL charactor
+                    //
+                    size = token.datumSize + 1;
+                } else {
+                    size = token.datumSize;
+                }
+            }
+            return String.format("%-20s%s[%d];\r\n", typeStr, cName, size);
         } else {
-            typeStr = "";
+            throw new EntityException("Unknown DATUM_TYPE type in when generating code for VARIABLE_ENABLED PCD entry");
         }
 
         return String.format("%-20s%s;\r\n", typeStr, cName);
@@ -1678,7 +1717,7 @@ class PcdDatabase {
         s += tab + "{" + newLine;
 
         for (i = 0; i < t.skuData.size(); i++) {
-            if (t.isUnicodeStringType() && !t.isHiiEnable()) {
+            if (t.isUnicodeStringType()) {
                 s += tab + tab + String.format("{ %d }", stringTable.add(t.skuData.get(i).value.value, t));
             } else if (t.isHiiEnable()) {
                 /* VPD_HEAD definition
@@ -1686,6 +1725,7 @@ class PcdDatabase {
                       UINT16  GuidTableIndex;   // Offset in Guid Table in units of GUID.
                       UINT16  StringIndex;      // Offset in String Table in units of UINT16.
                       UINT16  Offset;           // Offset in Variable
+                      UINT16  DefaultValueOffset; // Offset of the Default Value
                     } VARIABLE_HEAD  ;
                  */
                 String variableDefaultName = String.format("%s_VariableDefault_%d", t.getPrimaryKeyString(), i); 
@@ -1700,7 +1740,7 @@ class PcdDatabase {
                 // the instantiation for the default value.
                 //
                 CStructTypeDeclaration decl = new CStructTypeDeclaration (variableDefaultName,
-                                                        getDataTypeAlignmentSize(t),
+                                                        getHiiPtrTypeAlignmentSize(t),
                                                         getDataTypeDeclarationForVariableDefault_new(t, variableDefaultName, i),
                                                         true
                                                         ); 
