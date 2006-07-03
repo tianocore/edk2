@@ -545,6 +545,10 @@ GetExPcdTokenNumber (
   GuidTable   = PeiPcdDb->Init.GuidTable;
 
   MatchGuid = ScanGuid (GuidTable, sizeof(PeiPcdDb->Init.GuidTable), Guid);
+  //
+  // We need to ASSERT here. If GUID can't be found in GuidTable, this is a
+  // error in the BUILD system.
+  //
   ASSERT (MatchGuid != NULL);
   
   MatchGuidIdx = MatchGuid - GuidTable;

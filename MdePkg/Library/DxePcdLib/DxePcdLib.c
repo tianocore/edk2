@@ -57,6 +57,8 @@ LibPcdSetSku (
   IN UINTN  SkuId
   )
 {
+  ASSERT (SkuId < 0x100);
+
   mPcd->SetSku (SkuId);
 
   return SkuId;
@@ -728,9 +730,14 @@ LibPcdSetExPtr (
   EFI_STATUS  Status;
   UINTN       Size;
 
+  ASSERT (Guid != NULL);
+
+  ASSERT (SizeOfBuffer != NULL);
+
   if (*SizeOfBuffer > 0) {
     ASSERT (Buffer != NULL);
   }
+
 
   Size = LibPcdGetExSize (Guid, TokenNumber);
   if (*SizeOfBuffer > Size) {
@@ -901,7 +908,7 @@ LibPcdGetNextToken (
   @retval CONST GUID *  The next valid token namespace.
 
 **/
-CONST GUID*           
+GUID *           
 EFIAPI
 LibPcdGetNextTokenSpace (
   IN CONST GUID  *Guid
@@ -913,6 +920,6 @@ LibPcdGetNextTokenSpace (
 
   ASSERT_EFI_ERROR (Status);
 
-  return Guid;
+  return (GUID *) Guid;
 }
 

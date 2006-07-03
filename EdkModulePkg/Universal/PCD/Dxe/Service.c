@@ -742,19 +742,23 @@ GetExPcdTokenNumber (
   EFI_GUID            *MatchGuid;
   UINTN               MatchGuidIdx;
 
-  ExMap       = mPcdDatabase->PeiDb.Init.ExMapTable;
-  GuidTable   = mPcdDatabase->PeiDb.Init.GuidTable;
-  
-  MatchGuid   = ScanGuid (GuidTable, sizeof(mPcdDatabase->PeiDb.Init.GuidTable), Guid);
-  ASSERT (MatchGuid != NULL);
+  if (!PEI_DATABASE_EMPTY) {
+    ExMap       = mPcdDatabase->PeiDb.Init.ExMapTable;
+    GuidTable   = mPcdDatabase->PeiDb.Init.GuidTable;
+    
+    MatchGuid   = ScanGuid (GuidTable, sizeof(mPcdDatabase->PeiDb.Init.GuidTable), Guid);
+    
+    if (MatchGuid != NULL) {
 
-  MatchGuidIdx = MatchGuid - GuidTable;
-  
-  for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
-    if ((ExTokenNumber == ExMap[i].ExTokenNumber) &&
-        (MatchGuidIdx == ExMap[i].ExGuidIndex)) {
-        return ExMap[i].LocalTokenNumber;
+      MatchGuidIdx = MatchGuid - GuidTable;
+      
+      for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
+        if ((ExTokenNumber == ExMap[i].ExTokenNumber) &&
+            (MatchGuidIdx == ExMap[i].ExGuidIndex)) {
+            return ExMap[i].LocalTokenNumber;
 
+        }
+      }
     }
   }
   
@@ -762,6 +766,10 @@ GetExPcdTokenNumber (
   GuidTable   = mPcdDatabase->DxeDb.Init.GuidTable;
 
   MatchGuid   = ScanGuid (GuidTable, sizeof(mPcdDatabase->DxeDb.Init.GuidTable), Guid);
+  //
+  // We need to ASSERT here. If GUID can't be found in GuidTable, this is a
+  // error in the BUILD system.
+  //
   ASSERT (MatchGuid != NULL);
 
   MatchGuidIdx = MatchGuid - GuidTable;
@@ -769,7 +777,7 @@ GetExPcdTokenNumber (
   for (i = 0; i < DXE_EXMAPPING_TABLE_SIZE; i++) {
     if ((ExTokenNumber == ExMap[i].ExTokenNumber) &&
          (MatchGuidIdx == ExMap[i].ExGuidIndex)) {
-        return ExMap[i].LocalTokenNumber + PEI_LOCAL_TOKEN_NUMBER;
+        return ExMap[i].LocalTokenNumber;
     }
   }
 

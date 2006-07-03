@@ -587,8 +587,6 @@ public class Token {
         DynamicTokenValue dynamicData = getDefaultSku();
         if (hasDefaultValue()) {
             switch (dynamicData.type) {
-            case HII_TYPE:
-                return dynamicData.hiiDefaultValue;
             case DEFAULT_TYPE:
                 return dynamicData.value;
             }
@@ -626,7 +624,6 @@ public class Token {
     }
 
     public boolean isValidNullValue(String judgedValue) {
-        int         intValue;
         String      subStr;
         BigInteger  bigIntValue;
 
@@ -687,7 +684,27 @@ public class Token {
         }
         return false;
     }
-
+    
+    public boolean isHiiDefaultValueUnicodeStringType() {
+        DynamicTokenValue dynamicData = getDefaultSku();
+        
+        if (dynamicData == null)
+            return false;
+        
+        return dynamicData.hiiDefaultValue.startsWith("L\"")
+                && dynamicData.hiiDefaultValue.endsWith("\"");
+    }
+    
+    public boolean isHiiDefaultValueASCIIStringType() {
+        DynamicTokenValue dynamicData = getDefaultSku();
+    
+        if (dynamicData == null)
+            return false;
+        
+        return dynamicData.hiiDefaultValue.startsWith("\"")
+        && dynamicData.hiiDefaultValue.endsWith("\"");
+    }
+    
     /**
        Judege whether current value is UNICODE string type.
        @return boolean

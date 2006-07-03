@@ -21,7 +21,7 @@ typedef UINT8 SKU_ID;
 
 typedef struct  {
   UINT32                ExTokenNumber;
-  UINT32                LocalTokenNumber;   // PCD Number of this particular platform build
+  UINT16                LocalTokenNumber;   // PCD Number of this particular platform build
   UINT16                ExGuidIndex;        // Index of GuidTable
 } DYNAMICEX_MAPPING;
 
