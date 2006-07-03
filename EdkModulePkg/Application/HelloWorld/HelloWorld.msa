@@ -10,7 +10,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
 <ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>HelloWorld</ModuleName>
-    <ModuleType>DXE_DRIVER</ModuleType>
+    <ModuleType>UEFI_APPLICATION</ModuleType>
     <GuidValue>6987936E-ED34-44db-AE97-1FA5E4ED2116</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for SecurityStub module</Abstract>
