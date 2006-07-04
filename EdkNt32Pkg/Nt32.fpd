@@ -18,7 +18,7 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </PlatformHeader>
   <PlatformDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32</SupportedArchitectures>
     <BuildTargets>DEBUG</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
     <OutputDirectory/>
@@ -6569,7 +6569,7 @@
         "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/DDEBUG", "/Cx", "/Zd", "/Zi", "/DEFI_NT_EMULATOR", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
       </Option>
       <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/P", "/TC" </Option>
+      <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h" </Option>
       <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASL"> "/nologo" </Option>
       
       <!-- MSFT tool chain options definition : IA32 -->
@@ -6584,7 +6584,7 @@
         "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/DDEBUG", "/Cx", "/Zd", "/Zi", "/DEFI_NT_EMULATOR", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
       </Option>
       <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/P", "/TC" </Option>
+      <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h" </Option>
       <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASL"> "/nologo" </Option>
     </Options>
 
