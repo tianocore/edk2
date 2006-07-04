@@ -102,7 +102,6 @@ GetWorker (
 
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
       if (Status == EFI_SUCCESS) {
-        ASSERT (DataSize >= (UINTN) (VariableHead->Offset + Size));
         return (UINT8 *) Data + VariableHead->Offset;
       } else {
         //

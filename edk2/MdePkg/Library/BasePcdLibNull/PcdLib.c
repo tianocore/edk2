@@ -780,3 +780,52 @@ LibPcdGetNextTokenSpace (
 {
   return NULL;
 }
+
+
+
+/**
+  Sets the PCD entry specified by PatchVariable to the value specified by Buffer 
+  and SizeOfValue.  Buffer is returned.  If SizeOfValue is greater than 
+  MaximumDatumSize, then set SizeOfValue to MaximumDatumSize and return 
+  NULL to indicate that the set operation was not actually performed.  
+  If SizeOfValue is set to MAX_ADDRESS, then SizeOfValue must be set to 
+  MaximumDatumSize and NULL must be returned.
+  
+  If PatchVariable is NULL, then ASSERT().
+  If SizeOfValue is NULL, then ASSERT().
+  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
+
+  @param[in] PatchVariable      A pointer to the global variable in a module that is 
+                                the target of the set operation.
+  @param[in] MaximumDatumSize   The maximum size allowed for the PCD entry specified by PatchVariable.
+  @param[in, out] SizeOfBuffer  A pointer to the size, in bytes, of Buffer.
+  @param[in] Buffer             A pointer to the buffer to used to set the target variable.
+
+**/
+VOID *
+EFIAPI
+LibPatchPcdSetPtr (
+  IN        VOID        *PatchVariable,
+  IN        UINTN       MaximumDatumSize,
+  IN OUT    UINTN       *SizeOfBuffer,
+  IN CONST  VOID        *Buffer
+  )
+{
+  ASSERT (PatchVariable != NULL);
+  ASSERT (SizeOfBuffer  != NULL);
+  
+  if (*SizeOfBuffer > 0) {
+    ASSERT (Buffer != NULL);
+  }
+
+  if ((*SizeOfBuffer > MaximumDatumSize) ||
+      (*SizeOfBuffer == MAX_ADDRESS)) {
+    *SizeOfBuffer = MaximumDatumSize;
+    return NULL;
+  }
+    
+  CopyMem (PatchVariable, Buffer, *SizeOfBuffer);
+  
+  return (VOID *) Buffer;
+}
+

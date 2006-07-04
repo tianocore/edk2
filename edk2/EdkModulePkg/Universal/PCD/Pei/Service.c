@@ -16,7 +16,6 @@ Module Name: Service.c
 **/
 #include "Service.h"
 
-
 /**
   The function registers the CallBackOnSet fucntion
   according to TokenNumber and EFI_GUID space.
@@ -496,7 +495,6 @@ GetWorker (
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
 
       if (Status == EFI_SUCCESS) {
-        ASSERT (DataSize >= (UINTN) (VariableHead->Offset + Size));
         return (VOID *) ((UINT8 *) Data + VariableHead->Offset);
       } else {
         //
