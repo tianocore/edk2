@@ -630,6 +630,59 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <!--
     EFI_SECTION_PE32
     -->
+
+  <macrodef name="EFI_SECTION_TE">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="" />
+
+    <element name="PRE.PROCESS" optional="yes"/>
+    <element name="POST.PROCESS" optional="yes"/>
+
+    <sequential>
+      <PRE.PROCESS/>
+      <if>
+        <not>
+          <equals arg1="${LIBS}" arg2=""/>
+        </not>
+
+        <then>
+          <GenDll FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="">
+            <LIB.ARG></LIB.ARG>
+            <LINK.ARG></LINK.ARG>
+          </GenDll>
+
+          <GenEfi FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="dll"/>
+        </then>
+      </if>
+
+      <OnDependency>
+        <sourcefiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
+        </sourcefiles>
+        <targetfiles>
+          <file name="${DEST_DIR_OUTPUT}/@{FILENAME}.tes"/>
+        </targetfiles>
+
+        <sequential>
+          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${BIN_DIR}/@{FILENAME}.efi" />
+          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}/@{FILENAME}.efi" />          
+          <genteimage Dump="false" Verbose="false" OutputDir="" OutputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.te" InputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.efi"/>
+          <!-- 
+          <exec executable="${GENTEIMAGE}">
+            <arg line="-o ${DEST_DIR_OUTPUT}/@{FILENAME}.te ${DEST_DIR_OUTPUT}/@{FILENAME}.efi" />
+          </exec>
+          -->
+          <copy file="${DEST_DIR_OUTPUT}/@{FILENAME}.te" tofile="${BIN_DIR}/@{FILENAME}.te" />
+          <gensection inputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.te" 
+                      outputfile="${DEST_DIR_OUTPUT}/@{FILENAME}.tes" 
+                      sectiontype="EFI_SECTION_TE"/>
+          <POST.PROCESS/>
+        </sequential>
+      </OnDependency>
+    </sequential>
+  </macrodef>
+
   <macrodef name="EFI_SECTION_PE32">
     <attribute name="FILEPATH"/>
     <attribute name="FILENAME"/>
@@ -868,59 +921,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <!-- 
     EFI_SECTION_TE
   -->
-  <macrodef name="EFI_SECTION_TE">
-    <attribute name="FILEPATH"/>
-    <attribute name="FILENAME"/>
-    <attribute name="FILEEXT" default="" />
-
-    <element name="PRE.PROCESS" optional="yes"/>
-    <element name="POST.PROCESS" optional="yes"/>
-
-    <sequential>
-      <PRE.PROCESS/>
-
-      <if>
-        <not>
-          <!-- TBD ${OBJECTS} -->
-          <equals arg1="${LIBS}" arg2=""/>
-        </not>
-
-        <then>
-          <GenDll FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="">
-            <LIB.ARG></LIB.ARG>
-            <LINK.ARG></LINK.ARG>
-          </GenDll>
-    
-          <GenEfi FILEPATH="." FILENAME="@{FILENAME}" FILEEXT="dll"/>
-        </then>
-      </if>
-
-      <OnDependency>
-        <sourcefiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.efi"/>
-        </sourcefiles>
-        <targetfiles>
-          <file name="${DEST_DIR_OUTPUT}\@{FILENAME}.tes"/>
-        </targetfiles>
-
-        <sequential>
-          <copy file="${DEST_DIR_OUTPUT}\@{FILENAME}.efi" tofile="${BIN_DIR}\@{FILENAME}.efi" />
-          <copy file="${DEST_DIR_OUTPUT}\@{FILENAME}.efi" tofile="${DEST_DIR_DEBUG}\@{FILENAME}.efi" />
-          
-          <exec executable="${GENTEIMAGE}">
-            <arg line="-o ${DEST_DIR_OUTPUT}\@{FILENAME}.te ${DEST_DIR_OUTPUT}\@{FILENAME}.efi" />
-          </exec>
-          
-          <copy file="${DEST_DIR_OUTPUT}\@{FILENAME}.te" tofile="${BIN_DIR}\@{FILENAME}.te" />
-          
-          <gensection inputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.te" 
-                      outputfile="${DEST_DIR_OUTPUT}\@{FILENAME}.tes" 
-                      sectiontype="EFI_SECTION_TE"/>
-          <POST.PROCESS/>
-        </sequential>
-      </OnDependency>
-    </sequential>
-  </macrodef>
 
 
   <!--
