@@ -391,6 +391,149 @@ public class FpdFileContents {
         instance.setPackageVersion(pv);
         
     }
+    
+    public String getFvBinding(String moduleKey){
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa == null || msa.getModuleSaBuildOptions() == null) {
+            return null;
+        }
+        return msa.getModuleSaBuildOptions().getFvBinding();
+    }
+    
+    public void setFvBinding(String moduleKey, String fvBinding){
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa == null ) {
+            return;
+        }
+        if(msa.getModuleSaBuildOptions() == null){
+            msa.addNewModuleSaBuildOptions().setFvBinding(fvBinding);
+            return;
+        }
+        msa.getModuleSaBuildOptions().setFvBinding(fvBinding);
+    }
+    
+    public String getFfsFileNameGuid(String moduleKey){
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa == null || msa.getModuleSaBuildOptions() == null) {
+            return null;
+        }
+        return msa.getModuleSaBuildOptions().getFfsFileNameGuid();
+    }
+    
+    public void setFfsFileNameGuid(String moduleKey, String fileGuid){
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa == null ) {
+            return;
+        }
+        if(msa.getModuleSaBuildOptions() == null){
+            msa.addNewModuleSaBuildOptions().setFfsFileNameGuid(fileGuid);
+            return;
+        }
+        msa.getModuleSaBuildOptions().setFfsFileNameGuid(fileGuid);
+    }
+    
+    public String getFfsFormatKey(String moduleKey){
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa == null || msa.getModuleSaBuildOptions() == null) {
+            return null;
+        }
+        return msa.getModuleSaBuildOptions().getFfsFormatKey();
+    }
+    
+    public void setFfsFormatKey(String moduleKey, String ffsKey){
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa == null ) {
+            return;
+        }
+        if(msa.getModuleSaBuildOptions() == null){
+            msa.addNewModuleSaBuildOptions().setFfsFormatKey(ffsKey);
+            return;
+        }
+        msa.getModuleSaBuildOptions().setFvBinding(ffsKey);
+    }
+    
+    public void getModuleSAOptions(String moduleKey, String[][] saa) {
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null
+                        || msa.getModuleSaBuildOptions().getOptions().getOptionList() == null) {
+            return ;
+        }
+        
+        List<OptionDocument.Option> lOpt = msa.getModuleSaBuildOptions().getOptions().getOptionList();
+        ListIterator li = lOpt.listIterator();
+        int i = 0;
+        while(li.hasNext()) {
+            OptionDocument.Option opt = (OptionDocument.Option)li.next();
+            if (opt.getBuildTargets() != null) {
+                saa[i][0] = listToString(opt.getBuildTargets());
+            }
+            saa[i][1] = opt.getToolChainFamily();
+            if (opt.getSupArchList() != null){
+                saa[i][2] = listToString(opt.getSupArchList());
+
+            }
+            saa[i][3] = opt.getToolCode();
+            saa[i][4] = opt.getTagName();
+            saa[i][5] = opt.getStringValue();
+             
+            ++i;
+        }
+    }
+    
+    public int getModuleSAOptionsCount(String moduleKey){
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null
+                        || msa.getModuleSaBuildOptions().getOptions().getOptionList() == null) {
+            return 0;
+        }
+        return msa.getModuleSaBuildOptions().getOptions().getOptionList().size();
+    }
+    
+    public void genModuleSAOptionsOpt(String moduleKey, Vector<Object> buildTargets, String toolChain, String tagName, String toolCmd, Vector<Object> archList, String contents) {
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa.getModuleSaBuildOptions() == null) {
+            msa.addNewModuleSaBuildOptions();
+        }
+        if (msa.getModuleSaBuildOptions().getOptions() == null){
+            msa.getModuleSaBuildOptions().addNewOptions();
+        }
+        OptionDocument.Option opt = msa.getModuleSaBuildOptions().getOptions().addNewOption();
+        setBuildOptionsOpt(buildTargets, toolChain, tagName, toolCmd, archList, contents, opt);
+    }
+    
+    public void removeModuleSAOptionsOpt(String moduleKey, int i) {
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null) {
+            return ;
+        }
+        OptionsDocument.Options opts = msa.getModuleSaBuildOptions().getOptions();
+        XmlCursor cursor = opts.newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j){
+                cursor.toNextSibling();
+            }
+            cursor.removeXml();
+        }
+        cursor.dispose();
+    }
+    
+    public void updateModuleSAOptionsOpt(String moduleKey, int i, Vector<Object> buildTargets, String toolChain, String tagName, String toolCmd, Vector<Object> archList, String contents) {
+        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
+        if (msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null) {
+            return ;
+        }
+        OptionsDocument.Options opts = msa.getModuleSaBuildOptions().getOptions();
+        XmlCursor cursor = opts.newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j){
+                cursor.toNextSibling();
+            }
+            OptionDocument.Option opt = (OptionDocument.Option)cursor.getObject();
+            setBuildOptionsOpt(buildTargets, toolChain, tagName, toolCmd, archList, contents, opt);
+        }
+        cursor.dispose();
+    }
+    
     /**add pcd information of module mi to a ModuleSA. 
      * @param mi
      * @param moduleSa if null, generate a new ModuleSA.
@@ -1050,7 +1193,7 @@ public class FpdFileContents {
             ++i;
         }
     }
-    public void genBuildOptionsOpt(String buildTargets, String toolChain, String tagName, String toolCmd, String archList, String contents) {
+    public void genBuildOptionsOpt(Vector<Object> buildTargets, String toolChain, String tagName, String toolCmd, Vector<Object> archList, String contents) {
         OptionsDocument.Options opts = getfpdBuildOpts().getOptions();
         if (opts == null) {
             opts = getfpdBuildOpts().addNewOptions();
@@ -1059,18 +1202,15 @@ public class FpdFileContents {
         setBuildOptionsOpt(buildTargets, toolChain, tagName, toolCmd, archList, contents, opt);
     }
     
-    private void setBuildOptionsOpt(String buildTargets, String toolChain, String tagName, String toolCmd, String archList, String contents, OptionDocument.Option opt){
+    private void setBuildOptionsOpt(Vector<Object> buildTargets, String toolChain, String tagName, String toolCmd, Vector<Object> archList, String contents, OptionDocument.Option opt){
         opt.setStringValue(contents);
-//        opt.setBuildTargets(buildTargets);
+        
+        opt.setBuildTargets(buildTargets);
         opt.setToolChainFamily(toolChain);
         opt.setTagName(tagName);
         opt.setToolCode(toolCmd);
-        String[] s = archList.split(" ");
-        ArrayList<String> al = new ArrayList<String>();
-        for (int i = 0; i < s.length; ++i) {
-            al.add(s[i]);
-        }
-        opt.setSupArchList(al);
+        
+        opt.setSupArchList(archList);
     }
     
     public void removeBuildOptionsOpt(int i){
@@ -1090,7 +1230,7 @@ public class FpdFileContents {
         cursor.dispose();
     }
     
-    public void updateBuildOptionsOpt(int i, String buildTargets, String toolChain, String tagName, String toolCmd, String archList, String contents) {
+    public void updateBuildOptionsOpt(int i, Vector<Object> buildTargets, String toolChain, String tagName, String toolCmd, Vector<Object> archList, String contents) {
         XmlObject o = getfpdBuildOpts().getOptions();
         if (o == null) {
             return;
@@ -1374,8 +1514,8 @@ public class FpdFileContents {
             while(li.hasNext()) {
                 BuildOptionsDocument.BuildOptions.Ffs.Sections.Sections2.Section section = li.next();
                 if (section.isSetSectionType()) {
-                al.add(section.getSectionType().toString());
-            }
+                    al.add(section.getSectionType().toString());
+                }
                 
             }
         }
@@ -2002,7 +2142,7 @@ public class FpdFileContents {
 
     }
     
-    private String listToString(List<String> l) {
+    private String listToString(List l) {
         if (l == null) {
             return null;
         }
