@@ -27,10 +27,10 @@ set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%XMLBEANS_HOME%
 @REM Build SurfaceArea first
 call "ant" -f %WORKSPACE%\Tools\build.xml SurfaceArea
 
-@REM Build ModuleEditor
+@REM Build Framework Wizard
 call "ant" -f %WORKSPACE%\Tools\Source\FrameworkWizard\build.xml
 
-@REM Run ModuleEditor
+@REM Run Framework Wizard
 call "java" org.tianocore.frameworkwizard.FrameworkWizardUI
 
 goto end
