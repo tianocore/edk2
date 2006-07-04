@@ -44,14 +44,14 @@
 *_MSFT_EBC_SLINK_NAME = link.exe
 
 # GCC definitions
-*_GCC_*_*_FAMILY = GCC
-*_GCC_*_CC_NAME = gcc
-*_GCC_*_SLINK_NAME = ar
-*_GCC_*_DLINK_NAME = ld
-*_GCC_*_ASM_NAME = ml.exe
-*_GCC_*_PP_NAME=gcc
+#*_GCC_*_*_FAMILY = GCC
+#*_GCC_*_CC_NAME = gcc
+#*_GCC_*_SLINK_NAME = ar
+#*_GCC_*_DLINK_NAME = ld
+#*_GCC_*_ASM_NAME = ml.exe
+#*_GCC_*_PP_NAME=gcc
 
 # GCC, IA32
-*_GCC_IA32_*_PATH = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
-*_GCC_IA32_ASM_PATH = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
-*_GCC_IA32_ASM_DPATH = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
+#*_GCC_IA32_*_PATH = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
+#*_GCC_IA32_ASM_PATH = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
+#*_GCC_IA32_ASM_DPATH = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
