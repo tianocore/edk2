@@ -164,7 +164,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 	    <if>
 	      <or>
 	        <equals arg1="@{FILEEXT}" arg2="asm" />
-	        <equals arg1="@{FILEEXT}" arg2="S" />
+	        <equals arg1="@{FILEEXT}" arg2="s" />
 	      </or>
 	      <then>
 	        <Build_Assembly FILEPATH="@{FILEPATH}" FILENAME="@{FILENAME}" FILEEXT="@{FILEEXT}">
@@ -173,7 +173,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </Build_Assembly>
 	      </then>
 	      <elseif>
-	        <equals arg1="@{FILEEXT}" arg2="s" />
+	        <equals arg1="@{FILEEXT}" arg2="S" />
 	        <then>
 	          <Build_IPF_Assembly_Code FILEPATH="@{FILEPATH}" FILENAME="@{FILENAME}" FILEEXT="@{FILEEXT}">
 	            <EXTRA.INC.1><EXTRA.INC /></EXTRA.INC.1>
@@ -210,7 +210,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-          <!--
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${CC_FAMILY}">
               <EXTRA.INC.1/>
@@ -232,7 +231,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                          replace="\10\2h"
                          flags="g"
                          byline="true"/>
-          -->
+
           <cc userdefine="on">
             <command type="ASM" cmd="${ASM}" workdir="${DEST_DIR_OUTPUT}" family="${ASM_FAMILY}"
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
@@ -241,8 +240,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <argument value="${ASM_FLAGS}"/>
               <EXTRA.ARG.1/>
       
-              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
-              <!-- fileset casesensitive="off" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/ -->
+              <!-- fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/ -->
+              <fileset casesensitive="off" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
             </command>
           </cc>
         </sequential>
