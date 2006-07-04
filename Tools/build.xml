@@ -62,6 +62,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 </catalog>]]>
     </echo>
     <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt" overwrite="false"/>
+    <copy file="Conf/target.template" tofile="Conf/target.txt" overwrite="false"/>
   </target>
   <target name="clean">
     <subant target="clean" inheritall="false">
