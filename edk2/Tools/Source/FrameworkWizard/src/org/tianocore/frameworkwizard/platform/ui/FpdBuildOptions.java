@@ -15,10 +15,8 @@
 package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 import javax.swing.JPanel;
-import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -26,18 +24,13 @@ import java.awt.FlowLayout;
 import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultListModel;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JComboBox;
-import javax.swing.JRadioButton;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
@@ -51,11 +44,11 @@ import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
-import java.awt.CardLayout;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.Vector;
 
 public class FpdBuildOptions extends IInternalFrame {
 
@@ -109,7 +102,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTable jTable5 = null;
     private JButton jButton10 = null;
     private JButton jButton11 = null;
-    private DefaultListModel listModel = new DefaultListModel();
     private JButton jButton17 = null;
     private JButton jButton18 = null;
     private FpdFileContents ffc = null;
@@ -856,9 +848,22 @@ public class FpdBuildOptions extends IInternalFrame {
                     TableModel m = (TableModel)arg0.getSource();
                     if (arg0.getType() == TableModelEvent.UPDATE){
                         //ToDo Data Validition check.
-                        String targetName = m.getValueAt(row, 0) + "";
+                        String targets = m.getValueAt(row, 0) + "";
+                        Vector<Object> targetName = new Vector<Object>();
+                        String[] sArray = targets.split("( )+");
+                        for (int i = 0; i < sArray.length; ++i) {
+                            targetName.add(sArray[i]);
+                        }
                         String toolChain = m.getValueAt(row, 1) + "";
-                        String supArch = m.getValueAt(row, 2) + "";
+                        String archs = m.getValueAt(row, 2) + "";
+                        Vector<Object> supArch = new Vector<Object>();
+                        String[] sArray1 = archs.split("( )+");
+                        for (int i = 0; i < sArray1.length; ++i) {
+                            supArch.add(sArray1[i]);
+                        }
+                        if (supArch.size() == 0) {
+                            supArch.add("IA32");
+                        }
                         String toolCmd = m.getValueAt(row, 3) + "";
                         String tagName = m.getValueAt(row, 4) + "";
                         String contents = m.getValueAt(row, 5) + "";
@@ -893,11 +898,21 @@ public class FpdBuildOptions extends IInternalFrame {
                     Object[] o = {jTextField12.getText(), jComboBox2.getSelectedItem(), s,
                                   jTextField8.getText(), jTextField13.getText(), jTextField7.getText()};
                     optionsTableModel.addRow(o);
-                    ffc.genBuildOptionsOpt(jTextField12.getText(), jComboBox2.getSelectedItem()+"", jTextField13.getText(), jTextField8.getText(), s, jTextField7.getText());
+                  
+                    ffc.genBuildOptionsOpt(stringToVector(jTextField12.getText()), jComboBox2.getSelectedItem()+"", jTextField13.getText(), jTextField8.getText(),  stringToVector(s), jTextField7.getText());
                 }
             });
         }
         return jButton10;
+    }
+    
+    private Vector<Object> stringToVector(String s) {
+        String[] sArray = s.split(" ");
+        Vector<Object> v = new Vector<Object>();
+        for (int i = 0; i < sArray.length; ++i) {
+            v.add(sArray[i]);
+        }
+        return v;
     }
     
     private String boolToList (boolean[] bool) {
@@ -920,7 +935,9 @@ public class FpdBuildOptions extends IInternalFrame {
         if (bool[5]) {
             s += "PPC ";
         }
-        
+        if (s == " ") {
+            s += "IA32";
+        }
         return s.trim();
     }
 

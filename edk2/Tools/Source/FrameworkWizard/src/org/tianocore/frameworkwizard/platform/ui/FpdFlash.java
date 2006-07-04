@@ -23,7 +23,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
 
-import org.tianocore.FvImagesDocument;
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -36,7 +35,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -719,11 +717,11 @@ public class FpdFlash extends IInternalFrame {
  if (jPanel5 == null) {
      //ToDo add ButtonGroup for RadioButtons
             jLabel6 = new JLabel();
-            jLabel6.setEnabled(false);
+            jLabel6.setEnabled(true);
             jLabel6.setText("Value");
             jLabel6.setPreferredSize(new Dimension(38, 20));
             jLabel5 = new JLabel();
-            jLabel5.setEnabled(false);
+            jLabel5.setEnabled(true);
             jLabel5.setText("Name");
             jLabel5.setPreferredSize(new Dimension(38, 20));
             jPanel5 = new JPanel();
@@ -924,7 +922,7 @@ public class FpdFlash extends IInternalFrame {
 
                 public void itemStateChanged(ItemEvent arg0) {
                     // TODO Auto-generated method stub
-                    boolean selected = jCheckBox3.isSelected();
+//                    boolean selected = jCheckBox3.isSelected();
                     
                         if (!jCheckBox2.isSelected() || jComboBox.getSelectedIndex() == 0) {
                             return;
@@ -1086,7 +1084,7 @@ public class FpdFlash extends IInternalFrame {
     private JTextField getJTextField4() {
         if (jTextField4 == null) {
             jTextField4 = new JTextField();
-            jTextField4.setEnabled(false);
+            jTextField4.setEnabled(true);
             jTextField4.setPreferredSize(new Dimension(100, 20));
         }
         return jTextField4;
@@ -1100,7 +1098,7 @@ public class FpdFlash extends IInternalFrame {
     private JTextField getJTextField5() {
         if (jTextField5 == null) {
             jTextField5 = new JTextField();
-            jTextField5.setEnabled(false);
+            jTextField5.setEnabled(true);
             jTextField5.setPreferredSize(new Dimension(100, 20));
         }
         return jTextField5;

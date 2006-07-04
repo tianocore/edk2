@@ -36,6 +36,8 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
+
 import javax.swing.JTextField;
 
 public class FpdModuleSA extends JDialog implements ActionListener {
@@ -82,6 +84,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private LibraryTableModel model1 = null;
     private LibraryTableModel model2 = null;
     private LibraryTableModel model3 = null;
+    private DefaultTableModel optionsTableModel = null;
     private FpdFileContents ffc = null;
     private String moduleKey = null;
     private HashMap<String, ArrayList<String>> classInstanceMap = null;
@@ -96,6 +99,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JTextField jTextField2 = null;
     private JScrollPane jScrollPane6 = null;
     private JTable jTable4 = null;
+    private JButton jButton4 = null;
+    private JButton jButton5 = null;
     /**
      * This is the default constructor
      */
@@ -150,6 +155,21 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         // display library classes that need to be resolved. also potential instances for them.
         //
         resolveLibraryInstances(key);
+        //
+        // display module SA options
+        //
+        String fvBinding = ffc.getFvBinding(key);
+        if (fvBinding != null) {
+            jTextField.setText(fvBinding);
+        }
+        String fileGuid = ffc.getFfsFileNameGuid(key);
+        if (fileGuid != null) {
+            jTextField1.setText(fileGuid);
+        }
+        String ffsKey = ffc.getFfsFormatKey(key);
+        if (ffsKey != null) {
+            jTextField2.setText(ffsKey);
+        }
     }
     
     private void resolveLibraryInstances(String key) {
@@ -995,6 +1015,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanel8.add(jLabel8, null);
             jPanel8.add(getJTextField2(), null);
             jPanel8.add(getJScrollPane6(), null);
+            jPanel8.add(getJButton4(), null);
+            jPanel8.add(getJButton5(), null);
         }
         return jPanel8;
     }
@@ -1007,6 +1029,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextField == null) {
             jTextField = new JTextField();
             jTextField.setPreferredSize(new java.awt.Dimension(100,20));
+            jTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    ffc.setFvBinding(moduleKey, jTextField.getText());
+                }
+            });
         }
         return jTextField;
     }
@@ -1019,6 +1046,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextField1 == null) {
             jTextField1 = new JTextField();
             jTextField1.setPreferredSize(new java.awt.Dimension(100,20));
+            jTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    ffc.setFfsFileNameGuid(moduleKey, jTextField1.getText());
+                }
+            });
         }
         return jTextField1;
     }
@@ -1031,6 +1063,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextField2 == null) {
             jTextField2 = new JTextField();
             jTextField2.setPreferredSize(new java.awt.Dimension(100,20));
+            jTextField2.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    ffc.setFfsFormatKey(moduleKey, jTextField2.getText());
+                }
+            });
         }
         return jTextField2;
     }
@@ -1054,9 +1091,95 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private JTable getJTable4() {
         if (jTable4 == null) {
-            jTable4 = new JTable();
+            optionsTableModel = new DefaultTableModel();
+            optionsTableModel.addColumn("BuildTargets");
+            optionsTableModel.addColumn("ToolChainFamily");
+            optionsTableModel.addColumn("TagName");
+            optionsTableModel.addColumn("ToolCode");
+            optionsTableModel.addColumn("SupportedArchs");
+            optionsTableModel.addColumn("Contents");
+            jTable4 = new JTable(optionsTableModel);
+            jTable4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable4.getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    int row = arg0.getFirstRow();
+                    TableModel m = (TableModel)arg0.getSource();
+                    
+                    if (arg0.getType() == TableModelEvent.UPDATE){
+                        //ToDo Data Validition check.
+                        String targets = m.getValueAt(row, 0) + "";
+                        Vector<Object> targetName = new Vector<Object>();
+                        String[] sArray = targets.split(" ");
+                        for (int i = 0; i < sArray.length; ++i) {
+                            targetName.add(sArray[i]);
+                        }
+                        String toolChain = m.getValueAt(row, 1) + "";
+                        String tagName = m.getValueAt(row, 2) + "";
+                        String toolCode = m.getValueAt(row, 3) + "";
+                        String archs = m.getValueAt(row, 4) + "";
+                        Vector<Object> supArch = new Vector<Object>();
+                        String[] sArray1 = archs.split(" ");
+                        for (int i = 0; i < sArray1.length; ++i) {
+                            supArch.add(sArray1[i]);
+                        }
+                        if (supArch.size() == 0) {
+                            supArch.add("IA32");
+                        }
+                        String contents = m.getValueAt(row, 5) + "";
+                        
+                        ffc.updateModuleSAOptionsOpt(moduleKey, row, targetName, toolChain, tagName, toolCode, supArch, contents);
+                    }
+                }
+            });
         }
         return jTable4;
+    }
+    /**
+     * This method initializes jButton4	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton4() {
+        if (jButton4 == null) {
+            jButton4 = new JButton();
+            jButton4.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton4.setText("New");
+            jButton4.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    String[] row = {"", "", "", "", "IA32", ""};
+                    optionsTableModel.addRow(row);
+                    Vector<Object> v = new Vector<Object>();
+                    Vector<Object> v1 = new Vector<Object>();
+                    v1.add("IA32");
+                    ffc.genModuleSAOptionsOpt(moduleKey, v, "", "", "", v1, "");
+                }
+            });
+        }
+        return jButton4;
+    }
+    /**
+     * This method initializes jButton5	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton5() {
+        if (jButton5 == null) {
+            jButton5 = new JButton();
+            jButton5.setPreferredSize(new java.awt.Dimension(80,20));
+            jButton5.setText("Delete");
+            jButton5.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    if (jTable4.getSelectedRow() < 0) {
+                        return;
+                    }
+                    
+                    ffc.removeModuleSAOptionsOpt(moduleKey, jTable4.getSelectedRow());
+                    optionsTableModel.removeRow(jTable4.getSelectedRow());
+                }
+            });
+        }
+        return jButton5;
     }
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
