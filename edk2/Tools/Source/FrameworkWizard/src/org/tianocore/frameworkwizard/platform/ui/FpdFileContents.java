@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.xml.namespace.QName;
 
@@ -36,6 +37,7 @@ import org.tianocore.EfiSectionType;
 import org.tianocore.FlashDefinitionFileDocument;
 import org.tianocore.FlashDocument;
 import org.tianocore.FrameworkModulesDocument;
+import org.tianocore.IntermediateOutputType;
 import org.tianocore.LibrariesDocument;
 import org.tianocore.ModuleSADocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
@@ -170,29 +172,6 @@ public class FpdFileContents {
             fpdFrameworkModules = fpdRoot.addNewFrameworkModules();
         }
         return fpdFrameworkModules;
-    }
-    
-    public int getPlatformDefsSkuInfoCount(){
-        if (getfpdPlatformDefs().getSkuInfo() == null || getfpdPlatformDefs().getSkuInfo().getUiSkuNameList() == null) {
-            return 0;
-        }
-        return getfpdPlatformDefs().getSkuInfo().getUiSkuNameList().size();
-    }
-    
-    public void getPlatformDefsSkuInfos(String[][] saa){
-        if (getfpdPlatformDefs().getSkuInfo() == null || getfpdPlatformDefs().getSkuInfo().getUiSkuNameList() == null) {
-            return ;
-        }
-        
-        List<SkuInfoDocument.SkuInfo.UiSkuName> l = getfpdPlatformDefs().getSkuInfo().getUiSkuNameList();
-        ListIterator<SkuInfoDocument.SkuInfo.UiSkuName> li = l.listIterator();
-        int i = 0;
-        while(li.hasNext()) {
-            SkuInfoDocument.SkuInfo.UiSkuName sku = li.next();
-            saa[i][0] = sku.getSkuID()+"";
-            saa[i][1] = sku.getStringValue();
-            ++i;
-        }
     }
     
     public int getFrameworkModulesCount() {
@@ -1504,6 +1483,129 @@ public class FpdFileContents {
         return fpdPlatformDefs;
     }
     
+    public void getPlatformDefsSupportedArchs(Vector<Object> archs){
+        if (getfpdPlatformDefs().getSupportedArchitectures() == null) {
+            return;
+        }
+        ListIterator li = getfpdPlatformDefs().getSupportedArchitectures().listIterator();
+        while(li.hasNext()) {
+            archs.add(li.next());
+        }
+    }
+    
+    public void setPlatformDefsSupportedArchs(Vector<Object> archs) {
+        getfpdPlatformDefs().setSupportedArchitectures(archs);
+    }
+    
+    public void getPlatformDefsBuildTargets(Vector<Object> targets) {
+        if (getfpdPlatformDefs().getBuildTargets() == null) {
+            return;
+        }
+        ListIterator li = getfpdPlatformDefs().getBuildTargets().listIterator();
+        while(li.hasNext()) {
+            targets.add(li.next());
+        }
+    }
+    
+    public void setPlatformDefsBuildTargets(Vector<Object> targets) {
+        getfpdPlatformDefs().setBuildTargets(targets);
+    }
+    
+    public void genPlatformDefsSkuInfo(String id, String name) {
+        SkuInfoDocument.SkuInfo skuInfo = null;
+        if (getfpdPlatformDefs().getSkuInfo() == null) {
+            skuInfo = getfpdPlatformDefs().addNewSkuInfo();
+        }
+        skuInfo = getfpdPlatformDefs().getSkuInfo();
+        if (skuInfo.getUiSkuNameList() == null || skuInfo.getUiSkuNameList().size() == 0) {
+            SkuInfoDocument.SkuInfo.UiSkuName skuName = skuInfo.addNewUiSkuName();
+            skuName.setSkuID(new BigInteger("0"));
+            skuName.setStringValue("DEFAULT");
+        }
+        if (id.equals("0")) {
+            return;
+        }
+        SkuInfoDocument.SkuInfo.UiSkuName skuName = skuInfo.addNewUiSkuName();
+        skuName.setSkuID(new BigInteger(id));
+        skuName.setStringValue(name);
+    }
+    
+    public int getPlatformDefsSkuInfoCount(){
+        if (getfpdPlatformDefs().getSkuInfo() == null || getfpdPlatformDefs().getSkuInfo().getUiSkuNameList() == null) {
+            return 0;
+        }
+        return getfpdPlatformDefs().getSkuInfo().getUiSkuNameList().size();
+    }
+    
+    public void getPlatformDefsSkuInfos(String[][] saa){
+        if (getfpdPlatformDefs().getSkuInfo() == null || getfpdPlatformDefs().getSkuInfo().getUiSkuNameList() == null) {
+            return ;
+        }
+        
+        List<SkuInfoDocument.SkuInfo.UiSkuName> l = getfpdPlatformDefs().getSkuInfo().getUiSkuNameList();
+        ListIterator<SkuInfoDocument.SkuInfo.UiSkuName> li = l.listIterator();
+        int i = 0;
+        while(li.hasNext()) {
+            SkuInfoDocument.SkuInfo.UiSkuName sku = li.next();
+            saa[i][0] = sku.getSkuID()+"";
+            saa[i][1] = sku.getStringValue();
+            ++i;
+        }
+    }
+    
+    public void removePlatformDefsSkuInfo(int i) {
+        SkuInfoDocument.SkuInfo skuInfo = getfpdPlatformDefs().getSkuInfo();
+        if (skuInfo == null || i == 0) {
+            return ;
+        }
+        
+        XmlCursor cursor = skuInfo.newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            cursor.removeXml();
+        }
+        cursor.dispose();
+    }
+    
+    public void updatePlatformDefsSkuInfo(int i, String id, String name) {
+        SkuInfoDocument.SkuInfo skuInfo = getfpdPlatformDefs().getSkuInfo();
+        if (skuInfo == null || i == 0) {
+            return ;
+        }
+        
+        XmlCursor cursor = skuInfo.newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            SkuInfoDocument.SkuInfo.UiSkuName sku = (SkuInfoDocument.SkuInfo.UiSkuName)cursor.getObject();
+            sku.setSkuID(new BigInteger(id));
+            sku.setStringValue(name);
+        }
+        cursor.dispose();
+    }
+    
+    public String getPlatformDefsInterDir(){
+        if (getfpdPlatformDefs().getIntermediateDirectories() == null) {
+            return null;
+        }
+        return getfpdPlatformDefs().getIntermediateDirectories().toString();
+    }
+    
+    public void setPlatformDefsInterDir(String interDir){
+        getfpdPlatformDefs().setIntermediateDirectories(IntermediateOutputType.Enum.forString(interDir));
+    }
+    
+    public String getPlatformDefsOutputDir() {
+        return getfpdPlatformDefs().getOutputDirectory();
+    }
+    
+    public void setPlatformDefsOutputDir(String outputDir) {
+        getfpdPlatformDefs().setOutputDirectory(outputDir);
+    }
+    
     public FlashDocument.Flash getfpdFlash() {
         if (fpdFlash == null) {
             fpdFlash = fpdRoot.addNewFlash();
@@ -1788,26 +1890,6 @@ public class FpdFileContents {
         return fpdHdr;
     }
     
-    public void genPlatformDefsSkuInfo(String id, String name) {
-        SkuInfoDocument.SkuInfo skuInfo = null;
-        if (getfpdPlatformDefs().getSkuInfo() == null) {
-            skuInfo = getfpdPlatformDefs().addNewSkuInfo();
-        }
-        skuInfo = getfpdPlatformDefs().getSkuInfo();
-        if (skuInfo.getUiSkuNameList() == null || skuInfo.getUiSkuNameList().size() == 0) {
-            SkuInfoDocument.SkuInfo.UiSkuName skuName = skuInfo.addNewUiSkuName();
-            skuName.setSkuID(new BigInteger("0"));
-            skuName.setStringValue("DEFAULT");
-        }
-        if (id.equals("0")) {
-            return;
-        }
-        SkuInfoDocument.SkuInfo.UiSkuName skuName = skuInfo.addNewUiSkuName();
-        skuName.setSkuID(new BigInteger(id));
-        skuName.setStringValue(name);
-            
-        
-    }
     public String getFpdHdrPlatformName() {
         return getFpdHdr().getPlatformName();
     }

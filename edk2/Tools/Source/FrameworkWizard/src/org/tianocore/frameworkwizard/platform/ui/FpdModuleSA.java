@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import javax.swing.JTextField;
 
 public class FpdModuleSA extends JDialog implements ActionListener {
 
@@ -86,6 +87,15 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private HashMap<String, ArrayList<String>> classInstanceMap = null;
     private ArrayList<String> classProduced = null;
     private HashMap<String, ArrayList<String>> classConsumed = null;
+    private JPanel jPanel8 = null;
+    private JLabel jLabel6 = null;
+    private JTextField jTextField = null;
+    private JLabel jLabel7 = null;
+    private JTextField jTextField1 = null;
+    private JLabel jLabel8 = null;
+    private JTextField jTextField2 = null;
+    private JScrollPane jScrollPane6 = null;
+    private JTable jTable4 = null;
     /**
      * This is the default constructor
      */
@@ -397,6 +407,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTabbedPane == null) {
             jTabbedPane = new JTabbedPane();
             jTabbedPane.addTab("PCD Build Definition", null, getJPanel(), null);
+            jTabbedPane.addTab("Module SA Options", null, getJPanel8(), null);
             jTabbedPane.addTab("Libraries", null, getJPanel1(), null);
         }
         return jTabbedPane;
@@ -962,6 +973,90 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             }
             this.setVisible(false);
         }
+    }
+    /**
+     * This method initializes jPanel8	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanel8() {
+        if (jPanel8 == null) {
+            jLabel8 = new JLabel();
+            jLabel8.setText("FFS Format Key");
+            jLabel7 = new JLabel();
+            jLabel7.setText("FFS File GUID");
+            jLabel6 = new JLabel();
+            jLabel6.setText("FV Binding");
+            jPanel8 = new JPanel();
+            jPanel8.add(jLabel6, null);
+            jPanel8.add(getJTextField(), null);
+            jPanel8.add(jLabel7, null);
+            jPanel8.add(getJTextField1(), null);
+            jPanel8.add(jLabel8, null);
+            jPanel8.add(getJTextField2(), null);
+            jPanel8.add(getJScrollPane6(), null);
+        }
+        return jPanel8;
+    }
+    /**
+     * This method initializes jTextField	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextField() {
+        if (jTextField == null) {
+            jTextField = new JTextField();
+            jTextField.setPreferredSize(new java.awt.Dimension(100,20));
+        }
+        return jTextField;
+    }
+    /**
+     * This method initializes jTextField1	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextField1() {
+        if (jTextField1 == null) {
+            jTextField1 = new JTextField();
+            jTextField1.setPreferredSize(new java.awt.Dimension(100,20));
+        }
+        return jTextField1;
+    }
+    /**
+     * This method initializes jTextField2	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextField2() {
+        if (jTextField2 == null) {
+            jTextField2 = new JTextField();
+            jTextField2.setPreferredSize(new java.awt.Dimension(100,20));
+        }
+        return jTextField2;
+    }
+    /**
+     * This method initializes jScrollPane6	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPane6() {
+        if (jScrollPane6 == null) {
+            jScrollPane6 = new JScrollPane();
+            jScrollPane6.setPreferredSize(new java.awt.Dimension(600,200));
+            jScrollPane6.setViewportView(getJTable4());
+        }
+        return jScrollPane6;
+    }
+    /**
+     * This method initializes jTable4	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTable4() {
+        if (jTable4 == null) {
+            jTable4 = new JTable();
+        }
+        return jTable4;
     }
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
