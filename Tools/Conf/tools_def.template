@@ -41,7 +41,7 @@
 # EBC definitions
 *_MSFT_EBC_*_FAMILY = INTEL
 *_MSFT_EBC_*_PATH = C:\Program Files\Intel\EBC\Bin
-*_MSFT_EBC_*_SPATH = C:\Program Files\Intel\EBC\Lib\EbcLib.lib
+*_MSFT_EBC_*_SPATH = C:\Progra~1\Intel\EBC\Lib\EbcLib.lib
 *_MSFT_EBC_CC_NAME = iec.exe
 *_MSFT_EBC_SLINK_NAME = link.exe
 

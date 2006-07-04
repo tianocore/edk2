@@ -164,7 +164,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 	    <if>
 	      <or>
 	        <equals arg1="@{FILEEXT}" arg2="asm" />
-	        <equals arg1="@{FILEEXT}" arg2="s" />
+	        <equals arg1="@{FILEEXT}" arg2="S" />
 	      </or>
 	      <then>
 	        <Build_Assembly FILEPATH="@{FILEPATH}" FILENAME="@{FILENAME}" FILEEXT="@{FILEEXT}">
@@ -173,7 +173,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </Build_Assembly>
 	      </then>
 	      <elseif>
-	        <equals arg1="@{FILEEXT}" arg2="S" />
+	        <equals arg1="@{FILEEXT}" arg2="s" />
 	        <then>
 	          <Build_IPF_Assembly_Code FILEPATH="@{FILEPATH}" FILENAME="@{FILENAME}" FILEEXT="@{FILEEXT}">
 	            <EXTRA.INC.1><EXTRA.INC /></EXTRA.INC.1>

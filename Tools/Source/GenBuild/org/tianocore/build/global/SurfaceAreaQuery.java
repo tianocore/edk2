@@ -26,41 +26,12 @@ import java.util.regex.Pattern;
 import org.apache.xmlbeans.XmlNormalizedString;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-import org.tianocore.BuildOptionsDocument;
-import org.tianocore.CNameType;
-import org.tianocore.DataIdDocument;
-import org.tianocore.ExternsDocument;
-import org.tianocore.FileNameConvention;
-import org.tianocore.FvAttributeDocument;
-import org.tianocore.FvImagesDocument;
-import org.tianocore.FvOptionDocument;
-import org.tianocore.GuidDeclarationsDocument;
-import org.tianocore.GuidsDocument;
-import org.tianocore.LibrariesDocument;
-import org.tianocore.LibraryClassDeclarationsDocument;
-import org.tianocore.LibraryClassDocument;
-import org.tianocore.ModuleDefinitionsDocument;
-import org.tianocore.ModuleSADocument;
-import org.tianocore.ModuleSaBuildOptionsDocument;
-import org.tianocore.ModuleTypeDef;
-import org.tianocore.MsaFilesDocument;
-import org.tianocore.MsaHeaderDocument;
-import org.tianocore.OptionDocument;
-import org.tianocore.PPIsDocument;
-import org.tianocore.PackageDependenciesDocument;
-import org.tianocore.PackageHeadersDocument;
-import org.tianocore.PcdCodedDocument;
-import org.tianocore.PlatformDefinitionsDocument;
-import org.tianocore.PpiDeclarationsDocument;
-import org.tianocore.ProtocolDeclarationsDocument;
-import org.tianocore.Sentence;
-import org.tianocore.SpdHeaderDocument;
-import org.tianocore.SupportedArchitectures;
+import org.tianocore.*;
 import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
-import org.tianocore.PlatformHeaderDocument;
+import org.tianocore.SupportedArchitectures.Enum;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
@@ -269,12 +240,7 @@ public class SurfaceAreaQuery {
         String[] xPath;
         Object[] returns;
 
-        if (arch == null || arch.equals("")) {
-            xPath = new String[] { "/Filename" };
-        } else {
-            xPath = new String[] { "/Filename[not(@SupArchList) or @SupArchList='"
-                    + arch + "']" };
-        }
+        xPath = new String[] { "/Filename" };
 
         returns = get("SourceFiles", xPath);
 
@@ -283,10 +249,18 @@ public class SurfaceAreaQuery {
         }
 
         Filename[] sourceFileNames = (Filename[]) returns;
-        String[][] outputString = new String[sourceFileNames.length][2];
+        List<String[]> outputList = new ArrayList<String[]>();
         for (int i = 0; i < sourceFileNames.length; i++) {
-            outputString[i][0] = sourceFileNames[i].getToolCode();
-            outputString[i][1] = sourceFileNames[i].getStringValue();
+            List<String> archList = sourceFileNames[i].getSupArchList();
+            if (arch == null || arch.equalsIgnoreCase("") || archList == null || archList.contains(arch)) {
+                outputList.add(new String[] {sourceFileNames[i].getToolCode(),sourceFileNames[i].getStringValue()});
+            }
+        }
+           
+        String[][] outputString = new String[outputList.size()][2];
+        for (int index = 0; index < outputList.size(); index++) {
+            outputString[index][0] = outputList.get(index)[0];
+            outputString[index][1] = outputList.get(index)[1];
         }
         return outputString;
     }
@@ -558,13 +532,9 @@ public class SurfaceAreaQuery {
         String packageGuid = null;
         String packageVersion = null;
 
-        if (arch == null || arch.equals("")) {
-            xPath = new String[] { "/Package" };
-        } else {
-            xPath = new String[] { "/Package[not(@SupArchList) or @SupArchList='"
-                    + arch + "']" };
-        }
-
+        
+        xPath = new String[] { "/Package" };
+        
         Object[] returns = get("PackageDependencies", xPath);
         if (returns == null) {
             return new PackageIdentification[0];
@@ -572,10 +542,13 @@ public class SurfaceAreaQuery {
         PackageIdentification[] packageIdList = new PackageIdentification[returns.length];
         for (int i = 0; i < returns.length; i++) {
             PackageDependenciesDocument.PackageDependencies.Package item = (PackageDependenciesDocument.PackageDependencies.Package) returns[i];
-            packageGuid = item.getPackageGuid();
-            packageVersion = item.getPackageVersion();
-            packageIdList[i] = (new PackageIdentification(null, packageGuid,
+            List<String> archList = item.getSupArchList();
+            if (arch == null || archList == null || archList.contains(arch)) {
+                packageGuid = item.getPackageGuid();
+                packageVersion = item.getPackageVersion();
+                packageIdList[i] = (new PackageIdentification(null, packageGuid,
                     packageVersion));
+            }
         }
         return packageIdList;
     }
@@ -654,7 +627,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            archXpath = "/Protocol[@SupArchList='" + arch + "']";
+            archXpath = "/Protocol";
             if (usage != null && !usage.equals("")) {
                 usageXpath = "/Protocol[@Usage='" + usage + "']";
                 xPath = new String[] { usageXpath, archXpath };
@@ -699,14 +672,19 @@ public class SurfaceAreaQuery {
         if (returns == null) {
             return new String[0];
         }
-        Protocol[] protocolList = (Protocol[]) returns;
+        Protocol[] returnlList = (Protocol[]) returns;
 
-        String[] protocolArray = new String[returns.length];
+        List<String> protocolList = new ArrayList<String>();
+        
         for (int i = 0; i < returns.length; i++) {
-            List<String> archList = protocolList[i].getSupArchList();
+            List<String> archList = returnlList[i].getSupArchList();
             if (archList == null || archList.contains(arch)){
-                protocolArray[i] = protocolList[i].getProtocolCName(); 
+                protocolList.add(returnlList[i].getProtocolCName());
             }
+        }
+        String[] protocolArray = new String[protocolList.size()];
+        for (int i = 0; i < protocolList.size(); i++) {
+            protocolArray[i] = protocolList.get(i);
         }
         return protocolArray;
     }
@@ -734,16 +712,20 @@ public class SurfaceAreaQuery {
             return new String[0];
         }
 
-        String[] protocolNotifyList = new String[returns.length];
+        List<String> protocolNotifyList = new ArrayList<String>();
+        
         for (int i = 0; i < returns.length; i++) {
             List<String> archList = ((ProtocolNotify) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
-                protocolNotifyList[i] = ((ProtocolNotify) returns[i]).getProtocolNotifyCName();
+                protocolNotifyList.add(((ProtocolNotify) returns[i]).getProtocolNotifyCName());
             }
             
         }
-
-        return protocolNotifyList;
+        String[] protocolNotifyArray = new String[protocolNotifyList.size()];
+        for (int i = 0; i < protocolNotifyList.size(); i++) {
+            protocolNotifyArray[i] = protocolNotifyList.get(i);
+        }
+        return protocolNotifyArray;
     }
 
     /**
@@ -764,7 +746,7 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equals("")) {
             return new String[0];
         } else {
-            archXpath = "/ProtocolNotify[@SupArchList='" + arch + "']";
+            archXpath = "/ProtocolNotify";
             if (usage != null && !usage.equals("")) {
                 usageXpath = "/ProtocolNotify[@Usage='" + arch + "']";
                 xPath = new String[] { archXpath, usageXpath };
@@ -851,16 +833,21 @@ public class SurfaceAreaQuery {
             return new String[0];
         }
 
-        String[] ppiNotifyList = new String[returns.length];
+        
+        List<String> ppiNotifyList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
             List<String> archList = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
-                ppiNotifyList[i] = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName();    
+                ppiNotifyList.add(((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName()); 
             }
             
         }
+        String[] ppiNotifyArray = new String[ppiNotifyList.size()];
+        for (int i = 0; i < ppiNotifyList.size(); i++) {
+            ppiNotifyArray[i] = ppiNotifyList.get(i);
+        }
 
-        return ppiNotifyList;
+        return ppiNotifyArray;
     }
 
     /**
@@ -927,15 +914,19 @@ public class SurfaceAreaQuery {
             return new String[0];
         }
 
-        String[] ppiList = new String[returns.length];
+        List<String> ppiList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
             List<String> archList = ((PPIsDocument.PPIs.Ppi) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
-                ppiList[i] = ((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName();    
+                ppiList.add(((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName());    
             }
             
         }
-        return ppiList;
+        String[] ppiArray = new String[ppiList.size()];
+        for (int i = 0; i < ppiList.size(); i++) {
+            ppiArray[i] = ppiList.get(i);
+        }
+        return ppiArray;
     }
 
     /**
@@ -1001,15 +992,20 @@ public class SurfaceAreaQuery {
         if (returns == null) {
             return new String[0];
         }
-        String[] guidList = new String[returns.length];
+
+        List<String> guidList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
             List<String> archList = ((GuidsDocument.Guids.GuidCNames) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
-                guidList[i] = ((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName();    
+                guidList.add(((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName());    
             }
             
         }
-        return guidList;
+        String[] guidArray = new String[guidList.size()];
+        for (int i = 0; i < guidList.size(); i++) {
+            guidArray[i] = guidList.get(i);
+        }
+        return guidArray;
 
     }
 
@@ -1074,6 +1070,11 @@ public class SurfaceAreaQuery {
         if (arch == null || arch.equalsIgnoreCase("")) {
             xPath = new String[] { "/Instance" };
         } else {
+            //
+            // Since Schema don't have SupArchList now, so the follow Xpath is 
+            // equal to "/Instance" and [not(@SupArchList) or @SupArchList= arch]
+            // don't have effect.
+            //
             xPath = new String[] { "/Instance[not(@SupArchList) or @SupArchList='"
                     + arch + "']" };
         }
