@@ -944,7 +944,7 @@
   <xs:element name="UserExtensions">
     <xs:complexType>
       <xs:sequence>
-        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" namespace="##local"/>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
       </xs:sequence>
       <xs:attribute name="UserID" type="xs:NCName" use="required"/>
       <xs:attribute name="Identifier" type="xs:nonNegativeInteger" use="required"/>
