@@ -1,58 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" >
   <MsaHeader>
-    <BaseName>JavaResources</BaseName>
-    <ModuleType>BASE</ModuleType>
-    <ComponentType>CUSTOM_BUILD</ComponentType>
-    <Guid>faf22a0f-10fc-428e-b311-fe506a9c0b2d</Guid>
+    <ModuleName>Java Resources</ModuleName>
+    <ModuleType>TOOL</ModuleType>
+    <GuidValue>faf22a0f-10fc-428e-b311-fe506a9c0b2d</GuidValue>
     <Version>2.0</Version>
-    <Abstract>This is the EFI/Tiano Tool Resources Module</Abstract>
+    <Abstract>This is the EFI/Tiano Java Tool Resources Module</Abstract>
     <Description>
-      This Module provides the EFI/Tiano Tools and resources that are used to create EFI/Tiano
-      Modules and Platform Binary Files (PBF)
-      These resources and tools do not require compilation.  (The three JAR files are provided,
-      Pre-compiled, and do not require additional compilation, the sources are provided, but
-      will not be built under normal procedures.
+      This Module provides the EFI/Tiano Tools and resources that are used to 
+      create EFI/Tiano Modules and Platform Binary Files (PBF.)
+      These resources and tools do not require compilation.
     </Description>
     <Copyright>Copyright 2005-2006, Intel Corporation</Copyright>
     <License>
-      All rights reserved. This program and the accompanying materials
-      are licensed and made available under the terms and conditions of the BSD License
-      which accompanies this distribution.  The full text of the license may be found at
+      All rights reserved.
+
+      This program and the accompanying materials are licensed and made available 
+      under the terms and conditions of the BSD License which accompanies this 
+      distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
+
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
       WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </License>
-    <CreatedDate>2006-03-23 12:00</CreatedDate>
-    <ModifiedDate>2006-06-01 17:25</ModifiedDate>
-    <Specification>EFI_SPECIFICATION_VERSION    0x00000000</Specification>
+    <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
-  <LibraryClassDefinitions>
-    <LibraryClass Usage="ALWAYS_CONSUMED">SurfaceArea</LibraryClass>
-  </LibraryClassDefinitions>
-  <SourceFiles>
-    <Filename Path="Conf" FileType="db">FrameworkDatabase.db</Filename>
-    <Filename Path="Conf" FileType="txt">cygwin_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">gcc_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">intel_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">msft_tools.txt</Filename>
-    <Filename Path="Conf" FileType="txt">tools_def.template</Filename>
-    <Filename Path="Conf" FileType="txt">winddk_tools.txt</Filename>
-  </SourceFiles>
-  <Includes>
-    <PackageName>Base</PackageName>
-  </Includes>
-  <BuildOptions>
-    <Option>DO_NOT_COMPILE</Option>
-  </BuildOptions>
+  <ModuleDefinitions>
+    <SupportedArchitectures>IA32 X64</SupportedArchitectures>
+    <BinaryModule>false</BinaryModule>
+    <OutputFileBasename>NULL</OutputFileBasename>
+  </ModuleDefinitions>
 </ModuleSurfaceArea>
