@@ -4122,7 +4122,7 @@
       <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASM">
         "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
       </Option>
-      <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
       <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/P", "/TC" </Option>
       <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASL"> "/nologo" </Option>
       
@@ -4141,7 +4141,7 @@
       </Option>
       <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="ASMLINK"> </Option>
       <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="PP">
-        "/P"
+        "/P", "/TC"
       </Option>
       <Option ToolChainFamily="MSFT" SupArchList="X64" ToolCode="ASL"> "/nologo" </Option>
       
@@ -4157,7 +4157,7 @@
         "-N us", "-X explicit", "-M ilp64", "-N so", "-W4"
       </Option>
       <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="ASMLINK"> </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="PP"> "/P" </Option>
+      <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="PP"> "/P", "/TC" </Option>
       <Option ToolChainFamily="MSFT" SupArchList="IPF" ToolCode="ASL"> "/nologo" </Option>
       
       <!-- INTC tool chain options definition : EBC -->
@@ -4170,16 +4170,16 @@
       <Option ToolChainFamily="INTC" SupArchList="EBC" ToolCode="DLINK">
         "/NOLOGO", "/MACHINE:EBC", "/SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER", "/OPT:REF", "/NODEFAULTLIB"
       </Option>
-      <Option ToolChainFamily="INTC" SupArchList="EBC" ToolCode="PP"> "/P" </Option>
+      <Option ToolChainFamily="INTC" SupArchList="EBC" ToolCode="PP"> "-P", "-TC" </Option>
         
       <!-- GCC tool chain options definition : IA32 -->
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="CC">
-        "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c"
+        "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c", "-include ${DEST_DIR_DEBUG}/AutoGen.h"
       </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASM"> "--warn" </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="SLINK"> </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="DLINK">
-        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols"
+        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry ${ENTRYPOINT}", "--subsystem ${SUBSYSTEM}"
       </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E" </Option>
