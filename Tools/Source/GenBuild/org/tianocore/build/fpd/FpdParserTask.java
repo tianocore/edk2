@@ -147,7 +147,11 @@ public class FpdParserTask extends Task {
         // Parse FPD file
         //
         parseFpdFile();
-        
+
+        getProject().setProperty("PLATFORM", platformId.getName());
+        getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
+
         //
         // Pcd Collection. Call CollectPCDAction to collect pcd info.
         //
@@ -361,9 +365,6 @@ public class FpdParserTask extends Task {
             //
             platformId = SurfaceAreaQuery.getFpdHeader();
             platformId.setFpdFile(fpdFile);
-            getProject().setProperty("PLATFORM", platformId.getName());
-            getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
-            getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
 
             //
             // Build mode. User-defined output dir. 

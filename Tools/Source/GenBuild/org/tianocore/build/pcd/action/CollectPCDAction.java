@@ -42,6 +42,7 @@ import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.ModuleSADocument;
 import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition;
 import org.tianocore.build.autogen.CommonDefinition;
+import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.pcd.action.ActionMessage;
@@ -2768,11 +2769,14 @@ public class CollectPCDAction {
     **/
     public static void main(String argv[]) throws EntityException {
         CollectPCDAction ca = new CollectPCDAction();
-        ca.setWorkspacePath("m:/tianocore/edk2");
-        ca.setFPDFilePath("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
+        ca.setWorkspacePath("f:/tianocore/edk2");
+        ca.setFPDFilePath("f:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
-//        GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-//                            "m:/tianocore/edk2");
-//        ca.execute();
+        GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
+                            "f:/tianocore/edk2",
+                            "tools_def.txt");
+        FpdParserTask fpt = new FpdParserTask();
+        fpt.parseFpdFile(new File("f:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd"));
+        ca.execute();
     }
 }
