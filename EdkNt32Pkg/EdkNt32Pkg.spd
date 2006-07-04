@@ -367,50 +367,5 @@
       <DefaultValue>L"Bus Driver Console Window"</DefaultValue>
       <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdRothmanTest</C_Name>
-      <Token>0x0000100b</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdRothmanTest</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdWinNtBinaryPatch1</C_Name>
-      <Token>0x0001000b</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBinaryPatch1</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0x1234</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdWinNtBinaryPatch2</C_Name>
-      <Token>0x0001000c</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBinaryPatch2</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0x5678</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdWinNtFeatureFlag1</C_Name>
-      <Token>0x0001000d</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFeatureFlag1</TokenSpaceGuidCName>
-      <DatumType>BOOLEAN</DatumType>
-      <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>0x1</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdWinNtDynamicUINT32</C_Name>
-      <Token>0x0001000e</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtDynamicUINT32</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0x0</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
-    </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
