@@ -725,17 +725,45 @@ LibPcdGetNextToken (
 
 
   
-  @param[in]  Pointer to a 128-bit unique value that designates from which namespace 
+  @param[in]  Guid Pointer to a 128-bit unique value that designates from which namespace 
               to start the search.
 
   @retval CONST GUID *  The next valid token namespace.
 
 **/
-
 GUID *           
 EFIAPI
 LibPcdGetNextTokenSpace (
   IN CONST GUID  *Guid
+  );
+
+
+/**
+  Sets the PCD entry specified by PatchVariable to the value specified by Buffer 
+  and SizeOfValue.  Buffer is returned.  If SizeOfValue is greater than 
+  MaximumDatumSize, then set SizeOfValue to MaximumDatumSize and return 
+  NULL to indicate that the set operation was not actually performed.  
+  If SizeOfValue is set to MAX_ADDRESS, then SizeOfValue must be set to 
+  MaximumDatumSize and NULL must be returned.
+  
+  If PatchVariable is NULL, then ASSERT().
+  If SizeOfValue is NULL, then ASSERT().
+  If SizeOfValue > 0 and Buffer is NULL, then ASSERT().
+
+  @param[in] PatchVariable      A pointer to the global variable in a module that is 
+                                the target of the set operation.
+  @param[in] MaximumDatumSize   The maximum size allowed for the PCD entry specified by PatchVariable.
+  @param[in, out] SizeOfBuffer  A pointer to the size, in bytes, of Buffer.
+  @param[in] Buffer             A pointer to the buffer to used to set the target variable.
+
+**/
+VOID *
+EFIAPI
+LibPatchPcdSetPtr (
+  IN        VOID        *PatchVariable,
+  IN        UINTN       MaximumDatumSize,
+  IN OUT    UINTN       *SizeOfBuffer,
+  IN CONST  VOID        *Buffer
   );
 
 #endif

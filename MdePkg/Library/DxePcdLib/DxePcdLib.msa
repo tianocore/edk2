@@ -31,6 +31,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiBootServicesTableLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>DxePcdLib.c</Filename>

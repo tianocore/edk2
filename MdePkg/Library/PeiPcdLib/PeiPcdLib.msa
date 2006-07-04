@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>PeiPcdLib</ModuleName>
@@ -34,6 +34,9 @@
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>PeiServicesTablePointerLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseMemoryLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>PeiPcdLib.c</Filename>
@@ -41,6 +44,11 @@
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
   </PackageDependencies>
+  <PPIs>
+    <Ppi Usage="ALWAYS_CONSUMED">
+      <PpiCName>PcdPpi</PpiCName>
+    </Ppi>
+  </PPIs>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
