@@ -380,9 +380,12 @@ public class PlatformBuildFileGenerator {
         ele.setAttribute("name", "cleanall");
 
         if (isUnified) {
-            Element cleanAllEle = document.createElement("delete");
-            cleanAllEle.setAttribute("dir", project.getProperty("BUILD_DIR"));
-            ele.appendChild(cleanAllEle);
+            String[] targetList = GlobalData.getToolChainInfo().getTargets();
+            for (int i = 0; i < targetList.length; ++i) {
+                Element cleanAllEle = document.createElement("delete");
+                cleanAllEle.setAttribute("dir", project.getProperty("BUILD_DIR") + File.separatorChar + targetList[i]);
+                ele.appendChild(cleanAllEle);
+            }
         } else {
             Set set = outfiles.keySet();
             Iterator iter = set.iterator();
