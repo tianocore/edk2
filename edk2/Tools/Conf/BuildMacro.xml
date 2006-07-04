@@ -211,6 +211,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
+            <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${CC_FAMILY}">
+              <EXTRA.INC.1/>
+              <argument value="${PP_FLAGS}"/>
+              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            </command>
+          </cc>
+
+          <replaceregexp file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"
+                         match="^(#line +1 +.*@{FILEPATH}/@{FILENAME}\.@{FILEEXT}&quot;).+\1"
+                         replace=";"
+                         flags="gs"/>
+          <replaceregexp file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"
+                         match="^(#line .*)$"
+                         replace="; \1"
+                         byline="true"/>
+          <replaceregexp file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"
+                         match="([^_a-zA-Z])0x([0-9a-fA-F]+)"
+                         replace="\10\2h"
+                         flags="g"
+                         byline="true"/>
+
+          <cc userdefine="on">
             <command type="ASM" cmd="${ASM}" workdir="${DEST_DIR_OUTPUT}" family="${ASM_FAMILY}"
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
               <EXTRA.INC.1/>
@@ -218,7 +240,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <argument value="${ASM_FLAGS}"/>
               <EXTRA.ARG.1/>
       
-              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+              <!-- fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/ -->
+              <fileset casesensitive="off" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
             </command>
           </cc>
         </sequential>
