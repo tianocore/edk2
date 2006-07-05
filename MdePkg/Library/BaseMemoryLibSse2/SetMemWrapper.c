@@ -19,7 +19,7 @@
     BaseMemoryLibSse2
     BaseMemoryLibRepStr
     PeiMemoryLib
-    UefiMemoryLib
+    DxeMemoryLib
 
 **/
 
@@ -32,7 +32,7 @@
   If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
   @param  Buffer    Memory to set.
-  @param  Length    Number of bytes to set
+  @param  Length    Number of bytes to set.
   @param  Value     Value of the set operation.
 
   @return Buffer.

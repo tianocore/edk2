@@ -1174,8 +1174,7 @@ PciExpressBitFieldAndThenOr32 (
 
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.
@@ -1197,11 +1196,11 @@ PciExpressReadBuffer (
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
-  ASSERT (Buffer != NULL);
+  ASSERT ((Buffer != NULL) || (Size == 0));
 
   EndAddress = StartAddress + Size;
 
-  if (StartAddress < EndAddress && (StartAddress & 1)) {
+  if ((StartAddress < EndAddress) && ((StartAddress & 1) != 0)) {
     //
     // Read a byte if StartAddress is byte aligned
     //
@@ -1210,7 +1209,7 @@ PciExpressReadBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (StartAddress < EndAddress && (StartAddress & 2)) {
+  if ((StartAddress < EndAddress) && ((StartAddress & 2) != 0)) {
     //
     // Read a word if StartAddress is word aligned
     //
@@ -1219,7 +1218,7 @@ PciExpressReadBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  while (EndAddress - StartAddress >= 4) {
+  while ((EndAddress - StartAddress) >= 4) {
     //
     // Read as many double words as possible
     //
@@ -1237,7 +1236,7 @@ PciExpressReadBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  if (EndAddress & 1) {
+  if ((EndAddress & 1) != 0) {
     //
     // Read the last remaining byte if exist
     //
@@ -1261,8 +1260,7 @@ PciExpressReadBuffer (
 
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.
@@ -1284,11 +1282,11 @@ PciExpressWriteBuffer (
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
-  ASSERT (Buffer != NULL);
+  ASSERT ((Buffer != NULL) || (Size == 0));
 
   EndAddress = StartAddress + Size;
 
-  if ((StartAddress < EndAddress) && ((StartAddress & 1)!= 0)) {
+  if ((StartAddress < EndAddress) && ((StartAddress & 1) != 0)) {
     //
     // Write a byte if StartAddress is byte aligned
     //
@@ -1297,7 +1295,7 @@ PciExpressWriteBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (StartAddress < EndAddress && (StartAddress & 2)) {
+  if ((StartAddress < EndAddress) && ((StartAddress & 2) != 0)) {
     //
     // Write a word if StartAddress is word aligned
     //
@@ -1306,7 +1304,7 @@ PciExpressWriteBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  while (EndAddress - StartAddress >= 4) {
+  while ((EndAddress - StartAddress) >= 4) {
     //
     // Write as many double words as possible
     //
@@ -1315,7 +1313,7 @@ PciExpressWriteBuffer (
     Buffer = (UINT32*)Buffer + 1;
   }
 
-  if (EndAddress & 2) {
+  if ((EndAddress & 2) != 0) {
     //
     // Write the last remaining word if exist
     //
@@ -1324,7 +1322,7 @@ PciExpressWriteBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  if (EndAddress & 1) {
+  if ((EndAddress & 1) != 0) {
     //
     // Write the last remaining byte if exist
     //

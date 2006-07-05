@@ -1011,8 +1011,7 @@ PciBitFieldAndThenOr32 (
 
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.
@@ -1047,8 +1046,7 @@ PciReadBuffer (
 
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x1000, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.

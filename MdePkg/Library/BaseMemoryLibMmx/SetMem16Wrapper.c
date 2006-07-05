@@ -19,7 +19,7 @@
     BaseMemoryLibSse2
     BaseMemoryLibRepStr
     PeiMemoryLib
-    UefiMemoryLib
+    DxeMemoryLib
 
 **/
 

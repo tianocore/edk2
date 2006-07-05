@@ -49,10 +49,15 @@
     <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
   </PackageDependencies>
   <Protocols>
-    <Protocol Usage="ALWAYS_CONSUMED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>DebugLevel</ProtocolCName>
     </Protocol>
   </Protocols>
+  <Guids>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>StatusCodeDataTypeDebug</GuidCName>
+    </GuidCNames>
+  </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
@@ -64,6 +69,11 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugPropertyMask</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText/>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+      <C_Name>PcdDebugClearMemoryValue</C_Name>
+      <TokenSpaceGuidCName>FIX_ME_PcdDebugClearMemoryValue</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">

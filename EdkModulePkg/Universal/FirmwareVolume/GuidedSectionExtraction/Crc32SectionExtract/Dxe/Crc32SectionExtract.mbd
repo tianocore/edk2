@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </MbdHeader>
   <Libraries>
     <Library>UefiBootServicesTableLib</Library>
-    <Library>UefiMemoryLib</Library>
+    <Library>DxeMemoryLib</Library>
     <Library>UefiLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeReportStatusCodeLib</Library>

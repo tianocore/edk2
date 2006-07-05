@@ -5,7 +5,7 @@
     <ModuleType>PEIM</ModuleType>
     <GuidValue>bda39d3a-451b-4350-8266-81ab10fa0523</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Debug Library for PEIMs that send debug messages to ReportStatusCode</Abstract>
+    <Abstract>Debug Library for PEIMs and DXE drivers that send debug messages to ReportStatusCode</Abstract>
     <Description>FIX ME!</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
@@ -44,6 +44,11 @@
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
   </PackageDependencies>
+  <Guids>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>StatusCodeDataTypeDebug</GuidCName>
+    </GuidCNames>
+  </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>

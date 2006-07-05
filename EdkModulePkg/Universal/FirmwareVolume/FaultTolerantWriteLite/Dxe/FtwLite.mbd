@@ -29,7 +29,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <Libraries>
     <Library>UefiBootServicesTableLib</Library>
     <Library>BaseLib</Library>
-    <Library>UefiMemoryLib</Library>
+    <Library>DxeMemoryLib</Library>
     <Library>DxeHobLib</Library>
     <Library>UefiLib</Library>
     <Library>UefiDriverEntryPoint</Library>
