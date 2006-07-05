@@ -345,7 +345,7 @@ public class FpdParserTask extends Task {
             Map<String, XmlObject> map = new HashMap<String, XmlObject>();
             map.put("PlatformSurfaceArea", doc);
             SurfaceAreaQuery.setDoc(map);
-            SurfaceAreaQuery.getFpdUserExtension();
+
             //
             // Initialize
             //
