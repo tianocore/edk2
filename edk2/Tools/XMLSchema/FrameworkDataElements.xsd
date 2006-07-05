@@ -515,14 +515,14 @@
   <xs:element name="ModuleBuildOptions">
     <xs:complexType>
       <xs:sequence>
-        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax" namespace="##local"/>
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="ModuleSaBuildOptions">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" maxOccurs="1" name="FvBinding" type="KeywordType"/>
+        <xs:element minOccurs="0" maxOccurs="1" name="FvBinding" type="KeywordList"/>
         <!-- The FfsFileNameGuid allows the Platform Integrator to specify a GUID for the FFS File Name GUID -->
         <xs:element minOccurs="0" maxOccurs="1" name="FfsFileNameGuid" type="GuidType"/>
         <!-- If binding is specified, you MUST specify the FfsFormatKey -->
@@ -549,7 +549,7 @@
                     <xs:element minOccurs="1" maxOccurs="1" name="ModuleVersion" type="VersionDataType"/>
                   </xs:sequence>
                   <!-- The Id is a number used to track heritage  the first entry will be 0 and increment from then on. -->
-                  <xs:attribute name="Id" type="xs:nonNegativeInteger" use="optional"/>
+                  <xs:attribute name="Id" type="xs:nonNegativeInteger" use="required"/>
                   <!-- If the original module was installed from a FAR, track the FAR it came from. -->
                   <xs:attribute name="FarGuid" type="GuidType" use="optional"/>
                 </xs:complexType>
@@ -608,7 +608,7 @@
                     <xs:element minOccurs="1" maxOccurs="1" name="PackageVersion" type="VersionDataType"/>
                   </xs:sequence>
                   <!-- The Id is a number used to track heritage  the first entry will be 0 and increment from then on. -->
-                  <xs:attribute name="Id" type="xs:nonNegativeInteger" use="optional"/>
+                  <xs:attribute name="Id" type="xs:nonNegativeInteger" use="required"/>
                   <!-- If the original Package was installed from a FAR, track the FAR it came from. -->
                   <xs:attribute name="FarGuid" type="GuidType" use="optional"/>
                 </xs:complexType>
