@@ -197,11 +197,15 @@ public class MemoryDatabaseManager {
                 }
                 
                 if (!found) {
-                    //
-                    // We only support Dynamice(EX) type for PEI and DXE phase.
-                    // If it is not referenced in either PEI or DXE, throw exception now.
-                    //
-                    throw new EntityException("Dynamic(EX) PCD Entries are referenced in module that is not in PEI phase nor in DXE phase.");
+                    if (token.isDynamicPCD && token.consumers.size() == 0) {
+                        dxe.add(token);
+                    } else {
+                        //
+                        // We only support Dynamice(EX) type for PEI and DXE phase.
+                        // If it is not referenced in either PEI or DXE, throw exception now.
+                        //
+                        throw new EntityException("Dynamic(EX) PCD Entries are referenced in module that is not in PEI phase nor in DXE phase.");
+                    }
                 }
             }
         }

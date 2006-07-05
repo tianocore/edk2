@@ -6478,51 +6478,7 @@
         <Value>L"UGA Window 1!UGA Window 2"</Value>
       </SkuInfo>
     </PcdBuildData>
-    <PcdBuildData ItemType="DYNAMIC">
-      <C_Name>PcdTestDynamicUint8</C_Name>
-      <Token>0x00011000</Token>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT8</DatumType>
-      <MaxDatumSize>1</MaxDatumSize>
-      <SkuInfo>
-        <SkuId>0</SkuId>
-        <Value>0x1</Value>
-      </SkuInfo>
-    </PcdBuildData>
-    <PcdBuildData ItemType="DYNAMIC">
-      <C_Name>PcdTestDynamicUint16</C_Name>
-      <Token>0x00011001</Token>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT16</DatumType>
-      <MaxDatumSize>2</MaxDatumSize>
-      <SkuInfo>
-        <SkuId>0</SkuId>
-        <Value>0x1234</Value>
-      </SkuInfo>
-    </PcdBuildData>
-    <PcdBuildData ItemType="DYNAMIC">
-      <C_Name>PcdTestDynamicUint32</C_Name>
-      <Token>0x00011002</Token>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <MaxDatumSize>4</MaxDatumSize>
-      <SkuInfo>
-        <SkuId>0</SkuId>
-        <Value>0</Value>
-      </SkuInfo>
-    </PcdBuildData>
-    <PcdBuildData ItemType="DYNAMIC">
-      <C_Name>PcdTestDynamicUint64</C_Name>
-      <Token>0x00011003</Token>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT64</DatumType>
-      <MaxDatumSize>8</MaxDatumSize>
-      <SkuInfo>
-        <SkuId>0</SkuId>
-        <Value>0</Value>
-      </SkuInfo>
-    </PcdBuildData>
-    <PcdBuildData ItemType="DYNAMIC">
+    <PcdBuildData ItemType="DYNAMIC_EX">
       <C_Name>PcdTestDynamicBoolean</C_Name>
       <Token>0x00011004</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
