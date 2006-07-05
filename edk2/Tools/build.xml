@@ -22,11 +22,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/GenBuild/build.xml
           Source/FrameworkTasks/build.xml
           Source/Cpptasks/build.xml
+          Source/FrameworkWizard/build.xml
           "/>
-        <!--
-          Source/ModuleEditor/build.xml
-          Source/PackageEditor/build.xml
-          -->
     </subant>
   </target>
 
@@ -42,7 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="C_Code" depends="JavaCode">
-    <subant target="" verbose="true" inheritall="false">
+    <subant target="" inheritall="false">
       <filelist dir="."
         files="
           Source/TianoTools/build.xml
@@ -64,31 +61,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt" overwrite="false"/>
     <copy file="Conf/target.template" tofile="Conf/target.txt" overwrite="false"/>
   </target>
+
   <target name="clean">
     <subant target="clean" inheritall="false">
       <filelist dir="."
         files="
           Source/TianoTools/build.xml
-          Source/ModuleEditor/build.xml
-          Source/PackageEditor/build.xml
+          Source/FrameworkWizard/build.xml
+          Source/Cpptasks/build.xml
           Source/FrameworkTasks/build.xml
           Source/GenBuild/build.xml
+          Source/Common/build.xml
           Source/SurfaceArea/build.xml
-          Source/Cpptasks/build.xml
           "/>
     </subant>
   </target>
+
   <target name="cleanall">
-    <subant target="cleanall" verbose="true" inheritall="false">
+    <subant target="cleanall" inheritall="false">
       <filelist dir="."
         files="
           Source/TianoTools/build.xml
-          Source/ModuleEditor/build.xml
-          Source/PackageEditor/build.xml
+          Source/FrameworkWizard/build.xml
+          Source/Cpptasks/build.xml
           Source/FrameworkTasks/build.xml
           Source/GenBuild/build.xml
+          Source/Common/build.xml
           Source/SurfaceArea/build.xml
-          Source/Cpptasks/build.xml
           "/>
     </subant>
   </target>
