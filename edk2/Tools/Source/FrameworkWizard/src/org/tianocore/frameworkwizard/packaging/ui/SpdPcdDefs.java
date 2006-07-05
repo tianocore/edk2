@@ -38,12 +38,15 @@ import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
 
+import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JCheckBox;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
+import org.tianocore.frameworkwizard.platform.ui.ListEditor;
+
 import java.awt.Rectangle;
 import java.util.Vector;
 
@@ -112,10 +115,6 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JButton jButtonRemove = null;
 
     private JButton jButtonClearAll = null;
-
-    private JButton jButtonGen = null;
-    
-    private GenGuidDialog guidDialog = null;
 
     private JScrollPane jScrollPane = null;
 
@@ -403,7 +402,6 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
             jContentPane.add(getJButtonClearAll(), null);
-            jContentPane.add(getJButtonGen(), null);
             jContentPane.add(getJScrollPane(), null);
             jContentPane.add(starLabel, null);
             jContentPane.add(getJCheckBox(), null);
@@ -440,7 +438,6 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             if (arg0.getSource() == jButtonOk) {
                 this.save();
                 this.dispose();
-
             }
             if (arg0.getSource() == jButtonCancel) {
                 this.dispose();
@@ -448,10 +445,10 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 
             if (arg0.getSource() == jButtonAdd) {
                 //ToDo: check before add
-                if (!checkValid()) {
+                boolean[] b = {jCheckBox.isSelected(), jCheckBox1.isSelected(), jCheckBox2.isSelected(), jCheckBox3.isSelected(), jCheckBox4.isSelected()};
+                if (!checkValidUsage(b)) {
                     return;
                 }
-                
                 String archList = vectorToString(iCheckBoxList.getAllCheckedItemsString());
                 if (archList.length() == 0) {
                     archList = null;
@@ -466,7 +463,9 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                                 jCheckBox.isSelected(), jCheckBox1.isSelected(),
                                 jCheckBox2.isSelected(), jCheckBox3.isSelected(), jCheckBox4.isSelected(),
                                 archList, modTypeList};
-               
+                if (!dataValidation(row)) {
+                    return;
+                }
                 model.addRow(row);
                 
                 String usage = getValidUsage(jCheckBox.isSelected(), jCheckBox1.isSelected(), jCheckBox2.isSelected(), jCheckBox3.isSelected(), jCheckBox4.isSelected());
@@ -497,16 +496,6 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 sfc.removeSpdPcdDefinition();
             }
             
-            if (arg0.getSource() == jButtonGen) {
-                guidDialog = new GenGuidDialog(this);
-                guidDialog.setGuid(jTextFieldTsGuid.getText());
-                guidDialog.setVisible(true);
-            }
-            
-            if (arg0.getActionCommand().equals("GenGuidValue")) {
-                jTextFieldTsGuid.setText(guidDialog.getGuid());
-            }
-
     }
 
     protected void save() {
@@ -521,8 +510,9 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JTextField getJTextFieldTsGuid() {
         if (jTextFieldTsGuid == null) {
             jTextFieldTsGuid = new JTextField();
-            jTextFieldTsGuid.setBounds(new java.awt.Rectangle(156,58,249,20));
-            jTextFieldTsGuid.setPreferredSize(new java.awt.Dimension(250,20));
+            jTextFieldTsGuid.setPreferredSize(new java.awt.Dimension(315,20));
+            jTextFieldTsGuid.setSize(new java.awt.Dimension(317,20));
+            jTextFieldTsGuid.setLocation(new java.awt.Point(156,58));
         }
         return jTextFieldTsGuid;
     }
@@ -604,22 +594,6 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         return jButtonClearAll;
     }
 
-    /**
-     * This method initializes jButtonGen	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButtonGen() {
-        if (jButtonGen == null) {
-            jButtonGen = new JButton();
-            jButtonGen.setBounds(new java.awt.Rectangle(414,57,58,20));
-            jButtonGen.setPreferredSize(new java.awt.Dimension(56,20));
-            jButtonGen.setText("Gen");
-            jButtonGen.addActionListener(this);
-        }
-        return jButtonGen;
-    }
-    
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
@@ -630,12 +604,10 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
         
-        resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
 //        relocateComponentX(this.jButtonClearAll, this.getWidth(), DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
 //        relocateComponentX(this.jButtonRemove, this.getWidth(), DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
 //        relocateComponentX(this.jButtonAdd, this.getWidth(), DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
-        relocateComponentX(this.jButtonGen, this.getWidth(), this.getPreferredSize().width, 30);
     }
 
     /**
@@ -661,6 +633,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         if (jTable == null) {
             model = new CheckboxTableModel();
             jTable = new JTable(model);
+            jTable.setRowHeight(20);
             jTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
             jTable.setSize(new Dimension(1000, 300));
             
@@ -678,7 +651,6 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             model.addColumn("DynamicEx");
             model.addColumn("SupportedArch");
             model.addColumn("SupportedModule");
-            jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
             
             //ToDo: add a valid usage editor
             
@@ -692,6 +664,30 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             TableColumn dataTypeColumn = jTable.getColumnModel().getColumn(3);
             dataTypeColumn.setCellEditor(new DefaultCellEditor(jComboBoxDataType));
 
+            Vector<String> vArch = new Vector<String>();
+            vArch.add("IA32");
+            vArch.add("X64");
+            vArch.add("IPF");
+            vArch.add("EBC");
+            vArch.add("ARM");
+            vArch.add("PPC");
+            jTable.getColumnModel().getColumn(11).setCellEditor(new ListEditor(vArch));
+            
+            Vector<String> vModule = new Vector<String>();
+            vModule.add("BASE");
+            vModule.add("SEC");
+            vModule.add("PEI_CORE");
+            vModule.add("PEIM");
+            vModule.add("DXE_CORE");
+            vModule.add("DXE_DRIVER");
+            vModule.add("DXE_RUNTIME_DRIVER");
+            vModule.add("DXE_SAL_DRIVER");
+            vModule.add("DXE_SMM_DRIVER");
+            vModule.add("UEFI_DRIVER");
+            vModule.add("UEFI_APPLICATION");
+            vModule.add("USER_DEFINED");
+            jTable.getColumnModel().getColumn(12).setCellEditor(new ListEditor(vModule));
+            
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -728,6 +724,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             String usage = getValidUsage(new Boolean(m.getValueAt(row, 6)+""), new Boolean(m.getValueAt(row, 7)+""), new Boolean(m.getValueAt(row, 8)+""), new Boolean(m.getValueAt(row, 9)+""), new Boolean(m.getValueAt(row, 10)+""));
             String archList = vectorToString(iCheckBoxList.getAllCheckedItemsString());
             String modTypeList = vectorToString(iCheckBoxList1.getAllCheckedItemsString());
+            if (usage.length() == 0) {
+                JOptionPane.showMessageDialog(frame, "You must choose at least one usage for PCD entry.");
+                return;
+            }
+            Object[] o = {cName, token, ts, dataType, defaultVal, help};
+            if (!dataValidation(o)){
+                return;
+            }
             sfc.updateSpdPcdDefinition(row, cName, token, dataType, usage, ts, defaultVal, help, archList, modTypeList);
         }
     }
@@ -828,9 +832,30 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         return usage.trim();
     }
     
-    private boolean checkValid() {
-        if (!(jCheckBox.isSelected() || jCheckBox1.isSelected() || jCheckBox2.isSelected() || jCheckBox3.isSelected() || jCheckBox4.isSelected())){
+    private boolean checkValidUsage(boolean[] b) {
+        if (!(b[0] || b[1] || b[2] || b[3] || b[4])){
             JOptionPane.showMessageDialog(frame, "You must specify at least one usage.");
+            return false;
+        }
+        return true;
+    }
+    private boolean dataValidation(Object[] row) {
+        
+        if (!DataValidation.isC_NameType(row[0].toString())) {
+            JOptionPane.showMessageDialog(frame, "C_Name is NOT C_NameType.");
+            return false;
+        }
+        if (!(DataValidation.isHexDoubleWordDataType(row[1].toString()) || 
+                        DataValidation.isInt(row[1].toString(), 0, 0xffffffff))) {
+            JOptionPane.showMessageDialog(frame, "Token is NOT correct.");
+            return false;
+        }
+        if (!DataValidation.isC_NameType(row[2].toString())) {
+            JOptionPane.showMessageDialog(frame, "Token Space is NOT C_NameType");
+            return false;
+        }
+        if (row[5].toString().length() == 0) {
+            JOptionPane.showMessageDialog(frame, "HelpText could NOT be empty.");
             return false;
         }
         return true;
@@ -865,6 +890,8 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             v.add("X64");
             v.add("IPF");
             v.add("EBC");
+            v.add("ARM");
+            v.add("PPC");
             iCheckBoxList.setAllItems(v);
         }
         return iCheckBoxList;

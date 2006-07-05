@@ -12,25 +12,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.frameworkwizard.packaging.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
-import java.io.File;
 import java.util.Vector;
 
-import javax.swing.DefaultListModel;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,11 +36,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
-import org.tianocore.frameworkwizard.common.DataType;
+import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
+import org.tianocore.frameworkwizard.platform.ui.ListEditor;
 
 /**
  GUI for create library definition elements of spd file.
@@ -57,6 +49,11 @@ import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
  @since PackageEditor 1.0
 **/
 public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     static JFrame frame;
     
     private SpdFileContents sfc = null;
@@ -190,6 +187,41 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            model.addColumn("GuidTypes");
            jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
 
+           Vector<String> vArch = new Vector<String>();
+           vArch.add("IA32");
+           vArch.add("X64");
+           vArch.add("IPF");
+           vArch.add("EBC");
+           vArch.add("ARM");
+           vArch.add("PPC");
+           jTable.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
+           
+           Vector<String> vModule = new Vector<String>();
+           vModule.add("BASE");
+           vModule.add("SEC");
+           vModule.add("PEI_CORE");
+           vModule.add("PEIM");
+           vModule.add("DXE_CORE");
+           vModule.add("DXE_DRIVER");
+           vModule.add("DXE_RUNTIME_DRIVER");
+           vModule.add("DXE_SAL_DRIVER");
+           vModule.add("DXE_SMM_DRIVER");
+           vModule.add("UEFI_DRIVER");
+           vModule.add("UEFI_APPLICATION");
+           vModule.add("USER_DEFINED");
+           jTable.getColumnModel().getColumn(5).setCellEditor(new ListEditor(vModule));
+           
+           Vector<String> vGuid = new Vector<String>();
+           vGuid.add("DATA_HUB_RECORD");
+           vGuid.add("EFI_EVENT");
+           vGuid.add("EFI_SYSTEM_CONFIGURATION_TABLE");
+           vGuid.add("EFI_VARIABLE");
+           vGuid.add("GUID");
+           vGuid.add("HII_PACKAGE_LIST");
+           vGuid.add("HOB");
+           vGuid.add("TOKEN_SPACE_GUID");
+           jTable.getColumnModel().getColumn(6).setCellEditor(new ListEditor(vGuid));
+           
            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
            jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                public void valueChanged(ListSelectionEvent e) {
@@ -238,7 +270,10 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
        if (m.getValueAt(row, 6) != null){
            guidTypeList = m.getValueAt(row, 6).toString();
        }
-       
+       String[] rowData = {name, cName, guid, help};
+       if (!dataValidation(rowData)){
+           return;
+       }
        
        sfc.updateSpdGuidDecl(row, name, cName, guid, help, archList, modTypeList, guidTypeList);
    }
@@ -481,7 +516,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         if (arg0.getSource() == jButtonAdd) {
             
             //ToDo: check before add
-            String[] row = {"", "", "", "", "", "", null};
+            String[] row = {"", "", "", "", "", "", ""};
             row[3] = jTextField.getText();
             row[2] = jTextFieldAdd.getText();
             row[1] = jTextFieldVersion.getText();
@@ -494,8 +529,13 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             if (row[5].length() == 0) {
                 row[5] = null;
             }
-            if (iCheckBoxList1.getAllCheckedItemsString() != null) {
-                row[6] = vectorToString(iCheckBoxList1.getAllCheckedItemsString());
+            row[6] = vectorToString(iCheckBoxList1.getAllCheckedItemsString());
+            if (row[6].length() == 0) {
+                row[6] = null;
+            }
+            
+            if (!dataValidation(row)) {
+                return;
             }
             model.addRow(row);
             addRow(row);
@@ -523,15 +563,33 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         }
         
         if (arg0.getSource() == jButtonGen) {
-            guidDialog = new GenGuidDialog(this);
-            guidDialog.setGuid(jTextFieldAdd.getText());
-            guidDialog.setVisible(true);
+            jTextFieldAdd.setText(Tools.generateUuidString());
         }
         
         if (arg0.getActionCommand().equals("GenGuidValue")) {
             jTextFieldAdd.setText(guidDialog.getGuid());
         }
         
+    }
+    
+    protected boolean dataValidation(String[] row){
+        if (!DataValidation.isUiNameType(row[0])) {
+            JOptionPane.showMessageDialog(this, "Name is NOT UiNameType.");
+            return false;
+        }
+        if (!DataValidation.isGuid(row[2])) {
+            JOptionPane.showMessageDialog(this, "Guid Value is NOT GuidType.");
+            return false;
+        }
+        if (!DataValidation.isC_NameType(row[1])) {
+            JOptionPane.showMessageDialog(this, "C_Name is NOT C_NameType.");
+            return false;
+        }
+        if (row[3].length() == 0) {
+            JOptionPane.showMessageDialog(this, "HelpText could NOT be empty.");
+            return false;
+        }
+        return true;
     }
     
     protected void addRow(String[] row) {
@@ -649,7 +707,8 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             v.add("X64");
             v.add("IPF");
             v.add("EBC");
-            
+            v.add("ARM");
+            v.add("PPC");
             iCheckBoxList.setAllItems(v);
         }
         return iCheckBoxList;

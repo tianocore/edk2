@@ -15,7 +15,6 @@
 package org.tianocore.frameworkwizard.packaging.ui;
 
 import javax.swing.JPanel;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import java.awt.Dimension;
@@ -26,6 +25,10 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
 
 public class SpdPackageDefinitions extends IInternalFrame {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private JPanel jContentPane = null;
     private JLabel jLabel = null;
     private JComboBox jComboBoxReadOnly = null;
@@ -113,8 +116,8 @@ public class SpdPackageDefinitions extends IInternalFrame {
             jComboBoxReadOnly = new JComboBox();
             jComboBoxReadOnly.setBounds(new java.awt.Rectangle(95,22,117,20));
             jComboBoxReadOnly.setPreferredSize(new Dimension(80, 20));
-            jComboBoxReadOnly.addItem("TRUE");
-            jComboBoxReadOnly.addItem("FALSE");
+            jComboBoxReadOnly.addItem("true");
+            jComboBoxReadOnly.addItem("false");
             jComboBoxReadOnly.setSelectedIndex(1);
             jComboBoxReadOnly.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
@@ -135,8 +138,8 @@ public class SpdPackageDefinitions extends IInternalFrame {
             jComboBoxRePackage = new JComboBox();
             jComboBoxRePackage.setBounds(new java.awt.Rectangle(95,62,116,20));
             jComboBoxRePackage.setPreferredSize(new Dimension(80, 20));
-            jComboBoxRePackage.addItem("FALSE");
-            jComboBoxRePackage.addItem("TRUE");
+            jComboBoxRePackage.addItem("false");
+            jComboBoxRePackage.addItem("true");
             jComboBoxRePackage.setSelectedIndex(0);
             jComboBoxRePackage.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {

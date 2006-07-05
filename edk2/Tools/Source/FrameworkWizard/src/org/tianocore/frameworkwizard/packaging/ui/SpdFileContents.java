@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import javax.xml.namespace.QName;
 
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
@@ -360,14 +359,23 @@ public class SpdFileContents {
             e.setCName(cName);
             e.setGuidValue(guid);
             e.setHelpText(hlp);
-            if (stringToList(guidTypeList) != null && !guidTypeList.equals("")) {
+            if (stringToList(guidTypeList) != null) {
                 e.setGuidTypeList(stringToList(guidTypeList));
+            }
+            else{
+                e.setGuidTypeList(null);
             }
             if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
+            else{
+                e.setSupArchList(null);
+            }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
+            }
+            else{
+                e.setSupModuleList(null);
             }
             
         }
@@ -394,8 +402,14 @@ public class SpdFileContents {
             if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
+            else{
+                e.setSupArchList(null);
+            }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
+            }
+            else{
+                e.setSupModuleList(null);
             }
         }
         cursor.dispose();
@@ -421,8 +435,14 @@ public class SpdFileContents {
             if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
+            else{
+                e.setSupArchList(null);
+            }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
+            }
+            else{
+                e.setSupModuleList(null);
             }
         }
         cursor.dispose();
@@ -1093,15 +1113,18 @@ public class SpdFileContents {
             e.setCName(cName);
             e.setGuidValue(guid);
             e.setHelpText(help);
-            if (guidTypeList != null && guidTypeList.size() > 0) {
-                e.setGuidTypeList(new ArrayList<String>(guidTypeList));
-            }
-            if (archList != null && archList.size() > 0){
-                e.setSupArchList(new ArrayList<String>(archList));
-            }
-            if (modTypeList != null && modTypeList.size() > 0) {
-                e.setSupModuleList(new ArrayList<String>(modTypeList));
-            }
+            e.setGuidTypeList(guidTypeList);
+            e.setSupArchList(archList);
+            e.setSupModuleList(modTypeList);
+//            if (guidTypeList != null && guidTypeList.size() > 0) {
+//                e.setGuidTypeList(new ArrayList<String>(guidTypeList));
+//            }
+//            if (archList != null && archList.size() > 0){
+//                e.setSupArchList(new ArrayList<String>(archList));
+//            }
+//            if (modTypeList != null && modTypeList.size() > 0) {
+//                e.setSupModuleList(new ArrayList<String>(modTypeList));
+//            }
             return;
         }
         if (parent instanceof ProtocolDeclarationsDocument.ProtocolDeclarations) {
@@ -1111,12 +1134,14 @@ public class SpdFileContents {
             pe.setCName(cName);
             pe.setGuidValue(guid);
             pe.setHelpText(help);
-            if (archList != null && archList.size() > 0){
-                pe.setSupArchList(new ArrayList<String>(archList));
-            }
-            if (modTypeList != null && modTypeList.size() > 0) {
-                pe.setSupModuleList(new ArrayList<String>(modTypeList));
-            }
+            pe.setSupArchList(archList);
+            pe.setSupModuleList(modTypeList);
+//            if (archList != null && archList.size() > 0){
+//                pe.setSupArchList(new ArrayList<String>(archList));
+//            }
+//            if (modTypeList != null && modTypeList.size() > 0) {
+//                pe.setSupModuleList(new ArrayList<String>(modTypeList));
+//            }
             return;
         }
         if (parent instanceof PpiDeclarationsDocument.PpiDeclarations) {
@@ -1126,12 +1151,14 @@ public class SpdFileContents {
             ppe.setCName(cName);
             ppe.setGuidValue(guid);
             ppe.setHelpText(help);
-            if (archList != null && archList.size() > 0){
-                ppe.setSupArchList(new ArrayList<String>(archList));
-            }
-            if (archList != null && modTypeList.size() > 0) {
-                ppe.setSupModuleList(new ArrayList<String>(modTypeList));
-            }
+            ppe.setSupArchList(archList);
+            ppe.setSupModuleList(modTypeList);
+//            if (archList != null && archList.size() > 0){
+//                ppe.setSupArchList(new ArrayList<String>(archList));
+//            }
+//            if (archList != null && modTypeList.size() > 0) {
+//                ppe.setSupModuleList(new ArrayList<String>(modTypeList));
+//            }
             return;
         }
 
@@ -1507,10 +1534,10 @@ public class SpdFileContents {
     }
     
     private List<String> stringToList(String s){
-        if (s == null) {
+        if (s == null || s.length() == 0) {
             return null;
         }
-        ArrayList<String> al = new ArrayList<String>();
+        Vector<String> al = new Vector<String>();
         String[] sArray = s.split(" ");
         for(int i = 0; i < sArray.length; ++i){
             al.add(sArray[i]);
@@ -1518,7 +1545,7 @@ public class SpdFileContents {
         return al; 
     }
     
-    private String listToString(List<String> l) {
+    private String listToString(List l) {
         if (l == null) {
             return null;
         }

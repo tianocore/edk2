@@ -12,7 +12,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.frameworkwizard.packaging.ui;
 
-import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
@@ -25,6 +24,10 @@ GUI for create library definition elements of spd file.
 **/
 public class SpdPpiDecls extends SpdGuidDecls {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private SpdFileContents sfc = null;
     
     public SpdPpiDecls() {
@@ -79,10 +82,18 @@ public class SpdPpiDecls extends SpdGuidDecls {
         if (m.getValueAt(row, 5) != null) {
             modTypeList = m.getValueAt(row, 5).toString();
         }
+        String[] rowData = {name, cName, guid, help};
+        if (!dataValidation(rowData)){
+            return;
+        }
         sfc.updateSpdPpiDecl(row, name, cName, guid, help, archList, modTypeList);
     }
     
     protected void addRow(String[] row) {
+        
+        if (!dataValidation(row)){
+            return;
+        }
         sfc.genSpdPpiDeclarations(row[0], row[1], row[2], row[3], stringToVector(row[4]), stringToVector(row[5]));
     }
     

@@ -12,26 +12,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.frameworkwizard.packaging.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.io.File;
-import java.util.Vector;
 
 import javax.swing.AbstractAction;
-import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -46,7 +38,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
-import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -57,6 +48,11 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
  @since PackageEditor 1.0
 **/
 public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     static JFrame frame;
     
     private JScrollPane jScrollPane = null;  //  @jve:decl-index=0:visual-constraint="10,95"
@@ -340,7 +336,10 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
         if (arg0.getSource() == jButtonAdd) {
             //ToDo: check before add
             String[] row = {jTextField.getText().replace('\\', '/')};
-           
+            if (jTextField.getText().length() == 0) {
+                JOptionPane.showMessageDialog(this, "Msa File is NOT PathAndFilename type.");
+                return;
+            }
             model.addRow(row);
             sfc.genSpdMsaFiles(row[0], null, null, null);
         }
@@ -374,7 +373,10 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
         TableModel m = (TableModel)arg0.getSource();
         if (arg0.getType() == TableModelEvent.UPDATE){
             String file = m.getValueAt(row, 0) + "";
-
+            if (file.length() == 0) {
+                JOptionPane.showMessageDialog(this, "Msa File is NOT PathAndFilename type.");
+                return;
+            }
             sfc.updateSpdMsaFile(row, file, null, null, null);
         }
     }
@@ -412,6 +414,11 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
             jButtonBrowse.setText("Browse");
             jButtonBrowse.setPreferredSize(new java.awt.Dimension(90,20));
             jButtonBrowse.addActionListener(new AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(ActionEvent e) {
                     //
                     // Select files from current workspace
