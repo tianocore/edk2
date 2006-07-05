@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <fileset dir="${env.XMLBEANS_HOME}/lib" includes="*.jar"/>
   </path>
   <property name="buildDir" value="build"/>
+  <property name="resourceDir" value="rsc"/>
   <property name="installLocation" value="${WORKSPACE}/Tools/bin"/>
   <target name="all" depends="install"/>
   <target name="source">
@@ -35,10 +36,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <delete file="${installLocation}/FrameworkWizard.jar"/>
   </target>
   <target name="install" depends="source">
-    <jar destfile="${installLocation}/FrameworkWizard.jar"
-      basedir="${buildDir}"
-      includes="**"
-      manifest="MANIFEST.MF"
-    />
+    <jar destfile="${installLocation}/FrameworkWizard.jar" manifest="MANIFEST.MF">
+      <fileset dir="${buildDir}"/>
+			<fileset dir="${resourceDir}"/>
+    </jar>
   </target>
 </project>

@@ -35,73 +35,78 @@
   <SourceFiles>
     <Filename>build.xml</Filename>
     <Filename>MANIFEST.MF</Filename>
+    <Filename>rsc/resources/images/logo.gif</Filename>
     <Filename>src/org/tianocore/frameworkwizard/About.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/Clone.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/FrameworkWizardUI.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/NewFileChooser.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/SelectModuleBelong.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/ToolChainConfig.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/DataType.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/DataValidation.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/EnumerationData.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/FileOperation.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/Identification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/IFileFilter.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Log.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpenFile.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpeningFileType.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpeningModuleList.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpeningModuleType.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpeningPackageList.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpeningPackageType.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpeningPlatformList.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/OpeningPlatformType.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/SaveFile.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Tools.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/XmlConfig.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/Identification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpenFile.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningFileType.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningModuleList.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningModuleType.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningPackageList.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningPackageType.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningPlatformList.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningPlatformType.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/ToolChainConfigId.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Identifications/ToolChainConfigVector.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/ExitConfirm.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxList.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListCellRenderer.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListener.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListItem.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListModel.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IComboBox.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IDefaultMutableTreeNode.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IDesktopManager.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IDialog.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IFrame.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IInternalFrame.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/ui/ILayoutManager.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/ITree.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/StarLabel.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/XmlConfig.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/FrameworkWizardUI.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/BootModes/BootModesIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/BootModes/BootModesVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/DataHubs/DataHubsIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/DataHubs/DataHubsVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Events/EventsIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Events/EventsVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Externs/ExternsIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Externs/ExternsVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Guids/GuidsIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Guids/GuidsVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/HiiPackages/HiiPackagesIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/HiiPackages/HiiPackagesVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Hobs/HobsIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Hobs/HobsVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/LibraryClass/LibraryClassIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/LibraryClass/LibraryClassVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/ModuleIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/PackageDependencies/PackageDependenciesIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/PackageDependencies/PackageDependenciesVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/PcdCoded/PcdCodedIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/PcdCoded/PcdCodedVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Ppis/PpisIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Ppis/PpisVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Protocols/ProtocolsIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Protocols/ProtocolsVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/SourceFiles/SourceFilesIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/SourceFiles/SourceFilesVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/SystemTables/SystemTablesIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/SystemTables/SystemTablesVector.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Variables/VariablesIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/Identification/Variables/VariablesVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxList.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListCellRenderer.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListener.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListItem.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListModel.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/ModuleIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/BootModes/BootModesIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/BootModes/BootModesVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/DataHubs/DataHubsIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/DataHubs/DataHubsVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Events/EventsIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Events/EventsVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Externs/ExternsIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Externs/ExternsVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Guids/GuidsIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Guids/GuidsVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/HiiPackages/HiiPackagesIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/HiiPackages/HiiPackagesVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Hobs/HobsIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Hobs/HobsVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/LibraryClass/LibraryClassIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/LibraryClass/LibraryClassVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PackageDependencies/PackageDependenciesIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PackageDependencies/PackageDependenciesVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PcdCoded/PcdCodedIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PcdCoded/PcdCodedVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Ppis/PpisIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Ppis/PpisVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Protocols/ProtocolsIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Protocols/ProtocolsVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/SourceFiles/SourceFilesIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/SourceFiles/SourceFilesVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/SystemTables/SystemTablesIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/SystemTables/SystemTablesVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Variables/VariablesIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Variables/VariablesVector.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/ui/ModuleBootModes.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/ui/ModuleDataHubs.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/ui/ModuleDefinitions.java</Filename>
@@ -119,7 +124,6 @@
     <Filename>src/org/tianocore/frameworkwizard/module/ui/ModuleSystemTables.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/ui/ModuleVariables.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/ui/MsaHeader.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/NewFileChooser.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/packaging/PackageIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/packaging/ui/GenGuidDialog.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/packaging/ui/GuidEditor.java</Filename>
@@ -151,9 +155,8 @@
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/ModuleIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/PackageIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/PlatformIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/SelectModuleBelong.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/workspace/ui/SwitchWorkspace.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/Workspace.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/WorkspaceTools.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/workspace/ui/SwitchWorkspace.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>
