@@ -136,7 +136,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <sequential>
 
           <cc userdefine="on">
-            <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" family="${CC_FAMILY}">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}" family="${PP_FAMILY}">
               <EXTRA.INC/>
               <argument value="${PP_FLAGS}"/>
               <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
@@ -211,7 +211,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
-            <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${CC_FAMILY}">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}">
               <EXTRA.INC.1/>
               <argument value="${PP_FLAGS}"/>
               <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
@@ -283,7 +283,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
         <sequential>
           <cc userdefine="on">
-            <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${CC_FAMILY}">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}">
               <EXTRA.INC.1/>
               <argument value="${PP_FLAGS}"/>
               <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
@@ -522,7 +522,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     
           <cc userdefine="on">
             <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}" 
-                     includepathDelimiter="-I"
+                     includepathDelimiter="-I" family="${CC_FAMILY}"
                      outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" >
               <argument value="${CC_FLAGS}"/>
               <EXTRA.INC/>
