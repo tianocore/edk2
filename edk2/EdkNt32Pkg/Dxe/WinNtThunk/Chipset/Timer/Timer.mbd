@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>BaseLib</Library>
     <Library>UefiLib</Library>
     <Library>HiiLib</Library>
-    <Library>UefiMemoryLib</Library>
+    <Library>DxeMemoryLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeReportStatusCodeLib</Library>
     <Library>DxeWinNtLib</Library>

@@ -1,108 +1,183 @@
-/*++
+/** @file
+  EFI Debug Library that installs Debug Level Protocol.
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006, Intel Corporation<BR>
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-Module Name:
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  DebugLib.c
+**/
 
-Abstract:
+STATIC BOOLEAN                   mDebugLevelInstalled = FALSE;
+STATIC EFI_DEBUG_LEVEL_PROTOCOL  mDebugLevel = { 0 };
 
-  EFI Debug Library 
+/**
+  Installs Debug Level Protocol.
+  
+  The constructor function installs Debug Level Protocol on the ImageHandle.
+  It will ASSERT() if the installation fails and will always return EFI_SUCCESS. 
 
---*/
+  @param  ImageHandle   The firmware allocated handle for the EFI image.
+  @param  SystemTable   A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
-static BOOLEAN                   mDebugLevelInstalled = FALSE;
-static EFI_DEBUG_LEVEL_PROTOCOL  mDebugLevel = { 0 };
-
+**/
 EFI_STATUS
+EFIAPI
 DebugLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
 {
-  EFI_STATUS               Status;
+  EFI_STATUS           Status;
 
   //
-  // Initialize Debug Level Protocol
+  // Initialize Debug Level Protocol.
   //
   mDebugLevel.DebugLevel = PcdGet32(PcdDebugPrintErrorLevel);
 
   //
-  // Install Debug Level Protocol 
+  // Install Debug Level Protocol. 
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
-                  &gEfiDebugLevelProtocolGuid, &mDebugLevel,
+                  &gEfiDebugLevelProtocolGuid,
+                  &mDebugLevel,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Set flag to show that the Debug Level Protocol has been installed
+  // Set flag to show that the Debug Level Protocol has been installed.
   //
   mDebugLevelInstalled = TRUE;
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
+/**
+
+  Prints a debug message to the debug output device if the specified error level is enabled.
+
+  If any bit in ErrorLevel is also set in PcdDebugPrintErrorLevel, then print 
+  the message specified by Format and the associated variable argument list to 
+  the debug output device.
+
+  If Format is NULL, then ASSERT().
+
+  @param  ErrorLevel  The error level of the debug message.
+  @param  Format      Format string for the debug message to print.
+
+**/
+VOID
+EFIAPI
+DebugPrint (
+  IN  UINTN        ErrorLevel,
+  IN  CONST CHAR8  *Format,
+  ...
+  )
+{
+  UINT64          Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
+  EFI_DEBUG_INFO  *DebugInfo;
+  UINTN           TotalSize;
+  UINTN           Index;
+  VA_LIST         Marker;
+  UINT64          *ArgumentPointer;
+
+  //
+  // If Format is NULL, then ASSERT().
+  //
+  ASSERT (Format != NULL);
+
+  //
+  // Check driver Debug Level value and global debug level
+  //
+  if (mDebugLevelInstalled) {
+    if ((ErrorLevel & mDebugLevel.DebugLevel) == 0) {
+      return;
+    }
+  } else {
+    if ((ErrorLevel & PcdGet32(PcdDebugPrintErrorLevel)) == 0) {
+      return;
+    }
+  }
+
+  TotalSize = sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64) + AsciiStrLen (Format) + 1;
+  if (TotalSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
+    return;
+  }
+
+  //
+  // Then EFI_DEBUG_INFO
+  //
+  DebugInfo = (EFI_DEBUG_INFO *)Buffer;
+  DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
+
+  //
+  // 256 byte mini Var Arg stack. That is followed by the format string.
+  //
+  VA_START (Marker, Format);
+  for (Index = 0, ArgumentPointer = (UINT64 *)(DebugInfo + 1); Index < 12; Index++, ArgumentPointer++) {
+    *ArgumentPointer = VA_ARG (Marker, UINT64);
+  }
+  VA_END (Marker);
+  AsciiStrCpy ((CHAR8 *)ArgumentPointer, Format);
+
+  REPORT_STATUS_CODE_EX (
+    EFI_DEBUG_CODE,
+    (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_DC_UNSPECIFIED),
+    0,
+    NULL,
+    &gEfiStatusCodeDataTypeDebugGuid,
+    DebugInfo,
+    TotalSize
+    );
+}
+
+
+/**
+
+  Prints an assert message containing a filename, line number, and description.  
+  This may be followed by a breakpoint or a dead loop.
+
+  Print a message of the form "ASSERT <FileName>(<LineNumber>): <Description>\n" 
+  to the debug output device.  If DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED bit of 
+  PcdDebugProperyMask is set then CpuBreakpoint() is called. Otherwise, if 
+  DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED bit of PcdDebugProperyMask is set then 
+  CpuDeadLoop() is called.  If neither of these bits are set, then this function 
+  returns immediately after the message is printed to the debug output device.
+  DebugAssert() must actively prevent recusrsion.  If DebugAssert() is called while
+  processing another DebugAssert(), then DebugAssert() must return immediately.
+
+  If FileName is NULL, then a <FileName> string of "(NULL) Filename" is printed.
+
+  If Description is NULL, then a <Description> string of "(NULL) Description" is printed.
+
+  @param  FileName     Pointer to the name of the source file that generated the assert condition.
+  @param  LineNumber   The line number in the source file that generated the assert condition
+  @param  Description  Pointer to the description of the assert condition.
+
+**/
 VOID
 EFIAPI
 DebugAssert (
-  IN CHAR8  *FileName,
-  IN UINTN  LineNumber,
-  IN CHAR8  *Description
+  IN CONST CHAR8  *FileName,
+  IN UINTN        LineNumber,
+  IN CONST CHAR8  *Description
   )
-/*++
-
-Routine Description:
-
-  Worker function for ASSERT(). If Error Logging hub is loaded log ASSERT
-  information. If Error Logging hub is not loaded CpuBreakpoint ().
-
-  We use UINT64 buffers due to IPF alignment concerns.
-
-Arguments:
-
-  FileName    - File name of failing routine.
-
-  LineNumber  - Line number of failing ASSERT().
-
-  Description - Descritption, usally the assertion,
-  
-Returns:
-  
-  None
-
---*/
 {
   UINT64                 Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof(UINT64)];
   EFI_DEBUG_ASSERT_DATA  *AssertData;
   UINTN                  TotalSize;
   CHAR8                  *Temp;
 
-  if ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) == 0) {
-    return;
-  }
-
   //
-  // Make sure it will all fit in the passed in buffer
+  // Make sure it will all fit in the passed in buffer.
   //
   TotalSize = sizeof (EFI_DEBUG_ASSERT_DATA) + AsciiStrLen (FileName) + 1 + AsciiStrLen (Description) + 1;
   if (TotalSize <= EFI_STATUS_CODE_DATA_MAX_SIZE) {
@@ -118,9 +193,9 @@ Returns:
     Temp = AsciiStrCpy ((CHAR8 *)(AssertData + 1), FileName);
 
     //
-    // Copy Ascii Description 
+    // Copy Ascii Description. 
     //
-    AsciiStrCpy (Temp + AsciiStrLen(FileName) + 1, Description);
+    AsciiStrCpy (Temp + AsciiStrLen (FileName) + 1, Description);
 
     REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
       (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED),
@@ -131,124 +206,18 @@ Returns:
   }
 
   //
-  // Put break point in module that contained the error.
+  // Generate a Breakpoint, DeadLoop, or NOP based on PCD settings
   //
-  CpuBreakpoint ();
+  if ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_BREAKPOINT_ENABLED) != 0) {
+    CpuBreakpoint ();
+  } else if ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_ASSERT_DEADLOOP_ENABLED) != 0) {
+    CpuDeadLoop ();
+  }
 }
 
-VOID
-DebugVPrint (
-  IN  UINTN    ErrorLevel,
-  IN  CHAR8    *Format,
-  IN  VA_LIST  Marker
-  )
-/*++
-
-Routine Description:
-
-  Worker function for DEBUG(). If Error Logging hub is loaded log ASSERT
-  information. If Error Logging hub is not loaded do nothing.
-
-  We use UINT64 buffers due to IPF alignment concerns.
-
-Arguments:
-
-  ErrorLevel - If error level is set do the debug print.
-
-  Format     - String to use for the print, followed by Print arguments.
-
-  Marker     - VarArgs
-  
-Returns:
-  
-  None
-
---*/
-{
-  UINT64          Buffer[EFI_STATUS_CODE_DATA_MAX_SIZE / sizeof (UINT64)];
-  EFI_DEBUG_INFO  *DebugInfo;
-  UINTN           TotalSize;
-  UINTN           Index;
-  UINT64          *ArgumentPointer;
-
-  //
-  // Check driver Debug Level value and global debug level
-  //
-  if (mDebugLevelInstalled) {
-    if ((ErrorLevel & mDebugLevel.DebugLevel) == 0) {
-      return;
-    }
-  } else {
-    if ((ErrorLevel & PcdGet32(PcdDebugPrintErrorLevel)) == 0) {
-      return;
-    }
-  }
-
-  TotalSize = sizeof (EFI_DEBUG_INFO) + 12 * sizeof (UINT64 *) + AsciiStrLen (Format) + 1;
-  if (TotalSize > EFI_STATUS_CODE_DATA_MAX_SIZE) {
-    return;
-  }
-
-  //
-  // Then EFI_DEBUG_INFO
-  //
-  DebugInfo = (EFI_DEBUG_INFO *)Buffer;
-  DebugInfo->ErrorLevel = (UINT32)ErrorLevel;
-
-  //
-  // 256 byte mini Var Arg stack. That is followed by the format string.
-  //
-  for (Index = 0, ArgumentPointer = (UINT64 *)(DebugInfo + 1); Index < 12; Index++, ArgumentPointer++) {
-    *ArgumentPointer = VA_ARG (Marker, UINT64);
-  }
-  AsciiStrCpy ((CHAR8 *)ArgumentPointer, Format);
-
-  //
-  //
-  //
-  REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
-    EFI_DEBUG_CODE,
-    (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_DC_UNSPECIFIED),
-    DebugInfo,
-    TotalSize
-    );
-}
-
-VOID
-EFIAPI
-DebugPrint (
-  IN  UINTN  ErrorLevel,
-  IN  CHAR8  *Format,
-  ...
-  )
-/*++
-
-Routine Description:
-
-  Wrapper for DebugVPrint ()
-  
-Arguments:
-
-  ErrorLevel - If error level is set do the debug print.
-
-  Format     - String to use for the print, followed by Print arguments.
-
-  ...        - Print arguments.
-
-Returns:
-  
-  None
-
---*/
-{
-  VA_LIST Marker;
-
-  VA_START (Marker, Format);
-  DebugVPrint (ErrorLevel, Format, Marker);
-  VA_END (Marker);
-}
 
 /**
+
   Fills a target buffer with PcdDebugClearMemoryValue, and returns the target buffer.
 
   This function fills Length bytes of Buffer with the value specified by 
@@ -258,8 +227,8 @@ Returns:
 
   If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
-  @param  Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
-  @param  Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
+  @param   Buffer  Pointer to the target buffer to fill with PcdDebugClearMemoryValue.
+  @param   Length  Number of bytes in Buffer to fill with zeros PcdDebugClearMemoryValue. 
 
   @return  Buffer
 
@@ -271,11 +240,29 @@ DebugClearMemory (
   IN UINTN  Length
   )
 {
-//  SetMem (Buffer, Length, PcdGet8(PcdDebugClearMemoryValue));
-  SetMem (Buffer, Length, 0xAF);
-  return Buffer;
+  //
+  // If Buffer is NULL, then ASSERT().
+  //
+  ASSERT (Buffer != NULL);
+
+  //
+  // SetMem() checks for the the ASSERT() condition on Length and returns Buffer
+  //
+  return SetMem (Buffer, Length, PcdGet8(PcdDebugClearMemoryValue));
 }
 
+
+/**
+  
+  Returns TRUE if ASSERT() macros are enabled.
+
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of 
+  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+
+  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear.
+
+**/
 BOOLEAN
 EFIAPI
 DebugAssertEnabled (
@@ -285,6 +272,18 @@ DebugAssertEnabled (
   return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED) != 0);
 }
 
+
+/**
+  
+  Returns TRUE if DEBUG()macros are enabled.
+
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of 
+  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+
+  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_PRINT_ENABLED bit of PcdDebugProperyMask is clear.
+
+**/
 BOOLEAN
 EFIAPI
 DebugPrintEnabled (
@@ -294,6 +293,18 @@ DebugPrintEnabled (
   return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_PRINT_ENABLED) != 0);
 }
 
+
+/**
+  
+  Returns TRUE if DEBUG_CODE()macros are enabled.
+
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of 
+  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+
+  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CODE_ENABLED bit of PcdDebugProperyMask is clear.
+
+**/
 BOOLEAN
 EFIAPI
 DebugCodeEnabled (
@@ -303,6 +314,18 @@ DebugCodeEnabled (
   return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_DEBUG_CODE_ENABLED) != 0);
 }
 
+
+/**
+  
+  Returns TRUE if DEBUG_CLEAR_MEMORY()macro is enabled.
+
+  This function returns TRUE if the DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of 
+  PcdDebugProperyMask is set.  Otherwise FALSE is returned.
+
+  @retval  TRUE    The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is set.
+  @retval  FALSE   The DEBUG_PROPERTY_DEBUG_CLEAR_MEMORY_ENABLED bit of PcdDebugProperyMask is clear.
+
+**/
 BOOLEAN
 EFIAPI
 DebugClearMemoryEnabled (
@@ -311,4 +334,3 @@ DebugClearMemoryEnabled (
 {
   return ((PcdGet8(PcdDebugPropertyMask) & DEBUG_PROPERTY_CLEAR_MEMORY_ENABLED) != 0);
 }
-

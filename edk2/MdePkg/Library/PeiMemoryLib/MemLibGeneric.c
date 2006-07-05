@@ -16,7 +16,7 @@
 
     BaseMemoryLib
     PeiMemoryLib
-    UefiMemoryLib
+    DxeMemoryLib
 
 **/
 

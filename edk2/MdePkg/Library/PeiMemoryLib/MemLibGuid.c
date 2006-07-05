@@ -19,7 +19,7 @@
     BaseMemoryLibSse2
     BaseMemoryLibRepStr
     PeiMemoryLib
-    UefiMemoryLib
+    DxeMemoryLib
 
 **/
 
@@ -95,7 +95,8 @@ CompareGuid (
   GUID in the target buffer is returned.  If no match is found, then NULL is returned.
   If Length is 0, then NULL is returned.
   If Length > 0 and Buffer is NULL, then ASSERT().
-  If Buffer is not aligned on a 64-bit boundary, then ASSERT().
+  If Buffer is not aligned on a 32-bit boundary, then ASSERT().
+  If Length is not aligned on a 128-bit boundary, then ASSERT().
   If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
   @param  Buffer  Pointer to the target buffer to scan.
@@ -115,16 +116,12 @@ ScanGuid (
 {
   CONST GUID                        *GuidPtr;
 
-  ASSERT (Buffer != NULL);
-  //
-  // Make sure Buffer is aligned on a 64-bit boundary.
-  //
-  ASSERT (((UINTN) Buffer & 7) == 0);
-
+  ASSERT (((UINTN)Buffer & (sizeof (Guid->Data1) - 1)) == 0);
   ASSERT (Length <= (MAX_ADDRESS - (UINTN)Buffer + 1));
+  ASSERT ((Length & (sizeof (*GuidPtr) - 1)) == 0);
 
   GuidPtr = (GUID*)Buffer;
-  Buffer = GuidPtr + Length / sizeof (*GuidPtr);
+  Buffer  = GuidPtr + Length / sizeof (*GuidPtr);
   while (GuidPtr < (CONST GUID*)Buffer) {
     if (CompareGuid (GuidPtr, Guid)) {
       return (VOID*)GuidPtr;

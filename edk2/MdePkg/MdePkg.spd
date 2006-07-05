@@ -237,7 +237,7 @@
     <Filename>Library/UefiDriverEntryPoint/UefiDriverEntryPoint.msa</Filename>
     <Filename>Library/UefiDriverModelLib/UefiDriverModelLib.msa</Filename>
     <Filename>Library/UefiLib/UefiLib.msa</Filename>
-    <Filename>Library/UefiMemoryLib/UefiMemoryLib.msa</Filename>
+    <Filename>Library/DxeMemoryLib/DxeMemoryLib.msa</Filename>
     <Filename>Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib.msa</Filename>
   </MsaFiles>
   <PackageHeaders>

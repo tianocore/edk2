@@ -1277,8 +1277,7 @@ PciCf8BitFieldAndThenOr32(
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If the register specified by StartAddress >= 0x100, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x100, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.
@@ -1300,11 +1299,11 @@ PciCf8ReadBuffer (
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
-  ASSERT (Buffer != NULL);
+  ASSERT ((Buffer != NULL) || (Size == 0));
 
   EndAddress = StartAddress + Size;
 
-  if (StartAddress < EndAddress && (StartAddress & 1)) {
+  if ((StartAddress < EndAddress) && ((StartAddress & 1) != 0)) {
     //
     // Read a byte if StartAddress is byte aligned
     //
@@ -1313,7 +1312,7 @@ PciCf8ReadBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (StartAddress < EndAddress && (StartAddress & 2)) {
+  if ((StartAddress < EndAddress) && ((StartAddress & 2) != 0)) {
     //
     // Read a word if StartAddress is word aligned
     //
@@ -1322,7 +1321,7 @@ PciCf8ReadBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  while (EndAddress - StartAddress >= 4) {
+  while ((EndAddress - StartAddress) >= 4) {
     //
     // Read as many double words as possible
     //
@@ -1340,7 +1339,7 @@ PciCf8ReadBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  if (EndAddress & 1) {
+  if ((EndAddress & 1) != 0) {
     //
     // Read the last remaining byte if exist
     //
@@ -1365,8 +1364,7 @@ PciCf8ReadBuffer (
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If the register specified by StartAddress >= 0x100, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x100, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.
@@ -1388,7 +1386,7 @@ PciCf8WriteBuffer (
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
-  ASSERT (Buffer != NULL);
+  ASSERT ((Buffer != NULL) || (Size == 0));
 
   EndAddress = StartAddress + Size;
 
@@ -1401,7 +1399,7 @@ PciCf8WriteBuffer (
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if (StartAddress < EndAddress && (StartAddress & 2)) {
+  if ((StartAddress < EndAddress) && ((StartAddress & 2) != 0)) {
     //
     // Write a word if StartAddress is word aligned
     //
@@ -1410,7 +1408,7 @@ PciCf8WriteBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  while (EndAddress - StartAddress >= 4) {
+  while ((EndAddress - StartAddress) >= 4) {
     //
     // Write as many double words as possible
     //
@@ -1419,7 +1417,7 @@ PciCf8WriteBuffer (
     Buffer = (UINT32*)Buffer + 1;
   }
 
-  if (EndAddress & 2) {
+  if ((EndAddress & 2) != 0) {
     //
     // Write the last remaining word if exist
     //
@@ -1428,7 +1426,7 @@ PciCf8WriteBuffer (
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  if (EndAddress & 1) {
+  if ((EndAddress & 1) != 0) {
     //
     // Write the last remaining byte if exist
     //

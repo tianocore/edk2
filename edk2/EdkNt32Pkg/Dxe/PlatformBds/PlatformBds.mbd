@@ -32,7 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiRuntimeServicesTableLib</Library>
     <Library>BaseLib</Library>
     <Library>UefiLib</Library>
-    <Library>UefiMemoryLib</Library>
+    <Library>DxeMemoryLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>DxeServicesTableLib</Library>
     <Library>DxeReportStatusCodeLib</Library>

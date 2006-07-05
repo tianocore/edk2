@@ -6315,6 +6315,7 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="b57a1df6-ffdb-4247-a3df-3a562176751a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">

@@ -996,8 +996,7 @@ PciCf8BitFieldAndThenOr32 (
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If the register specified by StartAddress >= 0x100, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x100, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.
@@ -1030,8 +1029,7 @@ PciCf8ReadBuffer (
   If StartAddress > 0x0FFFFFFF, then ASSERT().
   If the register specified by StartAddress >= 0x100, then ASSERT().
   If ((StartAddress & 0xFFF) + Size) > 0x100, then ASSERT().
-  If (StartAddress + Size - 1)  > 0x0FFFFFFF, then ASSERT().
-  If Buffer is NULL, then ASSERT().
+  If Size > 0 and Buffer is NULL, then ASSERT().
 
   @param  StartAddress  Starting address that encodes the PCI Bus, Device,
                         Function and Register.

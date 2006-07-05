@@ -31,7 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Library>UefiBootServicesTableLib</Library>
     <Library>BaseLib</Library>
     <Library>UefiLib</Library>
-    <Library>UefiMemoryLib</Library>
+    <Library>DxeMemoryLib</Library>
     <Library>UefiDriverEntryPoint</Library>
     <Library>UefiDriverModelLib</Library>
     <Library>UefiDebugLibStdErr</Library>

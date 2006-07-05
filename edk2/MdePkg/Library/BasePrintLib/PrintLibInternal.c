@@ -92,7 +92,7 @@ BasePrintLibValueToString (
   Converts the decimal number specified by Value to a Null-terminated  
   string specified by Buffer containing at most Width characters.
   If Width is 0 then a width of  MAXIMUM_VALUE_CHARACTERS is assumed.
-  The total number of characters placed in Buffer is returned.
+  The number of characters in Buffer is returned not including the Null-terminator.
   If the conversion contains more than Width characters, then only the first
   Width characters are returned, and the total number of characters 
   required to perform the conversion is returned.
@@ -120,7 +120,7 @@ BasePrintLibValueToString (
   @param  Width      The maximum number of characters to place in Buffer.
   @param  Increment Character increment in Buffer.
   
-  @return Total number of characters required to perform the conversion.
+  @return The number of characters in Buffer not including the Null-terminator.
 
 **/
 UINTN
@@ -184,7 +184,7 @@ BasePrintLibConvertValueToString (
     }
   }
 
-  Buffer = BasePrintLibFillBuffer (Buffer, 1, 0, Increment);
+  BasePrintLibFillBuffer (Buffer, 1, 0, Increment);
 
   return ((Buffer - OriginalBuffer) / Increment);
 }

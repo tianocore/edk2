@@ -61,7 +61,7 @@ Returns:
   
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
 
-  *HobList = PrivateData->HobList.Raw;
+  *HobList    = PrivateData->HobList.Raw;
 
 
   return EFI_SUCCESS;   
@@ -111,7 +111,7 @@ Returns:
 
   HandOffHob = *Hob;
 
-  Length = (UINT16)((Length + 0x7) & (~0x7));
+  Length     = (UINT16)((Length + 0x7) & (~0x7));
 
   FreeMemory = HandOffHob->EfiFreeMemoryTop -
                HandOffHob->EfiFreeMemoryBottom;
@@ -121,9 +121,9 @@ Returns:
   }
   
   *Hob = (VOID*) (UINTN) HandOffHob->EfiEndOfHobList;
-  ((EFI_HOB_GENERIC_HEADER*) *Hob)->HobType = Type;
+  ((EFI_HOB_GENERIC_HEADER*) *Hob)->HobType   = Type;
   ((EFI_HOB_GENERIC_HEADER*) *Hob)->HobLength = Length;
-  ((EFI_HOB_GENERIC_HEADER*) *Hob)->Reserved = 0;
+  ((EFI_HOB_GENERIC_HEADER*) *Hob)->Reserved  = 0;
 
   HobEnd = (EFI_HOB_GENERIC_HEADER*) ((UINTN) *Hob + Length);
   HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
@@ -164,13 +164,13 @@ Returns:
 --*/
 {
   EFI_HOB_HANDOFF_INFO_TABLE   *Hob;
-  EFI_HOB_GENERIC_HEADER              *HobEnd;
+  EFI_HOB_GENERIC_HEADER       *HobEnd;
 
-  Hob = (VOID *)(UINTN)MemoryBegin;
+  Hob    = (VOID *)(UINTN)MemoryBegin;
   HobEnd = (EFI_HOB_GENERIC_HEADER*) (Hob+1);
-  Hob->Header.HobType  = EFI_HOB_TYPE_HANDOFF;
-  Hob->Header.HobLength   = sizeof(EFI_HOB_HANDOFF_INFO_TABLE);
-  Hob->Header.Reserved = 0;
+  Hob->Header.HobType   = EFI_HOB_TYPE_HANDOFF;
+  Hob->Header.HobLength = sizeof(EFI_HOB_HANDOFF_INFO_TABLE);
+  Hob->Header.Reserved  = 0;
   
   HobEnd->HobType     = EFI_HOB_TYPE_END_OF_HOB_LIST;
   HobEnd->HobLength   = sizeof(EFI_HOB_GENERIC_HEADER);

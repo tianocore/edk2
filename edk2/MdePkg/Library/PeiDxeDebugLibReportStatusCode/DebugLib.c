@@ -75,12 +75,12 @@ DebugPrint (
   VA_END (Marker);
   AsciiStrCpy ((CHAR8 *)ArgumentPointer, Format);
 
-  //
-  //
-  //
-  REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
+  REPORT_STATUS_CODE_EX (
     EFI_DEBUG_CODE,
     (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_DC_UNSPECIFIED),
+    0,
+    NULL,
+    &gEfiStatusCodeDataTypeDebugGuid,
     DebugInfo,
     TotalSize
     );
@@ -142,7 +142,7 @@ DebugAssert (
     //
     // Copy Ascii Description 
     //
-    AsciiStrCpy (Temp + AsciiStrLen(FileName) + 1, Description);
+    AsciiStrCpy (Temp + AsciiStrLen (FileName) + 1, Description);
 
     REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
       (EFI_ERROR_CODE | EFI_ERROR_UNRECOVERED),
