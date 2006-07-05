@@ -37,10 +37,10 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions;
 import org.tianocore.FrameworkModulesDocument;
-import org.tianocore.PlatformSurfaceAreaDocument;
-import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.ModuleSADocument;
+import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition;
+import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
@@ -2020,6 +2020,244 @@ public class CollectPCDAction {
                 token.addUsageInstance(usageInstance);
             }
         }
+
+        //
+        // ------------------------------------------------
+        // 3), Add unreference dynamic_Ex pcd token into Pcd database.
+        // ------------------------------------------------
+        // 
+        List<Token> tokenArray = getUnreferencedDynamicPcd();
+        if (tokenArray != null) {
+            for (index = 0; index < tokenArray.size(); index ++) {
+                dbManager.addTokenToDatabase(tokenArray.get(index).getPrimaryKeyString(), 
+                                             tokenArray.get(index));
+            }
+        }
+    }
+
+    private List<Token> getUnreferencedDynamicPcd () throws EntityException {
+        List<Token>                                   tokenArray                 = new ArrayList();
+        Token                                         token                      = null;
+        DynamicPcdBuildDefinitions                    dynamicPcdBuildDefinitions = null;
+        List<DynamicPcdBuildDefinitions.PcdBuildData> dynamicPcdBuildDataArray   = null;
+        DynamicPcdBuildDefinitions.PcdBuildData       pcdBuildData               = null;
+        List<DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo>   skuInfoList      = null;
+        Token.PCD_TYPE                                pcdType;
+        SkuInstance                                   skuInstance                = null;
+        String  primaryKey = null;
+        boolean hasSkuId0  = false;
+        int     index, offset, index2;
+        String  temp;
+        String  exceptionString;
+        String  hiiDefaultValue;
+        String  tokenSpaceStrRet[];
+        String  variableGuidString[];
+
+        //
+        // If FPD document is not be opened, open and initialize it.
+        // 
+        if (fpdDocInstance == null) {
+            try {
+                fpdDocInstance = (PlatformSurfaceAreaDocument)XmlObject.Factory.parse(new File(fpdFilePath));
+            } catch(IOException ioE) {
+                throw new EntityException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
+            } catch(XmlException xmlE) {
+                throw new EntityException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
+            }
+        }
+
+        dynamicPcdBuildDefinitions = fpdDocInstance.getPlatformSurfaceArea().getDynamicPcdBuildDefinitions();
+        if (dynamicPcdBuildDefinitions == null) {
+            return null;
+        }
+
+        dynamicPcdBuildDataArray = dynamicPcdBuildDefinitions.getPcdBuildDataList();
+        for (index2 = 0; index2 < dynamicPcdBuildDataArray.size(); index2 ++) {
+            pcdBuildData = dynamicPcdBuildDataArray.get(index2);
+            try {
+                tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(pcdBuildData.getTokenSpaceGuidCName());
+            } catch ( Exception e ) {
+                throw new EntityException ("Faile get Guid for token " + pcdBuildData.getCName() + ":" + e.getMessage());
+            }
+
+            if (tokenSpaceStrRet == null) {
+                throw new EntityException ("Fail to get Token space guid for token" + pcdBuildData.getCName());
+            } 
+
+            primaryKey = Token.getPrimaryKeyString(pcdBuildData.getCName(),
+                                                   translateSchemaStringToUUID(tokenSpaceStrRet[1]));
+
+            if (dbManager.isTokenInDatabase(primaryKey)) {
+                continue;
+            }
+
+            pcdType = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
+            if (pcdType != Token.PCD_TYPE.DYNAMIC_EX) {
+                throw new EntityException (String.format("[FPD file error] It not allowed for DYNAMIC PCD %s who is no used by any module",
+                                                         pcdBuildData.getCName()));
+            }
+
+            //
+            // Create new token for unreference dynamic PCD token
+            // 
+            token           = new Token(pcdBuildData.getCName(), translateSchemaStringToUUID(tokenSpaceStrRet[1]));
+            token.datumSize = pcdBuildData.getMaxDatumSize();
+            
+
+            token.datumType     = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
+            token.tokenNumber   = Long.decode(pcdBuildData.getToken().toString());
+            token.dynamicExTokenNumber = token.tokenNumber;
+            token.isDynamicPCD  = true; 
+            token.updateSupportPcdType(pcdType);
+
+            exceptionString = verifyDatum(token.cName, 
+                                          null,
+                                          null, 
+                                          token.datumType, 
+                                          token.datumSize);
+            if (exceptionString != null) {
+                throw new EntityException(exceptionString);
+            }
+
+            skuInfoList = pcdBuildData.getSkuInfoList();
+
+            //
+            // Loop all sku data 
+            // 
+            for (index = 0; index < skuInfoList.size(); index ++) {
+                skuInstance = new SkuInstance();
+                //
+                // Although SkuId in schema is BigInteger, but in fact, sku id is 32 bit value.
+                // 
+                temp = skuInfoList.get(index).getSkuId().toString();
+                skuInstance.id = Integer.decode(temp);
+                if (skuInstance.id == 0) {
+                    hasSkuId0 = true;
+                }
+                //
+                // Judge whether is DefaultGroup at first, because most case is DefautlGroup.
+                // 
+                if (skuInfoList.get(index).getValue() != null) {
+                    skuInstance.value.setValue(skuInfoList.get(index).getValue().toString());
+                    if ((exceptionString = verifyDatum(token.cName, 
+                                                       null, 
+                                                       skuInfoList.get(index).getValue().toString(), 
+                                                       token.datumType, 
+                                                       token.datumSize)) != null) {
+                        throw new EntityException(exceptionString);
+                    }
+
+                    token.skuData.add(skuInstance);
+
+                    continue;
+                }
+
+                //
+                // Judge whether is HII group case.
+                // 
+                if (skuInfoList.get(index).getVariableName() != null) {
+                    exceptionString = null;
+                    if (skuInfoList.get(index).getVariableGuid() == null) {
+                        exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                        "file, who use HII, but there is no <VariableGuid> defined for Sku %d data!",
+                                                        token.cName,
+                                                        index);
+                        if (exceptionString != null) {
+                            throw new EntityException(exceptionString);
+                        }                                                    
+                    }
+
+                    if (skuInfoList.get(index).getVariableOffset() == null) {
+                        exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                        "file, who use HII, but there is no <VariableOffset> defined for Sku %d data!",
+                                                        token.cName,
+                                                        index);
+                        if (exceptionString != null) {
+                            throw new EntityException(exceptionString);
+                        }
+                    }
+
+                    if (skuInfoList.get(index).getHiiDefaultValue() == null) {
+                        exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                        "file, who use HII, but there is no <HiiDefaultValue> defined for Sku %d data!",
+                                                        token.cName,
+                                                        index);
+                        if (exceptionString != null) {
+                            throw new EntityException(exceptionString);
+                        }
+                    }
+
+                    if (skuInfoList.get(index).getHiiDefaultValue() != null) {
+                        hiiDefaultValue = skuInfoList.get(index).getHiiDefaultValue().toString();
+                    } else {
+                        hiiDefaultValue = null;
+                    }
+
+                    if ((exceptionString = verifyDatum(token.cName, 
+                                                       null, 
+                                                       hiiDefaultValue, 
+                                                       token.datumType, 
+                                                       token.datumSize)) != null) {
+                        throw new EntityException(exceptionString);
+                    }
+
+                    offset = Integer.decode(skuInfoList.get(index).getVariableOffset());
+                    if (offset > 0xFFFF) {
+                        throw new EntityException(String.format("[FPD file error] For dynamic PCD %s ,  the variable offset defined in sku %d data "+
+                                                                "exceed 64K, it is not allowed!",
+                                                                token.cName,
+                                                                index));
+                    }
+
+                    //
+                    // Get variable guid string according to the name of guid which will be mapped into a GUID in SPD file.
+                    // 
+                    variableGuidString = GlobalData.getGuidInfoFromCname(skuInfoList.get(index).getVariableGuid().toString());
+                    if (variableGuidString == null) {
+                        throw new EntityException(String.format("[GUID Error] For dynamic PCD %s,  the variable guid %s can be found in all SPD file!",
+                                                                token.cName, 
+                                                                skuInfoList.get(index).getVariableGuid().toString()));
+                    }
+                    String variableStr = skuInfoList.get(index).getVariableName();
+                    Pattern pattern = Pattern.compile("0x([a-fA-F0-9]){4}");
+                    Matcher matcher = pattern.matcher(variableStr);
+                    List<String> varNameList = new ArrayList<String>();
+                    while (matcher.find()){
+                            String str = variableStr.substring(matcher.start(),matcher.end());
+                            varNameList.add(str);
+                    }
+
+                    skuInstance.value.setHiiData(varNameList,
+                                                 translateSchemaStringToUUID(variableGuidString[1]),
+                                                 skuInfoList.get(index).getVariableOffset(),
+                                                 skuInfoList.get(index).getHiiDefaultValue().toString());
+                    token.skuData.add(skuInstance);
+                    continue;
+                }
+
+                if (skuInfoList.get(index).getVpdOffset() != null) {
+                    skuInstance.value.setVpdData(skuInfoList.get(index).getVpdOffset());
+                    token.skuData.add(skuInstance);
+                    continue;
+                }
+
+                exceptionString = String.format("[FPD file error] For dynamic PCD %s, the dynamic info must "+
+                                                "be one of 'DefaultGroup', 'HIIGroup', 'VpdGroup'.",
+                                                token.cName);
+                throw new EntityException(exceptionString);
+            }
+
+            if (!hasSkuId0) {
+                exceptionString = String.format("[FPD file error] For dynamic PCD %s in <DynamicPcdBuildDefinitions>, there are "+
+                                                "no sku id = 0 data, which is required for every dynamic PCD",
+                                                token.cName);
+                throw new EntityException(exceptionString);
+            }
+
+            tokenArray.add(token);
+        }
+
+        return tokenArray;
     }
 
     /**
@@ -2769,14 +3007,14 @@ public class CollectPCDAction {
     **/
     public static void main(String argv[]) throws EntityException {
         CollectPCDAction ca = new CollectPCDAction();
-        ca.setWorkspacePath("f:/tianocore/edk2");
-        ca.setFPDFilePath("f:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
+        ca.setWorkspacePath("m:/tianocore/edk2");
+        ca.setFPDFilePath("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "f:/tianocore/edk2",
+                            "m:/tianocore/edk2",
                             "tools_def.txt");
         FpdParserTask fpt = new FpdParserTask();
-        fpt.parseFpdFile(new File("f:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd"));
+        fpt.parseFpdFile(new File("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd"));
         ca.execute();
     }
 }
