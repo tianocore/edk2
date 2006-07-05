@@ -35,7 +35,9 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class PlatformBuildFileGenerator {
 
@@ -183,6 +185,7 @@ public class PlatformBuildFileGenerator {
             throw new BuildException("Generate " + platformName + "_build.xml failed. \n" + ex.getMessage());
         }
     }
+    
     private void applyModules(Document document, Node root, String num) {
         root.appendChild(document.createComment("Modules target"));
         Element ele = document.createElement("target");
@@ -464,9 +467,63 @@ public class PlatformBuildFileGenerator {
         Element ele = document.createElement("target");
         ele.setAttribute("name", "userextensions");
         
+        Node node = SurfaceAreaQuery.getFpdUserExtension();
+        if (node != null) {
+            //
+            // For every Target and ToolChain
+            //
+            String[] targetList = GlobalData.getToolChainInfo().getTargets();
+            for (int i = 0; i < targetList.length; i++){
+                String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
+                for(int j = 0; j < toolchainList.length; j++){
+                    //
+                    // Prepare FV_DIR
+                    //
+                    String ffsCommonDir = project.getProperty("BUILD_DIR") + File.separatorChar 
+                                    + targetList[i] + File.separatorChar 
+                                    + toolchainList[j];
+                    File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
+                    Element fvEle = document.createElement("var");
+                    fvEle.setAttribute("name", "FV_DIR");
+                    fvEle.setAttribute("value", fvDir.getPath().replaceAll("(\\\\)", "/"));
+                    ele.appendChild(fvEle);
+                    
+                    NodeList childNodes = node.getChildNodes();
+                    for (int k = 0; k < childNodes.getLength(); k++) {
+                        Node childItem = childNodes.item(k);
+                        if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                            ele.appendChild(recursiveNode(childItem, document));
+                        }
+                    }
+                
+                }
+            }
+        }
+        
         root.appendChild(ele);
     }
     
+    private Element recursiveNode(Node node, Document document) {
+        Element root = document.createElement(node.getNodeName());
+        NamedNodeMap attr = node.getAttributes();
+        for (int i = 0; i < attr.getLength(); i++) {
+            Node attrItem = attr.item(i);
+            root.setAttribute(attrItem.getNodeName(), attrItem.getNodeValue());
+        }
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node childItem = childNodes.item(i);
+            if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                root.appendChild(recursiveNode(childItem, document));
+            }
+            else if (childItem.getNodeType() == Node.TEXT_NODE){
+                if ( ! childItem.getNodeValue().trim().equalsIgnoreCase("")) {
+                    root.setTextContent(childItem.getNodeValue());
+                }
+            }
+        }
+        return root;
+    }
     
     private boolean isListInSequence(String fvName) {
         Set<String> numbers = sequences.keySet();

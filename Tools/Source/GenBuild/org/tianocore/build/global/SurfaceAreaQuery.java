@@ -23,17 +23,14 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.xmlbeans.XmlNormalizedString;
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.tianocore.BuildOptionsDocument;
 import org.tianocore.CNameType;
-import org.tianocore.DataIdDocument;
 import org.tianocore.ExternsDocument;
 import org.tianocore.FileNameConvention;
-import org.tianocore.FvAttributeDocument;
 import org.tianocore.FvImagesDocument;
-import org.tianocore.FvOptionDocument;
 import org.tianocore.GuidDeclarationsDocument;
 import org.tianocore.GuidsDocument;
 import org.tianocore.LibrariesDocument;
@@ -56,18 +53,18 @@ import org.tianocore.PpiDeclarationsDocument;
 import org.tianocore.ProtocolDeclarationsDocument;
 import org.tianocore.Sentence;
 import org.tianocore.SpdHeaderDocument;
-import org.tianocore.SupportedArchitectures;
+import org.tianocore.UserExtensionsDocument;
 import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
-import org.tianocore.SupportedArchitectures.Enum;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.logger.EdkLog;
+import org.w3c.dom.Node;
 
 /**
  * SurfaceAreaQuery class is used to query Surface Area information from msa,
@@ -1381,14 +1378,16 @@ public class SurfaceAreaQuery {
         return result;
     }
     
-    public static XmlObject getFpdUserExtension() {
+    public static Node getFpdUserExtension() {
         String[] xPath = new String[] { "/UserExtensions" };
 
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
-        if (queryResult == null) {
+        if (queryResult == null && queryResult.length == 0) {
             return null;
         }
-        return null;
+        UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)queryResult[0];
+        
+        return a.getDomNode();
     }
 
     /**
