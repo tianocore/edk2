@@ -12,7 +12,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 <LibraryModuleBuildDescription xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.TianoCore.org/2006/Edk2.0  http://www.TianoCore.org/2006/Edk2.0/SurfaceArea.xsd">
   <MbdLibHeader>
     <BaseName>UefiBootServicesTableLib</BaseName>
-    <Guid>baa1baa3-0a8d-402c-8042-985115fae953</Guid>
+    <Guid>ff5c7a2c-ab7a-4366-8616-11c6e53247b6</Guid>
     <Version>0</Version>
     <Description>Library to abstract Framework extensions that conflict with UEFI 2.0 Specification</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
