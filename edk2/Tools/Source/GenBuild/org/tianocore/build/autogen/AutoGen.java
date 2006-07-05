@@ -812,7 +812,7 @@ public class AutoGen {
 			int entryPointCount = 0;
 			fileBuffer
 					.append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT32 _gPeimRevision = 0;\r\n");
-			if (entryPointList == null) {
+			if (entryPointList == null || entryPointList.length == 0) {
 				fileBuffer.append("EFI_STATUS\r\n");
 				fileBuffer.append("EFIAPI\r\n");
 				fileBuffer.append("ProcessModuleEntryPointList (\r\n");
@@ -899,8 +899,8 @@ public class AutoGen {
                         fileBuffer.append("EFIAPI\r\n");
                         fileBuffer.append(entryPointList[i]);
                         fileBuffer.append(" (\r\n");
-                        fileBuffer.append("  EFI_HANDLE        ImageHandle,\r\n");
-                        fileBuffer.append("  EFI_SYSTEM_TABLE  *SystemTable\r\n");
+                        fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
+                        fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
                         fileBuffer.append("  );\r\n");
                         entryPointCount++;
                     } else {
@@ -975,7 +975,7 @@ public class AutoGen {
 						fileBuffer.append(entryPointList[i]);
 						fileBuffer.append(" (\r\n");
 						fileBuffer
-								.append("  EFI_HANDLE        ImageHandle\r\n");
+								.append("  IN EFI_HANDLE        ImageHandle\r\n");
 						fileBuffer.append("  );\r\n");
 					} else {
 						break;
@@ -1051,8 +1051,8 @@ public class AutoGen {
                     fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(entryPointList[i]);
                     fileBuffer.append(" (\r\n");
-                    fileBuffer.append("  EFI_HANDLE        ImageHandle,\r\n");
-                    fileBuffer.append("  EFI_SYSTEM_TABLE  *SystemTable\r\n");
+                    fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
+                    fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
                     fileBuffer.append("  );\r\n");
                     entryPointCount++;
                 }
@@ -1141,7 +1141,7 @@ public class AutoGen {
 						fileBuffer.append(entryPointList[i]);
 						fileBuffer.append(" (\r\n");
 						fileBuffer
-								.append("  EFI_HANDLE        ImageHandle\r\n");
+								.append("  IN EFI_HANDLE        ImageHandle\r\n");
 						fileBuffer.append("  );\r\n");
 						entryPointCount++;
 					} else {
@@ -1163,7 +1163,7 @@ public class AutoGen {
 						fileBuffer.append(entryPointList[i]);
 						fileBuffer.append(" (\r\n");
 						fileBuffer
-								.append("  EFI_HANDLE        ImageHandle\r\n");
+								.append("  IN EFI_HANDLE        ImageHandle\r\n");
 						fileBuffer.append("  );\r\n");
 					} else {
 						break;

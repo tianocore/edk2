@@ -301,7 +301,7 @@ public class EfiRomTask extends Task implements EfiDefine {
     /**
      * setclassCode
      * 
-     * This function is to set class member "fdImage"
+     * This function is to set class member "classCode"
      * 
      * @param fdImage        name of class code file.
      */
@@ -338,7 +338,7 @@ public class EfiRomTask extends Task implements EfiDefine {
     /**
      * getFlashDeviceImage
      * 
-     * This function is to get class member "flashDeviceImage"
+     * This function is to get class member "dump"
      * 
      * @return flashDeviceImage      name of flash device image
      */
@@ -349,7 +349,7 @@ public class EfiRomTask extends Task implements EfiDefine {
     /**
      * setFlashDeviceImage
      * 
-     * This function is to set class member "flashDeviceImage"
+     * This function is to set class member "dump"
      * 
      * @param flashDeviceImage        name of flash device image
      */
