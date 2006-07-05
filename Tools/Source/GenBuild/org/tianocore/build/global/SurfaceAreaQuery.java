@@ -281,6 +281,7 @@ public class SurfaceAreaQuery {
         Filename[] sourceFileNames = (Filename[]) returns;
         List<String[]> outputList = new ArrayList<String[]>();
         for (int i = 0; i < sourceFileNames.length; i++) {
+            @SuppressWarnings("unchecked")
             List<String> archList = sourceFileNames[i].getSupArchList();
             if (arch == null || arch.equalsIgnoreCase("") || archList == null || archList.contains(arch)) {
                 outputList.add(new String[] {sourceFileNames[i].getToolCode(),sourceFileNames[i].getStringValue()});
@@ -446,6 +447,7 @@ public class SurfaceAreaQuery {
             }
 
             archList = new ArrayList<String>();
+            @SuppressWarnings("unchecked")
             List<String> archEnumList = option.getSupArchList();            
             if (archEnumList == null) {
                 archList.add(null);
@@ -572,6 +574,7 @@ public class SurfaceAreaQuery {
         PackageIdentification[] packageIdList = new PackageIdentification[returns.length];
         for (int i = 0; i < returns.length; i++) {
             PackageDependenciesDocument.PackageDependencies.Package item = (PackageDependenciesDocument.PackageDependencies.Package) returns[i];
+            @SuppressWarnings("unchecked")
             List<String> archList = item.getSupArchList();
             if (arch == null || archList == null || archList.contains(arch)) {
                 packageGuid = item.getPackageGuid();
@@ -707,6 +710,7 @@ public class SurfaceAreaQuery {
         List<String> protocolList = new ArrayList<String>();
         
         for (int i = 0; i < returns.length; i++) {
+            @SuppressWarnings("unchecked")
             List<String> archList = returnlList[i].getSupArchList();
             if (archList == null || archList.contains(arch)){
                 protocolList.add(returnlList[i].getProtocolCName());
@@ -745,6 +749,7 @@ public class SurfaceAreaQuery {
         List<String> protocolNotifyList = new ArrayList<String>();
         
         for (int i = 0; i < returns.length; i++) {
+            @SuppressWarnings("unchecked")
             List<String> archList = ((ProtocolNotify) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
                 protocolNotifyList.add(((ProtocolNotify) returns[i]).getProtocolNotifyCName());
@@ -866,6 +871,7 @@ public class SurfaceAreaQuery {
         
         List<String> ppiNotifyList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
+            @SuppressWarnings("unchecked")
             List<String> archList = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
                 ppiNotifyList.add(((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName()); 
@@ -946,6 +952,7 @@ public class SurfaceAreaQuery {
 
         List<String> ppiList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
+            @SuppressWarnings("unchecked")
             List<String> archList = ((PPIsDocument.PPIs.Ppi) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
                 ppiList.add(((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName());    
@@ -1025,6 +1032,7 @@ public class SurfaceAreaQuery {
 
         List<String> guidList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
+            @SuppressWarnings("unchecked")
             List<String> archList = ((GuidsDocument.Guids.GuidCNames) returns[i]).getSupArchList();
             if (archList == null || archList.contains(arch)){
                 guidList.add(((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName());    

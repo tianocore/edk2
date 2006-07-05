@@ -2036,7 +2036,7 @@ public class CollectPCDAction {
     }
 
     private List<Token> getUnreferencedDynamicPcd () throws EntityException {
-        List<Token>                                   tokenArray                 = new ArrayList();
+        List<Token>                                   tokenArray                 = new ArrayList<Token>();
         Token                                         token                      = null;
         DynamicPcdBuildDefinitions                    dynamicPcdBuildDefinitions = null;
         List<DynamicPcdBuildDefinitions.PcdBuildData> dynamicPcdBuildDataArray   = null;
