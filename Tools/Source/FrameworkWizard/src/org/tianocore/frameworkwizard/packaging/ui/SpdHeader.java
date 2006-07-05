@@ -15,14 +15,15 @@
 
 package org.tianocore.frameworkwizard.packaging.ui;
 
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -52,6 +53,8 @@ public class SpdHeader extends IInternalFrame {
     //
     //Define class members
     //
+    static JFrame frame;
+    
     private JPanel jContentPane = null;
 
     private JLabel jLabelBaseName = null;
@@ -133,6 +136,10 @@ public class SpdHeader extends IInternalFrame {
             jTextFieldBaseName.setPreferredSize(new java.awt.Dimension(320,20));
             jTextFieldBaseName.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
+                    if (!DataValidation.isUiNameType(jTextFieldBaseName.getText())) {
+                        JOptionPane.showMessageDialog(frame, "Package Name is NOT UiNameType.");
+                        return;
+                    }
                     sfc.setSpdHdrPkgName(jTextFieldBaseName.getText());
                 }
             });
@@ -153,6 +160,10 @@ public class SpdHeader extends IInternalFrame {
             jTextFieldGuid.setPreferredSize(new java.awt.Dimension(250,20));
             jTextFieldGuid.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
+                    if (!DataValidation.isGuid(jTextFieldGuid.getText())) {
+                        JOptionPane.showMessageDialog(frame, "Guid is NOT GuidType.");
+                        return;
+                    }
                     sfc.setSpdHdrGuidValue(jTextFieldGuid.getText());
                 }
             });
@@ -173,6 +184,10 @@ public class SpdHeader extends IInternalFrame {
             jTextFieldVersion.setPreferredSize(new java.awt.Dimension(320,20));
             jTextFieldVersion.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
+                   if (!DataValidation.isVersion(jTextFieldVersion.getText())) {
+                       JOptionPane.showMessageDialog(frame, "Version is NOT version type.");
+                       return;
+                   }
                    sfc.setSpdHdrVer(jTextFieldVersion.getText());
                } 
             });
@@ -210,6 +225,10 @@ public class SpdHeader extends IInternalFrame {
             jTextAreaLicense.setLineWrap(true);
             jTextAreaLicense.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
+                    if (jTextAreaLicense.getText().length() == 0) {
+                        JOptionPane.showMessageDialog(frame, "License contents could NOT be empty.");
+                        return;
+                    }
                     sfc.setSpdHdrLicense(jTextAreaLicense.getText());
                 }
             });
@@ -230,6 +249,10 @@ public class SpdHeader extends IInternalFrame {
             jTextAreaDescription.setPreferredSize(new java.awt.Dimension(317,77));
             jTextAreaDescription.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
+                    if (jTextAreaDescription.getText().length() == 0) {
+                        JOptionPane.showMessageDialog(frame, "Description contents could NOT be empty.");
+                        return;
+                    }
                     sfc.setSpdHdrDescription(jTextAreaDescription.getText());
                 }
             });
@@ -338,6 +361,10 @@ public class SpdHeader extends IInternalFrame {
             jTextFieldAbstract.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldAbstract.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
+                    if (!DataValidation.isAbstract(jTextFieldAbstract.getText())) {
+                        JOptionPane.showMessageDialog(frame, "Abstract could NOT be empty.");
+                        return;
+                    }
                     sfc.setSpdHdrAbs(jTextFieldAbstract.getText());
                 }
             });
@@ -358,6 +385,10 @@ public class SpdHeader extends IInternalFrame {
             jTextFieldCopyright.setPreferredSize(new java.awt.Dimension(320,20));
             jTextFieldCopyright.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
+                   if (!DataValidation.isCopyright(jTextFieldCopyright.getText())) {
+                       JOptionPane.showMessageDialog(frame, "Copyright contents could not be empty.");
+                       return;
+                   }
                    sfc.setSpdHdrCopyright(jTextFieldCopyright.getText());
                } 
             });
@@ -666,6 +697,7 @@ public class SpdHeader extends IInternalFrame {
 		resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth,intPreferredWidth);
+        resizeComponentWidth(this.jTextField, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldCopyright, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth,intPreferredWidth);

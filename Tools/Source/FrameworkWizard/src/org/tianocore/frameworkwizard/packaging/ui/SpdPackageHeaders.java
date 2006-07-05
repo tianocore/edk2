@@ -12,17 +12,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.frameworkwizard.packaging.ui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.io.File;
-import java.util.Vector;
 
 import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -31,7 +26,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -47,7 +41,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
-import org.tianocore.frameworkwizard.common.DataType;
+import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -58,6 +52,11 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
  @since PackageEditor 1.0
 **/
 public class SpdPackageHeaders extends IInternalFrame implements TableModelListener{
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     static JFrame frame;
     
     private SpdFileContents sfc = null;
@@ -66,11 +65,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
 
     private JPanel jContentPane = null;
 
-    private JRadioButton jRadioButtonAdd = null;
-
     private JRadioButton jRadioButtonSelect = null;
-
-    private JTextField jTextFieldAdd = null;
 
     private JComboBox jComboBoxSelect = null;
 
@@ -115,23 +110,6 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     }
 
     /**
-      This method initializes jRadioButtonAdd	
-      	
-      @return javax.swing.JRadioButton	
-     **/
-    private JRadioButton getJRadioButtonAdd() {
-        if (jRadioButtonAdd == null) {
-            jRadioButtonAdd = new JRadioButton();
-            jRadioButtonAdd.setBounds(new java.awt.Rectangle(9,35,197,20));
-            jRadioButtonAdd.setText("Add a new ModuleType");
-            jRadioButtonAdd.setEnabled(false);
-            jRadioButtonAdd.addActionListener(this);
-            jRadioButtonAdd.setSelected(false);
-        }
-        return jRadioButtonAdd;
-    }
-
-    /**
       This method initializes jRadioButtonSelect	
       	
       @return javax.swing.JRadioButton	
@@ -145,21 +123,6 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             jRadioButtonSelect.setSelected(true);
         }
         return jRadioButtonSelect;
-    }
-
-    /**
-      This method initializes jTextFieldAdd	
-      	
-      @return javax.swing.JTextField	
-     **/
-    private JTextField getJTextFieldAdd() {
-        if (jTextFieldAdd == null) {
-            jTextFieldAdd = new JTextField();
-            jTextFieldAdd.setBounds(new java.awt.Rectangle(220, 35, 260, 20));
-            jTextFieldAdd.setPreferredSize(new java.awt.Dimension(260,20));
-            jTextFieldAdd.setEnabled(false);
-        }
-        return jTextFieldAdd;
     }
 
     /**
@@ -350,9 +313,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             jContentPane.add(jLabel, null);
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
-            jContentPane.add(getJRadioButtonAdd(), null);
             jContentPane.add(getJRadioButtonSelect(), null);
-            jContentPane.add(getJTextFieldAdd(), null);
             jContentPane.add(getJComboBoxSelect(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
@@ -402,9 +363,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
 
         if (arg0.getSource() == jButtonAdd) {
             String strLibClass = "";
-            if (jRadioButtonAdd.isSelected()) {
-                strLibClass = jTextFieldAdd.getText();
-            }
+            
             if (jRadioButtonSelect.isSelected()) {
                 strLibClass = jComboBoxSelect.getSelectedItem().toString();
             }
@@ -412,6 +371,9 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             String[] row = {"", ""};
             row[0] = strLibClass;
             row[1] = jTextField.getText().replace('\\', '/');
+            if (!dataValidation(row)) {
+                return;
+            }
             model.addRow(row);
             sfc.genSpdModuleHeaders(row[0], row[1], null, null, null, null, null, null);
         }
@@ -437,31 +399,15 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             sfc.removeSpdPkgHeader();
         }
 
-        if (arg0.getSource() == jRadioButtonAdd) {
-            if (jRadioButtonAdd.isSelected()) {
-                jRadioButtonSelect.setSelected(false);
-                jTextFieldAdd.setEnabled(true);
-                jComboBoxSelect.setEnabled(false);
-            }
-            if (!jRadioButtonSelect.isSelected() && !jRadioButtonAdd.isSelected()) {
-                jRadioButtonAdd.setSelected(true);
-                jTextFieldAdd.setEnabled(true);
-                jComboBoxSelect.setEnabled(false);
-            }
+    }
+    
+    private boolean dataValidation(String[] row) {
+        if (!DataValidation.isPathAndFilename(row[1])) {
+            JOptionPane.showMessageDialog(this, "Include header path is NOT PathAndFilename type.");
+            return false;
         }
-
-        if (arg0.getSource() == jRadioButtonSelect) {
-            if (jRadioButtonSelect.isSelected()) {
-                jRadioButtonAdd.setSelected(false);
-                jTextFieldAdd.setEnabled(false);
-                jComboBoxSelect.setEnabled(true);
-            }
-            if (!jRadioButtonSelect.isSelected() && !jRadioButtonAdd.isSelected()) {
-                jRadioButtonSelect.setSelected(true);
-                jTextFieldAdd.setEnabled(false);
-                jComboBoxSelect.setEnabled(true);
-            }
-        }
+        
+        return true;
     }
 
     /**
@@ -497,6 +443,11 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             jButtonBrowse.setText("Browse");
             jButtonBrowse.setPreferredSize(new java.awt.Dimension(92,20));
             jButtonBrowse.addActionListener(new javax.swing.AbstractAction() {
+                /**
+                 * 
+                 */
+                private static final long serialVersionUID = 1L;
+
                 public void actionPerformed(ActionEvent e) {
                     //
                     // Select files from current workspace
@@ -558,6 +509,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         if (jTable == null) {
             model = new DefaultTableModel();
             jTable = new JTable(model);
+            jTable.setRowHeight(20);
             model.addColumn("ModuleType");
             model.addColumn("IncludeHeader");
             TableColumn typeColumn = jTable.getColumnModel().getColumn(0);
@@ -605,6 +557,10 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         if (arg0.getType() == TableModelEvent.UPDATE){
             String pkg = m.getValueAt(row, 0) + "";
             String hdr = m.getValueAt(row, 1) + "";
+            String[] rowData = {pkg, hdr};
+            if (!dataValidation(rowData)) {
+                return;
+            }
             sfc.updateSpdPkgHdr(row, pkg, hdr);
         }
     }
@@ -613,7 +569,6 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         int intPreferredWidth = 500;
         
         resizeComponentWidth(this.jComboBoxSelect, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldAdd, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
         relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 30);

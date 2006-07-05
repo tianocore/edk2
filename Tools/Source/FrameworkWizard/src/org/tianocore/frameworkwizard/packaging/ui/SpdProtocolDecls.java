@@ -24,6 +24,10 @@ GUI for create library definition elements of spd file.
 **/
 public class SpdProtocolDecls extends SpdGuidDecls {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private SpdFileContents sfc = null;
     
     public SpdProtocolDecls() {
@@ -79,11 +83,18 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         if (m.getValueAt(row, 5) != null) {
             modTypeList = m.getValueAt(row, 5).toString();
         }
+        String[] rowData = {name, cName, guid, help};
+        if (!dataValidation(rowData)){
+            return;
+        }
         
         sfc.updateSpdProtocolDecl(row, name, cName, guid, help, archList, modTypeList);
     }
     
     protected void addRow(String[] row) {
+        if (!dataValidation(row)){
+            return;
+        }
         sfc.genSpdProtocolDeclarations(row[0], row[1], row[2], row[3], stringToVector(row[4]), stringToVector(row[5]));
     }
     
