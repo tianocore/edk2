@@ -9,26 +9,4 @@
 @REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 @REM
 
-@REM @if "%1"==""         (goto build)
-@REM @if "%1"=="clean"    (goto clean)
-@REM @if "%1"=="cleanall" (goto cleanall)
-
-:build
-	@echo on
-	ant -f %WORKSPACE%/build.xml %1 %2 %3
-	@echo off
-	@goto end
-
-:clean
-	@echo on
-	ant clean -f %WORKSPACE%/build.xml
-	@echo off
-	@goto end
-	
-:cleanall
-	@echo on
-	ant cleanall -f %WORKSPACE%/build.xml
-	@echo off
-	@goto end
-
-:end
+ant -f %WORKSPACE%/build.xml %*
