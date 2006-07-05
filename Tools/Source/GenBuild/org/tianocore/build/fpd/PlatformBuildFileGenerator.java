@@ -109,6 +109,10 @@ public class PlatformBuildFileGenerator {
             ele.setAttribute("resource", "frameworktasks.tasks");
             root.appendChild(ele);
 
+            ele = document.createElement("taskdef");
+            ele.setAttribute("resource", "net/sf/antcontrib/antlib.xml");
+            root.appendChild(ele);
+            
             ele = document.createElement("property");
             ele.setAttribute("environment", "env");
             root.appendChild(ele);
