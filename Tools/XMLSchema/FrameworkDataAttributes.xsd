@@ -37,7 +37,7 @@
   </xs:attributeGroup>
   <xs:attributeGroup name="EventAttributes">
     <xs:attribute name="Usage" type="EventUsage" use="required"/>
-    <xs:attribute name="EventGuidCName" type="C_NameType" use="required"/>
+    <xs:attribute name="EventGuidCName" type="C_NameType" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
   </xs:attributeGroup>

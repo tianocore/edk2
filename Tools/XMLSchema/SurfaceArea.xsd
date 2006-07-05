@@ -119,7 +119,7 @@
                     <xs:element minOccurs="1" maxOccurs="1" name="PlatformVersion" type="VersionDataType"/>
                   </xs:sequence>
                   <!-- The Id is a number used to track heritage  the first entry will be 0 and increment from then on. -->
-                  <xs:attribute name="Id" type="xs:nonNegativeInteger" use="optional"/>
+                  <xs:attribute name="Id" type="xs:nonNegativeInteger" use="required"/>
                   <!-- If the original module was installed from a FAR, track the FAR it came from. -->
                   <xs:attribute name="FarGuid" type="GuidType" use="optional"/>
                 </xs:complexType>

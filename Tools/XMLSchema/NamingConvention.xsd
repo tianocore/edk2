@@ -109,6 +109,12 @@
       <xs:pattern value="0x[a-fA-F0-9]{1,4}"/>
     </xs:restriction>
   </xs:simpleType>
+  <xs:simpleType name="KeywordList">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:pattern value="[a-zA-Z]+(\ *_*[a-zA-Z0-9]*)*"/>
+    </xs:restriction>
+  </xs:simpleType>
   <xs:simpleType name="KeywordType">
     <xs:restriction base="xs:normalizedString">
       <xs:pattern value="[a-zA-Z]+(_*[a-zA-Z0-9]*)*"/>
