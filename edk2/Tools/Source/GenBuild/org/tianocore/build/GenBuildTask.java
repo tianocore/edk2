@@ -100,11 +100,10 @@ public class GenBuildTask extends Ant {
     private ModuleIdentification moduleId;
 
     private Vector<Property> properties = new Vector<Property>();
-    
+
     private static Stack<Hashtable> backupPropertiesStack = new Stack<Hashtable>();
     
-    
-    private static Hashtable backupProperties;
+    private boolean isSingleModuleBuild = false;
     
     /**
       Public construct method. It is necessary for ANT task.
@@ -170,7 +169,7 @@ public class GenBuildTask extends Ant {
         //
         // Judge whether it is single module build or not
         //
-        if (getProject().getProperty("PLATFORM") == null) {
+        if (isSingleModuleBuild) {
             //
             // Single Module build
             //
@@ -180,8 +179,8 @@ public class GenBuildTask extends Ant {
             //
             // Platform build. Restore the platform related info
             //
-            String platformName = getProject().getProperty("PLATFORM");
-            PlatformIdentification platformId = GlobalData.getPlatform(platformName);
+            String filename = getProject().getProperty("PLATFORM_FILE");
+            PlatformIdentification platformId = GlobalData.getPlatform(filename);
             getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
             getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
             
@@ -309,13 +308,13 @@ public class GenBuildTask extends Ant {
         //
         // Read ACTIVE_PLATFORM's FPD file (Call FpdParserTask's method)
         //
-        String activePlatformName = getProject().getProperty("ACTIVE_PLATFORM");
+        String filename = getProject().getProperty("PLATFORM_FILE");
         
-        if (activePlatformName == null){
+        if (filename == null){
             throw new BuildException("Plese set ACTIVE_PLATFORM if you want to build a single module. ");
         }
         
-        PlatformIdentification platformId = GlobalData.getPlatform(activePlatformName);
+        PlatformIdentification platformId = GlobalData.getPlatform(filename);
         
         //
         // Read FPD file
@@ -328,7 +327,7 @@ public class GenBuildTask extends Ant {
         // Prepare for Platform related common properties
         // PLATFORM, PLATFORM_DIR, PLATFORM_RELATIVE_DIR
         //
-        getProject().setProperty("PLATFORM", activePlatformName);
+        getProject().setProperty("PLATFORM", platformId.getName());
         getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
         getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
     }
@@ -765,5 +764,9 @@ public class GenBuildTask extends Ant {
             String item = (String)iter.next();
             getProject().setProperty(item, (String)backupProperties.get(item));
         }
+    }
+
+    public void setSingleModuleBuild(boolean isSingleModuleBuild) {
+        this.isSingleModuleBuild = isSingleModuleBuild;
     }
 }

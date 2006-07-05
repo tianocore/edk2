@@ -139,7 +139,7 @@ public class FpdParserTask extends Task {
             if (platformName == null) {
                 throw new BuildException("FpdParserTask parameter error. Please specify platform name or FPD file. ");
             }
-            platformId = GlobalData.getPlatform(platformName);
+            platformId = GlobalData.getPlatformByName(platformName);
             fpdFile = platformId.getFpdFile();
         }
         
@@ -147,20 +147,6 @@ public class FpdParserTask extends Task {
         // Parse FPD file
         //
         parseFpdFile();
-
-        getProject().setProperty("PLATFORM", platformId.getName());
-        getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
-        getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
-
-        //
-        // Pcd Collection. Call CollectPCDAction to collect pcd info.
-        //
-        try {
-            CollectPCDAction ca = new CollectPCDAction();
-            ca.perform(GlobalData.getWorkspacePath(),platformId.getFpdFile().getPath(),ActionMessage.NULL_MESSAGE_LEVEL);
-        } catch (Exception e){
-            throw new BuildException(e.getMessage());
-        }
         
         //
         // Prepare BUILD_DIR
@@ -359,12 +345,16 @@ public class FpdParserTask extends Task {
             Map<String, XmlObject> map = new HashMap<String, XmlObject>();
             map.put("PlatformSurfaceArea", doc);
             SurfaceAreaQuery.setDoc(map);
-            
+            SurfaceAreaQuery.getFpdUserExtension();
             //
             // Initialize
             //
             platformId = SurfaceAreaQuery.getFpdHeader();
             platformId.setFpdFile(fpdFile);
+            getProject().setProperty("PLATFORM", platformId.getName());
+            getProject().setProperty("PLATFORM_FILE", platformId.getRelativeFpdFile().replaceAll("(\\\\)", "/"));
+            getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
+            getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
 
             //
             // Build mode. User-defined output dir. 
@@ -393,6 +383,16 @@ public class FpdParserTask extends Task {
             parseToolChainOptions();
 
             SurfaceAreaQuery.setDoc(map);
+            
+            //
+            // Pcd Collection. Call CollectPCDAction to collect pcd info.
+            //
+            try {
+                CollectPCDAction ca = new CollectPCDAction();
+                ca.perform(GlobalData.getWorkspacePath(),platformId.getFpdFile().getPath(),ActionMessage.NULL_MESSAGE_LEVEL);
+            } catch (Exception e){
+                throw new BuildException(e.getMessage());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             throw new BuildException("Load FPD file [" + fpdFile.getPath() + "] error. \n" + e.getMessage());

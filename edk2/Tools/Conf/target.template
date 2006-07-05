@@ -1,3 +1,11 @@
-ACTIVE_PLATFORM = MdePkg.fpd
-ACTIVE_TARGET = DEBUG
-ACTIVE_ARCH = IA32
+# Relative to WORKSPACE
+TOOLS_DEFINITION_FILE = Tools/Conf/tools_def.txt
+
+# Relative to WORKSPACE
+# ACTIVE_PLATFORM       = MdePkg/MdePkg.fpd
+
+# Separate multiple targets with space, not not use comma 
+TARGET                = 
+TARGET_ARCH           = 
+TAGNAME               = 
+

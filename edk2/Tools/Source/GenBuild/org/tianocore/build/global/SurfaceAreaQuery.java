@@ -26,7 +26,37 @@ import java.util.regex.Pattern;
 import org.apache.xmlbeans.XmlNormalizedString;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-import org.tianocore.*;
+import org.tianocore.BuildOptionsDocument;
+import org.tianocore.CNameType;
+import org.tianocore.DataIdDocument;
+import org.tianocore.ExternsDocument;
+import org.tianocore.FileNameConvention;
+import org.tianocore.FvAttributeDocument;
+import org.tianocore.FvImagesDocument;
+import org.tianocore.FvOptionDocument;
+import org.tianocore.GuidDeclarationsDocument;
+import org.tianocore.GuidsDocument;
+import org.tianocore.LibrariesDocument;
+import org.tianocore.LibraryClassDeclarationsDocument;
+import org.tianocore.LibraryClassDocument;
+import org.tianocore.ModuleDefinitionsDocument;
+import org.tianocore.ModuleSADocument;
+import org.tianocore.ModuleSaBuildOptionsDocument;
+import org.tianocore.ModuleTypeDef;
+import org.tianocore.MsaFilesDocument;
+import org.tianocore.MsaHeaderDocument;
+import org.tianocore.OptionDocument;
+import org.tianocore.PPIsDocument;
+import org.tianocore.PackageDependenciesDocument;
+import org.tianocore.PackageHeadersDocument;
+import org.tianocore.PcdCodedDocument;
+import org.tianocore.PlatformDefinitionsDocument;
+import org.tianocore.PlatformHeaderDocument;
+import org.tianocore.PpiDeclarationsDocument;
+import org.tianocore.ProtocolDeclarationsDocument;
+import org.tianocore.Sentence;
+import org.tianocore.SpdHeaderDocument;
+import org.tianocore.SupportedArchitectures;
 import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
@@ -1344,7 +1374,7 @@ public class SurfaceAreaQuery {
     }
     
     public static XmlObject getFpdUserExtension() {
-        String[] xPath = new String[] { "" };
+        String[] xPath = new String[] { "/UserExtensions" };
 
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
         if (queryResult == null) {
