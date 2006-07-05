@@ -6799,8 +6799,8 @@
   </BuildOptions>
   
   <UserExtensions UserID="Fix_Me" Identifier="1">
-    <copy tofile="${FV_DIR}/FV_RECOVERY.fd">
-      <fileset dir="${FV_DIR}" includes="*.fv" />
-    </copy>
+    <concat destfile="${FV_DIR}/FV_RECOVERY.fd" binary="true" >
+       <fileset dir="${FV_DIR}" includes="*.fv"/>
+    </concat>
   </UserExtensions>
 </PlatformSurfaceArea>
