@@ -21,7 +21,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.tianocore.frameworkwizard.common.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.Identification;
 
 /**
  The class is used to override JTree to provides customized interfaces 

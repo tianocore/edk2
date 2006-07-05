@@ -37,13 +37,13 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
-import org.tianocore.frameworkwizard.module.Identification.DataHubs.DataHubsIdentification;
-import org.tianocore.frameworkwizard.module.Identification.DataHubs.DataHubsVector;
+import org.tianocore.frameworkwizard.module.Identifications.DataHubs.DataHubsIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.DataHubs.DataHubsVector;
 
 /**
  The class is used to create, update DataHub of MSA/MBD file
@@ -147,6 +147,7 @@ public class ModuleDataHubs extends IInternalFrame {
             jTextFieldDataHubRecord = new JTextField();
             jTextFieldDataHubRecord.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jTextFieldDataHubRecord.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldDataHubRecord.setToolTipText("Enter the C Name of the Data Hub Record");
         }
         return jTextFieldDataHubRecord;
     }

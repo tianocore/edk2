@@ -36,13 +36,14 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
-import org.tianocore.frameworkwizard.module.Identification.Hobs.HobsIdentification;
-import org.tianocore.frameworkwizard.module.Identification.Hobs.HobsVector;
+import org.tianocore.frameworkwizard.module.Identifications.Hobs.HobsIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.Hobs.HobsVector;
+import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  The class is used to create, update Hob of MSA/MBD file
@@ -65,7 +66,7 @@ public class ModuleHobs extends IInternalFrame {
 
     private JLabel jLabel = null;
 
-    private JTextField jTextFieldC_Name = null;
+    private JComboBox jComboBoxGuidC_Name = null;
 
     private JLabel jLabelUsage = null;
 
@@ -121,6 +122,8 @@ public class ModuleHobs extends IInternalFrame {
     private HobsVector vid = new HobsVector();
 
     private EnumerationData ed = new EnumerationData();
+    
+    private WorkspaceTools wt = new WorkspaceTools();
 
     /**
      This method initializes jTextField 
@@ -128,13 +131,14 @@ public class ModuleHobs extends IInternalFrame {
      @return javax.swing.JTextField jTextFieldC_Name
      
      **/
-    private JTextField getJTextFieldC_Name() {
-        if (jTextFieldC_Name == null) {
-            jTextFieldC_Name = new JTextField();
-            jTextFieldC_Name.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-            jTextFieldC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+    private JComboBox getJComboBoxGuidC_Name() {
+        if (jComboBoxGuidC_Name == null) {
+            jComboBoxGuidC_Name = new JComboBox();
+            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Hob");
         }
-        return jTextFieldC_Name;
+        return jComboBoxGuidC_Name;
     }
 
     /**
@@ -423,7 +427,7 @@ public class ModuleHobs extends IInternalFrame {
      **/
     public void setViewMode(boolean isView) {
         if (isView) {
-            this.jTextFieldC_Name.setEnabled(!isView);
+            this.jComboBoxGuidC_Name.setEnabled(!isView);
             this.jComboBoxUsage.setEnabled(!isView);
             this.jComboBoxHobType.setEnabled(!isView);
         }
@@ -461,7 +465,7 @@ public class ModuleHobs extends IInternalFrame {
             jContentPane.setPreferredSize(new java.awt.Dimension(490, 495));
 
             jContentPane.add(jLabel, null);
-            jContentPane.add(getJTextFieldC_Name(), null);
+            jContentPane.add(getJComboBoxGuidC_Name(), null);
             jContentPane.add(jLabelUsage, null);
             jContentPane.add(jLabelHobType, null);
             jContentPane.add(getJComboBoxUsage(), null);
@@ -493,6 +497,7 @@ public class ModuleHobs extends IInternalFrame {
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVHobUsage());
         Tools.generateComboBoxByVector(jComboBoxHobType, ed.getVHobType());
+        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
 
         this.iCheckBoxListArch.setAllItems(ed.getVSupportedArchitectures());
     }
@@ -536,13 +541,13 @@ public class ModuleHobs extends IInternalFrame {
         //
         // Check Name 
         //
-        if (isEmpty(this.jTextFieldC_Name.getText())) {
+        if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
             Log.err("Hob Name couldn't be empty");
             return false;
         }
         
-        if (!isEmpty(this.jTextFieldC_Name.getText())) {
-            if (!DataValidation.isC_NameType(this.jTextFieldC_Name.getText())) {
+        if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
+            if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
                 Log.err("Incorrect data type for Hob Name");
                 return false;
             }
@@ -614,7 +619,7 @@ public class ModuleHobs extends IInternalFrame {
         int intPreferredWidth = this.getJContentPane().getPreferredSize().width;
         int intPreferredHeight = this.getJContentPane().getPreferredSize().height;
 
-        resizeComponentWidth(jTextFieldC_Name, intCurrentWidth, intPreferredWidth);
+        resizeComponentWidth(jComboBoxGuidC_Name, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(jComboBoxHobType, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(jComboBoxUsage, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(jTextFieldHelpText, intCurrentWidth, intPreferredWidth);
@@ -630,7 +635,7 @@ public class ModuleHobs extends IInternalFrame {
     }
     
     private HobsIdentification getCurrentHobs() {
-        String arg0 = this.jTextFieldC_Name.getText();
+        String arg0 = this.jComboBoxGuidC_Name.getSelectedItem().toString();
         String arg1 = this.jComboBoxHobType.getSelectedItem().toString();
         String arg2 = this.jComboBoxUsage.getSelectedItem().toString();
 
@@ -754,7 +759,7 @@ public class ModuleHobs extends IInternalFrame {
            //
            intSelectedItemId = jComboBoxList.getSelectedIndex();
 
-           this.jTextFieldC_Name.setText(vid.getHobs(intSelectedItemId).getName());
+           this.jComboBoxGuidC_Name.setSelectedItem(vid.getHobs(intSelectedItemId).getName());
            this.jComboBoxHobType.setSelectedItem(vid.getHobs(intSelectedItemId).getType());
            this.jComboBoxUsage.setSelectedItem(vid.getHobs(intSelectedItemId).getUsage());
            this.jTextFieldHelpText.setText(vid.getHobs(intSelectedItemId).getHelp());

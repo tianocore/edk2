@@ -49,22 +49,22 @@ import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.IFileFilter;
-import org.tianocore.frameworkwizard.common.Identification;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpenFile;
-import org.tianocore.frameworkwizard.common.OpeningModuleList;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
-import org.tianocore.frameworkwizard.common.OpeningPackageList;
-import org.tianocore.frameworkwizard.common.OpeningPackageType;
-import org.tianocore.frameworkwizard.common.OpeningPlatformList;
-import org.tianocore.frameworkwizard.common.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.SaveFile;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleList;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageList;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformList;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IDefaultMutableTreeNode;
 import org.tianocore.frameworkwizard.common.ui.IDesktopManager;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.ITree;
-import org.tianocore.frameworkwizard.module.Identification.ModuleIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.ui.ModuleBootModes;
 import org.tianocore.frameworkwizard.module.ui.ModuleDataHubs;
 import org.tianocore.frameworkwizard.module.ui.ModuleDefinitions;
@@ -136,7 +136,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private int currentOpeningPlatformIndex = -1;
 
-    private String windowTitle = "FrameworkWizard 1.0 ";
+    private String projectName = "FrameworkWizard";
+    
+    private String projectVersion = "0.5";
 
     private IDefaultMutableTreeNode dmtnRoot = null;
 
@@ -772,7 +774,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuTools.setText("Tools");
             jMenuTools.setMnemonic('T');
             jMenuTools.add(getJMenuItemToolsToolChainConfiguration());
-            //jMenuTools.addSeparator();
+            jMenuTools.addSeparator();
             jMenuTools.add(getJMenuItemToolsClone());
             //jMenuTools.addSeparator();
             jMenuTools.add(getJMenuItemToolsCodeScan());
@@ -1359,7 +1361,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemToolsToolChainConfiguration.setText("Tool Chain Configuration...");
             jMenuItemToolsToolChainConfiguration.setMnemonic('C');
             jMenuItemToolsToolChainConfiguration.addActionListener(this);
-            jMenuItemToolsToolChainConfiguration.setVisible(false);
         }
         return jMenuItemToolsToolChainConfiguration;
     }
@@ -1689,8 +1690,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         this.addComponentListener(this);
         this.getCompontentsFromFrameworkDatabase();
         this.setContentPane(getJContentPane());
-        this.setTitle(windowTitle + "- [" + Workspace.getCurrentWorkspace() + "]");
+        this.setTitle(projectName + " " + projectVersion + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
         this.setExitType(1);
+
         //
         // max the window
         //
@@ -1761,6 +1763,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
         if (arg0.getSource() == jMenuItemToolsClone) {
             cloneItem();
+        }
+        
+        if (arg0.getSource() == jMenuItemToolsToolChainConfiguration) {
+            setupToolChainConfiguration();
         }
 
         if (arg0.getSource() == jMenuItemHelpAbout) {
@@ -2876,11 +2882,24 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             // Reinit whole window
             //
             closeAll();
-            this.setTitle(windowTitle + "- [" + Workspace.getCurrentWorkspace() + "]");
+            this.setTitle(projectName + " " + projectVersion + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
         }
         sw.dispose();
     }
-
+    
+    /**
+    Show Tool Chain Configuration Dialog to setup Tool Chain
+    
+    **/
+    private void setupToolChainConfiguration() {
+        ToolChainConfig tcc = new ToolChainConfig(this, true);
+        int result = tcc.showDialog();
+        
+        if (result == DataType.RETURN_TYPE_CANCEL) {
+            tcc.dispose();
+        }
+    }
+    
     /**
      Clone selected item
      
@@ -2916,6 +2935,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         if (category >= IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
             mode = DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA;
         }
+        
         Clone c = new Clone(this, true, mode, id);
         int result = c.showDialog();
         

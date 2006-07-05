@@ -38,13 +38,13 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
-import org.tianocore.frameworkwizard.module.Identification.BootModes.BootModesIdentification;
-import org.tianocore.frameworkwizard.module.Identification.BootModes.BootModesVector;
+import org.tianocore.frameworkwizard.module.Identifications.BootModes.BootModesIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.BootModes.BootModesVector;
 
 /**
  The class is used to create, update BootModes of MSA/MBD file

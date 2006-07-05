@@ -39,13 +39,13 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
-import org.tianocore.frameworkwizard.module.Identification.Protocols.ProtocolsIdentification;
-import org.tianocore.frameworkwizard.module.Identification.Protocols.ProtocolsVector;
+import org.tianocore.frameworkwizard.module.Identifications.Protocols.ProtocolsIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.Protocols.ProtocolsVector;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
@@ -281,6 +281,7 @@ public class ModuleProtocols extends IInternalFrame {
             jComboBoxProtocolType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jComboBoxProtocolType.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxProtocolType.addItemListener(this);
+            jComboBoxProtocolType.setToolTipText("Select Protocol Type");
         }
         return jComboBoxProtocolType;
     }

@@ -16,7 +16,7 @@
 package org.tianocore.frameworkwizard.packaging;
 import java.io.File;
 
-import org.tianocore.frameworkwizard.common.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.Identification;
 
 public class PackageIdentification extends Identification{
     

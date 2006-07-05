@@ -36,13 +36,13 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
-import org.tianocore.frameworkwizard.module.Identification.PcdCoded.PcdCodedIdentification;
-import org.tianocore.frameworkwizard.module.Identification.PcdCoded.PcdCodedVector;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdCodedIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdCodedVector;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**

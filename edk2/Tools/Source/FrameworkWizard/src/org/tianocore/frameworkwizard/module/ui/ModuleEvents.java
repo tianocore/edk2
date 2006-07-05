@@ -38,13 +38,14 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
-import org.tianocore.frameworkwizard.module.Identification.Events.EventsIdentification;
-import org.tianocore.frameworkwizard.module.Identification.Events.EventsVector;
+import org.tianocore.frameworkwizard.module.Identifications.Events.EventsIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.Events.EventsVector;
+import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  The class is used to create, update Event of MSA/MBD file
@@ -69,7 +70,7 @@ public class ModuleEvents extends IInternalFrame {
 
     private JLabel jLabelC_Name = null;
 
-    private JTextField jTextFieldC_Name = null;
+    private JComboBox jComboBoxGuidC_Name = null;
 
     private JLabel jLabelUsage = null;
 
@@ -125,6 +126,8 @@ public class ModuleEvents extends IInternalFrame {
     private EventsVector vid = new EventsVector();
 
     private EnumerationData ed = new EnumerationData();
+    
+    private WorkspaceTools wt = new WorkspaceTools();
 
     /**
      This method initializes jTextFieldC_Name 
@@ -132,13 +135,14 @@ public class ModuleEvents extends IInternalFrame {
      @return javax.swing.JTextField jTextFieldC_Name
      
      **/
-    private JTextField getJTextFieldC_Name() {
-        if (jTextFieldC_Name == null) {
-            jTextFieldC_Name = new JTextField();
-            jTextFieldC_Name.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
-            jTextFieldC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+    private JComboBox getJComboBoxGuidC_Name() {
+        if (jComboBoxGuidC_Name == null) {
+            jComboBoxGuidC_Name = new JComboBox();
+            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Event");
         }
-        return jTextFieldC_Name;
+        return jComboBoxGuidC_Name;
     }
 
     /**
@@ -166,6 +170,7 @@ public class ModuleEvents extends IInternalFrame {
             jComboBoxEventsType = new JComboBox();
             jComboBoxEventsType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jComboBoxEventsType.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxEventsType.setToolTipText("Select Create event if the Module has an event that is waiting to be signaled.  Select Signal if the Module will signal all events in an event group.  Signal Event The events are named by GUID.");
         }
         return jComboBoxEventsType;
     }
@@ -445,7 +450,7 @@ public class ModuleEvents extends IInternalFrame {
      **/
     public void setViewMode(boolean isView) {
         if (isView) {
-            this.jTextFieldC_Name.setEnabled(!isView);
+            this.jComboBoxGuidC_Name.setEnabled(!isView);
             this.jComboBoxUsage.setEnabled(!isView);
         }
     }
@@ -483,7 +488,7 @@ public class ModuleEvents extends IInternalFrame {
 
             jContentPane.add(jLabelEventType, null);
             jContentPane.add(jLabelC_Name, null);
-            jContentPane.add(getJTextFieldC_Name(), null);
+            jContentPane.add(getJComboBoxGuidC_Name(), null);
             jContentPane.add(jLabelUsage, null);
             jContentPane.add(getJComboBoxUsage(), null);
             jStarLabel1 = new StarLabel();
@@ -517,6 +522,7 @@ public class ModuleEvents extends IInternalFrame {
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxEventsType, ed.getVEventType());
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVEventUsage());
+        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
         
         this.iCheckBoxListArch.setAllItems(ed.getVSupportedArchitectures());
     }
@@ -560,13 +566,13 @@ public class ModuleEvents extends IInternalFrame {
         //
         // Check Name 
         //
-        if (isEmpty(this.jTextFieldC_Name.getText())) {
+        if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
             Log.err("Event Name couldn't be empty");
             return false;
         }
         
-        if (!isEmpty(this.jTextFieldC_Name.getText())) {
-            if (!DataValidation.isC_NameType(this.jTextFieldC_Name.getText())) {
+        if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
+            if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
                 Log.err("Incorrect data type for Event Name");
                 return false;
             }
@@ -673,7 +679,7 @@ public class ModuleEvents extends IInternalFrame {
         int intPreferredHeight = this.getJContentPane().getPreferredSize().height;
 
         resizeComponentWidth(jComboBoxEventsType, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(jTextFieldC_Name, intCurrentWidth, intPreferredWidth);
+        resizeComponentWidth(jComboBoxGuidC_Name, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(jComboBoxUsage, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(jTextFieldHelpText, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(jTextFieldFeatureFlag, intCurrentWidth, intPreferredWidth);
@@ -687,7 +693,7 @@ public class ModuleEvents extends IInternalFrame {
     }
     
     private EventsIdentification getCurrentEvents() {
-        String arg0 = this.jTextFieldC_Name.getText();
+        String arg0 = this.jComboBoxGuidC_Name.getSelectedItem().toString();
         String arg1 = this.jComboBoxEventsType.getSelectedItem().toString();
         String arg2 = this.jComboBoxUsage.getSelectedItem().toString();
 
@@ -811,7 +817,7 @@ public class ModuleEvents extends IInternalFrame {
             //
             intSelectedItemId = jComboBoxList.getSelectedIndex();
 
-            this.jTextFieldC_Name.setText(vid.getEvents(intSelectedItemId).getName());
+            this.jComboBoxGuidC_Name.setSelectedItem(vid.getEvents(intSelectedItemId).getName());
             this.jComboBoxEventsType.setSelectedItem(vid.getEvents(intSelectedItemId).getType());
             this.jComboBoxUsage.setSelectedItem(vid.getEvents(intSelectedItemId).getUsage());
             this.jTextFieldHelpText.setText(vid.getEvents(intSelectedItemId).getHelp());

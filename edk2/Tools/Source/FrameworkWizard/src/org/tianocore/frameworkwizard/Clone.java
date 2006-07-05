@@ -17,6 +17,7 @@ package org.tianocore.frameworkwizard;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Vector;
 
 import javax.swing.JFileChooser;
@@ -36,14 +37,14 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.FileOperation;
 import org.tianocore.frameworkwizard.common.IFileFilter;
-import org.tianocore.frameworkwizard.common.Identification;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.common.SaveFile;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
-import org.tianocore.frameworkwizard.module.Identification.ModuleIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.Workspace;
@@ -589,6 +590,20 @@ public class Clone extends IDialog {
         // Check for Module
         //
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
+//            if (trg.indexOf(DataType.DOS_FILE_SEPARATOR) == -1 && trg.indexOf(DataType.UNIX_FILE_SEPARATOR) == -1) {
+//                Log.err("The module name must include a path");
+//                return false;
+//            }
+            trg = this.getModulePath();
+            if (src.equals(trg)) {
+                Log.err("The source and destination couldn't be same");
+                return false;
+            }
+            trgFile = new File(trg);
+            if (trgFile.exists()) {
+                Log.err("The target module already exists");
+                return false;
+            }
             return checkId();
         }
 
@@ -635,6 +650,7 @@ public class Clone extends IDialog {
     private void save() throws IOException, XmlException, Exception {
         String src = this.jTextFieldSource.getText();
         String trg = this.jTextFieldFilePath.getText();
+        Vector<String> vFiles = new Vector<String>();
         
         //
         // Clone Workspace
@@ -659,16 +675,17 @@ public class Clone extends IDialog {
             //
             trg = getModulePath();
             newId.setPath(trg);
+            vFiles = wt.getAllModuleFiles(src);
             
             //
             // First copy all files to new directory
             //
-            FileOperation.copyFolder(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
-
-            //
-            // Delete old spd file
-            //
-            FileOperation.delFile(Tools.getFilePathOnly(trg) + DataType.FILE_SEPARATOR + Tools.getFileNameOnly(src));
+            FileOperation.copyFile(src, trg);
+            for (int index = 1; index < vFiles.size(); index++) {
+                String oldFile = vFiles.get(index);
+                String newFile = vFiles.get(index).replace(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
+                FileOperation.copyFile(oldFile, newFile);
+            }
 
             //
             // Create new msa file
@@ -721,16 +738,24 @@ public class Clone extends IDialog {
             //
             trg = this.getPackagePath();
             newId.setPath(trg);
+            vFiles = wt.getAllPakcageFiles(src);
+            
+            FileOperation.copyFile(src, trg);
+            for (int index = 1; index < vFiles.size(); index++) {
+                String oldFile = vFiles.get(index);
+                String newFile = vFiles.get(index).replace(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
+                FileOperation.copyFile(oldFile, newFile);
+            }
             
             //
             // First copy all files to new directory
             //
-            FileOperation.copyFolder(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
+            //FileOperation.copyFolder(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
 
             //
             // Delete old spd file
             //
-            FileOperation.delFile(Tools.getFilePathOnly(trg) + DataType.FILE_SEPARATOR + Tools.getFileNameOnly(src));
+            //FileOperation.delFile(Tools.getFilePathOnly(trg) + DataType.FILE_SEPARATOR + Tools.getFileNameOnly(src));
 
             //
             // Create new spd file
@@ -804,6 +829,7 @@ public class Clone extends IDialog {
 
             this.returnType = DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA;
         }
+        vFiles = null;
     }
     
     private String getSelectPackagePath() {
@@ -813,7 +839,7 @@ public class Clone extends IDialog {
     private String getModulePath() {
         String trg = this.jTextFieldFilePath.getText();
         trg = Tools.addPathExt(trg, mode);
-        trg = getSelectPackagePath() + DataType.FILE_SEPARATOR + trg;
+        trg = Tools.addFileSeparator(getSelectPackagePath()) + trg;
         Tools.convertPathToCurrentOsType(trg);
         return trg;
     }
@@ -821,7 +847,7 @@ public class Clone extends IDialog {
     private String getPackagePath() {
         String trg = this.jTextFieldFilePath.getText();
         trg = Tools.addPathExt(trg, mode);
-        trg = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + trg;
+        trg = Tools.addFileSeparator(Workspace.getCurrentWorkspace()) + trg;
         trg = Tools.convertPathToCurrentOsType(trg);
         return trg;
     }
@@ -849,10 +875,18 @@ public class Clone extends IDialog {
         // Get ClonedFrom then
         //
         ModuleDefinitions.ClonedFrom cf = null;
+        BigInteger count = new BigInteger("-1");
         if (pd.getClonedFrom() == null) {
             cf = ModuleDefinitions.ClonedFrom.Factory.newInstance();
         } else {
             cf = pd.getClonedFrom();
+            if (cf != null) {
+                for (int index = 0; index < cf.getClonedList().size(); index++) {
+                    if (cf.getClonedList().get(index).getId() != null) {
+                        count = count.max(cf.getClonedList().get(index).getId());
+                    }
+                }
+            }
         }
 
         //
@@ -861,6 +895,9 @@ public class Clone extends IDialog {
         ModuleDefinitions.ClonedFrom.Cloned c = ModuleDefinitions.ClonedFrom.Cloned.Factory.newInstance();
         c.setModuleGuid(id.getGuid());
         c.setModuleVersion(id.getVersion());
+        c.setPackageGuid(wt.getPackageIdByModuleId(oldId).getGuid());
+        c.setPackageVersion(wt.getPackageIdByModuleId(oldId).getVersion());
+        c.setId(count.add(new BigInteger("1")));
 
         cf.addNewCloned();
         cf.setClonedArray(cf.getClonedList().size() - 1, c);
@@ -892,10 +929,18 @@ public class Clone extends IDialog {
         // Get ClonedFrom then
         //
         PackageDefinitions.ClonedFrom cf = null;
+        BigInteger count = new BigInteger("-1");
         if (pd.getClonedFrom() == null) {
             cf = PackageDefinitions.ClonedFrom.Factory.newInstance();
         } else {
             cf = pd.getClonedFrom();
+            if (cf != null) {
+                for (int index = 0; index < cf.getClonedList().size(); index++) {
+                    if (cf.getClonedList().get(index).getId() != null) {
+                        count = count.max(cf.getClonedList().get(index).getId());
+                    }
+                }
+            }
         }
 
         //
@@ -904,6 +949,7 @@ public class Clone extends IDialog {
         PackageDefinitions.ClonedFrom.Cloned c = PackageDefinitions.ClonedFrom.Cloned.Factory.newInstance();
         c.setPackageGuid(id.getGuid());
         c.setPackageVersion(id.getVersion());
+        c.setId(count.add(new BigInteger("1")));
 
         cf.addNewCloned();
         cf.setClonedArray(cf.getClonedList().size() - 1, c);
@@ -935,10 +981,18 @@ public class Clone extends IDialog {
         // Get ClonedFrom then
         //
         PlatformDefinitions.ClonedFrom cf = null;
+        BigInteger count = new BigInteger("-1");
         if (pd.getClonedFrom() == null) {
             cf = PlatformDefinitions.ClonedFrom.Factory.newInstance();
         } else {
             cf = pd.getClonedFrom();
+            if (cf != null) {
+                for (int index = 0; index < cf.getClonedList().size(); index++) {
+                    if (cf.getClonedList().get(index).getId() != null) {
+                        count = count.max(cf.getClonedList().get(index).getId());
+                    }
+                }
+            }
         }
 
         //
@@ -947,6 +1001,7 @@ public class Clone extends IDialog {
         PlatformDefinitions.ClonedFrom.Cloned c = PlatformDefinitions.ClonedFrom.Cloned.Factory.newInstance();
         c.setPlatformGuid(id.getGuid());
         c.setPlatformVersion(id.getVersion());
+        c.setId(count.add(new BigInteger("1")));
 
         cf.addNewCloned();
         cf.setClonedArray(cf.getClonedList().size() - 1, c);

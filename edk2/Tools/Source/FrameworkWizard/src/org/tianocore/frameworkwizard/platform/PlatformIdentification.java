@@ -17,7 +17,7 @@ package org.tianocore.frameworkwizard.platform;
 
 import java.io.File;
 
-import org.tianocore.frameworkwizard.common.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.Identification;
 
 public class PlatformIdentification extends Identification{
     

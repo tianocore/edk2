@@ -36,13 +36,13 @@ import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
-import org.tianocore.frameworkwizard.module.Identification.SystemTables.SystemTablesIdentification;
-import org.tianocore.frameworkwizard.module.Identification.SystemTables.SystemTablesVector;
+import org.tianocore.frameworkwizard.module.Identifications.SystemTables.SystemTablesIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.SystemTables.SystemTablesVector;
 
 /**
  The class is used to create, update SystemTable of MSA/MBD file
@@ -131,6 +131,7 @@ public class ModuleSystemTables extends IInternalFrame {
             jTextFieldGuidC_Name = new JTextField();
             jTextFieldGuidC_Name.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jTextFieldGuidC_Name.setPreferredSize(new java.awt.Dimension(320,20));
+            jTextFieldGuidC_Name.setToolTipText("Enter the C Name of the System Table");
         }
         return jTextFieldGuidC_Name;
     }
