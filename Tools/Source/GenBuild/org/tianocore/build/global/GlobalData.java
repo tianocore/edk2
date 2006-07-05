@@ -166,8 +166,7 @@ public class GlobalData {
         // If ToolChain has been set up before, do nothing.
         // CONF dir + tools definition file name
         //
-        String confDir = GlobalData.workspaceDir + File.separatorChar + "Tools" + File.separatorChar + "Conf";
-        File toolsDefFile = new File(confDir + File.separatorChar + toolsDefFilename);
+        File toolsDefFile = new File(workspaceDir + File.separatorChar + toolsDefFilename);
         System.out.println("Using file [" + toolsDefFile.getPath() + "] as tools definition file. ");
         toolsDef = new ToolChainConfig(toolsDefFile);
         
@@ -576,21 +575,27 @@ public class GlobalData {
 
     }
     
-    /////////////////////////// Update!! Update!! Update!!
-//    public synchronized static MemoryDatabaseManager getPCDMemoryDBManager() {
-//        return pcdDbManager;
-//    }
-    ///////////////////////////
-    public synchronized static PlatformIdentification getPlatform(String name) throws BuildException {
+    public synchronized static PlatformIdentification getPlatformByName(String name) throws BuildException {
         Iterator iter = platformList.iterator();
         while(iter.hasNext()){
             PlatformIdentification platformId = (PlatformIdentification)iter.next();
             if (platformId.getName().equalsIgnoreCase(name)) {
-//                GlobalData.log.info("Platform: " + platformId + platformId.getFpdFile());
                 return platformId;
             }
         }
-        throw new BuildException("Can't find platform [" + name + "] in current workspace. ");
+        throw new BuildException("Can't find platform [" + name + "] in current workspace database. ");
+    }
+    
+    public synchronized static PlatformIdentification getPlatform(String filename) throws BuildException {
+        File file = new File(workspaceDir + File.separatorChar + filename);
+        Iterator iter = platformList.iterator();
+        while(iter.hasNext()){
+            PlatformIdentification platformId = (PlatformIdentification)iter.next();
+            if (platformId.getFpdFile().getPath().equalsIgnoreCase(file.getPath())) {
+                return platformId;
+            }
+        }
+        throw new BuildException("Can't find platform file [" + filename + "] in current workspace database. ");
     }
     
     public synchronized static PackageIdentification refreshPackageIdentification(PackageIdentification packageId) throws BuildException {

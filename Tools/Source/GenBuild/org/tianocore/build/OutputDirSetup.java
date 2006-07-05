@@ -8,9 +8,7 @@ import org.apache.tools.ant.Task;
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
-import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
-import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
@@ -31,6 +29,7 @@ public class OutputDirSetup extends Task {
     ///
     private String componentType;
     
+    private boolean isSingleModuleBuild = false;
 //    private ToolChainFactory toolChainFactory;
     
     /**
@@ -64,7 +63,7 @@ public class OutputDirSetup extends Task {
         //
         // Judge whether it is single module build or not
         //
-        if (getProject().getProperty("PLATFORM") == null) {
+        if (isSingleModuleBuild) {
             //
             // Single Module build
             //
@@ -74,8 +73,8 @@ public class OutputDirSetup extends Task {
             //
             // Platform build
             //
-            String platformName = getProject().getProperty("PLATFORM");
-            PlatformIdentification platformId = GlobalData.getPlatform(platformName);
+            String filename = getProject().getProperty("PLATFORM_FILE");
+            PlatformIdentification platformId = GlobalData.getPlatform(filename);
             getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
             getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
           
@@ -160,9 +159,9 @@ public class OutputDirSetup extends Task {
         //
         // Read ACTIVE_PLATFORM's FPD file (Call FpdParserTask's method)
         //
-        String activePlatformName = getProject().getProperty("env.ACTIVE_PLATFORM");
-        
-        PlatformIdentification platformId = GlobalData.getPlatform(activePlatformName);
+        String filename = getProject().getProperty("PLATFORM_FILE");
+
+        PlatformIdentification platformId = GlobalData.getPlatform(filename);
         
         //
         // Read FPD file
@@ -174,7 +173,7 @@ public class OutputDirSetup extends Task {
         // Prepare for Platform related common properties
         // PLATFORM, PLATFORM_DIR, PLATFORM_RELATIVE_DIR
         //
-        getProject().setProperty("PLATFORM", activePlatformName);
+        getProject().setProperty("PLATFORM", platformId.getName());
         getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
         getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
     }

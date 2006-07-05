@@ -46,7 +46,7 @@ public class ModuleBuildFileGenerator {
     /// Pass: TARGET, TOOLCHAIN, ARCH
     /// PACKAGE, PACKAGE_GUID, PACKAGE_VERSION
     ///
-    String[] inheritProperties = {"ARCH", "MODULE_GUID", "MODULE_VERSION", "PLATFORM", "PACKAGE_GUID", "PACKAGE_VERSION"};
+    String[] inheritProperties = {"ARCH", "MODULE_GUID", "MODULE_VERSION", "PLATFORM_FILE", "PACKAGE_GUID", "PACKAGE_VERSION"};
 
     ///
     /// The information at the header of <em>build.xml</em>.

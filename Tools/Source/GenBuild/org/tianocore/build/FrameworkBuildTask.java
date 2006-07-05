@@ -1,3 +1,16 @@
+/** @file FrameworkBuildTask.java
+  
+  The file is ANT task to find MSA or FPD file and build them. 
+ 
+ Copyright (c) 2006, Intel Corporation
+ All rights reserved. This program and the accompanying materials
+ are licensed and made available under the terms and conditions of the BSD License
+ which accompanies this distribution.  The full text of the license may be found at
+ http://opensource.org/licenses/bsd-license.php
+
+ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ **/
 package org.tianocore.build;
 
 import java.io.BufferedReader;
@@ -12,6 +25,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
+import org.tianocore.build.toolchain.ConfigReader;
+import org.tianocore.build.toolchain.ToolChainConfig;
 import org.tianocore.build.toolchain.ToolChainInfo;
 
 public class FrameworkBuildTask extends Task{
@@ -21,6 +36,12 @@ public class FrameworkBuildTask extends Task{
     private Set<File> fpdFiles = new LinkedHashSet<File>();
     
     private Set<File> msaFiles = new LinkedHashSet<File>();
+    
+    String toolsDefFilename = "Tools" + File.separatorChar + "Conf" + File.separatorChar + "tools_def.txt";
+    
+    String targetFilename = "target.txt";
+    
+    String activePlatform = null;
     
     ///
     /// there are three type: all (build), clean and cleanall
@@ -65,44 +86,64 @@ public class FrameworkBuildTask extends Task{
         }
         
         //
-        // If there is no build files or FPD files or MSA files, stop build
-        //
-        if (fpdFiles.size() == 0 && msaFiles.size() == 0) {
-            throw new BuildException("Can't find any build.xml file or FPD files or MSA files in current directory. ");
-        }
-        
-        File buildFile = intercommuniteWithUser();
-        System.out.println("Start to build file [" + buildFile.getPath() + "] ..>> ");
-        
-        //
         // Deal with all environment variable (Add them to properties)
         //
         backupSystemProperties();
         
         //
-        // Get ToolChain Info from environment
+        // Read target.txt file
         //
-        ToolChainInfo envToolChainInfo = new ToolChainInfo(); 
-        envToolChainInfo.addTargets(getProject().getProperty("TARGET")); 
-        envToolChainInfo.addTagnames(getProject().getProperty("TAGNAME")); 
-        envToolChainInfo.addArchs(getProject().getProperty("ARCH")); 
-        GlobalData.setToolChainEnvInfo(envToolChainInfo);
-        
+        readTargetFile();
+
         //
         // Global Data initialization
         //
-        String toolsDefFilename = "tools_def.txt";
-        if (getProject().getProperty("TOOLS_DEF") != null) {
-            toolsDefFilename = getProject().getProperty("TOOLS_DEF");
-        }
-        
         GlobalData.initInfo("Tools" + File.separatorChar + "Conf" + File.separatorChar + "FrameworkDatabase.db",
                             getProject().getProperty("WORKSPACE_DIR"), toolsDefFilename);
         
+
+        
+        //
+        // If find MSA file and ACTIVE_PLATFORM is set, build the module; 
+        // else fail build. 
+        // If without MSA file, and ACTIVE_PLATFORM is set, build the ACTIVE_PLATFORM. 
+        // If ACTIVE_PLATFORM is not set, and only find one FPD file, build the platform; 
+        // If find more than one FPD files, let user select one. 
+        //
+        File buildFile = null;
+        if (msaFiles.size() > 1) {
+            throw new BuildException("More than one MSA file under current directory. It is not allowd. ");
+        }
+        else if (msaFiles.size() == 1 && activePlatform == null) {
+            throw new BuildException("If try to build a single module, please set ACTIVE_PLATFORM in file [Tool/Conf/target.txt]. ");
+        }
+        else if (msaFiles.size() == 1 && activePlatform != null) {
+            //
+            // Build the single module
+            //
+            buildFile = msaFiles.toArray(new File[1])[0];
+        }
+        else if (activePlatform != null) {
+            buildFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
+        }
+        else if (fpdFiles.size() == 1) {
+            buildFile = fpdFiles.toArray(new File[1])[0];
+        }
+        else if (fpdFiles.size() > 1) {
+            buildFile = intercommuniteWithUser();
+        }
+        //
+        // If there is no build files or FPD files or MSA files, stop build
+        //
+        else {
+            throw new BuildException("Can't find any FPD files or MSA files in current directory. ");
+        }
+
         //
         // Build every FPD files (PLATFORM build)
         //
         if (buildFile.getName().endsWith(".fpd")) {
+            System.out.println("Start to build FPD file [" + buildFile.getPath() + "] ..>> ");
             FpdParserTask fpdParserTask = new FpdParserTask();
             fpdParserTask.setType(type);
             fpdParserTask.setProject(getProject());
@@ -114,8 +155,11 @@ public class FrameworkBuildTask extends Task{
         // Build every MSA files (SINGLE MODULE BUILD)
         //
         else if (buildFile.getName().endsWith(".msa")) {
+            System.out.println("Start to build MSA file [" + buildFile.getPath() + "] ..>> ");
             GenBuildTask genBuildTask = new GenBuildTask();
+            genBuildTask.setSingleModuleBuild(true);
             genBuildTask.setType(type);
+            getProject().setProperty("PLATFORM_FILE", activePlatform);
             genBuildTask.setProject(getProject());
             genBuildTask.setMsaFile(buildFile);
             genBuildTask.execute();
@@ -206,5 +250,63 @@ public class FrameworkBuildTask extends Task{
         else {
             this.type = "all";
         }
+    }
+    
+    private void readTargetFile(){
+        try {
+            String[][] targetFileInfo = ConfigReader.parse(getProject().getProperty("WORKSPACE_DIR"), "Tools" + File.separatorChar + "Conf" + File.separatorChar + targetFilename);
+            
+            //
+            // Get ToolChain Info from target.txt
+            //
+            ToolChainInfo envToolChainInfo = new ToolChainInfo(); 
+            String str = getValue("TARGET", targetFileInfo);
+            if (str == null || str.trim().equals("")) {
+                envToolChainInfo.addTargets("*");
+            }
+            else {
+                envToolChainInfo.addTargets(str);
+            }
+            str = getValue("TAGNAME", targetFileInfo);
+            if (str == null || str.trim().equals("")) {
+                envToolChainInfo.addTagnames("*");
+            }
+            else {
+                envToolChainInfo.addTagnames(str);
+            }
+            str = getValue("TARGET_ARCH", targetFileInfo);
+            if (str == null || str.trim().equals("")) {
+                envToolChainInfo.addArchs("*");
+            }
+            else {
+                envToolChainInfo.addArchs(str);
+            }
+            GlobalData.setToolChainEnvInfo(envToolChainInfo);
+            
+            str = getValue("TOOLS_DEFINITION_FILE", targetFileInfo);
+            if (str != null) {
+                toolsDefFilename = str;
+            }
+            
+            str = getValue("ACTIVE_PLATFORM", targetFileInfo);
+            if (str != null && ! str.trim().equals("")) {
+                if ( ! str.endsWith(".fpd")) {
+                    throw new BuildException("FPD file's file extension must be \".fpd\"");
+                }
+                activePlatform = str;
+            }
+        }
+        catch (Exception ex) {
+            throw new BuildException(ex.getMessage());
+        }
+    }
+    
+    private String getValue(String key, String[][] map) {
+        for (int i = 0; i < map[0].length; i++){
+            if (key.equalsIgnoreCase(map[0][i])) {
+                return map[1][i];
+            }
+        }
+        return null;
     }
 }
