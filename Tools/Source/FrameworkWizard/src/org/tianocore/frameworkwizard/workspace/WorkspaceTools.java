@@ -26,14 +26,15 @@ import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
 import org.tianocore.PlatformHeaderDocument.PlatformHeader;
 import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
+import org.tianocore.SourceFilesDocument.SourceFiles;
 import org.tianocore.SpdHeaderDocument.SpdHeader;
 import org.tianocore.frameworkwizard.common.DataType;
-import org.tianocore.frameworkwizard.common.Identification;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.common.SaveFile;
 import org.tianocore.frameworkwizard.common.Tools;
-import org.tianocore.frameworkwizard.module.Identification.ModuleIdentification;
+import org.tianocore.frameworkwizard.common.Identifications.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
@@ -80,7 +81,10 @@ public class WorkspaceTools {
             MsaFiles files = OpenFile.openSpdFile(path).getMsaFiles();
             if (files != null) {
                 for (int index = 0; index < files.getFilenameList().size(); index++) {
-                    modulePath.addElement(files.getFilenameList().get(index));
+                    String msaPath = files.getFilenameList().get(index);
+                    msaPath = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + msaPath;
+                    msaPath = Tools.convertPathToCurrentOsType(msaPath);
+                    modulePath.addElement(msaPath);
                 }
             }
         } catch (IOException e) {
@@ -149,11 +153,10 @@ public class WorkspaceTools {
         for (int indexI = 0; indexI < vPackageList.size(); indexI++) {
             packagePath = vPackageList.elementAt(indexI).getPath();
             modulePaths = this.getAllModulesOfPackage(packagePath);
-            packagePath = packagePath.substring(0, packagePath.lastIndexOf(DataType.FILE_SEPARATOR)
-                                                   + DataType.FILE_SEPARATOR.length());
+            
             for (int indexJ = 0; indexJ < modulePaths.size(); indexJ++) {
-                modulePath = Tools.convertPathToCurrentOsType(packagePath + modulePaths.elementAt(indexJ));
                 try {
+                    modulePath = modulePaths.get(indexJ);
                     id = getId(modulePath, OpenFile.openMsaFile(modulePath));
                     vModuleList.addElement(new ModuleIdentification(id, vPackageList.elementAt(indexI)));
                 } catch (IOException e) {
@@ -251,7 +254,7 @@ public class WorkspaceTools {
                 for (int index = 0; index < spd.getPpiDeclarations().getEntryList().size(); index++) {
                     vector.addElement(spd.getPpiDeclarations().getEntryList().get(index).getCName());
                 }
-            }    
+            }
         }
         return vector;
     }
@@ -268,7 +271,7 @@ public class WorkspaceTools {
                 for (int index = 0; index < spd.getGuidDeclarations().getEntryList().size(); index++) {
                     vector.addElement(spd.getGuidDeclarations().getEntryList().get(index).getCName());
                 }
-            }    
+            }
         }
         return vector;
     }
@@ -285,7 +288,7 @@ public class WorkspaceTools {
                 for (int index = 0; index < spd.getPcdDeclarations().getPcdEntryList().size(); index++) {
                     vector.addElement(spd.getPcdDeclarations().getPcdEntryList().get(index).getCName());
                 }
-            }            
+            }
         }
         return vector;
     }
@@ -452,10 +455,8 @@ public class WorkspaceTools {
         for (int indexI = 0; indexI < vPackageList.size(); indexI++) {
             packagePath = vPackageList.elementAt(indexI).getPath();
             modulePaths = this.getAllModulesOfPackage(packagePath);
-            packagePath = packagePath.substring(0, packagePath.lastIndexOf(DataType.FILE_SEPARATOR)
-                                                   + DataType.FILE_SEPARATOR.length());
             for (int indexJ = 0; indexJ < modulePaths.size(); indexJ++) {
-                modulePath = Tools.convertPathToCurrentOsType(packagePath + modulePaths.elementAt(indexJ));
+                modulePath = modulePaths.get(indexJ);
                 try {
                     mid = getId(modulePath, OpenFile.openMsaFile(modulePath));
                     //
@@ -570,5 +571,71 @@ public class WorkspaceTools {
         String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
         strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
         SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+    }
+
+    /**
+     Get all file's path from one module
+     
+     @param path
+     @return
+     @throws IOException
+     @throws XmlException
+     @throws Exception
+     
+     **/
+    public Vector<String> getAllModuleFiles(String path) throws IOException, XmlException, Exception {
+        Vector<String> v = new Vector<String>();
+        path = Tools.convertPathToCurrentOsType(path);
+        v.addElement(path);
+        ModuleSurfaceArea msa = OpenFile.openMsaFile(path);
+        if (msa != null) {
+            //
+            // Get all files' path of a module
+            //
+            SourceFiles sf = msa.getSourceFiles();
+            if (sf != null) {
+                for (int index = 0; index < sf.getFilenameList().size(); index++) {
+                    String temp = sf.getFilenameList().get(index).getStringValue();
+                    temp = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + temp;
+                    v.addElement(Tools.convertPathToCurrentOsType(temp));
+                }
+            }
+        }
+
+        return v;
+    }
+
+    /**
+     Get all file's path from one package
+     
+     @param path
+     @return
+     @throws IOException
+     @throws XmlException
+     @throws Exception
+     
+     **/
+    public Vector<String> getAllPakcageFiles(String path) throws IOException, XmlException, Exception {
+        Vector<String> v = new Vector<String>();
+        path = Tools.convertPathToCurrentOsType(path);
+        //
+        // First add package
+        //
+        v.addElement(path);
+        
+        //
+        // Add module's files one by one
+        //
+        Vector<String> f1 = new Vector<String>();
+        f1 = getAllModulesOfPackage(path);
+        for (int indexI = 0; indexI < f1.size(); indexI++) {
+            Vector<String> f2 = getAllModuleFiles(f1.get(indexI));
+            for (int indexJ = 0; indexJ < f2.size(); indexJ++) {
+                v.addElement(f2.get(indexJ));
+            }
+        }
+        //v.add(0, path);
+
+        return v;
     }
 }

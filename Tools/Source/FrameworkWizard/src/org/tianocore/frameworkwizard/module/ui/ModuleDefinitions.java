@@ -26,11 +26,12 @@ import javax.swing.JComboBox;
 import org.tianocore.ModuleDefinitionsDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.ModuleDefinitionsDocument.ModuleDefinitions.ClonedFrom;
+import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
-import org.tianocore.frameworkwizard.common.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
@@ -136,6 +137,7 @@ public class ModuleDefinitions extends IInternalFrame {
         if (iCheckBoxListArch == null) {
             iCheckBoxListArch = new ICheckBoxList();
             iCheckBoxListArch.addFocusListener(this);
+            iCheckBoxListArch.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return iCheckBoxListArch;
     }
@@ -343,5 +345,7 @@ public class ModuleDefinitions extends IInternalFrame {
 
     public void focusLost(FocusEvent arg0) {
         this.save();
+        if (arg0.getSource() == this.jTextFieldOutputFileBasename) {
+        }
     }
 }

@@ -141,36 +141,35 @@ public class Tools {
             }
         }
     }
-    
+
     /**
      Get path only from a path
-    
+     
      @param filePath
      @return
-    
-    **/
+     
+     **/
     public static String getFilePathOnly(String filePath) {
         String path = filePath.substring(0, filePath.length() - getFileNameOnly(filePath).length());
         if (path.endsWith(DataType.FILE_SEPARATOR)) {
             path = path.substring(0, path.length() - DataType.FILE_SEPARATOR.length());
         }
-        
+
         return path;
     }
-    
-    
+
     /**
      Get file name from a path
      
      @param filePath
      @return
-    
-    **/
+     
+     **/
     public static String getFileNameOnly(String filePath) {
         File f = new File(filePath);
         return f.getAbsoluteFile().getName();
     }
-    
+
     public static String getFileNameWithoutExt(String filePath) {
         filePath = getFileNameOnly(filePath);
         filePath = filePath.substring(0, filePath.lastIndexOf(DataType.FILE_EXT_SEPARATOR));
@@ -265,14 +264,28 @@ public class Tools {
         }
         return path;
     }
-    
+
     /**
      Show a message box
      
      @param arg0
-    
-    **/
+     
+     **/
     public static void showInformationMessage(String arg0) {
         JOptionPane.showConfirmDialog(null, arg0, "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
+    
+    /**
+    if the string doesn't end with a file separator, append it to the string
+    
+    @param arg0
+    @return
+   
+   **/
+   public static String addFileSeparator(String arg0) {
+       if (!arg0.endsWith(DataType.FILE_SEPARATOR)) {
+           arg0 = arg0 + DataType.FILE_SEPARATOR;
+       }
+       return arg0;
+   }
 }

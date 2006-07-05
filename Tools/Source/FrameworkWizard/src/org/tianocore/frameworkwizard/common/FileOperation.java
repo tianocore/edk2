@@ -28,7 +28,7 @@ public class FileOperation {
      
      **/
     public static void main(String[] args) throws Exception {
-        FileOperation.newFolder("C:\\aaa\\bbb\\ccc\\ddd\\eee");
+        FileOperation.newFolder("C:\\aaa\\aaa\\aaa\\aaa\\aaa");
     }
 
     /**
@@ -45,14 +45,14 @@ public class FileOperation {
             if (folderPath.indexOf(DataType.FILE_SEPARATOR) > -1) {
                 temp = temp + folderPath.substring(0, folderPath.indexOf(DataType.FILE_SEPARATOR));
                 if (temp.endsWith(":")) {
-                    temp = temp + DataType.FILE_SEPARATOR;
+                    temp = Tools.addFileSeparator(temp);
                     folderPath = folderPath.substring(folderPath.indexOf(DataType.FILE_SEPARATOR) + DataType.FILE_SEPARATOR.length());
                     continue;
                 }
-                temp = temp + DataType.FILE_SEPARATOR;
+                temp = Tools.addFileSeparator(temp);
                 folderPath = folderPath.substring(folderPath.indexOf(DataType.FILE_SEPARATOR) + DataType.FILE_SEPARATOR.length());    
             } else {
-                temp = temp + DataType.FILE_SEPARATOR + folderPath;
+                temp = Tools.addFileSeparator(temp) + folderPath;
                 folderPath = "";
             }
             File f = new File(temp);
@@ -140,8 +140,16 @@ public class FileOperation {
      
      **/
     public static void copyFile(String oldPath, String newPath) throws Exception {
+        oldPath = Tools.convertPathToCurrentOsType(oldPath);
+        newPath = Tools.convertPathToCurrentOsType(newPath);
+        
         int byteCount = 0;
         File oldFile = new File(oldPath);
+        
+        File newFile = new File(Tools.getFilePathOnly(newPath));
+        if (!newFile.exists()) {
+            newFolder(Tools.getFilePathOnly(newPath));
+        }
 
         if (oldFile.exists()) {
             InputStream is = new FileInputStream(oldPath);

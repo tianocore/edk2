@@ -18,7 +18,7 @@ package org.tianocore.frameworkwizard.common.ui;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import org.tianocore.frameworkwizard.common.Identification;
+import org.tianocore.frameworkwizard.common.Identifications.Identification;
 
 /**
  The class is used to override DefaultMutableTreeNode to provides customized interfaces

@@ -41,7 +41,7 @@ import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
-import org.tianocore.frameworkwizard.module.Identification.ModuleIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.Workspace;
@@ -441,11 +441,9 @@ public class SelectModuleBelong extends IDialog {
             String packagePath = packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getPath();
             String modulePath = Tools.convertPathToCurrentOsType(this.jTextFieldFilePath.getText());
             Vector<String> msaFile = wt.getAllModulesOfPackage(packagePath);
-            packagePath = packagePath.substring(0, packagePath.lastIndexOf(DataType.FILE_SEPARATOR));
-            String path = Tools.getRelativePath(modulePath, packagePath);
 
             for (int index = 0; index < msaFile.size(); index++) {
-                if (msaFile.elementAt(index).equals(path)) {
+                if (msaFile.elementAt(index).equals(modulePath)) {
                     Log.err("This module is already existing in selected package");
                     return false;
                 }
