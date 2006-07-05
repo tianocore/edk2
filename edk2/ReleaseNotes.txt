@@ -1,12 +1,12 @@
 Intel(R) Platform Innovation Framework for EFI
-EFI Development Kit 2.0 (EDK 2.0) 
+EFI Development Kit II (EDK II (EDK 2)) 
 Alpha Release
-2006-04-26
+2006-06-29
 
 Copyright (c) 2006, Intel Corporation
 
 This document provides updates to documentation, along with a description on 
-how to install and build the Edk 2.0.
+how to install and build the EDK II.
 
 Package Contents
 ----------------
@@ -23,27 +23,27 @@ Package Contents
 
 Note: MDE and MDK that appear in other documentation refer to the MdePkg and
 Tools packages.  These two packages are the minimum requirement for developing
-EDK 2.0 Packages.  It is also recommended that the top level files included
+EDK II Packages.  It is also recommended that the top level files included
 with the EDK be downloaded in conjunction with these two packages.
 
 Note: Documents have the following filenames:
-  EDK 2.0 Module Development Environment Library Specification v0.50 
+  EDK II Module Development Environment Library Specification v0.50 
       (MDE_Library_Spec_0_50.rtf)
-  EDK 2.0 Build and Packaging Architecture Specification v0.50
+  EDK II Build and Packaging Architecture Specification v0.50
       (Build_Packaging_Spec_0_50.rtf)
-  EDK 2.0 Platform Configuration Database Infrastructure Description v0.51
+  EDK II Platform Configuration Database Infrastructure Description v0.51
       (PCD_Infrastructure_0_51.rtf)
-  EDK 2.0 Module Surface Area v0.50
+  EDK II Module Surface Area v0.50
       (Module_Surface_Area_0_50.rtf)
-  EDK 2.0 Module Development Environment (MDE) Package Specification v0.50
+  EDK II Module Development Environment (MDE) Package Specification v0.50
       (MDE_Package_Spec_0_50.rtf)
-  EDK 2.0 C Coding Standards Specification v0.50
+  EDK II C Coding Standards Specification v0.50
       (C_Coding_Standards_Specification_ 0_50.rtf)
 
 Pre-Requisites
 --------------
 The following list of tools must be installed on the development workstation
-prior to using the Edk 2.0.
+prior to using the EDK II.
 
 Compiler Tool Chain
       Microsoft* Visual Studio .NET 2003*  (http://www.microsoft.com)
@@ -85,7 +85,7 @@ Compiler Tool Chains:
 -----------------------
 Notes On Required Tools (Source Control System)
 -----------------------
-The EDK 2.0 is being managed by the Subversion Source Control on Tianocore.org.
+The EDK II is being managed by the Subversion Source Control on Tianocore.org.
 This software package provides speed, security, and additional features. The
 recommended client is TortoiseSVN version 1.3.3. 
  (Available at http://tortoisesvn.tigris.org/)
@@ -93,7 +93,7 @@ recommended client is TortoiseSVN version 1.3.3.
 There are instructions for the use of Subversion Source Control on the
 Tianocore.org website, as part of the checkout procedures.
 
-The URL of the EDK 2.0 repository is:
+The URL of the EDK II repository is:
   https://edk2.tianocore.org/svn/edk2/trunk/edk2
 
 -----------------------
@@ -101,8 +101,8 @@ Notes On Documentation
 -----------------------
 The documents are being managed by the Subversion Source Control on
 Tianocore.org.  The document repository is "docs" and must be checked out
-separately from the EDK 2.0 source tree. Refer to the checkout procedures on
-the Tianocore.org website for EDK 2.0.
+separately from the EDK II source tree. Refer to the checkout procedures on
+the Tianocore.org website for EDK II.
 
 The URL of the document repository is:
   https://edk2.tianocore.org/svn/edk2/trunk/docs
@@ -167,9 +167,9 @@ for the Microsoft tool chains and includes the standard location of the Intel C
 Compiler for EFI Byte Code (EBC)
   
 Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
-checkout the entire EDK 2.0 source tree.
+checkout the entire EDK II source tree.
 
-In a command window, change to the top level directory of the Edk 2.0 sources.
+In a command window, change to the top level directory of the EDK II sources.
   Set the WORKSPACE environment variable, e.g.:
 
     c:\> set WORKSPACE=C:\MyWork\Edk2.0
@@ -235,7 +235,7 @@ A Word on Apache-ANT
 --------------------
 The Apache-ANT program is a build tool that uses XML-based project files.
 Similar to Makefiles, these project files may contain multiple targets.  Most
-build.xml files in Edk2.0 are auto-generated; any edits performed on the
+build.xml files in EDK II are auto-generated; any edits performed on the
 build.xml files will be overwritten the next time ant is executed.
 
 Pre-defined targets in the build.xml files include:
@@ -245,11 +245,11 @@ Pre-defined targets in the build.xml files include:
 
 A Word on GCC tool chain
 ------------------------
-EDK2 will not compile with a standard Linux gcc tool chain. While Linux
-distributions are usually based on ELF, EDK2 requires a version of gcc that is
+EDK II will not compile with a standard Linux gcc tool chain. While Linux
+distributions are usually based on ELF, EDK II requires a version of gcc that is
 configured to produce PE-COFF images. You will find a script in edk2/Tools/gcc
 that will download, configure, compile, and install a gcc 4.X cross-compile
-tool chain for EDK2 development. It has support for the ia32 architecture. It
+tool chain for EDK II development. It has support for the ia32 architecture. It
 can be built and run on Cygwin, Linux, and many other POSIX compliant host
 operating environments. There are a few tools that you will need on your host
 computer in order to compile the tool chain. Among them are bash, gcc, gmake,
@@ -426,13 +426,13 @@ Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
 =======================================================
 Notes:
 ------
-The EDK 2.0 represents significant changes in the structure of the EDK.
+The EDK II represents significant changes in the structure of the EDK.
 Therefore it is very difficult to isolate all of the changes of this version of
 the EDK with the previous (EDK 1.0) version.
 
 Of particular note:
 
-1) EDK 2.0 contains new hardware feature support for the ICH SMBUS Libraries.
+1) EDK II contains new hardware feature support for the ICH SMBUS Libraries.
    These libraries are provided to make Memory Reference Code (MRC) development
    easier.
 2) The MDE Libraries - The MDE libraries represent significant changes in source
@@ -444,7 +444,7 @@ Of particular note:
    tool functionality.
 5) The EDK NT32 section has been ported to the new build process, but
    functionally remains the same as the EDK 1.0 version.
-6) The Application "HelloWorld" has been ported to EDK 2.0 as well.
+6) The Application "HelloWorld" has been ported to EDK II as well.
 
 =======================================================
 Virus scanned by McAfee VirusScan Enterprise 8.0.0, Virus Definitions 4718, no
