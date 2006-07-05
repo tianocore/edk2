@@ -2557,7 +2557,7 @@
         "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
       </Option>
       <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h", "/FI${DEST_DIR_DEBUG}/AutoGen.h" </Option>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h" </Option>
       <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASL"> "/nologo" </Option>
       
       <!-- MSFT tool chain options definition : X64 -->
