@@ -22,3 +22,4 @@ efirom=org.tianocore.framework.tasks.EfiRomTask
 secapresetvectorfixup=org.tianocore.framework.tasks.SecApResetVectorFixupTask
 gencapsulehdr=org.tianocore.framework.tasks.GenCapsuleHdrTask
 flashmap=org.tianocore.framework.tasks.FlashMapTask
+modifyinf=org.tianocore.framework.tasks.ModifyInfTask
