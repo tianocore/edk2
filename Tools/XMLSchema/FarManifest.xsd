@@ -65,7 +65,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <xs:element ref="FarFilename">
           <xs:annotation>
             <xs:documentation>
-              This is the name of the .spd or .psa file that describes the package. It must exist in the directory identified by DefaultPath.
+              This is the name of the .spd or file that describes the package. It must exist in the directory identified by DefaultPath.
             </xs:documentation>
           </xs:annotation>
         </xs:element>
@@ -78,10 +78,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             </xs:documentation>
           </xs:annotation>
         </xs:element>
-        <xs:element minOccurs="0" maxOccurs="1" ref="FarPackageList">
+        <xs:element minOccurs="0" maxOccurs="1" ref="FarPlatformList">
           <xs:annotation>
             <xs:documentation>
-              This list of packages is relative to the package root of the package that they are contained in. If the platform that these are bound to is intstalled in some directory other than the default, then these platforms should be stored relative to that.
+              This list of platforms is relative to the package root of the package that they are contained in. If the package that these are bound to is intstalled in some directory other than the default, then these platforms should be stored relative to that.
             </xs:documentation>
           </xs:annotation>
         </xs:element>
@@ -157,7 +157,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       Definitions and rules for creating, installing, updating and removing fars within the workspace.
     </xs:documentation>
     <xs:documentation>
-      1.  A module m is said to depend upon a package p, iff there exists a tuple (PackageGuid, PackageVerion) in the set m->PackageDependencies for which p->Guid==PackageGuid, and if PackageVersion is not empty, then p->Version is == PackageVersion.
+      1.  A module m is said to depend upon a package p, iff there exists a tuple (PackageGuid, PackageVerion) in the set m->PackageDependencies for which p->Guid==PackageGuid, and if PackageVersion is not empty, then p->Version== PackageVersion.
     </xs:documentation>
     <xs:documentation>
       2.  A far f is said to depend on a far g, iff there is a module in a package in f that depends on a package in g.
@@ -205,25 +205,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       11.1 If a platform p belongs to a far f, then it is not legal to remove p from the workspace w unless f is removed from w.
     </xs:documentation>
     <xs:documentation>
-      12. A package p may be removed from the workspace, provided there does not exist a far f that contains p. (Newly created packages will not exist within a far, and thus may be removed from the workspace directly.)
+      12. A package p may be removed from the workspace, provided there does not exist a far f that contains p. (Newly created or cloned packages will not exist within a far, and thus may be removed from the workspace directly.)
     </xs:documentation>
     <xs:documentation>
-      13. When a far f is removed from the workspace, the user has two options:
-    </xs:documentation>
-    <xs:documentation>
-      a. Keep all the files in the workspace tree.
-    </xs:documentation>
-    <xs:documentation>
-      b. Remove all the files in f from the workspace tree. If a file has been modified from the original as installed from the far (per md5sum) then the user should be asked if he is "sure" he wants to remove it.
+      13. When a far f is removed from the workspace, the we will remove all the files in f from the workspace tree. If a file has been modified from the original as installed from the far (per md5sum) then the user should be asked if he is "sure" he wants to remove it.
     </xs:documentation>
     <xs:documentation>
       14. When a far is created, a GUID is generated and assigned to the far. If a far is created from the same components at a later time, it would have a different GUID.
     </xs:documentation>
     <xs:documentation>
-      15. If a package p is marked with RePackage==false, then p may not be added to a far.
+      15. If a package p is marked with p->RePackage==false, then p may not be added to a far.
     </xs:documentation>
     <xs:documentation>
-      16. When constructing a far f that contains at least one platform, then f may optionally be constructed such that for each platform q in f, every package p on which q depends should be included in f, unless p->repackage==false. The far will have all the packages required, and may then be installed as a self-inflating executable that will create a brand new workspace on the developer's workstation.
+      16. When constructing a far f that contains at least one platform, then f may optionally be constructed such that for each platform q in f, every package p on which q depends should be included in f, unless p->RePackage==false. The far will have all the packages required, and may then be installed as a self-inflating executable that will create a brand new workspace on the developer's workstation.
     </xs:documentation>
     <xs:documentation>
       17. A far f is identical to a far g, iff f->Guid == g->Guid.
@@ -231,6 +225,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <xs:documentation>
       18. A far f may be installed into the workspace w, iff there is no far g in w such that f->Guid==g->Guid.
     </xs:documentation>
-    
   </xs:annotation>
 </xs:schema>
