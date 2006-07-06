@@ -236,7 +236,7 @@ BasePrintLibVSPrint (
           Format   -= BytesPerFormatCharacter;
           Precision = 0;
           //
-          // break skiped on purpose.
+          // break skipped on purpose.
           //
         default:
           Done = TRUE;
@@ -256,18 +256,22 @@ BasePrintLibVSPrint (
       //
       switch (FormatCharacter) {
       case 'p':
+        //
+        // Flag space, +, 0, L & l are invalid for type p.
+        //
+        Flags &= ~(PREFIX_BLANK | PREFIX_SIGN | PREFIX_ZERO | LONG_TYPE);
         if (sizeof (VOID *) > 4) {
           Flags |= LONG_TYPE;
         }
       case 'X':
         Flags |= PREFIX_ZERO;
         //
-        // break skiped on purpose
+        // break skipped on purpose
         //
       case 'x':
         Flags |= RADIX_HEX;
         //
-        // break skiped on purpose
+        // break skipped on purpose
         //
       case 'd':
         if ((Flags & LONG_TYPE) == 0) {

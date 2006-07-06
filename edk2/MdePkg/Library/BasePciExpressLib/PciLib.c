@@ -1196,11 +1196,16 @@ PciExpressReadBuffer (
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
-  ASSERT ((Buffer != NULL) || (Size == 0));
+
+  if (Size == 0) {
+    return 0;
+  }
+
+  ASSERT (Buffer != NULL);
 
   EndAddress = StartAddress + Size;
 
-  if ((StartAddress < EndAddress) && ((StartAddress & 1) != 0)) {
+  if ((StartAddress & 1) != 0) {
     //
     // Read a byte if StartAddress is byte aligned
     //
@@ -1282,11 +1287,16 @@ PciExpressWriteBuffer (
 
   ASSERT_INVALID_PCI_ADDRESS (StartAddress);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x1000);
-  ASSERT ((Buffer != NULL) || (Size == 0));
+
+  if (Size == 0) {
+    return 0;
+  }
+
+  ASSERT (Buffer != NULL);
 
   EndAddress = StartAddress + Size;
 
-  if ((StartAddress < EndAddress) && ((StartAddress & 1) != 0)) {
+  if ((StartAddress & 1) != 0) {
     //
     // Write a byte if StartAddress is byte aligned
     //

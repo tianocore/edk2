@@ -134,8 +134,8 @@ _RightShiftU64_Calc:
   mov    eax, dword ptr Operand[0]
   mov    edx, dword ptr Operand[4]
   
-  shrd   edx, eax, cl
-  shr    eax, cl
+  shrd   eax, edx, cl
+  shr    edx, cl
   cmp    ecx, 32
   jc     short _RightShiftU64_Done
   
