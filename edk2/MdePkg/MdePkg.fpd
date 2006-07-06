@@ -843,7 +843,7 @@
         "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry ${ENTRYPOINT}"
       </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
 
     </Options>
     

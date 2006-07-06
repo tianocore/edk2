@@ -23,7 +23,7 @@
 *_MSFT_IA32_ASMLINK_PATH = C:\WINDDK\3790.1830\Bin\Bin16\
 *_MSFT_IA32_ASL_PATH     = C:\TianoTools\Bin
 *_MSFT_IA32_*_DPATH      = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
-#*_MSFT_IA32_ASM_EXT     = .asm
+*_MSFT_IA32_ASM_EXT      = .asm
 
 # x64 definitions
 *_MSFT_X64_*_PATH       = C:\WINDDK\3790.1830\bin\win64\x86\amd64
@@ -35,6 +35,7 @@
 # IPF definitions
 *_MSFT_IPF_*_PATH       = C:\WINDDK\3790.1830\bin\win64\x86
 *_MSFT_IPF_ASM_NAME     = ias.exe
+*_MSFT_IPF_ASM_EXT      = .s
 
 # EBC definitions
 *_MSFT_EBC_*_FAMILY     = INTEL
@@ -45,18 +46,13 @@
 *_MSFT_EBC_PP_NAME      = iec.exe
 
 # GCC definitions
-#*_GCC_*_*_FAMILY       = GCC
-#*_GCC_*_CC_NAME        = gcc
-#*_GCC_*_SLINK_NAME     = ar
-#*_GCC_*_DLINK_NAME     = ld
+*_GCC_IA32_*_FAMILY     = GCC
+*_GCC_IA32_CC_NAME      = gcc
+*_GCC_IA32_SLINK_NAME   = ar
+*_GCC_IA32_DLINK_NAME   = ld
+*_GCC_IA32_ASM_NAME     = as
+*_GCC_IA32_PP_NAME      = gcc
 
 # GCC, IA32
-#*_GCC_IA32_*_PATH      = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
-#*_GCC_IA32_ASM_FAMILY  = MSFT
-#*_GCC_IA32_ASM_NAME    = ml.exe
-#*_GCC_IA32_ASM_PATH    = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
-#*_GCC_IA32_ASM_DPATH   = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
-#*_GCC_IA32_PP_FAMILY   = MSFT
-#*_GCC_IA32_PP_NAME     = cl.exe
-#*_GCC_IA32_PP_PATH     = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
-#*_GCC_IA32_PP_DPATH    = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
+*_GCC_IA32_*_PATH       = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
+*_GCC_IA32_ASM_EXT      = .S

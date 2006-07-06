@@ -56,6 +56,17 @@
     <Filename SupArchList="IA32">Ia32/ScanMem16.asm</Filename>
     <Filename SupArchList="IA32">Ia32/ScanMem32.asm</Filename>
     <Filename SupArchList="IA32">Ia32/ScanMem64.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/CopyMem.S</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem.S</Filename>
+    <Filename SupArchList="IA32">Ia32/ZeroMem.S</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem16.S</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem32.S</Filename>
+    <Filename SupArchList="IA32">Ia32/SetMem64.S</Filename>
+    <Filename SupArchList="IA32">Ia32/CompareMem.S</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem8.S</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem16.S</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem32.S</Filename>
+    <Filename SupArchList="IA32">Ia32/ScanMem64.S</Filename>
     <Filename SupArchList="X64">X64/CopyMem.asm</Filename>
     <Filename SupArchList="X64">X64/SetMem.asm</Filename>
     <Filename SupArchList="X64">X64/SetMem16.asm</Filename>

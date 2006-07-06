@@ -146,7 +146,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
-          <Value>0x10000</Value>
+          <Value>0x1000Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
@@ -15103,7 +15103,7 @@
         "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry ${ENTRYPOINT}"
       </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
 
       <!-- BOB tool chain options definition : IA32 -->
       <Option TagName="BOB" SupArchList="IA32" ToolCode="CC">
