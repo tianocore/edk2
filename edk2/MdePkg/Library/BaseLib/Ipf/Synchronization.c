@@ -32,7 +32,7 @@ InternalSyncIncrement (
 
   do {
     OriginalValue = *Value;
-  } while (OriginalValue == InternalSyncCompareExchange32 (
+  } while (OriginalValue != InternalSyncCompareExchange32 (
                               Value,
                               OriginalValue,
                               OriginalValue + 1
@@ -50,7 +50,7 @@ InternalSyncDecrement (
 
   do {
     OriginalValue = *Value;
-  } while (OriginalValue == InternalSyncCompareExchange32 (
+  } while (OriginalValue != InternalSyncCompareExchange32 (
                               Value,
                               OriginalValue,
                               OriginalValue - 1

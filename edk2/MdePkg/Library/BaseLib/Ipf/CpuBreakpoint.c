@@ -98,25 +98,6 @@ EnableInterrupts (
 }
 
 /**
-  Retrieves the current CPU interrupt state.
-
-  Retrieves the current CPU interrupt state. Returns TRUE is interrupts are
-  currently enabled. Otherwise returns FALSE.
-
-  @retval TRUE  CPU interrupts are enabled.
-  @retval FALSE CPU interrupts are disabled.
-
-**/
-BOOLEAN
-EFIAPI
-GetInterruptState (
-  VOID
-  )
-{
-  return FALSE;
-}
-
-/**
   Enables CPU interrupts for the smallest window required to capture any
   pending interrupts.
 
