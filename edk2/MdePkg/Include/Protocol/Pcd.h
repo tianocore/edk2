@@ -152,9 +152,9 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PROTOCOL_SET_POINTER) (
-  IN UINTN             TokenNumber,
-  IN UINTN             SizeOfBuffer,
-  IN VOID              *Buffer
+  IN      UINTN             TokenNumber,
+  IN OUT  UINTN             *SizeOfBuffer,
+  IN      VOID              *Buffer
   );
 
 typedef
@@ -199,10 +199,10 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PROTOCOL_SET_EX_POINTER) (
-  IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN UINTN             SizeOfBuffer,
-  IN VOID              *Buffer
+  IN      CONST EFI_GUID    *Guid,
+  IN      UINTN             TokenNumber,
+  IN OUT  UINTN             *SizeOfBuffer,
+  IN      VOID              *Buffer
   );
 
 typedef
@@ -228,7 +228,7 @@ typedef
 VOID
 (EFIAPI *PCD_PROTOCOL_CALLBACK) (
   IN      CONST EFI_GUID   *CallBackGuid, OPTIONAL
-  IN      UINTN                       CallBackToken,
+  IN      UINTN            CallBackToken,
   IN  OUT VOID             *TokenData,
   IN      UINTN            TokenDataSize
   );

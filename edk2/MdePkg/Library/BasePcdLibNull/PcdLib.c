@@ -463,6 +463,8 @@ LibPcdSetPtr (
   IN      VOID              *Buffer
   )
 {
+  ASSERT (SizeOfBuffer != NULL);
+
   if (*SizeOfBuffer > 0) {
     ASSERT (Buffer != NULL);
   }

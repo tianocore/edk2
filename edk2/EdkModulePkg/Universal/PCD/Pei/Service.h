@@ -40,24 +40,48 @@ GetPcdDatabase (
   )
 ;
 
+
 EFI_STATUS
-SetWorker (
-  IN UINTN              TokenNumber,
-  IN VOID               *Data,
-  IN UINTN              Size,
-  IN BOOLEAN            PtrType
+SetValueWorker (
+  IN          UINTN              TokenNumber,
+  IN          VOID               *Data,
+  IN          UINTN              Size
   )
 ;
 
+
 EFI_STATUS
-ExSetWorker (
-  IN UINTN                ExTokenNumber,
-  IN CONST EFI_GUID       *Guid,
-  IN VOID                 *Data,
-  IN UINTN                Size,
-  IN BOOLEAN              PtrType
+SetWorker (
+  IN          UINTN              TokenNumber,
+  IN          VOID               *Data,
+  IN OUT      UINTN              *Size,
+  IN          BOOLEAN            PtrType
   )
 ;
+
+
+EFI_STATUS
+ExSetValueWorker (
+  IN          UINTN                ExTokenNumber,
+  IN          CONST EFI_GUID       *Guid,
+  IN          VOID                 *Data,
+  IN          UINTN                Size
+  )
+;
+
+
+
+EFI_STATUS
+ExSetWorker (
+  IN      UINTN                ExTokenNumber,
+  IN      CONST EFI_GUID       *Guid,
+  IN      VOID                 *Data,
+  IN OUT  UINTN                *Size,
+  IN      BOOLEAN              PtrType
+  )
+;
+
+
 
 VOID *
 GetWorker (
@@ -65,6 +89,8 @@ GetWorker (
   IN UINTN                GetSize
   )
 ;
+
+
 
 VOID *
 ExGetWorker (
@@ -105,6 +131,27 @@ PeiRegisterCallBackWorker (
 VOID
 BuildPcdDatabase (
   VOID
+  )
+;
+
+
+
+
+UINTN
+GetPtrTypeSize (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  OUT   UINTN             *MaxSize,
+  IN    PEI_PCD_DATABASE  *Database
+  )
+;
+
+
+
+BOOLEAN
+SetPtrTypeSize (
+  IN          UINTN             LocalTokenNumberTableIdx,
+  IN    OUT   UINTN             *CurrentSize,
+  IN          PEI_PCD_DATABASE  *Database
   )
 ;
 
@@ -276,9 +323,9 @@ PeiPcdSet64 (
 EFI_STATUS
 EFIAPI
 PeiPcdSetPtr (
-  IN UINTN             TokenNumber,
-  IN UINTN             SizeOfBuffer,
-  IN VOID              *Buffer
+  IN        UINTN             TokenNumber,
+  IN OUT    UINTN             *SizeOfBuffer,
+  IN        VOID              *Buffer
   )
 ;
 
@@ -334,10 +381,10 @@ PeiPcdSet64Ex (
 EFI_STATUS
 EFIAPI
 PeiPcdSetPtrEx (
-  IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN UINTN             SizeOfBuffer,
-  IN VOID              *Buffer
+  IN        CONST EFI_GUID    *Guid,
+  IN        UINTN             TokenNumber,
+  IN OUT    UINTN             *SizeOfBuffer,
+  IN        VOID              *Buffer
   )
 ;
 

@@ -35,20 +35,22 @@ GetWorker (
   UINT32              *LocalTokenNumberTable;
   UINT16              *SizeTable;
   BOOLEAN             IsPeiDb;
-  UINTN               Size;
   UINT32              Offset;
   EFI_GUID            *GuidTable;
   UINT16              *StringTable;
   EFI_GUID            *Guid;
   UINT16              *Name;
   VARIABLE_HEAD       *VariableHead;
+  UINT8               *VaraiableDefaultBuffer;
   EFI_STATUS          Status;
   UINTN               DataSize;
-  VOID                *Data;
+  UINT8               *Data;
   VPD_HEAD            *VpdHead;
   UINT8               *PcdDb;
   UINT16              StringTableIdx;      
   UINT32              LocalTokenNumber;
+  UINTN               MaxSize;
+  UINTN               TmpTokenNumber;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -56,11 +58,12 @@ GetWorker (
   // as the array index.
   //
   TokenNumber--;
+
+  TmpTokenNumber = TokenNumber;
   
   ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
 
-  Size = DxePcdGetSize (TokenNumber + 1);
-  ASSERT (GetSize == Size || GetSize == 0);
+  ASSERT ((GetSize == DxePcdGetSize (TokenNumber + 1)) || (GetSize == 0));
 
   
   IsPeiDb = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
@@ -77,7 +80,12 @@ GetWorker (
   LocalTokenNumber = LocalTokenNumberTable[TokenNumber];
   
   if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
-    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, Size, IsPeiDb);
+    if (GetSize == 0) {
+      GetPtrTypeSize (TmpTokenNumber, &MaxSize);
+    } else {
+      MaxSize = GetSize;
+    }
+    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, MaxSize, IsPeiDb);
   }
 
   PcdDb = IsPeiDb ? ((UINT8 *) &mPcdDatabase->PeiDb) : ((UINT8 *) &mPcdDatabase->DxeDb);
@@ -86,7 +94,7 @@ GetWorker (
   
   Offset     = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
   
-  switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
+  switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
       VpdHead = (VPD_HEAD *) ((UINT8 *) PcdDb + Offset);
       return (VOID *) (UINTN) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
@@ -99,16 +107,31 @@ GetWorker (
       
       Guid = &(GuidTable[VariableHead->GuidTableIndex]);
       Name = &(StringTable[VariableHead->StringIndex]);
+      VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
 
       Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
       if (Status == EFI_SUCCESS) {
-        return (UINT8 *) Data + VariableHead->Offset;
-      } else {
-        //
-        // Return the default value specified by Platform Integrator 
-        //
-        return (VOID *) ((UINT8 *) PcdDb + VariableHead->DefaultValueOffset);
-     }
+        if (GetSize == 0) {
+          //
+          // It is a pointer type. So get the MaxSize reserved for
+          // this PCD entry.
+          //
+          GetPtrTypeSize (TokenNumber, &GetSize);
+        }
+        CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
+        FreePool (Data);
+      }
+      //
+      // If the operation is successful, we copy the data
+      // to the default value buffer in the PCD Database.
+      // So that we can free the Data allocated in GetHiiVariable.
+      //
+      //
+      // If the operation is not successful, 
+      // Return 1) either the default value specified by Platform Integrator 
+      //        2) Or the value Set by a PCD set operation.
+      //
+      return (VOID *) VaraiableDefaultBuffer;
 
     case PCD_TYPE_STRING:
       StringTableIdx = (UINT16) *((UINT8 *) PcdDb + Offset);
@@ -352,7 +375,7 @@ EFI_STATUS
 GetHiiVariable (
   IN  EFI_GUID      *VariableGuid,
   IN  UINT16        *VariableName,
-  OUT VOID          ** VariableData,
+  OUT VOID          **VariableData,
   OUT UINTN         *VariableSize
   )
 {
@@ -372,7 +395,6 @@ GetHiiVariable (
     );
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
-
     Buffer = AllocatePool (Size);
 
     ASSERT (Buffer != NULL);
@@ -386,13 +408,11 @@ GetHiiVariable (
       );
 
     ASSERT (Status == EFI_SUCCESS);
+    *VariableData = Buffer;
+    *VariableSize = Size;
   }
 
-  *VariableData = Buffer;
-  *VariableSize = Size;
-
   return Status;
-
 }
 
 
@@ -429,7 +449,7 @@ GetSkuEnabledTokenNumber (
   }
   ASSERT (i < SkuIdTable[0]);
 
-  switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
+  switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
       Value = (UINT8 *) &(((VPD_HEAD *) Value)[i]);
       return (UINT32) ((Value - PcdDb) | PCD_TYPE_VPD);
@@ -437,11 +457,15 @@ GetSkuEnabledTokenNumber (
     case PCD_TYPE_HII:
       Value = (UINT8 *) &(((VARIABLE_HEAD *) Value)[i]);
       return (UINT32) ((Value - PcdDb) | PCD_TYPE_HII);
+
+    case PCD_TYPE_STRING:
+      Value = (UINT8 *) &(((STRING_HEAD *) Value)[i]);
+      return (UINT32) ((Value - PcdDb) | PCD_TYPE_STRING);
       
     case PCD_TYPE_DATA:
       Value += Size * i;
       return (UINT32) (Value - PcdDb);
-      
+
     default:
       ASSERT (FALSE);
   }
@@ -494,14 +518,23 @@ InvokeCallbackOnSet (
 }
 
 
+EFI_STATUS
+SetValueWorker (
+  IN UINTN                   TokenNumber,
+  IN VOID                    *Data,
+  IN UINTN                   Size
+  )
+{
+  return SetWorker (TokenNumber, Data, &Size, FALSE);
+}
 
 
 EFI_STATUS
 SetWorker (
-  UINTN                   TokenNumber,
-  VOID                    *Data,
-  UINTN                   Size,
-  BOOLEAN                 PtrType
+  IN          UINTN                   TokenNumber,
+  IN          VOID                    *Data,
+  IN OUT      UINTN                   *Size,
+  IN          BOOLEAN                 PtrType
   )
 {
   UINT32              *LocalTokenNumberTable;
@@ -516,6 +549,9 @@ SetWorker (
   VARIABLE_HEAD       *VariableHead;
   UINTN               Offset;
   UINT8               *PcdDb;
+  EFI_STATUS          Status;
+  UINTN               MaxSize;
+  UINTN               TmpTokenNumber;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -523,13 +559,13 @@ SetWorker (
   // as the array index.
   //
   TokenNumber--;
+
+  TmpTokenNumber = TokenNumber;
   
   ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
 
-  if (PtrType) {
-    ASSERT (Size <= DxePcdGetSize (TokenNumber + 1));
-  } else {
-    ASSERT (Size == DxePcdGetSize (TokenNumber + 1));
+  if (!PtrType) {
+    ASSERT (*Size == DxePcdGetSize (TokenNumber + 1));
   }
   
   IsPeiDb = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
@@ -539,7 +575,7 @@ SetWorker (
 
   if ((TokenNumber < PEI_NEX_TOKEN_NUMBER) ||
       (TokenNumber >= PEI_LOCAL_TOKEN_NUMBER || TokenNumber < (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER))) {
-    InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, Size);
+    InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, *Size);
   }
 
   TokenNumber = IsPeiDb ? TokenNumber
@@ -548,7 +584,12 @@ SetWorker (
   LocalTokenNumber = LocalTokenNumberTable[TokenNumber];
   
   if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == PCD_TYPE_SKU_ENABLED) {
-    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, Size, IsPeiDb);
+    if (PtrType) {
+      GetPtrTypeSize (TmpTokenNumber, &MaxSize);
+    } else {
+      MaxSize = *Size;
+    }
+    LocalTokenNumber = GetSkuEnabledTokenNumber (LocalTokenNumber & ~PCD_TYPE_SKU_ENABLED, MaxSize, IsPeiDb);
   }
 
   Offset = LocalTokenNumber & PCD_DATABASE_OFFSET_MASK;
@@ -560,19 +601,26 @@ SetWorker (
   
   InternalData = PcdDb + Offset;
 
-  switch (LocalTokenNumber & ~PCD_DATABASE_OFFSET_MASK) {
+  switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
       ASSERT (FALSE);
       return EFI_INVALID_PARAMETER;
     
     case PCD_TYPE_STRING:
-      CopyMem (&StringTable[*((UINT16 *)InternalData)], Data, Size);
-      return EFI_SUCCESS;
+      if (SetPtrTypeSize (TokenNumber, Size)) {
+        CopyMem (&StringTable[*((UINT16 *)InternalData)], Data, *Size);
+        return EFI_SUCCESS;
+      } else {
+        return EFI_INVALID_PARAMETER;
+      }
 
     case PCD_TYPE_HII:
-      //
-      // Bug Bug: Please implement this
-      //
+      if (PtrType) {
+        if (!SetPtrTypeSize (TokenNumber, Size)) {
+          return EFI_INVALID_PARAMETER;
+        }
+      }
+      
       GuidTable   = IsPeiDb ? mPcdDatabase->PeiDb.Init.GuidTable :
                               mPcdDatabase->DxeDb.Init.GuidTable;
                               
@@ -582,15 +630,30 @@ SetWorker (
       Name = &(StringTable[VariableHead->StringIndex]);
       VariableOffset = VariableHead->Offset;
 
-      return SetHiiVariable (Guid, Name, Data, Size, VariableOffset);
+      Status = SetHiiVariable (Guid, Name, Data, *Size, VariableOffset);
+
+      if (EFI_NOT_FOUND == Status) {
+        CopyMem (PcdDb + VariableHead->DefaultValueOffset, Data, *Size);
+        return EFI_SUCCESS;
+      } else {
+        return Status;
+      }
+      
+      //
+      // Bug Bug: Please implement this
+      //
 
     case PCD_TYPE_DATA:
       if (PtrType) {
-        CopyMem (InternalData, Data, Size);
-        return EFI_SUCCESS;
+        if (SetPtrTypeSize (TokenNumber, Size)) {
+          CopyMem (InternalData, Data, *Size);
+          return EFI_SUCCESS;
+        } else {
+          return EFI_INVALID_PARAMETER;
+        }
       }
 
-      switch (Size) {
+      switch (*Size) {
         case sizeof(UINT8):
           *((UINT8 *) InternalData) = *((UINT8 *) Data);
           return EFI_SUCCESS;
@@ -638,26 +701,35 @@ ExGetWorker (
 
 
 
+EFI_STATUS
+ExSetValueWorker (
+  IN          UINTN                ExTokenNumber,
+  IN          CONST EFI_GUID       *Guid,
+  IN          VOID                 *Data,
+  IN          UINTN                SetSize
+  )
+{
+  return ExSetWorker (ExTokenNumber, Guid, Data, &SetSize, FALSE);
+}
+
 
 EFI_STATUS
 ExSetWorker (
-  IN UINTN                ExTokenNumber,
-  IN CONST EFI_GUID       *Guid,
-  VOID                    *Data,
-  UINTN                   SetSize,
-  BOOLEAN                 PtrType
+  IN          UINTN                ExTokenNumber,
+  IN          CONST EFI_GUID       *Guid,
+  IN          VOID                 *Data,
+  IN OUT      UINTN                *SetSize,
+  IN          BOOLEAN              PtrType
   )
 {
   UINTN                   TokenNumber;
   
   TokenNumber = GetExPcdTokenNumber (Guid, (UINT32) ExTokenNumber);
 
-  InvokeCallbackOnSet ((UINT32) ExTokenNumber, Guid, TokenNumber, Data, SetSize);
+  InvokeCallbackOnSet ((UINT32) ExTokenNumber, Guid, TokenNumber, Data, *SetSize);
 
-  SetWorker (TokenNumber, Data, SetSize, PtrType);
+  return SetWorker (TokenNumber, Data, SetSize, PtrType);
 
-  return EFI_SUCCESS;
-  
 }
 
 
@@ -705,24 +777,25 @@ SetHiiVariable (
 
     CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
 
-  } else {
+    Status = EfiSetVariable (
+              VariableName,
+              VariableGuid,
+              Attribute,
+              Size,
+              Buffer
+              );
 
-    Attribute = EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
-    Size = DataSize + Offset;
-    Buffer = AllocateZeroPool (Size);
-    ASSERT (Buffer != NULL);
-    CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
-    
-  }
+    FreePool (Buffer);
+    return Status;
 
-  return EfiSetVariable (
-            VariableName,
-            VariableGuid,
-            Attribute,
-            Size,
-            Buffer
-            );
-
+  } 
+  
+  //
+  // If we drop to here, we don't have a Variable entry in
+  // the variable service yet. So, we will save the data
+  // in the PCD Database's volatile area.
+  //
+  return Status;
 }
 
 
@@ -783,5 +856,260 @@ GetExPcdTokenNumber (
   ASSERT (FALSE);
 
   return 0;
+}
+
+
+
+SKU_ID *
+GetSkuIdArray (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  IN    BOOLEAN           IsPeiPcd
+  )
+{
+  SKU_HEAD  *SkuHead;
+  UINTN     LocalTokenNumber;
+  UINT8     *Database;
+
+  if (IsPeiPcd) {
+    LocalTokenNumber = mPcdDatabase->PeiDb.Init.LocalTokenNumberTable[LocalTokenNumberTableIdx];
+    Database         = (UINT8 *) &mPcdDatabase->PeiDb;
+  } else {
+    LocalTokenNumber = mPcdDatabase->DxeDb.Init.LocalTokenNumberTable[LocalTokenNumberTableIdx - PEI_LOCAL_TOKEN_NUMBER];
+    Database         = (UINT8 *) &mPcdDatabase->DxeDb;
+  }
+
+  ASSERT ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) != 0);
+
+  SkuHead = (SKU_HEAD *) ((UINT8 *)Database + (LocalTokenNumber & PCD_DATABASE_OFFSET_MASK));
+
+  return (SKU_ID *) (Database + SkuHead->SkuIdTableOffset);
+  
+}
+
+
+
+UINTN
+GetSizeTableIndexA (
+  IN UINTN        LocalTokenNumberTableIdx,
+  IN UINT32       *LocalTokenNumberTable,
+  IN BOOLEAN      IsPeiDb
+  )
+{
+  UINTN       i;
+  UINTN       SizeTableIdx;
+  UINTN       LocalTokenNumber;
+  SKU_ID      *SkuIdTable;
+  
+  SizeTableIdx = 0;
+
+  for (i=0; i<LocalTokenNumberTableIdx; i++) {
+    LocalTokenNumber = LocalTokenNumberTable[i];
+
+    if ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER) {
+      //
+      // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
+      // PCD entry.
+      //
+      if (LocalTokenNumber & PCD_TYPE_VPD) {
+          //
+          // We have only one entry for VPD enabled PCD entry:
+          // 1) MAX Size.
+          // We consider current size is equal to MAX size.
+          //
+          SizeTableIdx++;
+      } else {
+        if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
+          //
+          // We have only two entry for Non-Sku enabled PCD entry:
+          // 1) MAX SIZE
+          // 2) Current Size
+          //
+          SizeTableIdx += 2;
+        } else {
+          //
+          // We have these entry for SKU enabled PCD entry
+          // 1) MAX SIZE
+          // 2) Current Size for each SKU_ID (It is equal to MaxSku).
+          //
+          SkuIdTable = GetSkuIdArray (i, IsPeiDb);
+          SizeTableIdx += (UINTN)*SkuIdTable + 1;
+        }
+      }
+    }
+
+  }
+
+  return SizeTableIdx;
+}
+
+
+
+
+UINTN
+GetSizeTableIndex (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  IN    BOOLEAN           IsPeiDb
+  )
+{
+  UINT32 *LocalTokenNumberTable;
+  
+  if (IsPeiDb) {
+    LocalTokenNumberTable = mPcdDatabase->PeiDb.Init.LocalTokenNumberTable;
+  } else {
+    LocalTokenNumberTable = mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
+  }
+  return GetSizeTableIndexA (LocalTokenNumberTableIdx, 
+                              LocalTokenNumberTable,
+                              IsPeiDb);
+}
+
+
+
+UINTN
+GetPtrTypeSize (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  OUT   UINTN             *MaxSize
+  )
+{
+  INTN        SizeTableIdx;
+  UINTN       LocalTokenNumber;
+  SKU_ID      *SkuIdTable;
+  SIZE_INFO   *SizeTable;
+  UINTN       i;
+  BOOLEAN     IsPeiDb;
+  UINT32      *LocalTokenNumberTable;
+
+  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx < PEI_LOCAL_TOKEN_NUMBER);
+
+
+  if (IsPeiDb) {
+    LocalTokenNumberTable = mPcdDatabase->PeiDb.Init.LocalTokenNumberTable;
+    SizeTable = mPcdDatabase->PeiDb.Init.SizeTable;
+  } else {
+    LocalTokenNumberTableIdx -= PEI_LOCAL_TOKEN_NUMBER;
+    LocalTokenNumberTable = mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
+    SizeTable = mPcdDatabase->DxeDb.Init.SizeTable;
+  }
+
+  LocalTokenNumber = LocalTokenNumberTable[LocalTokenNumberTableIdx];
+
+  ASSERT ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER);
+  
+  SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, IsPeiDb);
+
+  *MaxSize = SizeTable[SizeTableIdx];
+  //
+  // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
+  // PCD entry.
+  //
+  if (LocalTokenNumber & PCD_TYPE_VPD) {
+      //
+      // We have only one entry for VPD enabled PCD entry:
+      // 1) MAX Size.
+      // We consider current size is equal to MAX size.
+      //
+      return *MaxSize;
+  } else {
+    if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
+      //
+      // We have only two entry for Non-Sku enabled PCD entry:
+      // 1) MAX SIZE
+      // 2) Current Size
+      //
+      return SizeTable[SizeTableIdx + 1];
+    } else {
+      //
+      // We have these entry for SKU enabled PCD entry
+      // 1) MAX SIZE
+      // 2) Current Size for each SKU_ID (It is equal to MaxSku).
+      //
+      SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, IsPeiDb);
+      for (i = 0; i < SkuIdTable[0]; i++) {
+        if (SkuIdTable[1 + i] == mPcdDatabase->PeiDb.Init.SystemSkuId) {
+          return SizeTable[SizeTableIdx + 1 + i];
+        }
+      }
+      return SizeTable[SizeTableIdx + 1];
+    }
+  }
+}
+
+
+
+BOOLEAN
+SetPtrTypeSize (
+  IN          UINTN             LocalTokenNumberTableIdx,
+  IN    OUT   UINTN             *CurrentSize
+  )
+{
+  INTN        SizeTableIdx;
+  UINTN       LocalTokenNumber;
+  SKU_ID      *SkuIdTable;
+  SIZE_INFO   *SizeTable;
+  UINTN       i;
+  UINTN       MaxSize;
+  BOOLEAN     IsPeiDb;
+  UINT32      *LocalTokenNumberTable;
+
+  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx < PEI_LOCAL_TOKEN_NUMBER);
+
+  if (IsPeiDb) {
+    LocalTokenNumberTable = mPcdDatabase->PeiDb.Init.LocalTokenNumberTable;
+    SizeTable = mPcdDatabase->PeiDb.Init.SizeTable;
+  } else {
+    LocalTokenNumberTableIdx -= PEI_LOCAL_TOKEN_NUMBER;
+    LocalTokenNumberTable = mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
+    SizeTable = mPcdDatabase->DxeDb.Init.SizeTable;
+  }
+
+  LocalTokenNumber = LocalTokenNumberTable[LocalTokenNumberTableIdx];
+
+  ASSERT ((LocalTokenNumber & PCD_DATUM_TYPE_ALL_SET) == PCD_DATUM_TYPE_POINTER);
+  
+  SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, IsPeiDb);
+
+  MaxSize = SizeTable[SizeTableIdx];
+  //
+  // SizeTable only contain record for PCD_DATUM_TYPE_POINTER type 
+  // PCD entry.
+  //
+  if (LocalTokenNumber & PCD_TYPE_VPD) {
+      //
+      // We shouldn't come here as we don't support SET for VPD
+      //
+      ASSERT (FALSE);
+      return FALSE;
+  } else {
+    if ((*CurrentSize > MaxSize) ||
+      (*CurrentSize == MAX_ADDRESS)) {
+       *CurrentSize = MaxSize;
+       return FALSE;
+    } 
+    
+    if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
+      //
+      // We have only two entry for Non-Sku enabled PCD entry:
+      // 1) MAX SIZE
+      // 2) Current Size
+      //
+      SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
+      return TRUE;
+    } else {
+      //
+      // We have these entry for SKU enabled PCD entry
+      // 1) MAX SIZE
+      // 2) Current Size for each SKU_ID (It is equal to MaxSku).
+      //
+      SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, IsPeiDb);
+      for (i = 0; i < SkuIdTable[0]; i++) {
+        if (SkuIdTable[1 + i] == mPcdDatabase->PeiDb.Init.SystemSkuId) {
+          SizeTable[SizeTableIdx + 1 + i] = (SIZE_INFO) *CurrentSize;
+          return TRUE;
+        }
+      }
+      SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
+      return TRUE;
+    }
+  }
 }
 

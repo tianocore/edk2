@@ -229,16 +229,24 @@ class StringTable {
 
 **/
 class SizeTable {
-    private ArrayList<Integer>  al;
+    private ArrayList<ArrayList<Integer>>  al;
     private ArrayList<String>   alComments;
-    private String              phase;
     private int                 len;
+    private String              phase;
     
     public SizeTable (String phase) {
-        this.phase = phase;
-        al = new ArrayList<Integer>();
+        al = new ArrayList<ArrayList<Integer>>();
         alComments = new ArrayList<String>();
         len = 0;
+        this.phase = phase;
+    }
+
+    public String getSizeMacro () {
+        return String.format(PcdDatabase.SizeTableSizeMacro, phase, getSize());
+    }
+    
+    private int getSize() {
+        return len == 0 ? 1 : len;
     }
 
     public void genCode (ArrayList<CStructTypeDeclaration> declaList, HashMap<String, String> instTable, String phase) {
@@ -262,6 +270,7 @@ class SizeTable {
     }
 
     private ArrayList<String> getInstantiation () {
+        final String comma   = ",";
         ArrayList<String> Output = new ArrayList<String>();
 
         Output.add("/* SizeTable */");
@@ -270,14 +279,23 @@ class SizeTable {
             Output.add("\t0");
         } else {
             for (int index = 0; index < al.size(); index++) {
-                Integer n = al.get(index);
-                String str = "\t" + n.toString();
-
-                if (index != (al.size() - 1)) {
-                    str += ",";
+                ArrayList<Integer> ial = al.get(index);
+                
+                String str = "\t";
+                
+                for (int index2 = 0; index2 < ial.size(); index2++) {
+                    str += " " + ial.get(index2).toString();
+                    if (index2 != ial.size() - 1) {
+                        str += comma;
+                    }
                 }
 
                 str += " /* " + alComments.get(index) + " */"; 
+                
+                if (index != (al.size() - 1)) {
+                    str += comma;
+                }
+
                 Output.add(str);
     
             }
@@ -287,20 +305,25 @@ class SizeTable {
         return Output;
     }
 
-    public int add (Token token) {
-        int index = len;
+    public void add (Token token) {
 
-        len++; 
-        al.add(token.datumSize);
+        //
+        // We only have size information for POINTER type PCD entry.
+        //
+        if (token.datumType != Token.DATUM_TYPE.POINTER) {
+            return;
+        }
+        
+        ArrayList<Integer> ial = token.getPointerTypeSize();
+        
+        len+= ial.size(); 
+
+        al.add(ial);
         alComments.add(token.getPrimaryKeyString());
 
-        return index;
+        return;
     }
     
-    public int getTableLen () {
-        return al.size() == 0 ? 1 : al.size();
-    }
-
 }
 
 /**
@@ -344,7 +367,7 @@ class GuidTable {
         cCode += String.format(PcdDatabase.GuidTableDeclaration, phase); 
         decl = new CStructTypeDeclaration (
                                             name,
-                                            8,
+                                            4,
                                             cCode,
                                             true
                                            );  
@@ -674,6 +697,25 @@ class LocalTokenNumberTable {
             str += " | PCD_TYPE_VPD";
         }
         
+        switch (token.datumType) {
+        case UINT8:
+        case BOOLEAN:
+            str += " | PCD_DATUM_TYPE_UINT8";
+            break;
+        case UINT16:
+            str += " | PCD_DATUM_TYPE_UINT16";
+            break;
+        case UINT32:
+            str += " | PCD_DATUM_TYPE_UINT32";
+            break;
+        case UINT64:
+            str += " | PCD_DATUM_TYPE_UINT64";
+            break;
+        case POINTER:
+            str += " | PCD_DATUM_TYPE_POINTER";
+            break;
+        }
+        
         al.add(str);
         alComment.add(token.getPrimaryKeyString());
 
@@ -851,7 +893,7 @@ class PcdDatabase {
     public final static String GuidTableDeclaration             = "EFI_GUID            GuidTable[%s_GUID_TABLE_SIZE];\r\n";
     public final static String LocalTokenNumberTableDeclaration = "UINT32              LocalTokenNumberTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
     public final static String StringTableDeclaration           = "UINT16              StringTable[%s_STRING_TABLE_SIZE];\r\n";
-    public final static String SizeTableDeclaration             = "UINT16              SizeTable[%s_LOCAL_TOKEN_NUMBER_TABLE_SIZE];\r\n";
+    public final static String SizeTableDeclaration             = "SIZE_INFO           SizeTable[%s_SIZE_TABLE_SIZE];\r\n";
     public final static String SkuIdTableDeclaration            = "UINT8               SkuIdTable[%s_SKUID_TABLE_SIZE];\r\n";
 
 
@@ -860,6 +902,7 @@ class PcdDatabase {
     public final static String GuidTableSizeMacro               = "#define %s_GUID_TABLE_SIZE         %d\r\n"; 
     public final static String LocalTokenNumberTableSizeMacro   = "#define %s_LOCAL_TOKEN_NUMBER_TABLE_SIZE            %d\r\n";
     public final static String LocalTokenNumberSizeMacro   		= "#define %s_LOCAL_TOKEN_NUMBER            %d\r\n";
+    public final static String SizeTableSizeMacro               = "#define %s_SIZE_TABLE_SIZE            %d\r\n";
     public final static String StringTableSizeMacro             = "#define %s_STRING_TABLE_SIZE       %d\r\n";
     public final static String SkuIdTableSizeMacro              = "#define %s_SKUID_TABLE_SIZE        %d\r\n";
 
@@ -1144,6 +1187,7 @@ class PcdDatabase {
         macroStr += skuIdTable.getSizeMacro();
         macroStr += localTokenNumberTable.getSizeMacro();
         macroStr += exMapTable.getSizeMacro();
+        macroStr += sizeTable.getSizeMacro();
 
         //
         // Generate existance info Macro for all Tables
@@ -1311,6 +1355,9 @@ class PcdDatabase {
         }
     }
     
+    //
+    // privateGlobalName and privateGlobalCCode is used to pass output to caller of getCDeclarationString
+    //
     private void getCDeclarationString(Token t) 
         throws EntityException {
         
@@ -1321,7 +1368,7 @@ class PcdDatabase {
         }
 
         String type = getCType(t);
-        if ((t.datumType == Token.DATUM_TYPE.POINTER) && (!t.isHiiEnable())) {
+        if ((t.datumType == Token.DATUM_TYPE.POINTER) && (!t.isHiiEnable()) && (!t.isUnicodeStringType())) {
             int bufferSize;
             if (t.isASCIIStringType()) {
                 //
@@ -3007,14 +3054,16 @@ public class CollectPCDAction {
     **/
     public static void main(String argv[]) throws EntityException {
         CollectPCDAction ca = new CollectPCDAction();
-        ca.setWorkspacePath("m:/tianocore/edk2");
-        ca.setFPDFilePath("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd");
+        String projectDir = "x:/edk2";
+        ca.setWorkspacePath(projectDir);
+        ca.setFPDFilePath(projectDir + "/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            "m:/tianocore/edk2",
+                            projectDir,
                             "tools_def.txt");
+        System.out.println("After initInfo!");
         FpdParserTask fpt = new FpdParserTask();
-        fpt.parseFpdFile(new File("m:/tianocore/edk2/EdkNt32Pkg/Nt32.fpd"));
+        fpt.parseFpdFile(new File(projectDir + "/EdkNt32Pkg/Nt32.fpd"));
         ca.execute();
     }
 }
