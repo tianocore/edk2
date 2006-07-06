@@ -33,6 +33,7 @@ import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 
@@ -114,6 +115,8 @@ public class SpdHeader extends IInternalFrame {
     private StarLabel jStarLabel9 = null;
     
     private SpdFileContents sfc = null;
+    
+    private OpeningPackageType docConsole = null;
 
     private JTextField jTextFieldCopyright = null;
     
@@ -140,6 +143,7 @@ public class SpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Package Name is NOT UiNameType.");
                         return;
                     }
+                    docConsole.setSaved(false);
                     sfc.setSpdHdrPkgName(jTextFieldBaseName.getText());
                 }
             });
@@ -164,6 +168,7 @@ public class SpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Guid is NOT GuidType.");
                         return;
                     }
+                    docConsole.setSaved(false);
                     sfc.setSpdHdrGuidValue(jTextFieldGuid.getText());
                 }
             });
@@ -188,6 +193,7 @@ public class SpdHeader extends IInternalFrame {
                        JOptionPane.showMessageDialog(frame, "Version is NOT version type.");
                        return;
                    }
+                   docConsole.setSaved(false);
                    sfc.setSpdHdrVer(jTextFieldVersion.getText());
                } 
             });
@@ -221,7 +227,7 @@ public class SpdHeader extends IInternalFrame {
         if (jTextAreaLicense == null) {
             jTextAreaLicense = new JTextArea();
             jTextAreaLicense.setText("");
-            jTextAreaLicense.setPreferredSize(new java.awt.Dimension(317,77));
+//            jTextAreaLicense.setPreferredSize(new java.awt.Dimension(317,77));
             jTextAreaLicense.setLineWrap(true);
             jTextAreaLicense.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
@@ -229,6 +235,7 @@ public class SpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "License contents could NOT be empty.");
                         return;
                     }
+                    docConsole.setSaved(false);
                     sfc.setSpdHdrLicense(jTextAreaLicense.getText());
                 }
             });
@@ -246,13 +253,14 @@ public class SpdHeader extends IInternalFrame {
         if (jTextAreaDescription == null) {
             jTextAreaDescription = new JTextArea();
             jTextAreaDescription.setLineWrap(true);
-            jTextAreaDescription.setPreferredSize(new java.awt.Dimension(317,77));
+//            jTextAreaDescription.setPreferredSize(new java.awt.Dimension(317,77));
             jTextAreaDescription.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
                     if (jTextAreaDescription.getText().length() == 0) {
                         JOptionPane.showMessageDialog(frame, "Description contents could NOT be empty.");
                         return;
                     }
+                    docConsole.setSaved(false);
                     sfc.setSpdHdrDescription(jTextAreaDescription.getText());
                 }
             });
@@ -365,6 +373,7 @@ public class SpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Abstract could NOT be empty.");
                         return;
                     }
+                    docConsole.setSaved(false);
                     sfc.setSpdHdrAbs(jTextFieldAbstract.getText());
                 }
             });
@@ -389,6 +398,7 @@ public class SpdHeader extends IInternalFrame {
                        JOptionPane.showMessageDialog(frame, "Copyright contents could not be empty.");
                        return;
                    }
+                   docConsole.setSaved(false);
                    sfc.setSpdHdrCopyright(jTextFieldCopyright.getText());
                } 
             });
@@ -410,6 +420,7 @@ public class SpdHeader extends IInternalFrame {
                public void focusLost(FocusEvent e){
                    sfc.setSpdHdrLicense(jTextAreaLicense.getText());
                    sfc.setSpdHdrUrl(jTextField.getText());
+                   docConsole.setSaved(false);
                } 
             });
         }
@@ -440,6 +451,11 @@ public class SpdHeader extends IInternalFrame {
         this();
         sfc = new SpdFileContents(inPsa);
         init(sfc);
+    }
+    
+    public SpdHeader(OpeningPackageType opt){
+        this(opt.getXmlSpd());
+        docConsole = opt;
     }
     /**
      This method initializes this
@@ -587,6 +603,7 @@ public class SpdHeader extends IInternalFrame {
      *
      */
     public void actionPerformed(ActionEvent arg0) {
+        docConsole.setSaved(false);
         if (arg0.getSource() == jButtonOk) {
             this.save();
             this.setEdited(true);

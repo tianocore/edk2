@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import javax.swing.JCheckBox;
 import java.awt.FlowLayout;
@@ -35,6 +36,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     private DynPcdTableModel model = null; 
     private DynPcdTableModel model1 = null;
     private FpdFileContents ffc = null;
+    private OpeningPlatformType docConsole = null;
     private JPanel jPanel3 = null;
     private JCheckBox jCheckBox = null;
     private JPanel jPanel4 = null;
@@ -69,6 +71,11 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
     public FpdDynamicPcdBuildDefinitions(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd){
         this();
         init(fpd);
+    }
+    
+    public FpdDynamicPcdBuildDefinitions(OpeningPlatformType opt) {
+        this(opt.getXmlFpd());
+        docConsole = opt;
     }
     
     public void init(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
@@ -492,7 +499,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                     if (pcdSelected < 0) {
                         return;
                     }
-                    
+                    docConsole.setSaved(false);
                     updateSkuInfo(pcdSelected);
                     
                 }

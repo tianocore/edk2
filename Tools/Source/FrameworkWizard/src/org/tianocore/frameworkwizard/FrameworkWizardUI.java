@@ -2376,32 +2376,30 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     **/
     private void showPlatformElement(int elementType, OpeningPlatformType fpd) {
         this.cleanDesktopPanePlatform();
-        fpd.setSaved(false);
+        
         switch (elementType) {
         case IDefaultMutableTreeNode.FPD_PLATFORMDEFINITIONS:
-            FpdPlatformDefs frmFpdPlatformDefs = new FpdPlatformDefs(fpd.getXmlFpd());
+            FpdPlatformDefs frmFpdPlatformDefs = new FpdPlatformDefs(fpd);
             getJDesktopPanePlatform().add(frmFpdPlatformDefs, 1);
             break;
         case IDefaultMutableTreeNode.FPD_PLATFORMHEADER:
-            FpdHeader frmFpdHeader = new FpdHeader(fpd.getXmlFpd());
+            FpdHeader frmFpdHeader = new FpdHeader(fpd);
             getJDesktopPanePlatform().add(frmFpdHeader, 1);
             break;
         case IDefaultMutableTreeNode.FPD_FLASH:
-            FpdFlash frmFpdFlash = new FpdFlash(fpd.getXmlFpd());
+            FpdFlash frmFpdFlash = new FpdFlash(fpd);
             getJDesktopPanePlatform().add(frmFpdFlash, 1);
             break;
         case IDefaultMutableTreeNode.FPD_FRAMEWORKMODULES:
-            FpdFrameworkModules frmFpdFrameworkModules = new FpdFrameworkModules(fpd.getXmlFpd());
+            FpdFrameworkModules frmFpdFrameworkModules = new FpdFrameworkModules(fpd);
             getJDesktopPanePlatform().add(frmFpdFrameworkModules, 1);
             break;
         case IDefaultMutableTreeNode.FPD_PCDDYNAMICBUILDDECLARATIONS:
-            FpdDynamicPcdBuildDefinitions frmFpdDynamicPcdBuildDefinitions = new FpdDynamicPcdBuildDefinitions(
-                                                                                                               fpd
-                                                                                                                  .getXmlFpd());
+            FpdDynamicPcdBuildDefinitions frmFpdDynamicPcdBuildDefinitions = new FpdDynamicPcdBuildDefinitions(fpd);
             getJDesktopPanePlatform().add(frmFpdDynamicPcdBuildDefinitions, 1);
             break;
         case IDefaultMutableTreeNode.FPD_BUILDOPTIONS:
-            FpdBuildOptions frmFpdBuildOptions = new FpdBuildOptions(fpd.getXmlFpd());
+            FpdBuildOptions frmFpdBuildOptions = new FpdBuildOptions(fpd);
             getJDesktopPanePlatform().add(frmFpdBuildOptions, 1);
             break;
         }
@@ -2419,42 +2417,41 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     private void showPackageElement(int elementType, OpeningPackageType spd) {
         this.cleanDesktopPanePackage();
         Tools.dirForNewSpd = spd.getId().getPath();
-        spd.setSaved(false);
         switch (elementType) {
         case IDefaultMutableTreeNode.SPD_HEADER:
-            SpdHeader frmSpdHeader = new SpdHeader(spd.getXmlSpd());
+            SpdHeader frmSpdHeader = new SpdHeader(spd);
             getJDesktopPanePackage().add(frmSpdHeader, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PACKAGEDEFINITIONS:
-            SpdPackageDefinitions frmSpdPackageDefinitions = new SpdPackageDefinitions(spd.getXmlSpd());
+            SpdPackageDefinitions frmSpdPackageDefinitions = new SpdPackageDefinitions(spd);
             getJDesktopPanePackage().add(frmSpdPackageDefinitions, 1);
             break;
         case IDefaultMutableTreeNode.SPD_LIBRARYCLASSDECLARATIONS:
-            SpdLibClassDecls frmSlcd = new SpdLibClassDecls(spd.getXmlSpd());
+            SpdLibClassDecls frmSlcd = new SpdLibClassDecls(spd);
             getJDesktopPanePackage().add(frmSlcd, 1);
             break;
         case IDefaultMutableTreeNode.SPD_MSAFILES:
-            SpdMsaFiles frmSmf = new SpdMsaFiles(spd.getXmlSpd());
+            SpdMsaFiles frmSmf = new SpdMsaFiles(spd);
             getJDesktopPanePackage().add(frmSmf, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PACKAGEHEADERS:
-            SpdPackageHeaders frmSph = new SpdPackageHeaders(spd.getXmlSpd());
+            SpdPackageHeaders frmSph = new SpdPackageHeaders(spd);
             getJDesktopPanePackage().add(frmSph, 1);
             break;
         case IDefaultMutableTreeNode.SPD_GUIDDECLARATIONS:
-            SpdGuidDecls frmSgd = new SpdGuidDecls(spd.getXmlSpd());
+            SpdGuidDecls frmSgd = new SpdGuidDecls(spd);
             getJDesktopPanePackage().add(frmSgd, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PROTOCOLDECLARATIONS:
-            SpdProtocolDecls frmSprod = new SpdProtocolDecls(spd.getXmlSpd());
+            SpdProtocolDecls frmSprod = new SpdProtocolDecls(spd);
             getJDesktopPanePackage().add(frmSprod, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PPIDECLARATIONS:
-            SpdPpiDecls frmSppid = new SpdPpiDecls(spd.getXmlSpd());
+            SpdPpiDecls frmSppid = new SpdPpiDecls(spd);
             getJDesktopPanePackage().add(frmSppid, 1);
             break;
         case IDefaultMutableTreeNode.SPD_PCDDECLARATIONS:
-            SpdPcdDefs frmSpcdd = new SpdPcdDefs(spd.getXmlSpd());
+            SpdPcdDefs frmSpcdd = new SpdPcdDefs(spd);
             getJDesktopPanePackage().add(frmSpcdd, 1);
             break;
         }

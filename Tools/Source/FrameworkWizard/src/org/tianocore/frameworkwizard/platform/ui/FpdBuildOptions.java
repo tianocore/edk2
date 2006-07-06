@@ -26,6 +26,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
@@ -43,6 +45,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -53,6 +57,7 @@ import java.util.Vector;
 public class FpdBuildOptions extends IInternalFrame {
 
     private static final long serialVersionUID = 1L;
+    static JFrame frame;
     private JPanel jContentPane = null;
     private JPanel jPanel = null;
     private JPanel jPanel1 = null;
@@ -105,6 +110,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton jButton17 = null;
     private JButton jButton18 = null;
     private FpdFileContents ffc = null;
+    private OpeningPlatformType docConsole = null;
     private JButton jButton19 = null;
     private JCheckBox jCheckBox9 = null;
     private JCheckBox jCheckBox10 = null;
@@ -319,12 +325,16 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton4.setText("Add");
             jButton4.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    if (!DataValidation.isInt(jTextField3.getText())) {
+                        JOptionPane.showMessageDialog(frame, "ID must be an integer.");
+                        return;
+                    }
                     Object[] o = {jTextField3.getText(), null, null};
                         o[1] = jTextField2.getText();
                         o[2] = jTextField4.getText();
                         ffc.genBuildOptionsUserDefAntTask(o[0]+"", null, o[2]+"");
                     antTaskTableModel.addRow(o);
-                    
+                    docConsole.setSaved(false);
                 }
             });
         }
@@ -344,6 +354,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton5.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     if (selectedRow >= 0) {
+                        docConsole.setSaved(false);
                         antTaskTableModel.removeRow(selectedRow);
                         ffc.removeBuildOptionsUserDefAntTask(selectedRow);
                     }
@@ -544,7 +555,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jTextField6 == null) {
             jTextField6 = new JTextField();
             jTextField6.setPreferredSize(new java.awt.Dimension(100,20));
-            jTextField6.setEditable(false);
+            jTextField6.setEditable(true);
             jTextField6.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     if (jTable.getSelectedRow() < 0) {
@@ -577,6 +588,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTextField6.getText().length() > 0) {
                         String[] row = {jTextField6.getText()};
                         ffsTableModel.addRow(row);
+                        docConsole.setSaved(false);
                         ffc.genBuildOptionsFfs(jTextField6.getText(), jTextField.getText());
                     }
                 }
@@ -605,6 +617,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTable.getSelectedRow() < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     ffc.removeBuildOptionsFfs(jTable.getSelectedRow());
                 }
             });
@@ -657,6 +670,7 @@ public class FpdBuildOptions extends IInternalFrame {
                         if (value.length() == 0){
                             return;
                         }
+                        docConsole.setSaved(false);
                         ffc.updateBuildOptionsFfsAttribute(jTable.getSelectedRow(), row, name, value);
                     }
                 }
@@ -826,7 +840,14 @@ public class FpdBuildOptions extends IInternalFrame {
             cb.addItem("CYGWIN");
             cb.addItem("INTEL");
             toolFamilyCol.setCellEditor(new DefaultCellEditor(cb));
-            
+            Vector<String> vArch = new Vector<String>();
+            vArch.add("IA32");
+            vArch.add("X64");
+            vArch.add("IPF");
+            vArch.add("EBC");
+            vArch.add("ARM");
+            vArch.add("PPC");
+            jTable5.getColumnModel().getColumn(2).setCellEditor(new ListEditor(vArch));
             jTable5.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable5.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -859,17 +880,19 @@ public class FpdBuildOptions extends IInternalFrame {
                         }
                         String toolChain = m.getValueAt(row, 1) + "";
                         String archs = m.getValueAt(row, 2) + "";
-                        Vector<Object> supArch = new Vector<Object>();
-                        String[] sArray1 = archs.split("( )+");
-                        for (int i = 0; i < sArray1.length; ++i) {
-                            supArch.add(sArray1[i]);
+                        Vector<Object> supArch = null;
+                        if (archs.length() > 0) {
+                            supArch = new Vector<Object>();
+                            String[] sArray1 = archs.split("( )+");
+                            for (int i = 0; i < sArray1.length; ++i) {
+                                supArch.add(sArray1[i]);
+                            }
                         }
-                        if (supArch.size() == 0) {
-                            supArch.add("IA32");
-                        }
+                        
                         String toolCmd = m.getValueAt(row, 3) + "";
                         String tagName = m.getValueAt(row, 4) + "";
                         String contents = m.getValueAt(row, 5) + "";
+                        docConsole.setSaved(false);
                         ffc.updateBuildOptionsOpt(row, targetName, toolChain, tagName, toolCmd, supArch, contents);
                     }
                 }
@@ -901,7 +924,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     Object[] o = {jTextField12.getText(), jComboBox2.getSelectedItem(), s,
                                   jTextField8.getText(), jTextField13.getText(), jTextField7.getText()};
                     optionsTableModel.addRow(o);
-                  
+                    docConsole.setSaved(false);
                     ffc.genBuildOptionsOpt(stringToVector(jTextField12.getText()), jComboBox2.getSelectedItem()+"", jTextField13.getText(), jTextField8.getText(),  stringToVector(s), jTextField7.getText());
                 }
             });
@@ -911,9 +934,12 @@ public class FpdBuildOptions extends IInternalFrame {
     
     private Vector<Object> stringToVector(String s) {
         String[] sArray = s.split(" ");
-        Vector<Object> v = new Vector<Object>();
-        for (int i = 0; i < sArray.length; ++i) {
-            v.add(sArray[i]);
+        Vector<Object> v = null;
+        if (s.length() > 0) {
+            v = new Vector<Object>();
+            for (int i = 0; i < sArray.length; ++i) {
+                v.add(sArray[i]);
+            } 
         }
         return v;
     }
@@ -963,6 +989,7 @@ public class FpdBuildOptions extends IInternalFrame {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     if (selectedRow >= 0) {
                         optionsTableModel.removeRow(selectedRow);
+                        docConsole.setSaved(false);
                         ffc.removeBuildOptionsOpt(selectedRow);
                     }
                 }
@@ -993,6 +1020,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     }
                     Object[] o = {"", ""};
                     ffsAttributesTableModel.addRow(o);
+                    docConsole.setSaved(false);
                     ffc.genBuildOptionsFfsAttribute(jTable.getSelectedRow(), "", "");
                 }
             });
@@ -1021,6 +1049,7 @@ public class FpdBuildOptions extends IInternalFrame {
                         return;
                     }
                     if (jTable4.getSelectedRow() >= 0){
+                        docConsole.setSaved(false);
                         ffsAttributesTableModel.removeRow(jTable4.getSelectedRow());
                         ffc.removeBuildOptionsFfsAttribute(jTable.getSelectedRow(), jTable4.getSelectedRow());
                     }
@@ -1240,7 +1269,7 @@ public class FpdBuildOptions extends IInternalFrame {
                         if (id.length() == 0) {
                             return;
                         }
-                       
+                        docConsole.setSaved(false);
                         ffc.updateBuildOptionsFfsKey(row, id);
                     }
                 }
@@ -1304,7 +1333,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (arg0.getType() == TableModelEvent.UPDATE){
                         //ToDo Data Validition check.
                         String type = m.getValueAt(row, 0) + "";
-                        
+                        docConsole.setSaved(false);
                        ffc.updateBuildOptionsFfsSectionsSection(jTable.getSelectedRow(), row, type);
                     }
                 }
@@ -1366,6 +1395,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (arg0.getType() == TableModelEvent.UPDATE){
                         //ToDo Data Validition check.
                         String type = m.getValueAt(row, 0) + "";
+                        docConsole.setSaved(false);
                         ffc.updateBuildOptionsFfsSectionsSectionsSection(jTable.getSelectedRow(), jTable6.getSelectedRow(), row, type);
                     }
                 }
@@ -1425,6 +1455,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTable.getSelectedRow() < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     String[] row = {"EFI_SECTION_RAW"};
                     sectionTableModel.addRow(row);
                     ffc.genBuildOptionsFfsSectionsSection(jTable.getSelectedRow(), row[0]);
@@ -1450,6 +1481,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTable.getSelectedRow() < 0 || jTable1.getSelectedRow() < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     sectionTableModel.removeRow(jTable1.getSelectedRow());
                     ffc.removeBuildOptionsFfsSectionsSection(jTable.getSelectedRow(), jTable1.getSelectedRow());
                 }
@@ -1473,6 +1505,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTable.getSelectedRow() < 0 || jTable6.getSelectedRow() < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     String[] row = {"EFI_SECTION_RAW"};
                     subsectionsTableModel.addRow(row);
                     ffc.genBuildOptionsFfsSectionsSectionsSection(jTable.getSelectedRow(), jTable6.getSelectedRow(), row[0]);
@@ -1498,6 +1531,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTable.getSelectedRow() < 0 || jTable6.getSelectedRow() < 0 || jTable3.getSelectedRow() < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     subsectionsTableModel.removeRow(jTable3.getSelectedRow());
                     ffc.removeBuildOptionsFfsSectionsSectionsSection(jTable.getSelectedRow(), jTable6.getSelectedRow(), jTable3.getSelectedRow());
                 }
@@ -1521,6 +1555,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTable.getSelectedRow() < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     String[] row = {""};
                     sectionsTableModel.addRow(row);
                     ffc.genBuildOptionsFfsSectionsSections(jTable.getSelectedRow(), "");
@@ -1545,6 +1580,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (jTable.getSelectedRow() < 0 || jTable6.getSelectedRow() < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     sectionsTableModel.removeRow(jTable6.getSelectedRow());
                     ffc.removeBuildOptionsFfsSectionsSections(jTable.getSelectedRow(), jTable6.getSelectedRow());
                 }
@@ -1612,6 +1648,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     if (arg0.getType() == TableModelEvent.UPDATE){
                         //ToDo Data Validition check.
                         String encapType = m.getValueAt(row, 0) + "";
+                        docConsole.setSaved(false);
                         ffc.updateBuildOptionsFfsSectionsSections(jTable.getSelectedRow(), row, encapType);
                     }
                 }
@@ -1641,6 +1678,11 @@ public class FpdBuildOptions extends IInternalFrame {
         this();
         ffc = new FpdFileContents(fpd);
         init(ffc);
+    }
+    
+    public FpdBuildOptions(OpeningPlatformType opt) {
+        this(opt.getXmlFpd());
+        docConsole = opt;
     }
 
     private void init(FpdFileContents ffc) {

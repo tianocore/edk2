@@ -20,6 +20,7 @@ import javax.swing.JComboBox;
 import java.awt.Dimension;
 
 import org.tianocore.PackageSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 
@@ -37,6 +38,7 @@ public class SpdPackageDefinitions extends IInternalFrame {
     private StarLabel starLabel = null;
     private StarLabel starLabel1 = null;
     private SpdFileContents sfc = null;
+    private OpeningPackageType docConsole = null;
 
     /**
      * This is the default constructor
@@ -50,6 +52,11 @@ public class SpdPackageDefinitions extends IInternalFrame {
         this();
         sfc = new SpdFileContents(inPsa);
         init(sfc);
+    }
+    
+    public SpdPackageDefinitions(OpeningPackageType opt) {
+        this(opt.getXmlSpd());
+        docConsole = opt;
     }
 
     private void init(SpdFileContents sfc) {
@@ -121,6 +128,7 @@ public class SpdPackageDefinitions extends IInternalFrame {
             jComboBoxReadOnly.setSelectedIndex(1);
             jComboBoxReadOnly.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    docConsole.setSaved(false);
                     sfc.setSpdPkgDefsRdOnly(jComboBoxReadOnly.getSelectedItem()+"");
                 }
             });
@@ -143,6 +151,7 @@ public class SpdPackageDefinitions extends IInternalFrame {
             jComboBoxRePackage.setSelectedIndex(0);
             jComboBoxRePackage.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    docConsole.setSaved(false);
                     sfc.setSpdPkgDefsRePkg(jComboBoxRePackage.getSelectedItem()+"");
                 }
             });

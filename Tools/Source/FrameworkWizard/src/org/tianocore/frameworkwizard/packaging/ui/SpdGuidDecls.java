@@ -38,6 +38,7 @@ import javax.swing.table.TableModel;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
@@ -57,6 +58,8 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     static JFrame frame;
     
     private SpdFileContents sfc = null;
+    
+    private OpeningPackageType docConsole = null;
 
     private JTable jTable = null;
 
@@ -249,6 +252,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
        int row = arg0.getFirstRow();
        TableModel m = (TableModel)arg0.getSource();
        if (arg0.getType() == TableModelEvent.UPDATE){
+           docConsole.setSaved(false);
            updateRow(row, m);
        }
    }
@@ -371,6 +375,11 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         this();
         sfc = new SpdFileContents(inPsa);
         init(sfc);
+    }
+    
+    public SpdGuidDecls(OpeningPackageType opt) {
+        this(opt.getXmlSpd());
+        docConsole = opt;
     }
     /**
       This method initializes this
@@ -504,6 +513,9 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent arg0) {
+        
+        docConsole.setSaved(false);
+        
         if (arg0.getSource() == jButtonOk) {
             this.save();
             this.dispose();

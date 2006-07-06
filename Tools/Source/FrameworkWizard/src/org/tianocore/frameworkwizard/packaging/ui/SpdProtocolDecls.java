@@ -16,6 +16,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 
 /**
 GUI for create library definition elements of spd file.
@@ -29,6 +30,7 @@ public class SpdProtocolDecls extends SpdGuidDecls {
      */
     private static final long serialVersionUID = 1L;
     private SpdFileContents sfc = null;
+    private OpeningPackageType docConsole = null;
     
     public SpdProtocolDecls() {
         super();
@@ -39,6 +41,11 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         this();
         sfc = new SpdFileContents(inPsa);
         init(sfc);
+    }
+    
+    public SpdProtocolDecls(OpeningPackageType opt) {
+        this(opt.getXmlSpd());
+        docConsole = opt;
     }
     
     protected void initFrame() {
@@ -87,7 +94,7 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         if (!dataValidation(rowData)){
             return;
         }
-        
+        docConsole.setSaved(false);
         sfc.updateSpdProtocolDecl(row, name, cName, guid, help, archList, modTypeList);
     }
     

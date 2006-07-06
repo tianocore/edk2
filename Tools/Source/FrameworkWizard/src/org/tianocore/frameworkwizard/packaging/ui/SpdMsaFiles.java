@@ -39,6 +39,7 @@ import javax.swing.table.TableModel;
 
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 
@@ -84,6 +85,8 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
     private StarLabel jStarLabel2 = null;
     
     private SpdFileContents sfc = null;
+    
+    private OpeningPackageType docConsole = null;
 
     private int selectedRow = -1; 
 
@@ -238,6 +241,11 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
+    
+    public SpdMsaFiles(OpeningPackageType opt){
+        this(opt.getXmlSpd());
+        docConsole = opt;
+    }
     /**
       This method initializes this
       
@@ -324,6 +332,8 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent arg0) {
+        
+        docConsole.setSaved(false);
         if (arg0.getSource() == jButtonOk) {
             this.save();
             this.dispose();
@@ -377,6 +387,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
                 JOptionPane.showMessageDialog(this, "Msa File is NOT PathAndFilename type.");
                 return;
             }
+            docConsole.setSaved(false);
             sfc.updateSpdMsaFile(row, file, null, null, null);
         }
     }
