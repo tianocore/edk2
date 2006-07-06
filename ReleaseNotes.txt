@@ -1,12 +1,12 @@
 Intel(R) Platform Innovation Framework for EFI
-EFI Development Kit II (EDK II (EDK 2)) 
+EFI Development Kit 2.0 (EDK II) 
 Alpha Release
-2006-06-29
+2006-04-26
 
 Copyright (c) 2006, Intel Corporation
 
 This document provides updates to documentation, along with a description on 
-how to install and build the EDK II.
+how to install and build the Edk II.
 
 Package Contents
 ----------------
@@ -43,7 +43,7 @@ Note: Documents have the following filenames:
 Pre-Requisites
 --------------
 The following list of tools must be installed on the development workstation
-prior to using the EDK II.
+prior to using the Edk II.
 
 Compiler Tool Chain
       Microsoft* Visual Studio .NET 2003*  (http://www.microsoft.com)
@@ -160,16 +160,21 @@ Java Tools:
 -------------------------------------------------------------------------------
 Quick Start
 -----------
-Edit the text file, msft_tools_def.txt, located in the Tools/Conf directory.
-This file contains the names of the compiler tool chains and the location of
-the compiler binaries.  It has been pre-populated with the standard location
-for the Microsoft tool chains and includes the standard location of the Intel C
-Compiler for EFI Byte Code (EBC)
+Edit the text file, target.txt, located in the Tools/Conf directory. This 
+file contains the tools defintion file and ative platform. It can also restrict
+current build target(s), tagname(s) and arch(s). Uncomment the line ACTIVE_PLATFORM
+which is commented out by default. 
+
+Edit the tools definition file, tools_def.txt, also located in the Tools/Conf 
+directory. This file contains the names of the compiler tool chains and the 
+location of the compiler binaries.  It has been pre-populated with the standard 
+location for the Microsoft tool chains and includes the standard location of 
+the Intel C Compiler for EFI Byte Code (EBC)
   
 Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
 checkout the entire EDK II source tree.
 
-In a command window, change to the top level directory of the EDK II sources.
+In a command window, change to the top level directory of the Edk II sources.
   Set the WORKSPACE environment variable, e.g.:
 
     c:\> set WORKSPACE=C:\MyWork\Edk2.0
@@ -184,39 +189,29 @@ this document.)
             Java applications and libraries.
 
 Once this is completed, you are ready to test the Build, by executing:
-    c:\MyWork\Edk2.0\> ant
+    c:\MyWork\Edk2.0\> build
 
-This command builds all of the packages, including the NT32 reference platform.
-
-------------------------------------
-Build Architectures other than IA32.
-------------------------------------
-
-By default, we are set up to build the ia32 architecture. If you would like to
-build for IPF, x64 and EBC, please copy MdePkg/MdePkg-All-Arch.fpd to
-MdePkg/MdePkg.fpd. For EdkModulePkg, copy EdkModulePkg-All-Archs.fpd to
-EdkModulePkg.fpd. Note, you may also add only the architecture you want from
-the -All-Archs files to the main fpd file. This is preferred if you do not have
-all the compilers installed.
-
-Optionally, you may modify the path to the compiler in
-Tools/Conf/msft_tools_def.txt. The flags for the ARCH tool chain are set in the
-file names by Tools/Conf/VENDOR_tools.txt, where VENDOR is set in
-Tools/Conf/msft_tools.txt.
-
-For example, if IPF_VENDOR = WINDDK, then the flags for the IPF DDK compiler
-will be specified in Tools/Conf/winddk_tools.txt.
+This command builds active platform specified in text file target.txt. If 
+active platform is not specified, go to sub-directory which contains FPD files and
+type build. More information about active platform policy reference to specification
+<<EDK II Build and Packaging Architecture Specification>>.
 
 -------------------------
-Individual Package Builds
+Individual Platform Builds
 -------------------------
-After running the setup command, you can build individual packages.
-  In the command window, cd to the package that you want to build, and just
-  type:
-    c:\MyWork\Edk2.0\EdkNt32Pkg\> ant
+After running the setup command, you can build individual platforms.
+  In the command window, 
+  1. Set active platform in target.txt, and type "build" in whatever directory;
+  2. or cd to the platform (FPD file) that you want to build, and just type:
+    c:\MyWork\Edk2.0\EdkNt32Pkg\> build
 
-The EdkNt32Pkg has a special target; "run" that will execute the Nt32 emulation
-platform under Microsoft Windows.
+  Note that active platform with the high priority to build, that means active 
+  platform will be built even if exists FPD file under current directory. More 
+  information about active platform policy reference to specification
+  <<EDK II Build and Packaging Architecture Specification>>. 
+
+Go to <full build path>\Debug\MSFT\IA32 and execute SecMain.exe
+to run the Nt32 emulation platform under Microsoft Windows.
 
 To exit the Nt32 emulation platform, you may type reset at the EFI Shell>
 command prompt.  Alternately, you may use the Graphical interface, Boot
@@ -228,14 +223,16 @@ Individual Module Builds
 After running the setup command, you can build individual modules.
   In the command window, cd to the module that you want to build, and just
   type:
-    c:\MyWork\Edk2.0\MdePkg\Library\BaseLib\> ant
+    c:\MyWork\Edk2.0\MdePkg\Library\BaseLib\> build
+
+  Note active platform must be set for individual module build. 
 
 -------------------------------------------------------------------------------
 A Word on Apache-ANT
 --------------------
 The Apache-ANT program is a build tool that uses XML-based project files.
 Similar to Makefiles, these project files may contain multiple targets.  Most
-build.xml files in EDK II are auto-generated; any edits performed on the
+build.xml files in Edk2.0 are auto-generated; any edits performed on the
 build.xml files will be overwritten the next time ant is executed.
 
 Pre-defined targets in the build.xml files include:
@@ -245,11 +242,11 @@ Pre-defined targets in the build.xml files include:
 
 A Word on GCC tool chain
 ------------------------
-EDK II will not compile with a standard Linux gcc tool chain. While Linux
-distributions are usually based on ELF, EDK II requires a version of gcc that is
+EDK2 will not compile with a standard Linux gcc tool chain. While Linux
+distributions are usually based on ELF, EDK2 requires a version of gcc that is
 configured to produce PE-COFF images. You will find a script in edk2/Tools/gcc
 that will download, configure, compile, and install a gcc 4.X cross-compile
-tool chain for EDK II development. It has support for the ia32 architecture. It
+tool chain for EDK2 development. It has support for the ia32 architecture. It
 can be built and run on Cygwin, Linux, and many other POSIX compliant host
 operating environments. There are a few tools that you will need on your host
 computer in order to compile the tool chain. Among them are bash, gcc, gmake,
@@ -311,20 +308,17 @@ The common operations by developers of new modules are:
 
   - Setup environment as Build
   - Add a module to a package
-     * Generate the module SurfaceArea description file and build description
-       file
-     * Run GenBuildFile.bat under <PackageDir> to generate an entrance
-       build.xml for the module
-     * Add a new <MsaFile> element under <MsaFiles> into
+     * Generate the module SurfaceArea description file
+     * Add a new <Filename> element under <MsaFiles> into
        <PackageDir>\<PackageName>.spd, using relative path to package
-     * Add a new <ModuleSA> entry under each <TianoImage> into
-       <PackageDir>\<PackageName>.fpd file
+     * Add a new <ModuleSA> entry under each <FrameworkModules> into
+       <PackageDir>\<PackageName>.fpd file if necessary. 
 
    - Remove a module from a package
-     * Comment out or remove corresponding <MsaFile> element under <MsaFiles>
+     * Comment out or remove corresponding <Filename> element under <MsaFiles>
        from <PackageDir>\<PackageName>.spd
      * Comment out or remove corresponding <ModuleSA> entry under each
-       <TianoImage> from <PackageDir>\<PackageName>.fpd
+       <FrameworkModules> from <PackageDir>\<PackageName>.fpd if necessary. 
 
 -----------------------------------
 3) How to manually create a package:
@@ -332,6 +326,8 @@ The common operations by developers of new modules are:
   - Identify the Variables and Guids required in and of the Package (including
     consumption/production information).
   - Create an SPD file defining these modules and calling out their MSA files.
+  - add a new <Filename> element under <PackageList> into 
+    Tools\Conf\FrameworkDatabase.db, using the relative path to workspace. 
 
 --------------------------------------
 4) Declare a new Protocol in a package: 
@@ -345,14 +341,17 @@ The common operations by developers of new modules are:
 
 Example Protocol Entries (NOTE: The Guid entry is a single line in the SPD file):
 <ProtocolDeclarations>
-  <Entry Name="UnicodeCollation">
-  <C_Name>gEfiUnicodeCollationProtocolGuid</C_Name>
-  <Guid>{ 0x1d85cd7f, 0xf43d, 0x11d2, 0x9a, 0xc, 0x0, 0x90, 0x27,
-    0x3f, 0xc1, 0x4d }</Guid>
-  <Entry Name="UsbHc">
-  <C_Name>gEfiUsbHcProtocolGuid</C_Name>
-  <Guid>{ 0xf5089266, 0x1aa0, 0x4953, 0x97, 0xd8, 0x56, 0x2f, 0x8a,
-    0x73, 0xb5, 0x19 }</Guid>
+  <Entry Name="Bds">
+    <C_Name>gEfiBdsArchProtocolGuid</C_Name>
+    <GuidValue>665E3FF6-46CC-11D4-9A38-0090273FC14D</GuidValue>
+    <HelpText/>
+  </Entry>
+  <Entry Name="Cpu">
+    <C_Name>gEfiCpuArchProtocolGuid</C_Name>
+    <GuidValue>26BACCB1-6F42-11D4-BCE7-0080C73C8881</GuidValue>
+    <HelpText/>
+  </Entry>
+</ProtocolDeclarations>
 
 ---------------------------------
 5) Declare a new PPI in a package:
@@ -365,18 +364,17 @@ Example Protocol Entries (NOTE: The Guid entry is a single line in the SPD file)
 
 Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
 <PpiDeclarations>
-  <Entry Name="NtPeiLoadFile">
-    <C_Name>gNtPeiLoadFilePpiGuid</C_Name>
-    <Guid>{ 0xfd0c65eb, 0x405, 0x4cd2, 0x8a, 0xee, 0xf4, 0x0, 0xef, 0x13,
-      0xba, 0xc2 }</Guid>
+  <Entry Name="BootInRecoveryMode">
+    <C_Name>gEfiPeiBootInRecoveryModePpiGuid</C_Name>
+    <GuidValue>17EE496A-D8E4-4B9A-94D1-CE8272300850</GuidValue>
+    <HelpText/>
   </Entry>
-  <Entry Name="NtThunk">
-    <C_Name>gPeiNtThunkPpiGuid</C_Name>
-    <Guid>{ 0x98c281e5, 0xf906, 0x43dd, 0xa9, 0x2b, 0xb0, 0x3, 0xbf,
-      0x27, 0x65, 0xda }</Guid>
+  <Entry Name="CpuIo">
+    <C_Name>gEfiPeiCpuIoPpiInServiceTableGuid</C_Name>
+    <GuidValue>E6AF1F7B-FC3F-46DA-A828-A3B457A44282</GuidValue>
+    <HelpText/>
   </Entry>
 </PpiDeclarations>
-
 
 ----------------------------------
 6) Declare a new GUID in a package:
@@ -408,20 +406,15 @@ Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
     the following example for the format:
 
 <LibraryClassDeclarations>
-  <LibraryClassDeclaration>
-    <LibraryClass>BaseLib</LibraryClass>
+  <LibraryClass Name="BaseLib">
     <IncludeHeader>Include/Library/BaseLib.h</IncludeHeader>
-  </LibraryClassDeclaration>
+    <HelpText/>
+  </LibraryClass>
+  <LibraryClass Name="BaseMemoryLib">
+    <IncludeHeader>Include/Library/BaseMemoryLib.h</IncludeHeader>
+    <HelpText/>
+  </LibraryClass>
 </LibraryClassDeclarations>
-
---------------------------------------
-9) Add a library instance to a package:
-  - This requires manual MSA and MBD file.
-
------------------------------
-10) Add a module to a package:
-  - This requires manual MSA and MBD editing
-
 
 =======================================================
 Notes:
