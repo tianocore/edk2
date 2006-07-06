@@ -397,7 +397,7 @@ EFI_STATUS
 GetHiiVariable (
   IN  EFI_GUID      *VariableGuid,
   IN  UINT16        *VariableName,
-  OUT VOID          **VariableData,
+  OUT UINT8          **VariableData,
   OUT UINTN         *VariableSize
   )
 ;
@@ -441,14 +441,14 @@ GetExPcdTokenNumber (
 
 
 
-UINTN           
+EFI_STATUS           
 ExGetNextTokeNumber (
-  IN CONST EFI_GUID    *Guid,
-  IN UINTN             TokenNumber,
-  IN EFI_GUID          *GuidTable,
-  IN UINTN             SizeOfGuidTable,
-  IN DYNAMICEX_MAPPING *ExMapTable,
-  IN UINTN             SizeOfExMapTable
+  IN      CONST EFI_GUID    *Guid,
+  IN OUT  UINTN             *TokenNumber,
+  IN      EFI_GUID          *GuidTable,
+  IN      UINTN             SizeOfGuidTable,
+  IN      DYNAMICEX_MAPPING *ExMapTable,
+  IN      UINTN             SizeOfExMapTable
   )
 ;
 

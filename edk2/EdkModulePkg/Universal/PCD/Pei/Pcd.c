@@ -480,6 +480,9 @@ PeiPcdGetNextToken (
   BOOLEAN             Found;
     
   if (Guid == NULL) {
+    if (*TokenNumber > PEI_NEX_TOKEN_NUMBER) {
+      return EFI_NOT_FOUND;
+    }
     (*TokenNumber)++;
     if (*TokenNumber > PEI_NEX_TOKEN_NUMBER) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
