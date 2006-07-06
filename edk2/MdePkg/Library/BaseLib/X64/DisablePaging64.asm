@@ -26,7 +26,8 @@
 InternalX86DisablePaging64    PROC
     cli
     shl     rcx, 32
-    lea     ecx, @F
+    lea     eax, @F
+    mov     ecx, eax
     push    rcx
     mov     ebx, edx
     mov     esi, r8d

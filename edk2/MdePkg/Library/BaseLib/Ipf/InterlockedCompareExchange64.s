@@ -22,7 +22,7 @@
 .type   InternalSyncCompareExchange64, @function
 InternalSyncCompareExchange64::
         mov                 ar.ccv = r33
-        cmpxchg8.rel        r8  = [r64], r34
+        cmpxchg8.rel        r8  = [r32], r34
         mf
         br.ret.sptk.many    b0
 .endp   InternalSyncCompareExchange64

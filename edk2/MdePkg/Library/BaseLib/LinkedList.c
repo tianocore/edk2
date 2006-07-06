@@ -34,9 +34,6 @@ IsNodeInList (
   ASSERT (Node != NULL);
 
   Count = PcdGet32 (PcdMaximumLinkedListLength);
-  if (Count != 0) {
-    Count++;
-  }
 
   Ptr = List;
   do {
