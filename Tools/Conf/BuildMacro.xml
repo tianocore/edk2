@@ -134,16 +134,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
 
         <sequential>
-
           <cc userdefine="on">
-            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}" family="${PP_FAMILY}">
+            <command type="CC" cmd="${CC}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${CC_FAMILY}"
+                     outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i">
               <EXTRA.INC/>
               <argument value="${PP_FLAGS}"/>
               <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
     
-          <gendepex inputFile="${DEST_DIR_OUTPUT}/@{FILENAME}.i" outputFile="${DEST_DIR_OUTPUT}/${BASE_NAME}.depex"/>
+          <gendepex inputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i" outputFile="${DEST_DIR_OUTPUT}/${BASE_NAME}.depex"/>
         </sequential>
       </OnDependency>
     </sequential>
@@ -158,20 +158,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
     
     <!-- Dispath ASM file, there are three type. 
-         asm,s   -   Build_Assembly
-         S       -   Build_Ipf_Assembly -->
+         asm     -   Build_Assembly
+         S       -   Build_Gcc_Assembly
+         s       -   Build_Ipf_Assembly -->
     <sequential>
 	    <if>
-	      <or>
-	        <equals arg1="@{FILEEXT}" arg2="asm" />
-	        <equals arg1="@{FILEEXT}" arg2="S" />
-	      </or>
+        <equals arg1="@{FILEEXT}" arg2="asm" />
 	      <then>
 	        <Build_Assembly FILEPATH="@{FILEPATH}" FILENAME="@{FILENAME}" FILEEXT="@{FILEEXT}">
             <EXTRA.INC.1><EXTRA.INC /></EXTRA.INC.1>
             <EXTRA.ARG.1><EXTRA.ARG /></EXTRA.ARG.1>
           </Build_Assembly>
 	      </then>
+        <elseif>
+          <equals arg1="@{FILEEXT}" arg2="S" />
+          <then>
+            <Build_Gcc_Assembly FILEPATH="@{FILEPATH}" FILENAME="@{FILENAME}" FILEEXT="@{FILEEXT}">
+              <EXTRA.INC.1><EXTRA.INC /></EXTRA.INC.1>
+              <EXTRA.ARG.1><EXTRA.ARG /></EXTRA.ARG.1>
+            </Build_Gcc_Assembly>
+          </then>
+        </elseif>
 	      <elseif>
 	        <equals arg1="@{FILEEXT}" arg2="s" />
 	        <then>
@@ -230,6 +237,67 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                          match="([^_a-zA-Z])0x([0-9a-fA-F]+)"
                          replace="\10\2h"
                          flags="g"
+                         byline="true"/>
+
+          <cc userdefine="on">
+            <command type="ASM" cmd="${ASM}" workdir="${DEST_DIR_OUTPUT}" family="${ASM_FAMILY}"
+                outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj">
+              <EXTRA.INC.1/>
+      
+              <argument value="${ASM_FLAGS}"/>
+              <EXTRA.ARG.1/>
+      
+              <!-- fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/ -->
+              <fileset casesensitive="off" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
+            </command>
+          </cc>
+        </sequential>
+      </OnDependency>
+    </sequential>
+  </macrodef>
+
+  <!--
+    Build GCC assembly code
+    -->
+  <macrodef name="Build_Gcc_Assembly">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT" default="asm"/>
+
+    <element name="EXTRA.INC.1" optional="yes"/>
+    <element name="EXTRA.ARG.1" optional="yes"/>
+
+    <sequential>
+      <var name="FILE_BASENAME" value="@{FILENAME}" />
+      <var name="FILE_PATH" value="@{FILEPATH}" />
+      <mkdir dir="${DEST_DIR_OUTPUT}/@{FILEPATH}"/>
+
+      <OnDependency>
+        <sourcefiles>
+          <file Name="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+        </sourcefiles>
+        <targetfiles>
+          <file Name="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
+        </targetfiles>
+
+        <sequential>
+          <cc userdefine="on">
+            <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}"
+                     outputDelimiter="-o"
+                     outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i">
+              <EXTRA.INC.1/>
+              <argument value="${PP_FLAGS}"/>
+              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+            </command>
+          </cc>
+
+          <replaceregexp file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"
+                         match="^(#[^ ]* +1 +.*@{FILEPATH}/@{FILENAME}\.@{FILEEXT}&quot;).+\1"
+                         replace="#"
+                         flags="gs"/>
+          <replaceregexp file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"
+                         match="^(#[^ ]* .*)$"
+                         replace="# \1"
                          byline="true"/>
 
           <cc userdefine="on">

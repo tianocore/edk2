@@ -6,6 +6,6 @@ TOOLS_DEFINITION_FILE = Tools/Conf/tools_def.txt
 
 # Separate multiple targets with space, not not use comma 
 TARGET                = 
-TARGET_ARCH           = 
-TAGNAME               = 
+TARGET_ARCH           = IA32
+TAGNAME               = MSFT
 
