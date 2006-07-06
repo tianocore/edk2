@@ -136,7 +136,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 model.addRow(saa[i]);
             }
         }
-        
+        //
+        // display library classes that need to be resolved. also potential instances for them.
+        //
+        resolveLibraryInstances(key);
         //
         // display lib instances already selected for key
         //
@@ -146,17 +149,22 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             String[][] saa = new String[instanceCount][5];
             ffc.getLibraryInstances(key, saa);
             for (int i = 0; i < saa.length; ++i) {
-                if (getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]) != null) {
-                    saa[i][0] = getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]).getName();
+                ModuleIdentification mi = getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
+                if (mi != null) {
+                    saa[i][0] = mi.getName();
+                    saa[i][2] = mi.getVersion();
+                    saa[i][4] = mi.getPackage().getVersion();
+                    //
+                    // re-evaluate lib instance usage when adding a already-selected lib instance.
+                    //
+                    resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
+                    model1.addRow(saa[i]);
                 }
                 
-                model1.addRow(saa[i]);
+                
             }
         }
-        //
-        // display library classes that need to be resolved. also potential instances for them.
-        //
-        resolveLibraryInstances(key);
+        
         //
         // display module SA options
         //
@@ -328,14 +336,16 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         
         while(ispi.hasNext()) {
             PackageIdentification pi = (PackageIdentification)ispi.next();
-            if ( !pi.getGuid().equals(keyPart[2]) || !pi.getVersion().equals(keyPart[3])){
+            if ( !pi.getGuid().equals(keyPart[2])){
+//                            || !pi.getVersion().equals(keyPart[3])){
                 continue;
             }
             Set<ModuleIdentification> smi = GlobalData.getModules(pi);
             Iterator ismi = smi.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                if (mi.getGuid().equals(keyPart[0]) && mi.getVersion().equals(keyPart[1])){
+                if (mi.getGuid().equals(keyPart[0])){
+//                                && mi.getVersion().equals(keyPart[1])){
                     return mi;
                 }
             }
@@ -474,6 +484,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanel1.add(getJPanel7(), java.awt.BorderLayout.CENTER);
             jPanel1.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
+                    init(moduleKey);
                 }
             });
         }
@@ -503,6 +514,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model = new PartialEditableTableModel();
             jTable = new JTable(model);
             jTable.setRowHeight(20);
+            jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             model.addColumn("CName");
             model.addColumn("TokenSpaceGUID");
             model.addColumn("ItemType");
@@ -687,6 +699,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model1.addColumn("PackageVersion");
             jTable1 = new JTable(model1);
             jTable1.setRowHeight(20);
+            jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -809,6 +822,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model3.addColumn("PackageVersion");
             jTable3 = new JTable(model3);
             jTable3.setRowHeight(20);
+            jTable3.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable3.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -1022,6 +1036,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanel8.add(getJScrollPane6(), null);
             jPanel8.add(getJButton4(), null);
             jPanel8.add(getJButton5(), null);
+            jPanel8.addComponentListener(new java.awt.event.ComponentAdapter() {
+                public void componentShown(java.awt.event.ComponentEvent e) {
+                    init(moduleKey);
+                }
+            });
         }
         return jPanel8;
     }
@@ -1114,6 +1133,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             vArch.add("PPC");
             jTable4.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
             jTable4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			jTable4.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTable4.getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent arg0) {
                     // TODO Auto-generated method stub
