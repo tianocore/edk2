@@ -656,6 +656,125 @@ Returns:
   return EFI_SUCCESS;
 }
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+EFI_STATUS
+EFIAPI
+QueryVariableInfo (
+  IN  UINT32                 Attributes,
+  OUT UINT64                 *MaximumVariableStorageSize,
+  OUT UINT64                 *RemainingVariableStorageSize,
+  OUT UINT64                 *MaximumVariableSize,
+  IN  VARIABLE_GLOBAL        *Global,
+  IN  UINT32                 Instance
+  )
+/*++
+
+Routine Description:
+
+  This code returns information about the EFI variables.
+
+Arguments:
+
+  Attributes                      Attributes bitmask to specify the type of variables 
+                                  on which to return information.
+  MaximumVariableStorageSize      Pointer to the maximum size of the storage space available
+                                  for the EFI variables associated with the attributes specified.
+  RemainingVariableStorageSize    Pointer to the remaining size of the storage space available 
+                                  for the EFI variables associated with the attributes specified.
+  MaximumVariableSize             Pointer to the maximum size of the individual EFI variables
+                                  associated with the attributes specified.
+  Global                          Pointer to VARIABLE_GLOBAL structure.
+  Instance                        Instance of the Firmware Volume.
+
+Returns:
+
+  EFI STATUS
+  EFI_INVALID_PARAMETER           - An invalid combination of attribute bits was supplied.
+  EFI_SUCCESS                     - Query successfully.
+  EFI_UNSUPPORTED                 - The attribute is not supported on this platform.
+
+--*/
+{
+  VARIABLE_HEADER        *Variable;
+  VARIABLE_HEADER        *NextVariable;
+  UINT64                 VariableSize;
+  VARIABLE_STORE_HEADER  *VariableStoreHeader;
+  
+  if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS)) == 0) {
+    //
+    // Make sure the Attributes combination is supported by the platform.
+    //
+    return EFI_UNSUPPORTED;
+  } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
+    //
+    // Make sure if runtime bit is set, boot service bit is set also.
+    //
+    return EFI_INVALID_PARAMETER;
+  } else if (EfiAtRuntime () && !(Attributes & EFI_VARIABLE_RUNTIME_ACCESS)) {
+    //
+    //   Make sure RT Attribute is set if we are in Runtime phase.
+    //
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
+    //
+    // Query is Volatile related.
+    //
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) Global->VolatileVariableBase);    
+  } else {
+    //
+    // Query is Non-Volatile related.
+    //
+    VariableStoreHeader = (VARIABLE_STORE_HEADER *) ((UINTN) Global->NonVolatileVariableBase);
+  }
+
+  //
+  // Now let's fill *MaximumVariableStorageSize *RemainingVariableStorageSize 
+  // with the storage size (excluding the storage header size)
+  //
+  *MaximumVariableStorageSize   = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
+  *RemainingVariableStorageSize = VariableStoreHeader->Size - sizeof (VARIABLE_STORE_HEADER);
+
+  //
+  // Let *MaximumVariableSize be MAX_VARIABLE_SIZE 
+  //
+  *MaximumVariableSize = MAX_VARIABLE_SIZE;
+
+  //
+  // Point to the starting address of the variables.
+  //
+  Variable = (VARIABLE_HEADER *) (VariableStoreHeader + 1);
+
+  //
+  // Now walk through the related variable store.
+  //
+  while (Variable < GetEndPointer (VariableStoreHeader)) {
+    if (Variable->StartId != VARIABLE_DATA) {
+      break;
+    }
+
+    NextVariable = (VARIABLE_HEADER *) (GetVariableDataPtr (Variable) + Variable->DataSize + GET_PAD_SIZE (Variable->DataSize));
+    VariableSize = (UINT64) (UINTN) NextVariable - (UINT64) (UINTN) Variable;
+
+    if (Variable->State == VAR_ADDED) {
+      *RemainingVariableStorageSize -= VariableSize;
+    }
+
+    //
+    // Go to the next one.
+    //
+    Variable = NextVariable;
+  }
+
+  return EFI_SUCCESS;
+}
+#endif
+
 EFI_STATUS
 EFIAPI
 InitializeVariableStore (

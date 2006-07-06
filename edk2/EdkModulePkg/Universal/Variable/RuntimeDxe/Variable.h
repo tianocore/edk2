@@ -140,4 +140,18 @@ SetVariable (
   )
 ;
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+EFI_STATUS
+EFIAPI
+QueryVariableInfo (
+  IN  UINT32                 Attributes,
+  OUT UINT64                 *MaximumVariableStorageSize,
+  OUT UINT64                 *RemainingVariableStorageSize,
+  OUT UINT64                 *MaximumVariableSize,
+  IN  VARIABLE_GLOBAL        *Global,
+  IN  UINT32                 Instance
+  )
+;
+#endif
+
 #endif

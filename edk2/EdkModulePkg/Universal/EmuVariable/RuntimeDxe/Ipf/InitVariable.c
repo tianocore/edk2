@@ -89,6 +89,19 @@ Returns:
                         );
     return ReturnVal;
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  case EsalQueryVariableInfo:
+    ReturnVal.Status = QueryVariableInfo (
+                        (UINT32) Arg2,
+                        (UINT64 *) Arg3,
+                        (UINT64 *) Arg4,
+                        (UINT64 *) Arg5,
+                        &Global->VariableBase[VirtualMode],
+                        Global->FvbInstance
+                        );
+    return ReturnVal;
+#endif
+
   default:
     ReturnVal.Status = EFI_SAL_INVALID_ARGUMENT;
     return ReturnVal;
@@ -160,6 +173,10 @@ Returns:
     EsalGetNextVariableName,
     EsalVariableCommonEntry,
     EsalSetVariable,
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+    EsalVariableCommonEntry,
+    EsalQueryVariableInfo,
+#endif
     NULL
     );
 

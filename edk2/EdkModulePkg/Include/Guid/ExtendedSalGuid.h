@@ -143,6 +143,10 @@ typedef enum {
   EsalGetVariable,
   EsalGetNextVariableName,
   EsalSetVariable
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  ,
+  EsalQueryVariableInfo
+#endif
 } EFI_EXTENDED_SAL_VARIABLE_SERVICES_FUNC_ID;
 
 typedef enum {

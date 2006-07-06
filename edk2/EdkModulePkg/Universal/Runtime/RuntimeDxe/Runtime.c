@@ -92,6 +92,9 @@ UINTN                         mVirtualMapMaxIndex;
 
 EFI_LOADED_IMAGE_PROTOCOL     *mMyLoadedImage;
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+STATIC EFI_GUID mEfiCapsuleHeaderGuid = EFI_CAPSULE_GUID;
+#endif
 //
 // Worker Functions
 //
@@ -356,6 +359,9 @@ RuntimeDriverSetVirtualAddressMap (
   UINTN                         Index1;
   EFI_DRIVER_OS_HANDOFF_HEADER  *DriverOsHandoffHeader;
   EFI_DRIVER_OS_HANDOFF         *DriverOsHandoff;
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  EFI_CAPSULE_TABLE             *CapsuleTable; 
+#endif
 
   //
   // Can only switch to virtual addresses once the memory map is locked down,
@@ -464,6 +470,11 @@ RuntimeDriverSetVirtualAddressMap (
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetVariable);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->SetVariable);
   RuntimeDriverConvertInternalPointer ((VOID **) &gRT->GetNextVariableName);
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->QueryVariableInfo);
+  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->UpdateCapsule);
+  RuntimeDriverConvertInternalPointer ((VOID **) &gRT->QueryCapsuleCapabilities);
+#endif
   RuntimeDriverCalculateEfiHdrCrc (&gRT->Hdr);
 
   //
@@ -486,6 +497,15 @@ RuntimeDriverSetVirtualAddressMap (
 
       RuntimeDriverConvertPointer (EFI_OPTIONAL_POINTER, (VOID **) &(gST->ConfigurationTable[Index].VendorTable));
     }
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+    if (CompareGuid (&mEfiCapsuleHeaderGuid, &(gST->ConfigurationTable[Index].VendorGuid))) {
+      CapsuleTable = gST->ConfigurationTable[Index].VendorTable;
+      for (Index1 = 0; Index1 < CapsuleTable->CapsuleArrayNumber; Index1++) {
+        RuntimeDriverConvertPointer (EFI_OPTIONAL_POINTER, (VOID **) &CapsuleTable->CapsulePtr[Index1]);
+      }     
+      RuntimeDriverConvertPointer (EFI_OPTIONAL_POINTER, (VOID **) &(gST->ConfigurationTable[Index].VendorTable));
+    }
+#endif
   }
   //
   // Convert the runtime fields of the EFI System Table and recompute the CRC-32
