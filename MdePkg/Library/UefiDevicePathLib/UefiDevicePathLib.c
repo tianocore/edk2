@@ -496,24 +496,26 @@ FileDevicePath (
   UINTN                     Size;
   FILEPATH_DEVICE_PATH      *FilePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *FileDevicePathNode;
+  EFI_DEVICE_PATH_PROTOCOL  *FileDevicePath;
 
   DevicePath = NULL;
 
   Size = StrSize (FileName);
-  FileDevicePathNode = CreateDeviceNode (
-                         MEDIA_DEVICE_PATH,
-                         MEDIA_FILEPATH_DP,
-                         (UINT16) (Size + SIZE_OF_FILEPATH_DEVICE_PATH)
-                         );
-  if (FileDevicePathNode != NULL) {
-    FilePath = (FILEPATH_DEVICE_PATH *) FileDevicePathNode;
+  FileDevicePath = AllocatePool (Size + SIZE_OF_FILEPATH_DEVICE_PATH + EFI_END_DEVICE_PATH_LENGTH);
+  if (FileDevicePath != NULL) {
+    FilePath = (FILEPATH_DEVICE_PATH *) FileDevicePath;
+    FilePath->Header.Type    = MEDIA_DEVICE_PATH;
+    FilePath->Header.SubType = MEDIA_FILEPATH_DP;
     CopyMem (&FilePath->PathName, FileName, Size);
+    SetDevicePathNodeLength (&FilePath->Header, Size + SIZE_OF_FILEPATH_DEVICE_PATH);
+    SetDevicePathEndNode (NextDevicePathNode (&FilePath->Header));
+
     if (Device != NULL) {
       DevicePath = DevicePathFromHandle (Device);
     }
-    DevicePath = AppendDevicePathNode (DevicePath, FileDevicePathNode);
-    FreePool (FileDevicePathNode);
+
+    DevicePath = AppendDevicePath (DevicePath, FileDevicePath);
+    FreePool (FileDevicePath);
   }
 
   return DevicePath;
