@@ -481,16 +481,14 @@ PeiPcdGetNextToken (
     
   if (Guid == NULL) {
     (*TokenNumber)++;
-
-    if (*TokenNumber >= PEI_NEX_TOKEN_NUMBER) {
+    if (*TokenNumber > PEI_NEX_TOKEN_NUMBER) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
     }
-    
+    return EFI_SUCCESS;
   } else {
-
     if (PEI_EXMAP_TABLE_EMPTY) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
-      return EFI_NOT_FOUND;
+      return EFI_SUCCESS;
     }
     
     //
@@ -503,7 +501,7 @@ PeiPcdGetNextToken (
     MatchGuid = ScanGuid (PeiPcdDb->Init.GuidTable, sizeof(PeiPcdDb->Init.GuidTable), Guid);
 
     if (MatchGuid == NULL) {
-      *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+      *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
       return EFI_NOT_FOUND;
     }
 
@@ -512,6 +510,9 @@ PeiPcdGetNextToken (
     ExMapTable = PeiPcdDb->Init.ExMapTable;
 
     Found = FALSE;
+    //
+    // Locate the GUID in ExMapTable first.
+    //
     for (i = 0; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
       if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
         Found = TRUE;
@@ -524,26 +525,31 @@ PeiPcdGetNextToken (
         *TokenNumber = ExMapTable[i].ExTokenNumber;
          return EFI_SUCCESS;
       }
-      
-      for ( ; ExMapTable[i].ExGuidIndex == GuidTableIdx; i++) {
+
+      for ( ; i < PEI_EXMAPPING_TABLE_SIZE; i++) {
         if (ExMapTable[i].ExTokenNumber == *TokenNumber) {
           i++;
+          if (i == PEI_EXMAPPING_TABLE_SIZE) {
+            //
+            // Exceed the length of ExMap Table
+            //
+            *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+            return EFI_SUCCESS;
+          }
           if (ExMapTable[i].ExGuidIndex == GuidTableIdx) {
             *TokenNumber = ExMapTable[i].ExTokenNumber;
             return EFI_SUCCESS;
           } else {
-            *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+            *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
             return EFI_SUCCESS;
           }
         }
       }
-
       return EFI_NOT_FOUND;
     }
-    
   }
 
-  return EFI_SUCCESS;
+  return EFI_NOT_FOUND;
 }
 
 

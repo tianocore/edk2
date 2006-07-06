@@ -32,130 +32,6 @@ Module Name: Service.h
   #error "Please make sure the version of PCD Service PEIM and PCD PEI Database Generation Tool matches"
 #endif
 
-/* Internal Function definitions */
-
-PEI_PCD_DATABASE *
-GetPcdDatabase (
-  VOID
-  )
-;
-
-
-EFI_STATUS
-SetValueWorker (
-  IN          UINTN              TokenNumber,
-  IN          VOID               *Data,
-  IN          UINTN              Size
-  )
-;
-
-
-EFI_STATUS
-SetWorker (
-  IN          UINTN              TokenNumber,
-  IN          VOID               *Data,
-  IN OUT      UINTN              *Size,
-  IN          BOOLEAN            PtrType
-  )
-;
-
-
-EFI_STATUS
-ExSetValueWorker (
-  IN          UINTN                ExTokenNumber,
-  IN          CONST EFI_GUID       *Guid,
-  IN          VOID                 *Data,
-  IN          UINTN                Size
-  )
-;
-
-
-
-EFI_STATUS
-ExSetWorker (
-  IN      UINTN                ExTokenNumber,
-  IN      CONST EFI_GUID       *Guid,
-  IN      VOID                 *Data,
-  IN OUT  UINTN                *Size,
-  IN      BOOLEAN              PtrType
-  )
-;
-
-
-
-VOID *
-GetWorker (
-  IN UINTN                TokenNumber,
-  IN UINTN                GetSize
-  )
-;
-
-
-
-VOID *
-ExGetWorker (
-  IN CONST EFI_GUID   *Guid,
-  IN UINTN            ExTokenNumber,
-  IN UINTN            GetSize
-  )
-;
-
-typedef struct {
-  UINTN   TokenNumber;
-  UINTN   Size;
-  UINT32  LocalTokenNumberAlias;
-} EX_PCD_ENTRY_ATTRIBUTE;
-
-
-UINTN           
-GetExPcdTokenNumber (
-  IN CONST EFI_GUID             *Guid,
-  IN UINTN                      ExTokenNumber
-  )
-;
-
-
-
-
-EFI_STATUS
-PeiRegisterCallBackWorker (
-  IN  UINTN              TokenNumber,
-  IN  CONST GUID         *Guid, OPTIONAL
-  IN  PCD_PPI_CALLBACK   CallBackFunction,
-  IN  BOOLEAN            Register
-);
-
-
-
-
-VOID
-BuildPcdDatabase (
-  VOID
-  )
-;
-
-
-
-
-UINTN
-GetPtrTypeSize (
-  IN    UINTN             LocalTokenNumberTableIdx,
-  OUT   UINTN             *MaxSize,
-  IN    PEI_PCD_DATABASE  *Database
-  )
-;
-
-
-
-BOOLEAN
-SetPtrTypeSize (
-  IN          UINTN             LocalTokenNumberTableIdx,
-  IN    OUT   UINTN             *CurrentSize,
-  IN          PEI_PCD_DATABASE  *Database
-  )
-;
-
-
 //
 // PPI Interface Implementation Declaration.
 //
@@ -435,6 +311,131 @@ PeiPcdGetNextTokenSpace (
   IN CONST EFI_GUID           **Guid
   )
 ;
+
+
+/* Internal Function definitions */
+
+PEI_PCD_DATABASE *
+GetPcdDatabase (
+  VOID
+  )
+;
+
+
+EFI_STATUS
+SetValueWorker (
+  IN          UINTN              TokenNumber,
+  IN          VOID               *Data,
+  IN          UINTN              Size
+  )
+;
+
+
+EFI_STATUS
+SetWorker (
+  IN          UINTN              TokenNumber,
+  IN          VOID               *Data,
+  IN OUT      UINTN              *Size,
+  IN          BOOLEAN            PtrType
+  )
+;
+
+
+EFI_STATUS
+ExSetValueWorker (
+  IN          UINTN                ExTokenNumber,
+  IN          CONST EFI_GUID       *Guid,
+  IN          VOID                 *Data,
+  IN          UINTN                Size
+  )
+;
+
+
+
+EFI_STATUS
+ExSetWorker (
+  IN      UINTN                ExTokenNumber,
+  IN      CONST EFI_GUID       *Guid,
+  IN      VOID                 *Data,
+  IN OUT  UINTN                *Size,
+  IN      BOOLEAN              PtrType
+  )
+;
+
+
+
+VOID *
+GetWorker (
+  IN UINTN                TokenNumber,
+  IN UINTN                GetSize
+  )
+;
+
+
+
+VOID *
+ExGetWorker (
+  IN CONST EFI_GUID   *Guid,
+  IN UINTN            ExTokenNumber,
+  IN UINTN            GetSize
+  )
+;
+
+typedef struct {
+  UINTN   TokenNumber;
+  UINTN   Size;
+  UINT32  LocalTokenNumberAlias;
+} EX_PCD_ENTRY_ATTRIBUTE;
+
+
+UINTN           
+GetExPcdTokenNumber (
+  IN CONST EFI_GUID             *Guid,
+  IN UINTN                      ExTokenNumber
+  )
+;
+
+
+
+
+EFI_STATUS
+PeiRegisterCallBackWorker (
+  IN  UINTN              TokenNumber,
+  IN  CONST GUID         *Guid, OPTIONAL
+  IN  PCD_PPI_CALLBACK   CallBackFunction,
+  IN  BOOLEAN            Register
+);
+
+
+
+
+VOID
+BuildPcdDatabase (
+  VOID
+  )
+;
+
+
+
+
+UINTN
+GetPtrTypeSize (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  OUT   UINTN             *MaxSize,
+  IN    PEI_PCD_DATABASE  *Database
+  )
+;
+
+
+
+BOOLEAN
+SetPtrTypeSize (
+  IN          UINTN             LocalTokenNumberTableIdx,
+  IN    OUT   UINTN             *CurrentSize,
+  IN          PEI_PCD_DATABASE  *Database
+  )
+;
+
 
 extern EFI_GUID gPcdDataBaseHobGuid;
 
