@@ -1022,7 +1022,7 @@
       <GuidValue>A6A72875-2962-4C18-9F46-8DA644CCFE00</GuidValue>
       <HelpText/>
     </Entry>
-    <Entry Name="ScsiIo">
+    <Entry Name="ScsiIoExt">
       <C_Name>gEfiScsiIoProtocolGuid</C_Name>
       <GuidValue>932F4736-2362-4002-803E-3CD54B138F85</GuidValue>
       <HelpText/>

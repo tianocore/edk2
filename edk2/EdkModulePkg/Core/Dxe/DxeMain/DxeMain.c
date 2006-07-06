@@ -308,7 +308,7 @@ EFI_RUNTIME_SERVICES mEfiRuntimeServicesTableTemplate = {
   (EFI_RESET_SYSTEM)             CoreEfiNotAvailableYetArg4       // ResetSystem 
 #if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION <  0x00020000))
   ,
-  (TIANO_REPORT_STATUS_CODE)       CoreEfiNotAvailableYetArg5     // ReportStatusCode
+  (EFI_REPORT_STATUS_CODE)       CoreEfiNotAvailableYetArg5       // ReportStatusCode
 #elif (EFI_SPECIFICATION_VERSION >= 0x00020000)
   ,
   (EFI_UPDATE_CAPSULE)              CoreEfiNotAvailableYetArg3,   // UpdateCapsule

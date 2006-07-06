@@ -1648,7 +1648,7 @@ typedef struct {
   //  It was moved to a protocol to not conflict with UEFI 2.0
   //  If Tiano is disabled this item is not enabled for EFI 1.10
   //
-  TIANO_REPORT_STATUS_CODE        ReportStatusCode;
+  EFI_REPORT_STATUS_CODE        ReportStatusCode;
 #endif
 } EFI_RUNTIME_SERVICES;
 
@@ -2393,7 +2393,7 @@ typedef enum {
 #include <Protocol/EdidDiscovered.h>
 #include <Protocol/EdidActive.h>
 #include <Protocol/EdidOverride.h>
-#include <Protocol/ScsiIo.h>
+#include <Protocol/ScsiIoExt.h>
 #include <Protocol/ScsiPassThruExt.h>
 #include <Protocol/IScsiInitatorName.h>
 #include <Protocol/Usb2HostController.h>

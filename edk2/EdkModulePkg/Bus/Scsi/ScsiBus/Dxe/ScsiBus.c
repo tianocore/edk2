@@ -366,7 +366,7 @@ EFI_STATUS
 EFIAPI
 ScsiGetDeviceLocation (
   IN  EFI_SCSI_IO_PROTOCOL    *This,
-  OUT UINT8                   **Target,
+  OUT UINT32                  *Target,
   OUT UINT64                  *Lun
   )
 /*++
@@ -393,7 +393,7 @@ ScsiGetDeviceLocation (
 
   ScsiIoDevice  = SCSI_IO_DEV_FROM_THIS (This);
 
-  *Target       = (UINT8 *) (UINTN) ScsiIoDevice->Pun;
+  *Target       = ScsiIoDevice->Pun;
   *Lun          = ScsiIoDevice->Lun;
 
   return EFI_SUCCESS;
