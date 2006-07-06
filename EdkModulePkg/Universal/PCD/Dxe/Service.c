@@ -109,7 +109,7 @@ GetWorker (
       Name = &(StringTable[VariableHead->StringIndex]);
       VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
 
-      Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
+      Status = GetHiiVariable (Guid, Name, (VOID*)&Data, &DataSize);
       if (Status == EFI_SUCCESS) {
         if (GetSize == 0) {
           //
