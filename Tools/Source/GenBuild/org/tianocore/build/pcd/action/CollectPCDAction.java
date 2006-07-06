@@ -430,7 +430,7 @@ class GuidTable {
         // If so, return the GuidTable index.
         //
         for (int i = 0; i < al.size(); i++) {
-            if (al.get(i).equals(uuid)) {
+            if (al.get(i).compareTo(uuid) == 0) {
                 return i;
             }
         }
@@ -752,7 +752,7 @@ class ExMapTable {
     }
 
     private ArrayList<ExTriplet> al;
-    private ArrayList<String>    alComment;
+    private Map<ExTriplet, String> alComment;
     private String               phase;
     private int                  len;
     private int                   bodyLineNum;
@@ -760,7 +760,7 @@ class ExMapTable {
     public ExMapTable (String phase) {
         this.phase = phase;
         al = new ArrayList<ExTriplet>();
-        alComment = new ArrayList<String>();
+        alComment = new HashMap<ExTriplet, String>();
         bodyLineNum = 0;
         len = 0;
     }
@@ -815,7 +815,7 @@ class ExMapTable {
             str += e.localTokenIdx.toString() + ", ";
             str += e.guidTableIdx.toString();
 
-            str += "}" + " /* " + alComment.get(index) + " */" ;
+            str += "}" + " /* " + alComment.get(e) + " */" ;
 
             if (index != al.size() - 1) {
                 str += ",";
@@ -834,9 +834,11 @@ class ExMapTable {
     public int add (int localTokenIdx, long exTokenNum, int guidTableIdx, String name) {
         int index = len;
 
-        len++; 
-        al.add(new ExTriplet(guidTableIdx, exTokenNum, localTokenIdx));
-        alComment.add(name);
+        len++;
+        ExTriplet et = new ExTriplet(guidTableIdx, exTokenNum, localTokenIdx); 
+
+        al.add(et);
+        alComment.put(et, name);
 
         return index;
     }

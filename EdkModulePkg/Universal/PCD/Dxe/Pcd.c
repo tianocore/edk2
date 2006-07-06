@@ -53,7 +53,8 @@ PCD_PROTOCOL mPcdInstance = {
 
   DxeRegisterCallBackOnSet,
   DxeUnRegisterCallBackOnSet,
-  DxePcdGetNextToken
+  DxePcdGetNextToken,
+  DxePcdGetNextTokenSpace
 };
 
 
@@ -505,31 +506,26 @@ DxePcdGetNextToken (
   //
   if (Guid == NULL) {
     (*TokenNumber)++;
-    if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
-      return EFI_SUCCESS;
-    } else {
-      if (*TokenNumber >= PEI_NEX_TOKEN_NUMBER &&
-          *TokenNumber < PEI_LOCAL_TOKEN_NUMBER) {
-        //
-        // The first Non-Ex type Token Number for DXE PCD 
-        // database is PEI_LOCAL_TOKEN_NUMBER
-        //
-        *TokenNumber = PEI_LOCAL_TOKEN_NUMBER;
-        return EFI_SUCCESS;
-      } else if (*TokenNumber >= DXE_NEX_TOKEN_NUMBER + PEI_LOCAL_TOKEN_NUMBER) {
-        *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
-        return EFI_SUCCESS;
-      }
+    if (*TokenNumber > PEI_NEX_TOKEN_NUMBER &&
+        *TokenNumber <= PEI_LOCAL_TOKEN_NUMBER) {
+      //
+      // The first Non-Ex type Token Number for DXE PCD 
+      // database is PEI_LOCAL_TOKEN_NUMBER
+      //
+      *TokenNumber = PEI_LOCAL_TOKEN_NUMBER;
+    } else if (*TokenNumber > DXE_NEX_TOKEN_NUMBER + PEI_LOCAL_TOKEN_NUMBER) {
+      *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
     }
+    return EFI_SUCCESS;
   }
 
-  if (PEI_EXMAP_TABLE_EMPTY && PEI_EXMAP_TABLE_EMPTY) {
-    *TokenNumber = (UINTN) PCD_INVALID_TOKEN_NUMBER;
+  if (PEI_EXMAP_TABLE_EMPTY && DXE_EXMAP_TABLE_EMPTY) {
+    *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
     return EFI_NOT_FOUND;
   }
 
-  ExTokenNumber = *TokenNumber;
   if (!PEI_EXMAP_TABLE_EMPTY) {
+    ExTokenNumber = *TokenNumber;
     ExTokenNumber = ExGetNextTokeNumber (
                         Guid,
                         ExTokenNumber,
@@ -543,13 +539,14 @@ DxePcdGetNextToken (
   if ((ExTokenNumber == PCD_INVALID_TOKEN_NUMBER) &&
       !DXE_EXMAP_TABLE_EMPTY
     ) {
+    ExTokenNumber = *TokenNumber;
     ExTokenNumber = ExGetNextTokeNumber (
                         Guid,
                         ExTokenNumber,
-                        mPcdDatabase->PeiDb.Init.GuidTable,
-                        sizeof(mPcdDatabase->PeiDb.Init.GuidTable),
-                        mPcdDatabase->PeiDb.Init.ExMapTable,
-                        sizeof(mPcdDatabase->PeiDb.Init.ExMapTable)
+                        mPcdDatabase->DxeDb.Init.GuidTable,
+                        sizeof(mPcdDatabase->DxeDb.Init.GuidTable),
+                        mPcdDatabase->DxeDb.Init.ExMapTable,
+                        sizeof(mPcdDatabase->DxeDb.Init.ExMapTable)
                         );
   }
 
@@ -578,19 +575,28 @@ GetDistinctTokenSpace (
   TsIdx = 0;
   OldGuidIndex = ExMapTable[0].ExGuidIndex;
   DistinctTokenSpace[TsIdx] = &GuidTable[OldGuidIndex];
-  for (Idx = 1; Idx < PEI_EXMAPPING_TABLE_SIZE; Idx++) {
+  for (Idx = 1; Idx < *ExMapTableSize; Idx++) {
     if (ExMapTable[Idx].ExGuidIndex != OldGuidIndex) {
       OldGuidIndex = ExMapTable[Idx].ExGuidIndex;
       DistinctTokenSpace[++TsIdx] = &GuidTable[OldGuidIndex];
     }
   }
 
-  *ExMapTableSize = TsIdx;
+  //
+  // The total number of Distinct Token Space
+  // is TsIdx + 1 because we use TsIdx as a index
+  // to the DistinctTokenSpace[]
+  //
+  *ExMapTableSize = TsIdx + 1;
   return DistinctTokenSpace;
     
 }
   
-
+//
+// Just pre-allocate a memory buffer that is big enough to
+// host all distinct TokenSpace guid in both
+// PEI ExMap and DXE ExMap.
+//
 STATIC EFI_GUID *TmpTokenSpaceBuffer[PEI_EXMAPPING_TABLE_SIZE + DXE_EXMAPPING_TABLE_SIZE] = { 0 };
 
 EFI_STATUS
@@ -619,7 +625,7 @@ DxePcdGetNextTokenSpace (
   }
   
   
-  if (TmpTokenSpaceBuffer[0] != NULL) {
+  if (TmpTokenSpaceBuffer[0] == NULL) {
     PeiTokenSpaceTableSize = 0;
 
     if (!PEI_EXMAP_TABLE_EMPTY) {

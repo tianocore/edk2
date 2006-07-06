@@ -32,144 +32,6 @@ Module Name: Service.h
   #error "Please make sure the version of PCD Service DXE Driver and PCD DXE Database Generation Tool matches"
 #endif
 
-
-typedef struct {
-  LIST_ENTRY              Node;
-  PCD_PROTOCOL_CALLBACK   CallbackFn;
-} CALLBACK_FN_ENTRY;
-
-#define CR_FNENTRY_FROM_LISTNODE(Record, Type, Field) _CR(Record, Type, Field)
-
-//
-// Internal Functions
-//
-
-EFI_STATUS
-SetValueWorker (
-  IN UINTN                   TokenNumber,
-  IN VOID                    *Data,
-  IN UINTN                   Size
-  )
-;
-
-EFI_STATUS
-SetWorker (
-  IN          UINTN                     TokenNumber,
-  IN          VOID                      *Data,
-  IN OUT      UINTN                     *Size,
-  IN          BOOLEAN                   PtrType
-  )
-;
-
-
-EFI_STATUS
-ExSetValueWorker (
-  IN          UINTN                ExTokenNumber,
-  IN          CONST EFI_GUID       *Guid,
-  IN          VOID                 *Data,
-  IN          UINTN                SetSize
-  )
-;
-
-
-
-EFI_STATUS
-ExSetWorker (
-  IN      UINTN                ExTokenNumber,
-  IN      CONST EFI_GUID       *Guid,
-  IN      VOID                 *Data,
-  IN OUT  UINTN                *Size,
-  IN      BOOLEAN              PtrType
-  )
-;
-
-
-VOID *
-GetWorker (
-  IN UINTN             TokenNumber,
-  IN UINTN             GetSize
-  )
-;
-
-VOID *
-ExGetWorker (
-  IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
-  IN UINTN                  GetSize
-  ) 
-;
-
-UINT32
-GetSkuEnabledTokenNumber (
-  UINT32 LocalTokenNumber,
-  UINTN  Size,
-  BOOLEAN IsPeiDb
-  ) 
-;
-
-EFI_STATUS
-GetHiiVariable (
-  IN  EFI_GUID      *VariableGuid,
-  IN  UINT16        *VariableName,
-  OUT VOID          **VariableData,
-  OUT UINTN         *VariableSize
-  )
-;
-
-EFI_STATUS
-SetHiiVariable (
-  IN  EFI_GUID     *VariableGuid,
-  IN  UINT16       *VariableName,
-  IN  CONST VOID   *Data,
-  IN  UINTN        DataSize,
-  IN  UINTN        Offset
-  )
-;
-
-EFI_STATUS
-DxeRegisterCallBackWorker (
-  IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
-  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-);
-
-EFI_STATUS
-DxeUnRegisterCallBackWorker (
-  IN  UINTN                   TokenNumber,
-  IN  CONST EFI_GUID          *Guid, OPTIONAL
-  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
-);
-
-VOID
-BuildPcdDxeDataBase (
-  VOID
-);
-
-
-UINTN           
-GetExPcdTokenNumber (
-  IN CONST EFI_GUID             *Guid,
-  IN UINT32                     ExTokenNumber
-  )
-;
-
-
-UINTN
-GetPtrTypeSize (
-  IN    UINTN             LocalTokenNumberTableIdx,
-  OUT   UINTN             *MaxSize
-  )
-;
-
-
-
-BOOLEAN
-SetPtrTypeSize (
-  IN          UINTN             LocalTokenNumberTableIdx,
-  IN    OUT   UINTN             *CurrentSize
-  )
-;
-
 //
 // Protocol Interface function declaration.
 //
@@ -447,6 +309,138 @@ DxePcdGetNextToken (
   )
 ;
 
+
+
+EFI_STATUS
+EFIAPI
+DxePcdGetNextTokenSpace (
+  IN OUT CONST EFI_GUID               **Guid
+  )
+;
+
+
+typedef struct {
+  LIST_ENTRY              Node;
+  PCD_PROTOCOL_CALLBACK   CallbackFn;
+} CALLBACK_FN_ENTRY;
+
+#define CR_FNENTRY_FROM_LISTNODE(Record, Type, Field) _CR(Record, Type, Field)
+
+//
+// Internal Functions
+//
+
+EFI_STATUS
+SetValueWorker (
+  IN UINTN                   TokenNumber,
+  IN VOID                    *Data,
+  IN UINTN                   Size
+  )
+;
+
+EFI_STATUS
+SetWorker (
+  IN          UINTN                     TokenNumber,
+  IN          VOID                      *Data,
+  IN OUT      UINTN                     *Size,
+  IN          BOOLEAN                   PtrType
+  )
+;
+
+
+EFI_STATUS
+ExSetValueWorker (
+  IN          UINTN                ExTokenNumber,
+  IN          CONST EFI_GUID       *Guid,
+  IN          VOID                 *Data,
+  IN          UINTN                SetSize
+  )
+;
+
+
+
+EFI_STATUS
+ExSetWorker (
+  IN      UINTN                ExTokenNumber,
+  IN      CONST EFI_GUID       *Guid,
+  IN      VOID                 *Data,
+  IN OUT  UINTN                *Size,
+  IN      BOOLEAN              PtrType
+  )
+;
+
+
+VOID *
+GetWorker (
+  IN UINTN             TokenNumber,
+  IN UINTN             GetSize
+  )
+;
+
+VOID *
+ExGetWorker (
+  IN CONST EFI_GUID         *Guid,
+  IN UINTN                  ExTokenNumber,
+  IN UINTN                  GetSize
+  ) 
+;
+
+UINT32
+GetSkuEnabledTokenNumber (
+  UINT32 LocalTokenNumber,
+  UINTN  Size,
+  BOOLEAN IsPeiDb
+  ) 
+;
+
+EFI_STATUS
+GetHiiVariable (
+  IN  EFI_GUID      *VariableGuid,
+  IN  UINT16        *VariableName,
+  OUT VOID          **VariableData,
+  OUT UINTN         *VariableSize
+  )
+;
+
+EFI_STATUS
+SetHiiVariable (
+  IN  EFI_GUID     *VariableGuid,
+  IN  UINT16       *VariableName,
+  IN  CONST VOID   *Data,
+  IN  UINTN        DataSize,
+  IN  UINTN        Offset
+  )
+;
+
+EFI_STATUS
+DxeRegisterCallBackWorker (
+  IN  UINTN                   TokenNumber,
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
+);
+
+EFI_STATUS
+DxeUnRegisterCallBackWorker (
+  IN  UINTN                   TokenNumber,
+  IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
+);
+
+VOID
+BuildPcdDxeDataBase (
+  VOID
+);
+
+
+UINTN           
+GetExPcdTokenNumber (
+  IN CONST EFI_GUID             *Guid,
+  IN UINT32                     ExTokenNumber
+  )
+;
+
+
+
 UINTN           
 ExGetNextTokeNumber (
   IN CONST EFI_GUID    *Guid,
@@ -455,6 +449,23 @@ ExGetNextTokeNumber (
   IN UINTN             SizeOfGuidTable,
   IN DYNAMICEX_MAPPING *ExMapTable,
   IN UINTN             SizeOfExMapTable
+  )
+;
+
+
+UINTN
+GetPtrTypeSize (
+  IN    UINTN             LocalTokenNumberTableIdx,
+  OUT   UINTN             *MaxSize
+  )
+;
+
+
+
+BOOLEAN
+SetPtrTypeSize (
+  IN          UINTN             LocalTokenNumberTableIdx,
+  IN    OUT   UINTN             *CurrentSize
   )
 ;
 
