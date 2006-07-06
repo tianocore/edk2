@@ -162,27 +162,118 @@ Java Tools:
 -------------------------------------------------------------------------------
 Quick Start
 -----------
+Copy the target.template file in the Tools/Conf directory to target.txt, which
+must also be in the Tools/Conf directory.
+
 Edit the text file, target.txt, located in the Tools/Conf directory. This 
-file contains the tools defintion file and ative platform. It can also restrict
-current build target(s), tagname(s) and arch(s). Uncomment the line ACTIVE_PLATFORM
-which is commented out by default. 
+file contains options for setting the active platform and restricting the build. 
+The restictions are used to limit the build output by specifying build target(s), 
+tagname(s) and architecture(s) to less than the full set of possible options. 
+
+The ACTIVE_PLATFORM MUST BE SET.  All other options need not be set, however by 
+unsetting these options (by removing the line from the file, or leaving the Value 
+empty) will result in all available build possibilites when typing build.  By
+default EDK II can build a matrix of binaries, using different target types, tool
+chain tags and architectures.  Options to target.txt file are as follows:
+
+ACTIVE_PLATFORM =  Value   REQUIRED
+  Where Value is the WORKSPACE relative path and filename of a Framework Platform 
+  Definition (FPD) File.  Example:
+
+ACTIVE_PLATFORM = MdePkg/MdePkg.fpd
+
+TARGET = Value             OPTIONAL
+  Where Value is a list of one or more of the following: DEBUG, RELEASE or a User
+  Defined Target type, such as PERF. Example: 
+
+TARGET = DEBUG RELEASE
+
+TARGET_ARCH = Value        OPTIONAL
+  Where Value is a list of one or more supported Architectures: IA32, X64, IPF or
+  EBC.  Example: 
+
+TARGET_ARCH = IA32 X64 EBC
+
+TOOL_CHAIN_CONF = Value    OPTIONAL
+  Where Value is the Filename of an alternate tools_def.txt file created by the
+  user.  The alternate tools_def.txt files must be in the Tools/Conf directory.
+  These tool definitions are scoped to the WORKSPACE (location of the EDK 
+  installation) and cannot be shared between WORKSPACES. (You can copy the files
+  from one workspace to another.) Example: 
+
+TOOL_CHAIN_CONF = alfred.txt
+
+TOOL_CHAIN_TAG = Value     OPTIONAL
+  Where Value is a list of TagName entries as defined in the tools_def.txt file.
+  The TagName can be used to specify different versions of a compiler, i.e., 
+  gcc 4.0 and gcc 4.1 which will allow you to build binaries with both tool chains 
+  during the same build - useful during testing of a new compiler tool chain, or 
+  for changing compiler flags to check out performance with a different set of 
+  flags than flags used for production.  Example:
+
+TOOL_CHAIN_TAG = GCC40 GCC41
+
+To clear a restriction, just remove any data after the equal sign.  To clear
+the TARGET_ARCH limitation that was set above, enter: 
+
+TARGET_ARCH =
+
+-----------
+Copy the tools_def.template file in Tools/Conf to tools_def.txt in the same
+directory.
 
 Edit the tools definition file, tools_def.txt, also located in the Tools/Conf 
 directory. This file contains the names of the compiler tool chains and the 
 location of the compiler binaries.  It has been pre-populated with the standard 
 location for the Microsoft tool chains and includes the standard location of 
-the Intel C Compiler for EFI Byte Code (EBC)
-  
+the Intel C Compiler for EFI Byte Code (EBC.)  In addition, EDK II provides
+support for Cygwin, Linux and OS X GCC compiler tool chains.  A script has been
+provided in the Tools/gcc directory as well as instructions in obtaining and
+building a version of GCC that has been tested.  The tools_def.txt file has
+the GCC binary locations that are created using this script.
+
+Both target.txt and tools_def.txt files are formatted as Property = Value, 
+which must appear on a single line.  Spanning a Value entry over multiple
+lines is not supported at this time.  In the target.txt file, the Property is
+a single, uppercase word with underscore characters. These Property names are
+fixed by the build system.  The tools_def.txt file's Property is an underscore
+delimited coding, which supports some user defined values.  The coding for
+the Property is:  TARGET_TAGNAME_ARCH_COMMAND_ATTR  The Value, is either a 
+full path, full path and filename or a reserved word.
+
+TARGET  - DEBUG and RELEASE are predefined, however the user may define one or
+          more of their own TARGET types in this file.
+
+TAGNAME - HOST, MSFT, GCC, INTC are predefined, however the user may define 
+          one or more of their own TAGNAME keywords in this file.
+
+ARCH    - EDK II supports IA32, X64, IPF and EBC at this time.
+
+COMMAND - Predefined command codes are listed in the tools_def.txt file, however
+          the user can specify additional command codes for their one, non-
+          standard tools.
+
+ATTR    - Predefined Attributes are listed in the tools_def.txt file.
+
+NOTE: The TAGNAME: HOST is reserved and MUST be defined in order to build the
+      included Tiano tools from their C source files.  These tools have been
+      built and tested using both Microsoft and GCC tool chains.
+NOTE: The "*" symbol may be used as a wildcard character in most of these
+      fields, refer to the tools_def.txt and the "EDK II Build and Packaging
+      Architecture Specification" for more details.
+
+
+-----------
 Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
 checkout the entire EDK II source tree.
 
 In a command window, change to the top level directory of the Edk II sources.
   Set the WORKSPACE environment variable, e.g.:
 
-    c:\> set WORKSPACE=C:\MyWork\Edk2.0
+    c:\> set WORKSPACE=C:\MyWork\Edk2
 
 To test your tool chain setup and to build the Supplied Tools, execute:
-    c:\MyWork\Edk2.0\> edksetup
+    c:\MyWork\Edk2\> edksetup
 
 (This command will be referred to as the setup command throughout the rest of
 this document.)
@@ -190,8 +281,12 @@ this document.)
             This configures the environment to include the TianoTools and the
             Java applications and libraries.
 
+If you are confident that none of the tool tool sources have changed, and you
+only want to set up the workspace environment you may execute:
+   c:\MyWork\Edk2\> edksetup skip
+
 Once this is completed, you are ready to test the Build, by executing:
-    c:\MyWork\Edk2.0\> build
+    c:\MyWork\Edk2\> build
 
 This command builds active platform specified in text file target.txt. If 
 active platform is not specified, go to sub-directory which contains FPD files and
@@ -205,14 +300,14 @@ After running the setup command, you can build individual platforms.
   In the command window, 
   1. Set active platform in target.txt, and type "build" in whatever directory;
   2. or cd to the platform (FPD file) that you want to build, and just type:
-    c:\MyWork\Edk2.0\EdkNt32Pkg\> build
+    c:\MyWork\Edk2\EdkNt32Pkg\> build
 
   Note that active platform with the high priority to build, that means active 
   platform will be built even if exists FPD file under current directory. More 
   information about active platform policy reference to specification
   <<EDK II Build and Packaging Architecture Specification>>. 
 
-Go to <full build path>\Debug\MSFT\IA32 and execute SecMain.exe
+Go to <full build path>\DEBUG\MSFT\IA32 and execute SecMain.exe
 to run the Nt32 emulation platform under Microsoft Windows.
 
 To exit the Nt32 emulation platform, you may type reset at the EFI Shell>
@@ -225,7 +320,7 @@ Individual Module Builds
 After running the setup command, you can build individual modules.
   In the command window, cd to the module that you want to build, and just
   type:
-    c:\MyWork\Edk2.0\MdePkg\Library\BaseLib\> build
+    c:\MyWork\Edk2\MdePkg\Library\BaseLib\> build
 
   Note active platform must be set for individual module build. 
 
@@ -234,25 +329,25 @@ A Word on Apache-ANT
 --------------------
 The Apache-ANT program is a build tool that uses XML-based project files.
 Similar to Makefiles, these project files may contain multiple targets.  Most
-build.xml files in Edk2.0 are auto-generated; any edits performed on the
-build.xml files will be overwritten the next time ant is executed.
+build.xml files in EDK II are auto-generated; any edits performed on the
+build.xml files will be overwritten the next time build is executed.
 
-Pre-defined targets in the build.xml files include:
+Pre-defined targets in the build.xml file include:
     all      - This target builds binaries for defined architectures
     clean    - This target removes object files generated by commands
     cleanall - This target removes all generated files and directories.
 
 A Word on GCC tool chain
 ------------------------
-EDK2 will not compile with a standard Linux gcc tool chain. While Linux
-distributions are usually based on ELF, EDK2 requires a version of gcc that is
-configured to produce PE-COFF images. You will find a script in edk2/Tools/gcc
-that will download, configure, compile, and install a gcc 4.X cross-compile
-tool chain for EDK2 development. It has support for the ia32 architecture. It
-can be built and run on Cygwin, Linux, and many other POSIX compliant host
-operating environments. There are a few tools that you will need on your host
-computer in order to compile the tool chain. Among them are bash, gcc, gmake,
-curl (or wget).
+EDK II will not compile with a standard Linux gcc tool chain. While Linux
+distributions are usually based on ELF, EDK II requires a version of gcc 
+that is configured to produce PE-COFF images. You will find a script in 
+edk2/Tools/gcc that will download, configure, compile, and install a gcc 
+4.X cross-compile tool chain for EDK II development. It has support for 
+the IA32 architecture. It can be built and run on Cygwin, Linux, and many 
+other POSIX compliant host operating environments. There are a few tools
+that you will need on your host computer in order to compile the tool 
+chain. Among them are bash, gcc, gmake, curl (or wget).
 
 -------------------------------------------------------------------------------
 
@@ -266,30 +361,42 @@ A) Surface Area Package Description (SPD) file contains information about the
 modules that the package contains, including the location of all MSA files, and
 public library names and headers that might be provided by a module in the
 package.  Packages are defined by SPD files.  (Found in the root of the Package
-subdirectory (i.e. EdkNt32Pkg)) The SPD is further explained in the "Build 
-Packaging Specification" document.
+subdirectory (i.e. EdkNt32Pkg)) The SPD is further explained in the "EDK Build 
+and Packaging Architecture Specification" document.
  
 B) Module Surface Area Definition (MSA) files.  A description of a module's 
 surface area, with all module specific default flags and features specified.
 Refer to the "Module Surface Area Architecture Specification" for additional
-details. The MSA is further explained in the "Build Packaging Specification"
-document.
- 
-C) Platform Configuration Database (PCD).  A platform database which contains a
+details. The MSA is further explained in the "EDK II Build Packaging Architecture 
+Specification" document.
+
+C) Framework Platform Description (FPD) files.  A description of a platform's
+surface are, including a list of modules that are needed by the platform.  To
+support individual module builds, developers are not required to provide
+information about specific flash devices, nor flash device layout.  There are
+specific sections in the FPD file that do control aspects of the build, such 
+as the Supported Architectures and Build Targets, as well as the tool flags 
+that are used to create the binary files.  A valid platform file can specify 
+zero or more modules, so individual modules can be compiled within the context
+of a platform (FPD) definition.
+
+D) Platform Configuration Database (PCD).  A platform database which contains a
 variety of current platform settings or directives by which a driver or
 application can interact with.  The PCD is defined by the PCD_Protocol (This is
 further explained in the "Platform Configuration Database Infrastructure 
 Description" document.
 
-D) Library Class.  A library class is a logical grouping of similar functions.
+E) Library Class.  A library class is a logical grouping of similar functions.
 When developing components, the module surface area declares the class of
-libraries that can be used by the component. The MBD file specifies the
-instance(s) of the library that will be used during compilation/linking. All
-library type modules must include header files in their distribution package,
-as well as their surface area and module build description files. Components,
-on the other hand, need only provide the binary and build description files
-when distributing BINARY packages.  The Library Classes are further explained
-in the "Build Packaging Specification" document.
+libraries that can be used by the component. The MSA and SPD files can specify
+a recommended instance of the library that a platform integrator may select,
+however this is only a recommendation.  The PI may choose to select a different
+library instance to be used during compilation/linking. All library type modules 
+must include header files in their distribution package, as well as their MSA
+files. Components, on the other hand, need only provide an MSA and either source
+or binary files when distributing packages.  The Library Classes are further 
+explained in the "EDK II Build and Packaging Architecture Specification" 
+document.
 
 =========================================================================
 The common operations by developers of new modules are:
