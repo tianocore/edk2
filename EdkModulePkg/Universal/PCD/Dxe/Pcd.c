@@ -182,21 +182,44 @@ DxePcdGetSize (
   IN UINTN                     TokenNumber
   )
 {
-  UINT16 * SizeTable;
+  UINTN   Size;
+  UINT32  *LocalTokenNumberTable;
+  BOOLEAN IsPeiDb;
+  UINTN   MaxSize;
+  UINTN   TmpTokenNumber;
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
   // as the array index.
   //
   TokenNumber--;
+
+  //
+  // Backup the TokenNumber passed in as GetPtrTypeSize need the original TokenNumber
+  // 
+  TmpTokenNumber = TokenNumber;
+
+  ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
+
+  IsPeiDb = (BOOLEAN) (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
   
-  SizeTable = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? mPcdDatabase->PeiDb.Init.SizeTable :
-                                                    mPcdDatabase->DxeDb.Init.SizeTable;
+  TokenNumber = IsPeiDb ? TokenNumber : 
+                          (TokenNumber - PEI_LOCAL_TOKEN_NUMBER);
 
+  LocalTokenNumberTable = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable 
+                                  : mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
 
-  TokenNumber = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TokenNumber : (TokenNumber - PEI_LOCAL_TOKEN_NUMBER);
+  Size = (LocalTokenNumberTable[TokenNumber] & PCD_DATUM_TYPE_ALL_SET) >> PCD_DATUM_TYPE_SHIFT;
 
-  return SizeTable[TokenNumber];
+  if (Size == 0) {
+    //
+    // For pointer type, we need to scan the SIZE_TABLE to get the current size.
+    //
+    return GetPtrTypeSize (TmpTokenNumber, &MaxSize);
+  } else {
+    return Size;
+  }
+
 }
 
 
@@ -256,7 +279,7 @@ DxePcdGetPtrEx (
   IN UINTN                 ExTokenNumber
   )
 {
-  return ExGetWorker (Guid, ExTokenNumber, 0);
+  return  ExGetWorker (Guid, ExTokenNumber, 0);
 }
 
 
@@ -292,7 +315,7 @@ DxePcdSet8 (
   IN UINT8              Value
   )
 {
-  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
+  return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
 
@@ -304,7 +327,7 @@ DxePcdSet16 (
   IN UINT16             Value
   )
 {
-  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
+  return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
 
@@ -316,7 +339,7 @@ DxePcdSet32 (
   IN UINT32             Value
   )
 {
-  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
+  return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
 
@@ -328,7 +351,7 @@ DxePcdSet64 (
   IN UINT64             Value
   )
 {
-  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
+  return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
 
@@ -336,9 +359,9 @@ DxePcdSet64 (
 EFI_STATUS
 EFIAPI
 DxePcdSetPtr (
-  IN UINTN              TokenNumber,
-  IN UINTN              SizeOfBuffer,
-  IN VOID               *Buffer
+  IN          UINTN              TokenNumber,
+  IN OUT      UINTN              *SizeOfBuffer,
+  IN          VOID               *Buffer
   )
 {
   return SetWorker (TokenNumber, Buffer, SizeOfBuffer, TRUE);
@@ -353,7 +376,7 @@ DxePcdSetBool (
   IN BOOLEAN            Value
   )
 {
-  return SetWorker (TokenNumber, &Value, sizeof (Value), FALSE);
+  return SetValueWorker (TokenNumber, &Value, sizeof (Value));
 }
 
 
@@ -366,13 +389,7 @@ DxePcdSet8Ex (
   IN UINT8                  Value
   )
 {
-  return          ExSetWorker(
-                              ExTokenNumber, 
-                              Guid,
-                              &Value, 
-                              sizeof (Value), 
-                              FALSE
-                              );
+  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 
@@ -385,13 +402,7 @@ DxePcdSet16Ex (
   IN UINT16            Value
   )
 {
-  return          ExSetWorker(
-                              ExTokenNumber, 
-                              Guid,
-                              &Value, 
-                              sizeof (Value), 
-                              FALSE
-                              );
+  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 
@@ -404,13 +415,7 @@ DxePcdSet32Ex (
   IN UINT32             Value
   )
 {
-  return          ExSetWorker(
-                              ExTokenNumber, 
-                              Guid,
-                              &Value, 
-                              sizeof (Value), 
-                              FALSE
-                              );
+  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 
@@ -423,13 +428,7 @@ DxePcdSet64Ex (
   IN UINT64            Value
   )
 {
-  return          ExSetWorker(
-                              ExTokenNumber, 
-                              Guid,
-                              &Value, 
-                              sizeof (Value), 
-                              FALSE
-                              );
+  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 
@@ -437,19 +436,13 @@ DxePcdSet64Ex (
 EFI_STATUS
 EFIAPI
 DxePcdSetPtrEx (
-  IN CONST EFI_GUID         *Guid,
-  IN UINTN                  ExTokenNumber,
-  IN UINTN                  SizeOfBuffer,
-  IN VOID                   *Buffer
+  IN            CONST EFI_GUID         *Guid,
+  IN            UINTN                  ExTokenNumber,
+  IN OUT        UINTN                  *SizeOfBuffer,
+  IN            VOID                   *Buffer
   )
 {
-  return          ExSetWorker(
-                              ExTokenNumber, 
-                              Guid,
-                              Buffer, 
-                              SizeOfBuffer, 
-                              TRUE
-                              );
+  return  ExSetWorker(ExTokenNumber, Guid, Buffer, SizeOfBuffer, TRUE);
 }
 
 
@@ -462,13 +455,7 @@ DxePcdSetBoolEx (
   IN BOOLEAN           Value
   )
 {
-  return          ExSetWorker(
-                              ExTokenNumber, 
-                              Guid,
-                              &Value, 
-                              sizeof (Value), 
-                              TRUE
-                              );
+  return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
 

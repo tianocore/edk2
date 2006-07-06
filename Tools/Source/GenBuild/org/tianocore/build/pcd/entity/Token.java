@@ -574,7 +574,78 @@ public class Token {
     public int getSkuIdCount () {
         return this.skuData.size();
     }
-    
+
+    private void getCurrentSizeFromDefaultValue (String str, ArrayList<Integer> al) {
+        if (isValidNullValue(str)) {
+            al.add(new Integer(0));
+        } else {
+            //
+            // isValidNullValue has already make sure that str here
+            // always contain a valid default value of the following 3
+            // cases:
+            // 1) "Hello world" //Assci string
+            // 2) L"Hello" //Unicode string
+            // 3) {0x01, 0x02, 0x03} //Byte stream
+            //
+            if (str.startsWith("\"")) {
+                al.add(new Integer(str.length() - 2));
+            } else if (str.startsWith("L\"")){
+                //
+                // Unicode is 2 bytes each.
+                //
+                al.add(new Integer((str.length() - 3) * 2));
+            } else if (str.startsWith("{")) {
+                //
+                // We count the number of "," in the string.
+                // The number of byte is one plus the number of 
+                // comma.
+                //
+                String str2 = str;
+                
+                int cnt = 0;
+                int pos = 0;
+                pos = str2.indexOf(",", 0);
+                while (pos != -1) {
+                    cnt++;
+                    pos++;
+                    pos = str2.indexOf(",", pos);
+                }
+                cnt++;
+                al.add(new Integer(cnt));
+            }
+        }
+    }
+    //
+    // This method can be used to get the MAX and current size
+    // for pointer type dynamic(ex) PCD entry
+    //
+    public ArrayList<Integer> getPointerTypeSize () {
+        ArrayList<Integer> al = new ArrayList<Integer>();
+        
+        //
+        // For VPD_enabled and HII_enabled, we can only return the MAX size.
+        // For the default DATA type dynamic PCD entry, we will return
+        // the MAX size and current size for each SKU_ID.
+        //
+        al.add(new Integer(this.datumSize));
+        
+        if (!this.isVpdEnable()) {
+            int idx;
+            if (this.isHiiEnable()){
+                for (idx = 0; idx < this.skuData.size(); idx++) {
+                    String str = this.skuData.get(idx).value.hiiDefaultValue;
+                    getCurrentSizeFromDefaultValue(str, al);
+                }
+            } else {
+                for (idx = 0; idx < this.skuData.size(); idx++) {
+                    String str = this.skuData.get(idx).value.value;
+                    getCurrentSizeFromDefaultValue(str, al);
+                }
+            }
+        }
+        
+        return al;
+    }
 
     /**
        Get default value for a token, For HII type, HiiDefaultValue of default

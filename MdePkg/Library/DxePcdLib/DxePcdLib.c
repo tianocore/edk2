@@ -514,22 +514,18 @@ LibPcdSetPtr (
   )
 {
   EFI_STATUS Status;
-  UINTN      Size;
+
+  ASSERT (SizeOfBuffer != NULL);
 
   if (*SizeOfBuffer > 0) {
     ASSERT (Buffer != NULL);
   }
 
-  Size = LibPcdGetSize (TokenNumber);
-  
-  if (*SizeOfBuffer > Size) {
-    *SizeOfBuffer = Size;
+  Status = mPcd->SetPtr (TokenNumber, SizeOfBuffer, Buffer);
+
+  if (EFI_ERROR (Status)) {
     return NULL;
   }
-
-  Status = mPcd->SetPtr (TokenNumber, *SizeOfBuffer, Buffer);
-
-  ASSERT_EFI_ERROR (Status);
 
   return Buffer;
 }
@@ -728,7 +724,6 @@ LibPcdSetExPtr (
   )
 {
   EFI_STATUS  Status;
-  UINTN       Size;
 
   ASSERT (Guid != NULL);
 
@@ -738,16 +733,11 @@ LibPcdSetExPtr (
     ASSERT (Buffer != NULL);
   }
 
+  Status = mPcd->SetPtrEx (Guid, TokenNumber, SizeOfBuffer, Buffer);
 
-  Size = LibPcdGetExSize (Guid, TokenNumber);
-  if (*SizeOfBuffer > Size) {
-    *SizeOfBuffer = Size;
+  if (EFI_ERROR (Status)) {
     return NULL;
   }
-
-  Status = mPcd->SetPtrEx (Guid, TokenNumber, *SizeOfBuffer, Buffer);
-
-  ASSERT_EFI_ERROR (Status);
 
   return Buffer;
 }

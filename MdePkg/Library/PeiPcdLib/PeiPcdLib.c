@@ -586,7 +586,6 @@ LibPcdSetPtr (
 {
   EFI_STATUS Status;
   PCD_PPI    *PcdPpi;
-  UINTN      Size;
 
   ASSERT (SizeOfBuffer != NULL);
 
@@ -596,16 +595,11 @@ LibPcdSetPtr (
 
   PcdPpi = GetPcdPpiPtr ();
   
-  Size = LibPcdGetSize (TokenNumber);
-  
-  if (*SizeOfBuffer > Size) {
-    *SizeOfBuffer = Size;
+  Status = PcdPpi->SetPtr (TokenNumber, SizeOfBuffer, Buffer);
+
+  if (EFI_ERROR (Status)) {
     return NULL;
   }
-
-  Status = PcdPpi->SetPtr (TokenNumber, *SizeOfBuffer, Buffer);
-
-  ASSERT_EFI_ERROR (Status);
 
   return Buffer;
 }
@@ -817,7 +811,6 @@ LibPcdSetExPtr (
 {
   EFI_STATUS      Status;
   PCD_PPI         *PcdPpi;
-  UINTN           Size;
 
   if (*SizeOfBuffer > 0) {
     ASSERT (Buffer != NULL);
@@ -825,15 +818,11 @@ LibPcdSetExPtr (
 
   PcdPpi = GetPcdPpiPtr ();
 
-  Size = LibPcdGetExSize (Guid, TokenNumber);
-  if (*SizeOfBuffer > Size) {
-    *SizeOfBuffer = Size;
+  Status = PcdPpi->SetPtrEx (Guid, TokenNumber, SizeOfBuffer, Buffer);
+
+  if (EFI_ERROR (Status)) {
     return NULL;
   }
-
-  Status = PcdPpi->SetPtrEx (Guid, TokenNumber, *SizeOfBuffer, Buffer);
-
-  ASSERT_EFI_ERROR (Status);
 
   return Buffer;
 }
