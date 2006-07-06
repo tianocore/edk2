@@ -109,7 +109,7 @@ GetWorker (
       Name = &(StringTable[VariableHead->StringIndex]);
       VaraiableDefaultBuffer = (UINT8 *) PcdDb + VariableHead->DefaultValueOffset;
 
-      Status = GetHiiVariable (Guid, Name, (VOID*)&Data, &DataSize);
+      Status = GetHiiVariable (Guid, Name, &Data, &DataSize);
       if (Status == EFI_SUCCESS) {
         if (GetSize == 0) {
           //
@@ -252,14 +252,14 @@ DxeUnRegisterCallBackWorker (
 
 
 
-UINTN           
+EFI_STATUS
 ExGetNextTokeNumber (
-  IN CONST EFI_GUID         *Guid,
-  IN UINTN                  TokenNumber,
-  IN EFI_GUID               *GuidTable,
-  IN UINTN                  SizeOfGuidTable,
-  IN DYNAMICEX_MAPPING      *ExMapTable,
-  IN UINTN                  SizeOfExMapTable
+  IN      CONST EFI_GUID         *Guid,
+  IN OUT  UINTN                  *TokenNumber,
+  IN      EFI_GUID               *GuidTable,
+  IN      UINTN                  SizeOfGuidTable,
+  IN      DYNAMICEX_MAPPING      *ExMapTable,
+  IN      UINTN                  SizeOfExMapTable
   )
 {
   EFI_GUID         *MatchGuid;
@@ -269,7 +269,7 @@ ExGetNextTokeNumber (
 
   MatchGuid = ScanGuid (GuidTable, SizeOfGuidTable, Guid);
   if (MatchGuid == NULL) {
-    return PCD_INVALID_TOKEN_NUMBER;
+    return EFI_NOT_FOUND;
   }
 
   Found = FALSE;
@@ -282,35 +282,39 @@ ExGetNextTokeNumber (
   }
 
   if (Found) {
-    if (TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
-      return ExMapTable[Idx].ExTokenNumber;
+    if (*TokenNumber == PCD_INVALID_TOKEN_NUMBER) {
+      *TokenNumber = ExMapTable[Idx].ExTokenNumber;
+      return EFI_SUCCESS;
     }
 
     for ( ; Idx < SizeOfExMapTable; Idx++) {
-      if (ExMapTable[Idx].ExTokenNumber == TokenNumber) {
+      if (ExMapTable[Idx].ExTokenNumber == *TokenNumber) {
         Idx++;
         if (Idx == SizeOfExMapTable) {
           //
           // Exceed the length of ExMap Table
           //
-          return PCD_INVALID_TOKEN_NUMBER;
+          *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+          return EFI_SUCCESS;
         } else if (ExMapTable[Idx].ExGuidIndex == GuidTableIdx) {
           //
           // Found the next match
           //
-          return ExMapTable[Idx].ExTokenNumber;
+          *TokenNumber = ExMapTable[Idx].ExTokenNumber;
+          return EFI_SUCCESS;
         } else {
           //
           // Guid has been changed. It is the next Token Space Guid.
           // We should flag no more TokenNumber.
           //
-          return PCD_INVALID_TOKEN_NUMBER;
+          *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
+          return EFI_SUCCESS;
         }
       }
     }
   }
   
-  return PCD_INVALID_TOKEN_NUMBER;
+  return EFI_NOT_FOUND;
 }
   
 
@@ -375,13 +379,13 @@ EFI_STATUS
 GetHiiVariable (
   IN  EFI_GUID      *VariableGuid,
   IN  UINT16        *VariableName,
-  OUT VOID          **VariableData,
+  OUT UINT8         **VariableData,
   OUT UINTN         *VariableSize
   )
 {
   UINTN      Size;
   EFI_STATUS Status;
-  VOID       *Buffer;
+  UINT8      *Buffer;
 
   Size = 0;
   Buffer = NULL;
@@ -395,7 +399,7 @@ GetHiiVariable (
     );
   
   if (Status == EFI_BUFFER_TOO_SMALL) {
-    Buffer = AllocatePool (Size);
+    Buffer = (UINT8 *) AllocatePool (Size);
 
     ASSERT (Buffer != NULL);
 

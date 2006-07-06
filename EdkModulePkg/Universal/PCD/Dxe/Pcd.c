@@ -499,12 +499,18 @@ DxePcdGetNextToken (
   IN OUT   UINTN            *TokenNumber
   )
 {
-  UINTN               ExTokenNumber;
-  
+  EFI_STATUS          Status;
+
+  Status = EFI_NOT_FOUND;
   //
   // Scan the local token space
   //
   if (Guid == NULL) {
+    if (((*TokenNumber > PEI_NEX_TOKEN_NUMBER) && (*TokenNumber < PEI_LOCAL_TOKEN_NUMBER)) ||
+        ((*TokenNumber > (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER)))) {
+        return EFI_NOT_FOUND;
+    }
+    
     (*TokenNumber)++;
     if (*TokenNumber > PEI_NEX_TOKEN_NUMBER &&
         *TokenNumber <= PEI_LOCAL_TOKEN_NUMBER) {
@@ -525,10 +531,9 @@ DxePcdGetNextToken (
   }
 
   if (!PEI_EXMAP_TABLE_EMPTY) {
-    ExTokenNumber = *TokenNumber;
-    ExTokenNumber = ExGetNextTokeNumber (
+    Status = ExGetNextTokeNumber (
                         Guid,
-                        ExTokenNumber,
+                        TokenNumber,
                         mPcdDatabase->PeiDb.Init.GuidTable,
                         sizeof(mPcdDatabase->PeiDb.Init.GuidTable),
                         mPcdDatabase->PeiDb.Init.ExMapTable,
@@ -536,13 +541,14 @@ DxePcdGetNextToken (
                         );
   }
 
-  if ((ExTokenNumber == PCD_INVALID_TOKEN_NUMBER) &&
-      !DXE_EXMAP_TABLE_EMPTY
-    ) {
-    ExTokenNumber = *TokenNumber;
-    ExTokenNumber = ExGetNextTokeNumber (
+  if (Status == EFI_SUCCESS) {
+    return Status;
+  }
+
+  if (!DXE_EXMAP_TABLE_EMPTY) {
+    Status = ExGetNextTokeNumber (
                         Guid,
-                        ExTokenNumber,
+                        TokenNumber,
                         mPcdDatabase->DxeDb.Init.GuidTable,
                         sizeof(mPcdDatabase->DxeDb.Init.GuidTable),
                         mPcdDatabase->DxeDb.Init.ExMapTable,
@@ -550,9 +556,7 @@ DxePcdGetNextToken (
                         );
   }
 
-  *TokenNumber = ExTokenNumber;
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 
