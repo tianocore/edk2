@@ -134,6 +134,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         if (jTable == null) {
             model = new NonEditableTableModel();
             jTable = new JTable(model);
+            jTable.setRowHeight(20);
             model.addColumn("ModuleName");
             model.addColumn("ModuleGUID");
             model.addColumn("ModuleVersion");
@@ -190,8 +191,11 @@ public class FpdFrameworkModules extends IInternalFrame {
                     fpdMsa.put(mg + mv + pg + pv, null);
                     
                     String[] row = {" ", mg, mv, pg, pv};
-                    if (getModuleId(mg + " " + mv + " " + pg + " " + pv) != null) {
-                        row[0] = getModuleId(mg + " " + mv + " " + pg + " " + pv).getName();
+                    ModuleIdentification mi = getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                    if (mi != null) {
+                        row[0] = mi.getName();
+                        row[2] = mi.getVersion();
+                        row[4] = mi.getPackage().getVersion();
                     }
                     model1.addRow(row);
                     ffc.addFrameworkModulesPcdBuildDefs(miList.get(selectedRow), null);
@@ -241,6 +245,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         if (jTable1 == null) {
             model1 = new NonEditableTableModel();
             jTable1 = new JTable(model1);
+            jTable1.setRowHeight(20);
             model1.addColumn("ModuleName");
             model1.addColumn("ModuleGUID");
             model1.addColumn("ModuleVersion");            
@@ -273,10 +278,10 @@ public class FpdFrameworkModules extends IInternalFrame {
                         settingDlg = new FpdModuleSA(ffc);
                     }
                     
-                    String mg = model1.getValueAt(selectedRow, 1).toString();
-                    String mv = model1.getValueAt(selectedRow, 2).toString();
-                    String pg = model1.getValueAt(selectedRow, 3).toString();
-                    String pv = model1.getValueAt(selectedRow, 4).toString();
+                    String mg = model1.getValueAt(selectedRow, 1)+"";
+                    String mv = model1.getValueAt(selectedRow, 2)+"";
+                    String pg = model1.getValueAt(selectedRow, 3)+"";
+                    String pv = model1.getValueAt(selectedRow, 4)+"";
                     settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv);
                     settingDlg.setVisible(true);
                 }
@@ -357,8 +362,11 @@ public class FpdFrameworkModules extends IInternalFrame {
             String[][] saa = new String[ffc.getFrameworkModulesCount()][5];
             ffc.getFrameworkModulesInfo(saa);
             for (int i = 0; i < saa.length; ++i) {
-                if (getModuleId(saa[i][1]+ " "+saa[i][2]+" "+saa[i][3]+" "+saa[i][4]) != null) {
-                    saa[i][0] = getModuleId(saa[i][1]+ " "+saa[i][2]+" "+saa[i][3]+" "+saa[i][4]).getName();
+                ModuleIdentification mi = getModuleId(saa[i][1]+ " "+saa[i][2]+" "+saa[i][3]+" "+saa[i][4]);
+                if (mi != null) {
+                    saa[i][0] = mi.getName();
+                    saa[i][2] = mi.getVersion();
+                    saa[i][4] = mi.getPackage().getVersion();
                 }
                 model1.addRow(saa[i]);
                 fpdMsa.put(saa[i][1]+saa[i][2]+saa[i][3]+saa[i][4], saa[i][0]);
@@ -417,14 +425,17 @@ public class FpdFrameworkModules extends IInternalFrame {
         
         while(ispi.hasNext()) {
             PackageIdentification pi = (PackageIdentification)ispi.next();
-            if ( !pi.getGuid().equals(keyPart[2]) || !pi.getVersion().equals(keyPart[3])){
+            if ( !pi.getGuid().equals(keyPart[2])){ 
+//                            || !pi.getVersion().equals(keyPart[3])){
                 continue;
             }
             Set<ModuleIdentification> smi = GlobalData.getModules(pi);
             Iterator ismi = smi.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                if (mi.getGuid().equals(keyPart[0]) && mi.getVersion().equals(keyPart[1])){
+                if (mi.getGuid().equals(keyPart[0])){
+//                                && mi.getVersion().equals(keyPart[1])){
+
                     return mi;
                 }
             }

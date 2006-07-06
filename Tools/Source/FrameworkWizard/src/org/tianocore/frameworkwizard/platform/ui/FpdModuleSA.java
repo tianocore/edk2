@@ -1,6 +1,8 @@
 package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -398,6 +400,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private void initialize() {
         this.setSize(664, 515);
+        this.centerWindow();
         this.setModal(true);
         this.setTitle("Module Settings");
         this.setContentPane(getJContentPane());
@@ -499,6 +502,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTable == null) {
             model = new PartialEditableTableModel();
             jTable = new JTable(model);
+            jTable.setRowHeight(20);
             model.addColumn("CName");
             model.addColumn("TokenSpaceGUID");
             model.addColumn("ItemType");
@@ -682,7 +686,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model1.addColumn("PackageGUID");
             model1.addColumn("PackageVersion");
             jTable1 = new JTable(model1);
-            
+            jTable1.setRowHeight(20);
             jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -731,7 +735,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model2 = new LibraryTableModel();
             model2.addColumn("LibraryClass");
             jTable2 = new JTable(model2);
-            
+            jTable2.setRowHeight(20);
+            jTable2.setShowGrid(false);
             jTable2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable2.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -803,7 +808,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model3.addColumn("PackageGUID");
             model3.addColumn("PackageVersion");
             jTable3 = new JTable(model3);
-            
+            jTable3.setRowHeight(20);
             jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable3.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
@@ -1099,6 +1104,15 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             optionsTableModel.addColumn("SupportedArchs");
             optionsTableModel.addColumn("Contents");
             jTable4 = new JTable(optionsTableModel);
+            jTable4.setRowHeight(20);
+            Vector<String> vArch = new Vector<String>();
+            vArch.add("IA32");
+            vArch.add("X64");
+            vArch.add("IPF");
+            vArch.add("EBC");
+            vArch.add("ARM");
+            vArch.add("PPC");
+            jTable4.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
             jTable4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable4.getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent arg0) {
@@ -1109,23 +1123,28 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     if (arg0.getType() == TableModelEvent.UPDATE){
                         //ToDo Data Validition check.
                         String targets = m.getValueAt(row, 0) + "";
-                        Vector<Object> targetName = new Vector<Object>();
-                        String[] sArray = targets.split(" ");
-                        for (int i = 0; i < sArray.length; ++i) {
-                            targetName.add(sArray[i]);
+                        Vector<Object> targetName = null;
+                        if (targets.length() > 0) {
+                            targetName = new Vector<Object>();
+                            String[] sArray = targets.split(" ");
+                            for (int i = 0; i < sArray.length; ++i) {
+                                targetName.add(sArray[i]);
+                            }
                         }
+                        
                         String toolChain = m.getValueAt(row, 1) + "";
                         String tagName = m.getValueAt(row, 2) + "";
                         String toolCode = m.getValueAt(row, 3) + "";
                         String archs = m.getValueAt(row, 4) + "";
-                        Vector<Object> supArch = new Vector<Object>();
-                        String[] sArray1 = archs.split(" ");
-                        for (int i = 0; i < sArray1.length; ++i) {
-                            supArch.add(sArray1[i]);
+                        Vector<Object> supArch = null;
+                        if (archs.length() > 0) {
+                            supArch = new Vector<Object>();
+                            String[] sArray1 = archs.split(" ");
+                            for (int i = 0; i < sArray1.length; ++i) {
+                                supArch.add(sArray1[i]);
+                            }
                         }
-                        if (supArch.size() == 0) {
-                            supArch.add("IA32");
-                        }
+                        
                         String contents = m.getValueAt(row, 5) + "";
                         
                         ffc.updateModuleSAOptionsOpt(moduleKey, row, targetName, toolChain, tagName, toolCode, supArch, contents);
@@ -1181,6 +1200,24 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         }
         return jButton5;
     }
+    
+    /**
+    Start the window at the center of screen
+    
+    **/
+   protected void centerWindow(int intWidth, int intHeight) {
+       Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+       this.setLocation((d.width - intWidth) / 2, (d.height - intHeight) / 2);
+   }
+
+   /**
+    Start the window at the center of screen
+    
+    **/
+   protected void centerWindow() {
+       centerWindow(this.getSize().width, this.getSize().height);
+   }
+
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
