@@ -1382,7 +1382,7 @@ public class SurfaceAreaQuery {
         String[] xPath = new String[] { "/UserExtensions" };
 
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
-        if (queryResult == null && queryResult.length == 0) {
+        if (queryResult == null || queryResult.length == 0) {
             return null;
         }
         UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)queryResult[0];
