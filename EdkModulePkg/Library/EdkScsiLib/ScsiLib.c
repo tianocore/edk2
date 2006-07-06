@@ -68,7 +68,7 @@ Returns:
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
   UINT64                          Lun;
-  UINT8                           *Target;
+  UINT32                          Target;
   EFI_STATUS                      Status;
   UINT8                           Cdb[6];
 
@@ -76,10 +76,11 @@ Returns:
   ZeroMem (Cdb, 6);
 
   CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = NULL;
+  CommandPacket.DataBuffer      = NULL;
   CommandPacket.SenseData       = SenseData;
-  CommandPacket.InTransferLength= 0;
+  CommandPacket.TransferLength  = 0;
   CommandPacket.Cdb             = Cdb;
+
   //
   // Fill Cdb for Test Unit Ready Command
   //
@@ -151,7 +152,7 @@ Returns:
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
   UINT64                          Lun;
-  UINT8                           *Target;
+  UINT32                          Target;
   EFI_STATUS                      Status;
   UINT8                           Cdb[6];
 
@@ -159,8 +160,8 @@ Returns:
   ZeroMem (Cdb, 6);
 
   CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = InquiryDataBuffer;
-  CommandPacket.InTransferLength= *InquiryDataLength;
+  CommandPacket.DataBuffer      = InquiryDataBuffer;
+  CommandPacket.TransferLength  = *InquiryDataLength;
   CommandPacket.SenseData       = SenseData;
   CommandPacket.SenseDataLength = *SenseDataLength;
   CommandPacket.Cdb             = Cdb;
@@ -186,7 +187,7 @@ Returns:
   *HostAdapterStatus          = CommandPacket.HostAdapterStatus;
   *TargetStatus               = CommandPacket.TargetStatus;
   *SenseDataLength            = CommandPacket.SenseDataLength;
-  *InquiryDataLength          = CommandPacket.InTransferLength;
+  *InquiryDataLength          = CommandPacket.TransferLength;
 
   return Status;
 }
@@ -247,7 +248,7 @@ Returns:
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
   UINT64                          Lun;
-  UINT8                           *Target;
+  UINT32                          Target;
   EFI_STATUS                      Status;
   UINT8                           Cdb[10];
 
@@ -255,9 +256,9 @@ Returns:
   ZeroMem (Cdb, 10);
 
   CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = DataBuffer;
+  CommandPacket.DataBuffer      = DataBuffer;
   CommandPacket.SenseData       = SenseData;
-  CommandPacket.InTransferLength= *DataLength;
+  CommandPacket.TransferLength  = *DataLength;
   CommandPacket.Cdb             = Cdb;
   //
   // Fill Cdb for Mode Sense (10) Command
@@ -279,7 +280,7 @@ Returns:
   *HostAdapterStatus            = CommandPacket.HostAdapterStatus;
   *TargetStatus                 = CommandPacket.TargetStatus;
   *SenseDataLength              = CommandPacket.SenseDataLength;
-  *DataLength                   = CommandPacket.InTransferLength;
+  *DataLength                   = CommandPacket.TransferLength;
 
   return Status;
 }
@@ -330,21 +331,17 @@ Returns:
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
   UINT64                          Lun;
-  UINT8                           *Target;
+  UINT32                          Target;
   EFI_STATUS                      Status;
   UINT8                           Cdb[6];
 
   ZeroMem (&CommandPacket, sizeof (EFI_SCSI_IO_SCSI_REQUEST_PACKET));
   ZeroMem (Cdb, 6);
-/*
-  if (*SenseDataLength > 0xff) {
-    *SenseDataLength = 0xff;
-  }
-*/
+
   CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = SenseData;
+  CommandPacket.DataBuffer      = SenseData;
   CommandPacket.SenseData       = NULL;
-  CommandPacket.InTransferLength= *SenseDataLength;
+  CommandPacket.TransferLength  = *SenseDataLength;
   CommandPacket.Cdb             = Cdb;
   //
   // Fill Cdb for Request Sense Command
@@ -363,7 +360,7 @@ Returns:
 
   *HostAdapterStatus            = CommandPacket.HostAdapterStatus;
   *TargetStatus                 = CommandPacket.TargetStatus;
-  *SenseDataLength              = (UINT8) CommandPacket.InTransferLength;
+  *SenseDataLength              = (UINT8) CommandPacket.TransferLength;
 
   return Status;
 }
@@ -420,7 +417,7 @@ Returns:
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
   UINT64                          Lun;
-  UINT8                           *Target;
+  UINT32                          Target;
   EFI_STATUS                      Status;
   UINT8                           Cdb[10];
 
@@ -428,9 +425,9 @@ Returns:
   ZeroMem (Cdb, 10);
 
   CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = DataBuffer;
+  CommandPacket.DataBuffer      = DataBuffer;
   CommandPacket.SenseData       = SenseData;
-  CommandPacket.InTransferLength= *DataLength;
+  CommandPacket.TransferLength  = *DataLength;
   CommandPacket.Cdb             = Cdb;
   //
   // Fill Cdb for Read Capacity Command
@@ -457,7 +454,7 @@ Returns:
   *HostAdapterStatus            = CommandPacket.HostAdapterStatus;
   *TargetStatus                 = CommandPacket.TargetStatus;
   *SenseDataLength              = CommandPacket.SenseDataLength;
-  *DataLength                   = CommandPacket.InTransferLength;
+  *DataLength                   = CommandPacket.TransferLength;
 
   return Status;
 }
@@ -516,7 +513,7 @@ Returns:
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
   UINT64                          Lun;
-  UINT8                           *Target;
+  UINT32                          Target;
   EFI_STATUS                      Status;
   UINT8                           Cdb[10];
 
@@ -524,9 +521,9 @@ Returns:
   ZeroMem (Cdb, 10);
 
   CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = DataBuffer;
+  CommandPacket.DataBuffer      = DataBuffer;
   CommandPacket.SenseData       = SenseData;
-  CommandPacket.InTransferLength= *DataLength;
+  CommandPacket.TransferLength  = *DataLength;
   CommandPacket.Cdb             = Cdb;
   //
   // Fill Cdb for Read (10) Command
@@ -551,7 +548,7 @@ Returns:
   *HostAdapterStatus            = CommandPacket.HostAdapterStatus;
   *TargetStatus                 = CommandPacket.TargetStatus;
   *SenseDataLength              = CommandPacket.SenseDataLength;
-  *DataLength                   = CommandPacket.InTransferLength;
+  *DataLength                   = CommandPacket.TransferLength;
 
   return Status;
 }
@@ -610,7 +607,7 @@ Returns:
 {
   EFI_SCSI_IO_SCSI_REQUEST_PACKET CommandPacket;
   UINT64                          Lun;
-  UINT8                           *Target;
+  UINT32                          Target;
   EFI_STATUS                      Status;
   UINT8                           Cdb[10];
 
@@ -618,9 +615,9 @@ Returns:
   ZeroMem (Cdb, 10);
 
   CommandPacket.Timeout         = Timeout;
-  CommandPacket.InDataBuffer    = DataBuffer;
+  CommandPacket.DataBuffer      = DataBuffer;
   CommandPacket.SenseData       = SenseData;
-  CommandPacket.InTransferLength= *DataLength;
+  CommandPacket.TransferLength  = *DataLength;
   CommandPacket.Cdb             = Cdb;
   //
   // Fill Cdb for Write (10) Command
@@ -645,7 +642,7 @@ Returns:
   *HostAdapterStatus            = CommandPacket.HostAdapterStatus;
   *TargetStatus                 = CommandPacket.TargetStatus;
   *SenseDataLength              = CommandPacket.SenseDataLength;
-  *DataLength                   = CommandPacket.InTransferLength;
+  *DataLength                   = CommandPacket.TransferLength;
 
   return Status;
 }

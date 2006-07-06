@@ -37,7 +37,7 @@
     <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
   </PackageDependencies>
   <Externs>
-    <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
+    <Specification>EFI_SPECIFICATION_VERSION 0x00010010</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
   </Externs>
 </ModuleSurfaceArea>
