@@ -43,6 +43,9 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
   { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE },
   { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
+  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE},
+  #endif
   { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
 //  { &gEfiStatusCodeRuntimeProtocolGuid,    (VOID **)&gStatusCode,    NULL, NULL, FALSE },
@@ -225,6 +228,9 @@ static const GUID_TO_STRING_PROTOCOL_ENTRY MissingProtocols[] = {
   { &gEfiRuntimeArchProtocolGuid,          (CHAR16 *)L"Runtime"            },
   { &gEfiVariableArchProtocolGuid,         (CHAR16 *)L"Variable"           },
   { &gEfiVariableWriteArchProtocolGuid,    (CHAR16 *)L"Variable Write"     },
+  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  { &gEfiCapsuleArchProtocolGuid,          (CHAR16 *)L"Capsule"            },
+  #endif
   { &gEfiMonotonicCounterArchProtocolGuid, (CHAR16 *)L"Monotonic Counter"  },
   { &gEfiResetArchProtocolGuid,            (CHAR16 *)L"Reset"              },
 //  { &gEfiStatusCodeRuntimeProtocolGuid,       (CHAR16 *)L"Status Code"        },

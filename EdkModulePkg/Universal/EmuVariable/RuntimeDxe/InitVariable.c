@@ -114,6 +114,36 @@ Returns:
           );
 }
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+EFI_STATUS
+EFIAPI
+RuntimeServiceQueryVariableInfo (
+  IN  UINT32                 Attributes,
+  OUT UINT64                 *MaximumVariableStorageSize,
+  OUT UINT64                 *RemainingVariableStorageSize,
+  OUT UINT64                 *MaximumVariableSize
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+Returns:
+
+--*/
+{
+  return QueryVariableInfo (
+          Attributes,
+          MaximumVariableStorageSize,
+          RemainingVariableStorageSize,
+          MaximumVariableSize,
+          &mVariableModuleGlobal->VariableBase[Physical],
+          mVariableModuleGlobal->FvbInstance
+          );
+}
+#endif
+
 VOID
 EFIAPI
 VariableClassAddressChangeEvent (
@@ -166,6 +196,9 @@ Returns:
   SystemTable->RuntimeServices->GetVariable         = RuntimeServiceGetVariable;
   SystemTable->RuntimeServices->GetNextVariableName = RuntimeServiceGetNextVariableName;
   SystemTable->RuntimeServices->SetVariable         = RuntimeServiceSetVariable;
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  SystemTable->RuntimeServices->QueryVariableInfo   = RuntimeServiceQueryVariableInfo;
+#endif
 
   //
   // Now install the Variable Runtime Architectural Protocol on a new handle

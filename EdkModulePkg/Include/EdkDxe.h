@@ -92,4 +92,8 @@ Abstract:
 #include <Protocol/ScsiIo.h>
 #endif
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+#include <Protocol/Capsule.h>
+#endif
+
 #endif

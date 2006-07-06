@@ -50,4 +50,8 @@ Abstract:
 #include <Protocol/EdkDecompress.h>
 #include <Protocol/Print.h>
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+#include <Protocol/Capsule.h>
+#endif
+
 #endif

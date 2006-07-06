@@ -159,6 +159,7 @@
     <Filename>Universal/Variable/Pei/Variable.msa</Filename>
     <Filename>Universal/EmuVariable/RuntimeDxe/EmuVariable.msa</Filename>
     <Filename>Universal/Variable/RuntimeDxe/Variable.msa</Filename>
+    <Filename>Universal/Capsule/RuntimeDxe/CapsuleRuntime.msa</Filename>
     <Filename>Universal/WatchdogTimer/Dxe/WatchDogTimer.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
@@ -356,6 +357,11 @@
     </Entry>
   </GuidDeclarations>
   <ProtocolDeclarations>
+    <Entry Name="Capsule">
+      <C_Name>gEfiCapsuleArchProtocolGuid</C_Name>
+      <GuidValue>5053697E-2EBC-4819-90D9-0580DEEE5754</GuidValue>
+      <HelpText/>
+    </Entry>
     <Entry Name="CustomizedDecompress">
       <C_Name>gEfiCustomizedDecompressProtocolGuid</C_Name>
       <GuidValue>9A44198E-A4A2-44E6-8A1F-39BEFDAC896F</GuidValue>
@@ -663,5 +669,29 @@
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <HelpText>HELP FIX ME!</HelpText>
     </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdSupportUpdateCapsuleRest</C_Name>
+      <Token>0x00010020</Token>
+      <TokenSpaceGuidCName>FIX_ME_PcdSupportUpdateCapsuleRest</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <HelpText>HELP FIX ME!</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdMaxSizePopulateCapsule</C_Name>
+      <Token>0x00010021</Token>
+      <TokenSpaceGuidCName>FIX_ME_PcdMaxSizePopulateCapsule</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <HelpText>HELP FIX ME!</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdMaxSizeNonPopulateCapsule</C_Name>
+      <Token>0x00010022</Token>
+      <TokenSpaceGuidCName>FIX_ME_PcdMaxSizeNonPopulateCapsule</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <HelpText>HELP FIX ME!</HelpText>
+    </PcdEntry>  
   </PcdDeclarations>
 </PackageSurfaceArea>

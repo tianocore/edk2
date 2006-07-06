@@ -194,6 +194,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>TianoDecompress</ProtocolCName>
     </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>Capsule</ProtocolCName>
+    </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
