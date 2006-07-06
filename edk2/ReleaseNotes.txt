@@ -1,12 +1,12 @@
 Intel(R) Platform Innovation Framework for EFI
-EFI Development Kit 2.0 (EDK II) 
-Alpha Release
-2006-04-26
+EFI Development Kit II (EDK II) 
+Root Package 1.00
+2006-07-06
 
 Copyright (c) 2006, Intel Corporation
 
 This document provides updates to documentation, along with a description on 
-how to install and build the Edk II.
+how to install and build the EDK II.
 
 Package Contents
 ----------------
@@ -17,6 +17,8 @@ Package Contents
                    libraries
   EdkModulePkg   - A package containing reference drivers
   EdkFatBinPkg   - A package containing binary DXE drivers for the Fat 32 file
+                   system
+  EdkFatPkg      - A package containing source DXE drivers for the Fat 32 file
                    system
   EdkShellBinPkg - A package containing binary Shell applications and commands
   EdkNt32Pkg     - A package containing the NT32 Emulation platform reference
@@ -273,17 +275,13 @@ Refer to the "Module Surface Area Architecture Specification" for additional
 details. The MSA is further explained in the "Build Packaging Specification"
 document.
  
-C) Module Build Description (MDB). The "as-built" definition file that contains
-only the changes to the default flags defined in the MSA. The MSA and MDB are
-further explained in the "Build Packaging Specification" document.
-
-D) Platform Configuration Database (PCD).  A platform database which contains a
+C) Platform Configuration Database (PCD).  A platform database which contains a
 variety of current platform settings or directives by which a driver or
 application can interact with.  The PCD is defined by the PCD_Protocol (This is
 further explained in the "Platform Configuration Database Infrastructure 
 Description" document.
 
-E) Library Class.  A library class is a logical grouping of similar functions.
+D) Library Class.  A library class is a logical grouping of similar functions.
 When developing components, the module surface area declares the class of
 libraries that can be used by the component. The MBD file specifies the
 instance(s) of the library that will be used during compilation/linking. All
