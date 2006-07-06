@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>BaseLib</ModuleName>
@@ -277,6 +277,7 @@
     <Filename SupArchList="IPF">Ipf/Synchronization.c</Filename>
     <Filename SupArchList="IPF">Ipf/CpuPause.s</Filename>
     <Filename SupArchList="IPF">Ipf/CpuFlushTlb.s</Filename>
+    <Filename SupArchList="IPF">Ipf/GetInterruptState.s</Filename>
     <Filename SupArchList="EBC">Math64.c</Filename>
     <Filename SupArchList="EBC">Unaligned.c</Filename>
     <Filename SupArchList="EBC">Ebc/SwitchStack.c</Filename>
