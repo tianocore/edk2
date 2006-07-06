@@ -390,6 +390,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jTable2 == null) {
             antTaskTableModel = new DefaultTableModel();
             jTable2 = new JTable(antTaskTableModel);
+            jTable2.setRowHeight(20);
             antTaskTableModel.addColumn("ID");
             antTaskTableModel.addColumn("Filename");
             antTaskTableModel.addColumn("ANT Command Options");
@@ -635,6 +636,7 @@ public class FpdBuildOptions extends IInternalFrame {
             ffsAttributesTableModel = new DefaultTableModel();
             jTable4 = new JTable(ffsAttributesTableModel);
             jTable4.setPreferredSize(new java.awt.Dimension(400,80));
+            jTable4.setRowHeight(20);
             ffsAttributesTableModel.addColumn("Name");
             ffsAttributesTableModel.addColumn("Value");
             
@@ -809,6 +811,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jTable5 == null) {
             optionsTableModel = new DefaultTableModel();
             jTable5 = new JTable(optionsTableModel);
+            jTable5.setRowHeight(20);
             optionsTableModel.addColumn("BuildTargets");
             optionsTableModel.addColumn("ToolChainFamily");
             optionsTableModel.addColumn("SupportedArch");
@@ -1271,6 +1274,7 @@ public class FpdBuildOptions extends IInternalFrame {
             sectionTableModel.addColumn("SectionType");
             
             jTable1 = new JTable(sectionTableModel);
+            jTable1.setRowHeight(20);
             JComboBox cb = new JComboBox();
             cb.addItem("EFI_SECTION_FREEFORM_SUBTYPE_GUID");
             cb.addItem("EFI_SECTION_VERSION");
@@ -1333,6 +1337,7 @@ public class FpdBuildOptions extends IInternalFrame {
             subsectionsTableModel = new DefaultTableModel();
             subsectionsTableModel.addColumn("SectionType");
             jTable3 = new JTable(subsectionsTableModel);
+            jTable3.setRowHeight(20);
             JComboBox cb = new JComboBox();
             cb.addItem("EFI_SECTION_FREEFORM_SUBTYPE_GUID");
             cb.addItem("EFI_SECTION_VERSION");
@@ -1572,7 +1577,7 @@ public class FpdBuildOptions extends IInternalFrame {
             sectionsTableModel = new DefaultTableModel();
             sectionsTableModel.addColumn("EncapsulationType");
             jTable6 = new JTable(sectionsTableModel);
-            
+            jTable6.setRowHeight(20);
             jTable6.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable6.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {

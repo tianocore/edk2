@@ -27,17 +27,12 @@ import java.util.regex.Pattern;
 import org.apache.xmlbeans.XmlNormalizedString;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-import org.tianocore.BuildOptionsDocument;
 import org.tianocore.BuildTargetList;
 import org.tianocore.DataIdDocument;
 import org.tianocore.ExternsDocument;
 import org.tianocore.FileNameConvention;
-import org.tianocore.FvAttributeDocument;
 //import org.tianocore.FvImageDocument;
-import org.tianocore.FvImagesDocument;
-import org.tianocore.FvOptionDocument;
 import org.tianocore.GuidDeclarationsDocument;
-import org.tianocore.GuidsDocument;
 import org.tianocore.LibrariesDocument;
 import org.tianocore.LibraryClassDeclarationsDocument;
 import org.tianocore.LibraryClassDocument;
@@ -45,18 +40,13 @@ import org.tianocore.ModuleSADocument;
 import org.tianocore.ModuleTypeDef;
 import org.tianocore.MsaFilesDocument;
 import org.tianocore.MsaHeaderDocument;
-import org.tianocore.OptionDocument;
-import org.tianocore.PPIsDocument;
 import org.tianocore.PackageDependenciesDocument;
 import org.tianocore.PackageHeadersDocument;
-import org.tianocore.PlatformDefinitionsDocument;
 import org.tianocore.PpiDeclarationsDocument;
 import org.tianocore.ProtocolDeclarationsDocument;
 import org.tianocore.SpdHeaderDocument;
 import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
-import org.tianocore.ProtocolsDocument.Protocols.Protocol;
-import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
 import org.tianocore.PlatformHeaderDocument;
 import org.tianocore.frameworkwizard.platform.ui.id.FpdModuleIdentification;
 import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
@@ -311,102 +301,6 @@ public class SurfaceAreaQuery {
 			// TBD
 		}
 		return "UNIFIED";
-	}
-
-	/**
-	 * Retrieve BuildOptions/Option or Arch/Option
-	 * 
-	 * @param toolChainFamilyFlag
-	 *            if true, retrieve options for toolchain family; otherwise for
-	 *            toolchain
-	 * 
-	 * @returns String[][5] name, target, toolchain, arch, coommand of options
-	 *          if elements are found at the known xpath. String[0][] if dont
-	 *          find element.
-	 * 
-	 * @returns Empty array if nothing is there
-	 */
-	public static String[][] getOptions(boolean toolChainFamilyFlag) {
-		String[] xPath;
-		String target = null;
-		String toolchain = null;
-		String toolchainFamily = null;
-		List<String> archList = null;
-		String cmd = null;
-		String targetName = null;
-		String optionName = null;
-
-		if (toolChainFamilyFlag == true) {
-			xPath = new String[] {
-					"/BuildOptions/Options/Option[not(@ToolChainFamily) and not(@ToolChainTag)]",
-					"/BuildOptions/Options/Option[@ToolChainFamily]", };
-		} else {
-			xPath = new String[] {
-					"/BuildOptions/Options/Option[not(@ToolChainFamily) and not(@ToolChainTag)]",
-					"/BuildOptions/Options/Option[@TagName]", };
-		}
-
-		XmlObject[] returns = get("FrameworkPlatformDescription", xPath);
-		if (returns == null) {
-			return new String[0][5];
-		}
-
-		List<String[]> optionList = new ArrayList<String[]>();
-		OptionDocument.Option option;
-
-		for (int i = 0; i < returns.length; i++) {
-			option = (OptionDocument.Option) returns[i];
-
-			//
-			// Get Target, ToolChain(Family), Arch, Cmd, and Option from Option,
-			// then
-			// put to result[][5] array in above order.
-			//
-			String[] targetList;
-			target = null;//Auber option.getBuildTargets();
-			if (target != null) {
-				targetList = target.split(" ");
-			} else {
-				targetList = new String[1];
-				targetList[0] = null;
-			}
-
-			if (toolChainFamilyFlag) {
-				toolchainFamily = option.getToolChainFamily();
-				if (toolchainFamily != null) {
-					toolchain = toolchainFamily.toString();
-				} else {
-					toolchain = null;
-				}
-			} else {
-				toolchain = option.getTagName();
-			}
-
-			archList = option.getSupArchList();
-			if (archList == null) {
-				archList.add(null);
-			}
-
-			cmd = option.getToolCode();
-
-			optionName = option.getStringValue();
-			for (int t = 0; t < targetList.length; t++) {
-				for (int j = 0; j < archList.size(); j++) {
-					optionList.add(new String[] { optionName, targetList[i],
-							toolchain, archList.get(j), cmd });
-				}
-			}
-		}
-
-		String[][] result = new String[optionList.size()][5];
-		for (int i = 0; i < optionList.size(); i++) {
-			result[i][0] = optionList.get(i)[0];
-			result[i][1] = optionList.get(i)[1];
-			result[i][2] = optionList.get(i)[2];
-			result[i][3] = optionList.get(i)[3];
-			result[i][4] = optionList.get(i)[4];
-		}
-		return result;
 	}
 
 	public static String getBuildTarget() {
@@ -885,7 +779,7 @@ public class SurfaceAreaQuery {
 		return result;
 	}
 
-
+	
 
 	public static XmlObject getFpdBuildOptions() {
 		String[] xPath = new String[] { "/BuildOptions" };
@@ -1352,7 +1246,6 @@ public class SurfaceAreaQuery {
 	 *         <BuildOptions>.
 	 */
 	public String getToolChainFamily() {
-		String toolChainFamily;
 		String[] xPath = new String[] { "/BuildOptions" };
 
 		XmlObject[] result = get("FrameworkPlatformDescription", xPath);

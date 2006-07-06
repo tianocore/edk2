@@ -208,9 +208,27 @@ public class FpdFileContents {
         ListIterator li = getfpdFrameworkModules().getModuleSAList().listIterator();
         while(li.hasNext()) {
             ModuleSADocument.ModuleSA msa = (ModuleSADocument.ModuleSA)li.next();
-            if (msa.getModuleGuid().equals(s[0]) && msa.getModuleVersion().equals(s[1])
-                            && msa.getPackageGuid().equals(s[2]) && msa.getPackageVersion().equals(s[3])) {
-                
+            if (msa.getModuleGuid().equals(s[0]) && msa.getPackageGuid().equals(s[2])) {
+                if (msa.getModuleVersion() != null) {
+                    if (!msa.getModuleVersion().equals(s[1])) {
+                        continue;
+                    }
+                }
+                else{
+                    if (s[1] != null) {
+                        continue;
+                    }
+                }
+                if (msa.getPackageVersion() != null) {
+                    if (!msa.getPackageVersion().equals(s[3])) {
+                        continue;
+                    }
+                }
+                else{
+                    if (s[3] != null) {
+                        continue;
+                    }
+                }
                 return msa;
             }
         }

@@ -31,16 +31,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
   GlobalData provide initializing, instoring, querying and update global data.
@@ -113,8 +107,6 @@ public class GlobalData {
     private static Map<String, Object> toolChainOptions;
     private static Map<String, Object> toolChainFamilyOptions;
     private static Map<String, String> toolChainDefinitions;
-    private static Map<FpdModuleIdentification, Map<String, Object>> moduleToolChainOptions = new HashMap<FpdModuleIdentification, Map<String, Object>>();;
-    private static Map<FpdModuleIdentification, Map<String, Object>> moduleToolChainFamilyOptions = new HashMap<FpdModuleIdentification, Map<String, Object>>();;
     ///
     ///
     ///
@@ -708,120 +700,8 @@ public class GlobalData {
     /*
 
      */
-    public static String getCommandSetting(String target, String toolChain, 
-        String arch, String command, String attribute, FpdModuleIdentification fpdModuleId) {
-        String[] commandDescription = new String[] {target, toolChain, arch, command, attribute};
-        return getCommandSetting(commandDescription, fpdModuleId);
-    }
-    /*
-
-     */
-    public static String getCommandSetting(String[] commandDescription, FpdModuleIdentification fpdModuleId) {
-        if (commandDescription[4].equals("FLAGS")) {
-            return getCommandFlags(commandDescription, fpdModuleId);
-        }
-
-        StringBuffer commandDescString = new StringBuffer(32);
-
-        int i = 0;
-        while (true) {
-            commandDescString.append(commandDescription[i++]);
-            if (i >= commandDescription.length) {
-                break;
-            }
-            commandDescString.append("_");
-        }
-
-        return getCommandSetting(commandDescString.toString());
-    }
-    /*
-
-     */
     public static String getCommandSetting(String commandDescString) {
         return (String)toolChainDefinitions.get(commandDescString);
-    }
-    /*
-
-     */
-    public static String getCommandFlags(String[] commandDescription, FpdModuleIdentification fpdModuleId) {
-        String setting = getSetting(toolChainOptions, commandDescription, fpdModuleId, false);
-
-        if (setting == null) {
-            String commandDesc = commandDescription[4];
-            commandDescription[4] = "FAMILY";
-            String toolChainFamily = getCommandSetting(commandDescription, fpdModuleId);
-            commandDescription[4] = commandDesc;
-
-            commandDesc = commandDescription[1];
-            commandDescription[1] = toolChainFamily;
-            setting = getSetting(toolChainFamilyOptions, commandDescription, fpdModuleId, true);
-            commandDescription[1] = commandDesc;
-        }
-
-        if (setting == null) {
-            setting = "";
-        }
-        
-        
-        Set<String> addFlagsSet = new LinkedHashSet<String>();
-        Set<String> subFlagsSet = new LinkedHashSet<String>();
-        putFlagsToSet(addFlagsSet, setting);
-
-        return getFlags(addFlagsSet, subFlagsSet);
-    }
-    /*
-
-     */
-    private static String getSetting(Map<String, Object> optionMap, String[] commandDescription, 
-        FpdModuleIdentification fpdModuleId, boolean toolChainFamilyFlag) {
-
-        String setting = (String)getOption(optionMap, commandDescription);
-        if (fpdModuleId == null) {
-            return setting;
-        }
-        //
-        // module overrides
-        //
-        //
-        // get module xml doc
-        //
-        Map<String, XmlObject> fpdModule = (Map<String, XmlObject>)fpdModuleSA.get(fpdModuleId);
-        if (fpdModuleId == null) {
-            return setting;
-        }
-        SurfaceAreaQuery.push(fpdModule);
-        //
-        // check if the module has been parsed
-        //
-        Map<String, Object> moduleOptions = (Map<String, Object>)moduleToolChainOptions.get(fpdModuleId);
-        if (moduleOptions == null) {
-            //
-            // get all the build options of this module
-            //
-            moduleOptions = new TreeMap<String, Object>(comparator);
-            parseBuildOptions(moduleOptions, SurfaceAreaQuery.getOptions(toolChainFamilyFlag));
-        }
-        //
-        // get setting for current qualified command
-        //
-        Set<String> addSet = new TreeSet<String>();
-        Set<String> subSet = new TreeSet<String>();
-        putFlagsToSet(addSet, setting);
-        String moduleSetting = getOption(moduleOptions, commandDescription);
-        if (moduleSetting != null) {
-            moduleSetting = parseOptionString(moduleSetting, addSet, subSet);
-        }
-        //
-        // do necessary setting override
-        //
-        if (moduleSetting == null) {
-            setting = getRawFlags(addSet, subSet);
-        } else {
-            setting = moduleSetting;
-        }
-
-        SurfaceAreaQuery.pop();
-        return setting;
     }
     /*
 
@@ -832,186 +712,6 @@ public class GlobalData {
 
     public static Map<String, String> getToolChainDefinitions() {
         return toolChainDefinitions;
-    }
-
-    /**
-      Separate the string and instore in set.
-       
-      <p> String is separated by Java Regulation Expression 
-      "[^\\\\]?(\".*?[^\\\\]\")[ \t,]+". </p>
-      
-      <p>For example: </p>
-      
-      <pre>
-        "/nologo", "/W3", "/WX"
-        "/C", "/DSTRING_DEFINES_FILE=\"BdsStrDefs.h\""
-      </pre>
-      
-      @param set store the separated string
-      @param str string to separate
-    **/
-    private static void putFlagsToSet(Set<String> set, String str) {
-        if (str == null || str.length() == 0) {
-            return;
-        }
-
-        Pattern myPattern = Pattern.compile("[^\\\\]?(\".*?[^\\\\]\")[ \t,]+");
-        Matcher matcher = myPattern.matcher(str + " ");
-        while (matcher.find()) {
-            String item = str.substring(matcher.start(1), matcher.end(1));
-            set.add(item);
-        }
-    }
-    
-    /**
-      Generate the final flags string will be used by compile command. 
-      
-      @param add the add flags set
-      @param sub the sub flags set
-      @return final flags after add set substract sub set
-    **/
-    private static String getFlags(Set<String> add, Set<String> sub) {
-        String result = "";
-        add.removeAll(sub);
-        Iterator iter = add.iterator();
-        while (iter.hasNext()) {
-            String str = (String) iter.next();
-            result += str.substring(1, str.length() - 1) + " ";
-        }
-        return result;
-    }
-
-    /**
-      Generate the flags string with original format. The format is defined by 
-      Java Regulation Expression "[^\\\\]?(\".*?[^\\\\]\")[ \t,]+". </p>
-      
-      <p>For example: </p>
-      
-      <pre>
-        "/nologo", "/W3", "/WX"
-        "/C", "/DSTRING_DEFINES_FILE=\"BdsStrDefs.h\""
-      </pre>
-      
-      @param add the add flags set
-      @param sub the sub flags set
-      @return flags with original format
-    **/
-    private static String getRawFlags(Set<String> add, Set<String> sub) {
-        String result = null;
-        add.removeAll(sub);
-        Iterator iter = add.iterator();
-        while (iter.hasNext()) {
-            String str = (String) iter.next();
-            result += "\"" + str.substring(1, str.length() - 1) + "\", ";
-        }
-        return result;
-    }
-
-    private static String parseOptionString(String optionString, Set<String> addSet, Set<String> subSet) {
-        boolean overrideOption = false;
-        Pattern pattern = Pattern.compile("ADD\\.\\[(.+)\\]");
-        Matcher matcher = pattern.matcher(optionString);
-
-        while (matcher.find()) {
-            overrideOption = true;
-            String addOption = optionString.substring(matcher.start(1), matcher.end(1)).trim();
-            putFlagsToSet(addSet, addOption);
-            
-        }
-
-        pattern = Pattern.compile("SUB\\.\\[(.+)\\]");
-        matcher = pattern.matcher(optionString);
-
-        while (matcher.find()) {
-            overrideOption = true;
-            String subOption = optionString.substring(matcher.start(1), matcher.end(1)).trim();
-            putFlagsToSet(subSet, subOption);
-        }
-
-        if (overrideOption == true) {
-            return null;
-        }
-
-        return optionString;
-    }
-
-    public static String getOption(Map<String, Object> options, String[] toolDefString) {
-        Stack<Map<String, Object>> stack = new Stack<Map<String, Object>>();
-        Map<String, Object> map = options;
-        Map<String, Object> lastMap;
-        String option = null;
-        int length = toolDefString.length - 2;
-
-        int i = 0;
-        String key = null;
-        boolean backtrack = false;
-        while (true) {
-            if (map == null) {
-                if (stack.empty()) {
-                    break;
-                }
-                map = (Map<String, Object>)stack.pop();
-                if (backtrack) {
-                    --i;
-                }
-                key = "*";
-                backtrack = true;
-            } else {
-                if (i >= length) {
-                    break;
-                }
-                key = toolDefString[i];
-                stack.push(map);
-                ++i;
-                backtrack = false;
-            }
-            lastMap = map;
-            map = (Map<String, Object>)lastMap.get(key);
-        }
-
-        if (map != null) {
-            option = (String)map.get(toolDefString[i]);
-        }
-
-        return option;
-    }
-
-    private static void parseBuildOptions(Map<String, Object> optionMap, String[][] options) {
-        Map<String, Object> map;
-        Map<String, Object> nextMap;
-
-        for (int i = 0; i < options.length; ++i) {
-            map = optionMap;
-
-            int flagIndex = options[i].length - 1;
-            int cmdIndex = flagIndex - 1;
-            int archIndex = cmdIndex - 1;
-            for (int j = 0; j < cmdIndex; ++j) {
-                String s = options[i][j];
-                if (s == null || s.trim().length() == 0) {
-                    s = "*";
-                }
-                s = s.trim().toUpperCase();
-
-                nextMap = (Map<String, Object>)map.get(s);
-                if (nextMap == null) {
-                    nextMap = new HashMap<String, Object>();
-                    map.put(s, nextMap);
-                }
-
-                map = nextMap;
-            }
-
-            String cmd = options[i][cmdIndex];
-            String flag = options[i][flagIndex];
-            if (cmd == null || cmd.trim().length() == 0) {
-                cmd = "*";
-            }
-            if (flag == null) {
-                flag = "";
-            }
-            map.put(cmd.trim().toUpperCase(), flag.trim().toUpperCase());
-        }
     }
 
 }

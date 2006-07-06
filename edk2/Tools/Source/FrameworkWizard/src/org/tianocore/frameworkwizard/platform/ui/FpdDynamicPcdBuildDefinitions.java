@@ -183,7 +183,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             model.addColumn("MaxDatumSize");
             model.addColumn("DatumType");
             jTable = new JTable(model);
-            
+            jTable.setRowHeight(20);
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {

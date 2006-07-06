@@ -674,6 +674,7 @@ public class FpdHeader extends IInternalFrame {
         resizeComponentWidth(this.jTextFieldBaseName, this.getWidth(), intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldGuid, this.getWidth(), intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldVersion, this.getWidth(), intPreferredWidth);
+        resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
 		resizeComponentWidth(this.jScrollPaneLicense, this.getWidth(), intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldCopyright, this.getWidth(), intPreferredWidth);
 		resizeComponentWidth(this.jScrollPaneDescription, this.getWidth(), intPreferredWidth);

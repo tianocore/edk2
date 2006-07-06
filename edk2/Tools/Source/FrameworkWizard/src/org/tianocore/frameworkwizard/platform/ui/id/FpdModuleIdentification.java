@@ -30,10 +30,6 @@ public class FpdModuleIdentification {
     
     private ModuleIdentification module;
     
-    private String target; // Optional
-    
-    private String toolchain; // Optional
-    
     public FpdModuleIdentification(String arch, String fvBinding, String sequence, ModuleIdentification module){
         this.arch = arch;
         this.fvBinding = fvBinding;
