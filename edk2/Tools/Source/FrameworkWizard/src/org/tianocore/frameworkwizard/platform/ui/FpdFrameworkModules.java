@@ -14,6 +14,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
 import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
@@ -54,7 +55,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     private FpdModuleSA settingDlg = null;
     
     private FpdFileContents ffc = null;
-    
+    private OpeningPlatformType docConsole = null;
     private Map<String, String> fpdMsa = null;
     
     private ArrayList<ModuleIdentification> miList = null;
@@ -198,6 +199,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         row[4] = mi.getPackage().getVersion();
                     }
                     model1.addRow(row);
+                    docConsole.setSaved(false);
                     ffc.addFrameworkModulesPcdBuildDefs(miList.get(selectedRow), null);
                 }
             });
@@ -277,7 +279,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (settingDlg == null) {
                         settingDlg = new FpdModuleSA(ffc);
                     }
-                    
+                    docConsole.setSaved(false);
                     String mg = model1.getValueAt(selectedRow, 1)+"";
                     String mv = model1.getValueAt(selectedRow, 2)+"";
                     String pg = model1.getValueAt(selectedRow, 3)+"";
@@ -312,6 +314,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String pv = model1.getValueAt(selectedRow, 4).toString();
                     model1.removeRow(selectedRow);
                     fpdMsa.remove(mg+mv+pg+pv);
+                    docConsole.setSaved(false);
                     ffc.removeModuleSA(selectedRow);
                 }
             });
@@ -339,6 +342,11 @@ public class FpdFrameworkModules extends IInternalFrame {
         this();
         init(fpd);
         
+    }
+    
+    public FpdFrameworkModules(OpeningPlatformType opt) {
+        this(opt.getXmlFpd());
+        docConsole = opt;
     }
     
     private void init(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {

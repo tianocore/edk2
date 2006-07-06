@@ -43,6 +43,7 @@ import javax.swing.table.TableModel;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 
@@ -60,6 +61,8 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     static JFrame frame;
     
     private SpdFileContents sfc = null;
+    
+    private OpeningPackageType docConsole = null;
 
     private DefaultTableModel model = null;
 
@@ -251,6 +254,11 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
+    
+    public SpdPackageHeaders(OpeningPackageType opt) {
+        this(opt.getXmlSpd());
+        docConsole = opt;
+    }
     /**
       This method initializes this
       
@@ -352,6 +360,8 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent arg0) {
+        
+        docConsole.setSaved(false);
         if (arg0.getSource() == jButtonOk) {
             this.save();
             this.dispose();
@@ -561,6 +571,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             if (!dataValidation(rowData)) {
                 return;
             }
+            docConsole.setSaved(false);
             sfc.updateSpdPkgHdr(row, pkg, hdr);
         }
     }

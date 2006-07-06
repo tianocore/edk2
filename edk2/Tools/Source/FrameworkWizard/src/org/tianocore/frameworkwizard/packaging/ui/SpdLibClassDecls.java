@@ -43,6 +43,7 @@ import javax.swing.table.TableModel;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
@@ -98,6 +99,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private StarLabel jStarLabel2 = null;
     
     private SpdFileContents sfc = null;
+    
+    private OpeningPackageType docConsole = null;
 
     private JLabel jLabel1 = null;
     
@@ -317,6 +320,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             if (!dataValidation(rowData)) {
                 return;
             }
+            docConsole.setSaved(false);
             sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
         }
     }
@@ -400,6 +404,11 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         this();
         sfc = new SpdFileContents(inPsa);
         init(sfc);
+    }
+    
+    public SpdLibClassDecls(OpeningPackageType opt) {
+        this(opt.getXmlSpd());
+        docConsole = opt;
     }
     /**
       This method initializes this
@@ -574,6 +583,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
     public void actionPerformed(ActionEvent arg0) {
+        
+        docConsole.setSaved(false);
         if (arg0.getSource() == jButtonOk) {
             this.save();
             this.dispose();
@@ -733,7 +744,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                     
                     headerDest = theFile.getPath();
                     int fileIndex = headerDest.indexOf(System.getProperty("file.separator"), dirPrefix.length());
-                    
                     jTextField.setText(headerDest.substring(fileIndex + 1).replace('\\', '/'));
                
                 }

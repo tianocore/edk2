@@ -39,6 +39,7 @@ import javax.swing.table.TableModel;
 import org.tianocore.PackageSurfaceAreaDocument;
 
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import javax.swing.JScrollPane;
@@ -85,6 +86,8 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JComboBox jComboBoxDataType = null;
 
     private SpdFileContents sfc = null;
+    
+    private OpeningPackageType docConsole = null;
 
     private StarLabel jStarLabel2 = null;
 
@@ -245,6 +248,11 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         this();
         sfc = new SpdFileContents(inPsa);
         init(sfc);
+    }
+    
+    public SpdPcdDefs(OpeningPackageType opt) {
+        this(opt.getXmlSpd());
+        docConsole = opt;
     }
     /**
      This method initializes this
@@ -435,6 +443,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 
     public void actionPerformed(ActionEvent arg0) {
         
+        docConsole.setSaved(false);
             if (arg0.getSource() == jButtonOk) {
                 this.save();
                 this.dispose();
@@ -732,6 +741,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             if (!dataValidation(o)){
                 return;
             }
+            docConsole.setSaved(false);
             sfc.updateSpdPcdDefinition(row, cName, token, dataType, usage, ts, defaultVal, help, archList, modTypeList);
         }
     }

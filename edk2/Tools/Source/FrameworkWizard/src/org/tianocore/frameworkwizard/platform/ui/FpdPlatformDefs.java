@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 
 
@@ -60,7 +61,7 @@ public class FpdPlatformDefs extends IInternalFrame {
     private TargetTableModel imageEntryPointTableModel = null;
     
     private SkuInfoTableModel skuInfoTableModel = null;
-    
+    private OpeningPlatformType docConsole = null;
     private FpdFileContents ffc = null;
     private JPanel jPanel4 = null;
     private JPanel jPanel5 = null;
@@ -109,6 +110,11 @@ public class FpdPlatformDefs extends IInternalFrame {
         this();
         ffc = new FpdFileContents(fpd);
         init(ffc);
+    }
+    
+    public FpdPlatformDefs(OpeningPlatformType opt) {
+        this(opt.getXmlFpd());
+        docConsole = opt;
     }
     
     /**
@@ -304,6 +310,9 @@ public class FpdPlatformDefs extends IInternalFrame {
    }
    
    private void getToolChain(Vector<Object> v) {
+       if (docConsole != null){
+           docConsole.setSaved(false);
+       }
        v.removeAllElements();
        if (jCheckBox1.isSelected()) {
            v.add("IA32");
@@ -469,6 +478,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                         for (int i = 0; i < jTable.getRowCount(); ++i) {
                             v.add(m.getValueAt(i, 0));
                         }
+                        docConsole.setSaved(false);
                         ffc.setPlatformDefsBuildTargets(v);
                     }
                 }
@@ -522,6 +532,9 @@ public class FpdPlatformDefs extends IInternalFrame {
             jComboBox.setSelectedIndex(0);
             jComboBox.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (docConsole != null){
+                        docConsole.setSaved(false);
+                    }
                     ffc.setPlatformDefsInterDir(jComboBox.getSelectedItem()+"");
                 }
             });
@@ -588,6 +601,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                         for (int i = 0; i < jTable.getRowCount(); ++i) {
                             v.add(imageEntryPointTableModel.getValueAt(i, 0));
                         }
+                        docConsole.setSaved(false);
                         ffc.setPlatformDefsBuildTargets(v);
                     }
                 }
@@ -662,6 +676,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                         //ToDo Data Validition check.
                         String id = m.getValueAt(row, 0)+"";
                         String name = m.getValueAt(row, 1)+"";
+                        docConsole.setSaved(false);
                         ffc.updatePlatformDefsSkuInfo(row, id, name);
                     }
                 }
@@ -771,6 +786,7 @@ public class FpdPlatformDefs extends IInternalFrame {
             jTextField.setPreferredSize(new java.awt.Dimension(300,20));
             jTextField.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
+                    docConsole.setSaved(false);
                     ffc.setPlatformDefsOutputDir(jTextField.getText());
                 }
             });
@@ -852,6 +868,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     if (jTextField2.getText().length() > 0) {
                         String[] row = {jTextField2.getText(), jTextField3.getText()};
                         skuInfoTableModel.addRow(row);
+                        docConsole.setSaved(false);
                         ffc.genPlatformDefsSkuInfo(row[0], row[1]);
                     }
                 }
@@ -878,6 +895,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     if (jTable2.getSelectedRow() < 1) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     ffc.removePlatformDefsSkuInfo(jTable2.getSelectedRow());
                     skuInfoTableModel.removeRow(jTable2.getSelectedRow());
                 }

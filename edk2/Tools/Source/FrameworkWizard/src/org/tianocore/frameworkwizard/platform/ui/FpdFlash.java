@@ -24,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 
@@ -108,7 +109,7 @@ public class FpdFlash extends IInternalFrame {
     private JButton jButton6 = null;
     private JCheckBox jCheckBox3 = null;
     private JPanel jPanel6 = null;
-    
+    private OpeningPlatformType docConsole = null;
     private FpdFileContents ffc = null;
     private JPanel jPanel7 = null;
     private JCheckBox jCheckBox = null;
@@ -137,6 +138,11 @@ public class FpdFlash extends IInternalFrame {
         this();
         ffc = new FpdFileContents(fpd);
         init(ffc);
+    }
+    
+    public FpdFlash(OpeningPlatformType opt) {
+        this(opt.getXmlFpd());
+        docConsole = opt;
     }
     
     /**
@@ -391,6 +397,7 @@ public class FpdFlash extends IInternalFrame {
                     if (jTextField.getText().length() > 0 && jTextField1.getText().length() > 0){
                         String[] row = {jTextField.getText(), jTextField1.getText()};                        
                         fvPropertyTableModel.addRow(row);
+                        docConsole.setSaved(false);
                         ffc.genFvImagesNameValue(row[0], row[1]);
                     }
                 }
@@ -454,7 +461,7 @@ public class FpdFlash extends IInternalFrame {
                         
                         String name = m.getValueAt(row, 0) + "";
                         String value = m.getValueAt(row, 1) + "";
-
+                        docConsole.setSaved(false);
                         ffc.updateFvImagesNameValue(row, name, value);
                     }
                 }
@@ -501,6 +508,7 @@ public class FpdFlash extends IInternalFrame {
                 public void actionPerformed(ActionEvent e) {
                     if (jTable.getSelectedRow() >= 0){
                         fvPropertyTableModel.removeRow(jTable.getSelectedRow());
+                        docConsole.setSaved(false);
                         ffc.removeFvImagesNameValue(jTable.getSelectedRow());
                     }
                 }
@@ -795,7 +803,7 @@ public class FpdFlash extends IInternalFrame {
                         getOptionNameValue(m);
                     }
                     ffc.genFvImagesFvImage(imageName.split(" "), jComboBox.getSelectedItem()+"", m);
-                    
+                    docConsole.setSaved(false);
                     Object[] row = {imageName, jComboBox.getSelectedItem()};
                     fvImageParaTableModel.addRow(row); 
                 }
@@ -898,8 +906,9 @@ public class FpdFlash extends IInternalFrame {
                 public void actionPerformed(ActionEvent arg0) {
                     // TODO Auto-generated method stub
                     if (jTable2.getSelectedRow() >= 0 ) {
-                        fvImageParaTableModel.removeRow(jTable2.getSelectedRow());
                         ffc.removeFvImagesFvImage(jTable2.getSelectedRow());
+                        fvImageParaTableModel.removeRow(jTable2.getSelectedRow());
+                        docConsole.setSaved(false);
                     }
                 }
                 
@@ -1235,7 +1244,7 @@ public class FpdFlash extends IInternalFrame {
                         LinkedHashMap<String, String> lhm = new LinkedHashMap<String, String>();
                         getOptionNameValue(lhm);
                         
-
+                        docConsole.setSaved(false);
                         ffc.updateFvImagesFvImage(row, name.split(" "), type, lhm);
                     
                 }
