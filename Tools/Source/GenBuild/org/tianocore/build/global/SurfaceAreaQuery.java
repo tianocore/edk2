@@ -23,7 +23,6 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
 import org.tianocore.BuildOptionsDocument;
@@ -1379,7 +1378,7 @@ public class SurfaceAreaQuery {
     }
     
     public static Node getFpdUserExtension() {
-        String[] xPath = new String[] { "/UserExtensions" };
+        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore']" }; 
 
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
         if (queryResult == null || queryResult.length == 0) {
