@@ -110,6 +110,10 @@ set CLASSPATH=.;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar
 
+@if "%1" neq "ForceRebuild" goto NormalBuild
+call ant -f %WORKSPACE%\Tools\build.xml cleanall
+
+:NormalBuild
 call ant -f %WORKSPACE%\Tools\build.xml SurfaceArea
 
 @REM
