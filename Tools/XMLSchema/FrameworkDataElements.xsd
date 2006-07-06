@@ -66,22 +66,6 @@
         <xs:element minOccurs="0" maxOccurs="1" ref="Options"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" ref="UserExtensions"/>
         <!-- The following sections are legacy and will be removed -->
-        <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory">
-          <xs:complexType>
-            <xs:simpleContent>
-              <xs:extension base="xs:anyURI">
-                <xs:attribute default="UNIFIED" name="IntermediateDirectories" use="optional">
-                  <xs:simpleType>
-                    <xs:restriction base="UCNameType">
-                      <xs:enumeration value="MODULE"/>
-                      <xs:enumeration value="UNIFIED"/>
-                    </xs:restriction>
-                  </xs:simpleType>
-                </xs:attribute>
-              </xs:extension>
-            </xs:simpleContent>
-          </xs:complexType>
-        </xs:element>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="Ffs">
           <xs:complexType>
             <xs:sequence>
@@ -133,45 +117,6 @@
             <xs:attribute name="FfsKey" type="KeywordType" use="optional"/>
           </xs:complexType>
         </xs:element>
-        <xs:element minOccurs="0" maxOccurs="1" name="Sections">
-          <xs:complexType>
-            <xs:sequence minOccurs="1">
-              <xs:element name="Section" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element ref=" Filenames " minOccurs="0"/>
-                    <xs:element name="Args" type=" ArgsType " minOccurs="0"/>
-                    <xs:element name="OutFile" type=" FileNameConvention " minOccurs="0"/>
-                    <xs:element name="OutputFileExtension" type=" xs:string " minOccurs="0"/>
-                    <xs:element name="ToolName" type=" ToolType " minOccurs="0"/>
-                  </xs:sequence>
-                  <xs:attributeGroup ref=" SectionsAttributes "/>
-                </xs:complexType>
-              </xs:element>
-              <xs:element name="Sections" minOccurs="0" maxOccurs="unbounded">
-                <xs:complexType>
-                  <xs:sequence minOccurs="1" maxOccurs="unbounded">
-                    <xs:element name="Section">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element ref=" Filenames " minOccurs="0"/>
-                          <xs:element name="Args" type=" ArgsType " minOccurs="0"/>
-                          <xs:element name="OutFile" type=" FileNameConvention " minOccurs="0"/>
-                          <xs:element name="OutputFileExtension" type=" xs:string " minOccurs="0"/>
-                          <xs:element name="ToolName" type=" ToolType " minOccurs="0"/>
-                        </xs:sequence>
-                        <xs:attributeGroup ref=" SectionsAttributes "/>
-                      </xs:complexType>
-                    </xs:element>
-                  </xs:sequence>
-                  <xs:attributeGroup ref=" SectionsAttributes "/>
-                </xs:complexType>
-              </xs:element>
-            </xs:sequence>
-            <xs:attributeGroup ref=" SectionsAttributes "/>
-          </xs:complexType>
-        </xs:element>
-        <!-- Remove to Here -->
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -877,12 +822,21 @@
   <xs:element name="ProcessStep">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="1" maxOccurs="1" name="ToolName" type="xs:string"/>
-        <xs:element minOccurs="0" maxOccurs="1" name="ToolArgs" type="xs:string"/>
-        <!-- Input patterns  to be processed by the tool above -->
-        <xs:element minOccurs="0" maxOccurs="1" name="InputPattern" type="xs:string"/>
-        <!-- A pattern to match for the output -->
-        <xs:element minOccurs="1" maxOccurs="1" name="OutputPattern" type="xs:string"/>
+        <!-- The following is a macro for Apache ANT -->
+        <xs:element minOccurs="0" maxOccurs="1" name="MacroDefFile">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="PathAndFilename">
+                <xs:attribute name="MacroName" type="KeywordType" use="required"/>    
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <!-- The following is for System Executables -->
+        <xs:element minOccurs="0" maxOccurs="1" name="ToolName" type="xs:NCName"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="ToolArgs" type="xs:normalizedString"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" name="InputPattern" type="xs:normalizedString"/>
+        <xs:element minOccurs="0" maxOccurs="1" name="OutputPattern" type="xs:normalizedString"/>
       </xs:sequence>
       <xs:attributeGroup ref="ProcessStepAttributes"/>
     </xs:complexType>
