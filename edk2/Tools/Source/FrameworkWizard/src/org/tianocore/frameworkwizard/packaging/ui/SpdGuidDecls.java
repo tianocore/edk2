@@ -514,8 +514,6 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
      */
     public void actionPerformed(ActionEvent arg0) {
         
-        docConsole.setSaved(false);
-        
         if (arg0.getSource() == jButtonOk) {
             this.save();
             this.dispose();
@@ -549,6 +547,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             if (!dataValidation(row)) {
                 return;
             }
+            docConsole.setSaved(false);
             model.addRow(row);
             addRow(row);
         }
