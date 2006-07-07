@@ -170,11 +170,12 @@ file contains options for setting the active platform and restricting the build.
 The restictions are used to limit the build output by specifying build target(s), 
 tagname(s) and architecture(s) to less than the full set of possible options. 
 
-The ACTIVE_PLATFORM MUST BE SET.  All other options need not be set, however by 
-unsetting these options (by removing the line from the file, or leaving the Value 
-empty) will result in all available build possibilites when typing build.  By
-default EDK II can build a matrix of binaries, using different target types, tool
-chain tags and architectures.  Options to target.txt file are as follows:
+The ACTIVE_PLATFORM must be set unless the current working directory contains one
+or more FPD files.  All other options need not be set, however by unsetting these
+options (by removing the line from the file, or leaving the Value empty) will 
+result in all available build possibilites when typing build.  By default EDK II
+can build a matrix of binaries, using different target types, tool chain tags and 
+architectures.  Options to target.txt file are as follows:
 
 ACTIVE_PLATFORM =  Value   REQUIRED
   Where Value is the WORKSPACE relative path and filename of a Framework Platform 
