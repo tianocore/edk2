@@ -210,7 +210,7 @@
           <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>VOID*</DatumType>
           <MaxDatumSize>52</MaxDatumSize>
-          <Value>L"..\\..\\Fv\\Fv_Recovery.fd"</Value>
+          <Value>L"..\\FV\\FV_RECOVERY.fd"</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdWinNtBootMode</C_Name>
