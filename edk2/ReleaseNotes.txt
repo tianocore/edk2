@@ -113,7 +113,7 @@ The URL of the document repository is:
 
 
 -----------------------
-Notes On Required Tools (MS Windows environment example)
+Notes On Required Tools (With examples for Windows, OS X, and Linux) 
 -----------------------
 Software Installation Order:
   After installing the compiler tools and your Subversion client, the following
@@ -123,9 +123,11 @@ Software Installation Order:
 Java Development Kit:
  
    The Java Environment Variable must be set before attempting to build.
-       i.e. For Sun JDK (see note below*):
-              set JAVA_HOME=c:\Java\jdk1.5.0_06  
-       i.e. For Bea Systems:
+       For Sun JDK (see note below*):
+              set JAVA_HOME=c:\Java\jdk1.5.0_06  (Windows example)
+              export JAVA_HOME=/Library/Java/Home/ (OS X example)
+              export JAVA_HOME=/usr/lib/j2sdk1.5-sun/ (Linux example)
+       For Bea Systems:
               set JAVA_HOME=c:\Java\jrockit-R26.0.0-jdk1.5.0_04
  
   *When using the Sun JDK5.0
@@ -145,6 +147,7 @@ Java Tools:
     The Apache-ANT requires the ANT_HOME environment variable to be set before
     attempting to build:
          i.e.  set ANT_HOME=c:\<full path to where ant was installed>
+          export ANT_HOME=~/ExternalTools/apache-ant (OS X and Linux example)
 
     The ant-contrib.jar file should be installed in the %ANT_HOME%\lib 
     directory.
@@ -152,6 +155,7 @@ Java Tools:
     The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
     before attempting to build:
          i.e. set XMLBEANS_HOME=C:\<full path to where xmlbeans was installed>
+          export XMLBEANS_HOME=~/ExternalTools/xmlbeans (OS X and Linux example)
 
     The saxon8.jar file should be copied to the %XMLBEANS_HOME%\lib directory.
 
@@ -277,6 +281,11 @@ In a command window, change to the top level directory of the Edk II sources.
 
 To test your tool chain setup and to build the Supplied Tools, execute:
     c:\MyWork\Edk2\> edksetup
+
+On Unix systems you must source the edksetup.sh file to load the correct
+settings into your shell.
+
+    . edksetup.sh # Note the dot.
 
 (This command will be referred to as the setup command throughout the rest of
 this document.)
