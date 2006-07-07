@@ -54,6 +54,6 @@
   </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
-    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
   </Externs>
 </ModuleSurfaceArea>
