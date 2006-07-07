@@ -347,10 +347,11 @@ public class FpdFileContents {
             PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = li.next();
             saa[i][0] = pcdData.getCName();
             saa[i][1] = pcdData.getTokenSpaceGuidCName();
-            saa[i][2] = pcdData.getItemType().toString();
+            saa[i][2] = pcdData.getItemType()+"";
             saa[i][3] = pcdData.getToken().toString();
-            saa[i][4] = pcdData.getDatumType().toString();
-            saa[i][5] = pcdData.getValue();
+            saa[i][4] = pcdData.getMaxDatumSize()+"";
+            saa[i][5] = pcdData.getDatumType()+"";
+            saa[i][6] = pcdData.getValue();
             
         }
     }
@@ -556,7 +557,7 @@ public class FpdFileContents {
      * @param mi
      * @param moduleSa if null, generate a new ModuleSA.
      */
-    public void addFrameworkModulesPcdBuildDefs(ModuleIdentification mi, ModuleSADocument.ModuleSA moduleSa){
+    public void addFrameworkModulesPcdBuildDefs(ModuleIdentification mi, ModuleSADocument.ModuleSA moduleSa) throws Exception {
         //ToDo add Arch filter
         
         try {
@@ -583,7 +584,7 @@ public class FpdFileContents {
                     //
                     // ToDo Error 
                     //
-                    break;
+                    throw new PcdDeclNotFound(mi.getName() + " " + msaPcd.getCName());
                 }
                 //
                 // AddItem to ModuleSA PcdBuildDefinitions
@@ -595,6 +596,7 @@ public class FpdFileContents {
         }
         catch (Exception e){
             e.printStackTrace();
+            throw e; 
         }
         
     }
@@ -640,7 +642,8 @@ public class FpdFileContents {
         return msa;
     }
     
-    private void genPcdData (String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal, ModuleSADocument.ModuleSA moduleSa) {
+    private void genPcdData (String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal, ModuleSADocument.ModuleSA moduleSa) 
+    throws PcdItemTypeConflictException, PcdValueMalFormed{
         if (moduleSa.getPcdBuildDefinition() == null){
             moduleSa.addNewPcdBuildDefinition();
         }
@@ -669,7 +672,7 @@ public class FpdFileContents {
                 if (!valuePart[4].equals("DYNAMIC")) {
                     //ToDo error for same pcd, other type than dynamic
                     pcdConsumer.remove(listValue);
-                    return;
+                    throw new PcdItemTypeConflictException(value);
                 }
             }
         }
@@ -681,7 +684,7 @@ public class FpdFileContents {
                 if (valuePart[4].equals("DYNAMIC")) {
                     //ToDo error for same pcd, other type than non-dynamic
                     pcdConsumer.remove(listValue);
-                    return;
+                    throw new PcdItemTypeConflictException(value);
                 }
             }
         }
@@ -740,7 +743,7 @@ public class FpdFileContents {
         }
     }
     
-    private int setMaxSizeForPointer(String datum) {
+    private int setMaxSizeForPointer(String datum) throws PcdValueMalFormed{
         if (datum == null) {
             return 0;
         }
@@ -760,6 +763,7 @@ public class FpdFileContents {
                 (end   > datum.length())||
                 ((start == end) && (datum.length() > 0))) {
                 //ToDo Error handling here
+                throw new PcdValueMalFormed (datum);
             }
 
             strValue    = datum.substring(start + 1, end);
@@ -770,7 +774,7 @@ public class FpdFileContents {
             if ((start > end)           || 
                 (end   > datum.length())||
                 ((start == end) && (datum.length() > 0))) {
-                
+                throw new PcdValueMalFormed (datum);
             }
             strValue    = datum.substring(start + 1, end);
             return strValue.length();
@@ -791,7 +795,7 @@ public class FpdFileContents {
                 if (value > 0xFF) {
 //                   "[FPD file error] The datum type of PCD %s in %s is VOID*, "+
 //                   "it is byte array in fact. But the element of %s exceed the byte range",
-                                                    
+                    throw new PcdValueMalFormed (datum);                               
                 }
             }
             return strValueArray.length;
@@ -803,7 +807,7 @@ public class FpdFileContents {
 //            "2) ANSIC string: like \"xxx\";\r\n"+
 //            "3) Byte array: like {0x2, 0x45, 0x23}\r\n"+
 //            "but the datum in seems does not following above format!",
-              return -1;                             
+            throw new PcdValueMalFormed (datum);
             
         }
     }
@@ -845,7 +849,8 @@ public class FpdFileContents {
         }
     }
     
-    private void addDynamicPcdBuildData(String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal) {
+    private void addDynamicPcdBuildData(String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal) 
+    throws PcdValueMalFormed{
         DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData dynPcdData = getfpdDynPcdBuildDefs().addNewPcdBuildData();
         dynPcdData.setItemType(PcdItemTypes.Enum.forString(itemType));
         dynPcdData.setCName(cName);
@@ -2171,5 +2176,56 @@ public class FpdFileContents {
             s += " ";
         }
         return s.trim();
+    }
+}
+
+class PcdItemTypeConflictException extends Exception {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private String details = null;
+    
+    PcdItemTypeConflictException(String info){
+        details = info;
+    }
+    
+    public String getMessage() {
+        return details;
+    }
+}
+
+class PcdDeclNotFound extends Exception {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private String details = null;
+    
+    PcdDeclNotFound(String info) {
+        details = info;
+    }
+    
+    public String getMessage() {
+        return details;
+    }
+}
+
+class PcdValueMalFormed extends Exception {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private String details = null;
+    
+    PcdValueMalFormed(String info) {
+        details = info;
+    }
+    
+    public String getMessage() {
+        return details;
     }
 }

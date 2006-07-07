@@ -130,7 +130,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         model.setRowCount(0);
         int pcdCount = ffc.getPcdDataCount(key);
         if (pcdCount != 0) {
-            String[][] saa = new String[pcdCount][6];
+            String[][] saa = new String[pcdCount][7];
             ffc.getPcdData(key, saa);
             for (int i = 0; i < saa.length; ++i) {
                 model.addRow(saa[i]);
@@ -519,6 +519,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model.addColumn("TokenSpaceGUID");
             model.addColumn("ItemType");
             model.addColumn("Token");
+            model.addColumn("MaxDatumSize");
             model.addColumn("DataType");
             model.addColumn("DefaultValue");
                         
@@ -933,8 +934,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     //
                     // Add pcd information of selected instance to current moduleSA
                     //
+                    try{
                     ffc.addFrameworkModulesPcdBuildDefs(getModuleId(instanceValue), ffc.getModuleSA(moduleKey));
-                    
+                    }
+                    catch (Exception exception) {
+                        JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
+                    }
                     resolveLibraryInstances(instanceValue);
                 }
             });
@@ -1250,7 +1255,7 @@ class PartialEditableTableModel extends DefaultTableModel {
     public boolean isCellEditable(int row, int col) {
         switch (col){
         case 2:
-            return true;
+            return false;
         default:
             return false; 
         }
