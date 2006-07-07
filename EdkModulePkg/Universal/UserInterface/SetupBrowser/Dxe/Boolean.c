@@ -456,7 +456,7 @@ Returns:
   UINT16                  MapValue;
   UINT16                  MapValue2;
   UINTN                   SizeOfVariable;
-  CHAR16                  VariableName[40];
+  CHAR16                  VariableName[MAXIMUM_VALUE_CHARACTERS];
   VOID                    *VariableData;
   EFI_VARIABLE_DEFINITION *VariableDefinition;
   EFI_STATUS              Status;
@@ -512,7 +512,7 @@ Returns:
         VariableName, 
         FALSE, 
         (UINTN) (*PIterator)->QuestionId1, 
-        (sizeof (VariableName) / sizeof (VariableName[0]))
+        (sizeof (VariableName) / sizeof (VariableName[0])) - 1
         );
 
       SizeOfVariable = 0;
@@ -672,7 +672,7 @@ Returns:
   UINT16                  MapValue;
   UINT16                  MapValue2;
   UINTN                   SizeOfVariable;
-  CHAR16                  VariableName[40];
+  CHAR16                  VariableName[MAXIMUM_VALUE_CHARACTERS];
   VOID                    *VariableData;
   EFI_STATUS              Status;
   UINT16                  Id;
@@ -811,7 +811,7 @@ Returns:
         VariableName, 
         FALSE, 
         (UINTN) Iterator->QuestionId1, 
-        (sizeof (VariableName) / sizeof (VariableName[0]))
+        (sizeof (VariableName) / sizeof (VariableName[0])) - 1
         );
 
       SizeOfVariable = 0;
@@ -944,7 +944,7 @@ Returns:
           VariableName, 
           FALSE, 
           (UINTN) Iterator->QuestionId1, 
-          (sizeof (VariableName) / sizeof (VariableName[0]))
+          (sizeof (VariableName) / sizeof (VariableName[0])) - 1
           );
 
         SizeOfVariable = 0;
@@ -1080,7 +1080,7 @@ Returns:
           VariableName, 
           FALSE, 
           (UINTN) Iterator->QuestionId1, 
-          (sizeof (VariableName) / sizeof (VariableName[0]))
+          (sizeof (VariableName) / sizeof (VariableName[0])) - 1
           );
 
         SizeOfVariable = 0;
@@ -1228,7 +1228,7 @@ Returns:
           VariableName, 
           FALSE, 
           (UINTN) Iterator->QuestionId1, 
-          (sizeof (VariableName) / sizeof (VariableName[0]))
+          (sizeof (VariableName) / sizeof (VariableName[0])) - 1
           );
 
         SizeOfVariable = 0;
