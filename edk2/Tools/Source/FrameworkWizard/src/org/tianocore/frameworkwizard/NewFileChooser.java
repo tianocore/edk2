@@ -134,7 +134,7 @@ public class NewFileChooser extends IDialog {
     private JRadioButton getJRadioButtonPlatform() {
         if (jRadioButtonPlatform == null) {
             jRadioButtonPlatform = new JRadioButton();
-            jRadioButtonPlatform.setText(DataType.PACKAGE_SURFACE_AREA);
+            jRadioButtonPlatform.setText(DataType.PLATFORM_SURFACE_AREA);
             jRadioButtonPlatform.setBounds(new java.awt.Rectangle(20, 80, 240, 20));
         }
         return jRadioButtonPlatform;
@@ -171,7 +171,7 @@ public class NewFileChooser extends IDialog {
     private void init() {
         this.setSize(310, 220);
         this.setContentPane(getJContentPane());
-        this.setTitle("New Framework File");
+        this.setTitle("Select New File Type");
         this.centerWindow();
     }
 

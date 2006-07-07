@@ -25,6 +25,8 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
     private JTextPane jTextPane = null;
 
     private JButton jButtonClose = null;
+    
+    private static ToolChainConfigHelp tcch = null;
 
     /**
      * This method initializes jTextPane	
@@ -38,7 +40,7 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
             jTextPane.setBackground(new java.awt.Color(238,238,238));
             jTextPane.setEditable(false);
             helpContent = helpContent
-            + "The coding forthe Property is: TARGET_TAGNAME_ARCH_COMMAND_ATTR" + DataType.UNIX_LINE_SEPARATOR
+            + "The coding for the Property is: TARGET_TAGNAME_ARCH_COMMAND_ATTR" + DataType.UNIX_LINE_SEPARATOR
             + "The Value, is either afull path, full path and filename or a reserved word." + DataType.UNIX_LINE_SEPARATOR
             + DataType.UNIX_LINE_SEPARATOR
             + DataType.UNIX_LINE_SEPARATOR
@@ -56,7 +58,6 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
             + DataType.UNIX_LINE_SEPARATOR
             + "NOTE: The \"*\" symbol may be used as a wildcard character in most of these fields, refer to the tools_def.txt and the \"EDK II Build and Packaging Architecture Specification\" for more details." + DataType.UNIX_LINE_SEPARATOR
             + DataType.UNIX_LINE_SEPARATOR;
-            
             
             jTextPane.setText(helpContent);
         }
@@ -78,6 +79,13 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
         return jButtonClose;
     }
 
+    public static ToolChainConfigHelp getInstance() {
+        if (tcch == null) {
+            tcch = new ToolChainConfigHelp();
+        }
+        return tcch;
+    }
+    
     /**
      
      @param args
@@ -103,6 +111,7 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
      */
     private void initialize() {
         this.setSize(625, 520);
+        this.setResizable(false);
         this.setTitle("How to Setup Tool Chain Configuration");
         this.setContentPane(getJContentPane());
     }
@@ -126,7 +135,5 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
         if (arg0.getSource() == jButtonClose) {
             this.dispose();
         }
-        
     }
-
 }

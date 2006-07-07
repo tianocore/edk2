@@ -48,7 +48,7 @@ public class IFrame extends JFrame implements ActionListener, WindowListener {
     // 1 - Whne editing module
     //
     private int intExitType = 0;
-
+    
     /**
      Main class, used for test
      
@@ -214,4 +214,28 @@ public class IFrame extends JFrame implements ActionListener, WindowListener {
     public int showSaveDialog() {
         return JOptionPane.showConfirmDialog(null, "Save all changed files?", "Save", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
     }
+    
+    /**
+    Check the input data is empty or not
+    
+    @param strValue The input data which need be checked
+    
+    @retval true - The input data is empty
+    @retval fals - The input data is not empty
+    
+    **/
+   public boolean isEmpty(String strValue) {
+       if (strValue.length() > 0) {
+           return false;
+       }
+       return true;
+   }
+   
+   /**
+    Display the dialog
+    
+    **/
+   public void showDialog() {
+       this.setVisible(true);
+   }
 }
