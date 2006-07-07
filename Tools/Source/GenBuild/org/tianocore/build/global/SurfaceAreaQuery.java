@@ -567,7 +567,11 @@ public class SurfaceAreaQuery {
         if (returns == null) {
             return new PackageIdentification[0];
         }
-        PackageIdentification[] packageIdList = new PackageIdentification[returns.length];
+
+        //
+        //  Get packageIdentification 
+        // 
+        List<PackageIdentification> packageIdList = new ArrayList<PackageIdentification>();
         for (int i = 0; i < returns.length; i++) {
             PackageDependenciesDocument.PackageDependencies.Package item = (PackageDependenciesDocument.PackageDependencies.Package) returns[i];
             @SuppressWarnings("unchecked")
@@ -575,11 +579,19 @@ public class SurfaceAreaQuery {
             if (arch == null || archList == null || archList.contains(arch)) {
                 packageGuid = item.getPackageGuid();
                 packageVersion = item.getPackageVersion();
-                packageIdList[i] = (new PackageIdentification(null, packageGuid,
+                packageIdList.add(new PackageIdentification(null, packageGuid,
                     packageVersion));
             }
         }
-        return packageIdList;
+
+        //
+        //  transfer packageIdentification list to array.
+        // 
+        PackageIdentification[] packageIdArray = new PackageIdentification[packageIdList.size()];
+        for (int i = 0; i < packageIdList.size(); i++) {
+            packageIdArray[i] = new PackageIdentification(null, packageIdList.get(i).getGuid(),packageIdList.get(i).getVersion());
+        }
+        return packageIdArray;
     }
 
     /**
