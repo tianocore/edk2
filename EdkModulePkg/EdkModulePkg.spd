@@ -524,7 +524,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
       <Token>0x00000001</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumUnicodeStringLength</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -533,7 +533,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
       <Token>0x00000002</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumAsciiStringLength</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -542,7 +542,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumLinkedListLength</C_Name>
       <Token>0x00000003</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumLinkedListLength</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -551,7 +551,7 @@
     <PcdEntry>
       <C_Name>PcdSpinLockTimeout</C_Name>
       <Token>0x00000004</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdSpinLockTimeout</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>10000000</DefaultValue>
@@ -560,7 +560,7 @@
     <PcdEntry>
       <C_Name>PcdDebugPropertyMask</C_Name>
       <Token>0x00000005</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugPropertyMask</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x0f</DefaultValue>
@@ -569,7 +569,7 @@
     <PcdEntry>
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
       <Token>0x00000006</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugPrintErrorLevel</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>0x80000000</DefaultValue>
@@ -578,7 +578,7 @@
     <PcdEntry>
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
       <Token>0x00000007</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdReportStatusCodePropertyMask</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x07</DefaultValue>
@@ -587,7 +587,7 @@
     <PcdEntry>
       <C_Name>PcdDebugClearMemoryValue</C_Name>
       <Token>0x00000008</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugClearMemoryValue</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0xAF</DefaultValue>
@@ -596,7 +596,7 @@
     <PcdEntry>
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
       <Token>0x00000009</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdPerformanceLibraryPropertyMask</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0</DefaultValue>
@@ -605,7 +605,7 @@
     <PcdEntry>
       <C_Name>PcdMaxPcdCallBackNumber</C_Name>
       <Token>0x0001000f</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaxPcdCallBackNumber</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0</DefaultValue>
@@ -614,7 +614,7 @@
     <PcdEntry>
       <C_Name>PcdTestDynamicUint8</C_Name>
       <Token>0x00011000</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdTestDynamicUint8</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>0x01</DefaultValue>
@@ -623,7 +623,7 @@
     <PcdEntry>
       <C_Name>PcdTestDynamicUint16</C_Name>
       <Token>0x00011001</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdTestDynamicUint16</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT16</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>0x1234</DefaultValue>
@@ -632,7 +632,7 @@
     <PcdEntry>
       <C_Name>PcdTestDynamicUint32</C_Name>
       <Token>0x00011002</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdTestDynamicUint32</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <HelpText>HELP FIX ME!</HelpText>
@@ -640,7 +640,7 @@
     <PcdEntry>
       <C_Name>PcdTestDynamicUint64</C_Name>
       <Token>0x00011003</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdTestDynamicUint64</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT64</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <HelpText>HELP FIX ME!</HelpText>
@@ -648,7 +648,7 @@
     <PcdEntry>
       <C_Name>PcdTestDynamicBoolean</C_Name>
       <Token>0x00011004</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdTestDynamicBoolean</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <HelpText>HELP FIX ME!</HelpText>
@@ -656,7 +656,7 @@
     <PcdEntry>
       <C_Name>PcdMaxPeiPcdCallBackNumberPerPcdEntry</C_Name>
       <Token>0x0001000f</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaxPeiPcdCallBackNumberPerPcdEntry</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <HelpText>HELP FIX ME!</HelpText>
@@ -664,7 +664,7 @@
     <PcdEntry>
       <C_Name>PcdVpdBaseAddress</C_Name>
       <Token>0x00010010</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdVpdBaseAddress</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <HelpText>HELP FIX ME!</HelpText>
