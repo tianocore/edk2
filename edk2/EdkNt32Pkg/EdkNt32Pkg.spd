@@ -172,7 +172,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumUnicodeStringLength</C_Name>
       <Token>0x00000001</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumUnicodeStringLength</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -181,7 +181,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
       <Token>0x00000002</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumAsciiStringLength</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -190,7 +190,7 @@
     <PcdEntry>
       <C_Name>PcdMaximumLinkedListLength</C_Name>
       <Token>0x00000003</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdMaximumLinkedListLength</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
@@ -199,7 +199,7 @@
     <PcdEntry>
       <C_Name>PcdSpinLockTimeout</C_Name>
       <Token>0x00000004</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdSpinLockTimeout</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>10000000</DefaultValue>
@@ -208,7 +208,7 @@
     <PcdEntry>
       <C_Name>PcdDebugPropertyMask</C_Name>
       <Token>0x00000005</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugPropertyMask</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x0f</DefaultValue>
@@ -217,7 +217,7 @@
     <PcdEntry>
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
       <Token>0x00000006</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugPrintErrorLevel</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>0x80000000</DefaultValue>
@@ -226,7 +226,7 @@
     <PcdEntry>
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
       <Token>0x00000007</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdReportStatusCodePropertyMask</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x07</DefaultValue>
@@ -235,7 +235,7 @@
     <PcdEntry>
       <C_Name>PcdDebugClearMemoryValue</C_Name>
       <Token>0x00000008</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugClearMemoryValue</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0xAF</DefaultValue>
@@ -244,7 +244,7 @@
     <PcdEntry>
       <C_Name>PcdDebugClearMemoryValue</C_Name>
       <Token>0x00000008</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdDebugClearMemoryValue</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0xAF</DefaultValue>
@@ -253,7 +253,7 @@
     <PcdEntry>
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
       <Token>0x00000009</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdPerformanceLibraryPropertyMask</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0</DefaultValue>
@@ -262,7 +262,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtPhysicalDisk</C_Name>
       <Token>0x00001000</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtPhysicalDisk</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
@@ -271,7 +271,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtVirtualDisk</C_Name>
       <Token>0x00001001</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtVirtualDisk</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
@@ -280,7 +280,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtSerialPort</C_Name>
       <Token>0x00001002</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtSerialPort</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"COM1!COM2"</DefaultValue>
@@ -289,7 +289,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtUga</C_Name>
       <Token>0x00001003</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtUga</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"UGA Window 1!UGA Window 2"</DefaultValue>
@@ -298,7 +298,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtFileSystem</C_Name>
       <Token>0x00001004</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFileSystem</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L".!C:\\D\\work\\Remodel\\mdk\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
@@ -307,7 +307,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtMemorySize</C_Name>
       <Token>0x00001005</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtMemorySize</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"64!64"</DefaultValue>
@@ -316,7 +316,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
       <Token>0x00001005</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtMemorySizeForSecMain</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"64!64"</DefaultValue>
@@ -325,7 +325,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtBootMode</C_Name>
       <Token>0x00001006</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtBootMode</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1</DefaultValue>
@@ -334,7 +334,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtCpuModel</C_Name>
       <Token>0x00001007</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtCpuModel</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"Intel(R) Processor Model"</DefaultValue>
@@ -343,7 +343,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtCpuSpeed</C_Name>
       <Token>0x00001008</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtCpuSpeed</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"3000"</DefaultValue>
@@ -352,7 +352,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtFirmwareVolume</C_Name>
       <Token>0x00001009</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtFirmwareVolume</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"..\\..\\Fv\\Fv_Recovery.fd"</DefaultValue>
@@ -361,7 +361,7 @@
     <PcdEntry>
       <C_Name>PcdWinNtConsole</C_Name>
       <Token>0x0000100a</Token>
-      <TokenSpaceGuidCName>FIX_ME_PcdWinNtConsole</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"Bus Driver Console Window"</DefaultValue>
