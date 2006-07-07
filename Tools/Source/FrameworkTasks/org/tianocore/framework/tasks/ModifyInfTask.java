@@ -210,7 +210,7 @@ public class ModifyInfTask extends Task implements EfiDefine {
      *            string of patternStr.
      */
     public void setpatternStr(String patternStr) {
-        this.patternStr = "[" + patternStr + "]";
+        this.patternStr = patternStr;
     }
 
 	/**
