@@ -116,7 +116,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
-    <Specification>EDK_RELEASE_VERSION 0x00000000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gWinNtBusDriverBinding</DriverBinding>
     </Extern>
@@ -127,67 +127,80 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <PcdCoded>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtConsole</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtUga</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtSerialPort</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtFileSystem</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtVirtualDisk</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtPhysicalDisk</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuModel</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtCpuSpeed</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySize</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch1</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdWinNtBinaryPatch2</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdWinNtFeatureFlag1</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtDynamicUINT32</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+
       <HelpText/>
     </PcdEntry>
   </PcdCoded>
