@@ -54,5 +54,8 @@
 *_GCC_IA32_PP_NAME      = gcc
 
 # GCC, IA32
+# Use this if you built the tiano gcc tool chain on a Windows/Cygwin system.
 *_GCC_IA32_*_PATH       = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
+# Use this if you built the tiano gcc tool chain on a Unix system.
+# *_GCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
 *_GCC_IA32_ASM_EXT      = .S
