@@ -65,10 +65,12 @@ Java Development Kit ( Java 5.0 or later)
 Java Tools
     Apache-ANT, version 1.6.5 or later (http://ant.apache.org)
     Ant-contrib, version 1.0b2 or later
-      (http://sourceforge.net/project/showfiles.php?group_id=36177)
+      (http://prdownloads.sourceforge.net/ant-contrib/ant-contrib-1.0b2-bin.zip?download)
     Saxon8, version 8.1.1
       (http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip?download)
-    XMLBeans, version 2.1.0 or later (http://xmlbeans.apache.org) 
+    XMLBeans, version 2.1.0 (http://xmlbeans.apache.org)
+      DO NOT download the latest XMLBeans, version 2.2.0. It cannot work with
+      Saxon8, version 8.1.1.
 
 Other Tools
     TortoiseSVN version 1.3.3. (http://tortoisesvn.tigris.org/)
@@ -122,9 +124,9 @@ Java Development Kit:
  
    The Java Environment Variable must be set before attempting to build.
        i.e. For Sun JDK (see note below*):
-              set JAVA_HOME=c:\ Java\jdk1.5.0_06  
+              set JAVA_HOME=c:\Java\jdk1.5.0_06  
        i.e. For Bea Systems:
-              set JAVA_HOME=c:\Program Files\Java\jrockit-R26.0.0-jdk1.5.0_04
+              set JAVA_HOME=c:\Java\jrockit-R26.0.0-jdk1.5.0_04
  
   *When using the Sun JDK5.0
     During installation, you should specify the install directory as C:\Java
@@ -149,7 +151,7 @@ Java Tools:
 
     The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
     before attempting to build:
-         i.e. set XMLBEANS_HOME=C:\<full path to where xmlbeans  was installed>
+         i.e. set XMLBEANS_HOME=C:\<full path to where xmlbeans was installed>
 
     The saxon8.jar file should be copied to the %XMLBEANS_HOME%\lib directory.
 
