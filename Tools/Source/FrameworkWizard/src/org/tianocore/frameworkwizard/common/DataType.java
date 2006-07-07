@@ -163,4 +163,12 @@ public class DataType {
     // Will be replaced by resource file later
     //
     public static final String SUP_ARCH_LIST_HELP_TEXT = "Deselecting a checkbox will restrict this module for use with the selected architectures, based on the list of items that are checked. If all boxes are checked, then the module will support all current AND FUTURE architectures";
+    
+    //
+    // Project name and version
+    //
+    public static final String PROJECT_NAME = "Framework Wizard";
+    
+    public static final String PROJECT_VERSION = "1.0";
+    
 }

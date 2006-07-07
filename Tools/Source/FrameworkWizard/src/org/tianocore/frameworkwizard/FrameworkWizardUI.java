@@ -136,10 +136,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private int currentOpeningPlatformIndex = -1;
 
-    private String projectName = "FrameworkWizard";
-    
-    private String projectVersion = "0.5";
-
     private IDefaultMutableTreeNode dmtnRoot = null;
 
     private IDefaultMutableTreeNode dmtnModuleDescription = null;
@@ -1690,7 +1686,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         this.addComponentListener(this);
         this.getCompontentsFromFrameworkDatabase();
         this.setContentPane(getJContentPane());
-        this.setTitle(projectName + " " + projectVersion + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
+        this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
         this.setExitType(1);
 
         //
@@ -2879,7 +2875,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             // Reinit whole window
             //
             closeAll();
-            this.setTitle(projectName + " " + projectVersion + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
+            this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
         }
         sw.dispose();
     }

@@ -20,6 +20,7 @@ import java.util.Vector;
 import org.apache.xmlbeans.XmlException;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
+import org.tianocore.IndustryStdIncludesDocument.IndustryStdIncludes;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaFilesDocument.MsaFiles;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
@@ -96,6 +97,34 @@ public class WorkspaceTools {
         }
         return modulePath;
     }
+    
+    /**
+    Get all Industry Std Includes' paths from one package
+    
+    @return a Vector with all paths
+    
+    **/
+   public Vector<String> getAllIndustryStdIncludesOfPackage(String path) {
+       Vector<String> includePath = new Vector<String>();
+       try {
+           IndustryStdIncludes files = OpenFile.openSpdFile(path).getIndustryStdIncludes();
+           if (files != null) {
+               for (int index = 0; index < files.getIndustryStdHeaderList().size(); index++) {
+                   String temp = files.getIndustryStdHeaderList().get(index).getName();
+                   temp = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + temp;
+                   temp = Tools.convertPathToCurrentOsType(temp);
+                   includePath.addElement(temp);
+               }
+           }
+       } catch (IOException e) {
+           e.printStackTrace();
+       } catch (XmlException e) {
+           e.printStackTrace();
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+       return includePath;
+   }
 
     /**
      Get all package basic information form the FrameworkDatabase.db file
@@ -583,7 +612,7 @@ public class WorkspaceTools {
      @throws Exception
      
      **/
-    public Vector<String> getAllModuleFiles(String path) throws IOException, XmlException, Exception {
+    public Vector<String> getAllModuleFilesPath(String path) throws IOException, XmlException, Exception {
         Vector<String> v = new Vector<String>();
         path = Tools.convertPathToCurrentOsType(path);
         v.addElement(path);
@@ -615,7 +644,7 @@ public class WorkspaceTools {
      @throws Exception
      
      **/
-    public Vector<String> getAllPakcageFiles(String path) throws IOException, XmlException, Exception {
+    public Vector<String> getAllPakcageFilesPath(String path) throws IOException, XmlException, Exception {
         Vector<String> v = new Vector<String>();
         path = Tools.convertPathToCurrentOsType(path);
         //
@@ -624,17 +653,25 @@ public class WorkspaceTools {
         v.addElement(path);
         
         //
-        // Add module's files one by one
+        // Add the package's industry std includes one by one
         //
         Vector<String> f1 = new Vector<String>();
+        f1 = getAllIndustryStdIncludesOfPackage(path);
+        for (int index = 0; index < f1.size(); index++) {
+            v.addElement(f1.get(index));
+        }
+        
+        //
+        // Add module's files one by one
+        //
+        f1 = new Vector<String>();
         f1 = getAllModulesOfPackage(path);
         for (int indexI = 0; indexI < f1.size(); indexI++) {
-            Vector<String> f2 = getAllModuleFiles(f1.get(indexI));
+            Vector<String> f2 = getAllModuleFilesPath(f1.get(indexI));
             for (int indexJ = 0; indexJ < f2.size(); indexJ++) {
                 v.addElement(f2.get(indexJ));
             }
         }
-        //v.add(0, path);
 
         return v;
     }

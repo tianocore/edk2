@@ -68,15 +68,23 @@ public class IDialog extends JDialog implements ActionListener {
     }
 
     /**
-     * This is the override constructor
-     */
-    /**
      This is the override constructor
      
      @param parentFrame The parent frame which open the dialog
      @param modal true means the dialog is modal dialog; false means the dialog is not modal dialog
      **/
     public IDialog(IFrame parentFrame, boolean modal) {
+        super(parentFrame, modal);
+        initialize();
+    }
+    
+    /**
+     This is the override constructor
+     
+     @param parentFrame The parent frame which open the dialog
+     @param modal true means the dialog is modal dialog; false means the dialog is not modal dialog
+     **/
+    public IDialog(IDialog parentFrame, boolean modal) {
         super(parentFrame, modal);
         initialize();
     }

@@ -580,7 +580,7 @@ public class ModulePCDs extends IInternalFrame {
         // Check TokenSpaceGuid
         //
         if (!isEmpty(this.jTextFieldTokenSpaceGuid.getText())) {
-            if (!DataValidation.isGuid(this.jTextFieldTokenSpaceGuid.getText())) {
+            if (!DataValidation.isC_NameType(this.jTextFieldTokenSpaceGuid.getText())) {
                 Log.err("Incorrect data type for Token Space C_Name");
                 return false;
             }

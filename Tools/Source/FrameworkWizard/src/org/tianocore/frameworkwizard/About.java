@@ -129,7 +129,7 @@ public class About extends IDialog {
             jLabel.setToolTipText("");
             jLabel.setBounds(new java.awt.Rectangle(25,90,270,20));
             jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            jLabel.setText("Framework Wizard 1.0");
+            jLabel.setText(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION);
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.setSize(new java.awt.Dimension(320,235));
