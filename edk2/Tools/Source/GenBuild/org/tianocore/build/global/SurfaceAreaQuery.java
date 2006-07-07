@@ -277,9 +277,8 @@ public class SurfaceAreaQuery {
         Filename[] sourceFileNames = (Filename[]) returns;
         List<String[]> outputList = new ArrayList<String[]>();
         for (int i = 0; i < sourceFileNames.length; i++) {
-            @SuppressWarnings("unchecked")
-            List<String> archList = sourceFileNames[i].getSupArchList();
-            if (arch == null || arch.equalsIgnoreCase("") || archList == null || archList.contains(arch)) {
+            List archList = sourceFileNames[i].getSupArchList();
+            if (arch == null || arch.equalsIgnoreCase("") || archList == null || contains(archList, arch)) {
                 outputList.add(new String[] {sourceFileNames[i].getToolCode(),sourceFileNames[i].getStringValue()});
             }
         }
@@ -443,20 +442,16 @@ public class SurfaceAreaQuery {
             }
 
             archList = new ArrayList<String>();
-            @SuppressWarnings("unchecked")
-            List<String> archEnumList = option.getSupArchList();            
+            List archEnumList = option.getSupArchList();            
             if (archEnumList == null) {
                 archList.add(null);
             } else {
-                archList.addAll(archEnumList);
-                /*
+                //archList.addAll(archEnumList);
                 Iterator it = archEnumList.iterator();
                 while (it.hasNext()) {
-                    System.out.println(it.next().getClass().getName());
-                    SupportedArchitectures.Enum archType = it.next();
-                    archList.add(archType.toString());
+                    String archType = (String)it.next();
+                    archList.add(archType);
                 }
-                */
             }
 
             cmd = option.getToolCode();
@@ -574,9 +569,8 @@ public class SurfaceAreaQuery {
         List<PackageIdentification> packageIdList = new ArrayList<PackageIdentification>();
         for (int i = 0; i < returns.length; i++) {
             PackageDependenciesDocument.PackageDependencies.Package item = (PackageDependenciesDocument.PackageDependencies.Package) returns[i];
-            @SuppressWarnings("unchecked")
-            List<String> archList = item.getSupArchList();
-            if (arch == null || archList == null || archList.contains(arch)) {
+            List archList = item.getSupArchList();
+            if (arch == null || archList == null || contains(archList, arch)) {
                 packageGuid = item.getPackageGuid();
                 packageVersion = item.getPackageVersion();
                 packageIdList.add(new PackageIdentification(null, packageGuid,
@@ -718,9 +712,8 @@ public class SurfaceAreaQuery {
         List<String> protocolList = new ArrayList<String>();
         
         for (int i = 0; i < returns.length; i++) {
-            @SuppressWarnings("unchecked")
-            List<String> archList = returnlList[i].getSupArchList();
-            if (archList == null || archList.contains(arch)){
+            List archList = returnlList[i].getSupArchList();
+            if (archList == null || contains(archList, arch)){
                 protocolList.add(returnlList[i].getProtocolCName());
             }
         }
@@ -757,9 +750,8 @@ public class SurfaceAreaQuery {
         List<String> protocolNotifyList = new ArrayList<String>();
         
         for (int i = 0; i < returns.length; i++) {
-            @SuppressWarnings("unchecked")
-            List<String> archList = ((ProtocolNotify) returns[i]).getSupArchList();
-            if (archList == null || archList.contains(arch)){
+            List archList = ((ProtocolNotify) returns[i]).getSupArchList();
+            if (archList == null || contains(archList, arch)){
                 protocolNotifyList.add(((ProtocolNotify) returns[i]).getProtocolNotifyCName());
             }
             
@@ -879,9 +871,8 @@ public class SurfaceAreaQuery {
         
         List<String> ppiNotifyList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
-            @SuppressWarnings("unchecked")
-            List<String> archList = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getSupArchList();
-            if (archList == null || archList.contains(arch)){
+            List archList = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getSupArchList();
+            if (archList == null || contains(archList, arch)){
                 ppiNotifyList.add(((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName()); 
             }
             
@@ -960,9 +951,8 @@ public class SurfaceAreaQuery {
 
         List<String> ppiList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
-            @SuppressWarnings("unchecked")
-            List<String> archList = ((PPIsDocument.PPIs.Ppi) returns[i]).getSupArchList();
-            if (archList == null || archList.contains(arch)){
+            List archList = ((PPIsDocument.PPIs.Ppi) returns[i]).getSupArchList();
+            if (archList == null || contains(archList, arch)){
                 ppiList.add(((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName());    
             }
             
@@ -1040,9 +1030,8 @@ public class SurfaceAreaQuery {
 
         List<String> guidList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
-            @SuppressWarnings("unchecked")
-            List<String> archList = ((GuidsDocument.Guids.GuidCNames) returns[i]).getSupArchList();
-            if (archList == null || archList.contains(arch)){
+            List archList = ((GuidsDocument.Guids.GuidCNames) returns[i]).getSupArchList();
+            if (archList == null || contains(archList, arch)){
                 guidList.add(((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName());    
             }
             
@@ -1590,81 +1579,7 @@ public class SurfaceAreaQuery {
             return null;
         }
 
-        // PcdCoded.PcdData[] pcds = (PcdCoded.PcdData[]) returns;
-        // String[][] result = new String[pcds.length][2];
-        // for (int i = 0; i < returns.length; ++i) {
-        // if (pcds[i].getItemType() != null) {
-        // result[i][1] = pcds[i].getItemType().toString();
-        // } else {
-        // result[i][1] = null;
-        // }
-        // result[i][0] = pcds[i].getCName();
-        // }
-
         return null;
-    }
-
-    /**
-     * Get the PcdToken array from module's surface area document. The array
-     * should contains following data:
-     * <p>
-     * -------------------------------------------------------------------
-     * </p>
-     * <p>
-     * CName | ItemType | TokenspaceName | DefaultValue | Usage | HelpText
-     * </p>
-     * <p>
-     * -------------------------------------------------------------------
-     * </p>
-     * <p>
-     * Note: Until new schema applying, now we can only get CName, ItemType,
-     * </p>
-     * 
-     * @return 2-array table contains all information of PCD token retrieved
-     *         from MSA.
-     */
-    public static Object[][] etModulePCDTokenArray() {
-        return null;
-        // int index;
-        // Object[][] result;
-        // PCDs.PcdData[] pcds;
-        // String[] xPath = new String[] { "/PcdData" };
-        // Object[] returns = get("PCDs", xPath);
-        //
-        // if ((returns == null) || (returns.length == 0)) {
-        // return null;
-        // }
-        //
-        // pcds = (PCDs.PcdData[]) returns;
-        // result = new Object[pcds.length][6];
-        // for (index = 0; index < pcds.length; index++) {
-        // //
-        // // Get CName
-        // //
-        // result[index][0] = pcds[index].getCName();
-        // //
-        // // Get ItemType: FEATURE_FLAG, FIXED_AT_BUILD, PATCHABLE_IN_MODLE,
-        // // DYNAMIC, DYNAMIC_EX
-        // //
-        // if (pcds[index].getItemType() != null) {
-        // result[index][1] = pcds[index].getItemType().toString();
-        // } else {
-        // result[index][1] = null;
-        // }
-        //
-        // //
-        // // BUGBUG: following field can *not* be got from current MSA until
-        // // schema changed.
-        // //
-        // // result [index][2] = pcds[index].getTokenSpaceName();
-        // result[index][2] = null;
-        // result[index][3] = pcds[index].getDefaultValue();
-        // // result [index][4] = pcds[index].getUsage ();
-        // result[index][4] = null;
-        // // result [index][5] = pcds[index].getHelpText ();
-        // result[index][5] = null;
-        // }
-        // return result;
     }
 
     /**
@@ -1786,7 +1701,7 @@ public class SurfaceAreaQuery {
         if (returns == null) {
             return packageIncludeMap;
         }
-//        GlobalData.log.info("" + returns[0].getClass().getName());
+
         for (int i = 0; i < returns.length; i++) {
             PackageHeadersDocument.PackageHeaders.IncludePkgHeader includeHeader = (PackageHeadersDocument.PackageHeaders.IncludePkgHeader) returns[i];
             packageIncludeMap.put(includeHeader.getModuleType().toString(),
@@ -1908,31 +1823,6 @@ public class SurfaceAreaQuery {
     }
 
     /**
-     * getToolChainFamily
-     * 
-     * This function is to retrieve ToolChainFamily attribute of FPD
-     * <BuildOptions>
-     * 
-     * @param
-     * @return toolChainFamily If find toolChainFamily attribute in
-     *         <BuildOptions> Null If don't have toolChainFamily in
-     *         <BuildOptions>.
-     */
-    public String getToolChainFamily() {
-        String toolChainFamily;
-        String[] xPath = new String[] { "/BuildOptions" };
-
-        Object[] result = get("PlatformSurfaceArea", xPath);
-        if (result == null) {
-            return null;
-        }
-        // toolChainFamily =
-        // ((BuildOptionsDocument.BuildOptions)result[0]).getToolChainFamilies();
-        // return toolChainFamily;
-        return null;
-    }
-
-    /**
      * Retrieve module Guid string
      * 
      * @returns GUILD string if elements are found at the known xpath
@@ -1968,24 +1858,41 @@ public class SurfaceAreaQuery {
     is same, and token name should not be conflicted.
     
     @return String[]
- **/
- public static String[] getModulePcdEntryNameArray() {
-     PcdCodedDocument.PcdCoded.PcdEntry[] pcdEntries  = null;
-     String[]            results;
-     int                 index;
-     String[]            xPath       = new String[] {"/PcdEntry"};
-     Object[]         returns     = get ("PcdCoded", xPath);
-     
-     if (returns == null) {
-         return new String[0];
-     }
-     
-     pcdEntries = (PcdCodedDocument.PcdCoded.PcdEntry[])returns;
-     results    = new String[pcdEntries.length];
-     
-     for (index = 0; index < pcdEntries.length; index ++) {
-         results[index] = pcdEntries[index].getCName();
-     }
-     return results;
- }
+    **/
+    public static String[] getModulePcdEntryNameArray() {
+        PcdCodedDocument.PcdCoded.PcdEntry[] pcdEntries  = null;
+        String[]            results;
+        int                 index;
+        String[]            xPath       = new String[] {"/PcdEntry"};
+        Object[]         returns     = get ("PcdCoded", xPath);
+
+        if (returns == null) {
+            return new String[0];
+        }
+
+        pcdEntries = (PcdCodedDocument.PcdCoded.PcdEntry[])returns;
+        results    = new String[pcdEntries.length];
+
+        for (index = 0; index < pcdEntries.length; index ++) {
+            results[index] = pcdEntries[index].getCName();
+        }
+        return results;
+    }
+
+    /**
+     Search in a List for a given string
+
+     @return boolean
+     **/
+    public static boolean contains(List list, String str) {
+        Iterator it = list.iterator();
+        while (it.hasNext()) {
+            String s = (String)it.next();
+            if (s.equalsIgnoreCase(str)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
