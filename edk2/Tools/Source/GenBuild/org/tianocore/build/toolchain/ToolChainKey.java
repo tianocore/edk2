@@ -27,7 +27,7 @@ import java.util.TreeMap;
 import org.tianocore.exception.EdkException;
 
 public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainKey> {
-
+    static final long serialVersionUID = -8034897190740066933L;
     private String delimiter = "_";
 
     public final static int keyLength = 5;

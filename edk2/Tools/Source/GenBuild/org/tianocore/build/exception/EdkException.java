@@ -19,7 +19,7 @@ package org.tianocore.build.exception;
   The class handle the exception throwed by entity class.
 **/
 public class EdkException extends Exception {
-    //static final long serialVersionUID = -8034897190740066939L;
+    static final long serialVersionUID = -8034897190740066938L;
     /**
       Constructure function
         

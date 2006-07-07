@@ -21,7 +21,7 @@ import org.tianocore.exception.EdkException;
   The class handle the exception throwed by entity class.
 **/
 public class GenBuildException extends EdkException {
-    //static final long serialVersionUID = -8034897190740066939L;
+    static final long serialVersionUID = -8034897190740066937L;
     /**
       Constructure function
         

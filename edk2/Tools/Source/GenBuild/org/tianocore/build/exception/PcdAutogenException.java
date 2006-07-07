@@ -19,7 +19,7 @@ package org.tianocore.build.exception;
   The class handle the exception throwed by entity class.
 **/
 public class PcdAutogenException extends AutoGenException {
-    //static final long serialVersionUID = -8034897190740066939L;
+    static final long serialVersionUID = -8034897190740066936L;
     /**
       Constructure function
         
