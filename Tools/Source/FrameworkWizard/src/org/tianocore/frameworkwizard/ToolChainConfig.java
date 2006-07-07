@@ -15,6 +15,7 @@
 package org.tianocore.frameworkwizard;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -38,11 +39,10 @@ import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.ToolChainConfigId;
 import org.tianocore.frameworkwizard.common.Identifications.ToolChainConfigVector;
-import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.workspace.Workspace;
 
-public class ToolChainConfig extends IDialog implements ListSelectionListener, TableModelListener{
+public class ToolChainConfig extends IFrame implements ListSelectionListener, TableModelListener{
 
     ///
     /// Define Class Members
@@ -85,6 +85,10 @@ public class ToolChainConfig extends IDialog implements ListSelectionListener, T
     private int selectedRow = -1;
 
     private JButton jButtonHelp = null;
+    
+    private static ToolChainConfig tcc = null;
+    
+    private ToolChainConfigHelp tcch = null;
     
     /**
      This method initializes jScrollPane	
@@ -260,12 +264,19 @@ public class ToolChainConfig extends IDialog implements ListSelectionListener, T
         // TODO Auto-generated method stub
 
     }
+    
+    public static ToolChainConfig getInstance() {
+        if (tcc == null) {
+            tcc = new ToolChainConfig();
+        }
+        return tcc;
+    }
 
     /**
      * This is the default constructor
      */
-    public ToolChainConfig(IFrame parentFrame, boolean modal) {
-        super(parentFrame, modal);
+    public ToolChainConfig() {
+        super();
         init();
     }
 
@@ -337,8 +348,7 @@ public class ToolChainConfig extends IDialog implements ListSelectionListener, T
      */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getSource() == jButtonClose) {
-            this.setVisible(false);
-            this.returnType = DataType.RETURN_TYPE_CANCEL;
+            this.exit();
         }
 
         if (arg0.getSource() == jButtonOpen) {
@@ -400,7 +410,7 @@ public class ToolChainConfig extends IDialog implements ListSelectionListener, T
         }
         
         if (arg0.getSource() == jButtonHelp) {
-            ToolChainConfigHelp tcch = new ToolChainConfigHelp();
+            tcch = ToolChainConfigHelp.getInstance();
             tcch.setVisible(true);
         }
     }
@@ -475,6 +485,23 @@ public class ToolChainConfig extends IDialog implements ListSelectionListener, T
         if (arg0.getType() == TableModelEvent.UPDATE){
             this.vtcc.getToolChainConfigs(row).setName(m.getValueAt(row, 0).toString());
             this.vtcc.getToolChainConfigs(row).setValue(m.getValueAt(row, 1).toString());
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see java.awt.event.WindowListener#windowClosing(java.awt.event.WindowEvent)
+     *
+     * Override windowClosing to popup warning message to confirm quit
+     * 
+     */
+    public void windowClosing(WindowEvent arg0) {
+        this.exit();
+    }
+    
+    private void exit() {
+        this.setVisible(false);
+        if (tcch != null) {
+            tcch.dispose();
         }
     }
 }

@@ -271,7 +271,7 @@ public class SelectModuleBelong extends IDialog {
     private void init() {
         this.setSize(500, 200);
         this.setContentPane(getJContentPane());
-        this.setTitle("New Module");
+        this.setTitle("New");
         this.centerWindow();
     }
 

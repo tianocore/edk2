@@ -293,6 +293,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     //private JToolBar jToolBarEdit = null;
 
     //private JToolBar jToolBarWindow = null;
+    
+    private static FrameworkWizardUI fwui = null;
+    
+    public static FrameworkWizardUI getInstance() {
+        if (fwui == null) {
+            fwui = new FrameworkWizardUI();
+        }
+        return fwui;
+    }
 
     /**
      This method initializes jMenuBar 
@@ -1648,7 +1657,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      * 
      */
     public static void main(String[] args) {
-        FrameworkWizardUI module = new FrameworkWizardUI();
+        FrameworkWizardUI module = FrameworkWizardUI.getInstance();
         module.setVisible(true);
     }
 
@@ -2885,12 +2894,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     
     **/
     private void setupToolChainConfiguration() {
-        ToolChainConfig tcc = new ToolChainConfig(this, true);
-        int result = tcc.showDialog();
-        
-        if (result == DataType.RETURN_TYPE_CANCEL) {
-            tcc.dispose();
-        }
+        ToolChainConfig tcc = ToolChainConfig.getInstance();
+        tcc.showDialog();
     }
     
     /**
