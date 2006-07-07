@@ -15,8 +15,10 @@
 package org.tianocore.frameworkwizard.common.Identifications;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -49,7 +51,7 @@ public class ToolChainConfigVector {
             return null;
         }
     }
-    
+
     public Vector<String> toStringVector(int index) {
         Vector<String> v = new Vector<String>();
         v.addElement(getToolChainConfigs(index).getName());
@@ -77,7 +79,7 @@ public class ToolChainConfigVector {
             vToolChainConfigs.removeElementAt(index);
         }
     }
-    
+
     public void removeAll() {
         vToolChainConfigs = new Vector<ToolChainConfigId>();
     }
@@ -89,7 +91,7 @@ public class ToolChainConfigVector {
         }
         return v;
     }
-    
+
     public Vector<String> getToolChainConfigsValue() {
         Vector<String> v = new Vector<String>();
         for (int index = 0; index < this.vToolChainConfigs.size(); index++) {
@@ -102,13 +104,29 @@ public class ToolChainConfigVector {
         return this.vToolChainConfigs.size();
     }
 
+    public void saveFile(String file) throws IOException {
+        if (size() > 0) {
+            FileWriter fw = new FileWriter(file);
+            BufferedWriter bw = new BufferedWriter(fw);
+            for (int index = 0; index < size(); index++) {
+                String line = this.getToolChainConfigs(index).getName() + " " + ToolChainConfigId.EQUALS + " "
+                              + this.getToolChainConfigs(index).getValue();
+                bw.write(line);
+                bw.newLine();
+            }
+            bw.flush();
+            bw.close();
+            fw.close();
+        }
+    }
+
     /**
-    
+     
      @param file
      @throws IOException
      @throws FileNotFoundException
-    
-    **/
+     
+     **/
     public void parseFile(String file) throws IOException {
         FileReader fr = new FileReader(file);
         BufferedReader br = new BufferedReader(fr);
@@ -118,13 +136,13 @@ public class ToolChainConfigVector {
             line = br.readLine();
         }
     }
-    
+
     /**
      Parse the input string and add name, value to vector 
      
      @param line
-    
-    **/
+     
+     **/
     private void parseLine(String line) {
         String name = "";
         String value = "";
