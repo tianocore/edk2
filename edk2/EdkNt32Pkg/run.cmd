@@ -11,11 +11,6 @@
 
 @echo off
 
-:create_fd
-if not exist Build\Debug\Fv mkdir Build\Debug\Fv
-copy Build\Debug\Msft\Fv\FV_RECOVERY.fv /B + Build\Debug\Msft\Fv\NV_STORAGE.fv /B Build\Debug\Fv\Fv_Recovery.fd /B
-
-:start_secmain
 pushd .
 cd Build\DEBUG\MSFT\IA32
 SecMain.exe

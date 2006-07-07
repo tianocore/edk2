@@ -488,20 +488,23 @@ Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
     element as described above.
 
 --------------------------------------- 
-7) Define a new PCD entry in a package:
+7) Declare a new PCD entry in a package:
   - This release requires manual editing of the SPD file to include the new
     PCD.  New Pcd entries are added to the PcdDefinitions section of the
     <PackageName>.spd file using the following example for the format:
     NOTE: The hex <Token> value must be unique.
 
-<PcdDefinitions>
+<PcdDeclarations>
   <PcdEntry ItemType="FIXED_AT_BUILD">
     <C_Name>PcdMaximumUnicodeStringLength</C_Name>
     <Token>0x00000001</Token>
+    <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
     <DatumType>UINT32</DatumType>
+    <ValidUsage>FIXED_AT_BUILD</ValidUsage>
     <DefaultValue>1000000</DefaultValue>
+    <HelpText>The maximum lengh for unicode string.</HelpText>
   </PcdEntry>
-</PcdDefinition>
+</PcdDeclarations>
   
 ------------------------------
 8) Declare a new Library Class:
