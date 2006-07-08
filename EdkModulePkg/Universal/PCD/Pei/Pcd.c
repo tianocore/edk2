@@ -182,7 +182,10 @@ PeiPcdGetSize (
   //
   TokenNumber--;
 
-  ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  ASSERT (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
 
   Size = (PeiPcdDb->Init.LocalTokenNumberTable[TokenNumber] & PCD_DATUM_TYPE_ALL_SET) >> PCD_DATUM_TYPE_SHIFT;
 
@@ -479,6 +482,10 @@ PeiPcdGetNextToken (
   UINTN               i;
   BOOLEAN             Found;
     
+  if (!FeaturePcdGet (PcdPeiPcdDatabaseTraverseEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+    
   if (Guid == NULL) {
     if (*TokenNumber > PEI_NEX_TOKEN_NUMBER) {
       return EFI_NOT_FOUND;
@@ -569,6 +576,10 @@ PeiPcdGetNextTokenSpace (
   DYNAMICEX_MAPPING   *ExMapTable;
   UINTN               i;
   BOOLEAN             Found;
+
+  if (!FeaturePcdGet (PcdPeiPcdDatabaseTraverseEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
 
   ASSERT (Guid != NULL);
 

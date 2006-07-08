@@ -61,12 +61,20 @@ GetWorker (
 
   TmpTokenNumber = TokenNumber;
   
-  ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
+  //
+  // PCD_TOTAL_TOKEN_NUMBER is a auto-generated constant.
+  // It could be zero. EBC compiler is very choosy. It may
+  // report warning. So we add 1 in each size of the 
+  // comparison.
+  //
+  ASSERT (TokenNumber + 1 < PCD_TOTAL_TOKEN_NUMBER + 1);
 
   ASSERT ((GetSize == DxePcdGetSize (TokenNumber + 1)) || (GetSize == 0));
 
-  
-  IsPeiDb = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  IsPeiDb = (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE;
 
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
@@ -362,11 +370,12 @@ BuildPcdDxeDataBase (
   // Initialized the Callback Function Table
   //
 
-  if (PCD_TOTAL_TOKEN_NUMBER != 0) {
-    mCallbackFnTable = AllocateZeroPool (PCD_TOTAL_TOKEN_NUMBER * sizeof (LIST_ENTRY));
-  }
+  mCallbackFnTable = AllocateZeroPool (PCD_TOTAL_TOKEN_NUMBER * sizeof (LIST_ENTRY));
   
-  for (Idx = 0; Idx < PCD_TOTAL_TOKEN_NUMBER; Idx++) {
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  for (Idx = 0; Idx + 1 < PCD_TOTAL_TOKEN_NUMBER + 1; Idx++) {
     InitializeListHead (&mCallbackFnTable[Idx]);
   }
     
@@ -390,7 +399,7 @@ GetHiiVariable (
   Size = 0;
   Buffer = NULL;
   
-  Status = EfiGetVariable (
+  Status = gRT->GetVariable (
     (UINT16 *)VariableName,
     VariableGuid,
     NULL,
@@ -403,7 +412,7 @@ GetHiiVariable (
 
     ASSERT (Buffer != NULL);
 
-    Status = EfiGetVariable (
+    Status = gRT->GetVariable (
       VariableName,
       VariableGuid,
       NULL,
@@ -566,19 +575,29 @@ SetWorker (
 
   TmpTokenNumber = TokenNumber;
   
-  ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+
+  ASSERT (TokenNumber + 1 < PCD_TOTAL_TOKEN_NUMBER + 1);
 
   if (!PtrType) {
     ASSERT (*Size == DxePcdGetSize (TokenNumber + 1));
   }
   
-  IsPeiDb = (TokenNumber < PEI_LOCAL_TOKEN_NUMBER) ? TRUE : FALSE;
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  IsPeiDb = (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1) ? TRUE : FALSE;
 
   LocalTokenNumberTable  = IsPeiDb ? mPcdDatabase->PeiDb.Init.LocalTokenNumberTable : 
                                      mPcdDatabase->DxeDb.Init.LocalTokenNumberTable;
 
-  if ((TokenNumber < PEI_NEX_TOKEN_NUMBER) ||
-      (TokenNumber >= PEI_LOCAL_TOKEN_NUMBER || TokenNumber < (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER))) {
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  if ((TokenNumber + 1 < PEI_NEX_TOKEN_NUMBER + 1) ||
+      (TokenNumber + 1 >= PEI_LOCAL_TOKEN_NUMBER + 1 || TokenNumber + 1 < (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER + 1))) {
     InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, *Size);
   }
 
@@ -755,7 +774,7 @@ SetHiiVariable (
 
   Size = 0;
 
-  Status = EfiGetVariable (
+  Status = gRT->GetVariable (
     (UINT16 *)VariableName,
     VariableGuid,
     &Attribute,
@@ -769,7 +788,7 @@ SetHiiVariable (
 
     ASSERT (Buffer != NULL);
 
-    Status = EfiGetVariable (
+    Status = gRT->GetVariable (
       VariableName,
       VariableGuid,
       &Attribute,
@@ -781,7 +800,7 @@ SetHiiVariable (
 
     CopyMem ((UINT8 *)Buffer + Offset, Data, DataSize);
 
-    Status = EfiSetVariable (
+    Status = gRT->SetVariable (
               VariableName,
               VariableGuid,
               Attribute,
@@ -983,7 +1002,10 @@ GetPtrTypeSize (
   BOOLEAN     IsPeiDb;
   UINT32      *LocalTokenNumberTable;
 
-  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx < PEI_LOCAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
 
 
   if (IsPeiDb) {
@@ -1055,7 +1077,10 @@ SetPtrTypeSize (
   BOOLEAN     IsPeiDb;
   UINT32      *LocalTokenNumberTable;
 
-  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx < PEI_LOCAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  IsPeiDb = (BOOLEAN) (LocalTokenNumberTableIdx + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
 
   if (IsPeiDb) {
     LocalTokenNumberTable = mPcdDatabase->PeiDb.Init.LocalTokenNumberTable;

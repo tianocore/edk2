@@ -103,5 +103,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
 
       <HelpText/>
     </PcdEntry>
+    <PcdEntry PcdItemType="FEATURE_FLAG">
+      <C_Name>PcdPeiPcdDatabaseTraverseEnabled</C_Name>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText/>
+    </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
