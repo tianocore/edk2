@@ -713,6 +713,10 @@ AsciiStrnCmp (
   IN      UINTN                     Length
   )
 {
+  if (Length == 0) {
+    return 0;
+  }
+
   //
   // ASSERT both strings are less long than PcdMaximumAsciiStringLength
   //
