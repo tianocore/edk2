@@ -52,7 +52,7 @@ PeiRegisterCallBackWorker (
     // as the array index.
     //
     TokenNumber--;
-    ASSERT (TokenNumber < PEI_NEX_TOKEN_NUMBER);
+    ASSERT (TokenNumber + 1 < PEI_NEX_TOKEN_NUMBER + 1);
   } else {
     TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
 
@@ -62,7 +62,10 @@ PeiRegisterCallBackWorker (
     // as the array index.
     //
     TokenNumber--;
-    ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+    // EBC compiler is very choosy. It may report warning about comparison
+    // between UINTN and 0 . So we add 1 in each size of the 
+    // comparison.
+    ASSERT (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
   }
 
 
@@ -230,19 +233,19 @@ GetSkuEnabledTokenNumber (
   switch (LocalTokenNumber & PCD_TYPE_ALL_SET) {
     case PCD_TYPE_VPD:
       Value = (UINT8 *) &(((VPD_HEAD *) Value)[i]);
-      return ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_VPD);
+      return (UINT32) ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_VPD);
 
     case PCD_TYPE_HII:
       Value = (UINT8 *) &(((VARIABLE_HEAD *) Value)[i]);
-      return ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_HII);
+      return (UINT32) ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_HII);
       
     case PCD_TYPE_STRING:
       Value = (UINT8 *) &(((STRING_HEAD *) Value)[i]);
-      return ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_STRING);
+      return (UINT32) ((Value - (UINT8 *) PeiPcdDb) | PCD_TYPE_STRING);
 
     case PCD_TYPE_DATA:
       Value += Size * i;
-      return (Value - (UINT8 *) PeiPcdDb);
+      return (UINT32) (Value - (UINT8 *) PeiPcdDb);
 
     default:
       ASSERT (FALSE);
@@ -259,7 +262,7 @@ GetSkuEnabledTokenNumber (
 
 VOID
 InvokeCallbackOnSet (
-  UINT32            ExTokenNumber,
+  UINTN             ExTokenNumber,
   CONST EFI_GUID    *Guid, OPTIONAL
   UINTN             TokenNumber,
   VOID              *Data,
@@ -277,8 +280,12 @@ InvokeCallbackOnSet (
   //
   TokenNumber--;
   
-  if (Guid == NULL)
-    ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+  if (Guid == NULL) {
+    // EBC compiler is very choosy. It may report warning about comparison
+    // between UINTN and 0 . So we add 1 in each size of the 
+    // comparison.
+    ASSERT (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
+  }
 
   GuidHob = GetFirstGuidHob (&gPcdPeiCallbackFnTableHobGuid);
   ASSERT (GuidHob != NULL);
@@ -335,7 +342,10 @@ SetWorker (
   //
   TokenNumber--;
 
-  ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  ASSERT (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
     
   PeiPcdDb = GetPcdDatabase ();
 
@@ -350,7 +360,7 @@ SetWorker (
   // For Dynamic EX PCD entry, we have invoked the callback function for Dynamic EX
   // type PCD entry in ExSetWorker.
   //
-  if (TokenNumber < PEI_NEX_TOKEN_NUMBER) {
+  if (TokenNumber + 1 < PEI_NEX_TOKEN_NUMBER + 1) {
     InvokeCallbackOnSet (0, NULL, TokenNumber + 1, Data, *Size);
   }
 
@@ -500,7 +510,10 @@ GetWorker (
   //
   TokenNumber--;
 
-  ASSERT (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  ASSERT (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
 
   ASSERT ((GetSize == PeiPcdGetSize(TokenNumber + 1)) || (GetSize == 0));
 
@@ -525,7 +538,7 @@ GetWorker (
     {
       VPD_HEAD *VpdHead;
       VpdHead = (VPD_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
-      return (VOID *) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
+      return (VOID *) (UINTN) (FixedPcdGet32(PcdVpdBaseAddress) + VpdHead->Offset);
     }
       
     case PCD_TYPE_HII:
@@ -570,7 +583,7 @@ GetWorker (
 UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
-  IN UINT32                     ExTokenNumber
+  IN UINTN                      ExTokenNumber
   )
 {
   UINT32              i;

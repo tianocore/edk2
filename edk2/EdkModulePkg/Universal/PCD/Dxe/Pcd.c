@@ -200,9 +200,15 @@ DxePcdGetSize (
   // 
   TmpTokenNumber = TokenNumber;
 
-  ASSERT (TokenNumber < PCD_TOTAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  ASSERT (TokenNumber + 1 < PCD_TOTAL_TOKEN_NUMBER + 1);
 
-  IsPeiDb = (BOOLEAN) (TokenNumber < PEI_LOCAL_TOKEN_NUMBER);
+  // EBC compiler is very choosy. It may report warning about comparison
+  // between UINTN and 0 . So we add 1 in each size of the 
+  // comparison.
+  IsPeiDb = (BOOLEAN) (TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1);
   
   TokenNumber = IsPeiDb ? TokenNumber : 
                           (TokenNumber - PEI_LOCAL_TOKEN_NUMBER);
@@ -501,25 +507,32 @@ DxePcdGetNextToken (
 {
   EFI_STATUS          Status;
 
+  if (!FeaturePcdGet (PcdDxePcdDatabaseTraverseEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+
   Status = EFI_NOT_FOUND;
   //
   // Scan the local token space
   //
   if (Guid == NULL) {
-    if (((*TokenNumber > PEI_NEX_TOKEN_NUMBER) && (*TokenNumber < PEI_LOCAL_TOKEN_NUMBER)) ||
-        ((*TokenNumber > (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER)))) {
+    // EBC compiler is very choosy. It may report warning about comparison
+    // between UINTN and 0 . So we add 1 in each size of the 
+    // comparison.
+    if (((*TokenNumber + 1 > PEI_NEX_TOKEN_NUMBER + 1) && (*TokenNumber + 1 < PEI_LOCAL_TOKEN_NUMBER + 1)) ||
+        ((*TokenNumber + 1 > (PEI_LOCAL_TOKEN_NUMBER + DXE_NEX_TOKEN_NUMBER + 1)))) {
         return EFI_NOT_FOUND;
     }
     
     (*TokenNumber)++;
-    if (*TokenNumber > PEI_NEX_TOKEN_NUMBER &&
-        *TokenNumber <= PEI_LOCAL_TOKEN_NUMBER) {
+    if ((*TokenNumber + 1 > PEI_NEX_TOKEN_NUMBER + 1) &&
+        (*TokenNumber <= PEI_LOCAL_TOKEN_NUMBER)) {
       //
       // The first Non-Ex type Token Number for DXE PCD 
       // database is PEI_LOCAL_TOKEN_NUMBER
       //
       *TokenNumber = PEI_LOCAL_TOKEN_NUMBER;
-    } else if (*TokenNumber > DXE_NEX_TOKEN_NUMBER + PEI_LOCAL_TOKEN_NUMBER) {
+    } else if (*TokenNumber + 1 > DXE_NEX_TOKEN_NUMBER + PEI_LOCAL_TOKEN_NUMBER + 1) {
       *TokenNumber = PCD_INVALID_TOKEN_NUMBER;
     }
     return EFI_SUCCESS;
@@ -617,6 +630,10 @@ DxePcdGetNextTokenSpace (
   EFI_GUID            **PeiTokenSpaceTable;
   EFI_GUID            **DxeTokenSpaceTable;
   BOOLEAN             Match;
+
+  if (!FeaturePcdGet (PcdDxePcdDatabaseTraverseEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
 
   ASSERT (Guid != NULL);
   
