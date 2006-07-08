@@ -18,7 +18,6 @@ package org.tianocore.build.pcd.action;
 
 import org.apache.tools.ant.Task;
 import org.tianocore.build.pcd.action.BuildAction;
-import org.tianocore.build.pcd.action.UIAction;
 
 /** ActionMessage class take over all message for loging and waning. This class 
     should dispatch message into different Action class according to instance 
@@ -72,8 +71,6 @@ public class ActionMessage {
 
         if(thisClass instanceof Task) {
             BuildAction.logMsg(thisClass, "$$LOG$$:" + logStr);
-        } else if(thisClass instanceof UIAction) {
-            UIAction.logMsg(thisClass, "$$LOG$$:" + logStr);
         } else {
             System.out.println("$$LOG$$:" + logStr);
         }
@@ -96,8 +93,6 @@ public class ActionMessage {
 
         if(thisClass instanceof Task) {
             BuildAction.warningMsg(thisClass, "**WARNING**:" + warningStr);
-        } else if(thisClass instanceof UIAction) {
-            UIAction.warningMsg(thisClass, "**WARNING**:" + warningStr);
         } else {
             System.out.println("**WARNING**:" + warningStr);
         }
@@ -120,8 +115,6 @@ public class ActionMessage {
 
         if(thisClass instanceof Task) {
             BuildAction.logMsg(thisClass, "%%DEBUG%%:" + debugStr);
-        } else if(thisClass instanceof UIAction) {
-            UIAction.logMsg(thisClass, "%%DEBUG%%:" + debugStr);
         } else {
             System.out.println("%%DEBUG%%:" + debugStr);
         }

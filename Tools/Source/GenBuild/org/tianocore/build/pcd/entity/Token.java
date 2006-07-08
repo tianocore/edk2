@@ -279,8 +279,9 @@ public class Token {
                                  usageInstance.arch,
                                  usageInstance.version)) {
             exceptionStr = String.format("PCD %s for module %s has already exist in database, Please check all PCD build entries "+
-                                         "in modules PcdPeim in <ModuleSA> to make sure no duplicated definitions!",
+                                         "in modules %s in <ModuleSA> to make sure no duplicated definitions!",
                                          usageInstance.parentToken.cName,
+                                         usageInstance.moduleName,
                                          usageInstance.moduleName);
             throw new EntityException(exceptionStr);
         }
