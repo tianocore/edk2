@@ -118,7 +118,8 @@ GetGauge (
 STATIC GAUGE_DATA_HEADER    *mGaugeData;
 STATIC UINT32               mMaxGaugeRecords;
 
-PERFORMANCE_PROTOCOL PerformanceInterface = {
+EFI_HANDLE           mHandle = NULL;
+PERFORMANCE_PROTOCOL mPerformanceInterface = {
   StartGauge,
   EndGauge,
   GetGauge
@@ -223,21 +224,18 @@ StartGauge (
     //
     OldGaugeData      = mGaugeData;
     OldGaugeDataSize  = sizeof (GAUGE_DATA_HEADER) + sizeof (GAUGE_DATA_ENTRY) * mMaxGaugeRecords;
+
     mMaxGaugeRecords *= 2;
     GaugeDataSize     = sizeof (GAUGE_DATA_HEADER) + sizeof (GAUGE_DATA_ENTRY) * mMaxGaugeRecords;
-    Status            = gBS->AllocatePool (
-                               EfiBootServicesData,
-                               GaugeDataSize,
-                               (VOID **) &mGaugeData
-                               );
-    if (EFI_ERROR (Status)) {
-      return Status;
+    
+    mGaugeData = AllocateZeroPool (GaugeDataSize);
+    if (mGaugeData == NULL) {
+      return EFI_OUT_OF_MEMORY;
     }
     //
     // Initialize new data arry and migrate old data one. 
     //
-    mGaugeData        = ZeroMem (mGaugeData, GaugeDataSize);
-    mGaugeData        = CopyMem (mGaugeData, OldGaugeData, OldGaugeDataSize);
+    mGaugeData = CopyMem (mGaugeData, OldGaugeData, OldGaugeDataSize);
     
     gBS->FreePool (OldGaugeData); 
   }
@@ -423,31 +421,23 @@ DxeCorePerformanceLibConstructor (
   )
 {
   EFI_STATUS                Status;
-  EFI_HANDLE                Handle;
-  UINTN                     GaugeDataSize;
 
   //
   // Install the protocol interfaces.
   //
   Handle = NULL;
   Status = gBS->InstallProtocolInterface (
-                  &Handle,
+                  &mHandle,
                   &gPerformanceProtocolGuid,
                   EFI_NATIVE_INTERFACE,
-                  &PerformanceInterface
+                  &mPerformanceInterface
                   );
   ASSERT_EFI_ERROR (Status);
 
   mMaxGaugeRecords = INIT_DXE_GAUGE_DATA_ENTRIES + MAX_PEI_PERFORMANCE_LOG_ENTRIES;
-  GaugeDataSize   = sizeof (GAUGE_DATA_HEADER) + sizeof (GAUGE_DATA_ENTRY) * mMaxGaugeRecords;
-  Status = gBS->AllocatePool (
-                  EfiBootServicesData,
-                  GaugeDataSize,
-                  (VOID **) &mGaugeData
-                  );
-  ASSERT_EFI_ERROR (Status);
 
-  ZeroMem (mGaugeData, GaugeDataSize);
+  mGaugeData = AllocateZeroPool (sizeof (GAUGE_DATA_HEADER) + (sizeof (GAUGE_DATA_ENTRY) * mMaxGaugeRecords));
+  ASSERT (mGaugeData != NULL);
 
   InternalGetPeiPerformance ();
 
