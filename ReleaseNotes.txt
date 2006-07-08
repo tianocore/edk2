@@ -168,6 +168,9 @@ Java Tools:
 -------------------------------------------------------------------------------
 Quick Start
 -----------
+For editing text files under Windows, use the Wordpad application.  Notepad
+does not handle UNIX style newline characters properly.
+
 Copy the target.template file in the Tools/Conf directory to target.txt, which
 must also be in the Tools/Conf directory.
 
@@ -183,7 +186,7 @@ result in all available build possibilites when typing build.  By default EDK II
 can build a matrix of binaries, using different target types, tool chain tags and 
 architectures.  Options to target.txt file are as follows:
 
-ACTIVE_PLATFORM =  Value   REQUIRED
+ACTIVE_PLATFORM =  Value   RECOMMENDED
   Where Value is the WORKSPACE relative path and filename of a Framework Platform 
   Definition (FPD) File.  Example:
 
