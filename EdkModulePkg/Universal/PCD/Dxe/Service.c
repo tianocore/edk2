@@ -124,7 +124,7 @@ GetWorker (
           // It is a pointer type. So get the MaxSize reserved for
           // this PCD entry.
           //
-          GetPtrTypeSize (TokenNumber, &GetSize);
+          GetPtrTypeSize (TmpTokenNumber, &GetSize);
         }
         CopyMem (VaraiableDefaultBuffer, Data + VariableHead->Offset, GetSize);
         FreePool (Data);
@@ -630,7 +630,7 @@ SetWorker (
       return EFI_INVALID_PARAMETER;
     
     case PCD_TYPE_STRING:
-      if (SetPtrTypeSize (TokenNumber, Size)) {
+      if (SetPtrTypeSize (TmpTokenNumber, Size)) {
         CopyMem (&StringTable[*((UINT16 *)InternalData)], Data, *Size);
         return EFI_SUCCESS;
       } else {
@@ -639,7 +639,7 @@ SetWorker (
 
     case PCD_TYPE_HII:
       if (PtrType) {
-        if (!SetPtrTypeSize (TokenNumber, Size)) {
+        if (!SetPtrTypeSize (TmpTokenNumber, Size)) {
           return EFI_INVALID_PARAMETER;
         }
       }
@@ -662,13 +662,9 @@ SetWorker (
         return Status;
       }
       
-      //
-      // Bug Bug: Please implement this
-      //
-
     case PCD_TYPE_DATA:
       if (PtrType) {
-        if (SetPtrTypeSize (TokenNumber, Size)) {
+        if (SetPtrTypeSize (TmpTokenNumber, Size)) {
           CopyMem (InternalData, Data, *Size);
           return EFI_SUCCESS;
         } else {
