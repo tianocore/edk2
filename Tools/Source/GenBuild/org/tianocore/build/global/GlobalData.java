@@ -693,7 +693,8 @@ public class GlobalData {
         String[] commands = getToolChainInfo().getCommands();
 
         for (int i = 0; i < commands.length; ++i) {
-            if (toolsDef.getConfig().get(new String[] {target, toolchain, arch, commands[i], ToolChainAttribute.NAME.toString()}) != null) {
+            String cmdName = toolsDef.getConfig().get(new String[] {target, toolchain, arch, commands[i], ToolChainAttribute.NAME.toString()});
+            if (cmdName != null && cmdName.length() != 0) {
                 return true;
             }
         }
