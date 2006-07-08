@@ -131,7 +131,8 @@ call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 @REM
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 
 call ant -f %WORKSPACE%\Tools\build.xml C_Code
 
@@ -185,7 +186,8 @@ echo.
 set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 goto end
 
