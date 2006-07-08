@@ -243,6 +243,15 @@ public class GenBuildTask extends Ant {
                 String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
                 for(int j = 0; j < toolchainList.length; j ++){
                     //
+                    // check if any tool is defined for current target + toolchain + arch
+                    // don't do anything if no tools found
+                    // 
+                    if (GlobalData.isCommandSet(targetList[i], toolchainList[j], archList[k]) == false) {
+                        System.out.println("!!!Warning: No build issued. No tools found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
+                        continue;
+                    }
+
+                    //
                     // Prepare for toolchain related common properties
                     // TOOLCHAIN
                     //

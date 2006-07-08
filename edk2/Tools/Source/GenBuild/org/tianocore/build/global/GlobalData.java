@@ -689,6 +689,18 @@ public class GlobalData {
         moduleToolChainFamilyOption.put(fpdModuleId, toolChainOption);
     }
 
+    public static boolean isCommandSet(String target, String toolchain, String arch) {
+        String[] commands = getToolChainInfo().getCommands();
+
+        for (int i = 0; i < commands.length; ++i) {
+            if (toolsDef.getConfig().get(new String[] {target, toolchain, arch, commands[i], ToolChainAttribute.NAME.toString()}) != null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static String getCommandSetting(String[] commandDescription, FpdModuleIdentification fpdModuleId) throws EdkException {
         ToolChainKey toolChainKey = new ToolChainKey(commandDescription);
         ToolChainMap toolChainConfig = toolsDef.getConfig(); 
