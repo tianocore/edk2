@@ -31,39 +31,38 @@ public class ToolChainMap {
     private Map<ToolChainKey, String> map = null;
 
     public ToolChainMap() {
-        //this.map = new TreeMap<ToolChainKey, String>();
         this.map = new HashMap<ToolChainKey, String>();
     }
 
-    public String put(String key, String delimiter, String value)throws EdkException {
+    public String put(String key, String delimiter, String value) {
         ToolChainKey toolChainKey;
 
         try {
             toolChainKey = new ToolChainKey(key, delimiter);
         } catch (Exception e) {
-            throw new EdkException(e.getMessage());
+            return null;
         }
         return (String)map.put(toolChainKey, value);
     }
 
-    public String put(String key, String value) throws EdkException {
+    public String put(String key, String value) {
         ToolChainKey toolChainKey;
 
         try {
             toolChainKey = new ToolChainKey(key);
         } catch (Exception e) {
-            throw new EdkException(e.getMessage());
+            return null;
         }
         return (String)map.put(toolChainKey, value);
     }
 
-    public String put(String[] key, String value) throws EdkException {
+    public String put(String[] key, String value) {
         ToolChainKey toolChainKey;
 
         try {
             toolChainKey = new ToolChainKey(key);
         } catch (Exception e) {
-            throw new EdkException(e.getMessage());
+            return null;
         }
         return (String)map.put(toolChainKey, value);
     }
@@ -72,40 +71,40 @@ public class ToolChainMap {
         return (String)map.put(key, value);
     }
 
-    public String get(String key) throws EdkException {
+    public String get(String key) {
         ToolChainKey toolChainKey;
 
         try {
             toolChainKey = new ToolChainKey(key);
         } catch (Exception e) {
-            throw new EdkException(e.getMessage());
+            return null;
         }
         return get(toolChainKey);
     }
 
-    public String get(String key, String delimiter) throws EdkException {
+    public String get(String key, String delimiter) {
         ToolChainKey toolChainKey;
 
         try {
             toolChainKey = new ToolChainKey(key, delimiter);
         } catch (Exception e) {
-            throw new EdkException(e.getMessage());
+            return null;
         }
         return get(toolChainKey);
     }
 
-    public String get(String[] key)  throws EdkException {
+    public String get(String[] key) {
         ToolChainKey toolChainKey;
 
         try {
             toolChainKey = new ToolChainKey(key);
         } catch (Exception e) {
-            throw new EdkException(e.getMessage());
+            return null;
         }
         return get(toolChainKey);
     }
 
-    public String get(ToolChainKey key)  throws EdkException {
+    public String get(ToolChainKey key) {
         String result = map.get(key);
         if (result != null || map.containsKey(key)) {
             return result;
@@ -116,7 +115,7 @@ public class ToolChainMap {
         try {
             tmpKey = new ToolChainKey(keySet);
         } catch (Exception e) {
-            throw new EdkException(e.getMessage());
+            return null;
         }
 
         int level = matchLevel;
@@ -134,7 +133,7 @@ public class ToolChainMap {
                         continue;
                     }
                 } catch (Exception e) {
-                    throw new EdkException(e.getMessage());
+                    return null;
                 }
 
                 result = map.get(tmpKey);
@@ -157,9 +156,5 @@ public class ToolChainMap {
     public Set<ToolChainKey> keySet() {
         return (Set<ToolChainKey>)map.keySet();
     }
-    
-//    public String toString() {
-//        return map.toString();
-//    }
 }
 

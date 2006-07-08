@@ -267,7 +267,7 @@ public class FrameworkBuildTask extends Task{
             else {
                 envToolChainInfo.addTargets(str);
             }
-            str = getValue("TAGNAME", targetFileInfo);
+            str = getValue("TOOL_CHAIN_TAG", targetFileInfo);
             if (str == null || str.trim().equals("")) {
                 envToolChainInfo.addTagnames("*");
             }
@@ -283,7 +283,7 @@ public class FrameworkBuildTask extends Task{
             }
             GlobalData.setToolChainEnvInfo(envToolChainInfo);
             
-            str = getValue("TOOLS_DEFINITION_FILE", targetFileInfo);
+            str = getValue("TOOL_CHAIN_CONF", targetFileInfo);
             if (str != null) {
                 toolsDefFilename = str;
             }
