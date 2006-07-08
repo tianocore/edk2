@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
   <target name="cleanall">
     <delete dir="${buildDir}"/>
+    <delete file="${installLocation}/GenBuild.jar"/>
     <if>
       <available file="${installLocation}/GenBuild.jar"/>
       <then>
