@@ -157,6 +157,9 @@ public class CommandLineUserDefine {
                 for (int j = 0; j < fileNames.length; j++){
                     // execute the command
                     allSrcFiles.add(scanner.getBasedir() + "/" + fileNames[j]);
+                    if (isGccCommand) {
+                        System.out.println("[" + userdefine.getType() + "] " + fileNames[j]);
+                    }
                 }
             }
         }
