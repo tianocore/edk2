@@ -9,7 +9,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<project name="FrameworkWizard" default="all" basedir=".">
+<project name="FrameworkWizard" default="FrameworkWizard" basedir=".">
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
   <property name="WORKSPACE" value="${env.WORKSPACE}"/>
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="buildDir" value="build"/>
   <property name="resourceDir" value="rsc"/>
   <property name="installLocation" value="${WORKSPACE}/Tools/bin"/>
-  <target name="all" depends="install"/>
+  <target name="FrameworkWizard" depends="install"/>
   <target name="source">
     <mkdir dir="${buildDir}"/>
     <javac srcdir="src" destdir="${buildDir}">

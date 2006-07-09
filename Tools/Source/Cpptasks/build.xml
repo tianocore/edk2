@@ -9,13 +9,13 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<project name="CppTasks" default="all" basedir=".">
+<project name="CppTasks" default="CppTasks" basedir=".">
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
   <property name="workspace" value="${env.WORKSPACE}"/>
   <property name="buildDir" value="build"/>
   <property name="installLocation" value="${workspace}/Tools/Jars"/>
-  <target name="all" depends="install"/>
+  <target name="CppTasks" depends="install"/>
   <target name="init">
     <uptodate property="jar.newer" targetfile="${installLocation}/cpptasks.jar">
       <srcfiles dir="net" includes="**"/>

@@ -9,7 +9,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<project name="GenBuild" default="all" basedir=".">
+<project name="GenBuild" default="GenBuild" basedir=".">
 
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </path>
   <property name="buildDir" value="build"/>
   <property name="installLocation" value="${WORKSPACE}/Tools/Jars"/>
-  <target name="all" depends="install"/>
+  <target name="GenBuild" depends="install"/>
   <target name="source">
     <mkdir dir="${buildDir}"/>
     <javac srcdir="." destdir="${buildDir}">

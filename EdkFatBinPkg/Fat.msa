@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </MsaHeader>
   <ModuleDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
-    <BinaryModule>false</BinaryModule>
+    <BinaryModule>true</BinaryModule>
     <OutputFileBasename>Fat</OutputFileBasename>
   </ModuleDefinitions>
   <SourceFiles>
