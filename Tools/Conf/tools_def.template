@@ -50,7 +50,7 @@
 *_GCC_IA32_CC_NAME      = gcc
 *_GCC_IA32_SLINK_NAME   = ar
 *_GCC_IA32_DLINK_NAME   = ld
-*_GCC_IA32_ASM_NAME     = as
+*_GCC_IA32_ASM_NAME     = gcc
 *_GCC_IA32_PP_NAME      = gcc
 
 # GCC, IA32

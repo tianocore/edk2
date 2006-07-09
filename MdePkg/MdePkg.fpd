@@ -816,184 +816,184 @@
     </ModuleSA>
   </FrameworkModules>
   <BuildOptions>
-    <!-- UserDefiendAntTasks -->
-    <Options>
-      <!-- MSFT tool chain options definition : IA32 -->
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="CC">
-        "/nologo", "/W3", "/WX", "/GX", "/Gy", "/Gs-", "/c", "/D EFI32", "/D UNICODE", "/FI${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="SLINK"> "/NOLOGO" </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
-        "/NOLOGO", "/NODEFAULTLIB", "/IGNORE:4086", "/MAP", "/OPT:REF", "/MACHINE:I386", "/ALIGN:32", "/DLL", "/LTCG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASM">
-        "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
-      </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h" </Option>
-      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASL"> "/nologo" </Option>
-      
-      <!-- GCC tool chain options definition : IA32 -->
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="CC">
-        "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c", "-include ${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASM"> "--warn" </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="SLINK"> </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="DLINK">
+    <!-- UserDefiendAntTasks -->
+    <Options>
+      <!-- MSFT tool chain options definition : IA32 -->
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="CC">
+        "/nologo", "/W3", "/WX", "/GX", "/Gy", "/Gs-", "/c", "/D EFI32", "/D UNICODE", "/FI${DEST_DIR_DEBUG}/AutoGen.h"
+      </Option>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="SLINK"> "/NOLOGO" </Option>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
+        "/NOLOGO", "/NODEFAULTLIB", "/IGNORE:4086", "/MAP", "/OPT:REF", "/MACHINE:I386", "/ALIGN:32", "/DLL", "/LTCG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}"
+      </Option>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASM">
+        "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
+      </Option>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASMLINK"/>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="PP"> "/nologo", "/P", "/TC", "/FI${DEST_DIR_DEBUG}/AutoGen.h" </Option>
+      <Option ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASL"> "/nologo" </Option>
+      
+      <!-- GCC tool chain options definition : IA32 -->
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="CC">
+        "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c", "-include ${DEST_DIR_DEBUG}/AutoGen.h"
+      </Option>
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASM"> "-c", "-imacros ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="SLINK"> </Option>
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="DLINK">
         "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry _${ENTRYPOINT}"
-      </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
-
-    </Options>
-    
-	  <Ffs FfsKey="APPLICATION">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_APPLICATION" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PE32" /> 
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="BINARY">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections  EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_RAW" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="FILE">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_RAW"/> 
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="PE32_PEIM_CompressPEIM">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	      <Sections EncapsulationType="Compress">
-	        <Section SectionType="EFI_SECTION_PE32" /> 
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="PEI_CORE">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEI_CORE" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PE32"/>
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
-	      <Section SectionType="EFI_SECTION_VERSION"/>
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="PE32_PEIM_Relocatable">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
-	      <Section SectionType="EFI_SECTION_PE32"/> 
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="DXE_CORE">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DXE_CORE" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections EncapsulationType="Compress">
-	      <Section SectionType="EFI_SECTION_PE32" /> 
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	      <Section SectionType="EFI_SECTION_VERSION" /> 
-	    </Sections>
-	  </Ffs>
-	
-	
-	  <Ffs FfsKey="BS_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	        <Section SectionType="EFI_SECTION_PE32" />
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" />
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="RT_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	        <Section SectionType="EFI_SECTION_PE32" />
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" />
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
-	  <Ffs FfsKey="SAL_RT_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
-	
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
-	        <Section SectionType="EFI_SECTION_PE32" />
-	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
-	        <Section SectionType="EFI_SECTION_VERSION" />
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  	
-	  <Ffs FfsKey="COMBINED_PEIM_DRIVER">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
-	      <Section SectionType="EFI_SECTION_PE32"/> 
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
-	      <Section SectionType="EFI_SECTION_VERSION"/> 
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="PE32_PEIM">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections>
-	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
-	      <Section SectionType="EFI_SECTION_PE32"/> 
-	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
-	      <Section SectionType="EFI_SECTION_VERSION"/> 
-	    </Sections>
-	  </Ffs>
-	
-	  <Ffs FfsKey="Logo">
-	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
-	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
-	    <Sections EncapsulationType="Compress">
-	      <Sections EncapsulationType="Guid-Defined">
-	        <Section SectionType="EFI_SECTION_RAW" /> 
-	      </Sections>
-	    </Sections>
-	  </Ffs>
-	  
+      </Option>
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
+      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
+
+    </Options>
+    
+	  <Ffs FfsKey="APPLICATION">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_APPLICATION" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections EncapsulationType="Compress">
+	      <Sections EncapsulationType="Guid-Defined">
+	        <Section SectionType="EFI_SECTION_PE32" /> 
+	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
+	        <Section SectionType="EFI_SECTION_VERSION" /> 
+	      </Sections>
+	    </Sections>
+	  </Ffs>
+	
+	  <Ffs FfsKey="BINARY">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections  EncapsulationType="Compress">
+	      <Sections EncapsulationType="Guid-Defined">
+	        <Section SectionType="EFI_SECTION_RAW" /> 
+	      </Sections>
+	    </Sections>
+	  </Ffs>
+	  
+	  <Ffs FfsKey="FILE">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections>
+	      <Section SectionType="EFI_SECTION_RAW"/> 
+	    </Sections>
+	  </Ffs>
+	  
+	  <Ffs FfsKey="PE32_PEIM_CompressPEIM">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" /> 
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
+	
+	    <Sections>
+	      <Section SectionType="EFI_SECTION_PEI_DEPEX" />
+	      <Sections EncapsulationType="Compress">
+	        <Section SectionType="EFI_SECTION_PE32" /> 
+	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
+	        <Section SectionType="EFI_SECTION_VERSION" /> 
+	      </Sections>
+	    </Sections>
+	  </Ffs>
+	
+	  <Ffs FfsKey="PEI_CORE">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEI_CORE" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections>
+	      <Section SectionType="EFI_SECTION_PE32"/>
+	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+	      <Section SectionType="EFI_SECTION_VERSION"/>
+	    </Sections>
+	  </Ffs>
+	
+	  <Ffs FfsKey="PE32_PEIM_Relocatable">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections>
+	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
+	      <Section SectionType="EFI_SECTION_PE32"/> 
+	    </Sections>
+	  </Ffs>
+	
+	  <Ffs FfsKey="DXE_CORE">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DXE_CORE" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections EncapsulationType="Compress">
+	      <Section SectionType="EFI_SECTION_PE32" /> 
+	      <Section SectionType="EFI_SECTION_USER_INTERFACE" />
+	      <Section SectionType="EFI_SECTION_VERSION" /> 
+	    </Sections>
+	  </Ffs>
+	
+	
+	  <Ffs FfsKey="BS_DRIVER">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
+	
+	    <Sections EncapsulationType="Compress">
+	      <Sections EncapsulationType="Guid-Defined">
+	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
+	        <Section SectionType="EFI_SECTION_PE32" />
+	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
+	        <Section SectionType="EFI_SECTION_VERSION" />
+	      </Sections>
+	    </Sections>
+	  </Ffs>
+	  
+	  <Ffs FfsKey="RT_DRIVER">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
+	
+	    <Sections EncapsulationType="Compress">
+	      <Sections EncapsulationType="Guid-Defined">
+	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
+	        <Section SectionType="EFI_SECTION_PE32" />
+	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
+	        <Section SectionType="EFI_SECTION_VERSION" />
+	      </Sections>
+	    </Sections>
+	  </Ffs>
+	  
+	  <Ffs FfsKey="SAL_RT_DRIVER">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_DRIVER" /> 
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" /> 
+	
+	    <Sections EncapsulationType="Compress">
+	      <Sections EncapsulationType="Guid-Defined">
+	        <Section SectionType="EFI_SECTION_PEI_DEPEX" />
+	        <Section SectionType="EFI_SECTION_PE32" />
+	        <Section SectionType="EFI_SECTION_USER_INTERFACE" />
+	        <Section SectionType="EFI_SECTION_VERSION" />
+	      </Sections>
+	    </Sections>
+	  </Ffs>
+	  	
+	  <Ffs FfsKey="COMBINED_PEIM_DRIVER">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections>
+	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
+	      <Section SectionType="EFI_SECTION_PE32"/> 
+	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+	      <Section SectionType="EFI_SECTION_VERSION"/> 
+	    </Sections>
+	  </Ffs>
+	
+	  <Ffs FfsKey="PE32_PEIM">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_PEIM" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections>
+	      <Section SectionType="EFI_SECTION_PEI_DEPEX"/> 
+	      <Section SectionType="EFI_SECTION_PE32"/> 
+	      <Section SectionType="EFI_SECTION_USER_INTERFACE"/>
+	      <Section SectionType="EFI_SECTION_VERSION"/> 
+	    </Sections>
+	  </Ffs>
+	
+	  <Ffs FfsKey="Logo">
+	    <Attribute Name="FFS_FILETYPE" Value="EFI_FV_FILETYPE_FREEFORM" />
+	    <Attribute Name="FFS_ATTRIB_CHECKSUM" Value="TRUE" />
+	    <Sections EncapsulationType="Compress">
+	      <Sections EncapsulationType="Guid-Defined">
+	        <Section SectionType="EFI_SECTION_RAW" /> 
+	      </Sections>
+	    </Sections>
+	  </Ffs>
+	  
   </BuildOptions>
 </PlatformSurfaceArea>
