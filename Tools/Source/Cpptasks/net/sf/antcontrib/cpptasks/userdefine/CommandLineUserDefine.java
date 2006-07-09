@@ -39,6 +39,7 @@ public class CommandLineUserDefine {
     String outputDelimiter = null;
     
     public void command(CCTask cctask, UserDefineDef userdefine){
+        boolean isGccCommand = userdefine.getFamily().equalsIgnoreCase("GCC");
         File workdir;
         Project project = cctask.getProject();
         if(userdefine.getWorkdir() == null) {
@@ -117,6 +118,9 @@ public class CommandLineUserDefine {
         String[] libSet = userdefine.get_libset();
         if (libSet != null && libSet.length > 0){
             cmdLen = cmdLen + libSet.length;
+            if (isGccCommand) {
+                cmdLen += 2;    // we need -( and -) to group libs for GCC
+            }
         }
 
         //
@@ -190,8 +194,14 @@ public class CommandLineUserDefine {
         }
         
         if (libSet != null && libSet.length > 0){
+            if (isGccCommand) {
+                cmd[index++] = "-(";
+            }
             for (int k = 0; k < libSet.length ; k++){
                 cmd[index++] = libSet[k];
+            }
+            if (isGccCommand) {
+                cmd[index++] = "-)";
             }
         }
         for (int j = 0; j < fileNames.length; j++){
