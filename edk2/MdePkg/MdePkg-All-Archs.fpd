@@ -2605,30 +2605,6 @@
         "/NOLOGO", "/MACHINE:EBC", "/SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER", "/OPT:REF", "/NODEFAULTLIB", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}"
       </Option>
       <Option ToolChainFamily="INTEL" SupArchList="EBC" ToolCode="PP"> "-nologo", "-P", "-TC" </Option>
-        
-      <!-- GCC tool chain options definition : IA32 -->
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="CC">
-        "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c", "-include ${DEST_DIR_DEBUG}/AutoGen.h"
-      </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASM"> "--warn" </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="SLINK"> </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="DLINK">
-        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry ${ENTRYPOINT}"
-      </Option>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
-
-      <!-- BOB tool chain options definition : IA32 -->
-      <Option TagName="BOB" SupArchList="IA32" ToolCode="CC">
-        "-Os", "-fshort-wchar", "-fno-strict-aliasing", "-Wall", "-Werror", "-c"
-      </Option>
-      <Option TagName="BOB" SupArchList="IA32" ToolCode="ASM"> "--warn" </Option>
-      <Option TagName="BOB" SupArchList="IA32" ToolCode="SLINK"> </Option>
-      <Option TagName="BOB" SupArchList="IA32" ToolCode="DLINK">
-        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols"
-      </Option>
-      <Option TagName="BOB" SupArchList="IA32" ToolCode="ASMLINK"/>
-      <Option TagName="BOB" SupArchList="IA32" ToolCode="PP"> "-E" </Option>
     </Options>    
 
 	  <Ffs FfsKey="APPLICATION">

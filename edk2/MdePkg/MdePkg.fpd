@@ -840,7 +840,7 @@
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASM"> "--warn" </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="SLINK"> </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="DLINK">
-        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry ${ENTRYPOINT}"
+        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry _${ENTRYPOINT}"
       </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
