@@ -19,6 +19,7 @@ import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
@@ -1046,6 +1047,11 @@ public class FpdFlash extends IInternalFrame {
             jTextField3 = new JTextField();
             jTextField3.setEnabled(false);
             jTextField3.setPreferredSize(new Dimension(300, 20));
+            jTextField3.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    ffc.genFlashDefinitionFile(jTextField3.getText());
+                }
+            });
         }
         return jTextField3;
     }
@@ -1069,14 +1075,20 @@ public class FpdFlash extends IInternalFrame {
 
                 public void actionPerformed(ActionEvent e) {
                     // TODO Auto-generated method stub
-                    JFileChooser chooser = new JFileChooser();
+                    String wsDir = System.getenv("WORKSPACE");
+                    JFileChooser chooser = new JFileChooser(wsDir);
                     chooser.setMultiSelectionEnabled(false);
                     chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                     int retval = chooser.showOpenDialog(frame);
                     if (retval == JFileChooser.APPROVE_OPTION) {
 
                         File theFile = chooser.getSelectedFile();
-                        jTextField3.setText(theFile.getPath());
+                        String filePath = theFile.getPath();
+                        if (!filePath.startsWith(wsDir)) {
+                            JOptionPane.showMessageDialog(frame, "You can only select files in current WORKSPACE.");
+                            return;
+                        }
+                        jTextField3.setText(filePath.substring(wsDir.length() + 1).replace('\\', '/'));
                     }
                 }
                 
@@ -1305,6 +1317,11 @@ public class FpdFlash extends IInternalFrame {
             fvImageParaTableModel.addRow(saa[i]);
             ++i;
         }
+        
+//        String fdfFile = ffc.getFlashDefinitionFile();
+//        if (fdfFile != null) {
+//            jTextField3.setText(fdfFile);
+//        }
     }
     
     private void getOptionNameValue(Map<String, String> m){
