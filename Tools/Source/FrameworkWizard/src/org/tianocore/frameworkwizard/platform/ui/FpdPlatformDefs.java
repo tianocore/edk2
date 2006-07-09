@@ -527,8 +527,9 @@ public class FpdPlatformDefs extends IInternalFrame {
         if (jComboBox == null) {
             jComboBox = new JComboBox();
             jComboBox.setPreferredSize(new Dimension(100, 20));
-            jComboBox.addItem("MODULE");
             jComboBox.addItem("UNIFIED");
+            jComboBox.addItem("MODULE");
+            
             jComboBox.setSelectedIndex(0);
             jComboBox.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {

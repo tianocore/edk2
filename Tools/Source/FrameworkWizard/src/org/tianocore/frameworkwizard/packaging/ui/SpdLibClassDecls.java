@@ -86,8 +86,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private JButton jButtonClearAll = null;
 
-    private JButton jButtonOk = null;
-
     private JLabel jLabel = null;
 
     private JTextField jTextField = null;
@@ -374,23 +372,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     }
 
     /**
-      This method initializes jButton	
-      	
-      @return javax.swing.JButton	
-     **/
-    private JButton getJButtonOk() {
-        if (jButtonOk == null) {
-            jButtonOk = new JButton();
-            jButtonOk.setSize(new java.awt.Dimension(90, 20));
-            jButtonOk.setText("OK");
-            jButtonOk.setLocation(new java.awt.Point(290, 305));
-            jButtonOk.setVisible(false);
-            jButtonOk.addActionListener(this);
-        }
-        return jButtonOk;
-    }
-
-    /**
       This is the default constructor
      **/
     public SpdLibClassDecls() {
@@ -507,7 +488,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
             jContentPane.add(getJButtonClearAll(), null);
-            jContentPane.add(getJButtonOk(), null);
             
             jContentPane.add(getJTextField(), null);
             jContentPane.add(getJButtonBrowse(), null);
@@ -584,13 +564,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
      */
     public void actionPerformed(ActionEvent arg0) {
         
-        docConsole.setSaved(false);
-        if (arg0.getSource() == jButtonOk) {
-            this.save();
-            this.dispose();
-
-        }
-
         if (arg0.getSource() == jButtonAdd) {
             
             //ToDo: check before add
@@ -610,6 +583,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                 return;
             }
             model.addRow(row);
+            docConsole.setSaved(false);
             sfc.genSpdLibClassDeclarations(row[0], row[3], row[1], row[2], row[5], null, null, row[4], null, row[6]);
             
         }

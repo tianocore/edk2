@@ -41,6 +41,8 @@ import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JTextField;
+import java.awt.GridLayout;
+import javax.swing.JComboBox;
 
 public class FpdModuleSA extends JDialog implements ActionListener {
 
@@ -103,6 +105,18 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JTable jTable4 = null;
     private JButton jButton4 = null;
     private JButton jButton5 = null;
+    private JPanel jPanel9 = null;
+    private JPanel jPanel10 = null;
+    private JPanel jPanel11 = null;
+    private JPanel jPanel12 = null;
+    private JLabel jLabel9 = null;
+    private JComboBox jComboBox = null;
+    private JLabel jLabel10 = null;
+    private JTextField jTextField3 = null;
+    private JLabel jLabel11 = null;
+    private JTextField jTextField4 = null;
+    private JButton jButton6 = null;
+    private JComboBox jComboBox1 = null;
     /**
      * This is the default constructor
      */
@@ -117,13 +131,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     
     public void setKey(String k){
         this.moduleKey = k;
+        jTabbedPane.setSelectedIndex(0);
     }
 
     /**
       init will be called each time FpdModuleSA object is to be shown.
       @param key Module information.
      **/
-    public void init(String key) {
+    public void initPcdBuildDefinition(String key) {
         //
         // display pcd for key.
         //
@@ -136,6 +151,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 model.addRow(saa[i]);
             }
         }
+    }
+    
+    public void initLibraries(String key) {
         //
         // display library classes that need to be resolved. also potential instances for them.
         //
@@ -164,7 +182,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 
             }
         }
-        
+    }
+    
+    public void initModuleSAOptions(String key) {
         //
         // display module SA options
         //
@@ -295,7 +315,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // remove pcd information of instance from current ModuleSA
         //
-        ffc.removePcdDataFromLibraryInstance(moduleKey, key);
+        ffc.removePcdData(moduleKey, mi);
         //
         // remove class produced by this instance and add back these produced class to be bound.
         //
@@ -462,7 +482,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanel.add(getJPanel2(), java.awt.BorderLayout.SOUTH);
             jPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-                    init(moduleKey);
+                    initPcdBuildDefinition(moduleKey);
                 }
             });
             
@@ -484,7 +504,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanel1.add(getJPanel7(), java.awt.BorderLayout.CENTER);
             jPanel1.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-                    init(moduleKey);
+                    initLibraries(moduleKey);
                 }
             });
         }
@@ -535,32 +555,107 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         return;
                     }
                     else{
-//                        int selectedRow = lsm.getMinSelectionIndex();
+                        int selectedRow = lsm.getMinSelectionIndex();
+                        String cName = jTable.getValueAt(selectedRow, 0)+"";
+                        String[] pcdInfo = {"", ""};
+                        getPcdInfo(cName, pcdInfo);
+                        jTextArea.setText(pcdInfo[0]);
+                        initComboBox(pcdInfo[1]);
+                        jComboBox.setSelectedItem(pcdInfo[1]);
+                        jTextField3.setEnabled(true);
+                        jTextField3.setVisible(true);
+                        jTextField3.setText(jTable.getValueAt(selectedRow, 4)+"");
+                        jTextField4.setEnabled(true);
+                        jTextField4.setText(jTable.getValueAt(selectedRow, 6)+"");
+                        if (jTable.getValueAt(selectedRow, 5).equals("VOID*")) {
+                            if (pcdInfo[1].equals("FEATURE_FLAG")) {
+                                jTextField3.setVisible(false);
+                            }
+                            else if (pcdInfo[1].equals("FIXED_AT_BUILD")) {
+                                try{
+                                    jTextField3.setEnabled(false);
+                                    jTextField3.setText(ffc.setMaxSizeForPointer(jTable.getValueAt(selectedRow, 6)+"")+"");
+                                }
+                                catch(Exception except){
+                                    JOptionPane.showMessageDialog(frame, "Unacceptable PCD Value: " + except.getMessage());
+                                }
+                            }
+                            else{
+                                jTextField3.setText(jTable.getValueAt(selectedRow, 4)+"");
+                            }
+                        }
+                        else {
+                            jTextField3.setEnabled(false);
+                        }
                         
-                        
+                        if (!jTable.getValueAt(selectedRow, 2).equals("DYNAMIC") && !jTable.getValueAt(selectedRow, 2).equals("DYNAMIC_EX")) {
+                            jTextField4.setText(jTable.getValueAt(selectedRow, 6)+"");
+                            if (jTable.getValueAt(selectedRow, 2).equals("FEATURE_FLAG")){
+                                jTextField4.setVisible(false);
+                                jComboBox1.setVisible(true);
+                                jComboBox1.setSelectedItem(jTable.getValueAt(selectedRow, 6)+"");
+                            }
+                            else{
+                                jTextField4.setVisible(true);
+                                jTextField4.setEnabled(true);
+                                jComboBox1.setVisible(false);
+                            }
+                        }
+                        else{
+                            jTextField4.setEnabled(false);
+                        }
                     }
+                    
+                    
                 }
             });
             
             jTable.getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent arg0) {
                     // TODO Auto-generated method stub
-                    int row = arg0.getFirstRow();
-                    TableModel m = (TableModel)arg0.getSource();
-                    if (arg0.getType() == TableModelEvent.INSERT) {
-                        //
-                        // Set combo box values for item type according to pcd values added.
-                        //
-                        
-                    }
+//                    int row = arg0.getFirstRow();
+//                    TableModel m = (TableModel)arg0.getSource();
+                    
                     if (arg0.getType() == TableModelEvent.UPDATE){
-                        //ToDo Data Validition check.
+                        //update xml doc here.
                         
                     }
                 }
             });
         }
         return jTable;
+    }
+    
+    private void initComboBox(String originalType) {
+        jComboBox.removeAllItems();
+        jComboBox.addItem(originalType);
+        if (originalType.equals("PATCHABLE_IN_MODULE")) {
+            jComboBox.addItem("FIXED_AT_BUILD");
+        }
+        if (originalType.equals("DYNAMIC")) {
+            jComboBox.addItem("FIXED_AT_BUILD");
+            jComboBox.addItem("PATCHABLE_IN_MODULE");
+        }
+    }
+    
+    private void getPcdInfo(String cName, String[] sa) {
+        String[][] saa = new String[ffc.getLibraryInstancesCount(moduleKey)][5];
+        ffc.getLibraryInstances(moduleKey, saa);
+        
+        try{
+            if (ffc.getPcdBuildDataInfo(getModuleId(moduleKey), cName, sa)) {
+                return;
+            }
+            for (int j = 0; j < saa.length; ++j) {
+                if (ffc.getPcdBuildDataInfo(getModuleId(saa[j][1] + " " + saa[j][2] + " " + saa[j][3] + " " + saa[j][4]),
+                                            cName, sa)) {
+                    return;
+                }
+            }
+        }
+        catch(Exception e) {
+            JOptionPane.showMessageDialog(this, "Get PCD details fail: " + e.getMessage());
+        }
     }
 
     /**
@@ -573,8 +668,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jLabel5 = new JLabel();
             jLabel5.setText("PCD Description");
             jPanel2 = new JPanel();
+            jPanel2.setPreferredSize(new java.awt.Dimension(607,200));
             jPanel2.add(jLabel5, null);
             jPanel2.add(getJScrollPane1(), null);
+            jPanel2.add(getJPanel9(), null);
         }
         return jPanel2;
     }
@@ -702,24 +799,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jTable1.setRowHeight(20);
             jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-                public void valueChanged(ListSelectionEvent e) {
-                    int selectedRow1 = -1;
-                    if (e.getValueIsAdjusting()){
-                        return;
-                    }
-                    ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-                    if (lsm.isSelectionEmpty()) {
-                        return;
-                    }
-                    else{
-                        selectedRow1 = lsm.getMinSelectionIndex();
-                        
-                        
-                    }
-                }
-            });
-            
             
         }
         return jTable1;
@@ -825,23 +904,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jTable3.setRowHeight(20);
             jTable3.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            jTable3.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
-                public void valueChanged(ListSelectionEvent e) {
-                    int selectedRow3 = -1;
-                    if (e.getValueIsAdjusting()){
-                        return;
-                    }
-                    ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-                    if (lsm.isSelectionEmpty()) {
-                        return;
-                    }
-                    else{
-                        selectedRow3 = lsm.getMinSelectionIndex();
-                        
-                        
-                    }
-                }
-            });
+            
         }
         return jTable3;
     }
@@ -931,11 +994,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     model3.getValueAt(row, 2) + " " +
                     model3.getValueAt(row, 3) + " " +
                     model3.getValueAt(row, 4);
+                    ffc.genLibraryInstance(model3.getValueAt(row, 1)+"", model3.getValueAt(row, 2)+"", model3.getValueAt(row, 3)+"", model3.getValueAt(row, 4)+"", moduleKey);
                     //
                     // Add pcd information of selected instance to current moduleSA
                     //
                     try{
-                    ffc.addFrameworkModulesPcdBuildDefs(getModuleId(instanceValue), ffc.getModuleSA(moduleKey));
+                        ffc.addFrameworkModulesPcdBuildDefs(getModuleId(instanceValue), ffc.getModuleSA(moduleKey));
                     }
                     catch (Exception exception) {
                         JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
@@ -967,6 +1031,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                                    model1.getValueAt(row, 2) + " " +
                                    model1.getValueAt(row, 3) + " " +
                                    model1.getValueAt(row, 4));
+                    ffc.removeLibraryInstance(moduleKey, row);
                     model1.removeRow(row);
                     
                 }
@@ -1007,14 +1072,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent arg0) {
 
         if (arg0.getSource() == jButton2) {
-            ffc.removeLibraryInstances(moduleKey);
-            for (int i = 0; i < model1.getRowCount(); ++i) {
-                String mg = model1.getValueAt(i, 1)+"";
-                String mv = model1.getValueAt(i, 2)+"";
-                String pg = model1.getValueAt(i, 3)+"";
-                String pv = model1.getValueAt(i, 4)+"";
-                ffc.genLibraryInstance(mg, mv, pg, pv, moduleKey);
-            }
+//            ffc.removeLibraryInstances(moduleKey);
+//            for (int i = 0; i < model1.getRowCount(); ++i) {
+//                String mg = model1.getValueAt(i, 1)+"";
+//                String mv = model1.getValueAt(i, 2)+"";
+//                String pg = model1.getValueAt(i, 3)+"";
+//                String pv = model1.getValueAt(i, 4)+"";
+//                ffc.genLibraryInstance(mg, mv, pg, pv, moduleKey);
+//            }
             this.setVisible(false);
         }
     }
@@ -1043,7 +1108,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanel8.add(getJButton5(), null);
             jPanel8.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-                    init(moduleKey);
+                    initModuleSAOptions(moduleKey);
                 }
             });
         }
@@ -1242,6 +1307,217 @@ public class FpdModuleSA extends JDialog implements ActionListener {
    protected void centerWindow() {
        centerWindow(this.getSize().width, this.getSize().height);
    }
+/**
+ * This method initializes jPanel9	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanel9() {
+    if (jPanel9 == null) {
+        GridLayout gridLayout = new GridLayout();
+        gridLayout.setRows(3);
+        gridLayout.setColumns(2);
+        jPanel9 = new JPanel();
+        jPanel9.setLayout(gridLayout);
+        jPanel9.setPreferredSize(new java.awt.Dimension(600,90));
+        jPanel9.add(getJPanel12(), null);
+        jPanel9.add(getJPanel10(), null);
+        jPanel9.add(getJPanel11(), null);
+    }
+    return jPanel9;
+}
+/**
+ * This method initializes jPanel10	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanel10() {
+    if (jPanel10 == null) {
+        FlowLayout flowLayout2 = new FlowLayout();
+        flowLayout2.setAlignment(java.awt.FlowLayout.LEFT);
+        jLabel10 = new JLabel();
+        jLabel10.setText("Max Datum Size");
+        jPanel10 = new JPanel();
+        jPanel10.setLayout(flowLayout2);
+        jPanel10.add(jLabel10, null);
+        jPanel10.add(getJTextField3(), null);
+    }
+    return jPanel10;
+}
+/**
+ * This method initializes jPanel11	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanel11() {
+    if (jPanel11 == null) {
+        FlowLayout flowLayout3 = new FlowLayout();
+        flowLayout3.setAlignment(java.awt.FlowLayout.LEFT);
+        jLabel11 = new JLabel();
+        jLabel11.setText("Default Value");
+        jLabel11.setPreferredSize(new java.awt.Dimension(91,16));
+        jPanel11 = new JPanel();
+        jPanel11.setLayout(flowLayout3);
+        jPanel11.add(jLabel11, null);
+        jPanel11.add(getJTextField4(), null);
+        jPanel11.add(getJComboBox1(), null);
+    }
+    return jPanel11;
+}
+/**
+ * This method initializes jPanel12	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanel12() {
+    if (jPanel12 == null) {
+        FlowLayout flowLayout1 = new FlowLayout();
+        flowLayout1.setAlignment(java.awt.FlowLayout.LEFT);
+        jLabel9 = new JLabel();
+        jLabel9.setText("Item Type");
+        jLabel9.setPreferredSize(new java.awt.Dimension(91,16));
+        jPanel12 = new JPanel();
+        jPanel12.setLayout(flowLayout1);
+        jPanel12.add(jLabel9, null);
+        jPanel12.add(getJComboBox(), null);
+        jPanel12.add(getJButton6(), null);
+    }
+    return jPanel12;
+}
+/**
+ * This method initializes jComboBox	
+ * 	
+ * @return javax.swing.JComboBox	
+ */
+private JComboBox getJComboBox() {
+    if (jComboBox == null) {
+        jComboBox = new JComboBox();
+        jComboBox.setPreferredSize(new java.awt.Dimension(200,20));
+        jComboBox.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent e) {
+                int row = jTable.getSelectedRow();
+                if (row < 0 || jTable.getValueAt(row, 2).equals(jComboBox.getSelectedItem())) {
+                    return;
+                }
+                if (jComboBox.getItemCount() == 3) {
+                    if (!jComboBox.getSelectedItem().equals("DYNAMIC")) {
+                        pcdDynamicToNonDynamic(jTable.getValueAt(row, 0)+"", jTable.getValueAt(row, 1)+"");
+                    }
+                    else{
+                        pcdNonDynamicToDynamic(jTable.getValueAt(row, 0)+"", jTable.getValueAt(row, 1)+"");
+                    }
+                }
+            }
+        });
+    }
+    return jComboBox;
+}
+
+private void pcdDynamicToNonDynamic(String cName, String tsGuid) {
+    String[][] saa = new String[ffc.getDynamicPcdBuildDataCount()][5];
+    ffc.getDynamicPcdBuildData(saa);
+    String maxSize = "";
+    String value = "";
+    for (int i = 0; i < saa.length; ++i) {
+        if (saa[i][0].equals(cName) && saa[i][2].equals(tsGuid)) {
+            maxSize = saa[i][3];
+            value = ffc.getDynamicPcdBuildDataValue(i);
+            break;
+        }
+    }
+    
+    ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+    for (int i = 0; i < al.size(); ++i) {
+        String[] s = al.get(i).split(" ");
+        String mKey = s[0] + s[1] + s[2] + s[3];
+        ffc.updatePcdData(mKey, cName, tsGuid, jComboBox.getSelectedItem()+"", maxSize, value);
+        s[4] = jComboBox.getSelectedItem()+"";
+        al.set(i, s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" "+s[4]);
+    }
+    
+    ffc.removeDynamicPcdBuildData(cName, tsGuid);
+}
+
+private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
+    ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
+    for (int i = 0; i < al.size(); ++i) {
+        String[] s = al.get(i).split(" ");
+        String mKey = s[0] + s[1] + s[2] + s[3];
+        ffc.updatePcdData(mKey, cName, tsGuid, jComboBox.getSelectedItem()+"", jTextField3.getText(), jTextField4.isVisible() ? jTextField4.getText() : jComboBox1.getSelectedItem()+"");
+        s[4] = jComboBox.getSelectedItem()+"";
+        al.set(i, s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" "+s[4]);
+    }
+    try{
+        ffc.addDynamicPcdBuildData(cName, jTable.getValueAt(jTable.getSelectedRow(), 3), tsGuid, "DYNAMIC", jTable.getValueAt(jTable.getSelectedRow(), 5)+"", jTextField4.isVisible() ? jTextField4.getText() : jComboBox1.getSelectedItem()+"");
+    }
+    catch(Exception e){
+        JOptionPane.showMessageDialog(frame, "PCD value format: " + e.getMessage());
+    }
+}
+/**
+ * This method initializes jTextField3	
+ * 	
+ * @return javax.swing.JTextField	
+ */
+private JTextField getJTextField3() {
+    if (jTextField3 == null) {
+        jTextField3 = new JTextField();
+        jTextField3.setPreferredSize(new java.awt.Dimension(200,20));
+    }
+    return jTextField3;
+}
+/**
+ * This method initializes jTextField4	
+ * 	
+ * @return javax.swing.JTextField	
+ */
+private JTextField getJTextField4() {
+    if (jTextField4 == null) {
+        jTextField4 = new JTextField();
+        jTextField4.setPreferredSize(new java.awt.Dimension(200,20));
+    }
+    return jTextField4;
+}
+/**
+ * This method initializes jButton6	
+ * 	
+ * @return javax.swing.JButton	
+ */
+private JButton getJButton6() {
+    if (jButton6 == null) {
+        jButton6 = new JButton();
+        jButton6.setPreferredSize(new java.awt.Dimension(150,20));
+        jButton6.setText("Update PCD Data");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                int row = jTable.getSelectedRow();
+                if (row < 0) {
+                    return;
+                }
+                model.setValueAt(jComboBox.getSelectedItem(), row, 2);
+                model.setValueAt(jTextField3.getText(), row, 4);
+                model.setValueAt(jTextField4.isVisible()? jTextField4.getText():jComboBox1.getSelectedItem(), row, 6);
+                ffc.updatePcdData(moduleKey, model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"", model.getValueAt(row, 2)+"", model.getValueAt(row, 4)+"", model.getValueAt(row, 6)+"");
+            }
+        });
+    }
+    return jButton6;
+}
+/**
+ * This method initializes jComboBox1	
+ * 	
+ * @return javax.swing.JComboBox	
+ */
+private JComboBox getJComboBox1() {
+    if (jComboBox1 == null) {
+        jComboBox1 = new JComboBox();
+        jComboBox1.setPreferredSize(new java.awt.Dimension(100,20));
+        jComboBox1.setVisible(false);
+        jComboBox1.addItem("true");
+        jComboBox1.addItem("false");
+    }
+    return jComboBox1;
+}
 
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"

@@ -85,7 +85,7 @@ public class FpdFileContents {
     
     private DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions fpdDynPcdBuildDefs = null;
     
-    public static HashMap<String, ArrayList<String>> dynPcdMap = null;
+    private HashMap<String, ArrayList<String>> dynPcdMap = null;
     
     /**
      * look through all pcd data in all ModuleSA, create pcd -> ModuleSA mappings.
@@ -121,6 +121,10 @@ public class FpdFileContents {
               }
           }
       }
+    }
+    
+    public ArrayList<String> getDynPcdMapValue(String key) {
+        return dynPcdMap.get(key);
     }
     /**
      Constructor to create a new spd file
@@ -252,79 +256,39 @@ public class FpdFileContents {
             String moduleInfo = moduleSa.getModuleGuid() + " " + moduleSa.getModuleVersion() + " " +
             moduleSa.getPackageGuid()+ " " + moduleSa.getPackageVersion();
             PcdBuildDefinitionDocument.PcdBuildDefinition pcdBuildDef = moduleSa.getPcdBuildDefinition();
-            if (pcdBuildDef != null) {
-                maintainDynPcdMap(pcdBuildDef, moduleInfo);
+            if (pcdBuildDef != null && pcdBuildDef.getPcdDataList() != null) {
+                ListIterator<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> li = pcdBuildDef.getPcdDataList().listIterator();
+                while(li.hasNext()) {
+                    PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = li.next();
+                    maintainDynPcdMap(pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName(), moduleInfo);
+                }
             }
             cursor.removeXml();
         }
         cursor.dispose();
     }
     
-    private void maintainDynPcdMap(PcdBuildDefinitionDocument.PcdBuildDefinition o, String moduleInfo) {
-        XmlCursor cursor = o.newCursor();
-        boolean fromLibInstance = false;
-        if (!cursor.toFirstChild()){
+    private void maintainDynPcdMap(String pcdKey, String moduleInfo) {
+        
+        ArrayList<String> al = dynPcdMap.get(pcdKey);
+        if (al == null) {
             return;
         }
-        //
-        // deal with first child, same process in the while loop below for siblings.
-        //
-        PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
-        String pcdKey = pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName();
-        ArrayList<String> al = dynPcdMap.get(pcdKey);
+        String[] s = moduleInfo.split(" ");
         for(int i = 0; i < al.size(); ++i){
-            if (al.get(i).startsWith(moduleInfo)){
-                fromLibInstance = true;
+            String consumer = al.get(i);
+            if (consumer.contains(s[0]) && consumer.contains(s[2])){
+                al.remove(consumer);
                 break;
             }
         }
-        al.remove(moduleInfo + " " + pcdData.getItemType().toString());
+
         if (al.size() == 0) {
             dynPcdMap.remove(pcdKey);
+            String[] s1 = pcdKey.split(" ");
+            removeDynamicPcdBuildData(s1[0], s1[1]);
         }
         
-        if (pcdData.getItemType().toString().equals("DYNAMIC")) {
-            if (dynPcdMap.get(pcdKey) == null) {
-                removeDynamicPcdBuildData(pcdData.getCName(), pcdData.getTokenSpaceGuidCName());
-            }
-        }
-        if (fromLibInstance){
-            cursor.removeXml();
-        }
-        while(cursor.toNextSibling()) {
-            fromLibInstance = false;
-            pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
-            //
-            // remove each pcd record from dynPcdMap
-            //
-            pcdKey = pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName();
-            al = dynPcdMap.get(pcdKey);
-            for(int i = 0; i < al.size(); ++i){
-                if (al.get(i).startsWith(moduleInfo)){
-                    fromLibInstance = true;
-                    break;
-                }
-            }
-            al.remove(moduleInfo + " " + pcdData.getItemType().toString());
-            if (al.size() == 0) {
-                dynPcdMap.remove(pcdKey);
-            }
-            
-            if (pcdData.getItemType().toString().equals("DYNAMIC")) {
-                //
-                // First check whether this is the only consumer of this dyn pcd.
-                //
-                if (dynPcdMap.get(pcdKey) == null) {
-                    //
-                    // delete corresponding entry in DynamicPcdBuildData
-                    //
-                    removeDynamicPcdBuildData(pcdData.getCName(), pcdData.getTokenSpaceGuidCName());
-                }
-            }
-            if (fromLibInstance){
-                cursor.removeXml();
-            }
-        }
     }
     //
     // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer"
@@ -355,6 +319,128 @@ public class FpdFileContents {
             
         }
     }
+    
+    public void updatePcdData(String key, String cName, String tsGuid, String itemType, String maxSize, String value){
+        ModuleSADocument.ModuleSA msa = getModuleSA(key);
+        if (msa == null || msa.getPcdBuildDefinition() == null){
+            return;
+        }
+        
+        XmlCursor cursor = msa.getPcdBuildDefinition().newCursor();
+        if (cursor.toFirstChild()){
+            do {
+                PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
+                if (pcdData.getCName().equals(cName) && pcdData.getTokenSpaceGuidCName().equals(tsGuid)) {
+                    pcdData.setItemType(PcdItemTypes.Enum.forString(itemType));
+                    if(pcdData.getDatumType().equals("VOID*")) {
+                        pcdData.setMaxDatumSize(new Integer(maxSize));
+                    }
+                    pcdData.setValue(value);
+                    break;
+                }
+            }
+            while(cursor.toNextSibling());
+        }
+        cursor.dispose();
+    }
+    
+    /**Get original Pcd info from MSA & SPD files.
+     * @param mi ModuleIdentification from which MSA & SPD come
+     * @param cName PCD cName
+     * @param sa Results: HelpText, Original item type.
+     * @return
+     */
+    public boolean getPcdBuildDataInfo(ModuleIdentification mi, String cName, String[] sa) throws Exception{
+        try {
+           
+            ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)GlobalData.getModuleXmlObject(mi);
+            if (msa.getPcdCoded() == null) {
+                return false;
+            }
+            
+            Map<String, XmlObject> m = new HashMap<String, XmlObject>();
+            m.put("ModuleSurfaceArea", msa);
+            SurfaceAreaQuery.setDoc(m);
+            PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null);
+            //
+            // First look through MSA pcd entries.
+            //
+            List<PcdCodedDocument.PcdCoded.PcdEntry> l = msa.getPcdCoded().getPcdEntryList();
+            ListIterator li = l.listIterator();
+            while(li.hasNext()) {
+                PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
+                if (!msaPcd.getCName().equals(cName)) {
+                    continue;
+                }
+                PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
+                if (spdPcd == null) {
+                    //
+                    // ToDo Error 
+                    //
+                    throw new PcdDeclNotFound(mi.getName() + " " + msaPcd.getCName());
+                }
+                //
+                // Get Pcd help text and original item type.
+                //
+                sa[0] = spdPcd.getHelpText() + msaPcd.getHelpText();
+                sa[1] = msaPcd.getPcdItemType()+"";
+                return true;
+            }
+            
+            
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+        
+        return false;
+    }
+    
+    /**Remove PCDBuildDefinition entries from ModuleSA
+     * @param moduleKey identifier of ModuleSA.
+     * @param consumer where these entries come from.
+     */
+    public void removePcdData(String moduleKey, ModuleIdentification consumer) {
+        try {
+            ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)GlobalData.getModuleXmlObject(consumer);
+            if (msa.getPcdCoded() == null) {
+                return;
+            }
+            
+            List<PcdCodedDocument.PcdCoded.PcdEntry> l = msa.getPcdCoded().getPcdEntryList();
+            ListIterator li = l.listIterator();
+            
+            while(li.hasNext()) {
+                PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
+                ModuleSADocument.ModuleSA moduleSA = getModuleSA(moduleKey);
+                XmlCursor cursor = moduleSA.getPcdBuildDefinition().newCursor();
+                if (cursor.toFirstChild()) {
+                    PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
+                    if (msaPcd.getCName().equals(pcdData.getCName()) && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
+                        
+                        maintainDynPcdMap(pcdData.getCName()+" "+pcdData.getTokenSpaceGuidCName(), moduleKey);
+                        cursor.removeXml();
+                        break;
+                    }
+                    while (cursor.toNextSibling()) {
+                        pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
+                        if (msaPcd.getCName().equals(pcdData.getCName()) && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
+                            maintainDynPcdMap(pcdData.getCName()+" "+pcdData.getTokenSpaceGuidCName(), moduleKey);
+                            cursor.removeXml();
+                            break;
+                        }
+                    }
+                }
+                cursor.dispose();
+            }
+            
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            
+        }
+    }
     //
     // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer"
     //
@@ -382,14 +468,20 @@ public class FpdFileContents {
         }
     }
     
-    public void removeLibraryInstances(String key) {
+    public void removeLibraryInstance(String key, int i) {
         ModuleSADocument.ModuleSA msa = getModuleSA(key);
         if (msa == null || msa.getLibraries() == null){
             return ;
         }
         
         XmlCursor cursor = msa.getLibraries().newCursor();
-        cursor.removeXml();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            cursor.removeXml();
+        }
+        
         cursor.dispose();
     }
     
@@ -590,6 +682,7 @@ public class FpdFileContents {
                 // AddItem to ModuleSA PcdBuildDefinitions
                 //
                 String defaultVal = msaPcd.getDefaultValue() == null ? spdPcd.getDefaultValue() : msaPcd.getDefaultValue();
+                
                 genPcdData(msaPcd.getCName(), spdPcd.getToken(), msaPcd.getTokenSpaceGuidCName(), msaPcd.getPcdItemType().toString(), spdPcd.getDatumType()+"", defaultVal, moduleSa);
             }
             
@@ -743,7 +836,7 @@ public class FpdFileContents {
         }
     }
     
-    private int setMaxSizeForPointer(String datum) throws PcdValueMalFormed{
+    public int setMaxSizeForPointer(String datum) throws PcdValueMalFormed{
         if (datum == null) {
             return 0;
         }
@@ -849,7 +942,7 @@ public class FpdFileContents {
         }
     }
     
-    private void addDynamicPcdBuildData(String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal) 
+    public void addDynamicPcdBuildData(String cName, Object token, String tsGuid, String itemType, String dataType, String defaultVal) 
     throws PcdValueMalFormed{
         DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData dynPcdData = getfpdDynPcdBuildDefs().addNewPcdBuildData();
         dynPcdData.setItemType(PcdItemTypes.Enum.forString(itemType));
@@ -905,19 +998,27 @@ public class FpdFileContents {
         }
     }
     
-    private void removeDynamicPcdBuildData(String cName, String tsGuid) {
+    public void removeDynamicPcdBuildData(String cName, String tsGuid) {
         XmlObject o = getfpdDynPcdBuildDefs();
         
         XmlCursor cursor = o.newCursor();
         if (cursor.toFirstChild()) {
             DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData pcdBuildData = 
                 (DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData)cursor.getObject();
-            while (!(pcdBuildData.getCName().equals(cName) && pcdBuildData.getTokenSpaceGuidCName().equals(tsGuid))) {
-                cursor.toNextSibling();
-                pcdBuildData = (DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData)cursor.getObject();
+            if (pcdBuildData.getCName().equals(cName) && pcdBuildData.getTokenSpaceGuidCName().equals(tsGuid)) {
+                cursor.removeXml();
+                cursor.dispose();
+                return;
             }
-            
-            cursor.removeXml();
+            while (cursor.toNextSibling()) {
+                
+                pcdBuildData = (DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData)cursor.getObject();
+                if (pcdBuildData.getCName().equals(cName) && pcdBuildData.getTokenSpaceGuidCName().equals(tsGuid)) {
+                    cursor.removeXml();
+                    cursor.dispose();
+                    return;
+                }
+            }
         }
         cursor.dispose();
     }
@@ -1116,15 +1217,6 @@ public class FpdFileContents {
                 }
             }
         }
-    }
-    
-    public void removePcdDataFromLibraryInstance(String moduleKey, String libInstanceKey){
-        ModuleSADocument.ModuleSA moduleSa = getModuleSA(moduleKey);
-        //
-        //  should better maintain pcd from lib instance only, but maintain all is acceptable now. 
-        //
-        maintainDynPcdMap(moduleSa.getPcdBuildDefinition(), libInstanceKey);
-        
     }
     
     public BuildOptionsDocument.BuildOptions getfpdBuildOpts() {
@@ -1793,8 +1885,6 @@ public class FpdFileContents {
         
         return fdf.getStringValue();
     }
-    
-    
     
     public void genFvImagesNameValue(String name, String value) {
       

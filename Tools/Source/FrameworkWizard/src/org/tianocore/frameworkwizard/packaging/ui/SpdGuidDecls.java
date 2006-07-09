@@ -252,7 +252,9 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
        int row = arg0.getFirstRow();
        TableModel m = (TableModel)arg0.getSource();
        if (arg0.getType() == TableModelEvent.UPDATE){
+           if (docConsole != null) {
            docConsole.setSaved(false);
+           }
            updateRow(row, m);
        }
    }
