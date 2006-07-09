@@ -11,10 +11,11 @@
 # Setup the environment for unix-like systems running a bash-like shell.
 # This file must be "sourced" not executed. For example: ". edksetup.sh"
 
-if [ "$WORKSPACE" == "" ]
-then
-  echo "Please set WORKSPACE before sourcing this script."
-else
+export WORKSPACE=$(pwd)
+
+# In unix-like system, gcc is the compiler for building tools
+export TOOL_CHAIN=gcc
+
 if [ "$JAVA_HOME" == "" ]
 then
   echo "Please set JAVA_HOME before sourcing this script."
@@ -22,6 +23,10 @@ else
 if [ "$ANT_HOME" == "" ]
 then
   echo "Please set ANT_HOME before sourcing this script."
+else 
+if [ "$XMLBEANS_HOME" == "" ]
+then
+  echo "Please set XMLBEANS_HOME before sourcing this script."
 else
 
 # These should be ok as they are.
@@ -29,6 +34,10 @@ export CLASSPATH=$WORKSPACE/Tools/Jars/SurfaceArea.jar:$WORKSPACE/Tools/Jars/fra
 export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Jars/Common.jar
 export FRAMEWORK_TOOLS_PATH=$WORKSPACE/Tools/bin
 export PATH=$FRAMEWORK_TOOLS_PATH:$ANT_HOME/bin:$JAVA_HOME/bin:$PATH
+# In some unix-like system, following export is to export system's environment to user's environment
+export ANT_HOME=$ANT_HOME
+export JAVA_HOME=$JAVA_HOME
+export XMLBEANS_HOME=$XMLBEANS_HOME
 
 # Handle any particulars down here.
 case "`uname`" in
