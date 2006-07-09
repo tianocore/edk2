@@ -1839,7 +1839,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="911D584C-35F7-4955-BEF9-B452769DDC3A">
+    <!--ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="911D584C-35F7-4955-BEF9-B452769DDC3A">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -1919,7 +1919,7 @@
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
-    </ModuleSA>
+    </ModuleSA-->
     <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="9E863906-A40F-4875-977F-5B93FF237FC6">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2668,7 +2668,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="13AC6DD0-73D0-11D4-B06B-00AA00BD6DE7">
+    <!--ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="13AC6DD0-73D0-11D4-B06B-00AA00BD6DE7">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2750,7 +2750,7 @@
         <FvBinding>NULL</FvBinding>
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
-    </ModuleSA>
+    </ModuleSA-->
     <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="EBf342FE-B1D3-4EF8-957C-8048606FF670">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4149,7 +4149,7 @@
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASM"> "--warn" </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="SLINK"> </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="DLINK">
-        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry ${ENTRYPOINT}"
+        "-nostdlib", "-O2", "--gc-sections", "--dll", "--export-all-symbols", "--entry _${ENTRYPOINT}"
       </Option>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="ASMLINK"/>
       <Option ToolChainFamily="GCC" SupArchList="IA32" ToolCode="PP"> "-E", "-x assembler-with-cpp", "-include ${DEST_DIR_DEBUG}/AutoGen.h" </Option>
