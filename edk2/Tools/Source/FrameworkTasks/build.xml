@@ -9,13 +9,13 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<project name="FrameworkTasks" default="all">
+<project name="FrameworkTasks" default="FrameworkTasks">
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
   <property name="workspace" value="${env.WORKSPACE}"/>
   <property name="buildDir" value="build"/>
   <property name="installLocation" value="${workspace}/Tools/Jars"/>
-  <target name="all" depends="install"/>
+  <target name="FrameworkTasks" depends="install"/>
   <target name="source">
     <mkdir dir="${buildDir}"/>
     <javac srcdir="." destdir="${buildDir}">

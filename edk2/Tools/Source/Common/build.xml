@@ -9,14 +9,14 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<project name="Common" default="all" basedir=".">
+<project name="Common" default="Common_Jar" basedir=".">
 
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
   <property name="WORKSPACE" value="${env.WORKSPACE}"/>
   <property name="buildDir" value="build"/>
   <property name="installLocation" value="${WORKSPACE}/Tools/Jars"/>
-  <target name="all" depends="install"/>
+  <target name="Common_Jar" depends="install"/>
   <target name="source">
     <mkdir dir="${buildDir}"/>
     <javac srcdir="." destdir="${buildDir}">

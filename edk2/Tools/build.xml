@@ -13,6 +13,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <property environment="env"/>
 
+  <target name="all" depends="C_Code"/>
+
+  <target name="C_Code" depends="JavaCode">
+    <subant target="" inheritall="false">
+      <filelist dir="."
+        files="
+          Source/TianoTools/build.xml
+          "/>
+    </subant>
+  </target>
+
   <target name="JavaCode" depends="SurfaceArea">
     <subant target="" verbose="true" inheritall="false">
       <!-- Note: this is an ordered list. The projects have dependencies between them. -->
@@ -27,22 +38,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </subant>
   </target>
 
-  <target name="all" depends="C_Code"/>
-
   <target name="SurfaceArea" depends="makeCatalog">
     <subant target="" verbose="true" inheritall="false">
       <filelist dir="."
         files="
           Source/SurfaceArea/build.xml
-          "/>
-    </subant>
-  </target>
-
-  <target name="C_Code" depends="JavaCode">
-    <subant target="" inheritall="false">
-      <filelist dir="."
-        files="
-          Source/TianoTools/build.xml
           "/>
     </subant>
   </target>
