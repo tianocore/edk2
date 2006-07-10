@@ -251,10 +251,8 @@ public class AutoGen {
 		// Add #ifndef ${BaseName}_AUTOGENH
 		// #def ${BseeName}_AUTOGENH
 		//
-		fileBuffer.append("#ifndef    " + this.moduleId.getName().toUpperCase()
-				+ "_AUTOGENH\r\n");
-		fileBuffer.append("#define    " + this.moduleId.getName().toUpperCase()
-				+ "_AUTOGENH\r\n\r\n");
+		fileBuffer.append("#ifndef    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") +"\r\n");
+		fileBuffer.append("#define    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") +"\r\n\r\n");
 
 		//
 		// Write the specification version and release version at the begine
@@ -298,7 +296,7 @@ public class AutoGen {
 		// Write library class's related *.h file to autogen.h.
 		//
 		String[] libClassList = SurfaceAreaQuery
-				.getLibraryClasses(CommonDefinition.AlwaysConsumed);
+				.getLibraryClasses(CommonDefinition.AlwaysConsumed,this.arch);
 		if (libClassList != null) {
 			libClassIncludeH = LibraryClassToAutogenH(libClassList);
 			item = libClassIncludeH.iterator();
@@ -308,7 +306,7 @@ public class AutoGen {
 		}
 
 		libClassList = SurfaceAreaQuery
-				.getLibraryClasses(CommonDefinition.AlwaysProduced);
+				.getLibraryClasses(CommonDefinition.AlwaysProduced, this.arch);
 		if (libClassList != null) {
 			libClassIncludeH = LibraryClassToAutogenH(libClassList);
 			item = libClassIncludeH.iterator();
@@ -493,10 +491,8 @@ public class AutoGen {
 		// Add #ifndef ${BaseName}_AUTOGENH
 		// #def ${BseeName}_AUTOGENH
 		//
-		fileBuffer.append("#ifndef    " + this.moduleId.getName().toUpperCase()
-				+ "_AUTOGENH\r\n");
-		fileBuffer.append("#define    " + this.moduleId.getName().toUpperCase()
-				+ "_AUTOGENH\r\n\r\n");
+		fileBuffer.append("#ifndef    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") + "\r\n");
+		fileBuffer.append("#define    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") + "\r\n\r\n");
 
 		//
 		// Write EFI_SPECIFICATION_VERSION and EDK_RELEASE_VERSION
@@ -528,7 +524,7 @@ public class AutoGen {
 		// Write library class's related *.h file to autogen.h
 		//
 		String[] libClassList = SurfaceAreaQuery
-				.getLibraryClasses(CommonDefinition.AlwaysConsumed);
+				.getLibraryClasses(CommonDefinition.AlwaysConsumed, this.arch);
 		if (libClassList != null) {
 			libClassIncludeH = LibraryClassToAutogenH(libClassList);
 			item = libClassIncludeH.iterator();
@@ -538,7 +534,7 @@ public class AutoGen {
 		}
 
 		libClassList = SurfaceAreaQuery
-				.getLibraryClasses(CommonDefinition.AlwaysProduced);
+				.getLibraryClasses(CommonDefinition.AlwaysProduced, this.arch);
 		if (libClassList != null) {
 			libClassIncludeH = LibraryClassToAutogenH(libClassList);
 			item = libClassIncludeH.iterator();
@@ -1772,7 +1768,7 @@ public class AutoGen {
 		if (compDiagList != null && compDiagList.length != 0) {
 			if (drvBindList.length != compDiagList.length) {
 				throw new BuildException(
-						"Different number of Driver Binding and Driver Configuration protocols!");
+						"Different number of Driver Binding and Driver Diagnosis protocols!");
 			}
 
 			BitMask |= 0x04;

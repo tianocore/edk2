@@ -158,7 +158,7 @@ public class GenBuildTask extends Ant {
             SurfaceAreaQuery.setDoc(doc);
             moduleId = SurfaceAreaQuery.getMsaHeader();
         }
-        String[] producedLibraryClasses = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED");
+        String[] producedLibraryClasses = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED",null);
         if (producedLibraryClasses.length == 0) {
             moduleId.setLibrary(false);
         }

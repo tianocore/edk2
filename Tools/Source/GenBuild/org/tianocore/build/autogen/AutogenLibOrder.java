@@ -76,7 +76,7 @@ public class AutogenLibOrder {
             // libInstanceMap.
             //
             libClassConsmList = SurfaceAreaQuery
-                    .getLibraryClasses(CommonDefinition.AlwaysConsumed);
+                    .getLibraryClasses(CommonDefinition.AlwaysConsumed, arch);
             if (libClassConsmList != null) {
                 String[] classStr = new String[libClassConsmList.length];
                 for (int k = 0; k < libClassConsmList.length; k++) {
@@ -95,7 +95,7 @@ public class AutogenLibOrder {
             // Add library class and library instance map.
             //
             libClassDeclList = SurfaceAreaQuery
-                    .getLibraryClasses(CommonDefinition.AlwaysProduced);
+                    .getLibraryClasses(CommonDefinition.AlwaysProduced, arch);
             if (libClassDeclList != null) {
                 for (int j = 0; j < libClassDeclList.length; j++) {
                     if (this.libClassMap.containsKey(libClassDeclList[j])) {
