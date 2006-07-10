@@ -190,7 +190,6 @@ public class PlatformBuildFileGenerator {
             xformer.setOutputProperty(OutputKeys.INDENT, "yes");
             xformer.transform(source, result);
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new BuildException("Generate " + platformName + "_build.xml failed. \n" + ex.getMessage());
         }
     }
