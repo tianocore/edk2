@@ -25,10 +25,10 @@
 //
 // Replaced by PCD
 //
-#define ICH_SMBUS_BASE_ADDRESS               0xEFA0
+#define ICH_SMBUS_IO_BASE_ADDRESS               0xEFA0
 
 /**
-  Reads an 8-bit SMBUS register on ICH.
+  Reads an 8-bit register on ICH SMBUS controller.
 
   This internal function reads an SMBUS register specified by Offset.
 
@@ -42,11 +42,11 @@ InternalSmBusIoRead8 (
   IN UINTN      Offset
   )
 {
-  return IoRead8 (ICH_SMBUS_BASE_ADDRESS + Offset);
+  return IoRead8 (ICH_SMBUS_IO_BASE_ADDRESS + Offset);
 }
 
 /**
-  Writes an 8-bit SMBUS register on ICH.
+  Writes an 8-bit register on ICH SMBUS controller.
 
   This internal function writes an SMBUS register specified by Offset.
 
@@ -62,7 +62,7 @@ InternalSmBusIoWrite8 (
   IN UINT8      Value
   )
 {
-  return IoWrite8 (ICH_SMBUS_BASE_ADDRESS + Offset, Value);
+  return IoWrite8 (ICH_SMBUS_IO_BASE_ADDRESS + Offset, Value);
 }
 
 /**
@@ -89,31 +89,29 @@ InternalSmBusAcquire (
     return RETURN_TIMEOUT;
   } else if ((HostStatus & SMBUS_B_HOST_BUSY) != 0) {
     //
-    // Clear Status Register and exit
+    // Clear host status register and exit.
     //
     InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);
     return RETURN_TIMEOUT;
   }
   //
-  // Clear byte pointer of 32-byte buffer.
+  // Clear out any odd status information (Will Not Clear In Use).
   //
-  InternalSmBusIoRead8 (SMBUS_R_HST_CTL);
-  //
-  // Clear BYTE_DONE status
-  //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_BYTE_DONE_STS);
+  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, HostStatus);
   
   return RETURN_SUCCESS;
 }
 
 /**
-  Waits until the completion of SMBUS transaction.
+  Starts the SMBUS transaction and waits until the end.
 
-  This internal function waits until the transaction of SMBUS is over
-  by polling the INTR bit of Host status register.
+  This internal function start the SMBUS transaction and waits until the transaction
+  of SMBUS is over by polling the INTR bit of Host status register.
   If the SMBUS is not available, RETURN_TIMEOUT is returned;
   Otherwise, it performs some basic initializations and returns
-  RETURN_SUCCESS. 
+  RETURN_SUCCESS.
+  
+  @param  HostControl         The Host control command to start SMBUS transaction.
 
   @retval RETURN_SUCCESS      The SMBUS command was executed successfully.
   @retval RETURN_CRC_ERROR    The checksum is not correct (PEC is incorrect).
@@ -124,18 +122,21 @@ InternalSmBusAcquire (
 
 **/
 RETURN_STATUS
-InternalSmBusWait (
-  VOID 
+InternalSmBusStart (
+  IN  UINT8                   HostControl
   )
 {
   UINT8   HostStatus;
   UINT8   AuxiliaryStatus;
-  BOOLEAN First;
-  First = TRUE;
+
+  //
+  // Set Host Control Register (Initiate Operation, Interrupt disabled).
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CTL, HostControl + SMBUS_B_START);
 
   do {
     //
-    // Poll INTR bit of host status register.
+    // Poll INTR bit of Host Status Register.
     //
     HostStatus = InternalSmBusIoRead8 (SMBUS_R_HST_STS);
   } while ((HostStatus & (SMBUS_B_INTR | SMBUS_B_ERROR | SMBUS_B_BYTE_DONE_STS)) == 0);
@@ -144,11 +145,11 @@ InternalSmBusWait (
     return RETURN_SUCCESS;
   }
   //
-  // Clear error bits of host status register
+  // Clear error bits of Host Status Register.
   //
   InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_ERROR);
   //
-  // Read auxiliary status register to judge CRC error.
+  // Read Auxiliary Status Register to judge CRC error.
   //
   AuxiliaryStatus = InternalSmBusIoRead8 (SMBUS_R_AUX_STS);
   if ((AuxiliaryStatus & SMBUS_B_CRCE) != 0) {
@@ -159,64 +160,85 @@ InternalSmBusWait (
 }
 
 /**
-  Executes an SMBUS quick read/write command.
+  Executes an SMBUS quick, byte or word command.
 
-  This internal function executes an SMBUS quick read/write command
-  on the SMBUS device specified by SmBusAddress.
-  Only the SMBUS slave address field of SmBusAddress is required.
+  This internal function executes an SMBUS quick, byte or word commond.
   If Status is not NULL, then the status of the executed command is returned in Status.
 
+  @param  HostControl     The value of Host Control Register to set.  
   @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
                           SMBUS Command, SMBUS Data Length, and PEC.
+  @param  Value           The byte/word write to the SMBUS.
   @param  Status          Return status for the executed command.
                           This is an optional parameter and may be NULL.
 
+  @return The byte/word read from the SMBUS.
+
 **/
-VOID
-EFIAPI
-InternalSmBusQuick (
+UINT16
+InternalSmBusNonBlock (
+  IN  UINT8                     HostControl,
   IN  UINTN                     SmBusAddress,
-  OUT RETURN_STATUS             *Status       OPTIONAL
+  IN  UINT16                    Value,
+  OUT RETURN_STATUS             *Status
   )
 {
-  RETURN_STATUS   ReturnStatus;
+  RETURN_STATUS                 ReturnStatus;
+  UINT8                         AuxiliaryControl;
 
+  //
+  // Try to acquire the ownership of ICH SMBUS.
+  //
   ReturnStatus = InternalSmBusAcquire ();
   if (RETURN_ERROR (ReturnStatus)) {
     goto Done;
   }
- 
   //
-  // Set Command register
+  // Set the appropriate Host Control Register and auxiliary Control Register.
   //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_CMD, 0);
+  AuxiliaryControl = 0;
+  if (SMBUS_LIB_PEC (SmBusAddress)) {
+    AuxiliaryControl |= SMBUS_B_AAC;
+    HostControl      |= SMBUS_B_PEC_EN;
+  }
   //
-  // Set Auxiliary Control register
+  // Set Host Commond Register.
   //
-  InternalSmBusIoWrite8 (SMBUS_R_AUX_CTL, 0);
+  InternalSmBusIoWrite8 (SMBUS_R_HST_CMD, (UINT8) SMBUS_LIB_COMMAND (SmBusAddress));
   //
-  // Set SMBus slave address for the device to send/receive from
+  // Write value to Host Data 0 and Host Data 1 Registers.
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_HST_D0, (UINT8) Value);
+  InternalSmBusIoWrite8 (SMBUS_R_HST_D1, (UINT8) (Value >> 8));
+  //
+  // Set Auxiliary Control Regiester.
+  //
+  InternalSmBusIoWrite8 (SMBUS_R_AUX_CTL, AuxiliaryControl);
+  //
+  // Set SMBUS slave address for the device to send/receive from.
   //
   InternalSmBusIoWrite8 (SMBUS_R_XMIT_SLVA, (UINT8) SmBusAddress);
   //
-  // Set Control Register (Initiate Operation, Interrupt disabled)
+  // Start the SMBUS transaction and wait for the end.
   //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_CTL, SMBUS_V_SMB_CMD_QUICK + SMBUS_B_START);
-
+  ReturnStatus = InternalSmBusStart (HostControl);
   //
-  // Wait for the end
+  // Read value from Host Data 0 and Host Data 1 Registers.
   //
-  ReturnStatus = InternalSmBusWait ();
-
+  Value  = InternalSmBusIoRead8 (SMBUS_R_HST_D1) << 8;
+  Value |= InternalSmBusIoRead8 (SMBUS_R_HST_D0);
   //
-  // Clear status register and exit
+  // Clear Host Status Register and Auxiliary Status Register.
   //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);;
+  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);
+  InternalSmBusIoWrite8 (SMBUS_R_AUX_STS, SMBUS_B_CRCE);
 
 Done:
   if (Status != NULL) {
     *Status = ReturnStatus;
   }
+
+  return Value;
 }
 
 /**
@@ -248,7 +270,12 @@ SmBusQuickRead (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  InternalSmBusQuick (SmBusAddress | SMBUS_B_READ, Status);
+  InternalSmBusNonBlock (
+    SMBUS_V_SMB_CMD_QUICK,
+    SmBusAddress | SMBUS_B_READ,
+    0,
+    Status
+    );
 }
 
 /**
@@ -280,88 +307,12 @@ SmBusQuickWrite (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  InternalSmBusQuick (SmBusAddress | SMBUS_B_WRITE, Status);
-}
-
-/**
-  Executes an SMBUS byte or word command.
-
-  This internal function executes an .
-  Only the SMBUS slave address field of SmBusAddress is required.
-  If Status is not NULL, then the status of the executed command is returned in Status.
-
-  @param  HostControl     The value of Host Control Register to set.  
-  @param  SmBusAddress    Address that encodes the SMBUS Slave Address,
-                          SMBUS Command, SMBUS Data Length, and PEC.
-  @param  Value           The byte/word write to the SMBUS.
-  @param  Status          Return status for the executed command.
-                          This is an optional parameter and may be NULL.
-
-  @return The byte/word read from the SMBUS.
-
-**/
-UINT16
-InternalSmBusByteWord (
-  IN  UINT8                     HostControl,
-  IN  UINTN                     SmBusAddress,
-  IN  UINT16                    Value,
-  OUT RETURN_STATUS             *Status
-  )
-{
-  RETURN_STATUS                 ReturnStatus;
-  UINT8                         AuxiliaryControl;
-
-  ReturnStatus = InternalSmBusAcquire ();
-  if (RETURN_ERROR (ReturnStatus)) {
-    goto Done;
-  }
-
-  AuxiliaryControl = 0;
-  if (SMBUS_LIB_PEC (SmBusAddress)) {
-    AuxiliaryControl |= SMBUS_B_AAC;
-    HostControl      |= SMBUS_B_PEC_EN;
-  }
- 
-  //
-  // Set commond register
-  //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_CMD, (UINT8) SMBUS_LIB_COMMAND (SmBusAddress));
-
-  InternalSmBusIoWrite8 (SMBUS_R_HST_D0, (UINT8) Value);
-  InternalSmBusIoWrite8 (SMBUS_R_HST_D1, (UINT8) (Value >> 8));
-
-  //
-  // Set Auxiliary Control Regiester.
-  //
-  InternalSmBusIoWrite8 (SMBUS_R_AUX_CTL, AuxiliaryControl);
-  //
-  // Set SMBus slave address for the device to send/receive from.
-  //
-  InternalSmBusIoWrite8 (SMBUS_R_XMIT_SLVA, (UINT8) SmBusAddress);
-  //
-  // Set Control Register (Initiate Operation, Interrupt disabled)
-  //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_CTL, HostControl + SMBUS_B_START);
-
-  //
-  // Wait for the end
-  //
-  ReturnStatus = InternalSmBusWait ();
- 
-  Value  = InternalSmBusIoRead8 (SMBUS_R_HST_D1) << 8;
-  Value |= InternalSmBusIoRead8 (SMBUS_R_HST_D0);
-
-  //
-  // Clear status register and exit
-  //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);;
-
-Done:
-  if (Status != NULL) {
-    *Status = ReturnStatus;
-  }
-
-  return Value;
+  InternalSmBusNonBlock (
+    SMBUS_V_SMB_CMD_QUICK,
+    SmBusAddress | SMBUS_B_WRITE,
+    0,
+    Status
+    );
 }
 
 /**
@@ -394,7 +345,7 @@ SmBusReceiveByte (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return (UINT8) InternalSmBusByteWord (
+  return (UINT8) InternalSmBusNonBlock (
                    SMBUS_V_SMB_CMD_BYTE,
                    SmBusAddress | SMBUS_B_READ,
                    0,
@@ -434,7 +385,7 @@ SmBusSendByte (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return (UINT8) InternalSmBusByteWord (
+  return (UINT8) InternalSmBusNonBlock (
                    SMBUS_V_SMB_CMD_BYTE,
                    SmBusAddress | SMBUS_B_WRITE,
                    Value,
@@ -470,7 +421,7 @@ SmBusReadDataByte (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return (UINT8) InternalSmBusByteWord (
+  return (UINT8) InternalSmBusNonBlock (
                    SMBUS_V_SMB_CMD_BYTE_DATA,
                    SmBusAddress | SMBUS_B_READ,
                    0,
@@ -509,7 +460,7 @@ SmBusWriteDataByte (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return (UINT8) InternalSmBusByteWord (
+  return (UINT8) InternalSmBusNonBlock (
                    SMBUS_V_SMB_CMD_BYTE_DATA,
                    SmBusAddress | SMBUS_B_WRITE,
                    Value,
@@ -545,7 +496,7 @@ SmBusReadDataWord (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return InternalSmBusByteWord (
+  return InternalSmBusNonBlock (
            SMBUS_V_SMB_CMD_WORD_DATA,
            SmBusAddress | SMBUS_B_READ,
            0,
@@ -584,7 +535,7 @@ SmBusWriteDataWord (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return InternalSmBusByteWord (
+  return InternalSmBusNonBlock (
            SMBUS_V_SMB_CMD_WORD_DATA,
            SmBusAddress | SMBUS_B_WRITE,
            Value,
@@ -623,7 +574,7 @@ SmBusProcessCall (
   ASSERT (SMBUS_LIB_LENGTH (SmBusAddress)    == 0);
   ASSERT (SMBUS_LIB_RESEARVED (SmBusAddress) == 0);
 
-  return InternalSmBusByteWord (
+  return InternalSmBusNonBlock (
            SMBUS_V_SMB_CMD_PROCESS_CALL,
            SmBusAddress | SMBUS_B_WRITE,
            Value,
@@ -666,61 +617,77 @@ InternalSmBusBlock (
   UINTN                         Index;
   UINTN                         BytesCount;
   UINT8                         AuxiliaryControl;
-
+  
   BytesCount = SMBUS_LIB_LENGTH (SmBusAddress);
-
+  //
+  // Try to acquire the ownership of ICH SMBUS.
+  //
   ReturnStatus = InternalSmBusAcquire ();
   if (RETURN_ERROR (ReturnStatus)) {
     goto Done;
   }
-  
+  //
+  // Set the appropriate Host Control Register and auxiliary Control Register.
+  //
   AuxiliaryControl = SMBUS_B_E32B;
   if (SMBUS_LIB_PEC (SmBusAddress)) {
     AuxiliaryControl |= SMBUS_B_AAC;
     HostControl      |= SMBUS_B_PEC_EN;
   }
-
+  //
+  // Set Host Command Register.
+  //
   InternalSmBusIoWrite8 (SMBUS_R_HST_CMD, (UINT8) SMBUS_LIB_COMMAND (SmBusAddress));
-
-  InternalSmBusIoWrite8 (SMBUS_R_HST_D0, (UINT8) BytesCount);
-
-  if (WriteBuffer != NULL) {
-    for (Index = 0; Index < BytesCount; Index++) {
-      InternalSmBusIoWrite8 (SMBUS_R_HOST_BLOCK_DB, WriteBuffer[Index]);
-    }
-  }
   //
   // Set Auxiliary Control Regiester.
   //
   InternalSmBusIoWrite8 (SMBUS_R_AUX_CTL, AuxiliaryControl);
   //
-  // Set SMBus slave address for the device to send/receive from
+  // Clear byte pointer of 32-byte buffer.
+  //
+  InternalSmBusIoRead8 (SMBUS_R_HST_CTL);
+
+  if (WriteBuffer != NULL) {
+    //
+    // Write the number of block to Host Block Data Byte Register.
+    //
+    InternalSmBusIoWrite8 (SMBUS_R_HST_D0, (UINT8) BytesCount);
+    //
+    // Write data block to Host Block Data Register.
+    //
+    for (Index = 0; Index < BytesCount; Index++) {
+      InternalSmBusIoWrite8 (SMBUS_R_HOST_BLOCK_DB, WriteBuffer[Index]);
+    }
+  }
+  //
+  // Set SMBUS slave address for the device to send/receive from.
   //
   InternalSmBusIoWrite8 (SMBUS_R_XMIT_SLVA, (UINT8) SmBusAddress);
   //
-  // Set Control Register (Initiate Operation, Interrupt disabled)
+  // Start the SMBUS transaction and wait for the end.
   //
-  InternalSmBusIoWrite8 (SMBUS_R_HST_CTL, HostControl + SMBUS_B_START);
-
-  //
-  // Wait for the end
-  //
-  ReturnStatus = InternalSmBusWait ();
+  ReturnStatus = InternalSmBusStart (HostControl);
   if (RETURN_ERROR (ReturnStatus)) {
     goto Done;
   }
 
-  BytesCount = InternalSmBusIoRead8 (SMBUS_R_HST_D0);
   if (ReadBuffer != NULL) {
+    //
+    // Read the number of block from host block data byte register.
+    //
+    BytesCount = InternalSmBusIoRead8 (SMBUS_R_HST_D0);
+    //
+    // Write data block from Host Block Data Register.
+    //
     for (Index = 0; Index < BytesCount; Index++) {
       ReadBuffer[Index] = InternalSmBusIoRead8 (SMBUS_R_HOST_BLOCK_DB);
     }
   }
-
   //
-  // Clear status register and exit
+  // Clear Host Status Register and Auxiliary Status Register.
   //
   InternalSmBusIoWrite8 (SMBUS_R_HST_STS, SMBUS_B_HSTS_ALL);
+  InternalSmBusIoWrite8 (SMBUS_R_AUX_STS, SMBUS_B_CRCE);
 
 Done:
   if (Status != NULL) {
