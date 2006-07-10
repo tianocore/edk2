@@ -237,6 +237,7 @@
     <xs:complexType>
       <xs:sequence minOccurs="1">
         <xs:element minOccurs="0" maxOccurs="1" name="PcdIsDriver" type="PcdDriverTypes"/>
+        <xs:element minOccurs="0" maxOccurs="1" name="TianoR8FlashMap_h" type="xs:boolean" default="false"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="Specification" type="Sentence"/>
         <xs:element minOccurs="0" maxOccurs="unbounded" name="Extern">
           <xs:complexType>
