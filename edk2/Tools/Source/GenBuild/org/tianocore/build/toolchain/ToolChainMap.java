@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.tianocore.exception.EdkException;
-
 public class ToolChainMap {
 
     private int matchLevel = ToolChainKey.keyLength - 2;

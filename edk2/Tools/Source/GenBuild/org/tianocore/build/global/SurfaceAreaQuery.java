@@ -397,7 +397,6 @@ public class SurfaceAreaQuery {
         String toolchainFamily = null;
         List<String> archList = null;
         String cmd = null;
-        String targetName = null;
         String optionName = null;
 
         Object[] returns = get(from, xPath);
@@ -1385,8 +1384,20 @@ public class SurfaceAreaQuery {
         return result;
     }
     
-    public static Node getFpdUserExtension() {
-        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore']" }; 
+    public static Node getFpdUserExtensionPreBuild() {
+        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore' and @Identifier='0']" }; 
+
+        Object[] queryResult = get("PlatformSurfaceArea", xPath);
+        if (queryResult == null || queryResult.length == 0) {
+            return null;
+        }
+        UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)queryResult[0];
+        
+        return a.getDomNode();
+    }
+    
+    public static Node getFpdUserExtensionPostBuild() {
+        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore' and @Identifier='1']" }; 
 
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
         if (queryResult == null || queryResult.length == 0) {

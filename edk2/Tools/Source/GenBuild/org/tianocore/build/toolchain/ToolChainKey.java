@@ -18,12 +18,6 @@ Abstract:
 
 package org.tianocore.build.toolchain;
 
-import java.io.Serializable;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.tianocore.exception.EdkException;
 
 public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainKey> {
