@@ -1295,18 +1295,21 @@ PciCf8ReadBuffer (
   OUT     VOID                      *Buffer
   )
 {
-  UINTN                             EndAddress;
+  UINTN                             ReturnValue;
 
-  ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
+  ASSERT_INVALID_PCI_ADDRESS (StartAddress);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
 
   if (Size == 0) {
-    return 0;
+    return Size;
   }
 
   ASSERT (Buffer != NULL);
 
-  EndAddress = StartAddress + Size;
+  //
+  // Save Size for return
+  //
+  ReturnValue = Size;
 
   if ((StartAddress & 1) != 0) {
     //
@@ -1314,44 +1317,48 @@ PciCf8ReadBuffer (
     //
     *(UINT8*)Buffer = PciCf8Read8 (StartAddress);
     StartAddress += sizeof (UINT8);
+    Size -= sizeof (UINT8);
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if ((StartAddress < EndAddress) && ((StartAddress & 2) != 0)) {
+  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
     //
     // Read a word if StartAddress is word aligned
     //
     *(UINT16*)Buffer = PciCf8Read16 (StartAddress);
     StartAddress += sizeof (UINT16);
+    Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  while ((EndAddress - StartAddress) >= 4) {
+  while (Size >= sizeof (UINT32)) {
     //
     // Read as many double words as possible
     //
     *(UINT32*)Buffer = PciCf8Read32 (StartAddress);
     StartAddress += sizeof (UINT32);
+    Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
   }
 
-  if ((EndAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16)) {
     //
     // Read the last remaining word if exist
     //
     *(UINT16*)Buffer = PciCf8Read16 (StartAddress);
     StartAddress += sizeof (UINT16);
+    Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  if ((EndAddress & 1) != 0) {
+  if (Size >= sizeof (UINT8)) {
     //
     // Read the last remaining byte if exist
     //
     *(UINT8*)Buffer = PciCf8Read8 (StartAddress);
   }
 
-  return Size;
+  return ReturnValue;
 }
 
 /**
@@ -1387,61 +1394,68 @@ PciCf8WriteBuffer (
   IN      VOID                      *Buffer
   )
 {
-  UINTN                             EndAddress;
+  UINTN                             ReturnValue;
 
-  ASSERT_INVALID_PCI_ADDRESS (StartAddress, 0);
+  ASSERT_INVALID_PCI_ADDRESS (StartAddress);
   ASSERT (((StartAddress & 0xFFF) + Size) <= 0x100);
 
   if (Size == 0) {
     return 0;
   }
 
-  ASSERT (Buffer != 0);
+  ASSERT (Buffer != NULL);
 
-  EndAddress = StartAddress + Size;
+  //
+  // Save Size for return
+  //
+  ReturnValue = Size;
 
-  if ((StartAddress & 1)!= 0) {
+  if ((StartAddress & 1) != 0) {
     //
     // Write a byte if StartAddress is byte aligned
     //
     PciCf8Write8 (StartAddress, *(UINT8*)Buffer);
     StartAddress += sizeof (UINT8);
+    Size -= sizeof (UINT8);
     Buffer = (UINT8*)Buffer + 1;
   }
 
-  if ((StartAddress < EndAddress) && ((StartAddress & 2) != 0)) {
+  if (Size >= sizeof (UINT16) && (StartAddress & 2) != 0) {
     //
     // Write a word if StartAddress is word aligned
     //
     PciCf8Write16 (StartAddress, *(UINT16*)Buffer);
     StartAddress += sizeof (UINT16);
+    Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  while ((EndAddress - StartAddress) >= 4) {
+  while (Size >= sizeof (UINT32)) {
     //
     // Write as many double words as possible
     //
     PciCf8Write32 (StartAddress, *(UINT32*)Buffer);
     StartAddress += sizeof (UINT32);
+    Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
   }
 
-  if ((EndAddress & 2) != 0) {
+  if (Size >= sizeof (UINT16)) {
     //
     // Write the last remaining word if exist
     //
     PciCf8Write16 (StartAddress, *(UINT16*)Buffer);
     StartAddress += sizeof (UINT16);
+    Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
   }
 
-  if ((EndAddress & 1) != 0) {
+  if (Size >= sizeof (UINT8)) {
     //
     // Write the last remaining byte if exist
     //
     PciCf8Write8 (StartAddress, *(UINT8*)Buffer);
   }
 
-  return Size;
+  return ReturnValue;
 }
