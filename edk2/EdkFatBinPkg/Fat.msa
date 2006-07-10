@@ -32,7 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <SourceFiles>
     <Filename SupArchList="IA32">Ia32/Fat.FFS</Filename>
     <Filename SupArchList="IPF">Ipf/Fat.FFS</Filename>
-    <Filename SupArchList="X64">X64Fat.FFS</Filename>
+    <Filename SupArchList="X64">X64/Fat.FFS</Filename>
   </SourceFiles>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
