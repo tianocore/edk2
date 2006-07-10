@@ -46,7 +46,7 @@
   </PackageDependencies>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>StatusCodeDataTypeDebug</GuidCName>
+      <GuidCName>gEfiStatusCodeDataTypeDebugGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>
@@ -56,20 +56,17 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugPropertyMask</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugClearMemoryValue</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

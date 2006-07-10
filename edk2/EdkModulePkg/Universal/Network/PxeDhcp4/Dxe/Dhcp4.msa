@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Dhcp4</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
@@ -69,16 +69,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PxeDhcp4Callback</ProtocolCName>
+      <ProtocolCName>gEfiPxeDhcp4CallbackProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="BY_START">
-      <ProtocolCName>PxeDhcp4</ProtocolCName>
+      <ProtocolCName>gEfiPxeDhcp4ProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleNetwork</ProtocolCName>
+      <ProtocolCName>gEfiSimpleNetworkProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>PxeBaseCode</ProtocolCName>
+      <ProtocolCName>gEfiPxeBaseCodeProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

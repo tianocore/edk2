@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>BC</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
@@ -79,28 +79,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="TO_START">
-      <ProtocolCName>Bis</ProtocolCName>
+      <ProtocolCName>gEfiBisProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="BY_START">
-      <ProtocolCName>LoadFile</ProtocolCName>
+      <ProtocolCName>gEfiLoadFileProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_PRODUCED">
-      <ProtocolCName>PxeBaseCodeCallBack</ProtocolCName>
+      <ProtocolCName>gEfiPxeBaseCodeCallbackProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>SimpleNetwork</ProtocolCName>
+      <ProtocolCName>gEfiSimpleNetworkProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>NetworkInterfaceIdentifier</ProtocolCName>
+      <ProtocolCName>gEfiNetworkInterfaceIdentifierProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>NetworkInterfaceIdentifier2</ProtocolCName>
+      <ProtocolCName>gEfiNetworkInterfaceIdentifierProtocolGuid_31</ProtocolCName>
     </Protocol>
     <Protocol Usage="BY_START">
-      <ProtocolCName>PxeBaseCode</ProtocolCName>
+      <ProtocolCName>gEfiPxeBaseCodeProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <SystemTables>
@@ -110,7 +110,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </SystemTables>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>SmbiosTable</GuidCName>
+      <GuidCName>gEfiSmbiosTableGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

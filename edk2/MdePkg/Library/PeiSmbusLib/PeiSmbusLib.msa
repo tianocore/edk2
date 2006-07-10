@@ -47,7 +47,7 @@
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>Smbus</PpiCName>
+      <PpiCName>gEfiPeiSmbusPpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Externs>

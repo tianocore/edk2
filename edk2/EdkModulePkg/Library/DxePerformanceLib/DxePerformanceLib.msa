@@ -47,7 +47,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Performance</ProtocolCName>
+      <ProtocolCName>gPerformanceProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>
@@ -60,8 +60,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

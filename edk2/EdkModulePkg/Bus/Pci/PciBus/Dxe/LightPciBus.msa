@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>LightPciBusPciBus</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -95,51 +95,51 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PciRootBridgeIo</ProtocolCName>
+      <ProtocolCName>gEfiPciRootBridgeIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Decompress</ProtocolCName>
+      <ProtocolCName>gEfiDecompressProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>UgaIo</ProtocolCName>
+      <ProtocolCName>gEfiUgaIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PciPlatform</ProtocolCName>
+      <ProtocolCName>gEfiPciPlatformProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PciIo</ProtocolCName>
+      <ProtocolCName>gEfiPciIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>BusSpecificDriverOverride</ProtocolCName>
+      <ProtocolCName>gEfiBusSpecificDriverOverrideProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PciHotPlugRequest</ProtocolCName>
+      <ProtocolCName>gEfiPciHotPlugRequestProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>IncompatiblePciDeviceSupport</ProtocolCName>
+      <ProtocolCName>gEfiIncompatiblePciDeviceSupportProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PciHotPlugInit</ProtocolCName>
+      <ProtocolCName>gEfiPciHotPlugInitProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PciHostBridgeResourceAllocation</ProtocolCName>
+      <ProtocolCName>gEfiPciHostBridgeResourceAllocationProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadedImage</ProtocolCName>
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PciOptionRomTable</GuidCName>
+      <GuidCName>gEfiPciOptionRomTableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PciHotplugDevice</GuidCName>
+      <GuidCName>gEfiPciHotplugDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>StatusCodeSpecificData</GuidCName>
+      <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

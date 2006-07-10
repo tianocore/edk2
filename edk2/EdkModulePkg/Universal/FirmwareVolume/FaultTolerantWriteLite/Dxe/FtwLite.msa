@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>FtwLite</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -71,21 +71,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>FaultTolerantWriteLite</ProtocolCName>
+      <ProtocolCName>gEfiFaultTolerantWriteLiteProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>PciRootBridgeIo</ProtocolCName>
+      <ProtocolCName>gEfiPciRootBridgeIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FlashMapHob</GuidCName>
+      <GuidCName>gEfiFlashMapHobGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>SystemNvDataFv</GuidCName>
+      <GuidCName>gEfiSystemNvDataFvGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

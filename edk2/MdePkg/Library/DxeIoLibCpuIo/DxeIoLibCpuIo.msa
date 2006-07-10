@@ -44,7 +44,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>CpuIo</ProtocolCName>
+      <ProtocolCName>gEfiCpuIoProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

@@ -38,7 +38,7 @@
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>NtPeiLoadFile</PpiCName>
+      <PpiCName>gNtPeiLoadFilePpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Externs>

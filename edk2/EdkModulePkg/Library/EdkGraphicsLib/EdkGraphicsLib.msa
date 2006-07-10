@@ -50,24 +50,24 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>OEMBadging</ProtocolCName>
+      <ProtocolCName>gEfiOEMBadgingProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolume</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>ConsoleControl</ProtocolCName>
+      <ProtocolCName>gEfiConsoleControlProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>UgaDraw</ProtocolCName>
+      <ProtocolCName>gEfiUgaDrawProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleTextOut</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>Bmp</GuidCName>
+      <GuidCName>gEfiDefaultBmpLogoGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

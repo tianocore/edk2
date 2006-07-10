@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>PeiFlashMap</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -60,26 +60,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <PPIs>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>FlashMap</PpiCName>
+      <PpiCName>gPeiFlashMapPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>NtFwh</PpiCName>
+      <PpiCName>gNtFwhPpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FlashMapHob</GuidCName>
+      <GuidCName>gEfiFlashMapHobGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FirmwareFileSystem</GuidCName>
+      <GuidCName>gEfiFirmwareFileSystemGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>SystemNvDataHob</GuidCName>
+      <GuidCName>gEfiSystemNvDataHobGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>PcdDxe</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -75,15 +75,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>PcdProtocol</ProtocolCName>
+      <ProtocolCName>gPcdProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Variable</ProtocolCName>
+      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PcdDataBaseHob</GuidCName>
+      <GuidCName>gPcdDataBaseHobGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>
@@ -96,19 +96,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaxPeiPcdCallBackNumberPerPcdEntry</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdVpdBaseAddress</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

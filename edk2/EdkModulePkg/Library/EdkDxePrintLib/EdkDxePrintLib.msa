@@ -41,7 +41,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Print</ProtocolCName>
+      <ProtocolCName>gEfiPrintProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

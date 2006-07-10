@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>ConSplitter</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -67,39 +67,39 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>UgaDraw</ProtocolCName>
+      <ProtocolCName>gEfiUgaDrawProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleTextOut</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleTextIn</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextInProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimplePointer</ProtocolCName>
+      <ProtocolCName>gEfiSimplePointerProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>ConsoleControl</ProtocolCName>
+      <ProtocolCName>gEfiConsoleControlProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_PRODUCED">
-      <GuidCName>PrimaryStandardErrorDevice</GuidCName>
+      <GuidCName>gEfiPrimaryStandardErrorDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_PRODUCED">
-      <GuidCName>PrimaryConsoleInDevice</GuidCName>
+      <GuidCName>gEfiPrimaryConsoleInDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_PRODUCED">
-      <GuidCName>PrimaryConsoleOutDevice</GuidCName>
+      <GuidCName>gEfiPrimaryConsoleOutDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>ConsoleOutDevice</GuidCName>
+      <GuidCName>gEfiConsoleOutDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>StandardErrorDevice</GuidCName>
+      <GuidCName>gEfiStandardErrorDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>ConsoleInDevice</GuidCName>
+      <GuidCName>gEfiConsoleInDeviceGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

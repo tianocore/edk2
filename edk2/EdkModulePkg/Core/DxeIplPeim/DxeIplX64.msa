@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>DxeIplX64</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -93,44 +93,44 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Decompress</ProtocolCName>
+      <ProtocolCName>gEfiDecompressProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>TianoDecompress</ProtocolCName>
+      <ProtocolCName>gEfiTianoDecompressProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>CustomizedDecompress</ProtocolCName>
+      <ProtocolCName>gEfiCustomizedDecompressProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <PPIs>
     <Ppi Usage="SOMETIMES_PRODUCED">
-      <PpiCName>DxeIpl</PpiCName>
+      <PpiCName>gEfiDxeIplPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_PRODUCED">
-      <PpiCName>FvFileLoader</PpiCName>
+      <PpiCName>gEfiPeiFvFileLoaderPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_PRODUCED">
-      <PpiCName>EndOfPeiSignal</PpiCName>
+      <PpiCName>gEfiEndOfPeiSignalPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_CONSUMED">
-      <PpiCName>RecoveryModule</PpiCName>
+      <PpiCName>gEfiPeiRecoveryModulePpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_CONSUMED">
-      <PpiCName>S3Resume</PpiCName>
+      <PpiCName>gEfiPeiS3ResumePpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_CONSUMED">
-      <PpiCName>SectionExtraction</PpiCName>
+      <PpiCName>gEfiPeiSectionExtractionPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_CONSUMED">
-      <PpiCName>Security</PpiCName>
+      <PpiCName>gEfiPeiSecurityPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="PRIVATE">
-      <PpiCName>PeiInMemory</PpiCName>
+      <PpiCName>gPeiInMemoryGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PeiPeCoffLoader</GuidCName>
+      <GuidCName>gEfiPeiPeCoffLoaderGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

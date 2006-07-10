@@ -43,13 +43,13 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SmmBase</ProtocolCName>
+      <ProtocolCName>gEfiSmmBaseProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadedImage</ProtocolCName>
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

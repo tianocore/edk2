@@ -57,13 +57,13 @@
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="SOMETIMES_PRODUCED">
-      <PpiCName>StatusCodeMemory</PpiCName>
+      <PpiCName>gPeiStatusCodeMemoryPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_CONSUMED">
-      <PpiCName>StatusCode</PpiCName>
+      <PpiCName>gEfiPeiStatusCodePpiGuid</PpiCName>
     </Ppi>
     <PpiNotify Usage="SOMETIMES_CONSUMED">
-      <PpiNotifyCName>FvFileLoader</PpiNotifyCName>
+      <PpiNotifyCName>gEfiPeiFvFileLoaderPpiGuid</PpiNotifyCName>
     </PpiNotify>
   </PPIs>
   <Externs>

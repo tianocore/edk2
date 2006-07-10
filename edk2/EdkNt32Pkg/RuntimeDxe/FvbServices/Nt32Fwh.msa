@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>FwBlockService</ModuleName>
     <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
@@ -74,13 +74,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="SOMETIMES_PRODUCED">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_PRODUCED">
-      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>FvbExtension</ProtocolCName>
+      <ProtocolCName>gEfiFvbExtensionProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Events>
@@ -92,7 +92,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </Events>
   <Guids>
     <GuidCNames Usage="ALWAYS_PRODUCED">
-      <GuidCName>AlternateFvBlock</GuidCName>
+      <GuidCName>gEfiAlternateFvBlockGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

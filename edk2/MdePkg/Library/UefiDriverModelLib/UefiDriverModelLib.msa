@@ -40,16 +40,16 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DriverBinding</ProtocolCName>
+      <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>ComponentName</ProtocolCName>
+      <ProtocolCName>gEfiComponentNameProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DriverConfiguration</ProtocolCName>
+      <ProtocolCName>gEfiDriverConfigurationProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DriverDiagnostics</ProtocolCName>
+      <ProtocolCName>gEfiDriverDiagnosticsProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

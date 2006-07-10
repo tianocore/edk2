@@ -78,27 +78,27 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadedImage</ProtocolCName>
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolume</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>AcpiS3Save</ProtocolCName>
+      <ProtocolCName>gEfiAcpiS3SaveProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleTextOut</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleTextIn</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextInProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleNetwork</ProtocolCName>
+      <ProtocolCName>gEfiSimpleNetworkProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>ShellFile</GuidCName>
+      <GuidCName>gEfiShellFileGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

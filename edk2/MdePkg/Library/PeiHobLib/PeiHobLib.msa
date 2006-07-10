@@ -43,13 +43,13 @@
   </PackageDependencies>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>HobMemoryAllocModule</GuidCName>
+      <GuidCName>gEfiHobMemoryAllocModuleGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>HobMemoryAllocBspStore</GuidCName>
+      <GuidCName>gEfiHobMemoryAllocBspStoreGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>HobMemoryAllocStack</GuidCName>
+      <GuidCName>gEfiHobMemoryAllocStackGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

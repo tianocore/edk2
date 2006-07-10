@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>IdeBusLite</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -76,30 +76,30 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PciIo</ProtocolCName>
+      <ProtocolCName>gEfiPciIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>IdeControllerInit</ProtocolCName>
+      <ProtocolCName>gEfiIdeControllerInitProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>BlockIo</ProtocolCName>
+      <ProtocolCName>gEfiBlockIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DiskInfo</ProtocolCName>
+      <ProtocolCName>gEfiDiskInfoProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>DiskInfoIde</GuidCName>
+      <GuidCName>gEfiDiskInfoIdeInterfaceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>DiskInfoScsi</GuidCName>
+      <GuidCName>gEfiDiskInfoScsiInterfaceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>DiskInfoUsb</GuidCName>
+      <GuidCName>gEfiDiskInfoUsbInterfaceGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

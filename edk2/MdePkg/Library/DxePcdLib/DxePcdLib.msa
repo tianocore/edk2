@@ -43,7 +43,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PcdProtocol</ProtocolCName>
+      <ProtocolCName>gPcdProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

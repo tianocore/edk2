@@ -46,7 +46,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadedImage</ProtocolCName>
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

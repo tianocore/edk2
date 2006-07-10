@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>PciBus</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -96,40 +96,40 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="TO_START">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>PciRootBridgeIo</ProtocolCName>
+      <ProtocolCName>gEfiPciRootBridgeIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>PciPlatform</ProtocolCName>
+      <ProtocolCName>gEfiPciPlatformProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>IncompatiblePciDeviceSupport</ProtocolCName>
+      <ProtocolCName>gEfiIncompatiblePciDeviceSupportProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>PciHostBridgeResourceAllocation</ProtocolCName>
+      <ProtocolCName>gEfiPciHostBridgeResourceAllocationProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>PciHotPlugInit</ProtocolCName>
+      <ProtocolCName>gEfiPciHotPlugInitProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>Decompress</ProtocolCName>
+      <ProtocolCName>gEfiDecompressProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>LoadedImage</ProtocolCName>
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>UgaIo</ProtocolCName>
+      <ProtocolCName>gEfiUgaIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="BY_START">
-      <ProtocolCName>PciIo</ProtocolCName>
+      <ProtocolCName>gEfiPciIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="BY_START">
-      <ProtocolCName>BusSpecificDriverOverride</ProtocolCName>
+      <ProtocolCName>gEfiBusSpecificDriverOverrideProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>PciHotPlugRequest</ProtocolCName>
+      <ProtocolCName>gEfiPciHotPlugRequestProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <SystemTables>
@@ -142,13 +142,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </SystemTables>
   <Guids>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>PciOptionRomTable</GuidCName>
+      <GuidCName>gEfiPciOptionRomTableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>StatusCodeSpecificData</GuidCName>
+      <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="PRIVATE">
-      <GuidCName>PciHotplugDevice</GuidCName>
+      <GuidCName>gEfiPciHotplugDeviceGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

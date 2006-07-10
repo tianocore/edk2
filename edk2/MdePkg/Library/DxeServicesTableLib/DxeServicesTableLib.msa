@@ -40,7 +40,7 @@
   </PackageDependencies>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>DxeServicesTable</GuidCName>
+      <GuidCName>gEfiDxeServicesTableGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

@@ -52,18 +52,18 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>StatusCode</ProtocolCName>
+      <ProtocolCName>gEfiStatusCodeRuntimeProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>StatusCodeDataTypeAssert</GuidCName>
+      <GuidCName>gEfiStatusCodeDataTypeAssertGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>StatusCodeDataTypeDebug</GuidCName>
+      <GuidCName>gEfiStatusCodeDataTypeDebugGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>StatusCodeSpecificData</GuidCName>
+      <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>
@@ -73,8 +73,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>
