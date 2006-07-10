@@ -22,6 +22,6 @@
 .type   GetInterruptState, @function
 GetInterruptState::
         mov                 r8  = psr
-        dep.z               r8  = r8, 14, 1
+        extr.u              r8  = r8, 14, 1
         br.ret.sptk.many    b0
 .endp   GetInterruptState
