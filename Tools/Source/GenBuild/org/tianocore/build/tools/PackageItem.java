@@ -13,7 +13,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.tools;
 
 import org.apache.tools.ant.BuildException;
-import org.tianocore.build.global.SurfaceAreaQuery;
 
 public class PackageItem {
 

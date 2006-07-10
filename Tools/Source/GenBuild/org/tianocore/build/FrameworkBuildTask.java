@@ -26,7 +26,6 @@ import org.apache.tools.ant.Task;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.toolchain.ConfigReader;
-import org.tianocore.build.toolchain.ToolChainConfig;
 import org.tianocore.build.toolchain.ToolChainInfo;
 
 public class FrameworkBuildTask extends Task{

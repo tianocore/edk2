@@ -119,7 +119,7 @@ public class PlatformBuildFileGenerator {
             
             Set<String> sequenceKeys = sequences.keySet();
             Iterator sequenceIter = sequenceKeys.iterator();
-            String dependsStr = "";
+            String dependsStr = "prebuild";
             while (sequenceIter.hasNext()) {
                 String num = (String)sequenceIter.next();
                 if (dependsStr.length() > 0) {
@@ -134,7 +134,7 @@ public class PlatformBuildFileGenerator {
             root.appendChild(document.createComment("Default target"));
             ele = document.createElement("target");
             ele.setAttribute("name", "all");
-            ele.setAttribute("depends", dependsStr + ", userextensions");
+            ele.setAttribute("depends", dependsStr + ", postbuild");
             root.appendChild(ele);
             
             //
@@ -158,9 +158,14 @@ public class PlatformBuildFileGenerator {
             applyCleanall(document, root);
             
             //
-            // User Extension
+            // User Extension pre build
             //
-            applyUserExtensions(document, root);
+            applyUserExtensionsPreBuild(document, root);
+            
+            //
+            // User Extension Post build
+            //
+            applyUserExtensionsPostBuild(document, root);
             
             document.appendChild(rootComment);
             document.appendChild(root);
@@ -463,15 +468,59 @@ public class PlatformBuildFileGenerator {
         root.appendChild(ele);
     }
     
-    private void applyUserExtensions(Document document, Node root) {
+    private void applyUserExtensionsPreBuild(Document document, Node root) {
         //
         // User Extensions
         //
-        root.appendChild(document.createComment("User Extensions"));
+        root.appendChild(document.createComment("Pre Build Processing"));
         Element ele = document.createElement("target");
-        ele.setAttribute("name", "userextensions");
+        ele.setAttribute("name", "prebuild");
         
-        Node node = SurfaceAreaQuery.getFpdUserExtension();
+        Node node = SurfaceAreaQuery.getFpdUserExtensionPreBuild();
+        if (node != null) {
+            //
+            // For every Target and ToolChain
+            //
+            String[] targetList = GlobalData.getToolChainInfo().getTargets();
+            for (int i = 0; i < targetList.length; i++){
+                String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
+                for(int j = 0; j < toolchainList.length; j++){
+                    //
+                    // Prepare FV_DIR
+                    //
+                    String ffsCommonDir = project.getProperty("BUILD_DIR") + File.separatorChar 
+                                    + targetList[i] + File.separatorChar 
+                                    + toolchainList[j];
+                    File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
+                    Element fvEle = document.createElement("var");
+                    fvEle.setAttribute("name", "FV_DIR");
+                    fvEle.setAttribute("value", fvDir.getPath().replaceAll("(\\\\)", "/"));
+                    ele.appendChild(fvEle);
+                    
+                    NodeList childNodes = node.getChildNodes();
+                    for (int k = 0; k < childNodes.getLength(); k++) {
+                        Node childItem = childNodes.item(k);
+                        if (childItem.getNodeType() == Node.ELEMENT_NODE) {
+                            ele.appendChild(recursiveNode(childItem, document));
+                        }
+                    }
+                
+                }
+            }
+        }
+        
+        root.appendChild(ele);
+    }
+    
+    private void applyUserExtensionsPostBuild(Document document, Node root) {
+        //
+        // User Extensions
+        //
+        root.appendChild(document.createComment("Post Build Processing"));
+        Element ele = document.createElement("target");
+        ele.setAttribute("name", "postbuild");
+        
+        Node node = SurfaceAreaQuery.getFpdUserExtensionPostBuild();
         if (node != null) {
             //
             // For every Target and ToolChain

@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
-import java.io.File;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
