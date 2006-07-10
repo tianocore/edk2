@@ -80,7 +80,6 @@ public class FrameworkBuildTask extends Task{
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new BuildException(e.getMessage());
         }
         

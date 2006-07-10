@@ -230,7 +230,6 @@ public class GlobalData {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new BuildException("Parse workspace Database [" + dbFile.getPath() + "] Error.\n" + e.getMessage());
         }
     }

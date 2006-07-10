@@ -311,7 +311,6 @@ public class FpdParserTask extends Task {
                 bw.close();
                 fw.close();
             } catch (Exception e) {
-                e.printStackTrace();
                 throw new BuildException("Generate FV file [" + fvFile.getPath() + "] failed. \n" + e.getMessage());
             }
         }
@@ -394,7 +393,6 @@ public class FpdParserTask extends Task {
                 throw new BuildException(e.getMessage());
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw new BuildException("Load FPD file [" + fpdFile.getPath() + "] error. \n" + e.getMessage());
         }
     }

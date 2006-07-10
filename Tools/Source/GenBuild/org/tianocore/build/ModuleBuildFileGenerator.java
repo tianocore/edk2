@@ -221,7 +221,6 @@ public class ModuleBuildFileGenerator {
             xformer.setOutputProperty(OutputKeys.INDENT, "yes");
             xformer.transform(source, result);
         } catch (Exception ex) {
-            ex.printStackTrace();
             throw new BuildException("Module [" + fpdModuleId.getModule().getName() + "] generating build file failed.\n" + ex.getMessage());
         }
     }

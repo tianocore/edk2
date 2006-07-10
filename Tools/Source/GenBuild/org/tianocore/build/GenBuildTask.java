@@ -291,7 +291,6 @@ public class GenBuildTask extends Ant {
         }
         popProperties();
         }catch (Exception e){
-            e.printStackTrace();
             throw new BuildException(e.getMessage());
         }
     }
