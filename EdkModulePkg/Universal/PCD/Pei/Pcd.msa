@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>PcdPeim</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -69,18 +69,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>PcdPpi</PpiCName>
+      <PpiCName>gPcdPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>ReadOnlyVariable</PpiCName>
+      <PpiCName>gEfiPeiReadOnlyVariablePpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PcdDataBaseHob</GuidCName>
+      <GuidCName>gPcdDataBaseHobGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PcdPeiCallbackFnTable</GuidCName>
+      <GuidCName>gPcdPeiCallbackFnTableHobGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>
@@ -93,19 +93,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdMaxPeiPcdCallBackNumberPerPcdEntry</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdVpdBaseAddress</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdPeiPcdDatabaseTraverseEnabled</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

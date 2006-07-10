@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Terminal</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -76,16 +76,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="BY_START">
-      <ProtocolCName>SimpleTextOut</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="BY_START">
-      <ProtocolCName>SimpleTextIn</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextInProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>SerialIo</ProtocolCName>
+      <ProtocolCName>gEfiSerialIoProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Variables>
@@ -104,22 +104,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </Variables>
   <Guids>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>HotPlugDevice</GuidCName>
+      <GuidCName>gEfiHotPlugDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>GlobalVariable</GuidCName>
+      <GuidCName>gEfiGlobalVariableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>PcAnsi</GuidCName>
+      <GuidCName>gEfiPcAnsiGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>VT100Plus</GuidCName>
+      <GuidCName>gEfiVT100PlusGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>VT100</GuidCName>
+      <GuidCName>gEfiVT100Guid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>VTUTF8</GuidCName>
+      <GuidCName>gEfiVTUTF8Guid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

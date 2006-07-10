@@ -64,13 +64,13 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FvbExtension</ProtocolCName>
+      <ProtocolCName>gEfiFvbExtensionProtocolGuid</ProtocolCName>
     </Protocol>
     <ProtocolNotify Usage="SOMETIMES_CONSUMED">
-      <ProtocolNotifyCName>FirmwareVolumeBlock</ProtocolNotifyCName>
+      <ProtocolNotifyCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolNotifyCName>
     </ProtocolNotify>
   </Protocols>
   <Externs>

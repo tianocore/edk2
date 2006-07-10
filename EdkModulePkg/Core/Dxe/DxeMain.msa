@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>DxeMain</ModuleName>
     <ModuleType>DXE_CORE</ModuleType>
@@ -111,132 +111,132 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>Ebc</ProtocolCName>
+      <ProtocolCName>gEfiEbcProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadedImage</ProtocolCName>
+      <ProtocolCName>gEfiLoadedImageProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Cpu</ProtocolCName>
+      <ProtocolCName>gEfiCpuArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolume</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolumeDispatch</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeDispatchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SectionExtraction</ProtocolCName>
+      <ProtocolCName>gEfiSectionExtractionProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>DriverBinding</ProtocolCName>
+      <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>PlatformDriverOverride</ProtocolCName>
+      <ProtocolCName>gEfiPlatformDriverOverrideProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>BusSpecificDriverOverride</ProtocolCName>
+      <ProtocolCName>gEfiBusSpecificDriverOverrideProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Timer</ProtocolCName>
+      <ProtocolCName>gEfiTimerArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Metronome</ProtocolCName>
+      <ProtocolCName>gEfiMetronomeArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>MonotonicCounter</ProtocolCName>
+      <ProtocolCName>gEfiMonotonicCounterArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>VariableWrite</ProtocolCName>
+      <ProtocolCName>gEfiVariableWriteArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Bds</ProtocolCName>
+      <ProtocolCName>gEfiBdsArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Variable</ProtocolCName>
+      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Security</ProtocolCName>
+      <ProtocolCName>gEfiSecurityArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>WatchdogTimer</ProtocolCName>
+      <ProtocolCName>gEfiWatchdogTimerArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Runtime</ProtocolCName>
+      <ProtocolCName>gEfiRuntimeArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>RealTimeClock</ProtocolCName>
+      <ProtocolCName>gEfiRealTimeClockArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Reset</ProtocolCName>
+      <ProtocolCName>gEfiResetArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadFile</ProtocolCName>
+      <ProtocolCName>gEfiLoadFileProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleFileSystem</ProtocolCName>
+      <ProtocolCName>gEfiSimpleFileSystemProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadPeImage</ProtocolCName>
+      <ProtocolCName>gEfiLoadPeImageProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Decompress</ProtocolCName>
+      <ProtocolCName>gEfiDecompressProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>CustomizedDecompress</ProtocolCName>
+      <ProtocolCName>gEfiCustomizedDecompressProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>TianoDecompress</ProtocolCName>
+      <ProtocolCName>gEfiTianoDecompressProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Capsule</ProtocolCName>
+      <ProtocolCName>gEfiCapsuleArchProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>MemoryTypeInformation</GuidCName>
+      <GuidCName>gEfiMemoryTypeInformationGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>DxeServicesTable</GuidCName>
+      <GuidCName>gEfiDxeServicesTableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>HobList</GuidCName>
+      <GuidCName>gEfiHobListGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>DebugImageInfoTable</GuidCName>
+      <GuidCName>gEfiDebugImageInfoTableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>Apriori</GuidCName>
+      <GuidCName>gAprioriGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FirmwareFileSystem</GuidCName>
+      <GuidCName>gEfiFirmwareFileSystemGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FileInfo</GuidCName>
+      <GuidCName>gEfiFileInfoGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>HobMemoryAllocModule</GuidCName>
+      <GuidCName>gEfiHobMemoryAllocModuleGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PeiPeCoffLoader</GuidCName>
+      <GuidCName>gEfiPeiPeCoffLoaderGuid</GuidCName>
     </GuidCNames>
     <!--<GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>LoadPeImage</GuidCName>
     </GuidCNames>-->
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>EventExitBootServices</GuidCName>
+      <GuidCName>gEfiEventExitBootServicesGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>EventVirtualAddressChange</GuidCName>
+      <GuidCName>gEfiEventVirtualAddressChangeGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>EventMemoryMapChange</GuidCName>
+      <GuidCName>gEfiEventMemoryMapChangeGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

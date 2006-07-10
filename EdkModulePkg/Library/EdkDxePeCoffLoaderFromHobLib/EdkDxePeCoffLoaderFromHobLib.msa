@@ -38,7 +38,7 @@
   </PackageDependencies>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PeiPeCoffLoader</GuidCName>
+      <GuidCName>gEfiPeiPeCoffLoaderGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Variable</ModuleName>
     <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
@@ -82,51 +82,51 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Variable</ProtocolCName>
+      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>VariableWrite</ProtocolCName>
+      <ProtocolCName>gEfiVariableWriteArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FaultTolerantWriteLite</ProtocolCName>
+      <ProtocolCName>gEfiFaultTolerantWriteLiteProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>CpuIo</ProtocolCName>
+      <ProtocolCName>gEfiCpuIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FvbExtension</ProtocolCName>
+      <ProtocolCName>gEfiFvbExtensionProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Variable</ProtocolCName>
+      <ProtocolCName>gEfiVariableArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>VariableWrite</ProtocolCName>
+      <ProtocolCName>gEfiVariableWriteArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FaultTolerantWriteLite</ProtocolCName>
+      <ProtocolCName>gEfiFaultTolerantWriteLiteProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>CpuIo</ProtocolCName>
+      <ProtocolCName>gEfiCpuIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FvbExtension</ProtocolCName>
+      <ProtocolCName>gEfiFvbExtensionProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FirmwareVolumeBlock</ProtocolCName>
+      <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>ExtendedSalBootService</ProtocolCName>
+      <ProtocolCName>gEfiExtendedSalBootServiceProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>ExtendedSalVariableServices</ProtocolCName>
+      <ProtocolCName>gEfiExtendedSalVariableServicesProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FlashMapHob</GuidCName>
+      <GuidCName>gEfiFlashMapHobGuid</GuidCName>
     </GuidCNames>
     <!--<GuidCNames Usage="ALWAYS_CONSUMED">
       <GuidCName>Hob</GuidCName>
@@ -135,7 +135,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <GuidCName>SystemNvData</GuidCName>
     </GuidCNames>-->
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>AlternateFvBlock</GuidCName>
+      <GuidCName>gEfiAlternateFvBlockGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

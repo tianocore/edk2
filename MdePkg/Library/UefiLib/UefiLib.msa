@@ -51,13 +51,13 @@
   </PackageDependencies>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>EventLegacyBoot</GuidCName>
+      <GuidCName>gEfiEventLegacyBootGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>EventReadyToBoot</GuidCName>
+      <GuidCName>gEfiEventReadyToBootGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FrameworkDevicePath</GuidCName>
+      <GuidCName>gEfiFrameworkDevicePathGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

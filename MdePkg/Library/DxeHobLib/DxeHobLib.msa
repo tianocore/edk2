@@ -43,7 +43,7 @@
   </PackageDependencies>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>HobList</GuidCName>
+      <GuidCName>gEfiHobListGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

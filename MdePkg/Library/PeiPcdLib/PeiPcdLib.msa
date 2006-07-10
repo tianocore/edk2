@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>PeiPcdLib</ModuleName>
@@ -46,7 +46,7 @@
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>PcdPpi</PpiCName>
+      <PpiCName>gPcdPpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Externs>

@@ -44,7 +44,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>CustomizedDecompress</ProtocolCName>
+      <ProtocolCName>gEfiCustomizedDecompressProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

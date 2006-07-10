@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Cpu</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -69,19 +69,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>Cpu</ProtocolCName>
+      <ProtocolCName>gEfiCpuArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>CpuIo</ProtocolCName>
+      <ProtocolCName>gEfiCpuIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>Hii</ProtocolCName>
+      <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>DataHub</ProtocolCName>
+      <ProtocolCName>gEfiDataHubProtocolGuid</ProtocolCName>
     </Protocol>
     <ProtocolNotify Usage="SOMETIMES_CONSUMED">
-      <ProtocolNotifyCName>WinNtIo</ProtocolNotifyCName>
+      <ProtocolNotifyCName>gEfiWinNtIoProtocolGuid</ProtocolNotifyCName>
     </ProtocolNotify>
   </Protocols>
   <DataHubs>
@@ -94,16 +94,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </DataHubs>
   <Guids>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>ProcessorProducer</GuidCName>
+      <GuidCName>gEfiProcessorProducerGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>ProcessorSubClass</GuidCName>
+      <GuidCName>gEfiProcessorSubClassGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>WinNtCPUModel</GuidCName>
+      <GuidCName>gEfiWinNtCPUModelGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>WinNtCPUSpeed</GuidCName>
+      <GuidCName>gEfiWinNtCPUSpeedGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

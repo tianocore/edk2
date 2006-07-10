@@ -59,12 +59,12 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>Performance</ProtocolCName>
+      <ProtocolCName>gPerformanceProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>PeiPerformanceHob</GuidCName>
+      <GuidCName>gPeiPerformanceHobGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>
@@ -77,8 +77,7 @@
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>SecMain</ModuleName>
     <ModuleType>USER_DEFINED</ModuleType>
@@ -65,24 +65,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>NtThunk</PpiCName>
+      <PpiCName>gPeiNtThunkPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>NtAutoScan</PpiCName>
+      <PpiCName>gPeiNtAutoScanPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>NtFwh</PpiCName>
+      <PpiCName>gNtFwhPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>StatusCode</PpiCName>
+      <PpiCName>gEfiPeiStatusCodePpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>NtPeiLoadFile</PpiCName>
+      <PpiCName>gNtPeiLoadFilePpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Guids>
     <GuidCNames Usage="ALWAYS_PRODUCED">
-      <GuidCName>PeiPeCoffLoader</GuidCName>
+      <GuidCName>gEfiPeiPeCoffLoaderGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>
@@ -92,20 +92,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <PcdCoded>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtFirmwareVolume</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtBootMode</C_Name>
-          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

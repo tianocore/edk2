@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>ConPlatform</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
@@ -72,13 +72,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="TO_START">
-      <ProtocolCName>SimpleTextOut</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextOutProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>SimpleTextIn</ProtocolCName>
+      <ProtocolCName>gEfiSimpleTextInProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Variables>
@@ -109,19 +109,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </Variables>
   <Guids>
     <GuidCNames Usage="SOMETIMES_PRODUCED">
-      <GuidCName>ConsoleInDevice</GuidCName>
+      <GuidCName>gEfiConsoleInDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_PRODUCED">
-      <GuidCName>ConsoleOutDevice</GuidCName>
+      <GuidCName>gEfiConsoleOutDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_PRODUCED">
-      <GuidCName>StandardErrorDevice</GuidCName>
+      <GuidCName>gEfiStandardErrorDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>HotPlugDevice</GuidCName>
+      <GuidCName>gEfiHotPlugDeviceGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
-      <GuidCName>GlobalVariable</GuidCName>
+      <GuidCName>gEfiGlobalVariableGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

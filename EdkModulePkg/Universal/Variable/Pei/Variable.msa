@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>PeiVariable</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -53,10 +53,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>FlashMap</PpiCName>
+      <PpiCName>gPeiFlashMapPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>ReadOnlyVariable</PpiCName>
+      <PpiCName>gEfiPeiReadOnlyVariablePpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Externs>

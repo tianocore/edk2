@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>WinNtAutoScan</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -63,13 +63,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>NtAutoScan</PpiCName>
+      <PpiCName>gPeiNtAutoScanPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>BaseMemoryTest</PpiCName>
+      <PpiCName>gPeiBaseMemoryTestPpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="ALWAYS_PRODUCED">
-      <PpiCName>MemoryDiscovered</PpiCName>
+      <PpiCName>gEfiPeiMemoryDiscoveredPpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Externs>

@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Bds</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -127,58 +127,58 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>Bds</ProtocolCName>
+      <ProtocolCName>gEfiBdsArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LegacyBios</ProtocolCName>
+      <ProtocolCName>gEfiLegacyBiosProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>UgaSplash</ProtocolCName>
+      <ProtocolCName>gEfiUgaSplashProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>Hii</ProtocolCName>
+      <ProtocolCName>gEfiHiiProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FormCallback</ProtocolCName>
+      <ProtocolCName>gEfiFormCallbackProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DataHub</ProtocolCName>
+      <ProtocolCName>gEfiDataHubProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>FormBrowser</ProtocolCName>
+      <ProtocolCName>gEfiFormBrowserProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>ConsoleControl</ProtocolCName>
+      <ProtocolCName>gEfiConsoleControlProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>CpuIo</ProtocolCName>
+      <ProtocolCName>gEfiCpuIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>UgaDraw</ProtocolCName>
+      <ProtocolCName>gEfiUgaDrawProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>LoadFile</ProtocolCName>
+      <ProtocolCName>gEfiLoadFileProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SimpleFileSystem</ProtocolCName>
+      <ProtocolCName>gEfiSimpleFileSystemProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>DevicePath</ProtocolCName>
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>BlockIo</ProtocolCName>
+      <ProtocolCName>gEfiBlockIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SerialIo</ProtocolCName>
+      <ProtocolCName>gEfiSerialIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>GenericMemTest</ProtocolCName>
+      <ProtocolCName>gEfiGenericMemTestProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>Cpu</ProtocolCName>
+      <ProtocolCName>gEfiCpuArchProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>DriverBinding</ProtocolCName>
+      <ProtocolCName>gEfiDriverBindingProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <DataHubs>
@@ -206,19 +206,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </DataHubs>
   <Guids>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>BootState</GuidCName>
+      <GuidCName>gEfiBootStateGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>GlobalVariable</GuidCName>
+      <GuidCName>gEfiGlobalVariableGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FlashMapHob</GuidCName>
+      <GuidCName>gEfiFlashMapHobGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FileSystemVolumeLabelInfoId</GuidCName>
+      <GuidCName>gEfiFileSystemVolumeLabelInfoIdGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="ALWAYS_CONSUMED">
-      <GuidCName>FileInfo</GuidCName>
+      <GuidCName>gEfiFileInfoGuid</GuidCName>
     </GuidCNames>
   </Guids>
   <Externs>

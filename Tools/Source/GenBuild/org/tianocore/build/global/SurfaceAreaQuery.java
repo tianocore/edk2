@@ -1769,7 +1769,7 @@ public class SurfaceAreaQuery {
             String[] guidPair = new String[2];
             guidPair[0] = entry.getCName();
             guidPair[1] = entry.getGuidValue();
-            guidDeclMap.put(entry.getName(), guidPair);
+            guidDeclMap.put(entry.getCName(), guidPair);
             EdkLog.log(EdkLog.EDK_VERBOSE, entry.getName());
             EdkLog.log(EdkLog.EDK_VERBOSE, guidPair[0]);
             EdkLog.log(EdkLog.EDK_VERBOSE, guidPair[1]);
@@ -1800,7 +1800,7 @@ public class SurfaceAreaQuery {
 
             protocolPair[0] = entry.getCName();
             protocolPair[1] = entry.getGuidValue();
-            protoclMap.put(entry.getName(), protocolPair);
+            protoclMap.put(entry.getCName(), protocolPair);
             EdkLog.log(EdkLog.EDK_VERBOSE, entry.getName());
             EdkLog.log(EdkLog.EDK_VERBOSE, protocolPair[0]);
             EdkLog.log(EdkLog.EDK_VERBOSE, protocolPair[1]);
@@ -1835,7 +1835,7 @@ public class SurfaceAreaQuery {
             String[] ppiPair = new String[2];
             ppiPair[0] = entry.getCName();
             ppiPair[1] = entry.getGuidValue();
-            ppiMap.put(entry.getName(), ppiPair);
+            ppiMap.put(entry.getCName(), ppiPair);
         }
         return ppiMap;
     }

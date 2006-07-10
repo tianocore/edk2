@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Crc32SectionExtract</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
@@ -61,10 +61,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>SecurityPolicy</ProtocolCName>
+      <ProtocolCName>gEfiSecurityPolicyProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_PRODUCED">
-      <ProtocolCName>Crc32GuidedSectionExtraction</ProtocolCName>
+      <ProtocolCName>gEfiCrc32GuidedSectionExtractionProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

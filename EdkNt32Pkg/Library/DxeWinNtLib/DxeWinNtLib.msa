@@ -42,7 +42,7 @@
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">
-      <ProtocolCName>WinNtThunk</ProtocolCName>
+      <ProtocolCName>gEfiWinNtThunkProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <Externs>

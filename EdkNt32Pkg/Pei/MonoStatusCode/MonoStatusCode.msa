@@ -7,7 +7,7 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>MonoStatusCode</ModuleName>
     <ModuleType>PEIM</ModuleType>
@@ -55,15 +55,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="SOMETIMES_CONSUMED">
-      <ProtocolCName>StatusCode</ProtocolCName>
+      <ProtocolCName>gEfiStatusCodeRuntimeProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
   <PPIs>
     <Ppi Usage="ALWAYS_CONSUMED">
-      <PpiCName>StatusCode</PpiCName>
+      <PpiCName>gEfiPeiStatusCodePpiGuid</PpiCName>
     </Ppi>
     <Ppi Usage="SOMETIMES_CONSUMED">
-      <PpiCName>FvFileLoader</PpiCName>
+      <PpiCName>gEfiPeiFvFileLoaderPpiGuid</PpiCName>
     </Ppi>
   </PPIs>
   <Externs>
