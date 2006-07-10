@@ -214,7 +214,6 @@ StartGauge (
   UINTN                     GaugeDataSize;
   UINTN                     OldGaugeDataSize;
   GAUGE_DATA_HEADER         *OldGaugeData;
-  EFI_STATUS                Status;
   UINT32                    Index;
 
   Index = mGaugeData->NumberOfEntries;
@@ -230,7 +229,7 @@ StartGauge (
     
     mGaugeData = AllocateZeroPool (GaugeDataSize);
     if (mGaugeData == NULL) {
-      return EFI_OUT_OF_MEMORY;
+      return EFI_OUT_OF_RESOURCES;
     }
     //
     // Initialize new data arry and migrate old data one. 
@@ -425,7 +424,6 @@ DxeCorePerformanceLibConstructor (
   //
   // Install the protocol interfaces.
   //
-  Handle = NULL;
   Status = gBS->InstallProtocolInterface (
                   &mHandle,
                   &gPerformanceProtocolGuid,

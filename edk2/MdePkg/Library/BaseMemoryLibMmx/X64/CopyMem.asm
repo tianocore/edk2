@@ -46,6 +46,7 @@ InternalMemCopyMem  PROC    USES    rsi rdi
     and     r8, 7
     shr     rcx, 3                      ; rcx <- # of Qwords to copy
     jz      @CopyBytes
+    DB      49h, 0fh, 7eh, 0c2h         ; movq    r10,  mm0    ; save mm0
 @@:
     DB      48h, 0fh, 6fh, 06h          ; movq    mm0, [rsi]
     DB      48h, 0fh, 0e7h, 07h         ; movntq  [rdi], mm0
@@ -53,6 +54,7 @@ InternalMemCopyMem  PROC    USES    rsi rdi
     add     rdi, 8
     loop    @B
     mfence
+    DB      49h, 0fh, 6eh, 0c2h          ; movq    mm0, r10    ; restore mm0
     jmp     @CopyBytes
 @CopyBackward:
     mov     rdi, r9                     ; rdi <- End of Destination

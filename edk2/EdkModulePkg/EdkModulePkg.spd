@@ -427,11 +427,6 @@
       <GuidValue>125F2DE1-FB85-440C-A54C-4D99358A8D38</GuidValue>
       <HelpText/>
     </Entry>
-    <Entry Name="Performance">
-      <C_Name>gEfiPerformanceProtocolGuid</C_Name>
-      <GuidValue>FFECFFFF-923C-14D2-9E3F-22A0C969563B</GuidValue>
-      <HelpText/>
-    </Entry>
     <Entry Name="PxeDhcp4">
       <C_Name>gEfiPxeDhcp4ProtocolGuid</C_Name>
       <GuidValue>03C4E624-AC28-11D3-9A2D-0090293FC14D</GuidValue>
