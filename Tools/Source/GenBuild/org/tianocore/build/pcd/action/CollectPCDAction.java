@@ -2777,9 +2777,7 @@ public class CollectPCDAction {
         }
 
         pcdType = Token.getpcdTypeFromString(dynamicInfo.getItemType().toString());
-        if (pcdType == Token.PCD_TYPE.DYNAMIC_EX) {
-            token.dynamicExTokenNumber = tokenNumber;
-        }
+        token.dynamicExTokenNumber = tokenNumber;
 
         skuInfoList = dynamicInfo.getSkuInfoList();
 
