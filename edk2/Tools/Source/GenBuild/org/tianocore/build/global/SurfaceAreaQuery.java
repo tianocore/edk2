@@ -598,9 +598,8 @@ public class SurfaceAreaQuery {
      *          xpath
      * @returns null if nothing is there
      */
-    public static String[] getLibraryClasses(String usage) {
+    public static String[] getLibraryClasses(String usage, String arch) {
         String[] xPath;
-
         if (usage == null || usage.equals("")) {
             xPath = new String[] { "/LibraryClass" };
         } else {
@@ -613,11 +612,19 @@ public class SurfaceAreaQuery {
         }
 
         LibraryClassDocument.LibraryClass[] libraryClassList = (LibraryClassDocument.LibraryClass[]) returns;
-        String[] libraryClassName = new String[libraryClassList.length];
+        List<String> libraryClassName = new ArrayList<String>();
         for (int i = 0; i < libraryClassList.length; i++) {
-            libraryClassName[i] = libraryClassList[i].getKeyword();
+			List archList = libraryClassList[i].getSupArchList();
+			
+			if (arch == null || contains(archList, arch)) {
+                libraryClassName.add(libraryClassList[i].getKeyword());
+			}
         }
-        return libraryClassName;
+		String[] libraryArray = new String[libraryClassName.size()];
+		for (int i = 0; i < libraryClassName.size(); i++) {
+			libraryArray[i] = libraryClassName.get(i);
+		}
+        return libraryArray;
     }
 
     /**
@@ -1885,6 +1892,9 @@ public class SurfaceAreaQuery {
      @return boolean
      **/
     public static boolean contains(List list, String str) {
+		if (list == null || list.size()== 0) {
+			return true;
+		}
         Iterator it = list.iterator();
         while (it.hasNext()) {
             String s = (String)it.next();
