@@ -6919,7 +6919,8 @@
   </BuildOptions>
   
   <UserExtensions UserID="TianoCore" Identifier="1">
-    <concat destfile="${FV_DIR}/FV_RECOVERY.fd" binary="true" >
+    <mkdir dir="${FV_DIR}/../../FV"/>
+    <concat destfile="${FV_DIR}/../../FV/FV_RECOVERY.fd" binary="true" >
        <fileset dir="${FV_DIR}" includes="*.fv"/>
     </concat>
   </UserExtensions>
