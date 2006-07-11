@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   AsmEnablePaging64 function
+#   InternalX86EnablePaging64 function
 #
 # Notes:
 #
@@ -28,7 +28,7 @@
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# AsmEnablePaging64 (
+# InternalX86EnablePaging64 (
 #   IN      UINT16                    CodeSelector,
 #   IN      UINT64                    EntryPoint,
 #   IN      UINT64                    Context1,    OPTIONAL
@@ -36,10 +36,10 @@
 #   IN      UINT64                    NewStack
 #   );
 #------------------------------------------------------------------------------
-.global _AsmEnablePaging64
-_AsmEnablePaging64:
+.global _InternalX86EnablePaging64
+_InternalX86EnablePaging64:
     cli
-    movl    $$LongStart, (%esp)
+    movl    $LongStart, (%esp)
     movl    %cr4, %eax
     orb     $0x20, %al
     movl    %eax, %cr4                  # enable PAE

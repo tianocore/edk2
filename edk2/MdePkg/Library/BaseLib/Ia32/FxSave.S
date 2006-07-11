@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   AsmFxSave function
+#   InternalX86FxSave function
 #
 # Notes:
 #
@@ -29,12 +29,12 @@
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# AsmFxSave (
+# InternalX86FxSave (
 #   OUT IA32_FX_BUFFER *Buffer
 #   );
 #------------------------------------------------------------------------------
-.global _AsmFxSave
-_AsmFxSave: 
+.global _InternalX86FxSave
+_InternalX86FxSave: 
     movl    4(%esp),%eax
     fxsave  (%eax)
     ret

@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   AsmReadGdtr function
+#   InternalX86ReadGdtr function
 #
 # Notes:
 #
@@ -28,12 +28,12 @@
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# AsmReadGdtr (
+# InternalX86ReadGdtr (
 #   OUT IA32_DESCRIPTOR  *Gdtr
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadGdtr
-_AsmReadGdtr: 
+.global _InternalX86ReadGdtr
+_InternalX86ReadGdtr: 
     movl    4(%esp),%eax
     sgdt    (%eax)
     ret

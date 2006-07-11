@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   AsmEnablePaging32 function
+#   InternalX86EnablePaging32 function
 #
 # Notes:
 #
@@ -28,15 +28,15 @@
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# AsmEnablePaging32 (
+# InternalX86EnablePaging32 (
 #   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
 #   IN      VOID                      *Context1,    OPTIONAL
 #   IN      VOID                      *Context2,    OPTIONAL
 #   IN      VOID                      *NewStack
 #   );
 #------------------------------------------------------------------------------
-.global _AsmEnablePaging32
-_AsmEnablePaging32: 
+.global _InternalX86EnablePaging32
+_InternalX86EnablePaging32: 
     movl    4(%esp),%ebx
     movl    8(%esp),%ecx
     movl    12(%esp),%edx

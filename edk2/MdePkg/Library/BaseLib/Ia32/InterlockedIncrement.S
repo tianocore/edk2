@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   InterlockedIncrement function
+#   InternalSyncIncrement function
 #
 # Notes:
 #
@@ -28,12 +28,12 @@
 #------------------------------------------------------------------------------
 # UINT32
 # EFIAPI
-# InterlockedIncrement (
+# InternalSyncIncrement (
 #   IN      UINT32                    *Value
 #   );
 #------------------------------------------------------------------------------
-.global _InterlockedIncrement
-_InterlockedIncrement: 
+.global _InternalSyncIncrement
+_InternalSyncIncrement: 
     movl    4(%esp),%eax
     lock    
     incl     (%eax)

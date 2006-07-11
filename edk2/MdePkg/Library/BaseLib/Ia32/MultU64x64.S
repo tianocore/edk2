@@ -23,15 +23,8 @@
 
      
 
-.global _MultS64x64
-_MultS64x64: 
-    #
-    # MultS64x32 shares the same implementation with _MultU64x32, and thus no
-    # code inside this function.
-    #
-
-
-.global _MultU64x64
+.global _InternalMathMultU64x64
+_InternalMathMultU64x64: 
     push    %ebx
     movl    8(%esp),%ebx
     movl    16(%esp),%edx

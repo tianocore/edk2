@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   AsmWriteGdtr function
+#   InternalX86WriteGdtr function
 #
 # Notes:
 #
@@ -28,12 +28,12 @@
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# AsmWriteGdtr (
+# InternalX86WriteGdtr (
 #   OUT IA32_DESCRIPTOR  *Gdtr
 #   );
 #------------------------------------------------------------------------------
-.global _AsmWriteGdtr
-_AsmWriteGdtr: 
+.global _InternalX86WriteGdtr
+_InternalX86WriteGdtr: 
     movl    4(%esp),%eax
     lgdt    (%eax)
     ret

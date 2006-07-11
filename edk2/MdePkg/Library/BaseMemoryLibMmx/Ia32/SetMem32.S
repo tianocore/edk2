@@ -52,7 +52,7 @@ L0:
     mfence
 @SetDwords: 
     testb   $1, %dl
-    jz      @F
+    jz      L1
     movd    %mm0, (%edi)
 L1: 
     pop     %edi

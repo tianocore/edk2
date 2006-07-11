@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   AsmFxRestore function
+#   InternalX86FxRestore function
 #
 # Notes:
 #
@@ -29,12 +29,12 @@
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# AsmFxRestore (
+# InternalX86FxRestore (
 #   IN CONST IA32_FX_BUFFER *Buffer
 #   );
 #------------------------------------------------------------------------------
-.global _AsmFxRestore
-_AsmFxRestore: 
+.global _InternalX86FxRestore
+_InternalX86FxRestore: 
     movl    4(%esp),%eax
     fxrstor (%eax)
     ret
