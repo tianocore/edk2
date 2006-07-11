@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -61,6 +61,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <SourceFiles>
     <Filename>Pcd.dxs</Filename>
     <Filename>Pcd.c</Filename>
+    <Filename>Service.h</Filename>
     <Filename>Service.c</Filename>
   </SourceFiles>
   <PackageDependencies>
