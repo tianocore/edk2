@@ -750,7 +750,7 @@ public class Token {
                 judgedValue.equalsIgnoreCase("\"\"")   ||
                 judgedValue.equalsIgnoreCase("L\"\"")   ||
                 (judgedValue.length() == 0)             ||
-                judgedValue.equalsIgnoreCase("{}")) {
+                judgedValue.equalsIgnoreCase("{0}")) {
                 return true;
             }
         }
