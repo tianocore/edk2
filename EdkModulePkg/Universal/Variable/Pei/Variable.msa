@@ -31,6 +31,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>BaseLib</Keyword>
+    </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -44,8 +47,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>Variable.h</Filename>
     <Filename>Variable.c</Filename>
     <Filename>Variable.dxs</Filename>
+    <Filename SupArchList="IA32">Ia32/VarMachine.h</Filename>
+    <Filename SupArchList="EBC">Ebc/VarMachine.h</Filename>
+    <Filename SupArchList="X64">x64/VarMachine.h</Filename>
+    <Filename SupArchList="IPF">Ipf/VarMachine.h</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

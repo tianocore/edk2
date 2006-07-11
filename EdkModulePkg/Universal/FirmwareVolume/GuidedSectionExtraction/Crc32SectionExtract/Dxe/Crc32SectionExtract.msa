@@ -54,6 +54,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>Crc32SectionExtract.h</Filename>
     <Filename>GuidedSection.c</Filename>
     <Filename>GuidedSection.h</Filename>
+    <Filename>Crc32SectionExtract.dxs</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

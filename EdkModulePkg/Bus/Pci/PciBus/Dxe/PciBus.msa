@@ -84,6 +84,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>PciEnumeratorSupport.c</Filename>
     <Filename>PciResourceSupport.c</Filename>
     <Filename>PciCommand.c</Filename>
+    <Filename>ComponentName.h</Filename>
     <Filename>ComponentName.c</Filename>
     <Filename>PciDeviceSupport.c</Filename>
     <Filename>pcibus.c</Filename>

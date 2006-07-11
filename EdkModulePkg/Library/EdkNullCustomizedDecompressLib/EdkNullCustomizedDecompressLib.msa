@@ -27,6 +27,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>CustomizedDecompress.h</Filename>
     <Filename>CustomizedDecompress.c</Filename>
   </SourceFiles>
   <PackageDependencies>

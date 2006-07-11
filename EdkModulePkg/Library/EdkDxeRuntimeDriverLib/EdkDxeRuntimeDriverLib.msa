@@ -42,6 +42,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>RuntimeLibInternal.h</Filename>
     <Filename SupArchList="IA32">Common/RuntimeLib.c</Filename>
     <Filename SupArchList="IA32">Common/RuntimeService.c</Filename>
     <Filename SupArchList="X64">Common/RuntimeLib.c</Filename>

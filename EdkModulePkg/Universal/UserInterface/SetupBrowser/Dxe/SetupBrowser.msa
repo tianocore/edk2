@@ -76,6 +76,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>ProcessOptions.c</Filename>
     <Filename>Ui.c</Filename>
     <Filename>Ui.h</Filename>
+    <Filename>Colors.h</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

@@ -54,6 +54,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>Fvb.h</Filename>
     <Filename SupArchList="IA32">Ia32/Fvb.c</Filename>
     <Filename SupArchList="X64">x64/Fvb.c</Filename>
     <Filename SupArchList="IPF">Ipf/Fvb.c</Filename>

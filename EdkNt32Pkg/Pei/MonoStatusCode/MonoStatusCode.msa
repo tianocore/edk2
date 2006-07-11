@@ -45,6 +45,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>MonoStatusCode.dxs</Filename>
+    <Filename>MonoStatusCode.h</Filename>
     <Filename>MonoStatusCode.c</Filename>
     <Filename>PlatformStatusCode.c</Filename>
   </SourceFiles>

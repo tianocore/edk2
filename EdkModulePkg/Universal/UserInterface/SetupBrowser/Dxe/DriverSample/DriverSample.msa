@@ -73,6 +73,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>VfrStrings.uni</Filename>
     <Filename>Vfr.vfr</Filename>
     <Filename>DriverSample.c</Filename>
+    <Filename>NVDataStruc.h</Filename>
     <Filename>DriverSample.h</Filename>
   </SourceFiles>
   <PackageDependencies>
