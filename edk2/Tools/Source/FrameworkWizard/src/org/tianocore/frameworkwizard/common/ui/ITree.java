@@ -238,12 +238,19 @@ public class ITree extends JTree {
             if (iNode.getId().equals(id) && iNode.getCategory() == category) {
                 return iNode;
             }
+            IDefaultMutableTreeNode childNode = getNodeById(iNode, id, category);
+            if (childNode != null) {
+                return childNode;
+            }
         }
         return null;
     }
     
     public TreePath getPathOfNode(IDefaultMutableTreeNode node) {
-        TreePath treePath = new TreePath(treeModel.getPathToRoot(node));
-        return treePath;
+        if (node != null) {
+            TreePath treePath = new TreePath(treeModel.getPathToRoot(node));
+            return treePath;    
+        }
+        return null;
     }
 }

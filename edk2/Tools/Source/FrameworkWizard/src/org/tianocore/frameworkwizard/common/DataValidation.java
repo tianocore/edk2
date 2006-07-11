@@ -192,7 +192,7 @@ public class DataValidation {
      
      **/
     public static boolean isVersionDataType(String arg0) {
-        return isMatch("(\\d)+(.)?(\\d)+", arg0);
+        return isMatch("\\d+(\\.\\d+)*", arg0);
     }
 
     /**

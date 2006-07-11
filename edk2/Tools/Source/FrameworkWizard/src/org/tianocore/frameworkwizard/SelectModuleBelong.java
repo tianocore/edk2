@@ -15,10 +15,12 @@
  **/
 package org.tianocore.frameworkwizard;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Vector;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -46,6 +48,7 @@ import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
+import javax.swing.JRadioButton;
 
 public class SelectModuleBelong extends IDialog {
 
@@ -55,7 +58,7 @@ public class SelectModuleBelong extends IDialog {
      **/
     private static final long serialVersionUID = 4171355136991448972L;
 
-    private JPanel jContentPane = null;
+    private JPanel jContentPane = null;  //  @jve:decl-index=0:visual-constraint="10,54"
 
     private JComboBox jComboBoxExistingPackage = null;
 
@@ -96,6 +99,8 @@ public class SelectModuleBelong extends IDialog {
     private StarLabel jStarLabel4 = null;
 
     private StarLabel jStarLabel5 = null;
+    
+    private ButtonGroup bg = new ButtonGroup();
 
     private WorkspaceTools wt = new WorkspaceTools();
 
@@ -106,6 +111,12 @@ public class SelectModuleBelong extends IDialog {
     private PlatformIdentification fid = null;
 
     private int mode = -1;
+
+    private JLabel jLabelIsLibrary = null;
+
+    private JRadioButton jRadioButtonYes = null;
+
+    private JRadioButton jRadioButtonNo = null;
 
     /**
      * This method initializes jComboBoxExistingPackage	
@@ -128,7 +139,7 @@ public class SelectModuleBelong extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(310, 140, 80, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(310, 165, 80, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -143,7 +154,7 @@ public class SelectModuleBelong extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(395, 140, 80, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(395, 165, 80, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -158,7 +169,7 @@ public class SelectModuleBelong extends IDialog {
     private JTextField getJTextFieldFilePath() {
         if (jTextFieldFilePath == null) {
             jTextFieldFilePath = new JTextField();
-            jTextFieldFilePath.setBounds(new java.awt.Rectangle(140, 35, 250, 20));
+            jTextFieldFilePath.setBounds(new java.awt.Rectangle(140, 60, 250, 20));
         }
         return jTextFieldFilePath;
     }
@@ -171,7 +182,7 @@ public class SelectModuleBelong extends IDialog {
     private JButton getJButtonBrowse() {
         if (jButtonBrowse == null) {
             jButtonBrowse = new JButton();
-            jButtonBrowse.setBounds(new java.awt.Rectangle(395, 35, 85, 20));
+            jButtonBrowse.setBounds(new java.awt.Rectangle(395, 60, 85, 20));
             jButtonBrowse.setText("Browse");
             jButtonBrowse.addActionListener(this);
         }
@@ -186,7 +197,7 @@ public class SelectModuleBelong extends IDialog {
     private JTextField getJTextFieldName() {
         if (jTextFieldName == null) {
             jTextFieldName = new JTextField();
-            jTextFieldName.setBounds(new java.awt.Rectangle(140, 60, 340, 20));
+            jTextFieldName.setBounds(new java.awt.Rectangle(140, 85, 340, 20));
         }
         return jTextFieldName;
     }
@@ -199,7 +210,7 @@ public class SelectModuleBelong extends IDialog {
     private JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(140, 85, 250, 20));
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(140, 110, 250, 20));
         }
         return jTextFieldGuid;
     }
@@ -212,7 +223,7 @@ public class SelectModuleBelong extends IDialog {
     private JButton getJButtonGen() {
         if (jButtonGen == null) {
             jButtonGen = new JButton();
-            jButtonGen.setBounds(new java.awt.Rectangle(395, 85, 85, 20));
+            jButtonGen.setBounds(new java.awt.Rectangle(395, 110, 85, 20));
             jButtonGen.setText("GEN");
             jButtonGen.addActionListener(this);
         }
@@ -227,9 +238,39 @@ public class SelectModuleBelong extends IDialog {
     private JTextField getJTextFieldVersion() {
         if (jTextFieldVersion == null) {
             jTextFieldVersion = new JTextField();
-            jTextFieldVersion.setBounds(new java.awt.Rectangle(140, 110, 340, 20));
+            jTextFieldVersion.setBounds(new java.awt.Rectangle(140, 135, 340, 20));
         }
         return jTextFieldVersion;
+    }
+
+    /**
+     * This method initializes jRadioButtonYes	
+     * 	
+     * @return javax.swing.JRadioButton	
+     */
+    private JRadioButton getJRadioButtonYes() {
+        if (jRadioButtonYes == null) {
+            jRadioButtonYes = new JRadioButton();
+            jRadioButtonYes.setBounds(new java.awt.Rectangle(140,35,100,20));
+            jRadioButtonYes.setSelected(true);
+            jRadioButtonYes.setText("Yes");
+        }
+        return jRadioButtonYes;
+    }
+
+    /**
+     * This method initializes jRadioButtonNo	
+     * 	
+     * @return javax.swing.JRadioButton	
+     */
+    private JRadioButton getJRadioButtonNo() {
+        if (jRadioButtonNo == null) {
+            jRadioButtonNo = new JRadioButton();
+            jRadioButtonNo.setBounds(new java.awt.Rectangle(300,35,110,20));
+            jRadioButtonNo.setSelected(false);
+            jRadioButtonNo.setText("No");
+        }
+        return jRadioButtonNo;
     }
 
     /**
@@ -260,6 +301,23 @@ public class SelectModuleBelong extends IDialog {
             this.jStarLabel1.setVisible(false);
             this.jLabelPackage.setVisible(false);
             this.jComboBoxExistingPackage.setVisible(false);
+            this.jLabelIsLibrary.setVisible(false);
+            this.jRadioButtonYes.setVisible(false);
+            this.jRadioButtonNo.setVisible(false);
+            upLocation(this.jStarLabel2, 50);
+            upLocation(this.jStarLabel3, 50);
+            upLocation(this.jStarLabel4, 50);
+            upLocation(this.jStarLabel5, 50);
+            upLocation(this.jLabelFilePath, 50);
+            upLocation(this.jLabelName, 50);
+            upLocation(this.jLabelGuid, 50);
+            upLocation(this.jLabelVersion, 50);
+            upLocation(this.jTextFieldFilePath, 50);
+            upLocation(this.jTextFieldName, 50);
+            upLocation(this.jTextFieldGuid, 50);
+            upLocation(this.jTextFieldVersion, 50);
+            upLocation(this.jButtonBrowse, 50);
+            upLocation(this.jButtonGen, 50);
         }
     }
 
@@ -269,7 +327,7 @@ public class SelectModuleBelong extends IDialog {
      * @return void
      */
     private void init() {
-        this.setSize(500, 200);
+        this.setSize(500, 230);
         this.setContentPane(getJContentPane());
         this.setTitle("New");
         this.centerWindow();
@@ -282,24 +340,27 @@ public class SelectModuleBelong extends IDialog {
      */
     private JPanel getJContentPane() {
         if (jContentPane == null) {
+            jLabelIsLibrary = new JLabel();
+            jLabelIsLibrary.setBounds(new java.awt.Rectangle(15,35,120,20));
+            jLabelIsLibrary.setText("Is a Library");
             jLabelVersion = new JLabel();
-            jLabelVersion.setBounds(new java.awt.Rectangle(15, 110, 120, 20));
+            jLabelVersion.setBounds(new java.awt.Rectangle(15, 135, 120, 20));
             jLabelVersion.setText("Version");
             jLabelGuid = new JLabel();
-            jLabelGuid.setBounds(new java.awt.Rectangle(15, 85, 120, 20));
+            jLabelGuid.setBounds(new java.awt.Rectangle(15, 110, 120, 20));
             jLabelGuid.setText("Guid");
             jLabelName = new JLabel();
-            jLabelName.setBounds(new java.awt.Rectangle(15, 60, 120, 20));
+            jLabelName.setBounds(new java.awt.Rectangle(15, 85, 120, 20));
             jLabelName.setText("Name");
             jLabelFilePath = new JLabel();
-            jLabelFilePath.setBounds(new java.awt.Rectangle(15, 35, 120, 20));
+            jLabelFilePath.setBounds(new java.awt.Rectangle(15, 60, 120, 20));
             jLabelFilePath.setText("File Path");
             jLabelPackage = new JLabel();
             jLabelPackage.setBounds(new java.awt.Rectangle(15, 10, 120, 20));
             jLabelPackage.setText("Choose Package");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setSize(new java.awt.Dimension(490, 175));
+            jContentPane.setSize(new java.awt.Dimension(490,198));
             jContentPane.add(getJComboBoxExistingPackage(), null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
@@ -318,18 +379,23 @@ public class SelectModuleBelong extends IDialog {
             jStarLabel1 = new StarLabel();
             jStarLabel1.setLocation(new java.awt.Point(0, 10));
             jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(0, 35));
+            jStarLabel2.setLocation(new java.awt.Point(0, 60));
             jStarLabel3 = new StarLabel();
-            jStarLabel3.setLocation(new java.awt.Point(0, 60));
+            jStarLabel3.setLocation(new java.awt.Point(0, 85));
             jStarLabel4 = new StarLabel();
-            jStarLabel4.setLocation(new java.awt.Point(0, 85));
+            jStarLabel4.setLocation(new java.awt.Point(0, 110));
             jStarLabel5 = new StarLabel();
-            jStarLabel5.setLocation(new java.awt.Point(0, 110));
+            jStarLabel5.setLocation(new java.awt.Point(0, 135));
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jStarLabel3, null);
             jContentPane.add(jStarLabel4, null);
             jContentPane.add(jStarLabel5, null);
+            jContentPane.add(jLabelIsLibrary, null);
+            jContentPane.add(getJRadioButtonYes(), null);
+            jContentPane.add(getJRadioButtonNo(), null);
+            bg.add(getJRadioButtonNo());
+            bg.add(getJRadioButtonYes());
         }
         return jContentPane;
     }
@@ -543,7 +609,7 @@ public class SelectModuleBelong extends IDialog {
         // Save to identification
         //
         mid = new ModuleIdentification(this.jTextFieldName.getText(), this.jTextFieldGuid.getText(),
-                                       this.jTextFieldVersion.getText(), path);
+                                       this.jTextFieldVersion.getText(), path, jRadioButtonYes.isSelected());
         mid.setPackageId(packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()));
     }
 
@@ -659,5 +725,9 @@ public class SelectModuleBelong extends IDialog {
 
     public void setPid(PackageIdentification pid) {
         this.pid = pid;
+    }
+    
+    private void upLocation(Component c, int size) {
+        c.setLocation(c.getLocation().x, c.getLocation().y - size);
     }
 }

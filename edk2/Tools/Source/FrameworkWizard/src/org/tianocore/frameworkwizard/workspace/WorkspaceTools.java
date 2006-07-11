@@ -89,11 +89,11 @@ public class WorkspaceTools {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+
         } catch (XmlException e) {
-            e.printStackTrace();
+
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
         return modulePath;
     }
@@ -117,11 +117,11 @@ public class WorkspaceTools {
                }
            }
        } catch (IOException e) {
-           e.printStackTrace();
+
        } catch (XmlException e) {
-           e.printStackTrace();
+
        } catch (Exception e) {
-           e.printStackTrace();
+
        }
        return includePath;
    }
@@ -147,22 +147,54 @@ public class WorkspaceTools {
                 vPackageList.addElement(new PackageIdentification(id));
             } catch (IOException e) {
                 Log.err("Open Package Surface Area " + path, e.getMessage());
-                e.printStackTrace();
+
             } catch (XmlException e) {
                 Log.err("Open Package Surface Area " + path, e.getMessage());
-                e.printStackTrace();
+
             } catch (Exception e) {
                 Log.err("Open Package Surface Area " + path, "Invalid file type");
-                e.printStackTrace();
+
             }
         }
+        Tools.sortPackages(vPackageList, DataType.SORT_TYPE_ASCENDING);
         return vPackageList;
+    }
+    
+    /**
+     Get all module basic information from a package
+    
+     @param id Package id
+     @return A vector includes all modules' basic information
+    
+    **/
+    public Vector<ModuleIdentification> getAllModules(PackageIdentification pid) {
+        Vector<ModuleIdentification> v = new Vector<ModuleIdentification>();
+        Vector<String> modulePaths = this.getAllModulesOfPackage(pid.getPath());
+        Identification id = null;
+        String modulePath = null;
+        
+        for (int index = 0; index < modulePaths.size(); index++) {
+            try {
+                modulePath = modulePaths.get(index);
+                id = getId(modulePath, OpenFile.openMsaFile(modulePath));
+            } catch (IOException e) {
+                Log.log("Error when Open Module Surface Area " + modulePath, e.getMessage());
+            } catch (XmlException e) {
+                Log.log("Error when Open Module Surface Area " + modulePath, e.getMessage());
+            } catch (Exception e) {
+                Log.log("Error when Open Module Surface Area " + modulePath, "Invalid file type " + e.getMessage());
+            }
+            v.addElement(new ModuleIdentification(id, pid));
+        }
+        Tools.sortModules(v, DataType.SORT_TYPE_ASCENDING);
+        return v;
+        
     }
 
     /**
-     Get all package basic information form the FrameworkDatabase.db file
+     Get all module basic information form the FrameworkDatabase.db file
      
-     @return vPackageList A vector includes all packages' basic information
+     @return vModuleList A vector includes all modules' basic information
      
      */
     public Vector<ModuleIdentification> getAllModules() {
@@ -190,17 +222,14 @@ public class WorkspaceTools {
                     vModuleList.addElement(new ModuleIdentification(id, vPackageList.elementAt(indexI)));
                 } catch (IOException e) {
                     Log.err("Open Module Surface Area " + modulePath, e.getMessage());
-                    e.printStackTrace();
                 } catch (XmlException e) {
                     Log.err("Open Module Surface Area " + modulePath, e.getMessage());
-                    e.printStackTrace();
                 } catch (Exception e) {
                     Log.err("Open Module Surface Area " + modulePath, "Invalid file type");
-                    e.printStackTrace();
                 }
             }
         }
-
+        Tools.sortModules(vModuleList, DataType.SORT_TYPE_ASCENDING);
         return vModuleList;
     }
 
@@ -225,15 +254,13 @@ public class WorkspaceTools {
                 vPlatformList.addElement(new PlatformIdentification(id));
             } catch (IOException e) {
                 Log.err("Open Platform Surface Area " + path, e.getMessage());
-                e.printStackTrace();
             } catch (XmlException e) {
                 Log.err("Open Platform Surface Area " + path, e.getMessage());
-                e.printStackTrace();
             } catch (Exception e) {
                 Log.err("Open Platform Surface Area " + path, "Invalid file type");
-                e.printStackTrace();
             }
         }
+        Tools.sortPlatforms(vPlatformList, DataType.SORT_TYPE_ASCENDING);
         return vPlatformList;
     }
 
@@ -251,6 +278,7 @@ public class WorkspaceTools {
                 }
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -268,6 +296,7 @@ public class WorkspaceTools {
                 }
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -285,6 +314,7 @@ public class WorkspaceTools {
                 }
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -302,6 +332,7 @@ public class WorkspaceTools {
                 }
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -319,6 +350,7 @@ public class WorkspaceTools {
                 }
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -340,15 +372,13 @@ public class WorkspaceTools {
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (XmlException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -368,15 +398,13 @@ public class WorkspaceTools {
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (XmlException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -396,15 +424,13 @@ public class WorkspaceTools {
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (XmlException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -424,15 +450,13 @@ public class WorkspaceTools {
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (XmlException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -452,15 +476,13 @@ public class WorkspaceTools {
                 }
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (XmlException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (Exception e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
+        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -495,11 +517,11 @@ public class WorkspaceTools {
                         return vPackageList.elementAt(indexI);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+
                 } catch (XmlException e) {
-                    e.printStackTrace();
+                
                 } catch (Exception e) {
-                    e.printStackTrace();
+
                 }
             }
         }

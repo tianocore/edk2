@@ -126,7 +126,7 @@ public class IFrame extends JFrame implements ActionListener, WindowListener {
      * 
      */
     public void windowClosing(WindowEvent arg0) {
-        this.onDisvisible();
+        //this.onDisvisible();
     }
 
     public void windowOpened(WindowEvent arg0) {

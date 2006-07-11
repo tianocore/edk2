@@ -14,16 +14,10 @@
  **/
 
 package org.tianocore.frameworkwizard.packaging;
-import java.io.File;
 
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
 
 public class PackageIdentification extends Identification{
-    
-    //
-    // It is optional
-    //
-    private File spdFile;
     
     public PackageIdentification(String name, String guid, String version){
         super(name, guid, version);
@@ -35,26 +29,5 @@ public class PackageIdentification extends Identification{
     
     public PackageIdentification(Identification id){
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
-    }
-    
-    public PackageIdentification(String name, String guid, String version, File spdFile){
-        super(name, guid, version);
-        this.spdFile = spdFile;
-    }
-    
-    public File getSpdFile() {
-        return spdFile;
-    }
-
-    public String toString(){
-        return "Package " + this.getName() + "[" + this.getGuid() + "]";
-    }
-
-    public void setSpdFile(File spdFile) {
-        this.spdFile = spdFile;
-    }
-    
-    public String getPackageDir(){
-        return spdFile.getParent();
     }
 }

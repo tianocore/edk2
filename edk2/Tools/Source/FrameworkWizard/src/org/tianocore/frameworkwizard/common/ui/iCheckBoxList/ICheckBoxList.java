@@ -86,6 +86,22 @@ public class ICheckBoxList extends JList {
         }
         return result;
     }
+    
+    /**
+    Get All Checked Items index of the CheckBoxList component.
+    
+    @return    All Checked Items index
+    **/
+   public Vector<Integer> getAllCheckedItemsIndex() {
+       Vector<Integer> result = new Vector<Integer>();
+
+       for (int i = 0; i < this.getModel().getSize(); i++) {
+           if (((ICheckBoxListItem) this.getModel().getElementAt(i)).isChecked()) {
+               result.addElement(i);
+           }
+       }
+       return result;
+   }
 
     /**
      Get All Checked Items String of the CheckBoxList component.

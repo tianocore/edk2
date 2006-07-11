@@ -113,12 +113,7 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
      **/
     private JTable getJTable() {
         if (jTable == null) {
-//            Vector<String> vTableHeader = new Vector<String>();
-//            vTableHeader.addElement("Name");
-//            vTableHeader.addElement("Value");
-//            
             model = new DefaultTableModel();
-            //model = new DefaultTableModel(vTableHeader);
             jTable = new JTable(model);
             jTable.setRowHeight(20);
 
