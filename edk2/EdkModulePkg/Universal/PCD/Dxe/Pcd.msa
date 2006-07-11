@@ -65,6 +65,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>Service.h</Filename>
     <Filename>Service.c</Filename>
     <Filename>Pcd.c</Filename>
     <Filename>Pcd.dxs</Filename>
