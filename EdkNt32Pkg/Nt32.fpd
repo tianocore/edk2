@@ -210,7 +210,7 @@
           <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>VOID*</DatumType>
           <MaxDatumSize>52</MaxDatumSize>
-          <Value>L"..\\..\\FV\\FV_RECOVERY.fd"</Value>
+          <Value>L"..\\FV\\FV_RECOVERY.fd"</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdWinNtBootMode</C_Name>
@@ -6919,8 +6919,7 @@
   </BuildOptions>
   
   <UserExtensions UserID="TianoCore" Identifier="1">
-    <mkdir dir="${FV_DIR}/../../FV"/>
-    <concat destfile="${FV_DIR}/../../FV/FV_RECOVERY.fd" binary="true" >
+    <concat destfile="${FV_DIR}/FV_RECOVERY.fd" binary="true" >
        <fileset dir="${FV_DIR}" includes="*.fv"/>
     </concat>
   </UserExtensions>
