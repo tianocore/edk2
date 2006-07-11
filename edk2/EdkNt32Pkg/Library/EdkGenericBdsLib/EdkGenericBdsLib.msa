@@ -67,6 +67,7 @@
     <Filename>BdsConsole.c</Filename>
     <Filename>BdsConnect.c</Filename>
     <Filename>DevicePath.c</Filename>
+    <Filename>Performance.h</Filename>
     <Filename>Performance.c</Filename>
     <Filename>BdsMisc.c</Filename>
     <Filename SupArchList="IPF">Ipf\ShadowRom.c</Filename>

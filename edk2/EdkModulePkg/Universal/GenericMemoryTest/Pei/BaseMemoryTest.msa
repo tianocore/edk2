@@ -41,6 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>BaseMemoryTest.h</Filename>
     <Filename>BaseMemoryTest.c</Filename>
   </SourceFiles>
   <PackageDependencies>

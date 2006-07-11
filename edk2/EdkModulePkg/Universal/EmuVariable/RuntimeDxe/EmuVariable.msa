@@ -56,6 +56,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>Variable.h</Filename>
     <Filename>EmuVariable.c</Filename>
     <Filename>EmuVariable.dxs</Filename>
     <Filename SupArchList="IA32">InitVariable.c</Filename>

@@ -60,6 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>MiscSubclassDriver.uni</Filename>
+    <Filename>MiscDevicePath.h</Filename>
     <Filename>MiscSubclassDriver.h</Filename>
     <Filename>MiscSubclassDriverEntryPoint.c</Filename>
     <Filename>MiscSubclassDriverDataTable.c</Filename>

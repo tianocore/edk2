@@ -19,10 +19,7 @@ Abstract:
 
 --*/
 
-
-#include <Ppi/ReadOnlyVariable.h>
 #include <Variable.h>
-#include <Library/BaseLib.h>
 
 //
 // Module globals

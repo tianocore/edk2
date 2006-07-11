@@ -64,6 +64,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <SourceFiles>
     <Filename>PeiMain.h</Filename>
     <Filename>BootMode/BootMode.c</Filename>
+    <Filename>Dependency/dependency.h</Filename>
     <Filename>Dependency/dependency.c</Filename>
     <Filename>Dispatcher/Dispatcher.c</Filename>
     <Filename>FwVol/FwVol.c</Filename>

@@ -62,6 +62,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>GraphicsConsole.h</Filename>
     <Filename>GraphicsConsole.c</Filename>
     <Filename>LaffStd.c</Filename>
+    <Filename>ComponentName.h</Filename>
     <Filename>ComponentName.c</Filename>
   </SourceFiles>
   <PackageDependencies>

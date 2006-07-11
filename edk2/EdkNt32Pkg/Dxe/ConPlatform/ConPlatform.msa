@@ -64,6 +64,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <SourceFiles>
     <Filename>ConPlatform.c</Filename>
     <Filename>ConPlatform.h</Filename>
+    <Filename>ComponentName.h</Filename>
     <Filename>ComponentName.c</Filename>
   </SourceFiles>
   <PackageDependencies>

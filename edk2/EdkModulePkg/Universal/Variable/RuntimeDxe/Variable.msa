@@ -65,7 +65,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>Variable.h</Filename>
     <Filename>Variable.c</Filename>
+    <Filename>reclaim.h</Filename>
     <Filename>reclaim.c</Filename>
     <Filename SupArchList="IA32">InitVariable.c</Filename>
     <Filename SupArchList="IA32">Ia32Variable.dxs</Filename>

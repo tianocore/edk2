@@ -82,10 +82,7 @@
     <Filename>Bus/Pci/AtapiPassThru/Dxe/AtapiPassThru.msa</Filename>
     <Filename>Bus/Pci/CirrusLogic/Dxe/CirrusLogic5430.msa</Filename>
     <Filename>Bus/Pci/IdeBus/Dxe/idebus.msa</Filename>
-    <Filename>Bus/Pci/IdeBus/Dxe/idebusLite.msa</Filename>
-    <Filename>Bus/Pci/PciBus/Dxe/LightPciBus.msa</Filename>
     <Filename>Bus/Pci/PciBus/Dxe/PciBus.msa</Filename>
-    <Filename>Bus/Pci/PciBus/Dxe/PciBusLite.msa</Filename>
     <Filename>Bus/Pci/Uhci/Dxe/Uhci.msa</Filename>
     <Filename>Bus/Pci/Undi/RuntimeDxe/Undi.msa</Filename>
     <Filename>Bus/Scsi/ScsiBus/Dxe/ScsiBus.msa</Filename>
