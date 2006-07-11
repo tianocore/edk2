@@ -34,6 +34,7 @@ GetPowerOfTwo32 (
   )
 {
   INTN                              BitPos;
-
-  return (BitPos = HighBitSet32 (Operand)) > 0 ? 1ul << BitPos : 0;
+  
+  BitPos = HighBitSet32 (Operand);
+  return BitPos >= 0 ? 1ul << BitPos : 0;
 }
