@@ -35,5 +35,6 @@ GetPowerOfTwo64 (
 {
   INTN                              BitPos;
 
-  return (BitPos = HighBitSet64 (Operand)) > 0 ? LShiftU64 (1, BitPos) : 0;
+  BitPos = HighBitSet64 (Operand);
+  return BitPos >= 0 ? LShiftU64 (1, BitPos) : 0;
 }
