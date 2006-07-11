@@ -542,7 +542,7 @@ public class GenBuildTask extends Ant {
         // AutoGen
         //
         
-        AutoGen autogen = new AutoGen(getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch());
+        AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch());
         autogen.genAutogen();
         
         

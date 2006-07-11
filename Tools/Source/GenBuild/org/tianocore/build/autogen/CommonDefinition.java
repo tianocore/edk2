@@ -54,6 +54,9 @@ public class CommonDefinition {
     public final static String protocolGuid = "ProtocolGuid";
     public final static String ppiGuid = "PpiGuid";
     public final static String guidGuid = "Guid";
+
+	public final static String tianoR8FlashMapH = "TianoR8FlashMap.h";
+	public final static String flashMapH = "FlashMap.h";
     
     //
     // AutoGen.h and AutoGen.c file's header

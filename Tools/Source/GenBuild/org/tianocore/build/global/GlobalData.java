@@ -16,13 +16,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.global;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
+
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
-import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
+import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
@@ -36,15 +46,6 @@ import org.tianocore.build.toolchain.ToolChainKey;
 import org.tianocore.build.toolchain.ToolChainMap;
 import org.tianocore.exception.EdkException;
 import org.tianocore.logger.EdkLog;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
   GlobalData provide initializing, instoring, querying and update global data.
@@ -133,8 +134,6 @@ public class GlobalData {
 
     private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
 
-    
-
     /**
       Parse framework database (DB) and all SPD files listed in DB to initialize
       the environment for next build. This method will only be executed only once
@@ -145,7 +144,7 @@ public class GlobalData {
       @throws BuildException
             Framework Dababase or SPD or MSA file is not valid
     **/
-    public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir, String toolsDefFilename) throws BuildException {
+    public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir, String toolsDefFilename ) throws BuildException {
         //
         // ensure this method will be revoked only once
         //
@@ -153,8 +152,8 @@ public class GlobalData {
             return;
         }
         globalFlag = true;
-        
-        //
+
+		// 
         // Backup workspace directory. It will be used by other method
         //
         GlobalData.workspaceDir = workspaceDir.replaceAll("(\\\\)", "/");

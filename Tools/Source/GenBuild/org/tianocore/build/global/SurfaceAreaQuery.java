@@ -1916,4 +1916,24 @@ public class SurfaceAreaQuery {
 
         return false;
     }
+
+	public static boolean isHaveTianoR8FlashMap(){
+        PcdCodedDocument.PcdCoded.PcdEntry[] pcdEntries  = null;
+        String[]            results;
+        int                 index;
+        String[]            xPath       = new String[] {"/"};
+        Object[]         returns     = get ("Externs", xPath);
+
+        if (returns == null) {
+            return false;
+        }
+
+		ExternsDocument.Externs ext = (ExternsDocument.Externs)returns[0];
+		
+		if (ext.getTianoR8FlashMapH()){
+			return true;
+	    }else {
+			return false;
+		}
+	}
 }
