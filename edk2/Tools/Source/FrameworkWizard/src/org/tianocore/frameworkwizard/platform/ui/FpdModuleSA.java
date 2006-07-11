@@ -132,6 +132,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     public void setKey(String k){
         this.moduleKey = k;
         jTabbedPane.setSelectedIndex(0);
+        initPcdBuildDefinition(k);
     }
 
     /**

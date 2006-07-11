@@ -164,7 +164,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     protected JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(5,256,472,196));
+            jScrollPane.setBounds(new java.awt.Rectangle(5,256,472,292));
             jScrollPane.setViewportView(getJTable());
         }
         return jScrollPane;
@@ -253,7 +253,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
        TableModel m = (TableModel)arg0.getSource();
        if (arg0.getType() == TableModelEvent.UPDATE){
            if (docConsole != null) {
-           docConsole.setSaved(false);
+               docConsole.setSaved(false);
            }
            updateRow(row, m);
        }
@@ -549,8 +549,11 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             if (!dataValidation(row)) {
                 return;
             }
-            docConsole.setSaved(false);
+            if (docConsole != null) {
+                docConsole.setSaved(false);
+            }
             model.addRow(row);
+            jTable.changeSelection(model.getRowCount()-1, 0, false, false);
             addRow(row);
         }
         //

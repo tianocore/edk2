@@ -129,6 +129,10 @@ public class SpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getSpdPcdDefinitionCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         } 
         cursor.dispose();
     }
@@ -156,6 +160,10 @@ public class SpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getSpdPpiDeclarationCount() == 0){
+                cursor.toParent();
+                cursor.removeXml();
+            }
         } 
         cursor.dispose();
     }
@@ -182,6 +190,10 @@ public class SpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getSpdProtocolDeclarationCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         cursor.dispose();
     }
@@ -208,7 +220,10 @@ public class SpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
-
+            if (getSpdGuidDeclarationCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         } 
         cursor.dispose();
     }
@@ -236,6 +251,10 @@ public class SpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getSpdPackageHeaderCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         } 
         cursor.dispose();
     }
@@ -263,6 +282,10 @@ public class SpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getSpdMsaFileCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         cursor.dispose();
     }
@@ -290,6 +313,10 @@ public class SpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getSpdLibClassDeclarationCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         cursor.dispose();
     }

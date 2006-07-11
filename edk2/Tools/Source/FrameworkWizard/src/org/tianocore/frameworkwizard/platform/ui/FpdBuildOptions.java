@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -41,18 +42,20 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Vector;
+import java.awt.Dimension;
 
 public class FpdBuildOptions extends IInternalFrame {
 
@@ -111,7 +114,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton jButton18 = null;
     private FpdFileContents ffc = null;
     private OpeningPlatformType docConsole = null;
-    private JButton jButton19 = null;
     private JCheckBox jCheckBox9 = null;
     private JCheckBox jCheckBox10 = null;
     private JCheckBox jCheckBox11 = null;
@@ -146,6 +148,8 @@ public class FpdBuildOptions extends IInternalFrame {
     private JButton jButton7 = null;
     private JScrollPane jScrollPane4 = null;
     private JTable jTable6 = null;
+    private JButton jButton12 = null;
+    private JTextField jTextField1 = null;
     /**
      * This method initializes jPanel	
      * 	
@@ -245,6 +249,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanel9.setLayout(flowLayout8);
             jPanel9.add(jLabel, null);
             jPanel9.add(getJTextField2(), null);
+            jPanel9.add(getJButton12(), null);
             jPanel9.add(jLabel3, null);
             jPanel9.add(getJTextField3(), null);
         }
@@ -325,14 +330,14 @@ public class FpdBuildOptions extends IInternalFrame {
             jButton4.setText("Add");
             jButton4.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (!DataValidation.isInt(jTextField3.getText())) {
-                        JOptionPane.showMessageDialog(frame, "ID must be an integer.");
+                    if (!DataValidation.isInt(jTextField3.getText()) || jTextField3.getText().length() != 8) {
+                        JOptionPane.showMessageDialog(frame, "ID must be an 8-digit integer.");
                         return;
                     }
                     Object[] o = {jTextField3.getText(), null, null};
                         o[1] = jTextField2.getText();
                         o[2] = jTextField4.getText();
-                        ffc.genBuildOptionsUserDefAntTask(o[0]+"", null, o[2]+"");
+                        ffc.genBuildOptionsUserDefAntTask(o[0]+"", o[1]+"", o[2]+"");
                     antTaskTableModel.addRow(o);
                     docConsole.setSaved(false);
                 }
@@ -736,6 +741,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanel20.add(jLabel14, null);
             jPanel20.add(getJTextField12(), null);
             jPanel20.add(jLabel10, null);
+            jPanel20.add(getJTextField1(), null);
             jPanel20.add(getJComboBox2(), null);
             jPanel20.add(jLabel12, null);
             jPanel20.add(getJTextField8(), null);
@@ -752,7 +758,6 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanel20.add(getJTextField7(), null);
             jPanel20.add(getJButton10(), null);
             jPanel20.add(getJButton11(), null);
-            jPanel20.add(getJButton19(), null);
             jPanel20.add(getJScrollPane6(), null);
         }
         return jPanel20;
@@ -785,6 +790,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jComboBox2.addItem("CYGWIN");
             jComboBox2.addItem("INTEL");
             jComboBox2.setSelectedIndex(0);
+            jComboBox2.setVisible(false);
         }
         return jComboBox2;
     }
@@ -833,13 +839,13 @@ public class FpdBuildOptions extends IInternalFrame {
             optionsTableModel.addColumn("TagName");
             optionsTableModel.addColumn("Contents");
             
-            TableColumn toolFamilyCol = jTable5.getColumnModel().getColumn(1);
-            JComboBox cb = new JComboBox();
-            cb.addItem("MSFT");
-            cb.addItem("GCC");
-            cb.addItem("CYGWIN");
-            cb.addItem("INTEL");
-            toolFamilyCol.setCellEditor(new DefaultCellEditor(cb));
+//            TableColumn toolFamilyCol = jTable5.getColumnModel().getColumn(1);
+//            JComboBox cb = new JComboBox();
+//            cb.addItem("MSFT");
+//            cb.addItem("GCC");
+//            cb.addItem("CYGWIN");
+//            cb.addItem("INTEL");
+//            toolFamilyCol.setCellEditor(new DefaultCellEditor(cb));
             Vector<String> vArch = new Vector<String>();
             vArch.add("IA32");
             vArch.add("X64");
@@ -910,7 +916,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jButton10 == null) {
             jButton10 = new JButton();
             jButton10.setText("Add");
-            jButton10.setPreferredSize(new java.awt.Dimension(70,20));
+            jButton10.setPreferredSize(new java.awt.Dimension(90,20));
             jButton10.addActionListener(new AbstractAction() {
                 /**
                  * 
@@ -921,11 +927,11 @@ public class FpdBuildOptions extends IInternalFrame {
                     boolean[] boolArray = {jCheckBox9.isSelected(),jCheckBox10.isSelected(),jCheckBox11.isSelected(),
                                            jCheckBox12.isSelected(),jCheckBox13.isSelected(),jCheckBox14.isSelected()};
                     String s = boolToList(boolArray);
-                    Object[] o = {jTextField12.getText(), jComboBox2.getSelectedItem(), s,
+                    Object[] o = {jTextField12.getText(), jTextField1.getText(), s,
                                   jTextField8.getText(), jTextField13.getText(), jTextField7.getText()};
                     optionsTableModel.addRow(o);
                     docConsole.setSaved(false);
-                    ffc.genBuildOptionsOpt(stringToVector(jTextField12.getText()), jComboBox2.getSelectedItem()+"", jTextField13.getText(), jTextField8.getText(),  stringToVector(s), jTextField7.getText());
+                    ffc.genBuildOptionsOpt(stringToVector(jTextField12.getText()), jTextField1.getText(), jTextField13.getText(), jTextField8.getText(),  stringToVector(s), jTextField7.getText());
                 }
             });
         }
@@ -979,7 +985,7 @@ public class FpdBuildOptions extends IInternalFrame {
         if (jButton11 == null) {
             jButton11 = new JButton();
             jButton11.setText("Delete");
-            jButton11.setPreferredSize(new java.awt.Dimension(70,20));
+            jButton11.setPreferredSize(new java.awt.Dimension(90,20));
             jButton11.addActionListener(new AbstractAction() {
                 /**
                  * 
@@ -1057,21 +1063,6 @@ public class FpdBuildOptions extends IInternalFrame {
             });
         }
         return jButton18;
-    }
-
-    /**
-     * This method initializes jButton19	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton19() {
-        if (jButton19 == null) {
-            jButton19 = new JButton();
-            jButton19.setPreferredSize(new java.awt.Dimension(75,20));
-            jButton19.setEnabled(false);
-            jButton19.setText("Update");
-        }
-        return jButton19;
     }
 
     /**
@@ -1655,6 +1646,67 @@ public class FpdBuildOptions extends IInternalFrame {
             });
         }
         return jTable6;
+    }
+
+    /**
+     * This method initializes jButton12	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButton12() {
+        if (jButton12 == null) {
+            jButton12 = new JButton();
+            jButton12.setPreferredSize(new Dimension(90, 20));
+            jButton12.setText("Browse");
+            jButton12.addActionListener(new AbstractAction() {
+                private static final long serialVersionUID = 1L;
+
+                public void actionPerformed(ActionEvent arg0) {
+                    //
+                    // Select files from current workspace
+                    //
+                    String dirPrefix = System.getenv("WORKSPACE");
+                    JFileChooser chooser = new JFileChooser(dirPrefix);
+                    File theFile = null;
+                    String headerDest = null;
+                    
+                    chooser.setMultiSelectionEnabled(false);
+                    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                    int retval = chooser.showOpenDialog(frame);
+                    if (retval == JFileChooser.APPROVE_OPTION) {
+
+                        theFile = chooser.getSelectedFile();
+                        String file = theFile.getPath();
+                        if (!file.startsWith(dirPrefix)) {
+                            JOptionPane.showMessageDialog(frame, "You can only select files in current package!");
+                            return;
+                        }
+                    }
+                    else {
+                        return;
+                    }
+                    
+                    headerDest = theFile.getPath();
+                    jTextField2.setText(headerDest.substring(dirPrefix.length()).replace('\\', '/'));
+               
+                }
+
+            });
+        }
+        return jButton12;
+    }
+
+    /**
+     * This method initializes jTextField1	
+     * 	
+     * @return javax.swing.JTextField	
+     */
+    private JTextField getJTextField1() {
+        if (jTextField1 == null) {
+            jTextField1 = new JTextField();
+            jTextField1.setPreferredSize(new java.awt.Dimension(85,20));
+        }
+        return jTextField1;
     }
 
     /**

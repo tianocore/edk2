@@ -287,7 +287,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             for (int k = 0; k < 6; ++k) {
                 rowData[k] = saa[i][k];
             }
-            for (int m = 7; m < 11; ++m) {
+            for (int m = 6; m < 11; ++m) {
                 rowData[m] = new Boolean("false");
             }
             int j = 0;
@@ -476,7 +476,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                     return;
                 }
                 model.addRow(row);
-                
+                jTable.changeSelection(model.getRowCount()-1, 0, false, false);
                 String usage = getValidUsage(jCheckBox.isSelected(), jCheckBox1.isSelected(), jCheckBox2.isSelected(), jCheckBox3.isSelected(), jCheckBox4.isSelected());
                 if (usage.length() == 0) {
                     usage = null;
@@ -627,7 +627,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(5,301,1473,137));
+            jScrollPane.setBounds(new java.awt.Rectangle(5,301,1473,259));
             jScrollPane.setViewportView(getJTable());
         }
         return jScrollPane;
@@ -769,7 +769,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JCheckBox getJCheckBox1() {
         if (jCheckBox1 == null) {
             jCheckBox1 = new JCheckBox();
-            jCheckBox1.setBounds(new java.awt.Rectangle(302,133,108,20));
+            jCheckBox1.setBounds(new java.awt.Rectangle(312,133,108,20));
             jCheckBox1.setText("Fixed at Build");
             jCheckBox1.setPreferredSize(new java.awt.Dimension(21,20));
         }
