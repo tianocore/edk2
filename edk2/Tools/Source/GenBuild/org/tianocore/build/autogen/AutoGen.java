@@ -17,22 +17,9 @@
 
 package org.tianocore.build.autogen;
 
-import org.tianocore.build.global.GlobalData;
-import org.tianocore.build.global.Spd;
-import org.tianocore.build.global.SurfaceAreaQuery;
-import org.tianocore.build.id.ModuleIdentification;
-import org.tianocore.build.id.PackageIdentification;
-import org.tianocore.GuidsDocument;
-import org.tianocore.LibraryClassDocument.LibraryClass;
-import org.tianocore.PPIsDocument;
-import org.tianocore.ProtocolsDocument;
-import org.tianocore.build.pcd.action.PCDAutoGenAction;
-import org.tianocore.build.exception.*;
-import org.tianocore.logger.EdkLog;
-import org.apache.tools.ant.BuildException;
-import org.apache.xmlbeans.XmlObject;
-
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -43,6 +30,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.xmlbeans.XmlObject;
+import org.tianocore.GuidsDocument;
+import org.tianocore.LibraryClassDocument.LibraryClass;
+import org.tianocore.PPIsDocument;
+import org.tianocore.ProtocolsDocument;
+import org.tianocore.build.exception.*;
+import org.tianocore.build.global.GlobalData;
+import org.tianocore.build.global.Spd;
+import org.tianocore.build.global.SurfaceAreaQuery;
+import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.build.id.PackageIdentification;
+import org.tianocore.build.pcd.action.PCDAutoGenAction;
+import org.tianocore.logger.EdkLog;
+
 /**
  * This class is to generate Autogen.h and Autogen.c according to module surface
  * area or library surface area.
@@ -52,7 +54,10 @@ public class AutoGen {
 	// / The output path of Autogen.h and Autogen.c
 	// /
 	private String outputPath;
-
+    /// 
+    /// The name of FV directory 
+    /// 
+    private String fvDir;
 	// /
 	// / The base name of module or library.
 	// /
@@ -104,10 +109,11 @@ public class AutoGen {
 	 * @param arch
 	 *            Target architecture.
 	 */
-	public AutoGen(String outputPath, ModuleIdentification moduleId, String arch) {
+	public AutoGen(String fvDir, String outputPath, ModuleIdentification moduleId, String arch) {
 		this.outputPath = outputPath;
 		this.moduleId = moduleId;
 		this.arch = arch;
+        this.fvDir = fvDir;
 
 	}
 
@@ -316,7 +322,17 @@ public class AutoGen {
 		}
 		fileBuffer.append("\r\n");
 
-		//
+        //
+        //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to 
+        // {DEST_DIR_DRBUG}/FlashMap.h
+        // 
+        if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
+            fileBuffer.append(CommonDefinition.include);
+            fileBuffer.append("  <");
+            fileBuffer.append(CommonDefinition.tianoR8FlashMapH + ">\r\n");
+            copyFlashMapHToDebugDir();
+        }
+
 		// Write PCD autogen information to AutoGen.h.
 		//
 		if (this.myPcdAutogen != null) {
@@ -543,6 +559,17 @@ public class AutoGen {
 			}
 		}
 		fileBuffer.append("\r\n");
+
+        //
+        //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to 
+        // {DEST_DIR_DRBUG}/FlashMap.h
+        // 
+        if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
+            fileBuffer.append(CommonDefinition.include);
+            fileBuffer.append("  <");
+            fileBuffer.append(CommonDefinition.tianoR8FlashMapH + ">\r\n");
+            copyFlashMapHToDebugDir();
+        }
 
 		//
 		// Write PCD information to library AutoGen.h.
@@ -2028,5 +2055,28 @@ public class AutoGen {
 		}
 
 	}
+
+    private void copyFlashMapHToDebugDir() throws  AutoGenException{
+        
+        File inFile = new File(fvDir + File.separatorChar + CommonDefinition.flashMapH);
+        int size = (int)inFile.length();
+        byte[] buffer = new byte[size];
+        File outFile = new File (this.outputPath + File.separatorChar + CommonDefinition.tianoR8FlashMapH);
+        try{
+            if (inFile.exists()) {
+                FileInputStream fis = new FileInputStream (inFile);
+                fis.read(buffer);
+                FileOutputStream fos = new FileOutputStream(outFile);
+                fos.write(buffer);
+                fis.close();
+                fos.close();
+            }else {
+                throw new AutoGenException("The flashMap.h file don't exist!!");
+            }
+        } catch (Exception e){
+            throw new AutoGenException(e.getMessage());
+        }
+        
+    }
 
 }
