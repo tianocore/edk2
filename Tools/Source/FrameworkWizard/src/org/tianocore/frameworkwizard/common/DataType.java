@@ -50,6 +50,8 @@ public class DataType {
     
     public static final int RETURN_TYPE_WORKSPACE = 15;
     
+    public static final int RETURN_TYPE_TEXT = 16;
+    
     
     //
     // Define all used final variables
@@ -96,6 +98,12 @@ public class DataType {
     public static final String ANT_BUILD_FILE_EXT = "xml";
     
     public static final String ANT_BUILD_FILE_EXT_DESCRIPTION = ANT_BUILD_FILE + " (*." + ANT_BUILD_FILE_EXT + ")";
+    
+    public static final String TEXT_FILE = "Text File";
+    
+    public static final String TEXT_FILE_EXT = "txt";
+    
+    public static final String TEXT_FILE_EXT_DESCRIPTION = TEXT_FILE + " (*." + TEXT_FILE_EXT + ")";
     
     //
     // Define file separator for current OS
@@ -171,4 +179,17 @@ public class DataType {
     
     public static final String PROJECT_VERSION = "1.0";
     
+    //
+    // Sort Type
+    //
+    public static final int SORT_TYPE_ASCENDING = 1;
+    
+    public static final int SORT_TYPE_DESCENDING = 2;
+    
+    //
+    // Module Type
+    //
+    public static final String MODULE_TYPE_LIBRARY = "Library";
+    
+    public static final String MODULE_TYPE_MODULE = "Module";
 }

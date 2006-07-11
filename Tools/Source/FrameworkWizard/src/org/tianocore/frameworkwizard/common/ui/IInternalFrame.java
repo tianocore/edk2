@@ -24,13 +24,17 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
-
-import org.tianocore.frameworkwizard.common.DataType;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 
 /**
  * The class is used to override JInternalFrame to provides customized
@@ -39,7 +43,8 @@ import org.tianocore.frameworkwizard.common.DataType;
  *
  * 
  */
-public class IInternalFrame extends JInternalFrame implements ActionListener, ComponentListener, ItemListener, FocusListener {
+public class IInternalFrame extends JInternalFrame implements ActionListener, ComponentListener, ItemListener,
+                                                  FocusListener, ListSelectionListener, TableModelListener, MouseListener {
 
     // /
     // / Define class Serial Version UID
@@ -157,8 +162,7 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
      * 
      */
     public void resizeComponentWidth(Component c, int containerWidth, int preferredWidth) {
-        int newWidth = c.getPreferredSize().width
-                       + (containerWidth - preferredWidth);
+        int newWidth = c.getPreferredSize().width + (containerWidth - preferredWidth);
         if (newWidth < c.getPreferredSize().width) {
             newWidth = c.getPreferredSize().width;
         }
@@ -190,7 +194,8 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
      * @param containerHeight
      * 
      */
-    public void resizeComponent(Component c, int containerWidth, int containerHeight, int preferredWidth, int preferredHeight) {
+    public void resizeComponent(Component c, int containerWidth, int containerHeight, int preferredWidth,
+                                int preferredHeight) {
         resizeComponentWidth(c, containerWidth, preferredWidth);
         resizeComponentHeight(c, containerHeight, preferredHeight);
     }
@@ -206,7 +211,7 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
     public void relocateComponentX(Component c, int containerWidth, int preferredWidth, int spaceToRight) {
         int intGapToRight = spaceToRight + c.getPreferredSize().width;
         int newLocationX = containerWidth - intGapToRight;
-        if (newLocationX < preferredWidth -intGapToRight) {
+        if (newLocationX < preferredWidth - intGapToRight) {
             newLocationX = preferredWidth - intGapToRight;
         }
         c.setLocation(newLocationX, c.getLocation().y);
@@ -221,10 +226,11 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
      * @param spaceToBottom
      * 
      */
-    public void relocateComponentY(Component c, int containerHeight, int spaceToBottom) {
-        int newLocationY = containerHeight - spaceToBottom;
-        if (newLocationY < DataType.MAIN_FRAME_EDITOR_PANEL_PREFERRED_SIZE_HEIGHT - spaceToBottom) {
-            newLocationY = DataType.MAIN_FRAME_EDITOR_PANEL_PREFERRED_SIZE_HEIGHT - spaceToBottom;
+    public void relocateComponentY(Component c, int containerHeight, int preferredHeight, int spaceToBottom) {
+        int intGapToBottom = spaceToBottom + c.getPreferredSize().height;
+        int newLocationY = containerHeight - intGapToBottom;
+        if (newLocationY < preferredHeight - spaceToBottom) {
+            newLocationY = preferredHeight - spaceToBottom;
         }
         c.setLocation(c.getLocation().x, newLocationY);
         c.validate();
@@ -240,10 +246,10 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
      * @param spaceToRight
      * 
      */
-    public void relocateComponent(Component c, int containerWidth, int containerHeight, int spaceToBottom,
-                                  int spaceToRight, int preferredWidht, int preferredHeight) {
-        relocateComponentX(c, containerWidth, preferredWidht, spaceToBottom);
-        relocateComponentY(c, containerHeight, spaceToRight);
+    public void relocateComponent(Component c, int containerWidth, int containerHeight, int preferredWidht,
+                                  int preferredHeight, int spaceToRight, int spaceToBottom) {
+        relocateComponentX(c, containerWidth, preferredWidht, spaceToRight);
+        relocateComponentY(c, containerHeight, preferredHeight, spaceToBottom);
     }
 
     public void showStandard() {
@@ -260,15 +266,50 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
 
     public void itemStateChanged(ItemEvent arg0) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void focusGained(FocusEvent arg0) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void focusLost(FocusEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void valueChanged(ListSelectionEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void tableChanged(TableModelEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void mouseClicked(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseEntered(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseExited(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mousePressed(MouseEvent arg0) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public void mouseReleased(MouseEvent arg0) {
         // TODO Auto-generated method stub
         
     }

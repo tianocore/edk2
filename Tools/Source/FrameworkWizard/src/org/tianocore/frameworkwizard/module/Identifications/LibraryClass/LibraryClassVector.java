@@ -86,4 +86,11 @@ public class LibraryClassVector {
     public int size() {
         return this.vLibraryClass.size();
     }
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getLibraryClass(index).getLibraryClassName());
+        v.addElement(getLibraryClass(index).getUsage());
+        return v;
+    }
 }

@@ -114,7 +114,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     /// Define class Serial Version UID
     ///
     private static final long serialVersionUID = -7103240960573031772L;
-    
+
     //
     // To save information of all files
     //
@@ -282,20 +282,22 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private JMenuItem jMenuItemHelpSearch = null;
 
-    private JMenuItem jMenuItemProjectInstallPackage = null;
+    private JMenuItem jMenuItemProjectInstallFar = null;
 
-    private JMenuItem jMenuItemProjectUpdatePackage = null;
+    private JMenuItem jMenuItemProjectUpdateFar = null;
 
-    private JMenuItem jMenuItemProjectRemovePackage = null;
+    private JMenuItem jMenuItemProjectRemoveFar = null;
 
     //private JToolBar jToolBarFile = null;
 
     //private JToolBar jToolBarEdit = null;
 
     //private JToolBar jToolBarWindow = null;
-    
+
     private static FrameworkWizardUI fwui = null;
-    
+
+    private JMenuItem jMenuItemProjectCreateFar = null;
+
     public static FrameworkWizardUI getInstance() {
         if (fwui == null) {
             fwui = new FrameworkWizardUI();
@@ -1262,9 +1264,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //jMenuProject.addSeparator();
             jMenuProject.add(getJMenuItemProjectChangeWorkspace());
             jMenuProject.addSeparator();
-            jMenuProject.add(getJMenuItemProjectInstallPackage());
-            jMenuProject.add(getJMenuItemProjectUpdatePackage());
-            jMenuProject.add(getJMenuItemProjectRemovePackage());
+            jMenuProject.add(getJMenuItemProjectCreateFar());
+            jMenuProject.add(getJMenuItemProjectInstallFar());
+            jMenuProject.add(getJMenuItemProjectUpdateFar());
+            jMenuProject.add(getJMenuItemProjectRemoveFar());
             //jMenuProject.addSeparator();
             jMenuProject.add(getJMenuProjectBuildTargets());
         }
@@ -1607,15 +1610,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      * 	
      * @return javax.swing.JMenuItem	
      */
-    private JMenuItem getJMenuItemProjectInstallPackage() {
-        if (jMenuItemProjectInstallPackage == null) {
-            jMenuItemProjectInstallPackage = new JMenuItem();
-            jMenuItemProjectInstallPackage.setText("Install Distribution Package");
-            jMenuItemProjectInstallPackage.setMnemonic('I');
-            jMenuItemProjectInstallPackage.setEnabled(false);
-            jMenuItemProjectInstallPackage.addActionListener(this);
+    private JMenuItem getJMenuItemProjectInstallFar() {
+        if (jMenuItemProjectInstallFar == null) {
+            jMenuItemProjectInstallFar = new JMenuItem();
+            jMenuItemProjectInstallFar.setText("Install FAR");
+            jMenuItemProjectInstallFar.setMnemonic('I');
+            jMenuItemProjectInstallFar.setEnabled(true);
+            jMenuItemProjectInstallFar.addActionListener(this);
         }
-        return jMenuItemProjectInstallPackage;
+        return jMenuItemProjectInstallFar;
     }
 
     /**
@@ -1623,15 +1626,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      * 	
      * @return javax.swing.JMenuItem	
      */
-    private JMenuItem getJMenuItemProjectUpdatePackage() {
-        if (jMenuItemProjectUpdatePackage == null) {
-            jMenuItemProjectUpdatePackage = new JMenuItem();
-            jMenuItemProjectUpdatePackage.setText("Update Disstribution Package");
-            jMenuItemProjectUpdatePackage.setMnemonic('U');
-            jMenuItemProjectUpdatePackage.setEnabled(false);
-            jMenuItemProjectUpdatePackage.addActionListener(this);
+    private JMenuItem getJMenuItemProjectUpdateFar() {
+        if (jMenuItemProjectUpdateFar == null) {
+            jMenuItemProjectUpdateFar = new JMenuItem();
+            jMenuItemProjectUpdateFar.setText("Update FAR");
+            jMenuItemProjectUpdateFar.setMnemonic('U');
+            jMenuItemProjectUpdateFar.setEnabled(true);
+            jMenuItemProjectUpdateFar.addActionListener(this);
         }
-        return jMenuItemProjectUpdatePackage;
+        return jMenuItemProjectUpdateFar;
     }
 
     /**
@@ -1639,15 +1642,30 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      * 	
      * @return javax.swing.JMenuItem	
      */
-    private JMenuItem getJMenuItemProjectRemovePackage() {
-        if (jMenuItemProjectRemovePackage == null) {
-            jMenuItemProjectRemovePackage = new JMenuItem();
-            jMenuItemProjectRemovePackage.setText("Remove Distribution Package");
-            jMenuItemProjectRemovePackage.setMnemonic('R');
-            jMenuItemProjectRemovePackage.setEnabled(false);
-            jMenuItemProjectRemovePackage.addActionListener(this);
+    private JMenuItem getJMenuItemProjectRemoveFar() {
+        if (jMenuItemProjectRemoveFar == null) {
+            jMenuItemProjectRemoveFar = new JMenuItem();
+            jMenuItemProjectRemoveFar.setText("Remove FAR");
+            jMenuItemProjectRemoveFar.setMnemonic('R');
+            jMenuItemProjectRemoveFar.setEnabled(true);
+            jMenuItemProjectRemoveFar.addActionListener(this);
         }
-        return jMenuItemProjectRemovePackage;
+        return jMenuItemProjectRemoveFar;
+    }
+
+    /**
+     * This method initializes jMenuItemProjectCreateFar	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemProjectCreateFar() {
+        if (jMenuItemProjectCreateFar == null) {
+            jMenuItemProjectCreateFar = new JMenuItem();
+            jMenuItemProjectCreateFar.setText("Create FAR");
+            jMenuItemProjectCreateFar.setMnemonic('C');
+            jMenuItemProjectCreateFar.addActionListener(this);
+        }
+        return jMenuItemProjectCreateFar;
     }
 
     /* (non-Javadoc)
@@ -1695,7 +1713,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         this.addComponentListener(this);
         this.getCompontentsFromFrameworkDatabase();
         this.setContentPane(getJContentPane());
-        this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
+        this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- ["
+                      + Workspace.getCurrentWorkspace() + "]");
         this.setExitType(1);
 
         //
@@ -1766,10 +1785,26 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             changeWorkspace();
         }
 
+        if (arg0.getSource() == jMenuItemProjectCreateFar) {
+
+        }
+
+        if (arg0.getSource() == jMenuItemProjectInstallFar) {
+            this.closeAll();
+        }
+
+        if (arg0.getSource() == jMenuItemProjectRemoveFar) {
+            this.closeAll();
+        }
+
+        if (arg0.getSource() == jMenuItemProjectUpdateFar) {
+            this.closeAll();
+        }
+
         if (arg0.getSource() == jMenuItemToolsClone) {
             cloneItem();
         }
-        
+
         if (arg0.getSource() == jMenuItemToolsToolChainConfiguration) {
             setupToolChainConfiguration();
         }
@@ -1794,13 +1829,55 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Make Module Description
         dmtnModuleDescription = new IDefaultMutableTreeNode("ModuleDescription", IDefaultMutableTreeNode.MODULE, -1);
 
-        if (this.vModuleList.size() > 0) {
-            for (int index = 0; index < this.vModuleList.size(); index++) {
-                dmtnModuleDescription.add(new IDefaultMutableTreeNode(this.vModuleList.elementAt(index).getName(),
-                                                                      IDefaultMutableTreeNode.MSA_HEADER, false,
-                                                                      this.vModuleList.elementAt(index)));
+        //
+        // First add package
+        //
+        if (this.vPackageList.size() > 0) {
+            for (int index = 0; index < this.vPackageList.size(); index++) {
+                IDefaultMutableTreeNode dmtnModulePackage = null;
+                IDefaultMutableTreeNode dmtnModulePackageLibrary = null;
+                IDefaultMutableTreeNode dmtnModulePackageModule = null;
+
+                dmtnModulePackage = new IDefaultMutableTreeNode(this.vPackageList.elementAt(index).getName(),
+                                                                IDefaultMutableTreeNode.MODULE_PACKAGE, false,
+                                                                this.vPackageList.elementAt(index));
+                dmtnModulePackageLibrary = new IDefaultMutableTreeNode("Library",
+                                                                       IDefaultMutableTreeNode.MODULE_PACKAGE_LIBRARY,
+                                                                       false, this.vPackageList.elementAt(index));
+                dmtnModulePackageModule = new IDefaultMutableTreeNode("Module",
+                                                                      IDefaultMutableTreeNode.MODULE_PACKAGE_MODULE,
+                                                                      false, this.vPackageList.elementAt(index));
+
+                Vector<ModuleIdentification> vModule = wt.getAllModules(this.vPackageList.elementAt(index));
+                for (int indexJ = 0; indexJ < vModule.size(); indexJ++) {
+                    if (vModule.get(indexJ).isLibrary()) {
+                        dmtnModulePackageLibrary.add(new IDefaultMutableTreeNode(vModule.get(indexJ).getName(),
+                                                                                 IDefaultMutableTreeNode.MSA_HEADER,
+                                                                                 false, vModule.get(indexJ)));
+                    } else {
+                        dmtnModulePackageModule.add(new IDefaultMutableTreeNode(vModule.get(indexJ).getName(),
+                                                                                IDefaultMutableTreeNode.MSA_HEADER,
+                                                                                false, vModule.get(indexJ)));
+                    }
+                }
+                if (dmtnModulePackageModule.getChildCount() > 0) {
+                    dmtnModulePackage.add(dmtnModulePackageModule);
+                }
+                if (dmtnModulePackageLibrary.getChildCount() > 0) {
+                    dmtnModulePackage.add(dmtnModulePackageLibrary);
+                }
+
+                dmtnModuleDescription.add(dmtnModulePackage);
             }
         }
+
+        //                if (this.vModuleList.size() > 0) {
+        //                    for (int index = 0; index < this.vModuleList.size(); index++) {
+        //                        dmtnModuleDescription.add(new IDefaultMutableTreeNode(this.vModuleList.elementAt(index).getName(),
+        //                                                                              IDefaultMutableTreeNode.MSA_HEADER, false,
+        //                                                                              this.vModuleList.elementAt(index)));
+        //                    }
+        //                }
 
         // Make Package Description
         dmtnPackageDescription = new IDefaultMutableTreeNode("PackageDescription", IDefaultMutableTreeNode.PACKAGE, -1);
@@ -1938,6 +2015,147 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         fc.addChoosableFileFilter(new IFileFilter(ext));
         return fc.showSaveDialog(new JPanel());
     }
+    
+    /**
+    Open Module
+
+    @param path input file path
+    
+    **/
+   private void openModule(String path, ModuleIdentification moduleId) {
+       ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = null;
+       try {
+           msa = OpenFile.openMsaFile(path);
+       } catch (IOException e) {
+           Log.err("Open Module Surface Area " + path, e.getMessage());
+           return;
+       } catch (XmlException e) {
+           Log.err("Open Module Surface Area " + path, e.getMessage());
+           return;
+       } catch (Exception e) {
+           Log.err("Open Module Surface Area " + path, "Invalid file type");
+           return;
+       }
+       Identification id = new Identification(msa.getMsaHeader().getModuleName(), msa.getMsaHeader().getGuidValue(),
+                                              msa.getMsaHeader().getVersion(), path);
+       //
+       // Generate module id
+       //
+       PackageIdentification pid = wt.getPackageIdByModuleId(id);
+       if (pid != null) {
+           //
+           // To judge if the module existed in vModuleList
+           // If not, add it to vModuleList
+           //
+           boolean isFind = false;
+           for (int index = 0; index < vModuleList.size(); index++) {
+               if (vModuleList.elementAt(index).equals(id)) {
+                   isFind = true;
+                   break;
+               }
+           }
+           if (!isFind) {
+               ModuleIdentification mid = new ModuleIdentification(id, pid, moduleId.isLibrary());
+               vModuleList.addElement(mid);
+               //
+               // Add new MsaHeader node to the tree
+               //
+               IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(mid.getName(),
+                                                                          IDefaultMutableTreeNode.MSA_HEADER, true,
+                                                                          mid);
+               //
+               // First find the module belongs to which package
+               //
+               IDefaultMutableTreeNode packageNode = iTree.getNodeById(dmtnModuleDescription, mid.getPackageId(),
+                                                                       IDefaultMutableTreeNode.MODULE_PACKAGE);
+               //
+               // To check if has module node or library node
+               //
+               IDefaultMutableTreeNode parentModuleNode = null;
+               IDefaultMutableTreeNode parentLibraryNode = null;
+               boolean hasModule = false;
+               boolean hasLibrary = false;
+               for (int index = 0; index < packageNode.getChildCount(); index++) {
+                   IDefaultMutableTreeNode iNode = (IDefaultMutableTreeNode) packageNode.getChildAt(index);
+                   if (iNode.getCategory() == IDefaultMutableTreeNode.MODULE_PACKAGE_LIBRARY) {
+                       hasLibrary = true;
+                       parentLibraryNode = iNode;
+                   }
+                   if (iNode.getCategory() == IDefaultMutableTreeNode.MODULE_PACKAGE_MODULE) {
+                       hasModule = true;
+                       parentModuleNode = iNode;
+                   }
+               }
+
+               //
+               // If is a module
+               //
+               if (!mid.isLibrary()) {
+                   //
+                   // Create parent node first if has no parent node
+                   //
+                   if (!hasModule) {
+                       parentModuleNode = new IDefaultMutableTreeNode("Module",
+                                                                      IDefaultMutableTreeNode.MODULE_PACKAGE_MODULE,
+                                                                      false, mid.getPackageId());
+                       iTree.addNode(packageNode, parentModuleNode);
+                   }
+
+                   iTree.addNode(parentModuleNode, node);
+               }
+
+               //
+               // If is a Library
+               //
+               if (mid.isLibrary()) {
+                   //
+                   // Create parent node first if has no parent node
+                   //
+                   if (!hasLibrary) {
+                       parentLibraryNode = new IDefaultMutableTreeNode("Library",
+                                                                       IDefaultMutableTreeNode.MODULE_PACKAGE_LIBRARY,
+                                                                       false, mid.getPackageId());
+                       iTree.addNode(packageNode, parentLibraryNode);
+                   }
+
+                   iTree.addNode(parentLibraryNode, node);
+               }
+           }
+       } else {
+           //
+           // The module is not in existing packages
+           //
+           Log.err("The module hasn't been added to any package of current workspace!");
+           return;
+       }
+       
+       //
+       // Make the node selected
+       //
+       iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnModuleDescription, id,
+                                                                    IDefaultMutableTreeNode.MSA_HEADER)));
+       //
+       // Update opening Module list information
+       //
+       if (!openingModuleList.existsModule(id)) {
+           //
+           // Insert sub node of module
+           //
+           insertModuleTreeNode(id);
+           iTree.getSelectNode().setOpening(true);
+
+           //
+           // Update opening module list
+           //
+           openingModuleList.insertToOpeningModuleList(id, msa);
+           openingModuleList.setTreePathById(id, iTree.getSelectionPath());
+       }
+       //
+       // Show msa header in editor panel
+       //
+       showModuleElement(IDefaultMutableTreeNode.MSA_HEADER, openingModuleList.getOpeningModuleById(id));
+       this.currentOpeningModuleIndex = openingModuleList.findIndexOfListById(id);
+   }
 
     /**
      Open Module
@@ -1978,14 +2196,71 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                 }
             }
             if (!isFind) {
-                vModuleList.addElement(new ModuleIdentification(id, pid));
+                ModuleIdentification mid = new ModuleIdentification(id, pid);
+                vModuleList.addElement(mid);
                 //
                 // Add new MsaHeader node to the tree
                 //
-                IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(vModuleList.lastElement().getName(),
+                IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(mid.getName(),
                                                                            IDefaultMutableTreeNode.MSA_HEADER, true,
-                                                                           vModuleList.lastElement());
-                iTree.addNode(dmtnModuleDescription, node);
+                                                                           mid);
+                //
+                // First find the module belongs to which package
+                //
+                IDefaultMutableTreeNode packageNode = iTree.getNodeById(dmtnModuleDescription, mid.getPackageId(),
+                                                                        IDefaultMutableTreeNode.MODULE_PACKAGE);
+                //
+                // To check if has module node or library node
+                //
+                IDefaultMutableTreeNode parentModuleNode = null;
+                IDefaultMutableTreeNode parentLibraryNode = null;
+                boolean hasModule = false;
+                boolean hasLibrary = false;
+                for (int index = 0; index < packageNode.getChildCount(); index++) {
+                    IDefaultMutableTreeNode iNode = (IDefaultMutableTreeNode) packageNode.getChildAt(index);
+                    if (iNode.getCategory() == IDefaultMutableTreeNode.MODULE_PACKAGE_LIBRARY) {
+                        hasLibrary = true;
+                        parentLibraryNode = iNode;
+                    }
+                    if (iNode.getCategory() == IDefaultMutableTreeNode.MODULE_PACKAGE_MODULE) {
+                        hasModule = true;
+                        parentModuleNode = iNode;
+                    }
+                }
+
+                //
+                // If is a module
+                //
+                if (!mid.isLibrary()) {
+                    //
+                    // Create parent node first if has no parent node
+                    //
+                    if (!hasModule) {
+                        parentModuleNode = new IDefaultMutableTreeNode("Module",
+                                                                       IDefaultMutableTreeNode.MODULE_PACKAGE_MODULE,
+                                                                       false, mid.getPackageId());
+                        iTree.addNode(packageNode, parentModuleNode);
+                    }
+
+                    iTree.addNode(parentModuleNode, node);
+                }
+
+                //
+                // If is a Library
+                //
+                if (mid.isLibrary()) {
+                    //
+                    // Create parent node first if has no parent node
+                    //
+                    if (!hasLibrary) {
+                        parentLibraryNode = new IDefaultMutableTreeNode("Library",
+                                                                        IDefaultMutableTreeNode.MODULE_PACKAGE_LIBRARY,
+                                                                        false, mid.getPackageId());
+                        iTree.addNode(packageNode, parentLibraryNode);
+                    }
+
+                    iTree.addNode(parentLibraryNode, node);
+                }
             }
         } else {
             //
@@ -1994,7 +2269,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             Log.err("The module hasn't been added to any package of current workspace!");
             return;
         }
-
+        
+        //
         // Make the node selected
         //
         iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnModuleDescription, id,
@@ -2311,7 +2587,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     private void insertPlatformTreeNode(Identification id) {
-        iTree.addNode(new IDefaultMutableTreeNode("Platform Definitions", IDefaultMutableTreeNode.FPD_PLATFORMDEFINITIONS, true, id));
+        iTree.addNode(new IDefaultMutableTreeNode("Platform Definitions",
+                                                  IDefaultMutableTreeNode.FPD_PLATFORMDEFINITIONS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Flash", IDefaultMutableTreeNode.FPD_FLASH, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Framework Modules", IDefaultMutableTreeNode.FPD_FRAMEWORKMODULES,
                                                   true, id));
@@ -2378,10 +2655,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      @param elementType
      @param fpd
      
-    **/
+     **/
     private void showPlatformElement(int elementType, OpeningPlatformType fpd) {
         this.cleanDesktopPanePlatform();
-        
+
         switch (elementType) {
         case IDefaultMutableTreeNode.FPD_PLATFORMDEFINITIONS:
             FpdPlatformDefs frmFpdPlatformDefs = new FpdPlatformDefs(fpd);
@@ -2596,7 +2873,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                     e.printStackTrace();
                     return;
                 }
-                this.openModule(smb.getMid().getPath());
+                this.openModule(smb.getMid().getPath(), smb.getMid());
             }
         } else if (result == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
             //
@@ -2884,27 +3161,28 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             // Reinit whole window
             //
             closeAll();
-            this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- [" + Workspace.getCurrentWorkspace() + "]");
+            this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- ["
+                          + Workspace.getCurrentWorkspace() + "]");
         }
         sw.dispose();
     }
-    
+
     /**
-    Show Tool Chain Configuration Dialog to setup Tool Chain
-    
-    **/
+     Show Tool Chain Configuration Dialog to setup Tool Chain
+     
+     **/
     private void setupToolChainConfiguration() {
         ToolChainConfig tcc = ToolChainConfig.getInstance();
         tcc.showDialog();
     }
-    
+
     /**
      Clone selected item
      
      **/
     private void cloneItem() {
         int mode = -1;
-        
+
         //
         // Check if there is any item can be cloned
         //
@@ -2919,7 +3197,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             Log.err("Please select a target to clone!");
             return;
         }
-        
+
         if (category == IDefaultMutableTreeNode.WORKSPACE) {
             mode = DataType.RETURN_TYPE_WORKSPACE;
             id = null;
@@ -2933,10 +3211,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         if (category >= IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
             mode = DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA;
         }
-        
+
         Clone c = new Clone(this, true, mode, id);
         int result = c.showDialog();
-        
+
         if (result == DataType.RETURN_TYPE_CANCEL) {
             c.dispose();
         }

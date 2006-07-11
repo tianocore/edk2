@@ -15,36 +15,15 @@
 
 package org.tianocore.frameworkwizard.platform;
 
-import java.io.File;
-
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
 
 public class PlatformIdentification extends Identification{
-    
-    private File fpdFile;
     
     public PlatformIdentification(String name, String guid, String version, String path){
         super(name, guid, version, path);
     }
     
-    public PlatformIdentification(String name, String guid, String version, File fpdFile){
-        super(name, guid, version);
-        this.fpdFile = fpdFile;
-    }
-    
     public PlatformIdentification(Identification id){
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
-    }
-    
-    public String toString(){
-        return "Platform " + this.getName() + "[" + this.getGuid() + "]";
-    }
-
-    public void setFpdFile(File fpdFile) {
-        this.fpdFile = fpdFile;
-    }
-
-    public File getFpdFile() {
-        return fpdFile;
     }
 }

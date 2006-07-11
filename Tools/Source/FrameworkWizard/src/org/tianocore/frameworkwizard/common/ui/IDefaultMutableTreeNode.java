@@ -115,6 +115,12 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
     public static final int PACKAGE = 2;
 
     public static final int PLATFORM = 3;
+    
+    public static final int MODULE_PACKAGE = 4;
+    
+    public static final int MODULE_PACKAGE_LIBRARY = 5;
+    
+    public static final int MODULE_PACKAGE_MODULE = 6;
 
     //
     //Static final definitions for operation
