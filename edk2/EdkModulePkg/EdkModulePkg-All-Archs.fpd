@@ -115,7 +115,7 @@
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
-          <Token>0x00000008</Token>
+          <Token>0x00010021</Token>
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
@@ -4212,7 +4212,7 @@
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
-          <Token>0x00000008</Token>
+          <Token>0x00010021</Token>
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
@@ -8228,7 +8228,7 @@
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
-          <Token>0x00000008</Token>
+          <Token>0x00010021</Token>
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
@@ -12249,7 +12249,7 @@
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
-          <Token>0x00000008</Token>
+          <Token>0x00010021</Token>
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
