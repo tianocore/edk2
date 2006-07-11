@@ -163,9 +163,11 @@ public class FileProcess {
                 parseFile(filename, fileTypes[i][2], root);
             }
         }
+        /*
         if (!flag) {
             throw new BuildException("File [" + filename + "] is not known from its suffix.");
         }
+        */
     }
 
     /**
