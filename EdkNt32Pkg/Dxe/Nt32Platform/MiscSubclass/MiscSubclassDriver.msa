@@ -70,7 +70,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>MiscChassisManufacturerData.c</Filename>
     <Filename>MiscNumberOfInstallableLanguagesData.c</Filename>
     <Filename>MiscOemStringData.c</Filename>
-    <Filename>MiscOnboardDeviceData.c</Filename>
     <Filename>MiscPortInternalConnectorDesignatorData.c</Filename>
     <Filename>MiscResetCapabilitiesData.c</Filename>
     <Filename>MiscSystemLanguageStringData.c</Filename>
