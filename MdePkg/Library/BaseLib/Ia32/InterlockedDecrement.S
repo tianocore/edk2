@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   InterlockedDecrement function
+#   InternalSyncDecrement function
 #
 # Notes:
 #
@@ -28,12 +28,12 @@
 #------------------------------------------------------------------------------
 # UINT32
 # EFIAPI
-# InterlockedDecrement (
+# InternalSyncDecrement (
 #   IN      UINT32                    *Value
 #   );
 #------------------------------------------------------------------------------
-.global _InterlockedDecrement
-_InterlockedDecrement: 
+.global _InternalSyncDecrement
+_InternalSyncDecrement: 
     movl    4(%esp),%eax
     lock    
     decl     (%eax)

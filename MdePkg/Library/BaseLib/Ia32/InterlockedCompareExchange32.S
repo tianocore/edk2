@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   InterlockedCompareExchange32 function
+#   InternalSyncCompareExchange32 function
 #
 # Notes:
 #
@@ -26,34 +26,16 @@
      
 
 #------------------------------------------------------------------------------
-# VOID *
-# EFIAPI
-# InterlockedCompareExchangePointer (
-#   IN      VOID                      **Value,
-#   IN      VOID                      *CompareValue,
-#   IN      VOID                      *ExchangeValue
-#   );
-#------------------------------------------------------------------------------
-.global _InterlockedCompareExchangePointer
-_InterlockedCompareExchangePointer: 
-    #
-    # InterlockedCompareExchangePointer() shares the same code as
-    # InterlockedCompareExchange32() on IA32 and thus no code inside this
-    # function
-    #
-
-
-#------------------------------------------------------------------------------
 # UINT32
 # EFIAPI
-# InterlockedCompareExchange32 (
+# InternalSyncCompareExchange32 (
 #   IN      UINT32                    *Value,
 #   IN      UINT32                    CompareValue,
 #   IN      UINT32                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-.global _InterlockedCompareExchange32
-_InterlockedCompareExchange32: 
+.global _InternalSyncCompareExchange32
+_InternalSyncCompareExchange32: 
     movl    4(%esp),%ecx
     movl    8(%esp),%eax
     movl    12(%esp),%edx

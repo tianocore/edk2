@@ -23,15 +23,13 @@
 
      
 
-.global _ARShiftU64
-_ARShiftU64: 
+.global _InternalMathARShiftU64
+_InternalMathARShiftU64: 
     movb    12(%esp),%cl
     movl    8(%esp),%eax
     cltd
     testb   $32,%cl
-# MISMATCH: "    cmovz   edx, eax"
     cmovz   %eax, %edx
-# MISMATCH: "    cmovz   eax, [esp + 4]"
     cmovz   4(%esp), %eax
     shrdl   %cl,%edx,%eax
     sar     %cl,%edx

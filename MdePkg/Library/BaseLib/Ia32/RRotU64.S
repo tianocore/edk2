@@ -23,7 +23,8 @@
 
      
 
-.global _RRotU64
+.global _InternalMathRRotU64
+_InternalMathRRotU64:
     push    %ebx
     movb    16(%esp),%cl
     movl    8(%esp),%eax

@@ -39,9 +39,8 @@ L1:
     jmp     _InternalMathDivRemU64x32
 
 
-.global DivRemU64x64
-DivRemU64x64:
-# MISMATCH: "DivRemU64x64:    USES    ebx esi edi"
+.global _DivRemU64x64
+_DivRemU64x64:
     push   %ebx                                                                             
     push   %esi                                                                             
     push   %edi                                        

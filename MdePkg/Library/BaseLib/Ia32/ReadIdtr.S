@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   AsmReadIdtr function
+#   InternalX86ReadIdtr function
 #
 # Notes:
 #
@@ -28,12 +28,12 @@
 #------------------------------------------------------------------------------
 # VOID
 # EFIAPI
-# AsmReadIdtr (
+# InternalX86ReadIdtr (
 #   OUT IA32_DESCRIPTOR  *Idtr
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadIdtr
-_AsmReadIdtr: 
+.global _InternalX86ReadIdtr
+_InternalX86ReadIdtr: 
     movl    4(%esp),%eax
     sidt    (%eax)
     ret

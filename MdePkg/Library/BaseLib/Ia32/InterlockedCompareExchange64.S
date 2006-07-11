@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   InterlockedCompareExchange64 function
+#   InternalSyncCompareExchange64 function
 #
 # Notes:
 #
@@ -28,13 +28,14 @@
 #------------------------------------------------------------------------------
 # UINT64
 # EFIAPI
-# InterlockedCompareExchange64 (
+# InternalSyncCompareExchange64 (
 #   IN      UINT64                    *Value,
 #   IN      UINT64                    CompareValue,
 #   IN      UINT64                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-.global _InterlockedCompareExchange64
+.global _InternalSyncCompareExchange64
+_InternalSyncCompareExchange64:
     push    %esi
     push    %ebx
     movl    12(%esp),%esi
