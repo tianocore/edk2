@@ -264,6 +264,10 @@ public class FpdFileContents {
                 }
             }
             cursor.removeXml();
+            if (getFrameworkModulesCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         cursor.dispose();
     }
@@ -390,7 +394,7 @@ public class FpdFileContents {
             
         }
         catch (Exception e){
-            e.printStackTrace();
+//            e.printStackTrace();
             throw e;
         }
         
@@ -653,13 +657,15 @@ public class FpdFileContents {
         //ToDo add Arch filter
         
         try {
+            if (moduleSa == null) {
+                moduleSa = genModuleSA(mi);
+            }
+            
             ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)GlobalData.getModuleXmlObject(mi);
             if (msa.getPcdCoded() == null) {
                 return;
             }
-            if (moduleSa == null) {
-                moduleSa = genModuleSA(mi);
-            }
+            
             Map<String, XmlObject> m = new HashMap<String, XmlObject>();
             m.put("ModuleSurfaceArea", msa);
             SurfaceAreaQuery.setDoc(m);
@@ -688,7 +694,7 @@ public class FpdFileContents {
             
         }
         catch (Exception e){
-            e.printStackTrace();
+//            e.printStackTrace();
             throw e; 
         }
         
@@ -1003,22 +1009,20 @@ public class FpdFileContents {
         
         XmlCursor cursor = o.newCursor();
         if (cursor.toFirstChild()) {
-            DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData pcdBuildData = 
-                (DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData)cursor.getObject();
-            if (pcdBuildData.getCName().equals(cName) && pcdBuildData.getTokenSpaceGuidCName().equals(tsGuid)) {
-                cursor.removeXml();
-                cursor.dispose();
-                return;
-            }
-            while (cursor.toNextSibling()) {
-                
-                pcdBuildData = (DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData)cursor.getObject();
+            do {
+                DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData pcdBuildData = 
+                    (DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData)cursor.getObject();
                 if (pcdBuildData.getCName().equals(cName) && pcdBuildData.getTokenSpaceGuidCName().equals(tsGuid)) {
                     cursor.removeXml();
+                    if (getDynamicPcdBuildDataCount() == 0) {
+                        cursor.toParent();
+                        cursor.removeXml();
+                    }
                     cursor.dispose();
                     return;
                 }
             }
+            while (cursor.toNextSibling());
         }
         cursor.dispose();
     }
@@ -1257,6 +1261,10 @@ public class FpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getBuildOptionsUserDefAntTaskCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         cursor.dispose();
     }
@@ -1341,6 +1349,10 @@ public class FpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.removeXml();
+            if (getBuildOptionsOptCount() == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         cursor.dispose();
     }
@@ -1576,10 +1588,15 @@ public class FpdFileContents {
                 cursor.toNextSibling(qSections);
             }
             if (cursor.toFirstChild()) {
-                for (int m = 0; m < k; ++m) {
+                int m = 0;
+                for (; m < k; ++m) {
                     cursor.toNextSibling();
                 }
                 cursor.removeXml();
+                if (m == 0) {
+                    cursor.toParent();
+                    cursor.removeXml();
+                }
             }
         }
         cursor.dispose();
@@ -1858,7 +1875,16 @@ public class FpdFileContents {
     }
     
     public void setPlatformDefsOutputDir(String outputDir) {
-        getfpdPlatformDefs().setOutputDirectory(outputDir);
+        if (outputDir != null && outputDir.length() > 0) {
+            getfpdPlatformDefs().setOutputDirectory(outputDir);
+        }
+        else{
+            XmlCursor cursor = getfpdPlatformDefs().newCursor();
+            if (cursor.toChild(new QName(xmlNs, "OutputDirectory"))) {
+                cursor.removeXml();
+            }
+            cursor.dispose();
+        }
     }
     
     public FlashDocument.Flash getfpdFlash() {

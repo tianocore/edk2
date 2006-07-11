@@ -108,7 +108,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
     private JScrollPane getJScrollPane1() {
         if (jScrollPane1 == null) {
             jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(13,177,461,139));
+            jScrollPane1.setBounds(new java.awt.Rectangle(13,177,461,421));
             jScrollPane1.setViewportView(getJTable());
         }
         return jScrollPane1;
@@ -351,6 +351,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
                 return;
             }
             model.addRow(row);
+            jTable.changeSelection(model.getRowCount()-1, 0, false, false);
             sfc.genSpdMsaFiles(row[0], null, null, null);
         }
         //

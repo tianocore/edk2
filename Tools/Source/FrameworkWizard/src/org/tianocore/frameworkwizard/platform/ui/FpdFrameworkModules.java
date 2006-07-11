@@ -199,13 +199,16 @@ public class FpdFrameworkModules extends IInternalFrame {
                         row[4] = mi.getPackage().getVersion();
                     }
                     model1.addRow(row);
+                    
                     docConsole.setSaved(false);
                     try{
-                    ffc.addFrameworkModulesPcdBuildDefs(miList.get(selectedRow), null);
-                }
+                        ffc.addFrameworkModulesPcdBuildDefs(miList.get(selectedRow), null);
+                    }
                     catch (Exception exception) {
                         JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
                     }
+                    JOptionPane.showMessageDialog(frame, "This Module Added Successfully.");
+                    jTable1.changeSelection(model1.getRowCount()-1, 0, false, false);
                 }
             });
         }

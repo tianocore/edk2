@@ -385,6 +385,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
                 return;
             }
             model.addRow(row);
+            jTable.changeSelection(model.getRowCount()-1, 0, false, false);
             sfc.genSpdModuleHeaders(row[0], row[1], null, null, null, null, null, null);
         }
         //
@@ -504,7 +505,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private JScrollPane getJScrollPane1() {
         if (jScrollPane1 == null) {
             jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(13,149,453,165));
+            jScrollPane1.setBounds(new java.awt.Rectangle(13,149,453,258));
             jScrollPane1.setViewportView(getJTable());
         }
         return jScrollPane1;
