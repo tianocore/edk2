@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Version>1.0</Version>
     <Abstract>Make a FFS section for an FV that contains the FAT driver.*.FFS files are compressed FFS sections.</Abstract>
     <Description>This is the FAT 32 EFI/Tiano Driver</Description>
-    <Copyright>Copyright 2004, Intel Corporation</Copyright>
+    <Copyright>Copyright 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
