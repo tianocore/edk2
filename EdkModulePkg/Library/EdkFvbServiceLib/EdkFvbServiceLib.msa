@@ -30,7 +30,7 @@ Found 'Copyright' 3 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkFatBinPkg\Fat.msa' :
 C:\tianocore\edk2\EdkFatBinPkg\Fat.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkFatBinPkg\Fat.msa(18):     <Copyright>Copyright 2004, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkFatBinPkg\Fat.msa(18):     <Copyright>Copyright 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkFatBinPkg\Fat_build.xml' :
