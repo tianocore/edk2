@@ -5,8 +5,9 @@
     <ModuleType>PEIM</ModuleType>
     <GuidValue>b694e0dc-cd4e-4b30-885b-9c164ed3e74a</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Pei Memory Allocation Library</Abstract>
+    <Description>Memory Allocation Library that uses PEI Services to allocate memory.
+      Free operations are ignored.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

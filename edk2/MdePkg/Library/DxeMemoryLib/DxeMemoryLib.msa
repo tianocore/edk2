@@ -5,8 +5,9 @@
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>f1bbe03d-2f28-4dee-bec7-d98d7a30c36a</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Memory-only library functions with no library constructor/destructor</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Dxe Memory Library.</Abstract>
+    <Description>Base Memory Library implementation that uses EFI Boot Services
+      where possible for size reduction.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -36,6 +37,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>MemLibInternals.h</Filename>
     <Filename>MemLib.c</Filename>
     <Filename>MemLibGuid.c</Filename>
     <Filename>MemLibGeneric.c</Filename>

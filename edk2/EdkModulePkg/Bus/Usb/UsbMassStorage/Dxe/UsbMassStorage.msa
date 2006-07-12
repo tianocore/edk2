@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidValue>A5C6D68B-E78A-4426-9278-A8F0D9EB4D8F</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for UsbMassStorage module</Abstract>
-    <Description>FIX ME!</Description>
+    <Description>This module provides Block IO interface for USB mass storage class</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

@@ -5,8 +5,9 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>e94cd42a-3aad-4ea0-9b09-945891c60ccd</GuidValue>
     <Version>1.0</Version>
-    <Abstract>I/O Library implemented with Framework CPU I/O Protocol</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Cpu Io Dxe Io Library.</Abstract>
+    <Description>I/O Library implementation that uses the CPU I/O Protocol for I/O
+      and MMIO operations.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

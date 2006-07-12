@@ -5,8 +5,8 @@
     <ModuleType>BASE</ModuleType>
     <GuidValue>fd44e603-002a-4b29-9f5f-529e815b6165</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Memory-only library functions with no library constructor/destructor</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Base Memory Library</Abstract>
+    <Description>Base Memory Library implementation – no ASM.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -33,6 +33,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>MemLibInternals.h</Filename>
     <Filename>CopyMem.c</Filename>
     <Filename>MemLibGuid.c</Filename>
     <Filename>MemLibGeneric.c</Filename>

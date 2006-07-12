@@ -5,8 +5,9 @@
     <ModuleType>BASE</ModuleType>
     <GuidValue>926c9cd0-4bb8-479b-9ac4-8a2a23f85307</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Intrinsic Base Io Library</Abstract>
+    <Description>I/O Library that uses compiler intrinsics to perform IN and OUT instructions
+      for IA-32 and x64.  It also performs direct memory access for MMIO services.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

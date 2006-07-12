@@ -49,8 +49,8 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdPostCodePropertyMask</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
-      <HelpText/>
+      <HelpText>The bitmask of flags that specify the enable/disable of Post
+                Code, Post Code Description.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
