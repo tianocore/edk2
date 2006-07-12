@@ -50,7 +50,7 @@ public class SourceFilesVector {
         vSourceFiles.addElement(sfi);
     }
 
-    public void updateSourceFiles(SourceFilesIdentification sfi, int index) {
+    public void setSourceFiles(SourceFilesIdentification sfi, int index) {
         vSourceFiles.setElementAt(sfi, index);
     }
 
@@ -85,5 +85,11 @@ public class SourceFilesVector {
 
     public int size() {
         return this.vSourceFiles.size();
+    }
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getSourceFiles(index).getFilename());
+        return v;
     }
 }

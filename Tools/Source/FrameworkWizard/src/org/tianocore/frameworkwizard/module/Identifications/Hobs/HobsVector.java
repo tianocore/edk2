@@ -50,7 +50,7 @@ public class HobsVector {
         vHobs.addElement(arg0);
     }
 
-    public void updateHobs(HobsIdentification arg0, int arg1) {
+    public void setHobs(HobsIdentification arg0, int arg1) {
         vHobs.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,12 @@ public class HobsVector {
     public int size() {
         return this.vHobs.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getHobs(index).getName());
+        v.addElement(getHobs(index).getType());
+        v.addElement(getHobs(index).getUsage());
+        return v;
+    }
 }

@@ -20,6 +20,8 @@ public class EnumerationData {
     //
     // Static data
     //
+    public final static String EXTERNS_PCD_IS_DRIVER = "Pcd Is Driver";
+    
     public final static String EXTERNS_SPECIFICATION = "Specification";
     
     public final static String EXTERNS_MODULE_ENTRY_POINT = "ModuleEntryPoint";
@@ -647,6 +649,9 @@ public class EnumerationData {
     
     private void initExternTypes() {
         vExternTypes.removeAllElements();
+        
+        vExternTypes.addElement(EnumerationData.EXTERNS_PCD_IS_DRIVER);
+
         vExternTypes.addElement(EnumerationData.EXTERNS_SPECIFICATION);
         
         vExternTypes.addElement(EnumerationData.EXTERNS_MODULE_ENTRY_POINT);

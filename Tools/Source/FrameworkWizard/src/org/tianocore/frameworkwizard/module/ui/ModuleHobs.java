@@ -14,18 +14,18 @@
  **/
 package org.tianocore.frameworkwizard.module.ui;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
 
 import org.tianocore.HobTypes;
 import org.tianocore.HobUsage;
@@ -33,17 +33,15 @@ import org.tianocore.HobsDocument;
 import org.tianocore.HobsDocument.Hobs;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.frameworkwizard.common.DataType;
-import org.tianocore.frameworkwizard.common.DataValidation;
-import org.tianocore.frameworkwizard.common.EnumerationData;
+import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
+import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
-import org.tianocore.frameworkwizard.common.ui.StarLabel;
-import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.module.Identifications.Hobs.HobsIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.Hobs.HobsVector;
-import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
+import org.tianocore.frameworkwizard.module.ui.dialog.HobsDlg;
 
 /**
  The class is used to create, update Hob of MSA/MBD file
@@ -64,26 +62,6 @@ public class ModuleHobs extends IInternalFrame {
     //
     private JPanel jContentPane = null;
 
-    private JLabel jLabel = null;
-
-    private JComboBox jComboBoxGuidC_Name = null;
-
-    private JLabel jLabelUsage = null;
-
-    private JLabel jLabelHobType = null;
-
-    private JComboBox jComboBoxUsage = null;
-
-    private JComboBox jComboBoxHobType = null;
-
-    private StarLabel jStarLabel1 = null;
-
-    private JLabel jLabelArch = null;
-
-    private JTextArea jTextAreaList = null;
-
-    private JComboBox jComboBoxList = null;
-
     private JButton jButtonAdd = null;
 
     private JButton jButtonRemove = null;
@@ -92,25 +70,13 @@ public class ModuleHobs extends IInternalFrame {
 
     private JScrollPane jScrollPane = null;
 
-    private JScrollPane jScrollPaneList = null;
+    private JScrollPane jScrollPaneTable = null;
 
-    private JLabel jLabelFeatureFlag = null;
-
-    private JTextField jTextFieldFeatureFlag = null;
-
-    private ICheckBoxList iCheckBoxListArch = null;
-
-    private JScrollPane jScrollPaneArch = null;
-    
-    private JLabel jLabelHelpText = null;
-
-    private JTextField jTextFieldHelpText = null;
+    private JTable jTable = null;
 
     //
     // Not used by UI
     //
-    private int intSelectedItemId = 0;
-
     private OpeningModuleType omt = null;
 
     private ModuleSurfaceArea msa = null;
@@ -121,72 +87,9 @@ public class ModuleHobs extends IInternalFrame {
 
     private HobsVector vid = new HobsVector();
 
-    private EnumerationData ed = new EnumerationData();
-    
-    private WorkspaceTools wt = new WorkspaceTools();
+    private IDefaultTableModel model = null;
 
-    /**
-     This method initializes jTextField 
-     
-     @return javax.swing.JTextField jTextFieldC_Name
-     
-     **/
-    private JComboBox getJComboBoxGuidC_Name() {
-        if (jComboBoxGuidC_Name == null) {
-            jComboBoxGuidC_Name = new JComboBox();
-            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-            jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Hob");
-        }
-        return jComboBoxGuidC_Name;
-    }
-
-    /**
-     This method initializes jComboBoxUsage 
-     
-     @return javax.swing.JComboBox jComboBoxUsage
-     
-     **/
-    private JComboBox getJComboBoxUsage() {
-        if (jComboBoxUsage == null) {
-            jComboBoxUsage = new JComboBox();
-            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
-            jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
-        }
-        return jComboBoxUsage;
-    }
-
-    /**
-     This method initializes jComboBoxHobType 
-     
-     @return javax.swing.JComboBox jComboBoxHobType
-     
-     **/
-    private JComboBox getJComboBoxHobType() {
-        if (jComboBoxHobType == null) {
-            jComboBoxHobType = new JComboBox();
-            jComboBoxHobType.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
-            jComboBoxHobType.setPreferredSize(new java.awt.Dimension(320, 20));
-        }
-        return jComboBoxHobType;
-    }
-
-    /**
-     This method initializes jComboBoxFileList 
-     
-     @return javax.swing.JComboBox jComboBoxFileList
-     
-     **/
-    private JComboBox getJComboBoxList() {
-        if (jComboBoxList == null) {
-            jComboBoxList = new JComboBox();
-            jComboBoxList.setBounds(new java.awt.Rectangle(15, 220, 210, 20));
-            jComboBoxList.addItemListener(this);
-            jComboBoxList.addActionListener(this);
-            jComboBoxList.setPreferredSize(new java.awt.Dimension(210, 20));
-        }
-        return jComboBoxList;
-    }
+    private int selectedRow = -1;
 
     /**
      This method initializes jButtonAdd 
@@ -233,25 +136,10 @@ public class ModuleHobs extends IInternalFrame {
             jButtonUpdate = new JButton();
             jButtonUpdate.setBounds(new java.awt.Rectangle(315, 220, 80, 20));
             jButtonUpdate.setPreferredSize(new java.awt.Dimension(80, 20));
-            jButtonUpdate.setText("Update");
+            jButtonUpdate.setText("Edit");
             jButtonUpdate.addActionListener(this);
         }
         return jButtonUpdate;
-    }
-
-    /**
-     * This method initializes jScrollPaneFileList   
-     *   
-     * @return javax.swing.JScrollPane   
-     */
-    private JScrollPane getJScrollPaneList() {
-        if (jScrollPaneList == null) {
-            jScrollPaneList = new JScrollPane();
-            jScrollPaneList.setBounds(new java.awt.Rectangle(15, 245, 465, 240));
-            jScrollPaneList.setViewportView(getJTextAreaList());
-            jScrollPaneList.setPreferredSize(new java.awt.Dimension(465, 240));
-        }
-        return jScrollPaneList;
     }
 
     /**
@@ -268,77 +156,43 @@ public class ModuleHobs extends IInternalFrame {
     }
 
     /**
-     * This method initializes jTextAreaFileList 
-     *   
-     * @return javax.swing.JTextArea 
-     */
-    private JTextArea getJTextAreaList() {
-        if (jTextAreaList == null) {
-            jTextAreaList = new JTextArea();
-            jTextAreaList.setEditable(false);
-
-        }
-        return jTextAreaList;
-    }
-
-    /**
-     * This method initializes jTextFieldFeatureFlag	
-     * 	
-     * @return javax.swing.JTextField	
-     */
-    private JTextField getJTextFieldFeatureFlag() {
-        if (jTextFieldFeatureFlag == null) {
-            jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
-            jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
-        }
-        return jTextFieldFeatureFlag;
-    }
-
-    /**
-     This method initializes iCheckBoxListArch   
-
-     @return ICheckBoxList   
-     **/
-    private ICheckBoxList getICheckBoxListSupportedArchitectures() {
-        if (iCheckBoxListArch == null) {
-            iCheckBoxListArch = new ICheckBoxList();
-            iCheckBoxListArch.addFocusListener(this);
-            iCheckBoxListArch.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
-        }
-        return iCheckBoxListArch;
-    }
-
-    /**
-     This method initializes jScrollPaneArch 
-
+     This method initializes jScrollPaneTable    
+     
      @return javax.swing.JScrollPane 
-
      **/
-    private JScrollPane getJScrollPaneArch() {
-        if (jScrollPaneArch == null) {
-            jScrollPaneArch = new JScrollPane();
-            jScrollPaneArch.setBounds(new java.awt.Rectangle(160, 135, 320, 80));
-            jScrollPaneArch.setPreferredSize(new java.awt.Dimension(320, 80));
-            jScrollPaneArch.setViewportView(getICheckBoxListSupportedArchitectures());
+    private JScrollPane getJScrollPaneTable() {
+        if (jScrollPaneTable == null) {
+            jScrollPaneTable = new JScrollPane();
+            jScrollPaneTable.setBounds(new java.awt.Rectangle(15, 10, 470, 420));
+            jScrollPaneTable.setPreferredSize(new Dimension(470, 420));
+            jScrollPaneTable.setViewportView(getJTable());
         }
-        return jScrollPaneArch;
+        return jScrollPaneTable;
     }
-    
+
     /**
-    This method initializes jTextFieldHelpText  
-    
-    @return javax.swing.JTextField  
-    
-    **/
-   private JTextField getJTextFieldHelpText() {
-       if (jTextFieldHelpText == null) {
-           jTextFieldHelpText = new JTextField();
-           jTextFieldHelpText.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
-           jTextFieldHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
-       }
-       return jTextFieldHelpText;
-   }
+     This method initializes jTable  
+     
+     @return javax.swing.JTable  
+     **/
+    private JTable getJTable() {
+        if (jTable == null) {
+            jTable = new JTable();
+            model = new IDefaultTableModel();
+            jTable = new JTable(model);
+            jTable.setRowHeight(20);
+
+            model.addColumn("Guid C_Name");
+            model.addColumn("Type");
+            model.addColumn("Usage");
+
+            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable.getSelectionModel().addListSelectionListener(this);
+            jTable.getModel().addTableModelListener(this);
+            jTable.addMouseListener(this);
+        }
+        return jTable;
+    }
 
     public static void main(String[] args) {
 
@@ -352,8 +206,6 @@ public class ModuleHobs extends IInternalFrame {
         this.setSize(500, 515);
         this.setContentPane(getJScrollPane());
         this.setTitle("Hobs");
-        initFrame();
-        this.setViewMode(false);
     }
 
     /**
@@ -373,13 +225,13 @@ public class ModuleHobs extends IInternalFrame {
                     String arg0 = hobs.getHobTypesList().get(index).getHobGuidCName();
                     String arg1 = null;
                     if (hobs.getHobTypesList().get(index).getHobType() != null) {
-                        arg1 = hobs.getHobTypesList().get(index).getHobType().toString();    
+                        arg1 = hobs.getHobTypesList().get(index).getHobType().toString();
                     }
                     String arg2 = null;
                     if (hobs.getHobTypesList().get(index).getUsage() != null) {
-                        arg2 = hobs.getHobTypesList().get(index).getUsage().toString();    
+                        arg2 = hobs.getHobTypesList().get(index).getUsage().toString();
                     }
-                    
+
                     String arg3 = hobs.getHobTypesList().get(index).getFeatureFlag();
                     Vector<String> arg4 = Tools.convertListToVector(hobs.getHobTypesList().get(index).getSupArchList());
                     String arg5 = hobs.getHobTypesList().get(index).getHelpText();
@@ -388,11 +240,7 @@ public class ModuleHobs extends IInternalFrame {
                 }
             }
         }
-        //
-        // Update the list
-        //
-        Tools.generateComboBoxByVector(jComboBoxList, vid.getHobsName());
-        reloadListArea();
+        showTable();
     }
 
     /**
@@ -420,20 +268,6 @@ public class ModuleHobs extends IInternalFrame {
     }
 
     /**
-     Disable all components when the mode is view
-     
-     @param isView true - The view mode; false - The non-view mode
-     
-     **/
-    public void setViewMode(boolean isView) {
-        if (isView) {
-            this.jComboBoxGuidC_Name.setEnabled(!isView);
-            this.jComboBoxUsage.setEnabled(!isView);
-            this.jComboBoxHobType.setEnabled(!isView);
-        }
-    }
-
-    /**
      This method initializes jContentPane
      
      @return javax.swing.JPanel jContentPane
@@ -441,65 +275,63 @@ public class ModuleHobs extends IInternalFrame {
      **/
     public JPanel getJContentPane() {
         if (jContentPane == null) {
-            jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
-            jLabelFeatureFlag.setText("Feature Flag");
-            jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
-            jLabelArch.setText("Arch");
-            jLabelHobType = new JLabel();
-            jLabelHobType.setText("Hob Type");
-            jLabelHobType.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
-            jLabelUsage = new JLabel();
-            jLabelUsage.setText("Usage");
-            jLabelUsage.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
-            jLabel = new JLabel();
-            jLabel.setText("C_Name");
-            jLabel.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
-            jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 85, 140, 20));
-            jLabelHelpText.setText("Help Text");
-            
+
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 495));
+            jContentPane.setPreferredSize(new java.awt.Dimension(490, 490));
 
-            jContentPane.add(jLabel, null);
-            jContentPane.add(getJComboBoxGuidC_Name(), null);
-            jContentPane.add(jLabelUsage, null);
-            jContentPane.add(jLabelHobType, null);
-            jContentPane.add(getJComboBoxUsage(), null);
-            jContentPane.add(getJComboBoxHobType(), null);
-            jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(0, 10));
-            jContentPane.add(jStarLabel1, null);
-
-            jContentPane.add(jLabelArch, null);
-
-            jContentPane.add(getJComboBoxList(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
             jContentPane.add(getJButtonUpdate(), null);
-            jContentPane.add(getJScrollPaneList(), null);
-            jContentPane.add(jLabelFeatureFlag, null);
-            jContentPane.add(getJTextFieldFeatureFlag(), null);
-            jContentPane.add(getJScrollPaneArch(), null);
-            jContentPane.add(jLabelHelpText, null);
-            jContentPane.add(getJTextFieldHelpText(), null);
+            jContentPane.add(getJScrollPaneTable(), null);
         }
         return jContentPane;
     }
 
+    private void showEdit(int index) {
+        HobsDlg dlg = new HobsDlg(vid.getHobs(index), new IFrame());
+        int result = dlg.showDialog();
+        if (result == DataType.RETURN_TYPE_OK) {
+            if (index == -1) {
+                this.vid.addHobs(dlg.getId());
+            } else {
+                this.vid.setHobs(dlg.getId(), index);
+            }
+            this.showTable();
+            this.save();
+            dlg.dispose();
+        }
+        if (result == DataType.RETURN_TYPE_CANCEL) {
+            dlg.dispose();
+        }
+    }
+
     /**
-     This method initializes Usage type and Hob type
+     Clear all table rows
      
      **/
-    private void initFrame() {
-        Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVHobUsage());
-        Tools.generateComboBoxByVector(jComboBoxHobType, ed.getVHobType());
-        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
+    private void clearAll() {
+        if (model != null) {
+            for (int index = model.getRowCount() - 1; index >= 0; index--) {
+                model.removeRow(index);
+            }
+        }
+    }
 
-        this.iCheckBoxListArch.setAllItems(ed.getVSupportedArchitectures());
+    /**
+     Read content of vector and put then into table
+     
+     **/
+    private void showTable() {
+        clearAll();
+
+        if (vid.size() > 0) {
+            for (int index = 0; index < vid.size(); index++) {
+                model.addRow(vid.toStringVector(index));
+            }
+        }
+        this.jTable.repaint();
+        this.jTable.updateUI();
     }
 
     /* (non-Javadoc)
@@ -510,60 +342,27 @@ public class ModuleHobs extends IInternalFrame {
      */
     public void actionPerformed(ActionEvent arg0) {
         if (arg0.getSource() == jButtonAdd) {
-            if (!checkAdd()) {
-                return;
-            }
-            addToList();
-        }
-        if (arg0.getSource() == jButtonRemove) {
-            removeFromList();
+            showEdit(-1);
         }
         if (arg0.getSource() == jButtonUpdate) {
-            if (!checkAdd()) {
+            if (this.selectedRow < 0) {
+                Log.err("Please select one record first.");
                 return;
             }
-            updateForList();
+            showEdit(selectedRow);
         }
-    }
 
-    /**
-     Data validation for all fields
-     
-     @retval true - All datas are valid
-     @retval false - At least one data is invalid
-     
-     **/
-    public boolean checkAdd() {
-        //
-        // Check if all fields have correct data types 
-        //
-
-        //
-        // Check Name 
-        //
-        if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-            Log.err("Hob Name couldn't be empty");
-            return false;
-        }
-        
-        if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-            if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-                Log.err("Incorrect data type for Hob Name");
-                return false;
+        if (arg0.getSource() == jButtonRemove) {
+            if (jTable.isEditing()) {
+                jTable.getCellEditor().stopCellEditing();
+            }
+            if (selectedRow > -1) {
+                this.model.removeRow(selectedRow);
+                this.vid.removeHobs(selectedRow);
+                selectedRow = -1;
+                this.save();
             }
         }
-        
-        //
-        // Check FeatureFlag
-        //
-        if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
-            if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /**
@@ -609,6 +408,36 @@ public class ModuleHobs extends IInternalFrame {
     }
 
     /* (non-Javadoc)
+     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+     *
+     */
+    public void valueChanged(ListSelectionEvent arg0) {
+        if (arg0.getValueIsAdjusting()) {
+            return;
+        }
+        ListSelectionModel lsm = (ListSelectionModel) arg0.getSource();
+        if (lsm.isSelectionEmpty()) {
+            return;
+        } else {
+            selectedRow = lsm.getMinSelectionIndex();
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     *
+     */
+    public void mouseClicked(MouseEvent arg0) {
+        if (arg0.getClickCount() == 2) {
+            if (this.selectedRow < 0) {
+                return;
+            } else {
+                showEdit(selectedRow);
+            }
+        }
+    }
+
+    /* (non-Javadoc)
      * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
      * 
      * Override componentResized to resize all components when frame's size is changed
@@ -619,182 +448,12 @@ public class ModuleHobs extends IInternalFrame {
         int intPreferredWidth = this.getJContentPane().getPreferredSize().width;
         int intPreferredHeight = this.getJContentPane().getPreferredSize().height;
 
-        resizeComponentWidth(jComboBoxGuidC_Name, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(jComboBoxHobType, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(jComboBoxUsage, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(jTextFieldHelpText, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(jTextFieldFeatureFlag, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(jScrollPaneArch, intCurrentWidth, intPreferredWidth);
-
-        resizeComponentWidth(jComboBoxList, intCurrentWidth, intPreferredWidth);
-        resizeComponent(jScrollPaneList, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight);
-
-        relocateComponentX(jButtonAdd, intCurrentWidth, intPreferredWidth, DataType.SPACE_TO_RIGHT_FOR_ADD_BUTTON);
-        relocateComponentX(jButtonRemove, intCurrentWidth, intPreferredWidth, DataType.SPACE_TO_RIGHT_FOR_REMOVE_BUTTON);
-        relocateComponentX(jButtonUpdate, intCurrentWidth, intPreferredWidth, DataType.SPACE_TO_RIGHT_FOR_UPDATE_BUTTON);
+        resizeComponent(this.jScrollPaneTable, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight);
+        relocateComponent(this.jButtonAdd, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
+                          DataType.SPACE_TO_RIGHT_FOR_ADD_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_ADD_BUTTON);
+        relocateComponent(this.jButtonRemove, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
+                          DataType.SPACE_TO_RIGHT_FOR_REMOVE_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_REMOVE_BUTTON);
+        relocateComponent(this.jButtonUpdate, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
+                          DataType.SPACE_TO_RIGHT_FOR_UPDATE_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_UPDATE_BUTTON);
     }
-    
-    private HobsIdentification getCurrentHobs() {
-        String arg0 = this.jComboBoxGuidC_Name.getSelectedItem().toString();
-        String arg1 = this.jComboBoxHobType.getSelectedItem().toString();
-        String arg2 = this.jComboBoxUsage.getSelectedItem().toString();
-
-        String arg3 = this.jTextFieldFeatureFlag.getText();
-        Vector<String> arg4 = this.iCheckBoxListArch.getAllCheckedItemsString();
-        String arg5 = this.jTextFieldHelpText.getText();
-        id = new HobsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
-        return id;
-    }
-    
-    /**
-    Add current item to Vector
-    
-    **/
-   private void addToList() {
-       intSelectedItemId = vid.size();
-
-       vid.addHobs(getCurrentHobs());
-
-       jComboBoxList.addItem(id.getName());
-       jComboBoxList.setSelectedItem(id.getName());
-
-       //
-       // Reset select item index
-       //
-       intSelectedItemId = vid.size();
-
-       //
-       // Reload all fields of selected item
-       //
-       reloadFromList();
-
-       // 
-       // Save to memory
-       //
-       save();
-   }
-
-   /**
-    Remove current item from Vector
-    
-    **/
-   private void removeFromList() {
-       //
-       // Check if exist items
-       //
-       if (this.vid.size() < 1) {
-           return;
-       }
-
-       int intTempIndex = intSelectedItemId;
-
-       jComboBoxList.removeItemAt(intSelectedItemId);
-
-       vid.removeHobs(intTempIndex);
-
-       //
-       // Reload all fields of selected item
-       //
-       reloadFromList();
-
-       // 
-       // Save to memory
-       //
-       save();
-   }
-
-   /**
-    Update current item of Vector
-    
-    **/
-   private void updateForList() {
-       //
-       // Check if exist items
-       //
-       if (this.vid.size() < 1) {
-           return;
-       }
-
-       //
-       // Backup selected item index
-       //
-       int intTempIndex = intSelectedItemId;
-
-       vid.updateHobs(getCurrentHobs(), intTempIndex);
-
-       jComboBoxList.removeAllItems();
-       for (int index = 0; index < vid.size(); index++) {
-           jComboBoxList.addItem(vid.getHobs(index).getName());
-       }
-
-       //
-       // Restore selected item index
-       //
-       intSelectedItemId = intTempIndex;
-
-       //
-       // Reset select item index
-       //
-       jComboBoxList.setSelectedIndex(intSelectedItemId);
-
-       //
-       // Reload all fields of selected item
-       //
-       reloadFromList();
-
-       // 
-       // Save to memory
-       //
-       save();
-   }
-
-   /**
-    Refresh all fields' values of selected item of Vector
-    
-    **/
-   private void reloadFromList() {
-       if (vid.size() > 0) {
-           //
-           // Get selected item index
-           //
-           intSelectedItemId = jComboBoxList.getSelectedIndex();
-
-           this.jComboBoxGuidC_Name.setSelectedItem(vid.getHobs(intSelectedItemId).getName());
-           this.jComboBoxHobType.setSelectedItem(vid.getHobs(intSelectedItemId).getType());
-           this.jComboBoxUsage.setSelectedItem(vid.getHobs(intSelectedItemId).getUsage());
-           this.jTextFieldHelpText.setText(vid.getHobs(intSelectedItemId).getHelp());
-
-           jTextFieldFeatureFlag.setText(vid.getHobs(intSelectedItemId).getFeatureFlag());
-           iCheckBoxListArch.setAllItemsUnchecked();
-           iCheckBoxListArch.initCheckedItem(true, vid.getHobs(intSelectedItemId).getSupArchList());
-
-       } else {
-       }
-
-       reloadListArea();
-   }
-
-   /**
-    Update list area pane via the elements of Vector
-    
-    **/
-   private void reloadListArea() {
-       String strListItem = "";
-       for (int index = 0; index < vid.size(); index++) {
-           strListItem = strListItem + vid.getHobs(index).getName() + DataType.UNIX_LINE_SEPARATOR;
-       }
-       this.jTextAreaList.setText(strListItem);
-   }
-
-   /* (non-Javadoc)
-    * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
-    *
-    * Reflesh the frame when selected item changed
-    * 
-    */
-   public void itemStateChanged(ItemEvent arg0) {
-       if (arg0.getSource() == this.jComboBoxList && arg0.getStateChange() == ItemEvent.SELECTED) {
-           reloadFromList();
-       }
-   }
 }

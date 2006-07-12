@@ -16,6 +16,8 @@ package org.tianocore.frameworkwizard.module.Identifications.Externs;
 
 import java.util.Vector;
 
+import org.tianocore.frameworkwizard.common.EnumerationData;
+
 public class ExternsVector {
 
     private Vector<ExternsIdentification> vExterns = new Vector<ExternsIdentification>();
@@ -47,10 +49,24 @@ public class ExternsVector {
     }
 
     public void addExterns(ExternsIdentification arg0) {
-        vExterns.addElement(arg0);
+        boolean isExistPcd = false;
+        if (arg0.getType().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
+            for (int index = 0; index < size(); index++) {
+                if (getExterns(index).getType().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
+                    setExterns(arg0, index);
+                    isExistPcd = true;
+                    break;
+                }
+            }
+            if (!isExistPcd) {
+                vExterns.addElement(arg0);    
+            }
+        } else {
+            vExterns.addElement(arg0);
+        }
     }
 
-    public void updateExterns(ExternsIdentification arg0, int arg1) {
+    public void setExterns(ExternsIdentification arg0, int arg1) {
         vExterns.setElementAt(arg0, arg1);
     }
 
@@ -87,4 +103,10 @@ public class ExternsVector {
         return this.vExterns.size();
     }
 
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getExterns(index).getName());
+        v.addElement(getExterns(index).getType());
+        return v;
+    }
 }

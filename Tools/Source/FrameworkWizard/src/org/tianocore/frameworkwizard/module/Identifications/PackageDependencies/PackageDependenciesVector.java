@@ -50,7 +50,7 @@ public class PackageDependenciesVector {
         vPackageDependencies.addElement(arg0);
     }
 
-    public void updatePackageDependencies(PackageDependenciesIdentification arg0, int arg1) {
+    public void setPackageDependencies(PackageDependenciesIdentification arg0, int arg1) {
         vPackageDependencies.setElementAt(arg0, arg1);
     }
 
@@ -85,6 +85,13 @@ public class PackageDependenciesVector {
 
     public int size() {
         return this.vPackageDependencies.size();
+    }
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getPackageDependencies(index).getName());
+        v.addElement(getPackageDependencies(index).getVersion());
+        return v;
     }
 
 }

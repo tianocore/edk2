@@ -50,7 +50,7 @@ public class DataHubsVector {
         vDataHubs.addElement(arg0);
     }
 
-    public void updateDataHubs(DataHubsIdentification arg0, int arg1) {
+    public void setDataHubs(DataHubsIdentification arg0, int arg1) {
         vDataHubs.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,11 @@ public class DataHubsVector {
     public int size() {
         return this.vDataHubs.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getDataHubs(index).getName());
+        v.addElement(getDataHubs(index).getUsage());
+        return v;
+    }
 }

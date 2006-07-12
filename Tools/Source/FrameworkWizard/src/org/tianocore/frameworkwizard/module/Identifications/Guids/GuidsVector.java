@@ -50,7 +50,7 @@ public class GuidsVector {
         vGuids.addElement(arg0);
     }
 
-    public void updateGuids(GuidsIdentification arg0, int arg1) {
+    public void setGuids(GuidsIdentification arg0, int arg1) {
         vGuids.setElementAt(arg0, arg1);
     }
 
@@ -85,6 +85,13 @@ public class GuidsVector {
 
     public int size() {
         return this.vGuids.size();
+    }
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getGuids(index).getName());
+        v.addElement(getGuids(index).getUsage());
+        return v;
     }
 
 }
