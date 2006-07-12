@@ -34,14 +34,14 @@
 ;    IN UINT64 Value
 ;    )
 ;------------------------------------------------------------------------------
-InternalMemSetMem64 PROC    USES    edi
-    movq    mm0, [esp + 16]
-    mov     ecx, [esp + 12]
-    mov     edi, [esp + 8]
-    mov     eax, edi
+InternalMemSetMem64 PROC
+    mov     eax, [esp + 4]
+    mov     ecx, [esp + 8]
+    movq    mm0, [esp + 12]
+    mov     edx, eax
 @@:
-    movntq  [edi], mm0
-    add     edi, 8
+    movntq  [edx], mm0
+    add     edx, 8
     loop    @B
     mfence
     ret

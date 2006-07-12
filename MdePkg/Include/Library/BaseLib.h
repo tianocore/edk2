@@ -134,7 +134,7 @@ typedef struct {
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
@@ -166,7 +166,7 @@ StrCpy (
   If Source is NULL, then ASSERT().
   If Source and Destination overlap, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and Source contains more than
-  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
 
   @param  Destination Pointer to a Null-terminated Unicode string.
@@ -191,7 +191,7 @@ StrnCpy (
 
   If String is NULL, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
-  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
 
   @param  String  Pointer to a Null-terminated Unicode string.
@@ -213,7 +213,7 @@ StrLen (
 
   If String is NULL, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and String contains more than
-  PcdMaximumUnicodeStringLength Unicode characters not including the 
+  PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
 
   @param  String  Pointer to a Null-terminated Unicode string.
@@ -239,10 +239,10 @@ StrSize (
   If FirstString is NULL, then ASSERT().
   If SecondString is NULL, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and FirstString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters not including the 
+  than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
   If PcdMaximumUnicodeStringLength is not zero, and SecondString contains more
-  than PcdMaximumUnicodeStringLength Unicode characters not including the 
+  than PcdMaximumUnicodeStringLength Unicode characters not including the
   Null-terminator, then ASSERT().
 
   @param  FirstString   Pointer to a Null-terminated Unicode string.
@@ -751,7 +751,7 @@ InitializeListHead (
   If Entry is NULL, then ASSERT().
   If ListHead was not initialized with InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
-  of nodes in ListHead, including the ListHead node, is greater than or 
+  of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
   @param  ListHead  A pointer to the head node of a doubly linked list.
@@ -779,7 +779,7 @@ InsertHeadList (
   If Entry is NULL, then ASSERT().
   If ListHead was not initialized with InitializeListHead(), then ASSERT().
   If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
-  of nodes in ListHead, including the ListHead node, is greater than or 
+  of nodes in ListHead, including the ListHead node, is greater than or
   equal to PcdMaximumLinkedListLength, then ASSERT().
 
   @param  ListHead  A pointer to the head node of a doubly linked list.
@@ -805,8 +805,8 @@ InsertTailList (
 
   If List is NULL, then ASSERT().
   If List was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
-  in List, including the List node, is greater than or equal to 
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
 
   @param  List  A pointer to the head node of a doubly linked list.
@@ -857,8 +857,8 @@ GetNextNode (
 
   If ListHead is NULL, then ASSERT().
   If ListHead was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
-  in List, including the List node, is greater than or equal to 
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
 
   @param  ListHead  A pointer to the head node of a doubly linked list.
@@ -883,8 +883,8 @@ IsListEmpty (
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
   If List was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
-  in List, including the List node, is greater than or equal to 
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
   If Node is not a node in List and Node is not equal to List, then ASSERT().
 
@@ -912,8 +912,8 @@ IsNull (
   If List is NULL, then ASSERT().
   If Node is NULL, then ASSERT().
   If List was not initialized with InitializeListHead(), then ASSERT().
-  If PcdMaximumLinkedListLenth is not zero, and the number of nodes 
-  in List, including the List node, is greater than or equal to 
+  If PcdMaximumLinkedListLenth is not zero, and the number of nodes
+  in List, including the List node, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
   If Node is not a node in List, then ASSERT().
 
@@ -947,7 +947,7 @@ IsNodeAtEnd (
   If SecondEntry and FirstEntry are not in the same linked list, then ASSERT().
   If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
   linked list containing the FirstEntry and SecondEntry nodes, including
-  the FirstEntry and SecondEntry nodes, is greater than or equal to 
+  the FirstEntry and SecondEntry nodes, is greater than or equal to
   PcdMaximumLinkedListLength, then ASSERT().
 
   @param  FirstEntry  A pointer to a node in a linked list.
@@ -973,8 +973,8 @@ SwapListEntries (
 
   If Entry is NULL, then ASSERT().
   If Entry is the head node of an empty list, then ASSERT().
-  If PcdMaximumLinkedListLength is not zero, and the number of nodes in the 
-  linked list containing Entry, including the Entry node, is greater than 
+  If PcdMaximumLinkedListLength is not zero, and the number of nodes in the
+  linked list containing Entry, including the Entry node, is greater than
   or equal to PcdMaximumLinkedListLength, then ASSERT().
 
   @param  Entry A pointer to a node in a linked list
@@ -2905,10 +2905,12 @@ typedef union {
 // Byte packed structure for an IDTR, GDTR, LDTR descriptor
 /// @bug  How to make this structure byte-packed in a compiler independent way?
 //
+#pragma pack (1)
 typedef struct {
   UINT16  Limit;
   UINTN   Base;
 } IA32_DESCRIPTOR;
+#pragma pack ()
 
 #define IA32_IDT_GATE_TYPE_TASK          0x85
 #define IA32_IDT_GATE_TYPE_INTERRUPT_16  0x86
