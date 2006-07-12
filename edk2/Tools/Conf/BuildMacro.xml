@@ -582,6 +582,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </sequential>
   </macrodef>
 
+  <!--
+    DUMMY
+    -->
+  <macrodef name="Build_DUMMY">
+    <attribute name="FILEPATH"/>
+    <attribute name="FILENAME"/>
+    <attribute name="FILEEXT"/>
+
+    <element name="EXTRA.INC" optional="yes"/>
+    <element name="EXTRA.ARG" optional="yes"/>
+
+    <sequential>
+      <echo message="Ignore DUMMY file ${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+    </sequential>
+  </macrodef>
+
 <!--############################################################################
   Build Sections
 #############################################################################-->
