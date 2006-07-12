@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidValue>42857F0A-13F2-4B21-8A23-53D3F714B840</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Capsule module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Description>CapsuleRuntime module provides capsule runtime services</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -92,17 +92,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdSupportUpdateCapsuleRest</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>Fix Me!</HelpText>
+      <HelpText>Indicate whether platform can support update capsule across a system reset</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>MaxSizePopulateCapsule</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>Fix Me!</HelpText>
+      <HelpText>Indicate the max size the platform can support in case of populated capsules</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>MaxSizeNonPopulateCapsule</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>Fix Me!</HelpText>
+      <HelpText>Indicate the max size the platform can support in case of non-populated capsules</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
