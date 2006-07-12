@@ -67,7 +67,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\AtapiPassThru\Dxe\AtapiPassThru.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Pci\AtapiPassThru\Dxe\AtapiPassThru.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Pci\AtapiPassThru\Dxe\AtapiPassThru.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Pci\AtapiPassThru\Dxe\AtapiPassThru.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\AtapiPassThru\Dxe\ComponentName.c' :
@@ -84,7 +84,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\CirrusLogic\Dxe\CirrusLogic5430.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Pci\CirrusLogic\Dxe\CirrusLogic5430.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Pci\CirrusLogic\Dxe\CirrusLogic5430.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Pci\CirrusLogic\Dxe\CirrusLogic5430.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\CirrusLogic\Dxe\CirrusLogic5430UgaDraw.c' :
@@ -137,7 +137,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\IdeBus\Dxe\idebus.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Pci\IdeBus\Dxe\idebus.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Pci\IdeBus\Dxe\idebus.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Pci\IdeBus\Dxe\idebus.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\IdeBus\Dxe\idedata.h' :
@@ -166,7 +166,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\PciBus\Dxe\PciBus.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Pci\PciBus\Dxe\PciBus.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Pci\PciBus\Dxe\PciBus.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Pci\PciBus\Dxe\PciBus.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\PciBus\Dxe\PciCommand.c' :
@@ -283,7 +283,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Uhci\Dxe\Uhci.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Uhci\Dxe\Uhci.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Uhci\Dxe\Uhci.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Uhci\Dxe\Uhci.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Undi\RuntimeDxe\Decode.c' :
@@ -304,7 +304,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Undi\RuntimeDxe\Undi.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Undi\RuntimeDxe\Undi.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Undi\RuntimeDxe\Undi.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Undi\RuntimeDxe\Undi.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Pci\Undi\RuntimeDxe\Undi32.h' :
@@ -325,7 +325,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiBus\Dxe\ScsiBus.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiBus\Dxe\ScsiBus.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiBus\Dxe\ScsiBus.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiBus\Dxe\ScsiBus.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiDisk\Dxe\ComponentName.c' :
@@ -342,7 +342,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiDisk\Dxe\ScsiDisk.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiDisk\Dxe\ScsiDisk.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiDisk\Dxe\ScsiDisk.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Scsi\ScsiDisk\Dxe\ScsiDisk.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBot\Dxe\bot.c' :
@@ -359,7 +359,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBot\Dxe\UsbBot.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBot\Dxe\UsbBot.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBot\Dxe\UsbBot.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBot\Dxe\UsbBot.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBus\Dxe\ComponentName.c' :
@@ -388,7 +388,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBus\Dxe\UsbBus.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBus\Dxe\UsbBus.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBus\Dxe\UsbBus.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBus\Dxe\UsbBus.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbBus\Dxe\usbio.c' :
@@ -417,7 +417,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi0\UsbCbi0.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi0\UsbCbi0.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi0\UsbCbi0.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi0\UsbCbi0.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi1\cbi1.c' :
@@ -426,7 +426,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi1\UsbCbi1.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi1\UsbCbi1.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi1\UsbCbi1.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbCbi\Dxe\Cbi1\UsbCbi1.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbKb\Dxe\ComponentName.c' :
@@ -451,7 +451,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbKb\Dxe\UsbKb.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbKb\Dxe\UsbKb.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbKb\Dxe\UsbKb.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbKb\Dxe\UsbKb.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMassStorage\Dxe\ComponentName.c' :
@@ -468,7 +468,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMassStorage\Dxe\UsbMassStorage.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMassStorage\Dxe\UsbMassStorage.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMassStorage\Dxe\UsbMassStorage.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMassStorage\Dxe\UsbMassStorage.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMassStorage\Dxe\UsbMassStorageData.h' :
@@ -505,7 +505,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMouse\Dxe\UsbMouse.msa' :
 C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMouse\Dxe\UsbMouse.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMouse\Dxe\UsbMouse.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Bus\Usb\UsbMouse\Dxe\UsbMouse.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\Dxe\DebugImageInfo.h' :
@@ -518,7 +518,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\Dxe\DxeMain.msa' :
 C:\tianocore\edk2\EdkModulePkg\Core\Dxe\DxeMain.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Core\Dxe\DxeMain.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Core\Dxe\DxeMain.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\Dxe\Exec.h' :
@@ -683,12 +683,12 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIpl.msa' :
 C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIpl.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIpl.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIpl.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIplX64.msa' :
 C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIplX64.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIplX64.msa(18):     <Copyright>Copyright 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeIplX64.msa(18):     <Copyright>Copyright 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\DxeIplPeim\DxeLoad.c' :
@@ -741,7 +741,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\Pei\PeiMain.msa' :
 C:\tianocore\edk2\EdkModulePkg\Core\Pei\PeiMain.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Core\Pei\PeiMain.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Core\Pei\PeiMain.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Core\Pei\BootMode\BootMode.c' :
@@ -1237,7 +1237,7 @@ C:\tianocore\edk2\EdkModulePkg\Library\EdkDxeSalLib\Ipf\EsalServiceLib.c(3): Cop
 Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Library\EdkFvbServiceLib\EdkFvbServiceLib.msa' :
-C:\tianocore\edk2\EdkModulePkg\Library\EdkFvbServiceLib\EdkFvbServiceLib.msa(10):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Library\EdkFvbServiceLib\EdkFvbServiceLib.msa(10):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 3 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Library\EdkFvbServiceLib\Fvb.h' :
@@ -1414,7 +1414,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Capsule\RuntimeDxe\CapsuleRuntime.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Capsule\RuntimeDxe\CapsuleRuntime.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Capsule\RuntimeDxe\CapsuleRuntime.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Capsule\RuntimeDxe\CapsuleRuntime.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Capsule\RuntimeDxe\CapsuleService.c' :
@@ -1439,7 +1439,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Console\ConSplitter\Dxe\ConSplitter.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Console\ConSplitter\Dxe\ConSplitter.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Console\ConSplitter\Dxe\ConSplitter.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Console\ConSplitter\Dxe\ConSplitter.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Console\ConSplitter\Dxe\ConSplitterGraphics.c' :
@@ -1464,7 +1464,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Console\GraphicsConsole\Dxe\GraphicsConsole.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Console\GraphicsConsole\Dxe\GraphicsConsole.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Console\GraphicsConsole\Dxe\GraphicsConsole.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Console\GraphicsConsole\Dxe\GraphicsConsole.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Console\GraphicsConsole\Dxe\LaffStd.c' :
@@ -1489,7 +1489,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Console\Terminal\Dxe\Terminal.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Console\Terminal\Dxe\Terminal.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Console\Terminal\Dxe\Terminal.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Console\Terminal\Dxe\Terminal.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Console\Terminal\Dxe\TerminalConIn.c' :
@@ -1518,7 +1518,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHub\Dxe\DataHub.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHub\Dxe\DataHub.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHub\Dxe\DataHub.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHub\Dxe\DataHub.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHubStdErr\Dxe\DataHubStdErr.c' :
@@ -1531,7 +1531,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHubStdErr\Dxe\DataHubStdErr.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHubStdErr\Dxe\DataHubStdErr.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHubStdErr\Dxe\DataHubStdErr.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\DataHub\DataHubStdErr\Dxe\DataHubStdErr.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Debugger\Debugport\Dxe\ComponentName.c' :
@@ -1552,7 +1552,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Debugger\Debugport\Dxe\DebugPort.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Debugger\Debugport\Dxe\DebugPort.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Debugger\Debugport\Dxe\DebugPort.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Debugger\Debugport\Dxe\DebugPort.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\DebugSupport\Dxe\DebugSupport.c' :
@@ -1565,7 +1565,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\DebugSupport\Dxe\DebugSupport.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\DebugSupport\Dxe\DebugSupport.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\DebugSupport\Dxe\DebugSupport.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\DebugSupport\Dxe\DebugSupport.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\DebugSupport\Dxe\ia32\AsmFuncs.asm' :
@@ -1610,7 +1610,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Disk\DiskIo\Dxe\DiskIo.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Disk\DiskIo\Dxe\DiskIo.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Disk\DiskIo\Dxe\DiskIo.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Disk\DiskIo\Dxe\DiskIo.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Disk\Partition\Dxe\ComponentName.c' :
@@ -1651,12 +1651,12 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Disk\Partition\Dxe\Partition.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Disk\Partition\Dxe\Partition.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Disk\Partition\Dxe\Partition.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Disk\Partition\Dxe\Partition.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Disk\UnicodeCollation\English\Dxe\English.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Disk\UnicodeCollation\English\Dxe\English.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Disk\UnicodeCollation\English\Dxe\English.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Disk\UnicodeCollation\English\Dxe\English.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Disk\UnicodeCollation\English\Dxe\UnicodeCollationEng.c' :
@@ -1673,7 +1673,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Ebc\Dxe\Ebc.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Ebc\Dxe\Ebc.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Ebc\Dxe\Ebc.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Ebc\Dxe\Ebc.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Ebc\Dxe\EbcExecute.c' :
@@ -1742,7 +1742,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\EmuVariable\RuntimeDxe\EmuVariable.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\EmuVariable\RuntimeDxe\EmuVariable.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\EmuVariable\RuntimeDxe\EmuVariable.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\EmuVariable\RuntimeDxe\EmuVariable.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\EmuVariable\RuntimeDxe\InitVariable.c' :
@@ -1771,7 +1771,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\FaultTolerantWriteLite\Dxe\FtwLite.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\FaultTolerantWriteLite\Dxe\FtwLite.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\FaultTolerantWriteLite\Dxe\FtwLite.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\FaultTolerantWriteLite\Dxe\FtwLite.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\FaultTolerantWriteLite\Dxe\FtwMisc.c' :
@@ -1808,7 +1808,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\Crc32SectionExtract.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\FirmwareVolume\GuidedSectionExtraction\Crc32SectionExtract\Dxe\GuidedSection.c' :
@@ -1837,7 +1837,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Dxe\NullMemoryTest.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Dxe\NullMemoryTest.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Dxe\NullMemoryTest.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Dxe\NullMemoryTest.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Pei\BaseMemoryTest.c' :
@@ -1850,7 +1850,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Pei\BaseMemoryTest.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Pei\BaseMemoryTest.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Pei\BaseMemoryTest.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\GenericMemoryTest\Pei\BaseMemoryTest.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\MonotonicCounter\RuntimeDxe\MonotonicCounter.c' :
@@ -1867,7 +1867,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\MonotonicCounter\RuntimeDxe\MonotonicCounter.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\MonotonicCounter\RuntimeDxe\MonotonicCounter.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\MonotonicCounter\RuntimeDxe\MonotonicCounter.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\MonotonicCounter\RuntimeDxe\MonotonicCounter.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeBc\Dxe\bc.c' :
@@ -1880,7 +1880,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeBc\Dxe\BC.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeBc\Dxe\BC.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeBc\Dxe\BC.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeBc\Dxe\BC.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeBc\Dxe\ComponentName.c' :
@@ -1941,7 +1941,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeDhcp4\Dxe\Dhcp4.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeDhcp4\Dxe\Dhcp4.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeDhcp4\Dxe\Dhcp4.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeDhcp4\Dxe\Dhcp4.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Network\PxeDhcp4\Dxe\PxeDhcp4.c' :
@@ -2026,7 +2026,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Network\Snp32_64\Dxe\SNP.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Network\Snp32_64\Dxe\SNP.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Network\Snp32_64\Dxe\SNP.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Network\Snp32_64\Dxe\SNP.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Network\Snp32_64\Dxe\start.c' :
@@ -2063,7 +2063,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Dxe\Pcd.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Dxe\Pcd.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Dxe\Pcd.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Dxe\Pcd.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Dxe\Service.c' :
@@ -2084,7 +2084,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Pei\Pcd.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Pei\Pcd.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Pei\Pcd.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Pei\Pcd.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\PCD\Pei\Service.c' :
@@ -2117,7 +2117,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Runtime\RuntimeDxe\Runtime.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Runtime\RuntimeDxe\Runtime.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Runtime\RuntimeDxe\Runtime.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Runtime\RuntimeDxe\Runtime.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Runtime\RuntimeDxe\Ia32\PeHotRelocateEx.c' :
@@ -2150,7 +2150,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Security\SecurityStub\Dxe\SecurityStub.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Security\SecurityStub\Dxe\SecurityStub.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Security\SecurityStub\Dxe\SecurityStub.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Security\SecurityStub\Dxe\SecurityStub.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\StatusCode\RuntimeDxe\DebugAssert.c' :
@@ -2167,7 +2167,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\StatusCode\RuntimeDxe\StatusCode.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\StatusCode\RuntimeDxe\StatusCode.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\StatusCode\RuntimeDxe\StatusCode.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\StatusCode\RuntimeDxe\StatusCode.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\StatusCode\RuntimeDxe\Ia32\Ia32StatusCode.c' :
@@ -2216,7 +2216,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\UserInterface\HiiDataBase\Dxe\HiiDatabase.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\UserInterface\HiiDataBase\Dxe\HiiDatabase.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\UserInterface\HiiDataBase\Dxe\HiiDatabase.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\UserInterface\HiiDataBase\Dxe\HiiDatabase.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\UserInterface\HiiDataBase\Dxe\Keyboard.c' :
@@ -2331,7 +2331,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Variable\Pei\Variable.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Variable\Pei\Variable.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Variable\Pei\Variable.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Variable\Pei\Variable.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Variable\Pei\Ebc\VarMachine.h' :
@@ -2380,7 +2380,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Variable\RuntimeDxe\Variable.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\Variable\RuntimeDxe\Variable.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\Variable\RuntimeDxe\Variable.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\Variable\RuntimeDxe\Variable.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\Variable\RuntimeDxe\x64Variable.dxs' :
@@ -2405,7 +2405,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkModulePkg\Universal\WatchdogTimer\Dxe\WatchDogTimer.msa' :
 C:\tianocore\edk2\EdkModulePkg\Universal\WatchdogTimer\Dxe\WatchDogTimer.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkModulePkg\Universal\WatchdogTimer\Dxe\WatchDogTimer.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkModulePkg\Universal\WatchdogTimer\Dxe\WatchDogTimer.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\EdkNt32Pkg.spd' :
@@ -2422,7 +2422,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Build\AprioriList.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Build\AprioriList.msa(3): Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Build\AprioriList.msa(21):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Build\AprioriList.msa(21):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Build\component.def' :
@@ -2447,7 +2447,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\ConPlatform\ConPlatform.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\ConPlatform\ConPlatform.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\ConPlatform\ConPlatform.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\ConPlatform\ConPlatform.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\Nt32Platform\MiscSubclass\MiscBaseBoardManufacturer.uni' :
@@ -2581,7 +2581,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\PlatformBds\PlatformBds.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\PlatformBds\PlatformBds.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\PlatformBds\PlatformBds.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\PlatformBds\PlatformBds.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\PlatformBds\PlatformData.c' :
@@ -2758,7 +2758,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\BlockIo\WinNtBlockIo.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\BlockIo\WinNtBlockIo.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\BlockIo\WinNtBlockIo.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\BlockIo\WinNtBlockIo.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Console\ComponentName.c' :
@@ -2783,7 +2783,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Console\WinNtConsole.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Console\WinNtConsole.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Console\WinNtConsole.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Console\WinNtConsole.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SerialIo\ComponentName.c' :
@@ -2800,7 +2800,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SerialIo\WinNtSerialIo.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SerialIo\WinNtSerialIo.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SerialIo\WinNtSerialIo.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SerialIo\WinNtSerialIo.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SimpleFileSystem\ComponentName.c' :
@@ -2817,7 +2817,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SimpleFileSystem\WinNtSimpleFileSystem.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SimpleFileSystem\WinNtSimpleFileSystem.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SimpleFileSystem\WinNtSimpleFileSystem.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\SimpleFileSystem\WinNtSimpleFileSystem.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Uga\ComponentName.c' :
@@ -2830,7 +2830,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Uga\WinNtUga.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Uga\WinNtUga.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Uga\WinNtUga.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Uga\WinNtUga.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\Uga\WinNtUgaDriver.c' :
@@ -2859,7 +2859,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\WinNtBusDriver\WinNtBusDriver.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\WinNtBusDriver\WinNtBusDriver.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\WinNtBusDriver\WinNtBusDriver.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Bus\WinNtBusDriver\WinNtBusDriver.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Metronome\Metronome.c' :
@@ -2876,7 +2876,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Metronome\Metronome.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Metronome\Metronome.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Metronome\Metronome.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Metronome\Metronome.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\RealTimeClock\RealTimeClock.c' :
@@ -2889,7 +2889,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\RealTimeClock\RealTimeClock.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\RealTimeClock\RealTimeClock.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\RealTimeClock\RealTimeClock.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\RealTimeClock\RealTimeClock.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Reset\reset.c' :
@@ -2902,7 +2902,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Reset\Reset.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Reset\Reset.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Reset\Reset.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Reset\Reset.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Timer\Timer.c' :
@@ -2919,7 +2919,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Timer\Timer.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Timer\Timer.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Timer\Timer.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Chipset\Timer\Timer.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Cpu\Cpu.c' :
@@ -2932,7 +2932,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Cpu\Cpu.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Cpu\Cpu.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Cpu\Cpu.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Cpu\Cpu.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\Cpu\CpuDriver.h' :
@@ -2961,7 +2961,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\WinNtThunk\WinNtThunk.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\WinNtThunk\WinNtThunk.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\WinNtThunk\WinNtThunk.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Dxe\WinNtThunk\WinNtThunk\WinNtThunk.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Include\FlashLayout.h' :
@@ -3074,7 +3074,7 @@ Found 'Copyright' 3 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Logo\Logo.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Logo\Logo.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Logo\Logo.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Logo\Logo.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Logo\Logo_build.xml' :
@@ -3091,7 +3091,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\Autoscan\WinNtAutoScan.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Pei\Autoscan\WinNtAutoScan.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Pei\Autoscan\WinNtAutoScan.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Pei\Autoscan\WinNtAutoScan.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\BootMode\BootMode.c' :
@@ -3104,7 +3104,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\BootMode\BootMode.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Pei\BootMode\BootMode.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Pei\BootMode\BootMode.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Pei\BootMode\BootMode.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\FirmwareVolume\WinntFwh.c' :
@@ -3117,7 +3117,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\FirmwareVolume\WinNtFwh.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Pei\FirmwareVolume\WinNtFwh.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Pei\FirmwareVolume\WinNtFwh.msa(19):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Pei\FirmwareVolume\WinNtFwh.msa(19):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\FlashMap\FlashMap.c' :
@@ -3130,7 +3130,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\FlashMap\FlashMap.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Pei\FlashMap\FlashMap.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Pei\FlashMap\FlashMap.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Pei\FlashMap\FlashMap.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\MonoStatusCode\MonoStatusCode.c' :
@@ -3147,7 +3147,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\MonoStatusCode\MonoStatusCode.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Pei\MonoStatusCode\MonoStatusCode.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Pei\MonoStatusCode\MonoStatusCode.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Pei\MonoStatusCode\MonoStatusCode.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\MonoStatusCode\PlatformStatusCode.c' :
@@ -3164,7 +3164,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Pei\WinNtStuff\WinNtStuff.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Pei\WinNtStuff\WinNtStuff.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Pei\WinNtStuff\WinNtStuff.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Pei\WinNtStuff\WinNtStuff.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\RuntimeDxe\FvbServices\Nt32Fwh.dxs' :
@@ -3173,7 +3173,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\RuntimeDxe\FvbServices\Nt32Fwh.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\RuntimeDxe\FvbServices\Nt32Fwh.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\RuntimeDxe\FvbServices\Nt32Fwh.msa(20):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\RuntimeDxe\FvbServices\Nt32Fwh.msa(20):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\RuntimeDxe\FvbServices\Common\FWBlockService.c' :
@@ -3214,7 +3214,7 @@ Found 'Copyright' 1 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Sec\SecMain.msa' :
 C:\tianocore\edk2\EdkNt32Pkg\Sec\SecMain.msa(2): <!--Copyright (c) 2006, Intel Corporation
-C:\tianocore\edk2\EdkNt32Pkg\Sec\SecMain.msa(18):     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+C:\tianocore\edk2\EdkNt32Pkg\Sec\SecMain.msa(18):     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
 Found 'Copyright' 4 time(s).
 ----------------------------------------
 Find 'Copyright' in 'C:\tianocore\edk2\EdkNt32Pkg\Sec\SecMain_build.xml' :
