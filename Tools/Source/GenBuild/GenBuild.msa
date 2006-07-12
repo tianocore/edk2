@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>GenBuild</ModuleName>
     <ModuleType>TOOL</ModuleType>
-    <GuidValue>5d6c499e-53fd-430e-9285-2d7811b924e8</GuidValue>
+    <GuidValue>0FC76CF5-8ACF-49a7-82E9-EA5BE953CC48</GuidValue>
     <Version>2.0</Version>
     <Abstract>This is the EFI/Tiano Tool Resources Module</Abstract>
     <Description>
