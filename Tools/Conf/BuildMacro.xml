@@ -396,7 +396,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file list="${OBJECTS}"/>
+          <fileset casesensitive="off" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
         </sourcefiles>
         <targetfiles>
           <file name="${BIN_DIR}/@{FILENAME}.lib"/>
@@ -618,6 +618,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <OnDependency>
         <sourcefiles>
           <file list="${LIBS}"/>
+          <fileset casesensitive="off" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
