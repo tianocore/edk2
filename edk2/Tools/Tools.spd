@@ -33,13 +33,10 @@
   <MsaFiles>
     <Filename>ToolResources.msa</Filename>
     <Filename>JavaResources.msa</Filename>
-    <Filename>Source/Tools.msa</Filename>
     <Filename>Source/Common/Common.msa</Filename>
     <Filename>Source/Cpptasks/CppTasks.msa</Filename>
     <Filename>Source/FrameworkTasks/FrameworkTasks.msa</Filename>
     <Filename>Source/FrameworkWizard/FrameworkWizard.msa</Filename>
     <Filename>Source/GenBuild/GenBuild.msa</Filename>
-    <Filename>Source/SurfaceArea/SurfaceArea.msa</Filename>
-    <Filename>Source/TianoTools/TianoTools.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>
