@@ -3,7 +3,7 @@
   <MsaHeader>
     <ModuleName>Framework Wizard</ModuleName>
     <ModuleType>TOOL</ModuleType>
-    <GuidValue>5d6c499e-53fd-430e-9285-2d7811b924e8</GuidValue>
+    <GuidValue>EAC548CB-1B55-4d32-B3E1-F790095BF590</GuidValue>
     <Version>2.0</Version>
     <Abstract>This is the EFI/Tiano Tool Resources Module</Abstract>
     <Description>
