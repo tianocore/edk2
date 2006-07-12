@@ -6334,7 +6334,7 @@
         <FfsFormatKey>APPLICATION</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="X64" PackageGuid="0fd7197b-9bde-44fe-a7e4-d2177a9922e5" ModuleGuid="5058F21C-BC34-11d4-BD18-0080C73C8881">
+    <ModuleSA SupArchList="IA32" PackageGuid="0fd7197b-9bde-44fe-a7e4-d2177a9922e5" ModuleGuid="5058F21C-BC34-11d4-BD18-0080C73C8881">
       <ModuleSaBuildOptions>
         <FvBinding>FV_RECOVERY</FvBinding>
         <FfsFormatKey>CUSTOM_BUILD</FfsFormatKey>
@@ -6554,7 +6554,7 @@
       </Option>
       <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="SLINK"> "/NOLOGO", "/LTCG"</Option>
       <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
-        "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/DEF:${PLATFORM_DIR}\Build\component.def", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb"
+        "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/EXPORT:InitializeDriver=_ModuleEntryPoint", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb"
       </Option>
       <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASM">
         "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/DDEBUG", "/Cx", "/Zd", "/Zi", "/DEFI_NT_EMULATOR", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
@@ -6569,7 +6569,7 @@
       </Option>
       <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="SLINK"> "/NOLOGO", "/LTCG"</Option>
       <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
-        "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/DEF:${PLATFORM_DIR}\Build\component.def", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:CONSOLE", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb"
+        "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/EXPORT:InitializeDriver=_ModuleEntryPoint", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:CONSOLE", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb"
       </Option>
       <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="ASM">
         "/nologo", "/W3", "/WX", "/c", "/coff", "/DEFI32", "/DDEBUG", "/Cx", "/Zd", "/Zi", "/DEFI_NT_EMULATOR", "/Fl${DEST_DIR_OUTPUT}/${FILE_PATH}/${FILE_BASENAME}.lst"
