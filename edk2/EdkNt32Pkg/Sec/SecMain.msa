@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>USER_DEFINED</ModuleType>
     <GuidValue>4b837b03-6587-4d19-b82b-edfad836c0a0</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for NT32 Sec.Warning the [sources.*] does not work like you think!If you add a file you need to update the makefile in the NT32 build tipSEC_OBJECTS needs to get the OBJ of the new C file added in.We keep [sources.*] synced up with SEC_OBJECTS so dependencies workproperly.Libraries.Common does not work you must update SEC_OBJECTS in the platformmakefile</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Entry Point of NT32 Emulator</Abstract>
+    <Description>Main executable file of NT32 Emulator that loads PEI core after initialization finished.</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
