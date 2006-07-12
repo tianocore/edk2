@@ -9,7 +9,7 @@
     <Description>The library instance provides common library routines help in 
     IFR creation on-the-fly, HII variable access, HII database access, multi language supports.
     </Description>
-    <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
+    <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
       which accompanies this distribution.  The full text of the license may be found at
