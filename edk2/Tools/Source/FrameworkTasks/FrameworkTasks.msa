@@ -77,5 +77,6 @@
     <Filename>org/tianocore/framework/tasks/ToolArg.java</Filename>
     <Filename>org/tianocore/framework/tasks/VfrCompilerTask.java</Filename>
     <Filename>org/tianocore/framework/tasks/ZeroDebugDataTask.java</Filename>
+    <Filename>org/tianocore/framework/tasks/ModifyInfTask.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>

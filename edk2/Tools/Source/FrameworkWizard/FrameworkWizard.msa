@@ -158,5 +158,25 @@
     <Filename>src/org/tianocore/frameworkwizard/workspace/Workspace.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/WorkspaceTools.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/ui/SwitchWorkspace.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/IDefaultTableModel.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/ui/ArchCheckBox.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/BootModesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/DataHubsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/EventsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/ExternsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/GuidsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/HiiPackagesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/HobsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/LibraryClassDefsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PackageDepDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PCDsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PpisDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/ProtocolsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/SourceFilesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/SystemTablesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/VariablesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/GenListDialog.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/ListEditor.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/ToolChainConfigHelp.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>
