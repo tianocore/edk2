@@ -78,6 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>DxeLoad.c</Filename>
+    <Filename>DxeIpl.h</Filename>
     <Filename>DxeIpl.dxs</Filename>
     <Filename SupArchList="IA32">Ia32/ImageRead.c</Filename>
     <Filename SupArchList="IA32">Ia32/DxeLoadFunc.c</Filename>

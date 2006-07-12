@@ -93,6 +93,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>pcibus.c</Filename>
     <Filename>PciIo.c</Filename>
     <Filename>PciLib.c</Filename>
+    <Filename ToolCode="DUMMY">LightPciLib.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
