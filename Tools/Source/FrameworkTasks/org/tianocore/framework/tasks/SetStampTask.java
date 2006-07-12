@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.framework.tasks;
 
+import java.io.File;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -74,23 +76,18 @@ public class SetStampTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(commandLine.getCommandline());
 
-            System.out.println(Commandline.toString(commandLine
-                    .getCommandline()));
+            log(Commandline.toString(commandLine.getCommandline()), Project.MSG_VERBOSE);
+            log((new File(this.peFile)).getName());
 
             returnVal = runner.execute();
             if (EFI_SUCCESS == returnVal) {
-                ///
-                /// command execution success
-                ///
-                System.out.println("SetStamp execute succeeded!");
+                log("SetStamp succeeded!", Project.MSG_VERBOSE);
             } else {
                 ///
                 /// command execution fail
                 ///
-                System.out.println("SetStamp failed. (error="
-                        + Integer.toHexString(returnVal) + ")");
-                throw new BuildException("SetStamp failed. (error="
-                        + Integer.toHexString(returnVal) + ")");
+                log("ERROR = " + Integer.toHexString(returnVal));
+                throw new BuildException("SetStamp failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

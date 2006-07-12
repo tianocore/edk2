@@ -98,22 +98,20 @@ public class SplitfileTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
             
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "splitfile succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "splitfile succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "splitfile failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("splitfile failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("splitfile failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

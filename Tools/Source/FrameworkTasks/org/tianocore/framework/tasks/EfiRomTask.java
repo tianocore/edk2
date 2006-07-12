@@ -161,8 +161,10 @@ public class EfiRomTask extends Task implements EfiDefine {
                 argList.add(((Input)pe32ComprList.next()).getFile());
             }
         }
-        EdkLog.log(EdkLog.EDK_INFO, argList.toString().replaceAll(",",""));
-        
+
+        EdkLog.log(EdkLog.EDK_VERBOSE, argList.toString().replaceAll(",",""));
+        EdkLog.log(EdkLog.EDK_INFO, " ");
+
         //
         // lauch the program
         //
@@ -177,15 +179,15 @@ public class EfiRomTask extends Task implements EfiDefine {
             exitCode = cmdProc.waitFor();
             if (exitCode != 0) {
                 int len = cmdOut.read(buf, 0, 1024);
-                EdkLog.log(EdkLog.EDK_ERROR,new String(buf, 0, len));
+                EdkLog.log(EdkLog.EDK_INFO, new String(buf, 0, len));
             } else {
-                EdkLog.log(EdkLog.EDK_INFO, "FlashMap succeed!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "EfiRom succeeded!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
         } finally {
             if (exitCode != 0) {
-                //throw new BuildException("GenFvImage: failed to generate FV file!");
+                throw new BuildException("EfiRom failed!");
             }
         }
     }

@@ -854,16 +854,6 @@ Returns:
   Output_Flag = FALSE;
   Pad_Flag    = FALSE;
 
-  //
-  //  Output the calling arguments
-  //
-  printf ("\n\n");
-  for (Index = 0; Index < argc; Index++) {
-    printf ("%s ", argv[Index]);
-  }
-
-  printf ("\n\n");
-
   if (argc < 5) {
     printf ("Not enough arguments\n");
     PrintGenDepexUsageInfo ();

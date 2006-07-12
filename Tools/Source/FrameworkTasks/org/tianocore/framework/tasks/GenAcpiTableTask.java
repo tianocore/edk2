@@ -104,24 +104,21 @@ public class GenAcpiTableTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline.getCommandline()));
-            
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
             revl = runner.execute();
             
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO,"GenAcpiTable successed!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "GenAcpiTable succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "GenAcpiTable failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("GenAcpiTable failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("GenAcpiTable failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

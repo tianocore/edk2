@@ -40,7 +40,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
     // / Input file
     // /
     private String inputFile = "";
-
+    private String inputFileName = "";
     // /
     // / Output file
     // /
@@ -128,7 +128,8 @@ public class PeiReBaseTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, this.inputFileName);
             
             revl = runner.execute();
             
@@ -136,16 +137,13 @@ public class PeiReBaseTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO,"PeiBase succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "PeiReBase succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "PeiBase failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("PeiBase failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("PeiReBase failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -172,6 +170,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
      *            string of input file name.
      */
     public void setInputFile(String inputFile) {
+        this.inputFileName = (new File(inputFile)).getName();
         this.inputFile = "-I " + inputFile;
     }
 

@@ -125,8 +125,8 @@ public class GenTeImageTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline
-                    .getCommandline()));
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
 
             revl = runner.execute();
 
@@ -134,16 +134,13 @@ public class GenTeImageTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "GenTeImage succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "GenTeImage succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "GenTeImage failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("GenTeImage failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = "+ Integer.toHexString(revl));
+                throw new BuildException("GenTeImage failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

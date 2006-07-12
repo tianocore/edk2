@@ -35,6 +35,7 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 import org.apache.tools.ant.types.Path;
+import org.tianocore.logger.EdkLog;
 
 /**
  Class MakeDeps is used to wrap MakeDeps.exe as an ANT task.
@@ -77,6 +78,10 @@ public class MakeDeps extends Task {
 
         Project prj  = this.getOwningTarget().getProject();
         String  toolPath = prj.getProperty("env.FRAMEWORK_TOOLS_PATH");
+        FrameworkLogger logger = new FrameworkLogger(prj, "makedeps");
+        EdkLog.setLogLevel(prj.getProperty("env.LOGLEVEL"));
+        EdkLog.setLogger(logger);
+
         ///
         /// compose full tool path
         ///
@@ -118,8 +123,9 @@ public class MakeDeps extends Task {
         Iterator iterator = inputFileList.iterator();
         while (iterator.hasNext()) {
             Input inputFile = (Input)iterator.next();
+            String inputFileString = cleanupPathName(inputFile.getFile());
             args.append(" -f ");
-            args.append(cleanupPathName(inputFile.getFile()));
+            args.append(inputFileString);
         }
 
         ///
@@ -165,6 +171,9 @@ public class MakeDeps extends Task {
         runner.setAntRun(prj);
         runner.setCommandline(cmd.getCommandline());
 
+        EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmd.getCommandline()));
+        EdkLog.log(EdkLog.EDK_INFO, " ");
+
         int result = 0;
         try {
             result = runner.execute();
@@ -173,7 +182,7 @@ public class MakeDeps extends Task {
         }
 
         if (result != 0) {
-            log ("MakeDeps failed");
+            EdkLog.log(EdkLog.EDK_INFO, "MakeDeps failed!");
             return;
         }
 

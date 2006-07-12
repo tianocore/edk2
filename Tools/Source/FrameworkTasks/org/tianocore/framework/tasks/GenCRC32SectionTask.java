@@ -89,29 +89,23 @@ public class GenCRC32SectionTask extends Task implements EfiDefine{
             
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
-            System.out.println(Commandline.toString(cmdline.getCommandline()));
-            
+            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
+            log(" ");
             revl = runner.execute();
             if (EFI_SUCCESS == revl){
                 //
                 //  command execution success 
                 //
-                System.out.println("gencrc32section succeeded!");
-            }
-            else
-            {
+                log("gencrc32section succeeded!", Project.MSG_VERBOSE);
+            } else {
                 // 
                 // command execution fail
                 //
-                System.out.println("gencrc32section failed. (error=" + 
-                    Integer.toHexString(revl) + 
-                    ")"
-                    );
+                log("ERROR = " + Integer.toHexString(revl));
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
-        }
-        
+        }        
     }
 
     /**

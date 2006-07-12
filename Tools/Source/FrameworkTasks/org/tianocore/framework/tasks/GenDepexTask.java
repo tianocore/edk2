@@ -14,6 +14,8 @@
 
  **/
 package org.tianocore.framework.tasks;
+import java.io.File;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -35,6 +37,7 @@ public class GenDepexTask extends Task implements EfiDefine {
     /// input pre-processed dependency text files name
     ///
     private String inputFile = "";
+    private String inputFileName = "";
     ///
     /// padding integer value
     ///
@@ -79,24 +82,17 @@ public class GenDepexTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(commandLine.getCommandline());
 
-            System.out.println(Commandline.toString(commandLine
-                    .getCommandline()));
-
+            log(Commandline.toString(commandLine.getCommandline()), Project.MSG_VERBOSE);
+            log(inputFileName);
             returnVal = runner.execute();
             if (EFI_SUCCESS == returnVal) {
-                //
-                // command execution success
-                //
-                System.out.println("GenDepex execute succeeded!");
-
+                log("GenDepex succeeded!", Project.MSG_VERBOSE);
             } else {
                 //
                 // command execution fail
                 //
-                System.out.println("GenDepex failed. (error="
-                        + Integer.toHexString(returnVal) + ")");
-                throw new BuildException("GenDepex failed. (error="
-                        + Integer.toHexString(returnVal) + ")");
+                log("ERROR = " + Integer.toHexString(returnVal));
+                throw new BuildException("GenDepex failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -131,6 +127,7 @@ public class GenDepexTask extends Task implements EfiDefine {
       @param inputFileName          name of inputFile
     **/
     public void setInputFile(String inputFileName) {
+        this.inputFileName = (new File(inputFileName)).getName();
         this.inputFile = " -I " + inputFileName;
     }
 

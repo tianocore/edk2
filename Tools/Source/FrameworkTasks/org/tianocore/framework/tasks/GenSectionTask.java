@@ -16,9 +16,11 @@
 
 package org.tianocore.framework.tasks;
 
+import java.io.File;
+
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
@@ -28,6 +30,10 @@ public class GenSectionTask extends Task implements EfiDefine {
     /// inputfile name
     ///
     private String inputFile = "";
+    ///
+    /// 
+    /// 
+    private String inputFileName = "";
     ///
     /// outputfile name
     ///
@@ -86,22 +92,18 @@ public class GenSectionTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
-            System.out.println(Commandline.toString(cmdline.getCommandline()));
 
+            log(inputFileName);
+            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                //
-                // command execution success
-                //
-                System.out.println("gensection succeeded!");
+                log("gensection succeeded!", Project.MSG_VERBOSE);
             } else {
                 //
                 // command execution fail
                 //
-                System.out.println("gensection failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("gensection failed. (error="
-                        + Integer.toHexString(revl) + ")");
+                log("ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("gensection failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -127,6 +129,7 @@ public class GenSectionTask extends Task implements EfiDefine {
       @param inputFile            name of input file
     **/
     public void setInputFile(String inputFile) {
+        this.inputFileName = (new File(inputFile)).getName();
         this.inputFile = " -i " + inputFile;
     }
 

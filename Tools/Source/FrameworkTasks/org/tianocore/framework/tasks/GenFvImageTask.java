@@ -78,6 +78,7 @@ public class GenFvImageTask extends Task implements EfiDefine{
         ProcessBuilder pb = new ProcessBuilder(argList);
         pb.directory(new File(outputDir));
         int exitCode = 0;
+        log((new File(this.infFile)).getName());
         try {
             Process cmdProc = pb.start();
             InputStreamReader cmdOut = new InputStreamReader(cmdProc.getInputStream());
@@ -86,9 +87,9 @@ public class GenFvImageTask extends Task implements EfiDefine{
             exitCode = cmdProc.waitFor();
             if (exitCode != 0) {
                 int len = cmdOut.read(buf, 0, 1024);
-                log(new String(buf, 0, len), Project.MSG_ERR);
+                log(new String(buf, 0, len));
             } else {
-                log("GenFvImage - DONE!", Project.MSG_VERBOSE);
+                log("GenFvImage succeeded!", Project.MSG_VERBOSE);
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
