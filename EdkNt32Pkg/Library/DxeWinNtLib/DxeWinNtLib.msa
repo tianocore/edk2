@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>DxeWinNtLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>f6b5871d-5226-41b3-a569-3ff893fdc7bc</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>A library to produce the global variable 'gWinNt'</Abstract>
+    <Description>This library contains a single global variable 'gWinNt' along with a constructor to initialize that global.</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
