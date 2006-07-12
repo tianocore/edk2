@@ -39,7 +39,7 @@
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>BaseLibInternal.h</Filename>
+    <Filename>BaseLibInternals.h</Filename>
     <Filename>String.c</Filename>
     <Filename>LinkedList.c</Filename>
     <Filename>Synchronization.c</Filename>
@@ -366,7 +366,7 @@
     <Filename SupArchList="X64">X64/Thunk16.asm</Filename>
     <Filename SupArchList="IPF">Math64.c</Filename>
     <Filename SupArchList="IPF">Ipf/asm.h</Filename>
-    <Filename SupArchList="IPF">Ipf/ia64_gen.h</Filename>
+    <Filename SupArchList="IPF">Ipf/ia_64gen.h</Filename>
     <Filename SupArchList="IPF">Ipf/PalCallStatic.s</Filename>
     <Filename SupArchList="IPF">Ipf/setjmp.s</Filename>
     <Filename SupArchList="IPF">Ipf/longjmp.s</Filename>
