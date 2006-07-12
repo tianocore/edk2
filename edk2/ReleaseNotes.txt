@@ -168,122 +168,17 @@ Java Tools:
 -------------------------------------------------------------------------------
 Quick Start
 -----------
-For editing text files under Windows, use the Wordpad application.  Notepad
-does not handle UNIX style newline characters properly.
-
-Copy the target.template file in the Tools/Conf directory to target.txt, which
-must also be in the Tools/Conf directory.
-
-Edit the text file, target.txt, located in the Tools/Conf directory. This 
-file contains options for setting the active platform and restricting the build. 
-The restictions are used to limit the build output by specifying build target(s), 
-tagname(s) and architecture(s) to less than the full set of possible options. 
-
-The ACTIVE_PLATFORM must be set unless the current working directory contains one
-or more FPD files.  All other options need not be set, however by unsetting these
-options (by removing the line from the file, or leaving the Value empty) will 
-result in all available build possibilites when typing build.  By default EDK II
-can build a matrix of binaries, using different target types, tool chain tags and 
-architectures.  Options to target.txt file are as follows:
-
-ACTIVE_PLATFORM =  Value   RECOMMENDED
-  Where Value is the WORKSPACE relative path and filename of a Framework Platform 
-  Definition (FPD) File.  Example:
-
-ACTIVE_PLATFORM = MdePkg/MdePkg.fpd
-
-TARGET = Value             OPTIONAL
-  Where Value is a list of one or more of the following: DEBUG, RELEASE or a User
-  Defined Target type, such as PERF. Example: 
-
-TARGET = DEBUG RELEASE
-
-TARGET_ARCH = Value        OPTIONAL
-  Where Value is a list of one or more supported Architectures: IA32, X64, IPF or
-  EBC.  Example: 
-
-TARGET_ARCH = IA32 X64 EBC
-
-TOOL_CHAIN_CONF = Value    OPTIONAL
-  Where Value is the Filename of an alternate tools_def.txt file created by the
-  user.  The alternate tools_def.txt files must be in the Tools/Conf directory.
-  These tool definitions are scoped to the WORKSPACE (location of the EDK 
-  installation) and cannot be shared between WORKSPACES. (You can copy the files
-  from one workspace to another.) Example: 
-
-TOOL_CHAIN_CONF = alfred.txt
-
-TOOL_CHAIN_TAG = Value     OPTIONAL
-  Where Value is a list of TagName entries as defined in the tools_def.txt file.
-  The TagName can be used to specify different versions of a compiler, i.e., 
-  gcc 4.0 and gcc 4.1 which will allow you to build binaries with both tool chains 
-  during the same build - useful during testing of a new compiler tool chain, or 
-  for changing compiler flags to check out performance with a different set of 
-  flags than flags used for production.  Example:
-
-TOOL_CHAIN_TAG = GCC40 GCC41
-
-To clear a restriction, just remove any data after the equal sign.  To clear
-the TARGET_ARCH limitation that was set above, enter: 
-
-TARGET_ARCH =
-
------------
-Copy the tools_def.template file in Tools/Conf to tools_def.txt in the same
-directory.
-
-Edit the tools definition file, tools_def.txt, also located in the Tools/Conf 
-directory. This file contains the names of the compiler tool chains and the 
-location of the compiler binaries.  It has been pre-populated with the standard 
-location for the Microsoft tool chains and includes the standard location of 
-the Intel C Compiler for EFI Byte Code (EBC.)  In addition, EDK II provides
-support for Cygwin, Linux and OS X GCC compiler tool chains.  A script has been
-provided in the Tools/gcc directory as well as instructions in obtaining and
-building a version of GCC that has been tested.  The tools_def.txt file has
-the GCC binary locations that are created using this script.
-
-Both target.txt and tools_def.txt files are formatted as Property = Value, 
-which must appear on a single line.  Spanning a Value entry over multiple
-lines is not supported at this time.  In the target.txt file, the Property is
-a single, uppercase word with underscore characters. These Property names are
-fixed by the build system.  The tools_def.txt file's Property is an underscore
-delimited coding, which supports some user defined values.  The coding for
-the Property is:  TARGET_TAGNAME_ARCH_COMMAND_ATTR  The Value, is either a 
-full path, full path and filename or a reserved word.
-
-TARGET  - DEBUG and RELEASE are predefined, however the user may define one or
-          more of their own TARGET types in this file.
-
-TAGNAME - HOST, MSFT, GCC, INTC are predefined, however the user may define 
-          one or more of their own TAGNAME keywords in this file.
-
-ARCH    - EDK II supports IA32, X64, IPF and EBC at this time.
-
-COMMAND - Predefined command codes are listed in the tools_def.txt file, however
-          the user can specify additional command codes for their one, non-
-          standard tools.
-
-ATTR    - Predefined Attributes are listed in the tools_def.txt file.
-
-NOTE: The TAGNAME: HOST is reserved and MUST be defined in order to build the
-      included Tiano tools from their C source files.  These tools have been
-      built and tested using both Microsoft and GCC tool chains.
-NOTE: The "*" symbol may be used as a wildcard character in most of these
-      fields, refer to the tools_def.txt and the "EDK II Build and Packaging
-      Architecture Specification" for more details.
-
-
------------
 Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
 checkout the entire EDK II source tree.
 
 In a command window, change to the top level directory of the Edk II sources.
-  Set the WORKSPACE environment variable, e.g.:
 
-    c:\> set WORKSPACE=C:\MyWork\Edk2
+If the active compiler tool chain is GCC, you must set the
+environment variable, TOOL_CHAIN to "gcc" before running the
+edksetup script.  Example: export TOOL_CHAIN=gcc
 
 To test your tool chain setup and to build the Supplied Tools, execute:
-    c:\MyWork\Edk2\> edksetup
+    c:\MyWork\edkii\> edksetup ForceBuild
 
 On Unix systems you must source the edksetup.sh file to load the correct
 settings into your shell.
@@ -296,12 +191,23 @@ this document.)
             This configures the environment to include the TianoTools and the
             Java applications and libraries.
 
-If you are confident that none of the tool tool sources have changed, and you
-only want to set up the workspace environment you may execute:
-   c:\MyWork\Edk2\> edksetup skip
+Any changes to the tool source code or XML Schema documents will require that
+you run:
+   c:\MyWork\edkii\> edksetup ForceBuild
+
+You will need to set the WORKSPACE environment variable, or run the edksetup
+script (without any arguments) any time you want to build.
+
+  Set the WORKSPACE environment variable, e.g.:
+
+    c:\> set WORKSPACE=C:\MyWork\edkii
+
+You may need to edit the text files, Tools/Conf/target.txt and/or
+Tools/Conf/tools_def.txt (created by edksetup,) using your favorite 
+text editor to point to the tools you want to use to build EDK II binaries.
 
 Once this is completed, you are ready to test the Build, by executing:
-    c:\MyWork\Edk2\> build
+    c:\MyWork\edkii\> build
 
 This command builds active platform specified in text file target.txt. If 
 active platform is not specified, go to sub-directory which contains FPD files and
@@ -315,7 +221,7 @@ After running the setup command, you can build individual platforms.
   In the command window, 
   1. Set active platform in target.txt, and type "build" in whatever directory;
   2. or cd to the platform (FPD file) that you want to build, and just type:
-    c:\MyWork\Edk2\EdkNt32Pkg\> build
+    c:\MyWork\edkii\EdkNt32Pkg\> build
 
   Note that active platform with the high priority to build, that means active 
   platform will be built even if exists FPD file under current directory. More 
@@ -335,7 +241,7 @@ Individual Module Builds
 After running the setup command, you can build individual modules.
   In the command window, cd to the module that you want to build, and just
   type:
-    c:\MyWork\Edk2\MdePkg\Library\BaseLib\> build
+    c:\MyWork\edkii\MdePkg\Library\BaseLib\> build
 
   Note active platform must be set for individual module build. 
 
