@@ -14,6 +14,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.framework.tasks;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -21,18 +35,6 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 import org.apache.tools.ant.types.Path;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  Class MakeDeps is used to wrap MakeDeps.exe as an ANT task.
@@ -185,10 +187,15 @@ public class MakeDeps extends Task {
     /// Remove any duplicated path separator or inconsistent path separator
     ///
     private String cleanupPathName(String path) {
-        String separator = "\\" + File.separator;
-        String duplicateSeparator = separator + "{2}";
-        path = Path.translateFile(path);
-        path = path.replaceAll(duplicateSeparator, separator);
+        try {
+            path = (new File(path)).getCanonicalPath();
+        } catch (IOException e) {
+            String separator = "\\" + File.separator;
+            String duplicateSeparator = separator + "{2}";
+            path = Path.translateFile(path);
+            path = path.replaceAll(duplicateSeparator, separator);
+            return path;
+        }
 
         return path;
     }
@@ -335,6 +342,7 @@ public class MakeDeps extends Task {
 
         LineNumberReader    lineReader = null;
         FileReader          fileReader = null;
+        Set<String>         lineSet = new HashSet<String>(100); // used to remove duplicated lines
         try {
             fileReader = new FileReader(df);
             lineReader = new LineNumberReader(fileReader);
@@ -343,7 +351,6 @@ public class MakeDeps extends Task {
             /// clean-up each line in deps file
             //
             String line = null;
-            StringBuffer cleanedLines = new StringBuffer(4096);
             while ((line = lineReader.readLine()) != null) {
                 Pattern pattern = Pattern.compile(target + "[ ]*:[ ]*(.+)");
                 Matcher matcher = pattern.matcher(line);
@@ -354,8 +361,7 @@ public class MakeDeps extends Task {
                     ///
                     String filePath = line.substring(matcher.start(1), matcher.end(1));
                     filePath = cleanupPathName(filePath);
-                    cleanedLines.append(filePath);
-                    cleanedLines.append("\n");
+                    lineSet.add(filePath);
                 }
             }
             lineReader.close();
@@ -366,10 +372,19 @@ public class MakeDeps extends Task {
             ///
             StringTokenizer fileTokens = new StringTokenizer(extraDeps, ";");
             while (fileTokens.hasMoreTokens()) {
-                cleanedLines.append(cleanupPathName(fileTokens.nextToken()));
-                cleanedLines.append("\n");
+                lineSet.add(cleanupPathName(fileTokens.nextToken()));
             }
 
+            ///
+            /// compose the final file content
+            /// 
+            StringBuffer cleanedLines = new StringBuffer(40960);
+            Iterator<String> it = lineSet.iterator();
+            while (it.hasNext()) {
+                String filePath = it.next();
+                cleanedLines.append(filePath);
+                cleanedLines.append("\n");
+            }
             ///
             /// overwrite old dep file with new content
             ///

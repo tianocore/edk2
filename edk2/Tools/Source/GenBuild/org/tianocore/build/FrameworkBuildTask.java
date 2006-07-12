@@ -282,7 +282,7 @@ public class FrameworkBuildTask extends Task{
             GlobalData.setToolChainEnvInfo(envToolChainInfo);
             
             str = getValue("TOOL_CHAIN_CONF", targetFileInfo);
-            if (str != null) {
+            if (str != null && str.trim().length() > 0) {
                 toolsDefFilename = str;
             }
             

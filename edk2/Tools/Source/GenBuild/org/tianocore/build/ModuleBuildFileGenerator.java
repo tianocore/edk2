@@ -549,7 +549,7 @@ public class ModuleBuildFileGenerator {
             return ;
         }
         if (fp.initSections(ffsKeyword, project, fpdModuleId)) {
-            String targetFilename = fpdModuleId.getModule().getGuid() + "-" + fpdModuleId.getModule().getName() + FpdParserTask.getSuffix(fpdModuleId.getModule().getModuleType());
+            String targetFilename = fpdModuleId.getModule().getGuid() + "-" + "${BASE_NAME}" + FpdParserTask.getSuffix(fpdModuleId.getModule().getModuleType());
             String[] list = fp.getGenSectionElements(document, "${BASE_NAME}", fpdModuleId.getModule().getGuid(), targetFilename);
 
             for (int i = 0; i < list.length; i++) {
