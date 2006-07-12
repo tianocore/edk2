@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidValue>0167CCC4-D0F7-4f21-A3EF-9E64B7CDCE8B</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Scsi Bus module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Description>
+      SCSI bus driver. This driver scans all SCSI devices and export SCSI IO protocol    
+    </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
