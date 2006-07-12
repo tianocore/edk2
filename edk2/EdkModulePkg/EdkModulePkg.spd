@@ -96,7 +96,7 @@
     <Filename>Bus/Usb/UsbMouse/Dxe/UsbMouse.msa</Filename>
     <Filename>Core/Dxe/DxeMain.msa</Filename>
     <Filename>Core/DxeIplPeim/DxeIpl.msa</Filename>
-    <Filename>Core/DxeIplPeim/DxeIplX64.msa</Filename>
+    <Filename>Core/DxeIplX64Peim/DxeIplX64.msa</Filename>
     <Filename>Core/Pei/PeiMain.msa</Filename>
     <Filename>Library/BaseCustomDecompressLibNull/BaseCustomDecompressLibNull.msa</Filename>
     <Filename>Library/BaseUefiTianoDecompressLib/BaseUefiTianoDecompressLib.msa</Filename>
@@ -151,7 +151,7 @@
     <Filename>Universal/Security/SecurityStub/Dxe/SecurityStub.msa</Filename>
     <Filename>Universal/StatusCode/RuntimeDxe/StatusCode.msa</Filename>
     <Filename>Universal/UserInterface/HiiDataBase/Dxe/HiiDatabase.msa</Filename>
-    <Filename>Universal/UserInterface/SetupBrowser/Dxe/DriverSample/DriverSample.msa</Filename>
+    <Filename>Universal/UserInterface/DriverSample/DriverSample.msa</Filename>
     <Filename>Universal/UserInterface/SetupBrowser/Dxe/SetupBrowser.msa</Filename>
     <Filename>Universal/Variable/Pei/Variable.msa</Filename>
     <Filename>Universal/EmuVariable/RuntimeDxe/EmuVariable.msa</Filename>

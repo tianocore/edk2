@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
     <OutputFileBasename>DxeIplX64</OutputFileBasename>
   </ModuleDefinitions>
@@ -81,10 +81,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>DxeIpl.dxs</Filename>
+    <Filename>DxeIpl.h</Filename>
     <Filename>DxeLoadX64.c</Filename>
     <Filename SupArchList="IA32">x64/ImageRead.c</Filename>
     <Filename SupArchList="IA32">x64/LongMode.asm</Filename>
     <Filename SupArchList="IA32">x64/DxeLoadFunc.c</Filename>
+    <Filename SupArchList="IA32">x64/VirtualMemory.h</Filename>
     <Filename SupArchList="IA32">x64/VirtualMemory.c</Filename>
   </SourceFiles>
   <PackageDependencies>

@@ -5,8 +5,8 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>ed3de5c8-c389-44f2-a35e-2ebdc9802a49</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the PEI library.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>EdkPeCoffLoaderLib library instance</Abstract>
+    <Description>This library gets PeCoffLoader Protocol from Hob List</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
