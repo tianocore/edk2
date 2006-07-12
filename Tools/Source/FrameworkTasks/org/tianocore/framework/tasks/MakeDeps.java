@@ -172,7 +172,6 @@ public class MakeDeps extends Task {
         runner.setCommandline(cmd.getCommandline());
 
         EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmd.getCommandline()));
-        EdkLog.log(EdkLog.EDK_INFO, " ");
 
         int result = 0;
         try {
