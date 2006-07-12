@@ -59,6 +59,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename ToolCode="DUMMY">MiscBaseBoardManufacturer.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscBiosVendor.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscChassisManufacturer.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscOemString.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscPortInternalConnectorDesignator.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscSystemLanguageString.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscSystemManufacturer.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscSystemOptionString.uni</Filename>
+    <Filename ToolCode="DUMMY">MiscSystemSlotDesignation.uni</Filename>
     <Filename>MiscSubclassDriver.uni</Filename>
     <Filename>MiscDevicePath.h</Filename>
     <Filename>MiscSubclassDriver.h</Filename>
