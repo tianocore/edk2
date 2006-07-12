@@ -13,8 +13,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>AB248E8D-ABE1-11d4-BD0D-0080C73C8881</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for UGA module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Uga driver</Abstract>
+    <Description>
+      UGA is short hand for Universal Graphics Abstraction protocol.
+      This file is a verision of UgaIo the uses WinNtThunk system calls as an IO 
+      abstraction. For a PCI device WinNtIo would be replaced with
+      a PCI IO abstraction that abstracted a specific PCI device. 
+    </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

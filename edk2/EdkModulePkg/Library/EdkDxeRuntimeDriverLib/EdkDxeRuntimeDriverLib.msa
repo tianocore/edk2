@@ -5,8 +5,11 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>b1ee6c28-54aa-4d17-b705-3e28ccb27b2e</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Runtime driver library</Abstract>
+    <Description>
+      Instance of runtime driver library, Hook VitualAddressChange and 
+      BooterviceExit event and provide runtime service.
+    </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

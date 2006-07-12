@@ -5,8 +5,8 @@
     <ModuleType>PEIM</ModuleType>
     <GuidValue>bda39d3a-451b-4350-8266-81ab10fa0523</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Debug Library for PEIMs and DXE drivers that send debug messages to ReportStatusCode</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Debug Library based on report status code library</Abstract>
+    <Description>Debug Library for PEIMs and DXE drivers that send debug messages to ReportStatusCode</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

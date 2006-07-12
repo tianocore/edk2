@@ -5,8 +5,8 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>1517564b-ab66-42b7-8903-731a95f314f9</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the PEI library.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Runtime memory status code library</Abstract>
+    <Description>Save status code in runtime memory heap.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

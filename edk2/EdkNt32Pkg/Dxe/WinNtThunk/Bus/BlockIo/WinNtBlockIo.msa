@@ -13,8 +13,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>F479E147-A125-11d4-BCFC-0080C73C8881</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for WinNtBlockIo module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Block Io driver</Abstract>
+    <Description>
+      Produce block IO abstractions for real devices on your PC using Win32 APIs.
+      The configuration of what devices to mount or emulate comes from NT
+      environment variables. The variables must be visible to the Microsoft*
+      Developer Studio for them to work.
+    </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

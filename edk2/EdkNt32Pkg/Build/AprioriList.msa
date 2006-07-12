@@ -16,8 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <ComponentType>APRIORI</ComponentType>
     <Guid>0xfc510ee7, 0xffdc, 0x11d4, 0xbd, 0x41, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81</Guid>
     <Version>0</Version>
-    <Abstract>Component description file for creating an Apriori file.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Apriori List</Abstract>
+    <Description>Generate Apriori List for driver dispatcher</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>
       All rights reserved. This program and the accompanying materials

@@ -5,8 +5,8 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>50bcb105-6634-441d-b403-659110a03ad2</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>DXE Print library</Abstract>
+    <Description>Print Library based on EFI_PRINT_PROTOCOL</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
