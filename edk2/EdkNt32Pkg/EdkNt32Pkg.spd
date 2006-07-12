@@ -266,7 +266,9 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines physical disk which will be simualted as a 
+        harddisk in simulator.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtVirtualDisk</C_Name>
@@ -275,7 +277,9 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines the file attribute which will be simulated as 
+        a harddisk in simulator.
+        The item type if this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtSerialPort</C_Name>
@@ -284,7 +288,8 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"COM1!COM2"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This Pcd declares two serial port for simulated environment.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtUga</C_Name>
@@ -293,7 +298,8 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"UGA Window 1!UGA Window 2"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD declares the resolutions for the UGA windows.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtFileSystem</C_Name>
@@ -302,7 +308,9 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L".!C:\\D\\work\\Remodel\\mdk\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines the windows directory who will be mounted as 
+        harddisk in simulator.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtMemorySize</C_Name>
@@ -311,7 +319,8 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"64!64"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines the size of simulated memory size.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
@@ -320,7 +329,9 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"64!64"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
+        the size of PcdWinNtMemorySizeForSecMain in windows platform.
+        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtBootMode</C_Name>
@@ -329,7 +340,20 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines the boot mode for simualtor. 
+        The boot mode can be set as following value:
+          0x0:  Boot with full configuration.
+          0x1:  Boot with minimal configuration.
+          0x2:  Boot assume no configuration changes.
+          0x3:  Boot with full configuration plus diagnostics.
+          0x4:  Boot with default settings.
+          0x5:  Boot on S4 resume.
+          0x6:  Boot on S5 resume.
+          0x10: Boot on S2 resume. 
+          0x11: Boot on S3 resume.
+          0x12: Boot on flash update.
+          0x20: Boot in reovery mode.
+        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtCpuModel</C_Name>
@@ -338,7 +362,8 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"Intel(R) Processor Model"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines simulated CPU model string.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtCpuSpeed</C_Name>
@@ -347,7 +372,7 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"3000"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines simulated CPU speed string.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtFirmwareVolume</C_Name>
@@ -356,7 +381,8 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"..\\..\\Fv\\Fv_Recovery.fd"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.
+        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtConsole</C_Name>
@@ -365,7 +391,9 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>L"Bus Driver Console Window"</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>This PCD declares the title string of the text console window. 
+        such as "My EFI Console".
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

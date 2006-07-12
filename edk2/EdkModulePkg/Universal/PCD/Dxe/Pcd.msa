@@ -98,12 +98,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdVpdBaseAddress</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText/>
+      <HelpText>The base address of the VPD (Vital Product Data) region. It is 
+        normally a region reserved on flash.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText/>
+      <HelpText>This feature flag can be used to enable or disable the Pcd DXE database 
+        traverse capability. Disable it can reduce the size of final image generated.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
