@@ -14,44 +14,39 @@
  **/
 package org.tianocore.frameworkwizard.module.ui;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ItemEvent;
+import java.awt.event.MouseEvent;
 import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
 
 import org.tianocore.SourceFilesDocument;
 import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.SourceFilesDocument.SourceFiles;
 import org.tianocore.frameworkwizard.common.DataType;
-import org.tianocore.frameworkwizard.common.DataValidation;
-import org.tianocore.frameworkwizard.common.EnumerationData;
+import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
+import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
-import org.tianocore.frameworkwizard.common.ui.StarLabel;
-import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.module.Identifications.SourceFiles.SourceFilesIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.SourceFiles.SourceFilesVector;
-import org.tianocore.frameworkwizard.workspace.Workspace;
+import org.tianocore.frameworkwizard.module.ui.dialog.SourceFilesDlg;
 
 /**
  The class is used to create, update SourceFile of MSA/MBD file
  It extends IInternalFrame
  
-
-
  **/
 public class ModuleSourceFiles extends IInternalFrame {
 
@@ -65,21 +60,7 @@ public class ModuleSourceFiles extends IInternalFrame {
     //
     private SourceFilesDocument.SourceFiles sourceFiles = null;
 
-    private int intSelectedItemId = 0;
-
     private JPanel jContentPane = null;
-
-    private JLabel jLabelFileName = null;
-
-    private JTextField jTextFieldFileName = null;
-
-    private JButton jButtonOpenFile = null;
-
-    private JLabel jLabelToolChainFamily = null;
-
-    private StarLabel jStarLabel1 = null;
-
-    private JComboBox jComboBoxList = null;
 
     private JButton jButtonAdd = null;
 
@@ -89,92 +70,24 @@ public class ModuleSourceFiles extends IInternalFrame {
 
     private JCheckBox jCheckBoxArch = null;
 
-    private JScrollPane jScrollPaneList = null;
-
-    private JTextArea jTextAreaList = null;
-
-    private JLabel jLabelArch = null;
-
     private JScrollPane jScrollPane = null;
 
-    private JLabel jLabelTagName = null;
+    private JScrollPane jScrollPaneTable = null;
 
-    private JTextField jTextFieldTagName = null;
-
-    private JLabel jLabelToolCode = null;
-
-    private JTextField jTextFieldToolCode = null;
-
-    private JTextField jTextFieldToolChainFamily = null;
-
-    private JLabel jLabelFeatureFlag = null;
-
-    private JTextField jTextFieldFeatureFlag = null;
-
-    private ICheckBoxList iCheckBoxListArch = null;
-
-    private JScrollPane jScrollPaneArch = null;
+    private JTable jTable = null;
 
     //
     // Not used by UI
     //
     private OpeningModuleType omt = null;
-    
-    private ModuleSurfaceArea msa = null;
 
-    private SourceFilesIdentification sfid = null;
+    private ModuleSurfaceArea msa = null;
 
     private SourceFilesVector vSourceFiles = new SourceFilesVector();
 
-    /**
-     This method initializes jTextFieldFileName 
-     
-     @return javax.swing.JTextField jTextFieldFileName
-     
-     **/
-    private JTextField getJTextFieldSourceFilesDirectory() {
-        if (jTextFieldFileName == null) {
-            jTextFieldFileName = new JTextField();
-            jTextFieldFileName.setBounds(new java.awt.Rectangle(140, 10, 250, 20));
-            jTextFieldFileName.setPreferredSize(new java.awt.Dimension(250, 20));
-            jTextFieldFileName.setToolTipText("Path is relative to the MSA file and must include the file name");
-        }
-        return jTextFieldFileName;
-    }
+    private IDefaultTableModel model = null;
 
-    /**
-     This method initializes jButtonOpenFile 
-     
-     @return javax.swing.JButton jButtonOpenFile
-     
-     **/
-    private JButton getJButtonOpenFile() {
-        if (jButtonOpenFile == null) {
-            jButtonOpenFile = new JButton();
-            jButtonOpenFile.setText("Browse");
-            jButtonOpenFile.setBounds(new java.awt.Rectangle(395, 10, 85, 20));
-            jButtonOpenFile.setPreferredSize(new java.awt.Dimension(85, 20));
-            jButtonOpenFile.addActionListener(this);
-        }
-        return jButtonOpenFile;
-    }
-
-    /**
-     This method initializes jComboBoxFileList 
-     
-     @return javax.swing.JComboBox jComboBoxFileList
-     
-     **/
-    private JComboBox getJComboBoxList() {
-        if (jComboBoxList == null) {
-            jComboBoxList = new JComboBox();
-            jComboBoxList.setBounds(new java.awt.Rectangle(15, 220, 210, 20));
-            jComboBoxList.addItemListener(this);
-            jComboBoxList.addActionListener(this);
-            jComboBoxList.setPreferredSize(new java.awt.Dimension(210, 20));
-        }
-        return jComboBoxList;
-    }
+    private int selectedRow = -1;
 
     /**
      This method initializes jButtonAdd 
@@ -221,39 +134,10 @@ public class ModuleSourceFiles extends IInternalFrame {
             jButtonUpdate = new JButton();
             jButtonUpdate.setBounds(new java.awt.Rectangle(315, 220, 80, 20));
             jButtonUpdate.setPreferredSize(new java.awt.Dimension(80, 20));
-            jButtonUpdate.setText("Update");
+            jButtonUpdate.setText("Edit");
             jButtonUpdate.addActionListener(this);
         }
         return jButtonUpdate;
-    }
-
-    /**
-     * This method initializes jScrollPaneFileList	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
-    private JScrollPane getJScrollPaneList() {
-        if (jScrollPaneList == null) {
-            jScrollPaneList = new JScrollPane();
-            jScrollPaneList.setBounds(new java.awt.Rectangle(15, 245, 465, 240));
-            jScrollPaneList.setViewportView(getJTextAreaList());
-            jScrollPaneList.setPreferredSize(new java.awt.Dimension(465, 240));
-        }
-        return jScrollPaneList;
-    }
-
-    /**
-     * This method initializes jTextAreaFileList	
-     * 	
-     * @return javax.swing.JTextArea	
-     */
-    private JTextArea getJTextAreaList() {
-        if (jTextAreaList == null) {
-            jTextAreaList = new JTextArea();
-            jTextAreaList.setEditable(false);
-
-        }
-        return jTextAreaList;
     }
 
     /**
@@ -270,93 +154,40 @@ public class ModuleSourceFiles extends IInternalFrame {
     }
 
     /**
-     * This method initializes jTextFieldTagName	
-     * 	
-     * @return javax.swing.JTextField	
+     * This method initializes jScrollPaneTable 
+     *  
+     * @return javax.swing.JScrollPane  
      */
-    private JTextField getJTextFieldTagName() {
-        if (jTextFieldTagName == null) {
-            jTextFieldTagName = new JTextField();
-            jTextFieldTagName.setBounds(new java.awt.Rectangle(140, 35, 340, 20));
-            jTextFieldTagName.setPreferredSize(new java.awt.Dimension(340, 20));
-            jTextFieldTagName.setToolTipText("You may specify a specific tool chain tag name, such as BILL1");
+    private JScrollPane getJScrollPaneTable() {
+        if (jScrollPaneTable == null) {
+            jScrollPaneTable = new JScrollPane();
+            jScrollPaneTable.setBounds(new java.awt.Rectangle(15, 10, 470, 420));
+            jScrollPaneTable.setPreferredSize(new Dimension(470, 420));
+            jScrollPaneTable.setViewportView(getJTable());
         }
-        return jTextFieldTagName;
+        return jScrollPaneTable;
     }
 
     /**
-     * This method initializes jTextFieldToolCode	
-     * 	
-     * @return javax.swing.JTextField	
+     * This method initializes jTable   
+     *  
+     * @return javax.swing.JTable   
      */
-    private JTextField getJTextFieldToolCode() {
-        if (jTextFieldToolCode == null) {
-            jTextFieldToolCode = new JTextField();
-            jTextFieldToolCode.setBounds(new java.awt.Rectangle(140, 60, 340, 20));
-            jTextFieldToolCode.setPreferredSize(new java.awt.Dimension(340, 20));
-            jTextFieldToolCode.setToolTipText("You may specify a specific tool command, such as ASM");
-        }
-        return jTextFieldToolCode;
-    }
+    private JTable getJTable() {
+        if (jTable == null) {
+            jTable = new JTable();
+            model = new IDefaultTableModel();
+            jTable = new JTable(model);
+            jTable.setRowHeight(20);
 
-    /**
-     * This method initializes jTextFieldToolChainFamily	
-     * 	
-     * @return javax.swing.JTextField	
-     */
-    private JTextField getJTextFieldToolChainFamily() {
-        if (jTextFieldToolChainFamily == null) {
-            jTextFieldToolChainFamily = new JTextField();
-            jTextFieldToolChainFamily.setBounds(new java.awt.Rectangle(140, 85, 340, 20));
-            jTextFieldToolChainFamily.setPreferredSize(new java.awt.Dimension(340, 20));
-            jTextFieldToolChainFamily.setToolTipText("You may specify a specific tool chain family, such as GCC");
-        }
-        return jTextFieldToolChainFamily;
-    }
+            model.addColumn("File Name");
 
-    /**
-     * This method initializes jTextFieldFeatureFlag	
-     * 	
-     * @return javax.swing.JTextField	
-     */
-    private JTextField getJTextFieldFeatureFlag() {
-        if (jTextFieldFeatureFlag == null) {
-            jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(140, 110, 340, 20));
-            jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(340, 20));
-            jTextFieldFeatureFlag.setToolTipText("RESERVED FOR FUTURE USE");
+            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTable.getSelectionModel().addListSelectionListener(this);
+            jTable.getModel().addTableModelListener(this);
+            jTable.addMouseListener(this);
         }
-        return jTextFieldFeatureFlag;
-    }
-
-    /**
-     This method initializes iCheckBoxListArch   
-     
-     @return ICheckBoxList   
-     **/
-    private ICheckBoxList getICheckBoxListSupportedArchitectures() {
-        if (iCheckBoxListArch == null) {
-            iCheckBoxListArch = new ICheckBoxList();
-            iCheckBoxListArch.addFocusListener(this);
-            iCheckBoxListArch.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
-        }
-        return iCheckBoxListArch;
-    }
-
-    /**
-     This method initializes jScrollPaneArch 
-     
-     @return javax.swing.JScrollPane 
-     
-     **/
-    private JScrollPane getJScrollPaneArch() {
-        if (jScrollPaneArch == null) {
-            jScrollPaneArch = new JScrollPane();
-            jScrollPaneArch.setBounds(new java.awt.Rectangle(140, 135, 340, 80));
-            jScrollPaneArch.setPreferredSize(new java.awt.Dimension(340, 80));
-            jScrollPaneArch.setViewportView(getICheckBoxListSupportedArchitectures());
-        }
-        return jScrollPaneArch;
+        return jTable;
     }
 
     public static void main(String[] args) {
@@ -382,7 +213,7 @@ public class ModuleSourceFiles extends IInternalFrame {
     public ModuleSourceFiles(OpeningModuleType inOmt) {
         super();
         this.omt = inOmt;
-        this.msa = inOmt.getXmlMsa();
+        this.msa = omt.getXmlMsa();
         init(msa.getSourceFiles());
         this.setVisible(true);
     }
@@ -415,11 +246,7 @@ public class ModuleSourceFiles extends IInternalFrame {
                 }
             }
         }
-        //
-        // Update the list
-        //
-        Tools.generateComboBoxByVector(jComboBoxList, vSourceFiles.getSourceFilesName());
-        reloadListArea();
+        showTable();
     }
 
     /**
@@ -430,7 +257,6 @@ public class ModuleSourceFiles extends IInternalFrame {
         this.setSize(500, 515);
         this.setContentPane(getJScrollPane());
         this.setTitle("Source Files");
-        initFrame();
         this.setViewMode(false);
     }
 
@@ -442,9 +268,6 @@ public class ModuleSourceFiles extends IInternalFrame {
      **/
     public void setViewMode(boolean isView) {
         if (isView) {
-            this.jTextFieldFileName.setEnabled(!isView);
-            this.jButtonOpenFile.setEnabled(!isView);
-
             this.jButtonAdd.setEnabled(!isView);
             this.jButtonRemove.setEnabled(!isView);
             this.jButtonUpdate.setEnabled(!isView);
@@ -460,315 +283,16 @@ public class ModuleSourceFiles extends IInternalFrame {
      **/
     private JPanel getJContentPane() {
         if (jContentPane == null) {
-            jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 110, 120, 20));
-            jLabelFeatureFlag.setText("Feature Flag");
-            jLabelToolCode = new JLabel();
-            jLabelToolCode.setBounds(new java.awt.Rectangle(15, 60, 120, 20));
-            jLabelToolCode.setText("Tool Code");
-            jLabelTagName = new JLabel();
-            jLabelTagName.setBounds(new java.awt.Rectangle(15, 35, 120, 20));
-            jLabelTagName.setText("Tag Name");
-            jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 135, 120, 20));
-            jLabelArch.setText("Sup Arch List");
-            jLabelToolChainFamily = new JLabel();
-            jLabelToolChainFamily.setBounds(new java.awt.Rectangle(15, 85, 120, 20));
-            jLabelToolChainFamily.setText("Tool Chain Family");
-            jLabelFileName = new JLabel();
-            jLabelFileName.setText("File Name");
-            jLabelFileName.setBounds(new java.awt.Rectangle(15, 10, 120, 20));
-
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.setPreferredSize(new java.awt.Dimension(490, 490));
 
-            jContentPane.add(jLabelFileName, null);
-            jContentPane.add(getJTextFieldSourceFilesDirectory(), null);
-            jContentPane.add(getJButtonOpenFile(), null);
-            jContentPane.add(jLabelToolChainFamily, null);
-            jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(0, 10));
-
-            jContentPane.add(jStarLabel1, null);
-            jContentPane.add(getJComboBoxList(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
             jContentPane.add(getJButtonUpdate(), null);
-            jContentPane.add(getJScrollPaneList(), null);
-            jContentPane.add(jLabelArch, null);
-            jContentPane.add(jLabelTagName, null);
-            jContentPane.add(getJTextFieldTagName(), null);
-            jContentPane.add(jLabelToolCode, null);
-            jContentPane.add(getJTextFieldToolCode(), null);
-            jContentPane.add(getJTextFieldToolChainFamily(), null);
-            jContentPane.add(jLabelFeatureFlag, null);
-            jContentPane.add(getJTextFieldFeatureFlag(), null);
-            jContentPane.add(getJScrollPaneArch(), null);
+            jContentPane.add(getJScrollPaneTable(), null);
         }
         return jContentPane;
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     *
-     * Override actionPerformed to listen all actions
-     *  
-     */
-    public void actionPerformed(ActionEvent arg0) {
-        if (arg0.getSource() == jButtonOpenFile) {
-            selectFile();
-        }
-        if (arg0.getSource() == jButtonAdd) {
-            if (!checkAdd()) {
-                return;
-            }
-            addToList();
-        }
-        if (arg0.getSource() == jButtonRemove) {
-            removeFromList();
-        }
-        if (arg0.getSource() == jButtonUpdate) {
-            if (!checkAdd()) {
-                return;
-            }
-            updateForList();
-        }
-    }
-
-    /**
-     This method initializes Usage type and Arch type
-     
-     **/
-    private void initFrame() {
-        EnumerationData ed = new EnumerationData();
-
-        this.iCheckBoxListArch.setAllItems(ed.getVSupportedArchitectures());
-    }
-
-    private SourceFilesIdentification getCurrentSourceFiles() {
-        String name = this.jTextFieldFileName.getText();
-        String tagName = this.jTextFieldTagName.getText();
-        String toolCode = this.jTextFieldToolCode.getText();
-        String tcf = this.jTextFieldToolChainFamily.getText();
-        String featureFlag = this.jTextFieldFeatureFlag.getText();
-        Vector<String> arch = this.iCheckBoxListArch.getAllCheckedItemsString();
-        sfid = new SourceFilesIdentification(name, tagName, toolCode, tcf, featureFlag, arch);
-        return sfid;
-    }
-
-    /**
-     Add current item to Vector
-     
-     **/
-    private void addToList() {
-        intSelectedItemId = vSourceFiles.size();
-
-        vSourceFiles.addSourceFiles(getCurrentSourceFiles());
-
-        jComboBoxList.addItem(sfid.getFilename());
-        jComboBoxList.setSelectedItem(sfid.getFilename());
-
-        //
-        // Reset select item index
-        //
-        intSelectedItemId = vSourceFiles.size();
-
-        //
-        // Reload all fields of selected item
-        //
-        reloadFromList();
-
-        // 
-        // Save to memory
-        //
-        save();
-    }
-
-    /**
-     Remove current item from Vector
-     
-     **/
-    private void removeFromList() {
-        //
-        // Check if exist items
-        //
-        if (this.vSourceFiles.size() < 1) {
-            return;
-        }
-
-        int intTempIndex = intSelectedItemId;
-
-        jComboBoxList.removeItemAt(intSelectedItemId);
-
-        vSourceFiles.removeSourceFiles(intTempIndex);
-
-        //
-        // Reload all fields of selected item
-        //
-        reloadFromList();
-
-        // 
-        // Save to memory
-        //
-        save();
-    }
-
-    /**
-     Update current item of Vector
-     
-     **/
-    private void updateForList() {
-        //
-        // Check if exist items
-        //
-        if (this.vSourceFiles.size() < 1) {
-            return;
-        }
-
-        //
-        // Backup selected item index
-        //
-        int intTempIndex = intSelectedItemId;
-
-        vSourceFiles.updateSourceFiles(getCurrentSourceFiles(), intTempIndex);
-
-        jComboBoxList.removeAllItems();
-        for (int index = 0; index < vSourceFiles.size(); index++) {
-            jComboBoxList.addItem(vSourceFiles.getSourceFiles(index).getFilename());
-        }
-
-        //
-        // Restore selected item index
-        //
-        intSelectedItemId = intTempIndex;
-
-        //
-        // Reset select item index
-        //
-        jComboBoxList.setSelectedIndex(intSelectedItemId);
-
-        //
-        // Reload all fields of selected item
-        //
-        reloadFromList();
-
-        // 
-        // Save to memory
-        //
-        save();
-    }
-
-    /**
-     Refresh all fields' values of selected item of Vector
-     
-     **/
-    private void reloadFromList() {
-        if (vSourceFiles.size() > 0) {
-            //
-            // Get selected item index
-            //
-            intSelectedItemId = jComboBoxList.getSelectedIndex();
-
-            this.jTextFieldFileName.setText(vSourceFiles.getSourceFiles(intSelectedItemId).getFilename());
-            this.jTextFieldTagName.setText(vSourceFiles.getSourceFiles(intSelectedItemId).getTagName());
-            this.jTextFieldToolCode.setText(vSourceFiles.getSourceFiles(intSelectedItemId).getToolCode());
-            this.jTextFieldToolChainFamily.setText(vSourceFiles.getSourceFiles(intSelectedItemId).getToolChainFamily());
-            jTextFieldFeatureFlag.setText(vSourceFiles.getSourceFiles(intSelectedItemId).getFeatureFlag());
-            iCheckBoxListArch.setAllItemsUnchecked();
-            iCheckBoxListArch.initCheckedItem(true, vSourceFiles.getSourceFiles(intSelectedItemId).getSupArchList());
-
-        } else {
-        }
-
-        reloadListArea();
-    }
-
-    /**
-     Update list area pane via the elements of Vector
-     
-     **/
-    private void reloadListArea() {
-        String strListItem = "";
-        for (int index = 0; index < vSourceFiles.size(); index++) {
-            strListItem = strListItem + vSourceFiles.getSourceFiles(index).getFilename() + DataType.UNIX_LINE_SEPARATOR;
-        }
-        this.jTextAreaList.setText(strListItem);
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
-     *
-     * Reflesh the frame when selected item changed
-     * 
-     */
-    public void itemStateChanged(ItemEvent arg0) {
-        if (arg0.getStateChange() == ItemEvent.SELECTED) {
-            reloadFromList();
-        }
-    }
-
-    /**
-     Data validation for all fields
-     
-     @retval true - All datas are valid
-     @retval false - At least one data is invalid
-     
-     **/
-    public boolean checkAdd() {
-        //
-        // Check Filename
-        //
-        if (isEmpty(this.jTextFieldFileName.getText())) {
-            Log.err("File Name couldn't be empty");
-            return false;
-        }
-        if (!DataValidation.isFilename(this.jTextFieldFileName.getText())) {
-            Log.err("Incorrect data type for File Name");
-            return false;
-        }
-        
-        //
-        // Check TagName 
-        //
-        if (!isEmpty(this.jTextFieldTagName.getText())) {
-            if (!DataValidation.isTagName(this.jTextFieldTagName.getText())) {
-                Log.err("Incorrect data type for Tag Name");
-                return false;
-            }
-        }
-        
-        //
-        // Check ToolCode 
-        //
-        if (!isEmpty(this.jTextFieldToolCode.getText())) {
-            if (!DataValidation.isToolCode(this.jTextFieldToolCode.getText())) {
-                Log.err("Incorrect data type for Tool Code");
-                return false;
-            }
-        }
-        
-        //
-        // Check ToolChainFamily 
-        //
-        if (!isEmpty(this.jTextFieldToolChainFamily.getText())) {
-            if (!DataValidation.isToolChainFamily(this.jTextFieldToolChainFamily.getText())) {
-                Log.err("Incorrect data type for Tool Chain Family");
-                return false;
-            }
-        }
-        
-        //
-        // Check FeatureFlag
-        //
-        if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
-            if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
-                return false;
-            }
-        }
-        
-        return true;
     }
 
     /**
@@ -815,21 +339,115 @@ public class ModuleSourceFiles extends IInternalFrame {
             this.msa.setSourceFiles(sourceFiles);
             this.omt.setSaved(false);
         } catch (Exception e) {
-            e.printStackTrace();
             Log.err("Update Source Files", e.getMessage());
         }
     }
 
+    private void showEdit(int index) {
+        SourceFilesDlg sfd = new SourceFilesDlg(this.vSourceFiles.getSourceFiles(index), new IFrame());
+        int result = sfd.showDialog();
+        if (result == DataType.RETURN_TYPE_OK) {
+            if (index == -1) {
+                this.vSourceFiles.addSourceFiles(sfd.getSfid());
+            } else {
+                this.vSourceFiles.setSourceFiles(sfd.getSfid(), index);
+            }
+            this.showTable();
+            this.save();
+            sfd.dispose();
+        }
+        if (result == DataType.RETURN_TYPE_CANCEL) {
+            sfd.dispose();
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     *
+     * Override actionPerformed to listen all actions
+     *  
+     */
+    public void actionPerformed(ActionEvent arg0) {
+        if (arg0.getSource() == jButtonAdd) {
+            showEdit(-1);
+        }
+        if (arg0.getSource() == jButtonUpdate) {
+            if (this.selectedRow < 0) {
+                Log.err("Please select one record first.");
+                return;
+            }
+            showEdit(selectedRow);
+        }
+
+        if (arg0.getSource() == jButtonRemove) {
+            if (jTable.isEditing()) {
+                jTable.getCellEditor().stopCellEditing();
+            }
+            if (selectedRow > -1) {
+                this.model.removeRow(selectedRow);
+                this.vSourceFiles.removeSourceFiles(selectedRow);
+                selectedRow = -1;
+                this.save();
+            }
+        }
+    }
+
     /**
-     Display a file open browser to let user select file
+     Clear all table rows
      
      **/
-    private void selectFile() {
-        JFileChooser fc = new JFileChooser(Workspace.getCurrentWorkspace());
+    private void clearAll() {
+        if (model != null) {
+            for (int index = model.getRowCount() - 1; index >= 0; index--) {
+                model.removeRow(index);
+            }
+        }
+    }
 
-        int result = fc.showOpenDialog(new JPanel());
-        if (result == JFileChooser.APPROVE_OPTION) {
-            this.jTextFieldFileName.setText(fc.getSelectedFile().getName());
+    /**
+     Read content of vector and put then into table
+     
+     **/
+    private void showTable() {
+        clearAll();
+
+        if (vSourceFiles.size() > 0) {
+            for (int index = 0; index < vSourceFiles.size(); index++) {
+                model.addRow(vSourceFiles.toStringVector(index));
+            }
+        }
+        this.jTable.repaint();
+        this.jTable.updateUI();
+        //this.jScrollPane.setViewportView(this.jTable);
+    }
+
+    /* (non-Javadoc)
+     * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
+     *
+     */
+    public void valueChanged(ListSelectionEvent arg0) {
+        if (arg0.getValueIsAdjusting()) {
+            return;
+        }
+        ListSelectionModel lsm = (ListSelectionModel) arg0.getSource();
+        if (lsm.isSelectionEmpty()) {
+            return;
+        } else {
+            selectedRow = lsm.getMinSelectionIndex();
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+     *
+     */
+    public void mouseClicked(MouseEvent arg0) {
+        if (arg0.getClickCount() == 2) {
+            if (this.selectedRow < 0) {
+                return;
+            } else {
+                showEdit(selectedRow);
+            }
         }
     }
 
@@ -844,21 +462,12 @@ public class ModuleSourceFiles extends IInternalFrame {
         int intPreferredWidth = this.getJContentPane().getPreferredSize().width;
         int intPreferredHeight = this.getJContentPane().getPreferredSize().height;
 
-        resizeComponentWidth(this.jTextFieldFileName, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldTagName, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldToolCode, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldToolChainFamily, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldFeatureFlag, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jScrollPaneArch, intCurrentWidth, intPreferredWidth);
-
-        resizeComponentWidth(this.jComboBoxList, intCurrentWidth, intPreferredWidth);
-        resizeComponent(this.jScrollPaneList, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight);
-        relocateComponentX(this.jButtonAdd, intCurrentWidth, intPreferredWidth, DataType.SPACE_TO_RIGHT_FOR_ADD_BUTTON);
-        relocateComponentX(this.jButtonOpenFile, intCurrentWidth, intPreferredWidth,
-                           DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
-        relocateComponentX(this.jButtonRemove, intCurrentWidth, intPreferredWidth,
-                           DataType.SPACE_TO_RIGHT_FOR_REMOVE_BUTTON);
-        relocateComponentX(this.jButtonUpdate, intCurrentWidth, intPreferredWidth,
-                           DataType.SPACE_TO_RIGHT_FOR_UPDATE_BUTTON);
+        resizeComponent(this.jScrollPaneTable, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight);
+        relocateComponent(this.jButtonAdd, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
+                          DataType.SPACE_TO_RIGHT_FOR_ADD_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_ADD_BUTTON);
+        relocateComponent(this.jButtonRemove, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
+                          DataType.SPACE_TO_RIGHT_FOR_REMOVE_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_REMOVE_BUTTON);
+        relocateComponent(this.jButtonUpdate, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
+                          DataType.SPACE_TO_RIGHT_FOR_UPDATE_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_UPDATE_BUTTON);
     }
 }

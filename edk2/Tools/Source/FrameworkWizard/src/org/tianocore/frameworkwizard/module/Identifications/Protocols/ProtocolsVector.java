@@ -50,7 +50,7 @@ public class ProtocolsVector {
         vProtocols.addElement(arg0);
     }
 
-    public void updateProtocols(ProtocolsIdentification arg0, int arg1) {
+    public void setProtocols(ProtocolsIdentification arg0, int arg1) {
         vProtocols.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,12 @@ public class ProtocolsVector {
     public int size() {
         return this.vProtocols.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getProtocols(index).getName());
+        v.addElement(getProtocols(index).getType());
+        v.addElement(getProtocols(index).getUsage());
+        return v;
+    }
 }

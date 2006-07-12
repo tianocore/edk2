@@ -50,7 +50,7 @@ public class SystemTablesVector {
         vSystemTables.addElement(arg0);
     }
 
-    public void updateSystemTables(SystemTablesIdentification arg0, int arg1) {
+    public void setSystemTables(SystemTablesIdentification arg0, int arg1) {
         vSystemTables.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,11 @@ public class SystemTablesVector {
     public int size() {
         return this.vSystemTables.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getSystemTables(index).getName());
+        v.addElement(getSystemTables(index).getUsage());
+        return v;
+    }
 }

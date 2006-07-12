@@ -50,7 +50,7 @@ public class HiiPackagesVector {
         vHiiPackages.addElement(arg0);
     }
 
-    public void updateHiiPackages(HiiPackagesIdentification arg0, int arg1) {
+    public void setHiiPackages(HiiPackagesIdentification arg0, int arg1) {
         vHiiPackages.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,11 @@ public class HiiPackagesVector {
     public int size() {
         return this.vHiiPackages.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getHiiPackages(index).getName());
+        v.addElement(getHiiPackages(index).getUsage());
+        return v;
+    }
 }

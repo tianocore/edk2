@@ -50,7 +50,7 @@ public class PcdCodedVector {
         vPcdCoded.addElement(arg0);
     }
 
-    public void updatePcdCoded(PcdCodedIdentification arg0, int arg1) {
+    public void setPcdCoded(PcdCodedIdentification arg0, int arg1) {
         vPcdCoded.setElementAt(arg0, arg1);
     }
 
@@ -87,4 +87,11 @@ public class PcdCodedVector {
         return this.vPcdCoded.size();
     }
 
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getPcdCoded(index).getName());
+        v.addElement(getPcdCoded(index).getType());
+        v.addElement(getPcdCoded(index).getValue());
+        return v;
+    }
 }

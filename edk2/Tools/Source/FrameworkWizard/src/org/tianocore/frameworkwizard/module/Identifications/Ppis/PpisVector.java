@@ -50,7 +50,7 @@ public class PpisVector {
         vPpis.addElement(arg0);
     }
 
-    public void updatePpis(PpisIdentification arg0, int arg1) {
+    public void setPpis(PpisIdentification arg0, int arg1) {
         vPpis.setElementAt(arg0, arg1);
     }
 
@@ -85,6 +85,14 @@ public class PpisVector {
 
     public int size() {
         return this.vPpis.size();
+    }
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getPpis(index).getName());
+        v.addElement(getPpis(index).getType());
+        v.addElement(getPpis(index).getUsage());
+        return v;
     }
 
 }

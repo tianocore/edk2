@@ -50,7 +50,7 @@ public class LibraryClassVector {
         vLibraryClass.addElement(lib);
     }
     
-    public void updateLibraryClass(LibraryClassIdentification lib, int index) {
+    public void setLibraryClass(LibraryClassIdentification lib, int index) {
         vLibraryClass.setElementAt(lib, index);
     }
     

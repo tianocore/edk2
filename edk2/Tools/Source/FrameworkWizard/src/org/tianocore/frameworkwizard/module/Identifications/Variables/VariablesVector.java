@@ -50,7 +50,7 @@ public class VariablesVector {
         vVariables.addElement(arg0);
     }
 
-    public void updateVariables(VariablesIdentification arg0, int arg1) {
+    public void setVariables(VariablesIdentification arg0, int arg1) {
         vVariables.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,12 @@ public class VariablesVector {
     public int size() {
         return this.vVariables.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getVariables(index).getName());
+        v.addElement(getVariables(index).getGuid());
+        v.addElement(getVariables(index).getUsage());
+        return v;
+    }
 }

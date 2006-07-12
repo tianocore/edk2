@@ -50,7 +50,7 @@ public class BootModesVector {
         vBootModes.addElement(arg0);
     }
 
-    public void updateBootModes(BootModesIdentification arg0, int arg1) {
+    public void setBootModes(BootModesIdentification arg0, int arg1) {
         vBootModes.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,11 @@ public class BootModesVector {
     public int size() {
         return this.vBootModes.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getBootModes(index).getName());
+        v.addElement(getBootModes(index).getUsage());
+        return v;
+    }
 }

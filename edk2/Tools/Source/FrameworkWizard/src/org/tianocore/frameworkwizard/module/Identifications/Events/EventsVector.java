@@ -50,7 +50,7 @@ public class EventsVector {
         vEvents.addElement(arg0);
     }
 
-    public void updateEvents(EventsIdentification arg0, int arg1) {
+    public void setEvents(EventsIdentification arg0, int arg1) {
         vEvents.setElementAt(arg0, arg1);
     }
 
@@ -86,5 +86,12 @@ public class EventsVector {
     public int size() {
         return this.vEvents.size();
     }
-
+    
+    public Vector<String> toStringVector(int index) {
+        Vector<String> v = new Vector<String>();
+        v.addElement(getEvents(index).getName());
+        v.addElement(getEvents(index).getType());
+        v.addElement(getEvents(index).getUsage());
+        return v;
+    }
 }
