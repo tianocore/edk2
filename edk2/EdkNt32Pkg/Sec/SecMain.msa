@@ -53,6 +53,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename ToolCode="DUMMY">SecMain_build.xml</Filename>
     <Filename>SecMain.c</Filename>
     <Filename>FwVol.c</Filename>
     <Filename>WinNtThunk.c</Filename>

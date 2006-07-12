@@ -68,6 +68,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename SupArchList="IA32">nt32\FwBlockService.c</Filename>
     <Filename SupArchList="IA32">nt32\FwBlockService.h</Filename>
     <Filename SupArchList="IA32">nt32\FvbInfo.c</Filename>
+    <Filename ToolCode="DUMMY">Common\FWBlockService.c</Filename>
+    <Filename ToolCode="DUMMY">Common\FwBlockService.h</Filename>
+    <Filename ToolCode="DUMMY">Common\ia32\Ia32Fwh.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
