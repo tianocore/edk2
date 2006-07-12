@@ -38,5 +38,7 @@
     <Filename>Source/FrameworkTasks/FrameworkTasks.msa</Filename>
     <Filename>Source/FrameworkWizard/FrameworkWizard.msa</Filename>
     <Filename>Source/GenBuild/GenBuild.msa</Filename>
+    <Filename>Source/SurfaceArea/SurfaceArea.msa</Filename>
+    <Filename>Source/TianoTools/TianoTools.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>

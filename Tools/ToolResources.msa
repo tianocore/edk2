@@ -33,21 +33,31 @@
     <OutputFileBasename>NULL</OutputFileBasename>
   </ModuleDefinitions>
   <SourceFiles>
-    <Filename ToolCode="NULL">Conf/FrameworkDatabase.db</Filename>
-    <Filename ToolCode="NULL">Conf/tools_def.template</Filename>
-    <Filename ToolCode="NULL">Conf/target.template</Filename>
-    <Filename ToolCode="NULL">Conf/BuildMacro.xml</Filename>
-    <Filename ToolCode="NULL">XMLSchema/FarManifest.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/FrameworkDataAttributes.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/FrameworkDataElements.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/FrameworkDataTypes.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/FrameworkHeaders.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/FrameworkPlatformDataElements.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/FrameworkPlatformDataTypes.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/NamingConvention.xsd</Filename>
-    <Filename ToolCode="NULL">XMLSchema/SurfaceArea.xsd</Filename>
-    <Filename ToolCode="NULL">Conf/Pcd/PcdDatabaseCommonDefinitions.sample</Filename>
-    <Filename ToolCode="NULL">Conf/Pcd/PcdDatabaseDxeDefinitions.sample</Filename>
-    <Filename ToolCode="NULL">Conf/Pcd/PcdDatabasePeiDefinitions.sample</Filename>
+    <Filename>build.xml</Filename>
+    <Filename>bin/build</Filename>
+    <Filename>bin/build.bat</Filename>
+    <Filename>bin/FrameworkWizard</Filename>
+    <Filename>bin/FrameworkWizard.bat</Filename>
+    <Filename>bin/SAVerify.bat</Filename>
+    <Filename>Conf/FrameworkDatabase.db</Filename>
+    <Filename>Conf/tools_def.template</Filename>
+    <Filename>Conf/target.template</Filename>
+    <Filename>Conf/BuildMacro.xml</Filename>
+    <Filename>XMLSchema/FarManifest.xsd</Filename>
+    <Filename>XMLSchema/FrameworkDataAttributes.xsd</Filename>
+    <Filename>XMLSchema/FrameworkDataElements.xsd</Filename>
+    <Filename>XMLSchema/FrameworkDataTypes.xsd</Filename>
+    <Filename>XMLSchema/FrameworkHeaders.xsd</Filename>
+    <Filename>XMLSchema/FrameworkPlatformDataElements.xsd</Filename>
+    <Filename>XMLSchema/FrameworkPlatformDataTypes.xsd</Filename>
+    <Filename>XMLSchema/NamingConvention.xsd</Filename>
+    <Filename>XMLSchema/SurfaceArea.xsd</Filename>
+    <Filename>XMLSchema/SurfaceArea.xsdconfig</Filename>
+    <Filename>Conf/Pcd/PcdDatabaseCommonDefinitions.sample</Filename>
+    <Filename>Conf/Pcd/PcdDatabaseDxeDefinitions.sample</Filename>
+    <Filename>Conf/Pcd/PcdDatabasePeiDefinitions.sample</Filename>
+    <Filename>gcc/README.txt</Filename>
+    <Filename>gcc/tianoCross-gcc-4.0</Filename>
+    <Filename>gcc/tianoCross-gcc-4.1</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>
