@@ -10,7 +10,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
 <ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
     <ModuleName>Fat</ModuleName>
-    <ModuleType>PEIM</ModuleType>
+    <ModuleType>USER_DEFINED</ModuleType>
     <GuidValue>5058F21C-BC34-11d4-BD18-0080C73C8881</GuidValue>
     <Version>1.0</Version>
     <Abstract>Make a FFS section for an FV that contains the FAT driver.*.FFS files are compressed FFS sections.</Abstract>
@@ -30,6 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <OutputFileBasename>Fat</OutputFileBasename>
   </ModuleDefinitions>
   <SourceFiles>
+    <Filename ToolCode="DUMMY">Fat_build.xml</Filename>
     <Filename SupArchList="IA32">Ia32/Fat.FFS</Filename>
     <Filename SupArchList="IPF">Ipf/Fat.FFS</Filename>
     <Filename SupArchList="X64">X64/Fat.FFS</Filename>
