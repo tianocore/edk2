@@ -13,8 +13,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>BA929954-35B0-4dd3-90CD-9634BD7E1CF1</GuidValue>
     <Version>1.0</Version>
-    <Abstract>description of file contents</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>NT Emulation Reset Architectural Protocol Driver as defined in TIANO</Abstract>
+    <Description>
+      This Reset module simulates system reset by process exit on NT.
+    </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

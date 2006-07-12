@@ -6,7 +6,7 @@
     <GuidValue>e2368d1d-4c94-4e62-be2f-7817bbd78293</GuidValue>
     <Version>1.0</Version>
     <Abstract>Memory Status Code Library for UEFI drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Description>Lib to provide memory journal status code reporting Routines</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

@@ -5,8 +5,8 @@
     <ModuleType>PEIM</ModuleType>
     <GuidValue>e062c52d-78dc-4cc5-b246-b13497a8123c</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Post code library based on report status code library</Abstract>
+    <Description>PostCode Library for PEIMs and DXE drivers that send PostCode to ReportStatusCode</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

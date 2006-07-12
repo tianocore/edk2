@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>263631d7-5836-4b74-be48-ee22e92ce5d3</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for WinNtConsole module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Console Dxe driver</Abstract>
+    <Description>Simulate console with WinAPI</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
