@@ -106,7 +106,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <target name="cleanall" depends="init">
     <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
-    <delete dir="${BUILD_DRI}">
+    <delete dir="${BUILD_DIR}">
       <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
     </delete>
   </target>
