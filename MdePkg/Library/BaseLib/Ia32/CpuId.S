@@ -22,8 +22,6 @@
 #------------------------------------------------------------------------------
 
 
-
-
 #------------------------------------------------------------------------------
 #  VOID
 #  EFIAPI
@@ -35,29 +33,33 @@
 #    OUT  UINT32  *RegisterOutEdx  OPTIONAL
 #    )
 #------------------------------------------------------------------------------
-.globl _AsmCpuid
+.globl  _AsmCpuid
 _AsmCpuid:
-    push   %ebx
-    push   %edi
-    movl    12(%esp),%eax
+    pushl   %ebx
+    pushl   %ebp
+    movl    %esp, %ebp
+    movl    12(%ebp), %eax
     cpuid
-    movl    %ecx,%edi
-    movl    16(%esp),%ecx
+    pushl   %ecx
+    movl    16(%ebp), %ecx
     jecxz   L1
-    movl    %eax,(%ecx)
-L1:
-    movl    20(%esp),%ecx
+    movl    %eax, (%ecx)
+L1: 
+    movl    20(%ebp), %ecx
     jecxz   L2
-    movl    %ebx,(%ecx)
-L2:
-    movl    24(%esp),%ecx
+    movl    %ebx, (%ecx)
+L2: 
+    movl    24(%ebp), %ecx
     jecxz   L3
-    movl    %edi,(%ecx)
-L3:
-    movl    28(%esp),%ecx
+    popl    (%ecx)
+L3: 
+    movl    28(%ebp), %ecx
     jecxz   L4
-    movl    %edx,(%ecx)
-L4:
-    pop    %edi
-    pop    %ebx
+    movl    %edx, (%ecx)
+L4: 
+    movl    12(%ebp), %eax
+    leave
+    popl    %ebx
     ret
+
+

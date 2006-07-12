@@ -5,8 +5,9 @@
     <ModuleType>UEFI_DRIVER</ModuleType>
     <GuidValue>050EB8C6-C12E-4b86-892B-40985E8B3137</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Device Path Library</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Uefi Device Path Library via protocol</Abstract>
+    <Description>Device Path Library that layers on top of the UEFI 2.0 Device Path Protocol.
+      This library is not available for EFI 1.10 modules.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

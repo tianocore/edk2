@@ -5,8 +5,9 @@
     <ModuleType>BASE</ModuleType>
     <GuidValue>b5a05743-9b71-489b-a0ed-a0eb3950d23b</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Baser Timer Library</Abstract>
+    <Description>Timer Library that only uses CPU resources to provide calibrated
+      delays on IA-32 and x64.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

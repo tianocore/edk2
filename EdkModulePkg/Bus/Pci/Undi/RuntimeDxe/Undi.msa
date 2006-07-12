@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
     <GuidValue>A1f436EA-A127-4EF8-957C-8048606FF670</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for DiskIo module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Undi module.</Abstract>
+    <Description>This module provides support for Universal Network Driver Interface</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

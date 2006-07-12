@@ -5,8 +5,8 @@
     <ModuleType>BASE</ModuleType>
     <GuidValue>9ba1d976-0624-41a3-8650-28165e8d9ae8</GuidValue>
     <Version>1.0</Version>
-    <Abstract>NULL Debug Library for UEFI drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for NULL Debug Library</Abstract>
+    <Description>Debug Library with empty functions.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -52,20 +52,21 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugPropertyMask</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
-      <HelpText/>
+      <HelpText>The bitmask of flags that specify the enable/disable of Debug
+                Assert, Debug Print, Debug Code, Clear Memory, Assert
+                Breakpoint and Assert Deadloop.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugClearMemoryValue</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
-      <HelpText/>
+      <HelpText>The value used by DebugClearMemory () to fill a certain range
+                of memory.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
-      <HelpText/>
+      <HelpText>The bitmask of flags that specify the kind of debug message
+                output when Debug Print is enabled.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

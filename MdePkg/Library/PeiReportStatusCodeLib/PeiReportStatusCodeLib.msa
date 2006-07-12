@@ -69,7 +69,8 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText/>
+      <HelpText>The bitmask of flags that specify the enable/disable of
+                Progress Code, Error Code and Debug Code.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

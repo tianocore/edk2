@@ -5,8 +5,8 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>55c61087-7367-4546-bc32-4937c5e6aff3</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for NULL Report Status Code Library.</Abstract>
+    <Description>Null instance for Report Status Code Library.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -60,7 +60,8 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText/>
+      <HelpText>The bitmask of flags that specify the enable/disable of
+                Progress Code, Error Code and Debug Code.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

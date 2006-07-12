@@ -176,7 +176,9 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>If PcdMaximumUnicodeStringLength is not zero, the maximum
+                number of characters (not counting the NULL-terminator) in a
+                Unicode string cannot exceed it.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdMaximumAsciiStringLength</C_Name>
@@ -185,7 +187,9 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>If PcdMaximumAsciiStringLength is not zero, the maximum number
+                of characters (not counting the NULL-terminator) in an ASCII
+                string cannot exceed it.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdMaximumLinkedListLength</C_Name>
@@ -194,7 +198,9 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>1000000</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>If PcdMaximumLinkedListLength is not zero, the maximum number
+                of nodes (not counting the list header) in a linked list
+                cannot exceed it.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdSpinLockTimeout</C_Name>
@@ -203,7 +209,8 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>10000000</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>If PcdSpinLockTimeout is not zero, it stands for the timeout
+                value (unit: millisecond) for spin lock.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdDebugPropertyMask</C_Name>
@@ -212,7 +219,9 @@
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x0f</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>The bitmask of flags that specify the enable/disable of Debug
+                Assert, Debug Print, Debug Code, Clear Memory, Assert
+                Breakpoint and Assert Deadloop.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
@@ -221,7 +230,8 @@
       <DatumType>UINT32</DatumType>
       <ValidUsage>PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>0x80000000</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>The bitmask of flags that specify the kind of debug message
+                output when Debug Print is enabled.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdReportStatusCodePropertyMask</C_Name>
@@ -230,7 +240,8 @@
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0x07</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>The bitmask of flags that specify the enable/disable of
+                Progress Code, Error Code and Debug Code.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdDebugClearMemoryValue</C_Name>
@@ -239,7 +250,8 @@
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0xAF</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>The value used by DebugClearMemory () to fill a certain range
+                of memory.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdDebugClearMemoryValue</C_Name>
@@ -248,7 +260,8 @@
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0xAF</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>The value used by DebugClearMemory () to fill a certain range
+                of memory.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
@@ -257,7 +270,8 @@
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <DefaultValue>0</DefaultValue>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>The bitmask of flags that specify the enable/disable of
+                Performance Measurement.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtPhysicalDisk</C_Name>

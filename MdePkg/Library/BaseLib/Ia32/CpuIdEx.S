@@ -55,13 +55,13 @@ L1:
 L2: 
     movl    28(%ebp), %ecx
     jecxz   L3
-    popl    %ecx
+    popl    (%ecx)
 L3: 
     movl    32(%ebp), %edx
     jecxz   L4
     movl    %edx, (%ecx)
 L4: 
     movl    12(%ebp), %eax
-    pop     %ebx
     leave
+    pop     %ebx
     ret

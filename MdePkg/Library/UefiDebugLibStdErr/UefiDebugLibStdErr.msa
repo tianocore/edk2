@@ -55,20 +55,21 @@
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugPropertyMask</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
-      <HelpText/>
+      <HelpText>The bitmask of flags that specify the enable/disable of Debug
+                Assert, Debug Print, Debug Code, Clear Memory, Assert
+                Breakpoint and Assert Deadloop.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdDebugClearMemoryValue</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
-      <HelpText/>
+      <HelpText>The value used by DebugClearMemory () to fill a certain range
+                of memory.</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-
-      <HelpText/>
+      <HelpText>The bitmask of flags that specify the kind of debug message
+                output when Debug Print is enabled.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

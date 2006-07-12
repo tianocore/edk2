@@ -5,8 +5,10 @@
     <ModuleType>PEIM</ModuleType>
     <GuidValue>1c747f6b-0a58-49ae-8ea3-0327a4fa10e3</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Pei Services Table Library</Abstract>
+    <Description>PEI Services Table Library implementation that retrieves a pointer to the
+      PEI Services Table from a global variable.  Not available to modules that execute from
+      read-only memory.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
