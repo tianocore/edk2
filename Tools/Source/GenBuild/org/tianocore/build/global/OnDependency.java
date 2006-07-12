@@ -13,12 +13,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 --*/
 package org.tianocore.build.global;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Sequential;
-
-import java.io.File;
-import java.util.Iterator;
 
 /**
  Class OnDepdendency is used to check the timestamp between source files and
@@ -26,6 +28,10 @@ import java.util.Iterator;
  be re-generated from source files.
  **/
 public class OnDependency extends Task {
+    ///
+    /// cache the modified timestamp of files accessed, to speed up the depencey check
+    /// 
+    private static Map<String, Long> timeStampCache = new HashMap<String, Long>();
     ///
     /// source files list
     ///
@@ -77,12 +83,20 @@ public class OnDependency extends Task {
             Iterator srcIt = sources.nameList.iterator();
             while (srcIt.hasNext()) {
                 String srcFileName = (String)srcIt.next();
-                File srcFile = new File(srcFileName);
-                if (!srcFile.exists()) {
-                    throw new BuildException(srcFileName + " doesn't exist !!!");
+                long srcTimeStamp;
+
+                if (timeStampCache.containsKey(srcFileName)) {
+                    srcTimeStamp = ((Long)timeStampCache.get(srcFileName)).longValue();
+                } else {
+                    File srcFile = new File(srcFileName);
+                    if (!srcFile.exists()) {
+                        throw new BuildException(srcFileName + " doesn't exist !!!");
+                    }
+                    srcTimeStamp = srcFile.lastModified();
+                    timeStampCache.put(srcFileName, new Long(srcTimeStamp));
                 }
 
-                if (dstTimeStamp < srcFile.lastModified()) {
+                if (dstTimeStamp < srcTimeStamp) {
                     return true;
                 }
             }

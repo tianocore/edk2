@@ -16,10 +16,14 @@ package org.tianocore.build.global;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.FileSet;
+
 /**
  DpFileList is a container of Dpfile at the point of ANT task/datatype
  **/
-public class DpFileList {
+public class DpFileList extends DataType {
     ///
     /// Keep all the file names from all nested DpFile
     ///
@@ -45,6 +49,16 @@ public class DpFileList {
      **/
     public void addConfiguredFile(DpFile f) {
         this.nameList.addAll(f.getList());
+    }
+
+    public void addConfiguredFileSet(FileSet fileSet) {
+        DirectoryScanner ds = fileSet.getDirectoryScanner(getProject());
+        String dir = fileSet.getDir(getProject()).getAbsolutePath();
+        String[] files = ds.getIncludedFiles();
+
+        for (int i = 0; i < files.length; ++i) {
+            nameList.add(dir + "/" + files[i]);
+        }
     }
 }
 

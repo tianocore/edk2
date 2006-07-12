@@ -247,7 +247,7 @@ public class GenBuildTask extends Ant {
                     // don't do anything if no tools found
                     // 
                     if (GlobalData.isCommandSet(targetList[i], toolchainList[j], archList[k]) == false) {
-                        System.out.println("!!!Warning: No build issued. No tools found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
+                        System.out.println("Warning: No build issued. No tools found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
                         continue;
                     }
 
@@ -431,7 +431,6 @@ public class GenBuildTask extends Ant {
             key[4] = "NAME";
             String cmdName = GlobalData.getCommandSetting(key, fpdModuleId);
             File cmdFile = new File(cmdPath + File.separatorChar + cmdName);
-//            GlobalData.log.info("PATH: " + cmdFile.getPath());
             getProject().setProperty(cmd[m], cmdFile.getPath().replaceAll("(\\\\)", "/"));
             
             //
@@ -439,7 +438,6 @@ public class GenBuildTask extends Ant {
             //
             key[4] = "FLAGS";
             String cmdFlags = GlobalData.getCommandSetting(key, fpdModuleId);
-//            GlobalData.log.info("Flags: " + cmdFlags);
             Set<String> addset = new LinkedHashSet<String>();
             Set<String> subset = new LinkedHashSet<String>();
             putFlagsToSet(addset, cmdFlags);
@@ -450,7 +448,6 @@ public class GenBuildTask extends Ant {
             //
             key[4] = "EXT";
             String extName = GlobalData.getCommandSetting(key, fpdModuleId);
-//            GlobalData.log.info("Ext: " + extName);
             if ( extName != null && ! extName.equalsIgnoreCase("")) {
                 getProject().setProperty(cmd[m] + "_EXT", extName);
             }
@@ -463,7 +460,6 @@ public class GenBuildTask extends Ant {
             //
             key[4] = "FAMILY";
             String toolChainFamily = GlobalData.getCommandSetting(key, fpdModuleId);
-//            GlobalData.log.info("FAMILY: " + toolChainFamily);
             if (toolChainFamily != null) {
                 getProject().setProperty(cmd[m] + "_FAMILY", toolChainFamily);
             }
@@ -473,7 +469,6 @@ public class GenBuildTask extends Ant {
             //
             key[4] = "SPATH";
             String spath = GlobalData.getCommandSetting(key, fpdModuleId);
-//            GlobalData.log.info("SPATH: " + spath);
             if (spath != null) {
                 getProject().setProperty(cmd[m] + "_SPATH", spath.replaceAll("(\\\\)", "/"));
             }
@@ -486,7 +481,6 @@ public class GenBuildTask extends Ant {
             //
             key[4] = "DPATH";
             String dpath = GlobalData.getCommandSetting(key, fpdModuleId);
-//            GlobalData.log.info("DPATH: " + dpath);
             if (dpath != null) {
                 getProject().setProperty(cmd[m] + "_DPATH", dpath.replaceAll("(\\\\)", "/"));
             }
