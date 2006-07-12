@@ -5,8 +5,11 @@
     <ModuleType>PEIM</ModuleType>
     <GuidValue>9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e</GuidValue>
     <Version>1.0</Version>
-    <Abstract>PCD Library Instance implemented with PCD PPI.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>PCD Library instance implemented with PCD PPI.</Abstract>
+    <Description>This library instance implement the APIs listed 
+    in PCD library class defined in MDE library specification.
+    It is used by module in PEI phase.
+    </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

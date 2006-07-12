@@ -5,8 +5,11 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>af97eb89-4cc6-45f8-a514-ca025b346480</GuidValue>
     <Version>1.0</Version>
-    <Abstract>IO Library implemented with Framework CPU IO Protocol</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>PCD Library instance implemented with PCD Protocol</Abstract>
+    <Description>This library instance implement the APIs listed 
+    in PCD library class defined in MDE library specification.
+    It is used by modules in DXE phase.
+    </Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

@@ -5,8 +5,12 @@
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>1ec995b2-d15b-44f6-abd2-050ea7dd37d2</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for the entry point to a EFIDXE Drivers</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>EDK Generic BDS Common APIs Library Instance.</Abstract>
+    <Description>The library instance provides common library routines help in 
+    performance measurement, device path debug print, boot device selections,
+    boot device connection, console supports in BDS phase and boot from boot
+    device.
+    </Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
