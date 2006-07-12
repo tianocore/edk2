@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
     <GuidValue>B601F8C4-43B7-4784-95B1-F4226CB40CEE</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for DiskIo module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for Runtime module.</Abstract>
+    <Description>This module is used to produce the EFI runtime virtual switch over.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
