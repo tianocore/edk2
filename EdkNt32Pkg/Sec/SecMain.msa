@@ -93,17 +93,33 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText/>
+      <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
+        the size of PcdWinNtMemorySizeForSecMain in windows platform.
+        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtFirmwareVolume</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText/>
+      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.
+        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
       <C_Name>PcdWinNtBootMode</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText/>
+      <HelpText>This PCD defines the boot mode for simualtor. 
+        The boot mode can be set as following value:
+          0x0: Boot with full configuration.
+          0x1: Boot with minimal configuration.
+          0x2: Boot assume no configuration changes.
+          0x3: Boot with full configuration plus diagnostics.
+          0x4: Boot with default settings.
+          0x5: Boot on S4 resume.
+          0x6: Boot on S5 resume.
+          0x10: Boot on S2 resume. 
+          0x11: Boot on S3 resume.
+          0x12: Boot on flash update.
+          0x20: Boot in reovery mode.
+        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
