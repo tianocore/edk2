@@ -618,7 +618,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>Indicate whether platform can support update capsule across a system reset</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdMaxSizePopulateCapsule</C_Name>
@@ -626,7 +626,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>Indicate the max size the platform can support in case of populated capsules</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdMaxSizeNonPopulateCapsule</C_Name>
@@ -634,7 +634,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <HelpText>HELP FIX ME!</HelpText>
+      <HelpText>Indicate the max size the platform can support in case of non-populated capsules</HelpText>
     </PcdEntry>  
     <PcdEntry>
       <C_Name>PcdPeiPcdDatabaseTraverseEnabled</C_Name>
