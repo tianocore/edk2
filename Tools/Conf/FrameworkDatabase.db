@@ -3,9 +3,9 @@
   <FdbHeader>
     <DatabaseName>FrameworkDatabase</DatabaseName>
     <GuidValue>5ce32c23-6448-43ab-b509-a9deae3aae65</GuidValue>
-    <Version>0.3</Version>
+    <Version>0.5</Version>
     <Abstract>The Framework Module Development Packaging System Database</Abstract>
-    <Description>This Database tracks the Basename, Version, Guid and Path for all packages installed in this workspace.</Description>
+    <Description>This Database tracks all packages and platforms installed in this workspace.</Description>
     <Copyright>Copyright (c) 2006,  Intel Corporation.</Copyright>
     <License>
       All rights reserved.
@@ -18,22 +18,17 @@
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </FdbHeader>
   <PackageList>
-    <Filename>EdkFatBinPkg/EdkFatBinPkg.spd</Filename>
-    <Filename>EdkFatPkg/EdkFatPkg.spd</Filename>
-    <Filename>EdkModulePkg/EdkModulePkg.spd</Filename>
-
-    <Filename>EdkNt32Pkg/EdkNt32Pkg.spd</Filename>
-    <Filename>EdkShellBinPkg/EdkShellBinPkg.spd</Filename>
     <Filename>MdePkg/MdePkg.spd</Filename>
-    <!--
     <Filename>Tools/Tools.spd</Filename>
-    -->
+    <Filename>EdkModulePkg/EdkModulePkg.spd</Filename>
+    <Filename>EdkNt32Pkg/EdkNt32Pkg.spd</Filename>
+    <Filename>EdkFatBinPkg/EdkFatBinPkg.spd</Filename>
+    <Filename>EdkShellBinPkg/EdkShellBinPkg.spd</Filename>
   </PackageList>
   <PlatformList>
-    <Filename>EdkNt32Pkg/Nt32.fpd</Filename>
-    <Filename>EdkModulePkg/EdkModulePkg-All-Archs.fpd</Filename>
-    <Filename>EdkModulePkg/EdkModulePkg.fpd</Filename>
     <Filename>MdePkg/MdePkg.fpd</Filename>
+    <Filename>EdkModulePkg/EdkModulePkg.fpd</Filename>
+    <Filename>EdkNt32Pkg/Nt32.fpd</Filename>
   </PlatformList>
   <FarList>
     <Filename>hello.world</Filename>

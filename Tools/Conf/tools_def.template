@@ -1,3 +1,15 @@
+#
+#  Copyright (c) 2006, Intel Corporation
+#
+#  All rights reserved. This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+
 # format: TARGET_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE = <string>
 
 #Default values
@@ -11,11 +23,6 @@
 *_MSFT_*_ASMLINK_NAME   = link.exe
 *_MSFT_*_ASL_NAME       = iasl.exe
 *_MSFT_*_PP_NAME        = cl.exe
-
-# HOST definitions
-#*_MSFT_HOST_*_PATH = C:\Program Files\Intel\Compiler\C++\9.0\IA32\Bin
-#*_MSFT_HOST_CC_NAME = icl.exe
-
 
 # IA32 definitions
 *_MSFT_IA32_*_PATH       = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
