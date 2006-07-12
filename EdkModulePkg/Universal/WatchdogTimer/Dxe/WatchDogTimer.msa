@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>F099D67F-71AE-4c36-B2A3-DCEB0EB2B7D8</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for DiskIo module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for WatchDogTimer module.</Abstract>
+    <Description>Generic watchdog timer implemenetation using EFI APIs.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

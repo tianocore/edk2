@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidValue>1FA1F39E-FEFF-4aae-BD7B-38A070A3B609</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for Partition module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Description>Partition driver that produces logical BlockIo devices from a physical BlockIo device.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

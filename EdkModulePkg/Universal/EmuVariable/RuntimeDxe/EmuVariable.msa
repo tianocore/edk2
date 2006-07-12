@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>DXE_RUNTIME_DRIVER</ModuleType>
     <GuidValue>CBD2E4D5-7068-4FF5-B866-9822B4AD8D60</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for DiskIo module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for EmuVariable module.</Abstract>
+    <Description>This module provides three EFI_RUNTIME_SERVICES: SetVariable, GetVariable, GetNextVariableName</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

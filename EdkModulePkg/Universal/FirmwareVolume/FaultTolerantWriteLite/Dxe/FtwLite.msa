@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>4C862FC6-0E54-4e36-8C8F-FF6F3167951F</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for DiskIo module.</Abstract>
-    <Description>FIX ME!</Description>
+    <Abstract>Component description file for FtwLite module.</Abstract>
+    <Description>This driver provides fault tolerant write capability for block devices.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
