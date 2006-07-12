@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidValue>BE0FEABA-3443-4919-9F3A-2D4216329EA9</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for WinNtAutoScan module</Abstract>
-    <Description>FIX ME!</Description>
+    <Description>This module abstracts memory auto-scan in a Windows NT environment.</Description>
     <Copyright>Copyright (c) 2004-2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License

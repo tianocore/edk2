@@ -13,7 +13,7 @@ Module Name:
   WinNtAutoscan.c
 
 Abstract:
-  Tiano PEIM to abstract memory auto-scan in a Windows NT environment.
+  This PEIM to abstract memory auto-scan in a Windows NT environment.
 
 Revision History
 
