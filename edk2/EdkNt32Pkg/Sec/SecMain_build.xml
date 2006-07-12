@@ -148,6 +148,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         
         <sequential>
           <shellscript shell="cmd.exe" tmpsuffix=".cmd" >
+            <arg line="/q"/>
             <arg line="/c"/>
             <arg line="call"/>
             "${DLINK}" /LIBPATH:"${env.MSVCDir}\Lib" /LIBPATH:"${env.MSVCDir}\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib ${OBJECTS} ${LIBS} /base:0x10000000 /out:${BIN_DIR}\SecMain.exe /pdb:${DEST_DIR_DEBUG}\SecMain.pdb

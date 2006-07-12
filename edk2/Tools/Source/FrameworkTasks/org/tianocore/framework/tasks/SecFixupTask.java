@@ -116,8 +116,7 @@ public class SecFixupTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline
-                    .getCommandline()));
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
 
             revl = runner.execute();
 
@@ -125,16 +124,13 @@ public class SecFixupTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "SecFixup succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "SecFixup succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "SecFixup failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("SecFixup failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = "+ Integer.toHexString(revl));
+                throw new BuildException("SecFixup failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

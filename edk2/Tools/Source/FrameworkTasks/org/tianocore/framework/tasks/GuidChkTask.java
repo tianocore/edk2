@@ -113,7 +113,7 @@ public class GuidChkTask extends Task implements EfiDefine{
                           printGuiDef + 
                           printAllGuid;     
         try {
-            System.out.println(command + " " + argument);
+            log(command + " " + argument, Project.MSG_VERBOSE);
             //
             // execute command line 
             //
@@ -134,17 +134,13 @@ public class GuidChkTask extends Task implements EfiDefine{
             else {
                 BufferedReader bin = new BufferedReader(new InputStreamReader(proc.getInputStream()));
                 String line = bin.readLine();
-                System.out.println(line);
                 while (line != null ){
-                    System.out.print(line);
                     line = bin.readLine();
                 }               
             }                      
-            System.out.println("GuidChkTask Success!");
+            log("GuidChkTask Succeeded!", Project.MSG_VERBOSE);
         } catch (Exception e) {
-            System.out.println("GuidChkTask failed!");
-            System.out.println(e.getMessage());
-            
+            throw new BuildException("GuidChkTask failed!");
         }
     }
     /**

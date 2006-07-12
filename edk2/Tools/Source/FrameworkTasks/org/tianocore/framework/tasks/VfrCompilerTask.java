@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.framework.tasks;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,8 @@ public class VfrCompilerTask extends Task implements EfiDefine {
     private String outPutDir = "";
     private String createIfrBinFile = "";
     private String processerArg ="";
-    private String vfrFile;
+    private String vfrFile = "";
+    private String vfrFileName = "";
 
     private List<Object> includepathList = new ArrayList<Object>();
 
@@ -116,6 +118,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @param     vfrFile The name of VFR file
      **/
     public void setVfrFile(String vfrFile) {
+        this.vfrFileName = (new File(vfrFile)).getName();
         this.vfrFile = " " + vfrFile;
     }
 
@@ -203,17 +206,15 @@ public class VfrCompilerTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(commandLine.getCommandline());
 
-            System.out.println(Commandline.toString(commandLine.getCommandline()));         
+            log(Commandline.toString(commandLine.getCommandline()), Project.MSG_VERBOSE);
+            log(vfrFileName);
             int returnVal = runner.execute();
             if (EFI_SUCCESS == returnVal) {
-                System.out.println("VfrCompiler execution succeeded!");
+                log("VfrCompiler succeeded!", Project.MSG_VERBOSE);
             } else {
-                System.out.println("VfrCompiler failed. (error=" + 
-                                   Integer.toHexString(returnVal) + ")");  
-                throw new BuildException("VfrCompiler failed. (error=" + 
-                                         Integer.toHexString(returnVal) + ")");
+                log("ERROR = " + Integer.toHexString(returnVal));
+                throw new BuildException("VfrCompiler failed!");
             }
-
         } catch (IOException e) {
             throw new BuildException(e.getMessage());
         }

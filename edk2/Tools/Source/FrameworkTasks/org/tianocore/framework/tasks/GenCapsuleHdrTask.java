@@ -137,25 +137,21 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline
-                    .getCommandline()));
-
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, (new File(scriptFile)).getName());
             revl = runner.execute();
 
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "GenCapsuleHdr succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "GenCapsuleHdr succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "GenCapsuleHdr failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("GenCapsuleHdr failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                EdkLog.log(EdkLog.EDK_ERROR, "ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("GenCapsuleHdr failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

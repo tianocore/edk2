@@ -148,22 +148,18 @@ public class StrGatherTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
-            System.out.println(Commandline.toString(cmdline.getCommandline()));
 
+            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
+            log(this.commandType.substring(2));
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                ///
-                /// command execution success
-                ///
-                System.out.println("strgather succeeded!");
+                log("strgather succeeded!", Project.MSG_VERBOSE);
             } else {
                 ///
                 /// command execution fail
                 ///
-                System.out.println("strgather failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("strgather failed. (error="
-                        + Integer.toHexString(revl) + ")");
+                log("ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("strgather failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

@@ -169,17 +169,16 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
 
         }
 
-        ffsFile = new File (outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix);  
-        System.out.print("General Ffs file: file name is:\n");
-        System.out.print(outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix);
-        System.out.print("\n");
-        
+        String ffsFilePath = outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix;
+        ffsFile = new File (ffsFilePath);  
         //
         // Create ffs ORG file. fileName = FfsFileGuid + BaseName + ffsSuffix +
         // ".org".
         //
-        ffsOrgFile = new File(outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix + ".org");
+        ffsOrgFile = new File(ffsFilePath + ".org");
            
+        log(ffsFile.getName());
+        log(ffsOrgFile.getName());
         try {
             //
             //  Create file output stream -- dataBuffer.
@@ -428,8 +427,8 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             //
             ffsBuffer.close();
             orgFfsBuffer.close();
-            System.out.print ("Successful create ffs file!\n");
         } catch (Exception e) {
+            log("genffsfile failed!");
             throw new BuildException (e.getMessage());
         }
     }   

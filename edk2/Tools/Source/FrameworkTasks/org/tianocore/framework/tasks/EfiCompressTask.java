@@ -104,7 +104,8 @@ public class EfiCompressTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
             
             revl = runner.execute();
             
@@ -112,15 +113,13 @@ public class EfiCompressTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO,"EfiCompress succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "EfiCompress succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "EfiCompress failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("Strip failed. (error="
-                        + Integer.toHexString(revl) + ")");
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("Strip failed!");
 
             }
         } catch (Exception e) {

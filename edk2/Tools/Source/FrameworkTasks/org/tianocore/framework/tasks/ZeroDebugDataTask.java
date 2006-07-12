@@ -105,23 +105,22 @@ public class ZeroDebugDataTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline.getCommandline()));
-            
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.peFile)).getName());
+
             revl = runner.execute();
             
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO,"ZeroDebug succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "ZeroDebugData succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "ZeroDebug failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("ZeroDebug failed. (error="
-                        + Integer.toHexString(revl) + ")");
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("ZeroDebugData failed!");
 
             }
         } catch (Exception e) {

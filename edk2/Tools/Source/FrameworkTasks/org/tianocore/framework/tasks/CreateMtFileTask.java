@@ -108,24 +108,21 @@ public class CreateMtFileTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_INFO, Commandline.toString(cmdline.getCommandline()));
-            
+            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.outputFile)).getName());
             revl = runner.execute();
             
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_INFO,"CreateMtFile succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "CreateMtFile succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_ERROR, "CreateMtFile failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("CreateMtFile failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = "+ Integer.toHexString(revl));
+                throw new BuildException("CreateMtFile failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

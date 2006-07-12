@@ -16,12 +16,15 @@
  **/
 package org.tianocore.framework.tasks;
 
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.Project;
+import java.io.File;
+
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
+import org.tianocore.logger.EdkLog;
 
 
 /**
@@ -38,6 +41,7 @@ public class FwImageTask extends Task implements EfiDefine{
     /// input PE image
     /// 
     private String peImage = "";
+    private String peImageName = "";
     ///
     /// output EFI image
     /// 
@@ -93,24 +97,18 @@ public class FwImageTask extends Task implements EfiDefine{
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
-            //System.out.println(Commandline.toString(cmdline.getCommandline()));
-            //GenBuildTask.myLogger.log(Commandline.toString(cmdline.getCommandline()),0);
-            //getProject().log(Commandline.toString(cmdline.getCommandline()));
+
+            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
+            log(this.peImageName);
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                //
-                // command execution success
-                //
-                System.out.println("fwimage succeeded!");
+                log("fwimage succeeded!", Project.MSG_VERBOSE);
             } else {
                 //
                 // command execution fail
                 //
-                System.out.println("fwimage failed. (error="
-                        + Integer.toHexString(revl) + ")");
-                throw new BuildException("fwimage failed. (error="
-                        + Integer.toHexString(revl) + ")");
-
+                log("ERROR = " + Integer.toHexString(revl));
+                throw new BuildException("fwimage failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -155,6 +153,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @param  peImage        name of PE image
     **/
     public void setPeImage(String peImage) {
+        this.peImageName = (new File(peImage)).getName();
         this.peImage = " " + peImage;
     }
 

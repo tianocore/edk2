@@ -29,9 +29,9 @@ import org.apache.tools.ant.BuildException;
 import org.tianocore.logger.EdkLog;
 
 /**
- * SecFixupTask class.
+ * FlashMapTask class.
  * 
- * SecFixupTask is used to call SecFixup.exe to fix up sec image.
+ * FlashMapTask is used to call FlashMap.exe to generate flash map defition files and fd files.
  */
 public class FlashMapTask extends Task implements EfiDefine {
     // /
@@ -40,7 +40,7 @@ public class FlashMapTask extends Task implements EfiDefine {
     private final String toolName = "FlashMap";
 
     // /
-    // / Flash default file
+    // / Flash definition file
     // /
     private String flashDefFile = "";
 
@@ -181,7 +181,6 @@ public class FlashMapTask extends Task implements EfiDefine {
             }
         }
 
-        EdkLog.log(EdkLog.EDK_INFO, argList.toString().replace(",",""));
         //
         // lauch the program
         //
@@ -198,19 +197,19 @@ public class FlashMapTask extends Task implements EfiDefine {
             //
             // log command line string.
             //
-            EdkLog.log(EdkLog.EDK_INFO, cmdProc.getOutputStream().toString());
+            EdkLog.log(EdkLog.EDK_VERBOSE, cmdProc.getOutputStream().toString());
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.flashDefFile)).getName());
             if (exitCode != 0) {
                 int len = cmdOut.read(buf, 0, 1024);
-                EdkLog.log(EdkLog.EDK_ERROR, new String(buf, 0, len));
+                EdkLog.log(EdkLog.EDK_INFO, new String(buf, 0, len));
             } else {
-                EdkLog.log(EdkLog.EDK_INFO, "FlashMap succeed!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "FlashMap succeeded!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
         } finally {
             if (exitCode != 0) {
-                // throw new BuildException("GenFvImage: failed to generate FV
-                // file!");
+                throw new BuildException("FlashMap failed!");
             }
         }
     }
