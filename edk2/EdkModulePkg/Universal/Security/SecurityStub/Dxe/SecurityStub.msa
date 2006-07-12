@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <GuidValue>F80697E9-7FD6-4665-8646-88E33EF71DFC</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for SecurityStub module</Abstract>
-    <Description>FIX ME!</Description>
+    <Description>This driver supports platform security service.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
