@@ -28,34 +28,34 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem64 (
+;  InternalMemSetMem64 (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
 ;    IN UINT64 Value
 ;    )
 ;------------------------------------------------------------------------------
-InternalMemSetMem64 PROC    USES    edi
-    mov     ecx, [esp + 12]
-    mov     edi, [esp + 8]
-    test    edi, 8
-    DB      0f2h, 0fh, 12h, 44h, 24h, 16    ; movddup xmm0, [esp + 16]
+InternalMemSetMem64 PROC
+    mov     eax, [esp + 4]
+    mov     ecx, [esp + 8]
+    test    al, 8
+    mov     edx, eax
+    movq    xmm0, [esp + 12]
     jz      @F
-    movq    [edi], xmm0
-    add     edi, 8
+    movq    [edx], xmm0
+    add     edx, 8
     dec     ecx
 @@:
-    mov     edx, ecx
     shr     ecx, 1
     jz      @SetQwords
+    movlhps xmm0, xmm0
 @@:
-    movntdq [edi], xmm0
-    add     edi, 16
+    movntdq [edx], xmm0
+    lea     edx, [edx + 16]
     loop    @B
     mfence
 @SetQwords:
-    test    dl, 1
-    jz      @F
-    movq    [edi], xmm0
+    jnc     @F
+    movq    [edx], xmm0
 @@:
     ret
 InternalMemSetMem64 ENDP

@@ -25,35 +25,33 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem64 (
+;  InternalMemSetMem64 (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
-;    IN UINT8  Value
+;    IN UINT64 Value
 ;    )
 ;------------------------------------------------------------------------------
-InternalMemSetMem64 PROC    USES    rdi
-    mov     rdi, rcx
-    mov     r9, rcx
-    test    cl, 8
+InternalMemSetMem64 PROC
+    mov     rax, rcx
+    test    dl, 8
+    xchg    rcx, rdx
     jz      @F
-    mov     [rdi], r8
-    add     rdi, 8
-    dec     rdx
+    mov     [rdx], r8
+    add     rdx, 8
+    dec     rcx
 @@:
-    mov     rcx, rdx
     shr     rcx, 1
     jz      @SetQwords
     movd    xmm0, r8
     movlhps xmm0, xmm0
 @@:
-    movntdq [rdi], xmm0
-    add     rdi, 16
+    movntdq [rdx], xmm0
+    lea     rdx, [rdx + 16]
     loop    @B
     mfence
 @SetQwords:
-    test    dl, 1
-    jz      @F
-    mov     [rdi], r8
+    jnc     @F
+    mov     [rdx], r8
 @@:
     ret
 InternalMemSetMem64 ENDP
