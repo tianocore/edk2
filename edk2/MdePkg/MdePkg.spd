@@ -179,6 +179,952 @@
       <HelpText/>
     </LibraryClass>
   </LibraryClassDeclarations>
+  <IndustryStdIncludes>
+    <IndustryStdHeader Name="BaseTypes">
+      <IncludeHeader>Include/Common/BaseTypes.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BootMode">
+      <IncludeHeader>Include/Common/BootMode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BootScript">
+      <IncludeHeader>Include/Common/BootScript.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Capsule">
+      <IncludeHeader>Include/Common/Capsule.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DataHubRecords">
+      <IncludeHeader>Include/Common/DataHubRecords.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Dependency">
+      <IncludeHeader>Include/Common/Dependency.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EfiImage">
+      <IncludeHeader>Include/Common/EfiImage.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FirmwareFileSystem">
+      <IncludeHeader>Include/Common/FirmwareFileSystem.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FirmwareVolumeHeader">
+      <IncludeHeader>Include/Common/FirmwareVolumeHeader.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FirmwareVolumeImageFormat">
+      <IncludeHeader>Include/Common/FirmwareVolumeImageFormat.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Hob">
+      <IncludeHeader>Include/Common/Hob.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="InternalFormRepresentation">
+      <IncludeHeader>Include/Common/InternalFormRepresentation.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Legacy16">
+      <IncludeHeader>Include/Common/Legacy16.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="MultiPhase">
+      <IncludeHeader>Include/Common/MultiPhase.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="StatusCode">
+      <IncludeHeader>Include/Common/StatusCode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="StatusCodeDataTypeId">
+      <IncludeHeader>Include/Common/StatusCodeDataTypeId.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiBaseTypes">
+      <IncludeHeader>Include/Common/UefiBaseTypes.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Bds">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Bds.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Cpu">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Cpu.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Metronome">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Metronome.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="MonotonicCounter">
+      <IncludeHeader>Include/Dxe/ArchProtocol/MonotonicCounter.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="RealTimeClock">
+      <IncludeHeader>Include/Dxe/ArchProtocol/RealTimeClock.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Reset">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Reset.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Runtime">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Runtime.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Security">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Security.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SecurityPolicy">
+      <IncludeHeader>Include/Dxe/ArchProtocol/SecurityPolicy.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="StatusCode">
+      <IncludeHeader>Include/Dxe/ArchProtocol/StatusCode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Timer">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Timer.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Variable">
+      <IncludeHeader>Include/Dxe/ArchProtocol/Variable.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="VariableWrite">
+      <IncludeHeader>Include/Dxe/ArchProtocol/VariableWrite.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="WatchdogTimer">
+      <IncludeHeader>Include/Dxe/ArchProtocol/WatchdogTimer.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeCis">
+      <IncludeHeader>Include/Dxe/DxeCis.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmCis">
+      <IncludeHeader>Include/Dxe/SmmCis.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ProcessorBind">
+      <IncludeHeader>Include/Ebc/ProcessorBind.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Acpi">
+      <IncludeHeader>Include/Guid/Acpi.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="AcpiTableStorage">
+      <IncludeHeader>Include/Guid/AcpiTableStorage.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Apriori">
+      <IncludeHeader>Include/Guid/Apriori.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Capsule">
+      <IncludeHeader>Include/Guid/Capsule.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DataHubRecords">
+      <IncludeHeader>Include/Guid/DataHubRecords.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DebugImageInfoTable">
+      <IncludeHeader>Include/Guid/DebugImageInfoTable.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeServices">
+      <IncludeHeader>Include/Guid/DxeServices.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EventGroup">
+      <IncludeHeader>Include/Guid/EventGroup.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EventLegacyBios">
+      <IncludeHeader>Include/Guid/EventLegacyBios.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FirmwareFileSystem">
+      <IncludeHeader>Include/Guid/FirmwareFileSystem.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FrameworkDevicePath">
+      <IncludeHeader>Include/Guid/FrameworkDevicePath.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="GlobalVariable">
+      <IncludeHeader>Include/Guid/GlobalVariable.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Gpt">
+      <IncludeHeader>Include/Guid/Gpt.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="HobList">
+      <IncludeHeader>Include/Guid/HobList.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="MemoryAllocationHob">
+      <IncludeHeader>Include/Guid/MemoryAllocationHob.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Mps">
+      <IncludeHeader>Include/Guid/Mps.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PcAnsi">
+      <IncludeHeader>Include/Guid/PcAnsi.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SalSystemTable">
+      <IncludeHeader>Include/Guid/SalSystemTable.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmBios">
+      <IncludeHeader>Include/Guid/SmBios.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmCommunicate">
+      <IncludeHeader>Include/Guid/SmmCommunicate.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmramMemoryReserve">
+      <IncludeHeader>Include/Guid/SmramMemoryReserve.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="StatusCodeDataTypeId">
+      <IncludeHeader>Include/Guid/StatusCodeDataTypeId.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ProcessorBind">
+      <IncludeHeader>Include/Ia32/ProcessorBind.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Acpi">
+      <IncludeHeader>Include/IndustryStandard/Acpi.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="pci22">
+      <IncludeHeader>Include/IndustryStandard/pci22.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="scsi">
+      <IncludeHeader>Include/IndustryStandard/scsi.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Usb">
+      <IncludeHeader>Include/IndustryStandard/Usb.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IpfDefines">
+      <IncludeHeader>Include/Ipf/IpfDefines.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IpfMacro">
+      <IncludeHeader>Include/Ipf/IpfMacro.i</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ProcessorBind">
+      <IncludeHeader>Include/Ipf/ProcessorBind.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SalApi">
+      <IncludeHeader>Include/Ipf/SalApi.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BaseLib">
+      <IncludeHeader>Include/Library/BaseLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BaseMemoryLib">
+      <IncludeHeader>Include/Library/BaseMemoryLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="CacheMaintenanceLib">
+      <IncludeHeader>Include/Library/CacheMaintenanceLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="CpuLib">
+      <IncludeHeader>Include/Library/CpuLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DebugLib">
+      <IncludeHeader>Include/Library/DebugLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DevicePathLib">
+      <IncludeHeader>Include/Library/DevicePathLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeCoreEntryPoint">
+      <IncludeHeader>Include/Library/DxeCoreEntryPoint.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeRuntimeDriverLib">
+      <IncludeHeader>Include/Library/DxeRuntimeDriverLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeServicesTableLib">
+      <IncludeHeader>Include/Library/DxeServicesTableLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeSmmDriverEntryPoint">
+      <IncludeHeader>Include/Library/DxeSmmDriverEntryPoint.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="HiiLib">
+      <IncludeHeader>Include/Library/HiiLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="HobLib">
+      <IncludeHeader>Include/Library/HobLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IoLib">
+      <IncludeHeader>Include/Library/IoLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="MemoryAllocationLib">
+      <IncludeHeader>Include/Library/MemoryAllocationLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PcdLib">
+      <IncludeHeader>Include/Library/PcdLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciCf8Lib">
+      <IncludeHeader>Include/Library/PciCf8Lib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciExpressLib">
+      <IncludeHeader>Include/Library/PciExpressLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciLib">
+      <IncludeHeader>Include/Library/PciLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciSegmentLib">
+      <IncludeHeader>Include/Library/PciSegmentLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeCoffGetEntryPointLib">
+      <IncludeHeader>Include/Library/PeCoffGetEntryPointLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeCoffLib">
+      <IncludeHeader>Include/Library/PeCoffLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeiCoreEntryPoint">
+      <IncludeHeader>Include/Library/PeiCoreEntryPoint.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeimEntryPoint">
+      <IncludeHeader>Include/Library/PeimEntryPoint.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeiServicesLib">
+      <IncludeHeader>Include/Library/PeiServicesLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeiServicesTablePointerLib">
+      <IncludeHeader>Include/Library/PeiServicesTablePointerLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PerformanceLib">
+      <IncludeHeader>Include/Library/PerformanceLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PostCodeLib">
+      <IncludeHeader>Include/Library/PostCodeLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PrintLib">
+      <IncludeHeader>Include/Library/PrintLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ReportStatusCodeLib">
+      <IncludeHeader>Include/Library/ReportStatusCodeLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ResourcePublicationLib">
+      <IncludeHeader>Include/Library/ResourcePublicationLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmbusLib">
+      <IncludeHeader>Include/Library/SmbusLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="TimerLib">
+      <IncludeHeader>Include/Library/TimerLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiBootServicesTableLib">
+      <IncludeHeader>Include/Library/UefiBootServicesTableLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiDecompressLib">
+      <IncludeHeader>Include/Library/UefiDecompressLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiDriverEntryPoint">
+      <IncludeHeader>Include/Library/UefiDriverEntryPoint.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiDriverModelLib">
+      <IncludeHeader>Include/Library/UefiDriverModelLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiLib">
+      <IncludeHeader>Include/Library/UefiLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiRuntimeServicesTableLib">
+      <IncludeHeader>Include/Library/UefiRuntimeServicesTableLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeiCis">
+      <IncludeHeader>Include/Peim/PeiCis.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BlockIo">
+      <IncludeHeader>Include/Ppi/BlockIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BootInRecoveryMode">
+      <IncludeHeader>Include/Ppi/BootInRecoveryMode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BootScriptExecuter">
+      <IncludeHeader>Include/Ppi/BootScriptExecuter.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="CpuIo">
+      <IncludeHeader>Include/Ppi/CpuIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DeviceRecoveryModule">
+      <IncludeHeader>Include/Ppi/DeviceRecoveryModule.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeIpl">
+      <IncludeHeader>Include/Ppi/DxeIpl.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EndOfPeiPhase">
+      <IncludeHeader>Include/Ppi/EndOfPeiPhase.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FindFv">
+      <IncludeHeader>Include/Ppi/FindFv.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="LoadFile">
+      <IncludeHeader>Include/Ppi/LoadFile.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="MasterBootMode">
+      <IncludeHeader>Include/Ppi/MasterBootMode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="MemoryDiscovered">
+      <IncludeHeader>Include/Ppi/MemoryDiscovered.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Pcd">
+      <IncludeHeader>Include/Ppi/Pcd.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciCfg">
+      <IncludeHeader>Include/Ppi/PciCfg.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ReadOnlyVariable">
+      <IncludeHeader>Include/Ppi/ReadOnlyVariable.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="RecoveryModule">
+      <IncludeHeader>Include/Ppi/RecoveryModule.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Reset">
+      <IncludeHeader>Include/Ppi/Reset.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="S3Resume">
+      <IncludeHeader>Include/Ppi/S3Resume.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SecPlatformInformation">
+      <IncludeHeader>Include/Ppi/SecPlatformInformation.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SectionExtraction">
+      <IncludeHeader>Include/Ppi/SectionExtraction.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Security">
+      <IncludeHeader>Include/Ppi/Security.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Smbus">
+      <IncludeHeader>Include/Ppi/Smbus.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Stall">
+      <IncludeHeader>Include/Ppi/Stall.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="StatusCode">
+      <IncludeHeader>Include/Ppi/StatusCode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="AcpiSupport">
+      <IncludeHeader>Include/Protocol/AcpiSupport.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Arp">
+      <IncludeHeader>Include/Protocol/Arp.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="AuthenticationInfo">
+      <IncludeHeader>Include/Protocol/AuthenticationInfo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Bis">
+      <IncludeHeader>Include/Protocol/Bis.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BlockIo">
+      <IncludeHeader>Include/Protocol/BlockIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BootScriptSave">
+      <IncludeHeader>Include/Protocol/BootScriptSave.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="BusSpecificDriverOverride">
+      <IncludeHeader>Include/Protocol/BusSpecificDriverOverride.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ComponentName">
+      <IncludeHeader>Include/Protocol/ComponentName.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="CpuIo">
+      <IncludeHeader>Include/Protocol/CpuIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DataHub">
+      <IncludeHeader>Include/Protocol/DataHub.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DebugPort">
+      <IncludeHeader>Include/Protocol/DebugPort.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DebugSupport">
+      <IncludeHeader>Include/Protocol/DebugSupport.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Decompress">
+      <IncludeHeader>Include/Protocol/Decompress.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DeviceIo">
+      <IncludeHeader>Include/Protocol/DeviceIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DevicePath">
+      <IncludeHeader>Include/Protocol/DevicePath.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DevicePathFromText">
+      <IncludeHeader>Include/Protocol/DevicePathFromText.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DevicePathToText">
+      <IncludeHeader>Include/Protocol/DevicePathToText.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DevicePathUtilities">
+      <IncludeHeader>Include/Protocol/DevicePathUtilities.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Dhcp4">
+      <IncludeHeader>Include/Protocol/Dhcp4.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DiskIo">
+      <IncludeHeader>Include/Protocol/DiskIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DriverBinding">
+      <IncludeHeader>Include/Protocol/DriverBinding.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DriverConfiguration">
+      <IncludeHeader>Include/Protocol/DriverConfiguration.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DriverDiagnostics">
+      <IncludeHeader>Include/Protocol/DriverDiagnostics.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Ebc">
+      <IncludeHeader>Include/Protocol/Ebc.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EdidActive">
+      <IncludeHeader>Include/Protocol/EdidActive.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EdidDiscovered">
+      <IncludeHeader>Include/Protocol/EdidDiscovered.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EdidOverride">
+      <IncludeHeader>Include/Protocol/EdidOverride.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EfiNetworkInterfaceIdentifier">
+      <IncludeHeader>Include/Protocol/EfiNetworkInterfaceIdentifier.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FileInfo">
+      <IncludeHeader>Include/Protocol/FileInfo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FileSystemInfo">
+      <IncludeHeader>Include/Protocol/FileSystemInfo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FileSystemVolumeLabelInfo">
+      <IncludeHeader>Include/Protocol/FileSystemVolumeLabelInfo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FirmwareVolume">
+      <IncludeHeader>Include/Protocol/FirmwareVolume.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FirmwareVolumeBlock">
+      <IncludeHeader>Include/Protocol/FirmwareVolumeBlock.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FirmwareVolumeDispatch">
+      <IncludeHeader>Include/Protocol/FirmwareVolumeDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FormBrowser">
+      <IncludeHeader>Include/Protocol/FormBrowser.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FormCallback">
+      <IncludeHeader>Include/Protocol/FormCallback.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="GraphicsOutput">
+      <IncludeHeader>Include/Protocol/GraphicsOutput.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="GuidedSectionExtraction">
+      <IncludeHeader>Include/Protocol/GuidedSectionExtraction.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Hash">
+      <IncludeHeader>Include/Protocol/Hash.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Hii">
+      <IncludeHeader>Include/Protocol/Hii.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IdeControllerInit">
+      <IncludeHeader>Include/Protocol/IdeControllerInit.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IncompatiblePciDeviceSupport">
+      <IncludeHeader>Include/Protocol/IncompatiblePciDeviceSupport.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IP4">
+      <IncludeHeader>Include/Protocol/IP4.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IP4Config">
+      <IncludeHeader>Include/Protocol/IP4Config.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="IScsiInitatorName">
+      <IncludeHeader>Include/Protocol/IScsiInitatorName.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Legacy8259">
+      <IncludeHeader>Include/Protocol/Legacy8259.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="LegacyBios">
+      <IncludeHeader>Include/Protocol/LegacyBios.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="LegacyBiosPlatform">
+      <IncludeHeader>Include/Protocol/LegacyBiosPlatform.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="LegacyInterrupt">
+      <IncludeHeader>Include/Protocol/LegacyInterrupt.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="LegacyRegion">
+      <IncludeHeader>Include/Protocol/LegacyRegion.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="LoadedImage">
+      <IncludeHeader>Include/Protocol/LoadedImage.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="LoadFile">
+      <IncludeHeader>Include/Protocol/LoadFile.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ManagedNetwork">
+      <IncludeHeader>Include/Protocol/ManagedNetwork.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Mtftp4">
+      <IncludeHeader>Include/Protocol/Mtftp4.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Pcd">
+      <IncludeHeader>Include/Protocol/Pcd.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciHostBridgeResourceAllocation">
+      <IncludeHeader>Include/Protocol/PciHostBridgeResourceAllocation.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciHotPlugInit">
+      <IncludeHeader>Include/Protocol/PciHotPlugInit.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciIo">
+      <IncludeHeader>Include/Protocol/PciIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciPlatform">
+      <IncludeHeader>Include/Protocol/PciPlatform.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PciRootBridgeIo">
+      <IncludeHeader>Include/Protocol/PciRootBridgeIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PlatformDriverOverride">
+      <IncludeHeader>Include/Protocol/PlatformDriverOverride.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PxeBaseCode">
+      <IncludeHeader>Include/Protocol/PxeBaseCode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PxeBaseCodeCallBack">
+      <IncludeHeader>Include/Protocol/PxeBaseCodeCallBack.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ScsiIoExt">
+      <IncludeHeader>Include/Protocol/ScsiIoExt.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ScsiPassThru">
+      <IncludeHeader>Include/Protocol/ScsiPassThru.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ScsiPassThruExt">
+      <IncludeHeader>Include/Protocol/ScsiPassThruExt.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SectionExtraction">
+      <IncludeHeader>Include/Protocol/SectionExtraction.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SerialIo">
+      <IncludeHeader>Include/Protocol/SerialIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ServiceBinding">
+      <IncludeHeader>Include/Protocol/ServiceBinding.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SimpleFileSystem">
+      <IncludeHeader>Include/Protocol/SimpleFileSystem.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SimpleNetwork">
+      <IncludeHeader>Include/Protocol/SimpleNetwork.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SimplePointer">
+      <IncludeHeader>Include/Protocol/SimplePointer.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SimpleTextIn">
+      <IncludeHeader>Include/Protocol/SimpleTextIn.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SimpleTextOut">
+      <IncludeHeader>Include/Protocol/SimpleTextOut.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Smbus">
+      <IncludeHeader>Include/Protocol/Smbus.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmAccess">
+      <IncludeHeader>Include/Protocol/SmmAccess.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmBase">
+      <IncludeHeader>Include/Protocol/SmmBase.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmControl">
+      <IncludeHeader>Include/Protocol/SmmControl.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmGpiDispatch">
+      <IncludeHeader>Include/Protocol/SmmGpiDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmIchnDispatch">
+      <IncludeHeader>Include/Protocol/SmmIchnDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmPeriodicTimerDispatch">
+      <IncludeHeader>Include/Protocol/SmmPeriodicTimerDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmPowerButtonDispatch">
+      <IncludeHeader>Include/Protocol/SmmPowerButtonDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmStandbyButtonDispatch">
+      <IncludeHeader>Include/Protocol/SmmStandbyButtonDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmStatusCode">
+      <IncludeHeader>Include/Protocol/SmmStatusCode.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmSwDispatch">
+      <IncludeHeader>Include/Protocol/SmmSwDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmSxDispatch">
+      <IncludeHeader>Include/Protocol/SmmSxDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="SmmUsbDispatch">
+      <IncludeHeader>Include/Protocol/SmmUsbDispatch.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="TapeIo">
+      <IncludeHeader>Include/Protocol/TapeIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Tcp4">
+      <IncludeHeader>Include/Protocol/Tcp4.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Udp4">
+      <IncludeHeader>Include/Protocol/Udp4.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UgaDraw">
+      <IncludeHeader>Include/Protocol/UgaDraw.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UnicodeCollation">
+      <IncludeHeader>Include/Protocol/UnicodeCollation.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Usb2HostController">
+      <IncludeHeader>Include/Protocol/Usb2HostController.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UsbHostController">
+      <IncludeHeader>Include/Protocol/UsbHostController.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UsbIo">
+      <IncludeHeader>Include/Protocol/UsbIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EfiPxe">
+      <IncludeHeader>Include/Uefi/EfiPxe.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Errors">
+      <IncludeHeader>Include/Uefi/Errors.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="UefiSpec">
+      <IncludeHeader>Include/Uefi/UefiSpec.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="ProcessorBind">
+      <IncludeHeader>Include/x64/ProcessorBind.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Base">
+      <IncludeHeader>Include/Base.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Dxe">
+      <IncludeHeader>Include/Dxe.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeCore">
+      <IncludeHeader>Include/DxeCore.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="DxeDepex">
+      <IncludeHeader>Include/DxeDepex.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeiCore">
+      <IncludeHeader>Include/PeiCore.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Peim">
+      <IncludeHeader>Include/Peim.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PeimDepex">
+      <IncludeHeader>Include/PeimDepex.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PiwgDxe">
+      <IncludeHeader>Include/PiwgDxe.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="PiwgPeim">
+      <IncludeHeader>Include/PiwgPeim.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="Uefi">
+      <IncludeHeader>Include/Uefi.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+  </IndustryStdIncludes>
   <MsaFiles>
     <Filename>Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.msa</Filename>
     <Filename>Library/BaseDebugLibNull/BaseDebugLibNull.msa</Filename>
