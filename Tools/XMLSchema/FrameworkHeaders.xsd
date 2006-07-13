@@ -30,7 +30,7 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" default="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -47,7 +47,7 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" default="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -67,7 +67,7 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" default="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -86,7 +86,7 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" default="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -105,7 +105,7 @@
         <xs:element minOccurs="1" maxOccurs="1" ref="Description"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="Copyright"/>
         <xs:element minOccurs="1" maxOccurs="1" ref="License"/>
-        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" fixed="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
+        <xs:element minOccurs="1" maxOccurs="1" name="Specification" type="Sentence" default="FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
