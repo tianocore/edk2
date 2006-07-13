@@ -46,18 +46,39 @@ public class Identification {
     }
     
     public boolean equals(Object obj) {
-        if (obj instanceof Identification) {
-            Identification id = (Identification)obj;
-            if (path.equals(id.path)) {
-            //if ( name.equals(id.name) && guid.equals(id.guid) && version.equals(id.version)) {
-                return true;
-            }
-            return false;
-        }
-        else {
-            return super.equals(obj);
-        }
-    }
+      if (obj instanceof Identification) {
+          Identification id = (Identification)obj;
+          if (path.equals(id.path)) {
+          //if ( name.equals(id.name) && guid.equals(id.guid) && version.equals(id.version)) {
+              return true;
+          }
+          return false;
+      }
+      else {
+          return super.equals(obj);
+      }
+  }
+    
+    public boolean equalsWithGuid(Object obj) {
+      if (obj instanceof Identification) {
+          Identification id = (Identification)obj;
+          if ( guid.equalsIgnoreCase(id.guid)) {
+              if (version == null || id.version == null) {
+                  return true;
+              }
+              else if (version.trim().equalsIgnoreCase("") || id.version.trim().equalsIgnoreCase("")){
+                  return true;
+              }
+              else if (version.equalsIgnoreCase(id.version)) {
+                  return true;
+              }
+          }
+          return false;
+      }
+      else {
+          return super.equals(obj);
+      }
+   }
     
     public void setName(String name) {
         this.name = name;
@@ -90,4 +111,8 @@ public class Identification {
 	public String getPath() {
 		return path;
 	}
+ 
+ public int hashCode(){
+   return guid.toLowerCase().hashCode();
+ }
 }

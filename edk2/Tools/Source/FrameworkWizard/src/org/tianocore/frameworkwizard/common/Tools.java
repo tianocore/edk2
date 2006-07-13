@@ -304,6 +304,9 @@ public class Tools {
         if (type == DataType.RETURN_TYPE_TEXT) {
             match = DataType.FILE_EXT_SEPARATOR + DataType.TEXT_FILE_EXT;
         }
+        if (type == DataType.RETURN_TYPE_FAR_SURFACE_AREA) {
+          match = DataType.FILE_EXT_SEPARATOR + DataType.FAR_SURFACE_AREA_EXT;
+      }
         if (path.length() <= match.length()) {
             path = path + match;
             return path;
