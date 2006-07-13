@@ -303,7 +303,7 @@ public class EnumerationData {
         vModuleType.addElement("DXE_RUNTIME_DRIVER");
         vModuleType.addElement("DXE_SAL_DRIVER");
         vModuleType.addElement("DXE_SMM_DRIVER");
-        vModuleType.addElement("TOOLS");
+        vModuleType.addElement("TOOL");
         vModuleType.addElement("UEFI_DRIVER");
         vModuleType.addElement("UEFI_APPLICATION");
         vModuleType.addElement("USER_DEFINED");
@@ -358,7 +358,7 @@ public class EnumerationData {
         vFrameworkModuleTypes.addElement("DXE_RUNTIME_DRIVER");
         vFrameworkModuleTypes.addElement("DXE_SAL_DRIVER");
         vFrameworkModuleTypes.addElement("DXE_SMM_DRIVER");
-        vFrameworkModuleTypes.addElement("TOOLS");
+        vFrameworkModuleTypes.addElement("TOOL");
         vFrameworkModuleTypes.addElement("UEFI_DRIVER");
         vFrameworkModuleTypes.addElement("UEFI_APPLICATION");
         vFrameworkModuleTypes.addElement("USER_DEFINED");
