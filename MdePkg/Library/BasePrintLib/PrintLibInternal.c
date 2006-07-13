@@ -193,7 +193,7 @@ BasePrintLibConvertValueToString (
     }
   }
 
-  BasePrintLibFillBuffer (Buffer, EndBuffer, 1, 0, Increment);
+  BasePrintLibFillBuffer (Buffer, EndBuffer + Increment, 1, 0, Increment);
 
   return ((Buffer - OriginalBuffer) / Increment);
 }

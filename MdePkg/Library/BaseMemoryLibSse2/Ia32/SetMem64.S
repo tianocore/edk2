@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   SetMem64.asm
+#   SetMem64.S
 #
 # Abstract:
 #
@@ -21,43 +21,39 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
-
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_SetMem64 (
+#  InternalMemSetMem64 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT64 Value
 #    )
 #------------------------------------------------------------------------------
-.global _InternalMemSetMem64
+.globl _InternalMemSetMem64
 _InternalMemSetMem64:
-    push    %edi
-    movl    12(%esp), %ecx
-    movl    8(%esp), %edi
-    testl   $8, %edi
-    movddup 16(%esp), %xmm0
-    jz      L0
-    movq    %xmm0, (%edi)
-    addl    $8, %edi
+    movl    4(%esp), %eax
+    movl    8(%esp), %ecx
+    testb   $8, %al
+    movl    %eax, %edx
+    movq    0xc(%esp), %xmm0
+    jz      L1
+    movq    %xmm0, (%edx)
+    addl    $8, %edx
     decl    %ecx
-L0: 
-    movl    %ecx, %edx
+L1: 
     shrl    %ecx
     jz      @SetQwords
-L1: 
-    movntdq %xmm0, (%edi)
-    addl    $16, %edi
-    loop    L1
+    movlhps %xmm0, %xmm0
+L2: 
+    movntdq %xmm0, (%edx)
+    leal    16(%edx), %edx
+    loop    L2
     mfence
 @SetQwords: 
-    testb   $1, %dl
-    jz      L2
-    movq    %xmm0, (%edi)
-L2: 
-    pop     %edi
+    jnc     L3
+    movq    %xmm0, (%edx)
+L3: 
     ret
+
+
+

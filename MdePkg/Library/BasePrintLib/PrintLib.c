@@ -550,7 +550,7 @@ BasePrintLibVSPrint (
   //
   // Null terminate the Unicode or ASCII string
   //
-  BasePrintLibFillBuffer (Buffer, EndBuffer, 1, 0, BytesPerOutputCharacter);
+  BasePrintLibFillBuffer (Buffer, EndBuffer + BytesPerOutputCharacter, 1, 0, BytesPerOutputCharacter);
   //
   // Make sure output buffer cannot contain more than PcdMaximumUnicodeStringLength
   // Unicode characters if PcdMaximumUnicodeStringLength is not zero. 
