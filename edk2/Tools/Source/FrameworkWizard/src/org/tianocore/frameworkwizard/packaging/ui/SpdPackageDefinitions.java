@@ -154,7 +154,7 @@ public class SpdPackageDefinitions extends IInternalFrame {
             jComboBoxRePackage.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (docConsole != null) {
-                    docConsole.setSaved(false);
+                        docConsole.setSaved(false);
                     }
                     sfc.setSpdPkgDefsRePkg(jComboBoxRePackage.getSelectedItem()+"");
                 }
