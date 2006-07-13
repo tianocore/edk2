@@ -80,6 +80,7 @@ BasePrintLibVSPrint (
   )
 {
   CHAR8           *OriginalBuffer;
+  CHAR8           *EndBuffer;
   CHAR8           ValueBuffer[MAXIMUM_VALUE_CHARACTERS];
   UINTN           BytesPerOutputCharacter;
   UINTN           BytesPerFormatCharacter;
@@ -110,13 +111,22 @@ BasePrintLibVSPrint (
   }
   ASSERT (Buffer != NULL);
 
-  OriginalBuffer = Buffer;
-
   if ((Flags & OUTPUT_UNICODE) != 0) {
     BytesPerOutputCharacter = 2;
   } else {
     BytesPerOutputCharacter = 1;
   }
+
+  //
+  // Reserve space for the Null terminator.
+  //
+  BufferSize--;
+  OriginalBuffer = Buffer;
+  //
+  // Set the tag for the end of the input Buffer.
+  //
+  EndBuffer      = Buffer + BufferSize * BytesPerOutputCharacter;
+
   if ((Flags & FORMAT_UNICODE) != 0) {
     //
     // Make sure format string cannot contain more than PcdMaximumUnicodeStringLength
@@ -135,10 +145,7 @@ BasePrintLibVSPrint (
     FormatMask = 0xff;
   }
 
-  //
-  // Reserve space for the Null terminator.
-  //
-  BufferSize--;
+
 
   //
   // Get the first character from the format string
@@ -148,7 +155,7 @@ BasePrintLibVSPrint (
   //
   // Loop until the end of the format string is reached or the output buffer is full
   //
-  while (FormatCharacter != 0 && BufferSize > 0) {
+  while (FormatCharacter != 0 && Buffer < EndBuffer) {
     //
     // Clear all the flag bits except those that may have been passed in
     //
@@ -243,13 +250,6 @@ BasePrintLibVSPrint (
           break;
         }
       } 
-
-      //
-      // Limit the maximum field width to the remaining characters in the output buffer
-      //
-      if (Width > BufferSize) {
-        Width = BufferSize;
-      }
 
       //
       // Handle each argument type
@@ -477,12 +477,6 @@ BasePrintLibVSPrint (
       }
     }
 
-    //
-    // Limit the length of the string to append to the remaining characters in the output buffer
-    //
-    if (Count > BufferSize) {
-      Count = BufferSize;
-    }
     if (Precision < Count) {
       Precision = Count;
     }
@@ -491,18 +485,18 @@ BasePrintLibVSPrint (
     // Pad before the string
     //
     if ((Flags & (PAD_TO_WIDTH | LEFT_JUSTIFY)) == (PAD_TO_WIDTH)) {
-      Buffer = BasePrintLibFillBuffer (Buffer, Width - Precision, ' ', BytesPerOutputCharacter);
+      Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Precision, ' ', BytesPerOutputCharacter);
     }
 
     if (ZeroPad) {
       if (Prefix != 0) {
-        Buffer = BasePrintLibFillBuffer (Buffer, 1, Prefix, BytesPerOutputCharacter);
+        Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, Prefix, BytesPerOutputCharacter);
       }
-      Buffer = BasePrintLibFillBuffer (Buffer, Precision - Count, '0', BytesPerOutputCharacter);
+      Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Precision - Count, '0', BytesPerOutputCharacter);
     } else {
-      Buffer = BasePrintLibFillBuffer (Buffer, Precision - Count, ' ', BytesPerOutputCharacter);
+      Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Precision - Count, ' ', BytesPerOutputCharacter);
       if (Prefix != 0) {
-        Buffer = BasePrintLibFillBuffer (Buffer, 1, Prefix, BytesPerOutputCharacter);
+        Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, Prefix, BytesPerOutputCharacter);
       }
     }
 
@@ -520,7 +514,7 @@ BasePrintLibVSPrint (
     while (Index < Count) {
       ArgumentCharacter = ((*ArgumentString & 0xff) | (*(ArgumentString + 1) << 8)) & ArgumentMask;
 
-      Buffer = BasePrintLibFillBuffer (Buffer, 1, ArgumentCharacter, BytesPerOutputCharacter);
+      Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ArgumentCharacter, BytesPerOutputCharacter);
       ArgumentString    += BytesPerArgumentCharacter;
       Index++;
       if (Comma) {
@@ -529,7 +523,7 @@ BasePrintLibVSPrint (
           Digits = 0;
           Index++;
           if (Index < Count) {
-            Buffer = BasePrintLibFillBuffer (Buffer, 1, ',', BytesPerOutputCharacter);
+            Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ',', BytesPerOutputCharacter);
           }
         }
       }
@@ -539,13 +533,8 @@ BasePrintLibVSPrint (
     // Pad after the string
     //
     if ((Flags & (PAD_TO_WIDTH | LEFT_JUSTIFY)) == (PAD_TO_WIDTH | LEFT_JUSTIFY)) {
-      Buffer = BasePrintLibFillBuffer (Buffer, Width - Precision, ' ', BytesPerOutputCharacter);
+      Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Precision, ' ', BytesPerOutputCharacter);
     }
-
-    //
-    // Reduce the number of characters
-    //
-    BufferSize -= Count;
 
     //
     // Get the next character from the format string
@@ -561,7 +550,7 @@ BasePrintLibVSPrint (
   //
   // Null terminate the Unicode or ASCII string
   //
-  BasePrintLibFillBuffer (Buffer, 1, 0, BytesPerOutputCharacter);
+  BasePrintLibFillBuffer (Buffer, EndBuffer, 1, 0, BytesPerOutputCharacter);
   //
   // Make sure output buffer cannot contain more than PcdMaximumUnicodeStringLength
   // Unicode characters if PcdMaximumUnicodeStringLength is not zero. 
@@ -999,7 +988,8 @@ AsciiSPrintUnicodeFormat (
                   Unicode string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.
-  @param  Width   The maximum number of Unicode characters to place in Buffer.
+  @param  Width   The maximum number of Unicode characters to place in Buffer, not including
+                  the Null-terminator.
   
   @return The number of Unicode characters in Buffer not including the Null-terminator.
 
@@ -1046,7 +1036,8 @@ UnicodeValueToString (
                   ASCII string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.
-  @param  Width   The maximum number of ASCII characters to place in Buffer.
+  @param  Width   The maximum number of ASCII characters to place in Buffer, not including
+                  the Null-terminator.
   
   @return The number of ASCII characters in Buffer not including the Null-terminator.
 

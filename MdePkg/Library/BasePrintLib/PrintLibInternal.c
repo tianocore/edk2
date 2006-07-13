@@ -25,6 +25,8 @@ static CONST CHAR8 mHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B',
   Internal function that places ASCII or Unicode character into the Buffer.
 
   @param  Buffer      Buffer to place the Unicode or ASCII string.
+  @param  EndBuffer   The end of the input Buffer. No characters will be
+                      placed after that. 
   @param  Length      Count of character to be placed into Buffer.
   @param  Character   Character to be placed into Buffer.
   @param  Increment   Character increment in Buffer.
@@ -35,6 +37,7 @@ static CONST CHAR8 mHexStr[] = {'0','1','2','3','4','5','6','7','8','9','A','B',
 CHAR8 *
 BasePrintLibFillBuffer (
   CHAR8   *Buffer,
+  CHAR8   *EndBuffer,
   INTN    Length,
   UINTN   Character,
   INTN    Increment
@@ -42,7 +45,7 @@ BasePrintLibFillBuffer (
 {
   INTN  Index;
 
-  for (Index = 0; Index < Length; Index++) {
+  for (Index = 0; Index < Length && Buffer < EndBuffer; Index++) {
     *Buffer       =  (CHAR8) Character;
     *(Buffer + 1) =  (CHAR8) (Character >> 8);
     Buffer        += Increment;
@@ -117,7 +120,8 @@ BasePrintLibValueToString (
   @param  Flags     The bitmask of flags that specify left justification, zero pad,
                     and commas.
   @param  Value     The 64-bit signed value to convert to a string.
-  @param  Width      The maximum number of characters to place in Buffer.
+  @param  Width     The maximum number of characters to place in Buffer, not including
+                    the Null-terminator.
   @param  Increment Character increment in Buffer.
   
   @return The number of characters in Buffer not including the Null-terminator.
@@ -133,6 +137,7 @@ BasePrintLibConvertValueToString (
   )
 {
   CHAR8  *OriginalBuffer;
+  CHAR8  *EndBuffer;
   CHAR8  ValueBuffer[MAXIMUM_VALUE_CHARACTERS];
   UINTN  Count;
   UINTN  Digits;
@@ -154,17 +159,21 @@ BasePrintLibConvertValueToString (
   if (Width == 0) {
     Width = MAXIMUM_VALUE_CHARACTERS - 1;
   }
+  //
+  // Set the tag for the end of the input Buffer.
+  //
+  EndBuffer = Buffer + Width * Increment;
 
   if (Value < 0) {
     Value = -Value;
-    Buffer = BasePrintLibFillBuffer (Buffer, 1, '-', Increment);
+    Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, '-', Increment);
     Width--;
   }
 
   Count = BasePrintLibValueToString (ValueBuffer, Value, 10);
 
   if ((Flags & PREFIX_ZERO) != 0) {
-    Buffer = BasePrintLibFillBuffer (Buffer, Width - Count, '0', Increment);
+    Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Count, '0', Increment);
   }
 
   Digits = Count % 3;
@@ -172,19 +181,19 @@ BasePrintLibConvertValueToString (
     Digits = 3 - Digits;
   }
   for (Index = 0; Index < Count; Index++) {
-    Buffer = BasePrintLibFillBuffer (Buffer, 1, ValueBuffer[Count - Index], Increment);
+    Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ValueBuffer[Count - Index], Increment);
     if ((Flags & COMMA_TYPE) != 0) {
       Digits++;
       if (Digits == 3) {
         Digits = 0;
         if ((Index + 1) < Count) {
-          Buffer = BasePrintLibFillBuffer (Buffer, 1, ',', Increment);
+          Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, ',', Increment);
         }
       }
     }
   }
 
-  BasePrintLibFillBuffer (Buffer, 1, 0, Increment);
+  BasePrintLibFillBuffer (Buffer, EndBuffer, 1, 0, Increment);
 
   return ((Buffer - OriginalBuffer) / Increment);
 }

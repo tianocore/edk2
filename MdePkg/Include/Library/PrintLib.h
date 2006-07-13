@@ -394,7 +394,8 @@ AsciiSPrintUnicodeFormat (
                   Unicode string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.
-  @param  Width   The maximum number of Unicode characters to place in Buffer.
+  @param  Width   The maximum number of Unicode characters to place in Buffer, not including
+                  the Null-terminator.
   
   @return The number of Unicode characters in Buffer not including the Null-terminator.
 
@@ -438,7 +439,8 @@ UnicodeValueToString (
                   ASCII string.
   @param  Flags   The bitmask of flags that specify left justification, zero pad, and commas.
   @param  Value   The 64-bit signed value to convert to a string.
-  @param  Width   The maximum number of ASCII characters to place in Buffer.
+  @param  Width   The maximum number of ASCII characters to place in Buffer, not including
+                  the Null-terminator.
   
   @return The number of ASCII characters in Buffer not including the Null-terminator.
 
