@@ -508,7 +508,7 @@ public class FpdHeader extends IInternalFrame {
         if (ffc.getFpdHdrSpec() != null) {
             jTextFieldSpecification.setText(ffc.getFpdHdrSpec());
         }
-            
+        ffc.setFpdHdrSpec(jTextFieldSpecification.getText());    
     }
 
     /**

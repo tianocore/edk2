@@ -213,26 +213,16 @@ public class FpdFileContents {
         while(li.hasNext()) {
             ModuleSADocument.ModuleSA msa = (ModuleSADocument.ModuleSA)li.next();
             if (msa.getModuleGuid().equals(s[0]) && msa.getPackageGuid().equals(s[2])) {
-//                if (msa.getModuleVersion() != null) {
-//                    if (!msa.getModuleVersion().equals(s[1])) {
-//                        continue;
-//                    }
-//                }
-//                else{
-//                    if (s[1] != null) {
-//                        continue;
-//                    }
-//                }
-//                if (msa.getPackageVersion() != null) {
-//                    if (!msa.getPackageVersion().equals(s[3])) {
-//                        continue;
-//                    }
-//                }
-//                else{
-//                    if (s[3] != null) {
-//                        continue;
-//                    }
-//                }
+                if (msa.getModuleVersion() != null) {
+                    if (!msa.getModuleVersion().equals(s[1])) {
+                        continue;
+                    }
+                }
+                if (msa.getPackageVersion() != null) {
+                    if (!msa.getPackageVersion().equals(s[3])) {
+                        continue;
+                    }
+                }
                 return msa;
             }
         }
