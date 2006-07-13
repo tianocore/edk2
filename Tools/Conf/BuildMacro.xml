@@ -55,7 +55,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <EXTRA.INC/>
               <argument value="${CC_FLAGS}"/>
               <EXTRA.ARG/>
-              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
         </sequential>
@@ -103,7 +103,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <EXTRA.INC/>
               <argument value="${CC_FLAGS}"/>
               <EXTRA.ARG/>
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
         </sequential>
@@ -139,7 +139,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                      outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i">
               <EXTRA.INC/>
               <argument value="${PP_FLAGS}"/>
-              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
     
@@ -221,7 +221,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}">
               <EXTRA.INC.1/>
               <argument value="${PP_FLAGS}"/>
-              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
 
@@ -247,7 +247,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <argument value="${ASM_FLAGS}"/>
               <EXTRA.ARG.1/>
       
-              <fileset casesensitive="off" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
+              <fileset casesensitive="on" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
             </command>
           </cc>
         </sequential>
@@ -288,7 +288,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <argument value="${ASM_FLAGS}"/>
               <EXTRA.ARG.1/>
       
-              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
         </sequential>
@@ -333,7 +333,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="PP" cmd="${PP}" workdir="${DEST_DIR_OUTPUT}/@{FILEPATH}" family="${PP_FAMILY}">
               <EXTRA.INC.1/>
               <argument value="${PP_FLAGS}"/>
-              <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+              <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
             </command>
           </cc>
       
@@ -344,7 +344,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <EXTRA.INC.1/>
               <argument value="${ASM_FLAGS}"/>
               <EXTRA.ARG.1/>
-              <fileset casesensitive="off" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
+              <fileset casesensitive="on" file="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.i"/>
             </command>
           </cc>
         </sequential>
@@ -375,7 +375,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <EXTRA.ARG/>
           <OutputFile File="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj"/>
   
-          <fileset casesensitive="off" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
+          <fileset casesensitive="on" file="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}"/>
         </command>
       </cc>
     </sequential>
@@ -396,7 +396,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <fileset casesensitive="off" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+          <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
         </sourcefiles>
         <targetfiles>
           <file name="${BIN_DIR}/@{FILENAME}.lib"/>
@@ -408,7 +408,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                 outputFile="${BIN_DIR}/@{FILENAME}.lib">
               <argument value="${SLINK_FLAGS}"/>
 
-              <fileset casesensitive="off" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+              <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
             </command>
           </cc>
         </sequential>
@@ -520,7 +520,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                      outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj">
               <argument value="${CC_FLAGS}"/>
               <EXTRA.INC />
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c"/>
+              <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}Strings.c"/>
             </command>
           </cc>
         </sequential>
@@ -573,7 +573,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <argument value="${CC_FLAGS}"/>
               <EXTRA.INC/>
               <EXTRA.ARG/>
-              <fileset casesensitive="off" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.c"/>
+              <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.c"/>
             </command>
           </cc>
           <delete file="${PLATFORM_DIR}/@{FILENAME}.i" />
@@ -618,7 +618,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <OnDependency>
         <sourcefiles>
           <file list="${LIBS}"/>
-          <fileset casesensitive="off" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+          <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
@@ -630,7 +630,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib">
               <argument value="${SLINK_FLAGS}"/>
 
-              <fileset casesensitive="off" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+              <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
             </command>
           </cc>
           <cc userdefine="on">
