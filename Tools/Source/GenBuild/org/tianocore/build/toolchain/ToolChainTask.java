@@ -50,8 +50,6 @@ public class ToolChainTask extends Task{
     **/
     public void execute() throws BuildException {
         String toolChain = getProject().getProperty(toolsEnv);
-//        ToolChainConfig toolchain = new ToolChainConfig(new File(confPath + File.separatorChar + toolChain));
-        //getProject().setProperty("TARGET", toolchain.getCurrentTarget());
     }
 
     /**

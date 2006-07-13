@@ -1,3 +1,16 @@
+/** @file
+This file is to define  ToolChainInfo class.
+
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
+
 package org.tianocore.build.toolchain;
 
 import java.util.HashMap;
@@ -6,17 +19,31 @@ import java.util.Map;
 import java.util.Set;
 
 public class ToolChainInfo {
-
+    //
+    // build target set
+    // 
     private Set<String> targets = new LinkedHashSet<String>();
-    
+    //
+    // tool chain tag name set
+    // 
     private Set<String> tagnames = new LinkedHashSet<String>();
-    
+    //
+    // build archs set
+    // 
     private Set<String> archs = new LinkedHashSet<String>();
-    
+    //
+    // build commands set
+    // 
     private Set<String> commands = new LinkedHashSet<String>();
-
+    //
+    // build commands for specific tool chain
+    // 
     private Map<String, Set<String>> commandMap = new HashMap<String, Set<String>>();
-    
+    /**
+     Add a list of targets in the form of string separated by space
+
+     @param targetList target list string
+     **/
     public void addTargets(String targetList) {
         //
         // targetList some targets separated by space " "
@@ -27,7 +54,11 @@ public class ToolChainInfo {
         }
         addTargets(targetList.split(" "));
     }
-    
+    /**
+     Add a list of targets in the form of string array
+     
+     @param targetArray target string array
+     **/
     public void addTargets(String[] targetArray) {
         if (targetArray == null ) {
             return ;
@@ -36,11 +67,19 @@ public class ToolChainInfo {
             targets.add(targetArray[i]);
         }
     }
-    
+    /**
+     Add a list of target in the form of set
+     
+     @param targetSet target string set
+     **/
     public void addTargets(Set<String> targetSet) {
         targets.addAll(targetSet);
     }
-    
+    /**
+       Add a list of tool chain tag name in the form of string separated by space
+
+       @param tagnameList
+     **/
     public void addTagnames(String tagnameList) {
         //
         // tagnameList some tagnames separated by space " "
@@ -142,18 +181,14 @@ public class ToolChainInfo {
         result.addTargets(union(this.targets, info.targets));
         result.addTagnames(union(this.tagnames, info.tagnames));
         result.addArchs(union(this.archs, info.archs));
-        //result.addCommands(union(this.getCommands(), info.getCommands()));
         return result;
     }
     
     public ToolChainInfo intersection(ToolChainInfo info) {
-//        System.out.println(this + "\n" + info);
         ToolChainInfo result = new ToolChainInfo();
         result.addTargets(intersection(this.targets, info.targets));
         result.addTagnames(intersection(this.tagnames, info.tagnames));
         result.addArchs(intersection(this.archs, info.archs));
-        // result.addCommands(union(this.commands, info.commands));
-//        System.out.println("result: " + result);
         return result;
     }
     
@@ -182,7 +217,6 @@ public class ToolChainInfo {
             result.retainAll(set2);
         }
 
-//        result.remove("*");
         return result;
     }
     

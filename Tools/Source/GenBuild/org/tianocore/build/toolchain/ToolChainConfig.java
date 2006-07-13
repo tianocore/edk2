@@ -1,8 +1,7 @@
 /** @file
-  ToolChainFactory class.
+  ToolChainConfig class.
   
-  ToolChainFactory class parse all config files and get STD_FLAGS, GLOBAL_FLAGS,
-  and also command path + name.
+  ToolChainFactory class parse all config files and get tool chain information.
   
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -27,38 +26,30 @@ import java.util.Set;
 
 
 /**
-  This class parse all config files and get STD_FLAGS, GLOBAL_FLAGS, and also 
-  command path + name.
+ 
+  ToolChainFactory class parse all config files and get tool chain information.
   
-  @since GenBuild 1.0
-**/
+ **/
 public class ToolChainConfig {
-    ///
-    /// list of attributes
-    ///
-    private final static String[] attributes = {"NAME", "PATH", "DPATH", "SPATH", "EXT", "FAMILY", "FLAGS"};
-    ///
-    /// elements which are used to define one type of tool
-    ///
-    private final static String[] elements = {"TARGET", "TOOLCHAIN", "ARCH", "CMD", "ATTRIBUTE" };
-
     ///
     /// tool chain definitions
     ///
     private ToolChainMap config = null;
+    ///
+    /// tool chain information (how many targets, archs, etc.)
+    /// 
     private ToolChainInfo info = new ToolChainInfo();
 
     /**
       Public construct method.
-    **/
+     **/
     public ToolChainConfig () {
     }
 
     /**
       Public construct method.
       
-      @param confPath the path of config files
-      @param toolChainTag TOOL_CHAIN name
+      @param toolChainFile File object representing the tool chain configuration file
     **/
     public ToolChainConfig (File toolChainFile) {
         try {
@@ -70,10 +61,13 @@ public class ToolChainConfig {
         }
     }
 
-    /// 
-    /// 
-    /// 
-    public void parseToolChainDefKey (Set<ToolChainKey> toolChainDefKey) {
+    /**
+     Collect target, tool chain tag, arch and command information from key part
+     of configuration
+      
+     @param toolChainDefKey The set of keys in tool chain configuration
+     **/
+    private void parseToolChainDefKey (Set<ToolChainKey> toolChainDefKey) {
         Iterator it = toolChainDefKey.iterator();
         while (it.hasNext()) {
             ToolChainKey key = (ToolChainKey)it.next();
@@ -85,47 +79,29 @@ public class ToolChainConfig {
         }
     }
 
-/**
-     public Set<String> getTargets() {
-         return info.getTargets();
-     }
-
-     public Set<String> getTagnames() {
-         return info.getTagnames();
-     }
-
-     public Set<String> getArchs() {
-         return info.getArchs();
-     }
-
-     public Set<String> getCommands() {
-         return info.getCommands();
-     }
-
-     public String getValue(String key) {
-         return config.get(key);
-     }
-
-     public String getValue(String[] keySet) {
-         return config.get(keySet);
-     }
-
-     public String getValue(ToolChainKey key) {
-         return config.get(key);
-     }
- **/
-
+    /**
+     Return the tool chain configuration information in a Map form 
+      
+     @return ToolChainMap Tool chain configurations in a ToolChainMap
+     **/
     public ToolChainMap getConfig() {
         return config;
     }
 
+    /**
+     Return the tool chain's target, arch, tag and commands information
+     
+      @return ToolChainInfo
+     **/
     public ToolChainInfo getConfigInfo() {
         return info;
     }
 
-    ///
-    /// override toString()
-    /// 
+    /**
+     override toString()
+     
+     @return String The converted configuration string in name=value form
+     **/
     public String toString() {
         StringBuffer ts = new StringBuffer(10240);
 
@@ -133,7 +109,7 @@ public class ToolChainConfig {
         while (it.hasNext()) {
             ToolChainKey key = (ToolChainKey)it.next();
             ts.append(key.toString() + " = ");
-//            ts.append(config.get(key) + "\n");
+            ts.append(config.get(key) + "\n");
         }
 
         return ts.toString();
