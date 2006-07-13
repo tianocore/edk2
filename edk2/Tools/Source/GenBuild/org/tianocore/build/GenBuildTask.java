@@ -194,14 +194,7 @@ public class GenBuildTask extends Ant {
         // If single module : intersection MSA supported ARCHs and tools def!!
         // else, get arch from pass down
         //
-        String[] archList = new String[0];
-        if ( getProject().getProperty("ARCH") != null ) {
-            archList = getProject().getProperty("ARCH").split(" ");
-        }
-        else {
-            archList = GlobalData.getToolChainInfo().getArchs();
-        }
-        
+        String[] archList = GlobalData.getToolChainInfo().getArchs();        
         
         //
         // Judge if arch is all supported by current module. If not, throw Exception.
