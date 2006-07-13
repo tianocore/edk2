@@ -1,8 +1,11 @@
 Intel(R) Platform Innovation Framework for EFI
 EFI Development Kit II (EDK II) 
 Root Package 1.00
-2006-07-12
+2006-07-13
 
+Intel is a trademark or registered trademark of Intel Corporation or its 
+subsidiaries in the United States and other countries.
+* Other names and brands may be claimed as the property of others.
 Copyright (c) 2006, Intel Corporation
 
 This document provides updates to documentation, along with a description on 
@@ -11,47 +14,46 @@ how to install and build the EDK II.
 Package Contents
 ----------------
   ReleaseNote.txt- These release notes for the package.
-  MdePkg         - A package containing Industry Standard headers and libraries
-  Tools          - A package containing Build Specific tools which are designed
-                   to help the developer create and modify drivers and
-                   libraries
-  EdkModulePkg   - A package containing reference drivers
-  EdkFatBinPkg   - A package containing binary DXE drivers for the Fat 32 file
-                   system
-  EdkShellBinPkg - A package containing binary Shell applications and commands
-  EdkNt32Pkg     - A package containing the NT32 Emulation platform reference
+  MdePkg         - Industry-standard headers and libraries
+  Tools          - Build -specific tools that are designed to help the 
+                   developer create and modify drivers and libraries
+  EdkModulePkg   - Reference drivers
+  EdkFatBinPkg   - Binary DXE drivers for the Fat 32 file system
+  EdkShellBinPkg - Binary Shell applications and commands
+  EdkNt32Pkg     - NT32 Emulation platform reference
 
 Note: MDE and MDK that appear in other documentation refer to the MdePkg and
-Tools packages.  These two packages are the minimum requirement for developing
-EDK II Packages.  It is also recommended that the top level files included
-with the EDK be downloaded in conjunction with these two packages.
+Tools packages, respectively.  While, these two packages are the minimum 
+requirement for developing EDK II Packageswe recommend that you download all 
+of the top-level files listed above.
 
-The following package will be available as a separate project, under a 
-different license, on the TianoCore website: https://fat-driver2.tianocore.org
+The following package is available as a separate project, under a separate 
+license, on the TianoCore.org website: https://fat-driver2.tianocore.org
 
   EdkFatPkg      - A package containing source DXE drivers for the Fat 32 file
                    system
 
-Note: Documents have the following filenames:
-  EDK II Module Development Environment Library Specification v0.50 
-      (MDE_Library_Spec_0_50.rtf)
-  EDK II Build and Packaging Architecture Specification v0.50
-      (Build_Packaging_Spec_0_50.rtf)
-  EDK II Platform Configuration Database Infrastructure Description v0.51
-      (PCD_Infrastructure_0_51.rtf)
-  EDK II Module Surface Area v0.50
+Documents have the following filenames (to download these documents, see “Notes 
+on Documentation” later in these Release Notes):
+  EDK II Module Development Environment Library Specification, v0.58 
+      (MDE_Library_Spec_0_58.rtf)
+  EDK II Build and Packaging Architecture Specification, v0.53
+      (Build_Packaging_Spec_0_53.rtf)
+  EDK II Platform Configuration Database Infrastructure Description, v0.54
+      (PCD_Infrastructure_0_54.rtf)
+  EDK II Module Surface Area Specification, v0.51
       (Module_Surface_Area_0_50.rtf)
-  EDK II Module Development Environment (MDE) Package Specification v0.50
-      (MDE_Package_Spec_0_50.rtf)
-  EDK II C Coding Standards Specification v0.50
-      (C_Coding_Standards_Specification_ 0_50.rtf)
+  EDK II Module Development Environment Package Specification, v0.51
+      (MDE_Package_Spec_0_51.rtf)
+  EDK II C Coding Standards Specification v0.51
+      (C_Coding_Standards_Specification_ 0_51.rtf)
   EDK II Subversion Setup Guide
       (edk2-subversion-setup.rtf)
 
 Pre-Requisites
 --------------
 The following list of tools must be installed on the development workstation
-prior to using the Edk II.
+prior to using the EDK II.
 
 Compiler Tool Chain
       Microsoft* Visual Studio .NET 2003*  (http://www.microsoft.com)
@@ -75,8 +77,8 @@ Java Tools
     Saxon8, version 8.1.1
       (http://prdownloads.sourceforge.net/saxon/saxonb8-1-1.zip?download)
     XMLBeans, version 2.1.0 (http://xmlbeans.apache.org)
-      DO NOT download the latest XMLBeans, version 2.2.0. It cannot work with
-      Saxon8, version 8.1.1.
+      DO NOT download the latest XMLBeans, version 2.2.0. It is not compatible 
+      with Saxon8, version 8.1.1.
 
 Other Tools
     TortoiseSVN version 1.3.3. (http://tortoisesvn.tigris.org/)
@@ -84,77 +86,81 @@ Other Tools
 Optional Tools
 --------------
 Compiler Tool Chains:
-    Intel C++ Compiler for Windows, ver. 9.0 or later (http://www.intel.com)
-    Intel C Compiler for EFI Byte Code, ver. 1.2 or later 
+    Intel(R) C++ Compiler for Windows*, ver. 9.0 or later (http://www.intel.com)
+    Intel(R) C Compiler for EFI Byte Code, ver. 1.2 or later 
       (http://www.intel.com/cd/software/products/asmo-na/eng/compilers/efibc/index.htm)
     Microsoft Driver Development Kit, version 3790.1830 or later
       (http://www.microsoft.com/whdc/devtools/ddk/orderddkcd.mspx)
     Microsoft ACPI Source Language Assembler, Version 1.0.13NT or later
     Intel ACPI Component Architecture, version 20060113
 
------------------------
-Notes On Required Tools (Source Control System)
------------------------
+-----------------------------------------------
+Notes on Required Tools (Source Control System)
+-----------------------------------------------
 The EDK II is being managed by the Subversion Source Control on Tianocore.org.
-This software package provides speed, security, and additional features. The
+Subversion provides speed, security, and additional features. The
 recommended client is TortoiseSVN version 1.3.3. 
  (Available at http://tortoisesvn.tigris.org/)
 
-There are instructions for the use of Subversion Source Control on the
-Tianocore.org website, as part of the checkout procedures.
+The checkout procedures on the Tianocore.org Web site include
+instructions for the use of Subversion Source Control.
 
 The URL of the EDK II repository is:
   https://edk2.tianocore.org/svn/edk2/trunk/edk2
 
 
------------------------
-Notes On Required Tools (With examples for Windows, OS X, and Linux) 
------------------------
+--------------------------------------------------------------------
+Notes On Required Tools (With examples for Windows, OS X, and Linux*) 
+--------------------------------------------------------------------
 Software Installation Order:
-  After installing the compiler tools and your Subversion client, the following
-  required tools should be installed in order: 
-    Java JDK, Apache-Ant, ant-contrib, xmlbeans, saxon8
+  After installing the compiler tools and your Subversion client, install the 
+  following required tools in this order: 
+    1. Java JDK
+    2. Apache-Ant
+    3. ant-contrib
+    4. xmlbeans
+    5. saxon8
 
 Java Development Kit:
  
    The Java Environment Variable must be set before attempting to build.
-       For Sun JDK (see note below*):
+       For Sun JDK (see note below†):
               set JAVA_HOME=c:\Java\jdk1.5.0_06  (Windows example)
               export JAVA_HOME=/Library/Java/Home/ (OS X example)
               export JAVA_HOME=/usr/lib/j2sdk1.5-sun/ (Linux example)
        For Bea Systems:
               set JAVA_HOME=c:\Java\jrockit-R26.0.0-jdk1.5.0_04
  
-  *When using the Sun JDK5.0
+  † When using the Sun JDK5.0:
     During installation, you should specify the install directory as C:\Java
     instead of C:\Program Files\(or some other drive letter.)  While installing
-    to this non-standard location is not required. In use, it seems to work 
+    to this non-standard location is not required, in practice, it seems to work 
     more reliably. 
-    For the JDK, the install path would be C:\Java\jdk1.5.0_06
-    For the JRE, the install path would be C:\Java\jre1.5.0_06
+    For the JDK, the install path is C:\Java\jdk1.5.0_06
+    For the JRE, the install path is C:\Java\jre1.5.0_06
     Alternatively, you can specify C:\sunjavajdk and C:\sunjavajre.
 
-    NOTE: You cannot combine the location for the JDK and the JRE, as the JRE
-    install removes most of the binaries and libraries installed by the JDK
+    NOTE: You cannot combine the location for the JDK and the JRE, because the 
+    JRE install removes most of the binaries and libraries installed by the JDK
     install.
 
 Java Tools:
     The Apache-ANT requires the ANT_HOME environment variable to be set before
     attempting to build:
-         i.e.  set ANT_HOME=c:\<full path to where ant was installed>
+         set ANT_HOME=c:\<full path to where ant was installed>
           export ANT_HOME=~/ExternalTools/apache-ant (OS X and Linux example)
 
     The ant-contrib.jar file should be installed in the %ANT_HOME%\lib 
     directory.
 
-    The XMLBeans, requires the XMLBEANS_HOME environment variable to be set
+    XMLBeans, requires the XMLBEANS_HOME environment variable to be set
     before attempting to build:
-         i.e. set XMLBEANS_HOME=C:\<full path to where xmlbeans was installed>
+         set XMLBEANS_HOME=C:\<full path to where xmlbeans was installed>
           export XMLBEANS_HOME=~/ExternalTools/xmlbeans (OS X and Linux example)
 
-    The saxon8.jar file should be copied to the %XMLBEANS_HOME%\lib directory.
+    Copy the saxon8.jar file to the %XMLBEANS_HOME%\lib directory.
 
-   The Ant and XMLBean tools are required to be in the path.
+   The Ant and XMLBean tools must be in the path.
      MS system example:
         set PATH=%PATH%;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin
      Linux/OS X bash shell example:
@@ -166,261 +172,275 @@ A Word on Apache-ANT
 The Apache-ANT program is a build tool that uses XML-based project files.
 Similar to Makefiles, these project files may contain multiple targets.  Most
 build.xml files in EDK II are auto-generated; any edits performed on the
-build.xml files will be overwritten the next time build is executed.
+build.xml files will be overwritten by the next build.
 
 Pre-defined targets in the build.xml file include:
-    all      - This target builds binaries for defined architectures
-    clean    - This target removes object files generated by commands
+    all      - This target builds binaries for defined architectures.
+    clean    - This target removes object files generated by commands.
     cleanall - This target removes all generated files and directories.
 
-------------------------
-A Word on GCC tool chain
-------------------------
+----------------------------
+A Word on the GCC Tool Chain
+----------------------------
 EDK II will not compile with a standard Linux gcc tool chain. While Linux
 distributions are usually based on ELF, EDK II requires a version of gcc 
 that is configured to produce PE-COFF images. You will find a script in 
 edk2/Tools/gcc that will download, configure, compile, and install a gcc 
-4.X cross-compile tool chain for EDK II development. It has support for 
-the IA32 architecture. It can be built and run on Cygwin, Linux, and many 
-other POSIX compliant host operating environments. There are a few tools
-that you will need on your host computer in order to compile the tool 
-chain. Among them are bash, gcc, gmake, curl (or wget).
+4.X cross-compile tool chain for EDK II development. This custom tool chain 
+supports the IA-32 architecture. It can be built and run on Cygwin, Linux, and 
+many other POSIX-compliant host operating environments. To compile the custom 
+gcc tool chain, you need the following tools on your host computer: bash, gcc, 
+gmake, curl (or wget).
 
 
 -----------------------
-Notes On Documentation
+Notes on Documentation
 -----------------------
 The documents are being managed by the Subversion Source Control on
 Tianocore.org.  The document repository is "docs" and must be checked out
 separately from the EDK II source tree. Refer to the checkout procedures on
-the Tianocore.org website for EDK II.
+the Tianocore.org Web site for EDK II.
 
 The URL of the document repository is:
   https://edk2.tianocore.org/svn/edk2/trunk/docs
 
  
 -------------------------------------------------------------------------------
-Quick Start 
+Quick Start
 -----------
-(assumes Microsoft Tools and OS Environment, for GCC Tools or Unix, please see 
+(assumes Microsoft Tools and OS environment, for GCC Tools or Linux, see 
 "Detailed Starting Instructions" below)
 
 Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
-checkout the entire EDK II source tree.
+check out the entire EDK II source tree.
 
-In a command window, change to the top level directory of the Edk II sources.
+In a command window, change to the top-level directory of the EDK II source.
 
-To test your tool chain setup and to build the Supplied Tools, execute:
+To test your tool chain setup and to build the supplied tools, execute:
     c:\MyWork\edkii\> edksetup ForceBuild
 
-(The edksetup command will be referred to as the setup command throughout the 
+(The edksetup script is referred to as the setup command throughout the 
 rest of this document.)
       NOTE: You should run the setup command at the start of every session.
             This configures the environment to include the TianoTools and the
             Java applications and libraries.
 
 You will need to set the WORKSPACE environment variable, or run the edksetup
-script (without any arguments) any time you want to build.
+script (without any arguments), any time you want to build.
 
   Set the WORKSPACE environment variable, e.g.:
 
     c:\> set WORKSPACE=C:\MyWork\edkii
 
-You may need to edit the text files, Tools/Conf/target.txt and
-Tools/Conf/tools_def.txt (created by edksetup,) using your favorite 
+You may need to edit the text files Tools/Conf/target.txt and
+Tools/Conf/tools_def.txt (created by edksetup) using your favorite 
 text editor to ensure that the paths to the tools you want to use 
 to build EDK II binaries are correct.  These files contain the default 
 paths (as per the default installation of the tools), so a customized 
 install may require this manual process.
 
-Once this is completed, you are ready to test the Build, by executing:
+Once this is completed, you are ready to test the build, by executing:
     c:\MyWork\edkii\> build
 
-This command builds active platform specified in text file target.txt. If 
-active platform is not specified, go to sub-directory which contains FPD files and
-type build. More information about active platform policy reference to specification
-<<EDK II Build and Packaging Architecture Specification>>.
+This command builds the active platform specified in text file target.txt. If 
+the active platform is not specified target.txt, you must execute the build 
+command from the sub-directory that contains FPD files. For more information 
+about the active platform policy, see the “EDK II Build and Packaging 
+Architecture Specification.”
 
 -------------------------------------------------------------------------------
-Detailed Start Instructions
----------------------------
+Detailed Starting Instructions
+------------------------------
 
 Follow the instructions at https://edk2.tianocore.org/servlets/ProjectSource to
-checkout the entire EDK II source tree.
+check out the entire EDK II source tree.
 
-In a command window, change to the top level directory of the Edk II sources.
+In a command window, change to the top-level directory of the EDK II source.
 
 If the active compiler tool chain is GCC, you must set the
 environment variable, TOOL_CHAIN to "gcc" before running the
 edksetup script.  Example: export TOOL_CHAIN=gcc
 
-To test your tool chain setup and to build the Supplied Tools, execute:
+To test your tool chain setup and to build the supplied tools, execute:
     c:\MyWork\edkii\> edksetup ForceBuild
 
-On Unix systems you must source the edksetup.sh file to load the correct
+On Linux systems, you must source the edksetup.sh file to load the correct
 settings into your shell.
 
     . edksetup.sh # Note the dot.
 
-The edksetup command will be referred to as the setup command throughout the 
-rest of this document.)
+The edksetup script is referred to as the setup command throughout the 
+rest of this document.
       NOTE: You should run the setup command at the start of every session.
             This configures the environment to include the TianoTools and the
             Java applications and libraries.
 
-Any changes to the tool source code or XML Schema documents will require that
-you run:
+Any changes to the tool source code or XML Schema documents require that
+you execute the following:
    c:\MyWork\edkii\> edksetup ForceBuild
 
-You will need to set the WORKSPACE environment variable, or run the edksetup
-script (without any arguments) any time you want to build.
+You must set the WORKSPACE environment variable, or run the edksetup
+script (without any arguments), any time you want to build.
 
   Set the WORKSPACE environment variable, e.g.:
 
     c:\> set WORKSPACE=C:\MyWork\edkii
 
-You may need to edit the text files, Tools/Conf/target.txt and
-Tools/Conf/tools_def.txt (created by edksetup,) using your favorite 
+You may need to edit the text files Tools/Conf/target.txt and
+Tools/Conf/tools_def.txt (created by edksetup) using your favorite 
 text editor to ensure that the paths to the tools you want to use 
 to build EDK II binaries are correct.  These files contain the default 
 paths (as per the default installation of the tools), so a customized 
 tool installation may require this manual process.
 
-Once this is completed, you are ready to test the Build, by executing:
+Once this is completed, you are ready to test the build, by executing:
     c:\MyWork\edkii\> build
 
-This command builds active platform specified in text file target.txt. If 
-active platform is not specified, go to sub-directory which contains FPD files and
-type build. More information about active platform policy reference to specification
-<<EDK II Build and Packaging Architecture Specification>>.
+This command builds the active platform specified in text file target.txt. If 
+the active platform is not specified, go to the sub-directory that contains FPD 
+files and execute the build command. For more information about the active 
+platform policy, see the “EDK II Build and Packaging Architecture 
+Specification.”
 
--------------------------
+--------------------------
 Individual Platform Builds
--------------------------
+--------------------------
 After running the setup command, you can build individual platforms.
-  In the command window, 
-  1. Set active platform in target.txt, and type "build" in whatever directory;
-  2. or cd to the platform (FPD file) that you want to build, and just type:
+In the command window:
+  Set the active platform in target.txt, and execute this command:
+    c:\<directory>\> build
+or
+  cd to the platform (FPD file) that you want to build and execute this command:
     c:\MyWork\edkii\EdkNt32Pkg\> build
 
-  Note that active platform with the high priority to build, that means active 
-  platform will be built even if exists FPD file under current directory. More 
-  information about active platform policy reference to specification
-  <<EDK II Build and Packaging Architecture Specification>>. 
+  Note that the active platform specified in target.txt overrides the platform 
+  specified by any FPD file in the current directory. For more   information 
+  about active platform policy, see the “EDK II Build and Packaging Architecture
+  Specification.” 
 
-Go to <full build path>\DEBUG\MSFT\IA32 and execute SecMain.exe
-to run the Nt32 emulation platform under Microsoft Windows.
+To run the Nt32 emulation platform under Microsoft Windows, go to <full build path>\DEBUG\MSFT\IA32 and execute SecMain.exe
 
-To exit the Nt32 emulation platform, you may type reset at the EFI Shell>
-command prompt.  Alternately, you may use the Graphical interface, Boot
-Maintenance Manager screen's Reset System command.
+To exit the Nt32 emulation platform, type “reset” at the EFI Shell>
+command prompt.  Alternatively, from the graphical interface, select the Boot
+Maintenance Manager's “Reset System” command.
+
+-----------------------
+Notes on Symbolic Debug
+-----------------------
+To enable EFI Symbolic Debugging, make sure the target output is set to DEBUG
+in the text file Tools/Conf/target.txt and then modify the FPD <BuildOptions>
+<Options><Option BuildTargets="DEBUG" ToolCode="CC"> and append the following
+compiler options to the string:
+"/D EFI_GENERATE_SYM_FILE", "/D EFI_SYMBOLIC_DEBUG"
+
+(If the Option line does not contain "/D EFI_DEBUG", you must add that
+option as well.)
 
 ------------------------
 Individual Module Builds
 ------------------------
 After running the setup command, you can build individual modules.
-  In the command window, cd to the module that you want to build, and just
-  type:
+  In the command window, cd to the module that you want to build, and
+  execute the build command:
     c:\MyWork\edkii\MdePkg\Library\BaseLib\> build
 
-  Note active platform must be set for individual module build. 
+  You must set the active platform in target.txt for individual module builds. 
 
 -------------------------------------------------------------------------------
 
 General Information:
 ===============================================================    
-Mechanisms:
+Mechanisms
 ----------
 A brief overview:
 
-A) Surface Area Package Description (SPD) file contains information about the
-modules that the package contains, including the location of all MSA files, and
-public library names and headers that might be provided by a module in the
+A) The Surface Area Package Description (SPD) file contains information about 
+the modules that the package contains, including the location of all MSA files, 
+and public library names and headers that might be provided by a module in the
 package.  Packages are defined by SPD files.  (Found in the root of the Package
-subdirectory (i.e. EdkNt32Pkg)) The SPD is further explained in the "EDK Build 
-and Packaging Architecture Specification" document.
+subdirectory (i.e. EdkNt32Pkg).) The SPD file is further explained in “EDK II 
+Build and Packaging Architecture Specification.”
  
 B) Module Surface Area Definition (MSA) files.  A description of a module's 
 surface area, with all module specific default flags and features specified.
-Refer to the "Module Surface Area Architecture Specification" for additional
-details. The MSA is further explained in the "EDK II Build Packaging Architecture 
-Specification" document.
+For additional details, see the "EDK II Module Surface Area Specification" and 
+the "EDK II Build and Packaging Architecture Specification."
 
 C) Framework Platform Description (FPD) files.  A description of a platform's
 surface are, including a list of modules that are needed by the platform.  To
 support individual module builds, developers are not required to provide
-information about specific flash devices, nor flash device layout.  There are
-specific sections in the FPD file that do control aspects of the build, such 
+information about specific flash devices, nor flash device layout.  
+Specific sections in the FPD file control aspects of the build, such 
 as the Supported Architectures and Build Targets, as well as the tool flags 
 that are used to create the binary files.  A valid platform file can specify 
 zero or more modules, so individual modules can be compiled within the context
 of a platform (FPD) definition.
 
-D) Platform Configuration Database (PCD).  A platform database which contains a
-variety of current platform settings or directives by which a driver or
-application can interact with.  The PCD is defined by the PCD_Protocol (This is
-further explained in the "Platform Configuration Database Infrastructure 
-Description" document.
+D) Platform Configuration Database (PCD).  A platform database that contains a
+variety of current platform settings or directives that can be accessed by a 
+driver or application.  The PCD is defined by the PCD_Protocol (This is
+further explained in the "EDK II Platform Configuration Database Infrastructure 
+Description."
 
 E) Library Class.  A library class is a logical grouping of similar functions.
 When developing components, the module surface area declares the class of
 libraries that can be used by the component. The MSA and SPD files can specify
-a recommended instance of the library that a platform integrator may select,
-however this is only a recommendation.  The PI may choose to select a different
-library instance to be used during compilation/linking. All library type modules 
-must include header files in their distribution package, as well as their MSA
-files. Components, on the other hand, need only provide an MSA and either source
-or binary files when distributing packages.  The Library Classes are further 
-explained in the "EDK II Build and Packaging Architecture Specification" 
-document.
+a recommended instance of the library that a platform integrator (PI) may 
+select, however this is only a recommendation.  The PI may choose to select a 
+different library instance to be used during compilation and linking. All 
+library type modules must include header files in their distribution package, 
+as well as their MSA files. Components, on the other hand, need provide only an 
+MSA file and either source or binary files when distributing packages.  The 
+Library Classes are further explained in the "EDK II Build and Packaging 
+Architecture Specification."
 
 =========================================================================
 The common operations by developers of new modules are:
--------------------------------------------------------
-
-1) How to manually create a new module in a package:
+-----------------------------------------------
+1) Manually creating a new module in a package:
   - The module source code must first be created in an appropriate directory
     (under the package the module is to be a part of.)  
   - An MSA file must be created, spelling out all aspects of the module.
   - The MSA must be added to the SPD for the package to include the module.
 
------------------------------------------
-2) Add/Remove module(s) to/from a package:
+-----------------------------------------------------
+2) Adding and Removing modules to and from a package:
 
-  - Setup environment as Build
-  - Add a module to a package
-     * Generate the module SurfaceArea description file
-     * Add a new <Filename> element under <MsaFiles> into
-       <PackageDir>\<PackageName>.spd, using relative path to package
-     * Add a new <ModuleSA> entry under each <FrameworkModules> into
+  - Set up environment as Build
+  - Adding a module to a package:
+     - Generate the MSA file
+     - Add a new <Filename> element under <MsaFiles> into
+       <PackageDir>\<PackageName>.spd, using arelative path to the package
+     - Add a new <ModuleSA> entry under each <FrameworkModules> into the
        <PackageDir>\<PackageName>.fpd file if necessary. 
 
-   - Remove a module from a package
-     * Comment out or remove corresponding <Filename> element under <MsaFiles>
-       from <PackageDir>\<PackageName>.spd
-     * Comment out or remove corresponding <ModuleSA> entry under each
+   - Removing a module from a package:
+     - Comment out or remove the corresponding <Filename> element under 
+       <MsaFiles> from <PackageDir>\<PackageName>.spd
+     - Comment out or remove the corresponding <ModuleSA> entry under each
        <FrameworkModules> from <PackageDir>\<PackageName>.fpd if necessary. 
 
------------------------------------
-3) How to manually create a package:
+-------------------------------
+3) Manually creating a package:
   - Identify the modules that are to be members of the project.
   - Identify the Variables and Guids required in and of the Package (including
-    consumption/production information).
+    consumption and production information).
   - Create an SPD file defining these modules and calling out their MSA files.
-  - add a new <Filename> element under <PackageList> into 
-    Tools\Conf\FrameworkDatabase.db, using the relative path to workspace. 
+  - Add a new <Filename> element under <PackageList> into 
+    Tools\Conf\FrameworkDatabase.db, using the relative path to the workspace. 
 
---------------------------------------
-4) Declare a new Protocol in a package: 
+-----------------------------------------
+4) Declaring a new Protocol in a package: 
   - This release requires manual editing of the SPD file, adding the protocol
     to the ProtocolDeclarations section of the file. 
   - Add the Protocol .h file to the Include\Protocol directory.
   - Add an <Entry> to the <ProtocolDeclarations> element in the 
     <PackageName>.spd file
-     * Each line contains Protocol base name then the global variable name and
-       then the hex value of the Protocol GUID.
+     - Each line contains Protocol base name, followed by the global variable 
+       name, and        the hex value of the Protocol GUID.
 
-Example Protocol Entries (NOTE: The Guid entry is a single line in the SPD file):
+Example Protocol Entries (NOTE: The Guid entry is a single line in the SPD 
+file):
 <ProtocolDeclarations>
   <Entry Name="Bds">
     <C_Name>gEfiBdsArchProtocolGuid</C_Name>
@@ -434,14 +454,14 @@ Example Protocol Entries (NOTE: The Guid entry is a single line in the SPD file)
   </Entry>
 </ProtocolDeclarations>
 
----------------------------------
-5) Declare a new PPI in a package:
- - This release requires manual editing of the SPD file
+------------------------------------
+5) Declaring a new PPI in a package:
+  - This release requires manual editing of the SPD file
   - Add the PPI .h file to the Include\Ppi directory.
   - Add an <Entry> to the package <PpiDeclarations> element in the 
     <PackageName>.spd file
-     * Each line contains PPI base name then the global variable name and then
-       the hex value of the PPI GUID.
+     - Each line contains the PPI base name, followed by the global variable 
+       name and        the hex value of the PPI GUID.
 
 Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
 <PpiDeclarations>
@@ -457,18 +477,18 @@ Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
   </Entry>
 </PpiDeclarations>
 
-----------------------------------
-6) Declare a new GUID in a package:
+-------------------------------------
+6) Declaring a new GUID in a package:
   - This release requires manual editing of the SPD file to include the new
     Guid.  This is identical to adding a ProtocolDeclaration or PpiDeclaration
-    element as described above.
+    element, as described above.
 
---------------------------------------- 
-7) Declare a new PCD entry in a package:
+------------------------------------------
+7) Declaring a new PCD entry in a package:
   - This release requires manual editing of the SPD file to include the new
     PCD.  New Pcd entries are added to the PcdDefinitions section of the
-    <PackageName>.spd file using the following example for the format:
-    NOTE: The hex <Token> value must be unique.
+    <PackageName>.spd file using the following example for the format
+    (NOTE: The hex <Token> value must be unique):
 
 <PcdDeclarations>
   <PcdEntry ItemType="FIXED_AT_BUILD">
@@ -483,10 +503,10 @@ Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
 </PcdDeclarations>
   
 ------------------------------
-8) Declare a new Library Class:
+8) Declaring a new Library Class:
   - This release requires manual editing of the SPD file to include the new
     Library Class.  New Library Class entries are added to the 
-    LibraryClassDeclarations seection of the <PackageName>.spd file using
+    LibraryClassDeclarations section of the <PackageName>.spd file using
     the following example for the format:
 
 <LibraryClassDeclarations>
@@ -501,26 +521,26 @@ Example Ppi Entries (NOTE: The Guid entry is a single line in the SPD file):
 </LibraryClassDeclarations>
 
 =======================================================
-Notes:
-------
+EDK II Changes Relative to the original EDK:
+--------------------------------------------
 The EDK II represents significant changes in the structure of the EDK.
-Therefore it is very difficult to isolate all of the changes of this version of
-the EDK with the previous (EDK 1.0) version.
+Therefore, it is very difficult to isolate all of the changes of this version of
+the EDK with the original EDK.
 
 Of particular note:
 
 1) EDK II contains new hardware feature support for the ICH SMBUS Libraries.
    These libraries are provided to make Memory Reference Code (MRC) development
    easier.
-2) The MDE Libraries - The MDE libraries represent significant changes in source
+2) The MDE libraries represent significant changes in source
    (with only limited changes in functionality.)  These new libraries conform
-   to the "MDE Library Specification". 
+   to the "EDK II Module Development Environment Library Specification.” 
 3) The Fat Binary and the EDK Shell Binary Packages are functionally identical
-   to the EDK 1.0 version.
+   to the original EDK.
 4) The EDK tools directory has been expanded to include more tools and more
    tool functionality.
 5) The EDK NT32 section has been ported to the new build process, but
-   functionally remains the same as the EDK 1.0 version.
+   functionally remains the same as the original EDK.
 6) The Application "HelloWorld" has been ported to EDK II as well.
 
 =======================================================
