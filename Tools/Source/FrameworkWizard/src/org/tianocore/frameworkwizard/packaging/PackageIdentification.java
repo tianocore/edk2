@@ -15,7 +15,11 @@
 
 package org.tianocore.frameworkwizard.packaging;
 
+import java.io.File;
+
+import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
+import org.tianocore.frameworkwizard.workspace.Workspace;
 
 public class PackageIdentification extends Identification{
     
@@ -29,5 +33,14 @@ public class PackageIdentification extends Identification{
     
     public PackageIdentification(Identification id){
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
+    }
+    
+    public File getSpdFile(){
+        File spdFile = new File(this.getPath());
+        return spdFile;
+    }
+    
+    public String toString() {
+      return getName() + " " + getVersion() + " [" + Tools.getRelativePath(getSpdFile().getPath(), Workspace.getCurrentWorkspace()) + "]";
     }
 }

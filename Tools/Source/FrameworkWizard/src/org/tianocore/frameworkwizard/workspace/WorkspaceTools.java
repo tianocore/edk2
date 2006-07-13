@@ -14,12 +14,15 @@
  **/
 package org.tianocore.frameworkwizard.workspace;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Vector;
 
+import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.tianocore.DbPathAndFilename;
-import org.tianocore.FrameworkDatabaseDocument;
+import org.tianocore.FrameworkDatabaseDocument.FrameworkDatabase;
 import org.tianocore.IndustryStdIncludesDocument.IndustryStdIncludes;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaFilesDocument.MsaFiles;
@@ -35,6 +38,8 @@ import org.tianocore.frameworkwizard.common.SaveFile;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
+import org.tianocore.frameworkwizard.far.FarHeader;
+import org.tianocore.frameworkwizard.far.FarIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
@@ -43,7 +48,7 @@ public class WorkspaceTools {
     //
     // Define class members
     //
-    private FrameworkDatabaseDocument.FrameworkDatabase fdb = null;
+    private FrameworkDatabase fdb = null;
 
     private Vector<ModuleIdentification> vModuleList = new Vector<ModuleIdentification>();
 
@@ -56,20 +61,147 @@ public class WorkspaceTools {
      Open Framework Database file
      
      */
-    private void openFrameworkDb() {
+    private FrameworkDatabase openFrameworkDb() {
         String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
         strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
         try {
             fdb = OpenFile.openFrameworkDb(strFrameworkDbFilePath);
         } catch (XmlException e) {
             Log.err("Open Framework Database " + strFrameworkDbFilePath, e.getMessage());
-            return;
+            return null;
         } catch (Exception e) {
             Log.err("Open Framework Database " + strFrameworkDbFilePath, "Invalid file type");
-            return;
+            return null;
         }
+        return fdb;
     }
 
+    public void addFarToDb(List<String> packageList, List<String> platformList, FarHeader far) {
+      FrameworkDatabase fdb = openFrameworkDb();
+      
+      for (int i = 0; i < packageList.size(); i++) {
+        DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
+        item.setFarGuid(far.getGuidValue());
+        item.setStringValue(packageList.get(i));
+        fdb.getPackageList().getFilenameList().add(item);
+      }
+      
+      for (int i = 0; i < platformList.size(); i++) {
+        DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
+        item.setFarGuid(far.getGuidValue());
+        item.setStringValue(platformList.get(i));
+        fdb.getPlatformList().getFilenameList().add(item);
+      }
+      
+      DbPathAndFilename farItem = DbPathAndFilename.Factory.newInstance();
+      farItem.setFarGuid(far.getGuidValue());
+      farItem.setStringValue(far.getFarName());
+      fdb.getFarList().getFilenameList().add(farItem);
+      
+      String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
+      strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
+      
+      try {
+        SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+    
+    
+    public void removeFarFromDb(FarIdentification far) {
+        FrameworkDatabase fdb = openFrameworkDb();
+        //
+        // Remove Packages
+        //
+        XmlCursor cursor = fdb.getPackageList().newCursor();
+        cursor.toFirstChild();
+        do {
+          DbPathAndFilename item = (DbPathAndFilename)cursor.getObject();
+          
+          if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+            cursor.removeXml();
+          }
+        } while (cursor.toNextSibling());
+        cursor.dispose();
+        
+        //
+        // Remove Platforms
+        //
+        cursor = fdb.getPlatformList().newCursor();
+        cursor.toFirstChild();
+        do {
+          DbPathAndFilename item = (DbPathAndFilename)cursor.getObject();
+          if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+            cursor.removeXml();
+          }
+        } while (cursor.toNextSibling());
+        
+        //
+        // Remove Far
+        //
+        cursor = fdb.getFarList().newCursor();
+        cursor.toFirstChild();
+        do {
+          DbPathAndFilename item = (DbPathAndFilename)cursor.getObject();
+          if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+            cursor.removeXml();
+          }
+        } while (cursor.toNextSibling());
+        cursor.dispose();
+        
+        String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
+        strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
+        try {
+          SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+    }
+    
+    public String getPackageFarGuid(PackageIdentification packageId) {
+      openFrameworkDb();
+      
+      for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
+        DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
+        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
+                      + item.getStringValue();
+        File tempFile = new File(path);
+        if (tempFile.getPath().equalsIgnoreCase(packageId.getSpdFile().getPath())) {
+          return fdb.getPackageList().getFilenameArray(index).getFarGuid();
+        }
+      }
+      
+      return null;
+    }
+    
+    public String getPlatformFarGuid(PlatformIdentification platformId) {
+      openFrameworkDb();
+      
+      for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
+        DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
+        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
+                      + item.getStringValue();
+        File tempFile = new File(path);
+        if (tempFile.getPath().equalsIgnoreCase(platformId.getFpdFile().getPath())) {
+          return fdb.getPlatformList().getFilenameArray(index).getFarGuid();
+        }
+      }
+      
+      return null;
+    }
+    
+    public String getModuleFarGuid(ModuleIdentification moduleId) {
+      PackageIdentification packageId = getPackageIdByModuleId(moduleId);
+      if (packageId != null) {
+          return getPackageFarGuid(packageId);
+      }
+      else {
+        return null;
+      }
+    }
     /**
      Get all modules' paths from one package
      
@@ -159,7 +291,79 @@ public class WorkspaceTools {
         Tools.sortPackages(vPackageList, DataType.SORT_TYPE_ASCENDING);
         return vPackageList;
     }
+
+    public Vector<FarIdentification> getAllFars() {
+      openFrameworkDb();
+      Vector<FarIdentification> v = new Vector<FarIdentification>();
+      for (int index = 0; index < fdb.getFarList().getFilenameList().size(); index++) {
+        DbPathAndFilename item = fdb.getFarList().getFilenameList().get(index);
+        FarIdentification far = new FarIdentification(item.getFarGuid(), item.getMd5Sum(), item.getStringValue());
+        v.addElement(far);
+      }
+      return v;
+    }
     
+    public Vector<PackageIdentification> getPackagesByFar(FarIdentification far) {
+      Identification id = null;
+      openFrameworkDb();
+      Vector<PackageIdentification> v = new Vector<PackageIdentification>();
+      
+      for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
+        DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
+        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
+                      + item.getStringValue();
+        path = Tools.convertPathToCurrentOsType(path);
+        
+        if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+        
+          try {
+            id = getId(path, OpenFile.openSpdFile(path));
+            v.addElement(new PackageIdentification(id));
+          } catch (IOException e) {
+            Log.err("Open Package Surface Area " + path, e.getMessage());
+            e.printStackTrace();
+          } catch (XmlException e) {
+            Log.err("Open Package Surface Area " + path, e.getMessage());
+            e.printStackTrace();
+          } catch (Exception e) {
+            Log.err("Open Package Surface Area " + path, "Invalid file type");
+            e.printStackTrace();
+          }
+        }
+      }
+      return v;
+    }
+    
+    public Vector<PlatformIdentification> getPlatformsByFar(FarIdentification far) {
+      Identification id = null;
+      openFrameworkDb();
+      Vector<PlatformIdentification> v = new Vector<PlatformIdentification>();
+      
+      for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
+        DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
+        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
+                      + item.getStringValue();
+        path = Tools.convertPathToCurrentOsType(path);
+        
+        if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+          try {
+            id = getId(path, OpenFile.openFpdFile(path));
+            v.addElement(new PlatformIdentification(id));
+          } catch (IOException e) {
+            Log.err("Open Platform Surface Area " + path, e.getMessage());
+            e.printStackTrace();
+          } catch (XmlException e) {
+            Log.err("Open Platform Surface Area " + path, e.getMessage());
+            e.printStackTrace();
+          } catch (Exception e) {
+            Log.err("Open Platform Surface Area " + path, "Invalid file type");
+            e.printStackTrace();
+          }
+        }
+    }
+      return v;
+    }
+
     /**
      Get all module basic information from a package
     

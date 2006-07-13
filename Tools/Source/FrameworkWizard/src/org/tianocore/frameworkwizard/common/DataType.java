@@ -52,6 +52,9 @@ public class DataType {
 
     public static final int RETURN_TYPE_TEXT = 16;
 
+    public static final int RETURN_TYPE_FAR_SURFACE_AREA = 17;
+    
+    
     //
     // Define all used final variables
     //
@@ -107,6 +110,11 @@ public class DataType {
 
     public static final String TEXT_FILE_EXT_DESCRIPTION = TEXT_FILE + " (*." + TEXT_FILE_EXT + ")";
 
+    public static final String FAR_SURFACE_AREA = "Framework Archive";
+    
+    public static final String FAR_SURFACE_AREA_EXT = "far";
+    
+    public static final String FAR_SURFACE_AREA_EXT_DESCRIPTION = FAR_SURFACE_AREA + " (*." + FAR_SURFACE_AREA_EXT + ")";
     //
     // Define file separator for current OS
     //

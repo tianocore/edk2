@@ -83,6 +83,8 @@ public class IFileFilter extends FileFilter {
             return DataType.PLATFORM_SURFACE_AREA_EXT_DESCRIPTION;
         if (strExt.equals(DataType.TEXT_FILE_EXT))
             return DataType.TEXT_FILE_EXT_DESCRIPTION;
+        if (strExt.equals(DataType.FAR_SURFACE_AREA_EXT))
+          return DataType.FAR_SURFACE_AREA_EXT_DESCRIPTION;
         return "";
     }
 

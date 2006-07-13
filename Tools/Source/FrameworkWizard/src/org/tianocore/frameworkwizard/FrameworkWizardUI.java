@@ -64,6 +64,10 @@ import org.tianocore.frameworkwizard.common.ui.IDefaultMutableTreeNode;
 import org.tianocore.frameworkwizard.common.ui.IDesktopManager;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.ITree;
+import org.tianocore.frameworkwizard.far.createui.CreateStepOne;
+import org.tianocore.frameworkwizard.far.deleteui.DeleteStepOne;
+import org.tianocore.frameworkwizard.far.installui.InstallStepOne;
+import org.tianocore.frameworkwizard.far.updateui.UpdateStepOne;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 import org.tianocore.frameworkwizard.module.ui.ModuleBootModes;
 import org.tianocore.frameworkwizard.module.ui.ModuleDataHubs;
@@ -1786,19 +1790,39 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         }
 
         if (arg0.getSource() == jMenuItemProjectCreateFar) {
-
+            CreateStepOne cso = new CreateStepOne(this, true);
+            int result = cso.showDialog();
+            if (result == DataType.RETURN_TYPE_OK) {
+                this.closeAll();
+            }
+            cso.dispose();
         }
 
         if (arg0.getSource() == jMenuItemProjectInstallFar) {
-            this.closeAll();
+            InstallStepOne iso = new InstallStepOne(this, true);
+            int result = iso.showDialog();
+            if (result == DataType.RETURN_TYPE_OK) {
+                this.closeAll();
+            }
+            iso.dispose();
         }
 
         if (arg0.getSource() == jMenuItemProjectRemoveFar) {
-            this.closeAll();
+            DeleteStepOne dso = new DeleteStepOne(this, true);
+            int result = dso.showDialog();
+            if (result == DataType.RETURN_TYPE_OK) {
+                this.closeAll();
+            }
+            dso.dispose();
         }
 
         if (arg0.getSource() == jMenuItemProjectUpdateFar) {
-            this.closeAll();
+            UpdateStepOne uso = new UpdateStepOne(this, true);
+            int result = uso.showDialog();
+            if (result == DataType.RETURN_TYPE_OK) {
+                this.closeAll();
+            }
+            uso.dispose();
         }
 
         if (arg0.getSource() == jMenuItemToolsClone) {
