@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -194,7 +195,29 @@ public class GenBuildTask extends Ant {
         // If single module : intersection MSA supported ARCHs and tools def!!
         // else, get arch from pass down
         //
-        String[] archList = GlobalData.getToolChainInfo().getArchs();        
+        Set<String> archListSupByToolChain = new LinkedHashSet<String>(); 
+        String[] archs = GlobalData.getToolChainInfo().getArchs(); 
+        
+        for (int i = 0; i < archs.length; i ++) {
+            archListSupByToolChain.add(archs[i]);
+        }
+        
+        Set<String> archSet = new LinkedHashSet<String>();
+        
+        if ( getProject().getProperty("ARCH") != null) {
+            String[] fpdArchList = getProject().getProperty("ARCH").split(" ");
+            
+            for (int i = 0; i < fpdArchList.length; i++) {
+                if (archListSupByToolChain.contains(fpdArchList[i])) {
+                    archSet.add(fpdArchList[i]);
+                }
+            }
+        }
+        else {
+            archSet = archListSupByToolChain; 
+        }
+  
+        String[] archList = archSet.toArray(new String[archSet.size()]);
         
         //
         // Judge if arch is all supported by current module. If not, throw Exception.
@@ -209,6 +232,7 @@ public class GenBuildTask extends Ant {
         }
         
         for (int k = 0; k < archList.length; k++) {
+            
             getProject().setProperty("ARCH", archList[k]);
             
             FpdModuleIdentification fpdModuleId = new FpdModuleIdentification(moduleId, archList[k]);
