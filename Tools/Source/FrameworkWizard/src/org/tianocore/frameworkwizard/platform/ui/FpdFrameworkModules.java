@@ -362,7 +362,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
         }
         catch(Exception e){
-            JOptionPane.showMessageDialog(frame, "FrameworkDatabase Corrupted.");
+            JOptionPane.showMessageDialog(frame, "Error occurred when getting module data.");
         }
         
         if (ffc == null){
@@ -447,8 +447,8 @@ public class FpdFrameworkModules extends IInternalFrame {
             }
             if (keyPart[3] != null && keyPart[3].length() > 0 && !keyPart[3].equals("null")){
                 if(!pi.getVersion().equals(keyPart[3])){
-                continue;
-            }
+                    continue;
+                }
             }
             Set<ModuleIdentification> smi = GlobalData.getModules(pi);
             Iterator ismi = smi.iterator();

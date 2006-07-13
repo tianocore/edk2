@@ -278,7 +278,7 @@ public class FpdHeader extends IInternalFrame {
     private JTextField getJTextFieldSpecification() {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
-            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 305, 320, 20));
+            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160,328,320,20));
             jTextFieldSpecification.setEditable(false);
             jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320,20));
             jTextFieldSpecification.addFocusListener(new FocusAdapter(){
@@ -333,7 +333,7 @@ public class FpdHeader extends IInternalFrame {
     private JScrollPane getJScrollPaneLicense() {
         if (jScrollPaneLicense == null) {
             jScrollPaneLicense = new JScrollPane();
-            jScrollPaneLicense.setBounds(new java.awt.Rectangle(160, 85, 320, 80));
+            jScrollPaneLicense.setBounds(new java.awt.Rectangle(160,107,320,80));
             jScrollPaneLicense.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneLicense.setPreferredSize(new java.awt.Dimension(320,80));
             jScrollPaneLicense.setViewportView(getJTextAreaLicense());
@@ -350,7 +350,7 @@ public class FpdHeader extends IInternalFrame {
     private JScrollPane getJScrollPaneDescription() {
         if (jScrollPaneDescription == null) {
             jScrollPaneDescription = new JScrollPane();
-            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160, 220, 320, 80));
+            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160,243,320,80));
             jScrollPaneDescription.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneDescription.setViewportView(getJTextAreaDescription());
         }
@@ -366,7 +366,7 @@ public class FpdHeader extends IInternalFrame {
     private JTextField getJTextFieldAbstract() {
         if (jTextFieldAbstract == null) {
             jTextFieldAbstract = new JTextField();
-            jTextFieldAbstract.setBounds(new java.awt.Rectangle(160,195,320,20));
+            jTextFieldAbstract.setBounds(new java.awt.Rectangle(160,218,320,20));
             jTextFieldAbstract.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldAbstract.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
@@ -391,7 +391,7 @@ public class FpdHeader extends IInternalFrame {
     private JTextField getJTextFieldCopyright() {
         if (jTextFieldCopyright == null) {
             jTextFieldCopyright = new JTextField();
-            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160,330,320, 20));
+            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160,85,320,20));
             jTextFieldCopyright.setPreferredSize(new java.awt.Dimension(320,20));
             jTextFieldCopyright.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
@@ -415,7 +415,7 @@ public class FpdHeader extends IInternalFrame {
     private JTextField getJTextField() {
         if (jTextField == null) {
             jTextField = new JTextField();
-            jTextField.setBounds(new java.awt.Rectangle(160,170,320,20));
+            jTextField.setBounds(new java.awt.Rectangle(160,193,320,20));
             jTextField.setPreferredSize(new Dimension(320, 20));
             jTextField.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
@@ -520,27 +520,27 @@ public class FpdHeader extends IInternalFrame {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
         	jLabel = new JLabel();
-        	jLabel.setBounds(new java.awt.Rectangle(15,170,140,20));
+        	jLabel.setBounds(new java.awt.Rectangle(15,193,140,20));
         	jLabel.setText("URL");
         	jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.setLocation(new java.awt.Point(0, 0));
             jContentPane.setSize(new java.awt.Dimension(500,423));
             jLabelAbstract = new JLabel();
-            jLabelAbstract.setBounds(new java.awt.Rectangle(15, 195, 140, 20));
+            jLabelAbstract.setBounds(new java.awt.Rectangle(15,218,140,20));
             jLabelAbstract.setText("Abstract");
             jLabelSpecification = new JLabel();
             jLabelSpecification.setText("Specification");
-            jLabelSpecification.setBounds(new java.awt.Rectangle(15, 305, 140, 20));
+            jLabelSpecification.setBounds(new java.awt.Rectangle(15,328,140,20));
             jLabelDescription = new JLabel();
             jLabelDescription.setText("Description");
-            jLabelDescription.setBounds(new java.awt.Rectangle(15, 220, 140, 20));
+            jLabelDescription.setBounds(new java.awt.Rectangle(15,243,140,20));
             jLabelCopyright = new JLabel();
             jLabelCopyright.setText("Copyright");
-            jLabelCopyright.setBounds(new java.awt.Rectangle(15, 330, 140, 20));
+            jLabelCopyright.setBounds(new java.awt.Rectangle(15,85,140,20));
             jLabelLicense = new JLabel();
             jLabelLicense.setText("License");
-            jLabelLicense.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
+            jLabelLicense.setBounds(new java.awt.Rectangle(15,108,140,20));
             jLabelVersion = new JLabel();
             jLabelVersion.setText("Version");
             jLabelVersion.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
@@ -576,18 +576,18 @@ public class FpdHeader extends IInternalFrame {
             jStarLabel3 = new StarLabel();
             jStarLabel3.setLocation(new java.awt.Point(0, 60));
             jStarLabel4 = new StarLabel();
-            jStarLabel4.setLocation(new java.awt.Point(0, 85));
+            jStarLabel4.setLocation(new java.awt.Point(0,108));
             jStarLabel5 = new StarLabel();
-            jStarLabel5.setLocation(new java.awt.Point(0, 330));
+            jStarLabel5.setLocation(new java.awt.Point(0,85));
             jStarLabel6 = new StarLabel();
-            jStarLabel6.setLocation(new java.awt.Point(0, 195));
+            jStarLabel6.setLocation(new java.awt.Point(0,218));
             jStarLabel7 = new StarLabel();
-            jStarLabel7.setLocation(new java.awt.Point(0, 305));
+            jStarLabel7.setLocation(new java.awt.Point(0,328));
             jStarLabel7.setEnabled(false);
             jStarLabel8 = new StarLabel();
-            jStarLabel8.setLocation(new java.awt.Point(0, 220));
+            jStarLabel8.setLocation(new java.awt.Point(0,243));
             jStarLabel9 = new StarLabel();
-            jStarLabel9.setLocation(new java.awt.Point(0, 280));
+            jStarLabel9.setLocation(new java.awt.Point(0,303));
             jStarLabel9.setVisible(false);
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
