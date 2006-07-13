@@ -270,7 +270,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             String lib = m.getValueAt(row, 0) + "";
             String hdr = m.getValueAt(row, 1) + "";
             String hlp = m.getValueAt(row, 2) + "";
-            String guid = m.getValueAt(row, 3) + "";
+            String name = m.getValueAt(row, 3) + "";
             String ver = m.getValueAt(row, 4) + "";
             String arch = null;
             if (m.getValueAt(row, 5) != null) {
@@ -285,6 +285,10 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                 return;
             }
             docConsole.setSaved(false);
+            
+            getLibInstances(lib);
+            String guid = nameToGuid(name);
+            
             sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
         }
     }
@@ -389,6 +393,11 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         sfc.getSpdLibClassDeclarations(saa);
         int i = 0;
         while (i < saa.length) {
+            if (saa[i][3] != null && saa[i][3].length() > 0) {
+                getLibInstances(saa[i][0]);
+                saa[i][3] = guidToName(saa[i][3]);
+            }
+            
             model.addRow(saa[i]);
             i++;
         }
@@ -528,7 +537,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         if (arg0.getSource() == jButtonAdd) {
             
             //ToDo: check before add
-            String[] row = {null, null, null, jTextField1.getText(), jTextField2.getText(), null, null};
+            String[] row = {null, null, null, jComboBox.getSelectedItem()+"", jTextField2.getText(), null, null};
             row[0] = jTextFieldAdd.getText();
             row[1] = jTextField.getText().replace('\\', '/');
             row[2] = jTextFieldHelp.getText();
@@ -546,7 +555,12 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             model.addRow(row);
             jTable.changeSelection(model.getRowCount()-1, 0, false, false);
             docConsole.setSaved(false);
-            sfc.genSpdLibClassDeclarations(row[0], row[3], row[1], row[2], row[5], null, null, row[4], null, row[6]);
+            //
+            //convert to GUID before storing recommended lib instance.
+            //
+            getLibInstances(row[0]);
+            String recommendGuid = nameToGuid(row[3]);
+            sfc.genSpdLibClassDeclarations(row[0], recommendGuid, row[1], row[2], row[5], null, null, row[4], null, row[6]);
             
         }
         //
@@ -845,6 +859,32 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             JOptionPane.showMessageDialog(frame, "Search Instances Fail.");
         }
         
+    }
+
+    private String nameToGuid(String name) {
+        String s = "";
+        if (!libNameGuidMap.containsKey(name)) {
+            return s;
+        }
+        
+        s = libNameGuidMap.get(name);
+        return s;
+    }
+    
+    private String guidToName(String guid){
+        String s = "";
+        if (!libNameGuidMap.containsValue(guid)) {
+            return s;
+        }
+        Set<String> key = libNameGuidMap.keySet();
+        Iterator<String> is = key.iterator();
+        while(is.hasNext()) {
+            s = is.next();
+            if (libNameGuidMap.get(s).equals(guid)) {
+                break;
+            }
+        }
+        return s;
     }
 
 }
