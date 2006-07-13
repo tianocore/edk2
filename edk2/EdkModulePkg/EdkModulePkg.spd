@@ -1,15 +1,5 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<!--
-Copyright (c) 2006, Intel Corporation
-All rights reserved. This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
--->
-<PackageSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<?xml version="1.0" encoding="UTF-8"?>
+<PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>EdkModulePkg</PackageName>
     <GuidValue>B6EC423C-21D2-490D-85C6-DD5864EAA674</GuidValue>
@@ -495,7 +485,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <C_Name>gEfiEdkModulePkgTokenSpaceGuid</C_Name>
       <GuidValue>8CC4092F-F60E-46d1-B41C-1E761DF50582</GuidValue>
       <HelpText>All PCD define in EdkModulePkg is in this token space scope</HelpText>
-    </Entry>  
+    </Entry>
     <Entry Name="PcdDataBaseHob">
       <C_Name>gPcdDataBaseHobGuid</C_Name>
       <GuidValue>EA296D92-0B69-423C-8C28-33B4E0A91268</GuidValue>
@@ -833,100 +823,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </PpiDeclarations>
   <PcdDeclarations>
     <PcdEntry>
-      <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-      <Token>0x00000001</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>1000000</DefaultValue>
-      <HelpText>If PcdMaximumUnicodeStringLength is not zero, the maximum
-                number of characters (not counting the NULL-terminator) in a
-                Unicode string cannot exceed it.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdMaximumAsciiStringLength</C_Name>
-      <Token>0x00000002</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>1000000</DefaultValue>
-      <HelpText>If PcdMaximumAsciiStringLength is not zero, the maximum number
-                of characters (not counting the NULL-terminator) in an ASCII
-                string cannot exceed it.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdMaximumLinkedListLength</C_Name>
-      <Token>0x00000003</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>1000000</DefaultValue>
-      <HelpText>If PcdMaximumLinkedListLength is not zero, the maximum number
-                of nodes (not counting the list header) in a linked list
-                cannot exceed it.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdSpinLockTimeout</C_Name>
-      <Token>0x00000004</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>10000000</DefaultValue>
-      <HelpText>If PcdSpinLockTimeout is not zero, it stands for the timeout
-                value (unit: millisecond) for spin lock.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdDebugPropertyMask</C_Name>
-      <Token>0x00000005</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT8</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0x0f</DefaultValue>
-      <HelpText>The bitmask of flags that specify the enable/disable of Debug
-                Assert, Debug Print, Debug Code, Clear Memory, Assert
-                Breakpoint and Assert Deadloop.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdDebugPrintErrorLevel</C_Name>
-      <Token>0x00000006</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT32</DatumType>
-      <ValidUsage>PATCHABLE_IN_MODULE</ValidUsage>
-      <DefaultValue>0x80000000</DefaultValue>
-      <HelpText>The bitmask of flags that specify the kind of debug message
-                output when Debug Print is enabled.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-      <Token>0x00000007</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT8</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0x07</DefaultValue>
-      <HelpText>The bitmask of flags that specify the enable/disable of
-                Progress Code, Error Code and Debug Code.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdDebugClearMemoryValue</C_Name>
-      <Token>0x00000008</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT8</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0xAF</DefaultValue>
-      <HelpText>The value used by DebugClearMemory () to fill a certain range
-                of memory.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
-      <Token>0x00000009</Token>
-      <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT8</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0</DefaultValue>
-      <HelpText>The bitmask of flags that specify the enable/disable of
-                Performance Measurement.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
       <C_Name>PcdMaxPeiPcdCallBackNumberPerPcdEntry</C_Name>
       <Token>0x0001000f</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
@@ -967,7 +863,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
       <HelpText>Indicate the max size the platform can support in case of non-populated capsules</HelpText>
-    </PcdEntry>  
+    </PcdEntry>
     <PcdEntry>
       <C_Name>PcdPeiPcdDatabaseTraverseEnabled</C_Name>
       <Token>0x00010020</Token>
