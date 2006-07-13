@@ -11,7 +11,7 @@
 #
 # Module Name:
 #
-#   DivU64x32.asm
+#   DivU64x32.S
 #
 # Abstract:
 #
@@ -23,8 +23,8 @@
 
      
 
-.global _ModU64x32
-_ModU64x32: 
+.global _InternalMathModU64x32
+_InternalMathModU64x32: 
     movl    8(%esp),%eax
     movl    12(%esp),%ecx
     xorl    %edx,%edx
