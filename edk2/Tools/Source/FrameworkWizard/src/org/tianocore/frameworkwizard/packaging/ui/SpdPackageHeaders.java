@@ -349,7 +349,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         jComboBoxSelect.addItem("DXE_RUNTIME_DRIVER");
         jComboBoxSelect.addItem("DXE_SAL_DRIVER");
         jComboBoxSelect.addItem("DXE_SMM_DRIVER");
-        jComboBoxSelect.addItem("TOOLS");
+        jComboBoxSelect.addItem("TOOL");
         jComboBoxSelect.addItem("UEFI_DRIVER");
         jComboBoxSelect.addItem("UEFI_APPLICATION");
         jComboBoxSelect.addItem("USER_DEFINED");
@@ -534,7 +534,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             jComboBoxSelect.addItem("DXE_RUNTIME_DRIVER");
             jComboBoxSelect.addItem("DXE_SAL_DRIVER");
             jComboBoxSelect.addItem("DXE_SMM_DRIVER");
-            jComboBoxSelect.addItem("TOOLS");
+            jComboBoxSelect.addItem("TOOL");
             jComboBoxSelect.addItem("UEFI_DRIVER");
             jComboBoxSelect.addItem("UEFI_APPLICATION");
             jComboBoxSelect.addItem("USER_DEFINED");
