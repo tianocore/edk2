@@ -34,18 +34,23 @@
   </ModuleDefinitions>
   <SourceFiles>
     <Filename>build.xml</Filename>
+    <Filename>FrameworkWizard.msa</Filename>
     <Filename>MANIFEST.MF</Filename>
     <Filename>rsc/resources/images/logo.gif</Filename>
+    <Filename>rsc/resources/images/No.JPG</Filename>
+    <Filename>rsc/resources/images/Yes.JPG</Filename>
     <Filename>src/org/tianocore/frameworkwizard/About.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/Clone.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/FrameworkWizardUI.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/NewFileChooser.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/SelectModuleBelong.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/ToolChainConfig.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/ToolChainConfigHelp.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/DataType.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/DataValidation.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/EnumerationData.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/FileOperation.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/IDefaultTableModel.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/IFileFilter.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Log.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/SaveFile.java</Filename>
@@ -62,6 +67,7 @@
     <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningPlatformType.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Identifications/ToolChainConfigId.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Identifications/ToolChainConfigVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/ui/ArchCheckBox.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/ExitConfirm.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IComboBox.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/IDefaultMutableTreeNode.java</Filename>
@@ -76,6 +82,30 @@
     <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListener.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListItem.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/ui/iCheckBoxList/ICheckBoxListModel.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/AggregationOperation.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/DistributeRule.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/Far.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/FarFileItem.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/FarHeader.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/FarIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/FarInterface.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/FarMd5.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/FarPackage.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/FarPlatformItem.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/Mainfest.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/ManifestInterface.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/PackageQuery.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/PackageQueryInterface.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/createui/CreateStepFour.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/createui/CreateStepOne.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/createui/CreateStepThree.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/createui/CreateStepTwo.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/deleteui/DeleteStepOne.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/deleteui/DeleteStepTwo.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/installui/InstallStepOne.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/installui/InstallStepTwo.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/updateui/UpdateStepOne.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/far/updateui/UpdateStepTwo.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/ModuleIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/BootModes/BootModesIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/BootModes/BootModesVector.java</Filename>
@@ -124,6 +154,21 @@
     <Filename>src/org/tianocore/frameworkwizard/module/ui/ModuleSystemTables.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/ui/ModuleVariables.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/ui/MsaHeader.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/BootModesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/DataHubsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/EventsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/ExternsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/GuidsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/HiiPackagesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/HobsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/LibraryClassDefsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PackageDepDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PCDsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PpisDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/ProtocolsDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/SourceFilesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/SystemTablesDlg.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/VariablesDlg.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/packaging/PackageIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/packaging/ui/GenGuidDialog.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/packaging/ui/GuidEditor.java</Filename>
@@ -147,6 +192,8 @@
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/FpdHeader.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/FpdModuleSA.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/FpdPlatformDefs.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/GenListDialog.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/ListEditor.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/global/GlobalData.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/global/Spd.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/global/SurfaceAreaQuery.java</Filename>
@@ -158,25 +205,5 @@
     <Filename>src/org/tianocore/frameworkwizard/workspace/Workspace.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/WorkspaceTools.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/ui/SwitchWorkspace.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/IDefaultTableModel.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/common/ui/ArchCheckBox.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/BootModesDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/DataHubsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/EventsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/ExternsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/GuidsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/HiiPackagesDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/HobsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/LibraryClassDefsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PackageDepDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PCDsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/PpisDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/ProtocolsDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/SourceFilesDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/SystemTablesDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/module/ui/dialog/VariablesDlg.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/GenListDialog.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/ListEditor.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/ToolChainConfigHelp.java</Filename>
   </SourceFiles>
 </ModuleSurfaceArea>
