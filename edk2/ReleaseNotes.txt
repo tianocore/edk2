@@ -64,7 +64,7 @@ Assembler Tool Chain
       GNU binutils 2.16.1 or later
 
 Java Development Kit ( Java 5.0 or later)
-      Sun* jdk-1.5.0_04 or later (http://java.sun.com)
+      Sun* jdk-1.5.0_06 or later (http://java.sun.com)
     or
       Bea Systems* jrockit-25.2.0-jdk1.5.0_03 or later (http://www.bea.com)
 

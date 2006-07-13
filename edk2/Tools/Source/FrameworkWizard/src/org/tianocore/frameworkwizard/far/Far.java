@@ -62,10 +62,9 @@ public class Far {
         jf = farFile;
         this.mainfest = new Mainfest(getMainfestFile());
     }
-    
-    public void creatFar (List<PackageIdentification> pkgList,
-            List<PlatformIdentification> plfList, Set<String> fileFilter,
-            FarHeader fHeader) throws Exception{
+
+    public void creatFar(List<PackageIdentification> pkgList, List<PlatformIdentification> plfList,
+                         Set<String> fileFilter, FarHeader fHeader) throws Exception {
         jos = new JarOutputStream(new FileOutputStream(jarFile));
 
         //
@@ -94,23 +93,28 @@ public class Far {
         }
         jos.close();
     }
-    
-    private void writeToJar(File file, JarOutputStream jos) throws Exception{
-      byte[] buffer = new byte[(int)file.length()];
-      FileInputStream fInput = new FileInputStream(file);
-      JarEntry entry = new JarEntry(Tools.convertPathToUnixType(Tools.getRelativePath(file.getPath(),Workspace.getCurrentWorkspace())));
-      jos.putNextEntry(entry);
-      fInput.read(buffer);
-      jos.write(buffer);
-      fInput.close();
+
+    private void writeToJar(File file, JarOutputStream jos) throws Exception {
+        byte[] buffer = new byte[(int) file.length()];
+        FileInputStream fInput = new FileInputStream(file);
+        JarEntry entry = new JarEntry(
+                                      Tools
+                                           .convertPathToUnixType(Tools
+                                                                       .getRelativePath(file.getPath(),
+                                                                                        Workspace.getCurrentWorkspace())));
+        jos.putNextEntry(entry);
+        fInput.read(buffer);
+        jos.write(buffer);
+        fInput.close();
     }
 
     public void InstallFar(String dir) throws Exception {
         List<FarFileItem> allFile = mainfest.getAllFileItem();
         extract(allFile, dir);
     }
-    
-    public void InstallFar (Map<PlatformIdentification, File> plfMap, Map<PackageIdentification, File> pkgMap) throws Exception{
+
+    public void InstallFar(Map<PlatformIdentification, File> plfMap, Map<PackageIdentification, File> pkgMap)
+                                                                                                             throws Exception {
         Set<PlatformIdentification> plfKeys = plfMap.keySet();
         Iterator<PlatformIdentification> plfIter = plfKeys.iterator();
         while (plfIter.hasNext()) {
@@ -149,39 +153,40 @@ public class Far {
     public boolean hibernateToFile() {
         return true;
     }
-//    public static void main(String[] args){
-//        try {
-//            JarFile jarFile = new JarFile(new File("C:\\cvswork\\newEdk\\jar.jar.far"));
-//            JarEntry je= jarFile.getJarEntry("MdePkg/MdePkg.spd");
-//            InputStream is = jarFile.getInputStream(je);
-//            byte[] buffer = new byte[1];      
-//            File tempFile = new File("C:\\cvswork\\newEdk\\tempFile");
-//            File tfile2 = new File("C:\\cvswork\\newEdk\\tempFile1");
-//            FileOutputStream fos1 = new FileOutputStream(tfile2);
-//            FileOutputStream fos = new FileOutputStream(tempFile);
-//            int size = is.read(buffer);
-//            int totoalSize = size;
-//            while ( size >=  0) {
-//                fos.write(buffer);
-//                size = is.read(buffer);
-//                totoalSize = totoalSize + size;
-//            }
-//            
-//            
-////            is = jarFile.getInputStream(je);
-////            is.read(totalbuffer);
-////            fos.write(totalbuffer);
-//            fos.close();
-//            byte[] totalbuffer = new byte[(int)tempFile.length()];
-//            FileInputStream fis = new FileInputStream(tempFile);
-//            fis.read(totalbuffer);
-//            fos1.write(totalbuffer);
-//            fos1.close();
-//        }catch(Exception e){
-//            
-//        }
-//    }
-    
+
+    //    public static void main(String[] args){
+    //        try {
+    //            JarFile jarFile = new JarFile(new File("C:\\cvswork\\newEdk\\jar.jar.far"));
+    //            JarEntry je= jarFile.getJarEntry("MdePkg/MdePkg.spd");
+    //            InputStream is = jarFile.getInputStream(je);
+    //            byte[] buffer = new byte[1];      
+    //            File tempFile = new File("C:\\cvswork\\newEdk\\tempFile");
+    //            File tfile2 = new File("C:\\cvswork\\newEdk\\tempFile1");
+    //            FileOutputStream fos1 = new FileOutputStream(tfile2);
+    //            FileOutputStream fos = new FileOutputStream(tempFile);
+    //            int size = is.read(buffer);
+    //            int totoalSize = size;
+    //            while ( size >=  0) {
+    //                fos.write(buffer);
+    //                size = is.read(buffer);
+    //                totoalSize = totoalSize + size;
+    //            }
+    //            
+    //            
+    ////            is = jarFile.getInputStream(je);
+    ////            is.read(totalbuffer);
+    ////            fos.write(totalbuffer);
+    //            fos.close();
+    //            byte[] totalbuffer = new byte[(int)tempFile.length()];
+    //            FileInputStream fis = new FileInputStream(tempFile);
+    //            fis.read(totalbuffer);
+    //            fos1.write(totalbuffer);
+    //            fos1.close();
+    //        }catch(Exception e){
+    //            
+    //        }
+    //    }
+
     public void extract(List<FarFileItem> allFile, String dir) throws Exception {
 
         Iterator filesItem = allFile.iterator();
@@ -191,7 +196,7 @@ public class Far {
         dir += File.separatorChar;
         while (filesItem.hasNext()) {
             try {
-                ffItem = (FarFileItem)filesItem.next();
+                ffItem = (FarFileItem) filesItem.next();
                 je = jf.getJarEntry(Tools.convertPathToUnixType(ffItem.getDefaultPath()));
                 InputStream entryStream = jf.getInputStream(je);
                 File file = new File(dir + ffItem.getRelativeFilename());
@@ -202,24 +207,23 @@ public class Far {
                     // exists).
                     //
                     FileOutputStream outputStream = new FileOutputStream(file);
-                    
 
                     try {
                         //
                         // Read the entry data and write it to the output
                         // file.
                         //
-                        byte[] buffer = new byte[1];      
+                        byte[] buffer = new byte[1];
                         File tempFile = new File("tempFile");
                         FileOutputStream fos = new FileOutputStream(tempFile);
                         int size = entryStream.read(buffer);
-                        while ( size >=  0) {
+                        while (size >= 0) {
                             fos.write(buffer);
                             size = entryStream.read(buffer);
                         }
-                        
+
                         fos.close();
-                        byte[] totalBuffer = new byte[(int)tempFile.length()];
+                        byte[] totalBuffer = new byte[(int) tempFile.length()];
                         FileInputStream fis = new FileInputStream(tempFile);
                         fis.read(totalBuffer);
                         outputStream.write(totalBuffer);
@@ -235,12 +239,11 @@ public class Far {
             } finally {
             }
         }
-                        
-     }
-    
-    
-    public void addFileToFar (File file, JarOutputStream farOuputStream, String workDir){
-        
+
+    }
+
+    public void addFileToFar(File file, JarOutputStream farOuputStream, String workDir) {
+
     }
 
     /**
@@ -254,6 +257,9 @@ public class Far {
         List<PackageIdentification> result = new ArrayList<PackageIdentification>();
 
         entry = this.mainfest.getPackgeSpd(pkgId);
+        if (entry == null) {
+            return result;
+        }
         if (entry[0] != null) {
             try {
                 JarEntry je;

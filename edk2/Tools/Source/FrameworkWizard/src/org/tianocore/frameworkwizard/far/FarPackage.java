@@ -14,7 +14,6 @@
  **/
 package org.tianocore.frameworkwizard.far;
 
-import java.io.File;
 import java.util.List;
 
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
@@ -84,8 +83,8 @@ public class FarPackage {
     }
 
     public boolean isIdentityPkg(PackageIdentification pkgId) {
-        File file = new File(farFile.getRelativeFilename());
-        if (pkgId.getName() == file.getName() && pkgId.getGuid() == guidValue && pkgId.getVersion() == version) {
+        //File file = new File(farFile.getRelativeFilename());
+        if (pkgId.getGuid().equalsIgnoreCase(guidValue) && pkgId.getVersion().equalsIgnoreCase(version)) {
             return true;
         }
         return false;

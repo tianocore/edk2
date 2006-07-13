@@ -1637,7 +1637,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemProjectUpdateFar.setMnemonic('U');
             jMenuItemProjectUpdateFar.setEnabled(true);
             jMenuItemProjectUpdateFar.addActionListener(this);
-            jMenuItemProjectUpdateFar.setVisible(false);
+            jMenuItemProjectUpdateFar.setVisible(true);
         }
         return jMenuItemProjectUpdateFar;
     }
