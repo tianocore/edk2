@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "../cbi.h"
+#include "cbi.h"
 
 extern EFI_COMPONENT_NAME_PROTOCOL  gUsbCbi0ComponentName;
 //
