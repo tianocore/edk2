@@ -137,7 +137,7 @@ public class DeleteStepTwo extends IDialog implements MouseListener {
     private JRadioButton getJRadioButton() {
         if (jRadioButton == null) {
             jRadioButton = new JRadioButton();
-            jRadioButton.setBounds(new java.awt.Rectangle(100, 100, 340, 20));
+            jRadioButton.setBounds(new java.awt.Rectangle(40,100,340,20));
             jRadioButton.setSelected(true);
             jRadioButton.setText("Mode 1: Only remove from framework database");
         }
@@ -152,7 +152,7 @@ public class DeleteStepTwo extends IDialog implements MouseListener {
     private JRadioButton getJRadioButton1() {
         if (jRadioButton1 == null) {
             jRadioButton1 = new JRadioButton();
-            jRadioButton1.setBounds(new java.awt.Rectangle(100, 140, 358, 20));
+            jRadioButton1.setBounds(new java.awt.Rectangle(40,140,358,20));
             jRadioButton1.setText("Mode 2: Delete all related files from workspace");
         }
         return jRadioButton1;

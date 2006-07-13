@@ -153,7 +153,7 @@ public class CreateStepThree extends IDialog implements MouseListener {
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(139, 85, 500, 130));
+            jScrollPane.setBounds(new java.awt.Rectangle(30, 85, 640, 130));
             jScrollPane.setViewportView(getJComboBoxFileFilter());
         }
         return jScrollPane;
@@ -167,7 +167,7 @@ public class CreateStepThree extends IDialog implements MouseListener {
     private JTextField getJTextField() {
         if (jTextField == null) {
             jTextField = new JTextField();
-            jTextField.setBounds(new java.awt.Rectangle(139, 250, 500, 20));
+            jTextField.setBounds(new java.awt.Rectangle(30, 250, 640, 20));
         }
         return jTextField;
     }

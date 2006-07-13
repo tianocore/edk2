@@ -146,7 +146,7 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(30, 98, 570, 170));
+            jScrollPane.setBounds(new java.awt.Rectangle(30, 100, 642, 170));
             jScrollPane.setViewportView(getJTablePackage());
         }
         return jScrollPane;

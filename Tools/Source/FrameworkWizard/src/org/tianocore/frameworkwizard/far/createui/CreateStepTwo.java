@@ -173,7 +173,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
     private JScrollPane getJScrollPanePackage() {
         if (jScrollPanePackage == null) {
             jScrollPanePackage = new JScrollPane();
-            jScrollPanePackage.setBounds(new java.awt.Rectangle(139, 64, 500, 130));
+            jScrollPanePackage.setBounds(new java.awt.Rectangle(140,65,535,130));
             jScrollPanePackage.setViewportView(getJComboBoxPackage());
         }
         return jScrollPanePackage;
@@ -187,7 +187,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
     private JScrollPane getJScrollPanePlatform() {
         if (jScrollPanePlatform == null) {
             jScrollPanePlatform = new JScrollPane();
-            jScrollPanePlatform.setBounds(new java.awt.Rectangle(139, 200, 500, 100));
+            jScrollPanePlatform.setBounds(new java.awt.Rectangle(140,200,535,110));
             jScrollPanePlatform.setViewportView(getJComboBoxPlatform());
         }
         return jScrollPanePlatform;

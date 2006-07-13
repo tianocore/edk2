@@ -122,7 +122,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldBaseName() {
         if (jTextFieldBaseName == null) {
             jTextFieldBaseName = new JTextField();
-            jTextFieldBaseName.setBounds(new java.awt.Rectangle(160, 10, 260, 20));
+            jTextFieldBaseName.setBounds(new java.awt.Rectangle(160, 10, 520, 20));
             jTextFieldBaseName.setToolTipText("An brief Identifier, such as USB I/O Library, of the module");
         }
         return jTextFieldBaseName;
@@ -137,7 +137,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 260, 20));
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 410, 20));
             jTextFieldGuid.setToolTipText("Guaranteed Unique Identification Number (8-4-4-4-12)");
         }
         return jTextFieldGuid;
@@ -152,7 +152,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldVersion() {
         if (jTextFieldVersion == null) {
             jTextFieldVersion = new JTextField();
-            jTextFieldVersion.setBounds(new java.awt.Rectangle(160, 60, 260, 20));
+            jTextFieldVersion.setBounds(new java.awt.Rectangle(160, 60, 520, 20));
             jTextFieldVersion.setToolTipText("A Version Number, 1.0, 1, 1.01");
         }
         return jTextFieldVersion;
@@ -167,7 +167,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
             jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(440, 35, 90, 20));
+            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(590, 35, 90, 20));
             jButtonGenerateGuid.setText("Generate");
             jButtonGenerateGuid.addMouseListener(this);
         }
@@ -215,7 +215,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
             jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
-            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 290, 420, 20));
+            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 290, 520, 20));
             jTextFieldSpecification.setEditable(false);
         }
         return jTextFieldSpecification;
@@ -231,7 +231,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jScrollPaneLicense == null) {
             jScrollPaneLicense = new JScrollPane();
             jScrollPaneLicense.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneLicense.setBounds(new java.awt.Rectangle(160, 200, 420, 60));
+            jScrollPaneLicense.setBounds(new java.awt.Rectangle(160, 200, 520, 60));
             jScrollPaneLicense.setViewportView(getJTextAreaLicense());
         }
         return jScrollPaneLicense;
@@ -247,7 +247,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jScrollPaneDescription == null) {
             jScrollPaneDescription = new JScrollPane();
             jScrollPaneDescription.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160, 110, 420, 60));
+            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160, 110, 520, 60));
             jScrollPaneDescription.setViewportView(getJTextAreaDescription());
         }
         return jScrollPaneDescription;
@@ -262,7 +262,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldAbstract() {
         if (jTextFieldAbstract == null) {
             jTextFieldAbstract = new JTextField();
-            jTextFieldAbstract.setBounds(new java.awt.Rectangle(160, 85, 420, 20));
+            jTextFieldAbstract.setBounds(new java.awt.Rectangle(160, 85, 520, 20));
             jTextFieldAbstract.setToolTipText("A one sentence description of this module");
         }
         return jTextFieldAbstract;
@@ -277,7 +277,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldCopyright() {
         if (jTextFieldCopyright == null) {
             jTextFieldCopyright = new JTextField();
-            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160, 175, 420, 20));
+            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160, 175, 520, 20));
             jTextFieldCopyright.setToolTipText("One or more copyright lines");
         }
         return jTextFieldCopyright;
@@ -291,7 +291,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldURL() {
         if (jTextFieldURL == null) {
             jTextFieldURL = new JTextField();
-            jTextFieldURL.setBounds(new java.awt.Rectangle(160, 265, 420, 20));
+            jTextFieldURL.setBounds(new java.awt.Rectangle(160, 265, 520, 20));
             jTextFieldURL.setToolTipText("A URL for the latest version of the license");
         }
         return jTextFieldURL;
@@ -318,7 +318,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(570, 330, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(590, 330, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addMouseListener(this);
         }
@@ -333,7 +333,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JButton getJButtonNext() {
         if (jButtonNext == null) {
             jButtonNext = new JButton();
-            jButtonNext.setBounds(new java.awt.Rectangle(470, 330, 90, 20));
+            jButtonNext.setBounds(new java.awt.Rectangle(480, 330, 90, 20));
             jButtonNext.setText("Next");
             jButtonNext.addMouseListener(this);
         }
@@ -398,31 +398,31 @@ public class CreateStepOne extends IDialog implements MouseListener {
 
             jLabelURL = new JLabel();
             jLabelURL.setText("License URL");
-            jLabelURL.setBounds(new java.awt.Rectangle(35, 265, 140, 20));
+            jLabelURL.setBounds(new java.awt.Rectangle(35, 265, 120, 20));
             jLabelBaseName = new JLabel();
             jLabelBaseName.setText("FAR Name");
-            jLabelBaseName.setBounds(new java.awt.Rectangle(35, 10, 140, 20));
+            jLabelBaseName.setBounds(new java.awt.Rectangle(35, 10, 120, 20));
             jLabelGuid = new JLabel();
             jLabelGuid.setText("Guid Value");
-            jLabelGuid.setBounds(new java.awt.Rectangle(35, 35, 140, 20));
+            jLabelGuid.setBounds(new java.awt.Rectangle(35, 35, 120, 20));
             jLabelVersion = new JLabel();
             jLabelVersion.setText("Version");
-            jLabelVersion.setBounds(new java.awt.Rectangle(35, 60, 140, 20));
+            jLabelVersion.setBounds(new java.awt.Rectangle(35, 60, 120, 20));
             jLabelAbstract = new JLabel();
             jLabelAbstract.setText("Abstract");
-            jLabelAbstract.setBounds(new java.awt.Rectangle(35, 85, 140, 20));
+            jLabelAbstract.setBounds(new java.awt.Rectangle(35, 85, 120, 20));
             jLabelDescription = new JLabel();
             jLabelDescription.setText("Description");
-            jLabelDescription.setBounds(new java.awt.Rectangle(35, 110, 140, 20));
+            jLabelDescription.setBounds(new java.awt.Rectangle(35, 110, 120, 20));
             jLabelCopyright = new JLabel();
             jLabelCopyright.setText("Copyright");
-            jLabelCopyright.setBounds(new java.awt.Rectangle(35, 175, 140, 20));
+            jLabelCopyright.setBounds(new java.awt.Rectangle(35, 175, 120, 20));
             jLabelLicense = new JLabel();
             jLabelLicense.setText("License");
-            jLabelLicense.setBounds(new java.awt.Rectangle(35, 200, 140, 20));
+            jLabelLicense.setBounds(new java.awt.Rectangle(35, 200, 120, 20));
             jLabelSpecification = new JLabel();
             jLabelSpecification.setText("Specification");
-            jLabelSpecification.setBounds(new java.awt.Rectangle(35, 290, 140, 20));
+            jLabelSpecification.setBounds(new java.awt.Rectangle(35, 290, 120, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);

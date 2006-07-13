@@ -134,7 +134,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldFarFile() {
         if (jTextFieldFarFile == null) {
             jTextFieldFarFile = new JTextField();
-            jTextFieldFarFile.setBounds(new java.awt.Rectangle(130, 100, 400, 20));
+            jTextFieldFarFile.setBounds(new java.awt.Rectangle(130,80,436,20));
         }
         return jTextFieldFarFile;
     }
@@ -147,7 +147,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
     private JButton getJButtonBrowser() {
         if (jButtonBrowser == null) {
             jButtonBrowser = new JButton();
-            jButtonBrowser.setBounds(new java.awt.Rectangle(542, 100, 97, 20));
+            jButtonBrowser.setBounds(new java.awt.Rectangle(570, 80, 100, 20));
             jButtonBrowser.setText("Browser...");
             jButtonBrowser.addMouseListener(this);
         }
@@ -162,7 +162,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(130, 164, 500, 160));
+            jScrollPane.setBounds(new java.awt.Rectangle(30, 135, 642, 160));
             jScrollPane.setViewportView(getJListFarFromDb());
         }
         return jScrollPane;
@@ -212,10 +212,10 @@ public class UpdateStepOne extends IDialog implements MouseListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabel1 = new JLabel();
-            jLabel1.setBounds(new java.awt.Rectangle(30, 138, 355, 18));
+            jLabel1.setBounds(new java.awt.Rectangle(30, 110, 355, 18));
             jLabel1.setText("Choose FAR from current framework database");
             jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(30, 80, 220, 20));
+            jLabel.setBounds(new java.awt.Rectangle(30,80,97,20));
             jLabel.setText("Choose FAR file: ");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);

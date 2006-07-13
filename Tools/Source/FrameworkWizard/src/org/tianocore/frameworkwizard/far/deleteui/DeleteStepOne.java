@@ -13,12 +13,23 @@
 
 package org.tianocore.frameworkwizard.far.deleteui;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
+
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 import javax.swing.JButton;
-import javax.swing.JTextArea;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
@@ -30,20 +41,7 @@ import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import javax.swing.JList;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-public class DeleteStepOne extends IDialog implements ListSelectionListener, MouseListener {
+public class DeleteStepOne extends IDialog implements ListSelectionListener {
 
     /**
      * 
@@ -100,7 +98,7 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
             jButtonCancel = new JButton();
             jButtonCancel.setBounds(new java.awt.Rectangle(570, 330, 90, 20));
             jButtonCancel.setText("Cancel");
-            jButtonCancel.addMouseListener(this);
+            jButtonCancel.addActionListener(this);
         }
         return jButtonCancel;
     }
@@ -116,6 +114,7 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
             jButtonNext.setBounds(new java.awt.Rectangle(470, 330, 90, 20));
             jButtonNext.setText("Next");
             jButtonNext.setEnabled(false);
+            jButtonNext.addActionListener(this);
         }
         return jButtonNext;
     }
@@ -147,7 +146,7 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(139, 64, 500, 104));
+            jScrollPane.setBounds(new java.awt.Rectangle(140, 65, 530, 100));
             jScrollPane.setViewportView(getJListFar());
         }
         return jScrollPane;
@@ -161,7 +160,7 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
     private JScrollPane getJScrollPane1() {
         if (jScrollPane1 == null) {
             jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(40, 195, 300, 115));
+            jScrollPane1.setBounds(new java.awt.Rectangle(30, 195, 300, 115));
             jScrollPane1.setViewportView(getJListPackage());
         }
         return jScrollPane1;
@@ -175,7 +174,7 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
     private JScrollPane getJScrollPane2() {
         if (jScrollPane2 == null) {
             jScrollPane2 = new JScrollPane();
-            jScrollPane2.setBounds(new java.awt.Rectangle(360, 195, 300, 115));
+            jScrollPane2.setBounds(new java.awt.Rectangle(360, 195, 310, 115));
             jScrollPane2.setViewportView(getJListPlatform());
         }
         return jScrollPane2;
@@ -218,7 +217,6 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
             jButtonDetail.setBounds(new java.awt.Rectangle(367, 325, 69, 20));
             jButtonDetail.setText("Detail");
             jButtonDetail.setVisible(false);
-            jButtonDetail.addMouseListener(this);
         }
         return jButtonDetail;
     }
@@ -275,10 +273,10 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
             jLabel3.setBounds(new java.awt.Rectangle(360, 170, 113, 20));
             jLabel3.setText("FAR's Platforms");
             jLabel2 = new JLabel();
-            jLabel2.setBounds(new java.awt.Rectangle(40, 170, 113, 20));
+            jLabel2.setBounds(new java.awt.Rectangle(30, 170, 113, 20));
             jLabel2.setText("FAR's Packages");
             jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(30, 64, 100, 20));
+            jLabel.setBounds(new java.awt.Rectangle(30, 65, 100, 20));
             jLabel.setText("Select one FAR: ");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
@@ -342,18 +340,16 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
                 jLabel4.setText("Without any remain packages depend on this FAR. ");
                 jButtonDetail.setVisible(false);
                 jButtonNext.setEnabled(true);
-                jButtonNext.addMouseListener(this);
             } else {
                 jLabelImage.setIcon(new ImageIcon(getClass().getResource("/resources/images/No.JPG")));
                 jLabel4.setText("Some remain packages still depend on this FAR. ");
                 //        jButtonDetail.setVisible(true);
                 jButtonNext.setEnabled(false);
-                jButtonNext.removeMouseListener(this);
             }
         }
     }
-
-    public void mouseClicked(MouseEvent e) {
+    
+    public void actionPerformed(ActionEvent e) {
         if (e.getSource() == jButtonCancel) {
             this.setVisible(false);
         } else if (e.getSource() == jButtonNext) {
@@ -367,25 +363,6 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener, Mou
             this.setVisible(false);
             stepTwo.setVisible(true);
         }
-    }
-
-    public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
 
     }
 
