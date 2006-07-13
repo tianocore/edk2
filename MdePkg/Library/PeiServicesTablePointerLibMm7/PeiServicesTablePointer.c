@@ -15,7 +15,15 @@
 **/
 
 
+/**
+  The function returns the pointer to PeiServices.
+  
+  The function returns the pointer to PeiServices. 
+  It will ASSERT() if the pointer to PeiServices is NULL.
 
+  @retval  The pointer to PeiServices.
+
+**/
 EFI_PEI_SERVICES **
 GetPeiServicesTablePointer (
   VOID
@@ -29,6 +37,16 @@ GetPeiServicesTablePointer (
 }
 
 /**
+  The constructor function caches the pointer to PEI services.
+  
+  The constructor function caches the pointer to PEI services. 
+  It will always return EFI_SUCCESS.
+
+  @param  FfsHeader   Pointer to FFS header the loaded driver.
+  @param  PeiServices Pointer to the PEI services.
+  
+  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+
 **/
 EFI_STATUS
 PeiServicesTablePointerLibConstructor (
