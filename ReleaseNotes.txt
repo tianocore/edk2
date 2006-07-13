@@ -18,8 +18,6 @@ Package Contents
   EdkModulePkg   - A package containing reference drivers
   EdkFatBinPkg   - A package containing binary DXE drivers for the Fat 32 file
                    system
-  EdkFatPkg      - A package containing source DXE drivers for the Fat 32 file
-                   system
   EdkShellBinPkg - A package containing binary Shell applications and commands
   EdkNt32Pkg     - A package containing the NT32 Emulation platform reference
 
@@ -27,6 +25,12 @@ Note: MDE and MDK that appear in other documentation refer to the MdePkg and
 Tools packages.  These two packages are the minimum requirement for developing
 EDK II Packages.  It is also recommended that the top level files included
 with the EDK be downloaded in conjunction with these two packages.
+
+The following package will be available as a separate project, under a 
+different license, on the TianoCore website: https://fat-driver2.tianocore.org
+
+  EdkFatPkg      - A package containing source DXE drivers for the Fat 32 file
+                   system
 
 Note: Documents have the following filenames:
   EDK II Module Development Environment Library Specification v0.50 
