@@ -23,8 +23,11 @@
 
      
 
-.global _SetJump
+.global _SetJump, _InternalAssertJumpBuffer
 _SetJump: 
+    pushl   0x4(%esp)
+    call    _InternalAssertJumpBuffer
+    popl    %ecx
     popl    %ecx
     movl    (%esp),%edx
     movl    %ebx,(%edx)
