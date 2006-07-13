@@ -29,6 +29,56 @@
       <HelpText/>
     </LibraryClass>
   </LibraryClassDeclarations>
+  <IndustryStdIncludes>
+    <IndustryStdHeader Name="WinNTInclude">
+      <IncludeHeader>Include/Common/WinNTInclude.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="EdkGenericBdsLib">
+      <IncludeHeader>Include/library/EdkGenericBdsLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="WinNtLib">
+      <IncludeHeader>Include/library/WinNtLib.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="NtAutoscan">
+      <IncludeHeader>Include/Ppi/NtAutoscan.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="NtFwh">
+      <IncludeHeader>Include/Ppi/NtFwh.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="NtPeiLoadFile">
+      <IncludeHeader>Include/Ppi/NtPeiLoadFile.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="NtThunk">
+      <IncludeHeader>Include/Ppi/NtThunk.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="WinNtIo">
+      <IncludeHeader>Include/Protocol/WinNtIo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="WinNtThunk">
+      <IncludeHeader>Include/Protocol/WinNtThunk.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FlashLayout">
+      <IncludeHeader>Include/FlashLayout.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="WinNtDxe">
+      <IncludeHeader>Include/WinNtDxe.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="WinNtPeim">
+      <IncludeHeader>Include/WinNtPeim.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+  </IndustryStdIncludes>
   <MsaFiles>
     <Filename>Dxe/ConPlatform/ConPlatform.msa</Filename>
     <Filename>Dxe/Nt32Platform/MiscSubclass/MiscSubclassDriver.msa</Filename>
