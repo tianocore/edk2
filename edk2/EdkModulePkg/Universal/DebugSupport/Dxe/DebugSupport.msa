@@ -50,6 +50,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>DebugSupport.c</Filename>
     <Filename>DebugSupport.dxs</Filename>
     <Filename SupArchList="IA32">Ia32/AsmFuncs.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/AsmFuncs.S</Filename>
     <Filename SupArchList="IA32">Ia32/plDebugSupport.h</Filename>
     <Filename SupArchList="IA32">Ia32/plDebugSupport.c</Filename>
     <Filename SupArchList="IPF">ipf/AsmFuncs.s</Filename>
