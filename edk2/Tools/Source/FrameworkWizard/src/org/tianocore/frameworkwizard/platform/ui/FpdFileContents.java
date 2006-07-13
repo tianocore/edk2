@@ -2201,7 +2201,7 @@ public class FpdFileContents {
     
     public String getFpdHdrSpec() {
 
-        return "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052";
+        return "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052";
 //        return getFpdHdr().getSpecification();
     }
     
@@ -2247,7 +2247,7 @@ public class FpdFileContents {
     }
     
     public void setFpdHdrSpec(String s){
-        s = "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052";
+        s = "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052";
         getFpdHdr().setSpecification(s);
     }
     /**

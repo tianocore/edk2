@@ -249,7 +249,7 @@ public class MsaHeader extends IInternalFrame {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
             jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052");
+            jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
             jTextFieldSpecification.setSize(new java.awt.Dimension(320, 20));
             jTextFieldSpecification.setLocation(new java.awt.Point(160, 435));
             jTextFieldSpecification.setEditable(false);
