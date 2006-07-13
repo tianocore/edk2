@@ -301,7 +301,39 @@ EfiConvertList (
   IN OUT LIST_ENTRY       *ListHead
   );
 
+/**
+ 
+  Passes capsules to the firmware with both virtual and physical mapping. 
+  Depending on the intended consumption, the firmware may
+  process the capsule immediately. If the payload should persist across a
+  system reset, the reset value returned from EFI_QueryCapsuleCapabilities must
+  be passed into ResetSystem() and will cause the capsule to be processed by 
+  the firmware as part of the reset process.
+  
+  @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
+                                being passed into update capsule. Each capsules is assumed to
+                                stored in contiguous virtual memory. The capsules in the
+                                CapsuleHeaderArray must be the same capsules as the
+                                ScatterGatherList. The CapsuleHeaderArray must
+                                have the capsules in the same order as the ScatterGatherList.
+  @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
+                                CaspuleHeaderArray.
+  @param  ScatterGatherList     Physical pointer to a set of
+                                EFI_CAPSULE_BLOCK_DESCRIPTOR that describes the
+                                location in physical memory of a set of capsules. See Related
+                                Definitions for an explanation of how more than one capsule is
+                                passed via this interface. The capsules in the
+                                ScatterGatherList must be in the same order as the
+                                CapsuleHeaderArray. This parameter is only referenced if
+                                the capsules are defined to persist across system reset.
 
+  @retval EFI_SUCCESS           Valid capsule was passed. I Valid capsule was passed. If
+                                CAPSULE_FLAGS_PERSIT_ACROSS_RESET is not set, the
+                                capsule has been successfully processed by the firmware.
+  @retval EFI_INVALID_PARAMETER CapsuleSize is NULL or ResetTye is NULL.
+  @retval EFI_DEVICE_ERROR      The capsule update was started, but failed due to a device error.
+
+**/
 EFI_STATUS
 EFIAPI
 EfiUpdateCapsule (
@@ -311,6 +343,38 @@ EfiUpdateCapsule (
   );
 
 
+/**
+ 
+  The QueryCapsuleCapabilities() function allows a caller to test to see if a capsule or
+  capsules can be updated via UpdateCapsule(). The Flags values in the capsule header and
+  size of the entire capsule is checked.
+  If the caller needs to query for generic capsule capability a fake EFI_CAPSULE_HEADER can be
+  constructed where CapsuleImageSize is equal to HeaderSize that is equal to sizeof
+  (EFI_CAPSULE_HEADER). To determine reset requirements,
+  CAPSULE_FLAGS_PERSIST_ACROSS_RESET should be set in the Flags field of the
+  EFI_CAPSULE_HEADER.
+  The firmware must support any capsule that has the
+  CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag set in EFI_CAPSULE_HEADER. The
+  firmware sets the policy for what capsules are supported that do not have the
+  CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag set.
+  
+  @param  CapsuleHeaderArray    Virtual pointer to an array of virtual pointers to the capsules
+                                being passed into update capsule. The capsules are assumed to
+                                stored in contiguous virtual memory.
+  @param  CapsuleCount          Number of pointers to EFI_CAPSULE_HEADER in
+                                CaspuleHeaderArray.
+  @param  MaxiumCapsuleSize     On output the maximum size that UpdateCapsule() can
+                                support as an argument to UpdateCapsule() via
+                                CapsuleHeaderArray and ScatterGatherList.
+                                Undefined on input.
+  @param  ResetType             Returns the type of reset required for the capsule update.
+
+  @retval EFI_SUCCESS           Valid answer returned..
+  @retval EFI_INVALID_PARAMETER MaximumCapsuleSize is NULL.
+  @retval EFI_UNSUPPORTED       The capsule type is not supported on this platform, and
+                                MaximumCapsuleSize and ResetType are undefined.
+
+**/
 EFI_STATUS
 EFIAPI
 EfiQueryCapsuleCapabilities (
@@ -320,6 +384,39 @@ EfiQueryCapsuleCapabilities (
   OUT EFI_RESET_TYPE           *ResetType
   );
 
+
+/**
+ 
+  The QueryVariableInfo() function allows a caller to obtain the information about the
+  maximum size of the storage space available for the EFI variables, the remaining size of the storage
+  space available for the EFI variables and the maximum size of each individual EFI variable,
+  associated with the attributes specified.
+  The returned MaximumVariableStorageSize, RemainingVariableStorageSize,
+  MaximumVariableSize information may change immediately after the call based on other
+  runtime activities including asynchronous error events. Also, these values associated with different
+  attributes are not additive in nature.
+  
+  @param  Attributes            Attributes bitmask to specify the type of variables on
+                                which to return information. Refer to the
+                                GetVariable() function description.
+  @param  MaximumVariableStorageSize  
+                                On output the maximum size of the storage space
+                                available for the EFI variables associated with the
+                                attributes specified.
+  @param  RemainingVariableStorageSize 
+                                Returns the remaining size of the storage space
+                                available for the EFI variables associated with the
+                                attributes specified..
+  @param  MaximumVariableSize   Returns the maximum size of the individual EFI
+                                variables associated with the attributes specified.
+
+  @retval EFI_SUCCESS           Valid answer returned.
+  @retval EFI_INVALID_PARAMETER An invalid combination of attribute bits was supplied.
+  @retval EFI_UNSUPPORTED       EFI_UNSUPPORTED The attribute is not supported on this platform, and the
+                                MaximumVariableStorageSize,
+                                RemainingVariableStorageSize, MaximumVariableSize
+                                are undefined.
+**/
 EFI_STATUS
 EFIAPI
 EfiQueryVariableInfo (
@@ -330,3 +427,4 @@ EfiQueryVariableInfo (
   );
 
 #endif
+
