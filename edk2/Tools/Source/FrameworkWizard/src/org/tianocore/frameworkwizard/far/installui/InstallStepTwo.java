@@ -160,7 +160,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(35, 81, 600, 113));
+            jScrollPane.setBounds(new java.awt.Rectangle(30, 80, 642, 110));
             jScrollPane.setViewportView(getJTablePackage());
         }
         return jScrollPane;
@@ -219,7 +219,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
     private JScrollPane getJScrollPane1() {
         if (jScrollPane1 == null) {
             jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(35, 214, 596, 112));
+            jScrollPane1.setBounds(new java.awt.Rectangle(30, 215, 642, 110));
             jScrollPane1.setViewportView(getJTablePlatform());
         }
         return jScrollPane1;

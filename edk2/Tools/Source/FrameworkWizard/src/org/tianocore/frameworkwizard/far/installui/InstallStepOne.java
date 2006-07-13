@@ -131,7 +131,7 @@ public class InstallStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldFarFile() {
         if (jTextFieldFarFile == null) {
             jTextFieldFarFile = new JTextField();
-            jTextFieldFarFile.setBounds(new java.awt.Rectangle(139, 100, 400, 20));
+            jTextFieldFarFile.setBounds(new java.awt.Rectangle(140, 80, 423, 20));
         }
         return jTextFieldFarFile;
     }
@@ -144,7 +144,7 @@ public class InstallStepOne extends IDialog implements MouseListener {
     private JButton getJButtonBrowser() {
         if (jButtonBrowser == null) {
             jButtonBrowser = new JButton();
-            jButtonBrowser.setBounds(new java.awt.Rectangle(542, 100, 97, 20));
+            jButtonBrowser.setBounds(new java.awt.Rectangle(570, 80, 100, 20));
             jButtonBrowser.setText("Browser...");
             jButtonBrowser.addMouseListener(this);
         }
@@ -159,7 +159,7 @@ public class InstallStepOne extends IDialog implements MouseListener {
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(27, 166, 511, 143));
+            jScrollPane.setBounds(new java.awt.Rectangle(30, 165, 642, 140));
             jScrollPane.setViewportView(getJTable());
         }
         jScrollPane.setVisible(false);
@@ -233,11 +233,11 @@ public class InstallStepOne extends IDialog implements MouseListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelWarning = new JLabel();
-            jLabelWarning.setBounds(new java.awt.Rectangle(29, 134, 410, 20));
+            jLabelWarning.setBounds(new java.awt.Rectangle(30, 125, 410, 20));
             jLabelWarning.setText("Can't install this FAR, lack following packages in current workspace");
             jLabelWarning.setVisible(false);
             jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(30, 80, 220, 20));
+            jLabel.setBounds(new java.awt.Rectangle(30, 80, 97, 20));
             jLabel.setText("Choose FAR file: ");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);

@@ -26,9 +26,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
 
 import org.tianocore.frameworkwizard.common.DataType;
+import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.IFileFilter;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
@@ -66,7 +66,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
 
     private JButton jButtonPrevious = null;
 
-    private PartialTableModel model = null;
+    private IDefaultTableModel model = null;
 
     private CreateStepThree stepThree = null;
 
@@ -99,7 +99,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
     private JTextField getJTextField1() {
         if (jTextFieldSaveToFile == null) {
             jTextFieldSaveToFile = new JTextField();
-            jTextFieldSaveToFile.setBounds(new java.awt.Rectangle(139, 70, 400, 20));
+            jTextFieldSaveToFile.setBounds(new java.awt.Rectangle(147,70,412,20));
         }
         return jTextFieldSaveToFile;
     }
@@ -112,7 +112,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
     private JButton getJButtonBrower() {
         if (jButtonBrowser == null) {
             jButtonBrowser = new JButton();
-            jButtonBrowser.setBounds(new java.awt.Rectangle(542, 70, 97, 20));
+            jButtonBrowser.setBounds(new java.awt.Rectangle(570, 70, 100, 20));
             jButtonBrowser.setText("Browser...");
             jButtonBrowser.addMouseListener(this);
         }
@@ -173,6 +173,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
             jButtonPrevious.setBounds(new java.awt.Rectangle(370, 330, 90, 20));
             jButtonPrevious.setText("Previous");
             jButtonPrevious.addMouseListener(this);
+            jButtonPrevious.setVisible(false);
         }
         return jButtonPrevious;
     }
@@ -193,7 +194,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Create Framework Archive(FAR) - Step 4: Summary");
+        this.setTitle("Create Framework Archive(FAR) - Step 4: Finish");
         this.centerWindow();
     }
 
@@ -205,10 +206,10 @@ public class CreateStepFour extends IDialog implements MouseListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabel2 = new JLabel();
-            jLabel2.setBounds(new java.awt.Rectangle(30, 70, 220, 18));
+            jLabel2.setBounds(new java.awt.Rectangle(30,70,111,18));
             jLabel2.setText("Select File to Save:  ");
             jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(30, 64, 320, 20));
+            jLabel.setBounds(new java.awt.Rectangle(29,108,320,20));
             jLabel.setText("This FAR will depend on following packages: ");
             jLabel.setVisible(false);
             jContentPane = new JPanel();
@@ -258,8 +259,8 @@ public class CreateStepFour extends IDialog implements MouseListener {
             this.setVisible(false);
             this.dispose();
         } else if (e.getSource() == jButtonPrevious) {
-            this.setVisible(false);
             stepThree.setVisible(true);
+            this.setVisible(false);
         } else if (e.getSource() == jButtonBrowser) {
             JFileChooser fc = new JFileChooser();
             fc.setAcceptAllFileFilterUsed(false);
@@ -352,16 +353,3 @@ public class CreateStepFour extends IDialog implements MouseListener {
     }
 }
 
-class PartialTableModel extends DefaultTableModel {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
-    public boolean isCellEditable(int row, int col) {
-        switch (col) {
-        default:
-            return false;
-        }
-    }
-}
