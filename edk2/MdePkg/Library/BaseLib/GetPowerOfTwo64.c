@@ -33,8 +33,9 @@ GetPowerOfTwo64 (
   IN      UINT64                    Operand
   )
 {
-  INTN                              BitPos;
+  if (Operand == 0) {
+    return 0;
+  }
 
-  BitPos = HighBitSet64 (Operand);
-  return BitPos >= 0 ? LShiftU64 (1, BitPos) : 0;
+  return LShiftU64 (1, HighBitSet64 (Operand));
 }
