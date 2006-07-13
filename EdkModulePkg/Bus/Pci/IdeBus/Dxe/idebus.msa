@@ -81,7 +81,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>ComponentName.c</Filename>
     <Filename>ComponentName.h</Filename>
     <Filename ToolCode="DUMMY">DriverConfiguration.c</Filename>
-    <Filename ToolCode="DUMMY">DriverDiagnostics.h</Filename>
+    <Filename ToolCode="DUMMY">DriverDiagnostics.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
