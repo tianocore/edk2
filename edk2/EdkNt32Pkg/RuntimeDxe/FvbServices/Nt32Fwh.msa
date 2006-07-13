@@ -65,7 +65,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Nt32Fwh.dxs</Filename>
-    <Filename SupArchList="IA32">nt32\FwBlockService.c</Filename>
+    <Filename SupArchList="IA32">nt32\FWBlockService.c</Filename>
     <Filename SupArchList="IA32">nt32\FwBlockService.h</Filename>
     <Filename SupArchList="IA32">nt32\FvbInfo.c</Filename>
     <Filename ToolCode="DUMMY">Common\FWBlockService.c</Filename>

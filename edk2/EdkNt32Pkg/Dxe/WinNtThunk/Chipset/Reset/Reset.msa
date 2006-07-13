@@ -55,7 +55,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>Reset.c</Filename>
+    <Filename>reset.c</Filename>
     <Filename>Reset.dxs</Filename>
   </SourceFiles>
   <PackageDependencies>

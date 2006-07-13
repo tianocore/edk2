@@ -53,7 +53,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>WinNtAutoScan.c</Filename>
+    <Filename>WinntAutoscan.c</Filename>
     <Filename>WinNtAutoscan.dxs</Filename>
   </SourceFiles>
   <PackageDependencies>
