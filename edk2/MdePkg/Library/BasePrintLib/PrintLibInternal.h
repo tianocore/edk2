@@ -85,6 +85,8 @@ BasePrintLibSPrint (
   Internal function that places ASCII or Unicode character into the Buffer.
 
   @param  Buffer      Buffer to place the Unicode or ASCII string.
+  @param  EndBuffer   The end of the input Buffer. No characters will be
+                      placed after that. 
   @param  Length      Count of character to be placed into Buffer.
   @param  Character   Character to be placed into Buffer.
   @param  Increment   Character increment in Buffer.
@@ -95,6 +97,7 @@ BasePrintLibSPrint (
 CHAR8 *
 BasePrintLibFillBuffer (
   CHAR8   *Buffer,
+  CHAR8   *EndBuffer,
   INTN    Length,
   UINTN   Character,
   INTN    Increment
@@ -151,7 +154,8 @@ BasePrintLibValueToString (
   @param  Flags     The bitmask of flags that specify left justification, zero pad,
                     and commas.
   @param  Value     The 64-bit signed value to convert to a string.
-  @param  Width     The maximum number of characters to place in Buffer.
+  @param  Width     The maximum number of characters to place in Buffer, not including
+                    the Null-terminator.
   @param  Increment Character increment in Buffer.
   
   @return Total number of characters required to perform the conversion.

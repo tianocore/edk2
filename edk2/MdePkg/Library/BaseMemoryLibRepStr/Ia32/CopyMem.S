@@ -53,6 +53,6 @@ L0:
     movsb                               # Copy bytes backward
     cld
     movl    12(%esp),%eax               # eax <- Destination as return value
-    push    %edi
-    push    %esi
+    pop    %edi
+    pop    %esi
     ret
