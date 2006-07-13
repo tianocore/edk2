@@ -9,7 +9,7 @@
 @REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 @REM
 
-@echo on
+@echo off
 
 :check_java
 if "%JAVA_HOME%"=="" goto no_jdk
@@ -19,16 +19,14 @@ if "%WORKSPACE%"=="" goto no_wks
 if "%ANT_HOME%"=="" goto no_ant
 :check_xmlbeans
 if "%XMLBEANS_HOME%"=="" goto no_xmlbeans
-
-set PATH=%JAVA_HOME%\bin;%ANT_HOME%\bin;%WORKSPACE%\Tools\bin;%XMLBEANS_HOME%\bin;%PATH%
-
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar;%WORKSPACE%\Tools\bin\FrameworkWizard.jar;.
-
-@REM Build SurfaceArea first
-call "ant" -f %WORKSPACE%\Tools\build.xml SurfaceArea
-
-@REM Build Framework Wizard
-call "ant" -f %WORKSPACE%\Tools\Source\FrameworkWizard\build.xml
+:check_surfacearea
+if not exist %WORKSPACE%\Tools\Jars\SurfaceArea.jar (
+  goto no_surfacearea
+)
+:check_frameworkwizard
+if not exist %WORKSPACE%\Tools\bin\FrameworkWizard.jar (
+  goto no_frameworkwizard
+)
 
 @REM Run Framework Wizard
 call "java" org.tianocore.frameworkwizard.FrameworkWizardUI
@@ -36,27 +34,39 @@ call "java" org.tianocore.frameworkwizard.FrameworkWizardUI
 goto end
 
 :no_jdk
-echo.
-echo !!! Please set JAVA_HOME !!!
-echo.
+@echo.
+@echo !!! Please set JAVA_HOME !!!
+@echo.
 goto check_wks
 
 :no_wks
-echo.
-echo !!! Please set WORKSPACE !!!
-echo.
+@echo.
+@echo !!! Please set WORKSPACE !!!
+@echo.
 goto check_ant
 
 :no_ant
-echo.
-echo !!! Please set ANT_HOME !!!
-echo.
+@echo.
+@echo !!! Please set ANT_HOME !!!
+@echo.
 goto check_xmlbeans
 
 :no_xmlbeans
-echo.
-echo !!! Please set XMLBEANS_HOME !!!
-echo.
+@echo.
+@echo !!! Please set XMLBEANS_HOME !!!
+@echo.
+goto end
+
+:no_surfacearea
+@echo.
+@echo !!! Please run edksetup.bat to build SurfaceArea.jar !!!
+@echo.
+goto end
+
+:no_frameworkwizard
+@echo.
+@echo !!! Please run edksetup.bat to build FrameworkWizard.jar !!!
+@echo.
 goto end
 
 :end
