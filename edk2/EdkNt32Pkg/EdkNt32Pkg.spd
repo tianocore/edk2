@@ -30,9 +30,6 @@
     </LibraryClass>
   </LibraryClassDeclarations>
   <MsaFiles>
-    <!--<MsaFile>
-      <Filename>Build/AprioriList.msa</Filename>
-    </MsaFile>-->
     <Filename>Dxe/ConPlatform/ConPlatform.msa</Filename>
     <Filename>Dxe/Nt32Platform/MiscSubclass/MiscSubclassDriver.msa</Filename>
     <Filename>Dxe/PlatformBds/PlatformBds.msa</Filename>
