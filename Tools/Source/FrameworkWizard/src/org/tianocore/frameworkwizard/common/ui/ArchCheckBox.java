@@ -20,6 +20,8 @@ import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.JCheckBox;
 
+import org.tianocore.frameworkwizard.common.DataType;
+
 public class ArchCheckBox extends JPanel {
 
     ///
@@ -49,6 +51,7 @@ public class ArchCheckBox extends JPanel {
             jCheckBoxIa32 = new JCheckBox();
             jCheckBoxIa32.setBounds(new java.awt.Rectangle(0, 0, 50, 20));
             jCheckBoxIa32.setText("IA32");
+            jCheckBoxIa32.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return jCheckBoxIa32;
     }
@@ -63,6 +66,7 @@ public class ArchCheckBox extends JPanel {
             jCheckBoxX64 = new JCheckBox();
             jCheckBoxX64.setBounds(new java.awt.Rectangle(50, 0, 50, 20));
             jCheckBoxX64.setText("X64");
+            jCheckBoxX64.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return jCheckBoxX64;
     }
@@ -77,6 +81,7 @@ public class ArchCheckBox extends JPanel {
             jCheckBoxIpf = new JCheckBox();
             jCheckBoxIpf.setBounds(new java.awt.Rectangle(100, 0, 50, 20));
             jCheckBoxIpf.setText("IPF");
+            jCheckBoxIpf.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return jCheckBoxIpf;
     }
@@ -91,6 +96,7 @@ public class ArchCheckBox extends JPanel {
             jCheckBoxEbc = new JCheckBox();
             jCheckBoxEbc.setBounds(new java.awt.Rectangle(150, 0, 50, 20));
             jCheckBoxEbc.setText("EBC");
+            jCheckBoxEbc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return jCheckBoxEbc;
     }
@@ -105,6 +111,7 @@ public class ArchCheckBox extends JPanel {
             jCheckBoxArm = new JCheckBox();
             jCheckBoxArm.setBounds(new java.awt.Rectangle(200, 0, 55, 20));
             jCheckBoxArm.setText("ARM");
+            jCheckBoxArm.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return jCheckBoxArm;
     }
@@ -119,6 +126,7 @@ public class ArchCheckBox extends JPanel {
             jCheckBoxPpc = new JCheckBox();
             jCheckBoxPpc.setBounds(new java.awt.Rectangle(255, 0, 50, 20));
             jCheckBoxPpc.setText("PPC");
+            jCheckBoxPpc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return jCheckBoxPpc;
     }
@@ -155,6 +163,7 @@ public class ArchCheckBox extends JPanel {
         this.add(getJCheckBoxEbc(), null);
         this.add(getJCheckBoxArm(), null);
         this.add(getJCheckBoxPpc(), null);
+        this.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
     }
     
     public Vector<String> getSelectedItemsVector() {

@@ -77,39 +77,37 @@ public class WorkspaceTools {
     }
 
     public void addFarToDb(List<String> packageList, List<String> platformList, FarHeader far) {
-      FrameworkDatabase fdb = openFrameworkDb();
-      
-      for (int i = 0; i < packageList.size(); i++) {
-        DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
-        item.setFarGuid(far.getGuidValue());
-        item.setStringValue(packageList.get(i));
-        fdb.getPackageList().getFilenameList().add(item);
-      }
-      
-      for (int i = 0; i < platformList.size(); i++) {
-        DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
-        item.setFarGuid(far.getGuidValue());
-        item.setStringValue(platformList.get(i));
-        fdb.getPlatformList().getFilenameList().add(item);
-      }
-      
-      DbPathAndFilename farItem = DbPathAndFilename.Factory.newInstance();
-      farItem.setFarGuid(far.getGuidValue());
-      farItem.setStringValue(far.getFarName());
-      fdb.getFarList().getFilenameList().add(farItem);
-      
-      String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
-      strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
-      
-      try {
-        SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
+        FrameworkDatabase fdb = openFrameworkDb();
+
+        for (int i = 0; i < packageList.size(); i++) {
+            DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
+            item.setFarGuid(far.getGuidValue());
+            item.setStringValue(packageList.get(i));
+            fdb.getPackageList().getFilenameList().add(item);
+        }
+
+        for (int i = 0; i < platformList.size(); i++) {
+            DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
+            item.setFarGuid(far.getGuidValue());
+            item.setStringValue(platformList.get(i));
+            fdb.getPlatformList().getFilenameList().add(item);
+        }
+
+        DbPathAndFilename farItem = DbPathAndFilename.Factory.newInstance();
+        farItem.setFarGuid(far.getGuidValue());
+        farItem.setStringValue(far.getFarName());
+        fdb.getFarList().getFilenameList().add(farItem);
+
+        String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
+        strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
+
+        try {
+            SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    
-    
+
     public void removeFarFromDb(FarIdentification far) {
         FrameworkDatabase fdb = openFrameworkDb();
         //
@@ -118,90 +116,87 @@ public class WorkspaceTools {
         XmlCursor cursor = fdb.getPackageList().newCursor();
         cursor.toFirstChild();
         do {
-          DbPathAndFilename item = (DbPathAndFilename)cursor.getObject();
-          
-          if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
-            cursor.removeXml();
-          }
+            DbPathAndFilename item = (DbPathAndFilename) cursor.getObject();
+
+            if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+                cursor.removeXml();
+            }
         } while (cursor.toNextSibling());
         cursor.dispose();
-        
+
         //
         // Remove Platforms
         //
         cursor = fdb.getPlatformList().newCursor();
         cursor.toFirstChild();
         do {
-          DbPathAndFilename item = (DbPathAndFilename)cursor.getObject();
-          if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
-            cursor.removeXml();
-          }
+            DbPathAndFilename item = (DbPathAndFilename) cursor.getObject();
+            if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+                cursor.removeXml();
+            }
         } while (cursor.toNextSibling());
-        
+
         //
         // Remove Far
         //
         cursor = fdb.getFarList().newCursor();
         cursor.toFirstChild();
         do {
-          DbPathAndFilename item = (DbPathAndFilename)cursor.getObject();
-          if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
-            cursor.removeXml();
-          }
+            DbPathAndFilename item = (DbPathAndFilename) cursor.getObject();
+            if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+                cursor.removeXml();
+            }
         } while (cursor.toNextSibling());
         cursor.dispose();
-        
+
         String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
         strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
         try {
-          SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
-        }
-        catch (Exception e) {
-          e.printStackTrace();
+            SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
-    
-    public String getPackageFarGuid(PackageIdentification packageId) {
-      openFrameworkDb();
-      
-      for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
-        DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
-        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
-                      + item.getStringValue();
-        File tempFile = new File(path);
-        if (tempFile.getPath().equalsIgnoreCase(packageId.getSpdFile().getPath())) {
-          return fdb.getPackageList().getFilenameArray(index).getFarGuid();
+
+    public String getPackageFarGuid(Identification packageId) {
+        openFrameworkDb();
+
+        for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
+            String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
+            File tempFile = new File(path);
+            if (tempFile.getPath().equalsIgnoreCase(packageId.getPath())) {
+                return fdb.getPackageList().getFilenameArray(index).getFarGuid();
+            }
         }
-      }
-      
-      return null;
-    }
-    
-    public String getPlatformFarGuid(PlatformIdentification platformId) {
-      openFrameworkDb();
-      
-      for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
-        DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
-        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
-                      + item.getStringValue();
-        File tempFile = new File(path);
-        if (tempFile.getPath().equalsIgnoreCase(platformId.getFpdFile().getPath())) {
-          return fdb.getPlatformList().getFilenameArray(index).getFarGuid();
-        }
-      }
-      
-      return null;
-    }
-    
-    public String getModuleFarGuid(ModuleIdentification moduleId) {
-      PackageIdentification packageId = getPackageIdByModuleId(moduleId);
-      if (packageId != null) {
-          return getPackageFarGuid(packageId);
-      }
-      else {
+
         return null;
-      }
     }
+
+    public String getPlatformFarGuid(Identification platformId) {
+        openFrameworkDb();
+
+        for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
+            String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
+            File tempFile = new File(path);
+            if (tempFile.getPath().equalsIgnoreCase(platformId.getPath())) {
+                return fdb.getPlatformList().getFilenameArray(index).getFarGuid();
+            }
+        }
+
+        return null;
+    }
+
+    public String getModuleFarGuid(Identification moduleId) {
+        PackageIdentification packageId = getPackageIdByModuleId(moduleId);
+        if (packageId != null) {
+            return getPackageFarGuid(packageId);
+        } else {
+            return null;
+        }
+    }
+
     /**
      Get all modules' paths from one package
      
@@ -229,34 +224,34 @@ public class WorkspaceTools {
         }
         return modulePath;
     }
-    
+
     /**
-    Get all Industry Std Includes' paths from one package
-    
-    @return a Vector with all paths
-    
-    **/
-   public Vector<String> getAllIndustryStdIncludesOfPackage(String path) {
-       Vector<String> includePath = new Vector<String>();
-       try {
-           IndustryStdIncludes files = OpenFile.openSpdFile(path).getIndustryStdIncludes();
-           if (files != null) {
-               for (int index = 0; index < files.getIndustryStdHeaderList().size(); index++) {
-                   String temp = files.getIndustryStdHeaderList().get(index).getName();
-                   temp = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + temp;
-                   temp = Tools.convertPathToCurrentOsType(temp);
-                   includePath.addElement(temp);
-               }
-           }
-       } catch (IOException e) {
+     Get all Industry Std Includes' paths from one package
+     
+     @return a Vector with all paths
+     
+     **/
+    public Vector<String> getAllIndustryStdIncludesOfPackage(String path) {
+        Vector<String> includePath = new Vector<String>();
+        try {
+            IndustryStdIncludes files = OpenFile.openSpdFile(path).getIndustryStdIncludes();
+            if (files != null) {
+                for (int index = 0; index < files.getIndustryStdHeaderList().size(); index++) {
+                    String temp = files.getIndustryStdHeaderList().get(index).getIncludeHeader();
+                    temp = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + temp;
+                    temp = Tools.convertPathToCurrentOsType(temp);
+                    includePath.addElement(temp);
+                }
+            }
+        } catch (IOException e) {
 
-       } catch (XmlException e) {
+        } catch (XmlException e) {
 
-       } catch (Exception e) {
+        } catch (Exception e) {
 
-       }
-       return includePath;
-   }
+        }
+        return includePath;
+    }
 
     /**
      Get all package basic information form the FrameworkDatabase.db file
@@ -293,90 +288,88 @@ public class WorkspaceTools {
     }
 
     public Vector<FarIdentification> getAllFars() {
-      openFrameworkDb();
-      Vector<FarIdentification> v = new Vector<FarIdentification>();
-      for (int index = 0; index < fdb.getFarList().getFilenameList().size(); index++) {
-        DbPathAndFilename item = fdb.getFarList().getFilenameList().get(index);
-        FarIdentification far = new FarIdentification(item.getFarGuid(), item.getMd5Sum(), item.getStringValue());
-        v.addElement(far);
-      }
-      return v;
+        openFrameworkDb();
+        Vector<FarIdentification> v = new Vector<FarIdentification>();
+        for (int index = 0; index < fdb.getFarList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = fdb.getFarList().getFilenameList().get(index);
+            FarIdentification far = new FarIdentification(item.getFarGuid(), item.getMd5Sum(), item.getStringValue());
+            v.addElement(far);
+        }
+        return v;
     }
-    
+
     public Vector<PackageIdentification> getPackagesByFar(FarIdentification far) {
-      Identification id = null;
-      openFrameworkDb();
-      Vector<PackageIdentification> v = new Vector<PackageIdentification>();
-      
-      for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
-        DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
-        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
-                      + item.getStringValue();
-        path = Tools.convertPathToCurrentOsType(path);
-        
-        if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
-        
-          try {
-            id = getId(path, OpenFile.openSpdFile(path));
-            v.addElement(new PackageIdentification(id));
-          } catch (IOException e) {
-            Log.err("Open Package Surface Area " + path, e.getMessage());
-            e.printStackTrace();
-          } catch (XmlException e) {
-            Log.err("Open Package Surface Area " + path, e.getMessage());
-            e.printStackTrace();
-          } catch (Exception e) {
-            Log.err("Open Package Surface Area " + path, "Invalid file type");
-            e.printStackTrace();
-          }
+        Identification id = null;
+        openFrameworkDb();
+        Vector<PackageIdentification> v = new Vector<PackageIdentification>();
+
+        for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
+            String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
+            path = Tools.convertPathToCurrentOsType(path);
+
+            if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+
+                try {
+                    id = getId(path, OpenFile.openSpdFile(path));
+                    v.addElement(new PackageIdentification(id));
+                } catch (IOException e) {
+                    Log.err("Open Package Surface Area " + path, e.getMessage());
+                    e.printStackTrace();
+                } catch (XmlException e) {
+                    Log.err("Open Package Surface Area " + path, e.getMessage());
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    Log.err("Open Package Surface Area " + path, "Invalid file type");
+                    e.printStackTrace();
+                }
+            }
         }
-      }
-      return v;
+        return v;
     }
-    
+
     public Vector<PlatformIdentification> getPlatformsByFar(FarIdentification far) {
-      Identification id = null;
-      openFrameworkDb();
-      Vector<PlatformIdentification> v = new Vector<PlatformIdentification>();
-      
-      for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
-        DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
-        String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
-                      + item.getStringValue();
-        path = Tools.convertPathToCurrentOsType(path);
-        
-        if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
-          try {
-            id = getId(path, OpenFile.openFpdFile(path));
-            v.addElement(new PlatformIdentification(id));
-          } catch (IOException e) {
-            Log.err("Open Platform Surface Area " + path, e.getMessage());
-            e.printStackTrace();
-          } catch (XmlException e) {
-            Log.err("Open Platform Surface Area " + path, e.getMessage());
-            e.printStackTrace();
-          } catch (Exception e) {
-            Log.err("Open Platform Surface Area " + path, "Invalid file type");
-            e.printStackTrace();
-          }
+        Identification id = null;
+        openFrameworkDb();
+        Vector<PlatformIdentification> v = new Vector<PlatformIdentification>();
+
+        for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
+            String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
+            path = Tools.convertPathToCurrentOsType(path);
+
+            if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
+                try {
+                    id = getId(path, OpenFile.openFpdFile(path));
+                    v.addElement(new PlatformIdentification(id));
+                } catch (IOException e) {
+                    Log.err("Open Platform Surface Area " + path, e.getMessage());
+                    e.printStackTrace();
+                } catch (XmlException e) {
+                    Log.err("Open Platform Surface Area " + path, e.getMessage());
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    Log.err("Open Platform Surface Area " + path, "Invalid file type");
+                    e.printStackTrace();
+                }
+            }
         }
-    }
-      return v;
+        return v;
     }
 
     /**
      Get all module basic information from a package
-    
+     
      @param id Package id
      @return A vector includes all modules' basic information
-    
-    **/
+     
+     **/
     public Vector<ModuleIdentification> getAllModules(PackageIdentification pid) {
         Vector<ModuleIdentification> v = new Vector<ModuleIdentification>();
         Vector<String> modulePaths = this.getAllModulesOfPackage(pid.getPath());
         Identification id = null;
         String modulePath = null;
-        
+
         for (int index = 0; index < modulePaths.size(); index++) {
             try {
                 modulePath = modulePaths.get(index);
@@ -392,7 +385,7 @@ public class WorkspaceTools {
         }
         Tools.sortModules(v, DataType.SORT_TYPE_ASCENDING);
         return v;
-        
+
     }
 
     /**
@@ -418,7 +411,7 @@ public class WorkspaceTools {
         for (int indexI = 0; indexI < vPackageList.size(); indexI++) {
             packagePath = vPackageList.elementAt(indexI).getPath();
             modulePaths = this.getAllModulesOfPackage(packagePath);
-            
+
             for (int indexJ = 0; indexJ < modulePaths.size(); indexJ++) {
                 try {
                     modulePath = modulePaths.get(indexJ);
@@ -723,7 +716,7 @@ public class WorkspaceTools {
                 } catch (IOException e) {
 
                 } catch (XmlException e) {
-                
+
                 } catch (Exception e) {
 
                 }
@@ -877,7 +870,7 @@ public class WorkspaceTools {
         // First add package
         //
         v.addElement(path);
-        
+
         //
         // Add the package's industry std includes one by one
         //
@@ -886,7 +879,7 @@ public class WorkspaceTools {
         for (int index = 0; index < f1.size(); index++) {
             v.addElement(f1.get(index));
         }
-        
+
         //
         // Add module's files one by one
         //

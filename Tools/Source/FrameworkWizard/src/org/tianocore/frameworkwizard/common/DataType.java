@@ -162,7 +162,7 @@ public class DataType {
     public static final int SPACE_TO_RIGHT_FOR_REMOVE_BUTTON = 95;
 
     public static final int SPACE_TO_RIGHT_FOR_UPDATE_BUTTON = 10;
-    
+
     public static final int SPACE_TO_BOTTOM_FOR_ADD_BUTTON = 30;
 
     public static final int SPACE_TO_BOTTOM_FOR_REMOVE_BUTTON = 30;
@@ -210,7 +210,7 @@ public class DataType {
     // First defined here
     // Will be replaced by resource file later
     //
-    public static final String SUP_ARCH_LIST_HELP_TEXT = "Deselecting a checkbox will restrict this module for use with the selected architectures, based on the list of items that are checked. If all boxes are checked, then the module will support all current AND FUTURE architectures";
+    public static final String SUP_ARCH_LIST_HELP_TEXT = "<html>Selecting a checkbox means supporting the selected architectures;<br> None of boxes are checked means supporting all architectures<html>";
 
     //
     // Project name and version

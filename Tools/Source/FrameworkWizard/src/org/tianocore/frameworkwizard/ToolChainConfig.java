@@ -35,6 +35,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.frameworkwizard.common.DataType;
+import org.tianocore.frameworkwizard.common.IFileFilter;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.ToolChainConfigId;
@@ -348,7 +349,9 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
 
         if (arg0.getSource() == jButtonOpen) {
             JFileChooser fc = new JFileChooser();
-            fc.setAcceptAllFileFilterUsed(true);
+            fc.setAcceptAllFileFilterUsed(false);
+            IFileFilter iff = new IFileFilter(DataType.TEXT_FILE_EXT);
+            fc.addChoosableFileFilter(iff);
             fc.setCurrentDirectory(new File(toolsDir));
 
             int result = fc.showOpenDialog(new JPanel());
@@ -369,8 +372,10 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
 
         if (arg0.getSource() == jButtonSave) {
             JFileChooser fc = new JFileChooser();
-            fc.setAcceptAllFileFilterUsed(true);
-            fc.setSelectedFile(new File(currentFile));
+            fc.setAcceptAllFileFilterUsed(false);
+            IFileFilter iff = new IFileFilter(DataType.TEXT_FILE_EXT);
+            fc.addChoosableFileFilter(iff);
+            fc.setCurrentDirectory(new File(toolsDir));
 
             int result = fc.showSaveDialog(new JPanel());
             if (result == JFileChooser.APPROVE_OPTION) {
