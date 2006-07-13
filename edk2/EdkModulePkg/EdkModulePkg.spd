@@ -116,7 +116,6 @@
     <Filename>Library/EdkMemoryStatusCodeLib/EdkMemoryStatusCodeLib.msa</Filename>
     <Filename>Library/EdkNullCustomizedDecompressLib/EdkNullCustomizedDecompressLib.msa</Filename>
     <Filename>Library/EdkPeCoffLoaderLib/EdkPeCoffLoaderLib.msa</Filename>
-    <Filename>Library/EdkPeCoffLoaderLibX64/EdkPeCoffLoaderLibX64.msa</Filename>
     <Filename>Library/EdkPeCoffLoaderX64Lib/EdkPeCoffLoaderX64Lib.msa</Filename>
     <Filename>Library/PeiPerformanceLib/PeiPerformanceLib.msa</Filename>
     <Filename>Library/EdkRuntimeStatusCodeLib/BsDataHubStatusCode/BsDataHubStatusCode.msa</Filename>
