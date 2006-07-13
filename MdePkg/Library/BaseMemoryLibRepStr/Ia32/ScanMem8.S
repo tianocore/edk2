@@ -39,4 +39,5 @@ _InternalMemScanMem8:
     repne   scasb
     leal    -1(%edi),%eax
     cmovnz  %ecx, %eax
+    pop     %edi
     ret

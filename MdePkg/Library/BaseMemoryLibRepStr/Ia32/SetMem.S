@@ -33,4 +33,5 @@ _InternalMemSetMem:
     rep
     stosb
     movl    8(%esp),%eax
+    pop     %edi
     ret
