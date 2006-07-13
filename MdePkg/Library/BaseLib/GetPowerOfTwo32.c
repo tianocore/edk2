@@ -33,8 +33,9 @@ GetPowerOfTwo32 (
   IN      UINT32                    Operand
   )
 {
-  INTN                              BitPos;
-  
-  BitPos = HighBitSet32 (Operand);
-  return BitPos >= 0 ? 1ul << BitPos : 0;
+  if (Operand == 0) {
+    return 0;
+  }
+
+  return 1ul << HighBitSet32 (Operand);
 }
