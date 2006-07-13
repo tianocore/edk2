@@ -1492,7 +1492,7 @@ public class SpdFileContents {
     @return SpecificationDocument.Specification
    **/
     public String getSpdHdrSpec() {
-        return "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052";
+        return "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052";
 //        return getSpdHdr().getSpecification();
     }
 
@@ -1502,7 +1502,7 @@ public class SpdFileContents {
     @param spec 
    **/
     public void setSpdHdrSpec(String spec) {
-        spec = "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052";
+        spec = "FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052";
         getSpdHdr().setSpecification(spec);
         
     }

@@ -214,7 +214,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldSpecification() {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
-            jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION 0x00000052");
+            jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
             jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 290, 420, 20));
             jTextFieldSpecification.setEditable(false);
         }
