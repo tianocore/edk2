@@ -17,7 +17,7 @@ Abstract:
 
 --*/
 
-#include "../cbi.h"
+#include "cbi.h"
 
 extern EFI_DRIVER_BINDING_PROTOCOL  gUsbCbi0DriverBinding;
 
