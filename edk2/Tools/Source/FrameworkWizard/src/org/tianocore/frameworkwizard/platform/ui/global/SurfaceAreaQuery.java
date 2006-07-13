@@ -976,7 +976,11 @@ public class SurfaceAreaQuery {
 		// which in MsaHeader.
 		//
 		String name = msaHeader.getModuleName();
-		String moduleType = msaHeader.getModuleType().toString();
+        String moduleType = "";
+        if (msaHeader.getModuleType() != null) {
+            moduleType = msaHeader.getModuleType().toString();
+        }
+        
 		String guid = msaHeader.getGuidValue();
 		String version = msaHeader.getVersion();
 

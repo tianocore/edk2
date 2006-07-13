@@ -59,7 +59,7 @@ public class GlobalData {
     ///
     /// Be used to ensure Global data will be initialized only once.
     ///
-    private static boolean globalFlag = false;
+//    private static boolean globalFlag = false;
     
     ///
     /// Framework Database information: package list and platform list
@@ -146,13 +146,6 @@ public class GlobalData {
             Framework Dababase or SPD or MSA file is not valid
     **/
     public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir) throws Exception {
-        //
-        // ensure this method will be revoked only once
-        //
-        if (globalFlag) {
-            return;
-        }
-        globalFlag = true;
         
         //
         // Backup workspace directory. It will be used by other method
@@ -177,7 +170,9 @@ public class GlobalData {
                 DbPathAndFilename dbPath = (DbPathAndFilename)iter.next();
                 String fileName = dbPath.getStringValue();
                 Spd spd = new Spd(new File(workspaceDir + File.separatorChar + fileName));
-                packageList.add(spd.getPackageId());
+                if (!packageList.contains(spd.getPackageId())) {
+                    packageList.add(spd.getPackageId());
+                }
                 spdTable.put(spd.getPackageId(), spd);
             }
 
@@ -342,9 +337,7 @@ public class GlobalData {
     }
     
     public synchronized static Map<String, XmlObject> getNativeMsa(File msaFile) throws Exception {
-        if (! msaFile.exists()) {
-            throw new Exception("Surface Area file [" + msaFile.getPath() + "] can't found.");
-        }
+        
         try {
             ModuleSurfaceAreaDocument doc = (ModuleSurfaceAreaDocument)XmlObject.Factory.parse(msaFile);
             //
