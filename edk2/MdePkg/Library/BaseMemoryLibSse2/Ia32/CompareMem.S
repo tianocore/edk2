@@ -42,7 +42,6 @@ _InternalMemCompareMem:
     movzbl  -1(%esi), %eax
     movzbl  -1(%edi), %edx
     subl    %edx, %eax
-    subl    %edx, %eax
     pop     %edi
     pop     %esi
     ret

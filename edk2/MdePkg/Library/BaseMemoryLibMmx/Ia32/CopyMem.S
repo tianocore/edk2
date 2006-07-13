@@ -85,6 +85,6 @@ L2:
     movsb
     cld
     movl    12(%esp), %eax
-    pop    %esi
-    pop    %edi
+    pop     %edi
+    pop     %esi
     ret
