@@ -62,7 +62,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename>EbcExecute.h</Filename>
     <Filename>Ebc.dxs</Filename>
     <Filename SupArchList="IA32">Ia32/EbcLowLevel.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/EbcLowLevel.S</Filename>
     <Filename SupArchList="IA32">Ia32/Ia32Math.asm</Filename>
+    <Filename SupArchList="IA32">Ia32/Ia32Math.S</Filename>
     <Filename SupArchList="IA32">Ia32/EbcSupport.c</Filename>
     <Filename SupArchList="X64">x64/EbcLowLevel.asm</Filename>
     <Filename SupArchList="X64">x64/x64Math.c</Filename>
