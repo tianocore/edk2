@@ -17,6 +17,15 @@
 #ifndef __PEI_SERVICES_TABLE_POINTER_LIB_H__
 #define __PEI_SERVICES_TABLE_POINTER_LIB_H__
 
+/**
+  The function returns the pointer to PEI services.
+  
+  The function returns the pointer to PEI services. 
+  It will ASSERT() if the pointer to PEI services is NULL.
+
+  @retval  The pointer to PeiServices.
+
+**/
 EFI_PEI_SERVICES **
 GetPeiServicesTablePointer (
   VOID
