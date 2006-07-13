@@ -82,8 +82,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
   
   <target name="SurfaceArea.java.clean">
-    <delete includeemptydirs="true">
-      <fileset dir="${WORKSPACE}/Tools/Source/SurfaceArea" includes="**/*" excludes="build.xml"/>
+    <delete includeemptydirs="true" failonerror="false">
+      <fileset dir="${WORKSPACE}/Tools/Source/SurfaceArea/org" includes="**/*"/>
     </delete>
   </target>
 
