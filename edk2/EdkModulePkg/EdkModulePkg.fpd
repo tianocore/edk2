@@ -147,7 +147,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3a9759d2-53bc-4eb2-abcd-c93099419063" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Inste ModuleGuid="b694e0dc-cd4e-4b30-885b-9c164ed3e74a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <InstancoduleGuid="b694e0dc-cd4e-4b30-885b-9c164ed3e74a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
