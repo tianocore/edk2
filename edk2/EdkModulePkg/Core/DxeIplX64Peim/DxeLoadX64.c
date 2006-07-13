@@ -263,10 +263,6 @@ Returns:
   PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderX64Protocol ();
 #endif 
 
-#if 0
-  Status = InstallEfiPeiPeCoffLoader64 (PeiServices, &PeiEfiPeiPeCoffLoader, NULL);
-  ASSERT_EFI_ERROR (Status);
-#endif
   //
   // Allocate 128KB for the Stack
   //
