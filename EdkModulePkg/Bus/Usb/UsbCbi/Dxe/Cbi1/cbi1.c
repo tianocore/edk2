@@ -18,7 +18,7 @@ Abstract:
 
 --*/
 
-#include "../cbi.h"
+#include "cbi.h"
 
 EFI_STATUS
 EFIAPI
