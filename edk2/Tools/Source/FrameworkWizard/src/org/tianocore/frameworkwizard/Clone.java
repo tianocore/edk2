@@ -121,7 +121,7 @@ public class Clone extends IDialog {
     private JTextField getJTextFieldType() {
         if (jTextFieldType == null) {
             jTextFieldType = new JTextField();
-            jTextFieldType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jTextFieldType.setBounds(new java.awt.Rectangle(210, 10, 320, 20));
             jTextFieldType.setEditable(false);
         }
         return jTextFieldType;
@@ -135,7 +135,7 @@ public class Clone extends IDialog {
     private JTextField getJTextFieldSource() {
         if (jTextFieldSource == null) {
             jTextFieldSource = new JTextField();
-            jTextFieldSource.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jTextFieldSource.setBounds(new java.awt.Rectangle(210, 35, 320, 20));
             jTextFieldSource.setEditable(false);
         }
         return jTextFieldSource;
@@ -149,7 +149,7 @@ public class Clone extends IDialog {
     private JButton getJButtonBrowse() {
         if (jButtonBrowse == null) {
             jButtonBrowse = new JButton();
-            jButtonBrowse.setBounds(new java.awt.Rectangle(395, 60, 85, 20));
+            jButtonBrowse.setBounds(new java.awt.Rectangle(445, 85, 85, 20));
             jButtonBrowse.setText("Browse");
             jButtonBrowse.addActionListener(this);
         }
@@ -164,7 +164,7 @@ public class Clone extends IDialog {
     private JTextField getJTextFieldFilePath() {
         if (jTextFieldFilePath == null) {
             jTextFieldFilePath = new JTextField();
-            jTextFieldFilePath.setBounds(new java.awt.Rectangle(160, 60, 230, 20));
+            jTextFieldFilePath.setBounds(new java.awt.Rectangle(210, 85, 230, 20));
         }
         return jTextFieldFilePath;
     }
@@ -177,7 +177,7 @@ public class Clone extends IDialog {
     private JTextField getJTextFieldBaseName() {
         if (jTextFieldBaseName == null) {
             jTextFieldBaseName = new JTextField();
-            jTextFieldBaseName.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
+            jTextFieldBaseName.setBounds(new java.awt.Rectangle(210, 110, 320, 20));
         }
         return jTextFieldBaseName;
     }
@@ -190,7 +190,7 @@ public class Clone extends IDialog {
     private JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 135, 230, 20));
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(210, 135, 230, 20));
         }
         return jTextFieldGuid;
     }
@@ -203,7 +203,7 @@ public class Clone extends IDialog {
     private JTextField getJTextFieldVersion() {
         if (jTextFieldVersion == null) {
             jTextFieldVersion = new JTextField();
-            jTextFieldVersion.setBounds(new java.awt.Rectangle(160, 160, 320, 20));
+            jTextFieldVersion.setBounds(new java.awt.Rectangle(210, 160, 320, 20));
         }
         return jTextFieldVersion;
     }
@@ -216,7 +216,7 @@ public class Clone extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(235, 200, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(285, 200, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -231,7 +231,7 @@ public class Clone extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(355, 200, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(405, 200, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -246,7 +246,7 @@ public class Clone extends IDialog {
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
             jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(395, 135, 85, 20));
+            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(445, 135, 85, 20));
             jButtonGenerateGuid.setText("Gen");
             jButtonGenerateGuid.addActionListener(this);
         }
@@ -261,7 +261,7 @@ public class Clone extends IDialog {
     private JComboBox getJComboBoxExistingPackage() {
         if (jComboBoxExistingPackage == null) {
             jComboBoxExistingPackage = new JComboBox();
-            jComboBoxExistingPackage.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jComboBoxExistingPackage.setBounds(new java.awt.Rectangle(210, 60, 320, 20));
         }
         return jComboBoxExistingPackage;
     }
@@ -316,7 +316,7 @@ public class Clone extends IDialog {
      * @return void
      */
     private void init() {
-        this.setSize(493, 260);
+        this.setSize(550, 260);
         this.setContentPane(getJContentPane());
         this.setTitle("Clone");
         this.centerWindow();
@@ -331,20 +331,26 @@ public class Clone extends IDialog {
         init();
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
             this.jTextFieldType.setText(DataType.MODULE_SURFACE_AREA);
-            this.jTextFieldSource.setText(oldId.getPath());
+            String s = oldId.getPath();
+            s = Tools.getRelativePath(s, Tools.getFilePathOnly(wt.getPackageIdByModuleId(oldId).getPath()));
+            this.jTextFieldSource.setText(Tools.convertPathToCurrentOsType(s));
             initExistingPackage();
-            this.jButtonBrowse.setEnabled(false);
+            this.jButtonBrowse.setVisible(false);
             this.jTextFieldFilePath.setToolTipText("Input module name here. For example, Application\\HelloWorld\\HelloWorld.msa");
-            this.jLabelDestinationFile.setText("Module Path\\Name");
+            this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
+            this.jLabelDestinationFile.setText("New Module Path and Filename");
         }
         if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
             this.jTextFieldType.setText(DataType.PACKAGE_SURFACE_AREA);
-            this.jTextFieldSource.setText(oldId.getPath());
+            String s = oldId.getPath();
+            s = Tools.getRelativePath(oldId.getPath(), Workspace.getCurrentWorkspace());
+            this.jTextFieldSource.setText(Tools.convertPathToCurrentOsType(s));
             this.jLabelBelong.setEnabled(false);
             this.jComboBoxExistingPackage.setEnabled(false);
-            this.jButtonBrowse.setEnabled(false);
+            this.jButtonBrowse.setVisible(false);
             this.jTextFieldFilePath.setToolTipText("Input package name here. For example, MdePkg\\MdePkg.fpd");
-            this.jLabelDestinationFile.setText("Package Path\\Name");
+            this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
+            this.jLabelDestinationFile.setText("New Package Path and Filename");
         }
         if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
             this.jTextFieldType.setText(DataType.PLATFORM_SURFACE_AREA);
@@ -352,7 +358,7 @@ public class Clone extends IDialog {
             this.jLabelBelong.setEnabled(false);
             this.jComboBoxExistingPackage.setEnabled(false);
             this.jTextFieldFilePath.setToolTipText("Select platform path here. For example, C:\\MyWorkspace\\EdkNt32Pkg\\Nt32.fpd");
-            this.jLabelDestinationFile.setText("New Platform path");
+            this.jLabelDestinationFile.setText("New Platform Path and Filename");
         }
         if (mode == DataType.RETURN_TYPE_WORKSPACE) {
             this.jTextFieldType.setText(DataType.WORKSPACE);
@@ -367,7 +373,7 @@ public class Clone extends IDialog {
             this.jLabelVersion.setEnabled(false);
             this.jTextFieldVersion.setEnabled(false);
             this.jTextFieldFilePath.setToolTipText("Input workspace path here. For example, C:\\MyWorkspace");
-            this.jLabelDestinationFile.setText("New Workspace path");
+            this.jLabelDestinationFile.setText("New Workspace Path");
         }
     }
 
@@ -379,29 +385,29 @@ public class Clone extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelBelong = new JLabel();
-            jLabelBelong.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
+            jLabelBelong.setBounds(new java.awt.Rectangle(15, 60, 190, 20));
             jLabelBelong.setText("Clone to Package");
             jLabelVersion = new JLabel();
-            jLabelVersion.setBounds(new java.awt.Rectangle(15, 160, 140, 20));
+            jLabelVersion.setBounds(new java.awt.Rectangle(15, 160, 190, 20));
             jLabelVersion.setText("Version");
             jLabelGuid = new JLabel();
-            jLabelGuid.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
+            jLabelGuid.setBounds(new java.awt.Rectangle(15, 135, 190, 20));
             jLabelGuid.setText("Guid");
             jLabelBaseName = new JLabel();
-            jLabelBaseName.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
+            jLabelBaseName.setBounds(new java.awt.Rectangle(15, 110, 190, 20));
             jLabelBaseName.setText("Base Name");
             jLabelDestinationFile = new JLabel();
-            jLabelDestinationFile.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
+            jLabelDestinationFile.setBounds(new java.awt.Rectangle(15, 85, 190, 20));
             jLabelDestinationFile.setText("Destination File Name");
             jLabelSource = new JLabel();
-            jLabelSource.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
+            jLabelSource.setBounds(new java.awt.Rectangle(15, 35, 190, 20));
             jLabelSource.setText("Source");
             jLabelType = new JLabel();
-            jLabelType.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
+            jLabelType.setBounds(new java.awt.Rectangle(15, 10, 190, 20));
             jLabelType.setText("Type");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setSize(new java.awt.Dimension(490, 227));
+            jContentPane.setSize(new java.awt.Dimension(540, 227));
             jContentPane.add(jLabelType, null);
             jContentPane.add(getJTextFieldType(), null);
             jContentPane.add(jLabelSource, null);
@@ -551,7 +557,7 @@ public class Clone extends IDialog {
      
      **/
     private boolean check() {
-        String src = this.jTextFieldSource.getText();
+        String src = this.oldId.getPath();
         String trg = this.jTextFieldFilePath.getText();
         File srcFile = new File(src);
         File trgFile = new File(trg);
@@ -648,7 +654,7 @@ public class Clone extends IDialog {
     }
 
     private void save() throws IOException, XmlException, Exception {
-        String src = this.jTextFieldSource.getText();
+        String src = this.oldId.getPath();
         String trg = this.jTextFieldFilePath.getText();
         Vector<String> vFiles = new Vector<String>();
         
@@ -898,6 +904,10 @@ public class Clone extends IDialog {
         c.setPackageGuid(wt.getPackageIdByModuleId(oldId).getGuid());
         c.setPackageVersion(wt.getPackageIdByModuleId(oldId).getVersion());
         c.setId(count.add(new BigInteger("1")));
+        String guid = wt.getModuleFarGuid(oldId);
+        if (guid != null && !guid.equals("")) {
+            c.setFarGuid(guid);    
+        }
 
         cf.addNewCloned();
         cf.setClonedArray(cf.getClonedList().size() - 1, c);
@@ -950,6 +960,10 @@ public class Clone extends IDialog {
         c.setPackageGuid(id.getGuid());
         c.setPackageVersion(id.getVersion());
         c.setId(count.add(new BigInteger("1")));
+        String guid = wt.getModuleFarGuid(oldId);
+        if (guid != null && !guid.equals("")) {
+            c.setFarGuid(guid);    
+        }
 
         cf.addNewCloned();
         cf.setClonedArray(cf.getClonedList().size() - 1, c);
@@ -1002,7 +1016,11 @@ public class Clone extends IDialog {
         c.setPlatformGuid(id.getGuid());
         c.setPlatformVersion(id.getVersion());
         c.setId(count.add(new BigInteger("1")));
-
+        String guid = wt.getModuleFarGuid(oldId);
+        if (guid != null && !guid.equals("")) {
+            c.setFarGuid(guid);    
+        }
+        
         cf.addNewCloned();
         cf.setClonedArray(cf.getClonedList().size() - 1, c);
         pd.addNewClonedFrom();

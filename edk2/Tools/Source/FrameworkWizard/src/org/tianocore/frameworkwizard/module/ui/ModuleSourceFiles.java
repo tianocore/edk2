@@ -344,7 +344,7 @@ public class ModuleSourceFiles extends IInternalFrame {
     }
 
     private void showEdit(int index) {
-        SourceFilesDlg sfd = new SourceFilesDlg(this.vSourceFiles.getSourceFiles(index), new IFrame());
+        SourceFilesDlg sfd = new SourceFilesDlg(this.vSourceFiles.getSourceFiles(index), new IFrame(), omt.getId().getPath());
         int result = sfd.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {

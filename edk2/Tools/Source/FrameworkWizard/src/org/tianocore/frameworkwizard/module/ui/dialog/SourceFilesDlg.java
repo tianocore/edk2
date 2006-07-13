@@ -15,6 +15,7 @@
 package org.tianocore.frameworkwizard.module.ui.dialog;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -27,12 +28,12 @@ import javax.swing.JTextField;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Log;
+import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.SourceFiles.SourceFilesIdentification;
-import org.tianocore.frameworkwizard.workspace.Workspace;
 
 /**
  The class is used to create, update SourceFile of MSA/MBD file
@@ -82,15 +83,17 @@ public class SourceFilesDlg extends IDialog {
     private JTextField jTextFieldFeatureFlag = null;
 
     private ArchCheckBox jArchCheckBox = null;
+    
+    private JButton jButtonOk = null;
+
+    private JButton jButtonCancel = null;
 
     //
     // Not used by UI
     //
     private SourceFilesIdentification sfid = null;
 
-    private JButton jButtonOk = null;
-
-    private JButton jButtonCancel = null;
+    private String msaFileName = "";
 
     /**
      This method initializes jTextFieldFileName 
@@ -238,9 +241,9 @@ public class SourceFilesDlg extends IDialog {
      This is the default constructor
      
      **/
-    public SourceFilesDlg(SourceFilesIdentification inSourceFilesIdentification, IFrame iFrame) {
+    public SourceFilesDlg(SourceFilesIdentification inSourceFilesIdentification, IFrame iFrame, String fileName) {
         super(iFrame, true);
-        init(inSourceFilesIdentification);
+        init(inSourceFilesIdentification, fileName);
     }
 
     /**
@@ -263,9 +266,10 @@ public class SourceFilesDlg extends IDialog {
      @param inSourceFiles The input data of SourceFilesDocument.SourceFiles
      
      **/
-    private void init(SourceFilesIdentification inSourceFilesIdentifications) {
+    private void init(SourceFilesIdentification inSourceFilesIdentifications, String fileName) {
         init();
         this.sfid = inSourceFilesIdentifications;
+        this.msaFileName = fileName;
 
         if (this.sfid != null) {
             this.jTextFieldFileName.setText(sfid.getFilename());
@@ -451,8 +455,8 @@ public class SourceFilesDlg extends IDialog {
      
      **/
     private void selectFile() {
-        JFileChooser fc = new JFileChooser(Workspace.getCurrentWorkspace());
-
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(Tools.getFilePathOnly(msaFileName)));
         int result = fc.showOpenDialog(new JPanel());
         if (result == JFileChooser.APPROVE_OPTION) {
             this.jTextFieldFileName.setText(fc.getSelectedFile().getName());

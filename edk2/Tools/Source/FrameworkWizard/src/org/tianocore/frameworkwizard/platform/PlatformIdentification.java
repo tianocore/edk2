@@ -23,8 +23,7 @@ import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.workspace.Workspace;
 
 public class PlatformIdentification extends Identification{
-    
-    
+
     public PlatformIdentification(String name, String guid, String version, String path){
         super(name, guid, version, path);
     }

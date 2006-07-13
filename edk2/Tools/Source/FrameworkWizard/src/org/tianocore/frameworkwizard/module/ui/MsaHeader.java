@@ -254,12 +254,6 @@ public class MsaHeader extends IInternalFrame {
             jTextFieldSpecification.setLocation(new java.awt.Point(160, 435));
             jTextFieldSpecification.setEditable(false);
             jTextFieldSpecification.addFocusListener(this);
-            jTextFieldSpecification
-                                   .setToolTipText("Deselecting a checkbox"
-                                                   + " will restrict this module for use with the selected architectures, "
-                                                   + "based on the list of items that are checked. "
-                                                   + "If all boxes are checked, "
-                                                   + "then the module will support all current AND FUTURE architectures");
         }
         return jTextFieldSpecification;
     }
@@ -800,6 +794,7 @@ public class MsaHeader extends IInternalFrame {
             //            }
             //            this.msaHeader.setSpecification(this.jTextFieldSpecification.getText());
 
+            msaHeader.setSpecification(this.jTextFieldSpecification.getText());
             msa.setMsaHeader(msaHeader);
             this.omt.setSaved(false);
         } catch (Exception e) {
