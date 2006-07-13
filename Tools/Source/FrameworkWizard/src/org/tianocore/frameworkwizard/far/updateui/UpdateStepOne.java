@@ -134,7 +134,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldFarFile() {
         if (jTextFieldFarFile == null) {
             jTextFieldFarFile = new JTextField();
-            jTextFieldFarFile.setBounds(new java.awt.Rectangle(130,80,436,20));
+            jTextFieldFarFile.setBounds(new java.awt.Rectangle(130, 80, 436, 20));
         }
         return jTextFieldFarFile;
     }
@@ -179,6 +179,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
             WorkspaceTools wt = new WorkspaceTools();
             farVector = wt.getAllFars();
             jListFarFromDb.setListData(farVector);
+            jListFarFromDb.setSelectionMode(0);
         }
         return jListFarFromDb;
     }
@@ -215,7 +216,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
             jLabel1.setBounds(new java.awt.Rectangle(30, 110, 355, 18));
             jLabel1.setText("Choose FAR from current framework database");
             jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(30,80,97,20));
+            jLabel.setBounds(new java.awt.Rectangle(30, 80, 97, 20));
             jLabel.setText("Choose FAR file: ");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
@@ -231,51 +232,48 @@ public class UpdateStepOne extends IDialog implements MouseListener {
         return jContentPane;
     }
 
-  public void mouseClicked(MouseEvent e) {
-    if (e.getSource() == jButtonCancel) {
-      this.setVisible(false);
-    }
-    else if (e.getSource() == jButtonNext) {
-      //
-      // Judge if FAR file is existed
-      //
-      farFile = new File(jTextFieldFarFile.getText());
-      if ( ! farFile.exists() || ! farFile.isFile()) {
-        Log.err("Please choose a FAR file already exists. ");
-        return ;
-      } 
-      
-      //
-      // Judge FAR is valid
-      //
-      try{
-          JarFile file = new JarFile(farFile);
-          this.far  = new Far(file);
-      } catch (Exception ex){
-          Log.err(ex.getMessage());
-      }
-      
-      
-      //
-      // Add more logic process here
-      //
-      if (jListFarFromDb.getSelectedValue() == null) {
-        Log.err("Please choose a FAR from framework database. ");
-        return ;
-      }
-      
-      if (stepTwo == null) {
+    public void mouseClicked(MouseEvent e) {
+        if (e.getSource() == jButtonCancel) {
+            this.setVisible(false);
+        } else if (e.getSource() == jButtonNext) {
+            //
+            // Judge if FAR file is existed
+            //
+            farFile = new File(jTextFieldFarFile.getText());
+            if (!farFile.exists() || !farFile.isFile()) {
+                Log.err("Please choose a FAR file already exists. ");
+                return;
+            }
+
+            //
+            // Judge FAR is valid
+            //
+            try {
+                JarFile file = new JarFile(farFile);
+                this.far = new Far(file);
+            } catch (Exception ex) {
+                Log.err(ex.getMessage());
+            }
+
+            //
+            // Add more logic process here
+            //
+            if (jListFarFromDb.getSelectedValue() == null) {
+                Log.err("Please choose a FAR from framework database. ");
+                return;
+            }
+
+            if (stepTwo == null) {
                 stepTwo = new UpdateStepTwo(this, true, this);
-      }
-      this.setVisible(false);
-      stepTwo.prepareTable();
-      stepTwo.setVisible(true);
-    }
-    else if (e.getSource() == jButtonBrowser) {
-      JFileChooser fc = new JFileChooser();
-      fc.setAcceptAllFileFilterUsed(false);
-      fc.addChoosableFileFilter(new IFileFilter(DataType.FAR_SURFACE_AREA_EXT));
-      fc.setCurrentDirectory(new File(Workspace.getCurrentWorkspace()));
+            }
+            this.setVisible(false);
+            stepTwo.prepareTable();
+            stepTwo.setVisible(true);
+        } else if (e.getSource() == jButtonBrowser) {
+            JFileChooser fc = new JFileChooser();
+            fc.setAcceptAllFileFilterUsed(false);
+            fc.addChoosableFileFilter(new IFileFilter(DataType.FAR_SURFACE_AREA_EXT));
+            fc.setCurrentDirectory(new File(Workspace.getCurrentWorkspace()));
 
             int result = fc.showSaveDialog(new JPanel());
             if (result == JFileChooser.APPROVE_OPTION) {

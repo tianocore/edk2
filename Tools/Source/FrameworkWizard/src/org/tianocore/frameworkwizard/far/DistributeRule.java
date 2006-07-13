@@ -59,8 +59,8 @@ public class DistributeRule {
                                                                             AggregationOperation.union(farPkgList,
                                                                                                        dbPkgList));
 
-        return resultList; 
-        
+        return resultList;
+
     }
 
     //    public void installPackgCheck (PackageIdentification pkgId, String pkgPath){
@@ -86,5 +86,4 @@ public class DistributeRule {
         }
         return set;
     }
-
 }

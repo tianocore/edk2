@@ -324,6 +324,15 @@ public class InstallStepTwo extends IDialog implements MouseListener {
             this.setVisible(false);
             this.dispose();
         } else if (e.getSource() == jButtonFinish) {
+
+            if (jTablePackage.isEditing()) {
+                jTablePackage.getCellEditor().stopCellEditing();
+            }
+
+            if (jTablePlatform.isEditing()) {
+                jTablePlatform.getCellEditor().stopCellEditing();
+            }
+
             List<String> packageList = new ArrayList<String>();
             List<String> platformList = new ArrayList<String>();
             //
@@ -419,11 +428,17 @@ public class InstallStepTwo extends IDialog implements MouseListener {
     }
 
     private boolean isPathContainMutual(File path1, File path2) {
-        if (path1.getPath().startsWith(path2.getParent())) {
-            return true;
-        }
-        if (path2.getPath().startsWith(path1.getPath())) {
-            return true;
+        String s1 = Tools.addFileSeparator(path1.getPath());
+        String s2 = Tools.addFileSeparator(path2.getParent());
+
+        if (s1.length() > s2.length()) {
+            if (s1.substring(0, s2.length()).equalsIgnoreCase(s2)) {
+                return true;
+            }
+        } else {
+            if (s2.substring(0, s1.length()).equalsIgnoreCase(s1)) {
+                return true;
+            }
         }
         return false;
     }
