@@ -1,13 +1,30 @@
+/** @file
+This file is to define  ToolChainAttribute class.
+
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+**/
+
 package org.tianocore.build.toolchain;
+
 /**
-* TODO: Add class description
-* 
-* @author   jwang36
-*/
+
+ ToolChainAttribute is used to define the enumeration value for the attributes
+ used in tool chain definition file. 
+
+ **/
 public class ToolChainAttribute {
     private static int nextValue = 0;
 
-    //"NAME", "PATH", "DPATH", "SPATH", "EXT", "FAMILY", "FLAGS"
+    //
+    // "NAME", "PATH", "DPATH", "SPATH", "EXT", "FAMILY", "FLAGS"
+    // 
     public final static ToolChainAttribute NAME = new ToolChainAttribute("NAME");
     public final static ToolChainAttribute PATH = new ToolChainAttribute("PATH");
     public final static ToolChainAttribute DPATH = new ToolChainAttribute("DPATH");
