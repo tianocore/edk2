@@ -7,14 +7,12 @@
     <Abstract>The Framework Module Development Packaging System Database</Abstract>
     <Description>This Database tracks all packages and platforms installed in this workspace.</Description>
     <Copyright>Copyright (c) 2006,  Intel Corporation.</Copyright>
-    <License>
-      All rights reserved.
+    <License>All rights reserved.
       This program and the accompanying materials are licensed and made available 
       under the terms and conditions of the BSD License which accompanies this distribution.
       The full text of the license may be found at http://opensource.org/licenses/bsd-license.php
       THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT WARRANTIES
-      OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-    </License>
+      OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </FdbHeader>
   <PackageList>
@@ -31,6 +29,6 @@
     <Filename>EdkNt32Pkg/Nt32.fpd</Filename>
   </PlatformList>
   <FarList>
-    <Filename>hello.world</Filename>
+    <Filename FarGuid="91062dfe-0bce-45b1-b3ad-3387d8d29d3f">Dummy</Filename>
   </FarList>
 </FrameworkDatabase>
