@@ -17,8 +17,13 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
@@ -29,11 +34,14 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
+import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.far.AggregationOperation;
+import org.tianocore.frameworkwizard.far.DistributeRule;
 import org.tianocore.frameworkwizard.far.Far;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
+import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -63,6 +71,7 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
     private JTable jTablePackage = null;
 
     private PartialTableModel model = null;
+  List<PackageIdentification> updatPkgList = new ArrayList<PackageIdentification>();
 
     public UpdateStepTwo(IDialog iDialog, boolean modal, UpdateStepOne stepOne) {
         this(iDialog, modal);
@@ -174,24 +183,25 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
             WorkspaceTools wt = new WorkspaceTools();
             List<PackageIdentification> packagesInDb = wt.getAllPackages();
 
-            List<PackageIdentification> result = AggregationOperation.intersection(packagesInDb, packagesInFar);
+      updatPkgList = AggregationOperation.intersection(packagesInDb, packagesInFar);
             //
             // Change here to get packages and platforms from FAR
             //
-            Iterator<PackageIdentification> iter = result.iterator();//packageList.iterator();
-            while (iter.hasNext()) {
-                String[] str = new String[4];
-                PackageIdentification item = iter.next();
-                str[0] = item.getName();
-                str[1] = item.getVersion();
-                str[2] = item.getGuid();
-                str[3] = Tools.getFilePathOnly(Tools.getRelativePath(item.getPath(), Workspace.getCurrentWorkspace()));
-                model.addRow(str);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+      Iterator<PackageIdentification> iter = updatPkgList.iterator() ;//packageList.iterator();
+      while (iter.hasNext()) {
+        String[] str = new String[4];
+        PackageIdentification item = iter.next();
+        str[0] = item.getName();
+        str[1] = item.getVersion();
+        str[2] = item.getGuid();
+        str[3] = Tools.getFilePathOnly(Tools.getRelativePath(item.getPath(), Workspace.getCurrentWorkspace()));
+        model.addRow(str);
+      } 
     }
+    catch (Exception ex) {
+      ex.printStackTrace();
+    }
+  }
 
     /**
      * This is the default constructor
@@ -214,85 +224,184 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
         this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2);
     }
 
-    /**
-     * This method initializes jContentPane
-     * 
-     * @return javax.swing.JPanel
-     */
-    private JPanel getJContentPane() {
-        if (jContentPane == null) {
-            jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(30, 70, 281, 20));
-            jLabel.setText("Following packages will be updated: ");
-            jContentPane = new JPanel();
-            jContentPane.setLayout(null);
-            jContentPane.add(getJTextArea(), null);
-            jContentPane.add(getJButtonCancel(), null);
-            jContentPane.add(getJButtonFinish(), null);
-            jContentPane.add(getJButtonPrevious(), null);
-            jContentPane.add(getJScrollPane(), null);
-            jContentPane.add(jLabel, null);
+  /**
+   * This method initializes jContentPane
+   * 
+   * @return javax.swing.JPanel
+   */
+  private JPanel getJContentPane() {
+    if (jContentPane == null) {
+      jLabel = new JLabel();
+      jLabel.setBounds(new java.awt.Rectangle(30,70,281,20));
+      jLabel.setText("Following packages will be updated: ");
+      jContentPane = new JPanel();
+      jContentPane.setLayout(null);
+      jContentPane.add(getJTextArea(), null);
+      jContentPane.add(getJButtonCancel(), null);
+      jContentPane.add(getJButtonFinish(), null);
+      jContentPane.add(getJButtonPrevious(), null);
+      jContentPane.add(getJScrollPane(), null);
+      jContentPane.add(jLabel, null);
+    }
+    return jContentPane;
+  }
+  public void mouseClicked(MouseEvent e) {
+    if (e.getSource() == jButtonCancel) {
+      this.setVisible(false);
+    }
+    else if (e.getSource() == jButtonFinish) {
+      //
+      // Check depedency ?
+      //
+      WorkspaceTools wsTools = new WorkspaceTools();
+      
+      Iterator<PackageIdentification> iter = updatPkgList.iterator();
+      List<PackageIdentification> depResultList = new ArrayList<PackageIdentification>();
+      while (iter.hasNext()){
+          List<PackageIdentification> depPkgList = stepOne.getFar().getPackageDependencies(iter.next());
+          depResultList = AggregationOperation.union(depResultList, depPkgList);
+      }
+      
+      List<PackageIdentification> dbPkgList = DistributeRule.vectorToList(wsTools.getAllPackages());
+      List<PackageIdentification> resultList = AggregationOperation.minus(depResultList, AggregationOperation.union(
+              this.updatPkgList, dbPkgList));
+      Iterator resultIter = resultList.iterator();
+      while (resultIter.hasNext()){
+          Log.err("Missing dependency package " + ((PackageIdentification)resultIter.next()).toString() + "in workspace!");
+          return;
+      }
+      
+      //
+      // Remove all update packages
+      //
+      //
+      // For all packages, remove all files. 
+      // Exception FPD file still in DB
+      //
+      Vector<PlatformIdentification> allPlatforms = wsTools.getAllPlatforms();
+      Set<File> allPlatformFiles = new LinkedHashSet<File>();
+      
+      Iterator<PlatformIdentification> allPlfIter = allPlatforms.iterator();
+      while (iter.hasNext()) {
+        allPlatformFiles.add(allPlfIter.next().getFpdFile());
+      }
+      
+      Iterator<PackageIdentification> packageIter = this.updatPkgList.iterator();
+      while (packageIter.hasNext()) {
+        PackageIdentification item = packageIter.next();
+        Set<File> deleteFiles = new LinkedHashSet<File>();
+        recursiveDir(deleteFiles, item.getSpdFile().getParentFile(), allPlatformFiles);
+        Iterator<File> iterDeleteFile = deleteFiles.iterator();
+        while (iterDeleteFile.hasNext()){
+          deleteFiles(iterDeleteFile.next());
         }
-        return jContentPane;
-    }
-
-    public void mouseClicked(MouseEvent e) {
-        if (e.getSource() == jButtonCancel) {
-            this.setVisible(false);
-        } else if (e.getSource() == jButtonFinish) {
-            //
-            // Check depedency ?
-            //
-
-            //
-            // Remove all update packages
-            //
-
-            //
-            // Install all update packages
-            //
-
-            this.setVisible(false);
-        } else if (e.getSource() == jButtonPrevious) {
-            this.setVisible(false);
-            stepOne.setVisible(true);
+        //
+        // Remove all empty parent dir
+        //
+        File parentDir = item.getSpdFile().getParentFile();
+        while (parentDir.listFiles().length == 0) {
+          File tempFile = parentDir;
+          parentDir = parentDir.getParentFile();
+          tempFile.delete();
         }
+      }
+      
+      //
+      // Install all update packages
+      //
+      Iterator<PackageIdentification> updataIter = this.updatPkgList.iterator();
+      while (updataIter.hasNext()){
+          PackageIdentification pkgId = updataIter.next();
+          try{
+              stepOne.getFar().installPackage(pkgId, pkgId.getSpdFile());
+          }catch (Exception ex){
+              Log.err("Can install " + pkgId.toString() + " pakcage, please check it!");
+          }
+          
+      }
+      
+      
+      this.setVisible(false);
     }
-
-    public void mousePressed(MouseEvent e) {
-        // TODO Auto-generated method stub
-
+    else if (e.getSource() == jButtonPrevious) {
+      this.setVisible(false);
+      stepOne.setVisible(true);
     }
+  }
+  public void mousePressed(MouseEvent e) {
+    // TODO Auto-generated method stub
+    
+  }
+  public void mouseReleased(MouseEvent e) {
+    // TODO Auto-generated method stub
+    
+  }
+  public void mouseEntered(MouseEvent e) {
+    // TODO Auto-generated method stub
+    
+  }
+  public void mouseExited(MouseEvent e) {
+    // TODO Auto-generated method stub
+    
+  }
 
-    public void mouseReleased(MouseEvent e) {
-        // TODO Auto-generated method stub
-
+  private void recursiveDir(Set<File> files, File dir, Set<File> platformFiles) {
+      File[] fileList = dir.listFiles();
+      for (int i = 0; i < fileList.length; i ++) {
+        if (fileList[i].isFile()) {
+          if( ! platformFiles.contains(fileList[i])) {
+            files.add(fileList[i]);
+          }
+        }
+        else {
+          if (isContain(fileList[i], platformFiles)) {
+            recursiveDir(files, fileList[i], platformFiles);
+          }
+          else {
+            files.add(fileList[i]);
+          }
+        }
+      }
     }
-
-    public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-
+    
+    private void deleteFiles(File file) {
+      if (file.isDirectory()) {
+        File[] files = file.listFiles();
+        for (int i = 0; i < files.length; i ++) {
+          deleteFiles(files[i]);
+        }
+      }
+      file.delete();
     }
-
-    public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
-
+    
+    private boolean isContain(File dir, Set<File> platformFiles) {
+      Iterator<File> iter = platformFiles.iterator();
+      while (iter.hasNext()) {
+        File file = iter.next();
+        if (file.getPath().startsWith(dir.getPath())) {
+          //
+          // continue this FPD file
+          //
+          return true;
+        }
+      }
+      return false;
     }
+  }
 
-}
 
 class PartialTableModel extends DefaultTableModel {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
 
-    public boolean isCellEditable(int row, int col) {
-        switch (col) {
-        case 3:
-            return false;
-        default:
-            return false;
-        }
-    }
+  public boolean isCellEditable(int row, int col) {
+      switch (col){
+      case 3:
+          return false;
+      default:
+          return false; 
+      }
+  }
 }

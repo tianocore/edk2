@@ -57,7 +57,6 @@ public class Mainfest implements ManifestInterface {
     // / Mainfest file element name
     // /
     final static String mfFileName = "FarMainfest.MF";
-
     //
     // Header
     //
@@ -132,9 +131,9 @@ public class Mainfest implements ManifestInterface {
     File mfFile = null;
 
     public FarHeader getHeader() {
-        return fhInfo;
+      return fhInfo;
     }
-
+    
     public Mainfest() throws Exception {
         DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder dombuilder = domfac.newDocumentBuilder();
@@ -164,8 +163,8 @@ public class Mainfest implements ManifestInterface {
         this.fhInfo = fHeader;
     }
 
-    public void createManifest(List<PackageIdentification> pkgList, List<PlatformIdentification> plfList,
-                               Set<String> fileFilter) throws Exception {
+    public void createManifest(List<PackageIdentification> pkgList,
+            List<PlatformIdentification> plfList, Set<String> fileFilter) throws Exception {
 
         //
         // Add Package and it's contents to FarPackageList.
@@ -203,7 +202,7 @@ public class Mainfest implements ManifestInterface {
 
     public void addPkgToPkgList(PackageIdentification packageId, Set<String> fileFilter) throws Exception {
         files.add(packageId.getSpdFile());
-
+        
         FarPackage farPackage = new FarPackage();
         //
         // Add SPD file to FarPackage
@@ -212,17 +211,17 @@ public class Mainfest implements ManifestInterface {
 
         FarFileItem ffItem = new FarFileItem(spdFile.getName(), FarMd5.md5(spdFile));
         farPackage.setFarFile(ffItem);
-
+        
         //
         // Add package guid value.
         //
         farPackage.setGuidValue(packageId.getGuid());
-
+        
         //
         // Add package version
         //
         farPackage.setVersion(packageId.getVersion());
-
+        
         //
         // Add DefaultPat: Package absoulte path - Workspace absolut
         // path.
@@ -246,7 +245,7 @@ public class Mainfest implements ManifestInterface {
         // Remove current package's SPD file
         //
         fileSet.remove(packageId.getSpdFile());
-
+        
         files.addAll(fileSet);
 
         Iterator<File> iter = fileSet.iterator();
@@ -257,25 +256,26 @@ public class Mainfest implements ManifestInterface {
             ffItem = new FarFileItem(fileRelativePath, FarMd5.md5(normalFile));
             contents.add(ffItem);
         }
-
+        
         farPackage.setContentList(contents);
-
-        //        List<FarPlatformItem> fpfList = new ArrayList<FarPlatformItem>();
-        //
-        //        iter = fpdFileSet.iterator();
-        //
-        //        while (iter.hasNext()) {
-        //            File fpdFile = iter.next();
-        //            PlatformIdentification platformId = new PlatformIdentification(wsTool
-        //                    .getId(fpdFile.getPath(), OpenFile.openFpdFile(fpdFile
-        //                            .getPath())));
-        //            addPlatformIdToFarPlatformItemList(fpfList, platformId);
-        //        }
-        //        farPackage.setFarPlatformList(fpfList);
+        
+//        List<FarPlatformItem> fpfList = new ArrayList<FarPlatformItem>();
+//
+//        iter = fpdFileSet.iterator();
+//
+//        while (iter.hasNext()) {
+//            File fpdFile = iter.next();
+//            PlatformIdentification platformId = new PlatformIdentification(wsTool
+//                    .getId(fpdFile.getPath(), OpenFile.openFpdFile(fpdFile
+//                            .getPath())));
+//            addPlatformIdToFarPlatformItemList(fpfList, platformId);
+//        }
+//        farPackage.setFarPlatformList(fpfList);
         fPkgList.add(farPackage);
     }
 
-    private void recursiveDirectory(Set<File> files, Set<File> fpds, File dir, Set<String> fileFilter) {
+    private void recursiveDirectory(Set<File> files, Set<File> fpds, File dir,
+            Set<String> fileFilter) {
         if (isFilter(dir, fileFilter)) {
             return;
         }
@@ -285,11 +285,11 @@ public class Mainfest implements ManifestInterface {
                 if (isFilter(allFilesInDir[i], fileFilter)) {
                     continue;
                 }
-                //                if (allFilesInDir[i].getPath().toLowerCase().endsWith(".fpd")) {
-                //                    fpds.add(allFilesInDir[i]);
-                //                } else {
-                files.add(allFilesInDir[i]);
-                //                }
+//                if (allFilesInDir[i].getPath().toLowerCase().endsWith(".fpd")) {
+//                    fpds.add(allFilesInDir[i]);
+//                } else {
+                    files.add(allFilesInDir[i]);
+//                }
             } else {
                 recursiveDirectory(files, fpds, allFilesInDir[i], fileFilter);
             }
@@ -298,7 +298,7 @@ public class Mainfest implements ManifestInterface {
 
     public void addPlatformIdToFarPlatformItemList(PlatformIdentification platformId) throws Exception {
         files.add(platformId.getFpdFile());
-
+        
         FarPlatformItem fpfItem = new FarPlatformItem();
         FarFileItem ffItem;
         String fpfPath = platformId.getPath();
@@ -306,8 +306,7 @@ public class Mainfest implements ManifestInterface {
         //
         // Add farFileName
         //
-        ffItem = new FarFileItem(Tools.getRelativePath(fpfFile.getPath(), Workspace.getCurrentWorkspace()),
-                                 FarMd5.md5(fpfFile));
+        ffItem = new FarFileItem(Tools.getRelativePath(fpfFile.getPath(),Workspace.getCurrentWorkspace()), FarMd5.md5(fpfFile));
         fpfItem.setFarFile(ffItem);
 
         //
@@ -344,18 +343,16 @@ public class Mainfest implements ManifestInterface {
             // identification.
             //
 
-            PackageIdentification pkgId = new PackageIdentification(fPkg.getFarFile().getRelativeFilename(),
-                                                                    fPkg.getGuidValue(), fPkg.getVersion());
-            pkgId.setPath(Workspace.getCurrentWorkspace() + File.separatorChar + fPkg.getDefaultPath()
-                          + File.separatorChar + fPkg.getFarFile().getRelativeFilename());
-            //            wsTool.getId(
-            //                    Workspace.getCurrentWorkspace() + File.separatorChar
-            //                            + fPkg.getDefaultPath(), OpenFile
-            //                            .openFpdFile(Workspace.getCurrentWorkspace()
-            //                                    + File.separatorChar
-            //                                    + fPkg.getDefaultPath()
-            //                                    + File.separatorChar
-            //                                    + fPkg.getFarFile().getRelativeFilename()));
+            PackageIdentification pkgId = new PackageIdentification(fPkg.getFarFile().getRelativeFilename(), fPkg.getGuidValue(), fPkg.getVersion());
+            pkgId.setPath(Workspace.getCurrentWorkspace() + File.separatorChar + fPkg.getDefaultPath() + File.separatorChar + fPkg.getFarFile().getRelativeFilename());
+//            wsTool.getId(
+//                    Workspace.getCurrentWorkspace() + File.separatorChar
+//                            + fPkg.getDefaultPath(), OpenFile
+//                            .openFpdFile(Workspace.getCurrentWorkspace()
+//                                    + File.separatorChar
+//                                    + fPkg.getDefaultPath()
+//                                    + File.separatorChar
+//                                    + fPkg.getFarFile().getRelativeFilename()));
             pkgList.add(pkgId);
         }
         return pkgList;
@@ -364,7 +361,8 @@ public class Mainfest implements ManifestInterface {
     /**
      * 
      */
-    public List<PlatformIdentification> getPlatformList() throws Exception, IOException, XmlException {
+    public List<PlatformIdentification> getPlatformList() throws Exception,
+            IOException, XmlException {
         //
         // PlatformIdentification set.
         //
@@ -372,21 +370,21 @@ public class Mainfest implements ManifestInterface {
         Iterator plfItem = this.fPlfList.iterator();
         while (plfItem.hasNext()) {
             FarPlatformItem fpfItem = (FarPlatformItem) plfItem.next();
-            File file = new File(Workspace.getCurrentWorkspace() + File.separatorChar
-                                 + fpfItem.getFarFile().getRelativeFilename());
+            File file = new File(Workspace.getCurrentWorkspace()
+                    + File.separatorChar 
+                    + fpfItem.getFarFile().getRelativeFilename());
             //
             // Set platformIdentificaiton's path as absolutly path (include
             // workspace and FPD relatively path)
             //
-            PlatformIdentification plfId = new PlatformIdentification(fpfItem.getFarFile().getRelativeFilename(),
-                                                                      fpfItem.getGuidValue(), fpfItem.getVersion(),
-                                                                      file.getPath());
-
-            //                (PlatformIdentification) wsTool
-            //                    .getId(file.getParent(), OpenFile.openFpdFile(Workspace
-            //                            .getCurrentWorkspace()
-            //                            + File.separatorChar
-            //                            + fpfItem.getFarFile().getRelativeFilename()));
+            PlatformIdentification plfId = new PlatformIdentification (fpfItem.getFarFile().getRelativeFilename(), fpfItem.getGuidValue(),fpfItem.getVersion(),
+                    file.getPath());
+            
+//                (PlatformIdentification) wsTool
+//                    .getId(file.getParent(), OpenFile.openFpdFile(Workspace
+//                            .getCurrentWorkspace()
+//                            + File.separatorChar
+//                            + fpfItem.getFarFile().getRelativeFilename()));
             plfList.add(plfId);
         }
         return plfList;
@@ -395,19 +393,20 @@ public class Mainfest implements ManifestInterface {
     public List<FarFileItem> getPlatformContents(PlatformIdentification platformId) {
         List<FarFileItem> result = new ArrayList<FarFileItem>();
         Iterator<FarPlatformItem> iter = this.fPlfList.iterator();
-
+        
         while (iter.hasNext()) {
             FarPlatformItem item = iter.next();
             if (item.isIdentityPlf(platformId)) {
                 FarFileItem farFileItem = item.getFarFile();
                 farFileItem.setDefaultPath(farFileItem.getRelativeFilename());
+                farFileItem.setRelativeFilename(Tools.getFileNameOnly(farFileItem.getRelativeFilename()));
                 result.add(farFileItem);
-                break;
+                break ;
             }
         }
         return result;
     }
-
+    
     public List<FarFileItem> getPackageContents(PackageIdentification packageId) {
         List<FarFileItem> farFileList = new ArrayList<FarFileItem>();
         Iterator pkgItem = this.fPkgList.iterator();
@@ -425,22 +424,23 @@ public class Mainfest implements ManifestInterface {
                 //
                 // Add all farfiles in <FarPlatformList> to list.
                 //
-                //                List<FarPlatformItem> plfList = pkg.getFarPlatformList();
-                //                Iterator plfItem = plfList.iterator();
-                //                while (plfItem.hasNext()) {
-                //                    farFileList.add(((FarPlatformItem) plfItem.next())
-                //                            .getFarFile());
-                //                }
-
+//                List<FarPlatformItem> plfList = pkg.getFarPlatformList();
+//                Iterator plfItem = plfList.iterator();
+//                while (plfItem.hasNext()) {
+//                    farFileList.add(((FarPlatformItem) plfItem.next())
+//                            .getFarFile());
+//                }
+                
                 Iterator<FarFileItem> ffIter = farFileList.iterator();
-                while (ffIter.hasNext()) {
-                    FarFileItem ffItem = ffIter.next();
+                while(ffIter.hasNext()){
+                    FarFileItem  ffItem = ffIter.next();
                     ffItem.setDefaultPath(pkg.getDefaultPath() + File.separatorChar + ffItem.getRelativeFilename());
                 }
                 break;
             }
         }
 
+        
         return farFileList;
     }
 
@@ -449,20 +449,20 @@ public class Mainfest implements ManifestInterface {
      * @param pkgId
      * @return String: return string represent jar file entry; 
      */
-    public String[] getPackgeSpd(PackageIdentification pkgId) {
+    public String[] getPackgeSpd(PackageIdentification pkgId){
         Iterator pkgItem = this.fPkgList.iterator();
         String[] entryStr = new String[2];
         while (pkgItem.hasNext()) {
             FarPackage pkg = (FarPackage) pkgItem.next();
             if (pkg.isIdentityPkg(pkgId)) {
-                entryStr[0] = pkg.getFarFile().getRelativeFilename();
-                entryStr[1] = pkg.getDefaultPath();
+                entryStr[0] =  pkg.getFarFile().getRelativeFilename();
+                entryStr[1] = pkg.getDefaultPath() ;
                 return entryStr;
             }
         }
         return null;
-    }
-
+    } 
+    
     public List<FarFileItem> getPackageContents() {
         //
         // In this farFilelist,all FarFileItem's relativeFileName should be
@@ -482,16 +482,18 @@ public class Mainfest implements ManifestInterface {
             //
             // Set farFileItem relativeFileName = absolutePath + file Name.
             //
-            farFileList.add(new FarFileItem(pkg.getDefaultPath() + File.separatorChar + ffItem.getRelativeFilename(),
-                                            ffItem.getMd5Value()));
+            farFileList.add(new FarFileItem(pkg.getDefaultPath()
+                    + File.separatorChar + ffItem.getRelativeFilename(), ffItem
+                    .getMd5Value()));
             //
             // Add all files in contents to list.
             //
             Iterator contentsItem = pkg.getContentList().iterator();
             while (contentsItem.hasNext()) {
                 ffItem = (FarFileItem) contentsItem.next();
-                farFileList.add(new FarFileItem(pkg.getDefaultPath() + File.separator + ffItem.getRelativeFilename(),
-                                                ffItem.getMd5Value()));
+                farFileList.add(new FarFileItem(pkg.getDefaultPath()
+                        + File.separator + ffItem.getRelativeFilename(), ffItem
+                        .getMd5Value()));
             }
             //
             // Add all farfiles in <FarPlatformList> to list.
@@ -500,8 +502,9 @@ public class Mainfest implements ManifestInterface {
             Iterator plfItem = plfList.iterator();
             while (plfItem.hasNext()) {
                 ffItem = ((FarPlatformItem) plfItem.next()).getFarFile();
-                farFileList.add(new FarFileItem(pkg.getDefaultPath() + File.separator + ffItem.getRelativeFilename(),
-                                                ffItem.getMd5Value()));
+                farFileList.add(new FarFileItem(pkg.getDefaultPath()
+                        + File.separator + ffItem.getRelativeFilename(), ffItem
+                        .getMd5Value()));
             }
         }
         return farFileList;
@@ -517,29 +520,29 @@ public class Mainfest implements ManifestInterface {
         }
         return null;
     }
-
-    //    public void setPackageInstallPath(PackageIdentification packageId, String path) {
-    //        Iterator<FarPackage> pkgItr = this.fPkgList.iterator();
-    //        while (pkgItr.hasNext()) {
-    //            FarPackage farPackage = pkgItr.next();
-    //            if (farPackage.isIdentityPkg(packageId)) {
-    //                farPackage.setDefaultPath(path);
-    //                return ;
-    //            }
-    //        }
-    //    }
-    //
-    //    public void setPlatformInstallPath(PlatformIdentification platformId, String path) {
-    //        Iterator<FarPlatformItem> plfItr = this.fPlfList.iterator();
-    //        while (plfItr.hasNext()) {
-    //            FarPlatformItem farPlatform = plfItr.next();
-    //            if (farPlatform.i.isIdentity(platformId)) {
-    //                farPackage.setDefaultPath(path);
-    //                return ;
-    //            }
-    //        }
-    //    }
-
+    
+//    public void setPackageInstallPath(PackageIdentification packageId, String path) {
+//        Iterator<FarPackage> pkgItr = this.fPkgList.iterator();
+//        while (pkgItr.hasNext()) {
+//            FarPackage farPackage = pkgItr.next();
+//            if (farPackage.isIdentityPkg(packageId)) {
+//                farPackage.setDefaultPath(path);
+//                return ;
+//            }
+//        }
+//    }
+//
+//    public void setPlatformInstallPath(PlatformIdentification platformId, String path) {
+//        Iterator<FarPlatformItem> plfItr = this.fPlfList.iterator();
+//        while (plfItr.hasNext()) {
+//            FarPlatformItem farPlatform = plfItr.next();
+//            if (farPlatform.i.isIdentity(platformId)) {
+//                farPackage.setDefaultPath(path);
+//                return ;
+//            }
+//        }
+//    }
+    
     public List<FarFileItem> getAllFileItem() {
         //
         // The farFileName in this list are all abosulte path.
@@ -553,7 +556,8 @@ public class Mainfest implements ManifestInterface {
         //
         // Add far files in <FarPlatformList> to list
         //
-        NodeList elementList = this.mainfestDoc.getElementsByTagName(farPlatformList);
+        NodeList elementList = this.mainfestDoc
+                .getElementsByTagName(farPlatformList);
         for (int i = 0; i < elementList.getLength(); i++) {
             //
             // Get <farPlatform> node list.
@@ -571,13 +575,15 @@ public class Mainfest implements ManifestInterface {
                     //
                     // Get child node value and set to platformIdentification.
                     //
-                    if (tempNode.getNodeName().equalsIgnoreCase(farPackage_FarfileName)) {
+                    if (tempNode.getNodeName().equalsIgnoreCase(
+                            farPackage_FarfileName)) {
                         NamedNodeMap farAttr = tempNode.getAttributes();
                         //
                         // Change relative path to absolute one
                         //
-                        FarFileItem farFile = new FarFileItem(tempNode.getTextContent(),
-                                                              farAttr.getNamedItem(farFileName_Md5sum).getTextContent());
+                        FarFileItem farFile = new FarFileItem(tempNode
+                                .getTextContent(), farAttr.getNamedItem(
+                                farFileName_Md5sum).getTextContent());
                         ffiList.add(farFile);
                     }
                 }
@@ -590,7 +596,8 @@ public class Mainfest implements ManifestInterface {
         //
         // create mainfest root node
         //
-        Element rootNode = this.mainfestDoc.createElement("FrameworkArchiveManifest");
+        Element rootNode = this.mainfestDoc
+                .createElement("FrameworkArchiveManifest");
         this.mainfestDoc.appendChild(rootNode);
 
         //
@@ -668,7 +675,8 @@ public class Mainfest implements ManifestInterface {
         // Write the DOM document to the file
         //
         Transformer xformer = TransformerFactory.newInstance().newTransformer();
-        xformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+        xformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
+                "2");
         xformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
         //
@@ -679,7 +687,8 @@ public class Mainfest implements ManifestInterface {
         // Prepare the output file, get the Mainifest file name from <FarHeader>
         // /<FarName>.
         //
-        this.mfFile = new File(Workspace.getCurrentWorkspace() + File.separatorChar + mfFileName);
+        this.mfFile = new File(Workspace.getCurrentWorkspace()
+                + File.separatorChar + mfFileName);
         //
         // generate all directory path
         //
@@ -688,7 +697,8 @@ public class Mainfest implements ManifestInterface {
     }
 
     public void pkgToFarPkgNode(Element parentNode, FarPackage pkgItem) {
-        Element pkgNode = this.mainfestDoc.createElement(farPackageList_FarPackage);
+        Element pkgNode = this.mainfestDoc
+                .createElement(farPackageList_FarPackage);
         //
         // Add <FarFileName>
         //
@@ -704,7 +714,8 @@ public class Mainfest implements ManifestInterface {
         //
         // Add <DefaultPath>
         //
-        setStrItemToNode(pkgNode, pkgItem.getDefaultPath(), farPackage_DefaultPath);
+        setStrItemToNode(pkgNode, pkgItem.getDefaultPath(),
+                farPackage_DefaultPath);
 
         //
         // Add <Contents>
@@ -719,7 +730,8 @@ public class Mainfest implements ManifestInterface {
     }
 
     public void PlfToPlatformNode(Element parentNode, FarPlatformItem fplItem) {
-        Element fplNode = this.mainfestDoc.createElement(farPlatformList_FarPlatform);
+        Element fplNode = this.mainfestDoc
+                .createElement(farPlatformList_FarPlatform);
         //
         // Add <FarFileName>
         //
@@ -740,15 +752,17 @@ public class Mainfest implements ManifestInterface {
     }
 
     public void ffiToFfNode(Element parentNode, FarFileItem ffi) {
-        Element farFileName = this.mainfestDoc.createElement(farPackage_FarfileName);
+        Element farFileName = this.mainfestDoc
+                .createElement(farPackage_FarfileName);
         farFileName.setTextContent(ffi.getRelativeFilename());
         System.out.println(farFileName.getTextContent());
-        System.out.println(ffi.getRelativeFilename());
+        System.out.println(ffi.getRelativeFilename()); 
         farFileName.setAttribute(farFileName_Md5sum, ffi.getMd5Value());
         parentNode.appendChild(farFileName);
     }
 
-    public void setStrItemToNode(Element parentNode, String strValue, String strName) {
+    public void setStrItemToNode(Element parentNode, String strValue,
+            String strName) {
         Element node = this.mainfestDoc.createElement(strName);
         node.setTextContent(strValue);
         parentNode.appendChild(node);
@@ -790,13 +804,13 @@ public class Mainfest implements ManifestInterface {
         } else {
             return;
         }
-        NodeList childList = headerNode.getChildNodes();
+               NodeList childList = headerNode.getChildNodes();
         Node node = null;
         String nodeName = null;
         for (int i = 0; i < childList.getLength(); i++) {
             node = childList.item(i);
             nodeName = node.getNodeName();
-            if (nodeName.equalsIgnoreCase(farHeader_FarName)) {
+          if (nodeName.equalsIgnoreCase(farHeader_FarName)) {
                 String nodeValue = node.getTextContent();
                 this.fhInfo.setFarName(nodeValue);
             } else if (nodeName.equalsIgnoreCase(guidValue)) {
@@ -830,7 +844,7 @@ public class Mainfest implements ManifestInterface {
         }
         NodeList fpnList = farPkgNode.getChildNodes();
         for (int i = 0; i < fpnList.getLength(); i++) {
-            if (fpnList.item(i).getNodeType() == Node.TEXT_NODE) {
+            if (fpnList.item(i).getNodeType()== Node.TEXT_NODE){
                 continue;
             }
             FarPackage fpItem = new FarPackage();
@@ -871,14 +885,15 @@ public class Mainfest implements ManifestInterface {
      * @param fpfListNode
      * @param plfList
      */
-    public void parseFarPlatformList(Node fpfListNode, List<FarPlatformItem> plfList) {
+    public void parseFarPlatformList(Node fpfListNode,
+            List<FarPlatformItem> plfList) {
         //
         // Get <FarPlatform> list.
         //
         NodeList child = fpfListNode.getChildNodes();
         Node farPlfNode;
         for (int i = 0; i < child.getLength(); i++) {
-            if (child.item(i).getNodeType() == Node.TEXT_NODE) {
+            if (child.item(i).getNodeType()== Node.TEXT_NODE){
                 continue;
             }
             farPlfNode = child.item(i);
@@ -921,7 +936,7 @@ public class Mainfest implements ManifestInterface {
         NodeList contentList = contentsNode.getChildNodes();
         Node contentNode;
         for (int i = 0; i < contentList.getLength(); i++) {
-            if (contentList.item(i).getNodeType() == Node.TEXT_NODE) {
+            if (contentList.item(i).getNodeType()== Node.TEXT_NODE){
                 continue;
             }
             contentNode = contentList.item(i);
@@ -935,20 +950,21 @@ public class Mainfest implements ManifestInterface {
     public FarFileItem parseFarFile(Node farFileNode) {
         String ffName = farFileNode.getTextContent();
         NamedNodeMap attr = farFileNode.getAttributes();
-        FarFileItem ffItem = new FarFileItem(ffName, attr.getNamedItem(farFileName_Md5sum).getTextContent());
+        FarFileItem ffItem = new FarFileItem(ffName, attr.getNamedItem(
+                farFileName_Md5sum).getTextContent());
         return ffItem;
     }
 
     public boolean isFilter(File file, Set<String> fileter) {
-        Iterator<String> iter = fileter.iterator();
-        while (iter.hasNext()) {
-            Pattern pattern = Pattern.compile(iter.next());
-            Matcher matcher = pattern.matcher(file.getName());
-
-            if (matcher.find()) {
-                return true;
+      Iterator<String> iter = fileter.iterator();
+      while (iter.hasNext()) {
+        Pattern pattern = Pattern.compile(iter.next());
+        Matcher matcher = pattern.matcher(file.getName());
+        
+        if(matcher.find()) {
+                    return true;
+                }
             }
-        }
         return false;
     }
 

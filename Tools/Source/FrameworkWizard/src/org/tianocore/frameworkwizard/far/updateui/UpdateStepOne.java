@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.Vector;
+import java.util.jar.JarFile;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -230,42 +231,51 @@ public class UpdateStepOne extends IDialog implements MouseListener {
         return jContentPane;
     }
 
-    public void mouseClicked(MouseEvent e) {
-        if (e.getSource() == jButtonCancel) {
-            this.setVisible(false);
-        } else if (e.getSource() == jButtonNext) {
-            //
-            // Judge if FAR file is existed
-            //
-            farFile = new File(jTextFieldFarFile.getText());
-            if (!farFile.exists() || !farFile.isFile()) {
-                Log.err("Please choose a FAR file already exists. ");
-                return;
-            }
-
-            //
-            // Judge FAR is valid
-            //
-
-            //
-            // Add more logic process here
-            //
-            if (jListFarFromDb.getSelectedValue() == null) {
-                Log.err("Please choose a FAR from framework database. ");
-                return;
-            }
-
-            if (stepTwo == null) {
+  public void mouseClicked(MouseEvent e) {
+    if (e.getSource() == jButtonCancel) {
+      this.setVisible(false);
+    }
+    else if (e.getSource() == jButtonNext) {
+      //
+      // Judge if FAR file is existed
+      //
+      farFile = new File(jTextFieldFarFile.getText());
+      if ( ! farFile.exists() || ! farFile.isFile()) {
+        Log.err("Please choose a FAR file already exists. ");
+        return ;
+      } 
+      
+      //
+      // Judge FAR is valid
+      //
+      try{
+          JarFile file = new JarFile(farFile);
+          this.far  = new Far(file);
+      } catch (Exception ex){
+          Log.err(ex.getMessage());
+      }
+      
+      
+      //
+      // Add more logic process here
+      //
+      if (jListFarFromDb.getSelectedValue() == null) {
+        Log.err("Please choose a FAR from framework database. ");
+        return ;
+      }
+      
+      if (stepTwo == null) {
                 stepTwo = new UpdateStepTwo(this, true, this);
-            }
-            this.setVisible(false);
-            stepTwo.prepareTable();
-            stepTwo.setVisible(true);
-        } else if (e.getSource() == jButtonBrowser) {
-            JFileChooser fc = new JFileChooser();
-            fc.setAcceptAllFileFilterUsed(false);
-            fc.addChoosableFileFilter(new IFileFilter(DataType.FAR_SURFACE_AREA_EXT));
-            fc.setCurrentDirectory(new File(Workspace.getCurrentWorkspace()));
+      }
+      this.setVisible(false);
+      stepTwo.prepareTable();
+      stepTwo.setVisible(true);
+    }
+    else if (e.getSource() == jButtonBrowser) {
+      JFileChooser fc = new JFileChooser();
+      fc.setAcceptAllFileFilterUsed(false);
+      fc.addChoosableFileFilter(new IFileFilter(DataType.FAR_SURFACE_AREA_EXT));
+      fc.setCurrentDirectory(new File(Workspace.getCurrentWorkspace()));
 
             int result = fc.showSaveDialog(new JPanel());
             if (result == JFileChooser.APPROVE_OPTION) {

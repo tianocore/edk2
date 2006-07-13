@@ -59,17 +59,8 @@ public class DistributeRule {
                                                                             AggregationOperation.union(farPkgList,
                                                                                                        dbPkgList));
 
-        //
-        //  If dependencies don't meet, print the error message and return.
-        // 
-        //        if (resultList != null || resultList.size()> 0){
-        //            Iterator resItem = resultList.iterator();
-        //            while (resItem.hasNext()){
-        //                System.out.println("Missing package:" + resItem.next().toString() + " !");
-        //            }
-        //        }
-        return resultList;
-
+        return resultList; 
+        
     }
 
     //    public void installPackgCheck (PackageIdentification pkgId, String pkgPath){
