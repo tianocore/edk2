@@ -107,8 +107,6 @@ echo Resetting the PATH variable to include the Framework_Tools_Path for this WO
 @IF NOT EXIST "Tools\bin\GenDepex.exe" goto NormalBuild
 @IF NOT EXIST "Tools\bin\GenFfsFile.exe" goto NormalBuild
 @IF NOT EXIST "Tools\bin\GenFvImage.exe" goto NormalBuild
-@IF NOT EXIST "Tools\bin\GenFvImage_IA32.exe" goto NormalBuild
-@IF NOT EXIST "Tools\bin\GenFvImage_IPF.exe" goto NormalBuild
 @IF NOT EXIST "Tools\bin\GenSection.exe" goto NormalBuild
 @IF NOT EXIST "Tools\bin\GenTEImage.exe" goto NormalBuild
 @IF NOT EXIST "Tools\bin\GuidChk.exe" goto NormalBuild
