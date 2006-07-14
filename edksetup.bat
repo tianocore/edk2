@@ -81,21 +81,65 @@ echo Resetting the PATH variable to include the Framework_Tools_Path for this WO
 
 :path_ok
 
-if "%1"=="skip" goto skipbuild
+@if "%1"=="-h" goto Usage
+@if "%1"=="-help" goto Usage
+@if "%1"=="--help" goto Usage
+@if "%1"=="/h" goto Usage
+@if "%1"=="/?" goto Usage
+@if "%1"=="/help" goto Usage
 
-echo.
-echo WORKSPACE:     %WORKSPACE%
-echo JAVA_HOME:     %JAVA_HOME%
-echo ANT_HOME:      %ANT_HOME%
-echo XMLBEANS_HOME: %XMLBEANS_HOME%
-echo CYGWIN_HOME:   %CYGWIN_HOME%
-echo PATH:          %PATH%
-echo.
+@IF NOT EXIST "Tools\Jars\Common.jar" goto NormalBuild
+@IF NOT EXIST "Tools\Jars\GenBuild.jar" goto NormalBuild
+@IF NOT EXIST "Tools\Jars\SurfaceArea.jar" goto NormalBuild
+@IF NOT EXIST "Tools\Jars\cpptasks.jar" goto NormalBuild
+@IF NOT EXIST "Tools\Jars\frameworktasks.jar" goto NormalBuild
+@IF NOT EXIST "Tools\bin\FrameworkWizard.jar" goto NormalBuild
+@IF NOT EXIST "Tools\bin\CompressDll.dll" goto NormalBuild
+@IF NOT EXIST "Tools\bin\CompressDll.lib" goto NormalBuild
+@IF NOT EXIST "Tools\bin\CreateMtFile.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\EfiCompress.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\EfiRom.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\FlashMap.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\FwImage.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenAcpiTable.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenCRC32Section.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenCapsuleHdr.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenDepex.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenFfsFile.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenFvImage.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenFvImage_IA32.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenFvImage_IPF.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenSection.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GenTEImage.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\GuidChk.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\MakeDeps.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\ModifyInf.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\PeiRebase_Ia32.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\PeiRebase_Ipf.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\PeiRebase_X64.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\SecApResetVectorFixup.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\SecFixup.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\SetStamp.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\SplitFile.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\StrGather.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\Strip.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\VfrCompile.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\ZeroDebugData.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\antlr.exe" goto NormalBuild
+@IF NOT EXIST "Tools\bin\dlg.exe" goto NormalBuild
 
+@if "%1"=="Rebuild" goto NormalBuild
+@if "%1"=="ForceRebuild" goto ForceBuild
+
+goto skipbuild
+
+:ForceBuild
+call ant -f %WORKSPACE%\Tools\build.xml cleanall
+
+:NormalBuild
 @REM
 @REM Start to build the Framework Tools
 @REM
-
 
 echo.
 echo Building the Framework Tools
@@ -106,22 +150,25 @@ echo.
 @REM Java Programs can use it.
 @REM It needs the XMLBEANS libraries in order to compile.
 @REM
-set CLASSPATH=.;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar
+if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xmlpublic.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\resolver.jar
 
-@if "%1" neq "ForceRebuild" goto NormalBuild
-call ant -f %WORKSPACE%\Tools\build.xml cleanall
-
-:NormalBuild
+:been_here
 call ant -f %WORKSPACE%\Tools\build.xml SurfaceArea
 
 @REM
 @REM Now we can make the other Java Programs
 @REM All of the remaining Java Programs require the SurfaceArea library to compile
 @REM
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\%Tools\Jars\SurfaceArea.jar
-
+if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here2
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar
+:been_here2
 
 call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 
@@ -129,11 +176,13 @@ call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 @REM We have all of the Java Programs and add-in classes created, so we can start
 @REM using the cpp-tasks to create our tools
 @REM
+if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here3
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
+:been_here3
 
 call ant -f %WORKSPACE%\Tools\build.xml C_Code
 
@@ -184,13 +233,27 @@ echo XMLBEANS_HOME: %XMLBEANS_HOME%
 echo CYGWIN_HOME:   %CYGWIN_HOME%
 echo PATH:          %PATH%
 echo.
-set CLASSPATH=%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar;%XMLBEANS_HOME%\lib\xbean.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar;%XMLBEANS_HOME%\lib\xmlpublic.jar
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar;%XMLBEANS_HOME%\lib\resolver.jar
+if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here4
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xmlpublic.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar
+set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\resolver.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar;%WORKSPACE%\Tools\Jars\GenBuild.jar
-set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar;%WORKSPACE%\Tools\Jars\frameworktasks.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
+:been_here4
 goto end
+
+:Usage
+echo.
+echo  Usage: %0 [Rebuild] [ForceRebuild]
+echo.
 
 :end
 @echo on
