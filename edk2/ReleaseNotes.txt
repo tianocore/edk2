@@ -318,11 +318,17 @@ or
   about active platform policy, see the “EDK II Build and Packaging Architecture
   Specification.” 
 
-To run the Nt32 emulation platform under Microsoft Windows, go to <full build path>\DEBUG\MSFT\IA32 and execute SecMain.exe
+To run the Nt32 emulation platform under Microsoft Windows, go to 
+<full build path>\DEBUG\MSFT\IA32 and execute SecMain.exe
 
 To exit the Nt32 emulation platform, type “reset” at the EFI Shell>
 command prompt.  Alternatively, from the graphical interface, select the Boot
 Maintenance Manager's “Reset System” command.
+
+      NOTE: When creating a new platform, the Platform Name should be restricted
+      to a single word, containing alphanumeric characters, with special characters,
+      underscore, dash and the period character also allowed.  Space characters and
+      other special characters are not allowed.
 
 -----------------------
 Notes on Symbolic Debug
