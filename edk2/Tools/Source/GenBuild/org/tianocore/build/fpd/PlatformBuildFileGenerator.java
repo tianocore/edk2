@@ -280,7 +280,7 @@ public class PlatformBuildFileGenerator {
             for(int j = 0; j < toolchainList.length; j++){
                 String fvOutputDir = project.getProperty("BUILD_DIR") + File.separatorChar 
                                         + targetList[i] + File.separatorChar 
-                                        + toolchainList[i] + File.separatorChar + "FV";
+                                        + toolchainList[j] + File.separatorChar + "FV";
                 String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
                 for (int k = 0; k < validFv.length; k++) {
                     if (fvNameSet.contains(validFv[k]) || ! isListInSequence(validFv[k])) {
