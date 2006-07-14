@@ -23,8 +23,7 @@ _ExtraPush:      .long   0x33333333 # ?
 _ExceptData:     .long   0x44444444 # ?
 _Eflags:         .long   0x55555555 # ?
 _OrigVector:     .long   0x66666666 # ?
-_StubSize:       .long   0x0
-# StubSize:       .long   InterruptEntryStubEnd - InterruptEntryStub
+_StubSize:       .long   _InterruptEntryStubEnd - _InterruptEntryStub
 
 .global _FxStorSupport
 _FxStorSupport:
@@ -84,6 +83,8 @@ _InterruptEntryStub:
         mov    $0x0,%esp
         push   $0x0
         jmp    _CommonIdtEntry
+.global _InterruptEntryStubEnd
+_InterruptEntryStubEnd:
 
 .global _CommonIdtEntry
 _CommonIdtEntry:
