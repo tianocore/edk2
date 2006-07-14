@@ -28,6 +28,8 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdVector;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
@@ -50,25 +52,25 @@ public class Tools {
      **/
     public static void main(String[] args) {
         System.out.println(getCurrentDateTime());
-//        Vector<String> v = new Vector<String>();
-//        Vector<String> v1 = new Vector<String>();
-//        
-//        v.addElement("CAC");
-//        v1.addElement("1111");
-//        v.addElement("1AC");
-//        v1.addElement("2222");
-//        v.addElement("ABC");
-//        v1.addElement("3333");
-//        v.addElement("0C");
-//        v1.addElement("4444");
-//        v.addElement("AAC");
-//        v1.addElement("5555");
-//        Vector<Integer> vs = new Vector<Integer>();
-//        vs = Tools.getVectorSortSequence(v, DataType.Sort_Type_Ascending);
-//        Tools.sortVectorString(v1, Tools.getVectorSortSequence(v, DataType.Sort_Type_Ascending));
-//        
-//        Tools.sortVectorString(v, DataType.Sort_Type_Ascending);
-//        Tools.sortVectorString(v, DataType.Sort_Type_Descending);
+        //        Vector<String> v = new Vector<String>();
+        //        Vector<String> v1 = new Vector<String>();
+        //        
+        //        v.addElement("CAC");
+        //        v1.addElement("1111");
+        //        v.addElement("1AC");
+        //        v1.addElement("2222");
+        //        v.addElement("ABC");
+        //        v1.addElement("3333");
+        //        v.addElement("0C");
+        //        v1.addElement("4444");
+        //        v.addElement("AAC");
+        //        v1.addElement("5555");
+        //        Vector<Integer> vs = new Vector<Integer>();
+        //        vs = Tools.getVectorSortSequence(v, DataType.Sort_Type_Ascending);
+        //        Tools.sortVectorString(v1, Tools.getVectorSortSequence(v, DataType.Sort_Type_Ascending));
+        //        
+        //        Tools.sortVectorString(v, DataType.Sort_Type_Ascending);
+        //        Tools.sortVectorString(v, DataType.Sort_Type_Descending);
     }
 
     /**
@@ -166,27 +168,27 @@ public class Tools {
             }
         }
     }
-    
+
     /**
-    Generate selection items for JList by input vector
-    
-    **/
-   public static void generateListByVector(JList jl, Vector<String> vector) {
-       if (jl != null) {
-           DefaultListModel listModel = (DefaultListModel) jl.getModel();
-           listModel.removeAllElements();
-           
-           if (vector != null) {
-               for (int index = 0; index < vector.size(); index++) {
-                   listModel.addElement(vector.get(index));
-               }
-           }
-           
-           if (listModel.size() > 0) {
-               jl.setSelectedIndex(0);
-           }
-       }
-   }
+     Generate selection items for JList by input vector
+     
+     **/
+    public static void generateListByVector(JList jl, Vector<String> vector) {
+        if (jl != null) {
+            DefaultListModel listModel = (DefaultListModel) jl.getModel();
+            listModel.removeAllElements();
+
+            if (vector != null) {
+                for (int index = 0; index < vector.size(); index++) {
+                    listModel.addElement(vector.get(index));
+                }
+            }
+
+            if (listModel.size() > 0) {
+                jl.setSelectedIndex(0);
+            }
+        }
+    }
 
     /**
      Get path only from a path
@@ -395,7 +397,7 @@ public class Tools {
                     String tempStr = v.get(indexI);
                     v.setElementAt(v.get(indexJ), indexI);
                     v.setElementAt(tempStr, indexJ);
-                    
+
                     //
                     // Swap sequences
                     //
@@ -427,14 +429,14 @@ public class Tools {
             }
         }
     }
-    
+
     /**
      Sort all modules
      
      @param v
      @param mode
-    
-    **/
+     
+     **/
     public static void sortModules(Vector<ModuleIdentification> v, int mode) {
         if (v != null) {
             //
@@ -452,54 +454,79 @@ public class Tools {
             }
         }
     }
+
+    /**
+     Sort all packages
+     
+     @param v
+     @param mode
+     
+     **/
+    public static void sortPackages(Vector<PackageIdentification> v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.get(indexJ).getName().compareTo(v.get(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.get(indexI).getName().compareTo(v.get(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        PackageIdentification temp = v.get(indexI);
+                        v.setElementAt(v.get(indexJ), indexI);
+                        v.setElementAt(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     Sort all platforms
+     
+     @param v
+     @param mode
+     
+     **/
+    public static void sortPlatforms(Vector<PlatformIdentification> v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.get(indexJ).getName().compareTo(v.get(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.get(indexI).getName().compareTo(v.get(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        PlatformIdentification temp = v.get(indexI);
+                        v.setElementAt(v.get(indexJ), indexI);
+                        v.setElementAt(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
     
     /**
-    Sort all packages
+     Sort all pcd entries
+     
+     @param v
+     @param mode
     
-    @param v
-    @param mode
-   
-   **/
-   public static void sortPackages(Vector<PackageIdentification> v, int mode) {
-       if (v != null) {
-           //
-           // sort by name
-           //
-           for (int indexI = 0; indexI < v.size(); indexI++) {
-               for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
-                   if ((v.get(indexJ).getName().compareTo(v.get(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
-                       || (v.get(indexI).getName().compareTo(v.get(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
-                       PackageIdentification temp = v.get(indexI);
-                       v.setElementAt(v.get(indexJ), indexI);
-                       v.setElementAt(temp, indexJ);
-                   }
-               }
-           }
-       }
-   }
-   
-   /**
-   Sort all platforms
-   
-   @param v
-   @param mode
-  
-  **/
-  public static void sortPlatforms(Vector<PlatformIdentification> v, int mode) {
-      if (v != null) {
-          //
-          // sort by name
-          //
-          for (int indexI = 0; indexI < v.size(); indexI++) {
-              for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
-                  if ((v.get(indexJ).getName().compareTo(v.get(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
-                      || (v.get(indexI).getName().compareTo(v.get(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
-                      PlatformIdentification temp = v.get(indexI);
-                      v.setElementAt(v.get(indexJ), indexI);
-                      v.setElementAt(temp, indexJ);
-                  }
-              }
-          }
-      }
-  }
+    **/
+    public static void sortPcds(PcdVector v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.getPcd(indexJ).getName().compareTo(v.getPcd(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.getPcd(indexI).getName().compareTo(v.getPcd(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        PcdIdentification temp = v.getPcd(indexI);
+                        v.setPcd(v.getPcd(indexJ), indexI);
+                        v.setPcd(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -33,14 +33,17 @@ public class EventsIdentification {
     private String featureFlag = null;
     
     private String help = null;
+    
+    private String group = null;
 
-    public EventsIdentification(String arg0, String arg1, String arg2, String arg3, Vector<String> arg4, String arg5) {
+    public EventsIdentification(String arg0, String arg1, String arg2, String arg3, Vector<String> arg4, String arg5, String arg6) {
         this.name = (arg0 == null ? "" : arg0);
         this.type = (arg1 == null ? "" : arg1);
         this.usage = (arg2 == null ? "" : arg2);
         this.featureFlag = (arg3 == null ? "" : arg3);
         this.supArchList = arg4;
         this.help = (arg5 == null ? "" : arg5);
+        this.group = (arg6 == null ? "" : arg6);
     }
 
     public String getFeatureFlag() {
@@ -96,5 +99,13 @@ public class EventsIdentification {
 
     public void setHelp(String help) {
         this.help = help;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }

@@ -41,6 +41,8 @@ import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
 import org.tianocore.frameworkwizard.far.FarHeader;
 import org.tianocore.frameworkwizard.far.FarIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdVector;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
@@ -538,16 +540,22 @@ public class WorkspaceTools {
      
      @return Vector
      **/
-    public Vector<String> getAllPcdDeclarationsFromPackage(PackageSurfaceArea spd) {
-        Vector<String> vector = new Vector<String>();
+    public PcdVector getAllPcdDeclarationsFromPackage(PackageSurfaceArea spd) {
+        PcdVector vector = new PcdVector();
         if (spd.getPcdDeclarations() != null) {
             if (spd.getPcdDeclarations().getPcdEntryList().size() > 0) {
                 for (int index = 0; index < spd.getPcdDeclarations().getPcdEntryList().size(); index++) {
-                    vector.addElement(spd.getPcdDeclarations().getPcdEntryList().get(index).getCName());
+                    String name = spd.getPcdDeclarations().getPcdEntryList().get(index).getCName();
+                    String guidCName = spd.getPcdDeclarations().getPcdEntryList().get(index).getTokenSpaceGuidCName();
+                    String help = spd.getPcdDeclarations().getPcdEntryList().get(index).getHelpText();
+                    Vector<String> type = Tools.convertListToVector(spd.getPcdDeclarations().getPcdEntryList()
+                                                                       .get(index).getValidUsage());
+
+                    vector.addPcd(new PcdIdentification(name, guidCName, help, type));
                 }
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Tools.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -657,17 +665,16 @@ public class WorkspaceTools {
         return vector;
     }
 
-    public Vector<String> getAllPcdDeclarationsFromWorkspace() {
+    public PcdVector getAllPcdDeclarationsFromWorkspace() {
         //
         // First get all packages
         //
         this.getAllPackages();
 
-        Vector<String> vector = new Vector<String>();
+        PcdVector vector = new PcdVector();
         for (int index = 0; index < this.vPackageList.size(); index++) {
             try {
-                Vector<String> v = getAllPcdDeclarationsFromPackage(OpenFile.openSpdFile(vPackageList.get(index)
-                                                                                                     .getPath()));
+                PcdVector v = getAllPcdDeclarationsFromPackage(OpenFile.openSpdFile(vPackageList.get(index).getPath()));
                 if (v != null && v.size() > 0) {
                     vector.addAll(v);
                 }
@@ -679,7 +686,7 @@ public class WorkspaceTools {
                 // TODO Auto-generated catch block
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Tools.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 

@@ -15,6 +15,8 @@
 package org.tianocore.frameworkwizard.module.ui.dialog;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -26,7 +28,6 @@ import javax.swing.JTextField;
 
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
-import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
@@ -34,16 +35,15 @@ import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdCodedIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdVector;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
  The class is used to create, update PCD of MSA/MBD file
  It extends IInternalFrame
  
-
-
  **/
-public class PCDsDlg extends IDialog {
+public class PCDsDlg extends IDialog implements ItemListener {
 
     ///
     /// Define class Serial Version UID
@@ -100,10 +100,10 @@ public class PCDsDlg extends IDialog {
     //
     private PcdCodedIdentification id = null;
 
-    private EnumerationData ed = new EnumerationData();
-
     private WorkspaceTools wt = new WorkspaceTools();
 
+    private PcdVector pcd = wt.getAllPcdDeclarationsFromWorkspace();
+    
     /**
      This method initializes jComboBoxItemType 
      
@@ -130,6 +130,8 @@ public class PCDsDlg extends IDialog {
             jComboBoxCName = new JComboBox();
             jComboBoxCName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jComboBoxCName.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxCName.addItemListener(this);
+            //jComboBoxCName.addActionListener(this);
         }
         return jComboBoxCName;
     }
@@ -374,8 +376,11 @@ public class PCDsDlg extends IDialog {
      
      **/
     private void initFrame() {
-        Tools.generateComboBoxByVector(jComboBoxCName, wt.getAllPcdDeclarationsFromWorkspace());
-        Tools.generateComboBoxByVector(jComboBoxItemType, ed.getVPcdItemTypes());
+        for (int index = 0; index < pcd.size(); index++) {
+            jComboBoxCName.addItem(pcd.getPcd(index));
+        }
+        
+        //Tools.generateComboBoxByVector(jComboBoxItemType, ed.getVPcdItemTypes());
     }
 
     /* (non-Javadoc)
@@ -424,12 +429,12 @@ public class PCDsDlg extends IDialog {
         //
         // Check TokenSpaceGuid
         //
-        //        if (!isEmpty(this.jTextFieldTokenSpaceGuid.getText())) {
-        //            if (!DataValidation.isC_NameType(this.jTextFieldTokenSpaceGuid.getText())) {
-        //                Log.err("Incorrect data type for Token Space C_Name");
-        //                return false;
-        //            }
-        //        }
+        if (!isEmpty(this.jTextFieldTokenSpaceGuid.getText())) {
+            if (!DataValidation.isC_NameType(this.jTextFieldTokenSpaceGuid.getText())) {
+                Log.err("Incorrect data type for the selected pcd entry, please check in in spd file");
+                return false;
+            }
+        }
 
         //
         // Check DefaultValue
@@ -482,5 +487,27 @@ public class PCDsDlg extends IDialog {
 
     public void setId(PcdCodedIdentification id) {
         this.id = id;
+    }
+
+    /* (non-Javadoc)
+     * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+     *
+     * Reflesh the frame when selected item changed
+     * 
+     */
+    public void itemStateChanged(ItemEvent arg0) {
+        int index = this.jComboBoxCName.getSelectedIndex();
+        if (arg0.getSource() == this.jComboBoxCName && arg0.getStateChange() == ItemEvent.SELECTED ) {
+            if (pcd.getPcd(index).getGuidCName() == null || isEmpty(pcd.getPcd(index).getGuidCName())
+                || pcd.getPcd(index).getType() == null || pcd.getPcd(index).getHelp() == null || isEmpty(pcd.getPcd(index).getHelp())) {
+                Log.err("select pcd entry when editing msa", "The selected is defined incorrectly.\r\nPlease check it in spd file");
+            } else {
+                this.jTextFieldTokenSpaceGuid.setText(pcd.getPcd(index).getGuidCName());
+                Tools.generateComboBoxByVector(this.jComboBoxItemType, pcd.getPcd(index).getType());
+                this.jTextFieldHelpText.setText(pcd.getPcd(index).getHelp());
+                this.jTextFieldHelpText.setSelectionStart(0);
+                this.jTextFieldHelpText.setSelectionEnd(0);
+            }
+        }
     }
 }

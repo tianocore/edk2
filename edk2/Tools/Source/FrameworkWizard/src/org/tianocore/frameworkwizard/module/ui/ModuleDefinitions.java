@@ -26,7 +26,6 @@ import javax.swing.JComboBox;
 import org.tianocore.ModuleDefinitionsDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.ModuleDefinitionsDocument.ModuleDefinitions.ClonedFrom;
-import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
@@ -137,7 +136,12 @@ public class ModuleDefinitions extends IInternalFrame {
         if (iCheckBoxListArch == null) {
             iCheckBoxListArch = new ICheckBoxList();
             iCheckBoxListArch.addFocusListener(this);
-            iCheckBoxListArch.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
+            iCheckBoxListArch.setToolTipText("<html>Deselecting a checkbox will restrict this module<br>" +
+                    "for use with the selected architectures, <br>" +
+                    "based on the list of items that are checked. <br>" +
+                    "If all boxes are checked, <br>" +
+                    "then the module will support all <br>" +
+                    "current AND FUTURE architectures</html>");
         }
         return iCheckBoxListArch;
     }
@@ -153,7 +157,14 @@ public class ModuleDefinitions extends IInternalFrame {
             jComboBoxBinaryModule.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
             jComboBoxBinaryModule.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxBinaryModule.addFocusListener(this);
-            jComboBoxBinaryModule.setToolTipText("Modules are either source modules which can be compiled or binary modules which are linked.  A module cannot contain both.  The GUID numbers should be identical for a binary and source MSA, but the BINARY MSA should have a higher version number.");
+            jComboBoxBinaryModule.setToolTipText("<html>Modules are either source modules <br>" +
+                                                 "which can be compiled or binary <br>" +
+                                                 "modules which are linked.  <br>" +
+                                                 "A module cannot contain both. <br>" +
+                                                 "The GUID numbers should be identical <br>" +
+                                                 "for a binary and source MSA, <br>" +
+                                                 "but the BINARY MSA should have <br>" +
+                                                 "a higher version number.</html>");
         }
         return jComboBoxBinaryModule;
     }

@@ -27,6 +27,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 
+import org.tianocore.EventTypes;
 import org.tianocore.EventsDocument;
 import org.tianocore.ProtocolNotifyUsage;
 import org.tianocore.ProtocolUsage;
@@ -239,7 +240,8 @@ public class ModuleEvents extends IInternalFrame {
                         Vector<String> arg4 = Tools.convertListToVector(events.getCreateEvents().getEventTypesList()
                                                                               .get(index).getSupArchList());
                         String arg5 = events.getCreateEvents().getEventTypesList().get(index).getHelpText();
-                        id = new EventsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
+                        String arg6 = events.getCreateEvents().getEventTypesList().get(index).getEventType().toString();
+                        id = new EventsIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
                         vid.addEvents(id);
                     }
                 }
@@ -258,7 +260,8 @@ public class ModuleEvents extends IInternalFrame {
                         Vector<String> arg4 = Tools.convertListToVector(events.getSignalEvents().getEventTypesList()
                                                                               .get(index).getSupArchList());
                         String arg5 = events.getSignalEvents().getEventTypesList().get(index).getHelpText();
-                        id = new EventsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
+                        String arg6 = events.getSignalEvents().getEventTypesList().get(index).getEventType().toString();
+                        id = new EventsIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
                         vid.addEvents(id);
                     }
                 }
@@ -422,6 +425,9 @@ public class ModuleEvents extends IInternalFrame {
                         if (!isEmpty(vid.getEvents(index).getHelp())) {
                             e.setHelpText(vid.getEvents(index).getHelp());
                         }
+                        if (!isEmpty(vid.getEvents(index).getGroup())) {
+                            e.setEventType(EventTypes.Enum.forString(vid.getEvents(index).getGroup()));
+                        }
                         ce.addNewEventTypes();
                         ce.setEventTypesArray(ce.getEventTypesList().size() - 1, e);
                     }
@@ -442,6 +448,9 @@ public class ModuleEvents extends IInternalFrame {
                         }
                         if (!isEmpty(vid.getEvents(index).getHelp())) {
                             e.setHelpText(vid.getEvents(index).getHelp());
+                        }
+                        if (!isEmpty(vid.getEvents(index).getGroup())) {
+                            e.setEventType(EventTypes.Enum.forString(vid.getEvents(index).getGroup()));
                         }
                         se.addNewEventTypes();
                         se.setEventTypesArray(ce.getEventTypesList().size() - 1, e);

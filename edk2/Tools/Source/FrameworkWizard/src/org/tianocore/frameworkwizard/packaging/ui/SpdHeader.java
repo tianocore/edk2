@@ -503,6 +503,14 @@ public class SpdHeader extends IInternalFrame {
                 jTextFieldSpecification.setText(sfc.getSpdHdrSpec());
             }
             sfc.setSpdHdrSpec(jTextFieldSpecification.getText());
+            
+            if (!sfc.getSpdPkgDefsRdOnly().equals("true")) {
+                sfc.setSpdPkgDefsRdOnly("false");
+            }
+            if (!sfc.getSpdPkgDefsRePkg().equals("true")) {
+                sfc.setSpdPkgDefsRePkg("false");
+            }
+            
     }
 
     /**
