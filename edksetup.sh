@@ -9,7 +9,7 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 # Setup the environment for unix-like systems running a bash-like shell.
-# This file must be "sourced" not executed. For example: ". edksetup.sh"
+# This file must be "sourced" notcuted. For example: ". edksetup.sh"
 
 export WORKSPACE=$(pwd)
 
@@ -49,8 +49,54 @@ case "`uname`" in
     ;;
 esac
 
-# Now we need to build the tools.
-(cd Tools; ant -noclasspath)
+if [ \
+  "$1" = Rebuild -o \
+  "$1" = ForceRebuild -o \
+  ! -e "$WORKSPACE/Tools/Jars/Common.jar" -o \
+  ! -e "$WORKSPACE/Tools/Jars/GenBuild.jar" -o \
+  ! -e "$WORKSPACE/Tools/Jars/SurfaceArea.jar" -o \
+  ! -e "$WORKSPACE/Tools/Jars/cpptasks.jar" -o \
+  ! -e "$WORKSPACE/Tools/Jars/frameworktasks.jar" -o \
+  ! -e "$WORKSPACE/Tools/bin/FrameworkWizard.jar" -o \
+  ! -e "$WORKSPACE/Tools/bin/CompressDll.dll" -o \
+  ! -e "$WORKSPACE/Tools/bin/CreateMtFile" -o \
+  ! -e "$WORKSPACE/Tools/bin/EfiCompress" -o \
+  ! -e "$WORKSPACE/Tools/bin/EfiRom" -o \
+  ! -e "$WORKSPACE/Tools/bin/FlashMap" -o \
+  ! -e "$WORKSPACE/Tools/bin/FwImage" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenAcpiTable" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenCRC32Section" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenCapsuleHdr" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenDepex" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenFfsFile" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenFvImage" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenSection" -o \
+  ! -e "$WORKSPACE/Tools/bin/GenTEImage" -o \
+  ! -e "$WORKSPACE/Tools/bin/MakeDeps" -o \
+  ! -e "$WORKSPACE/Tools/bin/ModifyInf" -o \
+  ! -e "$WORKSPACE/Tools/bin/PeiRebase_Ia32" -o \
+  ! -e "$WORKSPACE/Tools/bin/PeiRebase_Ipf" -o \
+  ! -e "$WORKSPACE/Tools/bin/PeiRebase_X64" -o \
+  ! -e "$WORKSPACE/Tools/bin/SecApResetVectorFixup" -o \
+  ! -e "$WORKSPACE/Tools/bin/SecFixup" -o \
+  ! -e "$WORKSPACE/Tools/bin/SetStamp" -o \
+  ! -e "$WORKSPACE/Tools/bin/SplitFile" -o \
+  ! -e "$WORKSPACE/Tools/bin/StrGather" -o \
+  ! -e "$WORKSPACE/Tools/bin/Strip" -o \
+  ! -e "$WORKSPACE/Tools/bin/VfrCompile" -o \
+  ! -e "$WORKSPACE/Tools/bin/ZeroDebugData" -o \
+  ! -e "$WORKSPACE/Tools/bin/antlr" -o \
+  ! -e "$WORKSPACE/Tools/bin/dlg" ]
+then
+  case "$1" in 
+    ForceRebuild)
+      ant -noclasspath -f $WORKSPACE/Tools/build.xml cleanall all
+      ;;
+    *)
+      ant -noclasspath -f $WORKSPACE/Tools/build.xml all
+      ;;
+  esac
+fi
 fi
 fi
 fi
