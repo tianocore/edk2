@@ -349,7 +349,7 @@ public class FfsProcess {
             // outputPath = "${DEST_DIR_OUTPUT}">
             //
             ele = doc.createElement("tool");
-            ele.setAttribute("toolName", "${WORKSPACE_DIR}" + File.separatorChar + "Tools" + File.separatorChar + "Bin"
+            ele.setAttribute("toolName", "${WORKSPACE_DIR}" + File.separatorChar + "Tools" + File.separatorChar + "bin"
                                          + File.separatorChar + "GenCRC32Section");
             ele.setAttribute("outputPath", "${DEST_DIR_OUTPUT}");
         }
