@@ -129,27 +129,27 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         this.ffc = ffc;
     }
     
-    public void setKey(String k){
+    public void setKey(String k, int i){
         this.moduleKey = k;
         jTabbedPane.setSelectedIndex(0);
-        initPcdBuildDefinition(k);
+        initPcdBuildDefinition(i);
     }
 
     /**
       init will be called each time FpdModuleSA object is to be shown.
       @param key Module information.
      **/
-    public void initPcdBuildDefinition(String key) {
+    public void initPcdBuildDefinition(int i) {
         //
         // display pcd for key.
         //
         model.setRowCount(0);
-        int pcdCount = ffc.getPcdDataCount(key);
+        int pcdCount = ffc.getPcdDataCount(i);
         if (pcdCount != 0) {
             String[][] saa = new String[pcdCount][7];
-            ffc.getPcdData(key, saa);
-            for (int i = 0; i < saa.length; ++i) {
-                model.addRow(saa[i]);
+            ffc.getPcdData(i, saa);
+            for (int j = 0; j < saa.length; ++j) {
+                model.addRow(saa[j]);
             }
         }
     }
@@ -483,7 +483,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanel.add(getJPanel2(), java.awt.BorderLayout.SOUTH);
             jPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-                    initPcdBuildDefinition(moduleKey);
+//                    initPcdBuildDefinition(moduleKey);
                 }
             });
             

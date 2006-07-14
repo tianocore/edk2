@@ -202,7 +202,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     
                     docConsole.setSaved(false);
                     try{
-                        ffc.addFrameworkModulesPcdBuildDefs(miList.get(selectedRow), null);
+                        ffc.addFrameworkModulesPcdBuildDefs(mi, null);
                     }
                     catch (Exception exception) {
                         JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
@@ -292,7 +292,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String mv = model1.getValueAt(selectedRow, 2)+"";
                     String pg = model1.getValueAt(selectedRow, 3)+"";
                     String pv = model1.getValueAt(selectedRow, 4)+"";
-                    settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv);
+                    settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv, selectedRow);
                     settingDlg.setVisible(true);
                 }
             });
