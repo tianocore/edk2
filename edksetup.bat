@@ -150,8 +150,7 @@ echo.
 @REM Java Programs can use it.
 @REM It needs the XMLBEANS libraries in order to compile.
 @REM
-if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
+set CLASSPATH=%XMLBEANS_HOME%\lib
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
@@ -159,16 +158,13 @@ set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xmlpublic.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\resolver.jar
 
-:been_here
 call ant -f %WORKSPACE%\Tools\build.xml SurfaceArea
 
 @REM
 @REM Now we can make the other Java Programs
 @REM All of the remaining Java Programs require the SurfaceArea library to compile
 @REM
-if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here2
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar
-:been_here2
 
 call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 
@@ -176,13 +172,11 @@ call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 @REM We have all of the Java Programs and add-in classes created, so we can start
 @REM using the cpp-tasks to create our tools
 @REM
-if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here3
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
-:been_here3
 
 call ant -f %WORKSPACE%\Tools\build.xml C_Code
 
@@ -233,8 +227,7 @@ echo XMLBEANS_HOME: %XMLBEANS_HOME%
 echo CYGWIN_HOME:   %CYGWIN_HOME%
 echo PATH:          %PATH%
 echo.
-if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto been_here4
-set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib
+set CLASSPATH=%XMLBEANS_HOME%\lib
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\jsr173_1.0_api.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\xbean_xpath.jar
@@ -247,7 +240,6 @@ set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
-:been_here4
 goto end
 
 :Usage
