@@ -258,6 +258,8 @@ LibPcdGetEx8 (
 {
   PCD_PPI * PcdPpi;
 
+  ASSERT (Guid != NULL);
+
   PcdPpi = GetPcdPpiPtr ();
 
   return PcdPpi->Get8Ex (Guid, TokenNumber);
@@ -285,6 +287,8 @@ LibPcdGetEx16 (
 {
   PCD_PPI * PcdPpi;
 
+  ASSERT (Guid != NULL);
+
   PcdPpi = GetPcdPpiPtr ();
 
   return PcdPpi->Get16Ex (Guid, TokenNumber);
@@ -311,6 +315,8 @@ LibPcdGetEx32 (
   )
 {
   PCD_PPI * PcdPpi;
+
+  ASSERT (Guid != NULL);
 
   PcdPpi = GetPcdPpiPtr ();
 
@@ -340,6 +346,8 @@ LibPcdGetEx64 (
 {
   PCD_PPI * PcdPpi;
 
+  ASSERT (Guid != NULL);
+
   PcdPpi = GetPcdPpiPtr ();
 
   return PcdPpi->Get64Ex (Guid, TokenNumber);
@@ -366,6 +374,8 @@ LibPcdGetExPtr (
   )
 {
   PCD_PPI * PcdPpi;
+
+  ASSERT (Guid != NULL);
 
   PcdPpi = GetPcdPpiPtr ();
 
@@ -394,6 +404,8 @@ LibPcdGetExBool (
 {
   PCD_PPI * PcdPpi;
 
+  ASSERT (Guid != NULL);
+
   PcdPpi = GetPcdPpiPtr ();
 
   return PcdPpi->GetBoolEx (Guid, TokenNumber);
@@ -420,6 +432,8 @@ LibPcdGetExSize (
   )
 {
   PCD_PPI * PcdPpi;
+
+  ASSERT (Guid != NULL);
 
   PcdPpi = GetPcdPpiPtr ();
 
@@ -449,7 +463,6 @@ LibPcdSet8 (
   PCD_PPI * PcdPpi;
 
   PcdPpi = GetPcdPpiPtr ();
-
 
   Status = PcdPpi->Set8 (TokenNumber, Value);
 
@@ -481,7 +494,6 @@ LibPcdSet16 (
   PCD_PPI * PcdPpi;
 
   PcdPpi = GetPcdPpiPtr ();
-
 
   Status = PcdPpi->Set16 (TokenNumber, Value);
 
@@ -544,7 +556,6 @@ LibPcdSet64 (
   PCD_PPI * PcdPpi;
 
   PcdPpi = GetPcdPpiPtr ();
-
 
   Status = PcdPpi->Set64 (TokenNumber, Value);
 
@@ -628,7 +639,6 @@ LibPcdSetBool (
 
   PcdPpi = GetPcdPpiPtr ();
 
-
   Status = PcdPpi->SetBool (TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
@@ -664,6 +674,7 @@ LibPcdSetEx8 (
 
   PcdPpi = GetPcdPpiPtr ();
 
+  ASSERT (Guid != NULL);
 
   Status = PcdPpi->Set8Ex (Guid, TokenNumber, Value);
 
@@ -700,7 +711,7 @@ LibPcdSetEx16 (
 
   PcdPpi = GetPcdPpiPtr ();
 
-
+  ASSERT (Guid != NULL);
   Status = PcdPpi->Set16Ex (Guid, TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
@@ -733,7 +744,7 @@ LibPcdSetEx32 (
 {
   EFI_STATUS Status;
   PCD_PPI * PcdPpi;
-
+  ASSERT (Guid != NULL);
   PcdPpi = GetPcdPpiPtr ();
 
 
@@ -769,7 +780,7 @@ LibPcdSetEx64 (
 {
   EFI_STATUS Status;
   PCD_PPI * PcdPpi;
-
+  ASSERT (Guid != NULL);
   PcdPpi = GetPcdPpiPtr ();
 
 
@@ -811,11 +822,11 @@ LibPcdSetExPtr (
 {
   EFI_STATUS      Status;
   PCD_PPI         *PcdPpi;
-
+ ASSERT (SizeOfBuffer != NULL);
   if (*SizeOfBuffer > 0) {
     ASSERT (Buffer != NULL);
   }
-
+  ASSERT (Guid != NULL);
   PcdPpi = GetPcdPpiPtr ();
 
   Status = PcdPpi->SetPtrEx (Guid, TokenNumber, SizeOfBuffer, Buffer);
@@ -855,7 +866,7 @@ LibPcdSetExBool (
 
   PcdPpi = GetPcdPpiPtr ();
 
-
+  ASSERT (Guid != NULL);
   Status = PcdPpi->SetBoolEx (Guid, TokenNumber, Value);
 
   ASSERT_EFI_ERROR (Status);
