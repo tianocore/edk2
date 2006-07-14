@@ -287,29 +287,56 @@ public class FpdFileContents {
     //
     // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer"
     //
-    public int getPcdDataCount(String key){
-        ModuleSADocument.ModuleSA msa = getModuleSA(key);
+    public int getPcdDataCount(int i){
+        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0) {
+            return 0;
+        }
+        
+        XmlCursor cursor = getfpdFrameworkModules().newCursor();
+        ModuleSADocument.ModuleSA msa = null;
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            msa = (ModuleSADocument.ModuleSA)cursor.getObject();
+        }
+        cursor.dispose();
+        
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
             return 0;
         }
         return msa.getPcdBuildDefinition().getPcdDataList().size();
+        
     }
     
-    public void getPcdData(String key, String[][] saa) {
-        ModuleSADocument.ModuleSA msa = getModuleSA(key);
+    public void getPcdData(int i, String[][] saa) {
+        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0) {
+            return;
+        }
+        
+        XmlCursor cursor = getfpdFrameworkModules().newCursor();
+        ModuleSADocument.ModuleSA msa = null;
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            msa = (ModuleSADocument.ModuleSA)cursor.getObject();
+        }
+        cursor.dispose();
+        
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
             return;
         }
         ListIterator<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData>li = msa.getPcdBuildDefinition().getPcdDataList().listIterator();
-        for (int i = 0; i < saa.length; ++i) {
+        for (int k = 0; k < saa.length; ++k) {
             PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = li.next();
-            saa[i][0] = pcdData.getCName();
-            saa[i][1] = pcdData.getTokenSpaceGuidCName();
-            saa[i][2] = pcdData.getItemType()+"";
-            saa[i][3] = pcdData.getToken().toString();
-            saa[i][4] = pcdData.getMaxDatumSize()+"";
-            saa[i][5] = pcdData.getDatumType()+"";
-            saa[i][6] = pcdData.getValue();
+            saa[k][0] = pcdData.getCName();
+            saa[k][1] = pcdData.getTokenSpaceGuidCName();
+            saa[k][2] = pcdData.getItemType()+"";
+            saa[k][3] = pcdData.getToken().toString();
+            saa[k][4] = pcdData.getMaxDatumSize()+"";
+            saa[k][5] = pcdData.getDatumType()+"";
+            saa[k][6] = pcdData.getValue();
             
         }
     }
