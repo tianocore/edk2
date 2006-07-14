@@ -402,6 +402,20 @@ public class ModuleBuildFileGenerator {
 //        project.setProperty("LIBS", propertyLibs.replaceAll("(\\\\)", "/"));
     }
     
+     /**
+      Return the name of the directory that corresponds to the architecture.
+      This is a translation from the XML Schema tag to a directory that
+      corresponds to our directory name coding convention.
+     
+      **/
+    private String archDir(String arch) {
+        return arch.replaceFirst("X64", "x64")
+                   .replaceFirst("IPF", "Ipf")
+                   .replaceFirst("IA32", "Ia32")
+                   .replaceFirst("ARM", "Arm")
+                   .replaceFirst("EBC", "Ebc");
+    }
+
     /**
       Generate the build source files elements for BaseName_build.xml. 
       
@@ -413,6 +427,7 @@ public class ModuleBuildFileGenerator {
         // Prepare the includes: PackageDependencies and Output debug direactory
         //
         Set<String> includes = new LinkedHashSet<String>();
+        String arch = project.getProperty("ARCH");
         
         //
         // WORKSPACE
@@ -423,7 +438,7 @@ public class ModuleBuildFileGenerator {
         // Module iteself
         //
         includes.add("${MODULE_DIR}");
-        includes.add("${MODULE_DIR}" + File.separatorChar + "${ARCH}");
+        includes.add("${MODULE_DIR}" + File.separatorChar + archDir(arch));
         
         //
         // Packages in PackageDenpendencies
@@ -433,7 +448,7 @@ public class ModuleBuildFileGenerator {
             GlobalData.refreshPackageIdentification(packageDependencies[i]);
             File packageFile = packageDependencies[i].getSpdFile();
             includes.add(packageFile.getParent() + File.separatorChar + "Include");
-            includes.add(packageFile.getParent() + File.separatorChar + "Include" + File.separatorChar + "${ARCH}");
+            includes.add(packageFile.getParent() + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
         }
 
         //
@@ -447,7 +462,7 @@ public class ModuleBuildFileGenerator {
                 GlobalData.refreshPackageIdentification(libraryPackageDependencies[j]);
                 File packageFile = libraryPackageDependencies[j].getSpdFile();
                 includes.add(packageFile.getParent() + File.separatorChar + "Include");
-                includes.add(packageFile.getParent() + File.separatorChar + "Include" + File.separatorChar + "${ARCH}");
+                includes.add(packageFile.getParent() + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
             }
             SurfaceAreaQuery.pop();
         }
@@ -457,7 +472,7 @@ public class ModuleBuildFileGenerator {
         // The package which the module belongs to
         // TBD
         includes.add(fpdModuleId.getModule().getPackage().getPackageDir() + File.separatorChar + "Include");
-        includes.add(fpdModuleId.getModule().getPackage().getPackageDir() + File.separatorChar + "Include" + File.separatorChar + "${ARCH}");
+        includes.add(fpdModuleId.getModule().getPackage().getPackageDir() + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
 
         //
         // Debug files output directory
