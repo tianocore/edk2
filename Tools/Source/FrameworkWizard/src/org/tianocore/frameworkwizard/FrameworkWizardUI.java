@@ -1795,7 +1795,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             int result = cso.showDialog();
             if (result == DataType.RETURN_TYPE_OK) {
                 String strReturn = "Create Far Done!";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                              JOptionPane.INFORMATION_MESSAGE);
             }
             cso.dispose();
         }
@@ -1805,7 +1806,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             int result = iso.showDialog();
             if (result == DataType.RETURN_TYPE_OK) {
                 String strReturn = "<html>Install Far Done! <br>The WORKSPACE will be refreshed!</html>";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                              JOptionPane.INFORMATION_MESSAGE);
                 this.closeAll();
             }
             iso.dispose();
@@ -1816,7 +1818,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             int result = dso.showDialog();
             if (result == DataType.RETURN_TYPE_OK) {
                 String strReturn = "<html>Delete Far Done! <br>The WORKSPACE will be refreshed!</html>";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                              JOptionPane.INFORMATION_MESSAGE);
                 this.closeAll();
             }
             dso.dispose();
@@ -1827,7 +1830,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             int result = uso.showDialog();
             if (result == DataType.RETURN_TYPE_OK) {
                 String strReturn = "<html>Update Far Done! <br>The WORKSPACE will be refreshed!</html>";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                              JOptionPane.INFORMATION_MESSAGE);
                 this.closeAll();
             }
             uso.dispose();
@@ -2872,13 +2876,23 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                     e.printStackTrace();
                 }
                 vPackageList.addElement(smb.getPid());
+
+                //
+                // Add to Module Description node
+                //
+                IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(vPackageList.lastElement().getName(),
+                                                                           IDefaultMutableTreeNode.MODULE_PACKAGE,
+                                                                           false, vPackageList.lastElement());
+
+                iTree.addNode(dmtnModuleDescription, node);
+
                 //
                 // Add new SpdHeader node to the tree
                 //
-                IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(vPackageList.lastElement().getName(),
-                                                                           IDefaultMutableTreeNode.SPD_HEADER, true,
-                                                                           vPackageList.lastElement());
+                node = new IDefaultMutableTreeNode(vPackageList.lastElement().getName(),
+                                                   IDefaultMutableTreeNode.SPD_HEADER, true, vPackageList.lastElement());
                 iTree.addNode(dmtnPackageDescription, node);
+
                 this.openPackage(smb.getPid().getPath());
             }
         } else if (result == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {

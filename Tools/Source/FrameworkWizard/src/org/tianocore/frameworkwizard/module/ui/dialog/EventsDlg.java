@@ -62,12 +62,18 @@ public class EventsDlg extends IDialog {
     private JComboBox jComboBoxGuidC_Name = null;
 
     private JLabel jLabelUsage = null;
+    
+    private JLabel jLabelGroup = null;
 
     private JComboBox jComboBoxUsage = null;
+    
+    private JComboBox jComboBoxEventGroup = null;
 
     private StarLabel jStarLabel1 = null;
 
     private StarLabel jStarLabel2 = null;
+    
+    private StarLabel jStarLabel3 = null;
 
     private JComboBox jComboBoxEventsType = null;
 
@@ -123,26 +129,42 @@ public class EventsDlg extends IDialog {
     private JComboBox getJComboBoxUsage() {
         if (jComboBoxUsage == null) {
             jComboBoxUsage = new JComboBox();
-            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jComboBoxUsage;
     }
+    
+    /**
+    This method initializes jComboBoxType 
+    
+    @return javax.swing.JComboBox jComboBoxType
+    
+    **/
+   private JComboBox getJComboBoxEventsType() {
+       if (jComboBoxEventsType == null) {
+           jComboBoxEventsType = new JComboBox();
+           jComboBoxEventsType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+           jComboBoxEventsType.setPreferredSize(new java.awt.Dimension(320, 20));
+           jComboBoxEventsType
+           .setToolTipText("<html>Select Create event if the Module has an event that<br> is waiting to be signaled.  Select Signal if the Module will signal all events in an event group.  Signal Event The events are named by GUID.</html>");
+       }
+       return jComboBoxEventsType;
+   }
 
     /**
      * This method initializes jComboBoxEventsType	
      * 	
      * @return javax.swing.JComboBox	
      */
-    private JComboBox getJComboBoxEventsType() {
-        if (jComboBoxEventsType == null) {
-            jComboBoxEventsType = new JComboBox();
-            jComboBoxEventsType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-            jComboBoxEventsType.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxEventsType
-                               .setToolTipText("Select Create event if the Module has an event that is waiting to be signaled.  Select Signal if the Module will signal all events in an event group.  Signal Event The events are named by GUID.");
+    private JComboBox getJComboBoxEventGroup() {
+        if (jComboBoxEventGroup == null) {
+            jComboBoxEventGroup = new JComboBox();
+            jComboBoxEventGroup.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jComboBoxEventGroup.setPreferredSize(new java.awt.Dimension(320, 20));
+            
         }
-        return jComboBoxEventsType;
+        return jComboBoxEventGroup;
     }
 
     /**
@@ -166,7 +188,7 @@ public class EventsDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 135, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jTextFieldFeatureFlag;
@@ -181,7 +203,7 @@ public class EventsDlg extends IDialog {
     private JTextField getJTextFieldHelpText() {
         if (jTextFieldHelpText == null) {
             jTextFieldHelpText = new JTextField();
-            jTextFieldHelpText.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jTextFieldHelpText.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
             jTextFieldHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jTextFieldHelpText;
@@ -196,7 +218,7 @@ public class EventsDlg extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 165, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 190, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -212,7 +234,7 @@ public class EventsDlg extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 165, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 190, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -228,7 +250,7 @@ public class EventsDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 225);
+        this.setSize(500, 255);
         this.setContentPane(getJScrollPane());
         this.setTitle("Events");
         initFrame();
@@ -255,6 +277,7 @@ public class EventsDlg extends IDialog {
 
             jTextFieldFeatureFlag.setText(id.getFeatureFlag());
             this.jArchCheckBox.setSelectedItems(id.getSupArchList());
+            this.jComboBoxEventGroup.setSelectedItem(id.getGroup());
         }
     }
 
@@ -295,29 +318,33 @@ public class EventsDlg extends IDialog {
             jArchCheckBox.setBounds(new java.awt.Rectangle(160, 135, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
             jLabelFeatureFlag.setText("Feature Flag");
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(15, 160, 140, 20));
             jLabelArch.setText("Arch");
             jLabelUsage = new JLabel();
             jLabelUsage.setText("Usage");
-            jLabelUsage.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
+            jLabelUsage.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
             jLabelC_Name = new JLabel();
             jLabelC_Name.setText("Guid C_Name");
             jLabelC_Name.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
+            jLabelGroup = new JLabel();
+            jLabelGroup.setText("Even Type");
+            jLabelGroup.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
             jLabelEventType = new JLabel();
-            jLabelEventType.setText("Event Type");
+            jLabelEventType.setText("Type");
             jLabelEventType.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 85, 140, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 110, 140, 20));
             jLabelHelpText.setText("Help Text");
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 190));
+            jContentPane.setPreferredSize(new java.awt.Dimension(490, 220));
 
             jContentPane.add(jLabelEventType, null);
+            jContentPane.add(jLabelGroup, null);
             jContentPane.add(jLabelC_Name, null);
             jContentPane.add(getJComboBoxGuidC_Name(), null);
             jContentPane.add(jLabelUsage, null);
@@ -326,9 +353,12 @@ public class EventsDlg extends IDialog {
             jStarLabel1.setBounds(new java.awt.Rectangle(0, 10, 10, 20));
             jStarLabel2 = new StarLabel();
             jStarLabel2.setBounds(new java.awt.Rectangle(0, 35, 10, 20));
-
+            jStarLabel3 = new StarLabel();
+            jStarLabel3.setBounds(new java.awt.Rectangle(0, 60, 10, 20));
+            
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
+            jContentPane.add(jStarLabel3, null);
             jContentPane.add(getJComboBoxEventsType(), null);
 
             jContentPane.add(jLabelArch, null);
@@ -339,6 +369,7 @@ public class EventsDlg extends IDialog {
             jContentPane.add(jArchCheckBox, null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
+            jContentPane.add(getJComboBoxEventGroup(), null);
         }
         return jContentPane;
     }
@@ -349,6 +380,7 @@ public class EventsDlg extends IDialog {
      **/
     private void initFrame() {
         Tools.generateComboBoxByVector(jComboBoxEventsType, ed.getVEventType());
+        Tools.generateComboBoxByVector(jComboBoxEventGroup, ed.getVEventGroup());
         Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVEventUsage());
         Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
     }
@@ -422,7 +454,8 @@ public class EventsDlg extends IDialog {
         String arg3 = this.jTextFieldFeatureFlag.getText();
         Vector<String> arg4 = this.jArchCheckBox.getSelectedItemsVector();
         String arg5 = this.jTextFieldHelpText.getText();
-        id = new EventsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
+        String arg6 = this.jComboBoxEventGroup.getSelectedItem().toString();
+        id = new EventsIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
         return id;
     }
 

@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.tianocore.ModuleDefinitionsDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.ModuleTypeDef;
 import org.tianocore.MsaHeaderDocument;
@@ -134,6 +135,8 @@ public class MsaHeader extends IInternalFrame {
     private JScrollPane jScrollPane = null;
 
     private OpeningModuleType omt = null;
+    
+    private EnumerationData ed = new EnumerationData();
 
     /**
      This method initializes jTextFieldBaseName 
@@ -235,6 +238,8 @@ public class MsaHeader extends IInternalFrame {
             jTextAreaDescription.setLineWrap(true);
             jTextAreaDescription.addFocusListener(this);
             jTextAreaDescription.setToolTipText("A verbose description of the module");
+            jTextAreaDescription.setSelectionStart(0);
+            jTextAreaDescription.setSelectionEnd(0);
         }
         return jTextAreaDescription;
     }
@@ -436,6 +441,17 @@ public class MsaHeader extends IInternalFrame {
         super();
         this.omt = inMsa;
         this.msa = omt.getXmlMsa();
+        
+        //      
+        // Set module definitions default value
+        //
+        if (msa.getModuleDefinitions() == null) {
+            ModuleDefinitionsDocument.ModuleDefinitions md = ModuleDefinitionsDocument.ModuleDefinitions.Factory.newInstance();
+            md.setOutputFileBasename(msa.getMsaHeader().getModuleName());
+            md.setBinaryModule(false);
+            md.setSupportedArchitectures(ed.getVSupportedArchitectures());
+            msa.setModuleDefinitions(md);
+        }
         init(msa.getMsaHeader());
         this.setVisible(true);
         this.setViewMode(false);
@@ -506,12 +522,16 @@ public class MsaHeader extends IInternalFrame {
             }
             if (this.msaHeader.getDescription() != null) {
                 this.jTextAreaDescription.setText(this.msaHeader.getDescription());
+                jTextAreaDescription.setSelectionStart(0);
+                jTextAreaDescription.setSelectionEnd(0);
             }
             if (this.msaHeader.getCopyright() != null) {
                 this.jTextFieldCopyright.setText(this.msaHeader.getCopyright());
             }
             if (this.msaHeader.getLicense() != null) {
                 this.jTextAreaLicense.setText(this.msaHeader.getLicense().getStringValue());
+                jTextAreaLicense.setSelectionStart(0);
+                jTextAreaLicense.setSelectionEnd(0);
             }
             if (this.msaHeader.getLicense() != null && this.msaHeader.getLicense().getURL() != null) {
                 this.jTextFieldURL.setText(this.msaHeader.getLicense().getURL());
@@ -795,6 +815,7 @@ public class MsaHeader extends IInternalFrame {
             //            this.msaHeader.setSpecification(this.jTextFieldSpecification.getText());
 
             msaHeader.setSpecification(this.jTextFieldSpecification.getText());
+            msaHeader.setModuleType(ModuleTypeDef.Enum.forString(jComboBoxModuleType.getSelectedItem().toString()));
             msa.setMsaHeader(msaHeader);
             this.omt.setSaved(false);
         } catch (Exception e) {
@@ -880,7 +901,7 @@ public class MsaHeader extends IInternalFrame {
         // Check Module Type
         //
         if (arg0.getSource() == this.jComboBoxModuleType) {
-            msaHeader.setModuleType(ModuleTypeDef.Enum.forString(jComboBoxModuleType.getSelectedItem().toString()));
+            //msaHeader.setModuleType(ModuleTypeDef.Enum.forString(jComboBoxModuleType.getSelectedItem().toString()));
         }
 
         //
@@ -956,7 +977,7 @@ public class MsaHeader extends IInternalFrame {
                 //this.jTextFieldCopyright.requestFocus();
                 return;
             }
-            this.msaHeader.setDescription(this.jTextFieldCopyright.getText());
+            this.msaHeader.setCopyright(this.jTextFieldCopyright.getText());
         }
 
         //

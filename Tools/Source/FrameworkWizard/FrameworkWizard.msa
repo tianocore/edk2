@@ -127,6 +127,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PackageDependencies/PackageDependenciesVector.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PcdCoded/PcdCodedIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PcdCoded/PcdCodedVector.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PcdCoded/PcdIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/module/Identifications/PcdCoded/PcdVector.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Ppis/PpisIdentification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Ppis/PpisVector.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/module/Identifications/Protocols/ProtocolsIdentification.java</Filename>
