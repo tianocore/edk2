@@ -17,6 +17,7 @@ package org.tianocore.frameworkwizard.common;
 import java.io.File;
 
 import org.apache.xmlbeans.XmlCursor;
+import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
@@ -44,6 +45,157 @@ public class SaveFile {
      
      **/
     public static void saveMsaFile(String path, ModuleSurfaceArea msa) throws Exception {
+        //
+        // Remove all empty top level elements
+        //
+        XmlObject o = msa.getLibraryClassDefinitions();
+        if (o != null) {
+            if (msa.getLibraryClassDefinitions().getLibraryClassList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getSourceFiles();
+        if (o != null) {
+            if (msa.getSourceFiles().getFilenameList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getPackageDependencies();
+        if (o != null) {
+            if (msa.getPackageDependencies().getPackageList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getProtocols();
+        if (o != null) {
+            if (msa.getProtocols().getProtocolList().size() <= 0
+                && msa.getProtocols().getProtocolNotifyList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getEvents();
+        if (o != null) {
+            if (msa.getEvents().getCreateEvents() != null || msa.getEvents().getSignalEvents() != null) {
+                if (msa.getEvents().getCreateEvents() != null && msa.getEvents().getCreateEvents().getEventTypesList().size() <= 0) {
+                    XmlCursor xmlCursor = o.newCursor();
+                    xmlCursor.removeXml();
+                    xmlCursor.dispose();
+                }
+                if (msa.getEvents().getSignalEvents() != null && msa.getEvents().getSignalEvents().getEventTypesList().size() <= 0) {
+                    XmlCursor xmlCursor = o.newCursor();
+                    xmlCursor.removeXml();
+                    xmlCursor.dispose();    
+                }
+            } else {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getHobs();
+        if (o != null) {
+            if (msa.getHobs().getHobTypesList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getPPIs();
+        if (o != null) {
+            if (msa.getPPIs().getPpiList().size() <= 0 && msa.getPPIs().getPpiNotifyList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getVariables();
+        if (o != null) {
+            if (msa.getVariables().getVariableList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getBootModes();
+        if (o != null) {
+            if (msa.getBootModes().getBootModeList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getSystemTables();
+        if (o != null) {
+            if (msa.getSystemTables().getSystemTableCNamesList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getDataHubs();
+        if (o != null) {
+            if (msa.getDataHubs().getDataHubRecordList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getHiiPackages();
+        if (o != null) {
+            if (msa.getHiiPackages().getHiiPackageList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getGuids();
+        if (o != null) {
+            if (msa.getGuids().getGuidCNamesList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getExterns();
+        if (o != null) {
+            if (msa.getExterns().getExternList().size() <= 0 && msa.getExterns().getSpecificationList().size() <= 0
+                && msa.getExterns().getPcdIsDriver() == null) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
+        o = msa.getPcdCoded();
+        if (o != null) {
+            if (msa.getPcdCoded().getPcdEntryList().size() <= 0) {
+                XmlCursor xmlCursor = o.newCursor();
+                xmlCursor.removeXml();
+                xmlCursor.dispose();
+            }
+        }
+
         ModuleSurfaceAreaDocument msaDoc = ModuleSurfaceAreaDocument.Factory.newInstance();
         File f = new File(path);
 
@@ -149,7 +301,7 @@ public class SaveFile {
         //
         dbDoc.addNewFrameworkDatabase();
         dbDoc.setFrameworkDatabase((FrameworkDatabase) cursor.getObject());
-             
+
         //
         //Save the file
         //
