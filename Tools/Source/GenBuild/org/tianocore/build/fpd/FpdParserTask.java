@@ -41,7 +41,6 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.action.CollectPCDAction;
-import org.tianocore.build.pcd.exception.EntityException;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainMap;

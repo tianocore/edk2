@@ -1316,7 +1316,9 @@ public class SurfaceAreaQuery {
             //
             // Get Fpd SA Module attribute and create FpdMoudleIdentification.
             //
-            arch = moduleSA.getSupArchList().toString();
+            if (moduleSA.getSupArchList() != null) {
+                arch = moduleSA.getSupArchList().toString();
+            }
 
             // TBD
             fvBinding = null;
@@ -1342,21 +1344,25 @@ public class SurfaceAreaQuery {
             // Create FpdModule Identification which have class member of module
             // identification
             //
-            if (arch != null) {
-                String[] archList = arch.split(" ");
-                for (int j = 0; j < archList.length; j++) {
-                    FpdModuleIdentification fpdSaId = new FpdModuleIdentification(saId,    archList[j]);
-        
-                    if (fvBinding != null) {
-                        fpdSaId.setFvBinding(fvBinding);
-                    }
-        
-                    //
-                    // Put element to Map<FpdModuleIdentification, Map<String,
-                    // Object>>.
-                    //
-                    fpdModuleMap.put(fpdSaId, ObjectMap);
+            String[] archList = new String[0];
+            if (arch == null || arch.trim().length() == 0) {
+                archList = GlobalData.getToolChainInfo().getArchs();
+            }
+            else{
+                archList = arch.split(" ");
+            }
+            for (int j = 0; j < archList.length; j++) {
+                FpdModuleIdentification fpdSaId = new FpdModuleIdentification(saId,    archList[j]);
+    
+                if (fvBinding != null) {
+                    fpdSaId.setFvBinding(fvBinding);
                 }
+    
+                //
+                // Put element to Map<FpdModuleIdentification, Map<String,
+                // Object>>.
+                //
+                fpdModuleMap.put(fpdSaId, ObjectMap);
             }
         }
         return fpdModuleMap;
