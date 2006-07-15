@@ -202,6 +202,7 @@
   </xs:attributeGroup>
   <xs:attributeGroup name="PpiDeclarationAttributes">
     <xs:attribute name="Name" type="UiNameType" use="required"/>
+    <xs:attribute name="GuidTypeList" type="GuidListType" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
   </xs:attributeGroup>
@@ -229,6 +230,7 @@
   </xs:attributeGroup>
   <xs:attributeGroup name="ProtocolDeclarationAttributes">
     <xs:attribute name="Name" type="UiNameType" use="required"/>
+    <xs:attribute name="GuidTypeList" type="GuidListType" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="SupModuleList" type="ModuleListType" use="optional"/>
   </xs:attributeGroup>
