@@ -579,8 +579,13 @@ public class SpdFileContents {
                 libClass[i][0] = lc.getName();
                 libClass[i][1] = lc.getIncludeHeader();
                 libClass[i][2] = lc.getHelpText();
-                libClass[i][3] = lc.getRecommendedInstanceGuid();
-                libClass[i][4] = lc.getRecommendedInstanceVersion();
+// LAH added logic so you cannot set the version unless the GUID is defined.
+                if (lc.getRecommendedInstanceGuid() != null) {
+                  libClass[i][3] = lc.getRecommendedInstanceGuid();
+                  if (lc.getRecommendedInstanceVersion() != null) {
+                    libClass[i][4] = lc.getRecommendedInstanceVersion();
+                  }
+                }
                 if (lc.getSupArchList() != null) {
                     libClass[i][5] = listToString(lc.getSupArchList());
                 }
@@ -961,8 +966,13 @@ public class SpdFileContents {
         lc.setName(clsName);
         lc.setIncludeHeader(clsIncludeFile);
         lc.setHelpText(help);
-        lc.setRecommendedInstanceGuid(clsUsage);
-        lc.setRecommendedInstanceVersion(instanceVer);
+// LAH added logic so you cannot set the version unless the GUID is defined.
+        if (clsUsage != null) {
+          lc.setRecommendedInstanceGuid(clsUsage);
+          if (instanceVer != null) {
+            lc.setRecommendedInstanceVersion(instanceVer);
+          }
+        }
         if (hdrAttribArch != null) {
             lc.setSupArchList(stringToList(hdrAttribArch));
         }
