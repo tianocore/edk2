@@ -187,6 +187,10 @@
     <xs:attribute name="ItemType" type="PcdItemTypes" use="required"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="PcdCodedAttributes">
+    <!-- We need to modify ALL the MSA files that have PcdCoded sections to 
+      set the PcdUsage.  Once we modify all the MSA files and we modify the 
+      wizard and the build tools, we need to make this required. -->
+    <xs:attribute name="Usage" type="PcdUsage" use="optional"/>
     <xs:attribute name="PcdItemType" type="PcdItemTypes" use="required"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
     <xs:attribute name="FeatureFlag" type="FeatureFlagExpressionType" use="optional"/>
