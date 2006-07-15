@@ -1262,7 +1262,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CBD2E4D5-7068-4FF5-B866-9822B4AD8D60">
+    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CBD2E4D5-7068-4FF5-B866-9822B4AD8D61">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5359,7 +5359,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="X64" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CBD2E4D5-7068-4FF5-B866-9822B4AD8D60">
+    <ModuleSA SupArchList="X64" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CBD2E4D5-7068-4FF5-B866-9822B4AD8D61">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -9378,7 +9378,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IPF" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CBD2E4D5-7068-4FF5-B866-9822B4AD8D60">
+    <ModuleSA SupArchList="IPF" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CBD2E4D5-7068-4FF5-B866-9822B4AD8D61">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
