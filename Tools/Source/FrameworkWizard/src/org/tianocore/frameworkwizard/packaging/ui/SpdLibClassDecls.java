@@ -103,7 +103,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     
     private OpeningPackageType docConsole = null;
 
-    private JLabel jLabel1 = null;
+    private JLabel jLabel1ClassName = null;
     
     private JScrollPane topScrollPane = null;  //  @jve:decl-index=0:visual-constraint="10,53"
     
@@ -111,21 +111,21 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private StarLabel starLabel = null;
 
-    private JLabel jLabel2 = null;
+    private JLabel jLabel2HelpText = null;
 
     private JTextField jTextFieldHelp = null;
 
-    private JLabel jLabel3 = null;
+    private JLabel jLabel3RecInstName = null;
 
-    private JTextField jTextField1 = null;
+    private JTextField jTextField1RecInstName = null;
 
-    private JLabel jLabel4 = null;
+    private JLabel jLabel4RecInstVer = null;
 
-    private JTextField jTextField2 = null;
+    private JTextField jTextField2RecInstVer = null;
 
-    private JLabel jLabel5 = null;
+    private JLabel jLabel5SupArchList = null;
 
-    private JLabel jLabel6 = null;
+    private JLabel jLabel6SupModList = null;
     
     private JScrollPane jScrollPaneArch = null;
     
@@ -207,13 +207,13 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            jTable = new JTable(model);
            jTable.setRowHeight(20);
            jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-           model.addColumn("LibraryClass");
-           model.addColumn("IncludeHeader");
+           model.addColumn("Library Class");
+           model.addColumn("Include Header");
            model.addColumn("HelpText");
-           model.addColumn("RecommendedInstance");
-           model.addColumn("InstanceVersion");
-           model.addColumn("SupportedArch");
-           model.addColumn("SupportedModule");
+           model.addColumn("Recommended Instance");
+           model.addColumn("Version");
+           model.addColumn("Supported Arch");
+           model.addColumn("Supported Module");
            
            Vector<String> vArch = new Vector<String>();
            vArch.add("IA32");
@@ -236,6 +236,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vModule.add("DXE_SMM_DRIVER");
            vModule.add("UEFI_DRIVER");
            vModule.add("UEFI_APPLICATION");
+           vModule.add("TOOLS");
            vModule.add("USER_DEFINED");
            jTable.getColumnModel().getColumn(6).setCellEditor(new ListEditor(vModule));
           
@@ -417,30 +418,30 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
      **/
     private JPanel getJContentPane1() {
         if (jContentPane == null) {
-            jLabel6 = new JLabel();
-            jLabel6.setBounds(new java.awt.Rectangle(16,252,108,16));
-            jLabel6.setText("Supported Module");
-            jLabel6.setEnabled(true);
-            jLabel5 = new JLabel();
-            jLabel5.setBounds(new java.awt.Rectangle(15,169,93,16));
-            jLabel5.setText("Supported Arch");
-            jLabel5.setEnabled(true);
-            jLabel4 = new JLabel();
-            jLabel4.setBounds(new java.awt.Rectangle(16,138,196,16));
-            jLabel4.setEnabled(true);
-            jLabel4.setText("Recommended Instance Version");
-            jLabel3 = new JLabel();
-            jLabel3.setBounds(new java.awt.Rectangle(17,112,195,16));
-            jLabel3.setEnabled(true);
-            jLabel3.setText("Recommended Instance Name");
-            jLabel2 = new JLabel();
-            jLabel2.setBounds(new java.awt.Rectangle(16,33,82,20));
-            jLabel2.setText("Help Text");
+            jLabel6SupModList = new JLabel();
+            jLabel6SupModList.setBounds(new java.awt.Rectangle(16,252,108,16));
+            jLabel6SupModList.setText("Supported Module");
+            jLabel6SupModList.setEnabled(true);
+            jLabel5SupArchList = new JLabel();
+            jLabel5SupArchList.setBounds(new java.awt.Rectangle(15,169,93,16));
+            jLabel5SupArchList.setText("Supported Arch");
+            jLabel5SupArchList.setEnabled(true);
+            jLabel4RecInstVer = new JLabel();
+            jLabel4RecInstVer.setBounds(new java.awt.Rectangle(16,138,196,16));
+            jLabel4RecInstVer.setEnabled(true);
+            jLabel4RecInstVer.setText("Recommended Instance Version");
+            jLabel3RecInstName = new JLabel();
+            jLabel3RecInstName.setBounds(new java.awt.Rectangle(17,112,195,16));
+            jLabel3RecInstName.setEnabled(true);
+            jLabel3RecInstName.setText("Recommended Instance Name");
+            jLabel2HelpText = new JLabel();
+            jLabel2HelpText.setBounds(new java.awt.Rectangle(16,33,82,20));
+            jLabel2HelpText.setText("Help Text");
             starLabel = new StarLabel();
             starLabel.setBounds(new java.awt.Rectangle(1,33,10,20));
-            jLabel1 = new JLabel();
-            jLabel1.setBounds(new java.awt.Rectangle(16,6,82,20));
-            jLabel1.setText("Library Class");
+            jLabel1ClassName = new JLabel();
+            jLabel1ClassName.setBounds(new java.awt.Rectangle(16,6,82,20));
+            jLabel1ClassName.setText("Library Class");
             jStarLabel1 = new StarLabel();
             jStarLabel1.setLocation(new java.awt.Point(1,7));
             jStarLabel2 = new StarLabel();
@@ -464,20 +465,21 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             
             jContentPane.add(getJTextField(), null);
             jContentPane.add(getJButtonBrowse(), null);
-            jContentPane.add(jLabel1, null);
+            jContentPane.add(jLabel1ClassName, null);
             jContentPane.add(starLabel, null);
-            jContentPane.add(jLabel2, null);
+            jContentPane.add(jLabel2HelpText, null);
             jContentPane.add(getJTextFieldHelp(), null);
-            jContentPane.add(jLabel3, null);
-            jContentPane.add(getJTextField1(), null);
-            jContentPane.add(jLabel4, null);
-            jContentPane.add(getJTextField2(), null);
-            jContentPane.add(jLabel5, null);
-            jContentPane.add(jLabel6, null);
+// LAH Removed until we can fix permanently
+//            jContentPane.add(jLabel3RecInstName, null);
+//            jContentPane.add(getJTextField1RecInstName(), null);
+//            jContentPane.add(jLabel4RecInstVer, null);
+//            jContentPane.add(getJTextField2RecInstVer(), null);
+            jContentPane.add(jLabel5SupArchList, null);
+            jContentPane.add(jLabel6SupModList, null);
             
             jContentPane.add(getJScrollPaneArch(), null);
             jContentPane.add(getJScrollPane1(), null);
-            jContentPane.add(getJComboBox(), null);
+// LAH            jContentPane.add(getJComboBox(), null);
             
         }
         
@@ -537,7 +539,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         if (arg0.getSource() == jButtonAdd) {
             
             //ToDo: check before add
-            String[] row = {null, null, null, jComboBox.getSelectedItem()+"", jTextField2.getText(), null, null};
+            // LAH WAS String[] row = {null, null, null, jComboBox.getSelectedItem()+"", jTextField2RecInstVer.getText(), null, null};
+            String[] row = {null, null, null, null, null, null, null};
             row[0] = jTextFieldAdd.getText();
             row[1] = jTextField.getText().replace('\\', '/');
             row[2] = jTextFieldHelp.getText();
@@ -559,8 +562,11 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             //convert to GUID before storing recommended lib instance.
             //
             getLibInstances(row[0]);
-            String recommendGuid = nameToGuid(row[3]);
-            sfc.genSpdLibClassDeclarations(row[0], recommendGuid, row[1], row[2], row[5], null, null, row[4], null, row[6]);
+
+// LAH            recommendGuid = nameToGuid(row[3]);
+
+// LAH WAS             sfc.genSpdLibClassDeclarations(row[0], recommendGuid, row[1], row[2], row[5], null, null, row[4], null, row[6]);
+            sfc.genSpdLibClassDeclarations(row[0], null, row[1], row[2], row[5], null, null, row[4], null, row[6]);
             
         }
         //
@@ -700,32 +706,32 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     }
 
     /**
-     * This method initializes jTextField1	
+     * This method initializes jTextField1RecInstName	
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField1() {
-        if (jTextField1 == null) {
-            jTextField1 = new JTextField();
-            jTextField1.setBounds(new java.awt.Rectangle(218,110,291,20));
-            jTextField1.setEnabled(true);
-            jTextField1.setVisible(false);
+    private JTextField getJTextField1RecInstName() {
+        if (jTextField1RecInstName == null) {
+            jTextField1RecInstName = new JTextField();
+            jTextField1RecInstName.setBounds(new java.awt.Rectangle(218,110,291,20));
+            jTextField1RecInstName.setEnabled(true);
+            jTextField1RecInstName.setVisible(false);
         }
-        return jTextField1;
+        return jTextField1RecInstName;
     }
 
     /**
-     * This method initializes jTextField2	
+     * This method initializes jTextField2RecInstVer	
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField2() {
-        if (jTextField2 == null) {
-            jTextField2 = new JTextField();
-            jTextField2.setBounds(new java.awt.Rectangle(218,135,292,20));
-            jTextField2.setEnabled(true);
+    private JTextField getJTextField2RecInstVer() {
+        if (jTextField2RecInstVer == null) {
+            jTextField2RecInstVer = new JTextField();
+            jTextField2RecInstVer.setBounds(new java.awt.Rectangle(218,135,292,20));
+            jTextField2RecInstVer.setEnabled(true);
         }
-        return jTextField2;
+        return jTextField2RecInstVer;
     }
 
     private JScrollPane getJScrollPaneArch() {
