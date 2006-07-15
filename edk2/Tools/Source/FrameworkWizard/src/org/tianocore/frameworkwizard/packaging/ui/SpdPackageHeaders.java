@@ -267,7 +267,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     private void init() {
         
         this.setContentPane(getJScrollPane());
-        this.setTitle("Library Class Declarations");
+        this.setTitle("Package Headers");
         this.setBounds(new java.awt.Rectangle(0, 0, 500, 370));
         this.setVisible(true);
         this.addInternalFrameListener(new InternalFrameAdapter(){

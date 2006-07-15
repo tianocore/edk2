@@ -186,7 +186,7 @@ public class ModulePackageDependencies extends IInternalFrame {
             jTable = new JTable(model);
             jTable.setRowHeight(20);
 
-            model.addColumn("Packge Name");
+            model.addColumn("Package Name");
             model.addColumn("Package Version");
 
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
