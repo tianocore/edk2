@@ -336,16 +336,26 @@ public class SpdFileContents {
             lc.setIncludeHeader(hdr);
             lc.setHelpText(hlp);
             if (clsUsage != null) {
-                lc.setRecommendedInstanceGuid(clsUsage);
-            }
-            if (instanceVer != null){
+              lc.setRecommendedInstanceGuid(clsUsage);
+              if (instanceVer != null){
                 lc.setRecommendedInstanceVersion(instanceVer);
+              } else {
+                lc.unsetRecommendedInstanceVersion();
+              }
+            } else {
+              lc.unsetRecommendedInstanceGuid();
+              lc.unsetRecommendedInstanceVersion();
             }
+
             if (stringToList(hdrAttribArch) != null){
-                lc.setSupArchList(stringToList(hdrAttribArch));
+              lc.setSupArchList(stringToList(hdrAttribArch));
+            } else {
+              lc.unsetSupArchList();
             }
             if (stringToList(hdrAttribModType) != null){
-                lc.setSupModuleList(stringToList(hdrAttribModType));
+              lc.setSupModuleList(stringToList(hdrAttribModType));
+            } else {
+              lc.unsetSupModuleList();
             }
         }
         
@@ -390,19 +400,19 @@ public class SpdFileContents {
                 e.setGuidTypeList(stringToList(guidTypeList));
             }
             else{
-                e.setGuidTypeList(null);
+                e.unsetGuidTypeList();
             }
             if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
             else{
-                e.setSupArchList(null);
+                e.unsetSupArchList();
             }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
             }
             else{
-                e.setSupModuleList(null);
+                e.unsetSupModuleList();
             }
             
         }
@@ -430,13 +440,13 @@ public class SpdFileContents {
                 e.setSupArchList(stringToList(archList));
             }
             else{
-                e.setSupArchList(null);
+                e.unsetSupArchList();
             }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
             }
             else{
-                e.setSupModuleList(null);
+                e.unsetSupModuleList();
             }
         }
         cursor.dispose();
@@ -463,13 +473,13 @@ public class SpdFileContents {
                 e.setSupArchList(stringToList(archList));
             }
             else{
-                e.setSupArchList(null);
+                e.unsetSupArchList();
             }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
             }
             else{
-                e.setSupModuleList(null);
+                e.unsetSupModuleList();
             }
         }
         cursor.dispose();
@@ -580,12 +590,14 @@ public class SpdFileContents {
                 libClass[i][1] = lc.getIncludeHeader();
                 libClass[i][2] = lc.getHelpText();
 // LAH added logic so you cannot set the version unless the GUID is defined.
+/* LAH do not set now
                 if (lc.getRecommendedInstanceGuid() != null) {
                   libClass[i][3] = lc.getRecommendedInstanceGuid();
                   if (lc.getRecommendedInstanceVersion() != null) {
                     libClass[i][4] = lc.getRecommendedInstanceVersion();
                   }
                 }
+*/
                 if (lc.getSupArchList() != null) {
                     libClass[i][5] = listToString(lc.getSupArchList());
                 }
@@ -967,17 +979,21 @@ public class SpdFileContents {
         lc.setIncludeHeader(clsIncludeFile);
         lc.setHelpText(help);
 // LAH added logic so you cannot set the version unless the GUID is defined.
+/* LAH
         if (clsUsage != null) {
           lc.setRecommendedInstanceGuid(clsUsage);
           if (instanceVer != null) {
             lc.setRecommendedInstanceVersion(instanceVer);
           }
         }
+*/
         if (hdrAttribArch != null) {
             lc.setSupArchList(stringToList(hdrAttribArch));
         }
         if (hdrAttribModType != null) {
-            lc.setSupModuleList(stringToList(hdrAttribModType));
+          lc.setSupModuleList(stringToList(hdrAttribModType));
+        } else {
+          lc.unsetSupModuleList();
         }
         
     }
@@ -1260,10 +1276,14 @@ public class SpdFileContents {
         pe.setTokenSpaceGuidCName(spaceGuid);
         pe.setHelpText(help);
         if (archList != null){
-            pe.setSupArchList(stringToList(archList));
+          pe.setSupArchList(stringToList(archList));
+        } else {
+          pe.unsetSupArchList();
         }
         if (modTypeList != null){
-            pe.setSupModuleList(stringToList(modTypeList));
+          pe.setSupModuleList(stringToList(modTypeList));
+        } else {
+          pe.unsetSupModuleList();
         }
     }
 
