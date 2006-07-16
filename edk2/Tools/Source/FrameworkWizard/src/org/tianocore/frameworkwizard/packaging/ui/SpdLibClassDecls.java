@@ -87,11 +87,11 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private JButton jButtonRemove = null;
 
-    private JButton jButtonClearAll = null;
+    private JButton jButtonRemoveAll = null;
 
-    private JLabel jLabel = null;
+    private JLabel jLabelHdr = null;
 
-    private JTextField jTextField = null;
+    private JTextField jTextFieldHdr = null;
 
     private JButton jButtonBrowse = null;
     
@@ -127,15 +127,23 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private JLabel jLabel6SupModList = null;
     
-    private JScrollPane jScrollPaneArch = null;
+    private JScrollPane jScrollPaneModules = null;
     
-    private JScrollPane jScrollPane1 = null;
+    private JScrollPane jScrollPane1Arch = null;
     
-    private ICheckBoxList iCheckBoxListArch = null;
+    private ICheckBoxList iCheckBoxListModules = null;
 
     private ICheckBoxList iCheckBoxList = null;
 
     private JComboBox jComboBox = null;
+
+    private int cnClassName = 0;
+    private int cnHdrFile = 1;
+    private int cnHelpText = 2;
+    private int cnRecInstName = 3;
+    private int cnRecInstVer = 4;
+    private int cnSupArch = 5;
+    private int cnSupMod = 6;
     
     HashMap<String, String> libNameGuidMap = new HashMap<String, String>();
 
@@ -185,12 +193,15 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
       This method initializes jScrollPane	
       	
       @return javax.swing.JScrollPane	
+
+      Used for the Table of Library Classes that are provided by this package
+
      **/
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
             jScrollPane.setBounds(new java.awt.Rectangle(12,351,608,253));
-            jScrollPane.setPreferredSize(new java.awt.Dimension(330,150));
+            jScrollPane.setPreferredSize(new java.awt.Dimension(390,150));
             jScrollPane.setViewportView(getJTable());
         }
         return jScrollPane;
@@ -206,14 +217,17 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            model = new DefaultTableModel();
            jTable = new JTable(model);
            jTable.setRowHeight(20);
-           jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-           model.addColumn("Library Class");
-           model.addColumn("Include Header");
-           model.addColumn("HelpText");
-           model.addColumn("Recommended Instance");
-           model.addColumn("Version");
-           model.addColumn("Supported Arch");
-           model.addColumn("Supported Module");
+//           jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+           jTable.setColumnSelectionAllowed(false);
+           model.addColumn("Class Name");
+           model.addColumn("Header");
+           model.addColumn("Help Text");
+           model.addColumn("Reserved");
+           model.addColumn("Reserved");
+//           model.addColumn("Recommended Instance");
+//           model.addColumn("Version");
+           model.addColumn("Sup. Arch");
+           model.addColumn("Mod. Types");
            
            Vector<String> vArch = new Vector<String>();
            vArch.add("IA32");
@@ -222,7 +236,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vArch.add("EBC");
            vArch.add("ARM");
            vArch.add("PPC");
-           jTable.getColumnModel().getColumn(5).setCellEditor(new ListEditor(vArch));
+//           jTable.getColumnModel().getColumn(cnSupArch).setCellEditor(new ListEditor(vArch));
            
            Vector<String> vModule = new Vector<String>();
            vModule.add("BASE");
@@ -236,9 +250,10 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vModule.add("DXE_SMM_DRIVER");
            vModule.add("UEFI_DRIVER");
            vModule.add("UEFI_APPLICATION");
-           vModule.add("TOOLS");
            vModule.add("USER_DEFINED");
-           jTable.getColumnModel().getColumn(6).setCellEditor(new ListEditor(vModule));
+           vModule.add("NONE");
+
+           jTable.getColumnModel().getColumn(cnSupMod).setCellEditor(new ListEditor(vModule));
           
            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
            jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -268,18 +283,22 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         int row = arg0.getFirstRow();
         TableModel m = (TableModel)arg0.getSource();
         if (arg0.getType() == TableModelEvent.UPDATE){
-            String lib = m.getValueAt(row, 0) + "";
-            String hdr = m.getValueAt(row, 1) + "";
-            String hlp = m.getValueAt(row, 2) + "";
-            String name = m.getValueAt(row, 3) + "";
-            String ver = m.getValueAt(row, 4) + "";
+            String lib = m.getValueAt(row, cnClassName) + "";
+            String hdr = m.getValueAt(row, cnHdrFile) + "";
+            String hlp = m.getValueAt(row, cnHelpText) + "";
+            String name = m.getValueAt(row, cnRecInstName) + "";
+            String ver = m.getValueAt(row, cnRecInstVer) + "";
             String arch = null;
-            if (m.getValueAt(row, 5) != null) {
-               arch = m.getValueAt(row, 5).toString();
+            if (m.getValueAt(row, cnSupArch) != null) {
+               arch = m.getValueAt(row, cnSupArch).toString();
             }
             String module = null;
-            if (m.getValueAt(row, 6) != null) {
-                module = m.getValueAt(row, 6).toString();
+                   // if (lsm.isSelectionEmpty()) {
+            if (m.getValueAt(row, cnSupMod) != null) {
+                module = m.getValueAt(row, cnSupMod).toString();
+                if (module == "NONE") {
+                  module = null;
+                }
             }
             String[] rowData = {lib, hdr, hlp};
             if (!dataValidation(rowData)) {
@@ -287,10 +306,12 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             }
             docConsole.setSaved(false);
             
-            getLibInstances(lib);
-            String guid = nameToGuid(name);
+// LAH            getLibInstances(lib);
+
+// LAH            String guid = nameToGuid(name);
             
-            sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
+            // LAH WAS sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
+            sfc.updateSpdLibClass(row, lib, hdr, hlp, null, null, arch, module);
         }
     }
 
@@ -303,8 +324,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         if (jButtonAdd == null) {
             jButtonAdd = new JButton();
             jButtonAdd.setText("Add");
-            jButtonAdd.setSize(new java.awt.Dimension(80,20));
-            jButtonAdd.setLocation(new java.awt.Point(359,326));
+            jButtonAdd.setSize(new java.awt.Dimension(99,20));
+            jButtonAdd.setLocation(new java.awt.Point(321,326));
             jButtonAdd.addActionListener(this);
         }
         return jButtonAdd;
@@ -319,8 +340,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         if (jButtonRemove == null) {
             jButtonRemove = new JButton();
             jButtonRemove.setText("Remove");
-            jButtonRemove.setSize(new java.awt.Dimension(80,20));
-            jButtonRemove.setLocation(new java.awt.Point(443,326));
+            jButtonRemove.setSize(new java.awt.Dimension(99,20));
+            jButtonRemove.setLocation(new java.awt.Point(424,326));
             jButtonRemove.addActionListener(this);
         }
         return jButtonRemove;
@@ -331,15 +352,15 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
       	
       @return javax.swing.JButton	
      **/
-    private JButton getJButtonClearAll() {
-        if (jButtonClearAll == null) {
-            jButtonClearAll = new JButton();
-            jButtonClearAll.setText("Clear All");
-            jButtonClearAll.setSize(new java.awt.Dimension(86,20));
-            jButtonClearAll.setLocation(new java.awt.Point(530,326));
-            jButtonClearAll.addActionListener(this);
+    private JButton getJButtonRemoveAll() {
+        if (jButtonRemoveAll == null) {
+            jButtonRemoveAll = new JButton();
+            jButtonRemoveAll.setText("Remove All");
+            jButtonRemoveAll.setSize(new java.awt.Dimension(99,20));
+            jButtonRemoveAll.setLocation(new java.awt.Point(527,326));
+            jButtonRemoveAll.addActionListener(this);
         }
-        return jButtonClearAll;
+        return jButtonRemoveAll;
     }
 
     /**
@@ -406,7 +427,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private JScrollPane getJContentPane(){
         if (topScrollPane == null){
           topScrollPane = new JScrollPane();
-          topScrollPane.setSize(new java.awt.Dimension(634,500));
+          topScrollPane.setSize(new java.awt.Dimension(634,590));
           topScrollPane.setViewportView(getJContentPane1());
         }
         return topScrollPane;
@@ -418,10 +439,32 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
      **/
     private JPanel getJContentPane1() {
         if (jContentPane == null) {
+            // Library Class
+            jStarLabel1 = new StarLabel();
+            jStarLabel1.setLocation(new java.awt.Point(1,7));
+            jLabel1ClassName = new JLabel();
+            jLabel1ClassName.setBounds(new java.awt.Rectangle(16,6,82,20));
+            jLabel1ClassName.setText("Library Class");
+
+            // Help Text
+            starLabel = new StarLabel();
+            starLabel.setBounds(new java.awt.Rectangle(1,33,10,20));
+            jLabel2HelpText = new JLabel();
+            jLabel2HelpText.setBounds(new java.awt.Rectangle(16,33,82,20));
+            jLabel2HelpText.setText("Help Text");
+
+            // Header File
+            jStarLabel2 = new StarLabel();
+            jStarLabel2.setLocation(new java.awt.Point(1,74));
+            jLabelHdr = new JLabel();
+            jLabelHdr.setBounds(new java.awt.Rectangle(14,74,199,22));
+            jLabelHdr.setText("Include Header for Specified Class");
+
             jLabel6SupModList = new JLabel();
             jLabel6SupModList.setBounds(new java.awt.Rectangle(16,252,108,16));
             jLabel6SupModList.setText("Supported Module");
             jLabel6SupModList.setEnabled(true);
+
             jLabel5SupArchList = new JLabel();
             jLabel5SupArchList.setBounds(new java.awt.Rectangle(15,169,93,16));
             jLabel5SupArchList.setText("Supported Arch");
@@ -434,26 +477,11 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jLabel3RecInstName.setBounds(new java.awt.Rectangle(17,112,195,16));
             jLabel3RecInstName.setEnabled(true);
             jLabel3RecInstName.setText("Recommended Instance Name");
-            jLabel2HelpText = new JLabel();
-            jLabel2HelpText.setBounds(new java.awt.Rectangle(16,33,82,20));
-            jLabel2HelpText.setText("Help Text");
-            starLabel = new StarLabel();
-            starLabel.setBounds(new java.awt.Rectangle(1,33,10,20));
-            jLabel1ClassName = new JLabel();
-            jLabel1ClassName.setBounds(new java.awt.Rectangle(16,6,82,20));
-            jLabel1ClassName.setText("Library Class");
-            jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(1,7));
-            jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(-1,74));
-            jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(14,74,199,22));
-            jLabel.setText("Include Header for Specified Class");
             
             jContentPane = new JPanel();
             jContentPane.setPreferredSize(new Dimension(480, 400));
             jContentPane.setLayout(null);
-            jContentPane.add(jLabel, null);
+            jContentPane.add(jLabelHdr, null);
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(getJTextFieldAdd(), null);
@@ -461,9 +489,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jContentPane.add(getJScrollPane(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
-            jContentPane.add(getJButtonClearAll(), null);
+            jContentPane.add(getJButtonRemoveAll(), null);
             
-            jContentPane.add(getJTextField(), null);
+            jContentPane.add(getJTextFieldHdr(), null);
             jContentPane.add(getJButtonBrowse(), null);
             jContentPane.add(jLabel1ClassName, null);
             jContentPane.add(starLabel, null);
@@ -477,8 +505,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jContentPane.add(jLabel5SupArchList, null);
             jContentPane.add(jLabel6SupModList, null);
             
-            jContentPane.add(getJScrollPaneArch(), null);
-            jContentPane.add(getJScrollPane1(), null);
+            jContentPane.add(getJScrollPaneModules(), null);
+            jContentPane.add(getJScrollPane1Arch(), null);
 // LAH            jContentPane.add(getJComboBox(), null);
             
         }
@@ -541,16 +569,16 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             //ToDo: check before add
             // LAH WAS String[] row = {null, null, null, jComboBox.getSelectedItem()+"", jTextField2RecInstVer.getText(), null, null};
             String[] row = {null, null, null, null, null, null, null};
-            row[0] = jTextFieldAdd.getText();
-            row[1] = jTextField.getText().replace('\\', '/');
-            row[2] = jTextFieldHelp.getText();
-            row[5] = vectorToString(iCheckBoxList.getAllCheckedItemsString());
-            if (row[5].length() == 0){
-                row[5] = null;
+            row[cnClassName] = jTextFieldAdd.getText();
+            row[cnHdrFile] = jTextFieldHdr.getText().replace('\\', '/');
+            row[cnHelpText] = jTextFieldHelp.getText();
+            row[cnSupArch] = vectorToString(iCheckBoxList.getAllCheckedItemsString());
+            if (row[cnSupArch].length() == 0) {
+                row[cnSupArch] = null;
             }
-            row[6] = vectorToString(iCheckBoxListArch.getAllCheckedItemsString());
-            if (row[6].length() == 0){
-                row[6] = null;
+            row[cnSupMod] = vectorToString(iCheckBoxListModules.getAllCheckedItemsString());
+            if (row[cnSupMod].length() == 0){
+                row[cnSupMod] = null;
             }
             if (!dataValidation(row)) {
                 return;
@@ -566,7 +594,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 // LAH            recommendGuid = nameToGuid(row[3]);
 
 // LAH WAS             sfc.genSpdLibClassDeclarations(row[0], recommendGuid, row[1], row[2], row[5], null, null, row[4], null, row[6]);
-            sfc.genSpdLibClassDeclarations(row[0], null, row[1], row[2], row[5], null, null, row[4], null, row[6]);
+            sfc.genSpdLibClassDeclarations(row[cnClassName], null, row[cnHdrFile], row[cnHelpText], row[cnSupArch], null, null, row[cnRecInstVer], null, row[cnSupMod]);
             
         }
         //
@@ -583,7 +611,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             }
         }
 
-        if (arg0.getSource() == jButtonClearAll) {
+        if (arg0.getSource() == jButtonRemoveAll) {
             if (model.getRowCount() == 0) {
                 return;
             }
@@ -594,15 +622,15 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     }
 
     private boolean dataValidation(String[] row) {
-        if (!DataValidation.isKeywordType(row[0])) {
+        if (!DataValidation.isKeywordType(row[cnClassName])) {
             JOptionPane.showMessageDialog(frame, "Library Class is NOT KeyWord Type.");
             return false;
         }
-        if (!DataValidation.isPathAndFilename(row[1])) {
+        if (!DataValidation.isPathAndFilename(row[cnHdrFile])) {
             JOptionPane.showMessageDialog(frame, "Include Header is NOT PathAndFilename Type.");
         }
-        if (row[2].length() == 0) {
-            JOptionPane.showMessageDialog(frame, "HelpText could NOT be empty.");
+        if (row[cnHelpText].length() == 0) {
+            JOptionPane.showMessageDialog(frame, "Help Text Must NOT be empty.");
         }
         return true;
     }
@@ -618,13 +646,13 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
       	
       @return javax.swing.JTextField	
      **/
-    private JTextField getJTextField() {
-        if (jTextField == null) {
-            jTextField = new JTextField();
-            jTextField.setBounds(new java.awt.Rectangle(218,75,290,21));
-            jTextField.setPreferredSize(new java.awt.Dimension(260,20));
+    private JTextField getJTextFieldHdr() {
+        if (jTextFieldHdr == null) {
+            jTextFieldHdr = new JTextField();
+            jTextFieldHdr.setBounds(new java.awt.Rectangle(218,75,305,21));
+            jTextFieldHdr.setPreferredSize(new java.awt.Dimension(260,20));
         }
-        return jTextField;
+        return jTextFieldHdr;
     }
 
     /**
@@ -635,9 +663,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private JButton getJButtonBrowse() {
         if (jButtonBrowse == null) {
             jButtonBrowse = new JButton();
-            jButtonBrowse.setBounds(new java.awt.Rectangle(528,75,90,20));
+            jButtonBrowse.setBounds(new java.awt.Rectangle(527,75,90,20));
             jButtonBrowse.setText("Browse");
-            jButtonBrowse.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonBrowse.setPreferredSize(new java.awt.Dimension(99,20));
             jButtonBrowse.addActionListener(new AbstractAction() {
                 
                 /**
@@ -674,7 +702,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                     
                     headerDest = theFile.getPath();
                     int fileIndex = headerDest.indexOf(System.getProperty("file.separator"), dirPrefix.length());
-                    jTextField.setText(headerDest.substring(fileIndex + 1).replace('\\', '/'));
+                    jTextFieldHdr.setText(headerDest.substring(fileIndex + 1).replace('\\', '/'));
                
                 }
 
@@ -688,7 +716,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         
         resizeComponentWidth(this.jTextFieldAdd, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
+        resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth-10);
         
     }
     /**
@@ -734,20 +762,20 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         return jTextField2RecInstVer;
     }
 
-    private JScrollPane getJScrollPaneArch() {
-        if (jScrollPaneArch == null) {
-            jScrollPaneArch = new JScrollPane();
-            jScrollPaneArch.setBounds(new java.awt.Rectangle(218,245,293,73));
-            jScrollPaneArch.setPreferredSize(new java.awt.Dimension(320, 80));
-            jScrollPaneArch.setViewportView(getICheckBoxListSupportedArchitectures());
+    private JScrollPane getJScrollPaneModules() {
+        if (jScrollPaneModules == null) {
+            jScrollPaneModules = new JScrollPane();
+            jScrollPaneModules.setBounds(new java.awt.Rectangle(218,245,293,73));
+            jScrollPaneModules.setPreferredSize(new java.awt.Dimension(320, 80));
+            jScrollPaneModules.setViewportView(getICheckBoxListSupportedModules());
         }
-        return jScrollPaneArch;
+        return jScrollPaneModules;
     }
     
-    private ICheckBoxList getICheckBoxListSupportedArchitectures() {
-        if (iCheckBoxListArch == null) {
-            iCheckBoxListArch = new ICheckBoxList();
-            iCheckBoxListArch.setBounds(new java.awt.Rectangle(218,246,292,73));
+    private ICheckBoxList getICheckBoxListSupportedModules() {
+        if (iCheckBoxListModules == null) {
+            iCheckBoxListModules = new ICheckBoxList();
+            iCheckBoxListModules.setBounds(new java.awt.Rectangle(218,246,292,73));
             Vector<String> v = new Vector<String>();
             v.add("BASE");
             v.add("SEC");
@@ -761,9 +789,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             v.add("UEFI_DRIVER");
             v.add("UEFI_APPLICATION");
             v.add("USER_DEFINED");
-            iCheckBoxListArch.setAllItems(v);
+            iCheckBoxListModules.setAllItems(v);
         }
-        return iCheckBoxListArch;
+        return iCheckBoxListModules;
     }
     
     private String vectorToString(Vector<String> v) {
@@ -775,14 +803,14 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         return s.trim();
     }
     
-    private JScrollPane getJScrollPane1() {
-        if (jScrollPane1 == null) {
-            jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(218,170,293,73));
-            jScrollPane1.setPreferredSize(new java.awt.Dimension(320, 80));
-            jScrollPane1.setViewportView(getICheckBoxList());
+    private JScrollPane getJScrollPane1Arch() {
+        if (jScrollPane1Arch == null) {
+            jScrollPane1Arch = new JScrollPane();
+            jScrollPane1Arch.setBounds(new java.awt.Rectangle(218,170,293,73));
+            jScrollPane1Arch.setPreferredSize(new java.awt.Dimension(320, 80));
+            jScrollPane1Arch.setViewportView(getICheckBoxList());
         }
-        return jScrollPane1;
+        return jScrollPane1Arch;
     }
     /**
      * This method initializes iCheckBoxList	
