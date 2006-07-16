@@ -340,22 +340,29 @@ public class SpdFileContents {
               if (instanceVer != null){
                 lc.setRecommendedInstanceVersion(instanceVer);
               } else {
-                lc.unsetRecommendedInstanceVersion();
+                if (lc.isSetRecommendedInstanceVersion()) {
+                  lc.unsetRecommendedInstanceVersion();
+                }
               }
             } else {
-              lc.unsetRecommendedInstanceGuid();
-              lc.unsetRecommendedInstanceVersion();
+              if (lc.isSetRecommendedInstanceGuid()) {
+                lc.unsetRecommendedInstanceGuid();
+              }
             }
 
             if (stringToList(hdrAttribArch) != null){
               lc.setSupArchList(stringToList(hdrAttribArch));
             } else {
-              lc.unsetSupArchList();
+              if (lc.isSetSupArchList()) {
+                lc.unsetSupArchList();
+              }
             }
             if (stringToList(hdrAttribModType) != null){
               lc.setSupModuleList(stringToList(hdrAttribModType));
             } else {
-              lc.unsetSupModuleList();
+              if (lc.isSetSupModuleList()) {
+                lc.unsetSupModuleList();
+              }
             }
         }
         
@@ -397,22 +404,28 @@ public class SpdFileContents {
             e.setGuidValue(guid);
             e.setHelpText(hlp);
             if (stringToList(guidTypeList) != null) {
-                e.setGuidTypeList(stringToList(guidTypeList));
+              e.setGuidTypeList(stringToList(guidTypeList));
             }
             else{
+              if (e.isSetGuidTypeList()) {
                 e.unsetGuidTypeList();
+              }
             }
             if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
             else{
+              if (e.isSetSupArchList()) {
                 e.unsetSupArchList();
+              }
             }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
             }
             else{
+              if (e.isSetSupModuleList()) {
                 e.unsetSupModuleList();
+              }
             }
             
         }
@@ -440,13 +453,17 @@ public class SpdFileContents {
                 e.setSupArchList(stringToList(archList));
             }
             else{
+              if (e.isSetSupArchList()) {
                 e.unsetSupArchList();
+              }
             }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
             }
             else{
+              if (e.isSetSupModuleList()) {
                 e.unsetSupModuleList();
+              }
             }
         }
         cursor.dispose();
@@ -473,13 +490,17 @@ public class SpdFileContents {
                 e.setSupArchList(stringToList(archList));
             }
             else{
+              if (e.isSetSupArchList()) {
                 e.unsetSupArchList();
+              }
             }
             if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
             }
             else{
+              if (e.isSetSupModuleList()) {
                 e.unsetSupModuleList();
+              }
             }
         }
         cursor.dispose();
@@ -989,11 +1010,18 @@ public class SpdFileContents {
 */
         if (hdrAttribArch != null) {
             lc.setSupArchList(stringToList(hdrAttribArch));
+        } else {
+          if (lc.isSetSupArchList()) {
+            lc.unsetSupArchList();
+          }
         }
+
         if (hdrAttribModType != null) {
           lc.setSupModuleList(stringToList(hdrAttribModType));
         } else {
-          lc.unsetSupModuleList();
+          if (lc.isSetSupModuleList()) {
+            lc.unsetSupModuleList();
+          }
         }
         
     }
@@ -1278,12 +1306,16 @@ public class SpdFileContents {
         if (archList != null){
           pe.setSupArchList(stringToList(archList));
         } else {
-          pe.unsetSupArchList();
+          if (pe.isSetSupArchList()) {
+            pe.unsetSupArchList();
+          }
         }
         if (modTypeList != null){
           pe.setSupModuleList(stringToList(modTypeList));
         } else {
-          pe.unsetSupModuleList();
+          if (pe.isSetSupModuleList()) {
+            pe.unsetSupModuleList();
+          }
         }
     }
 

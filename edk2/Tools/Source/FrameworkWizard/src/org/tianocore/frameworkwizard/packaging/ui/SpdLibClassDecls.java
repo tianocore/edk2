@@ -251,7 +251,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vModule.add("UEFI_DRIVER");
            vModule.add("UEFI_APPLICATION");
            vModule.add("USER_DEFINED");
-           vModule.add("NONE");
 
            jTable.getColumnModel().getColumn(cnSupMod).setCellEditor(new ListEditor(vModule));
           
@@ -293,12 +292,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                arch = m.getValueAt(row, cnSupArch).toString();
             }
             String module = null;
-                   // if (lsm.isSelectionEmpty()) {
             if (m.getValueAt(row, cnSupMod) != null) {
                 module = m.getValueAt(row, cnSupMod).toString();
-                if (module == "NONE") {
-                  module = null;
-                }
             }
             String[] rowData = {lib, hdr, hlp};
             if (!dataValidation(rowData)) {
@@ -308,7 +303,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             
 // LAH            getLibInstances(lib);
 
-// LAH            String guid = nameToGuid(name);
+            if (name != null) {
+              String guid = nameToGuid(name);
+            }
             
             // LAH WAS sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
             sfc.updateSpdLibClass(row, lib, hdr, hlp, null, null, arch, module);
@@ -589,8 +586,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             //
             //convert to GUID before storing recommended lib instance.
             //
-            getLibInstances(row[0]);
-
+            getLibInstances(row[cnClassName]);
 // LAH            recommendGuid = nameToGuid(row[3]);
 
 // LAH WAS             sfc.genSpdLibClassDeclarations(row[0], recommendGuid, row[1], row[2], row[5], null, null, row[4], null, row[6]);
