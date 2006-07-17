@@ -26,13 +26,11 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
-import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
