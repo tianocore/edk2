@@ -156,7 +156,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      
      **/
     private void initialize() {
-        this.setTitle("PCD Definition");
+        this.setTitle("PCD Declarations");
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
     }
@@ -731,8 +731,15 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             String defaultVal = m.getValueAt(row, 4) + "";
             String help = m.getValueAt(row, 5) + "";
             String usage = getValidUsage(new Boolean(m.getValueAt(row, 6)+""), new Boolean(m.getValueAt(row, 7)+""), new Boolean(m.getValueAt(row, 8)+""), new Boolean(m.getValueAt(row, 9)+""), new Boolean(m.getValueAt(row, 10)+""));
-            String archList = vectorToString(iCheckBoxList.getAllCheckedItemsString());
-            String modTypeList = vectorToString(iCheckBoxList1.getAllCheckedItemsString());
+            
+            String archList = null;
+            if (m.getValueAt(row, 11) != null){
+                archList = m.getValueAt(row, 11).toString();
+            }
+            String modTypeList = null;
+            if (m.getValueAt(row, 12) != null) {
+                modTypeList = m.getValueAt(row, 12).toString(); 
+            }
             if (usage.length() == 0) {
                 JOptionPane.showMessageDialog(frame, "You must choose at least one usage for PCD entry.");
                 return;

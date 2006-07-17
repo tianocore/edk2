@@ -551,12 +551,23 @@ public class SpdFileContents {
             e.setTokenSpaceGuidCName(spaceGuid);
             e.setDefaultValue(defaultString);
             e.setHelpText(help);
-            if (archList != null && archList.length() > 0){
+            if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
-            if (modTypeList != null && modTypeList.length() > 0){
+            else{
+              if (e.isSetSupArchList()) {
+                e.unsetSupArchList();
+              }
+            }
+            if (stringToList(modTypeList) != null) {
                 e.setSupModuleList(stringToList(modTypeList));
             }
+            else{
+              if (e.isSetSupModuleList()) {
+                e.unsetSupModuleList();
+              }
+            }
+            
         } 
         cursor.dispose();
     }
