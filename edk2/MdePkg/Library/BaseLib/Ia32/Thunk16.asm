@@ -29,10 +29,6 @@ EXTERNDEF   C   m16Gdt:WORD
 EXTERNDEF   C   m16GdtrBase:WORD
 EXTERNDEF   C   mTransition:WORD
 
-;THUNK_ATTRIBUTE_BIG_REAL_MODE               EQU 1
-;THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15     EQU 2
-;THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL   EQU 4
-
 IA32_REGS   STRUC   4t
 _EDI        DD      ?
 _ESI        DD      ?
@@ -54,19 +50,19 @@ IA32_REGS   ENDS
 
     .const
 
-m16Size         DW      offset InternalAsmThunk16 - offset m16Start
-mThunk16Attr    DW      offset _ThunkAttr - offset m16Start
-m16Gdt          DW      offset _NullSegDesc - offset m16Start
-m16GdtrBase     DW      offset _16GdtrBase - offset m16Start
-mTransition     DW      offset _EntryPoint - offset m16Start
+m16Size         DW      InternalAsmThunk16 - m16Start
+mThunk16Attr    DW      _ThunkAttr - m16Start
+m16Gdt          DW      _NullSegDesc - m16Start
+m16GdtrBase     DW      _16GdtrBase - m16Start
+mTransition     DW      _EntryPoint - m16Start
 
     .code
 
 m16Start    LABEL   BYTE
 
-SavedGdt        LABEL   FWORD
-                DW      ?
-                DD      ?
+SavedGdt    LABEL   FWORD
+            DW      ?
+            DD      ?
 
 _BackFromUserCode   PROC
     push    ss
@@ -106,7 +102,7 @@ _ThunkAttr  DD      ?
 SavedCr4    DD      ?
     mov     cr4, eax
     DB      66h
-    lgdt    fword ptr cs:[edi + (offset SavedGdt - offset @Base)]
+    lgdt    fword ptr cs:[edi + (SavedGdt - @Base)]
     DB      66h, 0b8h                   ; mov eax, imm32
 SavedCr0    DD      ?
     mov     cr0, eax
@@ -119,12 +115,12 @@ SavedEsp    DD      ?
     retf                                ; return to protected mode
 _BackFromUserCode   ENDP
 
-_EntryPoint     DD      offset _ToUserCode - offset m16Start
-                DW      8h
-_16Idtr         FWORD   (1 SHL 10) - 1
-_16Gdtr         LABEL   FWORD
-                DW      offset GdtEnd - offset _NullSegDesc - 1
-_16GdtrBase     DD      offset _NullSegDesc
+_EntryPoint DD      _ToUserCode - m16Start
+            DW      8h
+_16Idtr     FWORD   (1 SHL 10) - 1
+_16Gdtr     LABEL   FWORD
+            DW      GdtEnd - _NullSegDesc - 1
+_16GdtrBase DD      _NullSegDesc
 
 _ToUserCode PROC
     mov     edx, ss
@@ -140,17 +136,17 @@ _ToUserCode PROC
     DB      66h
     call    @Base                       ; push eip
 @Base:
-    pop     bp                          ; ebp <- offset @Base
+    pop     bp                          ; ebp <- address of @Base
     DB      67h                         ; address size override
     push    [esp + sizeof (IA32_REGS) + 2]
-    lea     eax, [esi + (offset @RealMode - offset @Base)]
+    lea     eax, [esi + (@RealMode - @Base)]
     push    eax
     retf
 @RealMode:
-    mov     cs:[esi + (offset SavedSs - offset @Base)], edx
-    mov     cs:[esi + (offset SavedEsp - offset @Base)], bx
+    mov     cs:[esi + (SavedSs - @Base)], edx
+    mov     cs:[esi + (SavedEsp - @Base)], bx
     DB      66h
-    lidt    fword ptr cs:[esi + (offset _16Idtr - offset @Base)]
+    lidt    fword ptr cs:[esi + (_16Idtr - @Base)]
     popaw                               ; popad actually
     pop     ds
     pop     es
@@ -196,26 +192,26 @@ InternalAsmThunk16  PROC    USES    ebp ebx esi edi ds  es  fs  gs
     rep     movsd                       ; copy RegSet
     mov     eax, [esp + 40]             ; eax <- address of transition code
     mov     esi, edx                    ; esi <- 16-bit stack segment
-    lea     edx, [eax + (offset SavedCr0 - offset m16Start)]
+    lea     edx, [eax + (SavedCr0 - m16Start)]
     mov     ecx, eax
     and     ecx, 0fh
     shl     eax, 12
-    lea     ecx, [ecx + (offset _BackFromUserCode - offset m16Start)]
+    lea     ecx, [ecx + (_BackFromUserCode - m16Start)]
     mov     ax, cx
     stosd                               ; [edi] <- return address of user code
-    sgdt    fword ptr [edx + (offset SavedGdt - offset SavedCr0)]
+    sgdt    fword ptr [edx + (SavedGdt - SavedCr0)]
     sidt    fword ptr [esp + 36]        ; save IDT stack in argument space
     mov     eax, cr0
     mov     [edx], eax                  ; save CR0 in SavedCr0
     and     eax, 7ffffffeh              ; clear PE, PG bits
     mov     ebp, cr4
-    mov     [edx + (offset SavedCr4 - offset SavedCr0)], ebp
+    mov     [edx + (SavedCr4 - SavedCr0)], ebp
     and     ebp, 300h                   ; clear all but PCE and OSFXSR bits
     push    10h
     pop     ecx                         ; ecx <- selector for data segments
-    lgdt    fword ptr [edx + (offset _16Gdtr - offset SavedCr0)]
+    lgdt    fword ptr [edx + (_16Gdtr - SavedCr0)]
     pushfd
-    call    fword ptr [edx + (offset _EntryPoint - offset SavedCr0)]
+    call    fword ptr [edx + (_EntryPoint - SavedCr0)]
     popfd
     lidt    fword ptr [esp + 36]        ; restore protected mode IDTR
     lea     eax, [ebp - sizeof (IA32_REGS)]
