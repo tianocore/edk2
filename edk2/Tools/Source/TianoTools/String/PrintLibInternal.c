@@ -1,22 +1,24 @@
-/** @file
-  Print Library worker functions.
-
+/*++
 
 Copyright (c)  2004-2006 Intel Corporation. All rights reserved
-This software and associated documentation (if any) is furnished
-under a license and may only be used or copied in accordance
-with the terms of the license. Except as permitted by such
-license, no part of this software or documentation may be
-reproduced, stored in a retrieval system, or transmitted in any
-form or by any means without the express written consent of
-Intel Corporation.
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
+distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  PrintLibInternal.c
 
-**/
+Module Name:
+
+  PrintLibInternal.c
+
+Abstract:
+
+  Print Library worker functions.
+
+--*/
 
 #include <Common/UefiBaseTypes.h>
 #include <Library/PrintLib.h>
@@ -48,11 +50,11 @@ BasePrintLibFillBuffer (
   Print worker function that prints a Value as a decimal number in Buffer.
 
   @param  Buffer Location to place the Unicode or ASCII string of Value.
-  
+
   @param  Value Value to convert to a Decimal or Hexidecimal string in Buffer.
-  
+
   @param  Flags Flags to use in printing string, see file header for details.
-  
+
   @param  Precision Minimum number of digits to return in the ASCII string
 
   @return Number of characters printed.
