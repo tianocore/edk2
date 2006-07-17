@@ -348,6 +348,9 @@ public class SpdFileContents {
               if (lc.isSetRecommendedInstanceGuid()) {
                 lc.unsetRecommendedInstanceGuid();
               }
+              if (lc.isSetRecommendedInstanceVersion()) {
+                  lc.unsetRecommendedInstanceVersion();
+              }
             }
 
             if (stringToList(hdrAttribArch) != null){
@@ -1011,14 +1014,22 @@ public class SpdFileContents {
         lc.setIncludeHeader(clsIncludeFile);
         lc.setHelpText(help);
 // LAH added logic so you cannot set the version unless the GUID is defined.
-/* LAH
+
         if (clsUsage != null) {
           lc.setRecommendedInstanceGuid(clsUsage);
           if (instanceVer != null) {
             lc.setRecommendedInstanceVersion(instanceVer);
           }
         }
-*/
+        else {
+          if (lc.isSetRecommendedInstanceGuid()) {
+              lc.unsetRecommendedInstanceGuid();
+          }
+          if (lc.isSetRecommendedInstanceVersion()) {
+              lc.unsetRecommendedInstanceVersion();
+          }
+        }
+
         if (hdrAttribArch != null) {
             lc.setSupArchList(stringToList(hdrAttribArch));
         } else {
