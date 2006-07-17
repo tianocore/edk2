@@ -1,22 +1,24 @@
-/** @file
-  Print Library.
-
+/*++
 
 Copyright (c)  2004-2006 Intel Corporation. All rights reserved
-This software and associated documentation (if any) is furnished
-under a license and may only be used or copied in accordance
-with the terms of the license. Except as permitted by such
-license, no part of this software or documentation may be
-reproduced, stored in a retrieval system, or transmitted in any
-form or by any means without the express written consent of
-Intel Corporation.
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
+distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  PrintLib.c
 
-**/
+Module Name:
+
+  PrintLib.c
+
+Abstract:
+
+  Print Library.
+
+--*/
 
 #include <Common/UefiBaseTypes.h>
 #include <Library/PrintLib.h>
@@ -64,19 +66,19 @@ static CONST STATUS_LOOKUP_TABLE_ENTRY  StatusString[] = {
 
 
 /**
-  VSPrint function to process format and place the results in Buffer. Since a 
-  VA_LIST is used this rountine allows the nesting of Vararg routines. Thus 
+  VSPrint function to process format and place the results in Buffer. Since a
+  VA_LIST is used this rountine allows the nesting of Vararg routines. Thus
   this is the main print working routine
 
   @param  StartOfBuffer Unicode buffer to print the results of the parsing of Format into.
-  
+
   @param  BufferSize Maximum number of characters to put into buffer. Zero means
   no limit.
-  
+
   @param  Flags Intial flags value.  Can only have FORMAT_UNICODE and OUTPUT_UNICODE set
-  
+
   @param  FormatString Unicode format string see file header for more details.
-  
+
   @param  Marker Vararg list consumed by processing Format.
 
   @return Number of characters printed.
@@ -172,24 +174,24 @@ BasePrintLibVSPrint (
         Format += BytesPerFormatCharacter;
         FormatCharacter = (*Format | (*(Format + 1) << 8)) & FormatMask;
         switch (FormatCharacter) {
-        case '.': 
-          Flags |= PRECISION; 
+        case '.':
+          Flags |= PRECISION;
           break;
-        case '-': 
-          Flags |= LEFT_JUSTIFY; 
+        case '-':
+          Flags |= LEFT_JUSTIFY;
           break;
-        case '+': 
-          Flags |= PREFIX_SIGN;  
+        case '+':
+          Flags |= PREFIX_SIGN;
           break;
-        case ' ': 
-          Flags |= PREFIX_BLANK; 
+        case ' ':
+          Flags |= PREFIX_BLANK;
           break;
-        case ',': 
-          Flags |= COMMA_TYPE; 
+        case ',':
+          Flags |= COMMA_TYPE;
           break;
         case 'L':
-        case 'l': 
-          Flags |= LONG_TYPE;    
+        case 'l':
+          Flags |= LONG_TYPE;
           break;
         case '*':
           if ((Flags & PRECISION) == 0) {
@@ -229,7 +231,7 @@ BasePrintLibVSPrint (
           Done = TRUE;
           break;
         }
-      } 
+      }
 
       //
       // Limit the maximum field width to the remaining characters in the output buffer
@@ -338,7 +340,7 @@ BasePrintLibVSPrint (
         } else {
           BasePrintLibSPrint (
             ValueBuffer,
-            0, 
+            0,
             0,
             "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
             TmpGuid->Data1,
@@ -358,7 +360,7 @@ BasePrintLibVSPrint (
         break;
 
       case 't':
-        TmpTime = VA_ARG (Marker, TIME *); 
+        TmpTime = VA_ARG (Marker, TIME *);
         if (TmpTime == NULL) {
           ArgumentString = "<null time>";
         } else {
@@ -519,7 +521,7 @@ BasePrintLibVSPrint (
   // Null terminate the Unicode or ASCII string
   //
   Buffer = BasePrintLibFillBuffer (Buffer, 1, 0, BytesPerOutputCharacter);
-   
+
   return ((Buffer - OriginalBuffer) / BytesPerOutputCharacter);
 }
 
