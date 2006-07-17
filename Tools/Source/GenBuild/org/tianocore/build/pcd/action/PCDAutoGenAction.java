@@ -425,13 +425,6 @@ private UUID translateSchemaStringToUUID(String uuidString)
             }
         }
 
-        if(usageInstanceArray.size() != 0) {
-            //
-            // Add "#include 'PcdLib.h'" for Header file
-            //
-            hAutoGenString = "#include <MdePkg/Include/Library/PcdLib.h>\r\n";
-        }
-
         //
         // Generate all PCD entry for a module.
         // 
