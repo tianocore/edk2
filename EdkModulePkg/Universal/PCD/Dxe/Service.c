@@ -1,5 +1,5 @@
 /** @file
-Private functions used by PCD DXE driver.s
+Private functions used by PCD DXE driver.
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -16,11 +16,6 @@ Module Name: Service.c
 **/
 #include "Service.h"
 
-
-//
-// Build Tool will generate DXE_PCD_DB_INIT_VALUE in Autogen.h
-// Compression Algorithm will take care of the size optimization.
-//
 
 PCD_DATABASE * mPcdDatabase;
 
@@ -341,7 +336,6 @@ BuildPcdDxeDataBase (
   ASSERT (mPcdDatabase != NULL);
 
   GuidHob = GetFirstGuidHob (&gPcdDataBaseHobGuid);
-
   if (GuidHob != NULL) {
 
     //

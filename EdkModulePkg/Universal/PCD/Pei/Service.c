@@ -20,12 +20,15 @@ Module Name: Service.c
   The function registers the CallBackOnSet fucntion
   according to TokenNumber and EFI_GUID space.
 
-  @param[in]  TokenNumber       The token number.
-  @param[in]  Guid              The GUID space.
-  @param[in]  CallBackFunction  The Callback function to be registered.
+  @param  TokenNumber       The token number.
+  @param  Guid              The GUID space.
+  @param  CallBackFunction  The Callback function to be registered.
+  @param  Register          To register or unregister the callback function.
 
   @retval EFI_SUCCESS If the Callback function is registered.
   @retval EFI_NOT_FOUND If the PCD Entry is not found according to Token Number and GUID space.
+  @retval EFI_OUT_OF_RESOURCES If the callback function can't be registered because there is not free
+                                slot left in the CallbackFnTable.
 --*/
 EFI_STATUS
 PeiRegisterCallBackWorker (
@@ -103,10 +106,9 @@ PeiRegisterCallBackWorker (
 
 
 /**
-  The function builds the PCD database based on the
-  PCD_IMAGE on the flash.
+  The function builds the PCD database.
 
-  @param[in] PcdImageOnFlash  The PCD image on flash.
+  @param VOID
 
   @retval VOID
 --*/
@@ -144,13 +146,13 @@ BuildPcdDatabase (
   The function is provided by PCD PEIM and PCD DXE driver to
   do the work of reading a HII variable from variable service.
 
-  @param[in] VariableGuid     The Variable GUID.
-  @param[in] VariableName     The Variable Name.
-  @param[out] VariableData    The output data.
-  @param[out] VariableSize    The size of the variable.
+  @param VariableGuid     The Variable GUID.
+  @param VariableName     The Variable Name.
+  @param VariableData    The output data.
+  @param VariableSize    The size of the variable.
 
   @retval EFI_SUCCESS         Operation successful.
-  @retval EFI_SUCCESS         Variablel not found.
+  @retval EFI_NOT_FOUND         Variablel not found.
 --*/
 EFI_STATUS
 GetHiiVariable (
@@ -580,6 +582,7 @@ GetWorker (
 }
 
 
+
 UINTN           
 GetExPcdTokenNumber (
   IN CONST EFI_GUID             *Guid,
@@ -633,6 +636,7 @@ GetPcdDatabase (
   
   return (PEI_PCD_DATABASE *) GET_GUID_HOB_DATA (GuidHob);
 }
+
 
 
 SKU_ID *

@@ -80,10 +80,6 @@ PcdDxeInit (
 
   BuildPcdDxeDataBase ();
 
-  //
-  // BugBug Check if PcdDatabase is already installed.
-  //
-  
   Status = gBS->InstallProtocolInterface (
                   &NewHandle,
                   &gPcdProtocolGuid,
