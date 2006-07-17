@@ -153,6 +153,8 @@ public class FrameworkBuildTask extends Task{
         // Build every MSA files (SINGLE MODULE BUILD)
         //
         else if (buildFile.getName().endsWith(".msa")) {
+            File tmpFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
+            System.out.println("Using FPD file [" + tmpFile.getPath() + "] as active platform. ");
             System.out.println("Start to build MSA file [" + buildFile.getPath() + "] ..>> ");
             GenBuildTask genBuildTask = new GenBuildTask();
             genBuildTask.setSingleModuleBuild(true);

@@ -500,6 +500,9 @@ public class FpdParserTask extends Task {
       @param moduleName current module identification
     **/
     private void updateFvs(String fvSequence, String fvName, FpdModuleIdentification fpdModuleId) {
+        if (fvName == null || fvName.trim().length() == 0) {
+            fvName = "NULL";
+        }
         String upcaseFvName = fvName.toUpperCase();
         String[] fvNameArray = upcaseFvName.split("[, \t]+");
         for (int i = 0; i < fvNameArray.length; i++) {
