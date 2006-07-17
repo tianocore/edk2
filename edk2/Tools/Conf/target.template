@@ -55,5 +55,5 @@ TOOL_CHAIN_CONF       = Tools/Conf/tools_def.txt
 #  TAGNAME               List      Optional   Specify the name(s) of the tools_def.txt TagName to use.  
 #                                             If not specified, all applicable TagName tools will be 
 #                                             used for the build.  The list uses space character separation.
-TOOL_CHAIN_TAG        = MSFT
+TOOL_CHAIN_TAG        = MYTOOLS
 
