@@ -217,15 +217,13 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            model = new DefaultTableModel();
            jTable = new JTable(model);
            jTable.setRowHeight(20);
-//           jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+           jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
            jTable.setColumnSelectionAllowed(false);
            model.addColumn("Class Name");
            model.addColumn("Header");
            model.addColumn("Help Text");
-           model.addColumn("Reserved");
-           model.addColumn("Reserved");
-//           model.addColumn("Recommended Instance");
-//           model.addColumn("Version");
+           model.addColumn("Recommended Instance");
+           model.addColumn("Version");
            model.addColumn("Sup. Arch");
            model.addColumn("Mod. Types");
            
@@ -236,7 +234,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            vArch.add("EBC");
            vArch.add("ARM");
            vArch.add("PPC");
-//           jTable.getColumnModel().getColumn(cnSupArch).setCellEditor(new ListEditor(vArch));
+           jTable.getColumnModel().getColumn(cnSupArch).setCellEditor(new ListEditor(vArch));
            
            Vector<String> vModule = new Vector<String>();
            vModule.add("BASE");
@@ -295,20 +293,16 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             if (m.getValueAt(row, cnSupMod) != null) {
                 module = m.getValueAt(row, cnSupMod).toString();
             }
-            String[] rowData = {lib, hdr, hlp};
+            String[] rowData = {lib, hdr, hlp, name, ver};
             if (!dataValidation(rowData)) {
                 return;
             }
             docConsole.setSaved(false);
             
-// LAH            getLibInstances(lib);
-
-            if (name != null) {
-              String guid = nameToGuid(name);
-            }
+            getLibInstances(lib);
+            String guid = nameToGuid(name);
             
-            // LAH WAS sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
-            sfc.updateSpdLibClass(row, lib, hdr, hlp, null, null, arch, module);
+            sfc.updateSpdLibClass(row, lib, hdr, hlp, guid, ver, arch, module);
         }
     }
 
@@ -494,17 +488,17 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jContentPane.add(starLabel, null);
             jContentPane.add(jLabel2HelpText, null);
             jContentPane.add(getJTextFieldHelp(), null);
-// LAH Removed until we can fix permanently
-//            jContentPane.add(jLabel3RecInstName, null);
-//            jContentPane.add(getJTextField1RecInstName(), null);
-//            jContentPane.add(jLabel4RecInstVer, null);
-//            jContentPane.add(getJTextField2RecInstVer(), null);
+
+            jContentPane.add(jLabel3RecInstName, null);
+            jContentPane.add(getJTextField1RecInstName(), null);
+            jContentPane.add(jLabel4RecInstVer, null);
+            jContentPane.add(getJTextField2RecInstVer(), null);
             jContentPane.add(jLabel5SupArchList, null);
             jContentPane.add(jLabel6SupModList, null);
             
             jContentPane.add(getJScrollPaneModules(), null);
             jContentPane.add(getJScrollPane1Arch(), null);
-// LAH            jContentPane.add(getJComboBox(), null);
+            jContentPane.add(getJComboBox(), null);
             
         }
         
@@ -569,6 +563,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             row[cnClassName] = jTextFieldAdd.getText();
             row[cnHdrFile] = jTextFieldHdr.getText().replace('\\', '/');
             row[cnHelpText] = jTextFieldHelp.getText();
+            row[cnRecInstName] = jComboBox.getSelectedItem()+"";
+            row[cnRecInstVer] = jTextField2RecInstVer.getText();
             row[cnSupArch] = vectorToString(iCheckBoxList.getAllCheckedItemsString());
             if (row[cnSupArch].length() == 0) {
                 row[cnSupArch] = null;
@@ -587,10 +583,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             //convert to GUID before storing recommended lib instance.
             //
             getLibInstances(row[cnClassName]);
-// LAH            recommendGuid = nameToGuid(row[3]);
+            String recommendGuid = nameToGuid(row[cnRecInstName]);
 
-// LAH WAS             sfc.genSpdLibClassDeclarations(row[0], recommendGuid, row[1], row[2], row[5], null, null, row[4], null, row[6]);
-            sfc.genSpdLibClassDeclarations(row[cnClassName], null, row[cnHdrFile], row[cnHelpText], row[cnSupArch], null, null, row[cnRecInstVer], null, row[cnSupMod]);
+            sfc.genSpdLibClassDeclarations(row[cnClassName], recommendGuid, row[cnHdrFile], row[cnHelpText], row[cnSupArch], null, null, row[cnRecInstVer], null, row[cnSupMod]);
             
         }
         //
@@ -603,6 +598,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             int rowSelected = selectedRow;
             if (rowSelected >= 0) {
                 model.removeRow(rowSelected);
+                docConsole.setSaved(false);
                 sfc.removeSpdLibClass(rowSelected);
             }
         }
@@ -611,7 +607,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             if (model.getRowCount() == 0) {
                 return;
             }
-            
+            docConsole.setSaved(false);
             model.setRowCount(0);
             sfc.removeSpdLibClass();
         }
@@ -624,9 +620,17 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         }
         if (!DataValidation.isPathAndFilename(row[cnHdrFile])) {
             JOptionPane.showMessageDialog(frame, "Include Header is NOT PathAndFilename Type.");
+            return false;
         }
         if (row[cnHelpText].length() == 0) {
             JOptionPane.showMessageDialog(frame, "Help Text Must NOT be empty.");
+            return false;
+        }
+        if (row[cnRecInstVer].length() > 0) {
+            if (!DataValidation.isVersionDataType(row[cnRecInstVer])) {
+                JOptionPane.showMessageDialog(frame, "Recommended Instance Version is NOT VersionDataType.");
+                return false;
+            }
         }
         return true;
     }
@@ -892,7 +896,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     }
 
     private String nameToGuid(String name) {
-        String s = "";
+        String s = null;
         if (!libNameGuidMap.containsKey(name)) {
             return s;
         }
