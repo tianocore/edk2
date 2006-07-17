@@ -26,7 +26,7 @@ Module Name: PcdLib.h
 //
 // Feature Flag is in the form of a global constant
 //
-#define FeaturePcdGet(TokenName)            _PCD_VALUE_##TokenName
+#define FeaturePcdGet(TokenName)            _PCD_GET_MODE_BOOL_##TokenName
 
 
 //
@@ -39,9 +39,6 @@ Module Name: PcdLib.h
 #define FixedPcdGetBool(TokenName)          _PCD_VALUE_##TokenName
 
 
-//
-// BugBug: This works for strings, but not constants.
-//
 #define FixedPcdGetPtr(TokenName)           ((VOID *)_PCD_VALUE_##TokenName)
 
 
