@@ -32,7 +32,7 @@ public class FarMd5 {
     static public String md5(byte[] buffer) throws Exception {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] md5 = md.digest(buffer);
-        return new String(String.format("%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s", md5[0], md5[1], md5[2], md5[3], md5[4],
+        return new String(String.format("%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", md5[0], md5[1], md5[2], md5[3], md5[4],
                                         md5[5], md5[6], md5[7], md5[8], md5[9], md5[10], md5[11], md5[12], md5[13],
                                         md5[14], md5[15]));
 

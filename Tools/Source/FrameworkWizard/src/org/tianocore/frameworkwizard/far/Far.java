@@ -226,6 +226,12 @@ public class Far {
                         byte[] totalBuffer = new byte[(int) tempFile.length()];
                         FileInputStream fis = new FileInputStream(tempFile);
                         fis.read(totalBuffer);
+                        //
+                        //  Check Md5
+                        //
+                        if (!ffItem.getMd5Value().equalsIgnoreCase(FarMd5.md5(totalBuffer))){
+                            throw new Exception (ffItem.getRelativeFilename() + " Md5 is invaild!");
+                        }
                         outputStream.write(totalBuffer);
                         fis.close();
                         tempFile.delete();

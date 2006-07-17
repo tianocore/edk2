@@ -56,7 +56,7 @@ public class Mainfest implements ManifestInterface {
     // /
     // / Mainfest file element name
     // /
-    final static String mfFileName = "FarMainfest.MF";
+    final static String mfFileName = "FrameworkArhciveMainfest.xml";
 
     //
     // Header
@@ -129,7 +129,7 @@ public class Mainfest implements ManifestInterface {
     //
     // Mainfest file
     //
-    File mfFile = null;
+    public File mfFile = null;
 
     public FarHeader getHeader() {
         return fhInfo;
@@ -678,7 +678,7 @@ public class Mainfest implements ManifestInterface {
         Source source = new DOMSource(this.mainfestDoc);
         //
         // Prepare the output file, get the Mainifest file name from <FarHeader>
-        // /<FarName>.
+        // <FarName>.
         //
         this.mfFile = new File(Workspace.getCurrentWorkspace() + File.separatorChar + mfFileName);
         //
@@ -686,6 +686,10 @@ public class Mainfest implements ManifestInterface {
         //
         Result result = new StreamResult(this.mfFile);
         xformer.transform(source, result);
+        //
+        // Close result. Flush file by manual for Jdk1.5.0_04. 
+        //
+        ((StreamResult) result).getOutputStream().close();
     }
 
     public void pkgToFarPkgNode(Element parentNode, FarPackage pkgItem) {
