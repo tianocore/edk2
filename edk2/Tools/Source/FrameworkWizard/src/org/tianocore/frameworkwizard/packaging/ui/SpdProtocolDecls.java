@@ -102,14 +102,17 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         if (!dataValidation(row)){
             return;
         }
+        docConsole.setSaved(false);
         sfc.genSpdProtocolDeclarations(row[0], row[1], row[2], row[3], stringToVector(row[4]), stringToVector(row[5]));
     }
     
     protected void removeRow(int i){
         sfc.removeSpdProtocolDeclaration(i);
+        docConsole.setSaved(false);
     }
     
     protected void clearAllRow(){
         sfc.removeSpdProtocolDeclaration();
+        docConsole.setSaved(false);
     }
 }

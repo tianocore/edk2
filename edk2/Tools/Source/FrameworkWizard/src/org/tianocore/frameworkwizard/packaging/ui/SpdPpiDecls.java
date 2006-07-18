@@ -108,9 +108,11 @@ public class SpdPpiDecls extends SpdGuidDecls {
     
     protected void removeRow(int i){
         sfc.removeSpdPpiDeclaration(i);
+        docConsole.setSaved(false);
     }
     
     protected void clearAllRow(){
         sfc.removeSpdPpiDeclaration();
+        docConsole.setSaved(false);
     }
 }

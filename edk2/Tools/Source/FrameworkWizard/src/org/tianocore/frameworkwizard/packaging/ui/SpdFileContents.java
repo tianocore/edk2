@@ -1216,18 +1216,31 @@ public class SpdFileContents {
             e.setCName(cName);
             e.setGuidValue(guid);
             e.setHelpText(help);
-            e.setGuidTypeList(guidTypeList);
-            e.setSupArchList(archList);
-            e.setSupModuleList(modTypeList);
-//            if (guidTypeList != null && guidTypeList.size() > 0) {
-//                e.setGuidTypeList(new ArrayList<String>(guidTypeList));
-//            }
-//            if (archList != null && archList.size() > 0){
-//                e.setSupArchList(new ArrayList<String>(archList));
-//            }
-//            if (modTypeList != null && modTypeList.size() > 0) {
-//                e.setSupModuleList(new ArrayList<String>(modTypeList));
-//            }
+            if (guidTypeList != null) {
+                e.setGuidTypeList(guidTypeList);
+            }
+            else{
+                if (e.isSetGuidTypeList()) {
+                    e.unsetGuidTypeList();
+                }
+            }
+            if (archList != null) {
+                e.setSupArchList(archList);
+            }
+            else {
+                if (e.isSetSupArchList()) {
+                    e.unsetSupArchList();
+                }
+            }
+            if (modTypeList != null){
+                e.setSupModuleList(modTypeList);
+            }
+            else {
+                if (e.isSetSupModuleList()) {
+                    e.unsetSupModuleList();
+                }
+            }
+
             return;
         }
         if (parent instanceof ProtocolDeclarationsDocument.ProtocolDeclarations) {
@@ -1237,14 +1250,23 @@ public class SpdFileContents {
             pe.setCName(cName);
             pe.setGuidValue(guid);
             pe.setHelpText(help);
-            pe.setSupArchList(archList);
-            pe.setSupModuleList(modTypeList);
-//            if (archList != null && archList.size() > 0){
-//                pe.setSupArchList(new ArrayList<String>(archList));
-//            }
-//            if (modTypeList != null && modTypeList.size() > 0) {
-//                pe.setSupModuleList(new ArrayList<String>(modTypeList));
-//            }
+            if (archList != null) {
+                pe.setSupArchList(archList);
+            }
+            else {
+                if (pe.isSetSupArchList()) {
+                    pe.unsetSupArchList();
+                }
+            }
+            if (modTypeList != null){
+                pe.setSupModuleList(modTypeList);
+            }
+            else {
+                if (pe.isSetSupModuleList()) {
+                    pe.unsetSupModuleList();
+                }
+            }
+
             return;
         }
         if (parent instanceof PpiDeclarationsDocument.PpiDeclarations) {
@@ -1254,14 +1276,23 @@ public class SpdFileContents {
             ppe.setCName(cName);
             ppe.setGuidValue(guid);
             ppe.setHelpText(help);
-            ppe.setSupArchList(archList);
-            ppe.setSupModuleList(modTypeList);
-//            if (archList != null && archList.size() > 0){
-//                ppe.setSupArchList(new ArrayList<String>(archList));
-//            }
-//            if (archList != null && modTypeList.size() > 0) {
-//                ppe.setSupModuleList(new ArrayList<String>(modTypeList));
-//            }
+            if (archList != null) {
+                ppe.setSupArchList(archList);
+            }
+            else {
+                if (ppe.isSetSupArchList()) {
+                    ppe.unsetSupArchList();
+                }
+            }
+            if (modTypeList != null){
+                ppe.setSupModuleList(modTypeList);
+            }
+            else {
+                if (ppe.isSetSupModuleList()) {
+                    ppe.unsetSupModuleList();
+                }
+            }
+
             return;
         }
 
