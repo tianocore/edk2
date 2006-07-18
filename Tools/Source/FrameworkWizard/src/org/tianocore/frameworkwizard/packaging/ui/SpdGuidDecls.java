@@ -252,9 +252,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
        int row = arg0.getFirstRow();
        TableModel m = (TableModel)arg0.getSource();
        if (arg0.getType() == TableModelEvent.UPDATE){
-           if (docConsole != null) {
-               docConsole.setSaved(false);
-           }
+           
            updateRow(row, m);
        }
    }
@@ -280,7 +278,9 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
        if (!dataValidation(rowData)){
            return;
        }
-       
+       if (docConsole != null) {
+           docConsole.setSaved(false);
+       }
        sfc.updateSpdGuidDecl(row, name, cName, guid, help, archList, modTypeList, guidTypeList);
    }
     /**
@@ -549,9 +549,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             if (!dataValidation(row)) {
                 return;
             }
-            if (docConsole != null) {
-                docConsole.setSaved(false);
-            }
+            
             model.addRow(row);
             jTable.changeSelection(model.getRowCount()-1, 0, false, false);
             addRow(row);
@@ -610,17 +608,35 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     
     protected void addRow(String[] row) {
         Vector<String> vArch = iCheckBoxList.getAllCheckedItemsString();
+        if (vArch.size() == 0) {
+            vArch = null;
+        }
         Vector<String> vModType = iCheckBoxList2.getAllCheckedItemsString();
+        if (vModType.size() == 0) {
+            vModType = null;
+        }
         Vector<String> vguidType = iCheckBoxList1.getAllCheckedItemsString();
+        if (vguidType.size() == 0) {
+            vguidType = null;
+        }
+        if (docConsole != null) {
+            docConsole.setSaved(false);
+        }
         sfc.genSpdGuidDeclarations(row[0], row[1], row[2], row[3], vArch, vModType, vguidType);
     }
     
     protected void removeRow(int i){
         sfc.removeSpdGuidDeclaration(i);
+        if (docConsole != null) {
+            docConsole.setSaved(false);
+        }
     }
     
     protected void clearAllRow(){
         sfc.removeSpdGuidDeclaration();
+        if (docConsole != null) {
+            docConsole.setSaved(false);
+        }
     }
 
     /**
