@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -7,14 +8,15 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
+
   <MsaHeader>
-    <ModuleName>Uhci</ModuleName>
-    <ModuleType>UEFI_DRIVER</ModuleType>
-    <GuidValue>2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7</GuidValue>
+    <ModuleName>DevicePath</ModuleName>
+    <ModuleType>DXE_DRIVER</ModuleType>
+    <GuidValue>9B680FCE-AD6B-4F3A-B60B-F59899003443</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for Uhci module</Abstract>
-    <Description>This module provides USB Host Controller Protocol implementation for Universal Host Controller Interface</Description>
+    <Abstract>Component description file for Device Path Driver.</Abstract>
+    <Description>This driver is for DevicePathUtilities, DevicePahtToText and DevicePathFromText</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -27,23 +29,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <ModuleDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>Uhci</OutputFileBasename>
+    <OutputFileBasename>DevicePath</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiDriverModelLib</Keyword>
+      <Keyword>PrintLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>BaseLib</Keyword>
+      <Keyword>UefiLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>UefiLib</Keyword>
+      <Keyword>BaseLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseMemoryLib</Keyword>
@@ -56,33 +58,52 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>uhci.c</Filename>
-    <Filename>uhchlp.c</Filename>
-    <Filename>ComponentName.c</Filename>
-    <Filename>uhci.h</Filename>
+    <Filename>DevicePath.c</Filename>
+    <Filename>DevicePath.h</Filename>
+    <Filename>DevicePathFromText.c</Filename>
+    <Filename>DevicePathToText.c</Filename>
+    <Filename>DevicePathUtilities.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
   </PackageDependencies>
-  <Protocols>
-    <Protocol Usage="TO_START">
-      <ProtocolCName>gEfiPciIoProtocolGuid</ProtocolCName>
+  <Protocols>    
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDebugPortProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="BY_START">
-      <ProtocolCName>gEfiUsbHcProtocolGuid</ProtocolCName>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="BY_START">
-      <ProtocolCName>gEfiUsb2HcProtocolGuid</ProtocolCName>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiDevicePathUtilitiesProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiDevicePathFromTextProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="ALWAYS_PRODUCED">
+      <ProtocolCName>gEfiDevicePathToTextProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
+  <Guids>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiPcAnsiGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiVT100PlusGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiVT100Guid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="ALWAYS_CONSUMED">
+      <GuidCName>gEfiVTUTF8Guid</GuidCName>
+    </GuidCNames>
+  </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
-    <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
+    <Specification>EDK_RELEASE_VERSION 0x00090000</Specification>
     <Extern>
-      <DriverBinding>gUhciDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
-      <ComponentName>gUhciComponentName</ComponentName>
+      <ModuleEntryPoint>DevicePathEntryPoint</ModuleEntryPoint>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>

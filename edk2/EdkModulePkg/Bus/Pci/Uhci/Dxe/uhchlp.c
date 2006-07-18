@@ -49,13 +49,13 @@ Returns:
   // Perform 16bit Read in PCI IO Space
   //
   return PciIo->Io.Read (
-                    PciIo,
-                    EfiPciIoWidthUint16,
-                    USB_BAR_INDEX,
-                    (UINT64) PortOffset,
-                    1,
-                    Data
-                    );
+                     PciIo,
+                     EfiPciIoWidthUint16,
+                     USB_BAR_INDEX,
+                     (UINT64) PortOffset,
+                     1,
+                     Data
+                     );
 }
 
 EFI_STATUS
@@ -86,13 +86,13 @@ Returns:
   // Perform 32bit Read in PCI IO Space
   //
   return PciIo->Io.Read (
-                    PciIo,
-                    EfiPciIoWidthUint32,
-                    USB_BAR_INDEX,
-                    (UINT64) PortOffset,
-                    1,
-                    Data
-                    );
+                     PciIo,
+                     EfiPciIoWidthUint32,
+                     USB_BAR_INDEX,
+                     (UINT64) PortOffset,
+                     1,
+                     Data
+                     );
 }
 
 EFI_STATUS
@@ -123,13 +123,13 @@ Returns:
   // Perform 16bit Write in PCI IO Space
   //
   return PciIo->Io.Write (
-                    PciIo,
-                    EfiPciIoWidthUint16,
-                    USB_BAR_INDEX,
-                    (UINT64) PortOffset,
-                    1,
-                    &Data
-                    );
+                     PciIo,
+                     EfiPciIoWidthUint16,
+                     USB_BAR_INDEX,
+                     (UINT64) PortOffset,
+                     1,
+                     &Data
+                     );
 }
 
 EFI_STATUS
@@ -160,13 +160,13 @@ Returns:
   // Perform 32bit Write in PCI IO Space
   //
   return PciIo->Io.Write (
-                    PciIo,
-                    EfiPciIoWidthUint32,
-                    USB_BAR_INDEX,
-                    (UINT64) PortOffset,
-                    1,
-                    &Data
-                    );
+                     PciIo,
+                     EfiPciIoWidthUint32,
+                     USB_BAR_INDEX,
+                     (UINT64) PortOffset,
+                     1,
+                     &Data
+                     );
 }
 //
 //  USB register-base helper functions
@@ -657,10 +657,10 @@ Returns:
   EFI_STATUS  Status;
 
   Status = ReadUHCCommandReg (
-            HcDev->PciIo,
-            (UINT32) (USBCMD),
-            &CommandContent
-            );
+             HcDev->PciIo,
+             (UINT32) (USBCMD),
+             &CommandContent
+             );
 
   if ((CommandContent & USBCMD_MAXP) != USBCMD_MAXP) {
     CommandContent |= USBCMD_MAXP;
@@ -715,25 +715,25 @@ Returns:
   BufferSizeInBytes = 4096;
   BufferSizeInPages = EFI_SIZE_TO_PAGES (BufferSizeInBytes);
   Status = HcDev->PciIo->AllocateBuffer (
-                          HcDev->PciIo,
-                          AllocateAnyPages,
-                          EfiBootServicesData,
-                          BufferSizeInPages,
-                          &CommonBuffer,
-                          0
-                          );
+                           HcDev->PciIo,
+                           AllocateAnyPages,
+                           EfiBootServicesData,
+                           BufferSizeInPages,
+                           &CommonBuffer,
+                           0
+                           );
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   Status = HcDev->PciIo->Map (
-                          HcDev->PciIo,
-                          EfiPciIoOperationBusMasterCommonBuffer,
-                          CommonBuffer,
-                          &BufferSizeInBytes,
-                          &MappedAddress,
-                          &Mapping
-                          );
+                           HcDev->PciIo,
+                           EfiPciIoOperationBusMasterCommonBuffer,
+                           CommonBuffer,
+                           &BufferSizeInBytes,
+                           &MappedAddress,
+                           &Mapping
+                           );
   if (EFI_ERROR (Status) || (BufferSizeInBytes != 4096)) {
     HcDev->PciIo->FreeBuffer (HcDev->PciIo, BufferSizeInPages, CommonBuffer);
     return EFI_UNSUPPORTED;
@@ -3589,13 +3589,13 @@ Returns:
   // and it is allocated as common buffer use.
   //
   Status = HcDev->PciIo->AllocateBuffer (
-                          HcDev->PciIo,
-                          AllocateAnyPages,
-                          EfiBootServicesData,
-                          MemoryBlockSizeInPages,
-                          &CommonBuffer,
-                          0
-                          );
+                           HcDev->PciIo,
+                           AllocateAnyPages,
+                           EfiBootServicesData,
+                           MemoryBlockSizeInPages,
+                           &CommonBuffer,
+                           0
+                           );
   if (EFI_ERROR (Status)) {
     gBS->FreePool ((*MemoryHeader)->BitArrayPtr);
     gBS->FreePool (*MemoryHeader);
@@ -3604,13 +3604,13 @@ Returns:
 
   MemoryBlockSizeInBytes = EFI_PAGES_TO_SIZE (MemoryBlockSizeInPages);
   Status = HcDev->PciIo->Map (
-                          HcDev->PciIo,
-                          EfiPciIoOperationBusMasterCommonBuffer,
-                          CommonBuffer,
-                          &MemoryBlockSizeInBytes,
-                          &MappedAddress,
-                          &Mapping
-                          );
+                           HcDev->PciIo,
+                           EfiPciIoOperationBusMasterCommonBuffer,
+                           CommonBuffer,
+                           &MemoryBlockSizeInBytes,
+                           &MappedAddress,
+                           &Mapping
+                           );
   //
   // if returned Mapped size is less than the size we request,do not support.
   //
@@ -3741,10 +3741,10 @@ Returns:
        TempHeaderPtr = TempHeaderPtr->Next) {
 
     Status = AllocMemInMemoryBlock (
-              TempHeaderPtr,
-              (VOID **) Pool,
-              RealAllocSize / 32
-              );
+               TempHeaderPtr,
+               (VOID **) Pool,
+               RealAllocSize / 32
+               );
     if (!EFI_ERROR (Status)) {
       ZeroMem (*Pool, AllocSize);
       return EFI_SUCCESS;
@@ -3777,10 +3777,10 @@ Returns:
   InsertMemoryHeaderToList (MemoryHeader, NewMemoryHeader);
 
   Status = AllocMemInMemoryBlock (
-            NewMemoryHeader,
-            (VOID **) Pool,
-            RealAllocSize / 32
-            );
+             NewMemoryHeader,
+             (VOID **) Pool,
+             RealAllocSize / 32
+             );
 
   if (!EFI_ERROR (Status)) {
     ZeroMem (*Pool, AllocSize);
@@ -4226,12 +4226,12 @@ TurnOffUSBEmulation (
   //
   Command = 0;
   PciIo->Pci.Write (
-              PciIo,
-              EfiPciIoWidthUint16,
-              USB_EMULATION,
-              1,
-              &Command
-              );
+               PciIo,
+               EfiPciIoWidthUint16,
+               USB_EMULATION,
+               1,
+               &Command
+               );
 
   return ;
 }

@@ -269,6 +269,7 @@ EFI_STATUS
   IN OUT UINT8                                               *DataToggle,
   IN     UINTN                                               PollingInterval  OPTIONAL,
   IN     UINTN                                               DataLength       OPTIONAL,
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR                  *Translator      OPTIONAL,
   IN     EFI_ASYNC_USB_TRANSFER_CALLBACK                     CallBackFunction OPTIONAL,
   IN     VOID                                                *Context         OPTIONAL
   )
@@ -305,16 +306,17 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *EFI_USB2_HC_PROTOCOL_SYNC_INTERRUPT_TRANSFER) (
-  IN     EFI_USB2_HC_PROTOCOL   *This,
-  IN     UINT8                  DeviceAddress,
-  IN     UINT8                  EndPointAddress,
-  IN     UINT8                  DeviceSpeed,
-  IN     UINTN                  MaximumPacketLength,
-  IN OUT VOID                   *Data,
-  IN OUT UINTN                  *DataLength,
-  IN OUT UINT8                  *DataToggle,
-  IN     UINTN                  TimeOut,
-  OUT    UINT32                 *TransferResult
+  IN     EFI_USB2_HC_PROTOCOL                        *This,
+  IN     UINT8                                       DeviceAddress,
+  IN     UINT8                                       EndPointAddress,
+  IN     UINT8                                       DeviceSpeed,
+  IN     UINTN                                       MaximumPacketLength,
+  IN OUT VOID                                        *Data,
+  IN OUT UINTN                                       *DataLength,
+  IN OUT UINT8                                       *DataToggle,
+  IN     UINTN                                       TimeOut,
+  IN     EFI_USB2_HC_TRANSACTION_TRANSLATOR          *Translator,
+  OUT    UINT32                                      *TransferResult
   )
 ;
 

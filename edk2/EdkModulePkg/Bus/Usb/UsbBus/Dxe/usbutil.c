@@ -35,10 +35,10 @@ IsPortConnect (
     Tell if there is a device connected to that port according to
     the Port Status.
 
-  Parameters:
+  Arguments:
     PortStatus  -   The status value of that port.
 
-  Return Value:
+  Returns:
     TRUE
     FALSE
 
@@ -280,7 +280,6 @@ IsPortResetChange (
   }
 }
 
-
 BOOLEAN
 IsPortSuspendChange (
   IN UINT16  PortChangeStatus
@@ -309,8 +308,7 @@ IsPortSuspendChange (
   }
 }
 
-
-INTERFACE_DESC_LIST_ENTRY* 
+INTERFACE_DESC_LIST_ENTRY *
 FindInterfaceListEntry (
   IN EFI_USB_IO_PROTOCOL    *This
   )
@@ -329,7 +327,7 @@ FindInterfaceListEntry (
 {
   USB_IO_CONTROLLER_DEVICE  *UsbIoController;
   USB_IO_DEVICE             *UsbIoDev;
-  LIST_ENTRY            *InterfaceListHead;
+  LIST_ENTRY                *InterfaceListHead;
   INTERFACE_DESC_LIST_ENTRY *InterfaceListEntry;
 
   UsbIoController = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
@@ -367,8 +365,8 @@ FindEndPointListEntry (
     Find EndPoint ListEntry.
 
   Arguments:
-    This         -  EFI_USB_IO_PROTOCOL   
-    EndpointAddr -  Endpoint address.
+    This            -  EFI_USB_IO_PROTOCOL   
+    EndPointAddress -  Endpoint address.
  
   Returns:
     ENDPOINT_DESC_LIST_ENTRY pointer
@@ -471,7 +469,7 @@ VOID
 GetDeviceEndPointMaxPacketLength (
   IN  EFI_USB_IO_PROTOCOL    *UsbIo,
   IN  UINT8                  EndpointAddr,
-  OUT UINT8                  *MaxPacketLength
+  OUT UINTN                  *MaxPacketLength
   )
 /*++
 
@@ -498,7 +496,7 @@ GetDeviceEndPointMaxPacketLength (
     return ;
   }
 
-  *MaxPacketLength = (UINT8) (EndpointListEntry->EndpointDescriptor.MaxPacketSize);
+  *MaxPacketLength = (UINTN) (EndpointListEntry->EndpointDescriptor.MaxPacketSize);
 
   return ;
 }

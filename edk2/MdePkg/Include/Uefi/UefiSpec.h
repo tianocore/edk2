@@ -1839,11 +1839,7 @@ typedef struct {
 #define HW_CONTROLLER_DP          0x05
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL        Header;
-#if EDK_RELEASE_VERSION >= 0x00020000
   UINT32                          ControllerNumber;
-#else
-  UINT32                          Controller;
-#endif
 } CONTROLLER_DEVICE_PATH;
 
 //
@@ -1945,6 +1941,7 @@ typedef struct {
     UINT8                         DeviceProtocol;
 } USB_CLASS_DEVICE_PATH;
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 #define MSG_USB_WWID_DP           0x10
 typedef struct {
     EFI_DEVICE_PATH_PROTOCOL      Header;
@@ -1957,8 +1954,9 @@ typedef struct {
 #define MSG_DEVICE_LOGICAL_UNIT_DP  0x11
 typedef struct {
     EFI_DEVICE_PATH_PROTOCOL      Header;
-    UINT8                         LUN;
+    UINT8                         Lun;
 } DEVICE_LOGICAL_UNIT_DEVICE_PATH;
+#endif
 
 #define MSG_I2O_DP                0x06
 typedef struct {
@@ -2030,8 +2028,27 @@ typedef struct {
 #define DEVICE_PATH_MESSAGING_VT_100      EFI_VT_100_GUID
 #define DEVICE_PATH_MESSAGING_VT_100_PLUS EFI_VT_100_PLUS_GUID
 #define DEVICE_PATH_MESSAGING_VT_UTF8     EFI_VT_UTF8_GUID
-#define DEVICE_PATH_MESSAGING_SAS         EFI_SAS_DEVICE_PATH_GUID
 
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+
+#define DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL   EFI_UART_DEVICE_PATH_GUID
+#define DEVICE_PATH_MESSAGING_SAS                 EFI_SAS_DEVICE_PATH_GUID
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  EFI_GUID                        Guid;
+  UINT32                          FlowControlMap;
+} UART_FLOW_CONTROL_DEVICE_PATH;
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL        Header;
+  EFI_GUID                        Guid;
+  UINT32                          Reserved;
+  UINT64                          SasAddress;
+  UINT64                          Lun;
+  UINT16                          DeviceTopology;
+  UINT16                          RelativeTargetPort;
+} SAS_DEVICE_PATH;
 
 #define MSG_ISCSI_DP              0x13
 typedef struct {
@@ -2053,6 +2070,7 @@ typedef struct {
 #define ISCSI_LOGIN_OPTION_CHAP_BI                      0x0000
 #define ISCSI_LOGIN_OPTION_CHAP_UNI                     0x2000
 
+#endif
 
 //
 // Media Device Path
