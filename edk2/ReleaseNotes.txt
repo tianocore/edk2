@@ -1,7 +1,7 @@
 Intel(R) Platform Innovation Framework for EFI
 EFI Development Kit II (EDK II) 
 Root Package 1.00
-2006-07-13
+2006-07-18
 
 Intel is a trademark or registered trademark of Intel Corporation or its 
 subsidiaries in the United States and other countries.
@@ -325,10 +325,10 @@ To exit the Nt32 emulation platform, type “reset” at the EFI Shell>
 command prompt.  Alternatively, from the graphical interface, select the Boot
 Maintenance Manager's “Reset System” command.
 
-      NOTE: When creating a new platform, the Platform Name should be restricted
-      to a single word, containing alphanumeric characters, with special characters,
-      underscore, dash and the period character also allowed.  Space characters and
-      other special characters are not allowed.
+      NOTE: When creating a new platform, the Platform Name is restricted
+      to a single word containing alphanumeric characters, underscore, dash, 
+      and period.  The space character and other special characters are 
+      not allowed.
 
 -----------------------
 Notes on Symbolic Debug
