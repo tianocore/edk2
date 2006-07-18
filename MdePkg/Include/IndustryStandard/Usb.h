@@ -255,6 +255,8 @@ typedef struct {
 #define USB_PORT_STAT_RESET         0x0010
 #define USB_PORT_STAT_POWER         0x0100
 #define USB_PORT_STAT_LOW_SPEED     0x0200
+#define USB_PORT_STAT_HIGH_SPEED    0x0400
+#define USB_PORT_STAT_OWNER         0x0800
 
 #define USB_PORT_STAT_C_CONNECTION  0x0001
 #define USB_PORT_STAT_C_ENABLE      0x0002
@@ -270,6 +272,7 @@ typedef enum {
   EfiUsbPortSuspend           = 2,
   EfiUsbPortReset             = 4,
   EfiUsbPortPower             = 8,
+  EfiUsbPortOwner             = 13,
   EfiUsbPortConnectChange     = 16,
   EfiUsbPortEnableChange      = 17,
   EfiUsbPortSuspendChange     = 18,

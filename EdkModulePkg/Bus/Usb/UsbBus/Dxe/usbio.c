@@ -233,9 +233,9 @@ UsbControlTransfer (
 --*/
 {
   USB_IO_CONTROLLER_DEVICE  *UsbIoController;
-  EFI_USB_HC_PROTOCOL       *UsbHCInterface;
+
   EFI_STATUS                RetStatus;
-  USB_IO_DEVICE             *UsbIoDevice;
+  USB_IO_DEVICE             *UsbIoDev;
   UINT8                     MaxPacketLength;
   UINT32                    TransferResult;
   BOOLEAN                   Disconnected;
@@ -251,9 +251,9 @@ UsbControlTransfer (
   // to perform other parameters checking
   //
   UsbIoController = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
-  UsbIoDevice     = UsbIoController->UsbDevice;
-  UsbHCInterface  = UsbIoDevice->BusController->UsbHCInterface;
-  MaxPacketLength = UsbIoDevice->DeviceDescriptor.MaxPacketSize0;
+  UsbIoDev        = UsbIoController->UsbDevice;
+
+  MaxPacketLength = UsbIoDev->DeviceDescriptor.MaxPacketSize0;
 
  
   if (Request->Request     == USB_DEV_CLEAR_FEATURE && 
@@ -268,24 +268,23 @@ UsbControlTransfer (
       return EFI_DEVICE_ERROR;
     }
   }
-
-
-
   //
   // using HostController's ControlTransfer to complete the request
   //
-  RetStatus = UsbHCInterface->ControlTransfer (
-                                UsbHCInterface,
-                                UsbIoDevice->DeviceAddress,
-                                UsbIoDevice->IsSlowDevice,
-                                MaxPacketLength,
-                                Request,
-                                Direction,
-                                Data,
-                                &DataLength,
-                                (UINTN) Timeout,
-                                &TransferResult
-                                );
+  RetStatus = UsbVirtualHcControlTransfer (
+                UsbIoDev->BusController,
+                UsbIoDev->DeviceAddress,
+                UsbIoDev->DeviceSpeed,
+                MaxPacketLength,
+                Request,
+                Direction,
+                Data,
+                &DataLength,
+                (UINTN) Timeout,
+                UsbIoDev->Translator,
+                &TransferResult
+                );
+
   *Status = TransferResult;
 
   if (Request->Request     == USB_DEV_CLEAR_FEATURE && 
@@ -346,18 +345,19 @@ UsbBulkTransfer (
 --*/
 {
   USB_IO_DEVICE               *UsbIoDev;
-  UINT8                       MaxPacketLength;
+  UINTN                       MaxPacketLength;
   UINT8                       DataToggle;
   UINT8                       OldToggle;
   EFI_STATUS                  RetStatus;
-  EFI_USB_HC_PROTOCOL         *UsbHCInterface;
+
   USB_IO_CONTROLLER_DEVICE    *UsbIoController;
   ENDPOINT_DESC_LIST_ENTRY    *EndPointListEntry;
   UINT32                      TransferResult;
-
-  UsbIoController = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
-  UsbIoDev        = UsbIoController->UsbDevice;
-  UsbHCInterface  = UsbIoDev->BusController->UsbHCInterface;
+  UINT8                       DataBuffersNumber;
+  
+  DataBuffersNumber = 1;
+  UsbIoController   = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
+  UsbIoDev          = UsbIoController->UsbDevice;
 
   //
   // Parameters Checking
@@ -408,17 +408,20 @@ UsbBulkTransfer (
   //
   // using HostController's BulkTransfer to complete the request
   //
-  RetStatus = UsbHCInterface->BulkTransfer (
-                                UsbHCInterface,
-                                UsbIoDev->DeviceAddress,
-                                DeviceEndpoint,
-                                MaxPacketLength,
-                                Data,
-                                DataLength,
-                                &DataToggle,
-                                Timeout,
-                                &TransferResult
-                                );
+  RetStatus = UsbVirtualHcBulkTransfer (
+                UsbIoDev->BusController,
+                UsbIoDev->DeviceAddress,
+                DeviceEndpoint,
+                UsbIoDev->DeviceSpeed,
+                MaxPacketLength,
+                DataBuffersNumber,
+                &Data,
+                DataLength,
+                &DataToggle,
+                Timeout,
+                UsbIoDev->Translator,
+                &TransferResult
+                );
 
   if (OldToggle != DataToggle) {
     //
@@ -474,14 +477,13 @@ UsbSyncInterruptTransfer (
 
 --*/
 {
-  USB_IO_DEVICE               *UsbIoDev;
-  UINT8                       MaxPacketLength;
-  UINT8                       DataToggle;
-  UINT8                       OldToggle;
-  EFI_STATUS                  RetStatus;
-  EFI_USB_HC_PROTOCOL         *UsbHCInterface;
-  USB_IO_CONTROLLER_DEVICE    *UsbIoController;
-  ENDPOINT_DESC_LIST_ENTRY    *EndPointListEntry;
+  USB_IO_DEVICE             *UsbIoDev;
+  UINTN                     MaxPacketLength;
+  UINT8                     DataToggle;
+  UINT8                     OldToggle;
+  EFI_STATUS                RetStatus;
+  USB_IO_CONTROLLER_DEVICE  *UsbIoController;
+  ENDPOINT_DESC_LIST_ENTRY  *EndPointListEntry;
 
   //
   // Parameters Checking
@@ -517,8 +519,6 @@ UsbSyncInterruptTransfer (
   //
   UsbIoController = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
   UsbIoDev        = UsbIoController->UsbDevice;
-  UsbHCInterface  = UsbIoDev->BusController->UsbHCInterface;
-
   GetDeviceEndPointMaxPacketLength (
     This,
     DeviceEndpoint,
@@ -535,18 +535,19 @@ UsbSyncInterruptTransfer (
   //
   // using HostController's SyncInterruptTransfer to complete the request
   //
-  RetStatus = UsbHCInterface->SyncInterruptTransfer (
-                                UsbHCInterface,
-                                UsbIoDev->DeviceAddress,
-                                DeviceEndpoint,
-                                UsbIoDev->IsSlowDevice,
-                                MaxPacketLength,
-                                Data,
-                                DataLength,
-                                &DataToggle,
-                                Timeout,
-                                Status
-                                );
+  RetStatus = UsbVirtualHcSyncInterruptTransfer (
+                UsbIoDev->BusController,
+                UsbIoDev->DeviceAddress,
+                DeviceEndpoint,
+                UsbIoDev->DeviceSpeed,
+                MaxPacketLength,
+                Data,
+                DataLength,
+                &DataToggle,
+                Timeout,
+                UsbIoDev->Translator,
+                Status
+                );
 
   if (OldToggle != DataToggle) {
     //
@@ -590,7 +591,7 @@ UsbAsyncInterruptTransfer (
                           the transfer is to be executed.
     DataLength        -   Specifies the length, in bytes, of the data to be
                           received from the USB device.
-    InterruptCallback -   The Callback function.  This function is called if
+    InterruptCallBack -   The Callback function.  This function is called if
                           the asynchronous interrupt transfer is completed.
     Context           -   Passed to InterruptCallback 
   Returns:
@@ -600,13 +601,12 @@ UsbAsyncInterruptTransfer (
 
 --*/
 {
-  USB_IO_DEVICE               *UsbIoDev;
-  UINT8                       MaxPacketLength;
-  UINT8                       DataToggle;
-  EFI_USB_HC_PROTOCOL         *UsbHCInterface;
-  EFI_STATUS                  RetStatus;
-  USB_IO_CONTROLLER_DEVICE    *UsbIoController;
-  ENDPOINT_DESC_LIST_ENTRY    *EndpointListEntry;
+  USB_IO_DEVICE             *UsbIoDev;
+  UINTN                     MaxPacketLength;
+  UINT8                     DataToggle;
+  EFI_STATUS                RetStatus;
+  USB_IO_CONTROLLER_DEVICE  *UsbIoController;
+  ENDPOINT_DESC_LIST_ENTRY  *EndpointListEntry;
 
   //
   // Check endpoint
@@ -634,25 +634,25 @@ UsbAsyncInterruptTransfer (
 
   UsbIoController = USB_IO_CONTROLLER_DEVICE_FROM_USB_IO_THIS (This);
   UsbIoDev        = UsbIoController->UsbDevice;
-  UsbHCInterface  = UsbIoDev->BusController->UsbHCInterface;
 
   if (!IsNewTransfer) {
     //
     // Delete this transfer
     //
-    UsbHCInterface->AsyncInterruptTransfer (
-                      UsbHCInterface,
-                      UsbIoDev->DeviceAddress,
-                      DeviceEndpoint,
-                      UsbIoDev->IsSlowDevice,
-                      0,
-                      FALSE,
-                      &DataToggle,
-                      PollingInterval,
-                      DataLength,
-                      NULL,
-                      NULL
-                      );
+    UsbVirtualHcAsyncInterruptTransfer (
+      UsbIoDev->BusController,
+      UsbIoDev->DeviceAddress,
+      DeviceEndpoint,
+      UsbIoDev->DeviceSpeed,
+      0,
+      FALSE,
+      &DataToggle,
+      PollingInterval,
+      DataLength,
+      UsbIoDev->Translator,
+      NULL,
+      NULL
+      );
 
     //
     // We need to store the toggle value
@@ -678,19 +678,20 @@ UsbAsyncInterruptTransfer (
     &DataToggle
     );
 
-  RetStatus = UsbHCInterface->AsyncInterruptTransfer (
-                                UsbHCInterface,
-                                UsbIoDev->DeviceAddress,
-                                DeviceEndpoint,
-                                UsbIoDev->IsSlowDevice,
-                                MaxPacketLength,
-                                TRUE,
-                                &DataToggle,
-                                PollingInterval,
-                                DataLength,
-                                InterruptCallBack,
-                                Context
-                                );
+  RetStatus = UsbVirtualHcAsyncInterruptTransfer (
+                UsbIoDev->BusController,
+                UsbIoDev->DeviceAddress,
+                DeviceEndpoint,
+                UsbIoDev->DeviceSpeed,
+                MaxPacketLength,
+                TRUE,
+                &DataToggle,
+                PollingInterval,
+                DataLength,
+                UsbIoDev->Translator,
+                InterruptCallBack,
+                Context
+                );
 
   return RetStatus;
 }
@@ -1070,6 +1071,7 @@ UsbGetStringDescriptor (
     EFI_SUCCESS
     EFI_NOT_FOUND
     EFI_OUT_OF_RESOURCES
+    EFI_UNSUPPORTED
 
 --*/
 {

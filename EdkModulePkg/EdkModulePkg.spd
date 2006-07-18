@@ -394,6 +394,7 @@
     <Filename>Bus/Pci/IdeBus/Dxe/idebus.msa</Filename>
     <Filename>Bus/Pci/PciBus/Dxe/PciBus.msa</Filename>
     <Filename>Bus/Pci/Uhci/Dxe/Uhci.msa</Filename>
+    <Filename>Bus/Pci/Ehci/Dxe/Ehci.msa</Filename>
     <Filename>Bus/Pci/Undi/RuntimeDxe/Undi.msa</Filename>
     <Filename>Bus/Scsi/ScsiBus/Dxe/ScsiBus.msa</Filename>
     <Filename>Bus/Scsi/ScsiDisk/Dxe/ScsiDisk.msa</Filename>
@@ -440,6 +441,7 @@
     <Filename>Universal/Console/Terminal/Dxe/Terminal.msa</Filename>
     <Filename>Universal/DataHub/DataHub/Dxe/DataHub.msa</Filename>
     <Filename>Universal/DataHub/DataHubStdErr/Dxe/DataHubStdErr.msa</Filename>
+    <Filename>Universal/DevicePath/Dxe/DevicePath.msa</Filename>
     <Filename>Universal/Debugger/Debugport/Dxe/DebugPort.msa</Filename>
     <Filename>Universal/DebugSupport/Dxe/DebugSupport.msa</Filename>
     <Filename>Universal/Disk/DiskIo/Dxe/DiskIo.msa</Filename>

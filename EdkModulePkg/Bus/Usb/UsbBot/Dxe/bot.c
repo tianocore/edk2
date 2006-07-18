@@ -710,7 +710,7 @@ BotDataPhase (
   BufferPtr       = (UINT8 *) DataBuffer;
   TransferredSize = 0;
   MaxRetry        = 10;
-  PackageNum      = 15;
+  PackageNum      = 128;
 
   //
   // retrieve the the max packet length of the given endpoint

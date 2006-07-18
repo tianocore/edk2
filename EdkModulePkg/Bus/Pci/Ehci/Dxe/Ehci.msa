@@ -7,14 +7,14 @@ http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
-<ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
+<ModuleSurfaceArea  xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
-    <ModuleName>Uhci</ModuleName>
+    <ModuleName>Ehci</ModuleName>
     <ModuleType>UEFI_DRIVER</ModuleType>
-    <GuidValue>2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7</GuidValue>
+    <GuidValue>BDFE430E-8F2A-4db0-9991-6F856594777E</GuidValue>
     <Version>1.0</Version>
-    <Abstract>Component description file for Uhci module</Abstract>
-    <Description>This module provides USB Host Controller Protocol implementation for Universal Host Controller Interface</Description>
+    <Abstract>Component description file for Ehci module</Abstract>
+    <Description>This module provides USB2 Host Controller Protocol implementation for Enhanced Host Controller Interface</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
       are licensed and made available under the terms and conditions of the BSD License
@@ -27,7 +27,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <ModuleDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>Uhci</OutputFileBasename>
+    <OutputFileBasename>Ehci</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -56,10 +56,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
-    <Filename>uhci.c</Filename>
-    <Filename>uhchlp.c</Filename>
+    <Filename>Ehci.c</Filename>
+    <Filename>EhciMem.c</Filename>
+    <Filename>EhciReg.c</Filename>
+    <Filename>EhciSched.c</Filename>
     <Filename>ComponentName.c</Filename>
-    <Filename>uhci.h</Filename>
+    <Filename>Ehci.h</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -69,9 +71,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <ProtocolCName>gEfiPciIoProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="BY_START">
-      <ProtocolCName>gEfiUsbHcProtocolGuid</ProtocolCName>
-    </Protocol>
-    <Protocol Usage="BY_START">
       <ProtocolCName>gEfiUsb2HcProtocolGuid</ProtocolCName>
     </Protocol>
   </Protocols>
@@ -79,10 +78,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
-      <DriverBinding>gUhciDriverBinding</DriverBinding>
+      <DriverBinding>gEhciDriverBinding</DriverBinding>
     </Extern>
     <Extern>
-      <ComponentName>gUhciComponentName</ComponentName>
+      <ComponentName>gEhciComponentName</ComponentName>
     </Extern>
   </Externs>
 </ModuleSurfaceArea>

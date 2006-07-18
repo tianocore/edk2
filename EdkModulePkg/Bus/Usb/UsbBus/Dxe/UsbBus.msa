@@ -83,7 +83,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Protocol Usage="BY_START">
       <ProtocolCName>gEfiUsbIoProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="TO_START">
+    <Protocol Usage="SOMETIMES_CONSUMED">
+      <ProtocolCName>gEfiUsb2HcProtocolGuid</ProtocolCName>
+    </Protocol>
+    <Protocol Usage="SOMETIMES_CONSUMED">
       <ProtocolCName>gEfiUsbHcProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="TO_START">

@@ -64,8 +64,8 @@ EFI_DEVICE_PATH_PROTOCOL*
 ;  
   
 typedef struct {
-  EFI_DEVICE_PATH_FROM_TEXT_NODE  ConvertDeviceNodeFromText;
-  EFI_DEVICE_PATH_FROM_TEXT_PATH  ConvertDevicePathFromText;
+  EFI_DEVICE_PATH_FROM_TEXT_NODE  ConvertTextToDeviceNode;
+  EFI_DEVICE_PATH_FROM_TEXT_PATH  ConvertTextToDevicePath;
 } EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL;
 
 extern EFI_GUID gEfiDevicePathFromTextProtocolGuid;
