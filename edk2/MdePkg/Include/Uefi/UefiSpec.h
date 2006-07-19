@@ -2137,22 +2137,22 @@ typedef struct {
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
-  EFI_GUID                  PiwgSpecificDevicePath;
+  EFI_GUID                  TianoSpecificDevicePath;
   UINT32                    Type;
-} PIWG_DEVICE_PATH;
+} TIANO_DEVICE_PATH;
 
-#define PIWG_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE         0x01
+#define TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE         0x01
 typedef struct {
-  PIWG_DEVICE_PATH      Piwg;
+  TIANO_DEVICE_PATH     Tiano;
   EFI_GUID              NameGuid;
 } MEDIA_FW_VOL_FILEPATH_DEVICE_PATH;
 
 //
 // Place holder for a future extension
 //
-#define PIWG_MEDIAFW_VOL_DEVICE_PATH_TYPE                   0x02
+#define TIANO_MEDIAFW_VOL_DEVICE_PATH_TYPE                   0x02
 typedef struct {
-  PIWG_DEVICE_PATH      Piwg;
+  TIANO_DEVICE_PATH     Tiano;
   EFI_GUID              VolumeGuid;
 } MEDIA_FW_VOL_DEVICE_PATH;
 

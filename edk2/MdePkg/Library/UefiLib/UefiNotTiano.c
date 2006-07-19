@@ -3,7 +3,8 @@
 
   Help Port Framework/Tinao code that has conflicts with UEFI 2.0 by hiding the
   oldconflicts with library functions and supporting implementations of the old 
-  (R8.5/EFI 1.10) and new (R9/UEFI 2.0) way.
+  (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way. This module is a DXE driver as 
+  it contains DXE enum extensions for EFI event services.
 
 Copyright (c) 2006, Intel Corporation<BR>
 All rights reserved. This program and the accompanying materials
@@ -16,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+
 /**
   An empty function to pass error checking of CreateEventEx (). 
   
@@ -24,6 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   
 **/
 VOID
+EFIAPI
 InternalEmptyFuntion (
   IN EFI_EVENT                Event,
   IN VOID                     *Context
@@ -39,7 +42,7 @@ InternalEmptyFuntion (
   This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
   added and now it's possible to not voilate the UEFI specification by 
   declaring a GUID for the legacy boot event class. This library supports
-  the R8.5/EFI 1.10 form and R9/UEFI 2.0 form and allows common code to 
+  the EDK/EFI 1.10 form and EDK II/UEFI 2.0 form and allows common code to 
   work both ways.
 
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
@@ -94,7 +97,7 @@ EfiCreateEventLegacyBootEx (
 
   ASSERT (LegacyBootEvent != NULL);
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000) 
+#if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
   //
   // prior to UEFI 2.0 use Tiano extension to EFI
   //
@@ -105,7 +108,7 @@ EfiCreateEventLegacyBootEx (
                   NotifyContext,
                   LegacyBootEvent
                   );
-#else
+#elif (EFI_SPECIFICATION_VERSION >= 0x00020000)
   //
   // For UEFI 2.0 and the future use an Event Group
   //
@@ -117,6 +120,11 @@ EfiCreateEventLegacyBootEx (
                   &gEfiEventLegacyBootGuid,
                   LegacyBootEvent
                   );
+#else
+  //
+  // For EFI 1.10 with no Tiano extensions return unsupported
+  //
+  Status = EFI_UNSUPORTED;
 #endif
 
   return Status;
@@ -129,7 +137,7 @@ EfiCreateEventLegacyBootEx (
   This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
   added and now it's possible to not voilate the UEFI specification and use 
   the ready to boot event class defined in UEFI 2.0. This library supports
-  the R8.5/EFI 1.10 form and R9/UEFI 2.0 form and allows common code to 
+  the EDK/EFI 1.10 form and EDK II/UEFI 2.0 form and allows common code to 
   work both ways.
 
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
@@ -184,7 +192,7 @@ EfiCreateEventReadyToBootEx (
 
   ASSERT (ReadyToBootEvent != NULL);
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000) 
+#if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
   //
   // prior to UEFI 2.0 use Tiano extension to EFI
   //
@@ -195,7 +203,7 @@ EfiCreateEventReadyToBootEx (
                   NotifyContext,
                   ReadyToBootEvent
                   );
-#else
+#elif (EFI_SPECIFICATION_VERSION >= 0x00020000)
   //
   // For UEFI 2.0 and the future use an Event Group
   //
@@ -207,6 +215,11 @@ EfiCreateEventReadyToBootEx (
                   &gEfiEventReadyToBootGuid,
                   ReadyToBootEvent
                   );
+#else
+  //
+  // For EFI 1.10 with no Tiano extensions return unsupported
+  //
+  Status = EFI_UNSUPORTED;
 #endif
 
   return Status;
@@ -266,7 +279,7 @@ EfiSignalEventLegacyBoot (
   Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
   so as we move to UEFI 2.0 support we must use a mechanism that conforms with
   the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed 
-  device path is defined for PIWG extensions of device path. If the code 
+  device path is defined for Tiano extensions of device path. If the code 
   is compiled to conform with the UEFI 2.0 specification use the new device path
   else use the old form for backwards compatability. The return value to this
   function points to a location in FvDevicePathNode and it does not allocate
@@ -286,7 +299,7 @@ EfiGetNameGuidFromFwVolDevicePathNode (
 {
   ASSERT (FvDevicePathNode != NULL);
 
-#if (EFI_SPECIFICATION_VERSION < 0x00020000) 
+#if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
   //
   // Use old Device Path that conflicts with UEFI
   //
@@ -295,14 +308,14 @@ EfiGetNameGuidFromFwVolDevicePathNode (
     return (EFI_GUID *) &FvDevicePathNode->NameGuid;
   }
 
-#else
+#elif ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION >= 0x00020000))
   //
   // Use the new Device path that does not conflict with the UEFI
   //
-  if (FvDevicePathNode->Piwg.Header.Type == MEDIA_DEVICE_PATH ||
-      FvDevicePathNode->Piwg.Header.SubType == MEDIA_VENDOR_DP) {
-    if (CompareGuid (&gEfiFrameworkDevicePathGuid, &FvDevicePathNode->Piwg.PiwgSpecificDevicePath)) {
-      if (FvDevicePathNode->Piwg.Type == PIWG_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE) {
+  if (FvDevicePathNode->Tiano.Header.Type == MEDIA_DEVICE_PATH ||
+      FvDevicePathNode->Tiano.Header.SubType == MEDIA_VENDOR_DP) {
+    if (CompareGuid (&gEfiFrameworkDevicePathGuid, &FvDevicePathNode->Tiano.TianoSpecificDevicePath)) {
+      if (FvDevicePathNode->Tiano.Type == TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE) {
         return (EFI_GUID *) &FvDevicePathNode->NameGuid;
       }
     }
@@ -318,7 +331,7 @@ EfiGetNameGuidFromFwVolDevicePathNode (
   Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
   so as we move to UEFI 2.0 support we must use a mechanism that conforms with
   the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed 
-  device path is defined for PIWG extensions of device path. If the code 
+  device path is defined for Tiano extensions of device path. If the code 
   is compiled to conform with the UEFI 2.0 specification use the new device path
   else use the old form for backwards compatability.
 
@@ -348,19 +361,19 @@ EfiInitializeFwVolDevicepathNode (
   //
   // Use the new Device path that does not conflict with the UEFI
   //
-  FvDevicePathNode->Piwg.Header.Type     = MEDIA_DEVICE_PATH;
-  FvDevicePathNode->Piwg.Header.SubType  = MEDIA_VENDOR_DP;
-  SetDevicePathNodeLength (&FvDevicePathNode->Piwg.Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
+  FvDevicePathNode->Tiano.Header.Type     = MEDIA_DEVICE_PATH;
+  FvDevicePathNode->Tiano.Header.SubType  = MEDIA_VENDOR_DP;
+  SetDevicePathNodeLength (&FvDevicePathNode->Tiano.Header, sizeof (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH));
 
   //
-  // Add the GUID for generic PIWG device paths
+  // Add the GUID for generic Tiano device paths
   //
-  CopyGuid (&FvDevicePathNode->Piwg.PiwgSpecificDevicePath, &gEfiFrameworkDevicePathGuid);
+  CopyGuid (&FvDevicePathNode->Tiano.TianoSpecificDevicePath, &gEfiFrameworkDevicePathGuid);
 
   //
-  // Add in the FW Vol File Path PIWG defined inforation
+  // Add in the FW Vol File Path Tiano defined information
   //
-  FvDevicePathNode->Piwg.Type = PIWG_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE;
+  FvDevicePathNode->Tiano.Type = TIANO_MEDIA_FW_VOL_FILEPATH_DEVICE_PATH_TYPE;
 
 #endif
 

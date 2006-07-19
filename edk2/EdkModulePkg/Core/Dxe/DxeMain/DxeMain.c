@@ -307,9 +307,16 @@ EFI_RUNTIME_SERVICES mEfiRuntimeServicesTableTemplate = {
   (EFI_GET_NEXT_HIGH_MONO_COUNT) CoreEfiNotAvailableYetArg1,      // GetNextHighMonotonicCount
   (EFI_RESET_SYSTEM)             CoreEfiNotAvailableYetArg4       // ResetSystem 
 #if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION <  0x00020000))
+  //
+  // This Tiano extension was removed when UEFI 2.0 support was added. 
+  // It's now just a protocol.
+  //
   ,
   (EFI_REPORT_STATUS_CODE)       CoreEfiNotAvailableYetArg5       // ReportStatusCode
 #elif (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  //
+  // New runtime services added by UEFI 2.0
+  //
   ,
   (EFI_UPDATE_CAPSULE)              CoreEfiNotAvailableYetArg3,   // UpdateCapsule
   (EFI_QUERY_CAPSULE_CAPABILITIES)  CoreEfiNotAvailableYetArg4,   // QueryCapsuleCapabilities
@@ -452,6 +459,10 @@ Returns:
   //
   CoreGetPeiProtocol (&gEfiStatusCodeRuntimeProtocolGuid, (VOID **)&gStatusCode->ReportStatusCode);
 #if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
+  //
+  // This Tiano extension was removed when UEFI 2.0 support was added. 
+  // It's now just a protocol.
+  //
   gRT->ReportStatusCode = gStatusCode->ReportStatusCode;
 #endif
 

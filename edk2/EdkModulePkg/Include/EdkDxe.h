@@ -86,7 +86,7 @@ Abstract:
 
 #if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION < 0x00020000))
 //
-// Tiano8.5 Module use ScsiPassThru protocol together with the original ScsiIo protocol 
+// Old EDK modules use Module use ScsiPassThru protocol together with the original ScsiIo protocol 
 // In UEFI2.0, Module use ScsiPassThruExt Protocol with new UEFI2.0 ScsiIo protocol
 //
 #include <Protocol/ScsiIo.h>

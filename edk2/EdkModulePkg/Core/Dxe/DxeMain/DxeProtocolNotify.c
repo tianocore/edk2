@@ -43,12 +43,23 @@ ARCHITECTURAL_PROTOCOL_ENTRY  mArchProtocols[] = {
   { &gEfiRuntimeArchProtocolGuid,          (VOID **)&gRuntime,       NULL, NULL, FALSE },
   { &gEfiVariableArchProtocolGuid,         (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiVariableWriteArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
-  #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+#if (EFI_SPECIFICATION_VERSION >= 0x00020000)
+  //
+  // UEFI 2.0 added support for Capsule services. DXE CIS ??? Added support for this AP
+  //
   { &gEfiCapsuleArchProtocolGuid,          (VOID **)NULL,            NULL, NULL, FALSE},
-  #endif
+#endif
   { &gEfiMonotonicCounterArchProtocolGuid, (VOID **)NULL,            NULL, NULL, FALSE },
   { &gEfiResetArchProtocolGuid,            (VOID **)NULL,            NULL, NULL, FALSE },
-//  { &gEfiStatusCodeRuntimeProtocolGuid,    (VOID **)&gStatusCode,    NULL, NULL, FALSE },
+#if ((EDK_RELEASE_VERSION != 0) && (EFI_SPECIFICATION_VERSION <  0x00020000))
+  //
+  // The ReportStatusCode Runtime service is in conflict with the UEFI 2.0 specificaiton
+  // Thus gEfiStatusCodeRuntimeProtocolGuid becomes a normal protocol in UEFI 2.0 systems
+  // It is only included if the EFI 1.10 with Tiano extensions is enabled for backward
+  // compatability
+  //
+  { &gEfiStatusCodeRuntimeProtocolGuid,    (VOID **)&gStatusCode,    NULL, NULL, FALSE },
+#endif
   { &gEfiRealTimeClockArchProtocolGuid,    (VOID **)NULL,            NULL, NULL, FALSE },
   { NULL,                                  (VOID **)NULL,            NULL, NULL, FALSE }
 };

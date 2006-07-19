@@ -400,7 +400,7 @@ EfiSignalEventLegacyBoot (
   This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
   added and now it's possible to not voilate the UEFI specification by 
   declaring a GUID for the legacy boot event class. This library supports
-  the R8.5/EFI 1.10 form and R9/UEFI 2.0 form and allows common code to 
+  the EDK/EFI 1.10 form and EDK II/UEFI 2.0 form and allows common code to 
   work both ways.
 
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
@@ -450,7 +450,7 @@ EfiCreateEventLegacyBootEx (
   This was bad as Tiano did not own the enum. In UEFI 2.0 CreateEventEx was
   added and now it's possible to not voilate the UEFI specification and use 
   the ready to boot event class defined in UEFI 2.0. This library supports
-  the R8.5/EFI 1.10 form and R9/UEFI 2.0 form and allows common code to 
+  the EDK/EFI 1.10 form and EDKII/UEFI 2.0 form and allows common code to 
   work both ways.
 
   @param  LegacyBootEvent   Returns the EFI event returned from gBS->CreateEvent(Ex).
@@ -499,7 +499,7 @@ EfiCreateEventReadyToBootEx (
   Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
   so as we move to UEFI 2.0 support we must use a mechanism that conforms with
   the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed 
-  device path is defined for PIWG extensions of device path. If the code 
+  device path is defined for Tiano extensions of device path. If the code 
   is compiled to conform with the UEFI 2.0 specification use the new device path
   else use the old form for backwards compatability.
 
@@ -520,7 +520,7 @@ EfiInitializeFwVolDevicepathNode (
   Tiano extended the EFI 1.10 device path nodes. Tiano does not own this enum
   so as we move to UEFI 2.0 support we must use a mechanism that conforms with
   the UEFI 2.0 specification to define the FV device path. An UEFI GUIDed 
-  device path is defined for PIWG extensions of device path. If the code 
+  device path is defined for Tiano extensions of device path. If the code 
   is compiled to conform with the UEFI 2.0 specification use the new device path
   else use the old form for backwards compatability. The return value to this
   function points to a location in FvDevicePathNode and it does not allocate
