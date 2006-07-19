@@ -13,7 +13,7 @@
 
 :start_secmain
 pushd .
-cd Build\DEBUG\MSFT\IA32
+cd Build\DEBUG\MYTOOLS\IA32
 SecMain.exe
 popd
 @echo on
