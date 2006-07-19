@@ -29,15 +29,15 @@ IDENTIFIER = Default TOOL_CHAIN_CONF
 # IA32 definitions
 *_MYTOOLS_IA32_*_PATH       = C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin
 *_MYTOOLS_IA32_ASM_PATH     = C:\WINDDK\3790.1830\bin\x86
-*_MYTOOLS_IA32_ASMLINK_PATH = C:\WINDDK\3790.1830\Bin\Bin16\
-*_MYTOOLS_IA32_ASL_PATH     = C:\TianoTools\Bin
+*_MYTOOLS_IA32_ASMLINK_PATH = C:\WINDDK\3790.1830\bin\bin16\
+*_MYTOOLS_IA32_ASL_PATH     = C:\ASL
 *_MYTOOLS_IA32_*_DPATH      = C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\IDE
 *_MYTOOLS_IA32_ASM_EXT      = .asm
 
 # x64 definitions
 *_MYTOOLS_X64_*_PATH       = C:\WINDDK\3790.1830\bin\win64\x86\amd64
-*_MYTOOLS_X64_ASMLINK_PATH = C:\WINDDK\3790.1830\Bin\Bin16\
-*_MYTOOLS_X64_ASL_PATH     = C:\TianoTools\Bin
+*_MYTOOLS_X64_ASMLINK_PATH = C:\WINDDK\3790.1830\bin\bin16\
+*_MYTOOLS_X64_ASL_PATH     = C:\ASL
 *_MYTOOLS_X64_ASM_NAME     = ml64.exe
 *_MYTOOLS_X64_ASM_EXT      = .asm
 
@@ -64,7 +64,7 @@ IDENTIFIER = Default TOOL_CHAIN_CONF
 
 # GCC, IA32
 # Use this if you built the tiano gcc tool chain on a Windows/Cygwin system.
-*_GCC_IA32_*_PATH       = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
+*_MYGCC_IA32_*_PATH       = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
 # Use this if you built the tiano gcc tool chain on a Unix system.
-# *_GCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-*_GCC_IA32_ASM_EXT      = .S
+# *_MYGCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
+*_MYGCC_IA32_ASM_EXT      = .S
