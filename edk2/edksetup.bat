@@ -32,7 +32,7 @@
 :check_vc
 if defined VCINSTALLDIR goto check_cygwin
 if defined VS71COMNTOOLS (
-  call "%VS71COMNTOOLS%vsvars32.bat"
+  call "%VS71COMNTOOLS%\vsvars32.bat"
 ) else (
   echo.
   echo !!! WARNING !!!! Cannot find Visual Studio !!!
