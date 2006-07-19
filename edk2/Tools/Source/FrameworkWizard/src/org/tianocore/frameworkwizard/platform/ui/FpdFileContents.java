@@ -104,7 +104,7 @@ public class FpdFileContents {
                   continue;
               }
               String ModuleInfo = msa.getModuleGuid() + " " + msa.getModuleVersion() +
-               " " + msa.getPackageGuid() + " " + msa.getPackageVersion();
+               " " + msa.getPackageGuid() + " " + msa.getPackageVersion() + " " + listToString(msa.getSupArchList());
               List<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> lp = msa.getPcdBuildDefinition().getPcdDataList();
               ListIterator<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> lpi = lp.listIterator();
               while (lpi.hasNext()) {
@@ -194,14 +194,26 @@ public class FpdFileContents {
         int i = 0;
         while(li.hasNext()) {
             ModuleSADocument.ModuleSA msa = (ModuleSADocument.ModuleSA)li.next();
-            saa[i][1] = msa.getModuleGuid();
-            saa[i][2] = msa.getModuleVersion();
+            saa[i][0] = msa.getModuleGuid();
+            saa[i][1] = msa.getModuleVersion();
             
-            saa[i][3] = msa.getPackageGuid();
-            saa[i][4] = msa.getPackageVersion();
-//            saa[i][4] = listToString(msa.getSupArchList());
+            saa[i][2] = msa.getPackageGuid();
+            saa[i][3] = msa.getPackageVersion();
+            saa[i][4] = listToString(msa.getSupArchList());
             ++i;
         }
+    }
+    
+    public void getFrameworkModuleInfo(int i, String[] sa) {
+        ModuleSADocument.ModuleSA msa = getModuleSA(i);
+        if (msa == null) {
+            return;
+        }
+        sa[0] = msa.getModuleGuid();
+        sa[1] = msa.getModuleVersion();
+        sa[2] = msa.getPackageGuid();
+        sa[3] = msa.getPackageVersion();
+        sa[4] = listToString(msa.getSupArchList());
     }
     
     public ModuleSADocument.ModuleSA getModuleSA(String key) {
@@ -223,11 +235,31 @@ public class FpdFileContents {
                         continue;
                     }
                 }
+                //ToDo add arch check for s[4]
+                if (msa.getSupArchList() != null) {
+                    if (!listToString(msa.getSupArchList()).equals(s[4])) {
+                        continue;
+                    }
+                }
                 return msa;
             }
         }
         return null;
     }
+    
+    private ModuleSADocument.ModuleSA getModuleSA(int i) {
+        ModuleSADocument.ModuleSA msa = null;
+        XmlCursor cursor = getfpdFrameworkModules().newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            msa = (ModuleSADocument.ModuleSA)cursor.getObject();
+        }
+        cursor.dispose();
+        return msa;
+    }
+    
     public void removeModuleSA(int i) {
         XmlObject o = getfpdFrameworkModules();
         if (o == null) {
@@ -244,7 +276,7 @@ public class FpdFileContents {
             //
             ModuleSADocument.ModuleSA moduleSa = (ModuleSADocument.ModuleSA)cursor.getObject();
             String moduleInfo = moduleSa.getModuleGuid() + " " + moduleSa.getModuleVersion() + " " +
-            moduleSa.getPackageGuid()+ " " + moduleSa.getPackageVersion();
+            moduleSa.getPackageGuid()+ " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList());
             PcdBuildDefinitionDocument.PcdBuildDefinition pcdBuildDef = moduleSa.getPcdBuildDefinition();
             if (pcdBuildDef != null && pcdBuildDef.getPcdDataList() != null) {
                 ListIterator<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> li = pcdBuildDef.getPcdDataList().listIterator();
@@ -272,6 +304,10 @@ public class FpdFileContents {
         for(int i = 0; i < al.size(); ++i){
             String consumer = al.get(i);
             if (consumer.contains(s[0]) && consumer.contains(s[2])){
+                String[] consumerPart = consumer.split(" ");
+                if (!consumerPart[4].equals(s[4])) {
+                    continue;
+                }
                 al.remove(consumer);
                 break;
             }
@@ -285,22 +321,10 @@ public class FpdFileContents {
         
     }
     //
-    // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer"
+    // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer Arch"
     //
     public int getPcdDataCount(int i){
-        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0) {
-            return 0;
-        }
-        
-        XmlCursor cursor = getfpdFrameworkModules().newCursor();
-        ModuleSADocument.ModuleSA msa = null;
-        if (cursor.toFirstChild()) {
-            for (int j = 0; j < i; ++j) {
-                cursor.toNextSibling();
-            }
-            msa = (ModuleSADocument.ModuleSA)cursor.getObject();
-        }
-        cursor.dispose();
+        ModuleSADocument.ModuleSA msa = getModuleSA(i);
         
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
             return 0;
@@ -310,19 +334,7 @@ public class FpdFileContents {
     }
     
     public void getPcdData(int i, String[][] saa) {
-        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0) {
-            return;
-        }
-        
-        XmlCursor cursor = getfpdFrameworkModules().newCursor();
-        ModuleSADocument.ModuleSA msa = null;
-        if (cursor.toFirstChild()) {
-            for (int j = 0; j < i; ++j) {
-                cursor.toNextSibling();
-            }
-            msa = (ModuleSADocument.ModuleSA)cursor.getObject();
-        }
-        cursor.dispose();
+        ModuleSADocument.ModuleSA msa = getModuleSA(i);
         
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
             return;
@@ -463,7 +475,7 @@ public class FpdFileContents {
         }
     }
     //
-    // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer"
+    // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer Arch"
     //
     public int getLibraryInstancesCount(String key) {
         ModuleSADocument.ModuleSA msa = getModuleSA(key);
@@ -581,7 +593,7 @@ public class FpdFileContents {
             msa.addNewModuleSaBuildOptions().setFfsFormatKey(ffsKey);
             return;
         }
-        msa.getModuleSaBuildOptions().setFvBinding(ffsKey);
+        msa.getModuleSaBuildOptions().setFfsFormatKey(ffsKey);
     }
     
     public void getModuleSAOptions(String moduleKey, String[][] saa) {
@@ -600,12 +612,14 @@ public class FpdFileContents {
                 saa[i][0] = listToString(opt.getBuildTargets());
             }
             saa[i][1] = opt.getToolChainFamily();
+            saa[i][2] = opt.getTagName();
+            saa[i][3] = opt.getToolCode();
+            
             if (opt.getSupArchList() != null){
-                saa[i][2] = listToString(opt.getSupArchList());
+                saa[i][4] = listToString(opt.getSupArchList());
 
             }
-            saa[i][3] = opt.getToolCode();
-            saa[i][4] = opt.getTagName();
+            
             saa[i][5] = opt.getStringValue();
              
             ++i;
@@ -670,12 +684,12 @@ public class FpdFileContents {
      * @param mi
      * @param moduleSa if null, generate a new ModuleSA.
      */
-    public void addFrameworkModulesPcdBuildDefs(ModuleIdentification mi, ModuleSADocument.ModuleSA moduleSa) throws Exception {
+    public void addFrameworkModulesPcdBuildDefs(ModuleIdentification mi, String arch, ModuleSADocument.ModuleSA moduleSa) throws Exception {
         //ToDo add Arch filter
         
         try {
             if (moduleSa == null) {
-                moduleSa = genModuleSA(mi);
+                moduleSa = genModuleSA(mi, arch);
             }
             
             ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)GlobalData.getModuleXmlObject(mi);
@@ -747,13 +761,18 @@ public class FpdFileContents {
         return null;
     }
     
-    private ModuleSADocument.ModuleSA genModuleSA (ModuleIdentification mi) {
+    private ModuleSADocument.ModuleSA genModuleSA (ModuleIdentification mi, String arch) {
         PackageIdentification pi = GlobalData.getPackageForModule(mi);
         ModuleSADocument.ModuleSA msa = getfpdFrameworkModules().addNewModuleSA();
         msa.setModuleGuid(mi.getGuid());
         msa.setModuleVersion(mi.getVersion());
         msa.setPackageGuid(pi.getGuid());
         msa.setPackageVersion(pi.getVersion());
+        if (arch != null) {
+            Vector<String> v = new Vector<String>();
+            v.add(arch);
+            msa.setSupArchList(v); 
+        }
         
         return msa;
     }
@@ -772,7 +791,7 @@ public class FpdFileContents {
             pcdConsumer = new ArrayList<String>();
         }
         String listValue = moduleSa.getModuleGuid() + " " + moduleSa.getModuleVersion() 
-        + " " + moduleSa.getPackageGuid() + " " + moduleSa.getPackageVersion() 
+        + " " + moduleSa.getPackageGuid() + " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList())
         + " " + itemType;
         pcdConsumer.add(listValue);
         dynPcdMap.put(cName + " " + tsGuid, pcdConsumer);
@@ -1259,12 +1278,20 @@ public class FpdFileContents {
     
     private void setBuildOptionsUserDefAntTask(String id, String fileName, String execOrder, AntTaskDocument.AntTask at) {
         at.setId(new Integer(id));
+        XmlCursor cursor = at.newCursor();
         if (fileName != null){
             at.setFilename(fileName);
+        }
+        else if (cursor.toChild(xmlNs, "Filename")) {
+            cursor.removeXml();
         }
         if (execOrder != null) {
             at.setAntCmdOptions(execOrder);
         }
+        else if (cursor.toChild(xmlNs, "AntCmdOptions")) {
+            cursor.removeXml();
+        }
+        cursor.dispose();
     }
     
     public void removeBuildOptionsUserDefAntTask(int i) {
@@ -1350,7 +1377,14 @@ public class FpdFileContents {
         opt.setTagName(tagName);
         opt.setToolCode(toolCmd);
         
-        opt.setSupArchList(archList);
+        if (archList != null) {
+            opt.setSupArchList(archList);
+        }
+        else {
+            if (opt.isSetSupArchList()) {
+                opt.unsetSupArchList();
+            }
+        }
     }
     
     public void removeBuildOptionsOpt(int i){
@@ -1783,7 +1817,16 @@ public class FpdFileContents {
     }
     
     public void setPlatformDefsSupportedArchs(Vector<Object> archs) {
-        getfpdPlatformDefs().setSupportedArchitectures(archs);
+        if (archs != null) {
+            getfpdPlatformDefs().setSupportedArchitectures(archs);
+        }
+//        else {
+//            XmlCursor cursor = getfpdPlatformDefs().newCursor();
+//            if (cursor.toChild(xmlNs, "SupportedArchitectures")) {
+//                cursor.removeXml();
+//            }
+//            cursor.dispose();
+//        }
     }
     
     public void getPlatformDefsBuildTargets(Vector<Object> targets) {

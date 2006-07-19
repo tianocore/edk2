@@ -131,6 +131,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     
     public void setKey(String k, int i){
         this.moduleKey = k;
+        
         jTabbedPane.setSelectedIndex(0);
         initPcdBuildDefinition(i);
     }
@@ -158,7 +159,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // display library classes that need to be resolved. also potential instances for them.
         //
-        resolveLibraryInstances(key);
+        resolveLibraryInstances(moduleKey);
         //
         // display lib instances already selected for key
         //
@@ -200,6 +201,13 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         String ffsKey = ffc.getFfsFormatKey(key);
         if (ffsKey != null) {
             jTextField2.setText(ffsKey);
+        }
+        
+        optionsTableModel.setRowCount(0);
+        String[][] saa = new String[ffc.getModuleSAOptionsCount(key)][6];
+        ffc.getModuleSAOptions(key, saa);
+        for (int i = 0; i < saa.length; ++i) {
+            optionsTableModel.addRow(saa[i]);
         }
     }
     
@@ -316,7 +324,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // remove pcd information of instance from current ModuleSA
         //
-        ffc.removePcdData(moduleKey, mi);
+        ffc.removePcdData(key, mi);
         //
         // remove class produced by this instance and add back these produced class to be bound.
         //
@@ -349,7 +357,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     
     private ModuleIdentification getModuleId(String key){
         //
-        // Get ModuleGuid, ModuleVersion, PackageGuid, PackageVersion into string array.
+        // Get ModuleGuid, ModuleVersion, PackageGuid, PackageVersion, Arch into string array.
         //
         String[] keyPart = key.split(" ");
         Set<PackageIdentification> spi = GlobalData.getPackageList();
@@ -357,16 +365,26 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         
         while(ispi.hasNext()) {
             PackageIdentification pi = (PackageIdentification)ispi.next();
-            if ( !pi.getGuid().equals(keyPart[2])){
-//                            || !pi.getVersion().equals(keyPart[3])){
+            if ( !pi.getGuid().equals(keyPart[2])){ 
+
                 continue;
+            }
+            if (keyPart[3] != null && keyPart[3].length() > 0 && !keyPart[3].equals("null")){
+                if(!pi.getVersion().equals(keyPart[3])){
+                    continue;
+                }
             }
             Set<ModuleIdentification> smi = GlobalData.getModules(pi);
             Iterator ismi = smi.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
                 if (mi.getGuid().equals(keyPart[0])){
-//                                && mi.getVersion().equals(keyPart[1])){
+                    if (keyPart[1] != null && keyPart[1].length() > 0 && !keyPart[1].equals("null")){
+                        if(!mi.getVersion().equals(keyPart[1])){
+                            continue;
+                        }
+                    }
+
                     return mi;
                 }
             }
@@ -745,7 +763,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JPanel getJPanel4() {
         if (jPanel4 == null) {
             jLabel1 = new JLabel();
-            jLabel1.setText("Library Classes Consumed");
+            jLabel1.setText("Library Classes Uninstantiated");
             jPanel4 = new JPanel();
             jPanel4.add(jLabel1, null);
             jPanel4.add(getJScrollPane3(), null);
@@ -1000,7 +1018,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     // Add pcd information of selected instance to current moduleSA
                     //
                     try{
-                        ffc.addFrameworkModulesPcdBuildDefs(getModuleId(instanceValue), ffc.getModuleSA(moduleKey));
+                        ffc.addFrameworkModulesPcdBuildDefs(getModuleId(instanceValue), null, ffc.getModuleSA(moduleKey));
                     }
                     catch (Exception exception) {
                         JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
@@ -1073,14 +1091,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     public void actionPerformed(ActionEvent arg0) {
 
         if (arg0.getSource() == jButton2) {
-//            ffc.removeLibraryInstances(moduleKey);
-//            for (int i = 0; i < model1.getRowCount(); ++i) {
-//                String mg = model1.getValueAt(i, 1)+"";
-//                String mv = model1.getValueAt(i, 2)+"";
-//                String pg = model1.getValueAt(i, 3)+"";
-//                String pv = model1.getValueAt(i, 4)+"";
-//                ffc.genLibraryInstance(mg, mv, pg, pv, moduleKey);
-//            }
+            if (jTable4.isEditing()) {
+                jTable4.getCellEditor().stopCellEditing();
+            }
+            ffc.setFvBinding(moduleKey, jTextField.getText());
+            ffc.setFfsFileNameGuid(moduleKey, jTextField1.getText());
+            ffc.setFfsFormatKey(moduleKey, jTextField2.getText());
             this.setVisible(false);
         }
     }
@@ -1124,11 +1140,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextField == null) {
             jTextField = new JTextField();
             jTextField.setPreferredSize(new java.awt.Dimension(100,20));
-            jTextField.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusLost(java.awt.event.FocusEvent e) {
-                    ffc.setFvBinding(moduleKey, jTextField.getText());
-                }
-            });
+            
         }
         return jTextField;
     }
@@ -1141,11 +1153,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextField1 == null) {
             jTextField1 = new JTextField();
             jTextField1.setPreferredSize(new java.awt.Dimension(100,20));
-            jTextField1.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusLost(java.awt.event.FocusEvent e) {
-                    ffc.setFfsFileNameGuid(moduleKey, jTextField1.getText());
-                }
-            });
+            
         }
         return jTextField1;
     }
@@ -1158,11 +1166,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextField2 == null) {
             jTextField2 = new JTextField();
             jTextField2.setPreferredSize(new java.awt.Dimension(100,20));
-            jTextField2.addFocusListener(new java.awt.event.FocusAdapter() {
-                public void focusLost(java.awt.event.FocusEvent e) {
-                    ffc.setFfsFormatKey(moduleKey, jTextField2.getText());
-                }
-            });
+            
         }
         return jTextField2;
     }
@@ -1257,11 +1261,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jButton4.setText("New");
             jButton4.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    String[] row = {"", "", "", "", "IA32", ""};
+                    String[] row = {"", "", "", "", "", ""};
                     optionsTableModel.addRow(row);
                     Vector<Object> v = new Vector<Object>();
-                    Vector<Object> v1 = new Vector<Object>();
-                    v1.add("IA32");
+                    Vector<Object> v1 = null;
+                    
                     ffc.genModuleSAOptionsOpt(moduleKey, v, "", "", "", v1, "");
                 }
             });
@@ -1443,7 +1447,7 @@ private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
     for (int i = 0; i < al.size(); ++i) {
         String[] s = al.get(i).split(" ");
-        String mKey = s[0] + s[1] + s[2] + s[3];
+        String mKey = s[0] + " " + s[1]+ " " + s[2] + " " + s[3];
         ffc.updatePcdData(mKey, cName, tsGuid, jComboBox.getSelectedItem()+"", jTextField3.getText(), jTextField4.isVisible() ? jTextField4.getText() : jComboBox1.getSelectedItem()+"");
         s[4] = jComboBox.getSelectedItem()+"";
         al.set(i, s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" "+s[4]);

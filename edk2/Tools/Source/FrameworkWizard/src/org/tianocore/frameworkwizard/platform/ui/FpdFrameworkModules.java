@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 public class FpdFrameworkModules extends IInternalFrame {
 
@@ -56,7 +57,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private FpdFileContents ffc = null;
     private OpeningPlatformType docConsole = null;
-    private Map<String, String> fpdMsa = null;
+    private Map<String, ArrayList<String>> fpdMsa = null;
     
     private ArrayList<ModuleIdentification> miList = null;
 
@@ -137,10 +138,10 @@ public class FpdFrameworkModules extends IInternalFrame {
             jTable = new JTable(model);
             jTable.setRowHeight(20);
             model.addColumn("ModuleName");
-            model.addColumn("ModuleGUID");
             model.addColumn("ModuleVersion");
-            model.addColumn("PackageGUID");
+            model.addColumn("PackageName");
             model.addColumn("PackageVersion");
+            model.addColumn("Path");
             
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
@@ -180,34 +181,68 @@ public class FpdFrameworkModules extends IInternalFrame {
                         return;
                     }
                     
-                    String mg = (String)model.getValueAt(selectedRow, 1);
-                    String mv = (String)model.getValueAt(selectedRow, 2);
-                    String pg = (String)model.getValueAt(selectedRow, 3);
-                    String pv = (String)model.getValueAt(selectedRow, 4);
-                    if (fpdMsa.containsKey(mg + mv + pg + pv)) {
+                    String path = model.getValueAt(selectedRow, 4)+"";
+                    ModuleIdentification mi = miList.get(selectedRow);
+                    Vector<String> vArchs = null;
+                    try {
+                        vArchs = GlobalData.getModuleSupArchs(mi);
+                    }
+                    catch (Exception exp) {
+                        JOptionPane.showMessageDialog(frame, exp.getMessage());
+                    }
+                    
+                    if (vArchs == null) {
+                        JOptionPane.showMessageDialog(frame, "No supported Archs specified in MSA file.");
+                        return;
+                    }
+                    
+                    String archsAdded = "";
+                    String mg = mi.getGuid();
+                    String mv = mi.getVersion();
+                    String pg = mi.getPackage().getGuid();
+                    String pv = mi.getPackage().getVersion();
+                    
+                    ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
+                    if (al == null) {
+                        al = new ArrayList<String>();
+                        fpdMsa.put(mg + mv + pg + pv, al);
+                    }
+                    for (int i = 0; i < al.size(); ++i) {
+                        vArchs.remove(al.get(i));
+                    }
+                    //
+                    // Archs this Module supported have already been added.
+                    //
+                    if (vArchs.size() == 0) {
                         JOptionPane.showMessageDialog(frame, "This Module Already Added.");
                         return;
                     }
                     //ToDo put Arch instead of null
-                    fpdMsa.put(mg + mv + pg + pv, null);
+                    for (int i = 0; i < vArchs.size(); ++i) {
+                        String arch = vArchs.get(i);
+                        al.add(arch);
+                        archsAdded += arch + " ";
+                        String[] row = {"", mv, "", pv, arch, path};
+                        
+                       if (mi != null) {
+                           row[0] = mi.getName();
+                           row[2] = mi.getPackage().getName();
+                           
+                       }
+                       model1.addRow(row);
+                       
+                       docConsole.setSaved(false);
+                       try{
+                           //ToDo : specify archs need to add.
+                           ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
+                       }
+                       catch (Exception exception) {
+                           JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
+                       }
+                    }
                     
-                    String[] row = {" ", mg, mv, pg, pv};
-                    ModuleIdentification mi = getModuleId(mg + " " + mv + " " + pg + " " + pv);
-                    if (mi != null) {
-                        row[0] = mi.getName();
-                        row[2] = mi.getVersion();
-                        row[4] = mi.getPackage().getVersion();
-                    }
-                    model1.addRow(row);
                     
-                    docConsole.setSaved(false);
-                    try{
-                        ffc.addFrameworkModulesPcdBuildDefs(mi, null);
-                    }
-                    catch (Exception exception) {
-                        JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
-                    }
-                    JOptionPane.showMessageDialog(frame, "This Module Added Successfully.");
+                    JOptionPane.showMessageDialog(frame, "This Module with Arch "+ archsAdded +" Added Successfully.");
                     jTable1.changeSelection(model1.getRowCount()-1, 0, false, false);
                 }
             });
@@ -257,11 +292,11 @@ public class FpdFrameworkModules extends IInternalFrame {
             jTable1 = new JTable(model1);
             jTable1.setRowHeight(20);
             model1.addColumn("ModuleName");
-            model1.addColumn("ModuleGUID");
             model1.addColumn("ModuleVersion");            
-            model1.addColumn("PackageGUID");
+            model1.addColumn("PackageName");
             model1.addColumn("PackageVersion");
-//            model1.addColumn("SupportedArch");
+            model1.addColumn("SupportedArch");
+            model1.addColumn("Path");
             
             jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
@@ -288,11 +323,14 @@ public class FpdFrameworkModules extends IInternalFrame {
                         settingDlg = new FpdModuleSA(ffc);
                     }
                     docConsole.setSaved(false);
-                    String mg = model1.getValueAt(selectedRow, 1)+"";
-                    String mv = model1.getValueAt(selectedRow, 2)+"";
-                    String pg = model1.getValueAt(selectedRow, 3)+"";
-                    String pv = model1.getValueAt(selectedRow, 4)+"";
-                    settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv, selectedRow);
+                    String[] sa = new String[5];
+                    ffc.getFrameworkModuleInfo(selectedRow, sa);
+                    String mg = sa[0];
+                    String mv = sa[1];
+                    String pg = sa[2];
+                    String pv = sa[3];
+                    String arch = sa[4];
+                    settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv + " " + arch, selectedRow);
                     settingDlg.setVisible(true);
                 }
             });
@@ -316,12 +354,30 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (selectedRow < 0){
                         return;
                     }
-                    String mg = model1.getValueAt(selectedRow, 1).toString();
-                    String mv = model1.getValueAt(selectedRow, 2).toString();
-                    String pg = model1.getValueAt(selectedRow, 3).toString();
-                    String pv = model1.getValueAt(selectedRow, 4).toString();
+                    String[] sa = new String[5];
+                    ffc.getFrameworkModuleInfo(selectedRow, sa);
+                    String mg = sa[0];
+                    String mv = sa[1];
+                    String pg = sa[2];
+                    String pv = sa[3];
+                    String arch = sa[4];
+                    ModuleIdentification mi = getModuleId(sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3] + " " + sa[4]);
+                    mv = mi.getVersion();
+                    pv = mi.getPackage().getVersion();
                     model1.removeRow(selectedRow);
-                    fpdMsa.remove(mg+mv+pg+pv);
+                    if (arch == null) {
+                        // if no arch specified in ModuleSA
+                        fpdMsa.remove(mg+mv+pg+pv);
+                    }
+                    else {
+                        ArrayList<String> al = fpdMsa.get(mg+mv+pg+pv);
+                        al.remove(arch);
+                        if (al.size() == 0) {
+                            fpdMsa.remove(mg+mv+pg+pv);
+                        }
+                    }
+                    
+                    
                     docConsole.setSaved(false);
                     ffc.removeModuleSA(selectedRow);
                 }
@@ -371,21 +427,36 @@ public class FpdFrameworkModules extends IInternalFrame {
         }
         
         if (fpdMsa == null) {
-            fpdMsa = new HashMap<String, String>();
+            fpdMsa = new HashMap<String, ArrayList<String>>();
         }
         
         if (ffc.getFrameworkModulesCount() > 0) {
             String[][] saa = new String[ffc.getFrameworkModulesCount()][5];
             ffc.getFrameworkModulesInfo(saa);
             for (int i = 0; i < saa.length; ++i) {
-                ModuleIdentification mi = getModuleId(saa[i][1]+ " "+saa[i][2]+" "+saa[i][3]+" "+saa[i][4]);
+                ModuleIdentification mi = getModuleId(saa[i][0]+ " "+saa[i][1]+" "+saa[i][2]+" "+saa[i][3]);
+                String[] row = {"", "", "", "", "", ""};
                 if (mi != null) {
-                    saa[i][0] = mi.getName();
-                    saa[i][2] = mi.getVersion();
-                    saa[i][4] = mi.getPackage().getVersion();
+                    row[0] = mi.getName();
+                    row[1] = mi.getVersion();
+                    row[2] = mi.getPackage().getName();
+                    row[3] = mi.getPackage().getVersion();
+                    row[4] = saa[i][4];
+                    try{
+                        row[5] = GlobalData.getMsaFile(mi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
+                    }
+                    catch (Exception e) {
+                        JOptionPane.showMessageDialog(frame, "ShowFPDModules:" + e.getMessage());
+                    }
                 }
-                model1.addRow(saa[i]);
-                fpdMsa.put(saa[i][1]+saa[i][2]+saa[i][3]+saa[i][4], saa[i][0]);
+                model1.addRow(row);
+                ArrayList<String> al = fpdMsa.get(saa[i][0]+row[1]+saa[i][2]+row[3]);
+                if (al == null) {
+                    al = new ArrayList<String>();
+                    fpdMsa.put(saa[i][0]+row[1]+saa[i][2]+row[3], al);
+                }
+                al.add(saa[i][4]);
+                
             }
         }
         
@@ -404,15 +475,21 @@ public class FpdFrameworkModules extends IInternalFrame {
         while(ispi.hasNext()) {
             PackageIdentification pi = (PackageIdentification)ispi.next();
             String[] s = {"", "", "", "", ""};
-            s[3] = pi.getGuid();
-            s[4] = pi.getVersion();
+            
             Set<ModuleIdentification> smi = GlobalData.getModules(pi);
             Iterator ismi = smi.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
                 s[0] = mi.getName();
-                s[1] = mi.getGuid();
-                s[2] = mi.getVersion();
+                s[1] = mi.getVersion();
+                s[2] = pi.getName();
+                s[3] = pi.getVersion();
+                try {
+                    s[4] = GlobalData.getMsaFile(mi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
+                }
+                catch (Exception e) {
+                    JOptionPane.showMessageDialog(frame, "ShowAllModules:" + e.getMessage());
+                }
                 model.addRow(s);
                 miList.add(mi);
             }
@@ -433,7 +510,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private ModuleIdentification getModuleId(String key){
         //
-        // Get ModuleGuid, ModuleVersion, PackageGuid, PackageVersion into string array.
+        // Get ModuleGuid, ModuleVersion, PackageGuid, PackageVersion, Arch into string array.
         //
         String[] keyPart = key.split(" ");
         Set<PackageIdentification> spi = GlobalData.getPackageList();

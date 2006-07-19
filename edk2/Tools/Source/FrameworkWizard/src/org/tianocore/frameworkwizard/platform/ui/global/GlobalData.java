@@ -32,8 +32,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Logger;
 
 /**
@@ -95,45 +97,6 @@ public class GlobalData {
     /// built modules list with ARCH, TARGET, TOOLCHAIN
     ///
     private static Set<FpdModuleIdentification> builtModules = new HashSet<FpdModuleIdentification>();
-    
-    ///
-    /// PCD memory database stored all PCD information which collected from FPD,MSA and SPD.
-    ///
-//    private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
-
-    ///
-    /// build target + tool chain family/tag name + arch + command types + command options
-    ///
-    private static Map<String, Object> toolChainOptions;
-    private static Map<String, Object> toolChainFamilyOptions;
-    private static Map<String, String> toolChainDefinitions;
-    ///
-    ///
-    ///
-    private static Set<String> targets;
-    ///
-    ///
-    ///
-    private static Set<String> toolChainFamilies;
-    ///
-    ///
-    ///
-    private static Set<String> toolChains;
-    ///
-    /// keep track which toolchain family a toolchain tag belongs to
-    ///
-    private static Map<String, Set<String>> toolChainFamilyMap;
-    private static Map<String, Set<String>> toolChainCommandMap;
-    
-    ///
-    /// list of Arch: EBC, ARM, IA32, X64, IPF, PPC
-    ///
-    private static Set<String> archs;
-
-    ///
-    /// list of Command Type: CC, LIB, LINK, ASL, ASM, ASMLINK, PP
-    ///
-    private static Set<String> commandTypes;
     
     /**
       Parse framework database (DB) and all SPD files listed in DB to initialize
@@ -465,134 +428,24 @@ public class GlobalData {
         return result;
     }
 
-    ////// Tool Chain Related, try to refine and put some logic process to ToolChainFactory
-    public static void setBuildToolChainFamilyOptions(Map<String, Object> map) {
-        toolChainFamilyOptions = map;
-    }
-
-    public static Map<String, Object> getToolChainFamilyOptions() {
-        return toolChainFamilyOptions;
-    }
-
-    public static void setBuildToolChainOptions(Map<String, Object> map) {
-        toolChainOptions = map;
-    }
-
-    public static Map<String, Object> getToolChainOptions() {
-        return toolChainOptions;
-    }
-
-    public static void setTargets(Set<String> targetSet) {
-        GlobalData.log.info("TargetSet: " + targetSet);
-        targets = targetSet;
-    }
-
-    public static String[] getTargets() {
-        return (String[])targets.toArray(new String[targets.size()]);
-    }
-
-    public static void setToolChains(Set<String> toolChainSet) {
-        toolChains = toolChainSet;
-    }
-
-    public static String[] getToolChains() {
-        String[] toolChainList = new String[toolChains.size()];
-        return (String[])toolChains.toArray(toolChainList);
-    }
-
-    public static void setToolChainFamilies(Set<String> toolChainFamilySet) {
-        toolChainFamilies = toolChainFamilySet;
-    }
-
-    public static void setToolChainFamiliyMap(Map<String, Set<String>> map) {
-        /*
-        Set<String> keys = map.keySet();
-        Iterator it = keys.iterator();
-        while (it.hasNext()) {
-            String toolchain = (String)it.next();
-            Set<String> familyMap = (Set<String>)map.get(toolchain);
-            Iterator fit = familyMap.iterator();
-            System.out.print(toolchain + ": ");
-            while (fit.hasNext()) {
-                System.out.print((String)fit.next() + " ");
+    
+    public static Vector<String> getModuleSupArchs(ModuleIdentification mi) throws Exception{
+        Vector<String> vArchs = null;
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)getModuleXmlObject(mi);
+        if (msa.getModuleDefinitions() == null || msa.getModuleDefinitions().getSupportedArchitectures() == null) {
+            return vArchs;
+        }
+        ListIterator li = msa.getModuleDefinitions().getSupportedArchitectures().listIterator();
+        while (li.hasNext()) {
+            if (vArchs == null) {
+                vArchs = new Vector<String>();
             }
-            System.out.println("");
+            vArchs.add((String)li.next());
         }
-        */
-        toolChainFamilyMap = map;
+        
+        return vArchs;
     }
-
-    public static String[] getToolChainFamilies() {
-        String[] toolChainFamilyList = new String[toolChainFamilies.size()];
-        return (String[])toolChainFamilies.toArray(toolChainFamilyList);
-    }
-
-    public static String[] getToolChainFamilies(String toolChain) {
-        Set<String> familySet = (Set<String>)toolChainFamilyMap.get(toolChain);
-        String[] toolChainFamilyList = new String[familySet.size()];
-        return (String[])familySet.toArray(toolChainFamilyList);
-    }
-
-    public static Set<String> getToolChainFamilySet(String toolChain) {
-        return (Set<String>)toolChainFamilyMap.get(toolChain);
-    }
-
-    public static void setArchs(Set<String> archSet) {
-        archs = archSet;
-    }
-
-    public static String[] getArchs() {
-        String[] archList = new String[archs.size()];
-        return (String[])archs.toArray(archList);
-    }
-    /*
-
-     */
-    public static void SetCommandTypes(Set<String> commandTypeSet) {
-        commandTypes = commandTypeSet;
-    }
-    /*
-
-     */
-    public static void SetCommandTypes(Map<String, Set<String>> commandTypeMap) {
-        toolChainCommandMap = commandTypeMap;
-    }
-    /*
-
-     */
-    public static String[] getCommandTypes() {
-        String[] commandList = new String[commandTypes.size()];
-        return (String[])commandTypes.toArray(commandList);
-    }
-    /*
-
-     */
-    public static String[] getCommandTypes(String toolChain) {
-        Set<String> commands = (Set<String>)toolChainCommandMap.get(toolChain);
-        if (commands == null) {
-            return new String[0];
-        }
-
-        String[] commandList = new String[commands.size()];
-        return (String[])commands.toArray(commandList);
-    }
-    /*
-
-     */
-    public static String getCommandSetting(String commandDescString) {
-        return (String)toolChainDefinitions.get(commandDescString);
-    }
-    /*
-
-     */
-    public static void setToolChainDefinitions(Map<String, String> def) {
-        toolChainDefinitions = def;
-    }
-
-    public static Map<String, String> getToolChainDefinitions() {
-        return toolChainDefinitions;
-    }
-
+    
 }
 
 final class KeyComparator implements Comparator<String> {
