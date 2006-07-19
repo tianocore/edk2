@@ -29,6 +29,7 @@ import java.awt.FlowLayout;
 
 
 import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -332,6 +333,7 @@ public class FpdPlatformDefs extends IInternalFrame {
        if (jCheckBox6.isSelected()) {
            v.add("PPC");
        }
+       
    }
  
     /**
@@ -406,6 +408,10 @@ public class FpdPlatformDefs extends IInternalFrame {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
+                    if (v.size() == 0) {
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        return;
+                    }
                     ffc.setPlatformDefsSupportedArchs(v);
                 }
             });
@@ -426,6 +432,10 @@ public class FpdPlatformDefs extends IInternalFrame {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
+                    if (v.size() == 0) {
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        return;
+                    }
                     ffc.setPlatformDefsSupportedArchs(v);
                 }
             });
@@ -446,6 +456,10 @@ public class FpdPlatformDefs extends IInternalFrame {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
+                    if (v.size() == 0) {
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        return;
+                    }
                     ffc.setPlatformDefsSupportedArchs(v);
                 }
             });
@@ -700,6 +714,10 @@ public class FpdPlatformDefs extends IInternalFrame {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
+                    if (v.size() == 0) {
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        return;
+                    }
                     ffc.setPlatformDefsSupportedArchs(v);
                 }
             });
@@ -717,10 +735,15 @@ public class FpdPlatformDefs extends IInternalFrame {
             jCheckBox5 = new JCheckBox();
             jCheckBox5.setPreferredSize(new java.awt.Dimension(52,20));
             jCheckBox5.setText("ARM");
+            jCheckBox5.setVisible(false);
             jCheckBox5.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
+                    if (v.size() == 0) {
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        return;
+                    }
                     ffc.setPlatformDefsSupportedArchs(v);
                 }
             });
@@ -738,10 +761,15 @@ public class FpdPlatformDefs extends IInternalFrame {
             jCheckBox6 = new JCheckBox();
             jCheckBox6.setPreferredSize(new Dimension(50, 20));
             jCheckBox6.setText("PPC");
+            jCheckBox6.setVisible(false);
             jCheckBox6.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
+                    if (v.size() == 0) {
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        return;
+                    }
                     ffc.setPlatformDefsSupportedArchs(v);
                 }
             });
