@@ -5,8 +5,8 @@
   DXE modules follow the public Framework specifications and the UEFI 
   specifiations. The build infrastructure must set 
   EFI_SPECIFICATION_VERSION  before including  this file. To support 
-  R9/UEFI2.0 set EFI_SPECIFIATION_VERSION to 0x00020000. To support 
-  R8.5/EFI 1.10 set EFI_SPECIFIATION_VERSION to 0x00010010. 
+  EDK II/UEFI2.0 set EFI_SPECIFIATION_VERSION to 0x00020000. To support 
+  EDK/EFI 1.10 set EFI_SPECIFIATION_VERSION to 0x00010010. 
   EDK_RELEASE_VERSION must be set to a non zero value.
   EFI_SPECIFIATION_VERSION and EDK_RELEASE_VERSION are set automatically
   by the build infrastructure for every module.

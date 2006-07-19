@@ -5,8 +5,8 @@
   UEFI modules follow the public EFI 1.10 or UEFI 2.0 specifications and
   also contains the infrastructure required to build modules. The build 
   infrastructure must set EFI_SPECIFICATION_VERSION  before including  this 
-  file. To support R9/UEFI2.0 set EFI_SPECIFIATION_VERSION to 0x00020000. To 
-  support R8.5/EFI 1.10 set EFI_SPECIFIATION_VERSION to 0x00010010. 
+  file. To support EDK II/UEFI2.0 set EFI_SPECIFIATION_VERSION to 0x00020000. To 
+  support EDK/EFI 1.10 set EFI_SPECIFIATION_VERSION to 0x00010010. 
   Seting EDK_RELEASE_VERSION to zero implies no Tiano extensions and a
   non zero value implies Tiano extensions are availible. 
   EFI_SPECIFIATION_VERSION and EDK_RELEASE_VERSION are set automatically
@@ -48,14 +48,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Common/UefiBaseTypes.h>
 #include <Uefi/UefiSpec.h>
-
-//
-// Need due to R8.5 Tiano contamination of UEFI enumes. 
-// There is a UEFI library that does things the new way and the old way
-// This is why these definitions are need in Uefi.h
-//
-#include <Guid/EventLegacyBios.h>
-#include <Guid/FrameworkDevicePath.h>
 
 
 //
