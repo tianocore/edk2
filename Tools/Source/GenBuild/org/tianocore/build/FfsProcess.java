@@ -163,45 +163,16 @@ public class FfsProcess {
         }
         
         //
-        // if module specify sections itself, it's okay
-        // otherwise find sections from WORKSPACE default setting with
-        // ComponentType
+        // If FfsFormatKey is not null, report exception and fail build
+        // Otherwise report warning message
         //
-        if (ffs == null) {
-            File file = new File(project.getProperty("COMMON_FILE"));
-            //
-            // if common file is not existed, just return
-            //
-            if (!file.exists()) {
-                return false;
+        if (buildType == null) {
+            System.out.println("Warning: this module doesn't specify a FfsFormatKey. ");
             }
-            DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
-            try {
-                DocumentBuilder dombuilder = domfac.newDocumentBuilder();
-                InputStream is = new FileInputStream(file);
-                Document doc = dombuilder.parse(is);
-                Element root = doc.getDocumentElement();
-                NodeList items = root.getChildNodes();
-                for (int i = 0; i < items.getLength(); i++) {
-                    Node node = items.item(i);
-                    if (node.getNodeType() == Node.ELEMENT_NODE) {
-                        String nodeName = node.getNodeName();
-                        if (nodeName.equalsIgnoreCase("Ffs")) {
-                            NamedNodeMap attr = node.getAttributes();
-                            Node type = attr.getNamedItem("type");
-                            if (type != null) {
-                                if (isMatch(type.getTextContent(), buildType)) {
-                                    ffs = node;
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                throw new BuildException("Parse COMMON_FILE [" + file.getPath() + "] error!\n" + e.getMessage());
-            }
+        else {
+            throw new BuildException("Can't find FfsFormatKey [" + buildType + "] in FPD file. ");            
         }
+
         if (ffs == null) {
             return false;
         } else {
