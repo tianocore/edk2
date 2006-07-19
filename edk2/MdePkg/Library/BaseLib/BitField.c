@@ -14,8 +14,19 @@
 
 **/
 
+/**
+  Worker function that returns a bit field from Operand
+
+  Returns the bitfield specified by the StartBit and the EndBit from Operand.
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+
+  @return The bit field read.
+
+**/
 unsigned int
-EFIAPI
 BitFieldReadUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -29,8 +40,23 @@ BitFieldReadUint (
   return (Operand & ~((unsigned int)-2 << EndBit)) >> StartBit;
 }
 
+/**
+  Worker function that reads a bit field from Operand, performs a bitwise OR, 
+  and returns the result.
+
+  Performs a bitwise OR between the bit field specified by StartBit and EndBit
+  in Operand and the value specified by AndData. All other bits in Operand are
+  preserved. The new value is returned.
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+  @param  OrData    The value to OR with the read value from the value
+
+  @return The new value.
+
+**/
 unsigned int
-EFIAPI
 BitFieldOrUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -42,11 +68,26 @@ BitFieldOrUint (
   // ~((unsigned int)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
   // are 1's while bit[EndBit + 1] thru the most significant bit are 0's.
   //
-  return Operand | ((OrData << StartBit) & ~((unsigned int)-2 << EndBit));
+  return Operand | ((OrData << StartBit) & ~((unsigned int) -2 << EndBit));
 }
 
+/**
+  Worker function that reads a bit field from Operand, performs a bitwise AND, 
+  and returns the result.
+
+  Performs a bitwise AND between the bit field specified by StartBit and EndBit
+  in Operand and the value specified by AndData. All other bits in Operand are
+  preserved. The new value is returned.
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+  @param  AndData    The value to And with the read value from the value
+
+  @return The new value.
+
+**/
 unsigned int
-EFIAPI
 BitFieldAndUint (
   IN      unsigned int              Operand,
   IN      UINTN                     StartBit,
@@ -58,7 +99,7 @@ BitFieldAndUint (
   // ~((unsigned int)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
   // are 1's while bit[EndBit + 1] thru the most significant bit are 0's.
   //
-  return Operand & ~((~AndData << StartBit) & ~((unsigned int)-2 << EndBit));
+  return Operand & ~((~AndData << StartBit) & ~((unsigned int) -2 << EndBit));
 }
 
 /**

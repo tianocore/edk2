@@ -988,4 +988,5 @@ MemoryFence (
   VOID
   )
 {
+  return;
 }

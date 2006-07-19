@@ -16,12 +16,28 @@
 
 #include "../BaseLibInternals.h"
 
+/**
+  Worker function that Divides a 64-bit signed integer by a 64-bit signed integer and 
+  generates a  64-bit signed result and a optional 64-bit signed remainder.
+
+  This function divides the 64-bit unsigned value Dividend by the 64-bit
+  unsigned value Divisor and generates a 64-bit unsigned quotient. If Remainder
+  is not NULL, then the 64-bit unsigned remainder is returned in Remainder.
+  This function returns the 64-bit unsigned quotient.
+
+  @param  Dividend  A 64-bit signed value.
+  @param  Divisor   A 64-bit signed value.
+  @param  Remainder A pointer to a 64-bit signed value. This parameter is
+                    optional and may be NULL.
+
+  @return Dividend / Divisor
+
+**/
 INT64
-EFIAPI
 InternalMathDivRemS64x64 (
   IN      INT64                     Dividend,
   IN      INT64                     Divisor,
-  OUT     INT64                     *Remainder
+  OUT     INT64                     *Remainder  OPTIONAL
   )
 {
   INT64                             Quot;

@@ -38,7 +38,7 @@ EFIAPI
 DivS64x64Remainder (
   IN      INT64                     Dividend,
   IN      INT64                     Divisor,
-  OUT     INT64                     *Remainder
+  OUT     INT64                     *Remainder  OPTIONAL
   )
 {
   ASSERT (Divisor != 0);

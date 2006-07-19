@@ -617,9 +617,21 @@ AsciiStrCmp (
   return *FirstString - *SecondString;
 }
 
+/**
+  Converts a lowercase Ascii character to upper one
+
+  If Chr is lowercase Ascii character, then converts it to upper one.
+
+  If Value >= 0xA0, then ASSERT().
+  If (Value & 0x0F) >= 0x0A, then ASSERT().
+
+  @param  chr   one Ascii character
+
+  @return The uppercase value of Ascii character 
+
+**/
 STATIC
 CHAR8
-EFIAPI
 AsciiToUpper (
   IN      CHAR8                     Chr
   )

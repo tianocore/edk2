@@ -14,6 +14,23 @@
 
 **/
 
+/**
+  Performs an atomic compare exchange operation on a 32-bit unsigned integer.
+
+  Performs an atomic compare exchange operation on the 32-bit unsigned integer
+  specified by Value.  If Value is equal to CompareValue, then Value is set to 
+  ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
+  then Value is returned.  The compare exchange operation must be performed using 
+  MP safe mechanisms.
+
+  @param  Value         A pointer to the 32-bit value for the compare exchange
+                        operation.
+  @param  CompareValue  32-bit value used in compare operation.
+  @param  ExchangeValue 32-bit value used in exchange operation.
+
+  @return The original *Value before exchange.
+
+**/
 UINT32
 EFIAPI
 InternalSyncCompareExchange32 (
@@ -22,6 +39,19 @@ InternalSyncCompareExchange32 (
   IN      UINT32                    ExchangeValue
   );
 
+/**
+  Performs an atomic increment of an 32-bit unsigned integer.
+
+  Performs an atomic increment of the 32-bit unsigned integer specified by
+  Value and returns the incremented value. The increment operation must be
+  performed using MP safe mechanisms. The state of the return value is not
+  guaranteed to be MP safe.
+
+  @param  Value A pointer to the 32-bit value to increment.
+
+  @return The incremented value.
+
+**/
 UINT32
 EFIAPI
 InternalSyncIncrement (
@@ -40,6 +70,19 @@ InternalSyncIncrement (
   return OriginalValue + 1;
 }
 
+/**
+  Performs an atomic decrement of an 32-bit unsigned integer.
+
+  Performs an atomic decrement of the 32-bit unsigned integer specified by
+  Value and returns the decrement value. The decrement operation must be
+  performed using MP safe mechanisms. The state of the return value is not
+  guaranteed to be MP safe.
+
+  @param  Value A pointer to the 32-bit value to decrement.
+
+  @return The decrement value.
+
+**/
 UINT32
 EFIAPI
 InternalSyncDecrement (
