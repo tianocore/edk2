@@ -624,9 +624,17 @@ LibPcdSetExBool (
   If Guid is NULL, then the default token space is used. 
   If NotificationFunction is NULL, then ASSERT().
 
+  This notification function serves two purposes. Firstly, it notifies the module which 
+  did the registration that the value of this PCD token has been set. Secondly, 
+  it provides a mechanism for the module which did the registration to intercept 
+  the set operation and override the value been set if necessary. After the invocation 
+  of the callback function, TokenData will be used by PCD service PEIM or driver to 
+  modify the internal data in PCD database. 
+
+
   @param[in]  CallBackGuid The PCD token GUID being set.
   @param[in]  CallBackToken The PCD token number being set.
-  @param[in]  TokenData A pointer to the token data being set.
+  @param[in, out]  TokenData A pointer to the token data being set.
   @param[in]  TokenDataSize The size, in bytes, of the data being set.
 
   @retval VOID

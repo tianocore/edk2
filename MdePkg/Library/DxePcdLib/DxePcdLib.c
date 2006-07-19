@@ -806,7 +806,7 @@ LibPcdCallbackOnSet (
 
   ASSERT (NotificationFunction != NULL);
 
-  Status = mPcd->CallbackOnSet (TokenNumber, Guid, NotificationFunction);
+  Status = mPcd->CallbackOnSet (Guid, TokenNumber, NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -838,7 +838,7 @@ LibPcdCancelCallback (
 
   ASSERT (NotificationFunction != NULL);
     
-  Status = mPcd->CancelCallback (TokenNumber, Guid, NotificationFunction);
+  Status = mPcd->CancelCallback (Guid, TokenNumber, NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 

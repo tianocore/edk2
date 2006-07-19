@@ -43,7 +43,7 @@ extern EFI_GUID gPcdPpiGuid;
   the system uses the default SKU Id. If the system attempts to use the default SKU Id and no value has been 
   set for that Id, the results are unpredictable.
 
-  @param  SkuId The SKU value that will be used when the PCD service will retrieve and 
+  @param[in]  SkuId The SKU value that will be used when the PCD service will retrieve and 
               set values associated with a PCD token.
 
   @retval VOID
@@ -63,7 +63,7 @@ VOID
   Retrieves the current byte-sized value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
-  @param  TokenNumber The PCD token number. 
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The UINT8 value.
   
@@ -82,7 +82,7 @@ UINT8
   Retrieves the current 16-bits value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
-  @param  TokenNumber The PCD token number. 
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The UINT16 value.
   
@@ -101,7 +101,7 @@ UINT16
   Retrieves the current 32-bits value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
-  @param  TokenNumber The PCD token number. 
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The UINT32 value.
   
@@ -120,7 +120,7 @@ UINT32
   Retrieves the current 64-bits value for a PCD token number.  
   If the TokenNumber is invalid, the results are unpredictable.
   
-  @param  TokenNumber The PCD token number. 
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The UINT64 value.
   
@@ -141,7 +141,7 @@ UINT64
   is returned by this function call.  If the TokenNumber is invalid, 
   the results are unpredictable.
 
-  @param  TokenNumber The PCD token number. 
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The pointer to the buffer to be retrived.
   
@@ -162,7 +162,7 @@ VOID *
   is returned by this function call.  If the TokenNumber is invalid, 
   the results are unpredictable.
 
-  @param  TokenNumber The PCD token number. 
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The Boolean value.
   
@@ -181,7 +181,7 @@ BOOLEAN
   Retrieves the current size of a particular PCD token.  
   If the TokenNumber is invalid, the results are unpredictable.
 
-  @param  TokenNumber The PCD token number. 
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The size of the value for the PCD token.
   
@@ -202,8 +202,8 @@ UINTN
   specified by Guid does not exist, the results are 
   unpredictable.
 
-  @param  Guid The token space for the token number.
-  @param  TokenNumber The PCD token number. 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The size 8-bit value for the PCD token.
   
@@ -225,8 +225,8 @@ UINT8
   specified by Guid does not exist, the results are 
   unpredictable.
 
-  @param  Guid The token space for the token number.
-  @param  TokenNumber The PCD token number. 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The size 16-bit value for the PCD token.
   
@@ -248,8 +248,8 @@ UINT16
   specified by Guid does not exist, the results are 
   unpredictable.
 
-  @param  Guid The token space for the token number.
-  @param  TokenNumber The PCD token number. 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The size 32-bit value for the PCD token.
   
@@ -271,8 +271,8 @@ UINT32
   specified by Guid does not exist, the results are 
   unpredictable.
 
-  @param  Guid The token space for the token number.
-  @param  TokenNumber The PCD token number. 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The size 64-bit value for the PCD token.
   
@@ -294,8 +294,8 @@ UINT64
   is returned by this function call.  If the TokenNumber is invalid, 
   the results are unpredictable.
 
-  @param  Guid The token space for the token number.
-  @param  TokenNumber The PCD token number. 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The pointer to the buffer to be retrived.
   
@@ -317,8 +317,8 @@ VOID *
   specified by Guid does not exist, the results are 
   unpredictable.
 
-  @param  Guid The token space for the token number.
-  @param  TokenNumber The PCD token number. 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The size Boolean value for the PCD token.
   
@@ -338,8 +338,8 @@ BOOLEAN
   Retrieves the current size of a particular PCD token.  
   If the TokenNumber is invalid, the results are unpredictable.
 
-  @param  Guid The token space for the token number.
-  @param  TokenNumber The PCD token number. 
+  @param[in]  Guid The token space for the token number.
+  @param[in]  TokenNumber The PCD token number. 
 
   @return The size of the value for the PCD token.
   
@@ -360,8 +360,8 @@ UINTN
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -386,8 +386,8 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -412,8 +412,8 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -438,8 +438,8 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -465,12 +465,12 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  TokenNumber The PCD token number. 
-  @param SizeOfBuffer A pointer to the length of the value being set for the PCD token.  
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in, out] SizeOfBuffer A pointer to the length of the value being set for the PCD token.  
                               On input, if the SizeOfValue is greater than the maximum size supported 
                               for this TokenNumber then the output value of SizeOfValue will reflect 
                               the maximum size supported for this TokenNumber.
-  @param  Buffer The buffer to set for the PCD token.
+  @param[in]  Buffer The buffer to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -496,8 +496,8 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -522,9 +522,9 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -550,9 +550,9 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -578,9 +578,9 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -606,9 +606,9 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -634,13 +634,13 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  TokenNumber The PCD token number. 
-  @param SizeOfBuffer A pointer to the length of the value being set for the PCD token.  
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in, out] SizeOfBuffer A pointer to the length of the value being set for the PCD token.  
                               On input, if the SizeOfValue is greater than the maximum size supported 
                               for this TokenNumber then the output value of SizeOfValue will reflect 
                               the maximum size supported for this TokenNumber.
-  @param  Buffer The buffer to set for the PCD token.
+  @param[in]  Buffer The buffer to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -667,9 +667,9 @@ EFI_STATUS
   size of the value being set is compatible with the Token's existing definition.  
   If it is not, an error will be returned.
 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  TokenNumber The PCD token number. 
-  @param  Value The value to set for the PCD token.
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Value The value to set for the PCD token.
 
   @retval EFI_SUCCESS  Procedure returned successfully.
   @retval EFI_INVALID_PARAMETER The PCD service determined that the size of the data 
@@ -691,10 +691,17 @@ EFI_STATUS
 /**
   Callback on SET function prototype definition.
 
-  @param  CallBackGuid The PCD token GUID being set.
-  @param  CallBackToken The PCD token number being set.
-  @param  TokenData A pointer to the token data being set.
-  @param  TokenDataSize The size, in bytes, of the data being set.
+  This notification function serves two purposes. Firstly, it notifies the module 
+  which did the registration that the value of this PCD token has been set. Secondly, 
+  it provides a mechanism for the module which did the registration to intercept the set 
+  operation and override the value been set if necessary. After the invocation of the 
+  callback function, TokenData will be used by PCD service PEIM to modify the internal data 
+  in PCD database.
+
+  @param[in]  CallBackGuid The PCD token GUID being set.
+  @param[in]  CallBackToken The PCD token number being set.
+  @param[in, out]  TokenData A pointer to the token data being set.
+  @param[in]  TokenDataSize The size, in bytes, of the data being set.
 
   @retval VOID
 
@@ -713,9 +720,9 @@ VOID
 /**
   Specifies a function to be called anytime the value of a designated token is changed.
 
-  @param  TokenNumber The PCD token number. 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  CallBackFunction The function prototype called when the value associated with the CallBackToken is set.  
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  CallBackFunction The function prototype called when the value associated with the CallBackToken is set.  
 
   @retval EFI_SUCCESS  The PCD service has successfully established a call event 
                         for the CallBackToken requested.
@@ -725,8 +732,8 @@ VOID
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_CALLBACK_ONSET) (
-  IN  UINTN                  TokenNumber,
   IN  CONST EFI_GUID         *Guid, OPTIONAL
+  IN  UINTN                  TokenNumber,
   IN  PCD_PPI_CALLBACK       CallBackFunction
   );
 
@@ -735,9 +742,9 @@ EFI_STATUS
 /**
   Cancels a previously set callback function for a particular PCD token number.
 
-  @param  TokenNumber The PCD token number. 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  CallBackFunction The function prototype called when the value associated with the CallBackToken is set.  
+  @param[in]  TokenNumber The PCD token number. 
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in]  CallBackFunction The function prototype called when the value associated with the CallBackToken is set.  
 
   @retval EFI_SUCCESS  The PCD service has successfully established a call event 
                         for the CallBackToken requested.
@@ -747,8 +754,8 @@ EFI_STATUS
 typedef
 EFI_STATUS
 (EFIAPI *PCD_PPI_CANCEL_CALLBACK) (
-  IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  UINTN                   TokenNumber,
   IN  PCD_PPI_CALLBACK        CallBackFunction
   );
 
@@ -757,12 +764,19 @@ EFI_STATUS
 /**
   Retrieves the next valid PCD token for a given namespace.
 
-  @param  Guid The 128-bit unique value that designates the namespace from which to extract the value.
-  @param  TokenNumber A pointer to the PCD token number to use to find the subsequent token number.  
-                              To retrieve the "first" token, have the pointer reference a TokenNumber value of 0.
+  @param[in]  Guid The 128-bit unique value that designates the namespace from which to extract the value.
+  @param[in, out]  TokenNumber A pointer to the PCD token number to use to find the subsequent token number.
+                    If the input token namespace or token number does not exist on the platform, an error is 
+                    returned and the value of *TokenNumber is undefined. To retrieve the ¡°first¡± token, 
+                    have the pointer reference a TokenNumber value of 0. If the input token number is 0 
+                    and there is no valid token number for this token namespace,  *TokenNumber will be 
+                    assigned to 0 and the function return EFI_SUCCESS. If the token number is the last valid 
+                    token number, *TokenNumber will be assigned to 0 and the function return EFI_SUCCESS.
 
-  @retval EFI_SUCCESS  The PCD service retrieved the value requested.
-  @retval EFI_NOT_FOUND The PCD service could not find data from the requested token number.
+  @retval EFI_SUCCESS  The PCD service has retrieved the next valid token number. 
+                        Or the input token number is already the last valid token number in the PCD database. 
+                        In the later case, *TokenNumber is updated with the value of 0.
+  @retval EFI_NOT_FOUND If this input token number and token namespace does not exist on the platform.
 
 **/
 typedef 
@@ -777,17 +791,23 @@ EFI_STATUS
 /**
   Retrieves the next valid PCD token namespace for a given namespace.
 
-  @param  Guid An indirect pointer to EFI_GUID.  On input it designates a known 
-                    token namespace from which the search will start. On output, 
-                    it designates the next valid token namespace on the platform. 
-                    If *Guid is NULL, then the GUID of the first token space of the current platform is returned.
-                    If this input token namespace is the last tokenspace on the platform,
+  @param[in, out]  Guid An indirect pointer to EFI_GUID.  On input it designates a known 
+                    token namespace from which the search will start. On output, it designates 
+                    the next valid token namespace on the platform. If the input token namespace 
+                    does not exist on the platform, an error is returned and the value of *Guid is 
+                    undefined. If *Guid is NULL, then the GUID of the first token space of the 
+                    current platform is assigned to *Guid the function return EFI_SUCCESS. 
+                    If  *Guid is NULL  and there is no namespace exist in the platform other than the default 
+                    (NULL) tokennamespace, *Guid is unchanged and the function return EFI_SUCCESS. 
+                    If this input token namespace is the last namespace on the platform, 
                     *Guid will be assigned to NULL and the function return EFI_SUCCESS.
-                    If the search cannot locate the input token namespace, an error is returned and 
-                    the value of *Guid is undefined. 
 
-  @retval EFI_SUCCESS  The PCD service retrieved the value requested.
-  @retval EFI_NOT_FOUND The PCD service could not find the input token namespace.
+  @retval EFI_SUCCESS  The PCD service has retrieved the next valid token namespace. 
+                        Or the input token namespace is already the last valid token 
+                        number in the PCD database. In the later case, *Guid is updated 
+                        with the value of NULL. Or the input token name space is NULL and there 
+                        is no valid token namespace other than the default namespace (NULL).
+  @retval EFI_NOT_FOUND If the input token namespace does not exist on the platform.
 
 **/
 typedef
