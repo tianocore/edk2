@@ -1990,14 +1990,12 @@ public class AutoGen {
 			//
 			Count = 0;
 			if (exitBootList != null) {
-				if (setVirtualList != null) {
-					for (i = 0; i < exitBootList.length; i++) {
-						if (exitBootList[i].equalsIgnoreCase("")) {
-							break;
-						}
+				for (i = 0; i < exitBootList.length; i++) {
+					if (exitBootList[i].equalsIgnoreCase("")) {
+						break;
 					}
-					Count = i;
 				}
+				Count = i;
 			}
 			fileBuffer.append(Integer.toString(Count));
 			fileBuffer.append(";\r\n\r\n");
