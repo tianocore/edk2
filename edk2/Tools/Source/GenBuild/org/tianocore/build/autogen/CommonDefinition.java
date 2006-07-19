@@ -17,6 +17,7 @@ package org.tianocore.build.autogen;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -332,7 +333,7 @@ public class CommonDefinition {
      * @return String[] String list which remove the duplicate string.
      */
     public static String[] remDupString (String[] orgList){
-        Set<String> strList = new HashSet<String>();
+        Set<String> strList = new LinkedHashSet<String>();
         String[] desList ;
         if (orgList == null){
             return new String[0];
