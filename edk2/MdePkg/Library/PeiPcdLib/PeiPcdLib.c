@@ -906,7 +906,7 @@ LibPcdCallbackOnSet (
   PcdPpi = GetPcdPpiPtr ();
 
 
-  Status = PcdPpi->CallbackOnSet (TokenNumber, Guid, NotificationFunction);
+  Status = PcdPpi->CallbackOnSet (Guid, TokenNumber, NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 
@@ -940,7 +940,7 @@ LibPcdCancelCallback (
   PcdPpi = GetPcdPpiPtr ();
 
 
-  Status = PcdPpi->CancelCallback (TokenNumber, Guid, NotificationFunction);
+  Status = PcdPpi->CancelCallback (Guid, TokenNumber, NotificationFunction);
 
   ASSERT_EFI_ERROR (Status);
 

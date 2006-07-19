@@ -279,8 +279,8 @@ PeiPcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 PeiRegisterCallBackOnSet (
-  IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  UINTN                   TokenNumber,
   IN  PCD_PPI_CALLBACK        CallBackFunction
   )
 ;
@@ -289,8 +289,8 @@ PeiRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 PcdUnRegisterCallBackOnSet (
-  IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  UINTN                   TokenNumber,
   IN  PCD_PPI_CALLBACK        CallBackFunction
   )
 ;

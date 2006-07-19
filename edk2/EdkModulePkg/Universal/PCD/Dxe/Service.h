@@ -284,8 +284,8 @@ DxePcdSetBoolEx (
 EFI_STATUS
 EFIAPI
 DxeRegisterCallBackOnSet (
-  IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 ;
@@ -294,8 +294,8 @@ DxeRegisterCallBackOnSet (
 EFI_STATUS
 EFIAPI
 DxeUnRegisterCallBackOnSet (
-  IN  UINTN                   TokenNumber,
   IN  CONST EFI_GUID          *Guid, OPTIONAL
+  IN  UINTN                   TokenNumber,
   IN  PCD_PROTOCOL_CALLBACK   CallBackFunction
   )
 ;
