@@ -2474,6 +2474,14 @@ InterlockedDecrement (
 /**
   Performs an atomic compare exchange operation on a 32-bit unsigned integer.
 
+  Performs an atomic compare exchange operation on the 32-bit unsigned integer
+  specified by Value.  If Value is equal to CompareValue, then Value is set to 
+  ExchangeValue and CompareValue is returned.  If Value is not equal to CompareValue,
+  then Value is returned.  The compare exchange operation must be performed using 
+  MP safe mechanisms.
+
+  If Value is NULL, then ASSERT().
+
   @param  Value         A pointer to the 32-bit value for the compare exchange
                         operation.
   @param  CompareValue  32-bit value used in compare operation.
@@ -2492,6 +2500,13 @@ InterlockedCompareExchange32 (
 
 /**
   Performs an atomic compare exchange operation on a 64-bit unsigned integer.
+
+  Performs an atomic compare exchange operation on the 64-bit unsigned integer specified 
+  by Value.  If Value is equal to CompareValue, then Value is set to ExchangeValue and 
+  CompareValue is returned.  If Value is not equal to CompareValue, then Value is returned. 
+  The compare exchange operation must be performed using MP safe mechanisms.
+
+  If Value is NULL, then ASSERT().
 
   @param  Value         A pointer to the 64-bit value for the compare exchange
                         operation.
@@ -2566,6 +2581,7 @@ MemoryFence (
   calls to LongJump() cause a non-zero value to be returned by SetJump().
 
   If JumpBuffer is NULL, then ASSERT().
+  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
 
   @param  JumpBuffer  A pointer to CPU context buffer.
 
@@ -2586,6 +2602,7 @@ SetJump (
   the state of JumpBuffer.
 
   If JumpBuffer is NULL, then ASSERT().
+  For IPF CPUs, if JumpBuffer is not aligned on a 16-byte boundary, then ASSERT().
   If Value is 0, then ASSERT().
 
   @param  JumpBuffer  A pointer to CPU context buffer.

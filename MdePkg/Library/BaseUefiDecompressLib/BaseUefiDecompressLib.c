@@ -69,9 +69,11 @@ typedef struct {
 } SCRATCH_DATA;
 
 /**
+  Read NumOfBit of bits from source into mBitBuf
+
   Shift mBitBuf NumOfBits left. Read in NumOfBits of bits from source.
 
-  @param  Sd The global scratch data
+  @param  Sd        The global scratch data
   @param  NumOfBits The number of bits to shift and read.
 
 **/
@@ -81,8 +83,14 @@ FillBuf (
   IN  UINT16        NumOfBits
   )
 {
+  //
+  // Left shift NumOfBits of bits in advance
+  //
   Sd->mBitBuf = (UINT32) (Sd->mBitBuf << NumOfBits);
 
+  //
+  // Copy data needed in bytes into mSbuBitBuf
+  //
   while (NumOfBits > Sd->mBitCount) {
 
     Sd->mBitBuf |= (UINT32) (Sd->mSubBitBuf << (NumOfBits = (UINT16) (NumOfBits - Sd->mBitCount)));
@@ -92,7 +100,6 @@ FillBuf (
       // Get 1 byte into SubBitBuf
       //
       Sd->mCompSize--;
-      Sd->mSubBitBuf  = 0;
       Sd->mSubBitBuf  = Sd->mSrcBase[Sd->mInBuf++];
       Sd->mBitCount   = 8;
 
@@ -106,16 +113,25 @@ FillBuf (
     }
   }
 
+  //
+  // Caculate additional bit count read to update mBitCount
+  //
   Sd->mBitCount = (UINT16) (Sd->mBitCount - NumOfBits);
+  
+  //
+  // Copy NumOfBits of bits from mSubBitBuf into mBitBuf
+  //
   Sd->mBitBuf |= Sd->mSubBitBuf >> Sd->mBitCount;
 }
 
 /**
+  Get NumOfBits of bits out from mBitBuf
+
   Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent 
   NumOfBits of bits from source. Returns NumOfBits of bits that are 
   popped out.
 
-  @param  Sd The global scratch data.
+  @param  Sd        The global scratch data.
   @param  NumOfBits The number of bits to pop and read.
 
   @return The bits that are popped out.
@@ -129,8 +145,14 @@ GetBits (
 {
   UINT32  OutBits;
 
+  //
+  // Pop NumOfBits of Bits from Left
+  //  
   OutBits = (UINT32) (Sd->mBitBuf >> (BITBUFSIZ - NumOfBits));
 
+  //
+  // Fill up mBitBuf from source
+  //
   FillBuf (Sd, NumOfBits);
 
   return OutBits;
@@ -139,11 +161,14 @@ GetBits (
 /**
   Creates Huffman Code mapping table according to code length array.
 
-  @param  Sd The global scratch data
+  Creates Huffman Code mapping table for Extra Set, Char&Len Set 
+  and Position Set according to code length array.
+
+  @param  Sd        The global scratch data
   @param  NumOfChar Number of symbols in the symbol set
-  @param  BitLen Code length array
+  @param  BitLen    Code length array
   @param  TableBits The width of the mapping table
-  @param  Table The table
+  @param  Table     The table
 
   @retval  0 OK.
   @retval  BAD_TABLE The table is corrupted.
@@ -266,6 +291,8 @@ MakeTable (
 /**
   Decodes a position value.
 
+  Get a position value according to Position Huffman Table.
+  
   @param  Sd the global scratch data
 
   @return The position value decoded.
@@ -312,9 +339,12 @@ DecodeP (
 /**
   Reads code lengths for the Extra Set or the Position Set.
 
-  @param  Sd The global scratch data.
-  @param  nn Number of symbols.
-  @param  nbit Number of bits needed to represent nn.
+  Read in the Extra Set or Pointion Set Length Arrary, then
+  generate the Huffman code mapping for them.
+
+  @param  Sd      The global scratch data.
+  @param  nn      Number of symbols.
+  @param  nbit    Number of bits needed to represent nn.
   @param  Special The special symbol that needs to be taken care of.
 
   @retval  0 OK.
@@ -334,9 +364,15 @@ ReadPTLen (
   volatile UINT16  Index;
   UINT32  Mask;
 
+  //
+  // Read Extra Set Code Length Array size 
+  //
   Number = (UINT16) GetBits (Sd, nbit);
 
   if (Number == 0) {
+    //
+    // This represents only Huffman code used
+    //
     CharC = (UINT16) GetBits (Sd, nbit);
 
     for (Index = 0; Index < 256; Index++) {
@@ -356,6 +392,11 @@ ReadPTLen (
 
     CharC = (UINT16) (Sd->mBitBuf >> (BITBUFSIZ - 3));
 
+    //
+    // If a code length is less than 7, then it is encoded as a 3-bit
+    // value. Or it is encoded as a series of "1"s followed by a 
+    // terminating "0". The number of "1"s = Code length - 4.
+    //
     if (CharC == 7) {
       Mask = 1U << (BITBUFSIZ - 1 - 3);
       while (Mask & Sd->mBitBuf) {
@@ -363,11 +404,17 @@ ReadPTLen (
         CharC += 1;
       }
     }
-
+    
     FillBuf (Sd, (UINT16) ((CharC < 7) ? 3 : CharC - 3));
 
     Sd->mPTLen[Index++] = (UINT8) CharC;
-
+ 
+    //
+    // For Code&Len Set, 
+    // After the third length of the code length concatenation,
+    // a 2-bit value is used to indicated the number of consecutive 
+    // zero lengths after the third length.
+    //
     if (Index == Special) {
       CharC = (UINT16) GetBits (Sd, 2);
       while ((INT16) (--CharC) >= 0) {
@@ -379,12 +426,15 @@ ReadPTLen (
   while (Index < nn) {
     Sd->mPTLen[Index++] = 0;
   }
-
+  
   return MakeTable (Sd, nn, Sd->mPTLen, 8, Sd->mPTTable);
 }
 
 /**
   Reads code lengths for Char&Len Set.
+  
+  Read in and decode the Char&Len Set Code Length Array, then
+  generate the Huffman Code mapping table for the Char&Len Set.
 
   @param  Sd the global scratch data
 
@@ -394,14 +444,17 @@ ReadCLen (
   SCRATCH_DATA  *Sd
   )
 {
-  UINT16  Number;
-  UINT16  CharC;
+  UINT16           Number;
+  UINT16           CharC;
   volatile UINT16  Index;
-  UINT32  Mask;
+  UINT32           Mask;
 
   Number = (UINT16) GetBits (Sd, CBIT);
 
   if (Number == 0) {
+    //
+    // This represents only Huffman code used
+    //
     CharC = (UINT16) GetBits (Sd, CBIT);
 
     for (Index = 0; Index < NC; Index++) {
@@ -417,7 +470,6 @@ ReadCLen (
 
   Index = 0;
   while (Index < Number) {
-
     CharC = Sd->mPTTable[Sd->mBitBuf >> (BITBUFSIZ - 8)];
     if (CharC >= NT) {
       Mask = 1U << (BITBUFSIZ - 1 - 8);
@@ -471,6 +523,10 @@ ReadCLen (
 
 /**
   Decode a character/length value.
+  
+  Read one value from mBitBuf, Get one code from mBitBuf. If it is at block boundary, generates
+  Huffman code mapping table for Extra Set, Code&Len Set and
+  Position Set.
 
   @param  Sd The global scratch data.
 
@@ -488,21 +544,38 @@ DecodeC (
   if (Sd->mBlockSize == 0) {
     //
     // Starting a new block
-    //
+    // Read BlockSize from block header
+    // 
     Sd->mBlockSize    = (UINT16) GetBits (Sd, 16);
+
+    //
+    // Read in the Extra Set Code Length Arrary,
+    // Generate the Huffman code mapping table for Extra Set.
+    //
     Sd->mBadTableFlag = ReadPTLen (Sd, NT, TBIT, 3);
     if (Sd->mBadTableFlag != 0) {
       return 0;
     }
 
+    //
+    // Read in and decode the Char&Len Set Code Length Arrary,
+    // Generate the Huffman code mapping table for Char&Len Set.
+    //
     ReadCLen (Sd);
 
+    //
+    // Read in the Position Set Code Length Arrary, 
+    // Generate the Huffman code mapping table for the Position Set.
+    //
     Sd->mBadTableFlag = ReadPTLen (Sd, MAXNP, Sd->mPBit, (UINT16) (-1));
     if (Sd->mBadTableFlag != 0) {
       return 0;
     }
   }
 
+  //
+  // Get one code according to Code&Set Huffman Table
+  //
   Sd->mBlockSize--;
   Index2 = Sd->mCTable[Sd->mBitBuf >> (BITBUFSIZ - 12)];
 
@@ -530,6 +603,8 @@ DecodeC (
 /**
   Decode the source data and put the resulting data into the destination buffer.
 
+  Decode the source data and put the resulting data into the destination buffer.
+  
   @param  Sd The global scratch data
 
 **/
@@ -547,6 +622,9 @@ Decode (
   DataIdx     = 0;
 
   for (;;) {
+    //
+    // Get one code from mBitBuf
+    // 
     CharC = DecodeC (Sd);
     if (Sd->mBadTableFlag != 0) {
       return ;
@@ -559,6 +637,9 @@ Decode (
       if (Sd->mOutBuf >= Sd->mOrigSize) {
         return ;
       } else {
+        //
+        // Write orignal character into mDstBase
+        //
         Sd->mDstBase[Sd->mOutBuf++] = (UINT8) CharC;
       }
 
@@ -567,11 +648,20 @@ Decode (
       // Process a Pointer
       //
       CharC       = (UINT16) (CharC - (UINT8_MAX + 1 - THRESHOLD));
-
+ 
+      //
+      // Get string length
+      //
       BytesRemain = CharC;
 
+      //
+      // Locate string position
+      //
       DataIdx     = Sd->mOutBuf - DecodeP (Sd) - 1;
 
+      //
+      // Write BytesRemain of bytes into mDstBase
+      //
       BytesRemain--;
       while ((INT16) (BytesRemain) >= 0) {
         Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
@@ -588,14 +678,35 @@ Decode (
 }
 
 /**
-  The internal implementation of *_DECOMPRESS_PROTOCOL.GetInfo().
+  Retrieves the size of the uncompressed buffer and the size of the scratch buffer.
 
-  @param  Source The source buffer containing the compressed data.
-  @param  SourceSize The size of source buffer
-  @param  DestinationSize The size of destination buffer.
-  @param  ScratchSize The size of scratch buffer.
+  Retrieves the size of the uncompressed buffer and the temporary scratch buffer 
+  required to decompress the buffer specified by Source and SourceSize.
+  If the size of the uncompressed buffer or the size of the scratch buffer cannot
+  be determined from the compressed data specified by Source and SourceData, 
+  then RETURN_INVALID_PARAMETER is returned.  Otherwise, the size of the uncompressed
+  buffer is returned in DestinationSize, the size of the scratch buffer is returned
+  in ScratchSize, and RETURN_SUCCESS is returned.
+  This function does not have scratch buffer available to perform a thorough 
+  checking of the validity of the source data.  It just retrieves the "Original Size"
+  field from the beginning bytes of the source data and output it as DestinationSize.
+  And ScratchSize is specific to the decompression implementation.
 
-  @retval  RETURN_SUCCESS The size of destination buffer and the size of scratch buffer are successull retrieved.
+  If Source is NULL, then ASSERT().
+  If DestinationSize is NULL, then ASSERT().
+  If ScratchSize is NULL, then ASSERT().
+
+  @param  Source          The source buffer containing the compressed data.
+  @param  SourceSize      The size, in bytes, of the source buffer.
+  @param  DestinationSize A pointer to the size, in bytes, of the uncompressed buffer
+                          that will be generated when the compressed buffer specified
+                          by Source and SourceSize is decompressed..
+  @param  ScratchSize     A pointer to the size, in bytes, of the scratch buffer that
+                          is required to decompress the compressed buffer specified 
+                          by Source and SourceSize.
+
+  @retval  RETURN_SUCCESS The size of destination buffer and the size of scratch 
+                          buffer are successull retrieved.
   @retval  RETURN_INVALID_PARAMETER The source data is corrupted
 
 **/
@@ -631,12 +742,27 @@ UefiDecompressGetInfo (
 }
 
 /**
-  The internal implementation of *_DECOMPRESS_PROTOCOL.Decompress().
+  Decompresses a compressed source buffer.
 
-  @param  Source The source buffer containing the compressed data.
+  This function is designed so that the decompression algorithm can be implemented
+  without using any memory services.  As a result, this function is not allowed to
+  call any memory allocation services in its implementation.  It is the caller¡¯s r
+  esponsibility to allocate and free the Destination and Scratch buffers.
+  If the compressed source data specified by Source is sucessfully decompressed 
+  into Destination, then RETURN_SUCCESS is returned.  If the compressed source data 
+  specified by Source is not in a valid compressed data format,
+  then RETURN_INVALID_PARAMETER is returned.
+
+  If Source is NULL, then ASSERT().
+  If Destination is NULL, then ASSERT().
+  If the required scratch buffer size > 0 and Scratch is NULL, then ASSERT().
+
+  @param  Source      The source buffer containing the compressed data.
   @param  Destination The destination buffer to store the decompressed data
-  @param  Scratch The buffer used internally by the decompress routine. This  buffer is needed to store intermediate data.
-
+  @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
+                      This is an optional parameter that may be NULL if the 
+                      required scratch buffer size is 0.
+                     
   @retval  RETURN_SUCCESS Decompression is successfull
   @retval  RETURN_INVALID_PARAMETER The source data is corrupted
 
@@ -688,6 +814,9 @@ UefiDecompress (
   Sd->mPBit     = 4;
   Sd->mSrcBase  = (UINT8 *)Src;
   Sd->mDstBase  = Dst;
+  //
+  // CompSize and OrigSize are caculated in bytes
+  //
   Sd->mCompSize = CompSize;
   Sd->mOrigSize = OrigSize;
 

@@ -17,6 +17,39 @@
 #ifndef __UEFI_DECPOMPRESS_LIB_H__
 #define __UEFI_DECPOMPRESS_LIB_H__
 
+/**
+  Retrieves the size of the uncompressed buffer and the size of the scratch buffer.
+
+  Retrieves the size of the uncompressed buffer and the temporary scratch buffer 
+  required to decompress the buffer specified by Source and SourceSize.
+  If the size of the uncompressed buffer or the size of the scratch buffer cannot
+  be determined from the compressed data specified by Source and SourceData, 
+  then RETURN_INVALID_PARAMETER is returned.  Otherwise, the size of the uncompressed
+  buffer is returned in DestinationSize, the size of the scratch buffer is returned
+  in ScratchSize, and RETURN_SUCCESS is returned.
+  This function does not have scratch buffer available to perform a thorough 
+  checking of the validity of the source data.  It just retrieves the "Original Size"
+  field from the beginning bytes of the source data and output it as DestinationSize.
+  And ScratchSize is specific to the decompression implementation.
+
+  If Source is NULL, then ASSERT().
+  If DestinationSize is NULL, then ASSERT().
+  If ScratchSize is NULL, then ASSERT().
+
+  @param  Source          The source buffer containing the compressed data.
+  @param  SourceSize      The size, in bytes, of the source buffer.
+  @param  DestinationSize A pointer to the size, in bytes, of the uncompressed buffer
+                          that will be generated when the compressed buffer specified
+                          by Source and SourceSize is decompressed..
+  @param  ScratchSize     A pointer to the size, in bytes, of the scratch buffer that
+                          is required to decompress the compressed buffer specified 
+                          by Source and SourceSize.
+
+  @retval  RETURN_SUCCESS The size of destination buffer and the size of scratch 
+                          buffer are successull retrieved.
+  @retval  RETURN_INVALID_PARAMETER The source data is corrupted
+
+**/
 RETURN_STATUS
 EFIAPI
 UefiDecompressGetInfo (
@@ -26,6 +59,32 @@ UefiDecompressGetInfo (
   OUT UINT32      *ScratchSize
   );
 
+/**
+  Decompresses a compressed source buffer.
+
+  This function is designed so that the decompression algorithm can be implemented
+  without using any memory services.  As a result, this function is not allowed to
+  call any memory allocation services in its implementation.  It is the caller¡¯s r
+  esponsibility to allocate and free the Destination and Scratch buffers.
+  If the compressed source data specified by Source is sucessfully decompressed 
+  into Destination, then RETURN_SUCCESS is returned.  If the compressed source data 
+  specified by Source is not in a valid compressed data format,
+  then RETURN_INVALID_PARAMETER is returned.
+
+  If Source is NULL, then ASSERT().
+  If Destination is NULL, then ASSERT().
+  If the required scratch buffer size > 0 and Scratch is NULL, then ASSERT().
+
+  @param  Source      The source buffer containing the compressed data.
+  @param  Destination The destination buffer to store the decompressed data
+  @param  Scratch     A temporary scratch buffer that is used to perform the decompression.
+                      This is an optional parameter that may be NULL if the 
+                      required scratch buffer size is 0.
+                     
+  @retval  RETURN_SUCCESS Decompression is successfull
+  @retval  RETURN_INVALID_PARAMETER The source data is corrupted
+
+**/
 RETURN_STATUS
 EFIAPI
 UefiDecompress (

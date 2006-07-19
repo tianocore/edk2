@@ -14,6 +14,27 @@
 
 **/
 
+/**
+  Worker function that locates the Node in the List 
+
+  By searching the List, finds the location of the Node in List. At the same time, 
+  verifies the validity of this list.
+
+  If List is NULL, then ASSERT().
+  If List->ForwardLink is NULL, then ASSERT().
+  If List->backLink is NULL, then ASSERT().
+  If Node is NULL, then ASSERT();
+  If PcdMaximumLinkedListLenth is not zero, and prior to insertion the number
+  of nodes in ListHead, including the ListHead node, is greater than or 
+  equal to PcdMaximumLinkedListLength, then ASSERT().
+
+  @param  List  A pointer to a node in a linked list.
+  @param  Node  A pointer to one nod.
+
+  @retval TRUE   Node is in List
+  @retval FALSE  Node isn't in List, or List is invalid 
+
+**/
 BOOLEAN
 EFIAPI
 IsNodeInList (

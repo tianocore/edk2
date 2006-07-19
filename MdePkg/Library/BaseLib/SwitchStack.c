@@ -26,6 +26,7 @@
 
   If EntryPoint is NULL, then ASSERT().
   If NewStack is NULL, then ASSERT().
+  For IPF CPUs, if NewStack is not aligned on a 16-byte boundary, then ASSERT().
 
   @param  EntryPoint  A pointer to function to call with the new stack.
   @param  Context1    A pointer to the context to pass into the EntryPoint
