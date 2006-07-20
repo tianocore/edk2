@@ -16,16 +16,16 @@
 
 
 //
-// Cached copy of the System Configuration Table
+// Cache copy of the DXE Services Table
 //
 EFI_DXE_SERVICES  *gDS      = NULL;
 
 /**
-  The constructor function caches the pointer of System Configuration Table.
+  The constructor function caches the pointer of DXE Services Table.
 
-  The constructor function caches the pointer of System Configuration Table.
+  The constructor function caches the pointer of DXE Services Table.
   It will ASSERT() if that operation fails.
-  It will ASSERT() if the pointer of System Configuration Table is NULL.
+  It will ASSERT() if the pointer of DXE Services Table is NULL.
   It will always return EFI_SUCCESS.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
@@ -43,7 +43,7 @@ DxeServicesTableLibConstructor (
   EFI_STATUS  Status;
 
   //
-  // Cached copy of the System Configuration Table
+  // Cache copy of the DXE Services Table
   //
   Status = EfiGetSystemConfigurationTable (&gEfiDxeServicesTableGuid, (VOID **) &gDS);
   ASSERT_EFI_ERROR (Status);
