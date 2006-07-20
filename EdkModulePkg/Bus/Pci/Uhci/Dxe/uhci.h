@@ -2511,8 +2511,6 @@ IsMemoryBlockEmptied (
   )
 /*++
 
-/*++
-
 Routine Description:
 
   Is Memory Block Emptied
