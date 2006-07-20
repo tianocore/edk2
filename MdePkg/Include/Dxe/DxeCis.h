@@ -39,7 +39,7 @@
 #endif
 
 //
-// BugBug: Implementation contamination of UEFI 2.0
+// Implementation contamination of UEFI 2.0
 // Pointer to internal runtime pointer
 //
 #define EFI_IPF_GP_POINTER  0x00000008
@@ -116,15 +116,12 @@ typedef struct {
   Adds reserved memory, system memory, or memory-mapped I/O resources to the
   global coherency domain of the processor.
 
-  @param  GcdMemoryType Memory type of the memory space.
-  
-  @param  BaseAddress Base address of the memory space.
-  
-  @param  Length Length of the memory space.
-  
-  @param  Capabilities alterable attributes of the memory space.
+  @param  GcdMemoryType    Memory type of the memory space.
+  @param  BaseAddress      Base address of the memory space.
+  @param  Length           Length of the memory space.
+  @param  Capabilities     alterable attributes of the memory space.
 
-  @retval  EFI_SUCCESS Merged this memory space into GCD map.
+  @retval EFI_SUCCESS           Merged this memory space into GCD map.
 
 **/
 typedef
@@ -141,25 +138,17 @@ EFI_STATUS
   Allocates nonexistent memory, reserved memory, system memory, or memorymapped
   I/O resources from the global coherency domain of the processor.
 
-  @param  GcdAllocateType The type of allocate operation
-  
-  @param  GcdMemoryType The desired memory type
-  
-  @param  Alignment Align with 2^Alignment
-  
-  @param  Length Length to allocate
-  
-  @param  BaseAddress Base address to allocate
-  
-  @param  Imagehandle The image handle consume the allocated space.
-  
-  @param  DeviceHandle The device handle consume the allocated space.
+  @param  GcdAllocateType  The type of allocate operation
+  @param  GcdMemoryType    The desired memory type
+  @param  Alignment        Align with 2^Alignment
+  @param  Length           Length to allocate
+  @param  BaseAddress      Base address to allocate
+  @param  Imagehandle      The image handle consume the allocated space.
+  @param  DeviceHandle     The device handle consume the allocated space.
 
-  @retval  EFI_INVALID_PARAMETER Invalid parameter.
-  
-  @retval  EFI_NOT_FOUND No descriptor contains the desired space.
-  
-  @retval  EFI_SUCCESS Memory space successfully allocated.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval EFI_NOT_FOUND         No descriptor contains the desired space.
+  @retval EFI_SUCCESS           Memory space successfully allocated.
 
 **/
 typedef
@@ -179,11 +168,10 @@ EFI_STATUS
   Frees nonexistent memory, reserved memory, system memory, or memory-mapped
   I/O resources from the global coherency domain of the processor.
 
-  @param  BaseAddress Base address of the segment.
-  
-  @param  Length Length of the segment.
+  @param  BaseAddress      Base address of the segment.
+  @param  Length           Length of the segment.
 
-  @retval  EFI_SUCCESS Space successfully freed.
+  @retval EFI_SUCCESS           Space successfully freed.
 
 **/
 typedef
@@ -198,11 +186,10 @@ EFI_STATUS
   Removes reserved memory, system memory, or memory-mapped I/O resources from
   the global coherency domain of the processor.
 
-  @param  BaseAddress Base address of the memory space.
-  
-  @param  Length Length of the memory space.
+  @param  BaseAddress      Base address of the memory space.
+  @param  Length           Length of the memory space.
 
-  @retval  EFI_SUCCESS Successfully remove a segment of memory space.
+  @retval EFI_SUCCESS           Successfully remove a segment of memory space.
 
 **/
 typedef
@@ -216,13 +203,11 @@ EFI_STATUS
 /**
   Retrieves the descriptor for a memory region containing a specified address.
 
-  @param  BaseAddress Specified start address
-  
-  @param  Descriptor Specified length
+  @param  BaseAddress      Specified start address
+  @param  Descriptor       Specified length
 
-  @retval  EFI_INVALID_PARAMETER Invalid parameter
-  
-  @retval  EFI_SUCCESS Successfully get memory space descriptor.
+  @retval EFI_INVALID_PARAMETER Invalid parameter
+  @retval EFI_SUCCESS           Successfully get memory space descriptor.
 
 **/
 typedef
@@ -237,13 +222,11 @@ EFI_STATUS
   Modifies the attributes for a memory region in the global coherency domain of the
   processor.
 
-  @param  BaseAddress Specified start address
-  
-  @param  Length Specified length
-  
-  @param  Attributes Specified attributes
+  @param  BaseAddress      Specified start address
+  @param  Length           Specified length
+  @param  Attributes       Specified attributes
 
-  @retval  EFI_SUCCESS Successfully set attribute of a segment of memory space.
+  @retval EFI_SUCCESS           Successfully set attribute of a segment of memory space.
 
 **/
 typedef
@@ -261,14 +244,11 @@ EFI_STATUS
   processor.
 
   @param  NumberOfDescriptors Number of descriptors.
-  
-  @param  MemorySpaceMap Descriptor array
+  @param  MemorySpaceMap      Descriptor array
 
-  @retval  EFI_INVALID_PARAMETER Invalid parameter
-  
-  @retval  EFI_OUT_OF_RESOURCES No enough buffer to allocate
-  
-  @retval  EFI_SUCCESS Successfully get memory space map.
+  @retval EFI_INVALID_PARAMETER Invalid parameter
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer to allocate
+  @retval EFI_SUCCESS           Successfully get memory space map.
 
 **/
 typedef
@@ -282,13 +262,11 @@ EFI_STATUS
 /**
   Adds reserved I/O or I/O resources to the global coherency domain of the processor.
 
-  @param  GcdIoType IO type of the segment.
-  
-  @param  BaseAddress Base address of the segment.
-  
-  @param  Length Length of the segment.
+  @param  GcdIoType        IO type of the segment.
+  @param  BaseAddress      Base address of the segment.
+  @param  Length           Length of the segment.
 
-  @retval  EFI_SUCCESS Merged this segment into GCD map.
+  @retval EFI_SUCCESS           Merged this segment into GCD map.
 
 **/
 typedef
@@ -304,25 +282,17 @@ EFI_STATUS
   Allocates nonexistent I/O, reserved I/O, or I/O resources from the global coherency
   domain of the processor.
 
-  @param  GcdAllocateType The type of allocate operation
-  
-  @param  GcdIoType The desired IO type
-  
-  @param  Alignment Align with 2^Alignment
-  
-  @param  Length Length to allocate
-  
-  @param  BaseAddress Base address to allocate
-  
-  @param  Imagehandle The image handle consume the allocated space.
-  
-  @param  DeviceHandle The device handle consume the allocated space.
+  @param  GcdAllocateType  The type of allocate operation
+  @param  GcdIoType        The desired IO type
+  @param  Alignment        Align with 2^Alignment
+  @param  Length           Length to allocate
+  @param  BaseAddress      Base address to allocate
+  @param  Imagehandle      The image handle consume the allocated space.
+  @param  DeviceHandle     The device handle consume the allocated space.
 
-  @retval  EFI_INVALID_PARAMETER Invalid parameter.
-  
-  @retval  EFI_NOT_FOUND No descriptor contains the desired space.
-  
-  @retval  EFI_SUCCESS IO space successfully allocated.
+  @retval EFI_INVALID_PARAMETER Invalid parameter.
+  @retval EFI_NOT_FOUND         No descriptor contains the desired space.
+  @retval EFI_SUCCESS           IO space successfully allocated.
 
 **/
 typedef
@@ -342,11 +312,10 @@ EFI_STATUS
   Frees nonexistent I/O, reserved I/O, or I/O resources from the global coherency
   domain of the processor.
 
-  @param  BaseAddress Base address of the segment.
-  
-  @param  Length Length of the segment.
+  @param  BaseAddress      Base address of the segment.
+  @param  Length           Length of the segment.
 
-  @retval  EFI_SUCCESS Space successfully freed.
+  @retval EFI_SUCCESS           Space successfully freed.
 
 **/
 typedef
@@ -361,11 +330,10 @@ EFI_STATUS
   Removes reserved I/O or I/O resources from the global coherency domain of the
   processor.
 
-  @param  BaseAddress Base address of the segment.
-  
-  @param  Length Length of the segment.
+  @param  BaseAddress      Base address of the segment.
+  @param Length Length of the segment.
 
-  @retval  EFI_SUCCESS Successfully removed a segment of IO space.
+  @retval EFI_SUCCESS           Successfully removed a segment of IO space.
 
 **/
 typedef
@@ -379,13 +347,11 @@ EFI_STATUS
 /**
   Retrieves the descriptor for an I/O region containing a specified address.
 
-  @param  BaseAddress Specified start address
-  
-  @param  Descriptor Specified length
+  @param  BaseAddress      Specified start address
+  @param  Descriptor       Specified length
 
-  @retval  EFI_INVALID_PARAMETER Descriptor is NULL.
-  
-  @retval  EFI_SUCCESS Successfully get the IO space descriptor.
+  @retval EFI_INVALID_PARAMETER Descriptor is NULL.
+  @retval EFI_SUCCESS           Successfully get the IO space descriptor.
 
 **/
 typedef
@@ -400,14 +366,11 @@ EFI_STATUS
   Returns a map of the I/O resources in the global coherency domain of the processor.
 
   @param  NumberOfDescriptors Number of descriptors.
-  
-  @param  MemorySpaceMap Descriptor array
+  @param  MemorySpaceMap      Descriptor array
 
-  @retval  EFI_INVALID_PARAMETER Invalid parameter
-  
-  @retval  EFI_OUT_OF_RESOURCES No enough buffer to allocate
-  
-  @retval  EFI_SUCCESS Successfully get IO space map.
+  @retval EFI_INVALID_PARAMETER Invalid parameter
+  @retval EFI_OUT_OF_RESOURCES  No enough buffer to allocate
+  @retval EFI_SUCCESS           Successfully get IO space map.
 
 **/
 typedef
@@ -433,8 +396,7 @@ EFI_STATUS
   Clears the Schedule on Request (SOR) flag for a component that is stored in a firmware volume.
 
   @param  FirmwareVolumeHandle The handle of the firmware volume that contains the file specified by FileName.
-  
-  @param  DriverName A pointer to the name of the file in a firmware volume.
+  @param  DriverName           A pointer to the name of the file in a firmware volume.
 
   @return Status code
 
@@ -451,8 +413,7 @@ EFI_STATUS
   Promotes a file stored in a firmware volume from the untrusted to the trusted state.
 
   @param  FirmwareVolumeHandle The handle of the firmware volume that contains the file specified by FileName.
-  
-  @param  DriverName A pointer to the name of the file in a firmware volume.
+  @param  DriverName           A pointer to the name of the file in a firmware volume.
 
   @return Status code
 
@@ -469,7 +430,7 @@ EFI_STATUS
   Creates a firmware volume handle for a firmware volume that is present in system memory.
 
   @param  FirmwareVolumeHeader A pointer to the header of the firmware volume.
-  @param  Size The size, in bytes, of the firmware volume.
+  @param  Size                 The size, in bytes, of the firmware volume.
   @param  FirmwareVolumeHandle On output, a pointer to the created handle.
 
   @return Status code

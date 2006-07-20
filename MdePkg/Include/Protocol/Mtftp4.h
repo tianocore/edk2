@@ -303,7 +303,6 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_UNSUPPORTED       One or more options in the OptionList are in the
                                 unsupported list of structure EFI_MTFTP4_MODE_DATA.
-  
   @retval EFI_NOT_STARTED       The EFI MTFTPv4 Protocol driver has not been started.
   @retval EFI_NO_MAPPING        When using a default address, configuration (DHCP, BOOTP,
                                 RARP, etc.) has not finished yet.
@@ -395,9 +394,9 @@ EFI_STATUS
 /**
   Sends a file to an MTFTPv4 server.
 
-  @param  This Pointer to the EFI_MTFTP4_PROTOCOL instance.
+  @param  This  Pointer to the EFI_MTFTP4_PROTOCOL instance.
   @param  Token Pointer to the token structure to provide the parameters that are
-  used in this operation.
+                used in this operation.
 
   @retval EFI_SUCCESS           The upload session has started.
   @retval EFI_UNSUPPORTED       The operation is not supported by this implementation.

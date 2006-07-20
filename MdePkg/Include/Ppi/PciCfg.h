@@ -51,19 +51,14 @@ typedef struct {
 /**
   PCI read and write operation.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table 
-  published by the PEI Foundation.
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Width The width of the access. Enumerated in bytes.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Buffer A pointer to the buffer of data.
+  @param  PeiServices    An indirect pointer to the PEI Services Table
+                         published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Width          The width of the access. Enumerated in bytes.
+  @param  Address        The physical address of the access.
+  @param  Buffer         A pointer to the buffer of data.
 
-  @retval EFI_SUCCESS The function completed successfully. 
-  
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_YET_AVAILABLE The service has not been installed.
 
 **/
@@ -80,20 +75,15 @@ EFI_STATUS
 /**
   PCI read-modify-write operation.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table 
-  published by the PEI Foundation.
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Width The width of the access. Enumerated in bytes.
-  
-  @param  Address The physical address of the access.
-  
-  @param  SetBits Value of the bits to set.
-  
-  @param  ClearBits Value of the bits to clear.
+  @param  PeiServices    An indirect pointer to the PEI Services Table
+                         published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Width          The width of the access. Enumerated in bytes.
+  @param  Address        The physical address of the access.
+  @param  SetBits        Value of the bits to set.
+  @param  ClearBits      Value of the bits to clear.
 
-  @retval EFI_SUCCESS  The function completed successfully.
+  @retval EFI_SUCCESS           The function completed successfully.
 
 **/
 typedef
@@ -119,7 +109,7 @@ EFI_STATUS
   PCI write services.  See the Write() function description.
 
   @param Modify
-PCI read-modify-write services.  See the Modify() function description.
+  PCI read-modify-write services.  See the Modify() function description.
 
 **/
 struct _EFI_PEI_PCI_CFG_PPI {

@@ -30,22 +30,16 @@ typedef struct _EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL EFI_INCOMPATIBLE_PC
   Returns a list of ACPI resource descriptors that detail the special 
   resource configuration requirements for an incompatible PCI device.
 
-  @param  This Pointer to the EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL instance. 
-  
-  @param  VendorID A unique ID to identify the manufacturer of the PCI device.
-  
-  @param  DeviceID A unique ID to identify the particular PCI device.
-  
-  @param  RevisionID A PCI device-specific revision identifier.
-  
-  @param  SubsystemVendorId Specifies the subsystem vendor ID. 
-  
-  @param  SubsystemDeviceId Specifies the subsystem device ID.
-  
-  @param  Configuration A list of ACPI resource descriptors that detail 
-  the configuration requirement. 
+  @param  This                  Pointer to the EFI_INCOMPATIBLE_PCI_DEVICE_SUPPORT_PROTOCOL instance.
+  @param  VendorID              A unique ID to identify the manufacturer of the PCI device.
+  @param  DeviceID              A unique ID to identify the particular PCI device.
+  @param  RevisionID            A PCI device-specific revision identifier.
+  @param  SubsystemVendorId     Specifies the subsystem vendor ID.
+  @param  SubsystemDeviceId     Specifies the subsystem device ID.
+  @param  Configuration         A list of ACPI resource descriptors that detail
+                                the configuration requirement.
 
-  @retval EFI_SUCCESS The function always returns EFI_SUCCESS.
+  @retval EFI_SUCCESS           The function always returns EFI_SUCCESS.
 
 **/
 typedef

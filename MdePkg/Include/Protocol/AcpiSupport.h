@@ -64,19 +64,14 @@ typedef struct _EFI_ACPI_SUPPORT_PROTOCOL EFI_ACPI_SUPPORT_PROTOCOL;
 /**
   Returns a requested ACPI table.
 
-  @param  This A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
-  
-  @param  Index The zero-based index of the table to retrieve.
-  
-  @param  Table Pointer for returning the table buffer.
-  
-  @param  Version Updated with the ACPI versions to which this table belongs.
-  
-  @param  Handle Pointer for identifying the table.
+  @param  This                  A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
+  @param  Index                 The zero-based index of the table to retrieve.
+  @param  Table                 Pointer for returning the table buffer.
+  @param  Version               Updated with the ACPI versions to which this table belongs.
+  @param  Handle                Pointer for identifying the table.
 
-  @retval EFI_SUCCESS The function completed successfully.
-  
-  @retval EFI_NOT_FOUND The requested index is too large and a table was not found.
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         The requested index is too large and a table was not found.
 
 **/
 typedef
@@ -92,22 +87,16 @@ EFI_STATUS
 /**
   Used to add, remove, or update ACPI tables.
 
-  @param  This A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
-  
-  @param  Table Pointer to the new table to add or update.
-  
-  @param  Checksum If TRUE, indicates that the checksum should be 
-  calculated for this table.
-  
-  @param  Version Indicates to which version(s) of ACPI the table should be added.
-  
-  @param  Pointer to the handle of the table to remove or update.
+  @param  This                  A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
+  @param  Table                 Pointer to the new table to add or update.
+  @param  Checksum              If TRUE, indicates that the checksum should be
+                                calculated for this table.
+  @param  Version               Indicates to which version(s) of ACPI the table should be added.
+  @param  Pointer               to the handle of the table to remove or update.
 
-  @retval EFI_SUCCESS The function completed successfully.
-  
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_INVALID_PARAMETER *Handle was zero and Table was NULL.
-  
-  @retval EFI_ABORTED Could not complete the desired action.
+  @retval EFI_ABORTED           Could not complete the desired action.
 
 **/
 typedef
@@ -124,13 +113,11 @@ EFI_STATUS
   Causes one or more versions of the ACPI tables to be published in 
   the EFI system configuration tables.
 
-  @param  This A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
-  
-  @param  Version Indicates to which version(s) of ACPI that the table should be published. 
+  @param  This                  A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
+  @param  Version               Indicates to which version(s) of ACPI that the table should be published.
 
-  @retval EFI_SUCCESS The function completed successfully.
-  
-  @retval EFI_ABORTED An error occurred and the function could not complete successfully.
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_ABORTED           An error occurred and the function could not complete successfully.
 
 **/
 typedef

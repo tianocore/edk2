@@ -34,14 +34,12 @@ typedef struct _EFI_PEI_STALL_PPI EFI_PEI_STALL_PPI;
   The Stall() function provides a blocking stall for at least the number 
   of microseconds stipulated in the final argument of the API.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table 
-  published by the PEI Foundation. 
-  
-  @param  This Pointer to the local data for the interface.
-  
-  @param  Microseconds Number of microseconds for which to stall.
+  @param  PeiServices    An indirect pointer to the PEI Services Table
+                         published by the PEI Foundation.
+  @param  This           Pointer to the local data for the interface.
+  @param  Microseconds   Number of microseconds for which to stall.
 
-  @retval EFI_SUCCESS The service provided at least the required delay.
+  @retval EFI_SUCCESS           The service provided at least the required delay.
 
 **/
 typedef

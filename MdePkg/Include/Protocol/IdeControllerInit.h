@@ -263,18 +263,14 @@ typedef union {
 /**
   Returns the information about the specified IDE channel. 
 
-  @param  This Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance. 
-  
-  @param  Channel Zero-based channel number.
-  
-  @param  Enabled TRUE if this channel is enabled. Disabled channels are not scanned 
-  to see if any devices are present.
-  
-  @param  MaxDevices The maximum number of IDE devices that the bus driver 
-  can expect on this channel. 
+  @param  This                  Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param  Channel               Zero-based channel number.
+  @param  Enabled               TRUE if this channel is enabled. Disabled channels are not scanned
+                                to see if any devices are present.
+  @param  MaxDevices            The maximum number of IDE devices that the bus driver
+                                can expect on this channel.
 
-  @retval EFI_SUCCESS Information was returned without any errors.
-  
+  @retval EFI_SUCCESS           Information was returned without any errors.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
 
 **/
@@ -291,19 +287,14 @@ EFI_STATUS
   The notifications from the IDE bus driver that it is about to enter a certain 
   phase of the IDE channel enumeration process. 
 
-  @param  This Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance. 
-  
-  @param  Phase The phase during enumeration. 
-  
-  @param  Channel Zero-based channel number.
+  @param  This                  Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param  Phase                 The phase during enumeration.
+  @param  Channel               Zero-based channel number.
 
-  @retval EFI_SUCCESS The notification was accepted without any errors.
-  
-  @retval EFI_NOT_SUPPORTED Phase is not supported.
-  
+  @retval EFI_SUCCESS           The notification was accepted without any errors.
+  @retval EFI_NOT_SUPPORTED     Phase is not supported.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
-  
-  @retval EFI_NOT_READY This phase cannot be entered at this time.
+  @retval EFI_NOT_READY         This phase cannot be entered at this time.
 
 **/
 typedef 
@@ -317,18 +308,14 @@ EFI_STATUS
 /**
   Submits the device information to the IDE controller driver. 
 
-  @param  This Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance. 
-  
-  @param  Channel Zero-based channel number.
-  
-  @param  Device Zero-based device number on the Channel.
-  
-  @param  IdentifyData The device¡¯s response to the ATA IDENTIFY_DEVICE command.
+  @param  This                  Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param  Channel               Zero-based channel number.
+  @param  Device                Zero-based device number on the Channel.
+  @param  IdentifyData          The device¡¯s response to the ATA IDENTIFY_DEVICE command.
 
-  @retval EFI_SUCCESS The information was accepted without any errors.
-  
+  @retval EFI_SUCCESS           The information was accepted without any errors.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
-  Or Device is invalid.
+                                Or Device is invalid.
 
 **/
 typedef 
@@ -343,19 +330,15 @@ EFI_STATUS
 /**
   Disqualifies specific modes for an IDE device. 
 
-  @param  This Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance. 
-  
-  @param  Channel Zero-based channel number.
-  
-  @param  Device Zero-based device number on the Channel.
-  
-  @param  BadModes The modes that the device does not support and that 
-  should be disqualified.
+  @param  This                  Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param  Channel               Zero-based channel number.
+  @param  Device                Zero-based device number on the Channel.
+  @param  BadModes              The modes that the device does not support and that
+                                should be disqualified.
 
-  @retval EFI_SUCCESS The modes were accepted without any errors.
-  
+  @retval EFI_SUCCESS           The modes were accepted without any errors.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
-  Or Device is invalid.
+                                Or Device is invalid.
 
 **/
 typedef
@@ -370,20 +353,15 @@ EFI_STATUS
 /**
   Returns the information about the optimum modes for the specified IDE device.
 
-  @param  This Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance. 
-  
-  @param  Channel Zero-based channel number.
-  
-  @param  Device Zero-based device number on the Channel.
-  
-  @param  SupportedModes The optimum modes for the device. 
+  @param  This                  Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param  Channel               Zero-based channel number.
+  @param  Device                Zero-based device number on the Channel.
+  @param  SupportedModes        The optimum modes for the device.
 
-  @retval EFI_SUCCESS SupportedModes was returned.
-  
+  @retval EFI_SUCCESS           SupportedModes was returned.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
-  Or Device is invalid. Or SupportedModes is NULL.
-  
-  @retval EFI_NOT_READY Modes cannot be calculated due to a lack of data. 
+                                Or Device is invalid. Or SupportedModes is NULL.
+  @retval EFI_NOT_READY         Modes cannot be calculated due to a lack of data.
 
 **/
 typedef
@@ -399,23 +377,17 @@ EFI_STATUS
   Commands the IDE controller driver to program the IDE controller hardware 
   so that the specified device can operate at the specified mode. 
 
-  @param  This Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance. 
-  
-  @param  Channel Zero-based channel number.
-  
-  @param  Device Zero-based device number on the Channel.
-  
-  @param  Modes The modes to set. 
+  @param  This                  Pointer to the EFI_IDE_CONTROLLER_INIT_PROTOCOL instance.
+  @param  Channel               Zero-based channel number.
+  @param  Device                Zero-based device number on the Channel.
+  @param  Modes                 The modes to set.
 
-  @retval EFI_SUCCESS The command was accepted without any errors.
-  
+  @retval EFI_SUCCESS           The command was accepted without any errors.
   @retval EFI_INVALID_PARAMETER Channel is invalid (Channel >= ChannelCount).
-  Or Device is invalid.
-  
-  @retval EFI_NOT_READY Modes cannot be set at this time due to lack of data.
-  
-  @retval EFI_DEVICE_ERROR Modes cannot be set due to hardware failure. 
-  The IDE bus driver should not use this device.
+                                Or Device is invalid.
+  @retval EFI_NOT_READY         Modes cannot be set at this time due to lack of data.
+  @retval EFI_DEVICE_ERROR      Modes cannot be set due to hardware failure.
+                                The IDE bus driver should not use this device.
 
 **/
 typedef

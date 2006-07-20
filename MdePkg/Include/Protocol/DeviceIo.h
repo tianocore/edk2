@@ -47,7 +47,7 @@ typedef enum {
   @param  Count                 The number of I/O operations to perform.
   @param  Buffer                For read operations, the destination buffer to store the results. For write
                                 operations, the source buffer to write data from.                
-  
+
   @retval EFI_SUCCESS           The data was read from or written to the device.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.      
   @retval EFI_INVALID_PARAMETER Width is invalid.
@@ -76,7 +76,7 @@ typedef struct {
                                 is going to be returned.  
   @param  PciDevicePath         A pointer to the pointer for the EFI Device Path for PciAddress.
                                 Memory for the Device Path is allocated from the pool.          
-  
+
   @retval EFI_SUCCESS           The PciDevicePath returns a pointer to a valid EFI Device Path.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.      
   @retval EFI_UNSUPPORTED       The PciAddress does not map to a valid EFI Device Path.
@@ -106,7 +106,7 @@ typedef enum {
   @param  DeviceAddress         The resulting map address for the bus master device to use to access the
                                 hosts HostAddress.
   @param  Mapping               A resulting value to pass to Unmap().
-  
+
   @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.      
   @retval EFI_UNSUPPORTED       The HostAddress cannot be mapped as a common buffer.
@@ -130,7 +130,7 @@ EFI_STATUS
     
   @param  This                  A pointer to the EFI_DEVICE_IO_INTERFACE instance.
   @param  Mapping               A resulting value to pass to Unmap().
-  
+
   @retval EFI_SUCCESS           The range was mapped for the returned NumberOfBytes.
   @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
                                    
@@ -151,7 +151,7 @@ EFI_STATUS
                                 EfiRuntimeServicesData.
   @param  Pages                 The number of pages to allocate.
   @param  HostAddress           A pointer to store the base address of the allocated range.                                
-  
+
   @retval EFI_SUCCESS           The requested memory pages were allocated.
   @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
   @retval EFI_INVALID_PARAMETER The requested memory type is invalid.
@@ -173,7 +173,7 @@ EFI_STATUS
   Flushes any posted write data to the device.
     
   @param  This                  A pointer to the EFI_DEVICE_IO_INTERFACE instance.
-  
+
   @retval EFI_SUCCESS           The buffers were flushed.
   @retval EFI_DEVICE_ERROR      The buffers were not flushed due to a hardware error.                                 
   
@@ -190,7 +190,7 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_DEVICE_IO_INTERFACE instance.  
   @param  Pages                 The number of pages to free.
   @param  HostAddress           The base address of the range to free.
-  
+
   @retval EFI_SUCCESS           The requested memory pages were allocated.
   @retval EFI_NOT_FOUND         The requested memory pages were not allocated with
                                 AllocateBuffer().  

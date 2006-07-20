@@ -185,7 +185,6 @@ EFI_STATUS
                      FC target.
   @param  Lun        The LUN of the SCSI device for which a device path node is to be
                      allocated and built.
-  
   @param  DevicePath A pointer to a single device path node that describes the SCSI device
                      specified by Target and Lun. This function is responsible for
                      allocating the buffer DevicePath with the boot service

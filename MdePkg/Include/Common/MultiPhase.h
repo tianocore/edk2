@@ -18,8 +18,6 @@
 #define __MULTI_PHASE_H__
 
 //
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
 // Needed EFI defines for PEI
 //
 typedef UINT64  EFI_PHYSICAL_ADDRESS;

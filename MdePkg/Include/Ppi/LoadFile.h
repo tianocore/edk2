@@ -30,22 +30,16 @@ typedef struct _EFI_PEI_FV_FILE_LOADER_PPI  EFI_PEI_FV_FILE_LOADER_PPI;
 /**
   Loads a PEIM into memory for subsequent execution.
 
-  @param  This Interface pointer that implements the Load File PPI instance.
-  
-  @param  FfsHeader Pointer to the FFS header of the file to load.
-  
-  @param  ImageAddress Pointer to the address of the loaded Image
-  
-  @param  ImageSize Pointer to the size of the loaded image.
-  
-  @param  EntryPoint Pointer to the entry point of the image.
+  @param  This           Interface pointer that implements the Load File PPI instance.
+  @param  FfsHeader      Pointer to the FFS header of the file to load.
+  @param  ImageAddress   Pointer to the address of the loaded Image
+  @param  ImageSize      Pointer to the size of the loaded image.
+  @param  EntryPoint     Pointer to the entry point of the image.
 
-  @retval EFI_SUCCESS The image was loaded successfully.
-  
-  @retval EFI_OUT_OF_RESOURCES There was not enough memory.
-  
-  @retval EFI_INVALID_PARAMETER The contents of the FFS file did not 
-  contain a valid PE/COFF image that could be loaded.
+  @retval EFI_SUCCESS           The image was loaded successfully.
+  @retval EFI_OUT_OF_RESOURCES  There was not enough memory.
+  @retval EFI_INVALID_PARAMETER The contents of the FFS file did not
+                                contain a valid PE/COFF image that could be loaded.
 
 **/
 typedef

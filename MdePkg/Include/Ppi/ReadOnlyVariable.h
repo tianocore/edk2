@@ -39,29 +39,20 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 /**
   Get Variable value by Name and GUID pair
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  VariableName A NULL-terminated Unicode string that is the name of the vendor¡¯s variable. 
-  
-  @param  VendorGuid A unique identifier for the vendor.
-  
-  @param  Attributes If not NULL, a pointer to the memory location to return 
-  the attributes bitmask for the variable.
-  
-  @param  DataSize On input, the size in bytes of the return Data buffer.
-  On output, the size of data returned in Data.
-  
-  @param  Data The buffer to return the contents of the variable.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  VariableName   A NULL-terminated Unicode string that is the name of the vendor¡¯s variable.
+  @param  VendorGuid     A unique identifier for the vendor.
+  @param  Attributes     If not NULL, a pointer to the memory location to return
+                         the attributes bitmask for the variable.
+  @param  DataSize       On input, the size in bytes of the return Data buffer.
+                         On output, the size of data returned in Data.
+  @param  Data           The buffer to return the contents of the variable.
 
-  @retval EFI_SUCCESS The function completed successfully. 
-  
-  @retval EFI_NOT_FOUND The variable was not found.
-  
-  @retval EFI_BUFFER_TOO_SMALL The BufferSize is too small for the result.
-  
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         The variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL  The BufferSize is too small for the result.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
-  
-  @retval EFI_DEVICE_ERROR The variable could not be retrieved due to a hardware error.
+  @retval EFI_DEVICE_ERROR      The variable could not be retrieved due to a hardware error.
 
 **/
 typedef
@@ -82,27 +73,20 @@ EFI_STATUS
   and on output the interface returns the next variable name data.  When the 
   entire variable list has been returned, the error EFI_NOT_FOUND is returned.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
+  @param  PeiServices      An indirect pointer to the PEI Services Table published by the PEI Foundation.
   @param  VariableNameSize The size of the VariableName buffer.
-  
-  @param  VariableName On input, supplies the last VariableName that was 
-  returned by GetNextVariableName().  On output, returns the Null-terminated 
-  Unicode string of the current variable.
-  
-  @param  VendorGuid On input, supplies the last VendorGuid that was 
-  returned by GetNextVariableName().  On output, returns the VendorGuid 
-  of the current variable.
+  @param  VariableName     On input, supplies the last VariableName that was
+                           returned by GetNextVariableName(). On output, returns the Null-terminated
+                           Unicode string of the current variable.
+  @param  VendorGuid       On input, supplies the last VendorGuid that was
+                           returned by GetNextVariableName(). On output, returns the VendorGuid
+                           of the current variable.
 
-  @retval EFI_SUCCESS The function completed successfully. 
-  
-  @retval EFI_NOT_FOUND The next variable was not found.
-  
-  @retval EFI_BUFFER_TOO_SMALL The VariableNameSize is too small for the result.
-  
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         The next variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the result.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
-  
-  @retval EFI_DEVICE_ERROR The variable name could not be retrieved due to a hardware error.
+  @retval EFI_DEVICE_ERROR      The variable name could not be retrieved due to a hardware error.
 
 **/
 typedef

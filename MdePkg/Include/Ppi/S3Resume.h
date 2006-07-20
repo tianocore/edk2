@@ -32,12 +32,11 @@ typedef struct _EFI_PEI_S3_RESUME_PPI   EFI_PEI_S3_RESUME_PPI;
   Restores the platform to its preboot configuration for an S3 resume and 
   jumps to the OS waking vector.
 
-  @param  PeiServices Pointer to the PEI Services Table
+  @param  PeiServices    Pointer to the PEI Services Table
 
-  @retval EFI_ABORTED Execution of the S3 resume boot script table failed.
-  
-  @retval EFI_NOT_FOUND Some necessary information that is used for 
-  the S3 resume boot path could not be located.
+  @retval EFI_ABORTED           Execution of the S3 resume boot script table failed.
+  @retval EFI_NOT_FOUND         Some necessary information that is used for
+                                the S3 resume boot path could not be located.
 
 **/
 typedef

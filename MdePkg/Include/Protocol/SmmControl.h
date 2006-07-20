@@ -41,24 +41,17 @@ typedef struct {
 /**
   Invokes SMI activation from either the preboot or runtime environment.
 
-  @param  This The EFI_SMM_CONTROL_PROTOCOL instance. 
-  
-  @param  ArgumentBuffer Optional sized data to pass into the protocol activation. 
-  
-  @param  ArgumentBufferSize Optional size of the data.
-  
-  @param  Periodic Optional mechanism to engender a periodic stream.
-  
-  @param  ActivationInterval Optional parameter to repeat at this period one 
-  time or, if the Periodic Boolean is set, periodically.
+  @param  This                  The EFI_SMM_CONTROL_PROTOCOL instance.
+  @param  ArgumentBuffer        Optional sized data to pass into the protocol activation.
+  @param  ArgumentBufferSize    Optional size of the data.
+  @param  Periodic              Optional mechanism to engender a periodic stream.
+  @param  ActivationInterval    Optional parameter to repeat at this period one
+                                time or, if the Periodic Boolean is set, periodically.
 
-  @retval EFI_SUCCESS  The SMI/PMI has been engendered.
-  
-  @retval EFI_DEVICE_ERROR  The timing is unsupported.
-  
-  @retval EFI_INVALID_PARAMETER  The activation period is unsupported.
-  
-  @retval EFI_NOT_STARTED  The SMM base service has not been initialized.
+  @retval EFI_SUCCESS           The SMI/PMI has been engendered.
+  @retval EFI_DEVICE_ERROR      The timing is unsupported.
+  @retval EFI_INVALID_PARAMETER The activation period is unsupported.
+  @retval EFI_NOT_STARTED       The SMM base service has not been initialized.
 
 **/
 typedef
@@ -74,15 +67,12 @@ EFI_STATUS
 /**
   Clears any system state that was created in response to the Active call.
 
-  @param  This The EFI_SMM_CONTROL_PROTOCOL instance. 
-  
-  @param  Periodic Optional parameter to repeat at this period one time
+  @param  This                  The EFI_SMM_CONTROL_PROTOCOL instance.
+  @param  Periodic              Optional parameter to repeat at this period one time
 
-  @retval EFI_SUCCESS  The SMI/PMI has been engendered.
-  
-  @retval EFI_DEVICE_ERROR  The source could not be cleared.
-  
-  @retval EFI_INVALID_PARAMETER  The service did not support the Periodic input argument.
+  @retval EFI_SUCCESS           The SMI/PMI has been engendered.
+  @retval EFI_DEVICE_ERROR      The source could not be cleared.
+  @retval EFI_INVALID_PARAMETER The service did not support the Periodic input argument.
 
 **/
 typedef
@@ -95,11 +85,10 @@ EFI_STATUS
 /**
   Provides information on the source register used to generate the SMI.
 
-  @param  This The EFI_SMM_CONTROL_PROTOCOL instance. 
-  
-  @param  SmiRegister Pointer to the SMI register description structure
+  @param  This                  The EFI_SMM_CONTROL_PROTOCOL instance.
+  @param  SmiRegister           Pointer to the SMI register description structure
 
-  @retval EFI_SUCCESS  The register structure has been returned.
+  @retval EFI_SUCCESS           The register structure has been returned.
 
 **/
 typedef

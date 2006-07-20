@@ -55,48 +55,36 @@ typedef struct {
   database or a passed-in set of data. This function also establishes a 
   pointer to the calling driver¡¯s callback interface. 
 
-  @param  This A pointer to the EFI_FORM_BROWSER_PROTOCOL instance.
-  
-  @param  UseDatabase Determines whether the HII database is to be 
-  used to gather information. If the value is FALSE, the configuration 
-  driver will get the information provided in the passed-in Packet parameters.
-  
-  @param  Handle A pointer to an array of HII handles to display. This value 
-  should correspond to the value of the HII form package that is required to 
-  be displayed.
-  
-  @param  HandleCount The number of handles in the array specified by Handle.
-  
-  @param  Packet A pointer to a set of data containing pointers to IFR 
-  and/or string data. 
-  
-  @param  CallbackHandle The handle to the driver¡¯s callback interface. 
-  This parameter is used only when the UseDatabase parameter is FALSE 
-  and an application wants to register a callback with the browser
-  
-  @param  NvMapOverride This buffer is used only when there is no NV variable 
-  to define the current settings and the caller needs to provide to the browser 
-  the current settings for the "fake" NV variable.
-  
-  @param  ScreenDimensions Allows the browser to be called so that it occupies 
-  a portion of the physical screen instead of dynamically determining the 
-  screen dimensions. 
-  
-  @param  ResetRequired This BOOLEAN value will tell the caller if a reset 
-  is required based on the data that might have been changed. The ResetRequired 
-  parameter is primarily applicable for configuration applications, and is an 
-  optional parameter. 
+  @param  This                  A pointer to the EFI_FORM_BROWSER_PROTOCOL instance.
+  @param  UseDatabase           Determines whether the HII database is to be
+                                used to gather information. If the value is FALSE, the configuration
+                                driver will get the information provided in the passed-in Packet parameters.
+  @param  Handle                A pointer to an array of HII handles to display. This value
+                                should correspond to the value of the HII form package that is required to
+                                be displayed.
+  @param  HandleCount           The number of handles in the array specified by Handle.
+  @param  Packet                A pointer to a set of data containing pointers to IFR
+                                and/or string data.
+  @param  CallbackHandle        The handle to the driver¡¯s callback interface.
+                                This parameter is used only when the UseDatabase parameter is FALSE
+                                and an application wants to register a callback with the browser
+  @param  NvMapOverride         This buffer is used only when there is no NV variable
+                                to define the current settings and the caller needs to provide to the browser
+                                the current settings for the "fake" NV variable.
+  @param  ScreenDimensions      Allows the browser to be called so that it occupies
+                                a portion of the physical screen instead of dynamically determining the
+                                screen dimensions.
+  @param  ResetRequired         This BOOLEAN value will tell the caller if a reset
+                                is required based on the data that might have been changed. The ResetRequired
+                                parameter is primarily applicable for configuration applications, and is an
+                                optional parameter.
 
-  @retval EFI_SUCCESS The function completed successfully
-  
-  @retval EFI_NOT_FOUND The variable was not found.
-  
-  @retval EFI_BUFFER_TOO_SMALL The DataSize is too small for the result. 
-  DataSize has been updated with the size needed to complete the request.
-  
+  @retval EFI_SUCCESS           The function completed successfully
+  @retval EFI_NOT_FOUND         The variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result.
+                                DataSize has been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
-  
-  @retval EFI_DEVICE_ERROR The variable could not be saved due to a hardware failure. 
+  @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
 **/
 typedef
@@ -117,29 +105,21 @@ EFI_STATUS
   Routine used to abstract a generic dialog interface and return the selected 
   key or string.
 
-  @param  NumberOfLines The number of lines for the dialog box.
-  
-  @param  HotKey Defines whether a single character is parsed (TRUE) 
-  and returned in KeyValue or if a string is returned in StringBuffer. 
-  
-  @param  MaximumStringSize The maximum size in bytes of a typed-in string. 
-  Because each character is a CHAR16, the minimum string returned is two bytes.
-  
-  @param  StringBuffer The passed-in pointer to the buffer that will hold 
-  the typed in string if HotKey is FALSE.
-  
-  @param  KeyValue The EFI_INPUT_KEY value returned if HotKey is TRUE.
-  
-  @param  String The pointer to the first string in the list of strings 
-  that comprise the dialog box.
-  
-  @param  ... A series of NumberOfLines text strings that will be used 
-  to construct the dialog box. 
+  @param  NumberOfLines         The number of lines for the dialog box.
+  @param  HotKey                Defines whether a single character is parsed (TRUE)
+                                and returned in KeyValue or if a string is returned in StringBuffer.
+  @param  MaximumStringSize     The maximum size in bytes of a typed-in string.
+                                Because each character is a CHAR16, the minimum string returned is two bytes.
+  @param  StringBuffer          The passed-in pointer to the buffer that will hold
+                                the typed in string if HotKey is FALSE.
+  @param  KeyValue              The EFI_INPUT_KEY value returned if HotKey is TRUE.
+  @param  String                The pointer to the first string in the list of strings
+                                that comprise the dialog box.
+  @param  ...                   A series of NumberOfLines text strings that will be used
+                                to construct the dialog box.
 
-  @retval EFI_SUCCESS The dialog was displayed and user interaction was received.
-  
-  @retval EFI_DEVICE_ERROR The user typed in an ESC character to exit the routine.
-  
+  @retval EFI_SUCCESS           The dialog was displayed and user interaction was received.
+  @retval EFI_DEVICE_ERROR      The user typed in an ESC character to exit the routine.
   @retval EFI_INVALID_PARAMETER One of the parameters was invalid
 
 **/

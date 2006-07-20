@@ -136,7 +136,7 @@ typedef struct {
                                    version numbers are updated with the major and minor version
                                    numbers of the interface                                    
   @param  TargetAddress            Indicates a network or device address of the BIS platform to connect to.                                                                 
-  
+
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_INCOMPATIBLE_VERSION The InterfaceVersion.Major requested by the                
                                    caller was not compatible with the interface version of the
@@ -164,7 +164,7 @@ EFI_STATUS
   @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
                                    of the BIS service.                                                                                         
   @param  ToFree                   An EFI_BIS_DATA* and associated memory block to be freed.
-  
+
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
                                    application instance handle associated with the EFI_BIS protocol.                                     
@@ -186,7 +186,7 @@ EFI_STATUS
       
   @param  AppHandle                An opaque handle that identifies the caller¡¯s instance of initialization
                                    of the BIS service.                                                                                           
-  
+
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
                                    application instance handle associated with the EFI_BIS protocol.                                     
@@ -208,7 +208,7 @@ EFI_STATUS
                                    of the BIS service.                                                                                           
   @param  Certificate              The function writes an allocated EFI_BIS_DATA* containing the Boot
                                    Object Authorization Certificate object.                            
-  
+
   @retval EFI_SUCCESS              The function completed successfully.
   @retval EFI_NO_MAPPING           The AppHandle parameter is not or is no longer a valid
                                    application instance handle associated with the EFI_BIS protocol.                                     

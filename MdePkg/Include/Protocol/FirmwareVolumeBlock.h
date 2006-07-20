@@ -35,8 +35,8 @@ typedef struct _EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL  EFI_FIRMWARE_VOLUME_BLOCK_PR
 /**
   Retrieves Volume attributes.  No polarity translations are done.
 
-  @param  This Calling context
-  @param  Attributes output buffer which contains attributes
+  @param  This                  Calling context
+  @param  Attributes            output buffer which contains attributes
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_SUCCESS
@@ -53,9 +53,9 @@ EFI_STATUS
 /**
   Sets Volume attributes.  No polarity translations are done.
 
-  @param  This Calling context
-  @param  Attributes On input: contains new attributes
-  On output: contains current attributes of FV
+  @param  This                  Calling context
+  @param  Attributes            On input: contains new attributes
+                                On output: contains current attributes of FV
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_SUCCESS
@@ -72,10 +72,10 @@ EFI_STATUS
 /**
   Retrieves the physical address of a memory mapped FV.
 
-  @param  This Calling context
-  @param  Attributes Address is a pointer to a caller allocated EFI_PHYSICAL_ADDRESS
-  that on successful return from GetPhysicalAddress() contains the
-  base address of the firmware volume.
+  @param  This                  Calling context
+  @param  Attributes            Address is a pointer to a caller allocated EFI_PHYSICAL_ADDRESS
+                                that on successful return from GetPhysicalAddress() contains the
+                                base address of the firmware volume.
 
   @retval EFI_UNSUPPORTED
   @retval EFI_SUCCESS
@@ -92,14 +92,14 @@ EFI_STATUS
 /**
   Retrieves the size in bytes of a specific block within an FV.
 
-  @param  This Calling context.
-  @param  Lba Indicates which block to return the size for.
-  @param  BlockSize BlockSize is a pointer to a caller allocated
-  UINTN in which the size of the block is returned.
-  @param  NumberOfBlocks NumberOfBlocks is a pointer to a caller allocated
-  UINTN in which the number of consecutive blocks
-  starting with Lba is returned. All blocks in this
-  range have a size of BlockSize.
+  @param  This                  Calling context.
+  @param  Lba                   Indicates which block to return the size for.
+  @param  BlockSize             BlockSize is a pointer to a caller allocated
+                                UINTN in which the size of the block is returned.
+  @param  NumberOfBlocks        NumberOfBlocks is a pointer to a caller allocated
+                                UINTN in which the number of consecutive blocks
+                                starting with Lba is returned. All blocks in this
+                                range have a size of BlockSize.
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_SUCCESS
@@ -121,12 +121,12 @@ EFI_STATUS
   a block boundary is reached.  *NumBytes is updated to reflect the actual
   number of bytes read.
 
-  @param  This Calling context
-  @param  Lba Block in which to begin read
-  @param  Offset Offset in the block at which to begin read
-  @param  NumBytes At input, indicates the requested read size.  At output, indicates
-  the actual number of bytes read.
-  @param  Buffer Data buffer in which to place data read.
+  @param  This                  Calling context
+  @param  Lba                   Block in which to begin read
+  @param  Offset                Offset in the block at which to begin read
+  @param  NumBytes              At input, indicates the requested read size. At output, indicates
+                                the actual number of bytes read.
+  @param  Buffer                Data buffer in which to place data read.
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_NOT_FOUND
@@ -151,12 +151,12 @@ EFI_STATUS
   reached.  *NumBytes is updated to reflect the actual number of bytes
   written.
 
-  @param  This Calling context
-  @param  Lba Block in which to begin write
-  @param  Offset Offset in the block at which to begin write
-  @param  NumBytes At input, indicates the requested write size.  At output, indicates
-  the actual number of bytes written.
-  @param  Buffer Buffer containing source data for the write.
+  @param  This                  Calling context
+  @param  Lba                   Block in which to begin write
+  @param  Offset                Offset in the block at which to begin write
+  @param  NumBytes              At input, indicates the requested write size. At output, indicates
+                                the actual number of bytes written.
+  @param  Buffer                Buffer containing source data for the write.
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_NOT_FOUND
@@ -185,9 +185,9 @@ EFI_STATUS
   block of the firmware volume), the EraseBlock() function must return
   EFI_INVALID_PARAMETER without modifying the contents of the firmware volume.
 
-  @param  This Calling context
-  @param  ... Starting LBA followed by Number of Lba to erase. a -1 to terminate
-  the list.
+  @param  This                  Calling context
+  @param  ...                   Starting LBA followed by Number of Lba to erase. a -1 to terminate
+                                the list.
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_DEVICE_ERROR

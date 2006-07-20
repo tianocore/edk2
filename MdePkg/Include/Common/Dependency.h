@@ -1,6 +1,5 @@
 /** @file
-  This module contains data specific to dependency expressions
-  and local function prototypes.
+  This module contains data specific to dependency expressions.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

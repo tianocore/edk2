@@ -46,16 +46,13 @@ typedef struct _EFI_SMM_ACCESS_PROTOCOL  EFI_SMM_ACCESS_PROTOCOL;
 /**
   Opens the SMRAM area to be accessible by a boot-service driver.
 
-  @param  This The EFI_SMM_ACCESS_PROTOCOL instance. 
-  
-  @param  DescriptorIndex Indicates that the driver wishes to open 
-  the memory tagged by this index. 
+  @param  This                  The EFI_SMM_ACCESS_PROTOCOL instance.
+  @param  DescriptorIndex       Indicates that the driver wishes to open
+                                the memory tagged by this index.
 
-  @retval EFI_SUCCESS The operation was successful.
-  
+  @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_INVALID_PARAMETER The given DescriptorIndex is not supported.
-  
-  @retval EFI_NOT_STARTED The SMM base service has not been initialized.
+  @retval EFI_NOT_STARTED       The SMM base service has not been initialized.
 
 **/
 typedef
@@ -68,18 +65,14 @@ EFI_STATUS
 /**
   Inhibits access to the SMRAM.
 
-  @param  This The EFI_SMM_ACCESS_PROTOCOL instance. 
-  
-  @param  DescriptorIndex Indicates that the driver wishes to open 
-  the memory tagged by this index. 
+  @param  This                  The EFI_SMM_ACCESS_PROTOCOL instance.
+  @param  DescriptorIndex       Indicates that the driver wishes to open
+                                the memory tagged by this index.
 
-  @retval EFI_SUCCESS The operation was successful.
-  
-  @retval EFI_DEVICE_ERROR The given DescriptorIndex is not open.
-  
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_DEVICE_ERROR      The given DescriptorIndex is not open.
   @retval EFI_INVALID_PARAMETER The given DescriptorIndex is not supported.
-  
-  @retval EFI_NOT_STARTED The SMM base service has not been initialized.
+  @retval EFI_NOT_STARTED       The SMM base service has not been initialized.
 
 **/
 typedef
@@ -91,19 +84,14 @@ EFI_STATUS
 
 /**
   Inhibits access to the SMRAM.
-  
-  @param  This The EFI_SMM_ACCESS_PROTOCOL instance. 
-  
-  @param  DescriptorIndex Indicates that the driver wishes to open 
-  the memory tagged by this index. 
+  @param  This                  The EFI_SMM_ACCESS_PROTOCOL instance.
+  @param  DescriptorIndex       Indicates that the driver wishes to open
+                                the memory tagged by this index.
 
-  @retval EFI_SUCCESS The operation was successful.
-  
-  @retval EFI_DEVICE_ERROR The given DescriptorIndex is not open.
-  
+  @retval EFI_SUCCESS           The operation was successful.
+  @retval EFI_DEVICE_ERROR      The given DescriptorIndex is not open.
   @retval EFI_INVALID_PARAMETER The given DescriptorIndex is not supported.
-  
-  @retval EFI_NOT_STARTED The SMM base service has not been initialized.
+  @retval EFI_NOT_STARTED       The SMM base service has not been initialized.
 
 **/
 typedef
@@ -116,15 +104,12 @@ EFI_STATUS
 /**
   Queries the memory controller for the possible regions that will support SMRAM.
 
-  @param  This The EFI_SMM_ACCESS_PROTOCOL instance. 
-  
-  @param  SmramMapSize A pointer to the size, in bytes, of the SmramMemoryMap buffer.
-  
-  @param  SmramMap A pointer to the buffer in which firmware places the current memory map.
+  @param  This                  The EFI_SMM_ACCESS_PROTOCOL instance.
+  @param  SmramMapSize          A pointer to the size, in bytes, of the SmramMemoryMap buffer.
+  @param  SmramMap              A pointer to the buffer in which firmware places the current memory map.
 
-  @retval EFI_SUCCESS The chipset supported the given resource.
-  
-  @retval EFI_BUFFER_TOO_SMALL The SmramMap parameter was too small.
+  @retval EFI_SUCCESS           The chipset supported the given resource.
+  @retval EFI_BUFFER_TOO_SMALL  The SmramMap parameter was too small.
 
 **/
 typedef

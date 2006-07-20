@@ -60,13 +60,13 @@ typedef struct {
 /**
   Dispatch function for a Sx state SMI handler.
 
-  @param  DispatchHandle Handle of this dispatch function.
-  @param  DispatchContext Pointer to the dispatch function¡¯s context. 
-  The Type and Phase fields are filled in by the Sx dispatch driver 
-  prior to invoking this dispatch function. For this interface, 
-  the Sx driver will call the dispatch function for all Sx type 
-  and phases, so the Sx state handler(s) must check the  Type and 
-  Phase field of EFI_SMM_SX_DISPATCH_CONTEXT and act accordingly.
+  @param  DispatchHandle        Handle of this dispatch function.
+  @param  DispatchContext       Pointer to the dispatch function¡¯s context.
+                                The Type and Phase fields are filled in by the Sx dispatch driver
+                                prior to invoking this dispatch function. For this interface,
+                                the Sx driver will call the dispatch function for all Sx type
+                                and phases, so the Sx state handler(s) must check the Type and
+                                Phase field of EFI_SMM_SX_DISPATCH_CONTEXT and act accordingly.
 
   Nothing
 
@@ -81,30 +81,30 @@ VOID
 /**
   Register a child SMI source dispatch function with a parent SMM driver
 
-  @param  This Protocol instance pointer.
-  @param  DispatchFunction Pointer to dispatch function to be invoked for
-  this SMI source
-  @param  DispatchContext Pointer to the dispatch function's context.
-  The caller fills this context in before calling
-  the register function to indicate to the register
-  function which Sx state type and phase the caller
-  wishes to be called back on.  For this intertace,
-  the Sx driver will call the registered handlers for
-  all Sx type and phases, so the Sx state handler(s)
-  must check the Type and Phase field of the Dispatch
-  context and act accordingly.
-  @param  DispatchHandle Handle of dispatch function, for when interfacing
-  with the parent Sx state SMM driver.
+  @param  This                  Protocol instance pointer.
+  @param  DispatchFunction      Pointer to dispatch function to be invoked for
+                                this SMI source
+  @param  DispatchContext       Pointer to the dispatch function's context.
+                                The caller fills this context in before calling
+                                the register function to indicate to the register
+                                function which Sx state type and phase the caller
+                                wishes to be called back on. For this intertace,
+                                the Sx driver will call the registered handlers for
+                                all Sx type and phases, so the Sx state handler(s)
+                                must check the Type and Phase field of the Dispatch
+                                context and act accordingly.
+  @param  DispatchHandle        Handle of dispatch function, for when interfacing
+                                with the parent Sx state SMM driver.
 
-  @retval  EFI_SUCCESS The dispatch function has been successfully
-  registered and the SMI source has been enabled.
-  @retval  EFI_UNSUPPORTED The Sx driver or hardware does not support that
-  Sx Type/Phase.
-  @retval  EFI_DEVICE_ERROR The Sx driver was unable to enable the SMI source.
-  @retval  EFI_OUT_OF_RESOURCES Not enough memory (system or SMM) to manage this
-  child.
-  @retval  EFI_INVALID_PARAMETER DispatchContext is invalid. Type & Phase are not
-  within valid range.
+  @retval EFI_SUCCESS           The dispatch function has been successfully
+                                registered and the SMI source has been enabled.
+  @retval EFI_UNSUPPORTED       The Sx driver or hardware does not support that
+                                Sx Type/Phase.
+  @retval EFI_DEVICE_ERROR      The Sx driver was unable to enable the SMI source.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory (system or SMM) to manage this
+                                child.
+  @retval EFI_INVALID_PARAMETER DispatchContext is invalid. Type & Phase are not
+                                within valid range.
 
 **/
 typedef
@@ -119,14 +119,14 @@ EFI_STATUS
 /**
   Unregister a child SMI source dispatch function with a parent SMM driver
 
-  @param  This Protocol instance pointer.
-  @param  DispatchHandle Handle of dispatch function to deregister.
+  @param  This                  Protocol instance pointer.
+  @param  DispatchHandle        Handle of dispatch function to deregister.
 
-  @retval  EFI_SUCCESS The dispatch function has been successfully unregistered and the
-  SMI source has been disabled if there are no other registered child
-  dispatch functions for this SMI source.
-  @retval  EFI_INVALID_PARAMETER Handle is invalid.
-  @retval  other TBD
+  @retval EFI_SUCCESS           The dispatch function has been successfully unregistered and the
+                                SMI source has been disabled if there are no other registered child
+                                dispatch functions for this SMI source.
+  @retval EFI_INVALID_PARAMETER Handle is invalid.
+  @retval other                 TBD
 
 **/
 typedef

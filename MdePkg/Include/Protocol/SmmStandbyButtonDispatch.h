@@ -54,11 +54,11 @@ typedef struct {
 /**
   Dispatch function for a Standby Button SMI handler.
 
-  @param  DispatchHandle Handle of this dispatch function.
-  @param  DispatchContext Pointer to the dispatch function's context.
-  The DispatchContext fields are filled in
-  by the dispatching driver prior to
-  invoking this dispatch function.
+  @param  DispatchHandle        Handle of this dispatch function.
+  @param  DispatchContext       Pointer to the dispatch function's context.
+                                The DispatchContext fields are filled in
+                                by the dispatching driver prior to
+                                invoking this dispatch function.
 
   @return Nothing
 
@@ -73,24 +73,24 @@ VOID
 /**
   Register a child SMI source dispatch function with a parent SMM driver
 
-  @param  This Protocol instance pointer.
-  @param  DispatchFunction Pointer to dispatch function to be invoked for
-  this SMI source
-  @param  DispatchContext Pointer to the dispatch function's context.
-  The caller fills this context in before calling
-  the register function to indicate to the register
-  function the Standby Button SMI phase for which the dispatch
-  function should be invoked.
-  @param  DispatchHandle Handle of dispatch function, for when interfacing
-  with the parent Sx state SMM driver.
+  @param  This                  Protocol instance pointer.
+  @param  DispatchFunction      Pointer to dispatch function to be invoked for
+                                this SMI source
+  @param  DispatchContext       Pointer to the dispatch function's context.
+                                The caller fills this context in before calling
+                                the register function to indicate to the register
+                                function the Standby Button SMI phase for which the dispatch
+                                function should be invoked.
+  @param  DispatchHandle        Handle of dispatch function, for when interfacing
+                                with the parent Sx state SMM driver.
 
-  @retval  EFI_SUCCESS The dispatch function has been successfully
-  registered and the SMI source has been enabled.
-  @retval  EFI_DEVICE_ERROR The driver was unable to enable the SMI source.
-  @retval  EFI_OUT_OF_RESOURCES Not enough memory (system or SMM) to manage this
-  child.
-  @retval  EFI_INVALID_PARAMETER DispatchContext is invalid. The Standby Button  SMI
-  phase is not within valid range.
+  @retval EFI_SUCCESS           The dispatch function has been successfully
+                                registered and the SMI source has been enabled.
+  @retval EFI_DEVICE_ERROR      The driver was unable to enable the SMI source.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory (system or SMM) to manage this
+                                child.
+  @retval EFI_INVALID_PARAMETER DispatchContext is invalid. The Standby Button SMI
+                                phase is not within valid range.
 
 **/
 typedef
@@ -105,15 +105,15 @@ EFI_STATUS
 /**
   Unregister a child SMI source dispatch function with a parent SMM driver
 
-  @param  This Protocol instance pointer.
-  @param  DispatchHandle Handle of dispatch function to deregister.
+  @param  This                  Protocol instance pointer.
+  @param  DispatchHandle        Handle of dispatch function to deregister.
 
-  @retval  EFI_SUCCESS The dispatch function has been successfully
-  unregistered and the SMI source has been disabled
-  if there are no other registered child dispatch
-  functions for this SMI source.
-  @retval  EFI_INVALID_PARAMETER Handle is invalid.
-  @retval  other TBD
+  @retval EFI_SUCCESS           The dispatch function has been successfully
+                                unregistered and the SMI source has been disabled
+                                if there are no other registered child dispatch
+                                functions for this SMI source.
+  @retval EFI_INVALID_PARAMETER Handle is invalid.
+  @retval other                 TBD
 
 **/
 typedef

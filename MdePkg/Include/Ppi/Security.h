@@ -32,18 +32,14 @@ typedef struct _EFI_PEI_SECURITY_PPI  EFI_PEI_SECURITY_PPI;
   Allows the platform builder to implement a security policy in response 
   to varying file authentication states.
 
-  @param  PeiServices Pointer to the PEI Services Table.
-  
-  @param  This Interface pointer that implements the particular EFI_PEI_SECURITY_PPI instance.
-  
-  @param  AuthenticationStatus Status returned by the verification service as part of section extraction.
-  
-  @param  FfsFileHeader Pointer to the file under review. 
-  
+  @param  PeiServices    Pointer to the PEI Services Table.
+  @param  This           Interface pointer that implements the particular EFI_PEI_SECURITY_PPI instance.
+  @param  AuthenticationStatus 
+                         Status returned by the verification service as part of section extraction.
+  @param  FfsFileHeader  Pointer to the file under review.
   @param  DeferExecution Pointer to a variable that alerts the PEI Foundation to defer execution of a PEIM.
 
-  @retval EFI_SUCCESS The service performed its action successfully.
-  
+  @retval EFI_SUCCESS           The service performed its action successfully.
   @retval EFI_SECURITY_VIOLATION The object cannot be trusted
 
 **/

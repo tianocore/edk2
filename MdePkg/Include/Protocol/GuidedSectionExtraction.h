@@ -49,20 +49,20 @@ typedef struct _EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL  EFI_GUIDED_SECTION_EXTRA
   Processes the input section and returns the data contained therein along 
   with the authentication status.
 
-  @param  This                  Indicates the EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.  
-  @param  InputSection          Buffer containing the input GUIDed section to be processed.  
-  @param  OutputBuffer          *OutputBuffer is allocated from boot services pool memory 
-                                and contains the new section stream.  
-  @param  OutputSize            A pointer to a caller-allocated UINTN in which the size 
-                                of *OutputBuffer allocation is stored.   
-  @param  AuthenticationStatus  A pointer to a caller-allocated UINT32 that 
+  @param  This                  Indicates the EFI_GUIDED_SECTION_EXTRACTION_PROTOCOL instance.
+  @param  InputSection          Buffer containing the input GUIDed section to be processed.
+  @param  OutputBuffer          *OutputBuffer is allocated from boot services pool memory
+                                and contains the new section stream.
+  @param  OutputSize            A pointer to a caller-allocated UINTN in which the size
+                                of *OutputBuffer allocation is stored.
+  @param  AuthenticationStatus  A pointer to a caller-allocated UINT32 that
                                 indicates the authentication status of the output buffer.
                                 
-  @retval EFI_SUCCESS           The InputSection was successfully processed and the 
+  @retval EFI_SUCCESS           The InputSection was successfully processed and the
                                 section contents were returned.
-  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to 
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to
                                 process the request.
-  @retval EFI_INVALID_PARAMETER The GUID in InputSection does not match 
+  @retval EFI_INVALID_PARAMETER The GUID in InputSection does not match
                                 this instance of the GUIDed Section Extraction Protocol.
 
 **/

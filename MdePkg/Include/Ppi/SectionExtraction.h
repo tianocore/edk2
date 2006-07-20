@@ -41,50 +41,40 @@ typedef struct _EFI_PEI_SECTION_EXTRACTION_PPI EFI_PEI_SECTION_EXTRACTION_PPI;
   It will retrieve both encapsulation sections and leaf sections in their entirety,
   exclusive of the section header.
 
-  @param  PeiServices Pointer to the PEI Services Table.
-  
-  @param  This Indicates the calling context
-  
-  @param  SectionType Pointer to an EFI_SECTION_TYPE. If SectionType == NULL, 
-  the contents of the entire section are returned in Buffer. If SectionType 
-  is not NULL, only the requested section is returned.
-  
-  @param  SectionDefinitionGuid Pointer to an EFI_GUID.
-  If SectionType == EFI_SECTION_GUID_DEFINED, SectionDefinitionGuid 
-  indicates for which section GUID to search.
-  If SectionType != EFI_SECTION_GUID_DEFINED, SectionDefinitionGuid 
-  is unused and is ignored.
-  
-  @param  SectionInstance If SectionType is not NULL, indicates which 
-  instance of the requested section type to return.
-  
-  @param  Buffer Pointer to a pointer to a buffer in which the section 
-  contents are returned.
-  
-  @param  BufferSize A pointer to a caller-allocated UINT32.On input, *BufferSize 
-  indicates the size in bytes of the memory region pointed to by Buffer.On output,
-  *BufferSize contains the number of bytes required to read the section.
-  
-  @param  AuthenticationStatus A pointer to a caller-allocated UINT32 in 
-  which any metadata from encapsulating GUID-defined sections is returned.
+  @param  PeiServices    Pointer to the PEI Services Table.
+  @param  This           Indicates the calling context
+  @param  SectionType    Pointer to an EFI_SECTION_TYPE. If SectionType == NULL,
+                         the contents of the entire section are returned in Buffer. If SectionType
+                         is not NULL, only the requested section is returned.
+  @param  SectionDefinitionGuid 
+                         Pointer to an EFI_GUID.
+                         If SectionType == EFI_SECTION_GUID_DEFINED, SectionDefinitionGuid
+                         indicates for which section GUID to search.
+                         If SectionType != EFI_SECTION_GUID_DEFINED, SectionDefinitionGuid
+                         is unused and is ignored.
+  @param  SectionInstance If SectionType is not NULL, indicates which
+                         instance of the requested section type to return.
+  @param  Buffer         Pointer to a pointer to a buffer in which the section
+                         contents are returned.
+  @param  BufferSize     A pointer to a caller-allocated UINT32.On input, *BufferSize
+                         indicates the size in bytes of the memory region pointed to by Buffer.On output,
+                         *BufferSize contains the number of bytes required to read the section.
+  @param  AuthenticationStatus 
+                         A pointer to a caller-allocated UINT32 in
+                         which any metadata from encapsulating GUID-defined sections is returned.
 
-  @retval EFI_SUCCESS The section was successfully processed and the section 
-  contents were returned in Buffer.
-  
-  @retval EFI_PROTOCOL_ERROR A GUID-defined section was encountered in 
-  the file with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED bit set, but 
-  there was no corresponding GUIDed Section Extraction Protocol in the 
-  handle database.*Buffer is unmodified.
-  
-  @retval EFI_NOT_FOUND The requested section does not exist.*Buffer is unmodified.
-  
-  @retval EFI_OUT_OF_RESOURCES The system has insufficient resources to process the request.
-  
+  @retval EFI_SUCCESS           The section was successfully processed and the section
+                                contents were returned in Buffer.
+  @retval EFI_PROTOCOL_ERROR    A GUID-defined section was encountered in
+                                the file with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED bit set, but
+                                there was no corresponding GUIDed Section Extraction Protocol in the
+                                handle database.*Buffer is unmodified.
+  @retval EFI_NOT_FOUND         The requested section does not exist.*Buffer is unmodified.
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process the request.
   @retval EFI_INVALID_PARAMETER The SectionStreamHandle does not exist.
-  
-  @retval EFI_WARN_TOO_SMALL The size of the input buffer is insufficient to 
-  contain the requested section.  The input buffer is filled and contents are
-  section contents are truncated.
+  @retval EFI_WARN_TOO_SMALL    The size of the input buffer is insufficient to
+                                contain the requested section. The input buffer is filled and contents are
+                                section contents are truncated.
 
 **/
 typedef

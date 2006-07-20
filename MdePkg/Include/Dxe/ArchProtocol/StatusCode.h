@@ -34,24 +34,19 @@
 /**
   Provides an interface that a software module can call to report a status code.
 
-  @param  Type Indicates the type of status code being reported.
-  
-  @param  Value Describes the current status of a hardware or software entity.
-  This included information about the class and subclass that is used to 
-  classify the entity as well as an operation.
-  
-  @param  Instance The enumeration of a hardware or software entity within 
-  the system. Valid instance numbers start with 1.
-  
-  @param  CallerId This optional parameter may be used to identify the caller.
-  This parameter allows the status code driver to apply different rules to 
-  different callers.
-  
-  @param  Data This optional parameter may be used to pass additional data.
+  @param  Type             Indicates the type of status code being reported.
+  @param  Value            Describes the current status of a hardware or software entity.
+                           This included information about the class and subclass that is used to
+                           classify the entity as well as an operation.
+  @param  Instance         The enumeration of a hardware or software entity within
+                           the system. Valid instance numbers start with 1.
+  @param  CallerId         This optional parameter may be used to identify the caller.
+                           This parameter allows the status code driver to apply different rules to
+                           different callers.
+  @param  Data             This optional parameter may be used to pass additional data.
 
-  @retval EFI_SUCCESS The function completed successfully
-  
-  @retval EFI_DEVICE_ERROR The function should not be completed due to a device error.
+  @retval EFI_SUCCESS           The function completed successfully
+  @retval EFI_DEVICE_ERROR      The function should not be completed due to a device error.
 
 **/
 typedef
@@ -70,7 +65,7 @@ EFI_STATUS
   This protocol must be produced by a runtime DXE driver and may be consumed 
   only by the DXE Foundation.
 
-  @param ReportStatusCode Emit a status code.
+  @param  ReportStatusCode Emit a status code.
 
 **/
 typedef struct _EFI_STATUS_CODE_PROTOCOL {

@@ -62,7 +62,7 @@ typedef struct {
 //
 #ifndef TRUE
 //
-// BugBug: UEFI specification claims 1 and 0. We are concerned about the 
+//  UEFI specification claims 1 and 0. We are concerned about the 
 //  complier portability so we did it this way.
 //
 #define TRUE  ((BOOLEAN)(1==1))

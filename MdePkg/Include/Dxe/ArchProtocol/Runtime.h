@@ -50,23 +50,19 @@ typedef struct _EFI_RUNTIME_ARCH_PROTOCOL   EFI_RUNTIME_ARCH_PROTOCOL;
   loaded into memory with the Boot Service LoadImage().  As a result, no 
   parameter checking needs to be performed.
 
-  @param  This The EFI_RUNTIME_ARCH_PROTOCOL instance.
-  
-  @param  ImageBase Start of image that has been loaded in memory. It is either
-  a pointer to the DOS or PE header of the image.
-  
-  @param  ImageSize Size of the image in bytes.
-  
-  @param  RelocationData Information about the fixups that were performed on ImageBase
-  when it was loaded into memory. This information is needed
-  when the virtual mode fix-ups are reapplied so that data that
-  has been programmatically updated will not be fixed up. If
-  code updates a global variable the code is responsible for
-  fixing up the variable for virtual mode.
+  @param  This             The EFI_RUNTIME_ARCH_PROTOCOL instance.
+  @param  ImageBase        Start of image that has been loaded in memory. It is either
+                           a pointer to the DOS or PE header of the image.
+  @param  ImageSize        Size of the image in bytes.
+  @param  RelocationData   Information about the fixups that were performed on ImageBase
+                           when it was loaded into memory. This information is needed
+                           when the virtual mode fix-ups are reapplied so that data that
+                           has been programmatically updated will not be fixed up. If
+                           code updates a global variable the code is responsible for
+                           fixing up the variable for virtual mode.
 
-  @retval  EFI_SUCCESS The ImageBase has been registered.
-  
-  @retval  EFI_OUT_OF_RESOURCES There are not enough resources to register ImageBase.
+  @retval EFI_SUCCESS           The ImageBase has been registered.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to register ImageBase.
 
 **/
 typedef
@@ -88,22 +84,16 @@ EFI_STATUS
   with the Boot Service CreateEvent().  As a result, no parameter checking needs 
   to be performed.
 
-  @param  This The EFI_RUNTIME_ARCH_PROTOCOL instance.
-  
-  @param  Type The same as Type passed into CreateEvent().
-  
-  @param  NotifyTpl The same as NotifyTpl passed into CreateEvent().
-  
-  @param  NotifyFunction The same as NotifyFunction passed into CreateEvent().
-  
-  @param  NotifyContext The same as NotifyContext passed into CreateEvent().
-  
-  @param  Event The EFI_EVENT returned by CreateEvent().  Event must be in
-  runtime memory.
+  @param  This             The EFI_RUNTIME_ARCH_PROTOCOL instance.
+  @param  Type             The same as Type passed into CreateEvent().
+  @param  NotifyTpl        The same as NotifyTpl passed into CreateEvent().
+  @param  NotifyFunction   The same as NotifyFunction passed into CreateEvent().
+  @param  NotifyContext    The same as NotifyContext passed into CreateEvent().
+  @param  Event            The EFI_EVENT returned by CreateEvent(). Event must be in
+                           runtime memory.
 
-  @retval  EFI_SUCCESS The Event has been registered.
-  
-  @retval  EFI_OUT_OF_RESOURCES There are not enough resources to register Event.
+  @retval EFI_SUCCESS           The Event has been registered.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources to register Event.
 
 **/
 typedef

@@ -51,24 +51,17 @@ typedef enum {
   Provides the basic memory and I/O interfaces that are used to 
   abstract accesses to devices.
 
-  @param  This The EFI_SMM_CPU_IO_INTERFACE instance.  
-  
-  @param  Width Signifies the width of the I/O operations. 
-  
-  @param  Address The base address of the I/O operations.
-  
-  @param  Count The number of I/O operations to perform. 
-  
-  @param  Buffer For read operations, the destination buffer to store the results.
-  For write operations, the source buffer from which to write data.
+  @param  This             The EFI_SMM_CPU_IO_INTERFACE instance.
+  @param  Width            Signifies the width of the I/O operations.
+  @param  Address          The base address of the I/O operations.
+  @param  Count            The number of I/O operations to perform.
+  @param  Buffer           For read operations, the destination buffer to store the results.
+                           For write operations, the source buffer from which to write data.
 
-  @retval EFI_SUCCESS The data was read from or written to the device.
-  
-  @retval EFI_UNSUPPORTED The Address is not valid for this system.
-  
+  @retval EFI_SUCCESS           The data was read from or written to the device.
+  @retval EFI_UNSUPPORTED       The Address is not valid for this system.
   @retval EFI_INVALID_PARAMETER Width or Count, or both, were invalid.
-  
-  @retval EFI_OUT_OF_RESOURCES The request could not be completed due to a lack of resources.
+  @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 
 **/
 typedef
@@ -95,18 +88,14 @@ struct _EFI_SMM_CPU_IO_INTERFACE {
   Allocates pool memory from SMRAM for IA-32 or runtime memory for 
   the Itanium processor family.
 
-  @param  PoolType The type of pool to allocate.The only supported type is EfiRuntimeServicesData
-  
-  @param  Size The number of bytes to allocate from the pool.
-  
-  @param  Buffer A pointer to a pointer to the allocated buffer if the call 
-  succeeds; undefined otherwise.
+  @param  PoolType         The type of pool to allocate.The only supported type is EfiRuntimeServicesData
+  @param  Size             The number of bytes to allocate from the pool.
+  @param  Buffer           A pointer to a pointer to the allocated buffer if the call
+                           succeeds; undefined otherwise.
 
-  @retval EFI_SUCCESS  The requested number of bytes was allocated.
-  
+  @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
-  
-  @retval EFI_UNSUPPORTED  In runtime.
+  @retval EFI_UNSUPPORTED       In runtime.
 
 **/
 typedef
@@ -120,13 +109,11 @@ EFI_STATUS
 /**
   Returns pool memory to the system.
 
-  @param  Buffer Pointer to the buffer to free.
+  @param  Buffer           Pointer to the buffer to free.
 
-  @retval EFI_SUCCESS  The memory was returned to the system.
-  
-  @retval EFI_INVALID_PARAMETER  Buffer was invalid.  
-  
-  @retval EFI_UNSUPPORTED  In runtime.
+  @retval EFI_SUCCESS           The memory was returned to the system.
+  @retval EFI_INVALID_PARAMETER Buffer was invalid.
+  @retval EFI_UNSUPPORTED       In runtime.
 
 **/
 typedef
@@ -138,24 +125,18 @@ EFI_STATUS
 /**
   Allocates memory pages from the system.
 
-  @param  Type The type of allocation to perform. 
-  
-  @param  MemoryType The only supported type is EfiRuntimeServicesData
-  
-  @param  NumberofPages The number of contiguous 4 KB pages to allocate
-  
-  @param  Memory Pointer to a physical address. On input, the way in which 
-  the address is used depends on the value of Type. On output, the address 
-  is set to the base of the page range that was allocated.
+  @param  Type             The type of allocation to perform.
+  @param  MemoryType       The only supported type is EfiRuntimeServicesData
+  @param  NumberofPages    The number of contiguous 4 KB pages to allocate
+  @param  Memory           Pointer to a physical address. On input, the way in which
+                           the address is used depends on the value of Type. On output, the address
+                           is set to the base of the page range that was allocated.
 
-  @retval EFI_SUCCESS  The requested pages were allocated.
-  
+  @retval EFI_SUCCESS           The requested pages were allocated.
   @retval EFI_OUT_OF_RESOURCES  The pages requested could not be allocated.
-  
-  @retval EFI_NOT_FOUND   The requested pages could not be found.
-  
-  @retval EFI_INVALID_PARAMETER  Type is not AllocateAnyPages or AllocateMaxAddress 
-  or AllocateAddress. Or MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
+  @retval EFI_NOT_FOUND         The requested pages could not be found.
+  @retval EFI_INVALID_PARAMETER Type is not AllocateAnyPages or AllocateMaxAddress
+                                or AllocateAddress. Or MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
 
 **/
 typedef
@@ -170,15 +151,12 @@ EFI_STATUS
 /**
   Frees memory pages for the system.
 
-  @param  Memory The base physical address of the pages to be freed
-  
-  @param  NumberOfPages The number of contiguous 4 KB pages to free.
+  @param  Memory           The base physical address of the pages to be freed
+  @param  NumberOfPages    The number of contiguous 4 KB pages to free.
 
-  @retval EFI_SUCCESS  The requested memory pages were freed.
-  
-  @retval EFI_INVALID_PARAMETER   Memory is not a page-aligned address or NumberOfPages is invalid.
-  
-  @retval EFI_NOT_FOUND   The requested memory pages were not allocated with SmmAllocatePages().
+  @retval EFI_SUCCESS           The requested memory pages were freed.
+  @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or NumberOfPages is invalid.
+  @retval EFI_NOT_FOUND         The requested memory pages were not allocated with SmmAllocatePages().
 
 **/
 typedef
@@ -412,15 +390,14 @@ typedef union {
   This function is the main entry point for an SMM handler dispatch 
   or communicate-based callback. 
 
-  @param  SmmImageHandle A unique value returned by the SMM infrastructure 
-  in response to registration for a communicate-based callback or dispatch. 
-  
-  @param  CommunicationBuffer An optional buffer that will be populated 
-  by the SMM infrastructure in response to a non-SMM agent (preboot or runtime) 
-  invoking the EFI_SMM_BASE_PROTOCOL.Communicate() service.
-  
-  @param  SourceSize If CommunicationBuffer is non-NULL, this field 
-  indicates the size of the data payload in this buffer.
+  @param  SmmImageHandle   A unique value returned by the SMM infrastructure
+                           in response to registration for a communicate-based callback or dispatch.
+  @param  CommunicationBuffer 
+                           An optional buffer that will be populated
+                           by the SMM infrastructure in response to a non-SMM agent (preboot or runtime)
+                           invoking the EFI_SMM_BASE_PROTOCOL.Communicate() service.
+  @param  SourceSize       If CommunicationBuffer is non-NULL, this field
+                           indicates the size of the data payload in this buffer.
 
   @return Status Code
 
@@ -439,15 +416,15 @@ EFI_STATUS
   Table.  The list is stored as an array of (GUID, Pointer) pairs.  The list 
   must be allocated from pool memory with PoolType set to EfiRuntimeServicesData.
 
-  @param  SystemTable A pointer to the SMM System Table.
-  @param  Guid A pointer to the GUID for the entry to add, update, or remove.
-  @param  Table A pointer to the buffer of the table to add.
-  @param  TableSize The size of the table to install.
+  @param  SystemTable      A pointer to the SMM System Table.
+  @param  Guid             A pointer to the GUID for the entry to add, update, or remove.
+  @param  Table            A pointer to the buffer of the table to add.
+  @param  TableSize        The size of the table to install.
 
-  @retval EFI_SUCCESS The (Guid, Table) pair was added, updated, or removed.
+  @retval EFI_SUCCESS           The (Guid, Table) pair was added, updated, or removed.
   @retval EFI_INVALID_PARAMETER Guid is not valid.
-  @retval EFI_NOT_FOUND An attempt was made to delete a non-existent entry.
-  @retval EFI_OUT_OF_RESOURCES There is not enough memory available to complete the operation.
+  @retval EFI_NOT_FOUND         An attempt was made to delete a non-existent entry.
+  @retval EFI_OUT_OF_RESOURCES  There is not enough memory available to complete the operation.
 
 **/
 typedef
