@@ -240,8 +240,9 @@ public class GenBuildTask extends Ant {
             //
             // Whether the module is built before
             //
-            if (GlobalData.isModuleBuilt(fpdModuleId)) {
-                return ;
+            if ((moduleId.isLibrary() == false && GlobalData.hasFpdModuleSA(fpdModuleId) == false) 
+                || GlobalData.isModuleBuilt(fpdModuleId)) {
+                continue;
             }
             else {
                 GlobalData.registerBuiltModule(fpdModuleId);

@@ -315,7 +315,11 @@ public class GlobalData {
         }
         fpdModuleSA.put(fpdModuleId, result);
     }
-    
+
+    public synchronized static boolean hasFpdModuleSA(FpdModuleIdentification fpdModuleId) {
+        return fpdModuleSA.containsKey(fpdModuleId);
+    }
+
     /**
       Query overrided module surface area information. If current is Package
       or Platform build, also include the information from FPD file. 

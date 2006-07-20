@@ -220,9 +220,9 @@ public class FpdParserTask extends Task {
                 getProject().setProperty(globalVariables[j][0], globalVariables[j][1]);
             }
 
-            getProject().setProperty("FV_FILENAME", validFv[i].toUpperCase());
+            getProject().setProperty("FV_FILENAME", validFv[i]);
             
-            File fvFile = new File(getProject().replaceProperties( getProject().getProperty("FV_DIR") + File.separatorChar + validFv[i].toUpperCase() + ".inf"));
+            File fvFile = new File(getProject().replaceProperties( getProject().getProperty("FV_DIR") + File.separatorChar + validFv[i] + ".inf"));
             fvFile.getParentFile().mkdirs();
 
             try {
@@ -295,7 +295,7 @@ public class FpdParserTask extends Task {
                 //
                 // Files
                 //
-                Set<FpdModuleIdentification> filesSet = fvs.get(validFv[i].toUpperCase());
+                Set<FpdModuleIdentification> filesSet = fvs.get(validFv[i]);
                 if (filesSet != null) {
                     FpdModuleIdentification[] files = filesSet.toArray(new FpdModuleIdentification[filesSet.size()]);
                     bw.write("[files]");
@@ -503,8 +503,7 @@ public class FpdParserTask extends Task {
         if (fvName == null || fvName.trim().length() == 0) {
             fvName = "NULL";
         }
-        String upcaseFvName = fvName.toUpperCase();
-        String[] fvNameArray = upcaseFvName.split("[, \t]+");
+        String[] fvNameArray = fvName.split("[, \t]+");
         for (int i = 0; i < fvNameArray.length; i++) {
             //
             // Put module to corresponding fvName

@@ -93,7 +93,7 @@ public class EfiRomTask extends Task implements EfiDefine {
     ///
     /// output directory
     ///
-    private String outputDir = "";
+    private String outputDir = ".";
  
     
     ///
