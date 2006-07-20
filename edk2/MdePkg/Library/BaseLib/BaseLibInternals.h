@@ -22,7 +22,7 @@
 //
 
 /**
-  Worker functons that shifts a 64-bit integer left between 0 and 63 bits. The low bits
+  Shifts a 64-bit integer left between 0 and 63 bits. The low bits
   are filled with zeros. The shifted value is returned.
 
   This function shifts the 64-bit value Operand to the left by Count bits. The
@@ -42,7 +42,7 @@ InternalMathLShiftU64 (
   );
 
 /**
-  Worker functon that shifts a 64-bit integer right between 0 and 63 bits. This high bits 
+  Shifts a 64-bit integer right between 0 and 63 bits. This high bits
   are filled with zeros. The shifted value is returned.
 
   This function shifts the 64-bit value Operand to the right by Count bits. The
@@ -62,7 +62,7 @@ InternalMathRShiftU64 (
   );
 
 /**
-  Worker function that shifts a 64-bit integer right between 0 and 63 bits. The high bits
+  Shifts a 64-bit integer right between 0 and 63 bits. The high bits
   are filled with original integer's bit 63. The shifted value is returned.
 
   This function shifts the 64-bit value Operand to the right by Count bits. The
@@ -82,7 +82,7 @@ InternalMathARShiftU64 (
   );
 
 /**
-  Worker function that rotates a 64-bit integer left between 0 and 63 bits, filling 
+  Rotates a 64-bit integer left between 0 and 63 bits, filling
   the low bits with the high bits that were rotated.
 
   This function rotates the 64-bit value Operand to the left by Count bits. The
@@ -103,7 +103,7 @@ InternalMathLRotU64 (
   );
 
 /**
-  Worker function that rotates a 64-bit integer right between 0 and 63 bits, filling
+  Rotates a 64-bit integer right between 0 and 63 bits, filling
   the high bits with the high low bits that were rotated.
 
   This function rotates the 64-bit value Operand to the right by Count bits.
@@ -124,7 +124,7 @@ InternalMathRRotU64 (
   );
 
 /**
-  Worker function that switches the endianess of a 64-bit integer.
+  Switches the endianess of a 64-bit integer.
 
   This function swaps the bytes in a 64-bit unsigned value to switch the value
   from little endian to big endian or vice versa. The byte swapped value is
@@ -142,7 +142,7 @@ InternalMathSwapBytes64 (
   );
 
 /**
-  Worker function that multiples a 64-bit unsigned integer by a 32-bit unsigned integer
+  Multiples a 64-bit unsigned integer by a 32-bit unsigned integer
   and generates a 64-bit unsigned result.
 
   This function multiples the 64-bit unsigned value Multiplicand by the 32-bit
@@ -163,7 +163,7 @@ InternalMathMultU64x32 (
   );
 
 /**
-  Worker function that multiples a 64-bit unsigned integer by a 64-bit unsigned integer
+  Multiples a 64-bit unsigned integer by a 64-bit unsigned integer
   and generates a 64-bit unsigned result.
 
   This function multiples the 64-bit unsigned value Multiplicand by the 64-bit
@@ -184,9 +184,9 @@ InternalMathMultU64x64 (
   );
 
 /**
-  Worker function that divides a 64-bit unsigned integer by a 32-bit unsigned integer and 
+  Divides a 64-bit unsigned integer by a 32-bit unsigned integer and
   generates a 64-bit unsigned result.
- 
+
   This function divides the 64-bit unsigned value Dividend by the 32-bit
   unsigned value Divisor and generates a 64-bit unsigned quotient. This
   function returns the 64-bit unsigned quotient.
@@ -205,7 +205,7 @@ InternalMathDivU64x32 (
   );
 
 /**
-  Worker function that divides a 64-bit unsigned integer by a 32-bit unsigned integer and 
+  Divides a 64-bit unsigned integer by a 32-bit unsigned integer and
   generates a 32-bit unsigned remainder.
 
   This function divides the 64-bit unsigned value Dividend by the 32-bit
@@ -226,7 +226,7 @@ InternalMathModU64x32 (
   );
 
 /**
-  Worker function that divides a 64-bit unsigned integer by a 32-bit unsigned integer and
+  Divides a 64-bit unsigned integer by a 32-bit unsigned integer and
   generates a 64-bit unsigned result and an optional 32-bit unsigned remainder.
 
   This function divides the 64-bit unsigned value Dividend by the 32-bit
@@ -251,7 +251,7 @@ InternalMathDivRemU64x32 (
   );
 
 /**
-  Worker function that divides a 64-bit unsigned integer by a 64-bit unsigned integer and 
+  Divides a 64-bit unsigned integer by a 64-bit unsigned integer and
   generates a 64-bit unsigned result and an optional 64-bit unsigned remainder.
 
   This function divides the 64-bit unsigned value Dividend by the 64-bit
@@ -276,7 +276,7 @@ InternalMathDivRemU64x64 (
   );
 
 /**
-  Worker function that divides a 64-bit signed integer by a 64-bit signed integer and 
+  Divides a 64-bit signed integer by a 64-bit signed integer and
   generates a  64-bit signed result and a optional 64-bit signed remainder.
 
   This function divides the 64-bit unsigned value Dividend by the 64-bit
@@ -297,7 +297,7 @@ InternalMathDivRemS64x64 (
   IN      INT64                     Dividend,
   IN      INT64                     Divisor,
   OUT     INT64                     *Remainder  OPTIONAL
-  );
+ );
 
 /**
   Transfers control to a function starting with a new stack.
@@ -317,6 +317,7 @@ InternalMathDivRemS64x64 (
 
 **/
 VOID
+EFIAPI
 InternalSwitchStack (
   IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
   IN      VOID                      *Context1,
