@@ -18,7 +18,7 @@
 #define __DXE_SERVICES_TABLE_LIB_H__
 
 //
-// Cached copy of the System Configuration Table
+// Cache copy of the DXE Services Table
 //
 extern EFI_DXE_SERVICES  *gDS;
 
