@@ -47,14 +47,12 @@ typedef struct _EFI_METRONOME_ARCH_PROTOCOL   EFI_METRONOME_ARCH_PROTOCOL;
   ticks will not be missed.  If a timeout occurs waiting for the specified 
   number of ticks, then EFI_TIMEOUT is returned.
 
-  @param  This The EFI_METRONOME_ARCH_PROTOCOL instance.
-  
-  @param  TickNumber Number of ticks to wait.
+  @param  This             The EFI_METRONOME_ARCH_PROTOCOL instance.
+  @param  TickNumber       Number of ticks to wait.
 
-  @retval  EFI_SUCCESS The wait for the number of ticks specified by TickNumber
-  succeeded.
-  
-  @retval  EFI_TIMEOUT A timeout occurred waiting for the specified number of ticks.
+  @retval EFI_SUCCESS           The wait for the number of ticks specified by TickNumber
+                                succeeded.
+  @retval EFI_TIMEOUT           A timeout occurred waiting for the specified number of ticks.
 
 **/
 typedef 

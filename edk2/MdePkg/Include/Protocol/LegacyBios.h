@@ -343,14 +343,14 @@ typedef struct {
   of BiosInt. Regs will contain the 16-bit register context on entry and 
   exit.
 
-  @param  This Protocol instance pointer.
-  @param  BiosInt Processor interrupt vector to invoke
-  @param  Reg Register contexted passed into (and returned) from thunk to
-  16-bit mode
+  @param  This                  Protocol instance pointer.
+  @param  BiosInt               Processor interrupt vector to invoke
+  @param  Reg                   Register contexted passed into (and returned) from thunk to
+                                16-bit mode
 
-  @retval  FALSE Thunk completed, and there were no BIOS errors in the target code.
-  See Regs for status.
-  @retval  TRUE There was a BIOS erro in the target code.
+  @retval FALSE                 Thunk completed, and there were no BIOS errors in the target code.
+                                See Regs for status.
+  @retval TRUE                  There was a BIOS erro in the target code.
 
 **/
 typedef
@@ -367,17 +367,17 @@ BOOLEAN
   16-bit register context on entry and exit. Arguments can be passed on 
   the Stack argument
 
-  @param  This Protocol instance pointer.
-  @param  Segment Segemnt of 16-bit mode call
-  @param  Offset Offset of 16-bit mdoe call
-  @param  Reg Register contexted passed into (and returned) from thunk to
-  16-bit mode
-  @param  Stack Caller allocated stack used to pass arguments
-  @param  StackSize Size of Stack in bytes
+  @param  This                  Protocol instance pointer.
+  @param  Segment               Segemnt of 16-bit mode call
+  @param  Offset                Offset of 16-bit mdoe call
+  @param  Reg                   Register contexted passed into (and returned) from thunk to
+                                16-bit mode
+  @param  Stack                 Caller allocated stack used to pass arguments
+  @param  StackSize             Size of Stack in bytes
 
-  @retval  FALSE Thunk completed, and there were no BIOS errors in the target code.
-  See Regs for status.
-  @retval  TRUE There was a BIOS erro in the target code.
+  @retval FALSE                 Thunk completed, and there were no BIOS errors in the target code.
+                                See Regs for status.
+  @retval TRUE                  There was a BIOS erro in the target code.
 
 **/
 typedef
@@ -405,14 +405,14 @@ EFI_STATUS
   Test to see if a legacy PCI ROM exists for this device. Optionally return
   the Legacy ROM instance for this PCI device.
 
-  @param  This Protocol instance pointer.
-  @param  PciHandle The PCI PC-AT OPROM from this devices ROM BAR will be loaded
-  @param  RomImage Return the legacy PCI ROM for this device
-  @param  RomSize Size of ROM Image
-  @param  Flags Indicates if ROM found and if PC-AT.
+  @param  This                  Protocol instance pointer.
+  @param  PciHandle             The PCI PC-AT OPROM from this devices ROM BAR will be loaded
+  @param  RomImage              Return the legacy PCI ROM for this device
+  @param  RomSize               Size of ROM Image
+  @param  Flags                 Indicates if ROM found and if PC-AT.
 
-  @retval  EFI_SUCCESS Legacy Option ROM availible for this device
-  @retval  EFI_UNSUPPORTED Legacy Option ROM not supported.
+  @retval EFI_SUCCESS           Legacy Option ROM availible for this device
+  @retval EFI_UNSUPPORTED       Legacy Option ROM not supported.
 
 **/
   )
@@ -423,23 +423,23 @@ EFI_STATUS
   about how many disks were added by the OPROM and the shadow address and
   size. DiskStart & DiskEnd are INT 13h drive letters. Thus 0x80 is C:
 
-  @param  This Protocol instance pointer.
-  @param  PciHandle The PCI PC-AT OPROM from this devices ROM BAR will be loaded.
-  This value is NULL if RomImage is non-NULL. This is the normal
-  case.
-  @param  RomImage A PCI PC-AT ROM image. This argument is non-NULL if there is
-  no hardware associated with the ROM and thus no PciHandle,
-  otherwise is must be NULL.
-  Example is PXE base code.
-  @param  Flags Return Status if ROM was found and if was Legacy OPROM.
-  @param  DiskStart Disk number of first device hooked by the ROM. If DiskStart
-  is the same as DiskEnd no disked were hooked.
-  @param  DiskEnd Disk number of the last device hooked by the ROM.
-  @param  RomShadowAddress Shadow address of PC-AT ROM
-  @param  RomShadowSize Size of RomShadowAddress in bytes
+  @param  This                  Protocol instance pointer.
+  @param  PciHandle             The PCI PC-AT OPROM from this devices ROM BAR will be loaded.
+                                This value is NULL if RomImage is non-NULL. This is the normal
+                                case.
+  @param  RomImage              A PCI PC-AT ROM image. This argument is non-NULL if there is
+                                no hardware associated with the ROM and thus no PciHandle,
+                                otherwise is must be NULL.
+                                Example is PXE base code.
+  @param  Flags                 Return Status if ROM was found and if was Legacy OPROM.
+  @param  DiskStart             Disk number of first device hooked by the ROM. If DiskStart
+                                is the same as DiskEnd no disked were hooked.
+  @param  DiskEnd               Disk number of the last device hooked by the ROM.
+  @param  RomShadowAddress      Shadow address of PC-AT ROM
+  @param  RomShadowSize         Size of RomShadowAddress in bytes
 
-  @retval  EFI_SUCCESS Thunk completed, see Regs for status.
-  @retval  EFI_INVALID_PARAMETER PciHandle not found
+  @retval EFI_SUCCESS           Thunk completed, see Regs for status.
+  @retval EFI_INVALID_PARAMETER PciHandle not found
 
 **/
 typedef
@@ -460,24 +460,24 @@ EFI_STATUS
   Attempt to legacy boot the BootOption. If the EFI contexted has been 
   compromised this function will not return.
 
-  @param  This Protocol instance pointer.
-  @param  BootOption EFI Device Path from BootXXXX variable.
-  @param  LoadOptionSize Size of LoadOption in size.
-  @param  LoadOption LoadOption from BootXXXX variable
+  @param  This                  Protocol instance pointer.
+  @param  BootOption            EFI Device Path from BootXXXX variable.
+  @param  LoadOptionSize        Size of LoadOption in size.
+  @param  LoadOption            LoadOption from BootXXXX variable
 
-  @retval  EFI_SUCCESS Removable media not present
+  @retval EFI_SUCCESS           Removable media not present
 
 **/
 /**
   Update BDA with current Scroll, Num & Cap lock LEDS
 
-  @param  This Protocol instance pointer.
-  @param  Leds Status of current Scroll, Num & Cap lock LEDS
-  Bit 0 is Scroll Lock  0 = Not locked
-  Bit 1 is Num Lock
-  Bit 2 is Caps Lock
+  @param  This                  Protocol instance pointer.
+  @param  Leds                  Status of current Scroll, Num & Cap lock LEDS
+                                Bit 0 is Scroll Lock 0 = Not locked
+                                Bit 1 is Num Lock
+                                Bit 2 is Caps Lock
 
-  @retval  EFI_SUCCESS Removable media not present
+  @retval EFI_SUCCESS           Removable media not present
 
 **/
 typedef
@@ -500,13 +500,13 @@ EFI_STATUS
 /**
   Retrieve legacy BBS info and assign boot priority.
 
-  @param  This Protocol instance pointer.
-  @param  HddCount Number of HDD_INFO structures
-  @param  HddInfo Onboard IDE controller information
-  @param  BbsCount Number of BBS_TABLE structures
-  @param  BbsTable List BBS entries
+  @param  This                  Protocol instance pointer.
+  @param  HddCount              Number of HDD_INFO structures
+  @param  HddInfo               Onboard IDE controller information
+  @param  BbsCount              Number of BBS_TABLE structures
+  @param  BbsTable              List BBS entries
 
-  @retval  EFI_SUCCESS Tables returned
+  @retval EFI_SUCCESS           Tables returned
 
 **/
 typedef
@@ -524,11 +524,11 @@ EFI_STATUS
   Assign drive number to legacy HDD drives prior to booting an EFI
   aware OS so the OS can access drives without an EFI driver.
 
-  @param  This Protocol instance pointer.
-  @param  BbsCount Number of BBS_TABLE structures
-  @param  BbsTable List BBS entries
+  @param  This                  Protocol instance pointer.
+  @param  BbsCount              Number of BBS_TABLE structures
+  @param  BbsTable              List BBS entries
 
-  @retval  EFI_SUCCESS Drive numbers assigned
+  @retval EFI_SUCCESS           Drive numbers assigned
 
 **/
 typedef
@@ -544,14 +544,14 @@ EFI_STATUS
   To boot from an unconventional device like parties and/or execute
   HDD diagnostics.
 
-  @param  This Protocol instance pointer.
-  @param  Attributes How to interpret the other input parameters
-  @param  BbsEntry The 0-based index into the BbsTable for the parent
-  device.
-  @param  BeerData Pointer to the 128 bytes of ram BEER data.
-  @param  ServiceAreaData Pointer to the 64 bytes of raw Service Area data. The
-  caller must provide a pointer to the specific Service
-  Area and not the start all Service Areas.
+  @param  This                  Protocol instance pointer.
+  @param  Attributes            How to interpret the other input parameters
+  @param  BbsEntry              The 0-based index into the BbsTable for the parent
+                                device.
+  @param  BeerData              Pointer to the 128 bytes of ram BEER data.
+  @param  ServiceAreaData       Pointer to the 64 bytes of raw Service Area data. The
+                                caller must provide a pointer to the specific Service
+                                Area and not the start all Service Areas.
 
   EFI_INVALID_PARAMETER if error. Does NOT return if no error.
 
@@ -573,7 +573,7 @@ EFI_STATUS
   drivers. If used externally then caller must re-connect EFI
   drivers.
 
-  @retval  EFI_SUCCESS OPROMs shadowed
+  @retval EFI_SUCCESS           OPROMs shadowed
 
 **/
 typedef
@@ -586,19 +586,18 @@ EFI_STATUS
 /**
   Get a region from the LegacyBios for S3 usage.
 
-  @param  This Protocol instance pointer.
-  @param  LegacyMemorySize Size of required region
-  @param  Region Region to use.
-  00 = Either 0xE0000 or 0xF0000 block
-  Bit0 = 1 0xF0000 block
-  Bit1 = 1 0xE0000 block
-  @param  Alignment Address alignment. Bit mapped. First non-zero
-  bit from right is alignment.
-  @param  LegacyMemoryAddress Region Assigned
+  @param  This                  Protocol instance pointer.
+  @param  LegacyMemorySize      Size of required region
+  @param  Region                Region to use.
+                                00 = Either 0xE0000 or 0xF0000 block
+                                Bit0 = 1 0xF0000 block
+                                Bit1 = 1 0xE0000 block
+  @param  Alignment             Address alignment. Bit mapped. First non-zero
+                                bit from right is alignment.
+  @param  LegacyMemoryAddress   Region Assigned
 
-  @retval  EFI_SUCCESS Region assigned
-  
-  @retval  Other Region not assigned
+  @retval EFI_SUCCESS           Region assigned
+  @retval Other                 Region not assigned
 
 **/
 typedef
@@ -615,15 +614,16 @@ EFI_STATUS
 /**
   Get a region from the LegacyBios for Tiano usage. Can only be invoked once.
 
-  @param  This Protocol instance pointer.
-  @param  LegacyMemorySize Size of data to copy
-  @param  LegacyMemoryAddress Legacy Region destination address
-  Note: must be in region assigned by
-  LegacyBiosGetLegacyRegion
-  @param  LegacyMemorySourceAddress Source of data
+  @param  This                  Protocol instance pointer.
+  @param  LegacyMemorySize      Size of data to copy
+  @param  LegacyMemoryAddress   Legacy Region destination address
+                                Note: must be in region assigned by
+                                LegacyBiosGetLegacyRegion
+  @param  LegacyMemorySourceAddress 
+                                Source of data
 
-  @retval  EFI_SUCCESS Region assigned
-  @retval  EFI_ACCESS_DENIED Destination outside assigned region
+  @retval EFI_SUCCESS           Region assigned
+  @retval EFI_ACCESS_DENIED     Destination outside assigned region
 
 **/
 typedef

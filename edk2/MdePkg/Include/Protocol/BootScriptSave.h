@@ -36,20 +36,15 @@ typedef struct _EFI_BOOT_SCRIPT_SAVE_PROTOCOL EFI_BOOT_SCRIPT_SAVE_PROTOCOL;
 /**
   Adds a record into a specified Framework boot script table.
 
-  @param  This A pointer to the EFI_BOOT_SCRIPT_SAVE_PROTOCOL instance.
-  
-  @param  TableName Name of the script table.Currently, the only meaningful 
-  value is EFI_ACPI_S3_RESUME_SCRIPT_TABLE.
-  
-  @param  OpCode The operation code (opcode) number.
-  
-  @param  ... Argument list that is specific to each opcode.
+  @param  This                  A pointer to the EFI_BOOT_SCRIPT_SAVE_PROTOCOL instance.
+  @param  TableName             Name of the script table.Currently, the only meaningful
+                                value is EFI_ACPI_S3_RESUME_SCRIPT_TABLE.
+  @param  OpCode                The operation code (opcode) number.
+  @param  ...                   Argument list that is specific to each opcode.
 
-  @retval EFI_SUCCESS The operation succeeded. A record was added into the specified script table.
-  
+  @retval EFI_SUCCESS           The operation succeeded. A record was added into the specified script table.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
-  
-  @retval EFI_OUT_OF_RESOURCES There is insufficient memory to store the boot script.
+  @retval EFI_OUT_OF_RESOURCES  There is insufficient memory to store the boot script.
 
 **/
 typedef
@@ -64,17 +59,13 @@ EFI_STATUS
 /**
   Closes the specified script table.
 
-  @param  This A pointer to the EFI_BOOT_SCRIPT_SAVE_PROTOCOL instance.
-  
-  @param  TableName Name of the script table.
-  
-  @param  Address A pointer to the physical address where the table begins.
+  @param  This                  A pointer to the EFI_BOOT_SCRIPT_SAVE_PROTOCOL instance.
+  @param  TableName             Name of the script table.
+  @param  Address               A pointer to the physical address where the table begins.
 
-  @retval EFI_SUCCESS The table was successfully returned.
-  
-  @retval EFI_NOT_FOUND The specified table was not created previously.
-  
-  @retval EFI_OUT_OF_RESOURCES Memory is insufficient to hold the reorganized boot script table.
+  @retval EFI_SUCCESS           The table was successfully returned.
+  @retval EFI_NOT_FOUND         The specified table was not created previously.
+  @retval EFI_OUT_OF_RESOURCES  Memory is insufficient to hold the reorganized boot script table.
 
 **/
 typedef

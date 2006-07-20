@@ -33,14 +33,12 @@ typedef struct _EFI_DXE_IPL_PPI EFI_DXE_IPL_PPI;
   The architectural PPI that the PEI Foundation invokes when 
   there are no additional PEIMs to invoke.
 
-  @param  This Pointer to the DXE IPL PPI instance
-  
-  @param  PeiServices Pointer to the PEI Services Table.
-  
-  @param  HobList Pointer to the list of Hand-Off Block (HOB) entries.
+  @param  This           Pointer to the DXE IPL PPI instance
+  @param  PeiServices    Pointer to the PEI Services Table.
+  @param  HobList        Pointer to the list of Hand-Off Block (HOB) entries.
 
-  @retval EFI_SUCCESS Upon this return code, the PEI Foundation should enter 
-  some exception handling.Under normal circumstances, the DXE IPL PPI should not return.
+  @retval EFI_SUCCESS           Upon this return code, the PEI Foundation should enter
+                                some exception handling.Under normal circumstances, the DXE IPL PPI should not return.
 
 **/
 typedef

@@ -79,24 +79,24 @@ typedef enum {
 /**
   Finds the binary data or other platform information.
 
-  @param  This Protocol instance pointer.
-  @param  Mode Specifies what data to return
-  @param  Table Pointer to MP table.
-  @param  TableSize Size in bytes of table.
-  @param  Location Legacy region requested
-  0x00 = Any location
-  Bit 0 = 0xF0000 region
-  Bit 1 = 0xE0000 region
-  Multiple bits can be set
-  @param  Alignment Address alignment for allocation.
-  Bit mapped. First non-zero bit from right
-  is alignment.
-  @param  LegacySegment Segment in LegacyBios where Table is stored
-  @param  LegacyOffset Offset in LegacyBios where Table is stored
+  @param  This                  Protocol instance pointer.
+  @param  Mode                  Specifies what data to return
+  @param  Table                 Pointer to MP table.
+  @param  TableSize             Size in bytes of table.
+  @param  Location              Legacy region requested
+                                0x00 = Any location
+                                Bit 0 = 0xF0000 region
+                                Bit 1 = 0xE0000 region
+                                Multiple bits can be set
+  @param  Alignment             Address alignment for allocation.
+                                Bit mapped. First non-zero bit from right
+                                is alignment.
+  @param  LegacySegment         Segment in LegacyBios where Table is stored
+  @param  LegacyOffset          Offset in LegacyBios where Table is stored
 
-  @retval  EFI_SUCCESS Data was returned successfully.
-  @retval  EFI_UNSUPPORTED Mode is not supported on the platform.
-  @retval  EFI_NOT_FOUND Binary image or table not found.
+  @retval EFI_SUCCESS           Data was returned successfully.
+  @retval EFI_UNSUPPORTED       Mode is not supported on the platform.
+  @retval EFI_NOT_FOUND         Binary image or table not found.
 
 **/
 typedef
@@ -116,17 +116,17 @@ EFI_STATUS
 /**
   Returns a buffer of handles for the requested sub-function.
 
-  @param  This Protocol instance pointer.
-  @param  Mode Specifies what handle to return.
-  @param  Type Type from Device Path for Handle to represent.
-  @param  HandleBuffer Handles of the device/controller in priority order
-  with HandleBuffer[0] highest priority.
-  @param  HandleCount Number of handles in the buffer.
-  @param  AdditionalData Mode specific.
+  @param  This                  Protocol instance pointer.
+  @param  Mode                  Specifies what handle to return.
+  @param  Type                  Type from Device Path for Handle to represent.
+  @param  HandleBuffer          Handles of the device/controller in priority order
+                                with HandleBuffer[0] highest priority.
+  @param  HandleCount           Number of handles in the buffer.
+  @param  AdditionalData        Mode specific.
 
-  @retval  EFI_SUCCESS Handle is valid
-  @retval  EFI_UNSUPPORTED Mode is not supported on the platform.
-  @retval  EFI_NOT_FOUND Handle is not known
+  @retval EFI_SUCCESS           Handle is valid
+  @retval EFI_UNSUPPORTED       Mode is not supported on the platform.
+  @retval EFI_NOT_FOUND         Handle is not known
 
 **/
 typedef
@@ -144,11 +144,11 @@ EFI_STATUS
 /**
   Load and initialize the Legacy BIOS SMM handler.
 
-  @param  This Protocol instance pointer.
+  @param  This                   Protocol instance pointer.
   @param  EfiToLegacy16BootTable Pointer to Legacy16 boot table.
 
-  @retval  EFI_SUCCESS SMM code loaded.
-  @retval  EFI_DEVICE_ERROR SMM code failed to load
+  @retval EFI_SUCCESS           SMM code loaded.
+  @retval EFI_DEVICE_ERROR      SMM code failed to load
 
 **/
 typedef
@@ -162,16 +162,16 @@ EFI_STATUS
 /**
   Allows platform to perform any required action after a LegacyBios operation.
 
-  @param  This Protocol instance pointer.
-  @param  Mode Specifies what handle to return.
-  @param  Type Mode specific.
-  @param  DeviceHandle List of PCI devices in the system.
-  @param  ShadowAddress First free OpROM area, after other OpROMs have been dispatched.
-  @param  Compatibility16Table Pointer to Compatibility16Table.
-  @param  AdditionalData Mode specific Pointer to additional data returned ¨C mode specific.
+  @param  This                  Protocol instance pointer.
+  @param  Mode                  Specifies what handle to return.
+  @param  Type                  Mode specific.
+  @param  DeviceHandle          List of PCI devices in the system.
+  @param  ShadowAddress         First free OpROM area, after other OpROMs have been dispatched.
+  @param  Compatibility16Table  Pointer to Compatibility16Table.
+  @param  AdditionalData        Mode specific Pointer to additional data returned ¨C mode specific.
 
-  @retval  EFI_SUCCESS RomImage is valid
-  @retval  EFI_UNSUPPORTED Mode is not supported on the platform.
+  @retval EFI_SUCCESS           RomImage is valid
+  @retval EFI_UNSUPPORTED       Mode is not supported on the platform.
 
 **/
 typedef
@@ -190,15 +190,15 @@ EFI_STATUS
 /**
   Returns information associated with PCI IRQ routing.
 
-  @param  This Protocol instance pointer.
-  @param  RoutingTable Pointer to PCI IRQ Routing table.
-  @param  RoutingTableEntries Number of entries in table.
-  @param  LocalPirqTable $PIR table
-  @param  PirqTableSize $PIR table size
-  @param  LocalIrqPriorityTable List of interrupts in priority order to assign
-  @param  IrqPriorityTableEntries- Number of entries in priority table
+  @param  This                    Protocol instance pointer.
+  @param  RoutingTable            Pointer to PCI IRQ Routing table.
+  @param  RoutingTableEntries     Number of entries in table.
+  @param  LocalPirqTable          $PIR table
+  @param  PirqTableSize           $PIR table size
+  @param  LocalIrqPriorityTable   List of interrupts in priority order to assign
+  @param  IrqPriorityTableEntries Number of entries in priority table
 
-  @retval  EFI_SUCCESS Data was successfully returned.
+  @retval EFI_SUCCESS           Data was successfully returned.
 
 **/
 typedef
@@ -217,15 +217,15 @@ EFI_STATUS
 /**
   Translates the given PIRQ accounting for bridge
 
-  @param  This Protocol instance pointer.
-  @param  PciBus PCI bus number for this device.
-  @param  PciDevice PCI device number for this device.
-  @param  PciFunction PCI function number for this device.
-  @param  Pirq Input is PIRQ reported by device, output is true PIRQ.
-  @param  PciIrq The IRQ already assigned to the PIRQ or the IRQ to be
-  assigned to the PIRQ.
+  @param  This                  Protocol instance pointer.
+  @param  PciBus                PCI bus number for this device.
+  @param  PciDevice             PCI device number for this device.
+  @param  PciFunction           PCI function number for this device.
+  @param  Pirq                  Input is PIRQ reported by device, output is true PIRQ.
+  @param  PciIrq                The IRQ already assigned to the PIRQ or the IRQ to be
+                                assigned to the PIRQ.
 
-  @retval  EFI_SUCCESS The PIRQ was translated.
+  @retval EFI_SUCCESS           The PIRQ was translated.
 
 **/
 typedef
@@ -244,14 +244,14 @@ EFI_STATUS
   Attempt to legacy boot the BootOption. If the EFI contexted has been 
   compromised this function will not return.
 
-  @param  This Protocol instance pointer.
-  @param  BbsDevicePath EFI Device Path from BootXXXX variable.
-  @param  BbsTable Internal BBS table.
-  @param  LoadOptionSize Size of LoadOption in size.
-  @param  LoadOption LoadOption from BootXXXX variable
+  @param  This                   Protocol instance pointer.
+  @param  BbsDevicePath          EFI Device Path from BootXXXX variable.
+  @param  BbsTable               Internal BBS table.
+  @param  LoadOptionSize         Size of LoadOption in size.
+  @param  LoadOption             LoadOption from BootXXXX variable
   @param  EfiToLegacy16BootTable Pointer to BootTable structure
 
-  @retval  EFI_SUCCESS Ready to boot.
+  @retval EFI_SUCCESS           Ready to boot.
 
 **/
 typedef

@@ -49,7 +49,7 @@ typedef struct _EFI_BDS_ARCH_PROTOCOL   EFI_BDS_ARCH_PROTOCOL;
   device connection operation fails twice in a row, then that boot device has 
   failed, and should be skipped.  This function should never return.
 
-  @param  This The EFI_BDS_ARCH_PROTOCOL instance.
+  @param  This             The EFI_BDS_ARCH_PROTOCOL instance.
 
   @return None.
 

@@ -54,15 +54,12 @@ typedef struct {
 /**
   This interface conveys state information out of the Security (SEC) phase into PEI.
 
-  @param  PeiServices Pointer to the PEI Services Table.
-  
-  @param  StructureSize Pointer to the variable describing size of the input buffer.
-  
-  @param  PlatformInformationRecord Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD. 
+  @param  PeiServices               Pointer to the PEI Services Table.
+  @param  StructureSize             Pointer to the variable describing size of the input buffer.
+  @param  PlatformInformationRecord Pointer to the EFI_SEC_PLATFORM_INFORMATION_RECORD.
 
-  @retval EFI_SUCCESS The data was successfully returned.
-  
-  @retval EFI_BUFFER_TOO_SMALL The buffer was too small.
+  @retval EFI_SUCCESS           The data was successfully returned.
+  @retval EFI_BUFFER_TOO_SMALL  The buffer was too small.
 
 **/
 typedef

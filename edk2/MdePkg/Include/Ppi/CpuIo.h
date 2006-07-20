@@ -52,21 +52,15 @@ typedef enum {
 /**
   Memory-based access services and I/O-based access services.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation.
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Width The width of the access.  Enumerated in bytes.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Count The number of accesses to perform.
-  
-  @param  Buffer A pointer to the buffer of data.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Width          The width of the access. Enumerated in bytes.
+  @param  Address        The physical address of the access.
+  @param  Count          The number of accesses to perform.
+  @param  Buffer         A pointer to the buffer of data.
 
-  @retval EFI_SUCCESS  The function completed successfully. 
-  
-  @retval EFI_NOT_YET_AVAILABLE  The service has not been installed.
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_YET_AVAILABLE The service has not been installed.
 
 **/
 typedef
@@ -93,11 +87,9 @@ typedef struct {
 /**
   8-bit I/O read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT8
 
@@ -113,11 +105,9 @@ UINT8
 /**
   16-bit I/O read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT16
 
@@ -133,11 +123,9 @@ UINT16
 /**
   32-bit I/O read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT32
 
@@ -153,11 +141,9 @@ UINT32
 /**
   64-bit I/O read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT64
 
@@ -173,13 +159,10 @@ UINT64
 /**
   8-bit I/O write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 
@@ -196,13 +179,10 @@ VOID
 /**
   16-bit I/O write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 
@@ -219,13 +199,10 @@ VOID
 /**
   32-bit I/O write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 
@@ -242,13 +219,10 @@ VOID
 /**
   64-bit I/O write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 
@@ -265,11 +239,9 @@ VOID
 /**
   8-bit Memory read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT8
 
@@ -285,11 +257,9 @@ UINT8
 /**
   16-bit Memory read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT16
 
@@ -305,11 +275,9 @@ UINT16
 /**
   32-bit Memory read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT32
 
@@ -325,11 +293,9 @@ UINT32
 /**
   64-bit Memory read operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
 
   @return UINT64
 
@@ -345,13 +311,10 @@ UINT64
 /**
   8-bit Memory write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 
@@ -368,13 +331,10 @@ VOID
 /**
   16-bit Memory write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 
@@ -391,13 +351,10 @@ VOID
 /**
   32-bit Memory write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 
@@ -414,13 +371,10 @@ VOID
 /**
   64-bit Memory write operations.
 
-  @param  PeiServices An indirect pointer to the PEI Services Table published by the PEI Foundation. 
-  
-  @param  This Pointer to local data for the interface.
-  
-  @param  Address The physical address of the access.
-  
-  @param  Data The data to write.
+  @param  PeiServices    An indirect pointer to the PEI Services Table published by the PEI Foundation.
+  @param  This           Pointer to local data for the interface.
+  @param  Address        The physical address of the access.
+  @param  Data           The data to write.
 
   @return None
 

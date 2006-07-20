@@ -190,7 +190,6 @@ EFI_STATUS
                                 transfer endpoint is capable of sending or receiving.     
   @param  IsNewTransfer         If TRUE, an asynchronous interrupt pipe is built between the host                       
                                 and the target interrupt endpoint. If FALSE, the specified       
-  
   @param  DataToggle            A pointer to the data toggle value.      
   @param  PollingInterval       Indicates the interval, in milliseconds, that the asynchronous
                                 interrupt transfer is polled.                                                                                                      asynchronous interrupt pipe is canceled.                         

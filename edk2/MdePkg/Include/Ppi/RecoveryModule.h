@@ -32,15 +32,12 @@ typedef struct _EFI_PEI_RECOVERY_MODULE_PPI EFI_PEI_RECOVERY_MODULE_PPI;
   Loads a DXE capsule from some media into memory and updates the HOB table 
   with the DXE firmware volume information.
 
-  @param  PeiServices General-purpose services that are available to every PEIM.
-  
-  @param  This Indicates the EFI_PEI_RECOVERY_MODULE_PPI instance. 
+  @param  PeiServices    General-purpose services that are available to every PEIM.
+  @param  This           Indicates the EFI_PEI_RECOVERY_MODULE_PPI instance.
 
-  @retval EFI_SUCCESS The capsule was loaded correctly.
-  
-  @retval EFI_DEVICE_ERROR A device error occurred.
-  
-  @retval EFI_NOT_FOUND A recovery DXE capsule cannot be found.
+  @retval EFI_SUCCESS           The capsule was loaded correctly.
+  @retval EFI_DEVICE_ERROR      A device error occurred.
+  @retval EFI_NOT_FOUND         A recovery DXE capsule cannot be found.
 
 **/
 typedef

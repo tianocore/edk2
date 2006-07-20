@@ -1,5 +1,5 @@
 /** @file
-  GUIDs used for ACPI entries in the EFI 1.0 system table
+  GUIDs used for ACPI entries in the EFI system table
 
   These GUIDs point the ACPI tables as defined in the ACPI specifications.
   ACPI 2.0 specification defines the ACPI 2.0 GUID. UEFI 2.0 defines the 

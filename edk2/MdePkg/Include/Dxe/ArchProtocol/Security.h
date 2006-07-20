@@ -65,29 +65,25 @@ typedef struct _EFI_SECURITY_ARCH_PROTOCOL    EFI_SECURITY_ARCH_PROTOCOL;
   might be possible to use it at a future time, then EFI_SECURITY_VIOLATION is 
   returned.
 
-  @param  This The EFI_SECURITY_ARCH_PROTOCOL instance.
-  
-  @param  AuthenticationStatus This is the authentication type returned from the Section
-  Extraction protocol.  See the Section Extraction Protocol
-  Specification for details on this type.
-  
-  @param  File This is a pointer to the device path of the file that is
-  being dispatched.  This will optionally be used for logging.
+  @param  This             The EFI_SECURITY_ARCH_PROTOCOL instance.
+  @param  AuthenticationStatus 
+                           This is the authentication type returned from the Section
+                           Extraction protocol. See the Section Extraction Protocol
+                           Specification for details on this type.
+  @param  File             This is a pointer to the device path of the file that is
+                           being dispatched. This will optionally be used for logging.
 
-  @retval  EFI_SUCCESS The file specified by File did authenticate, and the
-  platform policy dictates that the DXE Core may use File.
-  
-  @retval  EFI_INVALID_PARAMETER Driver is NULL.
-  
-  @retval  EFI_SECURITY_VIOLATION The file specified by File did not authenticate, and
-  the platform policy dictates that File should be placed
-  in the untrusted state.   A file may be promoted from
-  the untrusted to the trusted state at a future time
-  with a call to the Trust() DXE Service.
-  
-  @retval  EFI_ACCESS_DENIED The file specified by File did not authenticate, and
-  the platform policy dictates that File should not be
-  used for any purpose.
+  @retval EFI_SUCCESS           The file specified by File did authenticate, and the
+                                platform policy dictates that the DXE Core may use File.
+  @retval EFI_INVALID_PARAMETER Driver is NULL.
+  @retval EFI_SECURITY_VIOLATION The file specified by File did not authenticate, and
+                                the platform policy dictates that File should be placed
+                                in the untrusted state. A file may be promoted from
+                                the untrusted to the trusted state at a future time
+                                with a call to the Trust() DXE Service.
+  @retval EFI_ACCESS_DENIED     The file specified by File did not authenticate, and
+                                the platform policy dictates that File should not be
+                                used for any purpose.
 
 **/
 typedef 

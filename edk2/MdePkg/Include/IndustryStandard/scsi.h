@@ -1,5 +1,5 @@
 /** @file
-  support for SCSI standard
+  support for SCSI-2 standard
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

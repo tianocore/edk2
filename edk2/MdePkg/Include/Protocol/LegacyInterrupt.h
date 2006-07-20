@@ -31,10 +31,10 @@ typedef struct _EFI_LEGACY_INTERRUPT_PROTOCOL EFI_LEGACY_INTERRUPT_PROTOCOL;
 /**
   Get the number of PIRQs this hardware supports.
 
-  @param  This Protocol instance pointer.
-  @param  NumberPirsq Number of PIRQs.
+  @param  This                  Protocol instance pointer.
+  @param  NumberPirsq           Number of PIRQs.
 
-  @retval  EFI_SUCCESS Number of PIRQs returned.
+  @retval EFI_SUCCESS           Number of PIRQs returned.
 
 **/
 typedef
@@ -47,12 +47,12 @@ EFI_STATUS
 /**
   Gets the PCI location associated with this protocol.
 
-  @param  This Protocol instance pointer.
-  @param  Bus PCI Bus
-  @param  Device PCI Device
-  @param  Function PCI Function
+  @param  This                  Protocol instance pointer.
+  @param  Bus                   PCI Bus
+  @param  Device                PCI Device
+  @param  Function              PCI Function
 
-  @retval  EFI_SUCCESS Bus/Device/Function returned
+  @retval EFI_SUCCESS           Bus/Device/Function returned
 
 **/
 typedef
@@ -67,12 +67,12 @@ EFI_STATUS
 /**
   Read the PIRQ register and return the data
 
-  @param  This Protocol instance pointer.
-  @param  PirqNumber PIRQ register to read
-  @param  PirqData Data read
+  @param  This                  Protocol instance pointer.
+  @param  PirqNumber            PIRQ register to read
+  @param  PirqData              Data read
 
-  @retval  EFI_SUCCESS Data was read
-  @retval  EFI_INVALID_PARAMETER Invalid PIRQ number
+  @retval EFI_SUCCESS           Data was read
+  @retval EFI_INVALID_PARAMETER Invalid PIRQ number
 
 **/
 typedef
@@ -86,12 +86,12 @@ EFI_STATUS
 /**
   Write the specified PIRQ register with the given data.
 
-  @param  This Protocol instance pointer.
-  @param  PirqNumber PIRQ register to read.
-  @param  PirqData Data written.
+  @param  This                  Protocol instance pointer.
+  @param  PirqNumber            PIRQ register to read.
+  @param  PirqData              Data written.
 
-  @retval  EFI_SUCCESS Table pointer returned
-  @retval  EFI_INVALID_PARAMETER Invalid PIRQ number
+  @retval EFI_SUCCESS           Table pointer returned
+  @retval EFI_INVALID_PARAMETER Invalid PIRQ number
 
 **/
 typedef

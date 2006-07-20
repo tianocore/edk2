@@ -31,25 +31,19 @@ typedef struct _EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI EFI_PEI_BOOT_SCRIPT_EXECUTER_PP
 /**
   Executes the Framework boot script table.
 
-  @param  PeiServices A pointer to the system PEI Services Table.
-  
-  @param  This A pointer to the EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI instance.
-  
-  @param  Address The physical memory address where the table is stored. 
-  It must be zero if the table to be executed is stored in a firmware volume file.
-  
-  @param  FvFile The firmware volume file name that contains the table to 
-  be executed. It must be NULL if the table to be executed is stored in physical memory.
+  @param  PeiServices    A pointer to the system PEI Services Table.
+  @param  This           A pointer to the EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI instance.
+  @param  Address        The physical memory address where the table is stored.
+                         It must be zero if the table to be executed is stored in a firmware volume file.
+  @param  FvFile         The firmware volume file name that contains the table to
+                         be executed. It must be NULL if the table to be executed is stored in physical memory.
 
-  @retval EFI_SUCCESS The boot script table was executed successfully.
-  
+  @retval EFI_SUCCESS           The boot script table was executed successfully.
   @retval EFI_INVALID_PARAMETER Address is zero and FvFile is NULL.
-  
-  @retval EFI_NOT_FOUND The file name specified in FvFile cannot be found.
-  
-  @retval EFI_UNSUPPORTED The format of the boot script table is invalid.
-  Or An unsupported opcode occurred in the table.
-  Or There were opcode execution errors, such as an insufficient dependency.
+  @retval EFI_NOT_FOUND         The file name specified in FvFile cannot be found.
+  @retval EFI_UNSUPPORTED       The format of the boot script table is invalid.
+                                Or An unsupported opcode occurred in the table.
+                                Or There were opcode execution errors, such as an insufficient dependency.
 
 **/
 typedef

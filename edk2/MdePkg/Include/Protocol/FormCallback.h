@@ -88,31 +88,22 @@ typedef struct {
 /**
   Returns the value of a variable. 
 
-  @param  This A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
-  
-  @param  VariableName A NULL-terminated Unicode string that is the 
-  name of the vendor¡¯s variable. 
-  
-  @param  VendorGuid A unique identifier for the vendor.
-  
-  @param  Attributes If not NULL, a pointer to the memory location to 
-  return the attribute's bit-mask for the variable. 
-  
-  @param  DataSize The size in bytes of the Buffer. A size of zero causes 
-  the variable to be deleted.
-  
-  @param  Buffer The buffer to return the contents of the variable.
+  @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
+  @param  VariableName          A NULL-terminated Unicode string that is the
+                                name of the vendor¡¯s variable.
+  @param  VendorGuid            A unique identifier for the vendor.
+  @param  Attributes            If not NULL, a pointer to the memory location to
+                                return the attribute's bit-mask for the variable.
+  @param  DataSize              The size in bytes of the Buffer. A size of zero causes
+                                the variable to be deleted.
+  @param  Buffer                The buffer to return the contents of the variable.
 
-  @retval EFI_SUCCESS  The function completed successfully.
-  
-  @retval EFI_NOT_FOUND  The variable was not found.
-  
-  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result. 
-  DataSize has been updated with the size needed to complete the request.
-  
-  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
-  
-  @retval EFI_DEVICE_ERROR  The variable could not be saved due to a hardware failure. 
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_NOT_FOUND         The variable was not found.
+  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result.
+                                DataSize has been updated with the size needed to complete the request.
+  @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
+  @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
 **/
 typedef
@@ -129,35 +120,26 @@ EFI_STATUS
 /**
   Sets the value of a variable. 
 
-  @param  This A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
-  
-  @param  VariableName A NULL-terminated Unicode string that is the 
-  name of the vendor's variable. Each VariableName is unique for each VendorGuid.
-  
-  @param  VendorGuid A unique identifier for the vendor.
-  
-  @param  Attributes Attributes bit-mask to set for the variable. 
-  
-  @param  DataSize The size in bytes of the Buffer. A size of zero causes 
-  the variable to be deleted.
-  
-  @param  Buffer The buffer containing the contents of the variable.
-  
-  @param  ResetRequired Returns a value from the driver that abstracts 
-  this information and will enable a system to know if a system reset 
-  is required to achieve the configuration changes being enabled through 
-  this function.
+  @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
+  @param  VariableName          A NULL-terminated Unicode string that is the
+                                name of the vendor's variable. Each VariableName is unique for each VendorGuid.
+  @param  VendorGuid            A unique identifier for the vendor.
+  @param  Attributes            Attributes bit-mask to set for the variable.
+  @param  DataSize              The size in bytes of the Buffer. A size of zero causes
+                                the variable to be deleted.
+  @param  Buffer                The buffer containing the contents of the variable.
+  @param  ResetRequired         Returns a value from the driver that abstracts
+                                this information and will enable a system to know if a system reset
+                                is required to achieve the configuration changes being enabled through
+                                this function.
 
-  @retval EFI_SUCCESS  The firmware has successfully stored the variable and 
-  its data as defined by the Attributes.
-  
-  @retval EFI_OUT_OF_RESOURCES  Not enough storage is available to hold 
-  the variable and its data.
-  
-  @retval EFI_INVALID_PARAMETER  An invalid combination of Attributes bits 
-  was supplied, or the DataSize exceeds the maximum allowed.
-  
-  @retval EFI_DEVICE_ERROR  The variable could not be saved due to a hardware failure. 
+  @retval EFI_SUCCESS           The firmware has successfully stored the variable and
+                                its data as defined by the Attributes.
+  @retval EFI_OUT_OF_RESOURCES  Not enough storage is available to hold
+                                the variable and its data.
+  @retval EFI_INVALID_PARAMETER An invalid combination of Attributes bits
+                                was supplied, or the DataSize exceeds the maximum allowed.
+  @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
 **/
 typedef
@@ -175,16 +157,13 @@ EFI_STATUS
 /**
   This function is called to provide results data to the driver. 
 
-  @param  This A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
-  
-  @param  KeyValue A unique value which is sent to the original exporting 
-  driver so that it can identify the type of data to expect. The format of 
-  the data tends to vary based on the opcode that generated the callback. 
-  
-  @param  Data A pointer to the data being sent to the original exporting driver. 
-  
-  @param  Packet A pointer to a packet of information which a driver passes 
-  back to the browser.
+  @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
+  @param  KeyValue              A unique value which is sent to the original exporting
+                                driver so that it can identify the type of data to expect. The format of
+                                the data tends to vary based on the opcode that generated the callback.
+  @param  Data                  A pointer to the data being sent to the original exporting driver.
+  @param  Packet                A pointer to a packet of information which a driver passes
+                                back to the browser.
 
   @return Status Code
 

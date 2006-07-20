@@ -48,10 +48,8 @@ typedef struct {
 /**
   Gets the count of block I/O devices that one specific block driver detects.
 
-  @param  PeiServices General-purpose services that are available to every PEIM.
-  
-  @param  This Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
-  
+  @param  PeiServices        General-purpose services that are available to every PEIM.
+  @param  This               Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
   @param  NumberBlockDevices The number of block I/O devices discovered.
 
   @return Status code
@@ -68,21 +66,17 @@ EFI_STATUS
 /**
   Gets a block device¡¯s media information.
 
-  @param  PeiServices General-purpose services that are available to every PEIM
-  
-  @param  This Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance. 
-  
-  @param  DeviceIndex Specifies the block device to which the function 
-  wants to talk. Because the driver that implements Block I/O PPIs 
-  will manage multiple block devices, the PPIs that want to talk to a single 
-  device must specify the device index that was assigned during the enumeration 
-  process. This index is a number from one to NumberBlockDevices.
-  
-  @param  MediaInfo The media information of the specified block media.
+  @param  PeiServices    General-purpose services that are available to every PEIM
+  @param  This           Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
+  @param  DeviceIndex    Specifies the block device to which the function
+                         wants to talk. Because the driver that implements Block I/O PPIs
+                         will manage multiple block devices, the PPIs that want to talk to a single
+                         device must specify the device index that was assigned during the enumeration
+                         process. This index is a number from one to NumberBlockDevices.
+  @param  MediaInfo      The media information of the specified block media.
 
-  @retval EFI_SUCCESS Media information about the specified block device was obtained successfully.
-  
-  @retval EFI_DEVICE_ERROR Cannot get the media information due to a hardware error.
+  @retval EFI_SUCCESS           Media information about the specified block device was obtained successfully.
+  @retval EFI_DEVICE_ERROR      Cannot get the media information due to a hardware error.
 
 **/
 typedef
@@ -97,31 +91,22 @@ EFI_STATUS
 /**
   Reads the requested number of blocks from the specified block device.
 
-  @param  PeiServices General-purpose services that are available to every PEIM.
-  
-  @param  This Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
-  
-  @param  DeviceIndex Specifies the block device to which the function wants to talk.
-  
-  @param  StartLBA The starting logical block address (LBA) to read from on the device
-  
-  @param  BufferSize The size of the Buffer in bytes. This number must 
-  be a multiple of the intrinsic block size of the device.
-  
-  @param  Buffer A pointer to the destination buffer for the data.
-  The caller is responsible for the ownership of the buffer.
+  @param  PeiServices    General-purpose services that are available to every PEIM.
+  @param  This           Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
+  @param  DeviceIndex    Specifies the block device to which the function wants to talk.
+  @param  StartLBA       The starting logical block address (LBA) to read from on the device
+  @param  BufferSize     The size of the Buffer in bytes. This number must
+                         be a multiple of the intrinsic block size of the device.
+  @param  Buffer         A pointer to the destination buffer for the data.
+                         The caller is responsible for the ownership of the buffer.
 
-  @retval EFI_SUCCESS The data was read correctly from the device.
-  
-  @retval EFI_DEVICE_ERROR The device reported an error while attempting to perform the read operation.
-  
+  @retval EFI_SUCCESS           The data was read correctly from the device.
+  @retval EFI_DEVICE_ERROR      The device reported an error while attempting to perform the read operation.
   @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
-  or the buffer is not properly aligned.
-  
-  @retval EFI_BAD_BUFFER_SIZE The BufferSize parameter is not a multiple of 
-  the intrinsic block size of the device.
-  
-  @retval EFI_NO_MEDIA There is no media in the device.
+                                or the buffer is not properly aligned.
+  @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of
+                                the intrinsic block size of the device.
+  @retval EFI_NO_MEDIA          There is no media in the device.
 
 **/
 typedef

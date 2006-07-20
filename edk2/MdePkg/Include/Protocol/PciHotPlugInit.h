@@ -51,17 +51,13 @@ typedef enum{
   Returns a list of root Hot Plug Controllers (HPCs) that require initialization 
   during the boot process.
 
-  @param  This Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
-  
-  @param  HpcCount The number of root HPCs that were returned.
-  
-  @param  HpcList The list of root HPCs. HpcCount defines the number of 
-  elements in this list.
+  @param  This                  Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
+  @param  HpcCount              The number of root HPCs that were returned.
+  @param  HpcList               The list of root HPCs. HpcCount defines the number of
+                                elements in this list.
 
-  @retval EFI_SUCCESS HpcList was returned.
-  
-  @retval EFI_OUT_OF_RESOURCES HpcList was not returned due to insufficient resources.
-  
+  @retval EFI_SUCCESS           HpcList was returned.
+  @retval EFI_OUT_OF_RESOURCES  HpcList was not returned due to insufficient resources.
   @retval EFI_INVALID_PARAMETER HpcCount is NULL or HpcList is NULL.
 
 **/
@@ -77,27 +73,20 @@ EFI_STATUS
   Initializes one root Hot Plug Controller (HPC). This process may causes 
   initialization of its subordinate buses. 
 
-  @param  This Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
-  
-  @param  HpcDevicePath The device path to the HPC that is being initialized.
-  
-  @param  HpcPciAddress The address of the HPC function on the PCI bus.
-  
-  @param  Event The event that should be signaled when the HPC initialization 
-  is complete.
-  
-  @param  HpcState The state of the HPC hardware. 
+  @param  This                  Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
+  @param  HpcDevicePath         The device path to the HPC that is being initialized.
+  @param  HpcPciAddress         The address of the HPC function on the PCI bus.
+  @param  Event                 The event that should be signaled when the HPC initialization
+                                is complete.
+  @param  HpcState              The state of the HPC hardware.
 
-  @retval EFI_SUCCESS If Event is NULL, the specific HPC was successfully 
-  initialized. If Event is not NULL,  Event will be signaled at a later time 
-  when initialization is complete.
-  
-  @retval EFI_UNSUPPORTED This instance of EFI_PCI_HOT_PLUG_INIT_PROTOCOL 
-  does not support the specified HPC.
-  
-  @retval EFI_OUT_OF_RESOURCES Initialization failed due to insufficient 
-  resources.
-  
+  @retval EFI_SUCCESS           If Event is NULL, the specific HPC was successfully
+                                initialized. If Event is not NULL, Event will be signaled at a later time
+                                when initialization is complete.
+  @retval EFI_UNSUPPORTED       This instance of EFI_PCI_HOT_PLUG_INIT_PROTOCOL
+                                does not support the specified HPC.
+  @retval EFI_OUT_OF_RESOURCES  Initialization failed due to insufficient
+                                resources.
   @retval EFI_INVALID_PARAMETER HpcState is NULL.
 
 **/
@@ -115,31 +104,22 @@ EFI_STATUS
   Returns the resource padding that is required by the PCI bus that is controlled 
   by the specified Hot Plug Controller (HPC).
 
-  @param  This Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
-  
-  @param  HpcDevicePath The device path to the HPC.
-  
-  @param  HpcPciAddress The address of the HPC function on the PCI bus. 
-  
-  @param  HpcState The state of the HPC hardware. 
-  
-  @param  Padding The amount of resource padding that is required by the 
-  PCI bus under the control of the specified HPC. 
-  
-  @param  Attributes Describes how padding is accounted for. The padding 
-  is returned in the form of ACPI 2.0 resource descriptors. 
+  @param  This                  Pointer to the EFI_PCI_HOT_PLUG_INIT_PROTOCOL instance.
+  @param  HpcDevicePath         The device path to the HPC.
+  @param  HpcPciAddress         The address of the HPC function on the PCI bus.
+  @param  HpcState              The state of the HPC hardware.
+  @param  Padding               The amount of resource padding that is required by the
+                                PCI bus under the control of the specified HPC.
+  @param  Attributes            Describes how padding is accounted for. The padding
+                                is returned in the form of ACPI 2.0 resource descriptors.
 
-  @retval EFI_SUCCESS The resource padding was successfully returned.
-  
-  @retval EFI_UNSUPPORTED This instance of the EFI_PCI_HOT_PLUG_INIT_PROTOCOL 
-  does not support the specified HPC.
-  
-  @retval EFI_NOT_READY This function was called before HPC initialization is complete.
-  
-  @retval EFI_INVALID_PARAMETER  HpcState or Padding or Attributes is NULL.
-  
-  @retval EFI_OUT_OF_RESOURCES ACPI 2.0 resource descriptors for Padding 
-  cannot be allocated due to insufficient resources.
+  @retval EFI_SUCCESS           The resource padding was successfully returned.
+  @retval EFI_UNSUPPORTED       This instance of the EFI_PCI_HOT_PLUG_INIT_PROTOCOL
+                                does not support the specified HPC.
+  @retval EFI_NOT_READY         This function was called before HPC initialization is complete.
+  @retval EFI_INVALID_PARAMETER HpcState or Padding or Attributes is NULL.
+  @retval EFI_OUT_OF_RESOURCES  ACPI 2.0 resource descriptors for Padding
+                                cannot be allocated due to insufficient resources.
 
 **/
 typedef

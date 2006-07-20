@@ -86,7 +86,7 @@
 
     //
     // Assume standard IA-32 alignment. 
-    // BugBug: Need to check portability of long long
+    // Need to check portability of long long
     //
     typedef unsigned long long  UINT64;
     typedef long long           INT64;

@@ -33,18 +33,13 @@ typedef struct _EFI_PEI_FIND_FV_PPI EFI_PEI_FIND_FV_PPI;
   was passed in FvNumber.Once this function reports a firmware volume 
   index/base address pair, that index/address pairing must continue throughout PEI.
 
-  @param  PeiServices Pointer to the PEI Services Table.
-  
-  @param  This Interface pointer that implements the Find FV service.
-  
-  @param  FvNumber The index of the firmware volume to locate.
-  
-  @param  FvAddress The address of the volume to discover.
+  @param  PeiServices    Pointer to the PEI Services Table.
+  @param  This           Interface pointer that implements the Find FV service.
+  @param  FvNumber       The index of the firmware volume to locate.
+  @param  FvAddress      The address of the volume to discover.
 
-  @retval EFI_SUCCESS An additional firmware volume was found.
-  
-  @retval EFI_OUT_OF_RESOURCES There are no firmware volumes for the given FvNumber.
-  
+  @retval EFI_SUCCESS           An additional firmware volume was found.
+  @retval EFI_OUT_OF_RESOURCES  There are no firmware volumes for the given FvNumber.
   @retval EFI_INVALID_PARAMETER *FvAddress is NULL.
 
 **/

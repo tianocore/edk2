@@ -1,10 +1,7 @@
 /** @file
-  This file defines GUIDs and associated data structures for records 
-  posted to the Data Hub. 
-  The producers of these records use these definitions to construct 
-  records.
-  The consumers of these records use these definitions to retrieve,
-  filter and parse records.
+  This file defines GUIDs and associated data structures for records posted to the Data Hub. 
+  The producers of these records use these definitions to construct records.
+  The consumers of these records use these definitions to retrieve, filter and parse records.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          

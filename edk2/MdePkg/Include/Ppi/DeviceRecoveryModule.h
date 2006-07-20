@@ -34,19 +34,15 @@ typedef struct _EFI_PEI_DEVICE_RECOVERY_MODULE_PPI EFI_PEI_DEVICE_RECOVERY_MODUL
   the capsules discovered. Entry 1 is assumed to be the highest load priority 
   and entry N is assumed to be the lowest priority.
 
-  @param  PeiServices General-purpose services that are available to every PEIM
-  
-  @param  This Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
-  
-  @param  NumberRecoveryCapsules Pointer to a caller-allocated UINTN. On output, 
-  *NumberRecoveryCapsules contains the number of recovery capsule images available 
-  for retrieval from this PEIM instance.
+  @param  PeiServices            General-purpose services that are available to every PEIM
+  @param  This                   Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
+  @param  NumberRecoveryCapsules Pointer to a caller-allocated UINTN. On output,
+                                 *NumberRecoveryCapsules contains the number of recovery capsule 
+                                 images available for retrieval from this PEIM instance.
 
-  @retval EFI_SUCCESS One or more capsules were discovered.
-  
-  @retval EFI_DEVICE_ERROR A device error occurred.
-  
-  @retval EFI_NOT_FOUND A recovery DXE capsule cannot be found.
+  @retval EFI_SUCCESS           One or more capsules were discovered.
+  @retval EFI_DEVICE_ERROR      A device error occurred.
+  @retval EFI_NOT_FOUND         A recovery DXE capsule cannot be found.
 
 **/
 typedef
@@ -60,23 +56,17 @@ EFI_STATUS
 /**
   This function gets the size and type of the requested recovery capsule.
 
-  @param  PeiServices General-purpose services that are available to every PEIM
-  
-  @param  This Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
-  
+  @param  PeiServices     General-purpose services that are available to every PEIM
+  @param  This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
   @param  CapsuleInstance Specifies for which capsule instance to retrieve the information.
-  
-  @param  Size A pointer to a caller-allocated UINTN in which the size of 
-  the requested recovery module is returned.
-  
-  @param  CapsuleType A pointer to a caller-allocated EFI_GUID in 
-  which the type of the requested recovery capsule is returned.
+  @param  Size            A pointer to a caller-allocated UINTN in which the size of
+                          the requested recovery module is returned.
+  @param  CapsuleType     A pointer to a caller-allocated EFI_GUID in
+                          which the type of the requested recovery capsule is returned.
 
-  @retval EFI_SUCCESS One or more capsules were discovered.
-  
-  @retval EFI_DEVICE_ERROR A device error occurred.
-  
-  @retval EFI_NOT_FOUND A recovery DXE capsule cannot be found.
+  @retval EFI_SUCCESS           One or more capsules were discovered.
+  @retval EFI_DEVICE_ERROR      A device error occurred.
+  @retval EFI_NOT_FOUND         A recovery DXE capsule cannot be found.
 
 **/
 typedef
@@ -93,19 +83,15 @@ EFI_STATUS
   This function, by whatever mechanism, retrieves a DXE capsule from some device 
   and loads it into memory. Note that the published interface is device neutral.
 
-  @param  PeiServices General-purpose services that are available to every PEIM
-  
-  @param  This Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
-  
+  @param  PeiServices     General-purpose services that are available to every PEIM
+  @param  This            Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI instance.
   @param  CapsuleInstance Specifies which capsule instance to retrieve.
-  
-  @param  Buffer Specifies a caller-allocated buffer in which the requested recovery capsule will be returned. 
+  @param  Buffer          Specifies a caller-allocated buffer in which the requested 
+                          recovery capsule will be returned.
 
-  @retval EFI_SUCCESS One or more capsules were discovered.
-  
-  @retval EFI_DEVICE_ERROR A device error occurred.
-  
-  @retval EFI_NOT_FOUND A recovery DXE capsule cannot be found.
+  @retval EFI_SUCCESS           One or more capsules were discovered.
+  @retval EFI_DEVICE_ERROR      A device error occurred.
+  @retval EFI_NOT_FOUND         A recovery DXE capsule cannot be found.
 
 **/
 typedef

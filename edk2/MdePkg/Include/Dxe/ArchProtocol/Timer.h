@@ -39,10 +39,10 @@ typedef struct _EFI_TIMER_ARCH_PROTOCOL   EFI_TIMER_ARCH_PROTOCOL;
   of tyis type to be called for the timer interrupt, so it can know how much 
   time has passed.  This information is used to signal timer based events.  
 
-  @param  Time Time since the last timer interrupt in 100 ns units.  This will
-  typically be TimerPeriod, but if a timer interrupt is missed, and the
-  EFI_TIMER_ARCH_PROTOCOL driver can detect missed interrupts, then Time
-  will contain the actual amount of time since the last interrupt.
+  @param  Time             Time since the last timer interrupt in 100 ns units. This will
+                           typically be TimerPeriod, but if a timer interrupt is missed, and the
+                           EFI_TIMER_ARCH_PROTOCOL driver can detect missed interrupts, then Time
+                           will contain the actual amount of time since the last interrupt.
 
   None.
 
@@ -66,25 +66,20 @@ VOID
   register the NotifyFunction with the timer interrupt, then EFI_DEVICE_ERROR 
   is returned.
 
-  @param  This The EFI_TIMER_ARCH_PROTOCOL instance.
-  
-  @param  NotifyFunction The function to call when a timer interrupt fires.  This
-  function executes at TPL_HIGH_LEVEL.  The DXE Core will
-  register a handler for the timer interrupt, so it can know
-  how much time has passed.  This information is used to
-  signal timer based events.  NULL will unregister the handler.
+  @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
+  @param  NotifyFunction   The function to call when a timer interrupt fires. This
+                           function executes at TPL_HIGH_LEVEL. The DXE Core will
+                           register a handler for the timer interrupt, so it can know
+                           how much time has passed. This information is used to
+                           signal timer based events. NULL will unregister the handler.
 
-  @retval  EFI_SUCCESS The timer handler was registered.
-  
-  @retval  EFI_UNSUPPORTED The platform does not support timer interrupts.
-  
-  @retval  EFI_ALREADY_STARTED NotifyFunction is not NULL, and a handler is already
-  registered.
-  
-  @retval  EFI_INVALID_PARAMETER NotifyFunction is NULL, and a handler was not
-  previously registered.
-  
-  @retval  EFI_DEVICE_ERROR The timer handler could not be registered.
+  @retval EFI_SUCCESS           The timer handler was registered.
+  @retval EFI_UNSUPPORTED       The platform does not support timer interrupts.
+  @retval EFI_ALREADY_STARTED   NotifyFunction is not NULL, and a handler is already
+                                registered.
+  @retval EFI_INVALID_PARAMETER NotifyFunction is NULL, and a handler was not
+                                previously registered.
+  @retval EFI_DEVICE_ERROR      The timer handler could not be registered.
 
 **/
 typedef 
@@ -107,20 +102,17 @@ EFI_STATUS
   interrupt controller so that a CPU interrupt is not generated when the timer 
   interrupt fires. 
 
-  @param  This The EFI_TIMER_ARCH_PROTOCOL instance.
-  
-  @param  TimerPeriod The rate to program the timer interrupt in 100 nS units.  If
-  the timer hardware is not programmable, then EFI_UNSUPPORTED is
-  returned.  If the timer is programmable, then the timer period
-  will be rounded up to the nearest timer period that is supported
-  by the timer hardware.  If TimerPeriod is set to 0, then the
-  timer interrupts will be disabled.
+  @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
+  @param  TimerPeriod      The rate to program the timer interrupt in 100 nS units. If
+                           the timer hardware is not programmable, then EFI_UNSUPPORTED is
+                           returned. If the timer is programmable, then the timer period
+                           will be rounded up to the nearest timer period that is supported
+                           by the timer hardware. If TimerPeriod is set to 0, then the
+                           timer interrupts will be disabled.
 
-  @retval  EFI_SUCCESS The timer period was changed.
-  
-  @retval  EFI_UNSUPPORTED The platform cannot change the period of the timer interrupt.
-  
-  @retval  EFI_DEVICE_ERROR The timer period could not be changed due to a device error.
+  @retval EFI_SUCCESS           The timer period was changed.
+  @retval EFI_UNSUPPORTED       The platform cannot change the period of the timer interrupt.
+  @retval EFI_DEVICE_ERROR      The timer period could not be changed due to a device error.
 
 **/
 typedef 
@@ -136,14 +128,12 @@ EFI_STATUS
   is NULL, then EFI_INVALID_PARAMETER is returned.  If a TimerPeriod of 0 is 
   returned, then the timer is currently disabled.
 
-  @param  This The EFI_TIMER_ARCH_PROTOCOL instance.
-  
-  @param  TimerPeriod A pointer to the timer period to retrieve in 100 ns units.  If
-  0 is returned, then the timer is currently disabled.
+  @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
+  @param  TimerPeriod      A pointer to the timer period to retrieve in 100 ns units. If
+                           0 is returned, then the timer is currently disabled.
 
-  @retval  EFI_SUCCESS The timer period was returned in TimerPeriod.
-  
-  @retval  EFI_INVALID_PARAMETER TimerPeriod is NULL.
+  @retval EFI_SUCCESS           The timer period was returned in TimerPeriod.
+  @retval EFI_INVALID_PARAMETER TimerPeriod is NULL.
 
 **/
 typedef 
@@ -162,11 +152,10 @@ EFI_STATUS
   registered handler should not be able to distinguish a hardware-generated timer 
   interrupt from a software-generated timer interrupt.
 
-  @param  This The EFI_TIMER_ARCH_PROTOCOL instance.
+  @param  This             The EFI_TIMER_ARCH_PROTOCOL instance.
 
-  @retval  EFI_SUCCESS The soft timer interrupt was generated.
-  
-  @retval  EFI_UNSUPPORTEDT The platform does not support the generation of soft timer interrupts.
+  @retval EFI_SUCCESS           The soft timer interrupt was generated.
+  @retval EFI_UNSUPPORTEDT      The platform does not support the generation of soft timer interrupts.
 
 **/
 typedef 

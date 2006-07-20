@@ -82,8 +82,8 @@ typedef UINT64  EFI_FV_ATTRIBUTES;
   Retrieves attributes, insures positive polarity of attribute bits, returns
   resulting attributes in output parameter
 
-  @param  This Calling context
-  @param  Attributes output buffer which contains attributes
+  @param  This                  Calling context
+  @param  Attributes            output buffer which contains attributes
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_SUCCESS
@@ -99,8 +99,8 @@ EFI_STATUS
 /**
   Sets volume attributes
 
-  @param  This Calling context
-  @param  Attributes Buffer which contains attributes
+  @param  This                  Calling context
+  @param  Attributes            Buffer which contains attributes
 
   @retval EFI_INVALID_PARAMETER
   @retval EFI_DEVICE_ERROR
@@ -121,24 +121,23 @@ typedef UINT32  EFI_FV_FILE_ATTRIBUTES;
 /**
   Read the requested file (NameGuid) and returns data in Buffer.
 
-  @param  This Calling context
-  @param  NameGuid Filename identifying which file to read
-  @param  Buffer Pointer to pointer to buffer in which contents of file are returned.
-  <br>
-  If Buffer is NULL, only type, attributes, and size are returned as
-  there is no output buffer.
-  <br>
-  If Buffer != NULL and *Buffer == NULL, the output buffer is allocated
-  from BS pool by ReadFile
-  <br>
-  If Buffer != NULL and *Buffer != NULL, the output buffer has been
-  allocated by the caller and is being passed in.
-  
-  @param  BufferSize Indicates the buffer size passed in, and on output the size
-  required to complete the read
-  @param  FoundType Indicates the type of the file who's data is returned
-  @param  FileAttributes Indicates the attributes of the file who's data is resturned
-  @param  AuthenticationStatus Indicates the authentication status of the data
+  @param  This                  Calling context
+  @param  NameGuid              Filename identifying which file to read
+  @param  Buffer                Pointer to pointer to buffer in which contents of file are returned.
+                                <br>
+                                If Buffer is NULL, only type, attributes, and size are returned as
+                                there is no output buffer.
+                                <br>
+                                If Buffer != NULL and *Buffer == NULL, the output buffer is allocated
+                                from BS pool by ReadFile
+                                <br>
+                                If Buffer != NULL and *Buffer != NULL, the output buffer has been
+                                allocated by the caller and is being passed in.
+  @param  BufferSize            Indicates the buffer size passed in, and on output the size
+                                required to complete the read
+  @param  FoundType             Indicates the type of the file who's data is returned
+  @param  FileAttributes        Indicates the attributes of the file who's data is resturned
+  @param  AuthenticationStatus  Indicates the authentication status of the data
 
   @retval EFI_SUCCESS
   @retval EFI_WARN_BUFFER_TOO_SMALL
@@ -162,24 +161,23 @@ EFI_STATUS
 /**
   Read the requested section from the specified file and returns data in Buffer.
 
-  @param  This Calling context
-  @param  NameGuid Filename identifying the file from which to read
-  @param  SectionType Indicates what section type to retrieve
-  @param  SectionInstance Indicates which instance of SectionType to retrieve
-  @param  Buffer Pointer to pointer to buffer in which contents of file are returned.
-  <br>
-  If Buffer is NULL, only type, attributes, and size are returned as
-  there is no output buffer.
-  <br>
-  If Buffer != NULL and *Buffer == NULL, the output buffer is allocated
-  from BS pool by ReadFile
-  <br>
-  If Buffer != NULL and *Buffer != NULL, the output buffer has been
-  allocated by the caller and is being passed in.
-  
-  @param  BufferSize Indicates the buffer size passed in, and on output the size
-  required to complete the read
-  @param  AuthenticationStatus Indicates the authentication status of the data
+  @param  This                  Calling context
+  @param  NameGuid              Filename identifying the file from which to read
+  @param  SectionType           Indicates what section type to retrieve
+  @param  SectionInstance       Indicates which instance of SectionType to retrieve
+  @param  Buffer                Pointer to pointer to buffer in which contents of file are returned.
+                                <br>
+                                If Buffer is NULL, only type, attributes, and size are returned as
+                                there is no output buffer.
+                                <br>
+                                If Buffer != NULL and *Buffer == NULL, the output buffer is allocated
+                                from BS pool by ReadFile
+                                <br>
+                                If Buffer != NULL and *Buffer != NULL, the output buffer has been
+                                allocated by the caller and is being passed in.
+  @param  BufferSize            Indicates the buffer size passed in, and on output the size
+                                required to complete the read
+  @param  AuthenticationStatus  Indicates the authentication status of the data
 
   @retval EFI_SUCCESS
   @retval EFI_WARN_BUFFER_TOO_SMALL
@@ -217,13 +215,13 @@ typedef struct {
 /**
   Write the supplied file (NameGuid) to the FV.
 
-  @param  This Calling context
-  @param  NumberOfFiles Indicates the number of file records pointed to by FileData
-  @param  WritePolicy Indicates the level of reliability of the write with respect to
-  things like power failure events.
-  @param  FileData A pointer to an array of EFI_FV_WRITE_FILE_DATA structures.  Each
-  element in the array indicates a file to write, and there are
-  NumberOfFiles elements in the input array.
+  @param  This                  Calling context
+  @param  NumberOfFiles         Indicates the number of file records pointed to by FileData
+  @param  WritePolicy           Indicates the level of reliability of the write with respect to
+                                things like power failure events.
+  @param  FileData              A pointer to an array of EFI_FV_WRITE_FILE_DATA structures. Each
+                                element in the array indicates a file to write, and there are
+                                NumberOfFiles elements in the input array.
 
   @retval EFI_SUCCESS
   @retval EFI_OUT_OF_RESOURCES
@@ -245,14 +243,14 @@ EFI_STATUS
 /**
   Given the input key, search for the next matching file in the volume.
 
-  @param  This Calling context
-  @param  Key Pointer to a caller allocated buffer that contains an implementation
-  specific key that is used to track where to begin searching on
-  successive calls.
-  @param  FileType Indicates the file type to filter for
-  @param  NameGuid Guid filename of the file found
-  @param  Attributes Attributes of the file found
-  @param  Size Size in bytes of the file found
+  @param  This                  Calling context
+  @param  Key                   Pointer to a caller allocated buffer that contains an implementation
+                                specific key that is used to track where to begin searching on
+                                successive calls.
+  @param  FileType              Indicates the file type to filter for
+  @param  NameGuid              Guid filename of the file found
+  @param  Attributes            Attributes of the file found
+  @param  Size                  Size in bytes of the file found
 
   @retval EFI_SUCCESS
   @retval EFI_NOT_FOUND

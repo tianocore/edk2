@@ -412,16 +412,13 @@ typedef struct _EFI_HII_VARIABLE_PACK_LIST {
 /**
   Registers the various packs that are passed in via the Packages parameter. 
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Packages A pointer to an EFI_HII_PACKAGES package instance.
-  
-  @param  Handle A pointer to the EFI_HII_HANDLE instance.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Packages              A pointer to an EFI_HII_PACKAGES package instance.
+  @param  Handle                A pointer to the EFI_HII_HANDLE instance.
 
-  @retval EFI_SUCCESS Data was extracted from Packages, the database 
-  was updated with the data, and Handle returned successfully.
-  
-  @retval EFI_INVALID_PARAMETER The content of Packages  was invalid. 
+  @retval EFI_SUCCESS           Data was extracted from Packages, the database
+                                was updated with the data, and Handle returned successfully.
+  @retval EFI_INVALID_PARAMETER The content of Packages was invalid.
 
 **/
 typedef
@@ -435,15 +432,13 @@ EFI_STATUS
 /**
   Removes a package from the HII database. 
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle The handle that was registered to the data that is requested 
-  for removal. 
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                The handle that was registered to the data that is requested
+                                for removal.
 
-  @retval EFI_SUCCESS The data associated with the Handle was removed 
-  from the HII database.
-  
-  @retval EFI_INVALID_PARAMETER The Handle was not valid. 
+  @retval EFI_SUCCESS           The data associated with the Handle was removed
+                                from the HII database.
+  @retval EFI_INVALID_PARAMETER The Handle was not valid.
 
 **/
 typedef
@@ -456,18 +451,15 @@ EFI_STATUS
 /**
   Determines the handles that are currently active in the database.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  HandleBufferLength On input, a pointer to the length of the handle 
-  buffer. On output, the length of the handle buffer that is required 
-  for the handles found.
-  
-  @param  Handle An array of EFI_HII_HANDLE instances returned.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  HandleBufferLength    On input, a pointer to the length of the handle
+                                buffer. On output, the length of the handle buffer that is required
+                                for the handles found.
+  @param  Handle                An array of EFI_HII_HANDLE instances returned.
 
-  @retval EFI_SUCCESS Handle was updated successfully.
-  
-  @retval EFI_BUFFER_TOO_SMALL The HandleBufferLength parameter indicates 
-  that Handle is too small to support the number of handles.
+  @retval EFI_SUCCESS           Handle was updated successfully.
+  @retval EFI_BUFFER_TOO_SMALL  The HandleBufferLength parameter indicates
+                                that Handle is too small to support the number of handles.
 
 **/
 typedef
@@ -481,22 +473,18 @@ EFI_STATUS
 /**
   Exports the contents of the database into a buffer.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle An EFI_HII_HANDLE that corresponds to the desired 
-  handle to export. If the value is 0, the entire database will be exported.
-  In either case, the data will be exported in a format described by the 
-  structure definition of EFI_HII_EXPORT_TABLE.
-  
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                An EFI_HII_HANDLE that corresponds to the desired
+                                handle to export. If the value is 0, the entire database will be exported.
+                                In either case, the data will be exported in a format described by the
+                                structure definition of EFI_HII_EXPORT_TABLE.
   @param  BufferSize
   On input, a pointer to the length of the buffer. On output, the length 
   of the buffer that is required for the export data.
-  
-  @param  Buffer A pointer to a buffer that will contain the results of the export function.
+  @param  Buffer                A pointer to a buffer that will contain the results of the export function.
 
-  @retval EFI_SUCCESS The buffer was successfully filled with BufferSize amount of data.
-  
-  @retval EFI_BUFFER_TOO_SMALL The value in BufferSize was too small to contain the export data.
+  @retval EFI_SUCCESS           The buffer was successfully filled with BufferSize amount of data.
+  @retval EFI_BUFFER_TOO_SMALL  The value in BufferSize was too small to contain the export data.
 
 **/
 typedef
@@ -512,12 +500,10 @@ EFI_STATUS
   Remove any new strings that were added after the initial string export 
   for this handle.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle The handle on which the string resides.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                The handle on which the string resides.
 
-  @retval EFI_SUCCESS Remove strings from the handle successfully.
-  
+  @retval EFI_SUCCESS           Remove strings from the handle successfully.
   @retval EFI_INVALID_PARAMETER The Handle was unknown.
 
 **/
@@ -531,24 +517,20 @@ EFI_STATUS
 /**
   Tests if all of the characters in a string have corresponding font characters.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  StringToTest A pointer to a Unicode string.
-  
-  @param  FirstMissing A pointer to an index into the string. On input, 
-  the index of the first character in the StringToTest to examine. On exit, 
-  the index of the first character encountered for which a glyph is unavailable.
-  If all glyphs in the string are available, the index is the index of the 
-  terminator of the string.
-  
-  @param  GlyphBufferSize A pointer to a value. On output, if the function 
-  returns EFI_SUCCESS, it contains the amount of memory that is required to 
-  store the string¡¯s glyph equivalent.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  StringToTest          A pointer to a Unicode string.
+  @param  FirstMissing          A pointer to an index into the string. On input,
+                                the index of the first character in the StringToTest to examine. On exit,
+                                the index of the first character encountered for which a glyph is unavailable.
+                                If all glyphs in the string are available, the index is the index of the
+                                terminator of the string.
+  @param  GlyphBufferSize       A pointer to a value. On output, if the function
+                                returns EFI_SUCCESS, it contains the amount of memory that is required to
+                                store the string¡¯s glyph equivalent.
 
-  @retval EFI_SUCCESS All glyphs are available. Note that an empty string 
-  always returns this value.
-  
-  @retval EFI_NOT_FOUND A glyph was not found for a character.
+  @retval EFI_SUCCESS           All glyphs are available. Note that an empty string
+                                always returns this value.
+  @retval EFI_NOT_FOUND         A glyph was not found for a character.
 
 **/
 typedef
@@ -563,28 +545,22 @@ EFI_STATUS
 /**
   Translates a Unicode character into the corresponding font glyph.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Source A pointer to a Unicode string.
-  
-  @param  Index On input, the offset into the string from which to fetch 
-  the character.On successful completion, the index is updated to the first 
-  character past the character(s) making up the just extracted glyph. 
-  
-  @param  GlyphBuffer Pointer to an array where the glyphs corresponding 
-  to the characters in the source may be stored. GlyphBuffer is assumed 
-  to be wide enough to accept a wide glyph character.
-  
-  @param  BitWidth If EFI_SUCCESS was returned, the UINT16 pointed to by 
-  this value is filled with the length of the glyph in pixels. It is unchanged 
-  if the call was unsuccessful.
-  
-  @param  InternalStatus The cell pointed to by this parameter must be 
-  initialized to zero prior to invoking the call the first time for any string.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Source                A pointer to a Unicode string.
+  @param  Index                 On input, the offset into the string from which to fetch
+                                the character.On successful completion, the index is updated to the first
+                                character past the character(s) making up the just extracted glyph.
+  @param  GlyphBuffer           Pointer to an array where the glyphs corresponding
+                                to the characters in the source may be stored. GlyphBuffer is assumed
+                                to be wide enough to accept a wide glyph character.
+  @param  BitWidth              If EFI_SUCCESS was returned, the UINT16 pointed to by
+                                this value is filled with the length of the glyph in pixels. It is unchanged
+                                if the call was unsuccessful.
+  @param  InternalStatus        The cell pointed to by this parameter must be
+                                initialized to zero prior to invoking the call the first time for any string.
 
-  @retval EFI_SUCCESS It worked.
-  
-  @retval EFI_NOT_FOUND A glyph for a character was not found.
+  @retval EFI_SUCCESS           It worked.
+  @retval EFI_NOT_FOUND         A glyph for a character was not found.
 
 **/
 typedef
@@ -602,28 +578,20 @@ EFI_STATUS
   Translates a glyph into the format required for input to the Universal 
   Graphics Adapter (UGA) Block Transfer (BLT) routines.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  GlyphBuffer A pointer to the buffer that contains glyph data.
-  
-  @param  Foreground The foreground setting requested to be used for the 
-  generated BltBuffer data. 
-  
-  @param  Background The background setting requested to be used for the 
-  generated BltBuffer data.
-  
-  @param  Count The entry in the BltBuffer upon which to act.
-  
-  @param  Width The width in bits of the glyph being converted.
-  
-  @param  Height The height in bits of the glyph being converted
-  
-  @param  BltBuffer A pointer to the buffer that contains the data that is 
-  ready to be used by the UGA BLT routines. 
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  GlyphBuffer           A pointer to the buffer that contains glyph data.
+  @param  Foreground            The foreground setting requested to be used for the
+                                generated BltBuffer data.
+  @param  Background            The background setting requested to be used for the
+                                generated BltBuffer data.
+  @param  Count                 The entry in the BltBuffer upon which to act.
+  @param  Width                 The width in bits of the glyph being converted.
+  @param  Height                The height in bits of the glyph being converted
+  @param  BltBuffer             A pointer to the buffer that contains the data that is
+                                ready to be used by the UGA BLT routines.
 
-  @retval EFI_SUCCESS It worked.
-  
-  @retval EFI_NOT_FOUND A glyph for a character was not found.
+  @retval EFI_SUCCESS           It worked.
+  @retval EFI_NOT_FOUND         A glyph for a character was not found.
 
 **/
 typedef
@@ -642,22 +610,17 @@ EFI_STATUS
 /**
   Allows a new string to be added to an already existing string package.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Pointer to a NULL-terminated string containing a single ISO 639-2 
-  language identifier, indicating the language in which the string is translated. 
-  
-  @param  Handle The handle of the language pack to which the string is to be added.
-  
-  @param  Reference The identifier of the string to be added. If the reference 
-  value is zero, then the string will be assigned a new identifier on that 
-  handle for the language specified. Otherwise, the string will be updated 
-  with the NewString Value. 
-  
-  @param  NewString The string to be added.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Pointer               to a NULL-terminated string containing a single ISO 639-2
+                                language identifier, indicating the language in which the string is translated.
+  @param  Handle                The handle of the language pack to which the string is to be added.
+  @param  Reference             The identifier of the string to be added. If the reference
+                                value is zero, then the string will be assigned a new identifier on that
+                                handle for the language specified. Otherwise, the string will be updated
+                                with the NewString Value.
+  @param  NewString             The string to be added.
 
-  @retval EFI_SUCCESS The string was effectively registered.
-  
+  @retval EFI_SUCCESS           The string was effectively registered.
   @retval EFI_INVALID_PARAMETER The Handle was unknown.
 
 **/
@@ -675,15 +638,12 @@ EFI_STATUS
   Allows a program to determine the primary languages that are supported 
   on a given handle.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle The handle on which the strings reside.
-  
-  @param  LanguageString A string allocated by GetPrimaryLanguages() that 
-  contains a list of all primary languages registered on the handle. 
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                The handle on which the strings reside.
+  @param  LanguageString        A string allocated by GetPrimaryLanguages() that
+                                contains a list of all primary languages registered on the handle.
 
-  @retval EFI_SUCCESS LanguageString was correctly returned.
-  
+  @retval EFI_SUCCESS           LanguageString was correctly returned.
   @retval EFI_INVALID_PARAMETER The Handle was unknown.
 
 **/
@@ -699,18 +659,14 @@ EFI_STATUS
   Allows a program to determine which secondary languages are supported 
   on a given handle for a given primary language.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle The handle on which the strings reside.
-  
-  @param  PrimaryLanguage Pointer to a NULL-terminated string containing a single 
-  ISO 639-2 language identifier, indicating the primary language.
-  
-  @param  LanguageString A string allocated by GetSecondaryLanguages() 
-  containing a list of all secondary languages registered on the handle.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                The handle on which the strings reside.
+  @param  PrimaryLanguage       Pointer to a NULL-terminated string containing a single
+                                ISO 639-2 language identifier, indicating the primary language.
+  @param  LanguageString        A string allocated by GetSecondaryLanguages()
+                                containing a list of all secondary languages registered on the handle.
 
-  @retval EFI_SUCCESS LanguageString was correctly returned.
-  
+  @retval EFI_SUCCESS           LanguageString was correctly returned.
   @retval EFI_INVALID_PARAMETER The Handle was unknown.
 
 **/
@@ -726,32 +682,24 @@ EFI_STATUS
 /**
   Extracts a string from a package already registered with the EFI HII database.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle The handle on which the string resides.
-  
-  @param  Token The string token assigned to the string.
-  
-  @param  Raw If TRUE, the string is returned unedited in the internal 
-  storage format described above. If false, the string returned is edited 
-  by replacing <cr> with <space> and by removing special characters such 
-  as the <wide> prefix.
-  
-  @param  LanguageString Pointer to a NULL-terminated string containing a 
-  single ISO 639-2 language identifier, indicating the language to print. 
-  If the LanguageString is empty (starts with a NULL), the default system 
-  language will be used to determine the language.
-  
-  @param  BufferLength Length of the StringBuffer.
-  
-  @param  StringBuffer The buffer designed to receive the characters in the string.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                The handle on which the string resides.
+  @param  Token                 The string token assigned to the string.
+  @param  Raw                   If TRUE, the string is returned unedited in the internal
+                                storage format described above. If false, the string returned is edited
+                                by replacing <cr> with <space> and by removing special characters such
+                                as the <wide> prefix.
+  @param  LanguageString        Pointer to a NULL-terminated string containing a
+                                single ISO 639-2 language identifier, indicating the language to print.
+                                If the LanguageString is empty (starts with a NULL), the default system
+                                language will be used to determine the language.
+  @param  BufferLength          Length of the StringBuffer.
+  @param  StringBuffer          The buffer designed to receive the characters in the string.
 
-  @retval EFI_SUCCESS StringBuffer is filled with a NULL-terminated string.
-  
+  @retval EFI_SUCCESS           StringBuffer is filled with a NULL-terminated string.
   @retval EFI_INVALID_PARAMETER The handle or string token is unknown.
-  
-  @retval EFI_BUFFER_TOO_SMALL The buffer provided was not large enough to 
-  allow the entire string to be stored. 
+  @retval EFI_BUFFER_TOO_SMALL  The buffer provided was not large enough to
+                                allow the entire string to be stored.
 
 **/
 typedef
@@ -769,32 +717,23 @@ EFI_STATUS
 /**
   Allows a program to extract a part of a string of not more than a given width. 
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle The handle on which the string resides.
-  
-  @param  Token The string token assigned to the string. 
-  
-  @param  Index On input, the offset into the string where the line is to start.
-  On output, the index is updated to point to beyond the last character returned 
-  in the call.
-  
-  @param  LineWidth The maximum width of the line in units of narrow glyphs.
-  
-  @param  LanguageString Pointer to a NULL-terminated string containing a 
-  single ISO 639-2 language identifier, indicating the language to print.
-  
-  @param  BufferLength Pointer to the length of the StringBuffer. 
-  
-  @param  StringBuffer The buffer designed to receive the characters in the string. 
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                The handle on which the string resides.
+  @param  Token                 The string token assigned to the string.
+  @param  Index                 On input, the offset into the string where the line is to start.
+                                On output, the index is updated to point to beyond the last character returned
+                                in the call.
+  @param  LineWidth             The maximum width of the line in units of narrow glyphs.
+  @param  LanguageString        Pointer to a NULL-terminated string containing a
+                                single ISO 639-2 language identifier, indicating the language to print.
+  @param  BufferLength          Pointer to the length of the StringBuffer.
+  @param  StringBuffer          The buffer designed to receive the characters in the string.
 
-  @retval EFI_SUCCESS StringBuffer filled with characters that will fit on the line.
-  
-  @retval EFI_NOT_FOUND The font glyph for at least one of the characters in 
-  the string is not in the font database.
-  
-  @retval EFI_BUFFER_TOO_SMALL The buffer provided was not large enough 
-  to allow the entire string to be stored.
+  @retval EFI_SUCCESS           StringBuffer filled with characters that will fit on the line.
+  @retval EFI_NOT_FOUND         The font glyph for at least one of the characters in
+                                the string is not in the font database.
+  @retval EFI_BUFFER_TOO_SMALL  The buffer provided was not large enough
+                                to allow the entire string to be stored.
 
 **/
 typedef
@@ -814,28 +753,21 @@ EFI_STATUS
   Allows a program to extract a form or form package that has previously 
   been registered with the HII database.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle Handle on which the form resides.
-  
-  @param  FormId The ID of the form to return. If the ID is zero, 
-  the entire form package is returned. 
-  
-  @param  BufferLength On input, the length of the Buffer. On output, 
-  the length of the returned buffer, 
-  
-  @param  Buffer The buffer designed to receive the form(s).
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                Handle on which the form resides.
+  @param  FormId                The ID of the form to return. If the ID is zero,
+                                the entire form package is returned.
+  @param  BufferLength          On input, the length of the Buffer. On output,
+                                the length of the returned buffer,
+  @param  Buffer                The buffer designed to receive the form(s).
 
-  @retval EFI_SUCCESS Buffer filled with the requested forms. BufferLength 
-  was updated.
-  
+  @retval EFI_SUCCESS           Buffer filled with the requested forms. BufferLength
+                                was updated.
   @retval EFI_INVALID_PARAMETER The handle is unknown.
-  
-  @retval EFI_NOT_FOUND A form on the requested handle cannot be found with 
-  the requested FormId.
-  
-  @retval EFI_BUFFER_TOO_SMALL The buffer provided was not large enough 
-  to allow the form to be stored. 
+  @retval EFI_NOT_FOUND         A form on the requested handle cannot be found with
+                                the requested FormId.
+  @retval EFI_BUFFER_TOO_SMALL  The buffer provided was not large enough
+                                to allow the form to be stored.
 
 **/
 typedef
@@ -851,23 +783,18 @@ EFI_STATUS
 /**
   Extracts the defaults that are associated with a given handle in the HII database.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle The HII handle from which will have default data retrieved.
-  
-  @param  DefaultMask The mask used to specify some type of default override when extracting 
-  the default image data.
-  
-  @param  VariablePackList A indirect pointer to the first entry of a link list with 
-  type EFI_HII_VARIABLE_PACK_LIST. 
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                The HII handle from which will have default data retrieved.
+  @param  DefaultMask           The mask used to specify some type of default override when extracting
+                                the default image data.
+  @param  VariablePackList      A indirect pointer to the first entry of a link list with
+                                type EFI_HII_VARIABLE_PACK_LIST.
 
-  @retval EFI_SUCCESS The VariablePackList was populated with the appropriate 
-  default setting data.
-  
-  @retval EFI_NOT_FOUND The IFR does not have any explicit or default map(s).
-  
-  @retval EFI_INVALID_PARAMETER The HII database entry associated with Handle 
-  contain invalid data.
+  @retval EFI_SUCCESS           The VariablePackList was populated with the appropriate
+                                default setting data.
+  @retval EFI_NOT_FOUND         The IFR does not have any explicit or default map(s).
+  @retval EFI_INVALID_PARAMETER The HII database entry associated with Handle
+                                contain invalid data.
 
 **/
 typedef
@@ -883,23 +810,17 @@ EFI_STATUS
   Allows the caller to update a form or form package that has previously been 
   registered with the EFI HII database.
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  Handle Handle of the package where the form to be updated resides.
-  
-  @param  Label The label inside the form package where the update is to take place.
-  
-  @param  AddData If TRUE, adding data at a given Label; otherwise, 
-  if FALSE, removing data at a given Label.
-  
-  @param  Data The buffer containing the new tags to insert after the Label
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  Handle                Handle of the package where the form to be updated resides.
+  @param  Label                 The label inside the form package where the update is to take place.
+  @param  AddData               If TRUE, adding data at a given Label; otherwise,
+                                if FALSE, removing data at a given Label.
+  @param  Data                  The buffer containing the new tags to insert after the Label
 
-  @retval EFI_SUCCESS The form was updated with the new tags.
-  
-  @retval EFI_INVALID_PARAMETER The buffer for the buffer length does not 
-  contain an integral number of tags.
-  
-  @retval EFI_NOT_FOUND The Handle, Label, or FormId was not found. 
+  @retval EFI_SUCCESS           The form was updated with the new tags.
+  @retval EFI_INVALID_PARAMETER The buffer for the buffer length does not
+                                contain an integral number of tags.
+  @retval EFI_NOT_FOUND         The Handle, Label, or FormId was not found.
 
 **/
 typedef
@@ -915,15 +836,13 @@ EFI_STATUS
 /**
   Retrieves the current keyboard layout. 
 
-  @param  This A pointer to the EFI_HII_PROTOCOL instance.
-  
-  @param  DescriptorCount A pointer to the number of Descriptor entries being 
-  described in the keyboard layout being retrieved.
-  
-  @param  Descriptor A pointer to a buffer containing an array of EFI_KEY_DESCRIPTOR 
-  entries. Each entry will reflect the definition of a specific physical key.
+  @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
+  @param  DescriptorCount       A pointer to the number of Descriptor entries being
+                                described in the keyboard layout being retrieved.
+  @param  Descriptor            A pointer to a buffer containing an array of EFI_KEY_DESCRIPTOR
+                                entries. Each entry will reflect the definition of a specific physical key.
 
-  @retval EFI_SUCCESS The keyboard layout was retrieved successfully.
+  @retval EFI_SUCCESS           The keyboard layout was retrieved successfully.
 
 **/
 typedef

@@ -60,12 +60,12 @@ typedef enum {
   it needs to handle those errors on its own because there is no way to surface any 
   errors to the caller.
 
-  @param  This Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
-  @param  HostBridge The handle of the host bridge controller.
-  @param  Phase The phase of the PCI bus enumeration.
-  @param  ChipsetPhase Defines the execution phase of the PCI chipset driver.
+  @param  This                  Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param  HostBridge            The handle of the host bridge controller.
+  @param  Phase                 The phase of the PCI bus enumeration.
+  @param  ChipsetPhase          Defines the execution phase of the PCI chipset driver.
 
-  @retval  EFI_SUCCESS The function completed successfully.
+  @retval EFI_SUCCESS           The function completed successfully.
 
 **/
 typedef
@@ -92,14 +92,14 @@ EFI_STATUS
   needs to handle those errors on its own because there is no way to surface any errors to 
   the caller.  
 
-  @param  This Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
-  @param  HostBridge The associated PCI host bridge handle.
-  @param  RootBridge The associated PCI root bridge handle.
-  @param  PciAddress The address of the PCI device on the PCI bus.
-  @param  Phase The phase of the PCI controller enumeration.
-  @param  ChipsetPhase Defines the execution phase of the PCI chipset driver.
+  @param  This                  Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param  HostBridge            The associated PCI host bridge handle.
+  @param  RootBridge            The associated PCI root bridge handle.
+  @param  PciAddress            The address of the PCI device on the PCI bus.
+  @param  Phase                 The phase of the PCI controller enumeration.
+  @param  ChipsetPhase          Defines the execution phase of the PCI chipset driver.
 
-  @retval  EFI_SUCCESS The function completed successfully.
+  @retval EFI_SUCCESS           The function completed successfully.
 
 **/
 typedef
@@ -120,11 +120,11 @@ EFI_STATUS
   enumeration. The PCI bus driver and the PCI Host Bridge Resource Allocation Protocol 
   driver can call this member function to retrieve the policy.
 
-  @param  This Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
-  @param  PciPolicy The platform policy with respect to VGA and ISA aliasing.
+  @param  This                  Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param  PciPolicy             The platform policy with respect to VGA and ISA aliasing.
 
-  @retval  EFI_SUCCESS The function completed successfully.
-  @retval  EFI_INVALID_PARAMETER PciPolicy is NULL.
+  @retval EFI_SUCCESS           The function completed successfully.
+  @retval EFI_INVALID_PARAMETER PciPolicy is NULL.
 
 **/
 typedef
@@ -147,20 +147,20 @@ EFI_STATUS
   scanning the ROM that is attached to any controller, which allows a platform to specify a ROM 
   image that is different from the ROM image on a PCI card.
 
-  @param  This Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
-  @param  PciHandle The handle of the PCI device.
-  @param  RomImage If the call succeeds, the pointer to the pointer to the option ROM image.
-  Otherwise, this field is undefined. The memory for RomImage is allocated
-  by EFI_PCI_PLATFORM_PROTOCOL.GetPciRom() using the EFI Boot Service AllocatePool().
-  It is the caller's responsibility to free the memory using the EFI Boot Service
-  FreePool(), when the caller is done with the option ROM.
-  @param  RomSize If the call succeeds, a pointer to the size of the option ROM size. Otherwise,
-  this field is undefined.
+  @param  This                  Pointer to the EFI_PCI_PLATFORM_PROTOCOL instance.
+  @param  PciHandle             The handle of the PCI device.
+  @param  RomImage              If the call succeeds, the pointer to the pointer to the option ROM image.
+                                Otherwise, this field is undefined. The memory for RomImage is allocated
+                                by EFI_PCI_PLATFORM_PROTOCOL.GetPciRom() using the EFI Boot Service AllocatePool().
+                                It is the caller's responsibility to free the memory using the EFI Boot Service
+                                FreePool(), when the caller is done with the option ROM.
+  @param  RomSize               If the call succeeds, a pointer to the size of the option ROM size. Otherwise,
+                                this field is undefined.
 
-  @retval  EFI_SUCCESS The option ROM was available for this device and loaded into memory.
-  @retval  EFI_NOT_FOUND No option ROM was available for this device.
-  @retval  EFI_OUT_OF_RESOURCES No memory was available to load the option ROM.
-  @retval  EFI_DEVICE_ERROR An error occurred in getting the option ROM.
+  @retval EFI_SUCCESS           The option ROM was available for this device and loaded into memory.
+  @retval EFI_NOT_FOUND         No option ROM was available for this device.
+  @retval EFI_OUT_OF_RESOURCES  No memory was available to load the option ROM.
+  @retval EFI_DEVICE_ERROR      An error occurred in getting the option ROM.
 
 **/
 typedef

@@ -31,15 +31,12 @@ typedef struct _EFI_LEGACY_REGION_PROTOCOL EFI_LEGACY_REGION_PROTOCOL;
 /**
   Sets hardware to decode or not decode a region.
 
-  @param  This Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  
-  @param  Start Start of region to decode.
-  
-  @param  Length Size in bytes of the region.
-  
-  @param  On Decode/nondecode flag.
+  @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
+  @param  Start                 Start of region to decode.
+  @param  Length                Size in bytes of the region.
+  @param  On                    Decode/nondecode flag.
 
-  @retval EFI_SUCCESS Decode range successfully changed.
+  @retval EFI_SUCCESS           Decode range successfully changed.
 
 **/
 typedef
@@ -54,15 +51,12 @@ EFI_STATUS
 /**
   Sets a region to read only.
 
-  @param  This Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  
-  @param  Start Start of region to lock.
-  
-  @param  Length Size in bytes of the region.
-  
-  @param  Granularity Lock attribute affects this granularity in bytes.
+  @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
+  @param  Start                 Start of region to lock.
+  @param  Length                Size in bytes of the region.
+  @param  Granularity           Lock attribute affects this granularity in bytes.
 
-  @retval EFI_SUCCESS The region was made read only.
+  @retval EFI_SUCCESS           The region was made read only.
 
 **/
 typedef
@@ -78,15 +72,12 @@ EFI_STATUS
   Sets a region to read only and ensures that flash is locked from being 
   inadvertently modified.
 
-  @param  This Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  
-  @param  Start Start of region to lock.
-  
-  @param  Length Size in bytes of the region.
-  
-  @param  Granularity Lock attribute affects this granularity in bytes.
+  @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
+  @param  Start                 Start of region to lock.
+  @param  Length                Size in bytes of the region.
+  @param  Granularity           Lock attribute affects this granularity in bytes.
 
-  @retval EFI_SUCCESS The region was made read only and flash is locked.
+  @retval EFI_SUCCESS           The region was made read only and flash is locked.
 
 **/
 typedef
@@ -101,15 +92,12 @@ EFI_STATUS
 /**
   Sets a region to read-write.
 
-  @param  This Indicates the EFI_LEGACY_REGION_PROTOCOL instance
-  
-  @param  Start Start of region to lock.
-  
-  @param  Length Size in bytes of the region.
-  
-  @param  Granularity Lock attribute affects this granularity in bytes.
+  @param  This                  Indicates the EFI_LEGACY_REGION_PROTOCOL instance
+  @param  Start                 Start of region to lock.
+  @param  Length                Size in bytes of the region.
+  @param  Granularity           Lock attribute affects this granularity in bytes.
 
-  @retval EFI_SUCCESS The region was successfully made read-write.
+  @retval EFI_SUCCESS           The region was successfully made read-write.
 
 **/
 typedef
