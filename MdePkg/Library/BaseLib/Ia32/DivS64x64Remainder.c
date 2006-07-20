@@ -17,7 +17,7 @@
 #include "../BaseLibInternals.h"
 
 /**
-  Worker function that Divides a 64-bit signed integer by a 64-bit signed integer and 
+  Worker function that Divides a 64-bit signed integer by a 64-bit signed integer and
   generates a  64-bit signed result and a optional 64-bit signed remainder.
 
   This function divides the 64-bit unsigned value Dividend by the 64-bit
