@@ -1425,7 +1425,7 @@ public class SurfaceAreaQuery {
      */
     public static String[][] getFpdOptions(String fvName) {
            String[] xPath = new String[] { "/Flash/FvImages/FvImage[@Type='Options' and ./FvImageNames='"
-                      + fvName.toUpperCase() + "']/FvImageOptions" };
+                      + fvName + "']/FvImageOptions" };
            Object[] queryResult = get("PlatformSurfaceArea", xPath);
            if (queryResult == null) {
                  return new String[0][];
@@ -1493,7 +1493,7 @@ public class SurfaceAreaQuery {
      */
     public static String[][] getFpdAttributes(String fvName) {
         String[] xPath = new String[] { "/Flash/FvImages/FvImage[@Type='Attributes' and ./FvImageNames='"
-                         + fvName.toUpperCase() + "']/FvImageOptions" };
+                         + fvName + "']/FvImageOptions" };
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
         if (queryResult == null) {
              return new String[0][];
@@ -1563,7 +1563,7 @@ public class SurfaceAreaQuery {
      * @returns empty list if nothing is there
      */
     public static String[][] getFpdComponents(String fvName) {
-        String[] xPath = new String[] { "/Flash/FvImages/FvImage[@Type='Components' and ./FvImageNames='"+ fvName.toUpperCase() + "']/FvImageOptions" };
+        String[] xPath = new String[] { "/Flash/FvImages/FvImage[@Type='Components' and ./FvImageNames='"+ fvName + "']/FvImageOptions" };
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
         if (queryResult == null) {
             return new String[0][];
