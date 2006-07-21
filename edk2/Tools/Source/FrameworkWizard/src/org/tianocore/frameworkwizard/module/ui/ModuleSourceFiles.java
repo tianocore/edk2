@@ -181,6 +181,9 @@ public class ModuleSourceFiles extends IInternalFrame {
             jTable.setRowHeight(20);
 
             model.addColumn("File Name");
+            model.addColumn("Tag Name");
+            model.addColumn("Tool Code");
+            model.addColumn("Tool Chain Family");
 
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(this);

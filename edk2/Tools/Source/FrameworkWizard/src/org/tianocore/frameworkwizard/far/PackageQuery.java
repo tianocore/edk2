@@ -25,7 +25,7 @@ import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.PackageDependenciesDocument;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
-import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
+import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 

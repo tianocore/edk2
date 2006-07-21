@@ -23,8 +23,8 @@ import org.tianocore.LibraryUsage;
 import org.tianocore.LibraryClassDefinitionsDocument.LibraryClassDefinitions;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.frameworkwizard.common.DataType;
+import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
-import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
 public class ModuleIdentification extends Identification {
