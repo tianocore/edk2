@@ -2060,21 +2060,25 @@ public class AutoGen {
         int size = (int)inFile.length();
         byte[] buffer = new byte[size];
         File outFile = new File (this.outputPath + File.separatorChar + CommonDefinition.tianoR8FlashMapH);
-        try{
-            if (inFile.exists()) {
-                FileInputStream fis = new FileInputStream (inFile);
-                fis.read(buffer);
-                FileOutputStream fos = new FileOutputStream(outFile);
-                fos.write(buffer);
-                fis.close();
-                fos.close();
-            }else {
-                throw new AutoGenException("The flashMap.h file don't exist!!");
+		//
+		//  If TianoR8FlashMap.h existed and the flashMap.h don't change, 
+		//  do nothing.
+		// 
+        if ((!outFile.exists()) ||(inFile.lastModified() - outFile.lastModified()) >= 0) {
+		    try{
+                if (inFile.exists()) {
+                    FileInputStream fis = new FileInputStream (inFile);
+                    fis.read(buffer);
+                    FileOutputStream fos = new FileOutputStream(outFile);
+                    fos.write(buffer);
+                    fis.close();
+                    fos.close();
+                }else {
+                    throw new AutoGenException("The flashMap.h file don't exist!!");
+                }
+            } catch (Exception e){
+                throw new AutoGenException(e.getMessage());
             }
-        } catch (Exception e){
-            throw new AutoGenException(e.getMessage());
-        }
-        
+		}
     }
-
 }
