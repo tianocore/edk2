@@ -60,8 +60,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <IncludeHeader>Include/Library/DxeCoreEntryPoint.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
-    <LibraryClass Name="DxeRuntimeDriverLib">
-      <IncludeHeader>Include/Library/DxeRuntimeDriverLib.h</IncludeHeader>
+    <LibraryClass Name="UefiRuntimeLib">
+      <IncludeHeader>Include/Library/UefiRuntimeLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
     <LibraryClass Name="DxeServicesTableLib">
@@ -478,8 +478,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <IncludeHeader>Include/Library/DxeCoreEntryPoint.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
-    <IndustryStdHeader Name="DxeRuntimeDriverLib">
-      <IncludeHeader>Include/Library/DxeRuntimeDriverLib.h</IncludeHeader>
+    <IndustryStdHeader Name="UefiRuntimeLib">
+      <IncludeHeader>Include/Library/UefiRuntimeLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="DxeServicesTableLib">
