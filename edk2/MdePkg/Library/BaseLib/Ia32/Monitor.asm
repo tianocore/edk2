@@ -22,11 +22,11 @@
 ;------------------------------------------------------------------------------
 
     .686
-    .model  flat
+    .model  flat,C
     .code
 
 ;------------------------------------------------------------------------------
-; UINT64
+; UINTN
 ; EFIAPI
 ; AsmMonitor (
 ;   IN      UINTN                     Eax,
@@ -34,12 +34,12 @@
 ;   IN      UINTN                     Edx
 ;   );
 ;------------------------------------------------------------------------------
-_AsmMonitor PROC
+AsmMonitor  PROC
     mov     eax, [esp + 4]
     mov     ecx, [esp + 8]
     mov     edx, [esp + 12]
-    DB      0fh, 1, 0c8h
+    DB      0fh, 1, 0c8h                ; monitor
     ret
-_AsmMonitor ENDP
+AsmMonitor  ENDP
 
     END

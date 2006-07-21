@@ -34,7 +34,7 @@
 ;    OUT  UINT32  *RegisterOutEbx  OPTIONAL,
 ;    OUT  UINT32  *RegisterOutEcx  OPTIONAL,
 ;    OUT  UINT32  *RegisterOutEdx  OPTIONAL
-;    )
+;    );
 ;------------------------------------------------------------------------------
 AsmCpuid    PROC    USES    ebx
     push    ebp

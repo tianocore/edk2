@@ -23,6 +23,14 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; UINT64
+; EFIAPI
+; InternalMathRShiftU64 (
+;   IN      UINT64                    Operand,
+;   IN      UINTN                     Count
+;   );
+;------------------------------------------------------------------------------
 InternalMathRShiftU64   PROC
     mov     cl, [esp + 12]
     xor     edx, edx

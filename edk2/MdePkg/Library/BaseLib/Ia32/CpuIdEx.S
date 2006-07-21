@@ -21,8 +21,8 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    .code: 
+    .686:
+    .code:
 
 #------------------------------------------------------------------------------
 #  UINT32
@@ -39,28 +39,28 @@
 .globl _AsmCpuidEx
 _AsmCpuidEx:
     push    %ebx
-    pushl   %ebp
+    push    %ebp
     movl    %esp, %ebp
     movl    12(%ebp), %eax
     movl    16(%ebp), %ecx
     cpuid
-    pushl   %ecx
+    push    %ecx
     movl    20(%ebp), %ecx
     jecxz   L1
     movl    %eax, (%ecx)
-L1: 
+L1:
     movl    24(%ebp), %ecx
     jecxz   L2
     movl    %ebx, (%ecx)
-L2: 
+L2:
     movl    28(%ebp), %ecx
     jecxz   L3
     popl    (%ecx)
-L3: 
+L3:
     movl    32(%ebp), %edx
     jecxz   L4
     movl    %edx, (%ecx)
-L4: 
+L4:
     movl    12(%ebp), %eax
     leave
     pop     %ebx

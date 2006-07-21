@@ -21,25 +21,25 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .586P
-    .model  flat
-    .xmm
+    .586
+    .model  flat,C
+    .mmx
     .code
 
 ;------------------------------------------------------------------------------
-; UINTN
+; UINT64
 ; EFIAPI
 ; AsmReadMm7 (
 ;   VOID
 ;   );
 ;------------------------------------------------------------------------------
-_AsmReadMm7 PROC
+AsmReadMm7  PROC
     push    eax
     push    eax
     movq    [esp], mm7
     pop     eax
     pop     edx
     ret
-_AsmReadMm7 ENDP
+AsmReadMm7  ENDP
 
     END

@@ -31,9 +31,9 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmReadMsr64    PROC
-    rdmsr
-    shl     rax, 20h
-    shrd    rax, rdx, 20h
+    rdmsr                               ; edx & eax are zero extended
+    shl     rdx, 20h
+    or      rax, rdx
     ret
 AsmReadMsr64    ENDP
 

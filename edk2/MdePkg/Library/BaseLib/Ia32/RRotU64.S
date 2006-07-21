@@ -19,26 +19,28 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-
 .global _InternalMathRRotU64
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathRRotU64 (
+#   IN      UINT64                    Operand,
+#   IN      UINTN                     Count
+#   );
+#------------------------------------------------------------------------------
 _InternalMathRRotU64:
     push    %ebx
-    movb    16(%esp),%cl
-    movl    8(%esp),%eax
-    movl    12(%esp),%edx
-    shrdl   %cl,%eax,%ebx
-    shrdl   %cl,%edx,%eax
-    roll    %cl,%ebx
-    shrdl   %cl,%ebx,%edx
-    testb   $32,%cl
+    movb    16(%esp), %cl
+    movl    8(%esp), %eax
+    movl    12(%esp), %edx
+    shrdl   %cl, %eax, %ebx
+    shrdl   %cl, %edx, %eax
+    roll    %cl, %ebx
+    shrdl   %cl, %ebx, %edx
+    testb   $32, %cl
     cmovnz  %eax, %ecx
     cmovnz  %edx, %eax
     cmovnz  %ecx, %edx
     pop     %ebx
     ret
-
-
-

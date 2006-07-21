@@ -23,6 +23,13 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalX86ReadIdtr (
+;   OUT     IA32_DESCRIPTOR           *Idtr
+;   );
+;------------------------------------------------------------------------------
 InternalX86ReadIdtr   PROC
     sidt    fword ptr [rcx]
     ret

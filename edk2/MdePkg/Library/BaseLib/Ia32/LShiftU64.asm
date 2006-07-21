@@ -23,11 +23,19 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; UINT64
+; EFIAPI
+; InternalMathLShiftU64 (
+;   IN      UINT64                    Operand,
+;   IN      UINTN                     Count
+;   );
+;------------------------------------------------------------------------------
 InternalMathLShiftU64   PROC
     mov     cl, [esp + 12]
     xor     eax, eax
     mov     edx, [esp + 4]
-    test    cl, 32
+    test    cl, 32                      ; Count >= 32?
     cmovz   eax, edx
     cmovz   edx, [esp + 8]
     shld    edx, eax, cl

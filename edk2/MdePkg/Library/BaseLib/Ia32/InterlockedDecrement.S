@@ -21,9 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
+.global _InternalSyncDecrement
 
 #------------------------------------------------------------------------------
 # UINT32
@@ -32,13 +30,9 @@
 #   IN      UINT32                    *Value
 #   );
 #------------------------------------------------------------------------------
-.global _InternalSyncDecrement
-_InternalSyncDecrement: 
-    movl    4(%esp),%eax
-    lock    
-    decl     (%eax)
-    movl    (%eax),%eax
+_InternalSyncDecrement:
+    movl    4(%esp), %eax
+    lock
+    decl    (%eax)
+    movl    (%eax), %eax
     ret
-
-
-

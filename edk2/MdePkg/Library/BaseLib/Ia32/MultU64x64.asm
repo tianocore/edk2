@@ -23,6 +23,14 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; UINT64
+; EFIAPI
+; InternalMathMultU64x64 (
+;   IN      UINT64                    Multiplicand,
+;   IN      UINT64                    Multiplier
+;   );
+;------------------------------------------------------------------------------
 InternalMathMultU64x64  PROC    USES    ebx
     mov     ebx, [esp + 8]
     mov     edx, [esp + 16]

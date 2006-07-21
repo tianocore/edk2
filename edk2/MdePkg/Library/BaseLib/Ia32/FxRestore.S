@@ -21,10 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-     
+.global _InternalX86FxRestore
 
 #------------------------------------------------------------------------------
 # VOID
@@ -33,11 +30,7 @@
 #   IN CONST IA32_FX_BUFFER *Buffer
 #   );
 #------------------------------------------------------------------------------
-.global _InternalX86FxRestore
-_InternalX86FxRestore: 
-    movl    4(%esp),%eax
+_InternalX86FxRestore:
+    movl    4(%esp), %eax
     fxrstor (%eax)
     ret
-
-
-

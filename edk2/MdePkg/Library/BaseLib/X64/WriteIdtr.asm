@@ -23,6 +23,13 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalX86WriteIdtr (
+;   IN      CONST IA32_DESCRIPTOR     *Idtr
+;   );
+;------------------------------------------------------------------------------
 InternalX86WriteIdtr  PROC
     lidt    fword ptr [rcx]
     ret

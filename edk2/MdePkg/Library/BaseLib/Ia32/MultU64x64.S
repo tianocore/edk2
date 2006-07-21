@@ -19,24 +19,26 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-
 .global _InternalMathMultU64x64
-_InternalMathMultU64x64: 
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathMultU64x64 (
+#   IN      UINT64                    Multiplicand,
+#   IN      UINT64                    Multiplier
+#   );
+#------------------------------------------------------------------------------
+_InternalMathMultU64x64:
     push    %ebx
-    movl    8(%esp),%ebx
-    movl    16(%esp),%edx
-    movl    %ebx,%ecx
-    movl    %edx,%eax
-    imull   20(%esp),%ebx
-    imull   12(%esp),%edx
-    addl    %edx,%ebx
+    movl    8(%esp), %ebx
+    movl    16(%esp), %edx
+    movl    %ebx, %ecx
+    movl    %edx, %eax
+    imull   20(%esp), %ebx
+    imull   12(%esp), %edx
+    addl    %edx, %ebx
     mull    %ecx
-    addl    %ebx,%edx
+    addl    %ebx, %edx
     pop     %ebx
     ret
-
-
-

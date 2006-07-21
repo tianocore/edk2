@@ -26,12 +26,13 @@
 ;------------------------------------------------------------------------------
 ; UINTN
 ; EFIAPI
-; AsmWriteDr5 (
-;   VOID
+; AsmWriteDr6 (
+;   IN UINTN Value
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteDr5 PROC
     DB      0fh, 23h, 0e9h
+    mov     rax, rcx
     ret
 AsmWriteDr5 ENDP
 

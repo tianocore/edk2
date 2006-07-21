@@ -19,25 +19,26 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-
 .global _SetJump, _InternalAssertJumpBuffer
-_SetJump: 
+
+#------------------------------------------------------------------------------
+# UINTN
+# EFIAPI
+# SetJump (
+#   OUT     BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
+#   );
+#------------------------------------------------------------------------------
+_SetJump:
     pushl   0x4(%esp)
     call    _InternalAssertJumpBuffer
-    popl    %ecx
-    popl    %ecx
-    movl    (%esp),%edx
-    movl    %ebx,(%edx)
-    movl    %esi,4(%edx)
-    movl    %edi,8(%edx)
-    movl    %ebp,12(%edx)
-    movl    %esp,16(%edx)
-    movl    %ecx,20(%edx)
-    xorl    %eax,%eax
+    pop     %ecx
+    pop     %ecx
+    movl    (%esp), %edx
+    movl    %ebx, (%edx)
+    movl    %esi, 4(%edx)
+    movl    %edi, 8(%edx)
+    movl    %ebp, 12(%edx)
+    movl    %esp, 16(%edx)
+    movl    %ecx, 20(%edx)
+    xorl    %eax, %eax
     jmp     *%ecx
-
-
-

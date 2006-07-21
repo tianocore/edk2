@@ -19,20 +19,22 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-
 .global _InternalMathModU64x32
-_InternalMathModU64x32: 
-    movl    8(%esp),%eax
-    movl    12(%esp),%ecx
-    xorl    %edx,%edx
+
+#------------------------------------------------------------------------------
+# UINT32
+# EFIAPI
+# InternalMathModU64x32 (
+#   IN      UINT64                    Dividend,
+#   IN      UINT32                    Divisor
+#   );
+#------------------------------------------------------------------------------
+_InternalMathModU64x32:
+    movl    8(%esp), %eax
+    movl    12(%esp), %ecx
+    xorl    %edx, %edx
     divl    %ecx
-    movl    4(%esp),%eax
+    movl    4(%esp), %eax
     divl    %ecx
-    movl    %edx,%eax
+    movl    %edx, %eax
     ret
-
-
-

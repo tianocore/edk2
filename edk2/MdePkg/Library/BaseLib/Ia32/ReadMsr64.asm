@@ -21,23 +21,9 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .586P
-    .model  flat
+    .586p
+    .model  flat,C
     .code
-
-;------------------------------------------------------------------------------
-; UINT32
-; EFIAPI
-; AsmReadMsr32 (
-;   IN UINT32  Index
-;   );
-;------------------------------------------------------------------------------
-_AsmReadMsr32   PROC
-    ;
-    ; AsmReadMsr32 shares the same implementation with AsmReadMsr64 and thus no
-    ; code inside this function
-    ;
-_AsmReadMsr32   ENDP
 
 ;------------------------------------------------------------------------------
 ; UINT64
@@ -46,10 +32,10 @@ _AsmReadMsr32   ENDP
 ;   IN UINT64  Index
 ;   );
 ;------------------------------------------------------------------------------
-_AsmReadMsr64   PROC
+AsmReadMsr64    PROC
     mov     ecx, [esp + 4]
     rdmsr
     ret
-_AsmReadMsr64   ENDP
+AsmReadMsr64    ENDP
 
     END

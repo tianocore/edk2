@@ -23,6 +23,14 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; UINT64
+; EFIAPI
+; InternalMathLRotU64 (
+;   IN      UINT64                    Operand,
+;   IN      UINTN                     Count
+;   );
+;------------------------------------------------------------------------------
 InternalMathLRotU64 PROC    USES    ebx
     mov     cl, [esp + 16]
     mov     edx, [esp + 12]
@@ -31,7 +39,7 @@ InternalMathLRotU64 PROC    USES    ebx
     shld    edx, eax, cl
     ror     ebx, cl
     shld    eax, ebx, cl
-    test    cl, 32
+    test    cl, 32                      ; Count >= 32?
     cmovnz  ecx, eax
     cmovnz  eax, edx
     cmovnz  edx, ecx

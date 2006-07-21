@@ -21,6 +21,14 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalLongJump (
+;   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+;   IN      UINTN                     Value
+;   );
+;------------------------------------------------------------------------------
 InternalLongJump    PROC
     mov     rbx, [rcx]
     mov     rsp, [rcx + 8]

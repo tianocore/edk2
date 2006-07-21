@@ -21,21 +21,21 @@
 ;
 ;------------------------------------------------------------------------------
 
-    .586P
-    .model  flat
-    .xmm
+    .586
+    .model  flat,C
+    .mmx
     .code
 
 ;------------------------------------------------------------------------------
-; UINT64
+; VOID
 ; EFIAPI
 ; AsmWriteMm6 (
 ;   IN UINT64   Value
 ;   );
 ;------------------------------------------------------------------------------
-_AsmWriteMm6    PROC
+AsmWriteMm6 PROC
     movq    mm6, [esp + 4]
     ret
-_AsmWriteMm6    ENDP
+AsmWriteMm6 ENDP
 
     END

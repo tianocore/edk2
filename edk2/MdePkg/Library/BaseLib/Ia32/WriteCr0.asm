@@ -22,20 +22,20 @@
 ;------------------------------------------------------------------------------
 
     .386p
-    .model  flat
+    .model  flat,C
     .code
 
 ;------------------------------------------------------------------------------
 ; UINTN
 ; EFIAPI
 ; AsmWriteCr0 (
-;   VOID
+;   UINTN  Cr0
 ;   );
 ;------------------------------------------------------------------------------
-_AsmWriteCr0    PROC
+AsmWriteCr0 PROC
     mov     eax, [esp + 4]
     mov     cr0, eax
     ret
-_AsmWriteCr0    ENDP
+AsmWriteCr0 ENDP
 
     END

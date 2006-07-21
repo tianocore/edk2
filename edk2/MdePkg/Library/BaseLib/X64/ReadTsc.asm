@@ -32,8 +32,8 @@
 ;------------------------------------------------------------------------------
 AsmReadTsc  PROC
     rdtsc
-    shl     rax, 20h
-    shrd    rax, rdx, 20h
+    shl     rdx, 20h
+    or      rax, rdx
     ret
 AsmReadTsc  ENDP
 

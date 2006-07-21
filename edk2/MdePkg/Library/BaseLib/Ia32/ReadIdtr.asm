@@ -25,10 +25,17 @@
     .model  flat,C
     .code
 
-InternalX86ReadIdtr   PROC
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalX86ReadIdtr (
+;   OUT     IA32_DESCRIPTOR           *Idtr
+;   );
+;------------------------------------------------------------------------------
+InternalX86ReadIdtr PROC
     mov     eax, [esp + 4]
     sidt    fword ptr [eax]
     ret
-InternalX86ReadIdtr   ENDP
+InternalX86ReadIdtr ENDP
 
     END

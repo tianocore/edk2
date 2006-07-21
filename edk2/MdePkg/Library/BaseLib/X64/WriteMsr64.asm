@@ -32,11 +32,9 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteMsr64   PROC
-    push    rdx
-    mov     eax, edx
+    mov     rax, rdx
     shr     rdx, 20h
     wrmsr
-    pop     rax
     ret
 AsmWriteMsr64   ENDP
 

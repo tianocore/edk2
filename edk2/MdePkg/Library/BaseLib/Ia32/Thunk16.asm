@@ -29,6 +29,10 @@ EXTERNDEF   C   m16Gdt:WORD
 EXTERNDEF   C   m16GdtrBase:WORD
 EXTERNDEF   C   mTransition:WORD
 
+;
+; Here is the layout of the real mode stack. _ToUserCode() is responsible for
+; loading all these registers from real mode stack.
+;
 IA32_REGS   STRUC   4t
 _EDI        DD      ?
 _ESI        DD      ?
@@ -50,6 +54,9 @@ IA32_REGS   ENDS
 
     .const
 
+;
+; These are global constant to convey information to C code.
+;
 m16Size         DW      InternalAsmThunk16 - m16Start
 mThunk16Attr    DW      _ThunkAttr - m16Start
 m16Gdt          DW      _NullSegDesc - m16Start
@@ -63,7 +70,10 @@ m16Start    LABEL   BYTE
 SavedGdt    LABEL   FWORD
             DW      ?
             DD      ?
-
+;------------------------------------------------------------------------------
+; _BackFromUserCode() takes control in real mode after 'retf' has been executed
+; by user code. It will be shadowed to somewhere in memory below 1MB.
+;------------------------------------------------------------------------------
 _BackFromUserCode   PROC
     push    ss
     push    cs
@@ -122,6 +132,10 @@ _16Gdtr     LABEL   FWORD
             DW      GdtEnd - _NullSegDesc - 1
 _16GdtrBase DD      _NullSegDesc
 
+;------------------------------------------------------------------------------
+; _ToUserCode() takes control in real mode before passing control to user code.
+; It will be shadowed to somewhere in memory below 1MB.
+;------------------------------------------------------------------------------
 _ToUserCode PROC
     mov     edx, ss
     mov     ss, ecx                     ; set new segment selectors
@@ -174,11 +188,14 @@ _16DsDesc       LABEL   QWORD
                 DB      0
 GdtEnd          LABEL   QWORD
 
-;
-;   @param  RegSet  Pointer to a IA32_DWORD_REGS structure
-;   @param  Transition  Pointer to the transition code
-;   @return The address of the 16-bit stack after returning from user code
-;
+;------------------------------------------------------------------------------
+; IA32_REGISTER_SET *
+; EFIAPI
+; InternalAsmThunk16 (
+;   IN      IA32_REGISTER_SET         *RegisterSet,
+;   IN OUT  VOID                      *Transition
+;   );
+;------------------------------------------------------------------------------
 InternalAsmThunk16  PROC    USES    ebp ebx esi edi ds  es  fs  gs
     mov     esi, [esp + 36]             ; esi <- RegSet
     movzx   edx, (IA32_REGS ptr [esi])._SS

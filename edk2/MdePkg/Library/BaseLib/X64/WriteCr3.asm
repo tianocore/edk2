@@ -27,11 +27,12 @@
 ; UINTN
 ; EFIAPI
 ; AsmWriteCr3 (
-;   VOID
+;   UINTN  Cr3
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteCr3 PROC
     mov     cr3, rcx
+    mov     rax, rcx
     ret
 AsmWriteCr3 ENDP
 

@@ -23,6 +23,13 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalX86FxRestore (
+;   IN CONST IA32_FX_BUFFER *Buffer
+;   );
+;------------------------------------------------------------------------------
 InternalX86FxRestore  PROC
     fxrstor [rcx]
     ret

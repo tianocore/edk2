@@ -27,11 +27,12 @@
 ; UINTN
 ; EFIAPI
 ; AsmWriteDr4 (
-;   VOID
+;   IN UINTN Value
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteDr4 PROC
     DB      0fh, 23h, 0e1h
+    mov     rax, rcx
     ret
 AsmWriteDr4 ENDP
 

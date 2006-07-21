@@ -61,6 +61,10 @@ SavedGdt    LABEL   FWORD
             DW      ?
             DQ      ?
 
+;------------------------------------------------------------------------------
+; _BackFromUserCode() takes control in real mode after 'retf' has been executed
+; by user code. It will be shadowed to somewhere in memory below 1MB.
+;------------------------------------------------------------------------------
 _BackFromUserCode   PROC
     DB      16h                         ; push ss
     DB      0eh                         ; push cs
@@ -125,6 +129,10 @@ _16Gdtr     LABEL   FWORD
 _16GdtrBase DQ      _NullSegDesc
 _16Idtr     FWORD   (1 SHL 10) - 1
 
+;------------------------------------------------------------------------------
+; _ToUserCode() takes control in real mode before passing control to user code.
+; It will be shadowed to somewhere in memory below 1MB.
+;------------------------------------------------------------------------------
 _ToUserCode PROC
     mov     edi, ss
     mov     ss, edx                     ; set new segment selectors
@@ -184,11 +192,14 @@ _16DsDesc       LABEL   QWORD
                 DB      0
 GdtEnd          LABEL   QWORD
 
-;
-;   @param  RegSet  Pointer to a IA32_DWORD_REGS structure
-;   @param  Transition  Pointer to the transition code
-;   @return The address of the 16-bit stack after returning from user code
-;
+;------------------------------------------------------------------------------
+; IA32_REGISTER_SET *
+; EFIAPI
+; InternalAsmThunk16 (
+;   IN      IA32_REGISTER_SET         *RegisterSet,
+;   IN OUT  VOID                      *Transition
+;   );
+;------------------------------------------------------------------------------
 InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     mov     r10d, ds
     mov     r11d, es

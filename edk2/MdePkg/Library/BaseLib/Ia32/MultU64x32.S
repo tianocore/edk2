@@ -19,14 +19,23 @@
 #
 #------------------------------------------------------------------------------
 
-    .386: 
-    .code: 
+    .386:
+    .code:
 
 .global _InternalMathMultU64x32
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathMultU64x32 (
+#   IN      UINT64                    Multiplicand,
+#   IN      UINT32                    Multiplier
+#   );
+#------------------------------------------------------------------------------
 _InternalMathMultU64x32:
-    movl    12(%esp),%ecx
-    movl    %ecx,%eax
-    imull   8(%esp),%ecx
-    mull   0x4(%esp)
-    addl    %ecx,%edx
+    movl    12(%esp), %ecx
+    movl    %ecx, %eax
+    imull   8(%esp), %ecx
+    mull    0x4(%esp)
+    addl    %ecx, %edx
     ret

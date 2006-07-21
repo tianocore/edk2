@@ -22,20 +22,20 @@
 ;------------------------------------------------------------------------------
 
     .586p
-    .model  flat
+    .model  flat,C
     .code
 
 ;------------------------------------------------------------------------------
 ; UINTN
 ; EFIAPI
 ; AsmWriteCr4 (
-;   VOID
+;   UINTN  Cr4
 ;   );
 ;------------------------------------------------------------------------------
-_AsmWriteCr4    PROC
+AsmWriteCr4 PROC
     mov     eax, [esp + 4]
     mov     cr4, eax
     ret
-_AsmWriteCr4    ENDP
+AsmWriteCr4 ENDP
 
     END

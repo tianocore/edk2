@@ -23,6 +23,13 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalX86ReadGdtr (
+;   OUT IA32_DESCRIPTOR  *Gdtr
+;   );
+;------------------------------------------------------------------------------
 InternalX86ReadGdtr   PROC
     sgdt    fword ptr [rcx]
     ret

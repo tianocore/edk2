@@ -21,10 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-     
+.global _AsmFlushCacheLine
 
 #------------------------------------------------------------------------------
 # VOID
@@ -33,11 +30,7 @@
 #   IN      VOID                      *LinearAddress
 #   );
 #------------------------------------------------------------------------------
-.global _AsmFlushCacheLine
-_AsmFlushCacheLine: 
-    movl    4(%esp),%eax
+_AsmFlushCacheLine:
+    movl    4(%esp), %eax
     clflush (%eax)
     ret
-
-
-

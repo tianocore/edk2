@@ -19,21 +19,23 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-
 .global _InternalMathARShiftU64
-_InternalMathARShiftU64: 
-    movb    12(%esp),%cl
-    movl    8(%esp),%eax
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathARShiftU64 (
+#   IN      UINT64                    Operand,
+#   IN      UINTN                     Count
+#   );
+#------------------------------------------------------------------------------
+_InternalMathARShiftU64:
+    movb    12(%esp), %cl
+    movl    8(%esp), %eax
     cltd
-    testb   $32,%cl
+    testb   $32, %cl
     cmovz   %eax, %edx
     cmovz   4(%esp), %eax
-    shrdl   %cl,%edx,%eax
-    sar     %cl,%edx
+    shrdl   %cl, %edx, %eax
+    sar     %cl, %edx
     ret
-
-
-

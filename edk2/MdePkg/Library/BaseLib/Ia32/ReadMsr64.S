@@ -21,37 +21,16 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-
-#------------------------------------------------------------------------------
-# UINT32
-# EFIAPI
-# AsmReadMsr32 (
-#   IN UINT32  Index
-#   );
-#------------------------------------------------------------------------------
-.global _AsmReadMsr32
-_AsmReadMsr32: 
-    #
-    # AsmReadMsr32 shares the same implementation with AsmReadMsr64 and thus no
-    # code inside this function
-    #
-
+.global _AsmReadMsr64
 
 #------------------------------------------------------------------------------
 # UINT64
 # EFIAPI
 # AsmReadMsr64 (
-#   IN UINT64  Index
+#   IN UINT32  Index
 #   );
 #------------------------------------------------------------------------------
-.global _AsmReadMsr64
-_AsmReadMsr64: 
-    movl    4(%esp),%ecx
+_AsmReadMsr64:
+    movl    4(%esp), %ecx
     rdmsr
     ret
-
-
-

@@ -21,9 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
+.global _InternalX86EnablePaging32
 
 #------------------------------------------------------------------------------
 # VOID
@@ -35,24 +33,20 @@
 #   IN      VOID                      *NewStack
 #   );
 #------------------------------------------------------------------------------
-.global _InternalX86EnablePaging32
-_InternalX86EnablePaging32: 
-    movl    4(%esp),%ebx
-    movl    8(%esp),%ecx
-    movl    12(%esp),%edx
+_InternalX86EnablePaging32:
+    movl    4(%esp), %ebx
+    movl    8(%esp), %ecx
+    movl    12(%esp), %edx
     pushfl
-    popl    %edi
+    pop     %edi
     cli
     movl    %cr0, %eax
-    btsl    $31,%eax
-    movl    16(%esp),%esp
+    btsl    $31, %eax
+    movl    16(%esp), %esp
     movl    %eax, %cr0
-    pushl   %edi
+    push    %edi
     popfl
-    pushl   %edx
-    pushl   %ecx
+    push    %edx
+    push    %ecx
     call    *%ebx
     jmp     .
-
-
-
