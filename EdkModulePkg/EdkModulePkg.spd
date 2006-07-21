@@ -24,10 +24,6 @@
       <IncludeHeader>Include/Library/CustomDecompressLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
-    <LibraryClass Name="EdkBsDataHubStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkBsDataHubStatusCodeLib.h</IncludeHeader>
-      <HelpText/>
-    </LibraryClass>
     <LibraryClass Name="EdkDxeSalLib">
       <IncludeHeader>Include/Library/EdkDxeSalLib.h</IncludeHeader>
       <HelpText/>
@@ -44,24 +40,12 @@
       <IncludeHeader>Include/Library/EdkIfrSupportLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
-    <LibraryClass Name="EdkMemoryStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkMemoryStatusCodeLib.h</IncludeHeader>
-      <HelpText/>
-    </LibraryClass>
     <LibraryClass Name="EdkPeCoffLoaderLib">
       <IncludeHeader>Include/Library/EdkPeCoffLoaderLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
     <LibraryClass Name="EdkPeCoffLoaderX64Lib">
       <IncludeHeader>Include/Library/EdkPeCoffLoaderX64Lib.h</IncludeHeader>
-      <HelpText/>
-    </LibraryClass>
-    <LibraryClass Name="EdkRtMemoryStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkRtMemoryStatusCodeLib.h</IncludeHeader>
-      <HelpText/>
-    </LibraryClass>
-    <LibraryClass Name="EdkRtPlatformStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkRtPlatformStatusCodeLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
     <LibraryClass Name="EdkScsiLib">
@@ -74,6 +58,14 @@
     </LibraryClass>
     <LibraryClass Name="TianoDecompressLib">
       <IncludeHeader>Include/Library/TianoDecompressLib.h</IncludeHeader>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="SerialPortLib">
+      <IncludeHeader>Include/Library/SerialPortLib.h</IncludeHeader>
+      <HelpText/>
+    </LibraryClass>
+    <LibraryClass Name="OemHookStatusCodeLib">
+      <IncludeHeader>Include/Library/OemHookStatusCodeLib.h</IncludeHeader>
       <HelpText/>
     </LibraryClass>
   </LibraryClassDeclarations>
@@ -198,10 +190,6 @@
       <IncludeHeader>Include/Library/CustomDecompressLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
-    <IndustryStdHeader Name="EdkBsDataHubStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkBsDataHubStatusCodeLib.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
     <IndustryStdHeader Name="EdkDxeSalLib">
       <IncludeHeader>Include/Library/EdkDxeSalLib.h</IncludeHeader>
       <HelpText/>
@@ -218,24 +206,12 @@
       <IncludeHeader>Include/Library/EdkIfrSupportLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
-    <IndustryStdHeader Name="EdkMemoryStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkMemoryStatusCodeLib.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
     <IndustryStdHeader Name="EdkPeCoffLoaderLib">
       <IncludeHeader>Include/Library/EdkPeCoffLoaderLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="EdkPeCoffLoaderX64Lib">
       <IncludeHeader>Include/Library/EdkPeCoffLoaderX64Lib.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
-    <IndustryStdHeader Name="EdkRtMemoryStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkRtMemoryStatusCodeLib.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
-    <IndustryStdHeader Name="EdkRtPlatformStatusCodeLib">
-      <IncludeHeader>Include/Library/EdkRtPlatformStatusCodeLib.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="EdkScsiLib">
@@ -424,18 +400,16 @@
     <Filename>Library/EdkFvbServiceLib/EdkFvbServiceLib.msa</Filename>
     <Filename>Library/EdkGraphicsLib/EdkGraphicsLib.msa</Filename>
     <Filename>Library/EdkIfrSupportLib/EdkIfrSupportLib.msa</Filename>
-    <Filename>Library/EdkMemoryStatusCodeLib/EdkMemoryStatusCodeLib.msa</Filename>
     <Filename>Library/EdkNullCustomizedDecompressLib/EdkNullCustomizedDecompressLib.msa</Filename>
     <Filename>Library/EdkPeCoffLoaderLib/EdkPeCoffLoaderLib.msa</Filename>
     <Filename>Library/EdkPeCoffLoaderX64Lib/EdkPeCoffLoaderX64Lib.msa</Filename>
     <Filename>Library/PeiPerformanceLib/PeiPerformanceLib.msa</Filename>
-    <Filename>Library/EdkRuntimeStatusCodeLib/BsDataHubStatusCode/BsDataHubStatusCode.msa</Filename>
-    <Filename>Library/EdkRuntimeStatusCodeLib/RtMemoryStatusCode/RtMemoryStatusCode.msa</Filename>
-    <Filename>Library/EdkRuntimeStatusCodeLib/RtPlatformStatusCode/RtPlatformStatusCode.msa</Filename>
     <Filename>Library/EdkScsiLib/EdkScsiLib.msa</Filename>
     <Filename>Library/EdkUefiDebugLibConOut/EdkUefiDebugLibConOut.msa</Filename>
     <Filename>Library/EdkUefiDebugLibStdErr/EdkUefiDebugLibStdErr.msa</Filename>
     <Filename>Library/EdkUsbLib/EdkUsbLib.msa</Filename>
+    <Filename>Library/EdkSerialPortLibNull/EdkSerialPortLibNull.msa</Filename>
+    <Filename>Library/EdkOemHookStatusCodeLibNull/EdkOemHookStatusCodeLibNull.msa</Filename>
     <Filename>Universal/Console/ConSplitter/Dxe/ConSplitter.msa</Filename>
     <Filename>Universal/Console/GraphicsConsole/Dxe/GraphicsConsole.msa</Filename>
     <Filename>Universal/Console/Terminal/Dxe/Terminal.msa</Filename>
@@ -460,7 +434,6 @@
     <Filename>Universal/PCD/Dxe/Pcd.msa</Filename>
     <Filename>Universal/Runtime/RuntimeDxe/Runtime.msa</Filename>
     <Filename>Universal/Security/SecurityStub/Dxe/SecurityStub.msa</Filename>
-    <Filename>Universal/StatusCode/RuntimeDxe/StatusCode.msa</Filename>
     <Filename>Universal/UserInterface/HiiDataBase/Dxe/HiiDatabase.msa</Filename>
     <Filename>Universal/UserInterface/DriverSample/DriverSample.msa</Filename>
     <Filename>Universal/UserInterface/SetupBrowser/Dxe/SetupBrowser.msa</Filename>
@@ -469,6 +442,8 @@
     <Filename>Universal/Variable/RuntimeDxe/Variable.msa</Filename>
     <Filename>Universal/Capsule/RuntimeDxe/CapsuleRuntime.msa</Filename>
     <Filename>Universal/WatchdogTimer/Dxe/WatchDogTimer.msa</Filename>
+    <Filename>Universal/StatusCode/Pei/PeiStatusCode.msa</Filename>
+    <Filename>Universal/StatusCode/Dxe/DxeStatusCode.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
     <IncludePkgHeader ModuleType="SEC">Include/EdkPeim.h</IncludePkgHeader>
@@ -661,6 +636,11 @@
     <Entry Name="PeiPerformanceHob">
       <C_Name>gPeiPerformanceHobGuid</C_Name>
       <GuidValue>EC4DF5AF-4395-4CC9-94DE-77506D12C7B8</GuidValue>
+      <HelpText/>
+    </Entry>
+    <Entry Name="MemoryStatusCodeRecord">
+      <C_Name>gMemoryStatusCodeRecordGuid</C_Name>
+      <GuidValue>060CC026-4C0D-4DDA-8F41-595FEF00A502</GuidValue>
       <HelpText/>
     </Entry>
   </GuidDeclarations>
@@ -885,6 +865,123 @@
       <DefaultValue>TRUE</DefaultValue>
       <HelpText>This feature flag can be used to enable or disable the Pcd DXE database 
         traverse capability. Disable it can reduce the size of final image generated.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeUseSerial</C_Name>
+      <Token>0x00010022</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>This feature flag can be used to enable or disable report staus code to serial I/O. Disable it can reduce the size of final image generated.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeUseMemory</C_Name>
+      <Token>0x00010023</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>This feature flag can be used to enable or disable save statuc code in GUID'ed HOB. Disable it can reduce the size of final image generated.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeUseOEM</C_Name>
+      <Token>0x00010024</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>This feature flag can be used to enable or disable send status code to OEM device. Disable it can reduce the size of final image generated.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeMemorySize</C_Name>
+      <Token>0x00010025</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT16</DatumType>
+      <ValidUsage>DYNAMIC</ValidUsage>
+      <DefaultValue>4</DefaultValue>
+      <HelpText>kbytes size of GUID'ed HOB, if the GUID'ed HOB is full, create new GUID'ed HOB with this size.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeUseEfiSerial</C_Name>
+      <Token>0x00010026</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to switch on/off report status code through serial DXE.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeUseHardSerial</C_Name>
+      <Token>0x00010027</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to switch on/off report status code to serial device.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeUseRuntimeMemory</C_Name>
+      <Token>0x00010028</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to switch on/off save status code in runtime memory.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeUseDataHub</C_Name>
+      <Token>0x00010029</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to switch on/off log status code in data hub.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeReplayInSerial</C_Name>
+      <Token>0x0001002a</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to enable/dsable replay status code which saved in GUID'ed HOB in PEI phase to EFI serial.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeReplayInRuntimeMemory</C_Name>
+      <Token>0x0001002b</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to enable/dsable replay status code which saved in GUID'ed HOB in PEI phase to EFI serial.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeReplayInDataHub</C_Name>
+      <Token>0x0001002c</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to enable/dsable replay status code which saved in GUID'ed HOB in PEI phase to EFI serial.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeReplayInOEM</C_Name>
+      <Token>0x0001002c</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>Use to enable/dsable replay status code which saved in GUID'ed HOB in PEI phase to EFI serial.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdStatusCodeRuntimeMemorySize</C_Name>
+      <Token>0x0001002d</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT16</DatumType>
+      <ValidUsage>DYNAMIC</ValidUsage>
+      <DefaultValue>4</DefaultValue>
+      <HelpText>kbytes size of runtime memory.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
