@@ -54,6 +54,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>src/org/tianocore/frameworkwizard/common/IFileFilter.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Log.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/SaveFile.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/Sort.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Tools.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/XmlConfig.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Identifications/Identification.java</Filename>
