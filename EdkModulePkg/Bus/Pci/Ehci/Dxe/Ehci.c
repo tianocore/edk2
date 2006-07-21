@@ -2162,7 +2162,9 @@ EhciAsyncInterruptTransfer (
   
     Submits an asynchronous interrupt transfer to an 
     interrupt endpoint of a USB device.
-  
+    Translator parameter doesn't exist in UEFI2.0 spec, but it will be updated 
+    in the following specification version.
+    
   Arguments:
     
     This            - A pointer to the EFI_USB2_HC_PROTOCOL instance.
@@ -2469,7 +2471,9 @@ EhciSyncInterruptTransfer (
   Routine Description:
   
     Submits synchronous interrupt transfer to an interrupt endpoint 
-    of a USB device.
+    of a USB device. 
+    Translator parameter doesn't exist in UEFI2.0 spec, but it will be updated 
+    in the following specification version.
   
   Arguments:
     
