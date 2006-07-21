@@ -10,12 +10,12 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  DxeRuntimeDriverLib.h
+  Module Name:  UefiRuntimeLib.h
 
 **/
 
-#ifndef __DXE_RUNTIME_DRIVER_LIB__
-#define __DXE_RUNTIME_DRIVER_LIB__
+#ifndef __UEFI_RUNTIME_LIB__
+#define __UEFI_RUNTIME_LIB__
 
 
 extern const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[];
