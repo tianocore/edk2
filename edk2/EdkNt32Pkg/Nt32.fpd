@@ -7004,5 +7004,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <concat destfile="${FV_DIR}/FV_RECOVERY.fd" binary="true" >
        <fileset dir="${FV_DIR}" includes="*.fv"/>
     </concat>
+    
+    <!-- Generate Run.cmd file. This file will call SecMain.exe to start shell.-->
+    <pathconvert property="SecMainPath" targetos="windows">
+      <path path="${FV_DIR}/../IA32"/>
+    </pathconvert>
+    <echo file="${PLATFORM_DIR}/run.cmd">
+      @REM&#x0d;
+      @REM Copyright (c) 2006, Intel Corporation&#x0d;
+      @REM All rights reserved. This program and the accompanying materials&#x0d;
+      @REM are licensed and made available under the terms and conditions of the BSD License&#x0d;
+      @REM which accompanies this distribution.  The full text of the license may be found at&#x0d;
+      @REM http://opensource.org/licenses/bsd-license.php&#x0d;
+      @REM &#x0d;
+      @REM THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,&#x0d;
+      @REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.&#x0d;
+      @REM &#x0d;
+      &#x0d;
+      @echo off &#x0d;
+      pushd . &#x0d;
+      cd ${SecMainPath}&#x0d;
+      SecMain.exe&#x0d;
+      popd&#x0d;
+      @echo on&#x0d;
+  </echo>
   </UserExtensions>
 </PlatformSurfaceArea>
