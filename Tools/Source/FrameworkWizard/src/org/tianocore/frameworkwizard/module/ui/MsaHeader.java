@@ -135,7 +135,7 @@ public class MsaHeader extends IInternalFrame {
     private JScrollPane jScrollPane = null;
 
     private OpeningModuleType omt = null;
-    
+
     private EnumerationData ed = new EnumerationData();
 
     /**
@@ -221,6 +221,9 @@ public class MsaHeader extends IInternalFrame {
             jTextAreaLicense.setText("");
             jTextAreaLicense.setLineWrap(true);
             jTextAreaLicense.addFocusListener(this);
+            jTextAreaLicense.setWrapStyleWord(true);
+            jTextAreaLicense.setSelectionStart(0);
+            jTextAreaLicense.setSelectionEnd(0);
             jTextAreaLicense.setToolTipText("The License for this file");
         }
         return jTextAreaLicense;
@@ -238,6 +241,7 @@ public class MsaHeader extends IInternalFrame {
             jTextAreaDescription.setLineWrap(true);
             jTextAreaDescription.addFocusListener(this);
             jTextAreaDescription.setToolTipText("A verbose description of the module");
+            jTextAreaDescription.setWrapStyleWord(true);
             jTextAreaDescription.setSelectionStart(0);
             jTextAreaDescription.setSelectionEnd(0);
         }
@@ -441,12 +445,13 @@ public class MsaHeader extends IInternalFrame {
         super();
         this.omt = inMsa;
         this.msa = omt.getXmlMsa();
-        
+
         //      
         // Set module definitions default value
         //
         if (msa.getModuleDefinitions() == null) {
-            ModuleDefinitionsDocument.ModuleDefinitions md = ModuleDefinitionsDocument.ModuleDefinitions.Factory.newInstance();
+            ModuleDefinitionsDocument.ModuleDefinitions md = ModuleDefinitionsDocument.ModuleDefinitions.Factory
+                                                                                                                .newInstance();
             md.setOutputFileBasename(msa.getMsaHeader().getModuleName());
             md.setBinaryModule(false);
             md.setSupportedArchitectures(ed.getVSupportedArchitectures());
@@ -815,7 +820,6 @@ public class MsaHeader extends IInternalFrame {
             //            this.msaHeader.setSpecification(this.jTextFieldSpecification.getText());
 
             msaHeader.setSpecification(this.jTextFieldSpecification.getText());
-            msaHeader.setModuleType(ModuleTypeDef.Enum.forString(jComboBoxModuleType.getSelectedItem().toString()));
             msa.setMsaHeader(msaHeader);
             this.omt.setSaved(false);
         } catch (Exception e) {
@@ -879,7 +883,7 @@ public class MsaHeader extends IInternalFrame {
         if (this.msaHeader == null) {
             msaHeader = MsaHeaderDocument.MsaHeader.Factory.newInstance();
         }
-        
+
         //
         // Check BaseName
         //
@@ -894,14 +898,22 @@ public class MsaHeader extends IInternalFrame {
                 //this.jTextFieldBaseName.requestFocus();
                 return;
             }
-            this.msaHeader.setModuleName(this.jTextFieldBaseName.getText());
+            if (!this.jTextFieldBaseName.getText().equals(msaHeader.getModuleName())) {
+                this.msaHeader.setModuleName(this.jTextFieldBaseName.getText());
+            } else {
+                return;
+            }
         }
 
         //
         // Check Module Type
         //
         if (arg0.getSource() == this.jComboBoxModuleType) {
-            //msaHeader.setModuleType(ModuleTypeDef.Enum.forString(jComboBoxModuleType.getSelectedItem().toString()));
+            if (!jComboBoxModuleType.getSelectedItem().toString().equals(msaHeader.getModuleType().toString())) {
+                msaHeader.setModuleType(ModuleTypeDef.Enum.forString(jComboBoxModuleType.getSelectedItem().toString()));
+            } else {
+                return;
+            }
         }
 
         //
@@ -918,14 +930,17 @@ public class MsaHeader extends IInternalFrame {
                 //this.jTextFieldGuid.requestFocus();
                 return;
             }
-            this.msaHeader.setGuidValue(jTextFieldGuid.getText());
+            if (!this.jTextFieldGuid.getText().equals(msaHeader.getGuidValue())) {
+                this.msaHeader.setGuidValue(this.jTextFieldGuid.getText());
+            } else {
+                return;
+            }
         }
 
         //
         // Check Version
         //
         if (arg0.getSource() == this.jTextFieldVersion) {
-
             if (isEmpty(this.jTextFieldVersion.getText())) {
                 Log.err("Version couldn't be empty");
                 //this.jTextFieldVersion.requestFocus();
@@ -936,7 +951,11 @@ public class MsaHeader extends IInternalFrame {
                 //this.jTextFieldVersion.requestFocus();
                 return;
             }
-            this.msaHeader.setVersion(this.jTextFieldVersion.getText());
+            if (!this.jTextFieldVersion.getText().equals(msaHeader.getVersion())) {
+                this.msaHeader.setVersion(this.jTextFieldVersion.getText());
+            } else {
+                return;
+            }
         }
 
         //
@@ -953,7 +972,11 @@ public class MsaHeader extends IInternalFrame {
                 //this.jTextFieldAbstract.requestFocus();
                 return;
             }
-            this.msaHeader.setAbstract(this.jTextFieldAbstract.getText());
+            if (!this.jTextFieldAbstract.getText().equals(msaHeader.getAbstract())) {
+                this.msaHeader.setAbstract(this.jTextFieldAbstract.getText());
+            } else {
+                return;
+            }
         }
 
         //
@@ -965,7 +988,11 @@ public class MsaHeader extends IInternalFrame {
                 //this.jTextAreaDescription.requestFocus();
                 return;
             }
-            this.msaHeader.setDescription(this.jTextAreaDescription.getText());
+            if (!this.jTextAreaDescription.getText().equals(msaHeader.getDescription())) {
+                this.msaHeader.setDescription(this.jTextAreaDescription.getText());
+            } else {
+                return;
+            }
         }
 
         //
@@ -977,7 +1004,11 @@ public class MsaHeader extends IInternalFrame {
                 //this.jTextFieldCopyright.requestFocus();
                 return;
             }
-            this.msaHeader.setCopyright(this.jTextFieldCopyright.getText());
+            if (!this.jTextFieldCopyright.getText().equals(msaHeader.getCopyright())) {
+                this.msaHeader.setCopyright(this.jTextFieldCopyright.getText());
+            } else {
+                return;
+            }
         }
 
         //
@@ -990,7 +1021,11 @@ public class MsaHeader extends IInternalFrame {
                 return;
             }
             if (this.msaHeader.getLicense() != null) {
-                this.msaHeader.getLicense().setStringValue(this.jTextAreaLicense.getText());
+                if (!this.jTextAreaLicense.getText().equals(msaHeader.getLicense().getStringValue())) {
+                    this.msaHeader.getLicense().setStringValue(this.jTextAreaLicense.getText());
+                } else {
+                    return;
+                }
             } else {
                 License mLicense = License.Factory.newInstance();
                 mLicense.setStringValue(this.jTextAreaLicense.getText());
@@ -1008,11 +1043,15 @@ public class MsaHeader extends IInternalFrame {
                     mLicense.setURL(this.jTextFieldURL.getText());
                     this.msaHeader.setLicense(mLicense);
                 } else {
-                    this.msaHeader.getLicense().setURL(this.jTextFieldURL.getText());
+                    if (!this.jTextFieldURL.getText().equals(msaHeader.getLicense().getURL())) {
+                        this.msaHeader.getLicense().setURL(this.jTextFieldURL.getText());
+                    } else {
+                        return;
+                    }
                 }
             }
         }
-
+        
         this.save();
     }
 }

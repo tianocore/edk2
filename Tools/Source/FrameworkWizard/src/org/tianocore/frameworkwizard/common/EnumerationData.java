@@ -307,7 +307,7 @@ public class EnumerationData {
         vModuleType.addElement("UEFI_DRIVER");
         vModuleType.addElement("UEFI_APPLICATION");
         vModuleType.addElement("USER_DEFINED");
-        Tools.sortVectorString(vModuleType, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vModuleType, DataType.SORT_TYPE_ASCENDING);
     }
     
 //    private void initComponentType() {
@@ -363,7 +363,7 @@ public class EnumerationData {
         vFrameworkModuleTypes.addElement("UEFI_DRIVER");
         vFrameworkModuleTypes.addElement("UEFI_APPLICATION");
         vFrameworkModuleTypes.addElement("USER_DEFINED");
-        Tools.sortVectorString(vFrameworkModuleTypes, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vFrameworkModuleTypes, DataType.SORT_TYPE_ASCENDING);
     }
 
     private void initLibClassDef() {

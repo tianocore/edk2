@@ -63,7 +63,7 @@ public class About extends IDialog {
     private JButton getJButtonOK() {
         if (jButtonOK == null) {
             jButtonOK = new JButton();
-            jButtonOK.setBounds(new java.awt.Rectangle(115,200,90,20));
+            jButtonOK.setBounds(new java.awt.Rectangle(115, 200, 90, 20));
             jButtonOK.setText("OK");
             jButtonOK.addActionListener(this);
         }
@@ -83,15 +83,15 @@ public class About extends IDialog {
         super();
         init();
     }
-    
+
     /**
-    This is the default constructor
-    
-    **/
-   public About(IFrame parentFrame, boolean modal) {
-       super(parentFrame, modal);
-       init();
-   }
+     This is the default constructor
+     
+     **/
+    public About(IFrame parentFrame, boolean modal) {
+        super(parentFrame, modal);
+        init();
+    }
 
     /**
      This method initializes this
@@ -114,25 +114,25 @@ public class About extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelImage = new JLabel();
-            jLabelImage.setBounds(new java.awt.Rectangle(63,20,193,58));
+            jLabelImage.setBounds(new java.awt.Rectangle(63, 20, 193, 58));
             jLabelImage.setIcon(new ImageIcon(getClass().getResource("/resources/images/logo.gif")));
-            
+
             jLabel2 = new JLabel();
-            jLabel2.setBounds(new java.awt.Rectangle(25,160,270,20));
+            jLabel2.setBounds(new java.awt.Rectangle(25, 160, 270, 20));
             jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             jLabel2.setText("All rights reserved");
             jLabel1 = new JLabel();
-            jLabel1.setBounds(new java.awt.Rectangle(25,130,270,20));
+            jLabel1.setBounds(new java.awt.Rectangle(25, 130, 270, 20));
             jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             jLabel1.setText("Copyright (c) 2006, Intel Corporation");
             jLabel = new JLabel();
             jLabel.setToolTipText("");
-            jLabel.setBounds(new java.awt.Rectangle(25,90,270,20));
+            jLabel.setBounds(new java.awt.Rectangle(25, 90, 270, 20));
             jLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
             jLabel.setText(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION);
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setSize(new java.awt.Dimension(320,235));
+            jContentPane.setSize(new java.awt.Dimension(320, 235));
             jContentPane.add(jLabel, null);
             jContentPane.add(jLabel1, null);
             jContentPane.add(jLabel2, null);
