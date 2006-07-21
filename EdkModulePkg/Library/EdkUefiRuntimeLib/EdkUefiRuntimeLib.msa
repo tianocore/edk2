@@ -60,6 +60,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32">Common/RuntimeService.c</Filename>
     <Filename SupArchList="X64">Common/RuntimeLib.c</Filename>
     <Filename SupArchList="X64">Common/RuntimeService.c</Filename>
+    <Filename SupArchList="EBC">Common/RuntimeLib.c</Filename>
+    <Filename SupArchList="EBC">Common/RuntimeService.c</Filename>
     <Filename SupArchList="IPF">Ipf/RuntimeLib.c</Filename>
     <Filename SupArchList="IPF">Ipf/RuntimeService.c</Filename>
   </SourceFiles>
