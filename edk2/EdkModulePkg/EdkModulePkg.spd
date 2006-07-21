@@ -419,7 +419,7 @@
     <Filename>Library/EdkDxePeCoffLoaderFromHobLib/EdkDxePeCoffLoaderFromHobLib.msa</Filename>
     <Filename>Library/DxePerformanceLib/DxePerformanceLib.msa</Filename>
     <Filename>Library/EdkDxePrintLib/EdkDxePrintLib.msa</Filename>
-    <Filename>Library/EdkDxeRuntimeDriverLib/EdkDxeRuntimeDriverLib.msa</Filename>
+    <Filename>Library/EdkUefiRuntimeLib/EdkUefiRuntimeLib.msa</Filename>
     <Filename>Library/EdkDxeSalLib/EdkDxeSalLib.msa</Filename>
     <Filename>Library/EdkFvbServiceLib/EdkFvbServiceLib.msa</Filename>
     <Filename>Library/EdkGraphicsLib/EdkGraphicsLib.msa</Filename>
