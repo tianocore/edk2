@@ -12,7 +12,7 @@
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
  
  **/
-package org.tianocore.frameworkwizard.common.Identifications;
+package org.tianocore.frameworkwizard.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,7 +27,6 @@ import org.tianocore.FrameworkDatabaseDocument.FrameworkDatabase;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
 import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
-import org.tianocore.frameworkwizard.common.Log;
 
 public class OpenFile {
     /**

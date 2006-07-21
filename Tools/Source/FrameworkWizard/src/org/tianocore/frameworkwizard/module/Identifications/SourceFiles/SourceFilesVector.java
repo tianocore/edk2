@@ -92,6 +92,9 @@ public class SourceFilesVector {
     public Vector<String> toStringVector(int index) {
         Vector<String> v = new Vector<String>();
         v.addElement(getSourceFiles(index).getFilename());
+        v.addElement(getSourceFiles(index).getTagName());
+        v.addElement(getSourceFiles(index).getToolCode());
+        v.addElement(getSourceFiles(index).getToolChainFamily());
         return v;
     }
 }

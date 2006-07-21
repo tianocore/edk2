@@ -58,7 +58,7 @@ public class SelectModuleBelong extends IDialog {
      **/
     private static final long serialVersionUID = 4171355136991448972L;
 
-    private JPanel jContentPane = null;  //  @jve:decl-index=0:visual-constraint="10,54"
+    private JPanel jContentPane = null;
 
     private JComboBox jComboBoxExistingPackage = null;
 
@@ -99,7 +99,7 @@ public class SelectModuleBelong extends IDialog {
     private StarLabel jStarLabel4 = null;
 
     private StarLabel jStarLabel5 = null;
-    
+
     private ButtonGroup bg = new ButtonGroup();
 
     private WorkspaceTools wt = new WorkspaceTools();
@@ -251,8 +251,8 @@ public class SelectModuleBelong extends IDialog {
     private JRadioButton getJRadioButtonYes() {
         if (jRadioButtonYes == null) {
             jRadioButtonYes = new JRadioButton();
-            jRadioButtonYes.setBounds(new java.awt.Rectangle(140,35,100,20));
-            jRadioButtonYes.setSelected(true);
+            jRadioButtonYes.setBounds(new java.awt.Rectangle(140, 35, 100, 20));
+            jRadioButtonYes.setSelected(false);
             jRadioButtonYes.setText("Yes");
         }
         return jRadioButtonYes;
@@ -266,8 +266,8 @@ public class SelectModuleBelong extends IDialog {
     private JRadioButton getJRadioButtonNo() {
         if (jRadioButtonNo == null) {
             jRadioButtonNo = new JRadioButton();
-            jRadioButtonNo.setBounds(new java.awt.Rectangle(300,35,110,20));
-            jRadioButtonNo.setSelected(false);
+            jRadioButtonNo.setBounds(new java.awt.Rectangle(300, 35, 110, 20));
+            jRadioButtonNo.setSelected(true);
             jRadioButtonNo.setText("No");
         }
         return jRadioButtonNo;
@@ -341,7 +341,7 @@ public class SelectModuleBelong extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelIsLibrary = new JLabel();
-            jLabelIsLibrary.setBounds(new java.awt.Rectangle(15,35,120,20));
+            jLabelIsLibrary.setBounds(new java.awt.Rectangle(15, 35, 120, 20));
             jLabelIsLibrary.setText("Is a Library");
             jLabelVersion = new JLabel();
             jLabelVersion.setBounds(new java.awt.Rectangle(15, 135, 120, 20));
@@ -360,7 +360,7 @@ public class SelectModuleBelong extends IDialog {
             jLabelPackage.setText("Choose Package");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setSize(new java.awt.Dimension(490,198));
+            jContentPane.setSize(new java.awt.Dimension(490, 198));
             jContentPane.add(getJComboBoxExistingPackage(), null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
@@ -726,7 +726,7 @@ public class SelectModuleBelong extends IDialog {
     public void setPid(PackageIdentification pid) {
         this.pid = pid;
     }
-    
+
     private void upLocation(Component c, int size) {
         c.setLocation(c.getLocation().x, c.getLocation().y - size);
     }
