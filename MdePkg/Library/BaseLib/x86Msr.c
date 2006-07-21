@@ -1,5 +1,5 @@
 /** @file
-  IA-32/x64 specific functions.
+  IA-32/x64 MSR functions.
 
   Copyright (c) 2006, Intel Corporation<BR>
   All rights reserved. This program and the accompanying materials
@@ -10,15 +10,58 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-  Module Name:  x86LowLevel.c
+  Module Name:  x86Msr.c
 
 **/
 
-#include "BaseLibInternals.h"
+/**
+  Returns the lower 32-bits of a Machine Specific Register(MSR).
 
-//
-// Bit-wise MSR operations
-//
+  Reads and returns the lower 32-bits of the MSR specified by Index.
+  No parameter checking is performed on Index, and some Index values may cause
+  CPU exceptions. The caller must either guarantee that Index is valid, or the
+  caller must set up exception handlers to catch the exceptions. This function
+  is only available on IA-32 and X64.
+
+  @param  Index The 32-bit MSR index to read.
+
+  @return The lower 32 bits of the MSR identified by Index.
+
+**/
+UINT32
+EFIAPI
+AsmReadMsr32 (
+  IN      UINT32                    Index
+  )
+{
+  return (UINT32)AsmReadMsr64 (Index);
+}
+
+/**
+  Zero-extend a 32-bit value and writes it to a Machine Specific Register(MSR).
+
+  Writes the 32-bit value specified by Value to the MSR specified by Index. The
+  upper 32-bits of the MSR write are set to zero. The 32-bit value written to
+  the MSR is returned. No parameter checking is performed on Index or Value,
+  and some of these may cause CPU exceptions. The caller must either guarantee
+  that Index and Value are valid, or the caller must establish proper exception
+  handlers. This function is only available on IA-32 and X64.
+
+  @param  Index The 32-bit MSR index to write.
+  @param  Value The 32-bit value to write to the MSR.
+
+  @return Value
+
+**/
+UINT32
+EFIAPI
+AsmWriteMsr32 (
+  IN      UINT32                    Index,
+  IN      UINT32                    Value
+  )
+{
+  return (UINT32)AsmWriteMsr64 (Index, Value);
+}
 
 /**
   Reads a 64-bit MSR, performs a bitwise inclusive OR on the lower 32-bits, and
@@ -603,390 +646,4 @@ AsmMsrBitFieldAndThenOr64 (
              OrData
              )
            );
-}
-
-//
-// Base Library CPU Functions
-//
-
-/**
-  Retrieves the current CPU interrupt state.
-
-  Retrieves the current CPU interrupt state. Returns TRUE is interrupts are
-  currently enabled. Otherwise returns FALSE.
-
-  @retval TRUE  CPU interrupts are enabled.
-  @retval FALSE CPU interrupts are disabled.
-
-**/
-BOOLEAN
-EFIAPI
-GetInterruptState (
-  VOID
-  )
-{
-  IA32_EFLAGS32                     EFlags;
-
-  EFlags.UintN = AsmReadEflags ();
-  return (BOOLEAN)(EFlags.Bits.IF == 1);
-}
-
-//
-// Ia32 and x64 specific functions
-//
-
-/**
-  Reads the current Global Descriptor Table Register(GDTR) descriptor.
-
-  Reads and returns the current GDTR descriptor and returns it in Gdtr. This
-  function is only available on IA-32 and X64.
-
-  If Gdtr is NULL, then ASSERT().
-
-  @param  Gdtr  Pointer to a GDTR descriptor.
-
-**/
-VOID
-EFIAPI
-AsmReadGdtr (
-  OUT     IA32_DESCRIPTOR           *Gdtr
-  )
-{
-  ASSERT (Gdtr != NULL);
-  InternalX86ReadGdtr (Gdtr);
-}
-
-/**
-  Writes the current Global Descriptor Table Register (GDTR) descriptor.
-
-  Writes and the current GDTR descriptor specified by Gdtr. This function is
-  only available on IA-32 and X64.
-
-  If Gdtr is NULL, then ASSERT().
-
-  @param  Gdtr  Pointer to a GDTR descriptor.
-
-**/
-VOID
-EFIAPI
-AsmWriteGdtr (
-  IN      CONST IA32_DESCRIPTOR     *Gdtr
-  )
-{
-  ASSERT (Gdtr != NULL);
-  InternalX86WriteGdtr (Gdtr);
-}
-
-/**
-  Reads the current Interrupt Descriptor Table Register(GDTR) descriptor.
-
-  Reads and returns the current IDTR descriptor and returns it in Idtr. This
-  function is only available on IA-32 and X64.
-
-  If Idtr is NULL, then ASSERT().
-
-  @param  Idtr  Pointer to a IDTR descriptor.
-
-**/
-VOID
-EFIAPI
-AsmReadIdtr (
-  OUT     IA32_DESCRIPTOR           *Idtr
-  )
-{
-  ASSERT (Idtr != NULL);
-  InternalX86ReadIdtr (Idtr);
-}
-
-/**
-  Writes the current Interrupt Descriptor Table Register(GDTR) descriptor.
-
-  Writes the current IDTR descriptor and returns it in Idtr. This function is
-  only available on IA-32 and X64.
-
-  If Idtr is NULL, then ASSERT().
-
-  @param  Idtr  Pointer to a IDTR descriptor.
-
-**/
-VOID
-EFIAPI
-AsmWriteIdtr (
-  IN      CONST IA32_DESCRIPTOR     *Idtr
-  )
-{
-  ASSERT (Idtr != NULL);
-  InternalX86WriteIdtr (Idtr);
-}
-
-/**
-  Save the current floating point/SSE/SSE2 context to a buffer.
-
-  Saves the current floating point/SSE/SSE2 state to the buffer specified by
-  Buffer. Buffer must be aligned on a 16-byte boundary. This function is only
-  available on IA-32 and X64.
-
-  If Buffer is NULL, then ASSERT().
-  If Buffer is not aligned on a 16-byte boundary, then ASSERT().
-
-  @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
-
-**/
-VOID
-EFIAPI
-AsmFxSave (
-  OUT     IA32_FX_BUFFER            *Buffer
-  )
-{
-  ASSERT (Buffer != NULL);
-  ASSERT (((UINTN)Buffer & 0xf) == 0);
-
-  InternalX86FxSave (Buffer);
-  
-  //
-  // Mark one flag at end of Buffer, it will be check by AsmFxRestor()
-  //
-  *(UINT32 *) (&Buffer[sizeof (IA32_FX_BUFFER) - 4]) = 0xAA5555AA; 
-}
-
-/**
-  Restores the current floating point/SSE/SSE2 context from a buffer.
-
-  Restores the current floating point/SSE/SSE2 state from the buffer specified
-  by Buffer. Buffer must be aligned on a 16-byte boundary. This function is
-  only available on IA-32 and X64.
-
-  If Buffer is NULL, then ASSERT().
-  If Buffer is not aligned on a 16-byte boundary, then ASSERT().
-  If Buffer was not saved with AsmFxSave(), then ASSERT().
-
-  @param  Buffer  Pointer to a buffer to save the floating point/SSE/SSE2 context.
-
-**/
-VOID
-EFIAPI
-AsmFxRestore (
-  IN CONST IA32_FX_BUFFER  *Buffer
-  )
-{
-  ASSERT (Buffer != NULL);
-  ASSERT (((UINTN)Buffer & 0xf) == 0);
-
-  //
-  // Check the flag recorded by AsmFxSave()
-  //
-  ASSERT (*(UINT32 *) (&Buffer[sizeof (IA32_FX_BUFFER) - 4]) == 0xAA5555AA);
-
-  InternalX86FxRestore (Buffer);
-}
-
-/**
-  Enables the 32-bit paging mode on the CPU.
-
-  Enables the 32-bit paging mode on the CPU. CR0, CR3, CR4, and the page tables
-  must be properly initialized prior to calling this service. This function
-  assumes the current execution mode is 32-bit protected mode. This function is
-  only available on IA-32. After the 32-bit paging mode is enabled, control is
-  transferred to the function specified by EntryPoint using the new stack
-  specified by NewStack and passing in the parameters specified by Context1 and
-  Context2. Context1 and Context2 are optional and may be NULL. The function
-  EntryPoint must never return.
-
-  If the current execution mode is not 32-bit protected mode, then ASSERT().
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  There are a number of constraints that must be followed before calling this
-  function:
-  1)  Interrupts must be disabled.
-  2)  The caller must be in 32-bit protected mode with flat descriptors. This
-      means all descriptors must have a base of 0 and a limit of 4GB.
-  3)  CR0 and CR4 must be compatible with 32-bit protected mode with flat
-      descriptors.
-  4)  CR3 must point to valid page tables that will be used once the transition
-      is complete, and those page tables must guarantee that the pages for this
-      function and the stack are identity mapped.
-
-  @param  EntryPoint  A pointer to function to call with the new stack after
-                      paging is enabled.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function as the first parameter after paging is enabled.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function as the second parameter after paging is enabled.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function after paging is enabled.
-
-**/
-VOID
-EFIAPI
-AsmEnablePaging32 (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack
-  )
-{
-  ASSERT (EntryPoint != NULL);
-  ASSERT (NewStack != NULL);
-  InternalX86EnablePaging32 (EntryPoint, Context1, Context2, NewStack);
-}
-
-/**
-  Disables the 32-bit paging mode on the CPU.
-
-  Disables the 32-bit paging mode on the CPU and returns to 32-bit protected
-  mode. This function assumes the current execution mode is 32-paged protected
-  mode. This function is only available on IA-32. After the 32-bit paging mode
-  is disabled, control is transferred to the function specified by EntryPoint
-  using the new stack specified by NewStack and passing in the parameters
-  specified by Context1 and Context2. Context1 and Context2 are optional and
-  may be NULL. The function EntryPoint must never return.
-
-  If the current execution mode is not 32-bit paged mode, then ASSERT().
-  If EntryPoint is NULL, then ASSERT().
-  If NewStack is NULL, then ASSERT().
-
-  There are a number of constraints that must be followed before calling this
-  function:
-  1)  Interrupts must be disabled.
-  2)  The caller must be in 32-bit paged mode.
-  3)  CR0, CR3, and CR4 must be compatible with 32-bit paged mode.
-  4)  CR3 must point to valid page tables that guarantee that the pages for
-      this function and the stack are identity mapped.
-
-  @param  EntryPoint  A pointer to function to call with the new stack after
-                      paging is disabled.
-  @param  Context1    A pointer to the context to pass into the EntryPoint
-                      function as the first parameter after paging is disabled.
-  @param  Context2    A pointer to the context to pass into the EntryPoint
-                      function as the second parameter after paging is
-                      disabled.
-  @param  NewStack    A pointer to the new stack to use for the EntryPoint
-                      function after paging is disabled.
-
-**/
-VOID
-EFIAPI
-AsmDisablePaging32 (
-  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
-  IN      VOID                      *Context1,  OPTIONAL
-  IN      VOID                      *Context2,  OPTIONAL
-  IN      VOID                      *NewStack
-  )
-{
-  ASSERT (EntryPoint != NULL);
-  ASSERT (NewStack != NULL);
-  InternalX86DisablePaging32 (EntryPoint, Context1, Context2, NewStack);
-}
-
-/**
-  Enables the 64-bit paging mode on the CPU.
-
-  Enables the 64-bit paging mode on the CPU. CR0, CR3, CR4, and the page tables
-  must be properly initialized prior to calling this service. This function
-  assumes the current execution mode is 32-bit protected mode with flat
-  descriptors. This function is only available on IA-32. After the 64-bit
-  paging mode is enabled, control is transferred to the function specified by
-  EntryPoint using the new stack specified by NewStack and passing in the
-  parameters specified by Context1 and Context2. Context1 and Context2 are
-  optional and may be 0. The function EntryPoint must never return.
-
-  If the current execution mode is not 32-bit protected mode with flat
-  descriptors, then ASSERT().
-  If EntryPoint is 0, then ASSERT().
-  If NewStack is 0, then ASSERT().
-
-  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
-                      is called. The descriptor in the GDT that this selector
-                      references must be setup for long mode.
-  @param  EntryPoint  The 64-bit virtual address of the function to call with
-                      the new stack after paging is enabled.
-  @param  Context1    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the first parameter after
-                      paging is enabled.
-  @param  Context2    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the second parameter after
-                      paging is enabled.
-  @param  NewStack    The 64-bit virtual address of the new stack to use for
-                      the EntryPoint function after paging is enabled.
-
-**/
-VOID
-EFIAPI
-AsmEnablePaging64 (
-  IN      UINT16                    Cs,
-  IN      UINT64                    EntryPoint,
-  IN      UINT64                    Context1,  OPTIONAL
-  IN      UINT64                    Context2,  OPTIONAL
-  IN      UINT64                    NewStack
-  )
-{
-  ASSERT (EntryPoint != 0);
-  ASSERT (NewStack != 0);
-  InternalX86EnablePaging64 (Cs, EntryPoint, Context1, Context2, NewStack);
-}
-
-/**
-  Disables the 64-bit paging mode on the CPU.
-
-  Disables the 64-bit paging mode on the CPU and returns to 32-bit protected
-  mode. This function assumes the current execution mode is 64-paging mode.
-  This function is only available on X64. After the 64-bit paging mode is
-  disabled, control is transferred to the function specified by EntryPoint
-  using the new stack specified by NewStack and passing in the parameters
-  specified by Context1 and Context2. Context1 and Context2 are optional and
-  may be 0. The function EntryPoint must never return.
-
-  If the current execution mode is not 64-bit paged mode, then ASSERT().
-  If EntryPoint is 0, then ASSERT().
-  If NewStack is 0, then ASSERT().
-
-  @param  Cs          The 16-bit selector to load in the CS before EntryPoint
-                      is called. The descriptor in the GDT that this selector
-                      references must be setup for 32-bit protected mode.
-  @param  EntryPoint  The 64-bit virtual address of the function to call with
-                      the new stack after paging is disabled.
-  @param  Context1    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the first parameter after
-                      paging is disabled.
-  @param  Context2    The 64-bit virtual address of the context to pass into
-                      the EntryPoint function as the second parameter after
-                      paging is disabled.
-  @param  NewStack    The 64-bit virtual address of the new stack to use for
-                      the EntryPoint function after paging is disabled.
-
-**/
-VOID
-EFIAPI
-AsmDisablePaging64 (
-  IN      UINT16                    Cs,
-  IN      UINT32                    EntryPoint,
-  IN      UINT32                    Context1,  OPTIONAL
-  IN      UINT32                    Context2,  OPTIONAL
-  IN      UINT32                    NewStack
-  )
-{
-  ASSERT (EntryPoint != 0);
-  ASSERT (NewStack != 0);
-  InternalX86DisablePaging64 (Cs, EntryPoint, Context1, Context2, NewStack);
-}
-
-//
-// x86 version of MemoryFence()
-//
-
-/**
-  Used to serialize load and store operations.
-
-  All loads and stores that proceed calls to this function are guaranteed to be
-  globally visible when this function returns.
-
-**/
-VOID
-EFIAPI
-MemoryFence (
-  VOID
-  )
-{
-  return;
 }

@@ -31,7 +31,7 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmReadGs   PROC
-    mov     ax, gs
+    mov     eax, gs
     ret
 AsmReadGs   ENDP
 

@@ -19,16 +19,10 @@
 #
 #------------------------------------------------------------------------------
 
-.global _m16Start, _m16Size, _mThunk16Attr, _m16GdtrBase, _m16Gdt, _m16GdtrBase, _mTransition
+.global _m16Start, _m16Size, _mThunk16Attr, _m16Gdt, _m16GdtrBase, _mTransition
 .global _InternalAsmThunk16
 
-#THUNK_ATTRIBUTE_BIG_REAL_MODE               EQU 1
-#THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15     EQU 2
-#THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL   EQU 4
-
-   .code: 
-
-_m16Start: 
+_m16Start:
 
 SavedGdt:     .space  6
 
@@ -37,7 +31,7 @@ _BackFromUserCode:
     push    %cs
     .byte   0x66
     call    @Base1                      # push eip
-@Base1: 
+@Base1:
     pushfw                              # pushfd actually
     cli                                 # disable interrupts
     push    %gs
@@ -45,37 +39,37 @@ _BackFromUserCode:
     push    %es
     push    %ds
     pushaw                              # pushad actually
-    .byte   0x66,0xba                   # mov edx, imm32
+    .byte   0x66, 0xba                   # mov edx, imm32
 _ThunkAttr: .space  4
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_INT_15, %dl
     jz      @1
     movl    $0x15cd2401, %eax           # mov ax, 2401h & int 15h
     cli                                 # disable interrupts
     jnc     @2
-@1: 
+@1:
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL, %dl
     jz      @2
     inb     $0x92, %al
     orb     $2, %al
     outb    %al, $0x92                  # deactivate A20M#
-@2: 
+@2:
     movl    %ss, %eax
     .byte   0x67, 0x66, 0x8d, 0x6c, 0x24, 0x34, 0x66
-    mov    %ebp,0xffffffd8(%esi)
-    mov     0xfffffff8(%esi),%ebx
+    mov     %ebp, 0xffffffd8(%esi)
+    mov     0xfffffff8(%esi), %ebx
     shlw    $4, %ax                     # shl eax, 4
     addw    %ax, %bp                    # add ebp, eax
-    .byte   0x66,0xb8                   # mov eax, imm32
+    .byte   0x66, 0xb8                   # mov eax, imm32
 SavedCr4:   .space  4
     movl    %eax, %cr4
-    lgdtw  %cs:0xfffffff2(%edi)
-    .byte   0x66,0xb8                   # mov eax, imm32
+    lgdtw   %cs:0xfffffff2(%edi)
+    .byte   0x66, 0xb8                   # mov eax, imm32
 SavedCr0:   .space  4
     movl    %eax, %cr0
     .byte   0xb8                        # mov ax, imm16
 SavedSs:    .space  2
     movl    %eax, %ss
-    .byte   0x66,0xbc                   # mov esp, imm32
+    .byte   0x66, 0xbc                   # mov esp, imm32
 SavedEsp:   .space  4
     .byte   0x66
     lret                                # return to protected mode
@@ -100,23 +94,23 @@ _ToUserCode:
     xchgw   %bx, %sp                    # set up 16-bit stack pointer
     .byte   0x66
     call    @Base                       # push eip
-@Base: 
+@Base:
     popw    %bp                         # ebp <- offset @Base
     addr16  pushl 36(%si)
     .byte   0x36
-    lea     0xc(%esi),%eax
-    pushl   %eax
+    lea     0xc(%esi), %eax
+    push    %eax
     lret
 
-@RealMode: 
-    mov     %edx,%cs:0xffffffc5(%esi)
-    mov     %bx,%cs:0xffffffcb(%esi)
+@RealMode:
+    mov     %edx, %cs:0xffffffc5(%esi)
+    mov     %bx, %cs:0xffffffcb(%esi)
     lidtw   %cs:0xffffffd7(%esi)
     popaw                               # popad actually
-    popl    %ds
-    popl    %es
-    popl    %fs
-    popl    %gs
+    pop     %ds
+    pop     %es
+    pop     %fs
+    pop     %gs
     popfw                               # popfd
     lretw                               # transfer control to user code
 
@@ -152,41 +146,41 @@ _InternalAsmThunk16:
     push    %fs
     push    %gs
     movl    36(%esp), %esi              # esi <- RegSet
-    movzwl  0x32(%esi),%edx
-    mov     0xc(%esi),%edi
-    add     $0xffffffc8,%edi
+    movzwl  0x32(%esi), %edx
+    mov     0xc(%esi), %edi
+    add     $0xffffffc8, %edi
     movl    %edi, %ebx                  # ebx <- stack offset
-    imul    $0x10,%edx,%eax
+    imul    $0x10, %edx, %eax
     push    $0xd
     addl    %eax, %edi                  # edi <- linear address of 16-bit stack
-    popl    %ecx
+    pop     %ecx
     rep
     movsl                               # copy RegSet
     movl    40(%esp), %eax              # eax <- address of transition code
     movl    %edx, %esi                  # esi <- 16-bit stack segment
-    lea     0x5e(%eax),%edx
+    lea     0x5e(%eax), %edx
     movl    %eax, %ecx
     andl    $0xf, %ecx
     shll    $12, %eax
-    lea     0x6(%ecx),%ecx
+    lea     0x6(%ecx), %ecx
     movw    %cx, %ax
     stosl                               # [edi] <- return address of user code
-    sgdtl  0xffffffa2(%edx)
+    sgdtl   0xffffffa2(%edx)
     sidtl   0x24(%esp)
     movl    %cr0, %eax
     movl    %eax, (%edx)                # save CR0 in SavedCr0
     andl    $0x7ffffffe, %eax           # clear PE, PG bits
     movl    %cr4, %ebp
-    mov     %ebp,0xfffffff1(%edx)
+    mov     %ebp, 0xfffffff1(%edx)
     andl    $0x300, %ebp                # clear all but PCE and OSFXSR bits
     pushl   $0x10
-    popl    %ecx                        # ecx <- selector for data segments
+    pop     %ecx                        # ecx <- selector for data segments
     lgdtl   0x20(%edx)
     pushfl
     lcall   *0x14(%edx)
     popfl
     lidtl   0x24(%esp)
-    lea     0xffffffcc(%ebp),%eax
+    lea     0xffffffcc(%ebp), %eax
   	pop     %gs
    	pop     %fs
    	pop     %es
@@ -197,11 +191,10 @@ _InternalAsmThunk16:
    	pop     %ebp
     ret
 
-    .const: 
+    .const:
 
 _m16Size:        .word      _InternalAsmThunk16 - _m16Start
 _mThunk16Attr:   .word      _ThunkAttr          - _m16Start
 _m16Gdt:         .word      _NullSegDesc        - _m16Start
 _m16GdtrBase:    .word      _16GdtrBase         - _m16Start
 _mTransition:    .word      _EntryPoint         - _m16Start
-

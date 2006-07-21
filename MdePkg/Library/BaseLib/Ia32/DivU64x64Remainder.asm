@@ -26,10 +26,19 @@
 
 EXTERN  InternalMathDivRemU64x32:PROC
 
+;------------------------------------------------------------------------------
+; UINT64
+; EFIAPI
+; InternalMathDivRemU64x64 (
+;   IN      UINT64                    Dividend,
+;   IN      UINT64                    Divisor,
+;   OUT     UINT64                    *Remainder    OPTIONAL
+;   );
+;------------------------------------------------------------------------------
 InternalMathDivRemU64x64    PROC
     mov     ecx, [esp + 16]
     test    ecx, ecx
-    jnz     _@DivRemU64x64
+    jnz     _@DivRemU64x64              ; call _@DivRemU64x64 if Divisor > 2^32
     mov     ecx, [esp + 20]
     jecxz   @F
     and     dword ptr [ecx + 4], 0
@@ -40,10 +49,10 @@ InternalMathDivRemU64x64    ENDP
 
 _@DivRemU64x64  PROC    USES    ebx esi edi
     mov     edx, dword ptr [esp + 20]
-    mov     eax, dword ptr [esp + 16]
+    mov     eax, dword ptr [esp + 16]   ; edx:eax <- dividend
     mov     edi, edx
-    mov     esi, eax
-    mov     ebx, dword ptr [esp + 24]
+    mov     esi, eax                    ; edi:esi <- dividend
+    mov     ebx, dword ptr [esp + 24]   ; ecx:ebx <- divisor
 @@:
     shr     edx, 1
     rcr     eax, 1
@@ -51,31 +60,31 @@ _@DivRemU64x64  PROC    USES    ebx esi edi
     shr     ecx, 1
     jnz     @B
     div     ebx
-    mov     ebx, eax
+    mov     ebx, eax                    ; ebx <- quotient
     mov     ecx, [esp + 28]
     mul     dword ptr [esp + 24]
     imul    ecx, ebx
     add     edx, ecx
     mov     ecx, dword ptr [esp + 32]
-    jc      @TooLarge
-    cmp     edi, edx
+    jc      @TooLarge                   ; product > 2^64
+    cmp     edi, edx                    ; compare high 32 bits
     ja      @Correct
-    jb      @TooLarge
+    jb      @TooLarge                   ; product > dividend
     cmp     esi, eax
-    jae     @Correct
+    jae     @Correct                    ; product <= dividend
 @TooLarge:
-    dec     ebx
-    jecxz   @Return
+    dec     ebx                         ; adjust quotient by -1
+    jecxz   @Return                     ; return if Remainder == NULL
     sub     eax, dword ptr [esp + 24]
     sbb     edx, dword ptr [esp + 28]
 @Correct:
     jecxz   @Return
     sub     esi, eax
-    sbb     edi, edx
+    sbb     edi, edx                    ; edi:esi <- remainder
     mov     [ecx], esi
     mov     [ecx + 4], edi
 @Return:
-    mov     eax, ebx
+    mov     eax, ebx                    ; eax <- quotient
     xor     edx, edx
     ret
 _@DivRemU64x64  ENDP

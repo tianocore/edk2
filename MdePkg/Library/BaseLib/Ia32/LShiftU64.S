@@ -19,11 +19,16 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .code: 
-
 .global _InternalMathLShiftU64
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathLShiftU64 (
+#   IN      UINT64                    Operand,
+#   IN      UINTN                     Count
+#   );
+#------------------------------------------------------------------------------
 _InternalMathLShiftU64:
     movb    12(%esp), %cl
     xorl    %eax, %eax
@@ -31,6 +36,6 @@ _InternalMathLShiftU64:
     testb   $32, %cl
     cmovz   %edx, %eax
     cmovz   0x8(%esp), %edx
-    shld    %cl,%eax,%edx
+    shld    %cl, %eax, %edx
     shl     %cl, %eax
     ret

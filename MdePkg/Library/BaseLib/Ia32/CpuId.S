@@ -21,6 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
+.globl  _AsmCpuid
 
 #------------------------------------------------------------------------------
 #  VOID
@@ -33,33 +34,30 @@
 #    OUT  UINT32  *RegisterOutEdx  OPTIONAL
 #    )
 #------------------------------------------------------------------------------
-.globl  _AsmCpuid
 _AsmCpuid:
-    pushl   %ebx
-    pushl   %ebp
+    push    %ebx
+    push    %ebp
     movl    %esp, %ebp
     movl    12(%ebp), %eax
     cpuid
-    pushl   %ecx
+    push    %ecx
     movl    16(%ebp), %ecx
     jecxz   L1
     movl    %eax, (%ecx)
-L1: 
+L1:
     movl    20(%ebp), %ecx
     jecxz   L2
     movl    %ebx, (%ecx)
-L2: 
+L2:
     movl    24(%ebp), %ecx
     jecxz   L3
     popl    (%ecx)
-L3: 
+L3:
     movl    28(%ebp), %ecx
     jecxz   L4
     movl    %edx, (%ecx)
-L4: 
+L4:
     movl    12(%ebp), %eax
     leave
-    popl    %ebx
+    pop     %ebx
     ret
-
-

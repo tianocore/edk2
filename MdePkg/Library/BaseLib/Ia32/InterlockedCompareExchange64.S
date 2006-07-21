@@ -21,9 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
+.global _InternalSyncCompareExchange64
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -34,20 +32,16 @@
 #   IN      UINT64                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-.global _InternalSyncCompareExchange64
 _InternalSyncCompareExchange64:
     push    %esi
     push    %ebx
-    movl    12(%esp),%esi
-    movl    16(%esp),%eax
-    movl    20(%esp),%edx
-    movl    24(%esp),%ebx
-    movl    28(%esp),%ecx
-    lock    
+    movl    12(%esp), %esi
+    movl    16(%esp), %eax
+    movl    20(%esp), %edx
+    movl    24(%esp), %ebx
+    movl    28(%esp), %ecx
+    lock
     cmpxchg8b   (%esi)
     pop     %ebx
     pop     %esi
     ret
-
-
-

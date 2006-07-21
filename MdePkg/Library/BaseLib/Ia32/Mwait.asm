@@ -22,22 +22,22 @@
 ;------------------------------------------------------------------------------
 
     .686
-    .model  flat
+    .model  flat,C
     .code
 
 ;------------------------------------------------------------------------------
-; UINT64
+; UINTN
 ; EFIAPI
 ; AsmMwait (
 ;   IN      UINTN                     Eax,
 ;   IN      UINTN                     Ecx
 ;   );
 ;------------------------------------------------------------------------------
-_AsmMwait   PROC
+AsmMwait    PROC
     mov     eax, [esp + 4]
     mov     ecx, [esp + 8]
-    DB      0fh, 1, 0c9h
+    DB      0fh, 1, 0c9h                ; mwait
     ret
-_AsmMwait   ENDP
+AsmMwait    ENDP
 
     END

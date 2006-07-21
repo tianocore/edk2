@@ -20,69 +20,70 @@
 #
 #------------------------------------------------------------------------------
 
+.global _InternalMathDivRemU64x32, _InternalMathDivRemU64x64
 
-
-     
-
-.extern _InternalMathDivRemU64x32
-
-.global _InternalMathDivRemU64x64
-_InternalMathDivRemU64x64: 
-    movl    16(%esp),%ecx
-    testl   %ecx,%ecx
-    jnz     _DivRemU64x64
-    movl    20(%esp),%ecx
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathDivRemU64x64 (
+#   IN      UINT64                    Dividend,
+#   IN      UINT64                    Divisor,
+#   OUT     UINT64                    *Remainder    OPTIONAL
+#   );
+#------------------------------------------------------------------------------
+_InternalMathDivRemU64x64:
+    movl    16(%esp), %ecx
+    testl   %ecx, %ecx
+    jnz     Hard
+    movl    20(%esp), %ecx
     jecxz   L1
-    and     $0,4(%ecx)
-    movl    %ecx,16(%esp)
-L1: 
+    and     $0, 4(%ecx)
+    movl    %ecx, 16(%esp)
+L1:
     jmp     _InternalMathDivRemU64x32
-
-
-.global _DivRemU64x64
-_DivRemU64x64:
-    push   %ebx                                                                             
-    push   %esi                                                                             
-    push   %edi                                        
+Hard:
+    push    %ebx
+    push    %esi
+    push    %edi
     mov     20(%esp), %edx
     mov     16(%esp), %eax
-    movl    %edx,%edi
-    movl    %eax,%esi
+    movl    %edx, %edi
+    movl    %eax, %esi
     mov     24(%esp), %ebx
-L2: 
+L2:
     shrl    %edx
-    rcrl    $1,%eax
-    shrdl   $1,%ecx,%ebx
+    rcrl    $1, %eax
+    shrdl   $1, %ecx, %ebx
     shrl    %ecx
     jnz     L2
     divl    %ebx
-    movl    %eax,%ebx
-    movl    28(%esp),%ecx
+    movl    %eax, %ebx
+    movl    28(%esp), %ecx
     mull    24(%esp)
-    imull   %ebx,%ecx
-    addl    %ecx,%edx
+    imull   %ebx, %ecx
+    addl    %ecx, %edx
     mov     32(%esp), %ecx
     jc      TooLarge
-    cmpl    %edx,%edi
+    cmpl    %edx, %edi
     ja      Correct
     jb      TooLarge
-    cmpl    %eax,%esi
+    cmpl    %eax, %esi
     jae     Correct
-TooLarge: 
+TooLarge:
     decl    %ebx
     jecxz   Return
     sub     24(%esp), %eax
     sbb     28(%esp), %edx
-Correct: 
+Correct:
     jecxz   Return
-    subl    %eax,%esi
-    sbbl    %edx,%edi
-    movl    %esi,(%ecx)
-    movl    %edi,4(%ecx)
-Return: 
-    movl    %ebx,%eax
-    xorl    %edx,%edx
-    push   %edi                                        
-    push   %esi                                                                             
-    push   %ebx                                                                             
+    subl    %eax, %esi
+    sbbl    %edx, %edi
+    movl    %esi, (%ecx)
+    movl    %edi, 4(%ecx)
+Return:
+    movl    %ebx, %eax
+    xorl    %edx, %edx
+    pop     %edi
+    pop     %esi
+    pop     %ebx
     ret

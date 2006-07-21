@@ -19,25 +19,28 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
-
 .global _InternalMathDivRemU64x32
-_InternalMathDivRemU64x32: 
-    movl    12(%esp),%ecx
-    movl    8(%esp),%eax
-    xorl    %edx,%edx
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathDivRemU64x32 (
+#   IN      UINT64                    Dividend,
+#   IN      UINT32                    Divisor,
+#   OUT     UINT32                    *Remainder
+#   );
+#------------------------------------------------------------------------------
+_InternalMathDivRemU64x32:
+    movl    12(%esp), %ecx
+    movl    8(%esp), %eax
+    xorl    %edx, %edx
     divl    %ecx
-    pushl   %eax
-    movl    8(%esp),%eax
+    push    %eax
+    movl    8(%esp), %eax
     divl    %ecx
-    movl    20(%esp),%ecx
+    movl    20(%esp), %ecx
     jecxz   L1
-    movl    %edx,(%ecx)
-L1: 
-    popl    %edx
+    movl    %edx, (%ecx)
+L1:
+    pop     %edx
     ret
-
-
-

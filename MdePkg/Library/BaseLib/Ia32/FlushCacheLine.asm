@@ -22,7 +22,7 @@
 ;------------------------------------------------------------------------------
 
     .586P
-    .model  flat
+    .model  flat,C
     .xmm
     .code
 
@@ -33,10 +33,10 @@
 ;   IN      VOID                      *LinearAddress
 ;   );
 ;------------------------------------------------------------------------------
-_AsmFlushCacheLine  PROC
+AsmFlushCacheLine   PROC
     mov     eax, [esp + 4]
     clflush [eax]
     ret
-_AsmFlushCacheLine  ENDP
+AsmFlushCacheLine   ENDP
 
     END

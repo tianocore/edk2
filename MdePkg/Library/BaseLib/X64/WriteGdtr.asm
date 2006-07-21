@@ -23,6 +23,13 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalX86WriteGdtr (
+;   IN      CONST IA32_DESCRIPTOR     *Idtr
+;   );
+;------------------------------------------------------------------------------
 InternalX86WriteGdtr  PROC
     lgdt    fword ptr [rcx]
     ret

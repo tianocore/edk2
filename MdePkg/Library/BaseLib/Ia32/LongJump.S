@@ -19,20 +19,23 @@
 #
 #------------------------------------------------------------------------------
 
-    .386: 
-    .code: 
+.global _InternalLongJump
 
-.globl _InternalLongJump
+#------------------------------------------------------------------------------
+# VOID
+# EFIAPI
+# InternalLongJump (
+#   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+#   IN      UINTN                     Value
+#   );
+#------------------------------------------------------------------------------
 _InternalLongJump:
-    popl    %eax
-    popl    %edx
-    popl    %eax
+    pop     %eax
+    pop     %edx
+    pop     %eax
     movl    (%edx), %ebx
     movl    4(%edx), %esi
     movl    8(%edx), %edi
     movl    12(%edx), %ebp
     movl    16(%edx), %esp
     jmp     *20(%edx)
-#InternalLongJump ENDP
-
-

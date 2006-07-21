@@ -23,6 +23,15 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; UINT64
+; EFIAPI
+; InternalMathDivRemU64x32 (
+;   IN      UINT64                    Dividend,
+;   IN      UINT32                    Divisor,
+;   OUT     UINT32                    *Remainder
+;   );
+;------------------------------------------------------------------------------
 InternalMathDivRemU64x32    PROC
     mov     ecx, [esp + 12]
     mov     eax, [esp + 8]
@@ -32,7 +41,7 @@ InternalMathDivRemU64x32    PROC
     mov     eax, [esp + 8]
     div     ecx
     mov     ecx, [esp + 20]
-    jecxz   @F
+    jecxz   @F                      ; abandon remainder if Remainder == NULL
     mov     [ecx], edx
 @@:
     pop     edx

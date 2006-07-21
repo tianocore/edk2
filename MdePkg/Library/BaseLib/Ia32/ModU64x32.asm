@@ -23,6 +23,14 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; UINT32
+; EFIAPI
+; InternalMathModU64x32 (
+;   IN      UINT64                    Dividend,
+;   IN      UINT32                    Divisor
+;   );
+;------------------------------------------------------------------------------
 InternalMathModU64x32   PROC
     mov     eax, [esp + 8]
     mov     ecx, [esp + 12]

@@ -19,17 +19,23 @@
 #
 #------------------------------------------------------------------------------
 
-    .386: 
-    .code: 
-
 .global _InternalMathDivU64x32
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathDivU64x32 (
+#   IN      UINT64                    Dividend,
+#   IN      UINT32                    Divisor
+#   );
+#------------------------------------------------------------------------------
 _InternalMathDivU64x32:
-    movl    8(%esp),%eax
-    movl    12(%esp),%ecx
-    xorl    %edx,%edx
+    movl    8(%esp), %eax
+    movl    12(%esp), %ecx
+    xorl    %edx, %edx
     divl    %ecx
-    pushl   %eax
-    movl    8(%esp),%eax
+    push    %eax
+    movl    8(%esp), %eax
     divl    %ecx
-    popl    %edx
+    pop     %edx
     ret

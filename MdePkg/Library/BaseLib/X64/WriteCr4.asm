@@ -27,11 +27,12 @@
 ; UINTN
 ; EFIAPI
 ; AsmWriteCr4 (
-;   VOID
+;   UINTN  Cr4
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteCr4 PROC
     mov     cr4, rcx
+    mov     rax, rcx
     ret
 AsmWriteCr4 ENDP
 

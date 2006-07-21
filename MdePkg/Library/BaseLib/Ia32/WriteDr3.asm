@@ -22,20 +22,20 @@
 ;------------------------------------------------------------------------------
 
     .586p
-    .model  flat
+    .model  flat,C
     .code
 
 ;------------------------------------------------------------------------------
-; VOID
+; UINTN
 ; EFIAPI
 ; AsmWriteDr3 (
 ;   IN UINTN Value
 ;   );
 ;------------------------------------------------------------------------------
-_AsmWriteDr3    PROC
+AsmWriteDr3 PROC
     mov     eax, [esp + 4]
     mov     dr3, eax
     ret
-_AsmWriteDr3    ENDP
+AsmWriteDr3 ENDP
 
     END

@@ -83,8 +83,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>SwapBytes32.c</Filename>
     <Filename>SwapBytes64.c</Filename>
     <Filename>SwitchStack.c</Filename>
-    <Filename SupArchList="IA32">x86LowLevel.c</Filename>
+    <Filename SupArchList="IA32">x86DisablePaging32.c</Filename>
+    <Filename SupArchList="IA32">x86DisablePaging64.c</Filename>
+    <Filename SupArchList="IA32">x86EnablePaging32.c</Filename>
+    <Filename SupArchList="IA32">x86EnablePaging64.c</Filename>
+    <Filename SupArchList="IA32">x86FxRestore.c</Filename>
+    <Filename SupArchList="IA32">x86FxSave.c</Filename>
+    <Filename SupArchList="IA32">x86GetInterruptState.c</Filename>
+    <Filename SupArchList="IA32">x86MemoryFence.c</Filename>
+    <Filename SupArchList="IA32">x86Msr.c</Filename>
+    <Filename SupArchList="IA32">x86ReadGdtr.c</Filename>
+    <Filename SupArchList="IA32">x86ReadIdtr.c</Filename>
     <Filename SupArchList="IA32">x86Thunk.c</Filename>
+    <Filename SupArchList="IA32">x86WriteGdtr.c</Filename>
+    <Filename SupArchList="IA32">x86WriteIdtr.c</Filename>
     <Filename SupArchList="IA32">Unaligned.c</Filename>
     <Filename SupArchList="IA32">Ia32/Non-existing.c</Filename>
     <Filename SupArchList="IA32">Ia32/InternalSwitchStack.c</Filename>
@@ -107,7 +119,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32">Ia32/CpuIdEx.asm</Filename>
     <Filename SupArchList="IA32">Ia32/ReadEflags.asm</Filename>
     <Filename SupArchList="IA32">Ia32/ReadMsr64.asm</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMsr32.asm</Filename>
     <Filename SupArchList="IA32">Ia32/WriteMsr64.asm</Filename>
     <Filename SupArchList="IA32">Ia32/ReadCr0.asm</Filename>
     <Filename SupArchList="IA32">Ia32/ReadCr2.asm</Filename>
@@ -205,7 +216,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32">Ia32/CpuIdEx.S</Filename>
     <Filename SupArchList="IA32">Ia32/ReadEflags.S</Filename>
     <Filename SupArchList="IA32">Ia32/ReadMsr64.S</Filename>
-    <Filename SupArchList="IA32">Ia32/WriteMsr32.S</Filename>
     <Filename SupArchList="IA32">Ia32/WriteMsr64.S</Filename>
     <Filename SupArchList="IA32">Ia32/ReadCr0.S</Filename>
     <Filename SupArchList="IA32">Ia32/ReadCr2.S</Filename>
@@ -284,8 +294,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IA32">Ia32/CpuBreakpoint.S</Filename>
     <Filename SupArchList="IA32">Ia32/CpuFlushTlb.S</Filename>
     <Filename SupArchList="IA32">Ia32/Thunk16.S</Filename>
-    <Filename SupArchList="X64">x86LowLevel.c</Filename>
+    <Filename SupArchList="X64">x86DisablePaging32.c</Filename>
+    <Filename SupArchList="X64">x86DisablePaging64.c</Filename>
+    <Filename SupArchList="X64">x86EnablePaging32.c</Filename>
+    <Filename SupArchList="X64">x86EnablePaging64.c</Filename>
+    <Filename SupArchList="X64">x86FxRestore.c</Filename>
+    <Filename SupArchList="X64">x86FxSave.c</Filename>
+    <Filename SupArchList="X64">x86GetInterruptState.c</Filename>
+    <Filename SupArchList="X64">x86MemoryFence.c</Filename>
+    <Filename SupArchList="X64">x86Msr.c</Filename>
+    <Filename SupArchList="X64">x86ReadGdtr.c</Filename>
+    <Filename SupArchList="X64">x86ReadIdtr.c</Filename>
     <Filename SupArchList="X64">x86Thunk.c</Filename>
+    <Filename SupArchList="X64">x86WriteGdtr.c</Filename>
+    <Filename SupArchList="X64">x86WriteIdtr.c</Filename>
     <Filename SupArchList="X64">Unaligned.c</Filename>
     <Filename SupArchList="X64">Math64.c</Filename>
     <Filename SupArchList="X64">X64/Non-existing.c</Filename>
@@ -295,9 +317,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="X64">X64/CpuId.asm</Filename>
     <Filename SupArchList="X64">X64/CpuIdEx.asm</Filename>
     <Filename SupArchList="X64">X64/ReadEflags.asm</Filename>
-    <Filename SupArchList="X64">X64/ReadMsr32.asm</Filename>
     <Filename SupArchList="X64">X64/ReadMsr64.asm</Filename>
-    <Filename SupArchList="X64">X64/WriteMsr32.asm</Filename>
     <Filename SupArchList="X64">X64/WriteMsr64.asm</Filename>
     <Filename SupArchList="X64">X64/ReadCr0.asm</Filename>
     <Filename SupArchList="X64">X64/ReadCr2.asm</Filename>

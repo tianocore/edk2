@@ -21,9 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
+.global _AsmMonitor
 
 #------------------------------------------------------------------------------
 # UINT64
@@ -34,13 +32,9 @@
 #   IN      UINTN                     Edx
 #   );
 #------------------------------------------------------------------------------
-.global _AsmMonitor
-_AsmMonitor: 
-    movl    4(%esp),%eax
-    movl    8(%esp),%ecx
-    movl    12(%esp),%edx
-    monitor %eax,%ecx,%edx
+_AsmMonitor:
+    movl    4(%esp), %eax
+    movl    8(%esp), %ecx
+    movl    12(%esp), %edx
+    monitor %eax, %ecx, %edx
     ret
-
-
-

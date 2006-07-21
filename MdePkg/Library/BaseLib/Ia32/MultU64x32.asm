@@ -23,10 +23,18 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; UINT64
+; EFIAPI
+; InternalMathMultU64x32 (
+;   IN      UINT64                    Multiplicand,
+;   IN      UINT32                    Multiplier
+;   );
+;------------------------------------------------------------------------------
 InternalMathMultU64x32  PROC
     mov     ecx, [esp + 12]
     mov     eax, ecx
-    imul    ecx, [esp + 8]
+    imul    ecx, [esp + 8]              ; overflow not detectable
     mul     dword ptr [esp + 4]
     add     edx, ecx
     ret

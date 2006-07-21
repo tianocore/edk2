@@ -58,6 +58,7 @@ extern CONST UINT16                 mTransition;
 
 **/
 IA32_REGISTER_SET *
+EFIAPI
 InternalAsmThunk16 (
   IN      IA32_REGISTER_SET         *RegisterSet,
   IN OUT  VOID                      *Transition

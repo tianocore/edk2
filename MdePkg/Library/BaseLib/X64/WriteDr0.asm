@@ -27,11 +27,12 @@
 ; UINTN
 ; EFIAPI
 ; AsmWriteDr0 (
-;   VOID
+;   IN UINTN Value
 ;   );
 ;------------------------------------------------------------------------------
 AsmWriteDr0 PROC
     mov     dr0, rcx
+    mov     rax, rcx
     ret
 AsmWriteDr0 ENDP
 

@@ -21,9 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-
-
-     
+.global _InternalSyncCompareExchange32
 
 #------------------------------------------------------------------------------
 # UINT32
@@ -34,13 +32,10 @@
 #   IN      UINT32                    ExchangeValue
 #   );
 #------------------------------------------------------------------------------
-.global _InternalSyncCompareExchange32
-_InternalSyncCompareExchange32: 
-    movl    4(%esp),%ecx
-    movl    8(%esp),%eax
-    movl    12(%esp),%edx
-    lock    cmpxchgl %edx,(%ecx)
+_InternalSyncCompareExchange32:
+    movl    4(%esp), %ecx
+    movl    8(%esp), %eax
+    movl    12(%esp), %edx
+    lock
+    cmpxchgl    %edx, (%ecx)
     ret
-
-
-

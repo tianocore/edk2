@@ -23,6 +23,13 @@
 
 EXTERNDEF   InternalAssertJumpBuffer:PROC
 
+;------------------------------------------------------------------------------
+; UINTN
+; EFIAPI
+; SetJump (
+;   OUT     BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
+;   );
+;------------------------------------------------------------------------------
 SetJump     PROC
     push    rcx
     add     rsp, -20h

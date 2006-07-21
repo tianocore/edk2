@@ -25,9 +25,20 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalX86EnablePaging64 (
+;   IN      UINT16                    Cs,
+;   IN      UINT64                    EntryPoint,
+;   IN      UINT64                    Context1,  OPTIONAL
+;   IN      UINT64                    Context2,  OPTIONAL
+;   IN      UINT64                    NewStack
+;   );
+;------------------------------------------------------------------------------
 InternalX86EnablePaging64 PROC
     cli
-    mov     [esp], @F                   ; offset for far retf
+    mov     [esp], @F                   ; offset for far retf, seg is the 1st arg
     mov     eax, cr4
     or      al, (1 SHL 5)
     mov     cr4, eax                    ; enable PAE

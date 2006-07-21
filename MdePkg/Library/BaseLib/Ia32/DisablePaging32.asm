@@ -40,18 +40,18 @@ InternalX86DisablePaging32    PROC
     mov     ecx, [esp + 8]
     mov     edx, [esp + 12]
     pushfd
-    pop     edi
+    pop     edi                         ; save EFLAGS to edi
     cli
     mov     eax, cr0
     btr     eax, 31
     mov     esp, [esp + 16]
     mov     cr0, eax
     push    edi
-    popfd
+    popfd                               ; restore EFLAGS from edi
     push    edx
     push    ecx
     call    ebx
-    jmp     $
+    jmp     $                           ; EntryPoint() should not return
 InternalX86DisablePaging32    ENDP
 
     END

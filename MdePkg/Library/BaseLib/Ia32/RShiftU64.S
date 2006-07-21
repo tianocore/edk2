@@ -19,17 +19,26 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    .code: 
+    .686:
+    .code:
 
 .global _InternalMathRShiftU64
+
+#------------------------------------------------------------------------------
+# UINT64
+# EFIAPI
+# InternalMathRShiftU64 (
+#   IN      UINT64                    Operand,
+#   IN      UINTN                     Count
+#   );
+#------------------------------------------------------------------------------
 _InternalMathRShiftU64:
-    movb    12(%esp),%cl
-    xorl    %edx,%edx
-    movl    8(%esp),%eax
-    testb   $32,%cl
+    movb    12(%esp), %cl
+    xorl    %edx, %edx
+    movl    8(%esp), %eax
+    testb   $32, %cl
     cmovz   %eax, %edx
     cmovz   0x4(%esp), %eax
-    shrdl   %cl,%edx,%eax
-    shr     %cl,%edx
+    shrdl   %cl, %edx, %eax
+    shr     %cl, %edx
     ret

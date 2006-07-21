@@ -23,10 +23,18 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; VOID
+; EFIAPI
+; InternalLongJump (
+;   IN      BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer,
+;   IN      UINTN                     Value
+;   );
+;------------------------------------------------------------------------------
 InternalLongJump    PROC
-    pop     eax
-    pop     edx
-    pop     eax
+    pop     eax                         ; skip return address
+    pop     edx                         ; edx <- JumpBuffer
+    pop     eax                         ; eax <- Value
     mov     ebx, [edx]
     mov     esi, [edx + 4]
     mov     edi, [edx + 8]

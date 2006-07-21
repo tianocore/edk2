@@ -25,6 +25,13 @@
 
 InternalAssertJumpBuffer    PROTO   C
 
+;------------------------------------------------------------------------------
+; UINTN
+; EFIAPI
+; SetJump (
+;   OUT     BASE_LIBRARY_JUMP_BUFFER  *JumpBuffer
+;   );
+;------------------------------------------------------------------------------
 SetJump     PROC
     push    [esp + 4]
     call    InternalAssertJumpBuffer

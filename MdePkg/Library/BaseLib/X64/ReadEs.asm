@@ -31,7 +31,7 @@
 ;   );
 ;------------------------------------------------------------------------------
 AsmReadEs   PROC
-    mov     ax, es
+    mov     eax, es
     ret
 AsmReadEs   ENDP
 

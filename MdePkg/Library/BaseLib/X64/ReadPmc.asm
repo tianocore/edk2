@@ -32,11 +32,8 @@
 ;------------------------------------------------------------------------------
 AsmReadPmc  PROC
     rdpmc
-    shl     ecx, 1
-    jnc     @F
-    shl     rax, 20h
-    shrd    rax, rdx, 20h
-@@:
+    shl     rdx, 20h
+    or      rax, rdx
     ret
 AsmReadPmc  ENDP
 

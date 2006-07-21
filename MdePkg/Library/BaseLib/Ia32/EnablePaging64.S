@@ -21,9 +21,7 @@
 #
 #------------------------------------------------------------------------------
 
-     
-    #.MODEL flat
-     
+.global _InternalX86EnablePaging64
 
 #------------------------------------------------------------------------------
 # VOID
@@ -36,7 +34,6 @@
 #   IN      UINT64                    NewStack
 #   );
 #------------------------------------------------------------------------------
-.global _InternalX86EnablePaging64
 _InternalX86EnablePaging64:
     cli
     movl    $LongStart, (%esp)
@@ -52,13 +49,13 @@ _InternalX86EnablePaging64:
     movl    %eax, %cr0                  # enable paging
     lret
 LongStart:                              # long mode starts here
-    .byte   0x67,0x48
+    .byte   0x67, 0x48
     movl    (%esp), %ebx                # mov rbx, [esp]
-    .byte   0x67,0x48
+    .byte   0x67, 0x48
     movl    8(%esp), %ecx               # mov rcx, [esp + 8]
-    .byte   0x67,0x48
+    .byte   0x67, 0x48
     movl    0x10(%esp), %edx            # mov rdx, [esp + 10h]
-    .byte   0x67,0x48
+    .byte   0x67, 0x48
     movl    0x18(%esp), %esp            # mov rsp, [esp + 18h]
     .byte   0x48
     addl    $0x-20, %esp                # add rsp, -20h
