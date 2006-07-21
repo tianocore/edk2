@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <ModuleSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0">
   <MsaHeader>
-    <ModuleName>EdkDxeRuntimeDriverLib</ModuleName>
+    <ModuleName>EdkUefiRuntimeLib</ModuleName>
     <ModuleType>DXE_DRIVER</ModuleType>
     <GuidValue>b1ee6c28-54aa-4d17-b705-3e28ccb27b2e</GuidValue>
     <Version>1.0</Version>
@@ -32,11 +32,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <ModuleDefinitions>
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BinaryModule>false</BinaryModule>
-    <OutputFileBasename>EdkDxeRuntimeDriverLib</OutputFileBasename>
+    <OutputFileBasename>EdkUefiRuntimeLib</OutputFileBasename>
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_PRODUCED">
-      <Keyword>DxeRuntimeDriverLib</Keyword>
+      <Keyword>UefiRuntimeLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiLib</Keyword>

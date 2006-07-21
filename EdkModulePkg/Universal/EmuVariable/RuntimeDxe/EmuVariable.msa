@@ -35,7 +35,7 @@
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>DxeRuntimeDriverLib</Keyword>
+      <Keyword>UefiRuntimeLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>UefiDriverEntryPoint</Keyword>

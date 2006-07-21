@@ -43,7 +43,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <Keyword>DxeServicesTableLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>DxeRuntimeDriverLib</Keyword>
+      <Keyword>UefiRuntimeLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
