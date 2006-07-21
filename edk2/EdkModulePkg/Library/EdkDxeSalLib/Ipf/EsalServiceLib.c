@@ -38,6 +38,7 @@ DxeSalLibConstruct (
 }
 
 EFI_STATUS
+EFIAPI
 RegisterEsalFunction (
   IN  UINT64                                    FunctionId,
   IN  EFI_GUID                                  *ClassGuid,
@@ -72,6 +73,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 RegisterEsalClass (
   IN  EFI_GUID                                  *ClassGuid,
   IN  VOID                                      *ModuleGlobal,
@@ -129,6 +131,7 @@ Returns:
 }
 
 SAL_RETURN_REGS
+EFIAPI
 EfiCallEsalService (
   IN  EFI_GUID                                      *ClassGuid,
   IN  UINT64                                        FunctionId,

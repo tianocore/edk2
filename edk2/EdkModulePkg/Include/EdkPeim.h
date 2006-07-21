@@ -46,6 +46,7 @@ Abstract:
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/CapsuleVendor.h>
 #include <Guid/BootState.h>
+#include <Guid/MemoryStatusCodeRecord.h>
 
 #include <Ppi/PeiInMemory.h>
 #include <Ppi/FlashMap.h>

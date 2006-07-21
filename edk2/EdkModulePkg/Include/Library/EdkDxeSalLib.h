@@ -23,6 +23,7 @@ Abstract:
 //#include <Ipf/SalApi.h>
 
 EFI_STATUS
+EFIAPI
 RegisterEsalFunction (
   IN  UINT64                                    FunctionId,
   IN  EFI_GUID                                  *ClassGuid,
@@ -49,6 +50,7 @@ Returns:
 ;
 
 EFI_STATUS
+EFIAPI
 RegisterEsalClass (
   IN  EFI_GUID                                  *ClassGuid,
   IN  VOID                                      *ModuleGlobal,
@@ -74,6 +76,7 @@ Returns:
 ;
 
 SAL_RETURN_REGS
+EFIAPI
 EfiCallEsalService (
   IN  EFI_GUID                                      *ClassGuid,
   IN  UINT64                                        FunctionId,
@@ -112,6 +115,7 @@ Returns:
 ;
 
 SAL_RETURN_REGS
+EFIAPI
 SetEsalVirtualEntryPoint (
   IN  UINT64  EntryPoint,
   IN  UINT64  Gp
@@ -119,6 +123,7 @@ SetEsalVirtualEntryPoint (
 ;
 
 SAL_RETURN_REGS
+EFIAPI
 SetEsalPhysicalEntryPoint (
   IN  UINT64  EntryPoint,
   IN  UINT64  Gp
@@ -126,12 +131,14 @@ SetEsalPhysicalEntryPoint (
 ;
 
 SAL_RETURN_REGS
+EFIAPI
 GetEsalEntryPoint (
   VOID
   )
 ;
 
 VOID
+EFIAPI
 SalFlushCache (
   IN EFI_PHYSICAL_ADDRESS  Start,
   IN UINT64                Length

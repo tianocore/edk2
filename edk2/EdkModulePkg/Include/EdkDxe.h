@@ -56,6 +56,7 @@ Abstract:
 #include <Guid/PeiPeCoffLoader.h>
 #include <Guid/CapsuleVendor.h>
 #include <Guid/CompatibleMemoryTested.h>
+#include <Guid/MemoryStatusCodeRecord.h>
 
 #include <Ppi/StatusCodeMemory.h>
 
