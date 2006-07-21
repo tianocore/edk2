@@ -466,17 +466,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3" ModuleGuid="1501614E-0E6C-4ef4-8B8F-C276CDFB646F">
+    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="1EC0F53A-FDE0-4576-8F25-7A1A410F58EB">
       <Libraries>
-        <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="3a9759d2-53bc-4eb2-abcd-c93099419063" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="1c747f6b-0a58-49ae-8ea3-0327a4fa10e3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="9643128f-ac24-4b3e-b6be-d8849a306153" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="fa177ff7-1fc7-458d-a358-d9d62ae61cec" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="e2368d1d-4c94-4e62-be2f-7817bbd78293" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="a804239b-4155-446f-acc8-f0825d74908c" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="9ba1d976-0624-41a3-8650-28165e8d9ae8" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="a804239b-4155-446f-acc8-f0825d74908c" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="fa177ff7-1fc7-458d-a358-d9d62ae61cec" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="9643128f-ac24-4b3e-b6be-d8849a306153" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="e6e9c1f8-2c8a-4f4b-a27c-c382e4bb8e67" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" ModuleVersion="1.0" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" PackageVersion="0.3"/>
+        <Instance ModuleGuid="F3E4E221-D5CA-4dc9-8CB2-C5123C4827D5" ModuleVersion="1.0" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -501,7 +507,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x1f</Value>
+          <Value>0x0f</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
@@ -520,20 +526,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <Value>0x80000000</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x07</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x07</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
@@ -543,10 +549,74 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
         </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdVpdBaseAddress</C_Name>
+          <Token>0x00010010</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
+          <Token>0x00010021</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseSerial</C_Name>
+          <Token>0x00010022</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseMemory</C_Name>
+          <Token>0x00010023</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseOEM</C_Name>
+          <Token>0x00010024</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="PATCHABLE_IN_MODULE">
+          <C_Name>PcdStatusCodeMemorySize</C_Name>
+          <Token>0x00010025</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT16</DatumType>
+          <MaxDatumSize>2</MaxDatumSize>
+          <Value>1</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdNt32StatusCodeLibUseForPei</C_Name>
+          <Token>0x0000100b</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>FV_RECOVERY</FvBinding>
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
+        <Options>
+	      <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
+            "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/EXPORT:InitializeDriver=_ModuleEntryPoint", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:CONSOLE", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb", "Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib"
+          </Option>
+          <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
+            "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/EXPORT:InitializeDriver=_ModuleEntryPoint", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb", "Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib"
+          </Option>
+        </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IA32" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3" ModuleGuid="B7611005-1F26-45ba-A3DB-01F39DDB2785">
@@ -2277,24 +2347,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="9F455D3B-2B8A-4c06-960B-A71B9714B9CD">
+    
+    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F">
       <Libraries>
-        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="e94cd42a-3aad-4ea0-9b09-945891c60ccd" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="68b157b5-9534-43ff-9cd3-6705e4e1d56c" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="1517564b-ab66-42b7-8903-731a95f314f9" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="041bf780-dc3e-49ab-8d67-4b86075440ea" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="e2368d1d-4c94-4e62-be2f-7817bbd78293" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="F3E4E221-D5CA-4dc9-8CB2-C5123C4827D5" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
+        
+        <Instance ModuleGuid="1c747f6b-0a58-49ae-8ea3-0327a4fa10e3" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
+        <Instance ModuleGuid="a804239b-4155-446f-acc8-f0825d74908c" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -2319,7 +2392,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x1f</Value>
+          <Value>0x0f</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
@@ -2338,14 +2411,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <Value>0x80000000</Value>
         </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
-          <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT8</DatumType>
-          <MaxDatumSize>1</MaxDatumSize>
-          <Value>0x07</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
@@ -2361,10 +2426,130 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
         </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdReportStatusCodePropertyMask</C_Name>
+          <Token>0x00000007</Token>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT8</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>0x07</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdVpdBaseAddress</C_Name>
+          <Token>0x00010010</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDxePcdDatabaseTraverseEnabled</C_Name>
+          <Token>0x00010021</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseEfiSerial</C_Name>
+          <Token>0x00010026</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseHardSerial</C_Name>
+          <Token>0x00010027</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseRuntimeMemory</C_Name>
+          <Token>0x00010028</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseDataHub</C_Name>
+          <Token>0x00010029</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeUseOEM</C_Name>
+          <Token>0x00010024</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInSerial</C_Name>
+          <Token>0x0001002a</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInRuntimeMemory</C_Name>
+          <Token>0x0001002b</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInDataHub</C_Name>
+          <Token>0x0001002c</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdStatusCodeReplayInOEM</C_Name>
+          <Token>0x0001002c</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
+        <PcdData ItemType="PATCHABLE_IN_MODULE">
+          <C_Name>PcdStatusCodeRuntimeMemorySize</C_Name>
+          <Token>0x0001002d</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT16</DatumType>
+          <MaxDatumSize>2</MaxDatumSize>
+          <Value>128</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdNt32StatusCodeLibUseForPei</C_Name>
+          <Token>0x0000100b</Token>
+          <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>FALSE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>FV_RECOVERY</FvBinding>
-        <FfsFormatKey>RT_DRIVER</FfsFormatKey>
+        <FfsFormatKey>BS_DRIVER</FfsFormatKey>
+        <Options>
+	      <Option BuildTargets="DEBUG" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
+            "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/EXPORT:InitializeDriver=_ModuleEntryPoint", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:CONSOLE", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb", "libc.lib Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib"
+          </Option>
+          <Option BuildTargets="RELEASE" ToolChainFamily="MSFT" SupArchList="IA32" ToolCode="DLINK">
+            "/NODEFAULTLIB", "/LTCG", "/DLL", "/OPT:REF", "/EXPORT:InitializeDriver=_ModuleEntryPoint", "/IGNORE:4086", "/MAP", "/MACHINE:I386", "/NOLOGO", "/DEBUG", "/ENTRY:${ENTRYPOINT}", "/SUBSYSTEM:${SUBSYSTEM}", "/MAP:${DEST_DIR_DEBUG}/${BASE_NAME}.map", "/PDB:${DEST_DIR_DEBUG}/${BASE_NAME}.pdb", "libc.lib Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib"
+          </Option>
+        </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
     <ModuleSA SupArchList="IA32" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3" ModuleGuid="BDFE5FAA-2A35-44bb-B17A-8084D4E2B9E9">
