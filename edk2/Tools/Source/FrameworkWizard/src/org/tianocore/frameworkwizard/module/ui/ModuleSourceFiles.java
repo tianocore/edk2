@@ -348,9 +348,11 @@ public class ModuleSourceFiles extends IInternalFrame {
         int result = sfd.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
             if (index == -1) {
-                this.vSourceFiles.addSourceFiles(sfd.getSfid());
+                for (int indexI = 0; indexI < sfd.getSfid().length; indexI++) {
+                    this.vSourceFiles.addSourceFiles(sfd.getSfid()[indexI]);
+                }
             } else {
-                this.vSourceFiles.setSourceFiles(sfd.getSfid(), index);
+                this.vSourceFiles.setSourceFiles(sfd.getSfid()[0], index);
             }
             this.showTable();
             this.save();

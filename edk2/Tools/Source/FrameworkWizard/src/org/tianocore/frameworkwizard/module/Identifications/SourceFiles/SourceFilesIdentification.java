@@ -21,17 +21,17 @@ public class SourceFilesIdentification {
     private String filename = null;
 
     private String tagName = null;
-    
+
     private String toolCode = null;
-    
+
     private String toolChainFamily = null;
-    
+
     private Vector<String> supArchList = null;
 
     private String featureFlag = null;
 
-    public SourceFilesIdentification(String strFilename, String strTagName, String strToolCode, String strToolChainFamily,
-                                     String strFeatureFlag, Vector<String> arch) {
+    public SourceFilesIdentification(String strFilename, String strTagName, String strToolCode,
+                                     String strToolChainFamily, String strFeatureFlag, Vector<String> arch) {
         this.filename = (strFilename == null ? "" : strFilename);
         this.tagName = (strTagName == null ? "" : strTagName);
         this.toolCode = (strToolCode == null ? "" : strToolCode);
@@ -87,9 +87,12 @@ public class SourceFilesIdentification {
     public void setToolCode(String toolCode) {
         this.toolCode = toolCode;
     }
-    
+
     public boolean equals(SourceFilesIdentification sfid) {
-        if (this.filename.equals(sfid.filename)) {
+        if (this.filename.equals(sfid.filename) && this.tagName.equals(sfid.tagName)
+            && this.toolCode.equals(sfid.toolCode) && this.toolChainFamily.equals(sfid.toolChainFamily)
+            && this.featureFlag.equals(sfid.featureFlag)
+            && this.supArchList.toString().equals(sfid.supArchList.toString())) {
             return true;
         }
         return false;

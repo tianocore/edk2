@@ -35,6 +35,7 @@ import org.tianocore.SpdHeaderDocument.SpdHeader;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.SaveFile;
+import org.tianocore.frameworkwizard.common.Sort;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.common.Identifications.OpenFile;
@@ -285,7 +286,7 @@ public class WorkspaceTools {
 
             }
         }
-        Tools.sortPackages(vPackageList, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortPackages(vPackageList, DataType.SORT_TYPE_ASCENDING);
         return vPackageList;
     }
 
@@ -385,7 +386,7 @@ public class WorkspaceTools {
             }
             v.addElement(new ModuleIdentification(id, pid));
         }
-        Tools.sortModules(v, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortModules(v, DataType.SORT_TYPE_ASCENDING);
         return v;
 
     }
@@ -428,7 +429,7 @@ public class WorkspaceTools {
                 }
             }
         }
-        Tools.sortModules(vModuleList, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortModules(vModuleList, DataType.SORT_TYPE_ASCENDING);
         return vModuleList;
     }
 
@@ -459,7 +460,7 @@ public class WorkspaceTools {
                 Log.err("Open Platform Surface Area " + path, "Invalid file type");
             }
         }
-        Tools.sortPlatforms(vPlatformList, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortPlatforms(vPlatformList, DataType.SORT_TYPE_ASCENDING);
         return vPlatformList;
     }
 
@@ -477,7 +478,7 @@ public class WorkspaceTools {
                 }
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -495,7 +496,7 @@ public class WorkspaceTools {
                 }
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -513,7 +514,7 @@ public class WorkspaceTools {
                 }
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -531,7 +532,7 @@ public class WorkspaceTools {
                 }
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -555,7 +556,7 @@ public class WorkspaceTools {
                 }
             }
         }
-        Tools.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -583,7 +584,7 @@ public class WorkspaceTools {
                 // TODO Auto-generated catch block
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -609,7 +610,7 @@ public class WorkspaceTools {
                 // TODO Auto-generated catch block
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -635,7 +636,7 @@ public class WorkspaceTools {
                 // TODO Auto-generated catch block
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -661,7 +662,7 @@ public class WorkspaceTools {
                 // TODO Auto-generated catch block
             }
         }
-        Tools.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
@@ -686,7 +687,7 @@ public class WorkspaceTools {
                 // TODO Auto-generated catch block
             }
         }
-        Tools.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
+        Sort.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 

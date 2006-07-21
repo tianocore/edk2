@@ -47,7 +47,9 @@ public class SourceFilesVector {
     }
 
     public void addSourceFiles(SourceFilesIdentification sfi) {
-        vSourceFiles.addElement(sfi);
+        if (findSourceFiles(sfi) == -1) {
+            vSourceFiles.addElement(sfi);
+        }
     }
 
     public void setSourceFiles(SourceFilesIdentification sfi, int index) {

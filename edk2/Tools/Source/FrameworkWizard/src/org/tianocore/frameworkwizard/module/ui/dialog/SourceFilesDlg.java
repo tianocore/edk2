@@ -91,7 +91,7 @@ public class SourceFilesDlg extends IDialog {
     //
     // Not used by UI
     //
-    private SourceFilesIdentification sfid = null;
+    private SourceFilesIdentification sfid[] = null;
 
     private String msaFileName = "";
 
@@ -268,16 +268,16 @@ public class SourceFilesDlg extends IDialog {
      **/
     private void init(SourceFilesIdentification inSourceFilesIdentifications, String fileName) {
         init();
-        this.sfid = inSourceFilesIdentifications;
+        //this.sfid = inSourceFilesIdentifications;
         this.msaFileName = fileName;
 
-        if (this.sfid != null) {
-            this.jTextFieldFileName.setText(sfid.getFilename());
-            this.jTextFieldTagName.setText(sfid.getTagName());
-            this.jTextFieldToolCode.setText(sfid.getToolCode());
-            this.jTextFieldToolChainFamily.setText(sfid.getToolChainFamily());
-            jTextFieldFeatureFlag.setText(sfid.getFeatureFlag());
-            this.jArchCheckBox.setSelectedItems(sfid.getSupArchList());
+        if (inSourceFilesIdentifications != null) {
+            this.jTextFieldFileName.setText(inSourceFilesIdentifications.getFilename());
+            this.jTextFieldTagName.setText(inSourceFilesIdentifications.getTagName());
+            this.jTextFieldToolCode.setText(inSourceFilesIdentifications.getToolCode());
+            this.jTextFieldToolChainFamily.setText(inSourceFilesIdentifications.getToolChainFamily());
+            jTextFieldFeatureFlag.setText(inSourceFilesIdentifications.getFeatureFlag());
+            this.jArchCheckBox.setSelectedItems(inSourceFilesIdentifications.getSupArchList());
         }
     }
 
@@ -376,14 +376,18 @@ public class SourceFilesDlg extends IDialog {
         }
     }
 
-    private SourceFilesIdentification getCurrentSourceFiles() {
+    private SourceFilesIdentification[] getCurrentSourceFiles() {
         String name = this.jTextFieldFileName.getText();
+        String s[] = name.split(";");
         String tagName = this.jTextFieldTagName.getText();
         String toolCode = this.jTextFieldToolCode.getText();
         String tcf = this.jTextFieldToolChainFamily.getText();
         String featureFlag = this.jTextFieldFeatureFlag.getText();
         Vector<String> arch = this.jArchCheckBox.getSelectedItemsVector();
-        sfid = new SourceFilesIdentification(name, tagName, toolCode, tcf, featureFlag, arch);
+        sfid = new SourceFilesIdentification[s.length];
+        for (int index = 0; index < s.length; index++) {
+            sfid[index] =  new SourceFilesIdentification(s[index], tagName, toolCode, tcf, featureFlag, arch);
+        }
         return sfid;
     }
 
@@ -457,17 +461,23 @@ public class SourceFilesDlg extends IDialog {
     private void selectFile() {
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(Tools.getFilePathOnly(msaFileName)));
+        fc.setMultiSelectionEnabled(true);
         int result = fc.showOpenDialog(new JPanel());
         if (result == JFileChooser.APPROVE_OPTION) {
-            this.jTextFieldFileName.setText(fc.getSelectedFile().getName());
+            File f[] = fc.getSelectedFiles();
+            String s = "";
+            for (int index = 0; index < f.length; index++) {
+                s = s + f[index].getName() + ";";
+            }
+            this.jTextFieldFileName.setText(s);
         }
     }
 
-    public SourceFilesIdentification getSfid() {
+    public SourceFilesIdentification[] getSfid() {
         return sfid;
     }
 
-    public void setSfid(SourceFilesIdentification sfid) {
+    public void setSfid(SourceFilesIdentification[] sfid) {
         this.sfid = sfid;
     }
 }

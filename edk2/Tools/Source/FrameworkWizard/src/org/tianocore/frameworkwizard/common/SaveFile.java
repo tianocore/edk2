@@ -36,8 +36,13 @@ public class SaveFile {
      
      **/
     public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
+        
+    }
+    
+    private static void createDirectory(String path) throws Exception {
+        File f = new File(path);
+        path = f.getParent();
+        FileOperation.newFolder(path);
     }
 
     /**
@@ -45,6 +50,11 @@ public class SaveFile {
      
      **/
     public static void saveMsaFile(String path, ModuleSurfaceArea msa) throws Exception {
+        //
+        // Create the file's directory first
+        //
+        createDirectory(path);
+        
         //
         // Remove all empty top level elements
         //
@@ -225,6 +235,11 @@ public class SaveFile {
      
      **/
     public static void saveSpdFile(String path, PackageSurfaceArea spd) throws Exception {
+        //
+        // Create the file's directory first
+        //
+        createDirectory(path);
+        
         PackageSurfaceAreaDocument spdDoc = PackageSurfaceAreaDocument.Factory.newInstance();
         File f = new File(path);
 
@@ -254,6 +269,11 @@ public class SaveFile {
      
      **/
     public static void saveFpdFile(String path, PlatformSurfaceArea fpd) throws Exception {
+        //
+        // Create the file's directory first
+        //
+        createDirectory(path);
+        
         PlatformSurfaceAreaDocument fpdDoc = PlatformSurfaceAreaDocument.Factory.newInstance();
         File f = new File(path);
 

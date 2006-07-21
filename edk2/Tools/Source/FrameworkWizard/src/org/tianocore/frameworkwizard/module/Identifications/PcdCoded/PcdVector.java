@@ -17,9 +17,9 @@ package org.tianocore.frameworkwizard.module.Identifications.PcdCoded;
 import java.util.Vector;
 
 public class PcdVector {
-    
+
     private Vector<PcdIdentification> vPcd = new Vector<PcdIdentification>();
-    
+
     public int findPcd(PcdIdentification sfi) {
         for (int index = 0; index < vPcd.size(); index++) {
             if (vPcd.elementAt(index).equals(sfi)) {
@@ -86,7 +86,7 @@ public class PcdVector {
     public int size() {
         return this.vPcd.size();
     }
-    
+
     public void addAll(PcdVector v) {
         if (v != null) {
             for (int index = 0; index < v.size(); index++) {
