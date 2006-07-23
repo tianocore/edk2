@@ -1154,7 +1154,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Library/BasePostCodeLibPort80/BasePostCodeLibPort80.msa</Filename>
     <Filename>Library/BasePostCodeLibDebug/BasePostCodeLibDebug.msa</Filename>
     <Filename>Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.msa</Filename>
-    <Filename>Library/BaseSmbusLib/BaseSmbusLib.msa</Filename>
     <Filename>Library/PeiSmbusLib/PeiSmbusLib.msa</Filename>
     <Filename>Library/DxeSmbusLib/DxeSmbusLib.msa</Filename>
     <Filename>Library/BaseUefiDecompressLib/BaseUefiDecompressLib.msa</Filename>

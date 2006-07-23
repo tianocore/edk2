@@ -15,16 +15,17 @@
 **/
 
 
-
 /**
-  Allocates the number of 4KB pages specified by Pages of a certain memory type.
+  Allocates one or more 4KB pages of a certain memory type.
 
-  @param  MemoryType The type of memory to allocate.
-  @param  Pages The number of 4 KB pages to allocate.
-
-  @return A pointer to the allocated buffer.  The buffer returned is aligned on a 4KB boundary.<BR>
-  If Pages is 0, then NULL is returned.<BR>
+  Allocates the number of 4KB pages of a certain memory type and returns a pointer to the allocated
+  buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL is returned.
   If there is not enough memory remaining to satisfy the request, then NULL is returned.
+
+  @param  MemoryType            The type of memory to allocate.
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -48,13 +49,16 @@ InternalAllocatePages (
 }
 
 /**
-  Allocates the number of 4KB pages specified by Pages of type EfiBootServicesData.
+  Allocates one or more 4KB pages of type EfiBootServicesData.
 
-  @param  Pages The number of 4 KB pages to allocate.
+  Allocates the number of 4KB pages of type EfiBootServicesData and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
+  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
 
-  @return A pointer to the allocated buffer.  The buffer returned is aligned on a 4KB boundary.<BR>
-  If Pages is 0, then NULL is returned.<BR>
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -67,13 +71,16 @@ AllocatePages (
 }
 
 /**
-  Allocates the number of 4KB pages specified by Pages of type EfiRuntimeServicesData. 
+  Allocates one or more 4KB pages of type EfiRuntimeServicesData.
 
-  @param  Pages The number of 4 KB pages to allocate.
+  Allocates the number of 4KB pages of type EfiRuntimeServicesData and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
+  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
 
-  @return A pointer to the allocated buffer.  The buffer returned is aligned on a 4KB boundary.<BR>
-  If Pages is 0, then NULL is returned.<BR>
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -86,13 +93,16 @@ AllocateRuntimePages (
 }
 
 /**
-  Allocates the number of 4KB pages specified by Pages of type EfiReservedMemoryType. 
+  Allocates one or more 4KB pages of type EfiReservedMemoryType.
 
-  @param  Pages The number of 4 KB pages to allocate.
+  Allocates the number of 4KB pages of type EfiReservedMemoryType and returns a pointer to the
+  allocated buffer.  The buffer returned is aligned on a 4KB boundary.  If Pages is 0, then NULL
+  is returned.  If there is not enough memory remaining to satisfy the request, then NULL is
+  returned.
 
-  @return A pointer to the allocated buffer.  The buffer returned is aligned on a 4KB boundary.<BR>
-  If Pages is 0, then NULL is returned.<BR>
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  Pages                 The number of 4 KB pages to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -105,11 +115,18 @@ AllocateReservedPages (
 }
 
 /**
-  Frees one or more 4KB pages that were previously allocated with 
-  one of the page allocation functions in the Memory Allocation Library.
+  Frees one or more 4KB pages that were previously allocated with one of the page allocation
+  functions in the Memory Allocation Library.
 
-  @param  Buffer Pointer to the buffer of pages to free.
-  @param  Pages The number of 4 KB pages to free.
+  Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
+  must have been allocated on a previous call to the page allocation services of the Memory
+  Allocation Library.
+  If Buffer was not allocated with a page allocation function in the Memory Allocation Library,
+  then ASSERT().
+  If Pages is zero, then ASSERT().
+ 
+  @param  Buffer                Pointer to the buffer of pages to free.
+  @param  Pages                 The number of 4 KB pages to free.
 
 **/
 VOID
@@ -127,17 +144,20 @@ FreePages (
 }
 
 /**
-  Allocates the number of 4KB pages specified by Pages of a certian memory type 
-  with an alignment specified by Alignment. 
+  Allocates one or more 4KB pages of a certain memory type at a specified alignment.
 
-  @param  MemoryType The type of memory to allocate.
-  @param  Pages The number of 4 KB pages to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number of 4KB pages specified by Pages of a certain memory type with an alignment
+  specified by Alignment.  The allocated buffer is returned.  If Pages is 0, then NULL is returned.
+  If there is not enough memory at the specified alignment remaining to satisfy the request, then
+  NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return The allocated buffer is returned.<BR>
-  If Pages is 0, then NULL is returned.<BR>
-  If there is not enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.
+  @param  MemoryType            The type of memory to allocate.
+  @param  Pages                 The number of 4 KB pages to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -209,16 +229,19 @@ InternalAllocateAlignedPages (
 }
 
 /**
-  Allocates the number of 4KB pages specified by Pages of type EfiBootServicesData
-  with an alignment specified by Alignment.   
+  Allocates one or more 4KB pages of type EfiBootServicesData at a specified alignment.
 
-  @param  Pages The number of 4 KB pages to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number of 4KB pages specified by Pages of type EfiBootServicesData with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If Pages is 0, then NULL is
+  returned.  If there is not enough memory at the specified alignment remaining to satisfy the
+  request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return The allocated buffer is returned.<BR>
-  If Pages is 0, then NULL is returned.<BR>
-  If there is not enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.
+  @param  Pages                 The number of 4 KB pages to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -232,15 +255,19 @@ AllocateAlignedPages (
 }
 
 /**
-  Allocates the number of 4KB pages specified by Pages of type EfiRuntimeServicesData
-  with an alignment specified by Alignment.   
+  Allocates one or more 4KB pages of type EfiRuntimeServicesData at a specified alignment.
 
-  @param  Pages The number of 4 KB pages to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number of 4KB pages specified by Pages of type EfiRuntimeServicesData with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If Pages is 0, then NULL is
+  returned.  If there is not enough memory at the specified alignment remaining to satisfy the
+  request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return The allocated buffer is returned.  If Pages is 0, then NULL is returned.
-  If there is not enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.
+  @param  Pages                 The number of 4 KB pages to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -256,12 +283,17 @@ AllocateAlignedRuntimePages (
 /**
   Allocates one or more 4KB pages of type EfiReservedMemoryType at a specified alignment.
 
-  @param  Pages The number of 4 KB pages to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number of 4KB pages specified by Pages of type EfiReservedMemoryType with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If Pages is 0, then NULL is
+  returned.  If there is not enough memory at the specified alignment remaining to satisfy the
+  request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return The allocated buffer is returned.  If Pages is 0, then NULL is returned.
-  If there is not enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.
+  @param  Pages                 The number of 4 KB pages to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -275,11 +307,18 @@ AllocateAlignedReservedPages (
 }
 
 /**
-  Frees one or more 4KB pages that were previously allocated with 
-  one of the aligned page allocation functions in the Memory Allocation Library.
+  Frees one or more 4KB pages that were previously allocated with one of the aligned page
+  allocation functions in the Memory Allocation Library.
 
-  @param  Buffer Pointer to the buffer of pages to free.
-  @param  Pages The number of 4 KB pages to free.
+  Frees the number of 4KB pages specified by Pages from the buffer specified by Buffer.  Buffer
+  must have been allocated on a previous call to the aligned page allocation services of the Memory
+  Allocation Library.
+  If Buffer was not allocated with an aligned page allocation function in the Memory Allocation
+  Library, then ASSERT().
+  If Pages is zero, then ASSERT().
+  
+  @param  Buffer                Pointer to the buffer of pages to free.
+  @param  Pages                 The number of 4 KB pages to free.
 
 **/
 VOID
@@ -297,13 +336,16 @@ FreeAlignedPages (
 }
 
 /**
-  Allocates a buffer of a certain memory type.
+  Allocates a buffer of a certain pool type.
 
-  @param  MemoryType The type of memory to allocate.
-  @param  AllocationSize The number of bytes to allocate.
+  Allocates the number bytes specified by AllocationSize of a certain pool type and returns a
+  pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is
+  returned.  If there is not enough memory remaining to satisfy the request, then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  MemoryType            The type of memory to allocate.
+  @param  AllocationSize        The number of bytes to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -325,10 +367,13 @@ InternalAllocatePool (
 /**
   Allocates a buffer of type EfiBootServicesData.
 
-  @param  AllocationSize The number of bytes to allocate.
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData and returns a
+  pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is
+  returned.  If there is not enough memory remaining to satisfy the request, then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -343,10 +388,13 @@ AllocatePool (
 /**
   Allocates a buffer of type EfiRuntimeServicesData.
 
-  @param  AllocationSize The number of bytes to allocate.
+  Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData and returns
+  a pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is
+  returned.  If there is not enough memory remaining to satisfy the request, then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -359,12 +407,15 @@ AllocateRuntimePool (
 }
 
 /**
-  Allocates a buffer of type EfiReservedMemoryType.
+  Allocates a buffer of type EfieservedMemoryType.
 
-  @param  AllocationSize The number of bytes to allocate.
+  Allocates the number bytes specified by AllocationSize of type EfieservedMemoryType and returns
+  a pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is
+  returned.  If there is not enough memory remaining to satisfy the request, then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -379,11 +430,15 @@ AllocateReservedPool (
 /**
   Allocates and zeros a buffer of a certian pool type.
 
-  @param  PoolType The type of memory to allocate.
-  @param  AllocationSize The number of bytes to allocate and zero.
+  Allocates the number bytes specified by AllocationSize of a certian pool type, clears the buffer
+  with zeros, and returns a pointer to the allocated buffer.  If AllocationSize is 0, then a valid
+  buffer of 0 size is returned.  If there is not enough memory remaining to satisfy the request,
+  then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  PoolType              The type of memory to allocate.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -393,6 +448,7 @@ InternalAllocateZeroPool (
   ) 
 {
   VOID  *Memory;
+
   Memory = InternalAllocatePool (PoolType, AllocationSize);
   if (Memory != NULL) {
     Memory = ZeroMem (Memory, AllocationSize);
@@ -403,10 +459,14 @@ InternalAllocateZeroPool (
 /**
   Allocates and zeros a buffer of type EfiBootServicesData.
 
-  @param  AllocationSize The number of bytes to allocate and zero.
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData, clears the
+  buffer with zeros, and returns a pointer to the allocated buffer.  If AllocationSize is 0, then a
+  valid buffer of 0 size is returned.  If there is not enough memory remaining to satisfy the
+  request, then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -421,10 +481,14 @@ AllocateZeroPool (
 /**
   Allocates and zeros a buffer of type EfiRuntimeServicesData.
 
-  @param  AllocationSize The number of bytes to allocate and zero.
+  Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData, clears the
+  buffer with zeros, and returns a pointer to the allocated buffer.  If AllocationSize is 0, then a
+  valid buffer of 0 size is returned.  If there is not enough memory remaining to satisfy the
+  request, then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -439,10 +503,14 @@ AllocateRuntimeZeroPool (
 /**
   Allocates and zeros a buffer of type EfiReservedMemoryType.
 
-  @param  AllocationSize The number of bytes to allocate and zero.
+  Allocates the number bytes specified by AllocationSize of type EfiReservedMemoryType, clears the
+  buffer with zeros, and returns a pointer to the allocated buffer.  If AllocationSize is 0, then a
+  valid buffer of 0 size is returned.  If there is not enough memory remaining to satisfy the
+  request, then NULL is returned.
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -455,14 +523,20 @@ AllocateReservedZeroPool (
 }
 
 /**
-  Copies a buffer to an allocated buffer of a certian memory type. 
+  Copies a buffer to an allocated buffer of a certian pool type.
 
-  @param  MemoryType The type of pool to allocate.
-  @param  AllocationSize The number of bytes to allocate and zero.
-  @param  Buffer The buffer to copy to the allocated buffer.
+  Allocates the number bytes specified by AllocationSize of a certian pool type, copies
+  AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory remaining to satisfy the request, then NULL is returned.
+  If Buffer is NULL, then ASSERT().
+  If AllocationSize is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  PoolType              The type of pool to allocate.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -485,13 +559,19 @@ InternalAllocateCopyPool (
 } 
 
 /**
-  Copies a buffer to an allocated buffer of type EfiBootServicesData. 
+  Copies a buffer to an allocated buffer of type EfiBootServicesData.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Buffer The buffer to copy to the allocated buffer.
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData, copies
+  AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory remaining to satisfy the request, then NULL is returned.
+  If Buffer is NULL, then ASSERT().
+  If AllocationSize is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -505,13 +585,19 @@ AllocateCopyPool (
 }
 
 /**
-  Copies a buffer to an allocated buffer of type EfiRuntimeServicesData. 
+  Copies a buffer to an allocated buffer of type EfiRuntimeServicesData.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Buffer The buffer to copy to the allocated buffer.
+  Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData, copies
+  AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory remaining to satisfy the request, then NULL is returned.
+  If Buffer is NULL, then ASSERT().
+  If AllocationSize is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -525,13 +611,19 @@ AllocateRuntimeCopyPool (
 }
 
 /**
-  Copies a buffer to an allocated buffer of type EfiReservedMemoryType. 
+  Copies a buffer to an allocated buffer of type EfiReservedMemoryType.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Buffer The buffer to copy to the allocated buffer.
+  Allocates the number bytes specified by AllocationSize of type EfiReservedMemoryType, copies
+  AllocationSize bytes from Buffer to the newly allocated buffer, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory remaining to satisfy the request, then NULL is returned.
+  If Buffer is NULL, then ASSERT().
+  If AllocationSize is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate and zero.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -545,9 +637,15 @@ AllocateReservedCopyPool (
 }
 
 /**
-  Copies a buffer to an allocated buffer of type EfiReservedMemoryType at a specified alignment.
+  Frees a buffer that was previously allocated with one of the pool allocation functions in the
+  Memory Allocation Library.
 
-  @param  Buffer Pointer to the buffer to free.
+  Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the
+  pool allocation services of the Memory Allocation Library.
+  If Buffer was not allocated with a pool allocation function in the Memory Allocation Library,
+  then ASSERT().
+
+  @param  Buffer                Pointer to the buffer to free.
 
 **/
 VOID
@@ -565,12 +663,18 @@ FreePool (
 /**
   Allocates a buffer of a certain pool type at a specified alignment.
 
-  @param  PoolType The type of pool to allocate.
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.                            If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of a certain pool type with an alignment
+  specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0, then a valid
+  buffer of 0 size is returned.  If there is not enough memory at the specified alignment remaining
+  to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  PoolType              The type of pool to allocate.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.                            If Alignment is zero, then byte alignment is used.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -624,11 +728,17 @@ InternalAllocateAlignedPool (
 /**
   Allocates a buffer of type EfiBootServicesData at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.                            If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0,
+  then a valid buffer of 0 size is returned.  If there is not enough memory at the specified
+  alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -644,12 +754,17 @@ AllocateAlignedPool (
 /**
   Allocates a buffer of type EfiRuntimeServicesData at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0,
+  then a valid buffer of 0 size is returned.  If there is not enough memory at the specified
+  alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -663,14 +778,19 @@ AllocateAlignedRuntimePool (
 }
 
 /**
-  Allocates a buffer of type EfiReservedMemoryType at a specified alignment.
+  Allocates a buffer of type EfieservedMemoryType at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfieservedMemoryType with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0,
+  then a valid buffer of 0 size is returned.  If there is not enough memory at the specified
+  alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -684,15 +804,20 @@ AllocateAlignedReservedPool (
 }
 
 /**
-  Allocates and zeros a buffer of type EfiBootServicesData at a specified alignment.
+  Allocates and zeros a buffer of a certain pool type at a specified alignment.
 
-  @param  PoolType The type of pool to allocate.
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of a certain pool type with an alignment
+  specified by Alignment, clears the buffer with zeros, and returns a pointer to the allocated
+  buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there is not
+  enough memory at the specified alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  PoolType              The type of pool to allocate.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -713,12 +838,18 @@ InternalAllocateAlignedZeroPool (
 /**
   Allocates and zeros a buffer of type EfiBootServicesData at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData with an
+  alignment specified by Alignment, clears the buffer with zeros, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory at the specified alignment remaining to satisfy the request, then NULL is
+  returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -734,12 +865,18 @@ AllocateAlignedZeroPool (
 /**
   Allocates and zeros a buffer of type EfiRuntimeServicesData at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData with an
+  alignment specified by Alignment, clears the buffer with zeros, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory at the specified alignment remaining to satisfy the request, then NULL is
+  returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -753,14 +890,20 @@ AllocateAlignedRuntimeZeroPool (
 }
 
 /**
-  Allocates and zeros a buffer of type EfiReservedMemoryType at a specified alignment.
+  Allocates and zeros a buffer of type EfieservedMemoryType at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfieservedMemoryType with an
+  alignment specified by Alignment, clears the buffer with zeros, and returns a pointer to the
+  allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.  If there
+  is not enough memory at the specified alignment remaining to satisfy the request, then NULL is
+  returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -774,16 +917,21 @@ AllocateAlignedReservedZeroPool (
 }
 
 /**
-  Copies a buffer to an allocated buffer of type EfiBootServicesData at a specified alignment.
+  Copies a buffer to an allocated buffer of a certain pool type at a specified alignment.
 
-  @param  PoolType The type of pool to allocate.
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Buffer The buffer to copy to the allocated buffer.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of a certain pool type with an alignment
+  specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0, then a valid
+  buffer of 0 size is returned.  If there is not enough memory at the specified alignment remaining
+  to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  PoolType              The type of pool to allocate.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -809,13 +957,18 @@ InternalAllocateAlignedCopyPool (
 /**
   Copies a buffer to an allocated buffer of type EfiBootServicesData at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Buffer The buffer to copy to the allocated buffer.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfiBootServicesData type with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0,
+  then a valid buffer of 0 size is returned.  If there is not enough memory at the specified
+  alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -832,13 +985,18 @@ AllocateAlignedCopyPool (
 /**
   Copies a buffer to an allocated buffer of type EfiRuntimeServicesData at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Buffer The buffer to copy to the allocated buffer.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfiRuntimeServicesData type with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0,
+  then a valid buffer of 0 size is returned.  If there is not enough memory at the specified
+  alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -855,13 +1013,18 @@ AllocateAlignedRuntimeCopyPool (
 /**
   Copies a buffer to an allocated buffer of type EfiReservedMemoryType at a specified alignment.
 
-  @param  AllocationSize The number of bytes to allocate.
-  @param  Buffer The buffer to copy to the allocated buffer.
-  @param  Alignment The requested alignment of the allocation.  Must be a power of two.
-  If Alignment is zero, then byte alignment is used.
+  Allocates the number bytes specified by AllocationSize of type EfiReservedMemoryType type with an
+  alignment specified by Alignment.  The allocated buffer is returned.  If AllocationSize is 0,
+  then a valid buffer of 0 size is returned.  If there is not enough memory at the specified
+  alignment remaining to satisfy the request, then NULL is returned.
+  If Alignment is not a power of two and Alignment is not zero, then ASSERT().
 
-  @return A pointer to the allocated buffer.  If AllocationSize is 0, then a valid buffer of 0 size is returned.
-  If there is not enough memory remaining to satisfy the request, then NULL is returned.
+  @param  AllocationSize        The number of bytes to allocate.
+  @param  Buffer                The buffer to copy to the allocated buffer.
+  @param  Alignment             The requested alignment of the allocation.  Must be a power of two.
+                                If Alignment is zero, then byte alignment is used.
+
+  @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
 VOID *
@@ -879,7 +1042,12 @@ AllocateAlignedReservedCopyPool (
   Frees a buffer that was previously allocated with one of the aligned pool allocation functions 
   in the Memory Allocation Library.
 
-  @param  Buffer Pointer to the buffer to free.
+  Frees the buffer specified by Buffer.  Buffer must have been allocated on a previous call to the
+  aligned pool allocation services of the Memory Allocation Library.
+  If Buffer was not allocated with an aligned pool allocation function in the Memory Allocation
+  Library, then ASSERT().
+
+  @param  Buffer                Pointer to the buffer to free.
 
 **/
 VOID

@@ -31,8 +31,16 @@
   ASSERT (((A) & ~0xfffffff) == 0)
 
 
+/**
+  Gets the base address of PCI Express.
+  
+  This internal functions retrieves PCI Express Base Address via a PCD entry
+  PcdPciExpressBaseAddress.
+  
+  @return The base address of PCI Express.
+
+**/
 UINTN
-EFIAPI
 GetPciExpressBaseAddress (
   VOID
   )
