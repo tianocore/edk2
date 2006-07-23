@@ -2579,7 +2579,12 @@ public class CollectPCDAction {
                 strValue        = datum.substring(start + 1, end);
                 strValue        = strValue.trim();
                 if (strValue.length() == 0) {
-                    break;
+                    exceptionString = String.format ("[FPD file error] The datum type of PCD %s in %s is VOID*, and "+
+                                                     "it is byte array in fact, but '{}' is not valid for NULL datam but"+
+                                                     " need use '{0}'",
+                                                     cName,
+                                                     moduleName);
+                    return exceptionString;
                 }
                 strValueArray   = strValue.split(",");
                 for (index = 0; index < strValueArray.length; index ++) {
