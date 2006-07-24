@@ -436,7 +436,7 @@ public class SpdFileContents {
     }
     
     public void updateSpdPpiDecl(int i, String name, String cName, String guid, String hlp, String archList, 
-                                 String modTypeList){
+                                 String modTypeList, String guidTypeList){
         XmlObject o = psaRoot.getPpiDeclarations();
         if (o == null){
             return;
@@ -452,6 +452,14 @@ public class SpdFileContents {
             e.setCName(cName);
             e.setGuidValue(guid);
             e.setHelpText(hlp);
+            if (stringToList(guidTypeList) != null) {
+                e.setGuidTypeList(stringToList(guidTypeList));
+            }
+            else{
+                if (e.isSetGuidTypeList()) {
+                  e.unsetGuidTypeList();
+                }
+            }
             if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
@@ -473,7 +481,7 @@ public class SpdFileContents {
     }
     
     public void updateSpdProtocolDecl(int i, String name, String cName, String guid, String hlp, String archList, 
-                                      String modTypeList){
+                                      String modTypeList, String guidTypeList){
         XmlObject o = psaRoot.getProtocolDeclarations();
         if (o == null){
             return;
@@ -489,6 +497,14 @@ public class SpdFileContents {
             e.setCName(cName);
             e.setGuidValue(guid);
             e.setHelpText(hlp);
+            if (stringToList(guidTypeList) != null) {
+                e.setGuidTypeList(stringToList(guidTypeList));
+              }
+            else{
+                if (e.isSetGuidTypeList()) {
+                  e.unsetGuidTypeList();
+                }
+            }
             if (stringToList(archList) != null){
                 e.setSupArchList(stringToList(archList));
             }
@@ -792,6 +808,7 @@ public class SpdFileContents {
             protocol[i][3] = e.getHelpText();
             protocol[i][4] = listToString(e.getSupArchList());
             protocol[i][5] = listToString(e.getSupModuleList());
+            protocol[i][6] = listToString(e.getGuidTypeList());
             i++;
         }
     }
@@ -831,7 +848,7 @@ public class SpdFileContents {
             ppi[i][3] = e.getHelpText();
             ppi[i][4] = listToString(e.getSupArchList());
             ppi[i][5] = listToString(e.getSupModuleList());
-
+            ppi[i][6] = listToString(e.getGuidTypeList());
             i++;
         }
     }
@@ -1171,13 +1188,13 @@ public class SpdFileContents {
    **/
     public void genSpdProtocolDeclarations(String protocolDeclEntryName, String protocolDeclCName,
                                            String protocolDeclGuid, String protocolDeclFeatureFlag,
-                                           Vector<String> archList, Vector<String> modTypeList) {
+                                           Vector<String> archList, Vector<String> modTypeList, Vector<String> guidTypeList) {
         if (getSpdProtocolDeclarations() == null) {
             spdProtocolDeclarations = psaRoot.addNewProtocolDeclarations();
         }
 
         setSpdEntry(protocolDeclEntryName, protocolDeclCName, protocolDeclGuid, protocolDeclFeatureFlag,
-                    archList, modTypeList, null, spdProtocolDeclarations);
+                    archList, modTypeList, guidTypeList, spdProtocolDeclarations);
     }
 
     /**
@@ -1189,12 +1206,12 @@ public class SpdFileContents {
     @param ppiDeclFeatureFlag Reserved
    **/
     public void genSpdPpiDeclarations(String ppiDeclEntryName, String ppiDeclCName, String ppiDeclGuid,
-                                      String ppiDeclFeatureFlag, Vector<String> archList, Vector<String> modTypeList) {
+                                      String ppiDeclFeatureFlag, Vector<String> archList, Vector<String> modTypeList, Vector<String> guidTypeList) {
         if (getSpdPpiDeclarations() == null) {
             spdPpiDeclarations = psaRoot.addNewPpiDeclarations();
         }
 
-        setSpdEntry(ppiDeclEntryName, ppiDeclCName, ppiDeclGuid, ppiDeclFeatureFlag, archList, modTypeList, null, spdPpiDeclarations);
+        setSpdEntry(ppiDeclEntryName, ppiDeclCName, ppiDeclGuid, ppiDeclFeatureFlag, archList, modTypeList, guidTypeList, spdPpiDeclarations);
     }
 
     /**
@@ -1250,6 +1267,14 @@ public class SpdFileContents {
             pe.setCName(cName);
             pe.setGuidValue(guid);
             pe.setHelpText(help);
+            if (guidTypeList != null) {
+                pe.setGuidTypeList(guidTypeList);
+            }
+            else{
+                if (pe.isSetGuidTypeList()) {
+                    pe.unsetGuidTypeList();
+                }
+            }
             if (archList != null) {
                 pe.setSupArchList(archList);
             }
@@ -1276,6 +1301,14 @@ public class SpdFileContents {
             ppe.setCName(cName);
             ppe.setGuidValue(guid);
             ppe.setHelpText(help);
+            if (guidTypeList != null) {
+                ppe.setGuidTypeList(guidTypeList);
+            }
+            else{
+                if (ppe.isSetGuidTypeList()) {
+                    ppe.unsetGuidTypeList();
+                }
+            }
             if (archList != null) {
                 ppe.setSupArchList(archList);
             }

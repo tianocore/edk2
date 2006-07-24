@@ -201,7 +201,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
             jScrollPane.setBounds(new java.awt.Rectangle(12,351,608,253));
-            jScrollPane.setPreferredSize(new java.awt.Dimension(390,150));
+            jScrollPane.setPreferredSize(new java.awt.Dimension(500,419));
             jScrollPane.setViewportView(getJTable());
         }
         return jScrollPane;
@@ -316,7 +316,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jButtonAdd = new JButton();
             jButtonAdd.setText("Add");
             jButtonAdd.setSize(new java.awt.Dimension(99,20));
-            jButtonAdd.setLocation(new java.awt.Point(321,326));
+            jButtonAdd.setBounds(new java.awt.Rectangle(321,326,99,20));
             jButtonAdd.addActionListener(this);
         }
         return jButtonAdd;
@@ -332,7 +332,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jButtonRemove = new JButton();
             jButtonRemove.setText("Remove");
             jButtonRemove.setSize(new java.awt.Dimension(99,20));
-            jButtonRemove.setLocation(new java.awt.Point(424,326));
+            jButtonRemove.setBounds(new java.awt.Rectangle(424,326,99,20));
             jButtonRemove.addActionListener(this);
         }
         return jButtonRemove;
@@ -348,7 +348,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jButtonRemoveAll = new JButton();
             jButtonRemoveAll.setText("Remove All");
             jButtonRemoveAll.setSize(new java.awt.Dimension(99,20));
-            jButtonRemoveAll.setLocation(new java.awt.Point(527,326));
+            jButtonRemoveAll.setBounds(new java.awt.Rectangle(527,326,99,20));
             jButtonRemoveAll.addActionListener(this);
         }
         return jButtonRemoveAll;
@@ -418,7 +418,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private JScrollPane getJContentPane(){
         if (topScrollPane == null){
           topScrollPane = new JScrollPane();
-          topScrollPane.setSize(new java.awt.Dimension(634,590));
+//          topScrollPane.setSize(new java.awt.Dimension(634,590));
           topScrollPane.setViewportView(getJContentPane1());
         }
         return topScrollPane;
@@ -470,7 +470,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jLabel3RecInstName.setText("Recommended Instance Name");
             
             jContentPane = new JPanel();
-            jContentPane.setPreferredSize(new Dimension(480, 400));
+            jContentPane.setPreferredSize(new Dimension(680, 600));
             jContentPane.setLayout(null);
             jContentPane.add(jLabelHdr, null);
             jContentPane.add(jStarLabel1, null);

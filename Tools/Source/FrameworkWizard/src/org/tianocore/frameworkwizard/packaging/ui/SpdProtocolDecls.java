@@ -51,12 +51,7 @@ public class SpdProtocolDecls extends SpdGuidDecls {
     protected void initFrame() {
         
         this.setTitle("Protocol Declarations");
-        getJScrollPaneGuid().setVisible(false);
-        getJLabel3().setVisible(false);
         
-        getJTable().getColumn("GuidTypes").setPreferredWidth(0);
-        getJTable().getColumn("GuidTypes").setWidth(0);
-        getJTable().getColumn("GuidTypes").setHeaderValue(" ");
     }
     
     protected void init(SpdFileContents sfc){
@@ -67,7 +62,7 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         if (sfc.getSpdProtocolDeclarationCount() == 0) {
             return ;
         }
-        String[][] saa = new String[sfc.getSpdProtocolDeclarationCount()][6];
+        String[][] saa = new String[sfc.getSpdProtocolDeclarationCount()][7];
         sfc.getSpdProtocolDeclarations(saa);
         int i = 0;
         while (i < saa.length) {
@@ -90,12 +85,16 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         if (m.getValueAt(row, 5) != null) {
             modTypeList = m.getValueAt(row, 5).toString();
         }
+        String guidTypeList = null;
+        if (m.getValueAt(row, 6) != null) {
+            guidTypeList = m.getValueAt(row, 6).toString();
+        }
         String[] rowData = {name, cName, guid, help};
         if (!dataValidation(rowData)){
             return;
         }
         docConsole.setSaved(false);
-        sfc.updateSpdProtocolDecl(row, name, cName, guid, help, archList, modTypeList);
+        sfc.updateSpdProtocolDecl(row, name, cName, guid, help, archList, modTypeList, guidTypeList);
     }
     
     protected void addRow(String[] row) {
@@ -103,7 +102,7 @@ public class SpdProtocolDecls extends SpdGuidDecls {
             return;
         }
         docConsole.setSaved(false);
-        sfc.genSpdProtocolDeclarations(row[0], row[1], row[2], row[3], stringToVector(row[4]), stringToVector(row[5]));
+        sfc.genSpdProtocolDeclarations(row[0], row[1], row[2], row[3], stringToVector(row[4]), stringToVector(row[5]), stringToVector(row[6]));
     }
     
     protected void removeRow(int i){
