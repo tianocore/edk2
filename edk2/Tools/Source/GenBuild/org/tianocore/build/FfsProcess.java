@@ -248,7 +248,7 @@ public class FfsProcess {
         outofdateEle.appendChild(sourceEle);
         Element targetEle = document.createElement("targetfiles");
         Element fileEle = document.createElement("file");
-        fileEle.setAttribute("name", "${BIN_DIR}\\" + targetFilename);
+        fileEle.setAttribute("name", "${BIN_DIR}" + File.separatorChar + targetFilename);
         targetEle.appendChild(fileEle);
         outofdateEle.appendChild(targetEle);
         Element sequentialEle = document.createElement("sequential");

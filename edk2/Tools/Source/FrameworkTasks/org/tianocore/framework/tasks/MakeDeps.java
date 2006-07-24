@@ -195,16 +195,10 @@ public class MakeDeps extends Task {
     /// Remove any duplicated path separator or inconsistent path separator
     ///
     private String cleanupPathName(String path) {
-        try {
-            path = (new File(path)).getCanonicalPath();
-        } catch (IOException e) {
-            String separator = "\\" + File.separator;
-            String duplicateSeparator = separator + "{2}";
-            path = Path.translateFile(path);
-            path = path.replaceAll(duplicateSeparator, separator);
-            return path;
-        }
-
+        String separator = "\\" + File.separator;
+        String duplicateSeparator = separator + "{2}";
+        path = Path.translateFile(path);
+        path = path.replaceAll(duplicateSeparator, separator);
         return path;
     }
 
