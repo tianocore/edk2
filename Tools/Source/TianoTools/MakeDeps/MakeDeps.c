@@ -47,10 +47,10 @@ typedef struct _STRING_LIST {
 //
 // Define the relative paths used by the special #include macros
 //
-#define PROTOCOL_DIR_PATH       "Protocol\\"
-#define GUID_DIR_PATH           "Guid\\"
-#define ARCH_PROTOCOL_DIR_PATH  "ArchProtocol\\"
-#define PPI_PROTOCOL_DIR_PATH   "Ppi\\"
+#define PROTOCOL_DIR_PATH       "Protocol/"
+#define GUID_DIR_PATH           "Guid/"
+#define ARCH_PROTOCOL_DIR_PATH  "ArchProtocol/"
+#define PPI_PROTOCOL_DIR_PATH   "Ppi/"
 
 //
 // Use this structure to keep track of all the special #include forms
@@ -240,7 +240,7 @@ Returns:
       // Find the .extension
       //
       for (Cptr = TargetFileName + strlen (TargetFileName) - 1;
-           (*Cptr != '\\') && (Cptr > TargetFileName) && (*Cptr != '.');
+           (*Cptr != '\\' && *Cptr != '/') && (Cptr > TargetFileName) && (*Cptr != '.');
            Cptr--
           )
         ;
@@ -362,7 +362,7 @@ Returns:
     strcpy (SumDepsFile, mGlobals.SumDepsPath);
     strcat (SumDepsFile, FileName);
     for (Cptr = SumDepsFile + strlen (SumDepsFile) - 1;
-         (*Cptr != '\\') && (Cptr > SumDepsFile) && (*Cptr != '.');
+         (*Cptr != '\\' && *Cptr != '/') && (Cptr > SumDepsFile) && (*Cptr != '.');
          Cptr--
         )
       ;
@@ -550,7 +550,7 @@ Returns:
                 //
                 strcpy (MacroIncludeFileName, mMacroConversion[Index].PathName);
                 strcat (MacroIncludeFileName, Cptr);
-                strcat (MacroIncludeFileName, "\\");
+                strcat (MacroIncludeFileName, "/");
                 strcat (MacroIncludeFileName, Cptr);
                 strcat (MacroIncludeFileName, ".h");
                 //
@@ -867,8 +867,8 @@ ProcessArgs (
         }
 
         strcpy (NewList->Str, Argv[1]);
-        if (NewList->Str[strlen (NewList->Str) - 1] != '\\') {
-          strcat (NewList->Str, "\\");
+        if (NewList->Str[strlen (NewList->Str) - 1] != '\\' && NewList->Str[strlen (NewList->Str) - 1] != '/') {
+          strcat (NewList->Str, "/");
         }
         //
         // Add it to the end of the our list of include paths
@@ -953,10 +953,10 @@ ProcessArgs (
       //
       // Back up in the source file name to the last backslash and terminate after it.
       //
-      for (Index = strlen (NewList->Str) - 1; (Index > 0) && (NewList->Str[Index] != '\\'); Index--)
+      for (Index = strlen (NewList->Str) - 1; (Index > 0) && (NewList->Str[Index] != '\\' && NewList->Str[Index] != '/'); Index--)
         ;
       if (Index < 0) {
-        strcpy (NewList->Str, ".\\");
+        strcpy (NewList->Str, "./");
       } else {
         NewList->Str[Index + 1] = 0;
       }
@@ -1001,8 +1001,8 @@ ProcessArgs (
         }
 
         strcpy (NewList->Str, Argv[1]);
-        if (NewList->Str[strlen (NewList->Str) - 1] != '\\') {
-          strcat (NewList->Str, "\\");
+        if (NewList->Str[strlen (NewList->Str) - 1] != '\\' && NewList->Str[strlen (NewList->Str) - 1] != '/') {
+          strcat (NewList->Str, "/");
         }
 
         NewList->Next     = mGlobals.SubDirs;
@@ -1100,8 +1100,8 @@ ProcessArgs (
         //
         // Add slash on end if not there
         //
-        if (mGlobals.SumDepsPath[strlen (mGlobals.SumDepsPath) - 1] != '\\') {
-          strcat (mGlobals.SumDepsPath, "\\");
+        if (mGlobals.SumDepsPath[strlen (mGlobals.SumDepsPath) - 1] != '\\' && mGlobals.SumDepsPath[strlen (mGlobals.SumDepsPath) - 1] != '/') {
+          strcat (mGlobals.SumDepsPath, "/");
         }
       } else {
         Error (NULL, 0, 0, Argv[0], "option requires path to summary dependency files");
