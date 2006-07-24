@@ -229,7 +229,8 @@ EFI_STATUS
 
 /**
   Submits an asynchronous interrupt transfer to an interrupt endpoint of a USB device.
-
+  Translator parameter doesn't exist in UEFI2.0 spec, but it will be updated in the following specification version.
+  
   @param  This                A pointer to the EFI_USB2_HC_PROTOCOL instance.
   @param  DeviceAddress       Represents the address of the target device on the USB.
   @param  EndPointAddress     The combination of an endpoint number and an endpoint direction of the
@@ -246,6 +247,7 @@ EFI_STATUS
                               transfer is polled.
   @param  DataLength          Indicates the length of data to be received at the rate specified by
                               PollingInterval from the target asynchronous interrupt endpoint.
+  @param  Translator          A pointr to the transaction translator data.
   @param  CallBackFunction    The Callback function. This function is called at the rate specified by
                               PollingInterval.
   @param  Context             The context that is passed to the CallBackFunction. This is an
@@ -277,6 +279,7 @@ EFI_STATUS
 
 /**
   Submits synchronous interrupt transfer to an interrupt endpoint of a USB device.
+  Translator parameter doesn't exist in UEFI2.0 spec, but it will be updated in the following specification version.
 
   @param  This                  A pointer to the EFI_USB2_HC_PROTOCOL instance.
   @param  DeviceAddress         Represents the address of the target device on the USB.
@@ -292,6 +295,7 @@ EFI_STATUS
   @param  DataToggle            A pointer to the data toggle value.
   @param  TimeOut               Indicates the maximum time, in milliseconds, which the transfer is
                                 allowed to complete.
+  @param  Translator            A pointr to the transaction translator data.
   @param  TransferResult        A pointer to the detailed result information from the synchronous
                                 interrupt transfer.
 
