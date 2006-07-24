@@ -15,7 +15,7 @@
 @REM set XMLBEANS_HOME=C:\xmlbeans
 @REM set CYGWIN_HOME=C:\cygwin
 
-@REM usage: edksetup.bat [skip]
+@REM usage: edksetup.bat [Rebuild] [ForceRebuild]
 @REM if the argument, skip is present, only the paths and the
 @REM test and set of environment settings are performed. 
 
@@ -70,14 +70,14 @@ set FRAMEWORK_TOOLS_PATH=%WORKSPACE%\Tools\bin
 if defined WORKSPACE_TOOLS_PATH goto check_path
 set PATH=%FRAMEWORK_TOOLS_PATH%;%JAVA_HOME%\bin;%ANT_HOME%\bin;%XMLBEANS_HOME%\bin;%PATH%
 set WORKSPACE_TOOLS_PATH=%FRAMEWORK_TOOLS_PATH%
-echo Setting the PATH variable to include the Framework_Tools_Path for this WORKSPACE
+echo Setting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WORKSPACE
 goto path_ok
 
 :check_path
 if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto path_ok
 set PATH=%FRAMEWORK_TOOLS_PATH%;%PATH%
 set WORKSPACE_PATH=%WORKSPACE%
-echo Resetting the PATH variable to include the Framework_Tools_Path for this WORKSPACE
+echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WORKSPACE
 
 :path_ok
 
@@ -128,6 +128,7 @@ echo Resetting the PATH variable to include the Framework_Tools_Path for this WO
 
 @if "%1"=="Rebuild" goto NormalBuild
 @if "%1"=="ForceRebuild" goto ForceBuild
+@if NOT "%1"=="" goto Usage
 
 goto skipbuild
 
@@ -238,6 +239,7 @@ set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
+echo CLASSPATH:     %CLASSPATH%
 goto end
 
 :Usage
