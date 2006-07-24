@@ -362,8 +362,8 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
                     currentFile = fc.getSelectedFile().getPath();
                     this.setTitle("Tool Chain Configuration" + " [" + currentFile + "]");
                 } catch (IOException e) {
+                    Log.wrn(this.currentFile + "Read Error", e.getMessage());
                     Log.err(this.currentFile + "Read Error", e.getMessage());
-                    e.printStackTrace();
                     return;
                 }
                 this.showTable();
@@ -383,8 +383,8 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
                 try {
                     vtcc.saveFile(currentFile);
                 } catch (IOException e) {
+                    Log.wrn(this.currentFile + "Write Error", e.getMessage());
                     Log.err(this.currentFile + "Write Error", e.getMessage());
-                    e.printStackTrace();
                     return;
                 }
             }
@@ -452,12 +452,12 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
      **/
     private boolean check() {
         if (isEmpty(this.jTextFieldName.getText())) {
-            Log.err("Add Tool Chain", "Name couldn't be empty!");
+            Log.wrn("Add Tool Chain", "Name couldn't be empty!");
             return false;
         }
 
         if (isEmpty(this.jTextFieldValue.getText())) {
-            Log.err("Add Tool Chain", "Value couldn't be empty");
+            Log.wrn("Add Tool Chain", "Value couldn't be empty");
             return false;
         }
         return true;

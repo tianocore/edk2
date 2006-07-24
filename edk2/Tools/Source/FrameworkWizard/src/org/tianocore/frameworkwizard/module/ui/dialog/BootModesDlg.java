@@ -359,7 +359,7 @@ public class BootModesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Boot Modes", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

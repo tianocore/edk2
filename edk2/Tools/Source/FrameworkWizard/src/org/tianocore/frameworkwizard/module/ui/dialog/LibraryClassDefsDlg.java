@@ -468,11 +468,11 @@ public class LibraryClassDefsDlg extends IDialog {
         // Check LibraryClass
         //
         if (this.jComboBoxLibraryClassName.getSelectedItem() == null) {
-            Log.err("No Library Class can be added");
+            Log.wrn("Update Library Class Definitions", "No Library Class can be added");
             return false;
         }
         if (!DataValidation.isLibraryClass(this.jComboBoxLibraryClassName.getSelectedItem().toString())) {
-            Log.err("Incorrect data type for Library Class");
+            Log.wrn("Update Library Class Definitions", "Incorrect data type for Library Class");
             return false;
         }
 
@@ -501,7 +501,7 @@ public class LibraryClassDefsDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Library Class Definitions", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

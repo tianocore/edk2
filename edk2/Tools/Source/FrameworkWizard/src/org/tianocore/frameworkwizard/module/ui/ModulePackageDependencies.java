@@ -352,7 +352,7 @@ public class ModulePackageDependencies extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Package Dependencies", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -410,7 +410,7 @@ public class ModulePackageDependencies extends IInternalFrame {
             this.msa.setPackageDependencies(pd);
             this.omt.setSaved(false);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.wrn("Update Package Dependencies", e.getMessage());
             Log.err("Update Package Dependencies", e.getMessage());
         }
     }

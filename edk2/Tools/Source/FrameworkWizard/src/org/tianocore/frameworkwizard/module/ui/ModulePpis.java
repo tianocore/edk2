@@ -365,7 +365,7 @@ public class ModulePpis extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Ppis", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -445,7 +445,7 @@ public class ModulePpis extends IInternalFrame {
             this.msa.setPPIs(ppis);
             this.omt.setSaved(false);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.wrn("Update Ppis", e.getMessage());
             Log.err("Update Ppis", e.getMessage());
         }
     }

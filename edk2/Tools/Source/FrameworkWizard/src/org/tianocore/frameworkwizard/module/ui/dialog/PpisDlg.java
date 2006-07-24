@@ -375,7 +375,7 @@ public class PpisDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
-                Log.err("Incorrect data type for Ppi/PpiNotify Name");
+                Log.wrn("Update Ppis", "Incorrect data type for Ppi/PpiNotify Name");
                 return false;
             }
         }
@@ -385,7 +385,7 @@ public class PpisDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Ppis", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

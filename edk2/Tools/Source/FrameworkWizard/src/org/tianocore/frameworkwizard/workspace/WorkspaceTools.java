@@ -107,7 +107,7 @@ public class WorkspaceTools {
         try {
             SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.err("Save Database File", e.getMessage());
         }
     }
 
@@ -157,7 +157,7 @@ public class WorkspaceTools {
         try {
             SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.err("Save Database File", e.getMessage());
         }
     }
 
@@ -219,11 +219,11 @@ public class WorkspaceTools {
                 }
             }
         } catch (IOException e) {
-
+            Log.err("Get all mdoules of a package " + path, e.getMessage());
         } catch (XmlException e) {
-
+            Log.err("Get all mdoules of a package " + path, e.getMessage());
         } catch (Exception e) {
-
+            Log.err("Get all mdoules of a package " + path, e.getMessage());
         }
         return modulePath;
     }
@@ -247,11 +247,11 @@ public class WorkspaceTools {
                 }
             }
         } catch (IOException e) {
-
+            Log.err("Get all Industry Std Includes of a package " + path, e.getMessage());
         } catch (XmlException e) {
-
+            Log.err("Get all Industry Std Includes of a package " + path, e.getMessage());
         } catch (Exception e) {
-
+            Log.err("Get all Industry Std Includes of a package " + path, e.getMessage());
         }
         return includePath;
     }
@@ -277,13 +277,10 @@ public class WorkspaceTools {
                 vPackageList.addElement(new PackageIdentification(id));
             } catch (IOException e) {
                 Log.err("Open Package Surface Area " + path, e.getMessage());
-
             } catch (XmlException e) {
                 Log.err("Open Package Surface Area " + path, e.getMessage());
-
             } catch (Exception e) {
                 Log.err("Open Package Surface Area " + path, "Invalid file type");
-
             }
         }
         Sort.sortPackages(vPackageList, DataType.SORT_TYPE_ASCENDING);
@@ -318,13 +315,10 @@ public class WorkspaceTools {
                     v.addElement(new PackageIdentification(id));
                 } catch (IOException e) {
                     Log.err("Open Package Surface Area " + path, e.getMessage());
-                    e.printStackTrace();
                 } catch (XmlException e) {
                     Log.err("Open Package Surface Area " + path, e.getMessage());
-                    e.printStackTrace();
                 } catch (Exception e) {
                     Log.err("Open Package Surface Area " + path, "Invalid file type");
-                    e.printStackTrace();
                 }
             }
         }
@@ -347,13 +341,10 @@ public class WorkspaceTools {
                     v.addElement(new PlatformIdentification(id));
                 } catch (IOException e) {
                     Log.err("Open Platform Surface Area " + path, e.getMessage());
-                    e.printStackTrace();
                 } catch (XmlException e) {
                     Log.err("Open Platform Surface Area " + path, e.getMessage());
-                    e.printStackTrace();
                 } catch (Exception e) {
                     Log.err("Open Platform Surface Area " + path, "Invalid file type");
-                    e.printStackTrace();
                 }
             }
         }
@@ -378,11 +369,11 @@ public class WorkspaceTools {
                 modulePath = modulePaths.get(index);
                 id = getId(modulePath, OpenFile.openMsaFile(modulePath));
             } catch (IOException e) {
-                Log.log("Error when Open Module Surface Area " + modulePath, e.getMessage());
+                Log.err("Open Module Surface Area " + modulePath, e.getMessage());
             } catch (XmlException e) {
-                Log.log("Error when Open Module Surface Area " + modulePath, e.getMessage());
+                Log.err("Open Module Surface Area " + modulePath, e.getMessage());
             } catch (Exception e) {
-                Log.log("Error when Open Module Surface Area " + modulePath, "Invalid file type " + e.getMessage());
+                Log.err("Open Module Surface Area " + modulePath, "Invalid file type " + e.getMessage());
             }
             v.addElement(new ModuleIdentification(id, pid));
         }
@@ -577,11 +568,11 @@ public class WorkspaceTools {
                     vector.addAll(v);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllLibraryClassDefinitionsFromWorkspace ", e.getMessage());
             } catch (XmlException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllLibraryClassDefinitionsFromWorkspace ", e.getMessage());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllLibraryClassDefinitionsFromWorkspace ", e.getMessage());
             }
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
@@ -603,11 +594,11 @@ public class WorkspaceTools {
                     vector.addAll(v);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllProtocolDeclarationsFromPackage", e.getMessage());
             } catch (XmlException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllProtocolDeclarationsFromPackage", e.getMessage());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllProtocolDeclarationsFromPackage", e.getMessage());
             }
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
@@ -629,11 +620,11 @@ public class WorkspaceTools {
                     vector.addAll(v);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllPpiDeclarationsFromWorkspace", e.getMessage());
             } catch (XmlException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllPpiDeclarationsFromWorkspace", e.getMessage());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllPpiDeclarationsFromWorkspace", e.getMessage());
             }
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
@@ -655,11 +646,11 @@ public class WorkspaceTools {
                     vector.addAll(v);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllGuidDeclarationsFromWorkspace", e.getMessage());
             } catch (XmlException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllGuidDeclarationsFromWorkspace", e.getMessage());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllGuidDeclarationsFromWorkspace", e.getMessage());
             }
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
@@ -680,11 +671,11 @@ public class WorkspaceTools {
                     vector.addAll(v);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllPcdDeclarationsFromWorkspace", e.getMessage());
             } catch (XmlException e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllPcdDeclarationsFromWorkspace", e.getMessage());
             } catch (Exception e) {
-                // TODO Auto-generated catch block
+                Log.err("getAllPcdDeclarationsFromWorkspace", e.getMessage());
             }
         }
         Sort.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
@@ -722,11 +713,11 @@ public class WorkspaceTools {
                         return vPackageList.elementAt(indexI);
                     }
                 } catch (IOException e) {
-
+                    Log.err("getPackageIdByModuleId " + id.getPath(), e.getMessage());
                 } catch (XmlException e) {
-
+                    Log.err("getPackageIdByModuleId " + id.getPath(), e.getMessage());
                 } catch (Exception e) {
-
+                    Log.err("getPackageIdByModuleId " + id.getPath(), e.getMessage());
                 }
             }
         }

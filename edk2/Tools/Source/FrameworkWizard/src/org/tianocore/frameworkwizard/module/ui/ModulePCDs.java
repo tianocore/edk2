@@ -345,7 +345,7 @@ public class ModulePCDs extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update PcdCoded", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -408,7 +408,8 @@ public class ModulePCDs extends IInternalFrame {
             this.msa.setPcdCoded(pcds);
             this.omt.setSaved(false);
         } catch (Exception e) {
-            Log.err("Update Hobs", e.getMessage());
+            Log.wrn("Update PcdCoded", e.getMessage());
+            Log.err("Update PcdCoded", e.getMessage());
         }
     }
 

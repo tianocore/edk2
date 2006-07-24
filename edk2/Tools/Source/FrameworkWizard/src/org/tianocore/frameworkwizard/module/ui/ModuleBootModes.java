@@ -346,7 +346,7 @@ public class ModuleBootModes extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Boot Modes", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -403,6 +403,7 @@ public class ModuleBootModes extends IInternalFrame {
             this.msa.setBootModes(bootModes);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update Boot Modes", e.getMessage());
             Log.err("Update Boot Modes", e.getMessage());
         }
     }

@@ -34,6 +34,11 @@ public class Log {
     private static File fleLogFile = null;
 
     //
+    //Wrn file
+    //
+    private static File fleWrnFile = null;
+
+    //
     //Err file
     //
     private static File fleErrFile = null;
@@ -42,6 +47,11 @@ public class Log {
     //Log file name
     //
     static String strLogFileName = "Log.log";
+
+    //
+    //Wrn file name
+    //
+    static String strWrnFileName = "Wrn.log";
 
     //
     //Err file name
@@ -56,20 +66,16 @@ public class Log {
      **/
     public static void main(String[] args) {
         try {
-            Log.log("Test", "test");
-            Log.err("Test1", "test1");
-            Log.err("sdfsdfsd fsdfsdfsdfsdfj dsfksdjflsdjf sdkfjsdklfjsdkf dskfsjdkfjks dskfjsdklfjsdkf sdkfjsdlf sdkfjsdk kdfjskdf sdkfjsdkf ksdjfksdfjskdf sdkfsjdfksd fskdfjsdf", "dfsdf sdfksdf sd sdfksd fsdf");
+            //Log.log("Test", "test");
+            //Log.err("Test1", "test1");
+            Log.wrn("1");
+            Log
+               .wrn(
+                    "aaa bbbbbb cccccccccccc ddddddddddd eeeeeeeeee fffffffffff gggggggggggggggggg hhhhhhhhhhhhhhhhhhhhhhhhhhhhh",
+                    "iiiiii jjjj kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk lll mmm nn poooooooooooooooooooooooooooooooooooooooooooop");
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     This is the default constructor
-     Do nothing
-     
-     **/
-    public Log() {
     }
 
     /**
@@ -102,6 +108,37 @@ public class Log {
     }
 
     /**
+     Call writeToWrnFile to save wrn item and wrn information to wrn file
+     
+     @param strItem The wrn item
+     @param strLog The wrn information
+     
+     **/
+    public static void wrn(String strItem, String strWrn) {
+        try {
+            writeToWrnFile("Warning when " + strItem + "::" + strWrn);
+            showWrnMessage(strWrn);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     Call writeToWrnFile to save wrn information to wrn file
+     
+     @param strLog The wrn information
+     
+     **/
+    public static void wrn(String strWrn) {
+        try {
+            writeToWrnFile("Warning::" + strWrn);
+            showWrnMessage("Warning::" + strWrn);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      Call writeToErrFile to save err item and err information to err file
      
      @param strItem The err item
@@ -111,7 +148,6 @@ public class Log {
     public static void err(String strItem, String strErr) {
         try {
             writeToErrFile("Error when " + strItem + "::" + strErr);
-            showErrMessage("Error when " + strItem + "::" + strErr);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -126,7 +162,6 @@ public class Log {
     public static void err(String strErr) {
         try {
             writeToErrFile("Error::" + strErr);
-            showErrMessage("Error::" + strErr);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -139,22 +174,9 @@ public class Log {
      @param strErr The input data of err message
      
      **/
-    private static void showErrMessage(String strErr) {
-        int intMaxLength = 40;
-        String strReturn = "";
-        String strTemp = "";
-        while (strErr.length() > 0) {
-            if (strErr.length() > intMaxLength) {
-                strTemp = strErr.substring(0, intMaxLength);
-                strErr = strErr.substring(strTemp.length());
-                strReturn = strReturn + strTemp + DataType.UNIX_LINE_SEPARATOR;
-                
-            } else if (strErr.length() <= intMaxLength) {
-                strReturn = strReturn + strErr;
-                strErr = "";
-            }
-        }
-        JOptionPane.showConfirmDialog(null, strReturn, "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+    private static void showWrnMessage(String strErr) {
+        String strReturn = Tools.wrapStringByWord(strErr);
+        JOptionPane.showConfirmDialog(null, strReturn, "Warning", JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -171,6 +193,31 @@ public class Log {
                 fleLogFile.createNewFile();
             }
             FileOutputStream fos = new FileOutputStream(fleLogFile, true);
+            fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
+            fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
+            fos.flush();
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     Open wrn file and write wrn information
+     
+     @param strLog The log information
+     @throws IOException
+     
+     **/
+    private static void writeToWrnFile(String strLog) throws IOException {
+        try {
+            if (fleWrnFile == null) {
+                fleWrnFile = new File(strWrnFileName);
+                fleWrnFile.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(fleWrnFile, true);
             fos.write((Tools.getCurrentDateTime() + DataType.DOS_LINE_SEPARATOR).getBytes());
             fos.write((strLog + DataType.DOS_LINE_SEPARATOR).getBytes());
             fos.flush();

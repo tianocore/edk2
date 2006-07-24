@@ -403,11 +403,11 @@ public class SourceFilesDlg extends IDialog {
         // Check Filename
         //
         if (isEmpty(this.jTextFieldFileName.getText())) {
-            Log.err("File Name couldn't be empty");
+            Log.wrn("Update Source Files", "File Name couldn't be empty");
             return false;
         }
         if (!DataValidation.isFilename(this.jTextFieldFileName.getText())) {
-            Log.err("Incorrect data type for File Name");
+            Log.wrn("Update Source Files", "Incorrect data type for File Name");
             return false;
         }
 
@@ -416,7 +416,7 @@ public class SourceFilesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldTagName.getText())) {
             if (!DataValidation.isTagName(this.jTextFieldTagName.getText())) {
-                Log.err("Incorrect data type for Tag Name");
+                Log.wrn("Update Source Files", "Incorrect data type for Tag Name");
                 return false;
             }
         }
@@ -426,7 +426,7 @@ public class SourceFilesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldToolCode.getText())) {
             if (!DataValidation.isToolCode(this.jTextFieldToolCode.getText())) {
-                Log.err("Incorrect data type for Tool Code");
+                Log.wrn("Update Source Files", "Incorrect data type for Tool Code");
                 return false;
             }
         }
@@ -436,7 +436,7 @@ public class SourceFilesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldToolChainFamily.getText())) {
             if (!DataValidation.isToolChainFamily(this.jTextFieldToolChainFamily.getText())) {
-                Log.err("Incorrect data type for Tool Chain Family");
+                Log.wrn("Update Source Files", "Incorrect data type for Tool Chain Family");
                 return false;
             }
         }
@@ -446,7 +446,7 @@ public class SourceFilesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Source Files", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

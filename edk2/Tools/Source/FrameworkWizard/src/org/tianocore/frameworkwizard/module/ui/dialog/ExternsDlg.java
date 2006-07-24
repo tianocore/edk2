@@ -338,19 +338,19 @@ public class ExternsDlg extends IDialog implements ItemListener {
             // Check CName 
             //
             if (isEmpty(this.jTextFieldC_Name.getText())) {
-                Log.err("Value couldn't be empty");
+                Log.wrn("Update Externs", "Value couldn't be empty");
                 return false;
             }
 
             if (!isEmpty(this.jTextFieldC_Name.getText())) {
                 if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
                     if (!DataValidation.isSentence(this.jTextFieldC_Name.getText())) {
-                        Log.err("Incorrect data type for Specification");
+                        Log.wrn("Update Externs", "Incorrect data type for Specification");
                         return false;
                     }
                 } else {
                     if (!DataValidation.isC_NameType(this.jTextFieldC_Name.getText())) {
-                        Log.err("Incorrect data type for C_Name");
+                        Log.wrn("Update Externs", "Incorrect data type for C_Name");
                         return false;
                     }
                 }
@@ -361,13 +361,13 @@ public class ExternsDlg extends IDialog implements ItemListener {
             //
             if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
                 if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                    Log.err("Incorrect data type for Feature Flag");
+                    Log.wrn("Update Externs", "Incorrect data type for Feature Flag");
                     return false;
                 }
             }
         } else {
             if (this.jComboBoxPcdIsDriver.getSelectedItem().toString().equals(DataType.EMPTY_SELECT_ITEM)) {
-                Log.err("You must select one PCD DRIVER type");
+                Log.wrn("Update Externs", "You must select one PCD DRIVER type");
                 return false;
             }
         }

@@ -366,7 +366,7 @@ public class ModuleProtocols extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Protocols", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -446,7 +446,7 @@ public class ModuleProtocols extends IInternalFrame {
             this.msa.setProtocols(protocols);
             this.omt.setSaved(false);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.wrn("Update Protocols", e.getMessage());
             Log.err("Update Protocols", e.getMessage());
         }
     }

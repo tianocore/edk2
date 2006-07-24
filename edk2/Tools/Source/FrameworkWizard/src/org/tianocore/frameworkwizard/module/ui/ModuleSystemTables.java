@@ -343,7 +343,7 @@ public class ModuleSystemTables extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update System Tables", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -400,6 +400,7 @@ public class ModuleSystemTables extends IInternalFrame {
             this.msa.setSystemTables(systemTables);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update System Tables", e.getMessage());
             Log.err("Update System Tables", e.getMessage());
         }
     }

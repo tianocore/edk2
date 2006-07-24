@@ -336,4 +336,75 @@ public class Tools {
         }
         return arg0;
     }
+
+    /**
+     Wrap single line long input string to multiple short line string by word
+     
+     @param arg0 input string
+     @return wraped string
+     
+     **/
+    public static String wrapStringByWord(String arg0) {
+        int intMaxLength = 40;
+        String strReturn = "";
+        String strTemp = "";
+        boolean isCopied = true;
+
+        //
+        // Convert string to array by " "
+        //
+        String s[] = arg0.split(" ");
+        if (arg0.indexOf(" ") == -1) {
+            s[0] = arg0;
+        }
+
+        //
+        // Add each string of array one by one
+        //
+        for (int index = 0; index < s.length; index++) {
+            String ss = s[index];
+            isCopied = false;
+            //
+            // The word length > defined line length
+            //
+            if (ss.length() > intMaxLength) {
+                //
+                // Finish previous line
+                //
+                if (!isCopied) {
+                    strReturn = strReturn + strTemp + DataType.UNIX_LINE_SEPARATOR;
+                    strTemp = "";
+                }
+                //
+                // Separater to short lines
+                //
+                while (ss.length() > 0) {
+                    if (ss.length() > intMaxLength) {
+                        strReturn = strReturn + s[index].substring(0, intMaxLength - 1) + DataType.UNIX_LINE_SEPARATOR;
+                        ss = ss.substring(intMaxLength);
+                        isCopied = true;
+                    } else {
+                        strTemp = ss;
+                        ss = "";
+                        isCopied = false;
+                    }
+                }
+            } else {
+                if ((strTemp + " " + ss).length() <= intMaxLength) {
+                    strTemp = strTemp + " " + ss;
+                    continue;
+                } else {
+                    strReturn = strReturn + strTemp + DataType.UNIX_LINE_SEPARATOR;
+                    strTemp = ss + " ";
+                    isCopied = true;
+                }
+            }
+        }
+
+        if (!isCopied) {
+            strReturn = strReturn + strTemp;
+        }
+
+        return strReturn;
+    }
 }

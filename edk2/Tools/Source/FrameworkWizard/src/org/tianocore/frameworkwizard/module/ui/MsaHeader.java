@@ -695,12 +695,12 @@ public class MsaHeader extends IInternalFrame {
         // Check Base Name
         //
         if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.err("Base Name couldn't be empty");
+            Log.wrn("Update Msa Header", "Base Name couldn't be empty");
             //this.jTextFieldBaseName.requestFocus();
             return false;
         }
         if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.err("Incorrect data type for Base Name");
+            Log.wrn("Update Msa Header", "Incorrect data type for Base Name");
             //this.jTextFieldBaseName.requestFocus();
             return false;
         }
@@ -709,12 +709,12 @@ public class MsaHeader extends IInternalFrame {
         // Check Guid
         //
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.err("Guid Value couldn't be empty");
+            Log.wrn("Update Msa Header", "Guid Value couldn't be empty");
             //this.jTextFieldGuid.requestFocus();
             return false;
         }
         if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-            Log.err("Incorrect data type for Guid");
+            Log.wrn("Update Msa Header", "Incorrect data type for Guid");
             //this.jTextFieldGuid.requestFocus();
             return false;
         }
@@ -723,12 +723,12 @@ public class MsaHeader extends IInternalFrame {
         // Check Version
         //
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.err("Version couldn't be empty");
+            Log.wrn("Update Msa Header", "Version couldn't be empty");
             //this.jTextFieldVersion.requestFocus();
             return false;
         }
         if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
-            Log.err("Incorrect data type for Version");
+            Log.wrn("Update Msa Header", "Incorrect data type for Version");
             //this.jTextFieldVersion.requestFocus();
             return false;
         }
@@ -737,12 +737,12 @@ public class MsaHeader extends IInternalFrame {
         // Check Abstact
         //
         if (isEmpty(this.jTextFieldAbstract.getText())) {
-            Log.err("Abstract couldn't be empty");
+            Log.wrn("Update Msa Header", "Abstract couldn't be empty");
             //this.jTextFieldAbstract.requestFocus();
             return false;
         }
         if (!DataValidation.isAbstract(this.jTextFieldAbstract.getText())) {
-            Log.err("Incorrect data type for Abstract");
+            Log.wrn("Update Msa Header", "Incorrect data type for Abstract");
             //this.jTextFieldAbstract.requestFocus();
             return false;
         }
@@ -751,7 +751,7 @@ public class MsaHeader extends IInternalFrame {
         // Check Description
         //
         if (isEmpty(this.jTextAreaDescription.getText())) {
-            Log.err("Description couldn't be empty");
+            Log.wrn("Update Msa Header", "Description couldn't be empty");
             //this.jTextAreaDescription.requestFocus();
             return false;
         }
@@ -760,7 +760,7 @@ public class MsaHeader extends IInternalFrame {
         // Check Copyright
         //
         if (isEmpty(this.jTextFieldCopyright.getText())) {
-            Log.err("Copyright couldn't be empty");
+            Log.wrn("Update Msa Header", "Copyright couldn't be empty");
             //this.jTextFieldCopyright.requestFocus();
             return false;
         }
@@ -769,7 +769,7 @@ public class MsaHeader extends IInternalFrame {
         // Check License
         //
         if (isEmpty(this.jTextAreaLicense.getText())) {
-            Log.err("License couldn't be empty");
+            Log.wrn("Update Msa Header", "License couldn't be empty");
             //this.jTextAreaLicense.requestFocus();
             return false;
         }
@@ -778,12 +778,12 @@ public class MsaHeader extends IInternalFrame {
         // Check Specification
         //
         if (isEmpty(this.jTextFieldSpecification.getText())) {
-            Log.err("Specification couldn't be empty");
+            Log.wrn("Update Msa Header", "Specification couldn't be empty");
             //this.jTextFieldSpecification.requestFocus();
             return false;
         }
         if (!DataValidation.isSpecification(this.jTextFieldSpecification.getText())) {
-            Log.err("Incorrect data type for Specification");
+            Log.wrn("Update Msa Header", "Incorrect data type for Specification");
             //this.jTextFieldSpecification.requestFocus();
             return false;
         }
@@ -823,6 +823,7 @@ public class MsaHeader extends IInternalFrame {
             msa.setMsaHeader(msaHeader);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Save Module", e.getMessage());
             Log.err("Save Module", e.getMessage());
         }
     }
@@ -889,12 +890,12 @@ public class MsaHeader extends IInternalFrame {
         //
         if (arg0.getSource() == this.jTextFieldBaseName) {
             if (isEmpty(this.jTextFieldBaseName.getText())) {
-                Log.err("Base Name couldn't be empty");
+                Log.wrn("Update Msa Header", "Base Name couldn't be empty");
                 //this.jTextFieldBaseName.requestFocus();
                 return;
             }
             if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-                Log.err("Incorrect data type for Base Name");
+                Log.wrn("Update Msa Header", "Incorrect data type for Base Name");
                 //this.jTextFieldBaseName.requestFocus();
                 return;
             }
@@ -921,12 +922,12 @@ public class MsaHeader extends IInternalFrame {
         //
         if (arg0.getSource() == this.jTextFieldGuid) {
             if (isEmpty(this.jTextFieldGuid.getText())) {
-                Log.err("Guid Value couldn't be empty");
+                Log.wrn("Update Msa Header", "Guid Value couldn't be empty");
                 //this.jTextFieldGuid.requestFocus();
                 return;
             }
             if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-                Log.err("Incorrect data type for Guid");
+                Log.wrn("Update Msa Header", "Incorrect data type for Guid");
                 //this.jTextFieldGuid.requestFocus();
                 return;
             }
@@ -942,12 +943,12 @@ public class MsaHeader extends IInternalFrame {
         //
         if (arg0.getSource() == this.jTextFieldVersion) {
             if (isEmpty(this.jTextFieldVersion.getText())) {
-                Log.err("Version couldn't be empty");
+                Log.wrn("Update Msa Header", "Version couldn't be empty");
                 //this.jTextFieldVersion.requestFocus();
                 return;
             }
             if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
-                Log.err("Incorrect data type for Version");
+                Log.wrn("Update Msa Header", "Incorrect data type for Version");
                 //this.jTextFieldVersion.requestFocus();
                 return;
             }
@@ -963,12 +964,12 @@ public class MsaHeader extends IInternalFrame {
         //
         if (arg0.getSource() == this.jTextFieldAbstract) {
             if (isEmpty(this.jTextFieldAbstract.getText())) {
-                Log.err("Abstract couldn't be empty");
+                Log.wrn("Update Msa Header", "Abstract couldn't be empty");
                 //this.jTextFieldAbstract.requestFocus();
                 return;
             }
             if (!DataValidation.isAbstract(this.jTextFieldAbstract.getText())) {
-                Log.err("Incorrect data type for Abstract");
+                Log.wrn("Update Msa Header", "Incorrect data type for Abstract");
                 //this.jTextFieldAbstract.requestFocus();
                 return;
             }
@@ -984,7 +985,7 @@ public class MsaHeader extends IInternalFrame {
         //
         if (arg0.getSource() == this.jTextAreaDescription) {
             if (isEmpty(this.jTextAreaDescription.getText())) {
-                Log.err("Description couldn't be empty");
+                Log.wrn("Update Msa Header", "Description couldn't be empty");
                 //this.jTextAreaDescription.requestFocus();
                 return;
             }
@@ -1000,7 +1001,7 @@ public class MsaHeader extends IInternalFrame {
         //
         if (arg0.getSource() == this.jTextFieldCopyright) {
             if (isEmpty(this.jTextFieldCopyright.getText())) {
-                Log.err("Copyright couldn't be empty");
+                Log.wrn("Update Msa Header", "Copyright couldn't be empty");
                 //this.jTextFieldCopyright.requestFocus();
                 return;
             }
@@ -1016,7 +1017,7 @@ public class MsaHeader extends IInternalFrame {
         //
         if (arg0.getSource() == this.jTextAreaLicense) {
             if (isEmpty(this.jTextAreaLicense.getText())) {
-                Log.err("License couldn't be empty");
+                Log.wrn("Update Msa Header", "License couldn't be empty");
                 //this.jTextAreaLicense.requestFocus();
                 return;
             }

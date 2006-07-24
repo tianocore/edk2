@@ -362,7 +362,7 @@ public class SystemTablesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update System Tables", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

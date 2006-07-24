@@ -336,7 +336,8 @@ public class Clone extends IDialog {
             this.jTextFieldSource.setText(Tools.convertPathToCurrentOsType(s));
             initExistingPackage();
             this.jButtonBrowse.setVisible(false);
-            this.jTextFieldFilePath.setToolTipText("Input module name here. For example, Application\\HelloWorld\\HelloWorld.msa");
+            this.jTextFieldFilePath
+                                   .setToolTipText("Input module name here. For example, Application\\HelloWorld\\HelloWorld.msa");
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Module Path and Filename");
         }
@@ -357,7 +358,8 @@ public class Clone extends IDialog {
             this.jTextFieldSource.setText(oldId.getPath());
             this.jLabelBelong.setEnabled(false);
             this.jComboBoxExistingPackage.setEnabled(false);
-            this.jTextFieldFilePath.setToolTipText("Select platform path here. For example, C:\\MyWorkspace\\EdkNt32Pkg\\Nt32.fpd");
+            this.jTextFieldFilePath
+                                   .setToolTipText("Select platform path here. For example, C:\\MyWorkspace\\EdkNt32Pkg\\Nt32.fpd");
             this.jLabelDestinationFile.setText("New Platform Path and Filename");
         }
         if (mode == DataType.RETURN_TYPE_WORKSPACE) {
@@ -446,16 +448,16 @@ public class Clone extends IDialog {
                 try {
                     this.save();
                 } catch (IOException e) {
+                    Log.wrn("Clone", e.getMessage());
                     Log.err("Clone", e.getMessage());
-                    e.printStackTrace();
                     return;
                 } catch (XmlException e) {
+                    Log.wrn("Clone", e.getMessage());
                     Log.err("Clone", e.getMessage());
-                    e.printStackTrace();
                     return;
                 } catch (Exception e) {
+                    Log.wrn("Clone", e.getMessage());
                     Log.err("Clone", e.getMessage());
-                    e.printStackTrace();
                     return;
                 }
             } else {
@@ -507,11 +509,11 @@ public class Clone extends IDialog {
         // Check Basename
         //
         if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.err("Base Name couldn't be empty!");
+            Log.wrn("Clone", "Base Name couldn't be empty!");
             return false;
         }
         if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.err("Incorrect data type for Base Name");
+            Log.wrn("Clone", "Incorrect data type for Base Name");
             return false;
         }
 
@@ -519,11 +521,11 @@ public class Clone extends IDialog {
         // Check Guid
         //
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.err("Guid couldn't be empty!");
+            Log.wrn("Clone", "Guid couldn't be empty!");
             return false;
         }
         if (!DataValidation.isGuid(this.jTextFieldGuid.getText())) {
-            Log.err("Incorrect data type for Guid");
+            Log.wrn("Clone", "Incorrect data type for Guid");
             return false;
         }
 
@@ -531,11 +533,11 @@ public class Clone extends IDialog {
         // Check Version
         //
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.err("Version couldn't be empty!");
+            Log.wrn("Clone", "Version couldn't be empty!");
             return false;
         }
         if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
-            Log.err("Incorrect data type for Version");
+            Log.wrn("Clone", "Incorrect data type for Version");
             return false;
         }
 
@@ -566,19 +568,19 @@ public class Clone extends IDialog {
         // Common Check
         //
         if (!srcFile.exists()) {
-            Log.err("The source doesn't exist");
+            Log.wrn("Clone", "The source doesn't exist");
             return false;
         }
         if (isEmpty(trg)) {
-            Log.err("The destination file path couldn't be empty");
+            Log.wrn("Clone", "The destination file path couldn't be empty");
             return false;
         }
         if (src.equals(trg)) {
-            Log.err("The source and destination couldn't be same");
+            Log.wrn("Clone", "The source and destination couldn't be same");
             return false;
         }
         if (trgFile.exists()) {
-            Log.err("The destination already exists");
+            Log.wrn("Clone", "The destination already exists");
             return false;
         }
 
@@ -587,7 +589,7 @@ public class Clone extends IDialog {
         //
         if (mode == DataType.RETURN_TYPE_WORKSPACE) {
             if (trg.indexOf(src + DataType.FILE_SEPARATOR) == 0) {
-                Log.err("The new workspace couldn't be in current workspace!");
+                Log.wrn("Clone", "The new workspace couldn't be in current workspace!");
                 return false;
             }
         }
@@ -596,18 +598,18 @@ public class Clone extends IDialog {
         // Check for Module
         //
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
-//            if (trg.indexOf(DataType.DOS_FILE_SEPARATOR) == -1 && trg.indexOf(DataType.UNIX_FILE_SEPARATOR) == -1) {
-//                Log.err("The module name must include a path");
-//                return false;
-//            }
+            //            if (trg.indexOf(DataType.DOS_FILE_SEPARATOR) == -1 && trg.indexOf(DataType.UNIX_FILE_SEPARATOR) == -1) {
+            //                Log.err("The module name must include a path");
+            //                return false;
+            //            }
             trg = this.getModulePath();
             if (src.equals(trg)) {
-                Log.err("The source and destination couldn't be same");
+                Log.wrn("Clone", "The source and destination couldn't be same");
                 return false;
             }
             trgFile = new File(trg);
             if (trgFile.exists()) {
-                Log.err("The target module already exists");
+                Log.wrn("Clone", "The target module already exists");
                 return false;
             }
             return checkId();
@@ -618,17 +620,17 @@ public class Clone extends IDialog {
         //
         if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
             if (trg.indexOf(DataType.DOS_FILE_SEPARATOR) == -1 && trg.indexOf(DataType.UNIX_FILE_SEPARATOR) == -1) {
-                Log.err("The package name must include a path");
+                Log.wrn("Clone", "The package name must include a path");
                 return false;
             }
             trg = this.getPackagePath();
             if (Tools.getFilePathOnly(src).equals(Tools.getFilePathOnly(trg))) {
-                Log.err("The source and destination couldn't be same");
+                Log.wrn("Clone", "The source and destination couldn't be same");
                 return false;
             }
             trgFile = new File(trg);
             if (trgFile.exists()) {
-                Log.err("The target package already exists");
+                Log.wrn("Clone", "The target package already exists");
                 return false;
             }
             return checkId();
@@ -639,12 +641,12 @@ public class Clone extends IDialog {
         //
         if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
             if (trg.indexOf(Workspace.getCurrentWorkspace()) != 0) {
-                Log.err("The target platform must be in current workspace");
+                Log.wrn("Clone", "The target platform must be in current workspace");
                 return false;
             }
             trgFile = new File(trg);
             if (trgFile.exists()) {
-                Log.err("The target platform already exists");
+                Log.wrn("Clone", "The target platform already exists");
                 return false;
             }
             return checkId();
@@ -657,18 +659,12 @@ public class Clone extends IDialog {
         String src = this.oldId.getPath();
         String trg = this.jTextFieldFilePath.getText();
         Vector<String> vFiles = new Vector<String>();
-        
+
         //
         // Clone Workspace
         //
         if (mode == DataType.RETURN_TYPE_WORKSPACE) {
-            try {
-                FileOperation.copyFolder(src, trg);
-            } catch (Exception e) {
-                this.returnType = DataType.RETURN_TYPE_CANCEL;
-                Log.err("Clone Workspace", e.getMessage());
-                e.printStackTrace();
-            }
+            FileOperation.copyFolder(src, trg);
             this.returnType = DataType.RETURN_TYPE_WORKSPACE;
         }
 
@@ -682,7 +678,7 @@ public class Clone extends IDialog {
             trg = getModulePath();
             newId.setPath(trg);
             vFiles = wt.getAllModuleFilesPath(src);
-            
+
             //
             // First copy all files to new directory
             //
@@ -710,7 +706,7 @@ public class Clone extends IDialog {
             // Update Cloned From element
             //
             updateModuleClonedId(msa, oldId);
-            
+
             //
             // Save to file
             //
@@ -719,14 +715,15 @@ public class Clone extends IDialog {
             //
             // Update to platformId
             //
-            this.setMid(new ModuleIdentification(newId, packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex())));
+            this.setMid(new ModuleIdentification(newId,
+                                                 packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex())));
 
             //
             // Open belonging package
             //
             PackageSurfaceArea psa = PackageSurfaceArea.Factory.newInstance();
             psa = OpenFile.openSpdFile(mid.getPackageId().getPath());
-            
+
             //
             // Update the db file
             //
@@ -745,14 +742,14 @@ public class Clone extends IDialog {
             trg = this.getPackagePath();
             newId.setPath(trg);
             vFiles = wt.getAllPakcageFilesPath(src);
-            
+
             FileOperation.copyFile(src, trg);
             for (int index = 1; index < vFiles.size(); index++) {
                 String oldFile = vFiles.get(index);
                 String newFile = vFiles.get(index).replace(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
                 FileOperation.copyFile(oldFile, newFile);
             }
-            
+
             //
             // First copy all files to new directory
             //
@@ -780,7 +777,7 @@ public class Clone extends IDialog {
             // Update Cloned From element
             //
             updatePackageClonedId(spd, oldId);
-            
+
             //
             // Save to file
             //
@@ -837,7 +834,7 @@ public class Clone extends IDialog {
         }
         vFiles = null;
     }
-    
+
     private String getSelectPackagePath() {
         return Tools.getFilePathOnly(packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getPath());
     }
@@ -849,7 +846,7 @@ public class Clone extends IDialog {
         Tools.convertPathToCurrentOsType(trg);
         return trg;
     }
-    
+
     private String getPackagePath() {
         String trg = this.jTextFieldFilePath.getText();
         trg = Tools.addPathExt(trg, mode);
@@ -857,7 +854,7 @@ public class Clone extends IDialog {
         trg = Tools.convertPathToCurrentOsType(trg);
         return trg;
     }
-    
+
     /**
      Set target item's Cloned From element
 
@@ -906,7 +903,7 @@ public class Clone extends IDialog {
         c.setId(count.add(new BigInteger("1")));
         String guid = wt.getModuleFarGuid(oldId);
         if (guid != null && !guid.equals("")) {
-            c.setFarGuid(guid);    
+            c.setFarGuid(guid);
         }
 
         cf.addNewCloned();
@@ -962,7 +959,7 @@ public class Clone extends IDialog {
         c.setId(count.add(new BigInteger("1")));
         String guid = wt.getModuleFarGuid(oldId);
         if (guid != null && !guid.equals("")) {
-            c.setFarGuid(guid);    
+            c.setFarGuid(guid);
         }
 
         cf.addNewCloned();
@@ -1018,9 +1015,9 @@ public class Clone extends IDialog {
         c.setId(count.add(new BigInteger("1")));
         String guid = wt.getModuleFarGuid(oldId);
         if (guid != null && !guid.equals("")) {
-            c.setFarGuid(guid);    
+            c.setFarGuid(guid);
         }
-        
+
         cf.addNewCloned();
         cf.setClonedArray(cf.getClonedList().size() - 1, c);
         pd.addNewClonedFrom();

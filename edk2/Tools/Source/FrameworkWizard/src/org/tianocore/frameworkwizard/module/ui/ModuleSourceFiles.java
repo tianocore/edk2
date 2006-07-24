@@ -342,6 +342,7 @@ public class ModuleSourceFiles extends IInternalFrame {
             this.msa.setSourceFiles(sourceFiles);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update Source Files", e.getMessage());
             Log.err("Update Source Files", e.getMessage());
         }
     }
@@ -378,7 +379,7 @@ public class ModuleSourceFiles extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Source Files", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);

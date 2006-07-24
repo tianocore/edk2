@@ -241,7 +241,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
             //
             farFile = new File(jTextFieldFarFile.getText());
             if (!farFile.exists() || !farFile.isFile()) {
-                Log.err("Please choose a FAR file already exists. ");
+                Log.wrn("Update far", "Please choose a FAR file already exists. ");
                 return;
             }
 
@@ -252,14 +252,15 @@ public class UpdateStepOne extends IDialog implements MouseListener {
                 JarFile file = new JarFile(farFile);
                 this.far = new Far(file);
             } catch (Exception ex) {
-                Log.err(ex.getMessage());
+                Log.wrn("Update far", ex.getMessage());
+                Log.err("Update far", ex.getMessage());
             }
 
             //
             // Add more logic process here
             //
             if (jListFarFromDb.getSelectedValue() == null) {
-                Log.err("Please choose a FAR from framework database. ");
+                Log.wrn("Update far", "Please choose a FAR from framework database. ");
                 return;
             }
 

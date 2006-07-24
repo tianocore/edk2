@@ -182,11 +182,11 @@ public class SwitchWorkspace extends IDialog {
 
     private boolean check() {
         if (isEmpty(this.jTextFieldNew.getText())) {
-            Log.err("New workspace can't be empty!");
+            Log.wrn("Switch Workspace", "New workspace can't be empty!");
             return false;
         }
         if (!Workspace.checkWorkspace(this.jTextFieldNew.getText())) {
-            Log.err("Please select a valid workspace!");
+            Log.wrn("Switch Workspace", "Please select a valid workspace!");
             return false;
         }
         return true;

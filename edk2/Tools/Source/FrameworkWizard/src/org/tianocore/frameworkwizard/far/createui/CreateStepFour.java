@@ -236,7 +236,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
             // Guid Check, File Check etc.
             //
             if (this.jTextFieldSaveToFile.getText() == null) {
-                Log.err("Please input the Far name!");
+                Log.wrn("Create far", "Please input the Far name!");
             }
             try {
                 //
@@ -250,7 +250,8 @@ public class CreateStepFour extends IDialog implements MouseListener {
                                                                                                   .getFileFilter(),
                              this.getPreviousStep().getPreviousStep().getPreviousStep().getFarHeader());
             } catch (Exception exp) {
-                Log.err("Create error! ");
+                Log.wrn("Create far", exp.getMessage());
+                Log.err("Create far", exp.getMessage());
                 return;
             }
             getPreviousStep().getPreviousStep().getPreviousStep().returnType = DataType.RETURN_TYPE_OK;

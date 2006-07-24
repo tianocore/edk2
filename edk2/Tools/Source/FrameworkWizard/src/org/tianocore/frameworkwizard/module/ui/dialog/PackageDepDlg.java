@@ -386,7 +386,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jTextFieldPackageVersion.getText())) {
             if (!DataValidation.isVersion(this.jTextFieldPackageVersion.getText())) {
-                Log.err("Incorrect data type for Package Version");
+                Log.wrn("Update Package Dependencies", "Incorrect data type for Package Version");
                 return false;
             }
         }
@@ -396,7 +396,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Package Dependencies", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

@@ -262,7 +262,7 @@ public class InstallStepOne extends IDialog implements MouseListener {
             //
             File farFile = new File(jTextFieldFarFile.getText());
             if (!farFile.exists() || !farFile.isFile()) {
-                Log.err("Please choose a FAR file already exists. ");
+                Log.wrn("Install far", "Please choose a FAR file already exists. ");
                 return;
             }
 
@@ -288,8 +288,8 @@ public class InstallStepOne extends IDialog implements MouseListener {
                 }
 
             } catch (Exception exp) {
-                exp.printStackTrace();
-                Log.err("Far file invaild! The error message as follow:" + exp.getMessage());
+                Log.wrn("Install far" + exp.getMessage());
+                Log.err("Install far" + exp.getMessage());
             }
 
             if (stepTwo == null) {

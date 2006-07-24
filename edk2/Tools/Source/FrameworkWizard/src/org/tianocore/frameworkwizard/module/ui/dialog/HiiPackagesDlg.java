@@ -360,13 +360,13 @@ public class HiiPackagesDlg extends IDialog {
         // Check Hii Package Name 
         //
         if (isEmpty(this.jTextFieldName.getText())) {
-            Log.err("Hii Package Name Record couldn't be empty");
+            Log.wrn("Update Hii Packages", "Hii Package Name Record couldn't be empty");
             return false;
         }
 
         if (!isEmpty(this.jTextFieldName.getText())) {
             if (!DataValidation.isC_NameType(this.jTextFieldName.getText())) {
-                Log.err("Incorrect data type for Hii Package Name");
+                Log.wrn("Update Hii Packages", "Incorrect data type for Hii Package Name");
                 return false;
             }
         }
@@ -376,7 +376,7 @@ public class HiiPackagesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Hii Packages", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

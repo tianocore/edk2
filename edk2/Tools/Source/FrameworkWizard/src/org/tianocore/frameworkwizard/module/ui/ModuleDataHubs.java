@@ -343,7 +343,7 @@ public class ModuleDataHubs extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Data Hubs", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -400,6 +400,7 @@ public class ModuleDataHubs extends IInternalFrame {
             this.msa.setDataHubs(dataHubs);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update Data Hubs", e.getMessage());
             Log.err("Update Data Hubs", e.getMessage());
         }
     }
