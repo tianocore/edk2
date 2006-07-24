@@ -245,18 +245,13 @@ Returns:
 
 --*/
 {
-  PEI_FLASH_MAP_PPI       *FlashMapPpi;
-  EFI_FLASH_SUBAREA_ENTRY *VariableStoreEntry;
-  UINT32                  NumEntries;
   EFI_HOB_GUID_TYPE       *GuidHob;
   VARIABLE_STORE_HEADER   *VariableStoreHeader;
   VARIABLE_HEADER         *Variable;
-
-  EFI_STATUS              Status;
-
   VARIABLE_HEADER         *MaxIndex;
   VARIABLE_INDEX_TABLE    *IndexTable;
   UINT32                  Count;
+  UINT8                   *VariableBase;
 
   if (VariableName != 0 && VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -305,39 +300,10 @@ Returns:
     if (IndexTable->StartPtr || IndexTable->EndPtr) {
       Variable = IndexTable->StartPtr;
     } else {
-      //
-      // Locate FlashMap PPI
-      //
-      Status = (**PeiServices).LocatePpi (
-                                PeiServices,
-                                &gPeiFlashMapPpiGuid,
-                                0,
-                                NULL,
-                                (VOID **) &FlashMapPpi
-                                );
-      ASSERT_EFI_ERROR (Status);
-
-      //
-      // Get flash area info for variables
-      //
-      Status = FlashMapPpi->GetAreaInfo (
-                              PeiServices,
-                              FlashMapPpi,
-                              EFI_FLASH_AREA_EFI_VARIABLES,
-                              NULL,
-                              &NumEntries,
-                              &VariableStoreEntry
-                              );
-
-      //
-      //  Currently only one non-volatile variable store is supported
-      //
-      if (NumEntries != 1) {
-        return EFI_UNSUPPORTED;
-      }
-
-      VariableStoreHeader = (VARIABLE_STORE_HEADER *) (UINTN) (VariableStoreEntry->Base);
-
+      VariableBase = (UINT8 *) (UINTN) PcdGet32 (PcdFlashNvStorageVariableBase);
+      VariableStoreHeader = (VARIABLE_STORE_HEADER *) (VariableBase + \
+                            ((EFI_FIRMWARE_VOLUME_HEADER *) (VariableBase)) -> HeaderLength);
+      
       if (GetVariableStoreStatus (VariableStoreHeader) != EfiValid) {
         return EFI_UNSUPPORTED;
       }

@@ -458,6 +458,14 @@
     <IncludePkgHeader ModuleType="USER_DEFINED">Include/EdkPeim.h</IncludePkgHeader>
   </PackageHeaders>
   <GuidDeclarations>
+    <Entry Name="GenericPlatformTokenSpace">
+      <C_Name>gEfiGenericPlatformTokenSpaceGuid</C_Name>
+      <GuidValue>18D15EA6-9E14-40a1-B39C-59C44DA9D891</GuidValue>
+      <HelpText>
+        This is the token space GUID for platform generic PCD definitions.
+        Now FlashLayout and Platform CPU belong to this space.
+      </HelpText>      
+    </Entry> 
     <Entry Name="EdkModulePkgTokenSpace">
       <C_Name>gEfiEdkModulePkgTokenSpaceGuid</C_Name>
       <GuidValue>8CC4092F-F60E-46d1-B41C-1E761DF50582</GuidValue>
