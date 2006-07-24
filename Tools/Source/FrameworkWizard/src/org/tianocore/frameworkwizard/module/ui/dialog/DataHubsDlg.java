@@ -361,13 +361,13 @@ public class DataHubsDlg extends IDialog {
         // Check DataHubRecord 
         //
         if (isEmpty(this.jTextFieldDataHubRecord.getText())) {
-            Log.err("Data Hub Record couldn't be empty");
+            Log.wrn("Update Hubs", "Data Hub Record couldn't be empty");
             return false;
         }
 
         if (!isEmpty(this.jTextFieldDataHubRecord.getText())) {
             if (!DataValidation.isC_NameType(this.jTextFieldDataHubRecord.getText())) {
-                Log.err("Incorrect data type for Data Hub Record");
+                Log.wrn("Update Hubs", "Incorrect data type for Data Hub Record");
                 return false;
             }
         }
@@ -377,7 +377,7 @@ public class DataHubsDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Hubs", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

@@ -273,7 +273,7 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
                                                                                                            dbPkgList));
             Iterator resultIter = resultList.iterator();
             while (resultIter.hasNext()) {
-                Log.err("Missing dependency package " + ((PackageIdentification) resultIter.next()).toString()
+                Log.wrn("Update far", "Missing dependency package " + ((PackageIdentification) resultIter.next()).toString()
                         + "in workspace!");
                 return;
             }
@@ -322,7 +322,8 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
                 try {
                     stepOne.getFar().installPackage(pkgId, new File(pkgId.getSpdFile().getParent()));
                 } catch (Exception ex) {
-                    Log.err("Can install " + pkgId.toString() + " pakcage, please check it!");
+                    Log.wrn("Install " + pkgId.toString(), ex.getMessage());
+                    Log.err("Install " + pkgId.toString(), ex.getMessage());
                 }
 
             }

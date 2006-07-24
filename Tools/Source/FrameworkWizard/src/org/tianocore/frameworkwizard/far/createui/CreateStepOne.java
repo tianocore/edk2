@@ -482,11 +482,11 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check BaseName
         //
         if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.err("Base Name couldn't be empty");
+            Log.wrn("Create far", "Base Name couldn't be empty");
             return false;
         }
         if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.err("Incorrect data type for Base Name");
+            Log.wrn("Create far", "Incorrect data type for Base Name");
             return false;
         }
         farHeader.setFarName(this.jTextFieldBaseName.getText());
@@ -495,11 +495,11 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Guid
         //
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.err("Guid Value couldn't be empty");
+            Log.wrn("Create far", "Guid Value couldn't be empty");
             return false;
         }
         if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-            Log.err("Incorrect data type for Guid");
+            Log.wrn("Create far", "Incorrect data type for Guid");
             return false;
         }
         farHeader.setGuidValue(this.jTextFieldGuid.getText());
@@ -508,11 +508,11 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Version
         //
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.err("Version couldn't be empty");
+            Log.wrn("Create far", "Version couldn't be empty");
             return false;
         }
         if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
-            Log.err("Incorrect data type for Version");
+            Log.wrn("Create far", "Incorrect data type for Version");
             return false;
         }
         farHeader.setVersion(this.jTextFieldVersion.getText());
@@ -521,11 +521,11 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Abstact
         //
         if (isEmpty(this.jTextFieldAbstract.getText())) {
-            Log.err("Abstract couldn't be empty");
+            Log.wrn("Create far", "Abstract couldn't be empty");
             return false;
         }
         if (!DataValidation.isAbstract(this.jTextFieldAbstract.getText())) {
-            Log.err("Incorrect data type for Abstract");
+            Log.wrn("Create far", "Incorrect data type for Abstract");
             return false;
         }
         farHeader.setAbstractStr(this.jTextFieldAbstract.getText());
@@ -534,7 +534,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Description
         //
         if (isEmpty(this.jTextAreaDescription.getText())) {
-            Log.err("Description couldn't be empty");
+            Log.wrn("Create far", "Description couldn't be empty");
             return false;
         }
         farHeader.setDescription(this.jTextAreaDescription.getText());
@@ -543,7 +543,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check Copyright
         //
         if (isEmpty(this.jTextFieldCopyright.getText())) {
-            Log.err("Copyright couldn't be empty");
+            Log.wrn("Create far", "Copyright couldn't be empty");
             return false;
         }
         farHeader.setCopyright(this.jTextFieldCopyright.getText());
@@ -552,7 +552,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         // Check License
         //
         if (isEmpty(this.jTextAreaLicense.getText())) {
-            Log.err("License couldn't be empty");
+            Log.wrn("Create far", "License couldn't be empty");
             return false;
         }
         farHeader.setLicense(this.jTextAreaLicense.getText());

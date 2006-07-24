@@ -340,7 +340,7 @@ public class ModuleGuids extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Guids", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -396,6 +396,7 @@ public class ModuleGuids extends IInternalFrame {
             this.msa.setGuids(guids);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update Guids", e.getMessage());
             Log.err("Update Guids", e.getMessage());
         }
     }

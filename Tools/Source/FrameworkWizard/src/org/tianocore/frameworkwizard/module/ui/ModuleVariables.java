@@ -342,7 +342,7 @@ public class ModuleVariables extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Variables", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -402,6 +402,7 @@ public class ModuleVariables extends IInternalFrame {
             this.msa.setVariables(variables);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update Variables", e.getMessage());
             Log.err("Update Variables", e.getMessage());
         }
     }

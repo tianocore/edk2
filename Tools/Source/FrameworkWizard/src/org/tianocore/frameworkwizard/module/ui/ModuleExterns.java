@@ -410,7 +410,7 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Externs", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -546,6 +546,7 @@ public class ModuleExterns extends IInternalFrame implements ItemListener {
             this.msa.setExterns(externs);
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update Externs", e.getMessage());
             Log.err("Update Externs", e.getMessage());
         }
     }

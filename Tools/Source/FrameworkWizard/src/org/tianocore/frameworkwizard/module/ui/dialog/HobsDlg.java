@@ -382,13 +382,13 @@ public class HobsDlg extends IDialog {
         // Check Name 
         //
         if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-            Log.err("Hob Name couldn't be empty");
+            Log.wrn("Update Hobs", "Hob Name couldn't be empty");
             return false;
         }
 
         if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-                Log.err("Incorrect data type for Hob Name");
+                Log.wrn("Update Hobs", "Incorrect data type for Hob Name");
                 return false;
             }
         }
@@ -398,7 +398,7 @@ public class HobsDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Hobs", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

@@ -334,6 +334,7 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
 
             this.omt.setSaved(false);
         } catch (Exception e) {
+            Log.wrn("Update Library Class Definitions", e.getMessage());
             Log.err("Update Library Class Definitions", e.getMessage());
         }
     }
@@ -368,7 +369,7 @@ public class ModuleLibraryClassDefinitions extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Library Class Definitions", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);

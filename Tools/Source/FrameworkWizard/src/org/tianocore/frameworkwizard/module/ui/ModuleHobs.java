@@ -346,7 +346,7 @@ public class ModuleHobs extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonUpdate) {
             if (this.selectedRow < 0) {
-                Log.err("Please select one record first.");
+                Log.wrn("Update Hobs", "Please select one record first.");
                 return;
             }
             showEdit(selectedRow);
@@ -402,7 +402,7 @@ public class ModuleHobs extends IInternalFrame {
             this.msa.setHobs(hobs);
             this.omt.setSaved(false);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.wrn("Update Hobs", e.getMessage());
             Log.err("Update Hobs", e.getMessage());
         }
     }

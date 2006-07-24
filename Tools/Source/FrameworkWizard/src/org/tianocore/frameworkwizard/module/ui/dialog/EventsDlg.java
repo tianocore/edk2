@@ -422,13 +422,13 @@ public class EventsDlg extends IDialog {
         // Check Name 
         //
         if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-            Log.err("Event Name couldn't be empty");
+            Log.wrn("Update Events", "Event Name couldn't be empty");
             return false;
         }
 
         if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-                Log.err("Incorrect data type for Event Name");
+                Log.wrn("Update Events", "Incorrect data type for Event Name");
                 return false;
             }
         }
@@ -438,7 +438,7 @@ public class EventsDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Events", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

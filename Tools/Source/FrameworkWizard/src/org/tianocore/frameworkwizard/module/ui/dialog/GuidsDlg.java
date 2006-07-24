@@ -363,7 +363,7 @@ public class GuidsDlg extends IDialog {
         //
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
-                Log.err("Incorrect data type for Guid Name");
+                Log.wrn("Update Guids", "Incorrect data type for Guid Name");
                 return false;
             }
         }
@@ -373,7 +373,7 @@ public class GuidsDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Guids", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

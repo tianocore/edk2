@@ -286,11 +286,11 @@ public class ModuleDefinitions extends IInternalFrame {
     
     private boolean check() {
         if (isEmpty(this.jTextFieldOutputFileBasename.getText())) {
-            Log.err("Output File Basename couldn't be empty!");
+            Log.wrn("Update Definitions", "Output File Basename couldn't be empty!");
             return false;
         }
         if (!DataValidation.isOutputFileBasename(this.jTextFieldOutputFileBasename.getText())) {
-            Log.err("Incorrect data type for Output File Basename");
+            Log.wrn("Update Definitions", "Incorrect data type for Output File Basename");
             return false;
         }
         return true;

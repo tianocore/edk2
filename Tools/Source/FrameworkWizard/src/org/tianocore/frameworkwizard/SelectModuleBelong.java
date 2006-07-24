@@ -472,19 +472,19 @@ public class SelectModuleBelong extends IDialog {
         // Check if all required fields are not empty
         //
         if (isEmpty(this.jTextFieldFilePath.getText())) {
-            Log.err("File Path couldn't be empty");
+            Log.wrn("New File", "File Path couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextFieldName.getText())) {
-            Log.err("Name couldn't be empty");
+            Log.wrn("New File", "Name couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.err("Guid Value couldn't be empty");
+            Log.wrn("New File", "Guid Value couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.err("Version couldn't be empty");
+            Log.wrn("New File", "Version couldn't be empty");
             return false;
         }
 
@@ -492,11 +492,11 @@ public class SelectModuleBelong extends IDialog {
         // Check if all fields have correct data types 
         //
         if (!DataValidation.isBaseName(this.jTextFieldName.getText())) {
-            Log.err("Incorrect data type for Base Name");
+            Log.wrn("New File", "Incorrect data type for Base Name");
             return false;
         }
         if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-            Log.err("Incorrect data type for Guid");
+            Log.wrn("New File", "Incorrect data type for Guid");
             return false;
         }
 
@@ -510,7 +510,7 @@ public class SelectModuleBelong extends IDialog {
 
             for (int index = 0; index < msaFile.size(); index++) {
                 if (msaFile.elementAt(index).equals(modulePath)) {
-                    Log.err("This module is already existing in selected package");
+                    Log.wrn("New File", "This module is already existing in selected package");
                     return false;
                 }
             }
@@ -525,7 +525,7 @@ public class SelectModuleBelong extends IDialog {
             if (vPackageList != null && vPackageList.size() > 0) {
                 for (int index = 0; index < vPackageList.size(); index++) {
                     if (vPackageList.get(index).getPath().equals(path)) {
-                        Log.err("This package is already existing in database");
+                        Log.wrn("New File", "This package is already existing in database");
                         return false;
                     }
                 }
@@ -541,7 +541,7 @@ public class SelectModuleBelong extends IDialog {
             if (vPlatfromList != null && vPlatfromList.size() > 0) {
                 for (int index = 0; index < vPlatfromList.size(); index++) {
                     if (vPlatfromList.get(index).getPath().equals(path)) {
-                        Log.err("This platform is already existing in database");
+                        Log.wrn("New File", "This platform is already existing in database");
                         return false;
                     }
                 }
@@ -599,8 +599,8 @@ public class SelectModuleBelong extends IDialog {
         //
         try {
             SaveFile.saveMsaFile(path, msa);
-
         } catch (Exception e) {
+            Log.wrn("Save Module to file system", e.getMessage());
             Log.err("Save Module to file system", e.getMessage());
             return;
         }
@@ -636,7 +636,7 @@ public class SelectModuleBelong extends IDialog {
 
             spd.setSpdHeader(spdHeader);
         } catch (Exception e) {
-            Log.err("Save PackageSurfaceArea Document", e.getMessage());
+            Log.wrn("Save PackageSurfaceArea Document", e.getMessage());
             return;
         }
 
@@ -647,6 +647,7 @@ public class SelectModuleBelong extends IDialog {
             SaveFile.saveSpdFile(path, spd);
 
         } catch (Exception e) {
+            Log.wrn("Save Package to file system", e.getMessage());
             Log.err("Save Package to file system", e.getMessage());
             return;
         }
@@ -681,7 +682,7 @@ public class SelectModuleBelong extends IDialog {
 
             fpd.setPlatformHeader(fpdHeader);
         } catch (Exception e) {
-            Log.err("Save FrameworkPlatformDescription Document", e.getMessage());
+            Log.wrn("Save FrameworkPlatformDescription Document", e.getMessage());
             return;
         }
 
@@ -692,6 +693,7 @@ public class SelectModuleBelong extends IDialog {
             SaveFile.saveFpdFile(path, fpd);
 
         } catch (Exception e) {
+            Log.wrn("Save Platform to file system", e.getMessage());
             Log.err("Save Platform to file system", e.getMessage());
             return;
         }

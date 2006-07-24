@@ -2133,12 +2133,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         try {
             msa = OpenFile.openMsaFile(path);
         } catch (IOException e) {
+            Log.wrn("Open Module Surface Area " + path, e.getMessage());
             Log.err("Open Module Surface Area " + path, e.getMessage());
             return;
         } catch (XmlException e) {
+            Log.wrn("Open Module Surface Area " + path, e.getMessage());
             Log.err("Open Module Surface Area " + path, e.getMessage());
             return;
         } catch (Exception e) {
+            Log.wrn("Open Module Surface Area " + path, "Invalid file type");
             Log.err("Open Module Surface Area " + path, "Invalid file type");
             return;
         }
@@ -2212,12 +2215,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         try {
             msa = OpenFile.openMsaFile(path);
         } catch (IOException e) {
+            Log.wrn("Open Module Surface Area " + path, e.getMessage());
             Log.err("Open Module Surface Area " + path, e.getMessage());
             return;
         } catch (XmlException e) {
+            Log.wrn("Open Module Surface Area " + path, e.getMessage());
             Log.err("Open Module Surface Area " + path, e.getMessage());
             return;
         } catch (Exception e) {
+            Log.wrn("Open Module Surface Area " + path, "Invalid file type");
             Log.err("Open Module Surface Area " + path, "Invalid file type");
             return;
         }
@@ -2248,7 +2254,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             // The module is not in existing packages
             //
-            Log.err("The module hasn't been added to any package of current workspace!");
+            Log.wrn("Open Module", "The module hasn't been added to any package of current workspace!");
             return;
         }
 
@@ -2291,12 +2297,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         try {
             spd = OpenFile.openSpdFile(path);
         } catch (IOException e) {
+            Log.wrn("Open Package Surface Area " + path, e.getMessage());
             Log.err("Open Package Surface Area " + path, e.getMessage());
             return;
         } catch (XmlException e) {
+            Log.wrn("Open Package Surface Area " + path, e.getMessage());
             Log.err("Open Package Surface Area " + path, e.getMessage());
             return;
         } catch (Exception e) {
+            Log.wrn("Open Package Surface Area " + path, "Invalid file type");
             Log.err("Open Package Surface Area " + path, "Invalid file type");
             return;
         }
@@ -2317,7 +2326,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             // The module is not in existing packages
             //
-            Log.err("The package hasn't been added to current workspace!");
+            Log.wrn("Open Package", "The package hasn't been added to current workspace!");
             return;
         }
 
@@ -2360,12 +2369,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         try {
             fpd = OpenFile.openFpdFile(path);
         } catch (IOException e) {
+            Log.wrn("Open Platform Surface Area " + path, e.getMessage());
             Log.err("Open Platform Surface Area " + path, e.getMessage());
             return;
         } catch (XmlException e) {
+            Log.wrn("Open Platform Surface Area " + path, e.getMessage());
             Log.err("Open Platform Surface Area " + path, e.getMessage());
             return;
         } catch (Exception e) {
+            Log.wrn("Open Platform Surface Area " + path, "Invalid file type");
             Log.err("Open Platform Surface Area " + path, "Invalid file type");
             return;
         }
@@ -2387,7 +2399,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             // The module is not in existing packages
             //
-            Log.err("The platform hasn't been added to current workspace!");
+            Log.wrn("Open Platform", "The platform hasn't been added to current workspace!");
             return;
         }
 
@@ -2435,6 +2447,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             openingModuleList.setNew(omt.getId(), false);
             openingModuleList.setModuleSaved(omt.getId(), true);
         } catch (Exception e) {
+            Log.wrn("Save Module", e.getMessage());
             Log.err("Save Module", e.getMessage());
         }
     }
@@ -2455,6 +2468,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             openingPackageList.setNew(opt.getId(), false);
             openingPackageList.setPackageSaved(opt.getId(), true);
         } catch (Exception e) {
+            Log.wrn("Save Package", e.getMessage());
             Log.err("Save Package", e.getMessage());
         }
     }
@@ -2475,6 +2489,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             openingPlatformList.setNew(opt.getId(), false);
             openingPlatformList.setPlatformSaved(opt.getId(), true);
         } catch (Exception e) {
+            Log.wrn("Save Package", e.getMessage());
             Log.err("Save Package", e.getMessage());
         }
     }
@@ -2587,47 +2602,54 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         Identification id = iTree.getSelectNode().getId();
         int intCategory = iTree.getSelectCategory();
         String path = null;
-        //          
-        // If the node is not opened yet
-        // Insert top level elements first
-        //
-        //if (intCategory == IDefaultMutableTreeNode.MSA_HEADER || intCategory == IDefaultMutableTreeNode.SPD_MSAFILES) {
-        if (intCategory == IDefaultMutableTreeNode.MSA_HEADER) {
-
+        try {
+            //          
+            // If the node is not opened yet
+            // Insert top level elements first
+            //
+            //if (intCategory == IDefaultMutableTreeNode.MSA_HEADER || intCategory == IDefaultMutableTreeNode.SPD_MSAFILES) {
             if (intCategory == IDefaultMutableTreeNode.MSA_HEADER) {
-                path = iTree.getSelectNode().getId().getPath();
+
+                if (intCategory == IDefaultMutableTreeNode.MSA_HEADER) {
+                    path = iTree.getSelectNode().getId().getPath();
+                }
+                if (intCategory == IDefaultMutableTreeNode.SPD_MSAFILES) {
+                    path = iTree.getSelectNode().getId().getPath();
+                }
+                openModule(path);
+                return;
             }
-            if (intCategory == IDefaultMutableTreeNode.SPD_MSAFILES) {
+            if (intCategory == IDefaultMutableTreeNode.SPD_HEADER) {
                 path = iTree.getSelectNode().getId().getPath();
+                openPackage(path);
+                return;
             }
-            openModule(path);
-            return;
-        }
-        if (intCategory == IDefaultMutableTreeNode.SPD_HEADER) {
-            path = iTree.getSelectNode().getId().getPath();
-            openPackage(path);
-            return;
-        }
-        if (intCategory == IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
-            path = iTree.getSelectNode().getId().getPath();
-            openPlatform(path);
-            return;
-        }
-        //
-        // Show editor panel
-        //
-        if (intCategory >= IDefaultMutableTreeNode.MSA_HEADER && intCategory < IDefaultMutableTreeNode.SPD_HEADER) {
-            showModuleElement(intCategory, openingModuleList.getOpeningModuleById(id));
-            this.currentOpeningModuleIndex = openingModuleList.findIndexOfListById(id);
-        }
-        if (intCategory >= IDefaultMutableTreeNode.SPD_HEADER
-            && intCategory < IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
-            showPackageElement(intCategory, openingPackageList.getOpeningPackageById(id));
-            this.currentOpeningPackageIndex = openingPackageList.findIndexOfListById(id);
-        }
-        if (intCategory >= IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
-            showPlatformElement(intCategory, openingPlatformList.getOpeningPlatformById(id));
-            this.currentOpeningPlatformIndex = openingPlatformList.findIndexOfListById(id);
+            if (intCategory == IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
+                path = iTree.getSelectNode().getId().getPath();
+                openPlatform(path);
+                return;
+            }
+            //
+            // Show editor panel
+            //
+            if (intCategory >= IDefaultMutableTreeNode.MSA_HEADER && intCategory < IDefaultMutableTreeNode.SPD_HEADER) {
+                showModuleElement(intCategory, openingModuleList.getOpeningModuleById(id));
+                this.currentOpeningModuleIndex = openingModuleList.findIndexOfListById(id);
+            }
+            if (intCategory >= IDefaultMutableTreeNode.SPD_HEADER
+                && intCategory < IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
+                showPackageElement(intCategory, openingPackageList.getOpeningPackageById(id));
+                this.currentOpeningPackageIndex = openingPackageList.findIndexOfListById(id);
+            }
+            if (intCategory >= IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
+                showPlatformElement(intCategory, openingPlatformList.getOpeningPlatformById(id));
+                this.currentOpeningPlatformIndex = openingPlatformList.findIndexOfListById(id);
+            }
+        } catch (RuntimeException e) {
+            Log.log("double click category: " + intCategory);
+            Log.log("double click id path: " + id.getPath());
+            Log.log("double click exception: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -2843,16 +2865,16 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                 try {
                     wt.addModuleToPackage(smb.getMid(), psa);
                 } catch (IOException e) {
+                    Log.wrn("Upddate MsaFiles of Package", e.getMessage());
                     Log.err("Upddate MsaFiles of Package", e.getMessage());
-                    e.printStackTrace();
                     return;
                 } catch (XmlException e) {
+                    Log.wrn("Upddate MsaFiles of Package", e.getMessage());
                     Log.err("Upddate MsaFiles of Package", e.getMessage());
-                    e.printStackTrace();
                     return;
                 } catch (Exception e) {
+                    Log.wrn("Upddate MsaFiles of Package", e.getMessage());
                     Log.err("Upddate MsaFiles of Package", e.getMessage());
-                    e.printStackTrace();
                     return;
                 }
                 this.openModule(smb.getMid().getPath(), smb.getMid());
@@ -3179,14 +3201,14 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Check if there is any item can be cloned
         //
         if (iTree.getSelectionPath() == null) {
-            Log.err("Please select a target to clone!");
+            Log.wrn("Clone", "Please select a target to clone!");
             return;
         }
         int category = iTree.getSelectCategory();
         Identification id = iTree.getSelectNode().getId();
         if (category == IDefaultMutableTreeNode.MODULE || category == IDefaultMutableTreeNode.PACKAGE
             || category == IDefaultMutableTreeNode.PLATFORM) {
-            Log.err("Please select a target to clone!");
+            Log.wrn("Clone", "Please select a target to clone!");
             return;
         }
 

@@ -639,31 +639,31 @@ public class SpdHeader extends IInternalFrame {
         // Check if all required fields are not empty
         //
         if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.err("Base Name couldn't be empty");
+            Log.wrn("Update Spd Header", "Base Name couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.err("Guid couldn't be empty");
+            Log.wrn("Update Spd Header", "Guid couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.err("Version couldn't be empty");
+            Log.wrn("Update Spd Header", "Version couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextAreaLicense.getText())) {
-            Log.err("License couldn't be empty");
+            Log.wrn("Update Spd Header", "License couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextFieldCopyright.getText())) {
-            Log.err("Copyright couldn't be empty");
+            Log.wrn("Update Spd Header", "Copyright couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextAreaDescription.getText())) {
-            Log.err("Description couldn't be empty");
+            Log.wrn("Update Spd Header", "Description couldn't be empty");
             return false;
         }
         if (isEmpty(this.jTextFieldAbstract.getText())) {
-            Log.err("Abstract couldn't be empty");
+            Log.wrn("Update Spd Header", "Abstract couldn't be empty");
             return false;
         }
 
@@ -671,19 +671,19 @@ public class SpdHeader extends IInternalFrame {
         // Check if all fields have correct data types 
         //
         if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.err("Incorrect data type for Base Name");
+            Log.wrn("Update Spd Header", "Incorrect data type for Base Name");
             return false;
         }
         if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-            Log.err("Incorrect data type for Guid");
+            Log.wrn("Update Spd Header", "Incorrect data type for Guid");
             return false;
         }
         if (!DataValidation.isAbstract(this.jTextFieldAbstract.getText())) {
-            Log.err("Incorrect data type for Abstract");
+            Log.wrn("Update Spd Header", "Incorrect data type for Abstract");
             return false;
         }
         if (!DataValidation.isCopyright(this.jTextFieldCopyright.getText())) {
-            Log.err("Incorrect data type for Copyright");
+            Log.wrn("Update Spd Header", "Incorrect data type for Copyright");
             return false;
         }
         return true;
@@ -699,6 +699,7 @@ public class SpdHeader extends IInternalFrame {
         try {
             
         } catch (Exception e) {
+            Log.wrn("Save Package", e.getMessage());
             Log.err("Save Package", e.getMessage());
         }
     }

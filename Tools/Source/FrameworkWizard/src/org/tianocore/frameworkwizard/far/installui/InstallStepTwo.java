@@ -345,11 +345,11 @@ public class InstallStepTwo extends IDialog implements MouseListener {
                 File toFile = new File(Workspace.getCurrentWorkspace() + File.separatorChar
                                        + packageModel.getValueAt(i, 3));
                 if (!isPackagePathValid(toFile)) {
-                    Log.err(packageVector.get(i) + " path already has package now. ");
+                    Log.wrn("Install far", packageVector.get(i) + " path already has package now. ");
                     return;
                 }
                 if (allNewPath.contains(toFile)) {
-                    Log.err("Path " + packageModel.getValueAt(i, 3) + " is specified by twice. ");
+                    Log.wrn("Install far", "Path " + packageModel.getValueAt(i, 3) + " is specified by twice. ");
                     return;
                 }
                 allNewPath.add(toFile);
@@ -364,7 +364,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
                 File toFile = new File(Workspace.getCurrentWorkspace() + File.separatorChar
                                        + platformModel.getValueAt(i, 3));
                 if (!isPlatformPathValid(toFile)) {
-                    Log.err(platformVector.get(i) + " path already has platform now. ");
+                    Log.wrn("Install far", platformVector.get(i) + " path already has platform now. ");
                     return;
                 }
                 File fpdFile = new File((String) platformModel.getValueAt(i, 3) + File.separatorChar
@@ -385,8 +385,8 @@ public class InstallStepTwo extends IDialog implements MouseListener {
                 WorkspaceTools wt = new WorkspaceTools();
                 wt.addFarToDb(packageList, platformList, far.mainfest.getHeader());
             } catch (Exception ex) {
-                ex.printStackTrace();
-                Log.err("Install error. ");
+                Log.wrn("Install far", ex.getMessage());
+                Log.err("Install far", ex.getMessage());
                 return;
             }
 

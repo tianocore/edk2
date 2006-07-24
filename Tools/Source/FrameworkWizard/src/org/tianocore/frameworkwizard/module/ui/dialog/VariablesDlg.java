@@ -391,13 +391,13 @@ public class VariablesDlg extends IDialog {
         // Check VariableName 
         //
         if (isEmpty(this.jTextFieldVariableName.getText())) {
-            Log.err("Variable Name couldn't be empty");
+            Log.wrn("Update Variables", "Variable Name couldn't be empty");
             return false;
         }
 
         if (!isEmpty(this.jTextFieldVariableName.getText())) {
             if (!DataValidation.isHexWordArrayType(this.jTextFieldVariableName.getText())) {
-                Log.err("Incorrect data type for Variable Name");
+                Log.wrn("Update Variables", "Incorrect data type for Variable Name");
                 return false;
             }
         }
@@ -407,7 +407,7 @@ public class VariablesDlg extends IDialog {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update Variables", "Incorrect data type for Feature Flag");
                 return false;
             }
         }

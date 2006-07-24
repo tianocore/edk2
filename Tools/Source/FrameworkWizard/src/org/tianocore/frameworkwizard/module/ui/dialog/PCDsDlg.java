@@ -421,7 +421,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
-                Log.err("Incorrect data type for C_Name");
+                Log.wrn("Update PcdCoded", "Incorrect data type for C_Name");
                 return false;
             }
         }
@@ -431,7 +431,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jTextFieldTokenSpaceGuid.getText())) {
             if (!DataValidation.isC_NameType(this.jTextFieldTokenSpaceGuid.getText())) {
-                Log.err("Incorrect data type for the selected pcd entry, please check in in spd file");
+                Log.wrn("Update PcdCoded", "Incorrect data type for the selected pcd entry, please check in in spd file");
                 return false;
             }
         }
@@ -441,7 +441,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jTextFieldDefaultValue.getText())) {
             if (!DataValidation.isDefaultValueType(this.jTextFieldDefaultValue.getText())) {
-                Log.err("Incorrect data type for Default Value");
+                Log.wrn("Update PcdCoded", "Incorrect data type for Default Value");
                 return false;
             }
         }
@@ -450,7 +450,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         // Check HelpText
         //
         if (isEmpty(this.jTextFieldHelpText.getText())) {
-            Log.err("Help Text couldn't be empty");
+            Log.wrn("Update PcdCoded", "Help Text couldn't be empty");
             return false;
         }
 
@@ -459,7 +459,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
             if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-                Log.err("Incorrect data type for Feature Flag");
+                Log.wrn("Update PcdCoded", "Incorrect data type for Feature Flag");
                 return false;
             }
         }
@@ -500,7 +500,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         if (arg0.getSource() == this.jComboBoxCName && arg0.getStateChange() == ItemEvent.SELECTED ) {
             if (pcd.getPcd(index).getGuidCName() == null || isEmpty(pcd.getPcd(index).getGuidCName())
                 || pcd.getPcd(index).getType() == null || pcd.getPcd(index).getHelp() == null || isEmpty(pcd.getPcd(index).getHelp())) {
-                Log.err("select pcd entry when editing msa", "The selected is defined incorrectly.\r\nPlease check it in spd file");
+                Log.wrn("select pcd entry when editing msa", "The selected is defined incorrectly.\r\nPlease check it in spd file");
             } else {
                 this.jTextFieldTokenSpaceGuid.setText(pcd.getPcd(index).getGuidCName());
                 Tools.generateComboBoxByVector(this.jComboBoxItemType, pcd.getPcd(index).getType());

@@ -252,7 +252,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
             //
             if (jComboBoxPlatform.getAllCheckedItemsIndex().size() == 0
                 && jComboBoxPackage.getAllCheckedItemsIndex().size() == 0) {
-                Log.err("At least choose one of packages and platforms. ");
+                Log.wrn("Create far", "At least choose one of packages and platforms. ");
                 return;
             }
             if (stepThree == null) {
