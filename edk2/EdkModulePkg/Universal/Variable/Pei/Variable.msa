@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -45,6 +45,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>HobLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>    
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Variable.h</Filename>
@@ -74,4 +77,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <ModuleEntryPoint>PeimInitializeVariableServices</ModuleEntryPoint>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+      <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>
+        The driver gets the Variable store base address from this PCD.  This base address point to
+        an EFI_FIRMWARE_VOLUMN_HEADER struct.
+      </HelpText>
+    </PcdEntry>     
+  </PcdCoded> 
 </ModuleSurfaceArea>
