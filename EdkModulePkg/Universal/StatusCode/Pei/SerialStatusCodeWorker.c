@@ -141,7 +141,7 @@ SerialStatusCodeReportWorker (
   //
   // Callout to SerialPort Lib function to do print.
   //
-  SerialPortWrite (Buffer, CharCount);
+  SerialPortWrite ((UINT8 *) Buffer, CharCount);
 
   return EFI_SUCCESS;
 }

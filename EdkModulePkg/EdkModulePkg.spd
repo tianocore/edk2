@@ -967,7 +967,7 @@
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdStatusCodeReplayInOEM</C_Name>
-      <Token>0x0001002c</Token>
+      <Token>0x0001002d</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
@@ -976,7 +976,7 @@
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdStatusCodeRuntimeMemorySize</C_Name>
-      <Token>0x0001002d</Token>
+      <Token>0x0001002e</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT16</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
