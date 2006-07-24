@@ -396,6 +396,7 @@ CreateDeviceNode (
   if (DevicePath != NULL) {
      DevicePath->Type    = NodeType;
      DevicePath->SubType = NodeSubType;
+     SetDevicePathNodeLength (DevicePath, NodeLength);
   }
 
   return DevicePath;
