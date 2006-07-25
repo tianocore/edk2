@@ -41,7 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -49,7 +49,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -57,7 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -65,207 +65,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-          <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumAsciiStringLength</C_Name>
-          <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdSpinLockTimeout</C_Name>
-          <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>10000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumLinkedListLength</C_Name>
-          <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-          <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumAsciiStringLength</C_Name>
-          <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdSpinLockTimeout</C_Name>
-          <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>10000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumLinkedListLength</C_Name>
-          <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-          <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumAsciiStringLength</C_Name>
-          <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdSpinLockTimeout</C_Name>
-          <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>10000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumLinkedListLength</C_Name>
-          <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-          <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumAsciiStringLength</C_Name>
-          <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdSpinLockTimeout</C_Name>
-          <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>10000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumLinkedListLength</C_Name>
-          <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-      </PcdBuildDefinition>
-      <ModuleSaBuildOptions>
-        <FvBinding>NULL</FvBinding>
-        <FfsFormatKey>LIBRARY</FfsFormatKey>
-      </ModuleSaBuildOptions>
-    </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30">
-      <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumUnicodeStringLength</C_Name>
-          <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumAsciiStringLength</C_Name>
-          <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>1000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdSpinLockTimeout</C_Name>
-          <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
-          <DatumType>UINT32</DatumType>
-          <MaxDatumSize>4</MaxDatumSize>
-          <Value>10000000</Value>
-        </PcdData>
-        <PcdData ItemType="FIXED_AT_BUILD">
-          <C_Name>PcdMaximumLinkedListLength</C_Name>
-          <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -341,7 +141,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -349,7 +149,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -357,7 +157,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -373,7 +173,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
           <Token>0x00000009</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
@@ -395,7 +195,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -423,7 +223,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -475,7 +275,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -491,7 +291,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -499,7 +299,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -507,7 +307,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -577,7 +377,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -593,7 +393,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -609,7 +409,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -625,7 +425,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -641,7 +441,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -699,7 +499,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -707,7 +507,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -715,7 +515,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -731,7 +531,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -739,7 +539,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -747,7 +547,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -817,7 +617,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -825,7 +625,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -833,7 +633,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -841,7 +641,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -911,7 +711,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -919,7 +719,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -927,7 +727,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -943,7 +743,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
           <Token>0x00000009</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
@@ -965,7 +765,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -993,7 +793,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -1045,7 +845,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -1061,7 +861,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -1069,7 +869,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -1077,7 +877,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -1147,7 +947,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -1163,7 +963,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -1179,7 +979,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -1195,7 +995,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -1211,7 +1011,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -1269,7 +1069,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -1277,7 +1077,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -1285,7 +1085,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -1301,7 +1101,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -1309,7 +1109,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -1317,7 +1117,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -1387,7 +1187,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -1395,7 +1195,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -1403,7 +1203,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -1411,7 +1211,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -1487,7 +1287,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -1495,7 +1295,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -1503,7 +1303,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -1519,7 +1319,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
           <Token>0x00000009</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
@@ -1541,7 +1341,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -1569,7 +1369,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -1621,7 +1421,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -1637,7 +1437,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -1645,7 +1445,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -1653,7 +1453,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -1723,7 +1523,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -1739,7 +1539,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -1755,7 +1555,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -1771,7 +1571,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -1787,7 +1587,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -1845,7 +1645,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -1853,7 +1653,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -1861,7 +1661,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -1877,7 +1677,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -1885,7 +1685,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -1893,7 +1693,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -1963,7 +1763,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -1971,7 +1771,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumAsciiStringLength</C_Name>
           <Token>0x00000002</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -1979,7 +1779,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdSpinLockTimeout</C_Name>
           <Token>0x00000004</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
@@ -1987,7 +1787,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumLinkedListLength</C_Name>
           <Token>0x00000003</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>1000000</Value>
@@ -2057,7 +1857,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -2065,7 +1865,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -2073,7 +1873,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -2089,7 +1889,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPerformanceLibraryPropertyMask</C_Name>
           <Token>0x00000009</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0</Value>
@@ -2111,7 +1911,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -2139,7 +1939,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPciExpressBaseAddress</C_Name>
           <Token>0x0000000A</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT64</DatumType>
           <MaxDatumSize>8</MaxDatumSize>
           <Value>0xE0000000</Value>
@@ -2191,7 +1991,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -2207,7 +2007,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -2215,7 +2015,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -2223,7 +2023,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -2293,7 +2093,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -2309,7 +2109,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdReportStatusCodePropertyMask</C_Name>
           <Token>0x00000007</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x07</Value>
@@ -2325,7 +2125,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -2341,7 +2141,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -2357,7 +2157,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdPostCodePropertyMask</C_Name>
           <Token>0x0000000b</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x00</Value>
@@ -2415,7 +2215,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -2423,7 +2223,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -2431,7 +2231,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
@@ -2447,7 +2247,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugPropertyMask</C_Name>
           <Token>0x00000005</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0x0f</Value>
@@ -2455,7 +2255,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="PATCHABLE_IN_MODULE">
           <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <Token>0x00000006</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>0x80000000</Value>
@@ -2463,7 +2263,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdDebugClearMemoryValue</C_Name>
           <Token>0x00000008</Token>
-          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
