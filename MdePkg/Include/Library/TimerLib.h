@@ -24,7 +24,7 @@
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
-  @return Return value depends on implementation.
+  @return MicroSeconds
 
 **/
 UINTN
@@ -40,7 +40,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return Return value depends on implementation.
+  @return NanoSeconds
 
 **/
 UINTN

@@ -18,11 +18,6 @@
 
 **/
 
-UINT64
-ReadItc (
-  VOID
-  );
-
 typedef struct {
   UINT64                            Status;
   UINT64                            r9;
@@ -30,6 +25,21 @@ typedef struct {
   UINT64                            r11;
 } PAL_PROC_RETURN;
 
+/**
+  Performs a PAL call using static calling convention.
+
+  An internal function to perform a PAL call using static calling convention.
+
+  @param  PalEntryPoint The entry point address of PAL. The address in ar.kr5
+                        would be used if this parameter were NULL on input.
+  @param  Arg1          The first argument of a PAL call.
+  @param  Arg1          The second argument of a PAL call.
+  @param  Arg1          The third argument of a PAL call.
+  @param  Arg1          The fourth argument of a PAL call.
+
+  @return The values returned in r8, r9, r10 and r11.
+
+**/
 PAL_PROC_RETURN
 PalCallStatic (
   IN      CONST VOID                *PalEntryPoint,
@@ -40,13 +50,57 @@ PalCallStatic (
   );
 
 /**
+  Returns the current value of ar.itc.
+
+  An internal function to return the current value of ar.itc, which is the
+  timer tick on IPF.
+
+  @return The currect value of ar.itc
+
+**/
+INT64
+InternalIpfReadItc (
+  VOID
+  );
+
+/**
+  Performs a delay measured as number of ticks.
+
+  An internal function to perform a delay measured as number of ticks. It's
+  invoked by MicroSecondDelay() and NanoSecondDelay().
+
+  @param  Delay Number of ticks to delay.
+
+**/
+STATIC
+VOID
+InternalIpfDelay (
+  IN      INT64                     Delay
+  )
+{
+  INT64                             Ticks;
+
+  //
+  // The target timer count is calculated here
+  //
+  Ticks = InternalIpfReadItc () + Delay;
+
+  //
+  // Wait until time out
+  // Delay > 2^63 could not be handled by this function
+  // Timer wrap-arounds are handled correctly by this function
+  //
+  while (Ticks - InternalIpfReadItc () >= 0);
+}
+
+/**
   Stalls the CPU for at least the given number of microseconds.
 
   Stalls the CPU for the number of microseconds specified by MicroSeconds.
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
-  @return The ticks delayed actually.
+  @return MicroSeconds
 
 **/
 UINTN
@@ -55,13 +109,12 @@ MicroSecondDelay (
   IN      UINTN                     MicroSeconds
   )
 {
-  UINT64                            Ticks;
-  UINT64                            Delay;
-
-  Ticks = GetPerformanceCounter ();
-  Delay = GetPerformanceCounterProperties (NULL, NULL) * MicroSeconds / 1000000;
-  while (Ticks + Delay >= GetPerformanceCounter ());
-  return (UINTN)Delay;
+  InternalIpfDelay (
+    GetPerformanceCounterProperties (NULL, NULL) *
+    MicroSeconds /
+    1000000
+    );
+  return MicroSeconds;
 }
 
 /**
@@ -71,7 +124,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return The ticks delayed actually.
+  @return NanoSeconds
 
 **/
 UINTN
@@ -80,13 +133,12 @@ NanoSecondDelay (
   IN      UINTN                     NanoSeconds
   )
 {
-  UINT64                            Ticks;
-  UINT64                            Delay;
-
-  Ticks = GetPerformanceCounter ();
-  Delay = GetPerformanceCounterProperties (NULL, NULL) * NanoSeconds / 1000000000;
-  while (Ticks + Delay >= GetPerformanceCounter ());
-  return (UINTN)Delay;
+  InternalIpfDelay (
+    GetPerformanceCounterProperties (NULL, NULL) *
+    NanoSeconds /
+    1000000000
+    );
+  return NanoSeconds;
 }
 
 /**
@@ -107,7 +159,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  return ReadItc ();
+  return InternalIpfReadItc ();
 }
 
 /**
@@ -150,7 +202,13 @@ GetPerformanceCounterProperties (
   PalRet = PalCallStatic (NULL, 14, 0, 0, 0);
   ASSERT (PalRet.Status == 0);
 
-  *StartValue = 0;
-  *EndValue = (UINT64)(-1);
+  if (StartValue != NULL) {
+    *StartValue = 0;
+  }
+
+  if (EndValue != NULL) {
+    *EndValue = (UINT64)(-1);
+  }
+
   return BaseFrequence * (PalRet.r11 >> 32) / (UINT32)PalRet.r11;
 }
