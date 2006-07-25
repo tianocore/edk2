@@ -23,6 +23,7 @@
 // Include processor specific binding
 //
 #include <ProcessorBind.h>
+#include <stdarg.h>
 
 #define MEMORY_FENCE()  MemoryFence ()
 #define BREAKPOINT()    CpuBreakpoint ()
@@ -123,10 +124,15 @@ typedef struct {
 //
 #ifndef VA_START
 
-typedef CHAR8 *VA_LIST;
-#define VA_START(ap, v) (ap = (VA_LIST) & (v) + _INT_SIZE_OF (v))
-#define VA_ARG(ap, t)   (*(t *) ((ap += _INT_SIZE_OF (t)) - _INT_SIZE_OF (t)))
-#define VA_END(ap)      (ap = (VA_LIST) 0)
+// typedef CHAR8 *VA_LIST;
+// #define VA_START(ap, v) (ap = (VA_LIST) & (v) + _INT_SIZE_OF (v))
+// #define VA_ARG(ap, t)   (*(t *) ((ap += _INT_SIZE_OF (t)) - _INT_SIZE_OF (t)))
+// #define VA_END(ap)      (ap = (VA_LIST) 0)
+// Use the native arguments for tools.
+#define VA_START va_start
+#define VA_ARG   va_arg
+#define VA_END   va_end
+#define VA_LIST  va_list
 
 #endif
 

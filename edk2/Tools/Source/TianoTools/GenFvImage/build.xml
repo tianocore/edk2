@@ -87,6 +87,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <os family="mac"/>
     </condition>
     
+    <condition property="syslibdirs" value="/lib64">
+      <istrue value="${x86_64_linux}"/>
+    </condition>
+    
     <condition property="syslibdirs" value="${env.CYGWIN_HOME}/lib/e2fsprogs">
       <os family="windows"/>
     </condition>
@@ -123,7 +127,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/${ToolName}"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
+      <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
 

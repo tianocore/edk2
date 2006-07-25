@@ -107,6 +107,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${LIB_DIR}/${LibName}"
         outtype="static"
+        debug="true"
         optimize="speed">
 
       <compilerarg value="-fshort-wchar" if="gcc"/>
@@ -116,7 +117,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <includepath path="${PACKAGE_DIR}/${LibName}"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
+      <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
     </cc>
   </target>
