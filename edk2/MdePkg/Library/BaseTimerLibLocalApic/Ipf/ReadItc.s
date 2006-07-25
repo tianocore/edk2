@@ -1,5 +1,6 @@
 /// @file
-///   Contains an implementation of ReadItc on Itanium-based architecture.
+///   Contains an implementation of InternalIpfReadItc () on Itanium-based
+///   architecture.
 ///
 /// Copyright (c) 2006, Intel Corporation
 /// All rights reserved. This program and the accompanying materials
@@ -17,9 +18,9 @@
 .auto
 .text
 
-.proc   ReadItc
-.type   ReadItc, @function
-ReadItc::
+.proc   InternalIpfReadItc
+.type   InternalIpfReadItc, @function
+InternalIpfReadItc::
         mov                 r8  = ar.itc
         br.ret.sptk.many    b0
-.endp   ReadItc
+.endp   InternalIpfReadItc

@@ -18,25 +18,116 @@
 
 **/
 
-static
+//
+// The following 2 arrays are used in calculating the frequency of local APIC
+// timer. Refer to IA-32 developers' manual for more details.
+//
+
+GLOBAL_REMOVE_IF_UNREFERENCED
+CONST UINT32                          mTimerLibLocalApicFrequencies[] = {
+  100000000,
+  133000000,
+  200000000,
+  166000000
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED
+CONST UINT8                           mTimerLibLocalApicDivisor[] = {
+  0x02, 0x04, 0x08, 0x10,
+  0x02, 0x04, 0x08, 0x10,
+  0x20, 0x40, 0x80, 0x01,
+  0x20, 0x40, 0x80, 0x01
+};
+
+/**
+  Internal function to retrieve the base address of local APIC.
+
+  Internal function to retrieve the base address of local APIC.
+
+  @return The base address of local APIC
+
+**/
+STATIC
 UINTN
-EFIAPI
-DelayWorker (
-  IN      UINT64                    NDelay
+InternalX86GetApicBase (
+  VOID
   )
 {
-  UINT64                            Ticks;
+  return (UINTN)AsmMsrBitFieldRead64 (27, 12, 35) << 12;
+}
 
-  Ticks = GetPerformanceCounter ();
-  Ticks -= DivU64x32 (
-             MultU64x64 (
-               GetPerformanceCounterProperties (NULL, NULL),
-               NDelay
-               ),
-             1000000000u
-             );
-  while (Ticks <= GetPerformanceCounter ());
-  return (UINTN)Ticks;
+/**
+  Internal function to return the frequency of the local APIC timer.
+
+  Internal function to return the frequency of the local APIC timer.
+
+  @param  ApicBase  The base address of memory mapped registers of local APIC.
+
+  @return The frequency of the timer in Hz.
+
+**/
+STATIC
+UINT32
+InternalX86GetTimerFrequency (
+  IN      UINTN                     ApicBase
+  )
+{
+  return
+    mTimerLibLocalApicFrequencies[AsmMsrBitFieldRead32 (44, 16, 18)] /
+    mTimerLibLocalApicDivisor[MmioBitFieldRead32 (ApicBase + 0x3e0, 0, 3)];
+}
+
+/**
+  Internal function to read the current tick counter of local APIC.
+
+  Internal function to read the current tick counter of local APIC.
+
+  @param  ApicBase  The base address of memory mapped registers of local APIC.
+
+  @return The tick counter read.
+
+**/
+STATIC
+INT32
+InternalX86GetTimerTick (
+  IN      UINTN                     ApicBase
+  )
+{
+  return MmioRead32 (ApicBase + 0x390);
+}
+
+/**
+  Stalls the CPU for at least the given number of ticks.
+
+  Stalls the CPU for at least the given number of ticks. It's invoked by
+  MicroSecondDelay() and NanoSecondDelay().
+
+  @param  ApicBase  The base address of memory mapped registers of local APIC.
+  @param  Delay     A period of time to delay in ticks.
+
+**/
+STATIC
+VOID
+InternalX86Delay (
+  IN      UINTN                     ApicBase,
+  IN      UINT32                    Delay
+  )
+{
+  INT32                             Ticks;
+
+  ApicBase = InternalX86GetApicBase ();
+
+  //
+  // The target timer count is calculated here
+  //
+  Ticks = InternalX86GetTimerTick (ApicBase) - Delay;
+
+  //
+  // Wait until time out
+  // Delay > 2^31 could not be handled by this function
+  // Timer wrap-arounds are handled correctly by this function
+  //
+  while (InternalX86GetTimerTick (ApicBase) - Ticks >= 0);
 }
 
 /**
@@ -46,7 +137,7 @@ DelayWorker (
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
-  @return Return value depends on implementation.
+  @return MicroSeconds
 
 **/
 UINTN
@@ -55,7 +146,20 @@ MicroSecondDelay (
   IN      UINTN                     MicroSeconds
   )
 {
-  return DelayWorker (MicroSeconds * 1000ull);
+  UINTN                             ApicBase;
+
+  ApicBase = InternalX86GetApicBase ();
+  InternalX86Delay (
+    ApicBase,
+    (UINT32)DivU64x32 (
+              MultU64x64 (
+                InternalX86GetTimerFrequency (ApicBase),
+                MicroSeconds
+                ),
+              1000000u
+              )
+    );
+  return MicroSeconds;
 }
 
 /**
@@ -65,7 +169,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return Return value depends on implementation.
+  @return NanoSeconds
 
 **/
 UINTN
@@ -74,17 +178,20 @@ NanoSecondDelay (
   IN      UINTN                     NanoSeconds
   )
 {
-  return DelayWorker (NanoSeconds);
-}
+  UINTN                             ApicBase;
 
-static
-UINTN
-EFIAPI
-GetApicBase (
-  VOID
-  )
-{
-  return (UINTN)AsmMsrBitFieldRead64 (27, 12, 35) << 12;
+  ApicBase = InternalX86GetApicBase ();
+  InternalX86Delay (
+    ApicBase,
+    (UINT32)DivU64x32 (
+              MultU64x64 (
+                InternalX86GetTimerFrequency (ApicBase),
+                NanoSeconds
+                ),
+              1000000000u
+              )
+    );
+  return NanoSeconds;
 }
 
 /**
@@ -105,7 +212,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  return MmioRead32 (GetApicBase () + 0x390);
+  return InternalX86GetTimerTick (InternalX86GetApicBase ());
 }
 
 /**
@@ -138,22 +245,9 @@ GetPerformanceCounterProperties (
   IN      UINT64                    *EndValue
   )
 {
-  static const UINT32               mFrequencies[] = {
-    100000000,
-    133000000,
-    200000000,
-    166000000
-  };
-  static const UINT8                mDivisor[] = {
-    0x02, 0x04, 0x08, 0x10,
-    0x02, 0x04, 0x08, 0x10,
-    0x20, 0x40, 0x80, 0x01,
-    0x20, 0x40, 0x80, 0x01
-  };
-
   UINTN                             ApicBase;
 
-  ApicBase = GetApicBase ();
+  ApicBase = InternalX86GetApicBase ();
 
   if (StartValue != NULL) {
     *StartValue = MmioRead32 (ApicBase + 0x380);
@@ -163,6 +257,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0;
   }
 
-  return mFrequencies[AsmMsrBitFieldRead32 (44, 16, 18)] /
-         mDivisor[MmioBitFieldRead32 (ApicBase + 0x3e0, 0, 3)];
+  return InternalX86GetTimerFrequency (ApicBase);
 }
