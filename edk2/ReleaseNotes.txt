@@ -192,6 +192,21 @@ many other POSIX-compliant host operating environments. To compile the custom
 gcc tool chain, you need the following tools on your host computer: bash, gcc, 
 gmake, curl (or wget).
 
+Only the MdePkg and EdkModulePkg are currently supported by gcc builds. Other
+builds, such as the EdkNt32Pkg, will not compile with gcc.
+
+----------------------------
+A Word on compiling on Linux
+----------------------------
+
+In order to compile on Linux, you will need to have the e2fsprogs-dev package
+installed.  Check your distribution for the rpm, deb or other package format.
+This package contains the uuid library and header that are used by some of the
+host tools.
+
+If you are running on x86_64 Linux, then you should install a 64 bit version of
+the Java JDK. The version that was used was jdk-1_5_0_07-linux-amd64-rpm.bin.
+It may be downloaded from sun.com.
 
 -----------------------
 Notes on Documentation
