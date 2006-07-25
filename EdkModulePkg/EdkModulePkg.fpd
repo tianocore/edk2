@@ -4326,7 +4326,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="X64 EBC IPF" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F">
+    <ModuleSA SupArchList="X64 EBC" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F">
       <Libraries>
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
