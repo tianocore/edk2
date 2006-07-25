@@ -15,6 +15,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env" />
+  <condition property="HostArch" value="x64">
+    <os arch="amd64"/>
+  </condition>
+  <condition property="HostArch" value="Ia32">
+    <os arch="x86"/>
+  </condition>
+  <condition property="HostArch" value="Ia32">
+    <os arch="i386"/>
+  </condition>
   <property name="WORKSPACE" value="${env.WORKSPACE}" />
   <property name="WORKSPACE_DIR" value="${WORKSPACE}" />
   <property name="PACKAGE" value="Tools" />
@@ -77,6 +86,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
     <condition property="linux" value="true">
       <os name="Linux"/>
+    </condition>
+    
+    <condition property="x86_64_linux">
+      <and>
+        <os name="Linux"/>
+        <equals arg1="${HostArch}" arg2="x64"/>
+      </and>
     </condition>
     
     <condition property="windows" value="true">

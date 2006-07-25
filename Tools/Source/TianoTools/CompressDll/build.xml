@@ -89,7 +89,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       >
       <fileset dir="${ToolName}" includes="${LibFileSet}" defaultexcludes="TRUE" excludes="*.xml *.inf"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
+      <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <includepath path="${env.JAVA_HOME}/include"/>
       <includepath path="${env.JAVA_HOME}/include/win32" if="windows"/>

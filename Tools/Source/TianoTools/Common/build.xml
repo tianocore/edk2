@@ -82,8 +82,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outtype="static"
         optimize="speed">
 
+      <compilerarg value="-fPIC" if="x86_64_linux"/>
+
       <includepath path="${PACKAGE_DIR}/Include"/>
-      <includepath path="${PACKAGE_DIR}/Include/Ia32"/>
+      <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
 
       <fileset dir="${basedir}/Common" 
         includes="*.c" />
