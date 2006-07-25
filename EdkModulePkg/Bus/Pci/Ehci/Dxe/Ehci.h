@@ -27,10 +27,8 @@ Revision History
 //
 #include <IndustryStandard/pci22.h>
 
-#ifdef EFI_DEBUG
 extern UINTN  gEHCDebugLevel;
 extern UINTN  gEHCErrorLevel;
-#endif
 
 #define STALL_1_MACRO_SECOND              1
 #define STALL_1_MILLI_SECOND              1000 * STALL_1_MACRO_SECOND
