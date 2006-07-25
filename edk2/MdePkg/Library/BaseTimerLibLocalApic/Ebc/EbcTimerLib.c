@@ -21,7 +21,7 @@
 
   @param  MicroSeconds  The minimum number of microseconds to delay.
 
-  @return Return value depends on implementation.
+  @return MicroSeconds
 
 **/
 UINTN
@@ -34,7 +34,7 @@ MicroSecondDelay (
   // EBC architecture does not support local APIC timer.
   //
   ASSERT (FALSE);
-  return 0;
+  return MicroSeconds;
 }
 
 /**
@@ -44,7 +44,7 @@ MicroSecondDelay (
 
   @param  NanoSeconds The minimum number of nanoseconds to delay.
 
-  @return Return value depends on implementation.
+  @return NanoSeconds
 
 **/
 UINTN
@@ -57,7 +57,7 @@ NanoSecondDelay (
   // EBC architecture does not support local APIC timer.
   //
   ASSERT (FALSE);
-  return 0;
+  return NanoSeconds;
 }
 
 /**
@@ -119,5 +119,5 @@ GetPerformanceCounterProperties (
   // EBC architecture does not support local APIC timer.
   //
   ASSERT (FALSE);
-  return 0;  
+  return 0;
 }
