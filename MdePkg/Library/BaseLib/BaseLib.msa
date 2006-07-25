@@ -378,6 +378,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="X64">X64/ReadPmc.asm</Filename>
     <Filename SupArchList="X64">X64/Monitor.asm</Filename>
     <Filename SupArchList="X64">X64/Mwait.asm</Filename>
+    <Filename SupArchList="X64">X64/EnablePaging64.asm</Filename>
     <Filename SupArchList="X64">X64/DisablePaging64.asm</Filename>
     <Filename SupArchList="X64">X64/Wbinvd.asm</Filename>
     <Filename SupArchList="X64">X64/Invd.asm</Filename>
