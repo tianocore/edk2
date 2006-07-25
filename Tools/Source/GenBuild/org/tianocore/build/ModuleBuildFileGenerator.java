@@ -16,6 +16,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -211,7 +213,8 @@ public class ModuleBuildFileGenerator {
             // generate all directory path
             //
             (new File(file.getParent())).mkdirs();
-            Result result = new StreamResult(file);
+            FileOutputStream outputStream = new FileOutputStream(file);
+            Result result = new StreamResult(new OutputStreamWriter(outputStream));
             
             //
             // Write the DOM document to the file
