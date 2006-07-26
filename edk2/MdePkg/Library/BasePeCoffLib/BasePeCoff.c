@@ -488,6 +488,15 @@ PeCoffLoaderImageAddress (
   IN     UINTN                                 Address
   )
 {
+  //
+  // @bug Check to make sure ImageSize is correct for the relocated image. 
+  //      it may only work for the file we start with and not the relocated image
+  //
+  if (Address >= ImageContext->ImageSize) {
+    ImageContext->ImageError = IMAGE_ERROR_INVALID_IMAGE_ADDRESS;
+    return NULL;
+  }
+
   return (CHAR8 *)((UINTN) ImageContext->ImageAddress + Address);
 }
 
