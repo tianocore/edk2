@@ -25,6 +25,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
@@ -75,7 +76,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
 
     private JLabel jLabelHelpText = null;
 
-    private JTextField jTextFieldHelpText = null;
+    private JTextArea jTextAreaHelpText = null;
 
     private JScrollPane jScrollPane = null;
 
@@ -95,6 +96,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
 
     private JButton jButtonCancel = null;
 
+    private JScrollPane jScrollPaneHelpText = null;
     //
     // Not used by UI
     //
@@ -152,18 +154,33 @@ public class PCDsDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes jTextFieldHelpText	
+     * This method initializes jTextAreaHelpText	
      * 	
-     * @return javax.swing.JTextField	
+     * @return javax.swing.JTextArea	
      */
-    private JTextField getJTextFieldHelpText() {
-        if (jTextFieldHelpText == null) {
-            jTextFieldHelpText = new JTextField();
-            jTextFieldHelpText.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
-            jTextFieldHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
+    private JTextArea getJTextAreaHelpText() {
+        if (jTextAreaHelpText == null) {
+            jTextAreaHelpText = new JTextArea();
+            jTextAreaHelpText.setLineWrap(true);
+            jTextAreaHelpText.setWrapStyleWord(true);
+//            jTextAreaHelpText.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+//            jTextAreaHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
         }
-        return jTextFieldHelpText;
+        return jTextAreaHelpText;
     }
+    private JScrollPane getJScrollPaneHelpText() {
+      if (jScrollPaneHelpText == null ) {
+        jScrollPaneHelpText = new JScrollPane();
+        jScrollPaneHelpText.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
+        jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
+        jScrollPaneHelpText.setLocation(new java.awt.Point(160, 85));
+        jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
+
+      }
+      return jScrollPaneHelpText;
+    }
+
 
     /**
      This method initializes jScrollPane  
@@ -201,8 +218,9 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 130, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
+            //jLabelFeatureFlag.setBounds(new  java.awt.Rectangle(15, 130, 140, 20));
         }
         return jTextFieldFeatureFlag;
     }
@@ -216,7 +234,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 165, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 185, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -232,7 +250,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 165, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 185, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -248,7 +266,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
      
      **/
     private void init() {
-        this.setSize(508, 240);
+        this.setSize(508, 260);
         this.setContentPane(getJScrollPane());
         this.setTitle("Pcd Coded");
         initFrame();
@@ -271,7 +289,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
             this.jComboBoxCName.setSelectedItem(id.getName());
             this.jTextFieldTokenSpaceGuid.setText(id.getGuid());
             this.jTextFieldDefaultValue.setText(id.getValue());
-            this.jTextFieldHelpText.setText(id.getHelp());
+            this.jTextAreaHelpText.setText(id.getHelp());
             this.jComboBoxItemType.setSelectedItem(id.getType());
             this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
             this.jArchCheckBox.setSelectedItems(id.getSupArchList());
@@ -312,30 +330,32 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 135, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
             jLabelArch.setText("Sup Arch List");
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
             jLabelFeatureFlag.setText("Feature Flag");
             jLabelTokenSpaceGuid = new JLabel();
-            jLabelTokenSpaceGuid.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
             jLabelTokenSpaceGuid.setText("Token Space C Name");
             jLabelTokenSpaceGuid.setVisible(false);
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
             jLabelHelpText.setText("Help Text");
             jLabelC_Name = new JLabel();
             jLabelC_Name.setText("C Name");
-            jLabelC_Name.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
             jLabelDefaultValue = new JLabel();
             jLabelDefaultValue.setText("Default Value");
-            jLabelDefaultValue.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
             jLabelItemType = new JLabel();
             jLabelItemType.setText("Item Type");
-            jLabelItemType.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
+
+            jLabelC_Name.setBounds(new       java.awt.Rectangle(15, 10, 140, 20));
+            jLabelItemType.setBounds(new     java.awt.Rectangle(15, 35, 140, 20));
+            jLabelDefaultValue.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
+            jLabelHelpText.setBounds(new     java.awt.Rectangle(15, 85, 140, 20));
+            jLabelFeatureFlag.setBounds(new  java.awt.Rectangle(15, 130, 140, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(15, 155, 140, 20));
+
+            jArchCheckBox.setBounds(new      java.awt.Rectangle(160, 155, 320, 20));
+            jLabelTokenSpaceGuid.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
@@ -346,6 +366,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
             jContentPane.add(getJComboBoxCName(), null);
             jContentPane.add(jLabelDefaultValue, null);
             jContentPane.add(getJTextFieldDefaultValue(), null);
+            jContentPane.add(getJScrollPaneHelpText(), null);
             jContentPane.add(getJComboBoxItemType(), null);
             jStarLabel1 = new StarLabel();
             jStarLabel1.setLocation(new java.awt.Point(0, 10));
@@ -357,7 +378,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jStarLabel3, null);
             jContentPane.add(jLabelHelpText, null);
-            jContentPane.add(getJTextFieldHelpText(), null);
+//            jContentPane.add(getJTextFieldHelpText(), null);
 
             jContentPane.add(jLabelTokenSpaceGuid, null);
             jContentPane.add(getJTextFieldTokenSpaceGuid(), null);
@@ -449,8 +470,8 @@ public class PCDsDlg extends IDialog implements ItemListener {
         //
         // Check HelpText
         //
-        if (isEmpty(this.jTextFieldHelpText.getText())) {
-            Log.wrn("Update PcdCoded", "Help Text couldn't be empty");
+        if (isEmpty(this.jTextAreaHelpText.getText())) {
+            Log.wrn("Update PcdCoded", "Help Text should not be empty");
             return false;
         }
 
@@ -475,7 +496,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         Vector<String> arg3 = this.jArchCheckBox.getSelectedItemsVector();
 
         String arg4 = this.jTextFieldDefaultValue.getText();
-        String arg5 = this.jTextFieldHelpText.getText();
+        String arg5 = this.jTextAreaHelpText.getText();
         String arg6 = this.jComboBoxItemType.getSelectedItem().toString();
         id = new PcdCodedIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
         return id;
@@ -504,9 +525,9 @@ public class PCDsDlg extends IDialog implements ItemListener {
             } else {
                 this.jTextFieldTokenSpaceGuid.setText(pcd.getPcd(index).getGuidCName());
                 Tools.generateComboBoxByVector(this.jComboBoxItemType, pcd.getPcd(index).getType());
-                this.jTextFieldHelpText.setText(pcd.getPcd(index).getHelp());
-                this.jTextFieldHelpText.setSelectionStart(0);
-                this.jTextFieldHelpText.setSelectionEnd(0);
+                this.jTextAreaHelpText.setText(pcd.getPcd(index).getHelp());
+                this.jTextAreaHelpText.setSelectionStart(0);
+                this.jTextAreaHelpText.setSelectionEnd(0);
             }
         }
     }
