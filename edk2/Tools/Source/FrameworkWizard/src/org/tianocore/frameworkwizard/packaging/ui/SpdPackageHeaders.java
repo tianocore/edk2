@@ -564,8 +564,21 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     public void tableChanged(TableModelEvent arg0) {
         // TODO Auto-generated method stub
         int row = arg0.getFirstRow();
+        int column = arg0.getColumn();
         TableModel m = (TableModel)arg0.getSource();
         if (arg0.getType() == TableModelEvent.UPDATE){
+            String[] sa = new String[2];
+            sfc.getSpdModuleHeader(sa, row);
+            Object cellData = m.getValueAt(row, column);
+            if (cellData == null) {
+                cellData = "";
+            }
+            if (cellData.equals(sa[column])) {
+                return;
+            }
+            if (cellData.toString().length() == 0 && sa[column] == null) {
+                return;
+            }
             String pkg = m.getValueAt(row, 0) + "";
             String hdr = m.getValueAt(row, 1) + "";
             String[] rowData = {pkg, hdr};

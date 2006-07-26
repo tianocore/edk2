@@ -35,7 +35,6 @@ import javax.swing.JTextField;
 import org.tianocore.PlatformSurfaceAreaDocument;
 
 import org.tianocore.frameworkwizard.common.DataValidation;
-import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
@@ -146,6 +145,9 @@ public class FpdHeader extends IInternalFrame {
                        JOptionPane.showMessageDialog(frame, "Package Name is NOT UiNameType.");
                        return;
                    }
+                   if (jTextFieldBaseName.getText().equals(ffc.getFpdHdrPlatformName())) {
+                       return;
+                   }
                    docConsole.setSaved(false);
                    ffc.setFpdHdrPlatformName(jTextFieldBaseName.getText());
                } 
@@ -171,6 +173,9 @@ public class FpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Guid is NOT GuidType.");
                         return;
                     }
+                    if (jTextFieldGuid.getText().equals(ffc.getFpdHdrGuidValue())) {
+                        return;
+                    }
                     docConsole.setSaved(false);
                     ffc.setFpdHdrGuidValue(jTextFieldGuid.getText());
                 } 
@@ -194,6 +199,9 @@ public class FpdHeader extends IInternalFrame {
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isVersion(jTextFieldVersion.getText())) {
                         JOptionPane.showMessageDialog(frame, "Version is NOT version type.");
+                        return;
+                    }
+                    if (jTextFieldVersion.getText().equals(ffc.getFpdHdrVer())) {
                         return;
                     }
                     docConsole.setSaved(false);
@@ -237,6 +245,9 @@ public class FpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "License contents could NOT be empty.");
                         return;
                     }
+                    if (jTextAreaLicense.getText().equals(ffc.getFpdHdrLicense())) {
+                        return;
+                    }
                     docConsole.setSaved(false);
                     ffc.setFpdHdrLicense(jTextAreaLicense.getText());
                 } 
@@ -259,6 +270,9 @@ public class FpdHeader extends IInternalFrame {
                 public void focusLost(FocusEvent e) {
                     if (jTextAreaDescription.getText().length() == 0) {
                         JOptionPane.showMessageDialog(frame, "Description contents could NOT be empty.");
+                        return;
+                    }
+                    if (jTextAreaDescription.getText().equals(ffc.getFpdHdrDescription())) {
                         return;
                     }
                     docConsole.setSaved(false);
@@ -374,6 +388,9 @@ public class FpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Abstract could NOT be empty.");
                         return;
                     }
+                    if (jTextFieldAbstract.getText().equals(ffc.getFpdHdrAbs())) {
+                        return;
+                    }
                     docConsole.setSaved(false);
                     ffc.setFpdHdrAbs(jTextFieldAbstract.getText());
                 } 
@@ -399,6 +416,9 @@ public class FpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Copyright contents could not be empty.");
                         return;
                     }
+                    if (jTextFieldCopyright.getText().equals(ffc.getFpdHdrCopyright())) {
+                        return;
+                    }
                     docConsole.setSaved(false);
                     ffc.setFpdHdrCopyright(jTextFieldCopyright.getText());
                 } 
@@ -419,6 +439,12 @@ public class FpdHeader extends IInternalFrame {
             jTextField.setPreferredSize(new Dimension(320, 20));
             jTextField.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
+                   if (jTextField.getText().length() == 0 && ffc.getFpdHdrUrl() == null) {
+                       return;
+                   }
+                   if (jTextField.getText().equals(ffc.getFpdHdrUrl())) {
+                       return;
+                   }
                    ffc.setFpdHdrLicense(jTextAreaLicense.getText());
                    ffc.setFpdHdrUrl(jTextField.getText());
                    docConsole.setSaved(false);
@@ -613,13 +639,7 @@ public class FpdHeader extends IInternalFrame {
      *
      */
     public void actionPerformed(ActionEvent arg0) {
-        if (arg0.getSource() == jButtonOk) {
-            this.save();
-            this.setEdited(true);
-        }
-        if (arg0.getSource() == jButtonCancel) {
-            this.setEdited(false);
-        }
+        
         if (arg0.getSource() == jButtonGenerateGuid) {
             docConsole.setSaved(false);
             jTextFieldGuid.setText(Tools.generateUuidString());
@@ -627,78 +647,7 @@ public class FpdHeader extends IInternalFrame {
         }
     }
 
-    /**
-     Data validation for all fields
-     
-     @retval true - All datas are valid
-     @retval false - At least one data is invalid
-     
-     **/
-    public boolean check() {
-        //
-        // Check if all required fields are not empty
-        //
-        if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Update Fpd Header", "Base Name couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.wrn("Update Fpd Header", "Guid couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.wrn("Update Fpd Header", "Version couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextAreaLicense.getText())) {
-            Log.wrn("Update Fpd Header", "License couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldCopyright.getText())) {
-            Log.wrn("Update Fpd Header", "Copyright couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextAreaDescription.getText())) {
-            Log.wrn("Update Fpd Header", "Description couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldAbstract.getText())) {
-            Log.wrn("Update Fpd Header", "Abstract couldn't be empty");
-            return false;
-        }
-
-        //
-        // Check if all fields have correct data types 
-        //
-        if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Update Fpd Header", "Incorrect data type for Base Name");
-            return false;
-        }
-        if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-            Log.wrn("Update Fpd Header", "Incorrect data type for Guid");
-            return false;
-        }
-        if (!DataValidation.isAbstract(this.jTextFieldAbstract.getText())) {
-            Log.wrn("Update Fpd Header", "Incorrect data type for Abstract");
-            return false;
-        }
-        if (!DataValidation.isCopyright(this.jTextFieldCopyright.getText())) {
-            Log.wrn("Update Fpd Header", "Incorrect data type for Copyright");
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     Save all components of Fpd Header
-     if exists FpdHeader, set the value directly
-     if not exists FpdHeader, new an instance first
-     
-     **/
-    public void save() {
-        
-    }
-
+    
     /**
      This method initializes Package type and Compontent type
      
