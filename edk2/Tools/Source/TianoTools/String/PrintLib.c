@@ -403,7 +403,8 @@ BasePrintLibVSPrint (
       }
       break;
     case '\n':
-      ArgumentString = "\r\n";
+      ArgumentString = "\n";
+	  
       break;
     default:
       ArgumentString = (CHAR8 *)&FormatCharacter;
