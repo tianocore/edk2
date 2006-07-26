@@ -721,16 +721,66 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     public void tableChanged(TableModelEvent arg0) {
         // TODO Auto-generated method stub
         int row = arg0.getFirstRow();
+        int column = arg0.getColumn();
         TableModel m = (TableModel)arg0.getSource();
         if (arg0.getType() == TableModelEvent.UPDATE){
+            String[] sa = new String[9];
+            sfc.getSpdPcdDeclaration(sa, row);
+            Object cellData = m.getValueAt(row, column);
+            if (column < 6) {
+                
+                if (cellData == null) {
+                    cellData = "";
+                }
+                if (cellData.equals(sa[column])) {
+                    return;
+                }
+                if (cellData.toString().length() == 0 && sa[column] == null) {
+                    return;
+                }
+            }
             
+            String usage = getValidUsage(new Boolean(m.getValueAt(row, 6)+""), new Boolean(m.getValueAt(row, 7)+""), new Boolean(m.getValueAt(row, 8)+""), new Boolean(m.getValueAt(row, 9)+""), new Boolean(m.getValueAt(row, 10)+""));
+            if (usage.length() == 0) {
+                JOptionPane.showMessageDialog(frame, "You must choose at least one usage for PCD entry.");
+                return;
+            }
+            if (column <= 10 && column >= 6) {
+                if (compareTwoVectors(stringToVector(usage), stringToVector(sa[6]))) {
+                    return;
+                }
+            }
+            
+            if (column == 11) {
+                if (cellData == null) {
+                    cellData = "";
+                }
+                if (cellData.equals(sa[7])) {
+                    return;
+                }
+                if (cellData.toString().length() == 0 && sa[7] == null) {
+                    return;
+                }
+            }
+            
+            if (column == 12) {
+                if (cellData == null) {
+                    cellData = "";
+                }
+                if (cellData.equals(sa[8])) {
+                    return;
+                }
+                if (cellData.toString().length() == 0 && sa[8] == null) {
+                    return;
+                }
+            }
             String cName = m.getValueAt(row, 0) + "";
             String token = m.getValueAt(row, 1) + "";
             String ts = m.getValueAt(row, 2) + "";
             String dataType = m.getValueAt(row, 3) + "";
             String defaultVal = m.getValueAt(row, 4) + "";
             String help = m.getValueAt(row, 5) + "";
-            String usage = getValidUsage(new Boolean(m.getValueAt(row, 6)+""), new Boolean(m.getValueAt(row, 7)+""), new Boolean(m.getValueAt(row, 8)+""), new Boolean(m.getValueAt(row, 9)+""), new Boolean(m.getValueAt(row, 10)+""));
+            
             
             String archList = null;
             if (m.getValueAt(row, 11) != null){
@@ -740,10 +790,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             if (m.getValueAt(row, 12) != null) {
                 modTypeList = m.getValueAt(row, 12).toString(); 
             }
-            if (usage.length() == 0) {
-                JOptionPane.showMessageDialog(frame, "You must choose at least one usage for PCD entry.");
-                return;
-            }
+            
             Object[] o = {cName, token, ts, dataType, defaultVal, help};
             if (!dataValidation(o)){
                 return;
@@ -966,6 +1013,30 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             s += " ";
         }
         return s.trim();
+    }
+    
+    protected Vector<String> stringToVector(String s){
+        if (s == null) {
+            return null;
+        }
+        String[] sArray = s.split(" ");
+        Vector<String> v = new Vector<String>();
+        for (int i = 0; i < sArray.length; ++i) {
+            v.add(sArray[i]);
+        }
+        return v;
+    }
+    
+    private boolean compareTwoVectors(Vector v1, Vector v2) {
+        if (v1.size() != v2.size()) {
+            return false;
+        }
+        for (int i = 0; i < v1.size(); ++i) {
+            if (!v2.contains(v1.get(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 } //  @jve:decl-index=0:visual-constraint="22,11"
 

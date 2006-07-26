@@ -32,7 +32,6 @@ import javax.swing.JTextField;
 
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
-import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
@@ -144,6 +143,9 @@ public class SpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Package Name is NOT UiNameType.");
                         return;
                     }
+                    if (jTextFieldBaseName.getText().equals(sfc.getSpdHdrPkgName())) {
+                        return;
+                    }
                     docConsole.setSaved(false);
                     sfc.setSpdHdrPkgName(jTextFieldBaseName.getText());
                 }
@@ -169,6 +171,9 @@ public class SpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Guid is NOT GuidType.");
                         return;
                     }
+                    if (jTextFieldGuid.getText().equals(sfc.getSpdHdrGuidValue())) {
+                        return;
+                    }
                     docConsole.setSaved(false);
                     sfc.setSpdHdrGuidValue(jTextFieldGuid.getText());
                 }
@@ -192,6 +197,9 @@ public class SpdHeader extends IInternalFrame {
                public void focusLost(FocusEvent e){
                    if (!DataValidation.isVersion(jTextFieldVersion.getText())) {
                        JOptionPane.showMessageDialog(frame, "Version is NOT version type.");
+                       return;
+                   }
+                   if (jTextFieldVersion.getText().equals(sfc.getSpdHdrVer())){
                        return;
                    }
                    docConsole.setSaved(false);
@@ -228,12 +236,14 @@ public class SpdHeader extends IInternalFrame {
         if (jTextAreaLicense == null) {
             jTextAreaLicense = new JTextArea();
             jTextAreaLicense.setText("");
-//            jTextAreaLicense.setPreferredSize(new java.awt.Dimension(317,77));
             jTextAreaLicense.setLineWrap(true);
             jTextAreaLicense.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
                     if (jTextAreaLicense.getText().length() == 0) {
                         JOptionPane.showMessageDialog(frame, "License contents could NOT be empty.");
+                        return;
+                    }
+                    if (jTextAreaLicense.getText().equals(sfc.getSpdHdrLicense())) {
                         return;
                     }
                     docConsole.setSaved(false);
@@ -254,11 +264,13 @@ public class SpdHeader extends IInternalFrame {
         if (jTextAreaDescription == null) {
             jTextAreaDescription = new JTextArea();
             jTextAreaDescription.setLineWrap(true);
-//            jTextAreaDescription.setPreferredSize(new java.awt.Dimension(317,77));
             jTextAreaDescription.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
                     if (jTextAreaDescription.getText().length() == 0) {
                         JOptionPane.showMessageDialog(frame, "Description contents could NOT be empty.");
+                        return;
+                    }
+                    if (jTextAreaDescription.getText().equals(sfc.getSpdHdrDescription())) {
                         return;
                     }
                     docConsole.setSaved(false);
@@ -374,6 +386,9 @@ public class SpdHeader extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "Abstract could NOT be empty.");
                         return;
                     }
+                    if (jTextFieldAbstract.getText().equals(sfc.getSpdHdrAbs())) {
+                        return;
+                    }
                     docConsole.setSaved(false);
                     sfc.setSpdHdrAbs(jTextFieldAbstract.getText());
                 }
@@ -399,6 +414,9 @@ public class SpdHeader extends IInternalFrame {
                        JOptionPane.showMessageDialog(frame, "Copyright contents could not be empty.");
                        return;
                    }
+                   if (jTextFieldCopyright.getText().equals(sfc.getSpdHdrCopyright())) {
+                       return;
+                   }
                    docConsole.setSaved(false);
                    sfc.setSpdHdrCopyright(jTextFieldCopyright.getText());
                } 
@@ -419,6 +437,12 @@ public class SpdHeader extends IInternalFrame {
             jTextField.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextField.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
+                   if (jTextField.getText().length() == 0 && sfc.getSpdHdrUrl() == null) {
+                       return;
+                   }
+                   if (jTextField.getText().equals(sfc.getSpdHdrUrl())) {
+                       return;
+                   }
                    sfc.setSpdHdrLicense(jTextAreaLicense.getText());
                    sfc.setSpdHdrUrl(jTextField.getText());
                    docConsole.setSaved(false);
@@ -612,98 +636,15 @@ public class SpdHeader extends IInternalFrame {
      *
      */
     public void actionPerformed(ActionEvent arg0) {
-        docConsole.setSaved(false);
-        if (arg0.getSource() == jButtonOk) {
-            this.save();
-            this.setEdited(true);
-        }
-        if (arg0.getSource() == jButtonCancel) {
-            this.setEdited(false);
-        }
+        
         if (arg0.getSource() == jButtonGenerateGuid) {
             //ToDo: invoke GuidValueEditor
             jTextFieldGuid.setText(Tools.generateUuidString());
+            docConsole.setSaved(false);
             sfc.setSpdHdrGuidValue(jTextFieldGuid.getText());
         }
     }
-
-    /**
-     Data validation for all fields
-     
-     @retval true - All datas are valid
-     @retval false - At least one data is invalid
-     
-     **/
-    public boolean check() {
-        //
-        // Check if all required fields are not empty
-        //
-        if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Update Spd Header", "Base Name couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.wrn("Update Spd Header", "Guid couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.wrn("Update Spd Header", "Version couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextAreaLicense.getText())) {
-            Log.wrn("Update Spd Header", "License couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldCopyright.getText())) {
-            Log.wrn("Update Spd Header", "Copyright couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextAreaDescription.getText())) {
-            Log.wrn("Update Spd Header", "Description couldn't be empty");
-            return false;
-        }
-        if (isEmpty(this.jTextFieldAbstract.getText())) {
-            Log.wrn("Update Spd Header", "Abstract couldn't be empty");
-            return false;
-        }
-
-        //
-        // Check if all fields have correct data types 
-        //
-        if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Update Spd Header", "Incorrect data type for Base Name");
-            return false;
-        }
-        if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-            Log.wrn("Update Spd Header", "Incorrect data type for Guid");
-            return false;
-        }
-        if (!DataValidation.isAbstract(this.jTextFieldAbstract.getText())) {
-            Log.wrn("Update Spd Header", "Incorrect data type for Abstract");
-            return false;
-        }
-        if (!DataValidation.isCopyright(this.jTextFieldCopyright.getText())) {
-            Log.wrn("Update Spd Header", "Incorrect data type for Copyright");
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     Save all components of Spd Header
-     if exists spdHeader, set the value directly
-     if not exists spdHeader, new an instance first
-     
-     **/
-    public void save() {
-        try {
-            
-        } catch (Exception e) {
-            Log.wrn("Save Package", e.getMessage());
-            Log.err("Save Package", e.getMessage());
-        }
-    }
-
+    
     /**
      This method initializes Package type and Compontent type
      

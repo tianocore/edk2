@@ -641,14 +641,14 @@ public class SpdFileContents {
                 libClass[i][1] = lc.getIncludeHeader();
                 libClass[i][2] = lc.getHelpText();
 // LAH added logic so you cannot set the version unless the GUID is defined.
-/* LAH do not set now
-                if (lc.getRecommendedInstanceGuid() != null) {
+
+//                if (lc.getRecommendedInstanceGuid() != null) {
                   libClass[i][3] = lc.getRecommendedInstanceGuid();
-                  if (lc.getRecommendedInstanceVersion() != null) {
+//                  if (lc.getRecommendedInstanceVersion() != null) {
                     libClass[i][4] = lc.getRecommendedInstanceVersion();
-                  }
-                }
-*/
+//                  }
+//                }
+
                 if (lc.getSupArchList() != null) {
                     libClass[i][5] = listToString(lc.getSupArchList());
                 }
@@ -993,6 +993,27 @@ public class SpdFileContents {
                                   incHdrAttribPath, incHdrAttribClass, incHdrAttribVer, incHdrAttribOverrideID,
                                   incHdrAttribModuleType, spdLibClassDeclarations);
     }
+    
+    public void getSpdLibClassDeclaration(String[] sa, int i) {
+        if (getSpdLibClassDeclarations() == null) {
+            return;
+        }
+        XmlCursor cursor = getSpdLibClassDeclarations().newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            LibraryClassDeclarationsDocument.LibraryClassDeclarations.LibraryClass lc = (LibraryClassDeclarationsDocument.LibraryClassDeclarations.LibraryClass)cursor.getObject();
+            sa[0] = lc.getName();
+            sa[1] = lc.getIncludeHeader();
+            sa[2] = lc.getHelpText();
+            sa[3] = lc.getRecommendedInstanceGuid();
+            sa[4] = lc.getRecommendedInstanceVersion();
+            sa[5] = listToString(lc.getSupArchList());
+            sa[6] = listToString(lc.getSupModuleList());
+        }
+        cursor.dispose();
+    }
 
     /**
      Set library class declaration contents under parent tag
@@ -1118,6 +1139,20 @@ public class SpdFileContents {
         setSpdMsaFile(msaFileName, moduleName, ver, guid, spdMsaFiles);
         
     }
+    
+    public void getSpdMsaFile (String[] sa, int i) {
+        if (getSpdMsaFiles() == null) {
+            return;
+        }
+        XmlCursor cursor = getSpdMsaFiles().newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            sa[0] = cursor.getTextValue();
+        }
+        cursor.dispose();
+    }
 
     /**
      Set MsaFile contents under parent element.
@@ -1158,6 +1193,22 @@ public class SpdFileContents {
         //
         setSpdIncludeHeader(ModHdrModType, hdrFile, hdrAttribGuid, hdrAttribArch, hdrAttribPath, hdrAttribClass,
                             hdrAttribVer, hdrAttribOverID, spdModHdrs);
+    }
+    
+    public void getSpdModuleHeader(String[] sa, int i) {
+        if (getSpdModHdrs() == null) {
+            return;
+        }
+        XmlCursor cursor = getSpdModHdrs().newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            PackageHeadersDocument.PackageHeaders.IncludePkgHeader ih = (PackageHeadersDocument.PackageHeaders.IncludePkgHeader)cursor.getObject();
+            sa[0] = ih.getModuleType()+"";
+            sa[1] = ih.getStringValue();
+        }
+        cursor.dispose();
     }
 
     /**
@@ -1213,7 +1264,70 @@ public class SpdFileContents {
 
         setSpdEntry(ppiDeclEntryName, ppiDeclCName, ppiDeclGuid, ppiDeclFeatureFlag, archList, modTypeList, guidTypeList, spdPpiDeclarations);
     }
+    
+    public void getSpdGuidDeclaration(String[] sa, int i) {
+        if (getSpdGuidDeclarations() == null) {
+            return;
+        }
+        getSpdEntry(sa, i, getSpdGuidDeclarations());
+    }
+    
+    public void getSpdProtocolDeclaration(String[] sa, int i) {
+        if (getSpdProtocolDeclarations() == null) {
+            return;
+        }
+        getSpdEntry(sa, i, getSpdProtocolDeclarations());
+    }
+    
+    public void getSpdPpiDeclaration(String[] sa, int i) {
+        if (getSpdPpiDeclarations() == null) {
+            return;
+        }
+        getSpdEntry(sa, i, getSpdPpiDeclarations());
+    }
 
+    public void getSpdEntry(String[] sa, int i, XmlObject parent) {
+        XmlCursor cursor = parent.newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            if (parent instanceof GuidDeclarationsDocument.GuidDeclarations) {
+                GuidDeclarationsDocument.GuidDeclarations.Entry e = (GuidDeclarationsDocument.GuidDeclarations.Entry)cursor.getObject();
+                sa[0] = e.getName();
+                sa[1] = e.getCName();
+                sa[2] = e.getGuidValue();
+                sa[3] = e.getHelpText();
+                sa[4] = listToString(e.getSupArchList());
+                sa[5] = listToString(e.getSupModuleList());
+                sa[6] = listToString(e.getGuidTypeList());
+            }
+            
+            if (parent instanceof ProtocolDeclarationsDocument.ProtocolDeclarations) {
+                ProtocolDeclarationsDocument.ProtocolDeclarations.Entry e = (ProtocolDeclarationsDocument.ProtocolDeclarations.Entry)cursor.getObject();
+                sa[0] = e.getName();
+                sa[1] = e.getCName();
+                sa[2] = e.getGuidValue();
+                sa[3] = e.getHelpText();
+                sa[4] = listToString(e.getSupArchList());
+                sa[5] = listToString(e.getSupModuleList());
+                sa[6] = listToString(e.getGuidTypeList());
+            }
+            
+            if (parent instanceof PpiDeclarationsDocument.PpiDeclarations) {
+                PpiDeclarationsDocument.PpiDeclarations.Entry e = (PpiDeclarationsDocument.PpiDeclarations.Entry)cursor.getObject();
+                sa[0] = e.getName();
+                sa[1] = e.getCName();
+                sa[2] = e.getGuidValue();
+                sa[3] = e.getHelpText();
+                sa[4] = listToString(e.getSupArchList());
+                sa[5] = listToString(e.getSupModuleList());
+                sa[6] = listToString(e.getGuidTypeList());
+            }
+            
+        }
+        cursor.dispose();
+    }
     /**
      Set Entry contents using parameters passed in
      
@@ -1357,6 +1471,30 @@ public class SpdFileContents {
 
         setSpdPcdEntry(pcdItemTypes, cName, token, dataType, spaceGuid, help,
                        defaultString, archList, modTypeList, spdPcdDefinitions);
+    }
+    
+    public void getSpdPcdDeclaration(String[] sa, int i) {
+        if (getSpdPcdDefinitions() == null) {
+            return;
+        }
+        
+        XmlCursor cursor = getSpdPcdDefinitions().newCursor();
+        if (cursor.toFirstChild()) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling();
+            }
+            PcdDeclarationsDocument.PcdDeclarations.PcdEntry pe = (PcdDeclarationsDocument.PcdDeclarations.PcdEntry)cursor.getObject();
+            sa[0] = pe.getCName();
+            sa[1] = pe.getToken()+"";
+            sa[2] = pe.getTokenSpaceGuidCName();
+            sa[3] = pe.getDatumType()+"";
+            sa[4] = pe.getDefaultValue();
+            sa[5] = pe.getHelpText();
+            sa[6] = listToString(pe.getValidUsage());
+            sa[7] = listToString(pe.getSupArchList());
+            sa[8] = listToString(pe.getSupModuleList());
+        }
+        cursor.dispose();
     }
 
     /**

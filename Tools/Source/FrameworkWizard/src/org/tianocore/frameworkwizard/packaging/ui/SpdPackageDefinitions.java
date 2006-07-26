@@ -128,8 +128,11 @@ public class SpdPackageDefinitions extends IInternalFrame {
             jComboBoxReadOnly.setSelectedIndex(1);
             jComboBoxReadOnly.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (jComboBoxReadOnly.getSelectedItem().equals(sfc.getSpdPkgDefsRdOnly())) {
+                        return;
+                    }
                     if (docConsole != null) {
-                    docConsole.setSaved(false);
+                        docConsole.setSaved(false);
                     }
                     sfc.setSpdPkgDefsRdOnly(jComboBoxReadOnly.getSelectedItem()+"");
                 }
@@ -153,6 +156,9 @@ public class SpdPackageDefinitions extends IInternalFrame {
             jComboBoxRePackage.setSelectedIndex(0);
             jComboBoxRePackage.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (jComboBoxRePackage.getSelectedItem().equals(sfc.getSpdPkgDefsRePkg())) {
+                        return;
+                    }
                     if (docConsole != null) {
                         docConsole.setSaved(false);
                     }

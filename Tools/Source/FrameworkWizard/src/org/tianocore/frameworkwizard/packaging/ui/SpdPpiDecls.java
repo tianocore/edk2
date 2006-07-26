@@ -62,7 +62,7 @@ public class SpdPpiDecls extends SpdGuidDecls {
         if (sfc.getSpdPpiDeclarationCount() == 0) {
             return ;
         }
-        String[][] saa = new String[sfc.getSpdPpiDeclarationCount()][7];
+        saa = new String[sfc.getSpdPpiDeclarationCount()][7];
         sfc.getSpdPpiDeclarations(saa);
         int i = 0;
         while (i < saa.length) {
@@ -71,7 +71,20 @@ public class SpdPpiDecls extends SpdGuidDecls {
         }
     }
     
-    protected void updateRow(int row, TableModel m){
+    protected void updateRow(int row, int column, TableModel m){
+        String[] sa = new String[7];
+        sfc.getSpdPpiDeclaration(sa, row);
+        Object cellData = m.getValueAt(row, column);
+        if (cellData == null) {
+            cellData = "";
+        }
+        if (cellData.equals(sa[column])) {
+            return;
+        }
+        if (cellData.toString().length() == 0 && sa[column] == null) {
+            return;
+        }
+        
         String name = m.getValueAt(row, 0) + "";
         String cName = m.getValueAt(row, 1) + "";
         String guid = m.getValueAt(row, 2) + "";

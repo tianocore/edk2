@@ -62,7 +62,7 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         if (sfc.getSpdProtocolDeclarationCount() == 0) {
             return ;
         }
-        String[][] saa = new String[sfc.getSpdProtocolDeclarationCount()][7];
+        saa = new String[sfc.getSpdProtocolDeclarationCount()][7];
         sfc.getSpdProtocolDeclarations(saa);
         int i = 0;
         while (i < saa.length) {
@@ -72,7 +72,20 @@ public class SpdProtocolDecls extends SpdGuidDecls {
         
     }
     
-    protected void updateRow(int row, TableModel m){
+    protected void updateRow(int row, int column, TableModel m){
+        String[] sa = new String[7];
+        sfc.getSpdProtocolDeclaration(sa, row);
+        Object cellData = m.getValueAt(row, column);
+        if (cellData == null) {
+            cellData = "";
+        }
+        if (cellData.equals(sa[column])) {
+            return;
+        }
+        if (cellData.toString().length() == 0 && sa[column] == null) {
+            return;
+        }
+        
         String name = m.getValueAt(row, 0) + "";
         String cName = m.getValueAt(row, 1) + "";
         String guid = m.getValueAt(row, 2) + "";

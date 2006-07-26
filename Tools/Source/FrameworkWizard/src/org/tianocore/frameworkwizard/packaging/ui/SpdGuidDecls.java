@@ -129,7 +129,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
 
     private JLabel jLabel3 = null;
 
-
+    protected String[][] saa = null;
 
     /**
       This method initializes this
@@ -237,6 +237,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
                    }
                    else{
                        selectedRow = lsm.getMinSelectionIndex();
+                       
                    }
                }
            });
@@ -250,14 +251,28 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
    public void tableChanged(TableModelEvent arg0) {
        // TODO Auto-generated method stub
        int row = arg0.getFirstRow();
+       int column = arg0.getColumn();
        TableModel m = (TableModel)arg0.getSource();
        if (arg0.getType() == TableModelEvent.UPDATE){
            
-           updateRow(row, m);
+           updateRow(row, column, m);
        }
    }
    
-   protected void updateRow(int row, TableModel m){
+   protected void updateRow(int row, int column, TableModel m){
+       String[] sa = new String[7];
+       sfc.getSpdGuidDeclaration(sa, row);
+       Object cellData = m.getValueAt(row, column);
+       if (cellData == null) {
+           cellData = "";
+       }
+       if (cellData.equals(sa[column])) {
+           return;
+       }
+       if (cellData.toString().length() == 0 && sa[column] == null) {
+           return;
+       }
+       
        String name = m.getValueAt(row, 0) + "";
        String cName = m.getValueAt(row, 1) + "";
        String guid = m.getValueAt(row, 2) + "";
@@ -409,7 +424,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         //
         // initialize table using SpdFileContents object
         //
-        String[][] saa = new String[sfc.getSpdGuidDeclarationCount()][7];
+        saa = new String[sfc.getSpdGuidDeclarationCount()][7];
         sfc.getSpdGuidDeclarations(saa);
         int i = 0;
         while (i < saa.length) {
