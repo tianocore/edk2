@@ -150,7 +150,7 @@ public class MsaHeader extends IInternalFrame {
             jTextFieldBaseName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jTextFieldBaseName.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldBaseName.addFocusListener(this);
-            jTextFieldBaseName.setToolTipText("An brief Identifier, such as USB I/O Library, of the module");
+            jTextFieldBaseName.setToolTipText("A brief Identifier, such as USB I/O Library, of the module");
         }
         return jTextFieldBaseName;
     }
@@ -168,7 +168,7 @@ public class MsaHeader extends IInternalFrame {
             jTextFieldGuid.setLocation(new java.awt.Point(160, 60));
             jTextFieldGuid.setSize(new java.awt.Dimension(250, 20));
             jTextFieldGuid.addFocusListener(this);
-            jTextFieldGuid.setToolTipText("Guaranteed Unique Identification Number (8-4-4-4-12)");
+            jTextFieldGuid.setToolTipText("Guaranteed Unique Identification Number, Registry Format (8-4-4-4-12)");
         }
         return jTextFieldGuid;
     }
@@ -186,7 +186,7 @@ public class MsaHeader extends IInternalFrame {
             jTextFieldVersion.setLocation(new java.awt.Point(160, 85));
             jTextFieldVersion.setSize(new java.awt.Dimension(320, 20));
             jTextFieldVersion.addFocusListener(this);
-            jTextFieldVersion.setToolTipText("A Version Number, 1.0, 1, 1.01");
+            jTextFieldVersion.setToolTipText("A Version Number, 1.0, 1, 1.01, 1.0.1");
         }
         return jTextFieldVersion;
     }
@@ -224,7 +224,7 @@ public class MsaHeader extends IInternalFrame {
             jTextAreaLicense.setWrapStyleWord(true);
             jTextAreaLicense.setSelectionStart(0);
             jTextAreaLicense.setSelectionEnd(0);
-            jTextAreaLicense.setToolTipText("The License for this file");
+            jTextAreaLicense.setToolTipText("The License for this Module.");
         }
         return jTextAreaLicense;
     }

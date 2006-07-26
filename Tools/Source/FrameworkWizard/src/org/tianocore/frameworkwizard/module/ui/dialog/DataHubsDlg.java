@@ -206,7 +206,7 @@ public class DataHubsDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 200);
+        this.setSize(508, 220);
         this.setContentPane(getJScrollPane());
         this.setTitle("Data Hubs");
         initFrame();

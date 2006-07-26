@@ -248,7 +248,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
      
      **/
     private void init() {
-        this.setSize(500, 225);
+        this.setSize(508, 240);
         this.setContentPane(getJScrollPane());
         this.setTitle("Pcd Coded");
         initFrame();
@@ -322,13 +322,13 @@ public class PCDsDlg extends IDialog implements ItemListener {
             jLabelFeatureFlag.setText("Feature Flag");
             jLabelTokenSpaceGuid = new JLabel();
             jLabelTokenSpaceGuid.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
-            jLabelTokenSpaceGuid.setText("Token Space C_Name");
+            jLabelTokenSpaceGuid.setText("Token Space C Name");
             jLabelTokenSpaceGuid.setVisible(false);
             jLabelHelpText = new JLabel();
             jLabelHelpText.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
             jLabelHelpText.setText("Help Text");
             jLabelC_Name = new JLabel();
-            jLabelC_Name.setText("C_Name");
+            jLabelC_Name.setText("C Name");
             jLabelC_Name.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
             jLabelDefaultValue = new JLabel();
             jLabelDefaultValue.setText("Default Value");
@@ -421,7 +421,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         //
         if (!isEmpty(this.jComboBoxCName.getSelectedItem().toString())) {
             if (!DataValidation.isC_NameType(this.jComboBoxCName.getSelectedItem().toString())) {
-                Log.wrn("Update PcdCoded", "Incorrect data type for C_Name");
+                Log.wrn("Update PcdCoded", "Incorrect data type for C Name");
                 return false;
             }
         }

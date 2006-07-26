@@ -231,7 +231,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
      
      **/
     private void init() {
-        this.setSize(500, 225);
+        this.setSize(510, 240);
         this.setContentPane(getJScrollPane());
         this.setTitle("Protocols");
         initFrame();
@@ -313,7 +313,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
             jLabelFeatureFlag.setText("Feature Flag");
             jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
             jLabelC_Name = new JLabel();
-            jLabelC_Name.setText("C_Name Type");
+            jLabelC_Name.setText("C Name Type");
             jLabelC_Name.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
 
             jContentPane = new JPanel();

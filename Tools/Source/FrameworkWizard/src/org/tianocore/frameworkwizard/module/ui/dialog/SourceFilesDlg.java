@@ -251,7 +251,7 @@ public class SourceFilesDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 235);
+        this.setSize(510, 240);
         this.setContentPane(getJScrollPane());
         this.setTitle("Source Files");
         this.setViewMode(false);

@@ -208,7 +208,7 @@ public class SystemTablesDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 200);
+        this.setSize(508, 215);
         this.setContentPane(getJScrollPane());
         this.setTitle("System Tables");
         initFrame();
@@ -281,7 +281,7 @@ public class SystemTablesDlg extends IDialog {
             jLabelUsage.setText("Usage");
             jLabelUsage.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
             jLabelEntry = new JLabel();
-            jLabelEntry.setText("Guid C_Name");
+            jLabelEntry.setText("Guid C Name");
             jLabelEntry.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
             jLabelHelpText = new JLabel();
             jLabelHelpText.setBounds(new java.awt.Rectangle(14, 60, 140, 20));
