@@ -208,6 +208,26 @@ If you are running on x86_64 Linux, then you should install a 64 bit version of
 the Java JDK. The version that was used was jdk-1_5_0_07-linux-amd64-rpm.bin.
 It may be downloaded from sun.com.
 
+-----------------------------------------
+A Word on compiling under Cygwin with gcc
+-----------------------------------------
+
+Cygwin is a POSIX style operating environment for Windows. It is possible to
+compile the EDK 2 using gcc and cygwin. There are a few extra steps necessary
+to make this happen. There is a JNI (Java Native Interface) library in the
+Tools.  In order to compile this under Cygwin, the 'linux' java headers must be
+installed to the $JAVA_HOME dir on the windows system. To accomplish this, you
+must install the JDK on a linux system, and then copy
+linux:$JAVA_HOME/include/linux/ to windows:$JAVA_HOME/include. These are really
+typedefs needed by gcc.
+
+Compiling under cygwin is slow, because the underlying file accesses are slow
+in cygwin. For this reason, we do not encourage the use of cygwin. A true unix
+system will be a superior choice for those wishing to compile with gcc.
+
+Make sure that you select the e2fsprogs development package when you install
+cygwin. It is necessary for the GenFvImage tool.
+
 -----------------------
 Notes on Documentation
 -----------------------
