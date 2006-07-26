@@ -54,17 +54,26 @@ IDENTIFIER = Default TOOL_CHAIN_CONF
 *_MYTOOLS_EBC_SLINK_NAME   = link.exe
 *_MYTOOLS_EBC_PP_NAME      = iec.exe
 
-# GCC definitions
-*_MYGCC_IA32_*_FAMILY     = GCC
-*_MYGCC_IA32_CC_NAME      = gcc
-*_MYGCC_IA32_SLINK_NAME   = ar
-*_MYGCC_IA32_DLINK_NAME   = ld
-*_MYGCC_IA32_ASM_NAME     = gcc
-*_MYGCC_IA32_PP_NAME      = gcc
+# UNIXGCC definitions
+*_UNIXGCC_IA32_*_FAMILY     = GCC
+*_UNIXGCC_IA32_CC_NAME      = gcc
+*_UNIXGCC_IA32_SLINK_NAME   = ar
+*_UNIXGCC_IA32_DLINK_NAME   = ld
+*_UNIXGCC_IA32_ASM_NAME     = gcc
+*_UNIXGCC_IA32_PP_NAME      = gcc
 
-# GCC, IA32
-# Use this if you built the tiano gcc tool chain on a Windows/Cygwin system.
-*_MYGCC_IA32_*_PATH       = C:\cygwin\opt\tiano\i386-tiano-pe\i386-tiano-pe\bin
-# Use this if you built the tiano gcc tool chain on a Unix system.
-# *_MYGCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
-*_MYGCC_IA32_ASM_EXT      = .S
+# UNIXGCC, IA32
+*_UNIXGCC_IA32_*_PATH       = /opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
+*_UNIXGCC_IA32_ASM_EXT      = .S
+
+# CYGWINGCC definitions
+*_CYGWINGCC_IA32_*_FAMILY     = GCC
+*_CYGWINGCC_IA32_CC_NAME      = gcc
+*_CYGWINGCC_IA32_SLINK_NAME   = ar
+*_CYGWINGCC_IA32_DLINK_NAME   = ld
+*_CYGWINGCC_IA32_ASM_NAME     = gcc
+*_CYGWINGCC_IA32_PP_NAME      = gcc
+
+# CYGWINGCC, IA32
+*_CYGWINGCC_IA32_*_PATH       = c:/Cygwin/opt/tiano/i386-tiano-pe/i386-tiano-pe/bin
+*_CYGWINGCC_IA32_ASM_EXT      = .S
