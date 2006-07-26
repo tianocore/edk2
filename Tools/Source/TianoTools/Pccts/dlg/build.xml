@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
-  <property environment="env"/>
   <property name="PACKAGE_DIR" value="${WORKSPACE}/Tools"/>
 
   <target name="init">

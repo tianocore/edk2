@@ -19,8 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <property name="LibName" value="String"/>
-  <property environment="env"/>
-
   <property name="LINK_OUTPUT_TYPE" value="static"/>
   <property name="BUILD_DIR" value="${PACKAGE_DIR}/${LibName}/tmp"/>
 

@@ -21,8 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
-  <property environment="env"/>
-
   <property name="LINK_OUTPUT_TYPE" value="static"/>
   <property name="BUILD_DIR" value="${PACKAGE_DIR}/${ToolName}/tmp"/>
 
@@ -77,6 +75,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </then>
       </elseif>
     </if>
+
   </target>
 
   <target name="Tool" depends="init">
@@ -95,6 +94,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
+      <syslibset dir="${env.CYGWIN_HOME}/lib/mingw" libs="msvcr71" if="cygwin"/>
     </cc>
   </target>
 

@@ -19,7 +19,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
-  <property environment="env"/>
   <property name="tmp" value="tmp"/>
 
   <property name="LINK_OUTPUT_TYPE" value="static"/>
