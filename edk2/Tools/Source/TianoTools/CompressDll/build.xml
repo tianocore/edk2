@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Copyright (c) 2006, Intel Corporation
 -->
 
-  <property environment="env"/>
   <property name="WORKSPACE" value="${env.WORKSPACE}"/>
   <property name="ToolName" value="CompressDll"/>
   <property name="LibName" value="CompressDll"/>
@@ -92,8 +91,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <includepath path="${env.JAVA_HOME}/include"/>
-      <includepath path="${env.JAVA_HOME}/include/win32" if="windows"/>
       <includepath path="${env.JAVA_HOME}/include/linux" if="gcc"/>
+      <includepath path="${env.JAVA_HOME}/include/win32" if="windows"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
       <syslibset libs="kernel32" unless="gcc"/>
     </cc>

@@ -88,6 +88,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <os name="Linux"/>
     </condition>
     
+    <condition property="cygwin">
+      <and>
+        <os family="dos"/>
+        <istrue value="${gcc}"/>
+      </and>
+    </condition>
+    
     <condition property="x86_64_linux">
       <and>
         <os name="Linux"/>

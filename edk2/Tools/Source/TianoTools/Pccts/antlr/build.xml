@@ -20,8 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
-  <property environment="env"/>
-
   <target name="init">
     <echo message="The EDK Tool: ${ToolName}"/>
     <if>
