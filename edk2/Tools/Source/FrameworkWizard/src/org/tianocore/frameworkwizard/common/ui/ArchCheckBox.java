@@ -212,7 +212,7 @@ public class ArchCheckBox extends JPanel {
         return s.trim();
     }
     
-    public void setAllItmesSelected(boolean isSelected) {
+    public void setAllItemsSelected(boolean isSelected) {
         this.jCheckBoxIa32.setSelected(isSelected);
         this.jCheckBoxX64.setSelected(isSelected);
         this.jCheckBoxIpf.setSelected(isSelected);
@@ -222,7 +222,7 @@ public class ArchCheckBox extends JPanel {
     }
     
     public void setSelectedItems(Vector<String> v) {
-        setAllItmesSelected(false);
+        setAllItemsSelected(false);
         if (v != null) {
             for (int index = 0; index < v.size(); index++) {
                 if (v.get(index).equals(this.jCheckBoxIa32.getText())) {
