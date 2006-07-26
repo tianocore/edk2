@@ -557,9 +557,9 @@ Returns:
   //
   // Display Architectural protocols that were not loaded if this is DEBUG build
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     CoreDisplayMissingArchProtocols ();
-  );
+  DEBUG_CODE_END ();
   
   //
   // Assert if the Architectural Protocols are not present.
@@ -574,9 +574,9 @@ Returns:
   // Display any drivers that were not dispatched because dependency expression
   // evaluated to false if this is a debug build
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     CoreDisplayDiscoveredNotDispatched ();
-  );
+  DEBUG_CODE_END ();
 
   //
   // Transfer control to the BDS Architectural Protocol

@@ -65,10 +65,10 @@ Returns:
     SizeOfCarHeap = (UINT64) PeiStartupDescriptor->SizeOfCacheAsRam;
     SizeOfCarHeap = RShiftU64 (SizeOfCarHeap, 1);
  
-    DEBUG_CODE (
-        PrivateData->SizeOfCacheAsRam = PeiStartupDescriptor->SizeOfCacheAsRam;
-        PrivateData->MaxTopOfCarHeap  = (VOID *) ((UINTN) PrivateData->BottomOfCarHeap + (UINTN) SizeOfCarHeap);
-    );
+    DEBUG_CODE_BEGIN ();
+      PrivateData->SizeOfCacheAsRam = PeiStartupDescriptor->SizeOfCacheAsRam;
+      PrivateData->MaxTopOfCarHeap  = (VOID *) ((UINTN) PrivateData->BottomOfCarHeap + (UINTN) SizeOfCarHeap);
+    DEBUG_CODE_END ();
 
     PrivateData->HobList.Raw = PrivateData->BottomOfCarHeap;
     

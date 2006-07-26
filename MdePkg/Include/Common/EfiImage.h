@@ -1,8 +1,10 @@
 /** @file
-  EFI image format for PE32+. Please note some data structures are different
-  for IA-32 and Itanium-based images, look for UINTN and the #ifdef EFI_IA64
+  EFI image format for PE32 and PE32+. Please note some data structures are 
+  different for PE32 and PE32+. EFI_IMAGE_NT_HEADERS32 is for PE32 and 
+  EFI_IMAGE_NT_HEADERS64 is for PE32+. 
 
-  @bug Fix text - doc as defined in MSFT EFI specification.
+  This file is coded to the Visual Studio, Microsoft Portable Executable and 
+  Common Object File Format Specification, Revision 8.0 - May 16, 2006. 
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -26,17 +28,10 @@
 #define EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION         10
 #define EFI_IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER 11
 #define EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER      12
+#define EFI_IMAGE_SUBSYSTEM_EFI_EFI_ROM             13
+
 #define EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER      13
 
-//
-// BugBug: Need to get a real answer for this problem. This is not in the
-//         PE specification.
-//
-//         A SAL runtime driver does not get fixed up when a transition to
-//         virtual mode is made. In all other cases it should be treated
-//         like a EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER image
-//
-#define EFI_IMAGE_SUBSYSTEM_SAL_RUNTIME_DRIVER  13
 
 //
 // PE32+ Machine type for EFI images
@@ -58,7 +53,6 @@
 #define EFI_IMAGE_OS2_SIGNATURE     0x454E      // NE
 #define EFI_IMAGE_OS2_SIGNATURE_LE  0x454C      // LE
 #define EFI_IMAGE_NT_SIGNATURE      0x00004550  // PE00
-#define EFI_IMAGE_EDOS_SIGNATURE    0x44454550  // PEED
 
 ///
 /// PE images can start with an optional DOS header, so if an image is run
@@ -158,9 +152,9 @@ typedef struct {
 
 ///
 /// @attention
-/// EFI_IMAGE_OPTIONAL_HEADER32 and EFI_IMAGE_OPTIONAL_HEADER64
-/// are for use ONLY by tools.  All proper EFI code MUST use
-/// EFI_IMAGE_OPTIONAL_HEADER ONLY!!!
+/// EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC means PE32 and 
+/// EFI_IMAGE_OPTIONAL_HEADER32 must be used. The data structures only vary
+/// after NT additional fields.
 ///
 #define EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC 0x10b
 
@@ -206,9 +200,9 @@ typedef struct {
 
 ///
 /// @attention
-/// EFI_IMAGE_OPTIONAL_HEADER32 and EFI_IMAGE_OPTIONAL_HEADER64
-/// are for use ONLY by tools.  All proper EFI code MUST use
-/// EFI_IMAGE_OPTIONAL_HEADER ONLY!!!
+/// EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC means PE32+ and 
+/// EFI_IMAGE_OPTIONAL_HEADER64 must be used. The data structures only vary
+/// after NT additional fields.
 ///
 #define EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC 0x20b
 
@@ -251,6 +245,7 @@ typedef struct {
   EFI_IMAGE_DATA_DIRECTORY  DataDirectory[EFI_IMAGE_NUMBER_OF_DIRECTORY_ENTRIES];
 } EFI_IMAGE_OPTIONAL_HEADER64;
 
+
 ///
 /// @attention
 /// EFI_IMAGE_NT_HEADERS32 and EFI_IMAGE_HEADERS64 are for use ONLY
@@ -272,6 +267,7 @@ typedef struct {
 
 #define EFI_IMAGE_SIZEOF_NT_OPTIONAL64_HEADER sizeof (EFI_IMAGE_NT_HEADERS64)
 
+
 //
 // Processor specific definition of EFI_IMAGE_OPTIONAL_HEADER so the
 // type name EFI_IMAGE_OPTIONAL_HEADER is appropriate to the build.  Same for
@@ -279,30 +275,34 @@ typedef struct {
 //
 #if   defined (MDE_CPU_IA32)
 
-typedef EFI_IMAGE_OPTIONAL_HEADER32     EFI_IMAGE_OPTIONAL_HEADER;
-typedef EFI_IMAGE_NT_HEADERS32          EFI_IMAGE_NT_HEADERS;
-
-#define EFI_IMAGE_NT_OPTIONAL_HDR_MAGIC EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
   (((Machine) == EFI_IMAGE_MACHINE_IA32) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
 
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_X64) 
+
+//
+// @bug - Remove me when other package updated. 
+//
+typedef EFI_IMAGE_NT_HEADERS32    EFI_IMAGE_NT_HEADERS;
+
 #elif defined (MDE_CPU_IPF)
 
-typedef EFI_IMAGE_OPTIONAL_HEADER64     EFI_IMAGE_OPTIONAL_HEADER;
-typedef EFI_IMAGE_NT_HEADERS64          EFI_IMAGE_NT_HEADERS;
-
-#define EFI_IMAGE_NT_OPTIONAL_HDR_MAGIC EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
   (((Machine) == EFI_IMAGE_MACHINE_IPF) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
 
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
+
 #elif defined (MDE_CPU_X64)
 
-typedef EFI_IMAGE_OPTIONAL_HEADER64     EFI_IMAGE_OPTIONAL_HEADER;
-typedef EFI_IMAGE_NT_HEADERS64          EFI_IMAGE_NT_HEADERS;
-
-#define EFI_IMAGE_NT_OPTIONAL_HDR_MAGIC EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
   (((Machine) == EFI_IMAGE_MACHINE_X64) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
+
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_IA32) 
+
+//
+// @bug - Remove me when other package updated. 
+//
+typedef EFI_IMAGE_NT_HEADERS32    EFI_IMAGE_NT_HEADERS;
 
 #elif defined (MDE_CPU_EBC)
 
@@ -311,11 +311,9 @@ typedef EFI_IMAGE_NT_HEADERS64          EFI_IMAGE_NT_HEADERS;
 // It does not make sense to have a PE loader coded in EBC. You need to 
 // understand the basic 
 //
-typedef EFI_IMAGE_OPTIONAL_HEADER64     EFI_IMAGE_OPTIONAL_HEADER;
-typedef EFI_IMAGE_NT_HEADERS64          EFI_IMAGE_NT_HEADERS;
-
-#define EFI_IMAGE_NT_OPTIONAL_HDR_MAGIC EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_EBC)
+
+#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE) 
 
 #else
 #error Unknown Processor Type
@@ -515,15 +513,36 @@ typedef struct {
 //
 // I386 relocation types.
 //
-#define EFI_IMAGE_REL_I386_ABSOLUTE 0   // Reference is absolute, no relocation is necessary
-#define EFI_IMAGE_REL_I386_DIR16    01  // Direct 16-bit reference to the symbols virtual address
-#define EFI_IMAGE_REL_I386_REL16    02  // PC-relative 16-bit reference to the symbols virtual address
-#define EFI_IMAGE_REL_I386_DIR32    06  // Direct 32-bit reference to the symbols virtual address
-#define EFI_IMAGE_REL_I386_DIR32NB  07  // Direct 32-bit reference to the symbols virtual address, base not included
-#define EFI_IMAGE_REL_I386_SEG12    011 // Direct 16-bit reference to the segment-selector bits of a 32-bit virtual address
-#define EFI_IMAGE_REL_I386_SECTION  012
-#define EFI_IMAGE_REL_I386_SECREL   013
-#define EFI_IMAGE_REL_I386_REL32    024 // PC-relative 32-bit reference to the symbols virtual address
+#define EFI_IMAGE_REL_I386_ABSOLUTE 0x0000   // Reference is absolute, no relocation is necessary
+#define EFI_IMAGE_REL_I386_DIR16    0x0001  // Direct 16-bit reference to the symbols virtual address
+#define EFI_IMAGE_REL_I386_REL16    0x0002  // PC-relative 16-bit reference to the symbols virtual address
+#define EFI_IMAGE_REL_I386_DIR32    0x0006  // Direct 32-bit reference to the symbols virtual address
+#define EFI_IMAGE_REL_I386_DIR32NB  0x0007  // Direct 32-bit reference to the symbols virtual address, base not included
+#define EFI_IMAGE_REL_I386_SEG12    0x0009 // Direct 16-bit reference to the segment-selector bits of a 32-bit virtual address
+#define EFI_IMAGE_REL_I386_SECTION  0x001a
+#define EFI_IMAGE_REL_I386_SECREL   0x000b
+#define EFI_IMAGE_REL_I386_REL32    0x0014 // PC-relative 32-bit reference to the symbols virtual address
+
+//
+// x64 processor relocation types.
+//
+#define IMAGE_REL_AMD64_ABSOLUTE	0x0000
+#define IMAGE_REL_AMD64_ADDR64	  0x0001
+#define IMAGE_REL_AMD64_ADDR32	  0x0002
+#define IMAGE_REL_AMD64_ADDR32NB	0x0003
+#define IMAGE_REL_AMD64_REL32	    0x0004
+#define IMAGE_REL_AMD64_REL32_1	  0x0005
+#define IMAGE_REL_AMD64_REL32_2	  0x0006
+#define IMAGE_REL_AMD64_REL32_3	  0x0007
+#define IMAGE_REL_AMD64_REL32_4	  0x0008
+#define IMAGE_REL_AMD64_REL32_5	  0x0009
+#define IMAGE_REL_AMD64_SECTION	  0x000A
+#define IMAGE_REL_AMD64_SECREL	  0x000B
+#define IMAGE_REL_AMD64_SECREL7	  0x000C
+#define IMAGE_REL_AMD64_TOKEN	    0x000D
+#define IMAGE_REL_AMD64_SREL32	  0x000E
+#define IMAGE_REL_AMD64_PAIR	    0x000F
+#define IMAGE_REL_AMD64_SSPAN32	  0x0010
 
 ///
 /// Based relocation format.
@@ -694,5 +713,22 @@ typedef struct {
 //
 #define EFI_TE_IMAGE_DIRECTORY_ENTRY_BASERELOC  0
 #define EFI_TE_IMAGE_DIRECTORY_ENTRY_DEBUG      1
+
+
+//
+// Union of PE32, PE32+, and TE headers
+//
+typedef union {
+  EFI_IMAGE_NT_HEADERS32   Pe32;
+  EFI_IMAGE_NT_HEADERS64   Pe32Plus;
+  EFI_TE_IMAGE_HEADER      Te;
+} EFI_IMAGE_OPTIONAL_HEADER_UNION;
+
+typedef union {
+  EFI_IMAGE_NT_HEADERS32            *Pe32;
+  EFI_IMAGE_NT_HEADERS64            *Pe32Plus;
+  EFI_TE_IMAGE_HEADER               *Te;
+  EFI_IMAGE_OPTIONAL_HEADER_UNION   *Union;
+} EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION;
 
 #endif

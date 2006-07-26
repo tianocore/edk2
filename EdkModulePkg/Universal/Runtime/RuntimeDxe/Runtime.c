@@ -352,6 +352,7 @@ RuntimeDriverSetVirtualAddressMap (
   IN EFI_MEMORY_DESCRIPTOR  *VirtualMap
   )
 {
+  EFI_STATUS                    Status;
   RUNTIME_NOTIFY_EVENT_DATA     *RuntimeEvent;
   RUNTIME_IMAGE_RELOCATION_DATA *RuntimeImage;
   LIST_ENTRY                    *Link;
@@ -359,6 +360,7 @@ RuntimeDriverSetVirtualAddressMap (
   UINTN                         Index1;
   EFI_DRIVER_OS_HANDOFF_HEADER  *DriverOsHandoffHeader;
   EFI_DRIVER_OS_HANDOFF         *DriverOsHandoff;
+  EFI_PHYSICAL_ADDRESS          VirtImageBase;
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
   EFI_CAPSULE_TABLE             *CapsuleTable; 
 #endif
@@ -454,7 +456,19 @@ RuntimeDriverSetVirtualAddressMap (
   for (Link = mRelocationList.ForwardLink; Link != &mRelocationList; Link = Link->ForwardLink) {
     RuntimeImage = _CR (Link, RUNTIME_IMAGE_RELOCATION_DATA, Link);
     if (RuntimeImage->Valid) {
-      RelocatePeImageForRuntime (RuntimeImage);
+
+      VirtImageBase = RuntimeImage->ImageBase;
+      Status  = RuntimeDriverConvertPointer (0, (VOID **) &VirtImageBase);
+      ASSERT_EFI_ERROR (Status);
+
+      PeCoffLoaderRelocateImageForRuntime (
+        RuntimeImage->ImageBase,
+        VirtImageBase,
+        RuntimeImage->ImageSize,
+        RuntimeImage->RelocationData
+        );
+      
+      FlushCpuCache (RuntimeImage->ImageBase, (UINT64)RuntimeImage->ImageSize);
     }
   }
   //

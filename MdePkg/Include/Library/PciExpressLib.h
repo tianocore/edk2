@@ -36,7 +36,7 @@
 
 **/
 #define PCI_EXPRESS_LIB_ADDRESS(Bus,Device,Function,Offset) \
-  PCI_LIB_ADDRESS (Bus, Device, Function, Offset)
+  (((Offset) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 /**
   Reads an 8-bit PCI configuration register.

@@ -40,26 +40,63 @@ PeCoffLoaderGetEntryPoint (
   OUT VOID  **EntryPoint
   )
 {
-  EFI_IMAGE_DOS_HEADER  *DosHeader;
-  EFI_IMAGE_NT_HEADERS  *PeHeader;
+  EFI_IMAGE_DOS_HEADER                  *DosHeader;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION   Header;
 
   ASSERT (Pe32Data   != NULL);
   ASSERT (EntryPoint != NULL);
 
   DosHeader = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
-
   if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
     //
     // DOS image header is present, so read the PE header after the DOS image header.
     //
-    PeHeader = (EFI_IMAGE_NT_HEADERS *) ((UINTN) Pe32Data + (UINTN) ((DosHeader->e_lfanew) & 0x0ffff));
+    Header.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN) Pe32Data + (UINTN) ((DosHeader->e_lfanew) & 0x0ffff));
   } else {
     //
     // DOS image header is not present, so PE header is at the image base.
     //
-    PeHeader = (EFI_IMAGE_NT_HEADERS *) Pe32Data;
+    Header.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
   }
 
-  *EntryPoint = (VOID *) ((UINTN) Pe32Data + (UINTN) (PeHeader->OptionalHeader.AddressOfEntryPoint & 0x0ffffffff));
+  //
+  // Calculate the entry point relative to the start of the image. 
+  // AddressOfEntryPoint is common for PE32 & PE32+
+  //
+  *EntryPoint = (VOID *)((UINTN)Pe32Data + (UINTN)(Header.Pe32->OptionalHeader.AddressOfEntryPoint & 0x0ffffffff));
   return RETURN_SUCCESS;
 }
+
+
+/**
+  Returns the machine type of PE/COFF image. 
+
+  @param  Image   Pointer to a PE/COFF header
+
+  @return         Machine type or zero if not a valid iamge
+
+**/
+UINT16
+EFIAPI
+PeCoffLoaderGetMachineType (
+  IN  VOID  *Pe32Data
+  )
+{
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+  EFI_IMAGE_DOS_HEADER                 *DosHdr;
+
+  DosHdr = (EFI_IMAGE_DOS_HEADER  *)Pe32Data;
+  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + DosHdr->e_lfanew);
+  } else {
+    Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data);
+  }
+
+  if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
+    return Hdr.Pe32->FileHeader.Machine;
+  }
+
+  return 0x0000;
+}
+
+

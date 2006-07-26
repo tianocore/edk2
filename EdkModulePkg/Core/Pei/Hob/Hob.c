@@ -53,11 +53,11 @@ Returns:
   // Only check this parameter in debug mode
   //
   
-  DEBUG_CODE (  
+  DEBUG_CODE_BEGIN ();  
     if (HobList == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-  );
+  DEBUG_CODE_END ();
   
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
 

@@ -40,7 +40,7 @@
   @return The base address of PCI Express.
 
 **/
-UINTN
+volatile UINTN
 GetPciExpressBaseAddress (
   VOID
   )
@@ -1220,7 +1220,7 @@ PciExpressReadBuffer (
     //
     // Read a byte if StartAddress is byte aligned
     //
-    *(UINT8*)Buffer = PciExpressRead8 (StartAddress);
+    *(volatile UINT8 *)Buffer = PciExpressRead8 (StartAddress);
     StartAddress += sizeof (UINT8);
     Size -= sizeof (UINT8);
     Buffer = (UINT8*)Buffer + 1;
@@ -1230,7 +1230,7 @@ PciExpressReadBuffer (
     //
     // Read a word if StartAddress is word aligned
     //
-    *(UINT16*)Buffer = PciExpressRead16 (StartAddress);
+    *(volatile UINT16 *)Buffer = PciExpressRead16 (StartAddress);
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1240,7 +1240,7 @@ PciExpressReadBuffer (
     //
     // Read as many double words as possible
     //
-    *(UINT32*)Buffer = PciExpressRead32 (StartAddress);
+    *(volatile UINT32 *)Buffer = PciExpressRead32 (StartAddress);
     StartAddress += sizeof (UINT32);
     Size -= sizeof (UINT32);
     Buffer = (UINT32*)Buffer + 1;
@@ -1250,7 +1250,7 @@ PciExpressReadBuffer (
     //
     // Read the last remaining word if exist
     //
-    *(UINT16*)Buffer = PciExpressRead16 (StartAddress);
+    *(volatile UINT16 *)Buffer = PciExpressRead16 (StartAddress);
     StartAddress += sizeof (UINT16);
     Size -= sizeof (UINT16);
     Buffer = (UINT16*)Buffer + 1;
@@ -1260,7 +1260,7 @@ PciExpressReadBuffer (
     //
     // Read the last remaining byte if exist
     //
-    *(UINT8*)Buffer = PciExpressRead8 (StartAddress);
+    *(volatile UINT8 *)Buffer = PciExpressRead8 (StartAddress);
   }
 
   return ReturnValue;

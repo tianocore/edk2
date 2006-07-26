@@ -298,9 +298,9 @@ Returns:
   //
   // Produce a VM test interface protocol. Not required for execution.
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     InitEbcVmTestProtocol (&ImageHandle);
-  );
+  DEBUG_CODE_END ();
 
   return Status;
 }
@@ -908,10 +908,10 @@ Returns:
   }
   EbcVmTestProtocol->Execute      = (EBC_VM_TEST_EXECUTE) EbcExecuteInstructions;
 
-  DEBUG_CODE(
+  DEBUG_CODE_BEGIN ();
     EbcVmTestProtocol->Assemble     = (EBC_VM_TEST_ASM) EbcVmTestUnsupported;
     EbcVmTestProtocol->Disassemble  = (EBC_VM_TEST_DASM) EbcVmTestUnsupported;
-  );
+  DEBUG_CODE_END ();
 
   //
   // Publish the protocol

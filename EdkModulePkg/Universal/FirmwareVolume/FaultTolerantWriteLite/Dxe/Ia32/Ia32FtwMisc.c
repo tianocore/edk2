@@ -173,21 +173,23 @@ Note:
   Status = PciRootBridgeIo->Pci.Write (
                                   PciRootBridgeIo,
                                   EfiPciWidthUint32,
-                                  EFI_PCI_ADDRESS (LPC_BUS_NUMBER,
-    LPC_DEVICE_NUMBER,
-    LPC_IF,
-    GEN_STATUS),
+                                  EFI_PCI_ADDRESS (
+                                    LPC_BUS_NUMBER,
+                                    LPC_DEVICE_NUMBER,
+                                    LPC_IF,
+                                    GEN_STATUS
+                                    ),
                                   1,
                                   &GenStatus
                                   );
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (TopSwap) {
       DEBUG ((EFI_D_ERROR, "SAR: Set top swap\n"));
     } else {
       DEBUG ((EFI_D_ERROR, "SAR: Clear top swap\n"));
     }
-  );
+  DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
 }

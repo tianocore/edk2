@@ -60,7 +60,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Runtime.dxs</Filename>
-    <Filename>PeHotRelocate.c</Filename>
     <Filename>Runtime.c</Filename>
     <Filename>Runtime.h</Filename>
     <Filename>Crc32.c</Filename>
