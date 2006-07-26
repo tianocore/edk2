@@ -2085,94 +2085,90 @@ AtapiPassThruCheckErrorStatus (
   )
 {
   UINT8 StatusRegister;
-
-//#ifdef EFI_DEBUG
-
   UINT8 ErrorRegister;
-
-//#endif
 
   StatusRegister = ReadPortB (
                     AtapiScsiPrivate->PciIo,
                     AtapiScsiPrivate->IoPort->Reg.Status
                     );
-  DEBUG_CODE (
+  
+  DEBUG_CODE_BEGIN ();
 
     if (StatusRegister & DWF) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Write Fault\n",
-      StatusRegister)
-      );
-  }
+      DEBUG (
+        (EFI_D_BLKIO,
+        "AtapiPassThruCheckErrorStatus()-- %02x : Error : Write Fault\n",
+        StatusRegister)
+        );
+    }
 
-  if (StatusRegister & CORR) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Corrected Data\n",
-      StatusRegister)
-      );
-  }
+    if (StatusRegister & CORR) {
+      DEBUG (
+        (EFI_D_BLKIO,
+        "AtapiPassThruCheckErrorStatus()-- %02x : Error : Corrected Data\n",
+        StatusRegister)
+        );
+    }
 
-  if (StatusRegister & ERR) {
-    ErrorRegister = ReadPortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->Reg1.Error);
+    if (StatusRegister & ERR) {
+      ErrorRegister = ReadPortB (AtapiScsiPrivate->PciIo, AtapiScsiPrivate->IoPort->Reg1.Error);
+      
 
-    if (ErrorRegister & BBK_ERR) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Bad Block Detected\n",
-      ErrorRegister)
-      );
-  }
+      if (ErrorRegister & BBK_ERR) {
+        DEBUG (
+          (EFI_D_BLKIO,
+          "AtapiPassThruCheckErrorStatus()-- %02x : Error : Bad Block Detected\n",
+          ErrorRegister)
+          );
+      }
 
-  if (ErrorRegister & UNC_ERR) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Uncorrectable Data\n",
-      ErrorRegister)
-      );
-  }
+      if (ErrorRegister & UNC_ERR) {
+        DEBUG (
+          (EFI_D_BLKIO,
+          "AtapiPassThruCheckErrorStatus()-- %02x : Error : Uncorrectable Data\n",
+          ErrorRegister)
+          );
+      }
 
-  if (ErrorRegister & MC_ERR) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Media Change\n",
-      ErrorRegister)
-      );
-  }
+      if (ErrorRegister & MC_ERR) {
+        DEBUG (
+          (EFI_D_BLKIO,
+          "AtapiPassThruCheckErrorStatus()-- %02x : Error : Media Change\n",
+          ErrorRegister)
+          );
+      }
 
-  if (ErrorRegister & ABRT_ERR) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Abort\n",
-      ErrorRegister)
-      );
-  }
+      if (ErrorRegister & ABRT_ERR) {
+        DEBUG (
+          (EFI_D_BLKIO,
+          "AtapiPassThruCheckErrorStatus()-- %02x : Error : Abort\n",
+          ErrorRegister)
+          );
+      }
 
-  if (ErrorRegister & TK0NF_ERR) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Track 0 Not Found\n",
-      ErrorRegister)
-      );
-  }
+      if (ErrorRegister & TK0NF_ERR) {
+        DEBUG (
+          (EFI_D_BLKIO,
+          "AtapiPassThruCheckErrorStatus()-- %02x : Error : Track 0 Not Found\n",
+          ErrorRegister)
+          );
+      }
 
-  if (ErrorRegister & AMNF_ERR) {
-    DEBUG (
-      (EFI_D_BLKIO,
-      "AtapiPassThruCheckErrorStatus()-- %02x : Error : Address Mark Not Found\n",
-      ErrorRegister)
-      );
-  }
+      if (ErrorRegister & AMNF_ERR) {
+        DEBUG (
+          (EFI_D_BLKIO,
+          "AtapiPassThruCheckErrorStatus()-- %02x : Error : Address Mark Not Found\n",
+          ErrorRegister)
+          );
+       }
+    }
 
-  }
-  );
+  DEBUG_CODE_END ();
 
   if ((StatusRegister & (ERR | DWF | CORR)) == 0) {
-
     return EFI_SUCCESS;
   }
 
+ 
   return EFI_DEVICE_ERROR;
-
 }

@@ -685,9 +685,6 @@ Returns:
   EFI_STATUS                        Status;
   EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL  *EbcSimpleDebugger;
 
-  //
-  // end DEBUG_CODE
-  //
   EbcSimpleDebugger = NULL;
   Status            = EFI_SUCCESS;
   StackCorrupted    = 0;
@@ -704,7 +701,7 @@ Returns:
   //
   // Try to get the debug support for EBC
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     Status = gBS->LocateProtocol (
                     &mEbcSimpleDebuggerProtocolGuid,
                     NULL,
@@ -713,7 +710,7 @@ Returns:
     if (EFI_ERROR (Status)) {
       EbcSimpleDebugger = NULL;
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   // Save the start IP for debug. For example, if we take an exception we
@@ -731,11 +728,11 @@ Returns:
     //
     // If we've found a simple debugger protocol, call it
     //
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       if (EbcSimpleDebugger != NULL) {
         EbcSimpleDebugger->Debugger (EbcSimpleDebugger, VmPtr);
       }
-    );
+    DEBUG_CODE_END ();
 
     //
     // Verify the opcode is in range. Otherwise generate an exception.

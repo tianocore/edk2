@@ -368,7 +368,7 @@ Returns:
                   );
 
   if (EFI_ERROR (Status)) {
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       UINTN  BufferSize;
 
       BufferSize = 48;
@@ -378,7 +378,7 @@ Returns:
         &BufferSize,
         "DebugPort driver failed to open child controller\n\n"
         );
-    );
+    DEBUG_CODE_END ();
 
     gBS->CloseProtocol (
           ControllerHandle,
@@ -389,7 +389,7 @@ Returns:
     return Status;
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     UINTN  BufferSize;
 
     BufferSize = 38;
@@ -399,7 +399,7 @@ Returns:
       &BufferSize,
       "Hello World from the DebugPort driver\n\n"
       );
-  );
+  DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
 }

@@ -17,7 +17,6 @@
 #ifndef __PCI_CF8_LIB_H__
 #define __PCI_CF8_LIB_H__
 
-#include <Library/PciLib.h>
 
 /**
   Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an
@@ -36,7 +35,7 @@
 
 **/
 #define PCI_CF8_LIB_ADDRESS(Bus,Device,Function,Offset) \
-  PCI_LIB_ADDRESS (Bus, Device, Function, Offset)
+  (((Offset) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 /**
   Reads an 8-bit PCI configuration register.

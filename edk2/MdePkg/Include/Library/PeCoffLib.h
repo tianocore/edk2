@@ -1,5 +1,5 @@
 /** @file
-  Memory Only PE COFF loader
+  Memory Only PE COFF loader. 
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -156,5 +156,54 @@ PeCoffLoaderLoadImage (
   IN OUT PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
   )
 ;
+
+
+/**
+  ImageRead function that operates on a memory buffer whos base is passed into
+  FileHandle. 
+
+  @param  FileHandle        Ponter to baes of the input stream
+  @param  FileOffset        Offset to the start of the buffer
+  @param  ReadSize          Number of bytes to copy into the buffer
+  @param  Buffer            Location to place results of read
+
+  @retval RETURN_SUCCESS    Data is read from FileOffset from the Handle into 
+                            the buffer.
+**/
+RETURN_STATUS
+EFIAPI
+PeCoffLoaderImageReadFromMemory (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+;
+
+
+/**
+  Reapply fixups on a fixed up PE32/PE32+ image to allow virutal calling at EFI
+  runtime. 
+  
+  PE_COFF_LOADER_IMAGE_CONTEXT.FixupData stores information needed to reapply
+  the fixups with a virtual mapping.
+
+
+  @param  ImageBase          Base address of relocated image
+  @param  VirtImageBase      Virtual mapping for ImageBase
+  @param  ImageSize          Size of the image to relocate
+  @param  RelocationData     Location to place results of read
+  
+**/
+VOID
+EFIAPI
+PeCoffLoaderRelocateImageForRuntime (
+  IN  PHYSICAL_ADDRESS        ImageBase,
+  IN  PHYSICAL_ADDRESS        VirtImageBase,
+  IN  UINTN                   ImageSize,
+  IN  VOID                    *RelocationData
+  )
+;
+
 
 #endif

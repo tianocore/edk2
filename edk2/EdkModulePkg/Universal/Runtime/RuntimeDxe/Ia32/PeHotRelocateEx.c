@@ -24,38 +24,6 @@ Revision History
 
 #include "Runtime.h"
 
-EFI_STATUS
-PeHotRelocateImageEx (
-  IN UINT16      *Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  )
-/*++
-
-Routine Description:
-
-  Performs an Itanium-based platform specific relocation fixup
-
-Arguments:
-
-  Reloc      - Pointer to the relocation record
-
-  Fixup      - Pointer to the address to fix up
-
-  FixupData  - Pointer to a buffer to log the fixups
-
-  Adjust     - The offset to adjust the fixup
-
-Returns:
-
-  EFI_SUCCESS
-
---*/
-{
-  return EFI_SUCCESS;
-
-}
 
 //
 // Cache Flush Routine.

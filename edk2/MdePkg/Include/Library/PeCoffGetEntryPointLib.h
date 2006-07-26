@@ -41,4 +41,19 @@ PeCoffLoaderGetEntryPoint (
   OUT VOID  **EntryPoint
   );
 
+/**
+  Returns the machine type of PE/COFF image. 
+
+  @param  Image   Pointer to a PE/COFF header
+
+  @return         Machine type or zero if not a valid iamge
+
+**/
+UINT16
+EFIAPI
+PeCoffLoaderGetMachineType (
+  IN  VOID    *Image
+  );
+
+
 #endif

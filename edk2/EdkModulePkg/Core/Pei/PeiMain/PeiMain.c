@@ -150,10 +150,10 @@ Returns:
     //
     // The following code dumps out interesting cache as RAM usage information
     // so we can keep tabs on how the cache as RAM is being utilized.  The
-    // DEBUG_CODE macro is used to prevent this code from being compiled
+    // DEBUG_CODE_BEGIN macro is used to prevent this code from being compiled
     // on a debug build.
     //
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       UINTN  *StackPointer;
       UINTN  StackValue;
 
@@ -173,7 +173,7 @@ Returns:
         ((UINTN) OldCoreData->HobList.HandoffInformationTable->EfiFreeMemoryBottom -
         (UINTN) OldCoreData->HobList.Raw)
         ));
-    );
+    DEBUG_CODE_END ();
 
     //
     // Alert any listeners that there is permanent memory available

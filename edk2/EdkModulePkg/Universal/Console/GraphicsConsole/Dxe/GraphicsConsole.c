@@ -423,9 +423,9 @@ GraphicsConsoleControllerDriverStart (
     goto Error;
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     GraphicsConsoleConOutOutputString (&Private->SimpleTextOutput, (CHAR16 *)L"Graphics Console Started\n\r");
-  );
+  DEBUG_CODE_END ();
 
   //
   // Install protocol interfaces for the Graphics Console device.

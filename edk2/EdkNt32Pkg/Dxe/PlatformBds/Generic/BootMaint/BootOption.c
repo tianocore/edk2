@@ -1165,6 +1165,30 @@ Returns:
   return FALSE;
 }
 
+
+RETURN_STATUS
+EFIAPI
+IsEfiAppReadFromFile (
+  IN     VOID    *FileHandle,
+  IN     UINTN   FileOffset,
+  IN OUT UINTN   *ReadSize,
+  OUT    VOID    *Buffer
+  )
+{
+  EFI_STATUS        Status;
+  EFI_FILE_HANDLE   File;
+    
+  File = (EFI_FILE_HANDLE)FileHandle;
+  Status = File->SetPosition (File, FileOffset);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  return File->Read (File, ReadSize, Buffer);
+}
+
+
+
 BOOLEAN
 BOpt_IsEfiApp (
   IN EFI_FILE_HANDLE Dir,
@@ -1185,60 +1209,32 @@ Returns:
   
 --*/
 {
-  UINTN                       BufferSize;
-  EFI_IMAGE_DOS_HEADER        DosHdr;
-  EFI_IMAGE_NT_HEADERS        PeHdr;
-  EFI_IMAGE_OPTIONAL_HEADER32 *PeOpt32;
-  EFI_IMAGE_OPTIONAL_HEADER64 *PeOpt64;
-  UINT16                      Subsystem;
-  EFI_FILE_HANDLE             File;
-  EFI_STATUS                  Status;
+  EFI_STATUS                            Status;
+  PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
+  EFI_FILE_HANDLE                       File;
 
   Status = Dir->Open (Dir, &File, FileName, EFI_FILE_MODE_READ, 0);
-
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
-  BufferSize = sizeof (EFI_IMAGE_DOS_HEADER);
-  File->Read (File, &BufferSize, &DosHdr);
-  if (DosHdr.e_magic != EFI_IMAGE_DOS_SIGNATURE) {
-    File->Close (File);
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle    = (VOID *)File;
+  ImageContext.ImageRead = IsEfiAppReadFromFile;
+
+  Status = PeCoffLoaderGetImageInfo (&ImageContext);
+  File->Close (File);
+  if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
-  File->SetPosition (File, DosHdr.e_lfanew);
-  BufferSize = sizeof (EFI_IMAGE_NT_HEADERS);
-  File->Read (File, &BufferSize, &PeHdr);
-  if (PeHdr.Signature != EFI_IMAGE_NT_SIGNATURE) {
-    File->Close (File);
-    return FALSE;
-  }
-  //
-  // Determine PE type and read subsytem
-  // BugBug : We should be using EFI_IMAGE_MACHINE_TYPE_SUPPORTED (machine)
-  // macro to detect the machine type.
-  // We should not be using  EFI_IMAGE_OPTIONAL_HEADER32 and
-  // EFI_IMAGE_OPTIONAL_HEADER64
-  //
-  if (PeHdr.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    PeOpt32   = (EFI_IMAGE_OPTIONAL_HEADER32 *) &(PeHdr.OptionalHeader);
-    Subsystem = PeOpt32->Subsystem;
-  } else if (PeHdr.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
-    PeOpt64   = (EFI_IMAGE_OPTIONAL_HEADER64 *) &(PeHdr.OptionalHeader);
-    Subsystem = PeOpt64->Subsystem;
-  } else {
-    return FALSE;
-  }
-
-  if (Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
-    File->Close (File);
+  if (ImageContext.ImageType == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
     return TRUE;
   } else {
-    File->Close (File);
     return FALSE;
   }
-}
+ }
+
 
 EFI_STATUS
 BOpt_FindDrivers (

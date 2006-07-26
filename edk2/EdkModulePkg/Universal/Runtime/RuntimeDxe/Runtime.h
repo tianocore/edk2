@@ -54,15 +54,6 @@ RelocatePeImageForRuntime (
 ;
 
 EFI_STATUS
-PeHotRelocateImageEx (
-  IN UINT16      *Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  )
-;
-
-EFI_STATUS
 EFIAPI
 RuntimeDriverCalculateCrc32 (
   IN  VOID    *Data,

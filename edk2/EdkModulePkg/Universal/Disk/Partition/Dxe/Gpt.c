@@ -758,11 +758,11 @@ Returns:
   //
   // return status
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (OrgCrc != Crc) {
       DEBUG ((EFI_D_ERROR, "CheckCrc32: Crc check failed\n"));
     }
-  );
+  DEBUG_CODE_END ();
 
   return (BOOLEAN) (OrgCrc == Crc);
 }

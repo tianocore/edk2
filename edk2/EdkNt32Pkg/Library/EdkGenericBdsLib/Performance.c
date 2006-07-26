@@ -28,6 +28,9 @@ ClearDebugRegisters (
   VOID
   )
 {
+  //
+  // BugBug: We should not need to do this. We need to root cause this bug!!!!
+  //
   AsmWriteDr0 (0);
   AsmWriteDr1 (0);
 }
@@ -85,6 +88,8 @@ Returns:
   return ;
 }
 
+
+
 STATIC
 CHAR8 *
 GetPdbPath (
@@ -107,50 +112,17 @@ Returns:
 
 --*/
 {
-  CHAR8                           *PdbPath;
-  UINT32                          DirCount;
-  EFI_IMAGE_DOS_HEADER            *DosHdr;
-  EFI_IMAGE_NT_HEADERS            *NtHdr;
-  EFI_IMAGE_OPTIONAL_HEADER       *OptionalHdr;
-  EFI_IMAGE_DATA_DIRECTORY        *DirectoryEntry;
-  EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *DebugEntry;
-  VOID                            *CodeViewEntryPointer;
+  PE_COFF_LOADER_IMAGE_CONTEXT          ImageContext;
 
-  CodeViewEntryPointer  = NULL;
-  PdbPath               = NULL;
-  DosHdr                = ImageBase;
+  ZeroMem (&ImageContext, sizeof (ImageContext));
+  ImageContext.Handle    = ImageBase;
+  ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
 
-  if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-    NtHdr           = (EFI_IMAGE_NT_HEADERS *) ((UINT8 *) DosHdr + DosHdr->e_lfanew);
-    OptionalHdr     = (VOID *) &NtHdr->OptionalHeader;
-    DirectoryEntry  = (EFI_IMAGE_DATA_DIRECTORY *) &(OptionalHdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG]);
-    if (DirectoryEntry->VirtualAddress != 0) {
-      for (DirCount = 0;
-           (DirCount < DirectoryEntry->Size / sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY)) && CodeViewEntryPointer == NULL;
-           DirCount++
-          ) {
-        DebugEntry = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) (DirectoryEntry->VirtualAddress + (UINTN) ImageBase + DirCount * sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
-        if (DebugEntry->Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
-          CodeViewEntryPointer = (VOID *) ((UINTN) DebugEntry->RVA + (UINTN) ImageBase);
-          switch (*(UINT32 *) CodeViewEntryPointer) {
-          case CODEVIEW_SIGNATURE_NB10:
-            PdbPath = (CHAR8 *) CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY);
-            break;
+  PeCoffLoaderGetImageInfo (&ImageContext);
 
-          case CODEVIEW_SIGNATURE_RSDS:
-            PdbPath = (CHAR8 *) CodeViewEntryPointer + sizeof (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY);
-            break;
-
-          default:
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  return PdbPath;
+  return ImageContext.PdbPointer;
 }
+
 
 STATIC
 VOID

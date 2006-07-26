@@ -191,7 +191,7 @@ Returns:
 {
   static BOOLEAN  InHandler = FALSE;
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (InHandler) {
       EfiDebugPrint (EFI_D_GENERIC, "ERROR: Re-entered debugger!\n"
                                     "       ExceptionType == %X\n"
@@ -205,7 +205,8 @@ Returns:
                                     Context.SystemContextIpf->CrIpsr,
                                     InHandler);
     }
-  )
+  DEBUG_CODE_END ();
+
   ASSERT (!InHandler);
   InHandler = TRUE;
   if (IvtEntryTable[ExceptionType].RegisteredCallback != NULL) {

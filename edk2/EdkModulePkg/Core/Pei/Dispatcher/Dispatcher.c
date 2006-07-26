@@ -105,7 +105,7 @@ Returns:
       //
       if (Status == EFI_SUCCESS) {
 
-        DEBUG_CODE (
+        DEBUG_CODE_BEGIN ();
 
           //
           // Fill list of found Peims for later list of those not installed
@@ -116,7 +116,7 @@ Returns:
             sizeof (EFI_GUID)
             );
 
-        );
+        DEBUG_CODE_END ();
 
         if (!Dispatched (
                DispatchData->CurrentPeim,
@@ -320,7 +320,7 @@ Returns:
     DispatchData->CurrentFvAddress = DefaultFvAddress;
   }
 
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     //
     // Debug data for uninstalled Peim list
     //
@@ -345,10 +345,10 @@ Returns:
       DebugFoundPeimPoint++;
       DebugNotDispatchedBitmap >>= 1;
     }
+  
+  DEBUG_CODE_END ();
 
-  );
-
-   return EFI_NOT_FOUND;
+  return EFI_NOT_FOUND;
 }
 
 VOID

@@ -27,12 +27,13 @@
 //
 // Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics
 //
-int            _inp  (unsigned short port);
+int            _inp (unsigned short port);
 unsigned short _inpw (unsigned short port);
 unsigned long  _inpd (unsigned short port);
 int            _outp (unsigned short port, int databyte );
-unsigned short _outpw(unsigned short port, unsigned short dataword );
-unsigned long  _outpd(unsigned short port, unsigned long dataword );
+unsigned short _outpw (unsigned short port, unsigned short dataword );
+unsigned long  _outpd (unsigned short port, unsigned long dataword );
+void          _ReadWriteBarrier (void);
 
 #pragma intrinsic(_inp)
 #pragma intrinsic(_inpw)
@@ -40,7 +41,15 @@ unsigned long  _outpd(unsigned short port, unsigned long dataword );
 #pragma intrinsic(_outp)
 #pragma intrinsic(_outpw)
 #pragma intrinsic(_outpd)
+#pragma intrinsic(_ReadWriteBarrier)
 
+//
+// _ReadWriteBarrier() forces memory reads and writes to complete at the point
+// in the call. This is only a hint to the compiler and does emit code.
+// In past versions of the compiler, _ReadWriteBarrier was enforced only 
+// locally and did not affect functions up the call tree. In Visual C++ 
+// 2005, _ReadWriteBarrier is enforced all the way up the call tree.
+//
 
 /**
   Reads an 8-bit I/O port.
@@ -62,6 +71,7 @@ IoRead8 (
   IN      UINTN                     Port
   )
 {
+  _ReadWriteBarrier ();
   return (UINT8)_inp ((UINT16)Port);
 }
 
@@ -87,6 +97,7 @@ IoWrite8 (
   IN      UINT8                     Value
   )
 {
+  _ReadWriteBarrier ();
   return (UINT8)_outp ((UINT16)Port, Value);
 }
 
@@ -111,6 +122,7 @@ IoRead16 (
   )
 {
   ASSERT ((Port & 1) == 0);
+  _ReadWriteBarrier ();
   return _inpw((UINT16)Port);
 }
 
@@ -137,6 +149,7 @@ IoWrite16 (
   )
 {
   ASSERT ((Port & 1) == 0);
+  _ReadWriteBarrier ();
   return _outpw ((UINT16)Port, Value);
 }
 
@@ -161,6 +174,7 @@ IoRead32 (
   )
 {
   ASSERT ((Port & 3) == 0);
+  _ReadWriteBarrier ();
   return _inpd((UINT16)Port);
 }
 
@@ -187,7 +201,207 @@ IoWrite32 (
   )
 {
   ASSERT ((Port & 3) == 0);
+  _ReadWriteBarrier ();
   return _outpd ((UINT16)Port, Value);
+}
+
+
+/**
+  Reads an 8-bit MMIO register.
+
+  Reads the 8-bit MMIO register specified by Address. The 8-bit read value is
+  returned. This function must guarantee that all MMIO read and write
+  operations are serialized.
+
+  If 8-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to read.
+
+  @return The value read.
+
+**/
+UINT8
+EFIAPI
+MmioRead8 (
+  IN      UINTN                     Address
+  )
+{
+  _ReadWriteBarrier ();
+  return *(volatile UINT8 *)Address;
+}
+
+/**
+  Writes an 8-bit MMIO register.
+
+  Writes the 8-bit MMIO register specified by Address with the value specified
+  by Value and returns Value. This function must guarantee that all MMIO read
+  and write operations are serialized.
+
+  If 8-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
+
+**/
+UINT8
+EFIAPI
+MmioWrite8 (
+  IN      UINTN                     Address,
+  IN      UINT8                     Value
+  )
+{
+  _ReadWriteBarrier ();
+  return *(volatile UINT8 *)Address = Value;
+}
+
+/**
+  Reads a 16-bit MMIO register.
+
+  Reads the 16-bit MMIO register specified by Address. The 16-bit read value is
+  returned. This function must guarantee that all MMIO read and write
+  operations are serialized.
+
+  If 16-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to read.
+
+  @return The value read.
+
+**/
+UINT16
+EFIAPI
+MmioRead16 (
+  IN      UINTN                     Address
+  )
+{
+  ASSERT ((Address & 1) == 0);
+  _ReadWriteBarrier ();
+  return *(volatile UINT16 *)Address;
+}
+
+/**
+  Writes a 16-bit MMIO register.
+
+  Writes the 16-bit MMIO register specified by Address with the value specified
+  by Value and returns Value. This function must guarantee that all MMIO read
+  and write operations are serialized.
+
+  If 16-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
+
+**/
+UINT16
+EFIAPI
+MmioWrite16 (
+  IN      UINTN                     Address,
+  IN      UINT16                    Value
+  )
+{
+  ASSERT ((Address & 1) == 0);
+  _ReadWriteBarrier ();
+  return *(volatile UINT16 *)Address = Value;
+}
+
+/**
+  Reads a 32-bit MMIO register.
+
+  Reads the 32-bit MMIO register specified by Address. The 32-bit read value is
+  returned. This function must guarantee that all MMIO read and write
+  operations are serialized.
+
+  If 32-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to read.
+
+  @return The value read.
+
+**/
+UINT32
+EFIAPI
+MmioRead32 (
+  IN      UINTN                     Address
+  )
+{
+  ASSERT ((Address & 3) == 0);
+  _ReadWriteBarrier ();
+  return *(volatile UINT32 *)Address;
+}
+
+/**
+  Writes a 32-bit MMIO register.
+
+  Writes the 32-bit MMIO register specified by Address with the value specified
+  by Value and returns Value. This function must guarantee that all MMIO read
+  and write operations are serialized.
+
+  If 32-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
+
+**/
+UINT32
+EFIAPI
+MmioWrite32 (
+  IN      UINTN                     Address,
+  IN      UINT32                    Value
+  )
+{
+  ASSERT ((Address & 3) == 0);
+  _ReadWriteBarrier ();
+  return *(volatile UINT32 *)Address = Value;
+}
+
+/**
+  Reads a 64-bit MMIO register.
+
+  Reads the 64-bit MMIO register specified by Address. The 64-bit read value is
+  returned. This function must guarantee that all MMIO read and write
+  operations are serialized.
+
+  If 64-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to read.
+
+  @return The value read.
+
+**/
+UINT64
+EFIAPI
+MmioRead64 (
+  IN      UINTN                     Address
+  )
+{
+  ASSERT ((Address & 7) == 0);
+  _ReadWriteBarrier ();
+  return *(volatile UINT64 *)Address;
+}
+
+/**
+  Writes a 64-bit MMIO register.
+
+  Writes the 64-bit MMIO register specified by Address with the value specified
+  by Value and returns Value. This function must guarantee that all MMIO read
+  and write operations are serialized.
+
+  If 64-bit MMIO register operations are not supported, then ASSERT().
+
+  @param  Address The MMIO register to write.
+  @param  Value   The value to write to the MMIO register.
+
+**/
+UINT64
+EFIAPI
+MmioWrite64 (
+  IN      UINTN                     Address,
+  IN      UINT64                    Value
+  )
+{
+  ASSERT ((Address & 7) == 0);
+  _ReadWriteBarrier ();
+  return *(volatile UINT64 *)Address = Value;
 }
 
 #endif

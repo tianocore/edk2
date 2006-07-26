@@ -268,6 +268,15 @@ Returns:
     return Status;
   }
 
+  if (!EFI_IMAGE_MACHINE_TYPE_SUPPORTED (Image->ImageContext.Machine)) {
+    //
+    // The PE/COFF loader can support loading image types that can be executed. 
+    // If we loaded an image type that we can not execute return EFI_UNSUPORTED. 
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+
   //
   // Allocate memory of the correct memory type aligned on the required image boundry
   //
@@ -440,8 +449,8 @@ Returns:
   // Print the load address and the PDB file name if it is available
   //
 
-  DEBUG_CODE (
-  {
+  DEBUG_CODE_BEGIN ();
+ 
     UINTN Index;
     UINTN StartIndex;
     CHAR8 EfiFileName[256];
@@ -473,8 +482,8 @@ Returns:
       DEBUG ((EFI_D_INFO | EFI_D_LOAD, "%a", EfiFileName)); // &Image->ImageContext.PdbPointer[StartIndex]));
     }
     DEBUG ((EFI_D_INFO | EFI_D_LOAD, "\n"));
-  }
-  );
+  
+  DEBUG_CODE_END ();
 
   return EFI_SUCCESS;
 
@@ -924,22 +933,13 @@ Returns:
   //
   PERF_START (ImageHandle, START_IMAGE_TOK, NULL, 0);
 
-  if (sizeof (UINTN) == 4 && Image->Machine == EFI_IMAGE_MACHINE_X64) {
-    return EFI_UNSUPPORTED;
-  } else if (sizeof (UINTN) == 8 && Image->Machine == EFI_IMAGE_MACHINE_IA32) {
-    return EFI_UNSUPPORTED;
-  } else {
-    //
-    // For orther possible cases
-    //
-  }
 
   //
   // Push the current start image context, and
   // link the current image to the head.   This is the
   // only image that can call Exit()
   //
-  HandleDatabaseKey = CoreGetHandleDatabaseKey();
+  HandleDatabaseKey = CoreGetHandleDatabaseKey ();
   LastImage         = mCurrentImage;
   mCurrentImage     = Image;
   Image->Tpl        = gEfiCurrentTpl;
@@ -970,11 +970,11 @@ Returns:
     // This make the user aware and check if the driver image have already released
     // all the resource in this situation.
     //
-    DEBUG_CODE (
+    DEBUG_CODE_BEGIN ();
       if (EFI_ERROR (Image->Status)) {
         DEBUG ((EFI_D_ERROR, "Error: Image at %08X start failed: %x\n", Image->Info.ImageBase, Image->Status));
       }
-    );
+    DEBUG_CODE_END ();
 
     //
     // If the image returns, exit it through Exit()
@@ -1003,7 +1003,7 @@ Returns:
   //
   // Handle the image's returned ExitData
   //
-  DEBUG_CODE (
+  DEBUG_CODE_BEGIN ();
     if (Image->ExitDataSize != 0 || Image->ExitData != NULL) {
 
       DEBUG (
@@ -1017,7 +1017,7 @@ Returns:
       }
       DEBUG ((EFI_D_LOAD, "\n"));
     }
-  );
+  DEBUG_CODE_END ();
 
   //
   //  Return the exit data to the caller
