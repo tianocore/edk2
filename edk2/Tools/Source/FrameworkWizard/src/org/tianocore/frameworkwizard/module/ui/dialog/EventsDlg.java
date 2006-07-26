@@ -15,6 +15,8 @@
 package org.tianocore.frameworkwizard.module.ui.dialog;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -147,7 +149,7 @@ public class EventsDlg extends IDialog {
            jComboBoxEventsType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
            jComboBoxEventsType.setPreferredSize(new java.awt.Dimension(320, 20));
            jComboBoxEventsType
-           .setToolTipText("<html>Select Create event if the Module has an event that<br> is waiting to be signaled.  Select Signal if the Module will signal all events in an event group.  Signal Event The events are named by GUID.</html>");
+           .setToolTipText("<html>Select CreateEvents if the Module has an event that is waiting to be signaled.<br>Select SignalEvents if the Module will signal all events in an event group.<br>NOTE: Signal events are named by GUID.</html>");
        }
        return jComboBoxEventsType;
    }
@@ -162,6 +164,7 @@ public class EventsDlg extends IDialog {
             jComboBoxEventGroup = new JComboBox();
             jComboBoxEventGroup.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
             jComboBoxEventGroup.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxEventGroup.setToolTipText("Select Type of Event, Guid or Timer.");
             
         }
         return jComboBoxEventGroup;
@@ -250,7 +253,7 @@ public class EventsDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 255);
+        this.setSize(508, 265);
         this.setContentPane(getJScrollPane());
         this.setTitle("Events");
         initFrame();
@@ -315,7 +318,7 @@ public class EventsDlg extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 135, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 160, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
@@ -327,10 +330,10 @@ public class EventsDlg extends IDialog {
             jLabelUsage.setText("Usage");
             jLabelUsage.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
             jLabelC_Name = new JLabel();
-            jLabelC_Name.setText("Guid C_Name");
+            jLabelC_Name.setText("Guid C Name");
             jLabelC_Name.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
             jLabelGroup = new JLabel();
-            jLabelGroup.setText("Even Type");
+            jLabelGroup.setText("Event Type");
             jLabelGroup.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
             jLabelEventType = new JLabel();
             jLabelEventType.setText("Type");

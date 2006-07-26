@@ -110,7 +110,7 @@ public class VariablesDlg extends IDialog {
             jTextFieldVariableName.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldVariableName.setLocation(new java.awt.Point(160, 10));
             jTextFieldVariableName
-                                  .setToolTipText("Enter a Hex Word Array, you must provide leading Zeros. 0x000a, 0x0010, бн");
+            .setToolTipText("Enter a Hex Word Array, you must provide leading Zeros. 0x000a, 0x0010, 0x00FF");
         }
         return jTextFieldVariableName;
     }
@@ -169,6 +169,7 @@ public class VariablesDlg extends IDialog {
             jTextFieldHelpText = new JTextField();
             jTextFieldHelpText.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
             jTextFieldHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldHelpText.setToolTipText("Enter information on how to use this Variable.");
         }
         return jTextFieldHelpText;
     }
@@ -184,7 +185,7 @@ public class VariablesDlg extends IDialog {
             jComboBoxGuidC_Name = new JComboBox();
             jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
             jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Hob");
+            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Variable.");
         }
         return jComboBoxGuidC_Name;
     }
@@ -230,7 +231,7 @@ public class VariablesDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 225);
+        this.setSize(510, 240);
         this.setContentPane(getJScrollPane());
         this.setTitle("Variables");
         initFrame();
@@ -262,7 +263,7 @@ public class VariablesDlg extends IDialog {
     /**
      This is the override edit constructor
      
-     @param inHobsIdentification
+     @param inVariablesIdentification
      @param iFrame
      
      **/
@@ -297,7 +298,7 @@ public class VariablesDlg extends IDialog {
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelGuidCName = new JLabel();
             jLabelGuidCName.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
-            jLabelGuidCName.setText("Guid C_Name");
+            jLabelGuidCName.setText("Guid C Name");
             jLabelUsage = new JLabel();
             jLabelUsage.setText("Usage");
             jLabelUsage.setBounds(new java.awt.Rectangle(15, 60, 140, 20));

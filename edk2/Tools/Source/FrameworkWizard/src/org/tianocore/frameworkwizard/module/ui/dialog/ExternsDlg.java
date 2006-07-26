@@ -202,7 +202,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
      
      **/
     private void init() {
-        this.setSize(500, 180);
+        this.setSize(508, 200);
         this.setContentPane(getJScrollPane());
         this.setTitle("Externs");
         initFrame();
@@ -350,7 +350,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
                     }
                 } else {
                     if (!DataValidation.isC_NameType(this.jTextFieldC_Name.getText())) {
-                        Log.wrn("Update Externs", "Incorrect data type for C_Name");
+                        Log.wrn("Update Externs", "Incorrect data type for C Name");
                         return false;
                     }
                 }

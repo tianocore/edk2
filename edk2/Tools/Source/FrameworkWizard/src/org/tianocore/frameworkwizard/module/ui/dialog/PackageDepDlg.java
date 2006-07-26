@@ -228,7 +228,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
      
      **/
     private void init() {
-        this.setSize(500, 175);
+        this.setSize(508, 188);
         this.setContentPane(getJScrollPane());
         this.setTitle("Package Dependencies");
         initFrame();

@@ -223,7 +223,7 @@ public class HobsDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 225);
+        this.setSize(510, 240);
         this.setContentPane(getJScrollPane());
         this.setTitle("Hobs");
         initFrame();
@@ -302,7 +302,7 @@ public class HobsDlg extends IDialog {
             jLabelUsage.setText("Usage");
             jLabelUsage.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
             jLabel = new JLabel();
-            jLabel.setText("Guid C_Name");
+            jLabel.setText("Guid C Name");
             jLabel.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
             jLabelHelpText = new JLabel();
             jLabelHelpText.setBounds(new java.awt.Rectangle(14, 85, 140, 20));

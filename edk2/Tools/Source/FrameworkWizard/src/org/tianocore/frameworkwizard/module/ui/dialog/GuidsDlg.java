@@ -208,7 +208,7 @@ public class GuidsDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(500, 200);
+        this.setSize(508, 220);
         this.setContentPane(getJScrollPane());
         this.setTitle("Guids");
         initFrame();
