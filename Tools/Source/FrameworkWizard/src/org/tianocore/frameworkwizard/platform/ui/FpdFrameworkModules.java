@@ -322,7 +322,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (settingDlg == null) {
                         settingDlg = new FpdModuleSA(ffc);
                     }
-                    docConsole.setSaved(false);
+                    
                     String[] sa = new String[5];
                     ffc.getFrameworkModuleInfo(selectedRow, sa);
                     String mg = sa[0];
@@ -330,7 +330,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String pg = sa[2];
                     String pv = sa[3];
                     String arch = sa[4];
-                    settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv + " " + arch, selectedRow);
+                    settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv + " " + arch, selectedRow, docConsole);
                     settingDlg.setVisible(true);
                 }
             });
