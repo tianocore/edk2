@@ -46,6 +46,7 @@ case "`uname`" in
     # Convert paths to windows format.
     export WORKSPACE=`cygpath -w $WORKSPACE`
     export CLASSPATH=`cygpath -w -p $CLASSPATH`
+    export FRAMEWORK_TOOLS_PATH=`cygpath -w -p $FRAMEWORK_TOOLS_PATH`
     ;;
 esac
 
