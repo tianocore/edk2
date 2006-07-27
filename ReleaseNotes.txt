@@ -270,7 +270,7 @@ check out the entire EDK II source tree.
 In a command window, change to the top-level directory of the EDK II source.
 
 To test your tool chain setup and to build the supplied tools, execute:
-    c:\MyWork\edkii\> edksetup ForceBuild
+    c:\MyWork\edkii\> edksetup ForceRebuild
 
 (The edksetup script is referred to as the setup command throughout the 
 rest of this document.)
@@ -315,12 +315,19 @@ environment variable, TOOL_CHAIN to "gcc" before running the
 edksetup script.  Example: export TOOL_CHAIN=gcc
 
 To test your tool chain setup and to build the supplied tools, execute:
-    c:\MyWork\edkii\> edksetup ForceBuild
+    c:\MyWork\edkii\> edksetup ForceRebuild
 
 On Linux systems, you must source the edksetup.sh file to load the correct
 settings into your shell.
 
     . edksetup.sh # Note the dot.
+
+If you have recently updated your code from subversion, the tools will need to
+be rebuilt if there were any code changes made to them. You can request that
+the tools get rebuilt by typing:
+
+    . edksetup.sh Rebuild # Unix-like systems
+    edksetup.bat Rebuild  # Windows
 
 The edksetup script is referred to as the setup command throughout the 
 rest of this document.
@@ -330,7 +337,7 @@ rest of this document.
 
 Any changes to the tool source code or XML Schema documents require that
 you execute the following:
-   c:\MyWork\edkii\> edksetup ForceBuild
+   c:\MyWork\edkii\> edksetup ForceRebuild
 
 You must set the WORKSPACE environment variable, or run the edksetup
 script (without any arguments), any time you want to build.
