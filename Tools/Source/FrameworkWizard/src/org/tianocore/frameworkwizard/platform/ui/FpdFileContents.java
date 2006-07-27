@@ -286,6 +286,13 @@ public class FpdFileContents {
                     maintainDynPcdMap(pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName(), moduleInfo);
                 }
             }
+            
+            cursor.push();
+            cursor.toPrevToken();
+            if (cursor.isComment()) {
+                cursor.removeXml();
+            }
+            cursor.pop();
             cursor.removeXml();
             if (getFrameworkModulesCount() == 0) {
                 cursor.toParent();
@@ -448,25 +455,31 @@ public class FpdFileContents {
             while(li.hasNext()) {
                 PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
                 ModuleSADocument.ModuleSA moduleSA = getModuleSA(moduleKey);
-                XmlCursor cursor = moduleSA.getPcdBuildDefinition().newCursor();
-                if (cursor.toFirstChild()) {
-                    PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
-                    if (msaPcd.getCName().equals(pcdData.getCName()) && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
-                        
-                        maintainDynPcdMap(pcdData.getCName()+" "+pcdData.getTokenSpaceGuidCName(), moduleKey);
-                        cursor.removeXml();
-                        break;
-                    }
-                    while (cursor.toNextSibling()) {
-                        pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
-                        if (msaPcd.getCName().equals(pcdData.getCName()) && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
-                            maintainDynPcdMap(pcdData.getCName()+" "+pcdData.getTokenSpaceGuidCName(), moduleKey);
+                if (moduleSA.getPcdBuildDefinition() != null) {
+                    XmlCursor cursor = moduleSA.getPcdBuildDefinition().newCursor();
+                    if (cursor.toFirstChild()) {
+                        PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData) cursor
+                                                                                                                                                      .getObject();
+                        if (msaPcd.getCName().equals(pcdData.getCName())
+                            && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
+
+                            maintainDynPcdMap(pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName(), moduleKey);
                             cursor.removeXml();
                             break;
                         }
+                        while (cursor.toNextSibling()) {
+                            pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData) cursor.getObject();
+                            if (msaPcd.getCName().equals(pcdData.getCName())
+                                && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
+                                maintainDynPcdMap(pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName(),
+                                                  moduleKey);
+                                cursor.removeXml();
+                                break;
+                            }
+                        }
                     }
+                    cursor.dispose();
                 }
-                cursor.dispose();
             }
             
         }
@@ -513,13 +526,23 @@ public class FpdFileContents {
             for (int j = 0; j < i; ++j) {
                 cursor.toNextSibling();
             }
+            cursor.push();
+            cursor.toPrevToken();
+            if (cursor.isComment()) {
+                cursor.removeXml();
+            }
+            cursor.pop();
             cursor.removeXml();
+            if (getLibraryInstancesCount(key) == 0) {
+                cursor.toParent();
+                cursor.removeXml();
+            }
         }
         
         cursor.dispose();
     }
     
-    public void genLibraryInstance(String mg, String mv, String pg, String pv, String key) {
+    public void genLibraryInstance(ModuleIdentification libMi, String key) {
         ModuleSADocument.ModuleSA msa = getModuleSA(key);
         if (msa == null){
             msa = getfpdFrameworkModules().addNewModuleSA();
@@ -529,7 +552,26 @@ public class FpdFileContents {
             libs = msa.addNewLibraries();
         }
         
+        String mn = libMi.getName();
+        String mg = libMi.getGuid();
+        String mv = libMi.getVersion();
+        String pn = libMi.getPackage().getName();
+        String pg = libMi.getPackage().getGuid();
+        String pv = libMi.getPackage().getVersion();
         LibrariesDocument.Libraries.Instance instance = libs.addNewInstance();
+        XmlCursor cursor = instance.newCursor();
+        try{
+            String comment = "Pkg: " + pn + " Mod: " + mn 
+                + " Path: " + GlobalData.getMsaFile(libMi).getPath();
+            cursor.insertComment(comment);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
+            cursor.dispose();
+        }
+        
         instance.setModuleGuid(mg);
         instance.setModuleVersion(mv);
         instance.setPackageGuid(pg);
@@ -776,6 +818,18 @@ public class FpdFileContents {
     private ModuleSADocument.ModuleSA genModuleSA (ModuleIdentification mi, String arch) {
         PackageIdentification pi = GlobalData.getPackageForModule(mi);
         ModuleSADocument.ModuleSA msa = getfpdFrameworkModules().addNewModuleSA();
+        XmlCursor cursor = msa.newCursor();
+        try{
+            String comment = "Mod: " + mi.getName() + " Type: " + mi.getModuleType() + " Path: "
+                            + GlobalData.getMsaFile(mi).getPath();
+            cursor.insertComment(comment);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally { 
+            cursor.dispose();
+        }
         msa.setModuleGuid(mi.getGuid());
         msa.setModuleVersion(mi.getVersion());
         msa.setPackageGuid(pi.getGuid());

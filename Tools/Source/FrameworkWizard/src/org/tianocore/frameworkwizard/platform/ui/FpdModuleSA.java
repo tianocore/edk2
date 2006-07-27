@@ -328,7 +328,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // remove pcd information of instance from current ModuleSA
         //
-        ffc.removePcdData(key, mi);
+        ffc.removePcdData(moduleKey, mi);
         //
         // remove class produced by this instance and add back these produced class to be bound.
         //
@@ -1018,12 +1018,13 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     model3.getValueAt(row, 2) + " " +
                     model3.getValueAt(row, 3) + " " +
                     model3.getValueAt(row, 4);
-                    ffc.genLibraryInstance(model3.getValueAt(row, 1)+"", model3.getValueAt(row, 2)+"", model3.getValueAt(row, 3)+"", model3.getValueAt(row, 4)+"", moduleKey);
+                    ModuleIdentification libMi = getModuleId(instanceValue);
+                    ffc.genLibraryInstance(libMi, moduleKey);
                     //
                     // Add pcd information of selected instance to current moduleSA
                     //
                     try{
-                        ffc.addFrameworkModulesPcdBuildDefs(getModuleId(instanceValue), null, ffc.getModuleSA(moduleKey));
+                        ffc.addFrameworkModulesPcdBuildDefs(libMi, null, ffc.getModuleSA(moduleKey));
                     }
                     catch (Exception exception) {
                         JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
