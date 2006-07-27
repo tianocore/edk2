@@ -247,7 +247,7 @@ ConvertTextToDevicePath (
 ;
 
 UINTN
-GetDevicePathSize (
+GetDevicePathSizeProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 /*++
@@ -265,7 +265,7 @@ GetDevicePathSize (
 ;
 
 EFI_DEVICE_PATH_PROTOCOL *
-DuplicateDevicePath (
+DuplicateDevicePathProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
   )
 /*++
@@ -284,7 +284,7 @@ DuplicateDevicePath (
 ;
 
 EFI_DEVICE_PATH_PROTOCOL *
-AppendDevicePath (
+AppendDevicePathProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *Src1,
   IN CONST EFI_DEVICE_PATH_PROTOCOL *Src2
   )
@@ -306,7 +306,7 @@ AppendDevicePath (
 ;
 
 EFI_DEVICE_PATH_PROTOCOL *
-AppendDeviceNode (
+AppendDeviceNodeProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DeviceNode
   )
@@ -328,7 +328,7 @@ AppendDeviceNode (
 ;
 
 EFI_DEVICE_PATH_PROTOCOL *
-AppendDevicePathInstance (
+AppendDevicePathInstanceProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath,
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePathInstance
   )
@@ -349,7 +349,7 @@ AppendDevicePathInstance (
 ;
 
 EFI_DEVICE_PATH_PROTOCOL *
-GetNextDevicePathInstance (
+GetNextDevicePathInstanceProtocolInterface (
   IN OUT EFI_DEVICE_PATH_PROTOCOL   **DevicePathInstance,
   OUT UINTN                         *DevicePathInstanceSize
   )
@@ -374,7 +374,7 @@ GetNextDevicePathInstance (
 ;
 
 BOOLEAN
-IsDevicePathMultiInstance (
+IsDevicePathMultiInstanceProtocolInterface (
   IN CONST EFI_DEVICE_PATH_PROTOCOL *DevicePath
   )
 /*++
@@ -393,7 +393,7 @@ IsDevicePathMultiInstance (
 ;
 
 EFI_DEVICE_PATH_PROTOCOL *
-CreateDeviceNode (
+CreateDeviceNodeProtocolInterface (
   IN UINT8  NodeType,
   IN UINT8  NodeSubType,
   IN UINT16 NodeLength

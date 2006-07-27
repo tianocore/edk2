@@ -19,7 +19,6 @@ Abstract:
 
 --*/
 
-#include <protocol/DevicePathFromText.h>
 #include "DevicePath.h"
 
 CHAR16 *
@@ -574,6 +573,7 @@ Returns:
 {
   UINTN  Length;
 
+  *Data  = 0;
   Length = sizeof (UINT64);
   HexStringToBuf ((UINT8 *) Data, &Length, TrimHexStr (Str), NULL);
 }
@@ -618,7 +618,7 @@ Returns:
   Char = *(str++);
   while (Char) {
     if (Char >= '0' && Char <= '9') {
-      if (Rvalue > High || Rvalue == High && Char - '0' > (INTN) Low) {
+      if ((Rvalue > High || Rvalue == High) && (Char - '0' > (INTN) Low)) {
         return (UINTN) -1;
       }
 
@@ -1298,7 +1298,7 @@ DevPathFromTextVenPcAnsi (
                                     MESSAGING_DEVICE_PATH,
                                     MSG_VENDOR_DP,
                                     sizeof (VENDOR_DEVICE_PATH));
-  Vendor->Guid = gEfiPcAnsiGuid;
+  CopyGuid (&Vendor->Guid, &gEfiPcAnsiGuid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
@@ -1314,7 +1314,7 @@ DevPathFromTextVenVt100 (
                                     MESSAGING_DEVICE_PATH,
                                     MSG_VENDOR_DP,
                                     sizeof (VENDOR_DEVICE_PATH));
-  Vendor->Guid = gEfiVT100Guid;
+  CopyGuid (&Vendor->Guid, &gEfiVT100Guid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
@@ -1330,7 +1330,7 @@ DevPathFromTextVenVt100Plus (
                                     MESSAGING_DEVICE_PATH,
                                     MSG_VENDOR_DP,
                                     sizeof (VENDOR_DEVICE_PATH));
-  Vendor->Guid = gEfiVT100PlusGuid;
+  CopyGuid (&Vendor->Guid, &gEfiVT100PlusGuid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
@@ -1346,7 +1346,7 @@ DevPathFromTextVenUtf8 (
                                     MESSAGING_DEVICE_PATH,
                                     MSG_VENDOR_DP,
                                     sizeof (VENDOR_DEVICE_PATH));
-  Vendor->Guid = gEfiVTUTF8Guid;
+  CopyGuid (&Vendor->Guid, &gEfiVTUTF8Guid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Vendor;
 }
@@ -1366,7 +1366,7 @@ DevPathFromTextUartFlowCtrl (
                                                         sizeof (UART_FLOW_CONTROL_DEVICE_PATH)
                                                         );
 
-  UartFlowControl->Guid = mEfiDevicePathMessagingUartFlowControlGuid;
+  CopyGuid (&UartFlowControl->Guid, &mEfiDevicePathMessagingUartFlowControlGuid);
   if (StrCmp (ValueStr, L"XonXoff") == 0) {
     UartFlowControl->FlowControlMap = 2;
   } else if (StrCmp (ValueStr, L"Hardware") == 0) {
@@ -1409,7 +1409,7 @@ DevPathFromTextSAS (
                                        sizeof (SAS_DEVICE_PATH)
                                        );
 
-  Sas->Guid   = mEfiDevicePathMessagingSASGuid;
+  CopyGuid (&Sas->Guid, &mEfiDevicePathMessagingSASGuid);
   Xtoi64 (AddressStr, &Sas->SasAddress);
   Xtoi64 (LunStr, &Sas->Lun);
   Sas->RelativeTargetPort = (UINT16) Xtoi (RTPStr);
@@ -1455,7 +1455,7 @@ DevPathFromTextDebugPort (
                                                     sizeof (VENDOR_DEFINED_MESSAGING_DEVICE_PATH)
                                                     );
 
-  Vend->Guid = gEfiDebugPortProtocolGuid;
+  CopyGuid (&Vend->Guid, &gEfiDebugPortProtocolGuid);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Vend;
 }
@@ -2166,8 +2166,8 @@ DevPathFromTextBBS (
     Bbs->DeviceType = BBS_TYPE_UNKNOWN;
   }
 
-  AsciiStr = Bbs->String;
-  StrToAscii (IdStr, &AsciiStr);
+  AsciiStr = (UINT8 *) Bbs->String;
+  StrToAscii (IdStr, (CHAR8 **) &AsciiStr);
 
   Bbs->StatusFlag = (UINT16) Xtoi (FlagsStr);
 
@@ -2175,120 +2175,63 @@ DevPathFromTextBBS (
 }
 
 DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[] = {
-  L"Pci",
-  DevPathFromTextPci,
-  L"PcCard",
-  DevPathFromTextPcCard,
-  L"MemoryMapped",
-  DevPathFromTextMemoryMapped,
-  L"VenHw",
-  DevPathFromTextVenHw,
-  L"Ctrl",
-  DevPathFromTextCtrl,
-  L"Acpi",
-  DevPathFromTextAcpi,
-  L"PciRoot",
-  DevPathFromTextPciRoot,
-  L"Floppy",
-  DevPathFromTextFloppy,
-  L"Keyboard",
-  DevPathFromTextKeyboard,
-  L"Serial",
-  DevPathFromTextSerial,
-  L"ParallelPort",
-  DevPathFromTextParallelPort,
-  L"AcpiEx",
-  DevPathFromTextAcpiEx,
-  L"AcpiExp",
-  DevPathFromTextAcpiExp,
-  L"Ata",
-  DevPathFromTextAta,
-  L"Scsi",
-  DevPathFromTextScsi,
-  L"Fibre",
-  DevPathFromTextFibre,
-  L"I1394",
-  DevPathFromText1394,
-  L"USB",
-  DevPathFromTextUsb,
-  L"I2O",
-  DevPathFromTextI2O,
-  L"Infiniband",
-  DevPathFromTextInfiniband,
-  L"VenMsg",
-  DevPathFromTextVenMsg,
-  L"VenPcAnsi",
-  DevPathFromTextVenPcAnsi,
-  L"VenVt100",
-  DevPathFromTextVenVt100,
-  L"VenVt100Plus",
-  DevPathFromTextVenVt100Plus,
-  L"VenUtf8",
-  DevPathFromTextVenUtf8,
-  L"UartFlowCtrl",
-  DevPathFromTextUartFlowCtrl,
-  L"SAS",
-  DevPathFromTextSAS,
-  L"DebugPort",
-  DevPathFromTextDebugPort,
-  L"MAC",
-  DevPathFromTextMAC,
-  L"IPv4",
-  DevPathFromTextIPv4,
-  L"IPv6",
-  DevPathFromTextIPv6,
-  L"Uart",
-  DevPathFromTextUart,
-  L"UsbClass",
-  DevPathFromTextUsbClass,
-  L"UsbAudio",
-  DevPathFromTextUsbAudio,
-  L"UsbCDCControl",
-  DevPathFromTextUsbCDCControl,
-  L"UsbHID",
-  DevPathFromTextUsbHID,
-  L"UsbImage",
-  DevPathFromTextUsbImage,
-  L"UsbPrinter",
-  DevPathFromTextUsbPrinter,
-  L"UsbMassStorage",
-  DevPathFromTextUsbMassStorage,
-  L"UsbHub",
-  DevPathFromTextUsbHub,
-  L"UsbCDCData",
-  DevPathFromTextUsbCDCData,
-  L"UsbSmartCard",
-  DevPathFromTextUsbSmartCard,
-  L"UsbVideo",
-  DevPathFromTextUsbVideo,
-  L"UsbDiagnostic",
-  DevPathFromTextUsbDiagnostic,
-  L"UsbWireless",
-  DevPathFromTextUsbWireless,
-  L"UsbDeviceFirmwareUpdate",
-  DevPathFromTextUsbDeviceFirmwareUpdate,
-  L"UsbIrdaBridge",
-  DevPathFromTextUsbIrdaBridge,
-  L"UsbTestAndMeasurement",
-  DevPathFromTextUsbTestAndMeasurement,
-  L"UsbWwid",
-  DevPathFromTextUsbWwid,
-  L"Unit",
-  DevPathFromTextUnit,
-  L"iSCSI",
-  DevPathFromTextiSCSI,
-  L"HD",
-  DevPathFromTextHD,
-  L"CDROM",
-  DevPathFromTextCDROM,
-  L"VenMEDIA",
-  DevPathFromTextVenMEDIA,
-  L"Media",
-  DevPathFromTextMedia,
-  L"BBS",
-  DevPathFromTextBBS,
-  NULL,
-  NULL
+  {L"Pci", DevPathFromTextPci},
+  {L"PcCard", DevPathFromTextPcCard},
+  {L"MemoryMapped", DevPathFromTextMemoryMapped},
+  {L"VenHw", DevPathFromTextVenHw},
+  {L"Ctrl", DevPathFromTextCtrl},
+  {L"Acpi", DevPathFromTextAcpi},
+  {L"PciRoot", DevPathFromTextPciRoot},
+  {L"Floppy", DevPathFromTextFloppy},
+  {L"Keyboard", DevPathFromTextKeyboard},
+  {L"Serial", DevPathFromTextSerial},
+  {L"ParallelPort", DevPathFromTextParallelPort},
+  {L"AcpiEx", DevPathFromTextAcpiEx},
+  {L"AcpiExp", DevPathFromTextAcpiExp},
+  {L"Ata", DevPathFromTextAta},
+  {L"Scsi", DevPathFromTextScsi},
+  {L"Fibre", DevPathFromTextFibre},
+  {L"I1394", DevPathFromText1394},
+  {L"USB", DevPathFromTextUsb},
+  {L"I2O", DevPathFromTextI2O},
+  {L"Infiniband", DevPathFromTextInfiniband},
+  {L"VenMsg", DevPathFromTextVenMsg},
+  {L"VenPcAnsi", DevPathFromTextVenPcAnsi},
+  {L"VenVt100", DevPathFromTextVenVt100},
+  {L"VenVt100Plus", DevPathFromTextVenVt100Plus},
+  {L"VenUtf8", DevPathFromTextVenUtf8},
+  {L"UartFlowCtrl", DevPathFromTextUartFlowCtrl},
+  {L"SAS", DevPathFromTextSAS},
+  {L"DebugPort", DevPathFromTextDebugPort},
+  {L"MAC", DevPathFromTextMAC},
+  {L"IPv4", DevPathFromTextIPv4},
+  {L"IPv6", DevPathFromTextIPv6},
+  {L"Uart", DevPathFromTextUart},
+  {L"UsbClass", DevPathFromTextUsbClass},
+  {L"UsbAudio", DevPathFromTextUsbAudio},
+  {L"UsbCDCControl", DevPathFromTextUsbCDCControl},
+  {L"UsbHID", DevPathFromTextUsbHID},
+  {L"UsbImage", DevPathFromTextUsbImage},
+  {L"UsbPrinter", DevPathFromTextUsbPrinter},
+  {L"UsbMassStorage", DevPathFromTextUsbMassStorage},
+  {L"UsbHub", DevPathFromTextUsbHub},
+  {L"UsbCDCData", DevPathFromTextUsbCDCData},
+  {L"UsbSmartCard", DevPathFromTextUsbSmartCard},
+  {L"UsbVideo", DevPathFromTextUsbVideo},
+  {L"UsbDiagnostic", DevPathFromTextUsbDiagnostic},
+  {L"UsbWireless", DevPathFromTextUsbWireless},
+  {L"UsbDeviceFirmwareUpdate", DevPathFromTextUsbDeviceFirmwareUpdate},
+  {L"UsbIrdaBridge", DevPathFromTextUsbIrdaBridge},
+  {L"UsbTestAndMeasurement", DevPathFromTextUsbTestAndMeasurement},
+  {L"UsbWwid", DevPathFromTextUsbWwid},
+  {L"Unit", DevPathFromTextUnit},
+  {L"iSCSI", DevPathFromTextiSCSI},
+  {L"HD", DevPathFromTextHD},
+  {L"CDROM", DevPathFromTextCDROM},
+  {L"VenMEDIA", DevPathFromTextVenMEDIA},
+  {L"Media", DevPathFromTextMedia},
+  {L"BBS", DevPathFromTextBBS},
+  {NULL, NULL}
 };
 
 EFI_DEVICE_PATH_PROTOCOL *
@@ -2413,7 +2356,7 @@ ConvertTextToDevicePath (
       gBS->FreePool (ParamStr);
     }
 
-    NewDevicePath = AppendDeviceNode (DevicePath, DeviceNode);
+    NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);
     gBS->FreePool (DevicePath);
     gBS->FreePool (DeviceNode);
     DevicePath = NewDevicePath;
@@ -2422,7 +2365,7 @@ ConvertTextToDevicePath (
       DeviceNode = (EFI_DEVICE_PATH_PROTOCOL *) AllocatePool (END_DEVICE_PATH_LENGTH);
       SetDevicePathInstanceEndNode (DeviceNode);
 
-      NewDevicePath = AppendDeviceNode (DevicePath, DeviceNode);
+      NewDevicePath = AppendDeviceNodeProtocolInterface (DevicePath, DeviceNode);
       gBS->FreePool (DevicePath);
       gBS->FreePool (DeviceNode);
       DevicePath = NewDevicePath;

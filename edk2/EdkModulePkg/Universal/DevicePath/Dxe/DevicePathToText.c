@@ -19,7 +19,6 @@ Abstract:
 
 --*/
 
-#include <protocol/DevicePathToText.h>
 #include "DevicePath.h"
 
 EFI_DEVICE_PATH_PROTOCOL *
@@ -372,7 +371,7 @@ DevPathToTextController (
   CatPrint (
     Str,
     L"Ctrl(%x)",
-    (UINT16 *)Controller->ControllerNumber
+    Controller->ControllerNumber
     );
 }
 
@@ -423,7 +422,7 @@ DevPathToTextAcpi (
   }
 }
 
-#define NextStrA(a) ((UINT8 *) (((UINT8 *) (a)) + AsciiStrLen (a) + 1))
+#define NextStrA(a) ((UINT8 *) (((UINT8 *) (a)) + AsciiStrLen ((CHAR8 *) (a)) + 1))
 
 VOID
 DevPathToTextExtAcpi (
@@ -1257,102 +1256,38 @@ DevPathToTextNodeUnknown (
 }
 
 DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable[] = {
-  HARDWARE_DEVICE_PATH,
-  HW_PCI_DP,
-  DevPathToTextPci,
-  HARDWARE_DEVICE_PATH,
-  HW_PCCARD_DP,
-  DevPathToTextPccard,
-  HARDWARE_DEVICE_PATH,
-  HW_MEMMAP_DP,
-  DevPathToTextMemMap,
-  HARDWARE_DEVICE_PATH,
-  HW_VENDOR_DP,
-  DevPathToTextVendor,
-  HARDWARE_DEVICE_PATH,
-  HW_CONTROLLER_DP,
-  DevPathToTextController,
-  ACPI_DEVICE_PATH,
-  ACPI_DP,
-  DevPathToTextAcpi,
-  ACPI_DEVICE_PATH,
-  ACPI_EXTENDED_DP,
-  DevPathToTextExtAcpi,
-  MESSAGING_DEVICE_PATH,
-  MSG_ATAPI_DP,
-  DevPathToTextAtapi,
-  MESSAGING_DEVICE_PATH,
-  MSG_SCSI_DP,
-  DevPathToTextScsi,
-  MESSAGING_DEVICE_PATH,
-  MSG_FIBRECHANNEL_DP,
-  DevPathToTextFibre,
-  MESSAGING_DEVICE_PATH,
-  MSG_1394_DP,
-  DevPathToText1394,
-  MESSAGING_DEVICE_PATH,
-  MSG_USB_DP,
-  DevPathToTextUsb,
-  MESSAGING_DEVICE_PATH,
-  MSG_USB_WWID_DP,
-  DevPathToTextUsbWWID,
-  MESSAGING_DEVICE_PATH,
-  MSG_DEVICE_LOGICAL_UNIT_DP,
-  DevPathToTextLogicalUnit,
-  MESSAGING_DEVICE_PATH,
-  MSG_USB_CLASS_DP,
-  DevPathToTextUsbClass,
-  MESSAGING_DEVICE_PATH,
-  MSG_I2O_DP,
-  DevPathToTextI2O,
-  MESSAGING_DEVICE_PATH,
-  MSG_MAC_ADDR_DP,
-  DevPathToTextMacAddr,
-  MESSAGING_DEVICE_PATH,
-  MSG_IPv4_DP,
-  DevPathToTextIPv4,
-  MESSAGING_DEVICE_PATH,
-  MSG_IPv6_DP,
-  DevPathToTextIPv6,
-  MESSAGING_DEVICE_PATH,
-  MSG_INFINIBAND_DP,
-  DevPathToTextInfiniBand,
-  MESSAGING_DEVICE_PATH,
-  MSG_UART_DP,
-  DevPathToTextUart,
-  MESSAGING_DEVICE_PATH,
-  MSG_VENDOR_DP,
-  DevPathToTextVendor,
-  MESSAGING_DEVICE_PATH,
-  MSG_ISCSI_DP,
-  DevPathToTextiSCSI,
-  MEDIA_DEVICE_PATH,
-  MEDIA_HARDDRIVE_DP,
-  DevPathToTextHardDrive,
-  MEDIA_DEVICE_PATH,
-  MEDIA_CDROM_DP,
-  DevPathToTextCDROM,
-  MEDIA_DEVICE_PATH,
-  MEDIA_VENDOR_DP,
-  DevPathToTextVendor,
-  MEDIA_DEVICE_PATH,
-  MEDIA_FILEPATH_DP,
-  DevPathToTextFilePath,
-  MEDIA_DEVICE_PATH,
-  MEDIA_PROTOCOL_DP,
-  DevPathToTextMediaProtocol,
-  MEDIA_DEVICE_PATH,
-  MEDIA_FILEPATH_DP,
-  DevPathToTextFilePath,
-  BBS_DEVICE_PATH,
-  BBS_BBS_DP,
-  DevPathToTextBBS,
-  END_DEVICE_PATH_TYPE,
-  END_INSTANCE_DEVICE_PATH_SUBTYPE,
-  DevPathToTextEndInstance,
-  0,
-  0,
-  NULL
+  {HARDWARE_DEVICE_PATH, HW_PCI_DP, DevPathToTextPci},
+  {HARDWARE_DEVICE_PATH, HW_PCCARD_DP, DevPathToTextPccard},
+  {HARDWARE_DEVICE_PATH, HW_MEMMAP_DP, DevPathToTextMemMap},
+  {HARDWARE_DEVICE_PATH, HW_VENDOR_DP, DevPathToTextVendor},
+  {HARDWARE_DEVICE_PATH, HW_CONTROLLER_DP, DevPathToTextController},
+  {ACPI_DEVICE_PATH, ACPI_DP, DevPathToTextAcpi},
+  {ACPI_DEVICE_PATH, ACPI_EXTENDED_DP, DevPathToTextExtAcpi},
+  {MESSAGING_DEVICE_PATH, MSG_ATAPI_DP, DevPathToTextAtapi},
+  {MESSAGING_DEVICE_PATH, MSG_SCSI_DP, DevPathToTextScsi},
+  {MESSAGING_DEVICE_PATH, MSG_FIBRECHANNEL_DP, DevPathToTextFibre},
+  {MESSAGING_DEVICE_PATH, MSG_1394_DP, DevPathToText1394},
+  {MESSAGING_DEVICE_PATH, MSG_USB_DP, DevPathToTextUsb},
+  {MESSAGING_DEVICE_PATH, MSG_USB_WWID_DP, DevPathToTextUsbWWID},
+  {MESSAGING_DEVICE_PATH, MSG_DEVICE_LOGICAL_UNIT_DP, DevPathToTextLogicalUnit},
+  {MESSAGING_DEVICE_PATH, MSG_USB_CLASS_DP, DevPathToTextUsbClass},
+  {MESSAGING_DEVICE_PATH, MSG_I2O_DP, DevPathToTextI2O},
+  {MESSAGING_DEVICE_PATH, MSG_MAC_ADDR_DP, DevPathToTextMacAddr},
+  {MESSAGING_DEVICE_PATH, MSG_IPv4_DP, DevPathToTextIPv4},
+  {MESSAGING_DEVICE_PATH, MSG_IPv6_DP, DevPathToTextIPv6},
+  {MESSAGING_DEVICE_PATH, MSG_INFINIBAND_DP, DevPathToTextInfiniBand},
+  {MESSAGING_DEVICE_PATH, MSG_UART_DP, DevPathToTextUart},
+  {MESSAGING_DEVICE_PATH, MSG_VENDOR_DP, DevPathToTextVendor},
+  {MESSAGING_DEVICE_PATH, MSG_ISCSI_DP, DevPathToTextiSCSI},
+  {MEDIA_DEVICE_PATH, MEDIA_HARDDRIVE_DP, DevPathToTextHardDrive},
+  {MEDIA_DEVICE_PATH, MEDIA_CDROM_DP, DevPathToTextCDROM},
+  {MEDIA_DEVICE_PATH, MEDIA_VENDOR_DP, DevPathToTextVendor},
+  {MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP, DevPathToTextFilePath},
+  {MEDIA_DEVICE_PATH, MEDIA_PROTOCOL_DP, DevPathToTextMediaProtocol},
+  {MEDIA_DEVICE_PATH, MEDIA_FILEPATH_DP, DevPathToTextFilePath},
+  {BBS_DEVICE_PATH, BBS_BBS_DP, DevPathToTextBBS},
+  {END_DEVICE_PATH_TYPE, END_INSTANCE_DEVICE_PATH_SUBTYPE, DevPathToTextEndInstance},
+  {0, 0, NULL}
 };
 
 CHAR16 *

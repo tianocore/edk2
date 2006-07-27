@@ -261,7 +261,7 @@ Returns:
 
     Status = AllocMemInMemoryBlock (
               TempHeaderPtr,
-              Pool,
+              (VOID **) Pool,
               RealAllocSize / 32
               );
     if (!EFI_ERROR (Status)) {
@@ -302,7 +302,7 @@ Returns:
 
   Status = AllocMemInMemoryBlock (
              NewMemoryHeader,
-             Pool,
+             (VOID **) Pool,
              RealAllocSize / 32
              );
   if (!EFI_ERROR (Status)) {
