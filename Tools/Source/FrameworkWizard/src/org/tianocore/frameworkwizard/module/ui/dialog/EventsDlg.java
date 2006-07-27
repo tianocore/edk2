@@ -15,8 +15,6 @@
 package org.tianocore.frameworkwizard.module.ui.dialog;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.Vector;
 
 import javax.swing.JButton;

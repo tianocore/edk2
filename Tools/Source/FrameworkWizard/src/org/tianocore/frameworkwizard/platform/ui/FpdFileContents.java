@@ -182,7 +182,7 @@ public class FpdFileContents {
     }
     
     public int getFrameworkModulesCount() {
-        if (getfpdFrameworkModules().getModuleSAList() == null){
+        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0){
             removeElement(getfpdFrameworkModules());
             fpdFrameworkModules = null;
             return 0;
@@ -223,7 +223,7 @@ public class FpdFileContents {
     
     public ModuleSADocument.ModuleSA getModuleSA(String key) {
         String[] s = key.split(" ");
-        if (getfpdFrameworkModules().getModuleSAList() == null) {
+        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0) {
             removeElement(getfpdFrameworkModules());
             fpdFrameworkModules = null;
             return null;
@@ -1034,7 +1034,7 @@ public class FpdFileContents {
     }
     
     public int getDynamicPcdBuildDataCount() {
-        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null) {
+        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
             removeElement(getfpdDynPcdBuildDefs());
             fpdDynPcdBuildDefs = null;
             return 0;
@@ -1043,7 +1043,7 @@ public class FpdFileContents {
     }
     
     public void getDynamicPcdBuildData(String[][] saa) {
-        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null) {
+        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
             removeElement(getfpdDynPcdBuildDefs());
             fpdDynPcdBuildDefs = null;
             return ;
@@ -1962,6 +1962,10 @@ public class FpdFileContents {
     
     public void getPlatformDefsSkuInfos(String[][] saa){
         if (getfpdPlatformDefs().getSkuInfo() == null || getfpdPlatformDefs().getSkuInfo().getUiSkuNameList() == null) {
+            if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null) {
+                removeElement(getfpdDynPcdBuildDefs());
+                fpdDynPcdBuildDefs = null;
+            }
             return ;
         }
         
