@@ -1505,6 +1505,7 @@ public class AutoGen {
 			switch (CommonDefinition.getModuleType(moduleType)) {
 			case CommonDefinition.ModuleTypeBase:
 				fileBuffer.append("RETURN_STATUS\r\n");
+				fileBuffer.append("EFIAPI\r\n");
 				fileBuffer.append(libInstanceList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer.append("  VOID\r\n");
@@ -1514,6 +1515,7 @@ public class AutoGen {
 			case CommonDefinition.ModuleTypePeiCore:
 			case CommonDefinition.ModuleTypePeim:
 				fileBuffer.append("EFI_STATUS\r\n");
+				fileBuffer.append("EFIAPI\r\n");
 				fileBuffer.append(libInstanceList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer
@@ -1531,6 +1533,7 @@ public class AutoGen {
 			case CommonDefinition.ModuleTypeUefiDriver:
 			case CommonDefinition.ModuleTypeUefiApplication:
 				fileBuffer.append("EFI_STATUS\r\n");
+				fileBuffer.append("EFIAPI\r\n");
 				fileBuffer.append(libInstanceList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
@@ -1544,6 +1547,7 @@ public class AutoGen {
 		// Add ProcessLibraryConstructorList in AutoGen.c
 		//
 		fileBuffer.append("VOID\r\n");
+		fileBuffer.append("EFIAPI\r\n");
 		fileBuffer.append("ProcessLibraryConstructorList (\r\n");
 		switch (CommonDefinition.getModuleType(moduleType)) {
 		case CommonDefinition.ModuleTypeBase:
@@ -1636,7 +1640,8 @@ public class AutoGen {
 		for (int i = 0; i < libInstanceList.size(); i++) {
 			switch (CommonDefinition.getModuleType(moduleType)) {
 			case CommonDefinition.ModuleTypeBase:
-				fileBuffer.append("RETURN_STATUS\n");
+				fileBuffer.append("RETURN_STATUS\r\n");
+				fileBuffer.append("EFIAPI\r\n");
 				fileBuffer.append(libInstanceList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer.append("  VOID\r\n");
@@ -1645,6 +1650,7 @@ public class AutoGen {
 			case CommonDefinition.ModuleTypePeiCore:
 			case CommonDefinition.ModuleTypePeim:
 				fileBuffer.append("EFI_STATUS\r\n");
+				fileBuffer.append("EFIAPI\r\n");
 				fileBuffer.append(libInstanceList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer
@@ -1661,6 +1667,7 @@ public class AutoGen {
 			case CommonDefinition.ModuleTypeUefiDriver:
 			case CommonDefinition.ModuleTypeUefiApplication:
 				fileBuffer.append("EFI_STATUS\r\n");
+				fileBuffer.append("EFIAPI\r\n");
 				fileBuffer.append(libInstanceList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
@@ -1686,6 +1693,7 @@ public class AutoGen {
 		case CommonDefinition.ModuleTypeUefiDriver:
 		case CommonDefinition.ModuleTypeUefiApplication:
 			fileBuffer.append("VOID\r\n");
+			fileBuffer.append("EFIAPI\r\n");
 			fileBuffer.append("ProcessLibraryDestructorList (\r\n");
 			fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
 			fileBuffer.append("  IN EFI_SYSTEM_TABLE  *SystemTable\r\n");
