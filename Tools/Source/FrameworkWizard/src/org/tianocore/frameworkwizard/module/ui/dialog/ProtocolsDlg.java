@@ -127,6 +127,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
             jComboBoxUsage = new JComboBox();
             jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxUsage.setToolTipText("ALWAYS_CONSUMED is the only valid usage for type ProtocolNotify.");
         }
         return jComboBoxUsage;
     }
@@ -155,7 +156,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
             jComboBoxProtocolType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jComboBoxProtocolType.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxProtocolType.addItemListener(this);
-            jComboBoxProtocolType.setToolTipText("Select Protocol Type");
+            jComboBoxProtocolType.setToolTipText("<html>Select Protocol Type<br>Protocol Notify is a register protocol notify mechanism.");
         }
         return jComboBoxProtocolType;
     }
@@ -170,6 +171,7 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
             jComboBoxCName = new JComboBox();
             jComboBoxCName.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
             jComboBoxCName.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxCName.setToolTipText("Select Guid C Name of the Protocol");
 
         }
         return jComboBoxCName;
