@@ -479,7 +479,7 @@ EhciDriverBindingStart (
   //
   // Create AsyncRequest Polling Timer
   //
-  Status = CreatePollingTimer (HcDev, AsyncRequestMoniter);
+  Status = CreatePollingTimer (HcDev, (EFI_EVENT_NOTIFY) AsyncRequestMoniter);
   if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
     goto deinit_memory_management;
@@ -886,7 +886,7 @@ EhciReset (
     //
     Status = SetFrameListBaseAddr (
                HcDev, 
-               (UINT32) GET_0B_TO_31B (HcDev->PeriodicFrameListBuffer)
+               GET_0B_TO_31B (HcDev->PeriodicFrameListBuffer)
                );
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;

@@ -20,35 +20,12 @@ Abstract:
 
 --*/
 
-#include <Uefi/UefiSpec.h>
-#include <Protocol/DevicePath.h>
 #include "DevicePath.h"
 
 DEVICE_PATH_DRIVER_PRIVATE_DATA mPrivateData;
 
 EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid = DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL;
 EFI_GUID mEfiDevicePathMessagingSASGuid             = DEVICE_PATH_MESSAGING_SAS;
-
-STATIC EFI_DEVICE_PATH_UTILITIES_PROTOCOL mDevicePathUtilitiesProtocol = {
-  GetDevicePathSize,
-  DuplicateDevicePath,
-  AppendDevicePath,
-  AppendDeviceNode,
-  AppendDevicePathInstance,
-  GetNextDevicePathInstance,
-  IsDevicePathMultiInstance,
-  CreateDeviceNode
-};
-
-STATIC EFI_DEVICE_PATH_TO_TEXT_PROTOCOL   mDevicePathToTextProtocol = {
-  ConvertDeviceNodeToText,
-  ConvertDevicePathToText
-};
-
-STATIC EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL mDevicePathFromTextProtocol = {
-  ConvertTextToDeviceNode,
-  ConvertTextToDevicePath
-};
 
 EFI_STATUS
 EFIAPI
@@ -75,14 +52,14 @@ DevicePathEntryPoint (
 
   mPrivateData.Signature = DEVICE_PATH_DRIVER_SIGNATURE;
 
-  mPrivateData.DevicePathUtilities.GetDevicePathSize         = GetDevicePathSize;
-  mPrivateData.DevicePathUtilities.DuplicateDevicePath       = DuplicateDevicePath;
-  mPrivateData.DevicePathUtilities.AppendDevicePath          = AppendDevicePath;
-  mPrivateData.DevicePathUtilities.AppendDeviceNode          = AppendDeviceNode;
-  mPrivateData.DevicePathUtilities.AppendDevicePathInstance  = AppendDevicePathInstance;
-  mPrivateData.DevicePathUtilities.GetNextDevicePathInstance = GetNextDevicePathInstance;
-  mPrivateData.DevicePathUtilities.IsDevicePathMultiInstance = IsDevicePathMultiInstance;
-  mPrivateData.DevicePathUtilities.CreateDeviceNode          = CreateDeviceNode;
+  mPrivateData.DevicePathUtilities.GetDevicePathSize         = GetDevicePathSizeProtocolInterface;
+  mPrivateData.DevicePathUtilities.DuplicateDevicePath       = DuplicateDevicePathProtocolInterface;
+  mPrivateData.DevicePathUtilities.AppendDevicePath          = AppendDevicePathProtocolInterface;
+  mPrivateData.DevicePathUtilities.AppendDeviceNode          = AppendDeviceNodeProtocolInterface;
+  mPrivateData.DevicePathUtilities.AppendDevicePathInstance  = AppendDevicePathInstanceProtocolInterface;
+  mPrivateData.DevicePathUtilities.GetNextDevicePathInstance = GetNextDevicePathInstanceProtocolInterface;
+  mPrivateData.DevicePathUtilities.IsDevicePathMultiInstance = IsDevicePathMultiInstanceProtocolInterface;
+  mPrivateData.DevicePathUtilities.CreateDeviceNode          = CreateDeviceNodeProtocolInterface;
 
   mPrivateData.DevicePathToText.ConvertDeviceNodeToText      = ConvertDeviceNodeToText;
   mPrivateData.DevicePathToText.ConvertDevicePathToText      = ConvertDevicePathToText;

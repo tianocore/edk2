@@ -192,11 +192,10 @@ extern EFI_COMPONENT_NAME_PROTOCOL  gEhciComponentName;
 #define OUTPUT_PACKET_ID        0xE1
 #define ERROR_PACKET_ID         0x55
 
-#define bit(a)                1 << (a)
+#define bit(a)                  1 << (a)
 
-#define GET_0B_TO_31B(Addr)   (((UINTN) Addr) & (0xffffffff))
-#define GET_32B_TO_63B(Addr)  ((((UINTN) Addr) >> 32) & (0xffffffff))
-
+#define GET_0B_TO_31B(Addr)     (UINT32) (UINTN) (Addr)
+#define GET_32B_TO_63B(Addr)    (UINT32) (RShiftU64(((UINT64) (UINTN) (Addr)), 32) & 0xffffffff)
 
 //
 // Ehci Data and Ctrl Structures
@@ -326,7 +325,7 @@ typedef struct _EHCI_QTD_ENTITY     EHCI_QTD_ENTITY;
 typedef struct _EHCI_QH_ENTITY      EHCI_QH_ENTITY;
 typedef struct _EHCI_ASYNC_REQUEST  EHCI_ASYNC_REQUEST;
 
-typedef struct _EHCI_QTD_ENTITY {
+struct _EHCI_QTD_ENTITY {
   EHCI_QTD_HW     Qtd;
   UINT32          TotalBytes;
   UINT32          StaticTotalBytes;
@@ -335,9 +334,9 @@ typedef struct _EHCI_QTD_ENTITY {
   EHCI_QTD_ENTITY *Next;
   EHCI_QTD_ENTITY *AltNext;
   EHCI_QH_ENTITY  *SelfQh;
-} EHCI_QTD_ENTITY;
+};
 
-typedef struct _EHCI_QH_ENTITY {
+struct _EHCI_QH_ENTITY {
   EHCI_QH_HW      Qh;
   EHCI_QH_ENTITY  *Next;
   EHCI_QH_ENTITY  *Prev;
@@ -346,7 +345,7 @@ typedef struct _EHCI_QH_ENTITY {
   EHCI_QTD_ENTITY *AltQtdPtr;
   UINTN           Interval;
   UINT8           TransferType;
-} EHCI_QH_ENTITY;
+};
 
 #define GET_QH_ENTITY_ADDR(a)   ((EHCI_QH_ENTITY *) a)
 #define GET_QTD_ENTITY_ADDR(a)  ((EHCI_QTD_ENTITY *) a)
@@ -359,19 +358,14 @@ typedef struct _EHCI_QH_ENTITY {
 
 #define USB2_HC_DEV_SIGNATURE     EFI_SIGNATURE_32 ('e', 'h', 'c', 'i')
 
-typedef struct _LIST_HEAD {
-  struct _LIST_HEAD *pre;
-  struct _LIST_HEAD *next;
-} LIST_HEAD;
-
-typedef struct _EHCI_ASYNC_REQUEST {
+struct _EHCI_ASYNC_REQUEST {
   UINT8                           TransferType;
   EFI_ASYNC_USB_TRANSFER_CALLBACK CallBackFunc;
   VOID                            *Context;
   EHCI_ASYNC_REQUEST              *Prev;
   EHCI_ASYNC_REQUEST              *Next;
   EHCI_QH_ENTITY                  *QhPtr;
-} EHCI_ASYNC_REQUEST;
+};
 
 typedef struct _MEMORY_MANAGE_HEADER {
   UINT8                         *BitArrayPtr;
