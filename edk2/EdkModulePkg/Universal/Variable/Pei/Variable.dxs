@@ -22,7 +22,7 @@ Abstract:
 #include <PeimDepex.h>
 
 DEPENDENCY_START
-  PEI_FLASH_MAP_PPI_GUID
+  TRUE
 DEPENDENCY_END
 
 
