@@ -147,17 +147,20 @@ Returns:
     EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION Hdr;
     UINT32                              NumberOfRvaAndSizes;
 
-    DosHeader = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
-    if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-      //
-      // DOS image header is present, so read the PE header after the DOS image header
-      //
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + (UINTN)((DosHeader->e_lfanew) & 0x0ffff));
-    } else {
-      //
-      // DOS image header is not present, so PE header is at the image base
-      //
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
+    Hdr.Pe32 = NULL;
+    if (TEImageHeader == NULL) {
+      DosHeader = (EFI_IMAGE_DOS_HEADER *)Pe32Data;
+      if (DosHeader->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+        //
+        // DOS image header is present, so read the PE header after the DOS image header
+        //
+        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)((UINTN)Pe32Data + (UINTN)((DosHeader->e_lfanew) & 0x0ffff));
+      } else {
+        //
+        // DOS image header is not present, so PE header is at the image base
+        //
+        Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)Pe32Data;
+      }
     }
 
     //
