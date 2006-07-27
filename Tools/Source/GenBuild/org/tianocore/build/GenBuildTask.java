@@ -240,11 +240,12 @@ public class GenBuildTask extends Ant {
             //
             // Whether the module is built before
             //
-            if ((moduleId.isLibrary() == false && GlobalData.hasFpdModuleSA(fpdModuleId) == false) 
-                || GlobalData.isModuleBuilt(fpdModuleId)) {
+            if (moduleId.isLibrary() == false && GlobalData.hasFpdModuleSA(fpdModuleId) == false) {
+                System.out.println("\nWARNING: " + moduleId + " for " + archList[k] + " is not found in current platform\n");
+                continue;
+            } else if (GlobalData.isModuleBuilt(fpdModuleId)) {
                 return;
-            }
-            else {
+            } else {
                 GlobalData.registerBuiltModule(fpdModuleId);
             }
             
