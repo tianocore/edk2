@@ -193,7 +193,25 @@ gcc tool chain, you need the following tools on your host computer: bash, gcc,
 gmake, curl (or wget).
 
 Only the MdePkg and EdkModulePkg are currently supported by gcc builds. Other
-builds, such as the EdkNt32Pkg, will not compile with gcc.
+builds, such as the EdkNt32Pkg, will not compile with gcc. By default, the edk2
+will try to build the NT32.fpd, which is not supported by gcc. So, you need to
+change the Tools/Conf/target.txt.
+
+The platform to be built is identified by the Tools/Conf/target.txt file:
+
+#
+#  PROPERTY              Type       Use         Description
+#  ----------------      --------   --------    -----------------------------------------------------------
+#  ACTIVE_PLATFORM       Filename   Recommended Specify the WORKSPACE relative Path and Filename 
+#                                               of the platform FPD file that will be used for the build
+#                                               This line is required if and only if the current working
+#                                               directory does not contain one or more FPD files.
+
+ACTIVE_PLATFORM       =
+ 
+You can leave it black, as above, or set it to any .fpd file in the workspace.
+If you leave it blank, then you just cd to the dir that contains the .fpd that
+you would like to build (MdePkg/ or EdkModulePkg/) and then type build.
 
 ----------------------------
 A Word on compiling on Linux
