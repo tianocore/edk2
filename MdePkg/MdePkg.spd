@@ -1466,7 +1466,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <HelpText/>
     </Entry>
     <Entry Name="SmmPeiSmramMemoryReserve">
-      <C_Name>gEfiSmmPeiSmramMemoryReserve</C_Name>
+      <C_Name>gEfiSmmPeiSmramMemoryReserveGuid</C_Name>
       <GuidValue>6DADF1D1-D4CC-4910-BB6E-82B1FD80FF3D</GuidValue>
       <HelpText/>
     </Entry>

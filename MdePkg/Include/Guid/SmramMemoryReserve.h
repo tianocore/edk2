@@ -62,6 +62,6 @@ typedef struct {
   EFI_SMRAM_DESCRIPTOR  Descriptor[1];
 } EFI_SMRAM_HOB_DESCRIPTOR_BLOCK;
 
-extern EFI_GUID gEfiSmmPeiSmramMemoryReserve;
+extern EFI_GUID gEfiSmmPeiSmramMemoryReserveGuid;
 
 #endif
