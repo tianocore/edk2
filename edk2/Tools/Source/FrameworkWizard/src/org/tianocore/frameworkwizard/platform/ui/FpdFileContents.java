@@ -96,6 +96,8 @@ public class FpdFileContents {
           dynPcdMap = new HashMap<String, ArrayList<String>>();
           List<ModuleSADocument.ModuleSA> l = getfpdFrameworkModules().getModuleSAList();
           if (l == null) {
+              removeElement(getfpdFrameworkModules());
+              fpdFrameworkModules = null;
               return;
           }
           ListIterator<ModuleSADocument.ModuleSA> li = l.listIterator();
@@ -181,6 +183,8 @@ public class FpdFileContents {
     
     public int getFrameworkModulesCount() {
         if (getfpdFrameworkModules().getModuleSAList() == null){
+            removeElement(getfpdFrameworkModules());
+            fpdFrameworkModules = null;
             return 0;
         }
         return getfpdFrameworkModules().getModuleSAList().size();
@@ -220,6 +224,8 @@ public class FpdFileContents {
     public ModuleSADocument.ModuleSA getModuleSA(String key) {
         String[] s = key.split(" ");
         if (getfpdFrameworkModules().getModuleSAList() == null) {
+            removeElement(getfpdFrameworkModules());
+            fpdFrameworkModules = null;
             return null;
         }
         ListIterator li = getfpdFrameworkModules().getModuleSAList().listIterator();
@@ -250,7 +256,10 @@ public class FpdFileContents {
     
     private ModuleSADocument.ModuleSA getModuleSA(int i) {
         ModuleSADocument.ModuleSA msa = null;
-        XmlCursor cursor = getfpdFrameworkModules().newCursor();
+        if (fpdRoot.getFrameworkModules() == null) {
+            return null;
+        }
+        XmlCursor cursor = fpdRoot.getFrameworkModules().newCursor();
         if (cursor.toFirstChild()) {
             for (int j = 0; j < i; ++j) {
                 cursor.toNextSibling();
@@ -262,7 +271,7 @@ public class FpdFileContents {
     }
     
     public void removeModuleSA(int i) {
-        XmlObject o = getfpdFrameworkModules();
+        XmlObject o = fpdRoot.getFrameworkModules();
         if (o == null) {
             return;
         }
@@ -431,7 +440,7 @@ public class FpdFileContents {
             
         }
         catch (Exception e){
-//            e.printStackTrace();
+            e.printStackTrace();
             throw e;
         }
         
@@ -652,7 +661,7 @@ public class FpdFileContents {
     
     public void getModuleSAOptions(String moduleKey, String[][] saa) {
         ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
-        if (msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null
+        if (msa == null || msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null
                         || msa.getModuleSaBuildOptions().getOptions().getOptionList() == null) {
             return ;
         }
@@ -682,7 +691,7 @@ public class FpdFileContents {
     
     public int getModuleSAOptionsCount(String moduleKey){
         ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
-        if (msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null
+        if (msa == null || msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null
                         || msa.getModuleSaBuildOptions().getOptions().getOptionList() == null) {
             return 0;
         }
@@ -779,7 +788,7 @@ public class FpdFileContents {
             
         }
         catch (Exception e){
-//            e.printStackTrace();
+            e.printStackTrace();
             throw e; 
         }
         
@@ -1026,6 +1035,8 @@ public class FpdFileContents {
     
     public int getDynamicPcdBuildDataCount() {
         if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
             return 0;
         }
         return getfpdDynPcdBuildDefs().getPcdBuildDataList().size();
@@ -1033,6 +1044,8 @@ public class FpdFileContents {
     
     public void getDynamicPcdBuildData(String[][] saa) {
         if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
             return ;
         }
         List<DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData> l = getfpdDynPcdBuildDefs().getPcdBuildDataList();
@@ -1107,7 +1120,10 @@ public class FpdFileContents {
     }
     
     public void removeDynamicPcdBuildData(String cName, String tsGuid) {
-        XmlObject o = getfpdDynPcdBuildDefs();
+        XmlObject o = fpdRoot.getDynamicPcdBuildDefinitions();
+        if (o == null) {
+            return;
+        }
         
         XmlCursor cursor = o.newCursor();
         if (cursor.toFirstChild()) {
@@ -1132,7 +1148,8 @@ public class FpdFileContents {
     // Get the Sku Info count of ith dyn pcd element.
     //
     public int getDynamicPcdSkuInfoCount(int i){
-        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+        if (fpdRoot.getDynamicPcdBuildDefinitions() == null || fpdRoot.getDynamicPcdBuildDefinitions().getPcdBuildDataList() == null 
+                        || fpdRoot.getDynamicPcdBuildDefinitions().getPcdBuildDataList().size() == 0) {
             return 0;
         }
         
@@ -1156,6 +1173,8 @@ public class FpdFileContents {
     
     public void getDynamicPcdSkuInfos(int i, String[][] saa){
         if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
             return;
         }
         
@@ -1193,6 +1212,8 @@ public class FpdFileContents {
     public String getDynamicPcdBuildDataValue(int i){
         String value = null;
         if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
             return value;
         }
         
@@ -1216,6 +1237,8 @@ public class FpdFileContents {
     public String getDynamicPcdBuildDataVpdOffset(int i){
         String vpdOffset = null;
         if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
             return vpdOffset;
         }
         
@@ -1238,6 +1261,8 @@ public class FpdFileContents {
     
     public void removeDynamicPcdBuildDataSkuInfo(int i) {
         if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+            removeElement(getfpdDynPcdBuildDefs());
+            fpdDynPcdBuildDefs = null;
             return;
         }
         
@@ -1264,9 +1289,9 @@ public class FpdFileContents {
     //
     public void genDynamicPcdBuildDataSkuInfo(String id, String varName, String varGuid, String varOffset, 
                                               String hiiDefault, String vpdOffset, String value, int i) {
-        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
-            return;
-        }
+//        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+//            return;
+//        }
         
         XmlCursor cursor = getfpdDynPcdBuildDefs().newCursor();
         if (cursor.toFirstChild()) {
@@ -1293,9 +1318,9 @@ public class FpdFileContents {
     
     public void updateDynamicPcdBuildDataSkuInfo(String id, String varName, String varGuid, String varOffset, 
                                                  String hiiDefault, String vpdOffset, String value, int i){
-        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
-            return;
-        }
+//        if (getfpdDynPcdBuildDefs().getPcdBuildDataList() == null || getfpdDynPcdBuildDefs().getPcdBuildDataList().size() == 0) {
+//            return;
+//        }
         
         XmlCursor cursor = getfpdDynPcdBuildDefs().newCursor();
         if (cursor.toFirstChild()) {
@@ -2418,6 +2443,12 @@ public class FpdFileContents {
             s += " ";
         }
         return s.trim();
+    }
+    
+    private void removeElement(XmlObject o) {
+        XmlCursor cursor = o.newCursor();
+        cursor.removeXml();
+        cursor.dispose();
     }
 }
 
