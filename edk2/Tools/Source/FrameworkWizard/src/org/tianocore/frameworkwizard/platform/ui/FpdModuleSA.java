@@ -24,6 +24,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.apache.xmlbeans.XmlObject;
+import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
@@ -96,11 +98,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private HashMap<String, ArrayList<String>> classConsumed = null;
     private JPanel jPanel8 = null;
     private JLabel jLabel6 = null;
-    private JTextField jTextField = null;
+    private JTextField jTextFieldFvBinding = null;
     private JLabel jLabel7 = null;
-    private JTextField jTextField1 = null;
+    private JTextField jTextFieldFileGuid = null;
     private JLabel jLabel8 = null;
-    private JTextField jTextField2 = null;
+    private JTextField jTextFieldFfsKey = null;
     private JScrollPane jScrollPane6 = null;
     private JTable jTable4 = null;
     private JButton jButton4 = null;
@@ -117,6 +119,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JTextField jTextField4 = null;
     private JButton jButton6 = null;
     private JComboBox jComboBox1 = null;
+    private OpeningPlatformType docConsole = null;
+    private JLabel jLabel12 = null;
     /**
      * This is the default constructor
      */
@@ -129,9 +133,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         this.ffc = ffc;
     }
     
-    public void setKey(String k, int i){
+    public void setKey(String k, int i, OpeningPlatformType dc){
         this.moduleKey = k;
-        
+        this.docConsole = dc;
         jTabbedPane.setSelectedIndex(0);
         initPcdBuildDefinition(i);
     }
@@ -192,15 +196,15 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         String fvBinding = ffc.getFvBinding(key);
         if (fvBinding != null) {
-            jTextField.setText(fvBinding);
+            jTextFieldFvBinding.setText(fvBinding);
         }
         String fileGuid = ffc.getFfsFileNameGuid(key);
         if (fileGuid != null) {
-            jTextField1.setText(fileGuid);
+            jTextFieldFileGuid.setText(fileGuid);
         }
         String ffsKey = ffc.getFfsFormatKey(key);
         if (ffsKey != null) {
-            jTextField2.setText(ffsKey);
+            jTextFieldFfsKey.setText(ffsKey);
         }
         
         optionsTableModel.setRowCount(0);
@@ -900,7 +904,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JScrollPane getJScrollPane4() {
         if (jScrollPane4 == null) {
             jScrollPane4 = new JScrollPane();
-            jScrollPane4.setPreferredSize(new java.awt.Dimension(450,170));
+            jScrollPane4.setPreferredSize(new java.awt.Dimension(430,170));
             jScrollPane4.setViewportView(getJTable3());
         }
         return jScrollPane4;
@@ -1005,6 +1009,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     if (row < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     Object[] s = {model3.getValueAt(row, 0), model3.getValueAt(row, 1),
                                   model3.getValueAt(row, 2), model3.getValueAt(row, 3),
                                   model3.getValueAt(row, 4)};
@@ -1046,6 +1051,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     if (row < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
                     removeInstance(model1.getValueAt(row, 1) + " " + 
                                    model1.getValueAt(row, 2) + " " +
                                    model1.getValueAt(row, 3) + " " +
@@ -1094,9 +1100,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             if (jTable4.isEditing()) {
                 jTable4.getCellEditor().stopCellEditing();
             }
-            ffc.setFvBinding(moduleKey, jTextField.getText());
-            ffc.setFfsFileNameGuid(moduleKey, jTextField1.getText());
-            ffc.setFfsFormatKey(moduleKey, jTextField2.getText());
             this.setVisible(false);
         }
     }
@@ -1107,20 +1110,30 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private JPanel getJPanel8() {
         if (jPanel8 == null) {
+            jLabel12 = new JLabel();
+            jLabel12.setText("");
+            jLabel12.setPreferredSize(new java.awt.Dimension(250,16));
+            FlowLayout flowLayout4 = new FlowLayout();
+            flowLayout4.setAlignment(java.awt.FlowLayout.LEFT);
             jLabel8 = new JLabel();
             jLabel8.setText("FFS Format Key");
+            jLabel8.setPreferredSize(new java.awt.Dimension(90,16));
             jLabel7 = new JLabel();
             jLabel7.setText("FFS File GUID");
+            jLabel7.setPreferredSize(new java.awt.Dimension(90,16));
             jLabel6 = new JLabel();
             jLabel6.setText("FV Binding");
+            jLabel6.setPreferredSize(new java.awt.Dimension(90,16));
             jPanel8 = new JPanel();
+            jPanel8.setLayout(flowLayout4);
             jPanel8.add(jLabel6, null);
-            jPanel8.add(getJTextField(), null);
+            jPanel8.add(getJTextFieldFvBinding(), null);
             jPanel8.add(jLabel7, null);
-            jPanel8.add(getJTextField1(), null);
+            jPanel8.add(getJTextFieldFileGuid(), null);
             jPanel8.add(jLabel8, null);
-            jPanel8.add(getJTextField2(), null);
+            jPanel8.add(getJTextFieldFfsKey(), null);
             jPanel8.add(getJScrollPane6(), null);
+            jPanel8.add(jLabel12, null);
             jPanel8.add(getJButton4(), null);
             jPanel8.add(getJButton5(), null);
             jPanel8.addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -1136,39 +1149,91 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField() {
-        if (jTextField == null) {
-            jTextField = new JTextField();
-            jTextField.setPreferredSize(new java.awt.Dimension(100,20));
+    private JTextField getJTextFieldFvBinding() {
+        if (jTextFieldFvBinding == null) {
+            jTextFieldFvBinding = new JTextField();
+            jTextFieldFvBinding.setPreferredSize(new java.awt.Dimension(150,20));
+            jTextFieldFvBinding.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    String originalFvBinding = ffc.getFvBinding(moduleKey);
+                    String newFvBinding = jTextFieldFvBinding.getText();
+                    if (newFvBinding.equals(originalFvBinding)) {
+                        return;
+                    }
+                    if (newFvBinding.length() == 0 && originalFvBinding == null) {
+                        return;
+                    }
+                    docConsole.setSaved(false);
+                    ffc.setFvBinding(moduleKey, newFvBinding);
+                }
+            });
             
         }
-        return jTextField;
+        return jTextFieldFvBinding;
     }
     /**
      * This method initializes jTextField1	
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField1() {
-        if (jTextField1 == null) {
-            jTextField1 = new JTextField();
-            jTextField1.setPreferredSize(new java.awt.Dimension(100,20));
+    private JTextField getJTextFieldFileGuid() {
+        if (jTextFieldFileGuid == null) {
+            jTextFieldFileGuid = new JTextField();
+            jTextFieldFileGuid.setPreferredSize(new java.awt.Dimension(300,20));
+            jTextFieldFileGuid.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    String originalFileGuid = ffc.getFfsFileNameGuid(moduleKey);
+                    String newFileGuid = jTextFieldFileGuid.getText();
+                    if (newFileGuid.equals(originalFileGuid)) {
+                        return;
+                    }
+                    if (newFileGuid.length() == 0 && originalFileGuid == null) {
+                        return;
+                    }
+                    if (newFileGuid.length() > 0) {
+                        if (!DataValidation.isGuid(newFileGuid)) {
+                            JOptionPane.showMessageDialog(frame, "FFS File Guid is NOT GUID Type.");
+                            return;
+                        }
+                    }
+                    
+                    docConsole.setSaved(false);
+                    if (newFileGuid.length() == 0) {
+                        newFileGuid = null;
+                    }
+                    ffc.setFfsFileNameGuid(moduleKey, newFileGuid);
+                }
+            });
             
         }
-        return jTextField1;
+        return jTextFieldFileGuid;
     }
     /**
-     * This method initializes jTextField2	
+     * This method initializes jTextFieldFfsKey	
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField2() {
-        if (jTextField2 == null) {
-            jTextField2 = new JTextField();
-            jTextField2.setPreferredSize(new java.awt.Dimension(100,20));
+    private JTextField getJTextFieldFfsKey() {
+        if (jTextFieldFfsKey == null) {
+            jTextFieldFfsKey = new JTextField();
+            jTextFieldFfsKey.setPreferredSize(new java.awt.Dimension(150,20));
+            jTextFieldFfsKey.addFocusListener(new java.awt.event.FocusAdapter() {
+                public void focusLost(java.awt.event.FocusEvent e) {
+                    String originalFfsKey = ffc.getFfsFormatKey(moduleKey);
+                    String newFfsKey = jTextFieldFfsKey.getText();
+                    if (newFfsKey.equals(originalFfsKey)) {
+                        return;
+                    }
+                    if (newFfsKey.length() == 0 && originalFfsKey == null) {
+                        return;
+                    }
+                    docConsole.setSaved(false);
+                    ffc.setFfsFormatKey(moduleKey, newFfsKey);
+                }
+            });
             
         }
-        return jTextField2;
+        return jTextFieldFfsKey;
     }
     /**
      * This method initializes jScrollPane6	
@@ -1241,7 +1306,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         }
                         
                         String contents = m.getValueAt(row, 5) + "";
-                        
+                        docConsole.setSaved(false);
                         ffc.updateModuleSAOptionsOpt(moduleKey, row, targetName, toolChain, tagName, toolCode, supArch, contents);
                     }
                 }
@@ -1265,7 +1330,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     optionsTableModel.addRow(row);
                     Vector<Object> v = new Vector<Object>();
                     Vector<Object> v1 = null;
-                    
+                    docConsole.setSaved(false);
                     ffc.genModuleSAOptionsOpt(moduleKey, v, "", "", "", v1, "");
                 }
             });
@@ -1287,7 +1352,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     if (jTable4.getSelectedRow() < 0) {
                         return;
                     }
-                    
+                    docConsole.setSaved(false);
                     ffc.removeModuleSAOptionsOpt(moduleKey, jTable4.getSelectedRow());
                     optionsTableModel.removeRow(jTable4.getSelectedRow());
                 }
@@ -1499,6 +1564,7 @@ private JButton getJButton6() {
                 if (row < 0) {
                     return;
                 }
+                docConsole.setSaved(false);
                 model.setValueAt(jComboBox.getSelectedItem(), row, 2);
                 model.setValueAt(jTextField3.getText(), row, 4);
                 model.setValueAt(jTextField4.isVisible()? jTextField4.getText():jComboBox1.getSelectedItem(), row, 6);

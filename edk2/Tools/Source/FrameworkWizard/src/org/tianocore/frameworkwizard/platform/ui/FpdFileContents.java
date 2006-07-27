@@ -40,6 +40,7 @@ import org.tianocore.FrameworkModulesDocument;
 import org.tianocore.IntermediateOutputType;
 import org.tianocore.LibrariesDocument;
 import org.tianocore.ModuleSADocument;
+import org.tianocore.ModuleSaBuildOptionsDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.OptionDocument;
 import org.tianocore.OptionsDocument;
@@ -570,10 +571,21 @@ public class FpdFileContents {
             return;
         }
         if(msa.getModuleSaBuildOptions() == null){
-            msa.addNewModuleSaBuildOptions().setFfsFileNameGuid(fileGuid);
-            return;
+            msa.addNewModuleSaBuildOptions();
+            
         }
-        msa.getModuleSaBuildOptions().setFfsFileNameGuid(fileGuid);
+        ModuleSaBuildOptionsDocument.ModuleSaBuildOptions msaBuildOpts= msa.getModuleSaBuildOptions();
+        if (fileGuid != null) {
+            msaBuildOpts.setFfsFileNameGuid(fileGuid);
+        }
+        else{
+            XmlCursor cursor = msaBuildOpts.newCursor();
+            if (cursor.toChild(xmlNs, "FfsFileNameGuid")) {
+                cursor.removeXml();
+            }
+            cursor.dispose();
+        }
+        
     }
     
     public String getFfsFormatKey(String moduleKey){
