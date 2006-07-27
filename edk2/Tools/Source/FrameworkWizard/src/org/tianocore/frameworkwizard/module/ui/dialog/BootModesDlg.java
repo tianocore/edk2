@@ -24,6 +24,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
@@ -77,7 +78,9 @@ public class BootModesDlg extends IDialog {
 
     private JLabel jLabelHelpText = null;
 
-    private JTextField jTextFieldHelpText = null;
+    private JTextArea jTextAreaHelpText = null;
+
+    private JScrollPane jScrollPaneHelpText = null;
 
     private ArchCheckBox jArchCheckBox = null;
 
@@ -103,6 +106,7 @@ public class BootModesDlg extends IDialog {
             jComboBoxBootModeName = new JComboBox();
             jComboBoxBootModeName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
             jComboBoxBootModeName.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxBootModeName.setToolTipText("<html><table><tr><td>FULL</td><td>Boot with full configuration</td></tr><tr><td>MINIMAL</td><td>Boot with minimal configuration</td></tr><tr><td>NO_CHANGE</td><td>Boot assuming no configuration changes</td></tr><tr><td>DIAGNOSTICS</td><td>Boot with full configuration plus diagnostics</td></tr><tr><td>DEFAULT</td><td>Boot with default settings</td></tr><tr><td>BOOT_ON_S#_RESUME</td><td>where # is 2, 3, 4 or 5</td></tr><tr><td>FLASH_UPDATE</td><td>Boot on flash update</td></tr><tr><td>RECOVERY</td><td>Boot in recovery mode</td></tr></table></html>");
         }
         return jComboBoxBootModeName;
     }
@@ -118,6 +122,7 @@ public class BootModesDlg extends IDialog {
             jComboBoxUsage = new JComboBox();
             jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxUsage.setToolTipText("<html><table><tr><td>ALWAYS_CONSUMED</td><td>Indicates Supports the specified boot mode</td></tr><tr><td>SOMETIMES_CONSUMED</td><td>Indicates Supports the specified boot mode on some execution paths</td></tr><tr><td>ALWAYS_PRODUCED</td><td>Always changes the boot mode</td></tr><tr><td>SOMETIMES_PRODUCED</td><td>Change the boot mode sometimes</td></tr></table></html>");
         }
         return jComboBoxUsage;
     }
@@ -130,7 +135,7 @@ public class BootModesDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 105, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jTextFieldFeatureFlag;
@@ -150,18 +155,38 @@ public class BootModesDlg extends IDialog {
     }
 
     /**
-     This method initializes jTextFieldHelpText  
+     This method initializes jTextAreaHelpText  
      
-     @return javax.swing.JTextField  
+     @return javax.swing.JTextArea  
      
      **/
-    private JTextField getJTextFieldHelpText() {
-        if (jTextFieldHelpText == null) {
-            jTextFieldHelpText = new JTextField();
-            jTextFieldHelpText.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
-            jTextFieldHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
+    private JTextArea getJTextAreaHelpText() {
+        if (jTextAreaHelpText == null) {
+            jTextAreaHelpText = new JTextArea();
+            jTextAreaHelpText.setLineWrap(true);
+            jTextAreaHelpText.setWrapStyleWord(true);
+//            jTextAreaHelpText.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+//            jTextAreaHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
         }
-        return jTextFieldHelpText;
+        return jTextAreaHelpText;
+    }
+
+    /**
+     This method initializes jScrollPaneHelpText  
+     
+     @return javax.swing.JScrollPane  
+     
+     **/
+    private JScrollPane getJScrollPaneHelpText() {
+      if (jScrollPaneHelpText == null) {
+        jScrollPaneHelpText = new JScrollPane();
+        jScrollPaneHelpText.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
+        jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
+        jScrollPaneHelpText.setLocation(new java.awt.Point(160, 60));
+        jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
+      }
+      return jScrollPaneHelpText;
     }
 
     /**
@@ -173,7 +198,7 @@ public class BootModesDlg extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 140, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 157, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -189,7 +214,7 @@ public class BootModesDlg extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 140, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 157, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -204,7 +229,7 @@ public class BootModesDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(508, 220);
+        this.setSize(500, 230);
         this.setContentPane(getJScrollPane());
         this.setTitle("Boot Modes");
         initFrame();
@@ -226,7 +251,7 @@ public class BootModesDlg extends IDialog {
         if (this.id != null) {
             this.jComboBoxBootModeName.setSelectedItem(id.getName());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
-            this.jTextFieldHelpText.setText(id.getHelp());
+            this.jTextAreaHelpText.setText(id.getHelp());
             this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
             this.jArchCheckBox.setSelectedItems(id.getSupArchList());
         }
@@ -265,37 +290,37 @@ public class BootModesDlg extends IDialog {
      **/
     private JPanel getJContentPane() {
         if (jContentPane == null) {
-            jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
-            jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
-            jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
-            jLabelArch.setText("Arch");
-            jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
-            jLabelFeatureFlag.setText("Feature Flag");
-            jLabelUsage = new JLabel();
-            jLabelUsage.setText("Usage");
-            jLabelUsage.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
+            jStarLabel1 = new StarLabel();
+            jStarLabel1.setLocation(new java.awt.Point(2, 10));
             jLabelBootModeName = new JLabel();
             jLabelBootModeName.setText("Boot Mode Name");
-            jLabelBootModeName.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
+            jLabelBootModeName.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+            jStarLabel2 = new StarLabel();
+            jStarLabel2.setLocation(new java.awt.Point(2, 35));
+            jLabelUsage = new JLabel();
+            jLabelUsage.setText("Usage");
+            jLabelUsage.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 60, 140, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
             jLabelHelpText.setText("Help Text");
+            jLabelFeatureFlag = new JLabel();
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 105, 145, 20));
+            jLabelFeatureFlag.setText("Feature Flag");
+            jLabelArch = new JLabel();
+            jLabelArch.setBounds(new java.awt.Rectangle(15, 130, 145, 20));
+            jLabelArch.setText("Supported Archectures");
+            jArchCheckBox = new ArchCheckBox();
+            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 130, 320, 20));
+            jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 165));
+            jContentPane.setPreferredSize(new java.awt.Dimension(485, 185));
 
             jContentPane.add(jLabelBootModeName, null);
             jContentPane.add(getJComboBoxBootModeName(), null);
             jContentPane.add(jLabelUsage, null);
             jContentPane.add(getJComboBoxUsage(), null);
-            jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(0, 10));
-            jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(0, 35));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
@@ -304,7 +329,7 @@ public class BootModesDlg extends IDialog {
             jContentPane.add(jLabelArch, null);
 
             jContentPane.add(jLabelHelpText, null);
-            jContentPane.add(getJTextFieldHelpText(), null);
+            jContentPane.add(getJScrollPaneHelpText(), null);
             jContentPane.add(jArchCheckBox, null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
@@ -374,7 +399,7 @@ public class BootModesDlg extends IDialog {
 
         String arg2 = this.jTextFieldFeatureFlag.getText();
         Vector<String> arg3 = this.jArchCheckBox.getSelectedItemsVector();
-        String arg4 = this.jTextFieldHelpText.getText();
+        String arg4 = this.jTextAreaHelpText.getText();
         id = new BootModesIdentification(arg0, arg1, arg2, arg3, arg4);
         return id;
     }
