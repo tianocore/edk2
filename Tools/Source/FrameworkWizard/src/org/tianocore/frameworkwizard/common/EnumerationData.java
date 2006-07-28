@@ -168,6 +168,8 @@ public class EnumerationData {
     // Used by Pcd
     //
     public Vector<String> vPcdItemTypes = new Vector<String>();
+    
+    public Vector<String> vPcdUsage = new Vector<String>();
 
     public EnumerationData() {
         init();
@@ -280,7 +282,7 @@ public class EnumerationData {
         // Used by Pcd
         //
         initPcdItemTypes();
-        
+        initPcdUsage();
     }
     
     private void initEnabled() {
@@ -702,6 +704,16 @@ public class EnumerationData {
         vPcdItemTypes.addElement("DYNAMIC_EX");
     }
     
+    private void initPcdUsage() {
+        vPcdUsage.removeAllElements();
+        vPcdUsage.addElement(DataType.EMPTY_SELECT_ITEM);
+        vPcdUsage.addElement("ALWAYS_CONSUMED");
+        vPcdUsage.addElement("SOMETIMES_CONSUMED");
+        vPcdUsage.addElement("ALWAYS_PRODUCED");
+        vPcdUsage.addElement("SOMETIMES_PRODUCED");
+        vPcdUsage.addElement("DEFAULT");
+    }
+    
     public Vector<String> getvCompontentType() {
         return vCompontentType;
     }
@@ -1032,5 +1044,13 @@ public class EnumerationData {
 
     public void setVToolCode(Vector<String> toolCode) {
         vToolCode = toolCode;
+    }
+
+    public Vector<String> getVPcdUsage() {
+        return vPcdUsage;
+    }
+
+    public void setVPcdUsage(Vector<String> pcdUsage) {
+        vPcdUsage = pcdUsage;
     }
 }

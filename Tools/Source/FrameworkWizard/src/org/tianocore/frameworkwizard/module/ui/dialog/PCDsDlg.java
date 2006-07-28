@@ -29,6 +29,7 @@ import javax.swing.JTextArea;
 
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
@@ -97,11 +98,17 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JButton jButtonCancel = null;
 
     private JScrollPane jScrollPaneHelpText = null;
+    
+    private JLabel jLabelUsage = null;
+
+    private JComboBox jComboBoxUsage = null;
 
     //
     // Not used by UI
     //
     private PcdCodedIdentification id = null;
+    
+    private EnumerationData ed = new EnumerationData();
 
     private WorkspaceTools wt = new WorkspaceTools();
 
@@ -179,7 +186,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
             jScrollPaneHelpText.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
             jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
-            jScrollPaneHelpText.setLocation(new java.awt.Point(160, 85));
+            jScrollPaneHelpText.setLocation(new java.awt.Point(160, 110));
             jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
         }
         return jScrollPaneHelpText;
@@ -221,7 +228,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 130, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 155, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
         }
@@ -237,7 +244,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 182, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 205, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -253,11 +260,25 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 182, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 205, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
         return jButtonCancel;
+    }
+
+    /**
+     * This method initializes jComboBoxUsage	
+     * 	
+     * @return javax.swing.JComboBox	
+     */
+    private JComboBox getJComboBoxUsage() {
+        if (jComboBoxUsage == null) {
+            jComboBoxUsage = new JComboBox();
+            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
+        }
+        return jComboBoxUsage;
     }
 
     public static void main(String[] args) {
@@ -269,7 +290,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
      * 
      */
     private void init() {
-        this.setSize(500, 255);
+        this.setSize(500, 270);
         this.setContentPane(getJScrollPane());
         this.setTitle("Pcd Coded");
         initFrame();
@@ -292,6 +313,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
             this.jComboBoxCName.setSelectedItem(id.getName());
             this.jTextFieldTokenSpaceGuid.setText(id.getGuid());
             this.jTextFieldDefaultValue.setText(id.getValue());
+            this.jComboBoxUsage.setSelectedItem(id.getUsage());
             this.jTextAreaHelpText.setText(id.getHelp());
             this.jComboBoxItemType.setSelectedItem(id.getType());
             this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
@@ -333,6 +355,9 @@ public class PCDsDlg extends IDialog implements ItemListener {
      */
     private JPanel getJContentPane() {
         if (jContentPane == null) {
+            jLabelUsage = new JLabel();
+            jLabelUsage.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
+            jLabelUsage.setText("Usge");
             jStarLabel1 = new StarLabel();
             jStarLabel1.setLocation(new java.awt.Point(2, 10));
             jLabelC_Name = new JLabel();
@@ -350,14 +375,14 @@ public class PCDsDlg extends IDialog implements ItemListener {
             jLabelDefaultValue.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
 
             jStarLabel3 = new StarLabel();
-            jStarLabel3.setLocation(new java.awt.Point(2, 85));
+            jStarLabel3.setLocation(new java.awt.Point(2, 110));
             jLabelHelpText = new JLabel();
             jLabelHelpText.setText("Help Text");
-            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 85, 145, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 110, 145, 20));
 
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setText("Feature Flag Expression");
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 130, 140, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 155, 140, 20));
 
             jLabelTokenSpaceGuid = new JLabel();
             jLabelTokenSpaceGuid.setText("Token Space C Name");
@@ -365,17 +390,17 @@ public class PCDsDlg extends IDialog implements ItemListener {
 
             jLabelArch = new JLabel();
             jLabelArch.setText("Supported Architectures");
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 155, 145, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(15, 180, 145, 20));
             jArchCheckBox = new ArchCheckBox();
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 155, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 180, 320, 20));
 
             // Hidden field
             jLabelTokenSpaceGuid.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(485, 210));
+            jContentPane.setPreferredSize(new java.awt.Dimension(485, 235));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelC_Name, null);
@@ -397,6 +422,8 @@ public class PCDsDlg extends IDialog implements ItemListener {
             jContentPane.add(jLabelTokenSpaceGuid, null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
+            jContentPane.add(jLabelUsage, null);
+            jContentPane.add(getJComboBoxUsage(), null);
         }
         return jContentPane;
     }
@@ -410,7 +437,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
             jComboBoxCName.addItem(pcd.getPcd(index));
         }
 
-        // Tools.generateComboBoxByVector(jComboBoxItemType, ed.getVPcdItemTypes());
+        Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVPcdUsage());
     }
 
     /*
@@ -510,7 +537,12 @@ public class PCDsDlg extends IDialog implements ItemListener {
         String arg4 = this.jTextFieldDefaultValue.getText();
         String arg5 = this.jTextAreaHelpText.getText();
         String arg6 = this.jComboBoxItemType.getSelectedItem().toString();
-        id = new PcdCodedIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+        String arg7 = this.jComboBoxUsage.getSelectedItem().toString();
+        if (arg7.equals(DataType.EMPTY_SELECT_ITEM)) {
+            arg7 = "";
+        }
+
+        id = new PcdCodedIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         return id;
     }
 

@@ -29,6 +29,7 @@ import javax.swing.event.ListSelectionEvent;
 
 import org.tianocore.PcdCodedDocument;
 import org.tianocore.PcdItemTypes;
+import org.tianocore.PcdUsage;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.PcdCodedDocument.PcdCoded;
 import org.tianocore.PcdCodedDocument.PcdCoded.PcdEntry;
@@ -185,6 +186,7 @@ public class ModulePCDs extends IInternalFrame {
             model.addColumn("Name");
             model.addColumn("Type");
             model.addColumn("Value");
+            model.addColumn("Usage");
 
             jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTable.getSelectionModel().addListSelectionListener(this);
@@ -234,8 +236,11 @@ public class ModulePCDs extends IInternalFrame {
                     if (pcds.getPcdEntryList().get(index).getPcdItemType() != null) {
                         arg6 = pcds.getPcdEntryList().get(index).getPcdItemType().toString();
                     }
-
-                    id = new PcdCodedIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+                    String arg7 = null;
+                    if (pcds.getPcdEntryList().get(index).getUsage() != null) {
+                        arg7 = pcds.getPcdEntryList().get(index).getUsage().toString();
+                    }
+                    id = new PcdCodedIdentification(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
                     vid.addPcdCoded(id);
                 }
             }
@@ -399,6 +404,9 @@ public class ModulePCDs extends IInternalFrame {
                     }
                     if (!isEmpty(vid.getPcdCoded(index).getType())) {
                         p.setPcdItemType(PcdItemTypes.Enum.forString(vid.getPcdCoded(index).getType()));
+                    }
+                    if (!isEmpty(vid.getPcdCoded(index).getUsage())) {
+                        p.setUsage(PcdUsage.Enum.forString(vid.getPcdCoded(index).getUsage()));
                     }
                     this.pcds.addNewPcdEntry();
                     this.pcds.setPcdEntryArray(pcds.getPcdEntryList().size() - 1, p);
