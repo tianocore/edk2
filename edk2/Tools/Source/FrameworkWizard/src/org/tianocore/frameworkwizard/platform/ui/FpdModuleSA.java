@@ -55,72 +55,72 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     static JFrame frame;
     private JPanel jContentPane = null;
     private JTabbedPane jTabbedPane = null;
-    private JPanel jPanel = null;
-    private JPanel jPanel1 = null;
-    private JLabel jLabel = null;
-    private JScrollPane jScrollPane = null;
-    private JTable jTable = null;
-    private JPanel jPanel2 = null;
-    private JScrollPane jScrollPane1 = null;
-    private JTextArea jTextArea = null;
-    private JPanel jPanel3 = null;
+    private JPanel jPanelPcd = null;
+    private JPanel jPanelLibrary = null;
+    private JLabel jLabelPcdData = null;
+    private JScrollPane jScrollPaneTablePcd = null;
+    private JTable jTablePcd = null;
+    private JPanel jPanelPcdSouth = null;
+    private JScrollPane jScrollPanePcdHelp = null;
+    private JTextArea jTextAreaPcdHelp = null;
+    private JPanel jPanelContentPaneSouth = null;
     private JSplitPane jSplitPane = null;
-    private JPanel jPanel4 = null;
-    private JPanel jPanel5 = null;
-    private JLabel jLabel1 = null;
-    private JLabel jLabel2 = null;
-    private JScrollPane jScrollPane2 = null;
-    private JTable jTable1 = null;
-    private JScrollPane jScrollPane3 = null;
-    private JTable jTable2 = null;
-    private JScrollPane jScrollPane4 = null;
-    private JTable jTable3 = null;
-    private JPanel jPanel6 = null;
-    private JPanel jPanel7 = null;
-    private JScrollPane jScrollPane5 = null;
-    private JTextArea jTextArea1 = null;
-    private JLabel jLabel3 = null;
-    private JLabel jLabel4 = null;
-    private JButton jButton = null;
-    private JButton jButton1 = null;
-    private JLabel jLabel5 = null;
-    private JButton jButton2 = null;
-    private JButton jButton3 = null;
+    private JPanel jPanelLibraryLeft = null;
+    private JPanel jPanelLibraryRight = null;
+    private JLabel jLabelLibClass = null;
+    private JLabel jLabelQualifiedInstance = null;
+    private JScrollPane jScrollPaneSelectedInstances = null;
+    private JTable jTableSelectedInstances = null;
+    private JScrollPane jScrollPaneLibClass = null;
+    private JTable jTableLibClass = null;
+    private JScrollPane jScrollPaneQualifiedInstance = null;
+    private JTable jTableLibInstances = null;
+    private JPanel jPanelLibrarySouth = null;
+    private JPanel jPanelLibraryCenter = null;
+    private JScrollPane jScrollPaneInstanceHelp = null;
+    private JTextArea jTextAreaInstanceHelp = null;
+    private JLabel jLabelSelectedInstances = null;
+    private JLabel jLabelInstanceHelp = null;
+    private JButton jButtonAdd = null;
+    private JButton jButtonDeleteInstance = null;
+    private JLabel jLabelPcdHelp = null;
+    private JButton jButtonOk = null;
+    private JButton jButtonCancel = null;
     private PartialEditableTableModel model = null;
-    private LibraryTableModel model1 = null;
-    private LibraryTableModel model2 = null;
-    private LibraryTableModel model3 = null;
+    private LibraryTableModel selectedInstancesTableModel = null;
+    private LibraryTableModel libClassTableModel = null;
+    private LibraryTableModel libInstanceTableModel = null;
     private DefaultTableModel optionsTableModel = null;
     private FpdFileContents ffc = null;
     private String moduleKey = null;
     private HashMap<String, ArrayList<String>> classInstanceMap = null;
     private ArrayList<String> classProduced = null;
     private HashMap<String, ArrayList<String>> classConsumed = null;
-    private JPanel jPanel8 = null;
-    private JLabel jLabel6 = null;
+    private JPanel jPanelModuleSaOpts = null;
+    private JLabel jLabelFvBinding = null;
     private JTextField jTextFieldFvBinding = null;
-    private JLabel jLabel7 = null;
+    private JLabel jLabelFfsFileGuid = null;
     private JTextField jTextFieldFileGuid = null;
-    private JLabel jLabel8 = null;
+    private JLabel jLabelFfsFormatKey = null;
     private JTextField jTextFieldFfsKey = null;
-    private JScrollPane jScrollPane6 = null;
-    private JTable jTable4 = null;
-    private JButton jButton4 = null;
-    private JButton jButton5 = null;
-    private JPanel jPanel9 = null;
-    private JPanel jPanel10 = null;
-    private JPanel jPanel11 = null;
-    private JPanel jPanel12 = null;
-    private JLabel jLabel9 = null;
-    private JComboBox jComboBox = null;
-    private JLabel jLabel10 = null;
-    private JTextField jTextField3 = null;
-    private JLabel jLabel11 = null;
-    private JTextField jTextField4 = null;
-    private JButton jButton6 = null;
-    private JComboBox jComboBox1 = null;
+    private JScrollPane jScrollPaneModuleSaOptions = null;
+    private JTable jTableModuleSaOptions = null;
+    private JButton jButtonNew = null;
+    private JButton jButtonDeleteOption = null;
+    private JPanel jPanelPcdFields = null;
+    private JPanel jPanelPcdFieldsSecondRow = null;
+    private JPanel jPanelPcdFieldsThirdRow = null;
+    private JPanel jPanelPcdFieldsFirstRow = null;
+    private JLabel jLabelItemType = null;
+    private JComboBox jComboBoxItemType = null;
+    private JLabel jLabelMaxDatumSize = null;
+    private JTextField jTextFieldMaxDatumSize = null;
+    private JLabel jLabelPcdDefaultValue = null;
+    private JTextField jTextFieldPcdDefault = null;
+    private JButton jButtonUpdatePcd = null;
+    private JComboBox jComboBoxFeatureFlagValue = null;
     private OpeningPlatformType docConsole = null;
-    private JLabel jLabel12 = null;
+    private JLabel jLabelPad = null;
     /**
      * This is the default constructor
      */
@@ -136,6 +136,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     public void setKey(String k, int i, OpeningPlatformType dc){
         this.moduleKey = k;
         this.docConsole = dc;
+        classProduced = null;
+        classConsumed = null;
         jTabbedPane.setSelectedIndex(0);
         initPcdBuildDefinition(i);
     }
@@ -167,7 +169,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // display lib instances already selected for key
         //
-        model1.setRowCount(0);
+        selectedInstancesTableModel.setRowCount(0);
         int instanceCount = ffc.getLibraryInstancesCount(key);
         if (instanceCount != 0) {
             String[][] saa = new String[instanceCount][5];
@@ -182,7 +184,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     // re-evaluate lib instance usage when adding a already-selected lib instance.
                     //
                     resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
-                    model1.addRow(saa[i]);
+                    selectedInstancesTableModel.addRow(saa[i]);
                 }
                 
                 
@@ -426,7 +428,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     private void showClassToResolved(){
-        model2.setRowCount(0);
+        libClassTableModel.setRowCount(0);
         if (classConsumed.size() == 0) {
             return;
         }
@@ -441,10 +443,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 continue;
             }
             if (!classProduced.contains(s[0])){
-                model2.addRow(s);
+                libClassTableModel.addRow(s);
             }
         }
-        model3.setRowCount(0);
+        libInstanceTableModel.setRowCount(0);
     }
     /**
      * This method initializes this
@@ -469,7 +471,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
             jContentPane.add(getJTabbedPane(), java.awt.BorderLayout.CENTER);
-            jContentPane.add(getJPanel3(), java.awt.BorderLayout.SOUTH);
+            jContentPane.add(getJPanelContentPaneSouth(), java.awt.BorderLayout.SOUTH);
         }
         return jContentPane;
     }
@@ -482,69 +484,69 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JTabbedPane getJTabbedPane() {
         if (jTabbedPane == null) {
             jTabbedPane = new JTabbedPane();
-            jTabbedPane.addTab("PCD Build Definition", null, getJPanel(), null);
-            jTabbedPane.addTab("Module SA Options", null, getJPanel8(), null);
-            jTabbedPane.addTab("Libraries", null, getJPanel1(), null);
+            jTabbedPane.addTab("PCD Build Definition", null, getJPanelPcd(), null);
+            jTabbedPane.addTab("Module SA Options", null, getJPanelModuleSaOpts(), null);
+            jTabbedPane.addTab("Libraries", null, getJPanelLibrary(), null);
         }
         return jTabbedPane;
     }
 
     /**
-     * This method initializes jPanel	
+     * This method initializes jPanelPcd
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel() {
-        if (jPanel == null) {
-            jLabel = new JLabel();
-            jLabel.setText("PcdData");
-            jPanel = new JPanel();
-            jPanel.setLayout(new BorderLayout());
-            jPanel.add(jLabel, java.awt.BorderLayout.NORTH);
-            jPanel.add(getJScrollPane(), java.awt.BorderLayout.CENTER);
-            jPanel.add(getJPanel2(), java.awt.BorderLayout.SOUTH);
-            jPanel.addComponentListener(new java.awt.event.ComponentAdapter() {
+    private JPanel getJPanelPcd() {
+        if (jPanelPcd == null) {
+            jLabelPcdData = new JLabel();
+            jLabelPcdData.setText("PcdData");
+            jPanelPcd = new JPanel();
+            jPanelPcd.setLayout(new BorderLayout());
+            jPanelPcd.add(jLabelPcdData, java.awt.BorderLayout.NORTH);
+            jPanelPcd.add(getJScrollPaneTablePcd(), java.awt.BorderLayout.CENTER);
+            jPanelPcd.add(getJPanelPcdSouth(), java.awt.BorderLayout.SOUTH);
+            jPanelPcd.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
 //                    initPcdBuildDefinition(moduleKey);
                 }
             });
             
         }
-        return jPanel;
+        return jPanelPcd;
     }
 
     /**
-     * This method initializes jPanel1	
+     * This method initializes jPanelLibrary
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel1() {
-        if (jPanel1 == null) {
-            jPanel1 = new JPanel();
-            jPanel1.setLayout(new BorderLayout());
-            jPanel1.add(getJSplitPane(), java.awt.BorderLayout.NORTH);
-            jPanel1.add(getJPanel6(), java.awt.BorderLayout.SOUTH);
-            jPanel1.add(getJPanel7(), java.awt.BorderLayout.CENTER);
-            jPanel1.addComponentListener(new java.awt.event.ComponentAdapter() {
+    private JPanel getJPanelLibrary() {
+        if (jPanelLibrary == null) {
+            jPanelLibrary = new JPanel();
+            jPanelLibrary.setLayout(new BorderLayout());
+            jPanelLibrary.add(getJSplitPane(), java.awt.BorderLayout.NORTH);
+            jPanelLibrary.add(getJPanelLibrarySouth(), java.awt.BorderLayout.SOUTH);
+            jPanelLibrary.add(getJPanelLibraryCenter(), java.awt.BorderLayout.CENTER);
+            jPanelLibrary.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
                     initLibraries(moduleKey);
                 }
             });
         }
-        return jPanel1;
+        return jPanelLibrary;
     }
 
     /**
-     * This method initializes jScrollPane	
+     * This method initializes jScrollPaneTablePcd
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane() {
-        if (jScrollPane == null) {
-            jScrollPane = new JScrollPane();
-            jScrollPane.setViewportView(getJTable());
+    private JScrollPane getJScrollPaneTablePcd() {
+        if (jScrollPaneTablePcd == null) {
+            jScrollPaneTablePcd = new JScrollPane();
+            jScrollPaneTablePcd.setViewportView(getJTablePcd());
         }
-        return jScrollPane;
+        return jScrollPaneTablePcd;
     }
 
     /**
@@ -552,12 +554,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable() {
-        if (jTable == null) {
+    private JTable getJTablePcd() {
+        if (jTablePcd == null) {
             model = new PartialEditableTableModel();
-            jTable = new JTable(model);
-            jTable.setRowHeight(20);
-            jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTablePcd = new JTable(model);
+            jTablePcd.setRowHeight(20);
+            jTablePcd.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             model.addColumn("CName");
             model.addColumn("TokenSpaceGUID");
             model.addColumn("ItemType");
@@ -566,8 +568,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model.addColumn("DataType");
             model.addColumn("DefaultValue");
                         
-            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            jTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+            jTablePcd.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTablePcd.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
                     
                     if (e.getValueIsAdjusting()){
@@ -579,53 +581,53 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     }
                     else{
                         int selectedRow = lsm.getMinSelectionIndex();
-                        String cName = jTable.getValueAt(selectedRow, 0)+"";
+                        String cName = jTablePcd.getValueAt(selectedRow, 0)+"";
                         String[] pcdInfo = {"", ""};
                         getPcdInfo(cName, pcdInfo);
-                        jTextArea.setText(pcdInfo[0]);
+                        jTextAreaPcdHelp.setText(pcdInfo[0]);
                         initComboBox(pcdInfo[1]);
-                        jComboBox.setSelectedItem(pcdInfo[1]);
-                        jTextField3.setEnabled(true);
-                        jTextField3.setVisible(true);
-                        jTextField3.setText(jTable.getValueAt(selectedRow, 4)+"");
-                        jTextField4.setEnabled(true);
-                        jTextField4.setText(jTable.getValueAt(selectedRow, 6)+"");
-                        if (jTable.getValueAt(selectedRow, 5).equals("VOID*")) {
+                        jComboBoxItemType.setSelectedItem(pcdInfo[1]);
+                        jTextFieldMaxDatumSize.setEnabled(true);
+                        jTextFieldMaxDatumSize.setVisible(true);
+                        jTextFieldMaxDatumSize.setText(jTablePcd.getValueAt(selectedRow, 4)+"");
+                        jTextFieldPcdDefault.setEnabled(true);
+                        jTextFieldPcdDefault.setText(jTablePcd.getValueAt(selectedRow, 6)+"");
+                        if (jTablePcd.getValueAt(selectedRow, 5).equals("VOID*")) {
                             if (pcdInfo[1].equals("FEATURE_FLAG")) {
-                                jTextField3.setVisible(false);
+                                jTextFieldMaxDatumSize.setVisible(false);
                             }
                             else if (pcdInfo[1].equals("FIXED_AT_BUILD")) {
                                 try{
-                                    jTextField3.setEnabled(false);
-                                    jTextField3.setText(ffc.setMaxSizeForPointer(jTable.getValueAt(selectedRow, 6)+"")+"");
+                                    jTextFieldMaxDatumSize.setEnabled(false);
+                                    jTextFieldMaxDatumSize.setText(ffc.setMaxSizeForPointer(jTablePcd.getValueAt(selectedRow, 6)+"")+"");
                                 }
                                 catch(Exception except){
                                     JOptionPane.showMessageDialog(frame, "Unacceptable PCD Value: " + except.getMessage());
                                 }
                             }
                             else{
-                                jTextField3.setText(jTable.getValueAt(selectedRow, 4)+"");
+                                jTextFieldMaxDatumSize.setText(jTablePcd.getValueAt(selectedRow, 4)+"");
                             }
                         }
                         else {
-                            jTextField3.setEnabled(false);
+                            jTextFieldMaxDatumSize.setEnabled(false);
                         }
                         
-                        if (!jTable.getValueAt(selectedRow, 2).equals("DYNAMIC") && !jTable.getValueAt(selectedRow, 2).equals("DYNAMIC_EX")) {
-                            jTextField4.setText(jTable.getValueAt(selectedRow, 6)+"");
-                            if (jTable.getValueAt(selectedRow, 2).equals("FEATURE_FLAG")){
-                                jTextField4.setVisible(false);
-                                jComboBox1.setVisible(true);
-                                jComboBox1.setSelectedItem(jTable.getValueAt(selectedRow, 6)+"");
+                        if (!jTablePcd.getValueAt(selectedRow, 2).equals("DYNAMIC") && !jTablePcd.getValueAt(selectedRow, 2).equals("DYNAMIC_EX")) {
+                            jTextFieldPcdDefault.setText(jTablePcd.getValueAt(selectedRow, 6)+"");
+                            if (jTablePcd.getValueAt(selectedRow, 2).equals("FEATURE_FLAG")){
+                                jTextFieldPcdDefault.setVisible(false);
+                                jComboBoxFeatureFlagValue.setVisible(true);
+                                jComboBoxFeatureFlagValue.setSelectedItem(jTablePcd.getValueAt(selectedRow, 6)+"");
                             }
                             else{
-                                jTextField4.setVisible(true);
-                                jTextField4.setEnabled(true);
-                                jComboBox1.setVisible(false);
+                                jTextFieldPcdDefault.setVisible(true);
+                                jTextFieldPcdDefault.setEnabled(true);
+                                jComboBoxFeatureFlagValue.setVisible(false);
                             }
                         }
                         else{
-                            jTextField4.setEnabled(false);
+                            jTextFieldPcdDefault.setEnabled(false);
                         }
                     }
                     
@@ -633,7 +635,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 }
             });
             
-            jTable.getModel().addTableModelListener(new TableModelListener() {
+            jTablePcd.getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent arg0) {
                     // TODO Auto-generated method stub
 //                    int row = arg0.getFirstRow();
@@ -646,18 +648,18 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 }
             });
         }
-        return jTable;
+        return jTablePcd;
     }
     
     private void initComboBox(String originalType) {
-        jComboBox.removeAllItems();
-        jComboBox.addItem(originalType);
+        jComboBoxItemType.removeAllItems();
+        jComboBoxItemType.addItem(originalType);
         if (originalType.equals("PATCHABLE_IN_MODULE")) {
-            jComboBox.addItem("FIXED_AT_BUILD");
+            jComboBoxItemType.addItem("FIXED_AT_BUILD");
         }
         if (originalType.equals("DYNAMIC")) {
-            jComboBox.addItem("FIXED_AT_BUILD");
-            jComboBox.addItem("PATCHABLE_IN_MODULE");
+            jComboBoxItemType.addItem("FIXED_AT_BUILD");
+            jComboBoxItemType.addItem("PATCHABLE_IN_MODULE");
         }
     }
     
@@ -682,65 +684,65 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
 
     /**
-     * This method initializes jPanel2	
+     * This method initializes jPanelPcdSouth
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel2() {
-        if (jPanel2 == null) {
-            jLabel5 = new JLabel();
-            jLabel5.setText("PCD Description");
-            jPanel2 = new JPanel();
-            jPanel2.setPreferredSize(new java.awt.Dimension(607,200));
-            jPanel2.add(jLabel5, null);
-            jPanel2.add(getJScrollPane1(), null);
-            jPanel2.add(getJPanel9(), null);
+    private JPanel getJPanelPcdSouth() {
+        if (jPanelPcdSouth == null) {
+            jLabelPcdHelp = new JLabel();
+            jLabelPcdHelp.setText("PCD Description");
+            jPanelPcdSouth = new JPanel();
+            jPanelPcdSouth.setPreferredSize(new java.awt.Dimension(607,200));
+            jPanelPcdSouth.add(jLabelPcdHelp, null);
+            jPanelPcdSouth.add(getJScrollPanePcdHelp(), null);
+            jPanelPcdSouth.add(getJPanelPcdFields(), null);
         }
-        return jPanel2;
+        return jPanelPcdSouth;
     }
 
     /**
-     * This method initializes jScrollPane1	
+     * This method initializes jScrollPanePcdHelp
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane1() {
-        if (jScrollPane1 == null) {
-            jScrollPane1 = new JScrollPane();
-            jScrollPane1.setPreferredSize(new java.awt.Dimension(500,100));
-            jScrollPane1.setViewportView(getJTextArea());
+    private JScrollPane getJScrollPanePcdHelp() {
+        if (jScrollPanePcdHelp == null) {
+            jScrollPanePcdHelp = new JScrollPane();
+            jScrollPanePcdHelp.setPreferredSize(new java.awt.Dimension(500,100));
+            jScrollPanePcdHelp.setViewportView(getJTextAreaPcdHelp());
         }
-        return jScrollPane1;
+        return jScrollPanePcdHelp;
     }
 
     /**
-     * This method initializes jTextArea	
+     * This method initializes jTextAreaPcdHelp
      * 	
      * @return javax.swing.JTextArea	
      */
-    private JTextArea getJTextArea() {
-        if (jTextArea == null) {
-            jTextArea = new JTextArea();
-            jTextArea.setEditable(false);
+    private JTextArea getJTextAreaPcdHelp() {
+        if (jTextAreaPcdHelp == null) {
+            jTextAreaPcdHelp = new JTextArea();
+            jTextAreaPcdHelp.setEditable(false);
         }
-        return jTextArea;
+        return jTextAreaPcdHelp;
     }
 
     /**
-     * This method initializes jPanel3	
+     * This method initializes jPanelContentPaneSouth
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel3() {
-        if (jPanel3 == null) {
+    private JPanel getJPanelContentPaneSouth() {
+        if (jPanelContentPaneSouth == null) {
             FlowLayout flowLayout = new FlowLayout();
             flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
-            jPanel3 = new JPanel();
-            jPanel3.setLayout(flowLayout);
-            jPanel3.add(getJButton2(), null);
-            jPanel3.add(getJButton3(), null);
+            jPanelContentPaneSouth = new JPanel();
+            jPanelContentPaneSouth.setLayout(flowLayout);
+            jPanelContentPaneSouth.add(getJButtonOk(), null);
+            jPanelContentPaneSouth.add(getJButtonCancel(), null);
         }
-        return jPanel3;
+        return jPanelContentPaneSouth;
     }
 
     /**
@@ -752,109 +754,109 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jSplitPane == null) {
             jSplitPane = new JSplitPane();
             jSplitPane.setDividerLocation(200);
-            jSplitPane.setLeftComponent(getJPanel4());
-            jSplitPane.setRightComponent(getJPanel5());
+            jSplitPane.setLeftComponent(getJPanelLibraryLeft());
+            jSplitPane.setRightComponent(getJPanelLibraryRight());
             jSplitPane.setPreferredSize(new java.awt.Dimension(202,200));
         }
         return jSplitPane;
     }
 
     /**
-     * This method initializes jPanel4	
+     * This method initializes jPanelLibraryLeft
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel4() {
-        if (jPanel4 == null) {
-            jLabel1 = new JLabel();
-            jLabel1.setText("Library Classes Uninstantiated");
-            jPanel4 = new JPanel();
-            jPanel4.add(jLabel1, null);
-            jPanel4.add(getJScrollPane3(), null);
+    private JPanel getJPanelLibraryLeft() {
+        if (jPanelLibraryLeft == null) {
+            jLabelLibClass = new JLabel();
+            jLabelLibClass.setText("Library Classes Uninstantiated");
+            jPanelLibraryLeft = new JPanel();
+            jPanelLibraryLeft.add(jLabelLibClass, null);
+            jPanelLibraryLeft.add(getJScrollPaneLibClass(), null);
         }
-        return jPanel4;
+        return jPanelLibraryLeft;
     }
 
     /**
-     * This method initializes jPanel5	
+     * This method initializes jPanelLibraryRight
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel5() {
-        if (jPanel5 == null) {
-            jLabel2 = new JLabel();
-            jLabel2.setText("Instances Available");
-            jPanel5 = new JPanel();
-            jPanel5.add(jLabel2, null);
-            jPanel5.add(getJScrollPane4(), null);
+    private JPanel getJPanelLibraryRight() {
+        if (jPanelLibraryRight == null) {
+            jLabelQualifiedInstance = new JLabel();
+            jLabelQualifiedInstance.setText("Instances Available");
+            jPanelLibraryRight = new JPanel();
+            jPanelLibraryRight.add(jLabelQualifiedInstance, null);
+            jPanelLibraryRight.add(getJScrollPaneQualifiedInstance(), null);
         }
-        return jPanel5;
+        return jPanelLibraryRight;
     }
 
     /**
-     * This method initializes jScrollPane2	
+     * This method initializes jScrollPaneSelectedInstances
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane2() {
-        if (jScrollPane2 == null) {
-            jScrollPane2 = new JScrollPane();
-            jScrollPane2.setPreferredSize(new java.awt.Dimension(453,150));
-            jScrollPane2.setViewportView(getJTable1());
+    private JScrollPane getJScrollPaneSelectedInstances() {
+        if (jScrollPaneSelectedInstances == null) {
+            jScrollPaneSelectedInstances = new JScrollPane();
+            jScrollPaneSelectedInstances.setPreferredSize(new java.awt.Dimension(453,150));
+            jScrollPaneSelectedInstances.setViewportView(getJTableSelectedInstances());
         }
-        return jScrollPane2;
+        return jScrollPaneSelectedInstances;
     }
 
     /**
-     * This method initializes jTable1	
+     * This method initializes jTableSelectedInstances
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable1() {
-        if (jTable1 == null) {
-            model1 = new LibraryTableModel();
-            model1.addColumn("Name");
-            model1.addColumn("ModuleGUID");
-            model1.addColumn("ModuleVersion");
-            model1.addColumn("PackageGUID");
-            model1.addColumn("PackageVersion");
-            jTable1 = new JTable(model1);
-            jTable1.setRowHeight(20);
-            jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-            jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    private JTable getJTableSelectedInstances() {
+        if (jTableSelectedInstances == null) {
+            selectedInstancesTableModel = new LibraryTableModel();
+            selectedInstancesTableModel.addColumn("Name");
+            selectedInstancesTableModel.addColumn("ModuleGUID");
+            selectedInstancesTableModel.addColumn("ModuleVersion");
+            selectedInstancesTableModel.addColumn("PackageGUID");
+            selectedInstancesTableModel.addColumn("PackageVersion");
+            jTableSelectedInstances = new JTable(selectedInstancesTableModel);
+            jTableSelectedInstances.setRowHeight(20);
+            jTableSelectedInstances.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTableSelectedInstances.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
         }
-        return jTable1;
+        return jTableSelectedInstances;
     }
 
     /**
-     * This method initializes jScrollPane3	
+     * This method initializes jScrollPaneLibClass
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane3() {
-        if (jScrollPane3 == null) {
-            jScrollPane3 = new JScrollPane();
-            jScrollPane3.setPreferredSize(new java.awt.Dimension(200,170));
-            jScrollPane3.setViewportView(getJTable2());
+    private JScrollPane getJScrollPaneLibClass() {
+        if (jScrollPaneLibClass == null) {
+            jScrollPaneLibClass = new JScrollPane();
+            jScrollPaneLibClass.setPreferredSize(new java.awt.Dimension(200,170));
+            jScrollPaneLibClass.setViewportView(getJTableLibClass());
         }
-        return jScrollPane3;
+        return jScrollPaneLibClass;
     }
 
     /**
-     * This method initializes jTable2	
+     * This method initializes jTableLibClass
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable2() {
-        if (jTable2 == null) {
-            model2 = new LibraryTableModel();
-            model2.addColumn("LibraryClass");
-            jTable2 = new JTable(model2);
-            jTable2.setRowHeight(20);
-            jTable2.setShowGrid(false);
-            jTable2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-            jTable2.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
+    private JTable getJTableLibClass() {
+        if (jTableLibClass == null) {
+            libClassTableModel = new LibraryTableModel();
+            libClassTableModel.addColumn("LibraryClass");
+            jTableLibClass = new JTable(libClassTableModel);
+            jTableLibClass.setRowHeight(20);
+            jTableLibClass.setShowGrid(false);
+            jTableLibClass.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTableLibClass.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
                     if (e.getValueIsAdjusting()){
                         return;
@@ -871,8 +873,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         //
                         // display potential lib instances according to class selection
                         //
-                        model3.setRowCount(0);
-                        String cls = model2.getValueAt(selectedRow2, 0).toString();
+                        libInstanceTableModel.setRowCount(0);
+                        String cls = libClassTableModel.getValueAt(selectedRow2, 0).toString();
                         ArrayList<String> al = classInstanceMap.get(cls);
                         ListIterator<String> li = al.listIterator();
                         while(li.hasNext()) {
@@ -886,138 +888,138 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                             for (int i = 0; i < instancePart.length; ++i){
                                 s[i+1] = instancePart[i];
                             }
-                            model3.addRow(s);
+                            libInstanceTableModel.addRow(s);
                         }
                         
                     }
                 }
             });
         }
-        return jTable2;
+        return jTableLibClass;
     }
 
     /**
-     * This method initializes jScrollPane4	
+     * This method initializes jScrollPaneQualifiedInstance
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane4() {
-        if (jScrollPane4 == null) {
-            jScrollPane4 = new JScrollPane();
-            jScrollPane4.setPreferredSize(new java.awt.Dimension(430,170));
-            jScrollPane4.setViewportView(getJTable3());
+    private JScrollPane getJScrollPaneQualifiedInstance() {
+        if (jScrollPaneQualifiedInstance == null) {
+            jScrollPaneQualifiedInstance = new JScrollPane();
+            jScrollPaneQualifiedInstance.setPreferredSize(new java.awt.Dimension(430,170));
+            jScrollPaneQualifiedInstance.setViewportView(getJTableLibInstances());
         }
-        return jScrollPane4;
+        return jScrollPaneQualifiedInstance;
     }
 
     /**
-     * This method initializes jTable3	
+     * This method initializes jTableLibInstances
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable3() {
-        if (jTable3 == null) {
-            model3 = new LibraryTableModel();
-            model3.addColumn("Name");
-            model3.addColumn("ModuleGUID");
-            model3.addColumn("ModuleVersion");
-            model3.addColumn("PackageGUID");
-            model3.addColumn("PackageVersion");
-            jTable3 = new JTable(model3);
-            jTable3.setRowHeight(20);
-            jTable3.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-            jTable3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    private JTable getJTableLibInstances() {
+        if (jTableLibInstances == null) {
+            libInstanceTableModel = new LibraryTableModel();
+            libInstanceTableModel.addColumn("Name");
+            libInstanceTableModel.addColumn("ModuleGUID");
+            libInstanceTableModel.addColumn("ModuleVersion");
+            libInstanceTableModel.addColumn("PackageGUID");
+            libInstanceTableModel.addColumn("PackageVersion");
+            jTableLibInstances = new JTable(libInstanceTableModel);
+            jTableLibInstances.setRowHeight(20);
+            jTableLibInstances.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTableLibInstances.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
         }
-        return jTable3;
+        return jTableLibInstances;
     }
 
     /**
-     * This method initializes jPanel6	
+     * This method initializes jPanelLibrarySouth
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel6() {
-        if (jPanel6 == null) {
-            jPanel6 = new JPanel();
+    private JPanel getJPanelLibrarySouth() {
+        if (jPanelLibrarySouth == null) {
+            jPanelLibrarySouth = new JPanel();
         }
-        return jPanel6;
+        return jPanelLibrarySouth;
     }
 
     /**
-     * This method initializes jPanel7	
+     * This method initializes jPanelLibraryCenter
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel7() {
-        if (jPanel7 == null) {
-            jLabel4 = new JLabel();
-            jLabel4.setText("Instance Description");
-            jLabel3 = new JLabel();
-            jLabel3.setText("Selected Instances");
-            jPanel7 = new JPanel();
-            jPanel7.add(jLabel4, null);
-            jPanel7.add(getJScrollPane5(), null);
-            jPanel7.add(getJButton(), null);
-            jPanel7.add(getJButton1(), null);
-            jPanel7.add(jLabel3, null);
-            jPanel7.add(getJScrollPane2(), null);
+    private JPanel getJPanelLibraryCenter() {
+        if (jPanelLibraryCenter == null) {
+            jLabelInstanceHelp = new JLabel();
+            jLabelInstanceHelp.setText("Instance Description");
+            jLabelSelectedInstances = new JLabel();
+            jLabelSelectedInstances.setText("Selected Instances");
+            jPanelLibraryCenter = new JPanel();
+            jPanelLibraryCenter.add(jLabelInstanceHelp, null);
+            jPanelLibraryCenter.add(getJScrollPaneInstanceHelp(), null);
+            jPanelLibraryCenter.add(getJButtonAdd(), null);
+            jPanelLibraryCenter.add(getJButtonDeleteInstance(), null);
+            jPanelLibraryCenter.add(jLabelSelectedInstances, null);
+            jPanelLibraryCenter.add(getJScrollPaneSelectedInstances(), null);
         }
-        return jPanel7;
+        return jPanelLibraryCenter;
     }
 
     /**
-     * This method initializes jScrollPane5	
+     * This method initializes jScrollPaneInstanceHelp
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane5() {
-        if (jScrollPane5 == null) {
-            jScrollPane5 = new JScrollPane();
-            jScrollPane5.setPreferredSize(new java.awt.Dimension(300,50));
-            jScrollPane5.setViewportView(getJTextArea1());
+    private JScrollPane getJScrollPaneInstanceHelp() {
+        if (jScrollPaneInstanceHelp == null) {
+            jScrollPaneInstanceHelp = new JScrollPane();
+            jScrollPaneInstanceHelp.setPreferredSize(new java.awt.Dimension(300,50));
+            jScrollPaneInstanceHelp.setViewportView(getJTextAreaInstanceHelp());
         }
-        return jScrollPane5;
+        return jScrollPaneInstanceHelp;
     }
 
     /**
-     * This method initializes jTextArea1	
+     * This method initializes jTextAreaInstanceHelp
      * 	
      * @return javax.swing.JTextArea	
      */
-    private JTextArea getJTextArea1() {
-        if (jTextArea1 == null) {
-            jTextArea1 = new JTextArea();
-            jTextArea1.setEditable(false);
+    private JTextArea getJTextAreaInstanceHelp() {
+        if (jTextAreaInstanceHelp == null) {
+            jTextAreaInstanceHelp = new JTextArea();
+            jTextAreaInstanceHelp.setEditable(false);
         }
-        return jTextArea1;
+        return jTextAreaInstanceHelp;
     }
 
     /**
-     * This method initializes jButton	
+     * This method initializes jButtonAdd
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton() {
-        if (jButton == null) {
-            jButton = new JButton();
-            jButton.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton.setText("Add");
-            jButton.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonAdd() {
+        if (jButtonAdd == null) {
+            jButtonAdd = new JButton();
+            jButtonAdd.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonAdd.setText("Add");
+            jButtonAdd.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    int row = jTable3.getSelectedRow();
+                    int row = jTableLibInstances.getSelectedRow();
                     if (row < 0) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    Object[] s = {model3.getValueAt(row, 0), model3.getValueAt(row, 1),
-                                  model3.getValueAt(row, 2), model3.getValueAt(row, 3),
-                                  model3.getValueAt(row, 4)};
-                    model1.addRow(s);
-                    String instanceValue = model3.getValueAt(row, 1) + " " + 
-                    model3.getValueAt(row, 2) + " " +
-                    model3.getValueAt(row, 3) + " " +
-                    model3.getValueAt(row, 4);
+                    Object[] s = {libInstanceTableModel.getValueAt(row, 0), libInstanceTableModel.getValueAt(row, 1),
+                                  libInstanceTableModel.getValueAt(row, 2), libInstanceTableModel.getValueAt(row, 3),
+                                  libInstanceTableModel.getValueAt(row, 4)};
+                    selectedInstancesTableModel.addRow(s);
+                    String instanceValue = libInstanceTableModel.getValueAt(row, 1) + " " +
+                    libInstanceTableModel.getValueAt(row, 2) + " " +
+                    libInstanceTableModel.getValueAt(row, 3) + " " +
+                    libInstanceTableModel.getValueAt(row, 4);
                     ModuleIdentification libMi = getModuleId(instanceValue);
                     ffc.genLibraryInstance(libMi, moduleKey);
                     //
@@ -1033,37 +1035,37 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 }
             });
         }
-        return jButton;
+        return jButtonAdd;
     }
 
     /**
-     * This method initializes jButton1	
+     * This method initializes jButton1
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton1() {
-        if (jButton1 == null) {
-            jButton1 = new JButton();
-            jButton1.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton1.setText("Delete");
-            jButton1.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonDeleteInstance() {
+        if (jButtonDeleteInstance == null) {
+            jButtonDeleteInstance = new JButton();
+            jButtonDeleteInstance.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonDeleteInstance.setText("Delete");
+            jButtonDeleteInstance.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    int row = jTable1.getSelectedRow();
+                    int row = jTableSelectedInstances.getSelectedRow();
                     if (row < 0) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    removeInstance(model1.getValueAt(row, 1) + " " + 
-                                   model1.getValueAt(row, 2) + " " +
-                                   model1.getValueAt(row, 3) + " " +
-                                   model1.getValueAt(row, 4));
+                    removeInstance(selectedInstancesTableModel.getValueAt(row, 1) + " " +
+                                   selectedInstancesTableModel.getValueAt(row, 2) + " " +
+                                   selectedInstancesTableModel.getValueAt(row, 3) + " " +
+                                   selectedInstancesTableModel.getValueAt(row, 4));
                     ffc.removeLibraryInstance(moduleKey, row);
-                    model1.removeRow(row);
+                    selectedInstancesTableModel.removeRow(row);
                     
                 }
             });
         }
-        return jButton1;
+        return jButtonDeleteInstance;
     }
 
     /**
@@ -1071,14 +1073,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton2() {
-        if (jButton2 == null) {
-            jButton2 = new JButton();
-            jButton2.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton2.setText("Ok");
-            jButton2.addActionListener(this);
+    private JButton getJButtonOk() {
+        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonOk.setText("Ok");
+            jButtonOk.addActionListener(this);
         }
-        return jButton2;
+        return jButtonOk;
     }
 
     /**
@@ -1086,64 +1088,64 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton3() {
-        if (jButton3 == null) {
-            jButton3 = new JButton();
-            jButton3.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton3.setText("Cancel");
-            jButton3.setVisible(false);
+    private JButton getJButtonCancel() {
+        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonCancel.setText("Cancel");
+            jButtonCancel.setVisible(false);
         }
-        return jButton3;
+        return jButtonCancel;
     }
     public void actionPerformed(ActionEvent arg0) {
 
-        if (arg0.getSource() == jButton2) {
-            if (jTable4.isEditing()) {
-                jTable4.getCellEditor().stopCellEditing();
+        if (arg0.getSource() == jButtonOk) {
+            if (jTableModuleSaOptions.isEditing()) {
+                jTableModuleSaOptions.getCellEditor().stopCellEditing();
             }
             this.setVisible(false);
         }
     }
     /**
-     * This method initializes jPanel8	
+     * This method initializes jPanelModuleSaOpts
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel8() {
-        if (jPanel8 == null) {
-            jLabel12 = new JLabel();
-            jLabel12.setText("");
-            jLabel12.setPreferredSize(new java.awt.Dimension(250,16));
+    private JPanel getJPanelModuleSaOpts() {
+        if (jPanelModuleSaOpts == null) {
+            jLabelPad = new JLabel();
+            jLabelPad.setText("");
+            jLabelPad.setPreferredSize(new java.awt.Dimension(250,16));
             FlowLayout flowLayout4 = new FlowLayout();
             flowLayout4.setAlignment(java.awt.FlowLayout.LEFT);
-            jLabel8 = new JLabel();
-            jLabel8.setText("FFS Format Key");
-            jLabel8.setPreferredSize(new java.awt.Dimension(90,16));
-            jLabel7 = new JLabel();
-            jLabel7.setText("FFS File GUID");
-            jLabel7.setPreferredSize(new java.awt.Dimension(90,16));
-            jLabel6 = new JLabel();
-            jLabel6.setText("FV Binding");
-            jLabel6.setPreferredSize(new java.awt.Dimension(90,16));
-            jPanel8 = new JPanel();
-            jPanel8.setLayout(flowLayout4);
-            jPanel8.add(jLabel6, null);
-            jPanel8.add(getJTextFieldFvBinding(), null);
-            jPanel8.add(jLabel7, null);
-            jPanel8.add(getJTextFieldFileGuid(), null);
-            jPanel8.add(jLabel8, null);
-            jPanel8.add(getJTextFieldFfsKey(), null);
-            jPanel8.add(getJScrollPane6(), null);
-            jPanel8.add(jLabel12, null);
-            jPanel8.add(getJButton4(), null);
-            jPanel8.add(getJButton5(), null);
-            jPanel8.addComponentListener(new java.awt.event.ComponentAdapter() {
+            jLabelFfsFormatKey = new JLabel();
+            jLabelFfsFormatKey.setText("FFS Format Key");
+            jLabelFfsFormatKey.setPreferredSize(new java.awt.Dimension(90,16));
+            jLabelFfsFileGuid = new JLabel();
+            jLabelFfsFileGuid.setText("FFS File GUID");
+            jLabelFfsFileGuid.setPreferredSize(new java.awt.Dimension(90,16));
+            jLabelFvBinding = new JLabel();
+            jLabelFvBinding.setText("FV Binding");
+            jLabelFvBinding.setPreferredSize(new java.awt.Dimension(90,16));
+            jPanelModuleSaOpts = new JPanel();
+            jPanelModuleSaOpts.setLayout(flowLayout4);
+            jPanelModuleSaOpts.add(jLabelFvBinding, null);
+            jPanelModuleSaOpts.add(getJTextFieldFvBinding(), null);
+            jPanelModuleSaOpts.add(jLabelFfsFileGuid, null);
+            jPanelModuleSaOpts.add(getJTextFieldFileGuid(), null);
+            jPanelModuleSaOpts.add(jLabelFfsFormatKey, null);
+            jPanelModuleSaOpts.add(getJTextFieldFfsKey(), null);
+            jPanelModuleSaOpts.add(getJScrollPaneModuleSaOptions(), null);
+            jPanelModuleSaOpts.add(jLabelPad, null);
+            jPanelModuleSaOpts.add(getJButtonNew(), null);
+            jPanelModuleSaOpts.add(getJButtonDeleteOption(), null);
+            jPanelModuleSaOpts.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
                     initModuleSAOptions(moduleKey);
                 }
             });
         }
-        return jPanel8;
+        return jPanelModuleSaOpts;
     }
     /**
      * This method initializes jTextField	
@@ -1237,25 +1239,25 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         return jTextFieldFfsKey;
     }
     /**
-     * This method initializes jScrollPane6	
+     * This method initializes jScrollPaneModuleSaOptions
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane6() {
-        if (jScrollPane6 == null) {
-            jScrollPane6 = new JScrollPane();
-            jScrollPane6.setPreferredSize(new java.awt.Dimension(600,200));
-            jScrollPane6.setViewportView(getJTable4());
+    private JScrollPane getJScrollPaneModuleSaOptions() {
+        if (jScrollPaneModuleSaOptions == null) {
+            jScrollPaneModuleSaOptions = new JScrollPane();
+            jScrollPaneModuleSaOptions.setPreferredSize(new java.awt.Dimension(600,200));
+            jScrollPaneModuleSaOptions.setViewportView(getJTableModuleSaOptions());
         }
-        return jScrollPane6;
+        return jScrollPaneModuleSaOptions;
     }
     /**
-     * This method initializes jTable4	
+     * This method initializes jTableModuleSaOptions
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable4() {
-        if (jTable4 == null) {
+    private JTable getJTableModuleSaOptions() {
+        if (jTableModuleSaOptions == null) {
             optionsTableModel = new DefaultTableModel();
             optionsTableModel.addColumn("BuildTargets");
             optionsTableModel.addColumn("ToolChainFamily");
@@ -1263,8 +1265,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             optionsTableModel.addColumn("ToolCode");
             optionsTableModel.addColumn("SupportedArchs");
             optionsTableModel.addColumn("Contents");
-            jTable4 = new JTable(optionsTableModel);
-            jTable4.setRowHeight(20);
+            jTableModuleSaOptions = new JTable(optionsTableModel);
+            jTableModuleSaOptions.setRowHeight(20);
             Vector<String> vArch = new Vector<String>();
             vArch.add("IA32");
             vArch.add("X64");
@@ -1272,10 +1274,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             vArch.add("EBC");
             vArch.add("ARM");
             vArch.add("PPC");
-            jTable4.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
-            jTable4.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			jTable4.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-            jTable4.getModel().addTableModelListener(new TableModelListener() {
+            jTableModuleSaOptions.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
+            jTableModuleSaOptions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			jTableModuleSaOptions.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTableModuleSaOptions.getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent arg0) {
                     // TODO Auto-generated method stub
                     int row = arg0.getFirstRow();
@@ -1313,19 +1315,19 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 }
             });
         }
-        return jTable4;
+        return jTableModuleSaOptions;
     }
     /**
-     * This method initializes jButton4	
+     * This method initializes jButtonNew
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton4() {
-        if (jButton4 == null) {
-            jButton4 = new JButton();
-            jButton4.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton4.setText("New");
-            jButton4.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonNew() {
+        if (jButtonNew == null) {
+            jButtonNew = new JButton();
+            jButtonNew.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonNew.setText("New");
+            jButtonNew.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     String[] row = {"", "", "", "", "", ""};
                     optionsTableModel.addRow(row);
@@ -1336,30 +1338,30 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 }
             });
         }
-        return jButton4;
+        return jButtonNew;
     }
     /**
-     * This method initializes jButton5	
+     * This method initializes jButtonDelete
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton5() {
-        if (jButton5 == null) {
-            jButton5 = new JButton();
-            jButton5.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton5.setText("Delete");
-            jButton5.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonDeleteOption() {
+        if (jButtonDeleteOption == null) {
+            jButtonDeleteOption = new JButton();
+            jButtonDeleteOption.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonDeleteOption.setText("Delete");
+            jButtonDeleteOption.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTable4.getSelectedRow() < 0) {
+                    if (jTableModuleSaOptions.getSelectedRow() < 0) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    ffc.removeModuleSAOptionsOpt(moduleKey, jTable4.getSelectedRow());
-                    optionsTableModel.removeRow(jTable4.getSelectedRow());
+                    ffc.removeModuleSAOptionsOpt(moduleKey, jTableModuleSaOptions.getSelectedRow());
+                    optionsTableModel.removeRow(jTableModuleSaOptions.getSelectedRow());
                 }
             });
         }
-        return jButton5;
+        return jButtonDeleteOption;
     }
     
     /**
@@ -1379,109 +1381,109 @@ public class FpdModuleSA extends JDialog implements ActionListener {
        centerWindow(this.getSize().width, this.getSize().height);
    }
 /**
- * This method initializes jPanel9	
+ * This method initializes jPanelPcdFields
  * 	
  * @return javax.swing.JPanel	
  */
-private JPanel getJPanel9() {
-    if (jPanel9 == null) {
+private JPanel getJPanelPcdFields() {
+    if (jPanelPcdFields == null) {
         GridLayout gridLayout = new GridLayout();
         gridLayout.setRows(3);
         gridLayout.setColumns(2);
-        jPanel9 = new JPanel();
-        jPanel9.setLayout(gridLayout);
-        jPanel9.setPreferredSize(new java.awt.Dimension(600,90));
-        jPanel9.add(getJPanel12(), null);
-        jPanel9.add(getJPanel10(), null);
-        jPanel9.add(getJPanel11(), null);
+        jPanelPcdFields = new JPanel();
+        jPanelPcdFields.setLayout(gridLayout);
+        jPanelPcdFields.setPreferredSize(new java.awt.Dimension(600,90));
+        jPanelPcdFields.add(getJPanelPcdFieldsFirstRow(), null);
+        jPanelPcdFields.add(getJPanelPcdFieldsSecondRow(), null);
+        jPanelPcdFields.add(getJPanelPcdFieldsThirdRow(), null);
     }
-    return jPanel9;
+    return jPanelPcdFields;
 }
 /**
- * This method initializes jPanel10	
+ * This method initializes jPanelPcdFieldsSecondRow
  * 	
  * @return javax.swing.JPanel	
  */
-private JPanel getJPanel10() {
-    if (jPanel10 == null) {
+private JPanel getJPanelPcdFieldsSecondRow() {
+    if (jPanelPcdFieldsSecondRow == null) {
         FlowLayout flowLayout2 = new FlowLayout();
         flowLayout2.setAlignment(java.awt.FlowLayout.LEFT);
-        jLabel10 = new JLabel();
-        jLabel10.setText("Max Datum Size");
-        jPanel10 = new JPanel();
-        jPanel10.setLayout(flowLayout2);
-        jPanel10.add(jLabel10, null);
-        jPanel10.add(getJTextField3(), null);
+        jLabelMaxDatumSize = new JLabel();
+        jLabelMaxDatumSize.setText("Max Datum Size");
+        jPanelPcdFieldsSecondRow = new JPanel();
+        jPanelPcdFieldsSecondRow.setLayout(flowLayout2);
+        jPanelPcdFieldsSecondRow.add(jLabelMaxDatumSize, null);
+        jPanelPcdFieldsSecondRow.add(getJTextFieldMaxDatumSize(), null);
     }
-    return jPanel10;
+    return jPanelPcdFieldsSecondRow;
 }
 /**
- * This method initializes jPanel11	
+ * This method initializes jPanelPcdFieldsThirdRow
  * 	
  * @return javax.swing.JPanel	
  */
-private JPanel getJPanel11() {
-    if (jPanel11 == null) {
+private JPanel getJPanelPcdFieldsThirdRow() {
+    if (jPanelPcdFieldsThirdRow == null) {
         FlowLayout flowLayout3 = new FlowLayout();
         flowLayout3.setAlignment(java.awt.FlowLayout.LEFT);
-        jLabel11 = new JLabel();
-        jLabel11.setText("Default Value");
-        jLabel11.setPreferredSize(new java.awt.Dimension(91,16));
-        jPanel11 = new JPanel();
-        jPanel11.setLayout(flowLayout3);
-        jPanel11.add(jLabel11, null);
-        jPanel11.add(getJTextField4(), null);
-        jPanel11.add(getJComboBox1(), null);
+        jLabelPcdDefaultValue = new JLabel();
+        jLabelPcdDefaultValue.setText("Default Value");
+        jLabelPcdDefaultValue.setPreferredSize(new java.awt.Dimension(91,16));
+        jPanelPcdFieldsThirdRow = new JPanel();
+        jPanelPcdFieldsThirdRow.setLayout(flowLayout3);
+        jPanelPcdFieldsThirdRow.add(jLabelPcdDefaultValue, null);
+        jPanelPcdFieldsThirdRow.add(getJTextFieldPcdDefault(), null);
+        jPanelPcdFieldsThirdRow.add(getJComboBoxFeatureFlagValue(), null);
     }
-    return jPanel11;
+    return jPanelPcdFieldsThirdRow;
 }
 /**
- * This method initializes jPanel12	
+ * This method initializes jPanelPcdFieldsFirstRow
  * 	
  * @return javax.swing.JPanel	
  */
-private JPanel getJPanel12() {
-    if (jPanel12 == null) {
+private JPanel getJPanelPcdFieldsFirstRow() {
+    if (jPanelPcdFieldsFirstRow == null) {
         FlowLayout flowLayout1 = new FlowLayout();
         flowLayout1.setAlignment(java.awt.FlowLayout.LEFT);
-        jLabel9 = new JLabel();
-        jLabel9.setText("Item Type");
-        jLabel9.setPreferredSize(new java.awt.Dimension(91,16));
-        jPanel12 = new JPanel();
-        jPanel12.setLayout(flowLayout1);
-        jPanel12.add(jLabel9, null);
-        jPanel12.add(getJComboBox(), null);
-        jPanel12.add(getJButton6(), null);
+        jLabelItemType = new JLabel();
+        jLabelItemType.setText("Item Type");
+        jLabelItemType.setPreferredSize(new java.awt.Dimension(91,16));
+        jPanelPcdFieldsFirstRow = new JPanel();
+        jPanelPcdFieldsFirstRow.setLayout(flowLayout1);
+        jPanelPcdFieldsFirstRow.add(jLabelItemType, null);
+        jPanelPcdFieldsFirstRow.add(getJComboBoxItemType(), null);
+        jPanelPcdFieldsFirstRow.add(getJButtonUpdatePcd(), null);
     }
-    return jPanel12;
+    return jPanelPcdFieldsFirstRow;
 }
 /**
- * This method initializes jComboBox	
+ * This method initializes jComboBoxItemType
  * 	
  * @return javax.swing.JComboBox	
  */
-private JComboBox getJComboBox() {
-    if (jComboBox == null) {
-        jComboBox = new JComboBox();
-        jComboBox.setPreferredSize(new java.awt.Dimension(200,20));
-        jComboBox.addItemListener(new java.awt.event.ItemListener() {
+private JComboBox getJComboBoxItemType() {
+    if (jComboBoxItemType == null) {
+        jComboBoxItemType = new JComboBox();
+        jComboBoxItemType.setPreferredSize(new java.awt.Dimension(200,20));
+        jComboBoxItemType.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
-                int row = jTable.getSelectedRow();
-                if (row < 0 || jTable.getValueAt(row, 2).equals(jComboBox.getSelectedItem())) {
+                int row = jTablePcd.getSelectedRow();
+                if (row < 0 || jTablePcd.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
                     return;
                 }
-                if (jComboBox.getItemCount() == 3) {
-                    if (!jComboBox.getSelectedItem().equals("DYNAMIC")) {
-                        pcdDynamicToNonDynamic(jTable.getValueAt(row, 0)+"", jTable.getValueAt(row, 1)+"");
+                if (jComboBoxItemType.getItemCount() == 3) {
+                    if (!jComboBoxItemType.getSelectedItem().equals("DYNAMIC")) {
+                        pcdDynamicToNonDynamic(jTablePcd.getValueAt(row, 0)+"", jTablePcd.getValueAt(row, 1)+"");
                     }
                     else{
-                        pcdNonDynamicToDynamic(jTable.getValueAt(row, 0)+"", jTable.getValueAt(row, 1)+"");
+                        pcdNonDynamicToDynamic(jTablePcd.getValueAt(row, 0)+"", jTablePcd.getValueAt(row, 1)+"");
                     }
                 }
             }
         });
     }
-    return jComboBox;
+    return jComboBoxItemType;
 }
 
 private void pcdDynamicToNonDynamic(String cName, String tsGuid) {
@@ -1501,8 +1503,8 @@ private void pcdDynamicToNonDynamic(String cName, String tsGuid) {
     for (int i = 0; i < al.size(); ++i) {
         String[] s = al.get(i).split(" ");
         String mKey = s[0] + s[1] + s[2] + s[3];
-        ffc.updatePcdData(mKey, cName, tsGuid, jComboBox.getSelectedItem()+"", maxSize, value);
-        s[4] = jComboBox.getSelectedItem()+"";
+        ffc.updatePcdData(mKey, cName, tsGuid, jComboBoxItemType.getSelectedItem()+"", maxSize, value);
+        s[4] = jComboBoxItemType.getSelectedItem()+"";
         al.set(i, s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" "+s[4]);
     }
     
@@ -1514,81 +1516,81 @@ private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
     for (int i = 0; i < al.size(); ++i) {
         String[] s = al.get(i).split(" ");
         String mKey = s[0] + " " + s[1]+ " " + s[2] + " " + s[3];
-        ffc.updatePcdData(mKey, cName, tsGuid, jComboBox.getSelectedItem()+"", jTextField3.getText(), jTextField4.isVisible() ? jTextField4.getText() : jComboBox1.getSelectedItem()+"");
-        s[4] = jComboBox.getSelectedItem()+"";
+        ffc.updatePcdData(mKey, cName, tsGuid, jComboBoxItemType.getSelectedItem()+"", jTextFieldMaxDatumSize.getText(), jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
+        s[4] = jComboBoxItemType.getSelectedItem()+"";
         al.set(i, s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" "+s[4]);
     }
     try{
-        ffc.addDynamicPcdBuildData(cName, jTable.getValueAt(jTable.getSelectedRow(), 3), tsGuid, "DYNAMIC", jTable.getValueAt(jTable.getSelectedRow(), 5)+"", jTextField4.isVisible() ? jTextField4.getText() : jComboBox1.getSelectedItem()+"");
+        ffc.addDynamicPcdBuildData(cName, jTablePcd.getValueAt(jTablePcd.getSelectedRow(), 3), tsGuid, "DYNAMIC", jTablePcd.getValueAt(jTablePcd.getSelectedRow(), 5)+"", jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
     }
     catch(Exception e){
         JOptionPane.showMessageDialog(frame, "PCD value format: " + e.getMessage());
     }
 }
 /**
- * This method initializes jTextField3	
+ * This method initializes jTextFieldMaxDatumSize
  * 	
  * @return javax.swing.JTextField	
  */
-private JTextField getJTextField3() {
-    if (jTextField3 == null) {
-        jTextField3 = new JTextField();
-        jTextField3.setPreferredSize(new java.awt.Dimension(200,20));
+private JTextField getJTextFieldMaxDatumSize() {
+    if (jTextFieldMaxDatumSize == null) {
+        jTextFieldMaxDatumSize = new JTextField();
+        jTextFieldMaxDatumSize.setPreferredSize(new java.awt.Dimension(200,20));
     }
-    return jTextField3;
+    return jTextFieldMaxDatumSize;
 }
 /**
  * This method initializes jTextField4	
  * 	
  * @return javax.swing.JTextField	
  */
-private JTextField getJTextField4() {
-    if (jTextField4 == null) {
-        jTextField4 = new JTextField();
-        jTextField4.setPreferredSize(new java.awt.Dimension(200,20));
+private JTextField getJTextFieldPcdDefault() {
+    if (jTextFieldPcdDefault == null) {
+        jTextFieldPcdDefault = new JTextField();
+        jTextFieldPcdDefault.setPreferredSize(new java.awt.Dimension(200,20));
     }
-    return jTextField4;
+    return jTextFieldPcdDefault;
 }
 /**
  * This method initializes jButton6	
  * 	
  * @return javax.swing.JButton	
  */
-private JButton getJButton6() {
-    if (jButton6 == null) {
-        jButton6 = new JButton();
-        jButton6.setPreferredSize(new java.awt.Dimension(150,20));
-        jButton6.setText("Update PCD Data");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
+private JButton getJButtonUpdatePcd() {
+    if (jButtonUpdatePcd == null) {
+        jButtonUpdatePcd = new JButton();
+        jButtonUpdatePcd.setPreferredSize(new java.awt.Dimension(150,20));
+        jButtonUpdatePcd.setText("Update PCD Data");
+        jButtonUpdatePcd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent e) {
-                int row = jTable.getSelectedRow();
+                int row = jTablePcd.getSelectedRow();
                 if (row < 0) {
                     return;
                 }
                 docConsole.setSaved(false);
-                model.setValueAt(jComboBox.getSelectedItem(), row, 2);
-                model.setValueAt(jTextField3.getText(), row, 4);
-                model.setValueAt(jTextField4.isVisible()? jTextField4.getText():jComboBox1.getSelectedItem(), row, 6);
+                model.setValueAt(jComboBoxItemType.getSelectedItem(), row, 2);
+                model.setValueAt(jTextFieldMaxDatumSize.getText(), row, 4);
+                model.setValueAt(jTextFieldPcdDefault.isVisible()? jTextFieldPcdDefault.getText():jComboBoxFeatureFlagValue.getSelectedItem(), row, 6);
                 ffc.updatePcdData(moduleKey, model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"", model.getValueAt(row, 2)+"", model.getValueAt(row, 4)+"", model.getValueAt(row, 6)+"");
             }
         });
     }
-    return jButton6;
+    return jButtonUpdatePcd;
 }
 /**
- * This method initializes jComboBox1	
+ * This method initializes jComboBoxFeatureFlagValue
  * 	
  * @return javax.swing.JComboBox	
  */
-private JComboBox getJComboBox1() {
-    if (jComboBox1 == null) {
-        jComboBox1 = new JComboBox();
-        jComboBox1.setPreferredSize(new java.awt.Dimension(100,20));
-        jComboBox1.setVisible(false);
-        jComboBox1.addItem("true");
-        jComboBox1.addItem("false");
+private JComboBox getJComboBoxFeatureFlagValue() {
+    if (jComboBoxFeatureFlagValue == null) {
+        jComboBoxFeatureFlagValue = new JComboBox();
+        jComboBoxFeatureFlagValue.setPreferredSize(new java.awt.Dimension(100,20));
+        jComboBoxFeatureFlagValue.setVisible(false);
+        jComboBoxFeatureFlagValue.addItem("true");
+        jComboBoxFeatureFlagValue.addItem("false");
     }
-    return jComboBox1;
+    return jComboBoxFeatureFlagValue;
 }
 
 

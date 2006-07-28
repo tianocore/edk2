@@ -518,7 +518,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         
         while(ispi.hasNext()) {
             PackageIdentification pi = (PackageIdentification)ispi.next();
-            if ( !pi.getGuid().equals(keyPart[2])){ 
+            if ( !pi.getGuid().equalsIgnoreCase(keyPart[2])){ 
 
                 continue;
             }
@@ -531,7 +531,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             Iterator ismi = smi.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                if (mi.getGuid().equals(keyPart[0])){
+                if (mi.getGuid().equalsIgnoreCase(keyPart[0])){
                     if (keyPart[1] != null && keyPart[1].length() > 0 && !keyPart[1].equals("null")){
                         if(!mi.getVersion().equals(keyPart[1])){
                             continue;
