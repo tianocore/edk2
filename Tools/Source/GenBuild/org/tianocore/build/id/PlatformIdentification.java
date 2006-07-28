@@ -51,10 +51,10 @@ public class PlatformIdentification extends Identification{
     }
     
     public String getRelativeFpdFile (){
-        return fpdFile.getPath().substring(GlobalData.getWorkspacePath().length());
+        return fpdFile.getPath().substring(GlobalData.getWorkspacePath().length() + 1);
     }
     
     public String getPlatformRelativeDir(){
-        return fpdFile.getParent().substring(GlobalData.getWorkspacePath().length());
+        return fpdFile.getParent().substring(GlobalData.getWorkspacePath().length() + 1);
     }
 }

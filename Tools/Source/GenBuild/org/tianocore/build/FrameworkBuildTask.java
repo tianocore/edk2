@@ -96,8 +96,10 @@ public class FrameworkBuildTask extends Task{
         //
         // Global Data initialization
         //
+        File workspacePath = new File(getProject().getProperty("WORKSPACE"));
+        getProject().setProperty("WORKSPACE_DIR", workspacePath.getPath().replaceAll("(\\\\)", "/"));
         GlobalData.initInfo("Tools" + File.separatorChar + "Conf" + File.separatorChar + "FrameworkDatabase.db",
-                            getProject().getProperty("WORKSPACE_DIR"), toolsDefFilename);
+                workspacePath.getPath(), toolsDefFilename);
         
 
         
