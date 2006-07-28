@@ -108,7 +108,7 @@ public class DataHubsDlg extends IDialog {
     private JTextField getJTextFieldDataHubRecord() {
         if (jTextFieldDataHubRecord == null) {
             jTextFieldDataHubRecord = new JTextField();
-            jTextFieldDataHubRecord.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jTextFieldDataHubRecord.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jTextFieldDataHubRecord.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldDataHubRecord.setToolTipText("Enter the C Name of the Data Hub Record");
         }
@@ -124,7 +124,7 @@ public class DataHubsDlg extends IDialog {
     private JComboBox getJComboBoxUsage() {
         if (jComboBoxUsage == null) {
             jComboBoxUsage = new JComboBox();
-            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jComboBoxUsage.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxUsage
                           .setToolTipText("<html><table>"
@@ -145,7 +145,7 @@ public class DataHubsDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 105, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 107, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
         }
@@ -192,7 +192,7 @@ public class DataHubsDlg extends IDialog {
             jScrollPaneHelpText.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
             jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
-            jScrollPaneHelpText.setLocation(new java.awt.Point(160, 60));
+            jScrollPaneHelpText.setLocation(new java.awt.Point(168, 62));
             jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
         }
         return jScrollPaneHelpText;
@@ -207,7 +207,7 @@ public class DataHubsDlg extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 157, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 162, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -223,7 +223,7 @@ public class DataHubsDlg extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 157, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 162, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -239,7 +239,7 @@ public class DataHubsDlg extends IDialog {
      * 
      */
     private void init() {
-        this.setSize(500, 230);
+        this.setSize(505, 235);
         this.setContentPane(getJScrollPane());
         this.setTitle("Data Hubs");
         initFrame();
@@ -302,31 +302,31 @@ public class DataHubsDlg extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(2, 10));
+            jStarLabel1.setLocation(new java.awt.Point(2, 12));
             jLabelDataHubRecord = new JLabel();
-            jLabelDataHubRecord.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+            jLabelDataHubRecord.setBounds(new java.awt.Rectangle(12, 12, 155, 20));
             jLabelDataHubRecord.setText("Data Hub Record");
             jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(2, 35));
+            jStarLabel2.setLocation(new java.awt.Point(2, 37));
             jLabelUsage = new JLabel();
             jLabelUsage.setText("Usage");
-            jLabelUsage.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+            jLabelUsage.setBounds(new java.awt.Rectangle(12, 37, 155, 20));
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 60, 145, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(12, 62, 155, 20));
             jLabelHelpText.setText("Help Text");
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 105, 145, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 107, 155, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 130, 145, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 132, 155, 20));
             jLabelArch.setText("Supported Architectures");
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 130, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 132, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(485, 185));
+            jContentPane.setPreferredSize(new java.awt.Dimension(480, 180));
 
             jContentPane.add(jLabelDataHubRecord, null);
             jContentPane.add(jLabelUsage, null);
