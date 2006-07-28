@@ -382,7 +382,9 @@ private UUID translateSchemaStringToUUID(String uuidString)
         String                guidStringCName = null;
         String                guidString      = null;
         UsageInstance         usageInstance   = null;
+        boolean               found           = false;
 
+        usageInstanceArray = null;
         if (!isBuildUsedLibrary) {
             usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleName,
                                                                               moduleGuid,
@@ -392,10 +394,10 @@ private UUID translateSchemaStringToUUID(String uuidString)
                                                                               version);
             dbManager.UsageInstanceContext = usageInstanceArray;
             dbManager.CurrentModuleName    = moduleName; 
-        } else {
+        } else if ((pcdNameArray != null) && (pcdNameArray.length > 0)) {
             usageContext = dbManager.UsageInstanceContext;
             //
-            // For building MDE package, although all module are library, but PCD entries of 
+            // For building library package, although all module are library, but PCD entries of 
             // these library should be used to autogen.
             // 
             if (usageContext == null) {
@@ -407,22 +409,41 @@ private UUID translateSchemaStringToUUID(String uuidString)
                                                                                   version);
             } else {
                 usageInstanceArray = new ArrayList<UsageInstance>();
-                //
-                // Remove PCD entries which are not belong to this library.
-                // 
-                for (index = 0; index < usageContext.size(); index++) {
-                    if ((pcdNameArray == null) || (pcdNameArray.length == 0)){
-                        break;
-                    }
 
-                    for (index2 = 0; index2 < pcdNameArray.length; index2 ++) {
-                        if (pcdNameArray[index2].equalsIgnoreCase(usageContext.get(index).parentToken.cName)) {
-                            usageInstanceArray.add(usageContext.get(index));
+                //
+                // Try to find all PCD defined in library's PCD in all <PcdEntry> in module's 
+                // <ModuleSA> in FPD file.
+                // 
+                for (index = 0; index < pcdNameArray.length; index++) {
+                    found = false;
+                    for (index2 = 0; index2 < usageContext.size(); index2 ++) {
+                        if (pcdNameArray[index].equalsIgnoreCase(usageContext.get(index2).parentToken.cName)) {
+                            usageInstanceArray.add(usageContext.get(index2));
+                            found = true;
                             break;
                         }
                     }
+
+                    if (!found) {
+                        //
+                        // All library's PCD should instanted in module's <ModuleSA> who
+                        // use this library instance. If not, give errors.
+                        // 
+                        throw new BuildActionException (String.format("[PCD Autogen Error] Module %s use library instance %s, the PCD %s " +
+                                                                      "is required by this library instance, but can not find " +
+                                                                      "it in the %s's <ModuleSA> in FPD file!",
+                                                                      dbManager.CurrentModuleName,
+                                                                      moduleName,
+                                                                      pcdNameArray[index],
+                                                                      dbManager.CurrentModuleName
+                                                                      ));
+                    }
                 }
             }
+        }
+
+        if (usageInstanceArray == null) {
+            return;
         }
 
         //
