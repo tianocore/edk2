@@ -435,7 +435,7 @@ public class ModuleBuildFileGenerator {
         //
         // WORKSPACE
         //
-        includes.add("${WORKSPACE_DIR}");
+        includes.add("${WORKSPACE_DIR}" + File.separatorChar);
         
         //
         // Module iteself

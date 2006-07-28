@@ -262,7 +262,7 @@ public class FileProcess {
         Element includesEle = document.createElement("EXTRA.INC");
         for (int i = 0; i < includePaths.length; i++) {
             Element includeEle = document.createElement("includepath");
-            includeEle.setAttribute("path", includePaths[i]);
+            includeEle.setAttribute("path", project.replaceProperties(includePaths[i]));
             includesEle.appendChild(includeEle);
         }
         ele.appendChild(includesEle);
