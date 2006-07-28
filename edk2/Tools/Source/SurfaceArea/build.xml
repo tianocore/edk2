@@ -101,7 +101,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <copy file="${SURFACE_AREA_FILE}" tofile="${SURFACE_AREA_FILE}.xml"/>
     <java classname="org.apache.xmlbeans.impl.tool.InstanceValidator" 
           outputproperty="XMLBEANS_OUTPUT"
-          resultproperty="XMLBEANS_RESULT"
           errorproperty="XMLBEANS_ERROR">
           
       <classpath refid="classpath"/>
@@ -113,12 +112,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
     <delete file="${SURFACE_AREA_FILE}.xml" quiet="true"/>
     <if>
-      <contains string="${XMLBEANS_OUTPUT}" substring="NOT valid"/>
+      <or>
+        <contains string="${XMLBEANS_OUTPUT}" substring="NOT valid"/>
+        <contains string="${XMLBEANS_OUTPUT}" substring=": error:"/>
+        <contains string="${XMLBEANS_ERROR}" substring="XmlException"/>
+        <contains string="${XMLBEANS_ERROR}" substring=": error:"/>
+      </or>
       <then>
-        <fail message="Result ... ${XMLBEANS_OUTPUT}"/>
+        <echo message="Result ... ${XMLBEANS_OUTPUT}&#x0d;&#x0a;${XMLBEANS_ERROR}"/>
+        <fail message="${SURFACE_AREA_FILE} is invalid!"/>
       </then>
       <else>
-        <echo message="Result ... ${XMLBEANS_OUTPUT}"/>
+        <echo message="Result ... ${SURFACE_AREA_FILE} is valid"/>
       </else>
     </if>
   </target>
