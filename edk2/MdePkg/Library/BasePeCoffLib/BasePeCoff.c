@@ -144,7 +144,7 @@ PeCoffLoaderGetPeHeader (
   //
   // Use Signature to figure out if we understand the image format
   //
-  if (Hdr.Pe32->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+  if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
     ImageContext->IsTeImage         = TRUE;
     ImageContext->Machine           = Hdr.Te->Machine;
     ImageContext->ImageType         = (UINT16)(Hdr.Te->Subsystem);
