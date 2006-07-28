@@ -257,16 +257,16 @@ public class ExternsDlg extends IDialog implements ItemListener {
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelC_Name = new JLabel();
             jLabelC_Name.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
-            jLabelC_Name.setText("Value");
+            jLabelC_Name.setText("Enter Value");
             jLabelName = new JLabel();
-            jLabelName.setText("Choose Type");
+            jLabelName.setText("Choose Extern Type");
             jLabelName.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
             jLabelArch = new JLabel();
             jLabelArch.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
-            jLabelArch.setText("Arch");
+            jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
-            jLabelFeatureFlag.setText("Feature Flag");
+            jLabelFeatureFlag.setText("Feature Flag Expression");
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);

@@ -348,7 +348,7 @@ public class EventsDlg extends IDialog {
       jStarLabel1 = new StarLabel();
       jStarLabel1.setLocation(new java.awt.Point(2, 10));
       jLabelEventType = new JLabel();
-      jLabelEventType.setText("Type");
+      jLabelEventType.setText("Select Event Type");
       jLabelEventType.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
 
       jStarLabel2 = new StarLabel();
@@ -360,7 +360,7 @@ public class EventsDlg extends IDialog {
       jStarLabel3 = new StarLabel();
       jStarLabel3.setLocation(new java.awt.Point(2, 60));
       jLabelGroup = new JLabel();
-      jLabelGroup.setText("Event Type");
+      jLabelGroup.setText("Event Group Type");
       jLabelGroup.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
 
       jStarLabel4 = new StarLabel();
@@ -375,11 +375,11 @@ public class EventsDlg extends IDialog {
 
       jLabelFeatureFlag = new JLabel();
       jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 155, 145, 20));
-      jLabelFeatureFlag.setText("Feature Flag");
+      jLabelFeatureFlag.setText("Feature Flag Expression");
 
       jLabelArch = new JLabel();
       jLabelArch.setBounds(new java.awt.Rectangle(15, 180, 145, 20));
-      jLabelArch.setText("Arch");
+      jLabelArch.setText("Supported Architectures");
       jArchCheckBox = new ArchCheckBox();
       jArchCheckBox.setBounds(new java.awt.Rectangle(160, 180, 320, 20));
       jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));

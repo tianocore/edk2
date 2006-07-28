@@ -41,8 +41,9 @@ import org.tianocore.frameworkwizard.module.Identifications.Protocols.ProtocolsI
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update Protocol of MSA/MBD file 
- * It extends JDialog
+ * The class is used to create, update Protocol of MSA file
+ * 
+ * It extends IDialog
  * 
  */
 public class ProtocolsDlg extends IDialog implements ItemListener {
@@ -134,7 +135,15 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
       jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
       jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
       jComboBoxUsage
-          .setToolTipText("<html><table><tr><td colspan=2>Protocol</td></tr><tr><td>ALWAYS_CONSUMED</td><td>Module always consumes the protocol</td></tr><tr><td>SOMETIMES_CONSUMES</td><td>Module sometimes consumes the protocol</td></tr><tr><td>ALWAYS_PRODUCED</td><td>Module always produces the protocol</td></tr><tr><td>SOMETIMES_PRODUCED</td><td>Module sometimes produces the protocol</td></tr><tr><td>TO_START</td><td>The protocol is consumed by a Driver Binding protocol <b>Start</b><br>function.  The protocol is used in EFI 1.10 driver model</td></tr><tr><td>BY_START</td><td>Protocol is produced by a Driver Binding protocol <b>Start</b><br>function. The protocol is used in EFI 1.10 driver model</td></tr><tr><td colspan=2>Protocol Notify</td></tr><tr><td>SOMETIMES_CONSUMED</td><td>Module will consume the protocol if it is produced.<br>Consumption is defined by executing the protocol notify<br>function.</td></tr></table></html>");
+          .setToolTipText("<html><table><tr><td colspan=2 align=center><b>Protocol</b></td></tr>"
+              + "<tr><td>ALWAYS_CONSUMED</td><td>Module always consumes the protocol</td></tr>"
+              + "<tr><td>SOMETIMES_CONSUMES</td><td>Module sometimes consumes the protocol</td></tr>"
+              + "<tr><td>ALWAYS_PRODUCED</td><td>Module always produces the protocol</td></tr>"
+              + "<tr><td>SOMETIMES_PRODUCED</td><td>Module sometimes produces the protocol</td></tr>"
+              + "<tr><td>TO_START</td><td>The protocol is consumed by a Driver Binding protocol <b>Start</b><br>function.  The protocol is used in EFI 1.10 driver model</td></tr>"
+              + "<tr><td>BY_START</td><td>Protocol is produced by a Driver Binding protocol <b>Start</b><br>function. The protocol is used in EFI 1.10 driver model</td></tr>"
+              + "<tr><td colspan=2 align=center><b>Protocol Notify</b></td></tr>"
+              + "<tr><td>SOMETIMES_CONSUMED</td><td>Module will consume the protocol if it is produced.<br>Consumption is defined by executing the protocol notify<br>function.</td></tr></table></html>");
     }
     return jComboBoxUsage;
   }
@@ -464,8 +473,8 @@ public class ProtocolsDlg extends IDialog implements ItemListener {
     String arg5 = this.jTextAreaHelpText.getText();
     id = new ProtocolsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
     return id;
-  } 
-
+  }
+  
   /*
    * (non-Javadoc)
    * 
