@@ -35,8 +35,10 @@ public class PcdCodedIdentification {
     private String help = null;
     
     private String type = null;
+    
+    private String usage = null;
 
-    public PcdCodedIdentification(String arg0, String arg1, String arg2, Vector<String> arg3, String arg4, String arg5, String arg6) {
+    public PcdCodedIdentification(String arg0, String arg1, String arg2, Vector<String> arg3, String arg4, String arg5, String arg6, String arg7) {
         this.name = (arg0 == null ? "" : arg0);
         this.guid = (arg1 == null ? "" : arg1);
         this.featureFlag = (arg2 == null ? "" : arg2);
@@ -44,6 +46,7 @@ public class PcdCodedIdentification {
         this.value = (arg4 == null ? "" : arg4);
         this.help = (arg5 == null ? "" : arg5);
         this.type = (arg6 == null ? "" : arg6);
+        this.usage = (arg7 == null ? "" : arg7);
     }
 
     public String getFeatureFlag() {
@@ -107,5 +110,13 @@ public class PcdCodedIdentification {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    public String getUsage() {
+        return usage;
+    }
+
+    public void setUsage(String usage) {
+        this.usage = usage;
     }
 }

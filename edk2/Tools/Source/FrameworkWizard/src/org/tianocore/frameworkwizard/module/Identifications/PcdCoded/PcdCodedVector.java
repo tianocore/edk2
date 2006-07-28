@@ -92,6 +92,7 @@ public class PcdCodedVector {
         v.addElement(getPcdCoded(index).getName());
         v.addElement(getPcdCoded(index).getType());
         v.addElement(getPcdCoded(index).getValue());
+        v.addElement(getPcdCoded(index).getUsage());
         return v;
     }
 }
