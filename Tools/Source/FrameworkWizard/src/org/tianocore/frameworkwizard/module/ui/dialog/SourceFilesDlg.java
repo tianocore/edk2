@@ -276,6 +276,7 @@ public class SourceFilesDlg extends IDialog {
         this.setTitle("Source Files");
         this.setViewMode(false);
         this.centerWindow();
+        Tools.generateComboBoxByVector(iComboBoxToolCode, ed.getVToolCode());
     }
 
     /**         
