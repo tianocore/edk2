@@ -1052,7 +1052,7 @@ public class MsaHeader extends IInternalFrame {
                 }
             }
         }
-        
+
         this.save();
     }
 }

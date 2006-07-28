@@ -224,7 +224,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
             if (id.getType().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
                 this.jComboBoxPcdIsDriver.setSelectedItem(id.getName());
             } else {
-                this.jTextFieldC_Name.setText(id.getName());    
+                this.jTextFieldC_Name.setText(id.getName());
             }
             this.jComboBoxType.setSelectedItem(id.getType());
             this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
@@ -380,7 +380,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
         if (this.jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
             arg0 = this.jComboBoxPcdIsDriver.getSelectedItem().toString();
         } else {
-            arg0 = this.jTextFieldC_Name.getText();    
+            arg0 = this.jTextFieldC_Name.getText();
         }
         String arg1 = this.jComboBoxType.getSelectedItem().toString();
 

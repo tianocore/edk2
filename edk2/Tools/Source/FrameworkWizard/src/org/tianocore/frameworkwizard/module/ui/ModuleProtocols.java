@@ -307,7 +307,7 @@ public class ModuleProtocols extends IInternalFrame {
         }
         return jContentPane;
     }
-    
+
     private void showEdit(int index) {
         ProtocolsDlg dlg = new ProtocolsDlg(vid.getProtocols(index), new IFrame());
         int result = dlg.showDialog();
@@ -450,7 +450,7 @@ public class ModuleProtocols extends IInternalFrame {
             Log.err("Update Protocols", e.getMessage());
         }
     }
-    
+
     /* (non-Javadoc)
      * @see javax.swing.event.ListSelectionListener#valueChanged(javax.swing.event.ListSelectionEvent)
      *

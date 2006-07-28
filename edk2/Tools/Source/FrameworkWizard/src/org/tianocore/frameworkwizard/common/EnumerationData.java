@@ -84,6 +84,8 @@ public class EnumerationData {
     
     public Vector<String> vSourceFilesFileType = new Vector<String>();
     
+    public Vector<String> vToolCode = new Vector<String>();
+    
     //
     // Used by Package Dependencies
     //
@@ -203,6 +205,7 @@ public class EnumerationData {
         //
         initSourceFilesToolChainFamily();
         initSourceFilesFileType();
+        initToolCode();
         
         //
         // Used by Package Dependencies
@@ -489,6 +492,18 @@ public class EnumerationData {
         vSourceFilesFileType.addElement("FV");
         vSourceFilesFileType.addElement("FFS");
         vSourceFilesFileType.addElement("EFI");
+    }
+    
+    private void initToolCode() {
+        vToolCode.removeAllElements();
+        vToolCode.addElement(DataType.EMPTY_SELECT_ITEM);
+        vToolCode.addElement("CC");
+        vToolCode.addElement("DLINK");
+        vToolCode.addElement("SLINK");
+        vToolCode.addElement("PP");
+        vToolCode.addElement("ASM");
+        vToolCode.addElement("ASMLINK");
+        vToolCode.addElement("ASL");
     }
     
     private void initPackageUsage() {
@@ -1009,5 +1024,13 @@ public class EnumerationData {
 
     public void setVPackageUsage(Vector<String> packageUsage) {
         vPackageUsage = packageUsage;
+    }
+
+    public Vector<String> getVToolCode() {
+        return vToolCode;
+    }
+
+    public void setVToolCode(Vector<String> toolCode) {
+        vToolCode = toolCode;
     }
 }

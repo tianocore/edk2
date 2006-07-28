@@ -2599,10 +2599,12 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      **/
     private void doubleClickModuleTreeNode() {
-        Identification id = iTree.getSelectNode().getId();
-        int intCategory = iTree.getSelectCategory();
+        Identification id = null;
+        int intCategory = -1;
         String path = null;
         try {
+            id = iTree.getSelectNode().getId();
+            intCategory = iTree.getSelectCategory();
             //          
             // If the node is not opened yet
             // Insert top level elements first
@@ -2894,8 +2896,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                 try {
                     wt.addPackageToDatabase(smb.getPid());
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Log.err("addPackageToDatabase", e.getMessage());
                 }
                 vPackageList.addElement(smb.getPid());
 
@@ -2932,8 +2933,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                 try {
                     wt.addPlatformToDatabase(smb.getFid());
                 } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    Log.err("addPlatformToDatabase", e.getMessage());
                 }
                 vPlatformList.addElement(smb.getFid());
                 //

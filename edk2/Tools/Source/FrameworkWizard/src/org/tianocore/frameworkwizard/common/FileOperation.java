@@ -40,26 +40,8 @@ public class FileOperation {
      **/
     public static void newFolder(String folderPath) throws Exception {
         folderPath = Tools.convertPathToCurrentOsType(folderPath);
-        String temp = "";
-        while (folderPath.length() > 0) {
-            if (folderPath.indexOf(DataType.FILE_SEPARATOR) > -1) {
-                temp = temp + folderPath.substring(0, folderPath.indexOf(DataType.FILE_SEPARATOR));
-                if (temp.endsWith(":")) {
-                    temp = Tools.addFileSeparator(temp);
-                    folderPath = folderPath.substring(folderPath.indexOf(DataType.FILE_SEPARATOR) + DataType.FILE_SEPARATOR.length());
-                    continue;
-                }
-                temp = Tools.addFileSeparator(temp);
-                folderPath = folderPath.substring(folderPath.indexOf(DataType.FILE_SEPARATOR) + DataType.FILE_SEPARATOR.length());    
-            } else {
-                temp = Tools.addFileSeparator(temp) + folderPath;
-                folderPath = "";
-            }
-            File f = new File(temp);
-            if (!f.exists()) {
-                f.mkdir();
-            }
-        }
+        File f = new File(folderPath);
+        f.mkdirs();
     }
 
     /**

@@ -65,9 +65,9 @@ public class ModuleDefinitions extends IInternalFrame {
     private StarLabel jStarLabel2 = null;
 
     private StarLabel jStarLabel3 = null;
-    
+
     private OpeningModuleType omt = null;
-    
+
     private ClonedFrom cf = null;
 
     private ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = null;
@@ -136,12 +136,12 @@ public class ModuleDefinitions extends IInternalFrame {
         if (iCheckBoxListArch == null) {
             iCheckBoxListArch = new ICheckBoxList();
             iCheckBoxListArch.addFocusListener(this);
-            iCheckBoxListArch.setToolTipText("<html>Deselecting a checkbox will restrict this module<br>" +
-                    "for use with the selected architectures, <br>" +
-                    "based on the list of items that are checked. <br>" +
-                    "If all boxes are checked, <br>" +
-                    "then the module will support all <br>" +
-                    "current AND FUTURE architectures</html>");
+            iCheckBoxListArch.setToolTipText("<html>Deselecting a checkbox will restrict this module<br>"
+                                             + "for use with the selected architectures, <br>"
+                                             + "based on the list of items that are checked. <br>"
+                                             + "If all boxes are checked, <br>"
+                                             + "then the module will support all <br>"
+                                             + "current AND FUTURE architectures</html>");
         }
         return iCheckBoxListArch;
     }
@@ -157,14 +157,14 @@ public class ModuleDefinitions extends IInternalFrame {
             jComboBoxBinaryModule.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
             jComboBoxBinaryModule.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxBinaryModule.addFocusListener(this);
-            jComboBoxBinaryModule.setToolTipText("<html>Modules are either source modules <br>" +
-                                                 "which can be compiled or binary <br>" +
-                                                 "modules which are linked.  <br>" +
-                                                 "A module cannot contain both. <br>" +
-                                                 "The GUID numbers should be identical <br>" +
-                                                 "for a binary and source MSA, <br>" +
-                                                 "but the BINARY MSA should have <br>" +
-                                                 "a higher version number.</html>");
+            jComboBoxBinaryModule.setToolTipText("<html>Modules are either source modules <br>"
+                                                 + "which can be compiled or binary <br>"
+                                                 + "modules which are linked.  <br>"
+                                                 + "A module cannot contain both. <br>"
+                                                 + "The GUID numbers should be identical <br>"
+                                                 + "for a binary and source MSA, <br>"
+                                                 + "but the BINARY MSA should have <br>"
+                                                 + "a higher version number.</html>");
         }
         return jComboBoxBinaryModule;
     }
@@ -231,7 +231,7 @@ public class ModuleDefinitions extends IInternalFrame {
         this.omt = inOmt;
         this.msa = omt.getXmlMsa();
         if (msa.getModuleDefinitions() != null) {
-            this.cf = msa.getModuleDefinitions().getClonedFrom();    
+            this.cf = msa.getModuleDefinitions().getClonedFrom();
         }
         init(msa.getModuleDefinitions());
         this.setVisible(true);
@@ -283,7 +283,7 @@ public class ModuleDefinitions extends IInternalFrame {
         this.iCheckBoxListArch.setAllItems(ed.getVSupportedArchitectures());
         Tools.generateComboBoxByVector(jComboBoxBinaryModule, ed.getVBoolean());
     }
-    
+
     private boolean check() {
         if (isEmpty(this.jTextFieldOutputFileBasename.getText())) {
             Log.wrn("Update Definitions", "Output File Basename couldn't be empty!");
@@ -332,7 +332,7 @@ public class ModuleDefinitions extends IInternalFrame {
             } else {
                 md.setBinaryModule(true);
             }
-            
+
             //
             // Set ClonedFrom field
             //
@@ -344,9 +344,9 @@ public class ModuleDefinitions extends IInternalFrame {
             // Save Arch list
             //
             md.setSupportedArchitectures(this.iCheckBoxListArch.getAllCheckedItemsString());
-            
+
             msa.setModuleDefinitions(md);
-            
+
             this.omt.setSaved(false);
 
         } catch (Exception e) {
