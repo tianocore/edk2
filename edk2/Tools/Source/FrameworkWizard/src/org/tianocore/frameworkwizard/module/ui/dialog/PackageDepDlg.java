@@ -38,83 +38,82 @@ import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- The class is used to create, update Include of MSA/MBD file
- It extends IInternalFrame
- 
-
-
- **/
+ * The class is used to create, update Include of MSA/MBD file It extends
+ * IInternalFrame
+ * 
+ * 
+ * 
+ */
 public class PackageDepDlg extends IDialog implements ItemListener {
+  // /
+  // / Define class Serial Version UID
+  // /
+  private static final long serialVersionUID = 3465193035145152131L;
 
-    ///
-    /// Define class Serial Version UID
-    ///
-    private static final long serialVersionUID = 3465193035145152131L;
+  //
+  // Define class members
+  //
+  private JPanel jContentPane = null;
 
-    //
-    //Define class members
-    //
-    private JPanel jContentPane = null;
+  private JLabel jLabelPackageName = null;
 
-    private JLabel jLabelPackageName = null;
+  private StarLabel jStarLabel1 = null;
 
-    private StarLabel jStarLabel1 = null;
+  private JComboBox jComboBoxPackageName = null;
 
-    private JComboBox jComboBoxPackageName = null;
+  private JLabel jLabelPackageGuid = null;
 
-    private JLabel jLabelPackageGuid = null;
+  private JTextField jTextFieldPackageGuid = null;
 
-    private JTextField jTextFieldPackageGuid = null;
+  private JButton jButtonGenerateGuid = null;
 
-    private JButton jButtonGenerateGuid = null;
+  private JLabel jLabelPackageVersion = null;
 
-    private JLabel jLabelPackageVersion = null;
+  private JTextField jTextFieldPackageVersion = null;
 
-    private JTextField jTextFieldPackageVersion = null;
+  private JLabel jLabelFeatureFlag = null;
 
-    private JLabel jLabelFeatureFlag = null;
+  private JTextField jTextFieldFeatureFlag = null;
 
-    private JTextField jTextFieldFeatureFlag = null;
+  private JScrollPane jScrollPane = null;
 
-    private JScrollPane jScrollPane = null;
+  private JLabel jLabelArch = null;
 
-    private JLabel jLabelArch = null;
+  private ArchCheckBox jArchCheckBox = null;
 
-    private ArchCheckBox jArchCheckBox = null;
+  private JButton jButtonOk = null;
 
-    private JButton jButtonOk = null;
+  private JButton jButtonCancel = null;
 
-    private JButton jButtonCancel = null;
+  //
+  // Not used by UI
+  //
+  private PackageDependenciesIdentification pdid = null;
 
-    //
-    // Not used by UI
-    //
-    private PackageDependenciesIdentification pdid = null;
+  private WorkspaceTools wt = new WorkspaceTools();
 
-    private WorkspaceTools wt = new WorkspaceTools();
+  private Vector<PackageIdentification> vPackage = wt.getAllPackages();
 
-    private Vector<PackageIdentification> vPackage = wt.getAllPackages();
-
-    /**
-     * This method initializes jComboBoxPackageName	
-     * 	
-     * @return javax.swing.JComboBox	
-     */
+  /**
+   * This method initializes jComboBoxPackageName
+   * 
+   * @return javax.swing.JComboBox
+   */
     private JComboBox getJComboBoxPackageName() {
-        if (jComboBoxPackageName == null) {
-            jComboBoxPackageName = new JComboBox();
-            jComboBoxPackageName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-            jComboBoxPackageName.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxPackageName.setToolTipText("If your Module requires a package list that here.");
-            jComboBoxPackageName.addItemListener(this);
-        }
-        return jComboBoxPackageName;
+      if (jComboBoxPackageName == null) {
+        jComboBoxPackageName = new JComboBox();
+        jComboBoxPackageName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+        jComboBoxPackageName.setPreferredSize(new java.awt.Dimension(320, 20));
+        jComboBoxPackageName.setToolTipText("If your Module requires a package list that here.");
+        jComboBoxPackageName.addItemListener(this);
+      }
+      return jComboBoxPackageName;
     }
 
     /**
-     * This method initializes jTextFieldPackageGuid	
-     * 	
-     * @return javax.swing.JTextField	
+     * This method initializes jTextFieldPackageGuid
+     * 
+     * @return javax.swing.JTextField
      */
     private JTextField getJTextFieldPackageGuid() {
         if (jTextFieldPackageGuid == null) {
@@ -128,9 +127,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes jButtonGenerateGuid	
-     * 	
-     * @return javax.swing.JButton	
+     * This method initializes jButtonGenerateGuid
+     * 
+     * @return javax.swing.JButton
      */
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
@@ -145,9 +144,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes jTextFieldPackageVersion	
-     * 	
-     * @return javax.swing.JTextField	
+     * This method initializes jTextFieldPackageVersion
+     * 
+     * @return javax.swing.JTextField
      */
     private JTextField getJTextFieldPackageVersion() {
         if (jTextFieldPackageVersion == null) {
@@ -161,9 +160,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes jTextFieldFeatureFlag    
-     *  
-     * @return javax.swing.JTextField   
+     * This method initializes jTextFieldFeatureFlag
+     * 
+     * @return javax.swing.JTextField
      */
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
@@ -175,9 +174,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This method initializes jScrollPane  
-     
-     @return javax.swing.JScrollPane  
+     * This method initializes jScrollPane
+     * 
+     * @return javax.swing.JScrollPane
      */
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
@@ -188,11 +187,11 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This method initializes jButtonOk   
-     
-     @return javax.swing.JButton 
-     
-     **/
+     * This method initializes jButtonOk
+     * 
+     * @return javax.swing.JButton
+     * 
+     */
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
@@ -204,11 +203,11 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This method initializes jButtonCancel   
-     
-     @return javax.swing.JButton 
-     
-     **/
+     * This method initializes jButtonCancel
+     * 
+     * @return javax.swing.JButton
+     * 
+     */
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
@@ -224,9 +223,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This method initializes this
-     
-     **/
+     * This method initializes this
+     * 
+     */
     private void init() {
         this.setSize(508, 188);
         this.setContentPane(getJScrollPane());
@@ -237,9 +236,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This method initializes this
-     
-     **/
+     * This method initializes this
+     * 
+     */
     private void init(PackageDependenciesIdentification inPackageDependenciesIdentification) {
         init();
         this.pdid = inPackageDependenciesIdentification;
@@ -253,20 +252,21 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This is the default constructor
-     
-     **/
+     * This is the default constructor
+     * 
+     */
     public PackageDepDlg(PackageDependenciesIdentification inPackageDependenciesIdentification, IFrame iFrame) {
         super(iFrame, true);
         init(inPackageDependenciesIdentification);
     }
 
     /**
-     Disable all components when the mode is view
-     
-     @param isView true - The view mode; false - The non-view mode
-     
-     **/
+     * Disable all components when the mode is view
+     * 
+     * @param isView
+     *          true - The view mode; false - The non-view mode
+     * 
+     */
     public void setViewMode(boolean isView) {
         if (isView) {
             this.jComboBoxPackageName.setEnabled(!isView);
@@ -274,52 +274,54 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This method initializes jContentPane
-     
-     @return javax.swing.JPanel jContentPane
-     
-     **/
+     * This method initializes jContentPane
+     * 
+     * @return javax.swing.JPanel jContentPane
+     * 
+     */
     private JPanel getJContentPane() {
         if (jContentPane == null) {
-            jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
-            jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
-            jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
-            jLabelArch.setText("Sup Arch List");
-            jLabelPackageVersion = new JLabel();
-            jLabelPackageVersion.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
-            jLabelPackageVersion.setText("Package Version");
-            jLabelPackageGuid = new JLabel();
-            jLabelPackageGuid.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
-            jLabelPackageGuid.setText("Package Guid");
-            jLabelPackageGuid.setVisible(false);
-            jLabelPackageName = new JLabel();
-            jLabelPackageName.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
-            jLabelPackageName.setText("Package Name");
+          jStarLabel1 = new StarLabel();
+          jStarLabel1.setLocation(new java.awt.Point(2, 10));
+          jLabelPackageName = new JLabel();
+          jLabelPackageName.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+          jLabelPackageName.setText("Package Name");
+
+          jLabelPackageVersion = new JLabel();
+          jLabelPackageVersion.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+          jLabelPackageVersion.setText("Package Version");
+
+          jLabelPackageGuid = new JLabel();
+          jLabelPackageGuid.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+          jLabelPackageGuid.setText("Package Guid");
+          jLabelPackageGuid.setVisible(false);
+
+          jLabelFeatureFlag = new JLabel();
+          jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
+          jLabelFeatureFlag.setText("Feature Flag Expression");
+
+          jLabelArch = new JLabel();
+          jLabelArch.setBounds(new java.awt.Rectangle(15, 85, 145, 20));
+          jLabelArch.setText("Supported Architectures");
+          jArchCheckBox = new ArchCheckBox();
+          jArchCheckBox.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+          jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 140));
-
-            jContentPane.add(jLabelPackageName, null);
-            jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(0, 10));
-
+            jContentPane.setPreferredSize(new java.awt.Dimension(485, 145));
+            
             jContentPane.add(jStarLabel1, null);
+            jContentPane.add(jLabelPackageName, null);
             jContentPane.add(getJComboBoxPackageName(), null);
             jContentPane.add(jLabelPackageGuid, null);
             jContentPane.add(getJTextFieldPackageGuid(), null);
-            jContentPane.add(getJButtonGenerateGuid(), null);
             jContentPane.add(jLabelPackageVersion, null);
             jContentPane.add(getJTextFieldPackageVersion(), null);
-
-            jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
-            jLabelFeatureFlag.setText("Feature Flag");
+            // LAH Not Used here
+            // jContentPane.add(getJButtonGenerateGuid(), null);
             jContentPane.add(jLabelFeatureFlag, null);
             jContentPane.add(getJTextFieldFeatureFlag(), null);
-
             jContentPane.add(jLabelArch, null);
             jContentPane.add(jArchCheckBox, null);
             jContentPane.add(getJButtonOk(), null);
@@ -328,9 +330,11 @@ public class PackageDepDlg extends IDialog implements ItemListener {
         return jContentPane;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-     *
+     * 
      * Override actionPerformed to listen all actions
      * 
      */
@@ -350,9 +354,9 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     This method initializes Usage type, Package type and Arch type
-     
-     **/
+     * This method initializes Usage type, Package type and Arch type
+     * 
+     */
     private void initFrame() {
         for (int index = 0; index < vPackage.size(); index++) {
             jComboBoxPackageName.addItem(vPackage.elementAt(index).getName());
@@ -360,29 +364,29 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     Data validation for all fields before add current item to Vector
-     
-     @retval true - All datas are valid
-     @retval false - At least one data is invalid
-     
-     **/
+     * Data validation for all fields before add current item to Vector
+     * 
+     * @retval true - All datas are valid
+     * @retval false - At least one data is invalid
+     * 
+     */
     public boolean checkAdd() {
         //
-        // Check if all fields have correct data types 
+        // Check if all fields have correct data types
         //
 
         //
-        // Check PackageGuid 
+        // Check PackageGuid
         //
-//        if (!isEmpty(this.jTextFieldPackageGuid.getText())) {
-//            if (!DataValidation.isGuid(this.jTextFieldPackageGuid.getText())) {
-//                Log.err("Incorrect data type for Package Guid");
-//                return false;
-//            }
-//        }
+      // if (!isEmpty(this.jTextFieldPackageGuid.getText())) {
+// if (!DataValidation.isGuid(this.jTextFieldPackageGuid.getText())) {
+// Log.err("Incorrect data type for Package Guid");
+// return false;
+// }
+// }
 
         //
-        // Check PackageVersion 
+        // Check PackageVersion
         //
         if (!isEmpty(this.jTextFieldPackageVersion.getText())) {
             if (!DataValidation.isVersion(this.jTextFieldPackageVersion.getText())) {
@@ -416,9 +420,11 @@ public class PackageDepDlg extends IDialog implements ItemListener {
         return pdid;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
-     *
+     * 
      * Reflesh the frame when selected item changed
      * 
      */

@@ -309,7 +309,7 @@ public class PpisDlg extends IDialog implements ItemListener {
       jStarLabel1.setLocation(new java.awt.Point(2, 10));
       jLabelPpiType = new JLabel();
       jLabelPpiType.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
-      jLabelPpiType.setText("Ppi Type");
+      jLabelPpiType.setText("Select Ppi Type");
 
       jStarLabel2 = new StarLabel();
       jStarLabel2.setLocation(new java.awt.Point(2, 35));
@@ -328,12 +328,12 @@ public class PpisDlg extends IDialog implements ItemListener {
       jLabelHelpText.setText("Help Text");
 
       jLabelFeatureFlag = new JLabel();
-      jLabelFeatureFlag.setText("Feature Flag");
+      jLabelFeatureFlag.setText("Feature Flag Expression");
       jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 130, 145, 20));
 
       jLabelArch = new JLabel();
       jLabelArch.setBounds(new java.awt.Rectangle(15, 155, 145, 20));
-      jLabelArch.setText("Arch");
+      jLabelArch.setText("Supported Architectures");
       jArchCheckBox = new ArchCheckBox();
       jArchCheckBox.setBounds(new java.awt.Rectangle(160, 155, 320, 20));
       jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));

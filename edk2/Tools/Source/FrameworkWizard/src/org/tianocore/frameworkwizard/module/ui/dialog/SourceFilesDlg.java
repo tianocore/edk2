@@ -307,7 +307,7 @@ public class SourceFilesDlg extends IDialog {
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(340, 20));
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 110, 120, 20));
-            jLabelFeatureFlag.setText("Feature Flag");
+            jLabelFeatureFlag.setText("Feature Flag Expression");
             jLabelToolCode = new JLabel();
             jLabelToolCode.setBounds(new java.awt.Rectangle(15, 60, 120, 20));
             jLabelToolCode.setText("Tool Code");
@@ -316,7 +316,7 @@ public class SourceFilesDlg extends IDialog {
             jLabelTagName.setText("Tag Name");
             jLabelArch = new JLabel();
             jLabelArch.setBounds(new java.awt.Rectangle(15, 135, 120, 20));
-            jLabelArch.setText("Sup Arch List");
+            jLabelArch.setText("Supported Architectures");
             jLabelToolChainFamily = new JLabel();
             jLabelToolChainFamily.setBounds(new java.awt.Rectangle(15, 85, 120, 20));
             jLabelToolChainFamily.setText("Tool Chain Family");

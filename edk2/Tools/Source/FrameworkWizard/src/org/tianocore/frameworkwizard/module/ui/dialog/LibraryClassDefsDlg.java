@@ -362,14 +362,14 @@ public class LibraryClassDefsDlg extends IDialog {
             jArchCheckBox.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 60, 140, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
             jLabelHelpText.setText("Help Text");
             jLabelModuleList = new JLabel();
             jLabelModuleList.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
-            jLabelModuleList.setText("Sup Module List");
+            jLabelModuleList.setText("Supported Module Types");
             jLabelArch = new JLabel();
             jLabelArch.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
-            jLabelArch.setText("Sup Arch List");
+            jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
             jLabelFeatureFlag.setText("Feature Flag");
@@ -404,9 +404,9 @@ public class LibraryClassDefsDlg extends IDialog {
             jContentPane.add(getJTextFieldFeatureFlag(), null);
             jContentPane.add(jLabelArch, null);
             jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(0, 10));
+            jStarLabel1.setLocation(new java.awt.Point(2, 10));
             jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(0, 35));
+            jStarLabel2.setLocation(new java.awt.Point(2, 35));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
