@@ -43,428 +43,440 @@ import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
  */
 public class HobsDlg extends IDialog {
 
-  // /
-  // / Define class Serial Version UID
-  // /
-  private static final long serialVersionUID = -553473437579358325L;
-
-  //
-  // Define class members
-  //
-  private JPanel jContentPane = null;
-
-  private JLabel jLabelC_Name = null;
-
-  private JComboBox jComboBoxGuidC_Name = null;
-
-  private JLabel jLabelUsage = null;
-
-  private JLabel jLabelHobType = null;
-
-  private JComboBox jComboBoxUsage = null;
-
-  private JComboBox jComboBoxHobType = null;
-
-  private StarLabel jStarLabel1 = null;
-
-  private StarLabel jStarLabel2 = null;
-
-  private StarLabel jStarLabel3 = null;
-
-  private JLabel jLabelArch = null;
-
-  private JScrollPane jScrollPane = null;
-
-  private JLabel jLabelFeatureFlag = null;
-
-  private JTextField jTextFieldFeatureFlag = null;
-
-  private JLabel jLabelHelpText = null;
-
-  private JTextArea jTextAreaHelpText = null;
-
-  private JScrollPane jScrollPaneHelpText = null;
-
-  private ArchCheckBox jArchCheckBox = null;
-
-  private JButton jButtonOk = null;
-
-  private JButton jButtonCancel = null;
-
-  //
-  // Not used by UI
-  //
-  private HobsIdentification id = null;
-
-  private EnumerationData ed = new EnumerationData();
-
-  private WorkspaceTools wt = new WorkspaceTools();
-
-  /**
-   * This method initializes jTextField
-   * 
-   * @return javax.swing.JTextField jTextFieldC_Name
-   * 
-   */
-  private JComboBox getJComboBoxGuidC_Name() {
-    if (jComboBoxGuidC_Name == null) {
-      jComboBoxGuidC_Name = new JComboBox();
-      jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-      jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
-      jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Hob");
-    }
-    return jComboBoxGuidC_Name;
-  }
-
-  /**
-   * This method initializes jComboBoxHobType
-   * 
-   * @return javax.swing.JComboBox jComboBoxHobType
-   * 
-   */
-  private JComboBox getJComboBoxHobType() {
-    if (jComboBoxHobType == null) {
-      jComboBoxHobType = new JComboBox();
-      jComboBoxHobType.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
-      jComboBoxHobType.setPreferredSize(new java.awt.Dimension(320, 20));
-      jComboBoxHobType.setToolTipText("<html><table><tr><td>PHIT</td><td>EFI_HOB_TYPE_HANDOFF</td></tr><tr><td>MEMORY_ALLOCATION</td><td>EFI_HOB_TYPE_MEMORY_ALLOCATION and $BaseName</td></tr><tr><td>RESOURCE_DESCRIPTOR</td><td>EFI_HOB_TYPE_RESOURCE_DESCRIPTOR</td></tr><tr><td>GUID_EXTENTION</td><td>EFI_HOB_TYPE_GUID_EXTENSION and BaseName of GUID</td></tr><tr><td>FIRMWARE_VOLUME</td><td>EFI_HOB_TYPE_FV</td></tr><tr><td>CPU</td><td>EFI_HOB_TYPE_CPU</td></tr><tr><td>POOL</td><td>EFI_HOB_TYPE_PEI_MEMORY_POOL</td></tr><tr><td>CAPSULE_VOLUME</td><td>EFI_HOB_TYPE_CV</td></tr></table></html>");
-    }
-    return jComboBoxHobType;
-  }
-
-  /**
-   * This method initializes jComboBoxUsage
-   * 
-   * @return javax.swing.JComboBox jComboBoxUsage
-   * 
-   */
-  private JComboBox getJComboBoxUsage() {
-    if (jComboBoxUsage == null) {
-      jComboBoxUsage = new JComboBox();
-      jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
-      jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
-      jComboBoxUsage.setToolTipText("<html><table><tr><td>ALWAYS_CONSUMED</td><td>HOB must be present in the system</td></tr><tr><td>SOMETIMES_CONSUMED</td><td>HOB will be used if it's present</td></tr><tr><td>ALWAYS_PRODUCED</td><td>HOB is always produced</td></tr><tr><td>SOMETIMES_PRODUCED</td><td>HOB will sometimes be produced by the module</td></tr></table></html>");
-    }
-    return jComboBoxUsage;
-  }
-
-  /**
-   * This method initializes jScrollPane
-   * 
-   * @return javax.swing.JScrollPane
-   */
-  private JScrollPane getJScrollPane() {
-    if (jScrollPane == null) {
-      jScrollPane = new JScrollPane();
-      jScrollPane.setViewportView(getJContentPane());
-    }
-    return jScrollPane;
-  }
-
-  /**
-   * This method initializes jTextFieldFeatureFlag
-   * 
-   * @return javax.swing.JTextField
-   */
-  private JTextField getJTextFieldFeatureFlag() {
-    if (jTextFieldFeatureFlag == null) {
-      jTextFieldFeatureFlag = new JTextField();
-      jTextFieldFeatureFlag
-          .setBounds(new java.awt.Rectangle(160, 130, 320, 20));
-      jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
-      jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
-    }
-    return jTextFieldFeatureFlag;
-  }
-
-  /**
-   * This method initializes jTextFieldHelpText
-   * 
-   * @return javax.swing.JTextField
-   * 
-   */
-  private JTextArea getJTextAreaHelpText() {
-    if (jTextAreaHelpText == null) {
-      jTextAreaHelpText = new JTextArea();
-      jTextAreaHelpText.setLineWrap(true);
-      jTextAreaHelpText.setWrapStyleWord(true);
-    }
-    return jTextAreaHelpText;
-  }
-
-  /**
-   * This method initializes jScrollPaneHelpText
-   * 
-   * @return javax.swing.JScrollPane
-   */
-  private JScrollPane getJScrollPaneHelpText() {
-    if (jScrollPaneHelpText == null) {
-      jScrollPaneHelpText = new JScrollPane();
-      jScrollPaneHelpText
-          .setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-      jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
-      jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
-      jScrollPaneHelpText.setLocation(new java.awt.Point(160, 85));
-      jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
-    }
-    return jScrollPaneHelpText;
-  }
-
-  /**
-   * This method initializes jButtonOk
-   * 
-   * @return javax.swing.JButton
-   * 
-   */
-  private JButton getJButtonOk() {
-    if (jButtonOk == null) {
-      jButtonOk = new JButton();
-      jButtonOk.setBounds(new java.awt.Rectangle(290, 182, 90, 20));
-      jButtonOk.setText("Ok");
-      jButtonOk.addActionListener(this);
-    }
-    return jButtonOk;
-  }
-
-  /**
-   * This method initializes jButtonCancel
-   * 
-   * @return javax.swing.JButton
-   * 
-   */
-  private JButton getJButtonCancel() {
-    if (jButtonCancel == null) {
-      jButtonCancel = new JButton();
-      jButtonCancel.setBounds(new java.awt.Rectangle(390, 182, 90, 20));
-      jButtonCancel.setText("Cancel");
-      jButtonCancel.addActionListener(this);
-    }
-    return jButtonCancel;
-  }
-
-  public static void main(String[] args) {
-
-  }
-
-  /**
-   * This method initializes this
-   * 
-   */
-  private void init() {
-    this.setSize(500, 255);
-    this.setContentPane(getJScrollPane());
-    this.setTitle("Hobs");
-    initFrame();
-    this.setViewMode(false);
-    this.centerWindow();
-  }
-
-  /**
-   * This method initializes this Fill values to all fields if these values are
-   * not empty
-   * 
-   * @param inHobsId
-   * 
-   */
-  private void init(HobsIdentification inHobsId) {
-    init();
-    this.id = inHobsId;
-
-    if (this.id != null) {
-      this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
-      this.jComboBoxHobType.setSelectedItem(id.getType());
-      this.jComboBoxUsage.setSelectedItem(id.getUsage());
-      this.jTextAreaHelpText.setText(id.getHelp());
-      this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
-      this.jArchCheckBox.setSelectedItems(id.getSupArchList());
-    }
-  }
-
-  /**
-   * This is the override edit constructor
-   * 
-   * @param inHobsIdentification
-   * @param iFrame
-   * 
-   */
-  public HobsDlg(HobsIdentification inHobsIdentification, IFrame iFrame) {
-    super(iFrame, true);
-    init(inHobsIdentification);
-  }
-
-  /**
-   * Disable all components when the mode is view
-   * 
-   * @param isView
-   *          true - The view mode; false - The non-view mode
-   * 
-   */
-  public void setViewMode(boolean isView) {
-    if (isView) {
-      this.jComboBoxGuidC_Name.setEnabled(!isView);
-      this.jComboBoxUsage.setEnabled(!isView);
-      this.jComboBoxHobType.setEnabled(!isView);
-    }
-  }
-
-  /**
-   * This method initializes jContentPane
-   * 
-   * @return javax.swing.JPanel jContentPane
-   * 
-   */
-  public JPanel getJContentPane() {
-    if (jContentPane == null) {
-      jStarLabel1 = new StarLabel();
-      jStarLabel1.setLocation(new java.awt.Point(2, 10));
-      jLabelC_Name = new JLabel();
-      jLabelC_Name.setText("Hob's Guid C Name");
-      jLabelC_Name.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
-
-      jStarLabel2 = new StarLabel();
-      jStarLabel2.setLocation(new java.awt.Point(2, 35));
-      jLabelHobType = new JLabel();
-      jLabelHobType.setText("Hob Type");
-      jLabelHobType.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
-
-      jStarLabel3 = new StarLabel();
-      jStarLabel3.setLocation(new java.awt.Point(2, 60));
-      jLabelUsage = new JLabel();
-      jLabelUsage.setText("Usage");
-      jLabelUsage.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
-
-      jLabelHelpText = new JLabel();
-      jLabelHelpText.setBounds(new java.awt.Rectangle(15, 85, 145, 20));
-      jLabelHelpText.setText("Help Text");
-
-      jLabelFeatureFlag = new JLabel();
-      jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 130, 145, 20));
-      jLabelFeatureFlag.setText("Feature Flag Expression");
-
-      jLabelArch = new JLabel();
-      jLabelArch.setBounds(new java.awt.Rectangle(15, 155, 145, 20));
-      jLabelArch.setText("Supported Architectures");
-      jArchCheckBox = new ArchCheckBox();
-      jArchCheckBox.setBounds(new java.awt.Rectangle(160, 155, 320, 20));
-      jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
-
-      jContentPane = new JPanel();
-      jContentPane.setLayout(null);
-      jContentPane.setPreferredSize(new java.awt.Dimension(485, 210));
-
-      jContentPane.add(jStarLabel1, null);
-      jContentPane.add(jLabelC_Name, null);
-      jContentPane.add(getJComboBoxGuidC_Name(), null);
-      jContentPane.add(jStarLabel2, null);
-      jContentPane.add(jLabelHobType, null);
-      jContentPane.add(getJComboBoxHobType(), null);
-      jContentPane.add(jStarLabel3, null);
-      jContentPane.add(jLabelUsage, null);
-      jContentPane.add(getJComboBoxUsage(), null);
-      jContentPane.add(jLabelHelpText, null);
-      jContentPane.add(getJScrollPaneHelpText(), null);
-      jContentPane.add(jLabelFeatureFlag, null);
-      jContentPane.add(getJTextFieldFeatureFlag(), null);
-      jContentPane.add(jLabelArch, null);
-      jContentPane.add(jArchCheckBox, null);
-      jContentPane.add(getJButtonOk(), null);
-      jContentPane.add(getJButtonCancel(), null);
-    }
-    return jContentPane;
-  }
-
-  /**
-   * This method initializes Usage type and Hob type
-   * 
-   */
-  private void initFrame() {
-    Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVHobUsage());
-    Tools.generateComboBoxByVector(jComboBoxHobType, ed.getVHobType());
-    Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt
-        .getAllGuidDeclarationsFromWorkspace());
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-   * 
-   * Override actionPerformed to listen all actions
-   * 
-   */
-  public void actionPerformed(ActionEvent arg0) {
-    if (arg0.getSource() == jButtonOk) {
-      if (checkAdd()) {
-        getCurrentHobs();
-        this.returnType = DataType.RETURN_TYPE_OK;
-        this.setVisible(false);
-      }
-    }
-
-    if (arg0.getSource() == jButtonCancel) {
-      this.returnType = DataType.RETURN_TYPE_CANCEL;
-      this.setVisible(false);
-    }
-  }
-
-  /**
-   * Data validation for all fields
-   * 
-   * @retval true - All datas are valid
-   * @retval false - At least one data is invalid
-   * 
-   */
-  public boolean checkAdd() {
-    //
-    // Check if all fields have correct data types
-    //
+    // /
+    // / Define class Serial Version UID
+    // /
+    private static final long serialVersionUID = -553473437579358325L;
 
     //
-    // Check Name
+    // Define class members
     //
-    if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-      Log.wrn("Update Hobs", "Hob Guid C Name must not be empty");
-      return false;
+    private JPanel jContentPane = null;
+
+    private JLabel jLabelC_Name = null;
+
+    private JComboBox jComboBoxGuidC_Name = null;
+
+    private JLabel jLabelUsage = null;
+
+    private JLabel jLabelHobType = null;
+
+    private JComboBox jComboBoxUsage = null;
+
+    private JComboBox jComboBoxHobType = null;
+
+    private StarLabel jStarLabel1 = null;
+
+    private StarLabel jStarLabel2 = null;
+
+    private StarLabel jStarLabel3 = null;
+
+    private JLabel jLabelArch = null;
+
+    private JScrollPane jScrollPane = null;
+
+    private JLabel jLabelFeatureFlag = null;
+
+    private JTextField jTextFieldFeatureFlag = null;
+
+    private JLabel jLabelHelpText = null;
+
+    private JTextArea jTextAreaHelpText = null;
+
+    private JScrollPane jScrollPaneHelpText = null;
+
+    private ArchCheckBox jArchCheckBox = null;
+
+    private JButton jButtonOk = null;
+
+    private JButton jButtonCancel = null;
+
+    //
+    // Not used by UI
+    //
+    private HobsIdentification id = null;
+
+    private EnumerationData ed = new EnumerationData();
+
+    private WorkspaceTools wt = new WorkspaceTools();
+
+    /**
+     * This method initializes jTextField
+     * 
+     * @return javax.swing.JTextField jTextFieldC_Name
+     * 
+     */
+    private JComboBox getJComboBoxGuidC_Name() {
+        if (jComboBoxGuidC_Name == null) {
+            jComboBoxGuidC_Name = new JComboBox();
+            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Hob");
+        }
+        return jComboBoxGuidC_Name;
     }
 
-    if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-      if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name
-          .getSelectedItem().toString())) {
-        Log.wrn("Update Hobs", "Incorrect data type for Hob Name");
-        return false;
-      }
+    /**
+     * This method initializes jComboBoxHobType
+     * 
+     * @return javax.swing.JComboBox jComboBoxHobType
+     * 
+     */
+    private JComboBox getJComboBoxHobType() {
+        if (jComboBoxHobType == null) {
+            jComboBoxHobType = new JComboBox();
+            jComboBoxHobType.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jComboBoxHobType.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxHobType
+                            .setToolTipText("<html><table>"
+                                            + "<tr><td>PHIT</td><td>EFI_HOB_TYPE_HANDOFF</td></tr>"
+                                            + "<tr><td>MEMORY_ALLOCATION</td><td>EFI_HOB_TYPE_MEMORY_ALLOCATION and $BaseName</td></tr>"
+                                            + "<tr><td>RESOURCE_DESCRIPTOR</td><td>EFI_HOB_TYPE_RESOURCE_DESCRIPTOR</td></tr>"
+                                            + "<tr><td>GUID_EXTENTION</td><td>EFI_HOB_TYPE_GUID_EXTENSION and BaseName of GUID</td></tr>"
+                                            + "<tr><td>FIRMWARE_VOLUME</td><td>EFI_HOB_TYPE_FV</td></tr>"
+                                            + "<tr><td>CPU</td><td>EFI_HOB_TYPE_CPU</td></tr>"
+                                            + "<tr><td>POOL</td><td>EFI_HOB_TYPE_PEI_MEMORY_POOL</td></tr>"
+                                            + "<tr><td>CAPSULE_VOLUME</td><td>EFI_HOB_TYPE_CV</td></tr>"
+                                            + "</table></html>");
+        }
+        return jComboBoxHobType;
     }
 
-    //
-    // Check FeatureFlag
-    //
-    if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
-      if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
-        Log.wrn("Update Hobs", "Incorrect data type for Feature Flag");
-        return false;
-      }
+    /**
+     * This method initializes jComboBoxUsage
+     * 
+     * @return javax.swing.JComboBox jComboBoxUsage
+     * 
+     */
+    private JComboBox getJComboBoxUsage() {
+        if (jComboBoxUsage == null) {
+            jComboBoxUsage = new JComboBox();
+            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxUsage
+                          .setToolTipText("<html><table>"
+                                          + "<tr><td>ALWAYS_CONSUMED</td><td>HOB must be present in the system</td></tr>"
+                                          + "<tr><td>SOMETIMES_CONSUMED</td><td>HOB will be used if it's present</td></tr>"
+                                          + "<tr><td>ALWAYS_PRODUCED</td><td>HOB is always produced</td></tr>"
+                                          + "<tr><td>SOMETIMES_PRODUCED</td><td>HOB will sometimes be produced by the module</td></tr>"
+                                          + "</table></html>");
+        }
+        return jComboBoxUsage;
     }
 
-    return true;
-  }
+    /**
+     * This method initializes jScrollPane
+     * 
+     * @return javax.swing.JScrollPane
+     */
+    private JScrollPane getJScrollPane() {
+        if (jScrollPane == null) {
+            jScrollPane = new JScrollPane();
+            jScrollPane.setViewportView(getJContentPane());
+        }
+        return jScrollPane;
+    }
 
-  private HobsIdentification getCurrentHobs() {
-    String arg0 = this.jComboBoxGuidC_Name.getSelectedItem().toString();
-    String arg1 = this.jComboBoxHobType.getSelectedItem().toString();
-    String arg2 = this.jComboBoxUsage.getSelectedItem().toString();
+    /**
+     * This method initializes jTextFieldFeatureFlag
+     * 
+     * @return javax.swing.JTextField
+     */
+    private JTextField getJTextFieldFeatureFlag() {
+        if (jTextFieldFeatureFlag == null) {
+            jTextFieldFeatureFlag = new JTextField();
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 130, 320, 20));
+            jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
+        }
+        return jTextFieldFeatureFlag;
+    }
 
-    String arg3 = this.jTextFieldFeatureFlag.getText();
-    Vector<String> arg4 = this.jArchCheckBox.getSelectedItemsVector();
-    String arg5 = this.jTextAreaHelpText.getText();
-    id = new HobsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
-    return id;
-  }
-  
-  public HobsIdentification getId() {
-    return id;
-  }
+    /**
+     * This method initializes jTextFieldHelpText
+     * 
+     * @return javax.swing.JTextField
+     * 
+     */
+    private JTextArea getJTextAreaHelpText() {
+        if (jTextAreaHelpText == null) {
+            jTextAreaHelpText = new JTextArea();
+            jTextAreaHelpText.setLineWrap(true);
+            jTextAreaHelpText.setWrapStyleWord(true);
+        }
+        return jTextAreaHelpText;
+    }
 
-  public void setId(HobsIdentification id) {
-    this.id = id;
-  }
+    /**
+     * This method initializes jScrollPaneHelpText
+     * 
+     * @return javax.swing.JScrollPane
+     */
+    private JScrollPane getJScrollPaneHelpText() {
+        if (jScrollPaneHelpText == null) {
+            jScrollPaneHelpText = new JScrollPane();
+            jScrollPaneHelpText.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
+            jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
+            jScrollPaneHelpText.setLocation(new java.awt.Point(160, 85));
+            jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
+        }
+        return jScrollPaneHelpText;
+    }
+
+    /**
+     * This method initializes jButtonOk
+     * 
+     * @return javax.swing.JButton
+     * 
+     */
+    private JButton getJButtonOk() {
+        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 182, 90, 20));
+            jButtonOk.setText("Ok");
+            jButtonOk.addActionListener(this);
+        }
+        return jButtonOk;
+    }
+
+    /**
+     * This method initializes jButtonCancel
+     * 
+     * @return javax.swing.JButton
+     * 
+     */
+    private JButton getJButtonCancel() {
+        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 182, 90, 20));
+            jButtonCancel.setText("Cancel");
+            jButtonCancel.addActionListener(this);
+        }
+        return jButtonCancel;
+    }
+
+    public static void main(String[] args) {
+
+    }
+
+    /**
+     * This method initializes this
+     * 
+     */
+    private void init() {
+        this.setSize(500, 255);
+        this.setContentPane(getJScrollPane());
+        this.setTitle("Hobs");
+        initFrame();
+        this.setViewMode(false);
+        this.centerWindow();
+    }
+
+    /**
+     * This method initializes this Fill values to all fields if these values are
+     * not empty
+     * 
+     * @param inHobsId
+     * 
+     */
+    private void init(HobsIdentification inHobsId) {
+        init();
+        this.id = inHobsId;
+
+        if (this.id != null) {
+            this.jComboBoxGuidC_Name.setSelectedItem(id.getName());
+            this.jComboBoxHobType.setSelectedItem(id.getType());
+            this.jComboBoxUsage.setSelectedItem(id.getUsage());
+            this.jTextAreaHelpText.setText(id.getHelp());
+            this.jTextFieldFeatureFlag.setText(id.getFeatureFlag());
+            this.jArchCheckBox.setSelectedItems(id.getSupArchList());
+        }
+    }
+
+    /**
+     * This is the override edit constructor
+     * 
+     * @param inHobsIdentification
+     * @param iFrame
+     * 
+     */
+    public HobsDlg(HobsIdentification inHobsIdentification, IFrame iFrame) {
+        super(iFrame, true);
+        init(inHobsIdentification);
+    }
+
+    /**
+     * Disable all components when the mode is view
+     * 
+     * @param isView
+     *          true - The view mode; false - The non-view mode
+     * 
+     */
+    public void setViewMode(boolean isView) {
+        if (isView) {
+            this.jComboBoxGuidC_Name.setEnabled(!isView);
+            this.jComboBoxUsage.setEnabled(!isView);
+            this.jComboBoxHobType.setEnabled(!isView);
+        }
+    }
+
+    /**
+     * This method initializes jContentPane
+     * 
+     * @return javax.swing.JPanel jContentPane
+     * 
+     */
+    public JPanel getJContentPane() {
+        if (jContentPane == null) {
+            jStarLabel1 = new StarLabel();
+            jStarLabel1.setLocation(new java.awt.Point(2, 10));
+            jLabelC_Name = new JLabel();
+            jLabelC_Name.setText("Hob's Guid C Name");
+            jLabelC_Name.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+
+            jStarLabel2 = new StarLabel();
+            jStarLabel2.setLocation(new java.awt.Point(2, 35));
+            jLabelHobType = new JLabel();
+            jLabelHobType.setText("Hob Type");
+            jLabelHobType.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+
+            jStarLabel3 = new StarLabel();
+            jStarLabel3.setLocation(new java.awt.Point(2, 60));
+            jLabelUsage = new JLabel();
+            jLabelUsage.setText("Usage");
+            jLabelUsage.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
+
+            jLabelHelpText = new JLabel();
+            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 85, 145, 20));
+            jLabelHelpText.setText("Help Text");
+
+            jLabelFeatureFlag = new JLabel();
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 130, 145, 20));
+            jLabelFeatureFlag.setText("Feature Flag Expression");
+
+            jLabelArch = new JLabel();
+            jLabelArch.setBounds(new java.awt.Rectangle(15, 155, 145, 20));
+            jLabelArch.setText("Supported Architectures");
+            jArchCheckBox = new ArchCheckBox();
+            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 155, 320, 20));
+            jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
+
+            jContentPane = new JPanel();
+            jContentPane.setLayout(null);
+            jContentPane.setPreferredSize(new java.awt.Dimension(485, 210));
+
+            jContentPane.add(jStarLabel1, null);
+            jContentPane.add(jLabelC_Name, null);
+            jContentPane.add(getJComboBoxGuidC_Name(), null);
+            jContentPane.add(jStarLabel2, null);
+            jContentPane.add(jLabelHobType, null);
+            jContentPane.add(getJComboBoxHobType(), null);
+            jContentPane.add(jStarLabel3, null);
+            jContentPane.add(jLabelUsage, null);
+            jContentPane.add(getJComboBoxUsage(), null);
+            jContentPane.add(jLabelHelpText, null);
+            jContentPane.add(getJScrollPaneHelpText(), null);
+            jContentPane.add(jLabelFeatureFlag, null);
+            jContentPane.add(getJTextFieldFeatureFlag(), null);
+            jContentPane.add(jLabelArch, null);
+            jContentPane.add(jArchCheckBox, null);
+            jContentPane.add(getJButtonOk(), null);
+            jContentPane.add(getJButtonCancel(), null);
+        }
+        return jContentPane;
+    }
+
+    /**
+     * This method initializes Usage type and Hob type
+     * 
+     */
+    private void initFrame() {
+        Tools.generateComboBoxByVector(jComboBoxUsage, ed.getVHobUsage());
+        Tools.generateComboBoxByVector(jComboBoxHobType, ed.getVHobType());
+        Tools.generateComboBoxByVector(jComboBoxGuidC_Name, wt.getAllGuidDeclarationsFromWorkspace());
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+     * 
+     * Override actionPerformed to listen all actions
+     * 
+     */
+    public void actionPerformed(ActionEvent arg0) {
+        if (arg0.getSource() == jButtonOk) {
+            if (checkAdd()) {
+                getCurrentHobs();
+                this.returnType = DataType.RETURN_TYPE_OK;
+                this.setVisible(false);
+            }
+        }
+
+        if (arg0.getSource() == jButtonCancel) {
+            this.returnType = DataType.RETURN_TYPE_CANCEL;
+            this.setVisible(false);
+        }
+    }
+
+    /**
+     * Data validation for all fields
+     * 
+     * @retval true - All datas are valid
+     * @retval false - At least one data is invalid
+     * 
+     */
+    public boolean checkAdd() {
+        //
+        // Check if all fields have correct data types
+        //
+
+        //
+        // Check Name
+        //
+        if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
+            Log.wrn("Update Hobs", "Hob Guid C Name must not be empty");
+            return false;
+        }
+
+        if (!isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
+            if (!DataValidation.isC_NameType(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
+                Log.wrn("Update Hobs", "Incorrect data type for Hob Name");
+                return false;
+            }
+        }
+
+        //
+        // Check FeatureFlag
+        //
+        if (!isEmpty(this.jTextFieldFeatureFlag.getText())) {
+            if (!DataValidation.isFeatureFlag(this.jTextFieldFeatureFlag.getText())) {
+                Log.wrn("Update Hobs", "Incorrect data type for Feature Flag");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private HobsIdentification getCurrentHobs() {
+        String arg0 = this.jComboBoxGuidC_Name.getSelectedItem().toString();
+        String arg1 = this.jComboBoxHobType.getSelectedItem().toString();
+        String arg2 = this.jComboBoxUsage.getSelectedItem().toString();
+
+        String arg3 = this.jTextFieldFeatureFlag.getText();
+        Vector<String> arg4 = this.jArchCheckBox.getSelectedItemsVector();
+        String arg5 = this.jTextAreaHelpText.getText();
+        id = new HobsIdentification(arg0, arg1, arg2, arg3, arg4, arg5);
+        return id;
+    }
+
+    public HobsIdentification getId() {
+        return id;
+    }
+
+    public void setId(HobsIdentification id) {
+        this.id = id;
+    }
 }

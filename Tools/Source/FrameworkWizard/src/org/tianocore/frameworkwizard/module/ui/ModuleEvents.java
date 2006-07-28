@@ -313,7 +313,7 @@ public class ModuleEvents extends IInternalFrame {
         }
         return jContentPane;
     }
-    
+
     private void showEdit(int index) {
         EventsDlg dlg = new EventsDlg(vid.getEvents(index), new IFrame());
         int result = dlg.showDialog();

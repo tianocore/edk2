@@ -92,7 +92,8 @@ public class IComboBox extends JComboBox implements KeyListener, MouseListener, 
         this.addKeyListener(this);
         this.getEditor().getEditorComponent().addKeyListener(this);
         this.getEditor().getEditorComponent().addFocusListener(this);
-        this.setToolTipText("Double Click to add an entry and finished by press ENTER. Press DELETE can remove selected entry.");
+        this.setToolTipText("<html>Double Click to add an entry and finished by press ENTER. <br>"
+                            + "Press DELETE can remove selected entry.</html>");
     }
 
     public void keyPressed(KeyEvent arg0) {
@@ -122,6 +123,7 @@ public class IComboBox extends JComboBox implements KeyListener, MouseListener, 
                 }
                 this.setEditable(false);
             }
+
             if (arg0.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 closeEdit();
             }
@@ -160,7 +162,6 @@ public class IComboBox extends JComboBox implements KeyListener, MouseListener, 
             this.setEditable(true);
             this.getEditor().setItem("");
         }
-
     }
 
     public void mouseEntered(MouseEvent arg0) {
@@ -190,8 +191,5 @@ public class IComboBox extends JComboBox implements KeyListener, MouseListener, 
     private void closeEdit() {
         this.setEditable(false);
         this.getEditor().setItem("");
-        if (this.getItemCount() > 0) {
-            this.setSelectedIndex(0);
-        }
     }
 }

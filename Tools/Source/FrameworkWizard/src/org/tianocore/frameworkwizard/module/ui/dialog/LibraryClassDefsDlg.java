@@ -96,7 +96,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JTextField jTextFieldHelpText = null;
 
     private ArchCheckBox jArchCheckBox = null;
-    
+
     private JButton jButtonOk = null;
 
     private JButton jButtonCancel = null;
@@ -212,6 +212,7 @@ public class LibraryClassDefsDlg extends IDialog {
             jTextFieldFeatureFlag = new JTextField();
             jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
         }
         return jTextFieldFeatureFlag;
     }
@@ -372,7 +373,7 @@ public class LibraryClassDefsDlg extends IDialog {
             jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
-            jLabelFeatureFlag.setText("Feature Flag");
+            jLabelFeatureFlag.setText("Feature Flag Expression");
             jLabelRecommendedInstanceGuid = new JLabel();
             jLabelRecommendedInstanceGuid.setBounds(new java.awt.Rectangle(15, 110, 200, 20));
             jLabelRecommendedInstanceGuid.setText("Recommended Instance Guid");

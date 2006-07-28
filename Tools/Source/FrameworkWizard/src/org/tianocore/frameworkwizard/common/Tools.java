@@ -320,7 +320,7 @@ public class Tools {
      
      **/
     public static void showInformationMessage(String arg0) {
-        JOptionPane.showConfirmDialog(null, arg0, "Error", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showConfirmDialog(null, arg0, "Info", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**

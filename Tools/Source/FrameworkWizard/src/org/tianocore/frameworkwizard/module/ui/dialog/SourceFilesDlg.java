@@ -27,9 +27,11 @@ import javax.swing.JTextField;
 
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.EnumerationData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
+import org.tianocore.frameworkwizard.common.ui.IComboBox;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -76,6 +78,8 @@ public class SourceFilesDlg extends IDialog {
 
     private JTextField jTextFieldToolCode = null;
 
+    private IComboBox iComboBoxToolCode = null;
+
     private JTextField jTextFieldToolChainFamily = null;
 
     private JLabel jLabelFeatureFlag = null;
@@ -83,7 +87,7 @@ public class SourceFilesDlg extends IDialog {
     private JTextField jTextFieldFeatureFlag = null;
 
     private ArchCheckBox jArchCheckBox = null;
-    
+
     private JButton jButtonOk = null;
 
     private JButton jButtonCancel = null;
@@ -94,6 +98,8 @@ public class SourceFilesDlg extends IDialog {
     private SourceFilesIdentification sfid[] = null;
 
     private String msaFileName = "";
+
+    private EnumerationData ed = new EnumerationData();
 
     /**
      This method initializes jTextFieldFileName 
@@ -156,6 +162,19 @@ public class SourceFilesDlg extends IDialog {
         return jTextFieldTagName;
     }
 
+    private IComboBox getIComboBoxToolCode() {
+        if (iComboBoxToolCode == null) {
+            iComboBoxToolCode = new IComboBox();
+            iComboBoxToolCode.setBounds(new java.awt.Rectangle(140, 60, 340, 20));
+            iComboBoxToolCode.setPreferredSize(new java.awt.Dimension(340, 20));
+            iComboBoxToolCode.setToolTipText("<html>You may select a specific tool command from drop down list, <br>"
+                                             + "or you can DOUBLE-CLICK this fild to enter your customizing <br>"
+                                             + "tool command.<br>"
+                                             + "Press ENTER to save your input or press ESCAPE to quit</html>");
+        }
+        return iComboBoxToolCode;
+    }
+
     /**
      * This method initializes jTextFieldToolCode	
      * 	
@@ -167,6 +186,7 @@ public class SourceFilesDlg extends IDialog {
             jTextFieldToolCode.setBounds(new java.awt.Rectangle(140, 60, 340, 20));
             jTextFieldToolCode.setPreferredSize(new java.awt.Dimension(340, 20));
             jTextFieldToolCode.setToolTipText("You may specify a specific tool command, such as ASM");
+            jTextFieldToolCode.setVisible(false);
         }
         return jTextFieldToolCode;
     }
@@ -274,7 +294,32 @@ public class SourceFilesDlg extends IDialog {
         if (inSourceFilesIdentifications != null) {
             this.jTextFieldFileName.setText(inSourceFilesIdentifications.getFilename());
             this.jTextFieldTagName.setText(inSourceFilesIdentifications.getTagName());
-            this.jTextFieldToolCode.setText(inSourceFilesIdentifications.getToolCode());
+
+            //
+            // Generate Tool Code selection list
+            //
+            Vector<String> v = ed.getVToolCode();
+            boolean isFind = false;
+            String strToolCode = inSourceFilesIdentifications.getToolCode();
+
+            //
+            // If the input value is not in the default list, add it to the list
+            //
+            if (strToolCode != null) {
+                for (int index = 0; index < v.size(); index++) {
+                    if (v.elementAt(index).equals(strToolCode)) {
+                        isFind = true;
+                        break;
+                    }
+                }
+                if (!isFind && !isEmpty(strToolCode)) {
+                    v.addElement(strToolCode);
+                }
+            }
+
+            Tools.generateComboBoxByVector(iComboBoxToolCode, v);
+            this.iComboBoxToolCode.setSelectedItem(strToolCode);
+
             this.jTextFieldToolChainFamily.setText(inSourceFilesIdentifications.getToolChainFamily());
             jTextFieldFeatureFlag.setText(inSourceFilesIdentifications.getFeatureFlag());
             this.jArchCheckBox.setSelectedItems(inSourceFilesIdentifications.getSupArchList());
@@ -341,6 +386,7 @@ public class SourceFilesDlg extends IDialog {
             jContentPane.add(getJTextFieldTagName(), null);
             jContentPane.add(jLabelToolCode, null);
             jContentPane.add(getJTextFieldToolCode(), null);
+            jContentPane.add(getIComboBoxToolCode(), null);
             jContentPane.add(getJTextFieldToolChainFamily(), null);
             jContentPane.add(jLabelFeatureFlag, null);
             jContentPane.add(getJTextFieldFeatureFlag(), null);
@@ -380,13 +426,16 @@ public class SourceFilesDlg extends IDialog {
         String name = this.jTextFieldFileName.getText();
         String s[] = name.split(";");
         String tagName = this.jTextFieldTagName.getText();
-        String toolCode = this.jTextFieldToolCode.getText();
+        String toolCode = this.iComboBoxToolCode.getSelectedItem().toString();
+        if (toolCode.equals(DataType.EMPTY_SELECT_ITEM)) {
+            toolCode = "";
+        }
         String tcf = this.jTextFieldToolChainFamily.getText();
         String featureFlag = this.jTextFieldFeatureFlag.getText();
         Vector<String> arch = this.jArchCheckBox.getSelectedItemsVector();
         sfid = new SourceFilesIdentification[s.length];
         for (int index = 0; index < s.length; index++) {
-            sfid[index] =  new SourceFilesIdentification(s[index], tagName, toolCode, tcf, featureFlag, arch);
+            sfid[index] = new SourceFilesIdentification(s[index], tagName, toolCode, tcf, featureFlag, arch);
         }
         return sfid;
     }

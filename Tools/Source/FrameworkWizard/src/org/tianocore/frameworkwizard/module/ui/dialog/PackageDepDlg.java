@@ -45,69 +45,67 @@ import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
  * 
  */
 public class PackageDepDlg extends IDialog implements ItemListener {
-  // /
-  // / Define class Serial Version UID
-  // /
-  private static final long serialVersionUID = 3465193035145152131L;
+    // /
+    // / Define class Serial Version UID
+    // /
+    private static final long serialVersionUID = 3465193035145152131L;
 
-  //
-  // Define class members
-  //
-  private JPanel jContentPane = null;
+    //
+    // Define class members
+    //
+    private JPanel jContentPane = null;
 
-  private JLabel jLabelPackageName = null;
+    private JLabel jLabelPackageName = null;
 
-  private StarLabel jStarLabel1 = null;
+    private StarLabel jStarLabel1 = null;
 
-  private JComboBox jComboBoxPackageName = null;
+    private JComboBox jComboBoxPackageName = null;
 
-  private JLabel jLabelPackageGuid = null;
+    private JLabel jLabelPackageGuid = null;
 
-  private JTextField jTextFieldPackageGuid = null;
+    private JTextField jTextFieldPackageGuid = null;
 
-  private JButton jButtonGenerateGuid = null;
+    private JLabel jLabelPackageVersion = null;
 
-  private JLabel jLabelPackageVersion = null;
+    private JTextField jTextFieldPackageVersion = null;
 
-  private JTextField jTextFieldPackageVersion = null;
+    private JLabel jLabelFeatureFlag = null;
 
-  private JLabel jLabelFeatureFlag = null;
+    private JTextField jTextFieldFeatureFlag = null;
 
-  private JTextField jTextFieldFeatureFlag = null;
+    private JScrollPane jScrollPane = null;
 
-  private JScrollPane jScrollPane = null;
+    private JLabel jLabelArch = null;
 
-  private JLabel jLabelArch = null;
+    private ArchCheckBox jArchCheckBox = null;
 
-  private ArchCheckBox jArchCheckBox = null;
+    private JButton jButtonOk = null;
 
-  private JButton jButtonOk = null;
+    private JButton jButtonCancel = null;
 
-  private JButton jButtonCancel = null;
+    //
+    // Not used by UI
+    //
+    private PackageDependenciesIdentification pdid = null;
 
-  //
-  // Not used by UI
-  //
-  private PackageDependenciesIdentification pdid = null;
+    private WorkspaceTools wt = new WorkspaceTools();
 
-  private WorkspaceTools wt = new WorkspaceTools();
+    private Vector<PackageIdentification> vPackage = wt.getAllPackages();
 
-  private Vector<PackageIdentification> vPackage = wt.getAllPackages();
-
-  /**
-   * This method initializes jComboBoxPackageName
-   * 
-   * @return javax.swing.JComboBox
-   */
+    /**
+     * This method initializes jComboBoxPackageName
+     * 
+     * @return javax.swing.JComboBox
+     */
     private JComboBox getJComboBoxPackageName() {
-      if (jComboBoxPackageName == null) {
-        jComboBoxPackageName = new JComboBox();
-        jComboBoxPackageName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-        jComboBoxPackageName.setPreferredSize(new java.awt.Dimension(320, 20));
-        jComboBoxPackageName.setToolTipText("If your Module requires a package list that here.");
-        jComboBoxPackageName.addItemListener(this);
-      }
-      return jComboBoxPackageName;
+        if (jComboBoxPackageName == null) {
+            jComboBoxPackageName = new JComboBox();
+            jComboBoxPackageName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxPackageName.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxPackageName.setToolTipText("If your Module requires a package list that here.");
+            jComboBoxPackageName.addItemListener(this);
+        }
+        return jComboBoxPackageName;
     }
 
     /**
@@ -127,23 +125,6 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     }
 
     /**
-     * This method initializes jButtonGenerateGuid
-     * 
-     * @return javax.swing.JButton
-     */
-    private JButton getJButtonGenerateGuid() {
-        if (jButtonGenerateGuid == null) {
-            jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(415, 35, 65, 20));
-            jButtonGenerateGuid.setPreferredSize(new java.awt.Dimension(65, 20));
-            jButtonGenerateGuid.setText("GEN");
-            jButtonGenerateGuid.addActionListener(this);
-            jButtonGenerateGuid.setVisible(false);
-        }
-        return jButtonGenerateGuid;
-    }
-
-    /**
      * This method initializes jTextFieldPackageVersion
      * 
      * @return javax.swing.JTextField
@@ -154,7 +135,11 @@ public class PackageDepDlg extends IDialog implements ItemListener {
             jTextFieldPackageVersion.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
             jTextFieldPackageVersion.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldPackageVersion
-                                    .setToolTipText("If this module depends on a specific version of a package, enter the package version here.  If the module can use the latest version that does not break backward compatibility, leave this field blank");
+                                    .setToolTipText("<html>If this module depends on a specific version of a package, <br>" +
+                                            "enter the package version here.  <br>" +
+                                            "If the module can use the latest version <br>" +
+                                            "that does not break backward compatibility, <br>" +
+                                            "leave this field blank</html>");
         }
         return jTextFieldPackageVersion;
     }
@@ -281,36 +266,36 @@ public class PackageDepDlg extends IDialog implements ItemListener {
      */
     private JPanel getJContentPane() {
         if (jContentPane == null) {
-          jStarLabel1 = new StarLabel();
-          jStarLabel1.setLocation(new java.awt.Point(2, 10));
-          jLabelPackageName = new JLabel();
-          jLabelPackageName.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
-          jLabelPackageName.setText("Package Name");
+            jStarLabel1 = new StarLabel();
+            jStarLabel1.setLocation(new java.awt.Point(2, 10));
+            jLabelPackageName = new JLabel();
+            jLabelPackageName.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+            jLabelPackageName.setText("Package Name");
 
-          jLabelPackageVersion = new JLabel();
-          jLabelPackageVersion.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
-          jLabelPackageVersion.setText("Package Version");
+            jLabelPackageVersion = new JLabel();
+            jLabelPackageVersion.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+            jLabelPackageVersion.setText("Package Version");
 
-          jLabelPackageGuid = new JLabel();
-          jLabelPackageGuid.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
-          jLabelPackageGuid.setText("Package Guid");
-          jLabelPackageGuid.setVisible(false);
+            jLabelPackageGuid = new JLabel();
+            jLabelPackageGuid.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+            jLabelPackageGuid.setText("Package Guid");
+            jLabelPackageGuid.setVisible(false);
 
-          jLabelFeatureFlag = new JLabel();
-          jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
-          jLabelFeatureFlag.setText("Feature Flag Expression");
+            jLabelFeatureFlag = new JLabel();
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
+            jLabelFeatureFlag.setText("Feature Flag Expression");
 
-          jLabelArch = new JLabel();
-          jLabelArch.setBounds(new java.awt.Rectangle(15, 85, 145, 20));
-          jLabelArch.setText("Supported Architectures");
-          jArchCheckBox = new ArchCheckBox();
-          jArchCheckBox.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
-          jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
+            jLabelArch = new JLabel();
+            jLabelArch.setBounds(new java.awt.Rectangle(15, 85, 145, 20));
+            jLabelArch.setText("Supported Architectures");
+            jArchCheckBox = new ArchCheckBox();
+            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.setPreferredSize(new java.awt.Dimension(485, 145));
-            
+
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelPackageName, null);
             jContentPane.add(getJComboBoxPackageName(), null);
@@ -378,12 +363,12 @@ public class PackageDepDlg extends IDialog implements ItemListener {
         //
         // Check PackageGuid
         //
-      // if (!isEmpty(this.jTextFieldPackageGuid.getText())) {
-// if (!DataValidation.isGuid(this.jTextFieldPackageGuid.getText())) {
-// Log.err("Incorrect data type for Package Guid");
-// return false;
-// }
-// }
+        // if (!isEmpty(this.jTextFieldPackageGuid.getText())) {
+        // if (!DataValidation.isGuid(this.jTextFieldPackageGuid.getText())) {
+        // Log.err("Incorrect data type for Package Guid");
+        // return false;
+        // }
+        // }
 
         //
         // Check PackageVersion
@@ -407,7 +392,6 @@ public class PackageDepDlg extends IDialog implements ItemListener {
 
         return true;
     }
-    
 
     private PackageDependenciesIdentification getCurrentPackageDependencies() {
         String arg0 = this.jComboBoxPackageName.getSelectedItem().toString();
