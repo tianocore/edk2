@@ -68,7 +68,11 @@ public class PackageIdentification extends Identification{
     
     public String getPackageRelativeDir(){
         prepareSpdFile();
-        return spdFile.getParent().substring(GlobalData.getWorkspacePath().length() + 1);
+        String relativeDir =spdFile.getParent().substring(GlobalData.getWorkspacePath().length());
+        if(relativeDir.startsWith("\\") || relativeDir.startsWith("/")) {
+          relativeDir = relativeDir.substring(1);
+        }
+        return relativeDir;
     }
     
     private void prepareSpdFile(){
