@@ -51,10 +51,18 @@ public class PlatformIdentification extends Identification{
     }
     
     public String getRelativeFpdFile (){
-        return fpdFile.getPath().substring(GlobalData.getWorkspacePath().length() + 1);
+        String relativeDir = fpdFile.getPath().substring(GlobalData.getWorkspacePath().length());
+        if(relativeDir.startsWith("\\") || relativeDir.startsWith("/")) {
+            relativeDir = relativeDir.substring(1);
+        }
+        return relativeDir;
     }
     
     public String getPlatformRelativeDir(){
-        return fpdFile.getParent().substring(GlobalData.getWorkspacePath().length() + 1);
+        String relativeDir = fpdFile.getParent().substring(GlobalData.getWorkspacePath().length());
+        if(relativeDir.startsWith("\\") || relativeDir.startsWith("/")) {
+            relativeDir = relativeDir.substring(1);
+        }
+        return relativeDir;
     }
 }
