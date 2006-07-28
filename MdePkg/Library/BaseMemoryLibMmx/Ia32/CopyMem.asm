@@ -23,35 +23,27 @@
 
     .686
     .model  flat,C
-    .xmm
+    .mmx
     .code
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_CopyMem (
+;  EFIAPI
+;  InternalMemCopyMem (
 ;    IN VOID   *Destination,
 ;    IN VOID   *Source,
 ;    IN UINTN  Count
-;    )
+;    );
 ;------------------------------------------------------------------------------
 InternalMemCopyMem  PROC    USES    esi edi
     mov     esi, [esp + 16]             ; esi <- Source
     mov     edi, [esp + 12]             ; edi <- Destination
     mov     edx, [esp + 20]             ; edx <- Count
-    lea     eax, [edi + edx - 1]        ; eax <- End of Destination
+    lea     eax, [esi + edx - 1]        ; eax <- End of Source
     cmp     esi, edi
     jae     @F
-    cmp     eax, esi                    ; Overlapped?
+    cmp     eax, edi                    ; Overlapped?
     jae     @CopyBackward               ; Copy backward if overlapped
-@@:
-    xor     ecx, ecx
-    sub     ecx, esi
-    and     ecx, 7                      ; ecx + esi aligns on 8-byte boundary
-    jz      @F
-    cmp     ecx, edx
-    cmova   ecx, edx
-    sub     edx, ecx                    ; edx <- remaining bytes to copy
-    rep     movsb
 @@:
     mov     ecx, edx
     and     edx, 7
@@ -62,18 +54,17 @@ InternalMemCopyMem  PROC    USES    esi edi
     movq    [esp], mm0                  ; save mm0
 @@:
     movq    mm0, [esi]
-    movntq  [edi], mm0
+    movq    [edi], mm0
     add     esi, 8
     add     edi, 8
     loop    @B
-    mfence
     movq    mm0, [esp]                  ; restore mm0
     pop     ecx                         ; stack cleanup
     pop     ecx                         ; stack cleanup
     jmp     @CopyBytes
 @CopyBackward:
-    mov     edi, eax                    ; edi <- Last byte in Destination
-    lea     esi, [esi + edx - 1]        ; esi <- Last byte in Source
+    mov     esi, eax                    ; esi <- Last byte in Source
+    lea     edi, [edi + edx - 1]        ; edi <- Last byte in Destination
     std
 @CopyBytes:
     mov     ecx, edx

@@ -25,6 +25,14 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemSetMem16 (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count,
+;    IN UINT16 Value
+;    )
+;------------------------------------------------------------------------------
 InternalMemSetMem16 PROC    USES    edi
     mov     eax, [esp + 16]
     mov     edi, [esp + 8]

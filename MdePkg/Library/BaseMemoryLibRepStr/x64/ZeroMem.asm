@@ -23,6 +23,13 @@
 
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemZeroMem (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count
+;    );
+;------------------------------------------------------------------------------
 InternalMemZeroMem  PROC    USES    rdi
     push    rcx
     xor     rax, rax

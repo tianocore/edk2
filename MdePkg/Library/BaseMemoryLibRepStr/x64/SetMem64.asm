@@ -23,6 +23,14 @@
 
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemSetMem64 (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count,
+;    IN UINT64 Value
+;    )
+;------------------------------------------------------------------------------
 InternalMemSetMem64 PROC    USES    rdi
     mov     rdi, rcx
     mov     rax, r8

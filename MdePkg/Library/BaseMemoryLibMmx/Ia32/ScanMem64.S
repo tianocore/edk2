@@ -27,18 +27,24 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .code: 
-
 .global _InternalMemScanMem64
+
+#------------------------------------------------------------------------------
+# CONST VOID *
+# EFIAPI
+# InternalMemScanMem64 (
+#   IN      CONST VOID                *Buffer,
+#   IN      UINTN                     Length,
+#   IN      UINT64                    Value
+#   );
+#------------------------------------------------------------------------------
 _InternalMemScanMem64:
     push    %edi
     movl    12(%esp), %ecx
     movl    16(%esp), %eax
     movl    20(%esp), %edx
     movl    8(%esp), %edi
-L0: 
+L0:
     cmpl    (%edi), %eax
     leal    8(%edi), %edi
     loopne  L0
@@ -46,7 +52,7 @@ L0:
     cmpl    -4(%edi), %edx
     jecxz   L1
     jne     L0
-L1: 
+L1:
     leal    -8(%edi), %eax
     cmovne  %ecx, %eax
     pop     %edi

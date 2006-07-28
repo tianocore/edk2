@@ -25,6 +25,13 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemZeroMem (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count
+;    );
+;------------------------------------------------------------------------------
 InternalMemZeroMem  PROC    USES    edi
     xor     eax, eax
     mov     edi, [esp + 8]

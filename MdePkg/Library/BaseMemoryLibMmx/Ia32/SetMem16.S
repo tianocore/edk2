@@ -21,37 +21,36 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
+.global _InternalMemSetMem16
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_SetMem16 (
+#  InternalMemSetMem16 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT16 Value
 #    )
 #------------------------------------------------------------------------------
-.global _InternalMemSetMem16
 _InternalMemSetMem16:
     push    %edi
+    movl    16(%esp), %eax
+    shrdl   $16, %eax, %edx
+    shldl   $16, %edx, %eax
     movl    12(%esp), %edx
     movl    8(%esp), %edi
     movl    %edx, %ecx
     andl    $3, %edx
     shrl    $2, %ecx
-    movl    16(%esp), %eax
-    jz      @SetWords
+    jz      L1
     movd    %eax, %mm0
-    pshufw  $0, %mm0, %mm0
-L0: 
-    movntq  %mm0, (%edi)
+    movd    %eax, %mm1
+    psllq   $32, %mm0
+    por     %mm1, %mm0
+L0:
+    movq    %mm0, (%edi)
     addl    $8, %edi
-    loop    L0
-    mfence
-@SetWords: 
+    loopl   L0
+L1:
     movl    %edx, %ecx
     rep
     stosw

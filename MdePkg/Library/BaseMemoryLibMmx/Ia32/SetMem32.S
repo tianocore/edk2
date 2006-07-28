@@ -21,39 +21,32 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
+.global _InternalMemSetMem32
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_SetMem32 (
+#  InternalMemSetMem32 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT32 Value
 #    )
 #------------------------------------------------------------------------------
-.global _InternalMemSetMem32
 _InternalMemSetMem32:
-    push    %edi
-    movl    12(%esp), %edx
-    movl    8(%esp), %edi
-    movl    %edx, %ecx
+    movl    4(%esp), %eax
+    movl    8(%esp), %ecx
+    movd    12(%esp), %mm0
     shrl    %ecx
-    movd    16(%esp), %mm0
-    movl    %edi, %eax
-    jz      @SetDwords
-    pshufw  $0x44, %mm0, %mm0
-L0: 
-    movntq  %mm0, (%edi)
-    addl    $8, %edi
-    loopl   L0
-    mfence
-@SetDwords: 
-    testb   $1, %dl
+    movl    %eax, %edx
     jz      L1
-    movd    %mm0, (%edi)
-L1: 
-    pop     %edi
+    movq    %mm0, %mm1
+    psllq   $32, %mm1
+    por     %mm1, %mm0
+L0:
+    movq    %mm0, (%edx)
+    lea     8(%edx), %edx
+    loopl   L0
+L1:
+    jnc     L2
+    movd    %mm0, (%edx)
+L2:
     ret

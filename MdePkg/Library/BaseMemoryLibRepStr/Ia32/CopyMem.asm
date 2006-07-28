@@ -25,14 +25,22 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemCopyMem (
+;    IN VOID   *Destination,
+;    IN VOID   *Source,
+;    IN UINTN  Count
+;    )
+;------------------------------------------------------------------------------
 InternalMemCopyMem  PROC    USES    esi edi
     mov     esi, [esp + 16]             ; esi <- Source
     mov     edi, [esp + 12]             ; edi <- Destination
     mov     edx, [esp + 20]             ; edx <- Count
-    lea     eax, [edi + edx - 1]        ; eax <- End of Destination
+    lea     eax, [esi + edx - 1]        ; eax <- End of Source
     cmp     esi, edi
     jae     @F
-    cmp     eax, esi
+    cmp     eax, edi
     jae     @CopyBackward               ; Copy backward if overlapped
 @@:
     mov     ecx, edx
@@ -41,8 +49,8 @@ InternalMemCopyMem  PROC    USES    esi edi
     rep     movsd                       ; Copy as many Dwords as possible
     jmp     @CopyBytes
 @CopyBackward:
-    mov     edi, eax                    ; edi <- End of Destination
-    lea     esi, [esi + edx - 1]        ; esi <- End of Source
+    mov     esi, eax                    ; esi <- End of Source
+    lea     edi, [edi + edx - 1]        ; edi <- End of Destination
     std
 @CopyBytes:
     mov     ecx, edx

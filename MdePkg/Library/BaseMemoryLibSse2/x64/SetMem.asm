@@ -25,7 +25,7 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem (
+;  InternalMemSetMem (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
 ;    IN UINT8  Value

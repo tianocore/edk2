@@ -23,14 +23,21 @@
 
     .code
 
-InternalMemSetMem64 PROC    USES    rdi
-    DB      49h, 0fh, 6eh, 0c0h;  movq    mm0, r8       ; mm0 <- Value
-    mov     rax, rcx                                    ; rax <- Buffer
-    xchg    rcx, rdx                                    ; rcx <- Count
-    mov     rdi, rax
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemSetMem64 (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count,
+;    IN UINT64 Value
+;    )
+;------------------------------------------------------------------------------
+InternalMemSetMem64 PROC
+    DB      49h, 0fh, 6eh, 0c0h         ; movd mm0, r8 (Value)
+    mov     rax, rcx                    ; rax <- Buffer
+    xchg    rcx, rdx                    ; rcx <- Count
 @@:
-    DB      48h, 0fh, 0e7h, 07h;  movntq  [rdi], mm0
-    add     rdi, 8
+    DB      0fh, 0e7h, 02h              ; movntq  [rdx], mm0
+    add     rdx, 8
     loop    @B
     mfence
     ret

@@ -30,7 +30,7 @@
 
   This function fills Length bytes of Buffer with zeros, and returns Buffer.
   If Length > 0 and Buffer is NULL, then ASSERT().
-  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT(). 
+  If Length is greater than (MAX_ADDRESS – Buffer + 1), then ASSERT().
 
   @param  Buffer      Pointer to the target buffer to fill with zeros.
   @param  Length      Number of bytes in Buffer to fill with zeros.
@@ -47,5 +47,5 @@ ZeroMem (
 {
   ASSERT (!(Buffer == NULL && Length > 0));
   ASSERT (Length <= (MAX_ADDRESS - (UINTN)Buffer + 1));
-  return InternalMemSetMem (Buffer, Length, 0);
+  return InternalMemZeroMem (Buffer, Length);
 }

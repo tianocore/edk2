@@ -25,7 +25,7 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem16 (
+;  InternalMemSetMem16 (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
 ;    IN UINT16 Value

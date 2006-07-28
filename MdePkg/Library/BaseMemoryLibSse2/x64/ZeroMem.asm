@@ -25,7 +25,7 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_ZeroMem (
+;  InternalMemZeroMem (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count
 ;    )

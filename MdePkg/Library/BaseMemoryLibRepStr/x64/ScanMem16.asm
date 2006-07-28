@@ -29,6 +29,15 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; CONST VOID *
+; EFIAPI
+; InternalMemScanMem16 (
+;   IN      CONST VOID                *Buffer,
+;   IN      UINTN                     Length,
+;   IN      UINT16                    Value
+;   );
+;------------------------------------------------------------------------------
 InternalMemScanMem16    PROC    USES    rdi
     mov     rdi, rcx
     mov     rax, r8

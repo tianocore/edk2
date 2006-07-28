@@ -21,32 +21,29 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
+.global _InternalMemCopyMem
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_CopyMem (
+#  EFIAPI
+#  InternalMemCopyMem (
 #    IN VOID   *Destination,
 #    IN VOID   *Source,
 #    IN UINTN  Count
-#    )
+#    );
 #------------------------------------------------------------------------------
-.global _InternalMemCopyMem
 _InternalMemCopyMem:
     push    %esi
     push    %edi
     movl    16(%esp), %esi              # esi <- Source
     movl    12(%esp), %edi              # edi <- Destination
     movl    20(%esp), %edx              # edx <- Count
-    leal    -1(%edi,%edx,), %eax        # eax <- End of Destination
+    leal    -1(%esi,%edx,), %eax        # eax <- End of Source
     cmpl    %edi, %esi
     jae     L0
-    cmpl    %esi, %eax                  # Overlapped?
+    cmpl    %edi, %eax                  # Overlapped?
     jae     @CopyBackward               # Copy backward if overlapped
-L0: 
+L0:
     xorl    %ecx, %ecx
     subl    %edi, %ecx
     andl    $15, %ecx                   # ecx + edi aligns on 16-byte boundary
@@ -56,16 +53,16 @@ L0:
     subl    %ecx, %edx                  # edx <- remaining bytes to copy
     rep
     movsb
-L1: 
+L1:
     movl    %edx, %ecx
     andl    $15, %edx
     shrl    $4, %ecx                    # ecx <- # of DQwords to copy
     jz      @CopyBytes
     addl    $-16, %esp
     movdqu  %xmm0, (%esp)
-L2: 
+L2:
     movdqu  (%esi), %xmm0
-    movntdq %xmm0, (%edi) 
+    movntdq %xmm0, (%edi)
     addl    $16, %esi
     addl    $16, %edi
     loop    L2
@@ -73,11 +70,11 @@ L2:
     movdqu  (%esp),%xmm0
     addl    $16, %esp                   # stack cleanup
     jmp     @CopyBytes
-@CopyBackward: 
-    movl    %eax, %edi                  # edi <- Last byte in Destination
-    leal    -1(%esi,%edx,), %esi        # esi <- Last byte in Source
+@CopyBackward:
+    movl    %eax, %esi                  # esi <- Last byte in Source
+    leal    -1(%edi,%edx,), %edi        # edi <- Last byte in Destination
     std
-@CopyBytes: 
+@CopyBytes:
     movl    %edx, %ecx
     rep
     movsb

@@ -23,35 +23,35 @@
 
     .686
     .model  flat,C
-    .xmm
+    .mmx
     .code
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem32 (
+;  EFIAPI
+;  InternalMemSetMem32 (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
 ;    IN UINT32 Value
-;    )
+;    );
 ;------------------------------------------------------------------------------
-InternalMemSetMem32 PROC    USES    edi
-    mov     edx, [esp + 12]
-    mov     edi, [esp + 8]
-    mov     ecx, edx
-    shr     ecx, 1
-    movd    mm0, [esp + 16]
-    mov     eax, edi
+InternalMemSetMem32 PROC
+    mov     eax, [esp + 4]              ; eax <- Buffer as return value
+    mov     ecx, [esp + 8]              ; ecx <- Count
+    movd    mm0, [esp + 12]             ; mm0 <- Value
+    shr     ecx, 1                      ; ecx <- number of qwords to set
+    mov     edx, eax                    ; edx <- Buffer
     jz      @SetDwords
-    pshufw  mm0, mm0, 44h
+    movq    mm1, mm0
+    psllq   mm1, 32
+    por     mm0, mm1
 @@:
-    movntq  [edi], mm0
-    add     edi, 8
+    movq    [edx], mm0
+    lea     edx, [edx + 8]              ; use "lea" to avoid change in flags
     loop    @B
-    mfence
 @SetDwords:
-    test    dl, 1
-    jz      @F
-    movd    [edi], mm0
+    jnc     @F
+    movd    [edx], mm0
 @@:
     ret
 InternalMemSetMem32 ENDP

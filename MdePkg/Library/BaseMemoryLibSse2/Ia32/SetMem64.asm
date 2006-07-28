@@ -28,6 +28,7 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
+;  EFIAPI
 ;  InternalMemSetMem64 (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
@@ -35,8 +36,8 @@
 ;    )
 ;------------------------------------------------------------------------------
 InternalMemSetMem64 PROC
-    mov     eax, [esp + 4]
-    mov     ecx, [esp + 8]
+    mov     eax, [esp + 4]              ; eax <- Buffer
+    mov     ecx, [esp + 8]              ; ecx <- Count
     test    al, 8
     mov     edx, eax
     movq    xmm0, [esp + 12]

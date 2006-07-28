@@ -23,15 +23,15 @@
 
     .686
     .model  flat,C
-    .xmm
+    .mmx
     .code
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_ZeroMem (
+;  InternalMemZeroMem (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count
-;    )
+;    );
 ;------------------------------------------------------------------------------
 InternalMemZeroMem  PROC    USES    edi
     mov     edi, [esp + 8]
@@ -41,10 +41,9 @@ InternalMemZeroMem  PROC    USES    edi
     jz      @ZeroBytes
     pxor    mm0, mm0
 @@:
-    movntq  [edi], mm0
+    movq    [edi], mm0
     add     edi, 8
     loop    @B
-    mfence
 @ZeroBytes:
     and     edx, 7
     xor     eax, eax

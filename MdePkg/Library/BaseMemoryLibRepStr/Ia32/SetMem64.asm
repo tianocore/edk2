@@ -25,6 +25,14 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemSetMem64 (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count,
+;    IN UINT64 Value
+;    )
+;------------------------------------------------------------------------------
 InternalMemSetMem64 PROC    USES    edi
     mov     ecx, [esp + 12]
     mov     eax, [esp + 16]

@@ -23,12 +23,13 @@
 
     .686
     .model  flat,C
-    .xmm
+    .mmx
     .code
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem64 (
+;  EFIAPI
+;  InternalMemSetMem64 (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
 ;    IN UINT64 Value
@@ -40,10 +41,9 @@ InternalMemSetMem64 PROC
     movq    mm0, [esp + 12]
     mov     edx, eax
 @@:
-    movntq  [edx], mm0
+    movq    [edx], mm0
     add     edx, 8
     loop    @B
-    mfence
     ret
 InternalMemSetMem64 ENDP
 

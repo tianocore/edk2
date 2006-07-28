@@ -23,23 +23,29 @@
 
     .code
 
-InternalMemSetMem32 PROC    USES    rdi
-    DB      49h, 0fh, 6eh, 0c0h        ;  movq    mm0, r8       ; mm0 <- Value
-    mov     rax, rcx                                            ; rax <- Buffer
-    mov     rdi, rax
-    mov     rcx, rdx
-    shr     rcx, 1                                      
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemSetMem32 (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count,
+;    IN UINT32 Value
+;    )
+;------------------------------------------------------------------------------
+InternalMemSetMem32 PROC
+    DB      49h, 0fh, 6eh, 0c0h         ; movd mm0, r8 (Value)
+    mov     rax, rcx                    ; rax <- Buffer
+    xchg    rcx, rdx                    ; rcx <- Count  rdx <- Buffer
+    shr     rcx, 1                      ; rcx <- # of qwords to set
     jz      @SetDwords
-    DB      0fh, 70h, 0C0h, 44h        ;  pshufw  mm0, mm0, 44h
+    DB      0fh, 70h, 0C0h, 44h         ; pshufw mm0, mm0, 44h
 @@:
-    DB      48h, 0fh, 0e7h, 07h        ;  movntq  [rdi], mm0
-    add     rdi, 8
+    DB      0fh, 0e7h, 02h              ; movntq [rdx], mm0
+    lea     rdx, [rdx + 8]              ; use "lea" to avoid flag changes
     loop    @B
     mfence
 @SetDwords:
-    test    dl, 1
-    jz      @F
-    DB      0fh, 7eh, 07h              ;  movd    [rdi], mm0
+    jnc     @F
+    DB      0fh, 7eh, 02h               ; movd [rdx], mm0
 @@:
     ret
 InternalMemSetMem32 ENDP

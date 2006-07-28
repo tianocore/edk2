@@ -23,10 +23,19 @@
 
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  EFIAPI
+;  InternalMemCopyMem (
+;    IN VOID   *Destination,
+;    IN VOID   *Source,
+;    IN UINTN  Count
+;    )
+;------------------------------------------------------------------------------
 InternalMemCopyMem  PROC    USES    rsi rdi
     mov     rsi, rdx                    ; rsi <- Source
     mov     rdi, rcx                    ; rdi <- Destination
-    lea     r9, [rdi + r8 - 1]          ; r9 <- End of Destination
+    lea     r9, [rsi + r8 - 1]          ; r9 <- End of Source
     cmp     rsi, rdi
     mov     rax, rdi                    ; rax <- Destination as return value
     jae     @F
@@ -39,8 +48,8 @@ InternalMemCopyMem  PROC    USES    rsi rdi
     rep     movsq                       ; Copy as many Qwords as possible
     jmp     @CopyBytes
 @CopyBackward:
-    mov     rdi, r9                     ; rdi <- End of Destination
-    lea     rsi, [rsi + r8 - 1]         ; esi <- End of Source
+    mov     rsi, r9                     ; rsi <- End of Source
+    lea     rdi, [rdi + r8 - 1]         ; esi <- End of Destination
     std                                 ; set direction flag
 @CopyBytes:
     mov     rcx, r8
