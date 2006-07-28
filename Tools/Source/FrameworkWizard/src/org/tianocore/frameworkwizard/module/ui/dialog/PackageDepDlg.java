@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update Include of MSA/MBD file
+ The file is used to create, update Package Dependencies section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -38,10 +38,9 @@ import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update Include of MSA/MBD file It extends
- * IInternalFrame
+ * The class is used to create, update Package Dependencies section of the MSA file
  * 
- * 
+ * It extends * IDialog
  * 
  */
 public class PackageDepDlg extends IDialog implements ItemListener {
@@ -100,7 +99,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     private JComboBox getJComboBoxPackageName() {
         if (jComboBoxPackageName == null) {
             jComboBoxPackageName = new JComboBox();
-            jComboBoxPackageName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxPackageName.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jComboBoxPackageName.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxPackageName.setToolTipText("If your Module requires a package list that here.");
             jComboBoxPackageName.addItemListener(this);
@@ -116,7 +115,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldPackageGuid() {
         if (jTextFieldPackageGuid == null) {
             jTextFieldPackageGuid = new JTextField();
-            jTextFieldPackageGuid.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jTextFieldPackageGuid.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jTextFieldPackageGuid.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldPackageGuid.setEditable(false);
             jTextFieldPackageGuid.setVisible(false);
@@ -132,14 +131,14 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldPackageVersion() {
         if (jTextFieldPackageVersion == null) {
             jTextFieldPackageVersion = new JTextField();
-            jTextFieldPackageVersion.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jTextFieldPackageVersion.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jTextFieldPackageVersion.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldPackageVersion
-                                    .setToolTipText("<html>If this module depends on a specific version of a package, <br>" +
-                                            "enter the package version here.  <br>" +
-                                            "If the module can use the latest version <br>" +
-                                            "that does not break backward compatibility, <br>" +
-                                            "leave this field blank</html>");
+              .setToolTipText("<html>If this module depends on a specific version of a package, <br>"
+                + "enter the package version here.  <br>"
+                + "If the module can use the latest version <br>"
+                + "that does not break backward compatibility, <br>"
+                + "leave this field blank</html>");
         }
         return jTextFieldPackageVersion;
     }
@@ -152,7 +151,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 62, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jTextFieldFeatureFlag;
@@ -180,7 +179,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 115, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 122, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -196,7 +195,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 115, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 122, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -212,7 +211,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
      * 
      */
     private void init() {
-        this.setSize(508, 188);
+        this.setSize(505, 216);
         this.setContentPane(getJScrollPane());
         this.setTitle("Package Dependencies");
         initFrame();
@@ -267,34 +266,34 @@ public class PackageDepDlg extends IDialog implements ItemListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(2, 10));
+            jStarLabel1.setLocation(new java.awt.Point(2, 12));
             jLabelPackageName = new JLabel();
-            jLabelPackageName.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+            jLabelPackageName.setBounds(new java.awt.Rectangle(12, 12, 168, 20));
             jLabelPackageName.setText("Package Name");
 
             jLabelPackageVersion = new JLabel();
-            jLabelPackageVersion.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+            jLabelPackageVersion.setBounds(new java.awt.Rectangle(12, 37, 168, 20));
             jLabelPackageVersion.setText("Package Version");
 
             jLabelPackageGuid = new JLabel();
-            jLabelPackageGuid.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+            jLabelPackageGuid.setBounds(new java.awt.Rectangle(12, 37, 168, 20));
             jLabelPackageGuid.setText("Package Guid");
             jLabelPackageGuid.setVisible(false);
 
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 62, 168, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
 
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 85, 145, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 87, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(485, 145));
+            jContentPane.setPreferredSize(new java.awt.Dimension(485, 170));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelPackageName, null);
