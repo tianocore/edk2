@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update SourceFile of MSA/MBD file
+ The file is used to create, update SourceFiles section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -38,11 +38,10 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.SourceFiles.SourceFilesIdentification;
 
 /**
- The class is used to create, update SourceFile of MSA/MBD file
- It extends IInternalFrame
- 
-
-
+ * The class is used to create, update SourceFiles section of the MSA file
+ *
+ * It extends IDialog
+ * 
  **/
 public class SourceFilesDlg extends IDialog {
 
@@ -110,7 +109,7 @@ public class SourceFilesDlg extends IDialog {
     private JTextField getJTextFieldSourceFilesDirectory() {
         if (jTextFieldFileName == null) {
             jTextFieldFileName = new JTextField();
-            jTextFieldFileName.setBounds(new java.awt.Rectangle(140, 10, 250, 20));
+            jTextFieldFileName.setBounds(new java.awt.Rectangle(168, 12, 250, 20));
             jTextFieldFileName.setPreferredSize(new java.awt.Dimension(250, 20));
             jTextFieldFileName.setToolTipText("Path is relative to the MSA file and must include the file name");
         }
@@ -127,7 +126,7 @@ public class SourceFilesDlg extends IDialog {
         if (jButtonOpenFile == null) {
             jButtonOpenFile = new JButton();
             jButtonOpenFile.setText("Browse");
-            jButtonOpenFile.setBounds(new java.awt.Rectangle(395, 10, 85, 20));
+            jButtonOpenFile.setBounds(new java.awt.Rectangle(422, 12, 85, 20));
             jButtonOpenFile.setPreferredSize(new java.awt.Dimension(85, 20));
             jButtonOpenFile.addActionListener(this);
         }
@@ -155,7 +154,7 @@ public class SourceFilesDlg extends IDialog {
     private JTextField getJTextFieldTagName() {
         if (jTextFieldTagName == null) {
             jTextFieldTagName = new JTextField();
-            jTextFieldTagName.setBounds(new java.awt.Rectangle(140, 35, 340, 20));
+            jTextFieldTagName.setBounds(new java.awt.Rectangle(168, 37, 340, 20));
             jTextFieldTagName.setPreferredSize(new java.awt.Dimension(340, 20));
             jTextFieldTagName.setToolTipText("You may specify a specific tool chain tag name, such as BILL1");
         }
@@ -165,7 +164,7 @@ public class SourceFilesDlg extends IDialog {
     private IComboBox getIComboBoxToolCode() {
         if (iComboBoxToolCode == null) {
             iComboBoxToolCode = new IComboBox();
-            iComboBoxToolCode.setBounds(new java.awt.Rectangle(140, 60, 340, 20));
+            iComboBoxToolCode.setBounds(new java.awt.Rectangle(168, 62, 340, 20));
             iComboBoxToolCode.setPreferredSize(new java.awt.Dimension(340, 20));
             iComboBoxToolCode.setToolTipText("<html>You may select a specific tool command from drop down list, <br>"
                                              + "or you can DOUBLE-CLICK this fild to enter your customizing <br>"
@@ -183,7 +182,7 @@ public class SourceFilesDlg extends IDialog {
     private JTextField getJTextFieldToolCode() {
         if (jTextFieldToolCode == null) {
             jTextFieldToolCode = new JTextField();
-            jTextFieldToolCode.setBounds(new java.awt.Rectangle(140, 60, 340, 20));
+            jTextFieldToolCode.setBounds(new java.awt.Rectangle(168, 62, 340, 20));
             jTextFieldToolCode.setPreferredSize(new java.awt.Dimension(340, 20));
             jTextFieldToolCode.setToolTipText("You may specify a specific tool command, such as ASM");
             jTextFieldToolCode.setVisible(false);
@@ -199,7 +198,7 @@ public class SourceFilesDlg extends IDialog {
     private JTextField getJTextFieldToolChainFamily() {
         if (jTextFieldToolChainFamily == null) {
             jTextFieldToolChainFamily = new JTextField();
-            jTextFieldToolChainFamily.setBounds(new java.awt.Rectangle(140, 85, 340, 20));
+            jTextFieldToolChainFamily.setBounds(new java.awt.Rectangle(168, 87, 340, 20));
             jTextFieldToolChainFamily.setPreferredSize(new java.awt.Dimension(340, 20));
             jTextFieldToolChainFamily.setToolTipText("You may specify a specific tool chain family, such as GCC");
         }
@@ -214,7 +213,7 @@ public class SourceFilesDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(140, 110, 340, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 112, 340, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(340, 20));
             jTextFieldFeatureFlag.setToolTipText("RESERVED FOR FUTURE USE");
         }
@@ -230,7 +229,7 @@ public class SourceFilesDlg extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 165, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(317, 172, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -246,7 +245,7 @@ public class SourceFilesDlg extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 165, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(412, 172, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -271,7 +270,7 @@ public class SourceFilesDlg extends IDialog {
      
      **/
     private void init() {
-        this.setSize(510, 240);
+        this.setSize(525, 240);
         this.setContentPane(getJScrollPane());
         this.setTitle("Source Files");
         this.setViewMode(false);
@@ -349,30 +348,30 @@ public class SourceFilesDlg extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(140, 135, 340, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 137, 340, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(340, 20));
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 110, 120, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 112, 155, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
             jLabelToolCode = new JLabel();
-            jLabelToolCode.setBounds(new java.awt.Rectangle(15, 60, 120, 20));
+            jLabelToolCode.setBounds(new java.awt.Rectangle(12, 62, 155, 20));
             jLabelToolCode.setText("Tool Code");
             jLabelTagName = new JLabel();
-            jLabelTagName.setBounds(new java.awt.Rectangle(15, 35, 120, 20));
+            jLabelTagName.setBounds(new java.awt.Rectangle(12, 37, 155, 20));
             jLabelTagName.setText("Tag Name");
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 135, 120, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 137, 155, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelToolChainFamily = new JLabel();
-            jLabelToolChainFamily.setBounds(new java.awt.Rectangle(15, 85, 120, 20));
+            jLabelToolChainFamily.setBounds(new java.awt.Rectangle(12, 87, 155, 20));
             jLabelToolChainFamily.setText("Tool Chain Family");
             jLabelFileName = new JLabel();
             jLabelFileName.setText("File Name");
-            jLabelFileName.setBounds(new java.awt.Rectangle(15, 10, 120, 20));
+            jLabelFileName.setBounds(new java.awt.Rectangle(12, 12, 155, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 185));
+            jContentPane.setPreferredSize(new java.awt.Dimension(505, 192));
 
             jContentPane.add(jLabelFileName, null);
             jContentPane.add(getJTextFieldSourceFilesDirectory(), null);
