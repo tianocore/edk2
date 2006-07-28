@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update Event of MSA/MBD file
+ The file is used to create, update Events section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -38,8 +38,8 @@ import org.tianocore.frameworkwizard.module.Identifications.Events.EventsIdentif
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update Event of MSA/MBD file It extends
- * IInternalFrame
+ * The class is used to create, update Events section of the MSA file 
+ * It extends IDialog
  * 
  * @since ModuleEditor 1.0
  * 
@@ -118,12 +118,12 @@ public class EventsDlg extends IDialog {
     private JComboBox getJComboBoxEventsType() {
         if (jComboBoxEventsType == null) {
             jComboBoxEventsType = new JComboBox();
-            jComboBoxEventsType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxEventsType.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jComboBoxEventsType.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxEventsType
-                               .setToolTipText("<html>Select CreateEvents if the Module has an event that is waiting to be signaled.<br>"
-                                               + "Select SignalEvents if the Module will signal all events in an event group.<br>"
-                                               + "NOTE: Signal events are named by GUID.</html>");
+              .setToolTipText("<html>Select CreateEvents if the Module has an event that is waiting to be signaled.<br>"
+                + "Select SignalEvents if the Module will signal all events in an event group.<br>"
+                + "NOTE: Signal events are named by GUID.</html>");
         }
         return jComboBoxEventsType;
     }
@@ -137,7 +137,7 @@ public class EventsDlg extends IDialog {
     private JComboBox getJComboBoxGuidC_Name() {
         if (jComboBoxGuidC_Name == null) {
             jComboBoxGuidC_Name = new JComboBox();
-            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jComboBoxGuidC_Name.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jComboBoxGuidC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxGuidC_Name.setToolTipText("Select the GUID C Name of the Event");
         }
@@ -152,7 +152,7 @@ public class EventsDlg extends IDialog {
     private JComboBox getJComboBoxEventGroup() {
         if (jComboBoxEventGroup == null) {
             jComboBoxEventGroup = new JComboBox();
-            jComboBoxEventGroup.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jComboBoxEventGroup.setBounds(new java.awt.Rectangle(168, 62, 320, 20));
             jComboBoxEventGroup.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxEventGroup.setToolTipText("Select Type of Event: Guid or Timer.");
 
@@ -169,18 +169,18 @@ public class EventsDlg extends IDialog {
     private JComboBox getJComboBoxUsage() {
         if (jComboBoxUsage == null) {
             jComboBoxUsage = new JComboBox();
-            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jComboBoxUsage.setBounds(new java.awt.Rectangle(168, 87, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxUsage
-                          .setToolTipText("<html><table>"
-                                          + "<tr><td colspan=2 align=center><b>Create Events</b></td></tr>"
-                                          + "<tr><td>ALWAYS_CONSUMED</td><td>Module registers a notification function and REQUIRES that it be<br>"
-                                          + "executed for the module to fully function.</td></tr>"
-                                          + "<tr><td>SOMETIMES_CONSUMED</td><td>Module registers a notification function and calls the function<br>"
-                                          + "when it is signaled</td></tr><tr><td colspan=2 align=center><b>Signal Events</b></td></tr>"
-                                          + "<tr><td>ALWAYS_PRODUCED</td><td>Module will Always signal the event</td></tr>"
-                                          + "<tr><td>SOMETIMES_PRODUCED</td><td>Module will sometimes signal the event</td></tr>"
-                                          + "</table></html>");
+              .setToolTipText("<html><table>"
+                + "<tr><td colspan=2 align=center><b>Create Events</b></td></tr>"
+                + "<tr><td>ALWAYS_CONSUMED</td><td>Module registers a notification function and REQUIRES that it be<br>"
+                + "executed for the module to fully function.</td></tr>"
+                + "<tr><td>SOMETIMES_CONSUMED</td><td>Module registers a notification function and calls the function<br>"
+                + "when it is signaled</td></tr><tr><td colspan=2 align=center><b>Signal Events</b></td></tr>"
+                + "<tr><td>ALWAYS_PRODUCED</td><td>Module will Always signal the event</td></tr>"
+                + "<tr><td>SOMETIMES_PRODUCED</td><td>Module will sometimes signal the event</td></tr>"
+                + "</table></html>");
         }
         return jComboBoxUsage;
     }
@@ -206,7 +206,7 @@ public class EventsDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 155, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 157, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
         }
@@ -240,7 +240,7 @@ public class EventsDlg extends IDialog {
             jScrollPaneHelpText.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
             jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
-            jScrollPaneHelpText.setLocation(new java.awt.Point(160, 110));
+            jScrollPaneHelpText.setLocation(new java.awt.Point(168, 112));
             jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
         }
         return jScrollPaneHelpText;
@@ -255,7 +255,7 @@ public class EventsDlg extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 202, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 212, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -271,7 +271,7 @@ public class EventsDlg extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 202, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 212, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -287,7 +287,7 @@ public class EventsDlg extends IDialog {
      * 
      */
     private void init() {
-        this.setSize(500, 275);
+        this.setSize(505, 280);
         this.setContentPane(getJScrollPane());
         this.setTitle("Events");
         initFrame();
@@ -353,47 +353,47 @@ public class EventsDlg extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(2, 10));
+            jStarLabel1.setLocation(new java.awt.Point(2, 12));
             jLabelEventType = new JLabel();
             jLabelEventType.setText("Select Event Type");
-            jLabelEventType.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+            jLabelEventType.setBounds(new java.awt.Rectangle(12, 12, 168, 20));
 
             jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(2, 35));
+            jStarLabel2.setLocation(new java.awt.Point(2, 37));
             jLabelC_Name = new JLabel();
             jLabelC_Name.setText("Guid C Name");
-            jLabelC_Name.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+            jLabelC_Name.setBounds(new java.awt.Rectangle(12, 37, 168, 20));
 
             jStarLabel3 = new StarLabel();
-            jStarLabel3.setLocation(new java.awt.Point(2, 60));
+            jStarLabel3.setLocation(new java.awt.Point(2, 62));
             jLabelGroup = new JLabel();
             jLabelGroup.setText("Event Group Type");
-            jLabelGroup.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
+            jLabelGroup.setBounds(new java.awt.Rectangle(12, 62, 168, 20));
 
             jStarLabel4 = new StarLabel();
-            jStarLabel4.setLocation(new java.awt.Point(2, 85));
+            jStarLabel4.setLocation(new java.awt.Point(2, 87));
             jLabelUsage = new JLabel();
             jLabelUsage.setText("Usage");
-            jLabelUsage.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
+            jLabelUsage.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
 
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 110, 145, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(12, 112, 168, 20));
             jLabelHelpText.setText("Help Text");
 
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 155, 145, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 157, 168, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
 
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 180, 145, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 182, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 180, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 182, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(485, 230));
+            jContentPane.setPreferredSize(new java.awt.Dimension(485, 235));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelEventType, null);

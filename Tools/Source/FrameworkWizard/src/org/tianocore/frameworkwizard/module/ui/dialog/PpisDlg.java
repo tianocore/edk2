@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update Ppi of MSA/MBD file
+ The file is used to create, update Ppi section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -111,7 +111,7 @@ public class PpisDlg extends IDialog implements ItemListener {
     private JComboBox getJComboBoxPpiType() {
         if (jComboBoxPpiType == null) {
             jComboBoxPpiType = new JComboBox();
-            jComboBoxPpiType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxPpiType.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jComboBoxPpiType.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxPpiType.addItemListener(this);
             jComboBoxPpiType
@@ -129,7 +129,7 @@ public class PpisDlg extends IDialog implements ItemListener {
     private JComboBox getJComboBoxCName() {
         if (jComboBoxCName == null) {
             jComboBoxCName = new JComboBox();
-            jComboBoxCName.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jComboBoxCName.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jComboBoxCName.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxCName.setToolTipText("Select Guid C Name of PPI");
         }
@@ -145,7 +145,7 @@ public class PpisDlg extends IDialog implements ItemListener {
     private JComboBox getJComboBoxUsage() {
         if (jComboBoxUsage == null) {
             jComboBoxUsage = new JComboBox();
-            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jComboBoxUsage.setBounds(new java.awt.Rectangle(168, 62, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxUsage
                           .setToolTipText("<html><table><tr><td colspan=2 align=center><b>PPI</b></td></tr><tr><td>ALWAYS_CONSUMED</td><td>Module always consumes the PPI</td></tr><tr><td>SOMETIMES_CONSUMED</td><td>Module sometimes consumes the PPI</td></tr><tr><td>ALWAYS_PRODUCED</td><td>Module always produces the PPI</td></tr><tr><td>SOMETIMES_PRODUCED</td><td>Module sometimes produces the PPI</td></tr><tr><td colspan=2 align=center><b>PPI Notify</b></td></tr><tr><td>SOMETIMES_CONSUMED</td><td>Module will consume the PPI if it is produced. Consumption<br>is defined by executing the PPI notify function</td></tr></table></html>");
@@ -162,7 +162,7 @@ public class PpisDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 130, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 132, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
         }
@@ -209,7 +209,7 @@ public class PpisDlg extends IDialog implements ItemListener {
             jScrollPaneHelpText.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneHelpText.setSize(new java.awt.Dimension(320, 40));
             jScrollPaneHelpText.setPreferredSize(new java.awt.Dimension(320, 40));
-            jScrollPaneHelpText.setLocation(new java.awt.Point(160, 85));
+            jScrollPaneHelpText.setLocation(new java.awt.Point(168, 87));
             jScrollPaneHelpText.setViewportView(getJTextAreaHelpText());
         }
         return jScrollPaneHelpText;
@@ -224,7 +224,7 @@ public class PpisDlg extends IDialog implements ItemListener {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 182, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 187, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -240,7 +240,7 @@ public class PpisDlg extends IDialog implements ItemListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 182, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 187, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -256,7 +256,7 @@ public class PpisDlg extends IDialog implements ItemListener {
      * 
      */
     private void init() {
-        this.setSize(500, 255);
+        this.setSize(505, 260);
         this.setContentPane(getJScrollPane());
         this.setTitle("PPI Definitions");
         initFrame();
@@ -305,41 +305,41 @@ public class PpisDlg extends IDialog implements ItemListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(2, 10));
+            jStarLabel1.setLocation(new java.awt.Point(2, 12));
             jLabelPpiType = new JLabel();
-            jLabelPpiType.setBounds(new java.awt.Rectangle(15, 10, 145, 20));
+            jLabelPpiType.setBounds(new java.awt.Rectangle(12, 12, 168, 20));
             jLabelPpiType.setText("Select Ppi Type");
 
             jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(2, 35));
+            jStarLabel2.setLocation(new java.awt.Point(2, 37));
             jLabelC_Name = new JLabel();
             jLabelC_Name.setText("PPI GUID C Name");
-            jLabelC_Name.setBounds(new java.awt.Rectangle(15, 35, 145, 20));
+            jLabelC_Name.setBounds(new java.awt.Rectangle(12, 37, 168, 20));
 
             jStarLabel3 = new StarLabel();
-            jStarLabel3.setLocation(new java.awt.Point(2, 60));
+            jStarLabel3.setLocation(new java.awt.Point(2, 62));
             jLabelUsage = new JLabel();
             jLabelUsage.setText("Usage");
-            jLabelUsage.setBounds(new java.awt.Rectangle(15, 60, 145, 20));
+            jLabelUsage.setBounds(new java.awt.Rectangle(12, 62, 168, 20));
 
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 85, 145, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(14, 87, 168, 20));
             jLabelHelpText.setText("Help Text");
 
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setText("Feature Flag Expression");
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 130, 145, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 132, 168, 20));
 
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 155, 145, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 157, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 155, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 157, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(485, 210));
+            jContentPane.setPreferredSize(new java.awt.Dimension(485, 215));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jLabelPpiType, null);
