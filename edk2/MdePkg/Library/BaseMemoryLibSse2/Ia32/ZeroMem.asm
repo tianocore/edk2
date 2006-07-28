@@ -28,10 +28,11 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_ZeroMem (
+;  EFIAPI
+;  InternalMemZeroMem (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count
-;    )
+;    );
 ;------------------------------------------------------------------------------
 InternalMemZeroMem  PROC    USES    edi
     mov     edi, [esp + 8]

@@ -21,44 +21,43 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
+.global _InternalMemSetMem
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_SetMem (
+#  InternalMemSetMem (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT8  Value
 #    )
 #------------------------------------------------------------------------------
-.global _InternalMemSetMem
 _InternalMemSetMem:
     push    %edi
+    movb    16(%esp), %al
+    movb    %al, %ah
+    shrdl   $16, %eax, %edx
+    shldl   $16, %edx, %eax
     movl    12(%esp), %ecx              # ecx <- Count
     movl    8(%esp), %edi               # edi <- Buffer
     movl    %ecx, %edx
-    shrl    $3, %ecx                    # # of Qwords to set
-    movb    16(%esp), %al               # al <- Value
-    jz      @SetBytes
-    movb    %al, %ah                    # ax <- Value | (Value << 8)
-    pushl   %ecx
-    pushl   %ecx
-    movq    %mm0, (%esp)                # save mm0
-    movd    %eax, %mm0
-    pshufw  $0x0,%mm0,%mm0
-L0: 
-    movntq  %mm0, (%edi)
-    addl    $8, %edi
-    loop    L0
-    mfence
-    movq    (%esp), %mm0                # restore mm0
-    popl    %ecx                        # stack cleanup
-    popl    %ecx
-@SetBytes: 
     andl    $7, %edx
+    shrl    $3, %ecx                    # # of Qwords to set
+    jz      L1
+    addl    $0x-10, %esp
+    movq    %mm0, (%esp)                # save mm0
+    movq    %mm1, 8(%esp)               # save mm1
+    movd    %eax, %mm0
+    movd    %eax, %mm1
+    psllq   $32, %mm0
+    por     %mm1, %mm0                  # fill mm0 with 8 Value's
+L0:
+    movq    %mm0, (%edi)
+    addl    $8, %edi
+    loopl   L0
+    movq    (%esp), %mm0                # restore mm0
+    movq    8(%esp), %mm1               # restore mm1
+    addl    $0x10, %esp                 # stack cleanup
+L1:
     movl    %edx, %ecx
     rep
     stosb

@@ -27,11 +27,17 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .code: 
-
 .global _InternalMemScanMem16
+
+#------------------------------------------------------------------------------
+# CONST VOID *
+# EFIAPI
+# InternalMemScanMem16 (
+#   IN      CONST VOID                *Buffer,
+#   IN      UINTN                     Length,
+#   IN      UINT16                    Value
+#   );
+#------------------------------------------------------------------------------
 _InternalMemScanMem16:
     push    %edi
     movl    12(%esp), %ecx
@@ -42,5 +48,3 @@ _InternalMemScanMem16:
     cmovnz  %ecx, %eax
     pop     %edi
     ret
-
-

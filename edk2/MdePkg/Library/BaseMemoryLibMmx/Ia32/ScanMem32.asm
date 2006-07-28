@@ -31,6 +31,15 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; CONST VOID *
+; EFIAPI
+; InternalMemScanMem32 (
+;   IN      CONST VOID                *Buffer,
+;   IN      UINTN                     Length,
+;   IN      UINT32                    Value
+;   );
+;------------------------------------------------------------------------------
 InternalMemScanMem32    PROC    USES    edi
     mov     ecx, [esp + 12]
     mov     edi, [esp + 8]

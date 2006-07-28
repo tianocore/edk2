@@ -29,6 +29,15 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; INTN
+; EFIAPI
+; InternalMemCompareMem (
+;   IN      CONST VOID                *DestinationBuffer,
+;   IN      CONST VOID                *SourceBuffer,
+;   IN      UINTN                     Length
+;   );
+;------------------------------------------------------------------------------
 InternalMemCompareMem   PROC    USES    rsi rdi
     mov     rsi, rcx
     mov     rdi, rdx

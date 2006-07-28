@@ -27,20 +27,27 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    .code: 
-
 .global _InternalMemCompareMem
+
+#------------------------------------------------------------------------------
+# INTN
+# EFIAPI
+# InternalMemCompareMem (
+#   IN      CONST VOID                *DestinationBuffer,
+#   IN      CONST VOID                *SourceBuffer,
+#   IN      UINTN                     Length
+#   );
+#------------------------------------------------------------------------------
 _InternalMemCompareMem:
     push    %esi
     push    %edi
-    movl    12(%esp),%esi
-    movl    16(%esp),%edi
-    movl    20(%esp),%ecx
+    movl    12(%esp), %esi
+    movl    16(%esp), %edi
+    movl    20(%esp), %ecx
     repe    cmpsb
     movzbl  -1(%esi), %eax
     movzbl  -1(%edi), %edx
-    subl    %edx,%eax
+    subl    %edx, %eax
     pop     %edi
     pop     %esi
     ret

@@ -27,11 +27,17 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .code: 
-
 .global _InternalMemCompareMem
+
+#------------------------------------------------------------------------------
+# INTN
+# EFIAPI
+# InternalMemCompareMem (
+#   IN      CONST VOID                *DestinationBuffer,
+#   IN      CONST VOID                *SourceBuffer,
+#   IN      UINTN                     Length
+#   );
+#------------------------------------------------------------------------------
 _InternalMemCompareMem:
     push    %esi
     push    %edi

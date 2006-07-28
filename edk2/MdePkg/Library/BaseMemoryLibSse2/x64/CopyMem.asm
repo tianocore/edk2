@@ -25,20 +25,21 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_CopyMem (
+;  EFIAPI
+;  InternalMemCopyMem (
 ;    IN VOID   *Destination,
 ;    IN VOID   *Source,
 ;    IN UINTN  Count
-;    )
+;    );
 ;------------------------------------------------------------------------------
 InternalMemCopyMem  PROC    USES    rsi rdi
     mov     rsi, rdx                    ; rsi <- Source
     mov     rdi, rcx                    ; rdi <- Destination
-    lea     r9, [rdi + r8 - 1]          ; r9 <- Last byte of Destination
+    lea     r9, [rsi + r8 - 1]          ; r9 <- Last byte of Source
     cmp     rsi, rdi
     mov     rax, rdi                    ; rax <- Destination as return value
     jae     @F                          ; Copy forward if Source > Destination
-    cmp     r9, rsi                     ; Overlapped?
+    cmp     r9, rdi                     ; Overlapped?
     jae     @CopyBackward               ; Copy backward if overlapped
 @@:
     xor     rcx, rcx
@@ -65,8 +66,8 @@ InternalMemCopyMem  PROC    USES    rsi rdi
     movdqa  xmm0, [rsp + 18h]           ; restore xmm0
     jmp     @CopyBytes                  ; copy remaining bytes
 @CopyBackward:
-    mov     rdi, r9                     ; rdi <- Last byte of Destination
-    lea     rsi, [rsi + r8 - 1]         ; rsi <- Last byte of Source
+    mov     rsi, r9                     ; rsi <- Last byte of Source
+    lea     rdi, [rdi + r8 - 1]         ; rdi <- Last byte of Destination
     std
 @CopyBytes:
     mov     rcx, r8

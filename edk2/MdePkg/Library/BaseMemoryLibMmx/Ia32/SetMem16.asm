@@ -23,32 +23,36 @@
 
     .686
     .model  flat,C
-    .xmm
+    .mmx
     .code
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem16 (
+;  EFIAPI
+;  InternalMemSetMem16 (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
 ;    IN UINT16 Value
 ;    )
 ;------------------------------------------------------------------------------
 InternalMemSetMem16 PROC    USES    edi
+    mov     eax, [esp + 16]
+    shrd    edx, eax, 16
+    shld    eax, edx, 16
     mov     edx, [esp + 12]
     mov     edi, [esp + 8]
     mov     ecx, edx
     and     edx, 3
     shr     ecx, 2
-    mov     eax, [esp + 16]
     jz      @SetWords
     movd    mm0, eax
-    pshufw  mm0, mm0, 0
+    movd    mm1, eax
+    psllq   mm0, 32
+    por     mm0, mm1
 @@:
-    movntq  [edi], mm0
+    movq    [edi], mm0
     add     edi, 8
     loop    @B
-    mfence
 @SetWords:
     mov     ecx, edx
     rep     stosw

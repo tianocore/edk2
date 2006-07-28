@@ -31,6 +31,15 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; CONST VOID *
+; EFIAPI
+; InternalMemScanMem64 (
+;   IN      CONST VOID                *Buffer,
+;   IN      UINTN                     Length,
+;   IN      UINT64                    Value
+;   );
+;------------------------------------------------------------------------------
 InternalMemScanMem64    PROC    USES    edi
     mov     ecx, [esp + 12]
     mov     eax, [esp + 16]

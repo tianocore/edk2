@@ -89,6 +89,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="X64">X64/ScanMem16.asm</Filename>
     <Filename SupArchList="X64">X64/ScanMem32.asm</Filename>
     <Filename SupArchList="X64">X64/ScanMem64.asm</Filename>
+    <Filename SupArchList="X64">X64/ZeroMem.asm</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>

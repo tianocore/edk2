@@ -21,15 +21,17 @@
 #
 #------------------------------------------------------------------------------
 
+.globl _InternalMemSetMem64
+
 #------------------------------------------------------------------------------
 #  VOID *
+#  EFIAPI
 #  InternalMemSetMem64 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT64 Value
-#    )
+#    );
 #------------------------------------------------------------------------------
-.globl _InternalMemSetMem64
 _InternalMemSetMem64:
     movl    4(%esp), %eax
     movl    8(%esp), %ecx
@@ -40,20 +42,17 @@ _InternalMemSetMem64:
     movq    %xmm0, (%edx)
     addl    $8, %edx
     decl    %ecx
-L1: 
+L1:
     shrl    %ecx
     jz      @SetQwords
     movlhps %xmm0, %xmm0
-L2: 
+L2:
     movntdq %xmm0, (%edx)
     leal    16(%edx), %edx
     loop    L2
     mfence
-@SetQwords: 
+@SetQwords:
     jnc     L3
     movq    %xmm0, (%edx)
-L3: 
+L3:
     ret
-
-
-

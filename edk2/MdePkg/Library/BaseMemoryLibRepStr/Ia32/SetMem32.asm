@@ -25,6 +25,14 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  InternalMemSetMem32 (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count,
+;    IN UINT32 Value
+;    )
+;------------------------------------------------------------------------------
 InternalMemSetMem32 PROC    USES    edi
     mov     eax, [esp + 16]
     mov     edi, [esp + 8]

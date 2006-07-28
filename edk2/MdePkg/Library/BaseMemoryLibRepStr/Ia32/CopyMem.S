@@ -21,38 +21,45 @@
 #
 #------------------------------------------------------------------------------
 
-    .386: 
-    .code: 
-
 .global _InternalMemCopyMem
+
+#------------------------------------------------------------------------------
+#  VOID *
+#  EFIAPI
+#  InternalMemCopyMem (
+#    IN VOID   *Destination,
+#    IN VOID   *Source,
+#    IN UINTN  Count
+#    );
+#------------------------------------------------------------------------------
 _InternalMemCopyMem:
     push    %esi
     push    %edi
-    movl    16(%esp),%esi               # esi <- Source
-    movl    12(%esp),%edi               # edi <- Destination
-    movl    20(%esp),%edx               # edx <- Count
-    leal    -1(%edi,%edx),%eax          # eax <- End of Destination
-    cmpl    %edi,%esi
+    movl    16(%esp), %esi              # esi <- Source
+    movl    12(%esp), %edi              # edi <- Destination
+    movl    20(%esp), %edx              # edx <- Count
+    leal    -1(%esi, %edx), %eax        # eax <- End of Source
+    cmpl    %edi, %esi
     jae     L0
-    cmpl    %esi,%eax
+    cmpl    %edi, %eax
     jae     @CopyBackward               # Copy backward if overlapped
-L0: 
-    movl    %edx,%ecx
-    andl    $3,%edx
-    shrl    $2,%ecx
+L0:
+    movl    %edx, %ecx
+    andl    $3, %edx
+    shrl    $2, %ecx
     rep
     movsl                               # Copy as many Dwords as possible
     jmp     @CopyBytes
-@CopyBackward: 
-    movl    %eax,%edi                   # edi <- End of Destination
-    leal    -1(%esi,%edx),%esi          # esi <- End of Source
+@CopyBackward:
+    movl    %eax, %esi                  # esi <- End of Source
+    leal    -1(%edi, %edx), %edi        # edi <- End of Destination
     std
-@CopyBytes: 
-    movl    %edx,%ecx
+@CopyBytes:
+    movl    %edx, %ecx
     rep
     movsb                               # Copy bytes backward
     cld
-    movl    12(%esp),%eax               # eax <- Destination as return value
+    movl    12(%esp), %eax              # eax <- Destination as return value
     pop     %edi
     pop     %esi
     ret

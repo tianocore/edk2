@@ -21,19 +21,16 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
+.global _InternalMemZeroMem
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_ZeroMem (
+#  EFIAPI
+#  InternalMemZeroMem (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count
-#    )
+#    );
 #------------------------------------------------------------------------------
-.global _InternalMemZeroMem
 _InternalMemZeroMem:
     push    %edi
     movl    8(%esp), %edi
@@ -42,12 +39,11 @@ _InternalMemZeroMem:
     shrl    $3, %ecx
     jz      @ZeroBytes
     pxor    %mm0, %mm0
-L0: 
-    movntq  %mm0, (%edi)
+L0:
+    movq    %mm0, (%edi)
     addl    $8, %edi
     loop    L0
-    mfence
-@ZeroBytes: 
+@ZeroBytes:
     andl    $7, %edx
     xorl    %eax, %eax
     movl    %edx, %ecx

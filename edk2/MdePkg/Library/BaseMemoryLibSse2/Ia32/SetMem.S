@@ -21,10 +21,10 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
+    .686:
     #.MODEL flat,C
-    .xmm: 
-    .code: 
+    .xmm:
+    .code:
 
 #------------------------------------------------------------------------------
 #  VOID *
@@ -32,7 +32,7 @@
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT8  Value
-#    )
+#    );
 #------------------------------------------------------------------------------
 .global _InternalMemSetMem
 _InternalMemSetMem:
@@ -49,7 +49,7 @@ _InternalMemSetMem:
     subl    %ecx, %edx
     rep
     stosb
-L0: 
+L0:
     movl    %edx, %ecx
     andl    $15, %edx
     shrl    $4, %ecx                    # ecx <- # of DQwords to set
@@ -60,14 +60,14 @@ L0:
     movd    %eax, %xmm0
     pshuflw $0, %xmm0, %xmm0
     movlhps %xmm0, %xmm0
-L1: 
+L1:
     movntdq %xmm0, (%edi)
     addl    $16, %edi
     loop   L1
     mfence
     movdqu  (%esp), %xmm0
     addl    $16, %esp                   # stack cleanup
-@SetBytes: 
+@SetBytes:
     movl    %edx, %ecx
     rep
     stosb

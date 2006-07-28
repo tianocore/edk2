@@ -31,6 +31,15 @@
     .model  flat,C
     .code
 
+;------------------------------------------------------------------------------
+; INTN
+; EFIAPI
+; InternalMemCompareMem (
+;   IN      CONST VOID                *DestinationBuffer,
+;   IN      CONST VOID                *SourceBuffer,
+;   IN      UINTN                     Length
+;   );
+;------------------------------------------------------------------------------
 InternalMemCompareMem   PROC    USES    esi edi
     mov     esi, [esp + 12]
     mov     edi, [esp + 16]

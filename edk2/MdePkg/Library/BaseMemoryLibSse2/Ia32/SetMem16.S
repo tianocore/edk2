@@ -21,20 +21,17 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
+.global _InternalMemSetMem16
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_SetMem16 (
+#  EFIAPI
+#  InternalMemSetMem16 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT16 Value
 #    )
 #------------------------------------------------------------------------------
-.global _InternalMemSetMem16
 _InternalMemSetMem16:
     push    %edi
     movl    12(%esp), %edx
@@ -50,7 +47,7 @@ _InternalMemSetMem16:
     subl    %ecx, %edx
     rep
     stosw
-L0: 
+L0:
     movl    %edx, %ecx
     andl    $7, %edx
     shrl    $3, %ecx
@@ -63,7 +60,7 @@ L1:
     addl    $16, %edi
     loop    L1
     mfence
-@SetWords: 
+@SetWords:
     movl    %edx, %ecx
     rep
     stosw

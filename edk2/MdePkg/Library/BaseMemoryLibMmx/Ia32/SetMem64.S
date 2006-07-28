@@ -21,30 +21,23 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .xmm: 
-    .code: 
+.global _InternalMemSetMem64
 
 #------------------------------------------------------------------------------
 #  VOID *
-#  _mem_SetMem64 (
+#  InternalMemSetMem64 (
 #    IN VOID   *Buffer,
 #    IN UINTN  Count,
 #    IN UINT64 Value
 #    )
 #------------------------------------------------------------------------------
-.global _InternalMemSetMem64
 _InternalMemSetMem64:
-    push    %edi
-    movq    16(%esp), %mm0
-    movl    12(%esp), %ecx
-    movl    8(%esp), %edi
-    movl    %edi, %eax
-L0: 
-    movntq  %mm0, (%edi)
-    addl    $8, %edi
+    movl    4(%esp), %eax
+    movl    8(%esp), %ecx
+    movq    12(%esp), %mm0
+    movl    %eax, %edx
+L0:
+    movq    %mm0, (%edx)
+    lea     8(%edx), %edx
     loopl   L0
-    mfence
-    pop     %edi
     ret

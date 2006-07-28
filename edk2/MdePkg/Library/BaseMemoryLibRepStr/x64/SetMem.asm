@@ -23,6 +23,15 @@
 
     .code
 
+;------------------------------------------------------------------------------
+;  VOID *
+;  EFIAPI
+;  InternalMemSetMem (
+;    IN VOID   *Buffer,
+;    IN UINTN  Count,
+;    IN UINT8  Value
+;    )
+;------------------------------------------------------------------------------
 InternalMemSetMem   PROC    USES    rdi
     mov     rax, r8
     mov     rdi, rcx

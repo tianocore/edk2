@@ -27,17 +27,24 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    .code: 
-
 .global _InternalMemScanMem16
+
+#------------------------------------------------------------------------------
+# CONST VOID *
+# EFIAPI
+# InternalMemScanMem16 (
+#   IN      CONST VOID                *Buffer,
+#   IN      UINTN                     Length,
+#   IN      UINT16                    Value
+#   );
+#------------------------------------------------------------------------------
 _InternalMemScanMem16:
     push    %edi
-    movl    12(%esp),%ecx
-    movl    8(%esp),%edi
-    movl    16(%esp),%eax
+    movl    12(%esp), %ecx
+    movl    8(%esp), %edi
+    movl    16(%esp), %eax
     repne   scasw
-    leal    -2(%edi),%eax
+    leal    -2(%edi), %eax
     cmovnz  %ecx, %eax
     pop     %edi
     ret

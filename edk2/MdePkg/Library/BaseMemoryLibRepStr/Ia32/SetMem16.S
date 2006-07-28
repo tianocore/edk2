@@ -21,17 +21,23 @@
 #
 #------------------------------------------------------------------------------
 
-    .386: 
-    .code: 
-
 .global _InternalMemSetMem16
+
+#------------------------------------------------------------------------------
+#  VOID *
+#  InternalMemSetMem16 (
+#    IN VOID   *Buffer,
+#    IN UINTN  Count,
+#    IN UINT16 Value
+#    )
+#------------------------------------------------------------------------------
 _InternalMemSetMem16:
     push    %edi
-    movl    16(%esp),%eax
-    movl    8(%esp),%edi
-    movl    12(%esp),%ecx
+    movl    16(%esp), %eax
+    movl    8(%esp), %edi
+    movl    12(%esp), %ecx
     rep
     stosw
-    movl    8(%esp),%eax
+    movl    8(%esp), %eax
     pop     %edi
     ret

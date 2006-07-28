@@ -32,9 +32,10 @@
 ;    )
 ;------------------------------------------------------------------------------
 InternalMemSetMem64 PROC
-    mov     rax, rcx
+    mov     rax, rcx                    ; rax <- Buffer
+    xchg    rcx, rdx                    ; rcx <- Count & rdx <- Buffer
     test    dl, 8
-    xchg    rcx, rdx
+    movd    xmm0, r8
     jz      @F
     mov     [rdx], r8
     add     rdx, 8
@@ -42,7 +43,6 @@ InternalMemSetMem64 PROC
 @@:
     shr     rcx, 1
     jz      @SetQwords
-    movd    xmm0, r8
     movlhps xmm0, xmm0
 @@:
     movntdq [rdx], xmm0

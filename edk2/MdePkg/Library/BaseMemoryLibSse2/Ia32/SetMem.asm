@@ -28,11 +28,12 @@
 
 ;------------------------------------------------------------------------------
 ;  VOID *
-;  _mem_SetMem (
+;  EFIAPI
+;  InternalMemSetMem (
 ;    IN VOID   *Buffer,
 ;    IN UINTN  Count,
 ;    IN UINT8  Value
-;    )
+;    );
 ;------------------------------------------------------------------------------
 InternalMemSetMem   PROC    USES    edi
     mov     edx, [esp + 12]             ; edx <- Count

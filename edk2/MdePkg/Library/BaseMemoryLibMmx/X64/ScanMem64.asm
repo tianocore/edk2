@@ -29,6 +29,15 @@
 
     .code
 
+;------------------------------------------------------------------------------
+; CONST VOID *
+; EFIAPI
+; InternalMemScanMem64 (
+;   IN      CONST VOID                *Buffer,
+;   IN      UINTN                     Length,
+;   IN      UINT64                    Value
+;   );
+;------------------------------------------------------------------------------
 InternalMemScanMem64    PROC    USES    rdi
     mov     rdi, rcx
     mov     rax, r8

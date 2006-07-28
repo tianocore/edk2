@@ -27,11 +27,17 @@
 #
 #------------------------------------------------------------------------------
 
-    .686: 
-    #.MODEL flat,C
-    .code: 
-
 .global _InternalMemScanMem8
+
+#------------------------------------------------------------------------------
+# CONST VOID *
+# EFIAPI
+# InternalMemScanMem8 (
+#   IN      CONST VOID                *Buffer,
+#   IN      UINTN                     Length,
+#   IN      UINT8                     Value
+#   );
+#------------------------------------------------------------------------------
 _InternalMemScanMem8:
     push    %edi
     movl    12(%esp), %ecx
