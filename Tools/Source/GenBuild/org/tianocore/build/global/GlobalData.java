@@ -807,8 +807,8 @@ public class GlobalData {
     //
     // For PCD
     //
-    public synchronized static Map<FpdModuleIdentification, XmlObject> getFpdModuleSaXmlObject(
-            String xmlObjectName) {
+    public synchronized static Map<FpdModuleIdentification, XmlObject> 
+                               getFpdModuleSaXmlObject(String xmlObjectName) {
         Set<FpdModuleIdentification> fpdModuleSASet = fpdModuleSA.keySet();
         Iterator item = fpdModuleSASet.iterator();
         
@@ -823,17 +823,20 @@ public class GlobalData {
             try{
                 if (SANode.get(xmlObjectName)!= null){
                     SAPcdBuildDef.put(moduleId,
-                            (XmlObject) SANode
-                                    .get(xmlObjectName));
+                            (XmlObject) SANode.get(xmlObjectName));
 
                 }
-                            
-                
             } catch (Exception e){
                 EdkLog.log(EdkLog.EDK_INFO, e.getMessage());
             }
-            }
+        }
         return SAPcdBuildDef;
+    }
+
+    public synchronized static Map<FpdModuleIdentification,XmlObject> getFpdPcdBuildDefinitions() {
+        Map<FpdModuleIdentification,XmlObject> pcdBuildDef = getFpdModuleSaXmlObject ("PcdBuildDefinition");
+
+        return pcdBuildDef;
     }
 }
 

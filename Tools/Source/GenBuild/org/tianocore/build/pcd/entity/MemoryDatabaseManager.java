@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.pcd.exception.EntityException;
 
 /** Database hold all PCD information comes from SPD, MSA, FPD file in memory.
@@ -38,14 +39,20 @@ public class MemoryDatabaseManager {
     /// context of building libary.
     /// 
     public static List<UsageInstance> UsageInstanceContext = null;
+
     ///
-    /// 
+    /// Current module name, if now is buiding library, this value indicate this library
+    /// is for building what module.
     /// 
     public static String CurrentModuleName                 = null;
-    public static String PcdPeimHString       = "";
-    public static String PcdPeimCString       = "";
-    public static String PcdDxeHString        = "";
-    public static String PcdDxeCString        = "";
+
+    ///
+    /// String for PCD PEIM and DXE autogen file
+    /// 
+    public static String PcdPeimHString                    = "";
+    public static String PcdPeimCString                    = "";
+    public static String PcdDxeHString                     = "";
+    public static String PcdDxeCString                     = "";
 
     /**
       Constructure function
@@ -151,7 +158,7 @@ public class MemoryDatabaseManager {
           The output array is sorted based on descending order of the size of alignment for each feilds.
 
       @return the token record array contained all PCD token referenced in PEI phase.
-     * @throws EntityException 
+      @throws EntityException
     **/
     public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe) 
         throws EntityException {
@@ -204,7 +211,7 @@ public class MemoryDatabaseManager {
                         // We only support Dynamice(EX) type for PEI and DXE phase.
                         // If it is not referenced in either PEI or DXE, throw exception now.
                         //
-                        throw new EntityException("Dynamic(EX) PCD Entries are referenced in module that is not in PEI phase nor in DXE phase.");
+                        throw new EntityException("[PCD tool Internal Error] Dynamic(EX) PCD Entries are referenced in module that is not in PEI phase nor in DXE phase.");
                     }
                 }
             }
@@ -217,23 +224,15 @@ public class MemoryDatabaseManager {
       Get all PCD record for a module according to module's name, module's GUID,
       package name, package GUID, arch, version information.
      
-      @param moduleName  the name of module.
+      @param moduleId  the id of module.
+      @param arch      the architecture
       
       @return  all usage instance for this module in memory database.
     **/
-    public List<UsageInstance> getUsageInstanceArrayByModuleName(String moduleName,
-                                                                 UUID   moduleGuid,
-                                                                 String packageName,
-                                                                 UUID   packageGuid,
-                                                                 String arch,
-                                                                 String version) {
+    public List<UsageInstance> getUsageInstanceArrayByModuleName(ModuleIdentification  moduleId,
+                                                                 String                arch) {
 
-        String primaryKey = UsageInstance.getPrimaryKey(moduleName, 
-                                                        moduleGuid,
-                                                        packageName,
-                                                        packageGuid,
-                                                        arch,
-                                                        version);
+        String primaryKey = UsageInstance.getPrimaryKey(moduleId, arch);
 
         return getUsageInstanceArrayByKeyString(primaryKey);
     }

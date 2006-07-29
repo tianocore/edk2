@@ -19,8 +19,10 @@ package org.tianocore.build.pcd.entity;
 
 
 import java.util.UUID;
+
 import org.tianocore.ModuleTypeDef;
 import org.tianocore.build.autogen.CommonDefinition;
+import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.pcd.exception.EntityException;
 
 /**
@@ -32,105 +34,65 @@ public class UsageInstance {
     ///
     /// This parent that this usage instance belongs to.
     ///
-    public Token            parentToken;
+    public Token                parentToken;
 
     ///
-    /// The name of the module who contains this PCD.
-    ///
-    public String           moduleName;
-
-    ///
-    /// The GUID of the module who contains this PCD. 
+    /// ModuleIdentification for Usage Instance
     /// 
-    public UUID             moduleGUID;
+    public ModuleIdentification moduleId;
 
     ///
-    /// The name of the package whose module contains this PCD.
-    ///
-    public String           packageName;
-
-    ///
-    /// The GUID of the package whose module contains this PCD.
+    /// Arch also is a key for a UsageInstance
     /// 
-    public UUID             packageGUID;
+    public String               arch;
 
     ///
     /// The PCD type defined for module 
     /// 
-    public Token.PCD_TYPE   modulePcdType;
-
-    ///
-    /// The arch string of module contains this PCD
-    ///
-    public String           arch;
-
-    ///
-    /// The version of module contains this PCD
-    /// 
-    public String           version;
-
-    ///
-    /// The module type for this usage instance.
-    ///
-    public int              moduleType;
+    public Token.PCD_TYPE       modulePcdType;
 
     ///
     /// The value of the PCD in this usage instance. 
     /// 
-    public String           datum;
+    public String               datum;
 
     ///
     /// The maxDatumSize could be different for same PCD in different module
     /// But this case is allow for FeatureFlag, FixedAtBuild, PatchableInModule
     /// type.
     /// 
-    public int              maxDatumSize;
+    public int                  maxDatumSize;
 
     ///
     /// Autogen string for header file.
     ///
-    public String           hAutogenStr;
+    public String               hAutogenStr;
 
     ///
     /// Auotgen string for C code file.
     /// 
-    public String           cAutogenStr;
+    public String               cAutogenStr;
 
     /**
-       Constructure function
+       Constructure function for UsageInstance
        
-       @param parentToken         Member variable.
-       @param moduleName          Member variable.
-       @param moduleGUID          Member variable.
-       @param packageName         Member variable.
-       @param packageGUID         Member variable.
-       @param moduleType          Member variable.
-       @param modulePcdType       Member variable.
-       @param arch                Member variable.
-       @param version             Member variable.
-       @param value               Member variable.
-       @param maxDatumSize        Member variable.
-     */
-    public UsageInstance (Token             parentToken,
-                          String            moduleName,
-                          UUID              moduleGUID,
-                          String            packageName,
-                          UUID              packageGUID,
-                          int               moduleType,
-                          Token.PCD_TYPE    modulePcdType,
-                          String            arch,
-                          String            version,
-                          String            value,
-                          int               maxDatumSize) {
+       @param parentToken         The token instance for this usgaInstance
+       @param id                  The identification for usage instance
+       @param modulePcdType       The PCD type for this usage instance
+       @param value               The value of this PCD in this usage instance
+       @param maxDatumSize        The max datum size of this PCD in this usage
+                                  instance.
+    **/
+    public UsageInstance(Token                 parentToken,
+                         ModuleIdentification  moduleId,
+                         Token.PCD_TYPE        modulePcdType,
+                         String                arch,
+                         String                value,
+                         int                   maxDatumSize) {
         this.parentToken      = parentToken;
-        this.moduleName       = moduleName;
-        this.moduleGUID       = moduleGUID;
-        this.packageName      = packageName;
-        this.packageGUID      = packageGUID;
-        this.moduleType       = moduleType;
+        this.moduleId         = moduleId;
         this.modulePcdType    = modulePcdType;
         this.arch             = arch;
-        this.version          = version;
         this.datum            = value;
         this.maxDatumSize     = maxDatumSize;
     }
@@ -138,30 +100,30 @@ public class UsageInstance {
     /**
        Get the primary key for usage instance array for every token.
        
-       @param moduleName      the name of module
-       @param moduleGUID      the GUID name of module
-       @param packageName     the name of package who contains this module
-       @param packageGUID     the GUID name of package
-       @param arch            the archtecture string
-       @param version         the version of this module
+       @param   moduleId      The module Identification for generating primary key
+       @param   arch          Arch string
        
-       @return String         primary key
-     */
-    public static String getPrimaryKey(String moduleName,  
-                                       UUID   moduleGUID,  
-                                       String packageName,  
-                                       UUID   packageGUID,
-                                       String arch,
-                                       String version) {
+       @retval  String        The primary key for this usage instance
+    **/
+    public static String getPrimaryKey(ModuleIdentification moduleId,
+                                       String               arch) {
+        String moduleName   = moduleId.getName();
+        String moduleGuid   = moduleId.getGuid();
+        String packageName  = moduleId.getPackage().getName();
+        String packageGuid  = moduleId.getPackage().getGuid();
+        String version      = moduleId.getVersion();
+
         //
         // Because currently transition schema not require write moduleGuid, package Name, Packge GUID in
         // <ModuleSA> section, So currently no expect all paramter must be valid.
-        return(moduleName                                                              + "_" +
-               ((moduleGUID  != null) ? moduleGUID.toString() : "NullModuleGuid")      + "_" +
-               ((packageName != null) ? packageName : "NullPackageName")               + "_" +
-               ((packageGUID != null) ? packageGUID.toString() : "NullPackageGuid")    + "_" +
-               ((arch        != null) ? arch : "NullArch")                             + "_" +
-               ((version     != null) ? version : "NullVersion"));
+        // BUGBUG: Because currently we can not get version from MSA, So ignore verison.
+        // 
+        return(moduleName                                                                + "_" +
+               ((moduleGuid  != null) ? moduleGuid.toLowerCase()    : "NullModuleGuid")  + "_" +
+               ((packageName != null) ? packageName                 : "NullPackageName") + "_" +
+               ((packageGuid != null) ? packageGuid.toLowerCase()   : "NullPackageGuid") + "_" +
+               ((arch        != null) ? arch                        : "NullArch")        + "_" +
+               "NullVersion");
     }
 
     /**
@@ -170,48 +132,50 @@ public class UsageInstance {
        @return String primary key string
     **/
     public String getPrimaryKey() {
-        return UsageInstance.getPrimaryKey(moduleName, moduleGUID, packageName, packageGUID, arch, version);
+        return UsageInstance.getPrimaryKey(moduleId, arch);
     }
 
     /**
        Judget whether current module is PEI driver
        
-       @return boolean
-     */
+       @return boolean whether current module is PEI driver
+    **/
     public boolean isPeiPhaseComponent() {
+        int moduleType = CommonDefinition.getModuleType(moduleId.getModuleType());
+
         if ((moduleType == CommonDefinition.ModuleTypePeiCore) ||
             (moduleType == CommonDefinition.ModuleTypePeim)) {
             return true;
         }
         return false;
     }
-  
-  public boolean isDxePhaseComponent() {
-      //
-      // BugBug: May need confirmation on which type of module can
-      //         make use of Dynamic(EX) PCD entry.
-      //
-      if ((moduleType == CommonDefinition.ModuleTypeDxeDriver) ||
-          (moduleType == CommonDefinition.ModuleTypeDxeRuntimeDriver) ||
-          (moduleType == CommonDefinition.ModuleTypeDxeSalDriver) ||
-          (moduleType == CommonDefinition.ModuleTypeDxeSmmDriver) ||
-          (moduleType == CommonDefinition.ModuleTypeUefiDriver) ||
-          (moduleType == CommonDefinition.ModuleTypeUefiApplication)
-          ) {
-          return true;
-      }
-      return false;
-  }
+
+    /**
+       Judge whether current module is DXE driver.
+       
+       @return boolean whether current module is DXE driver
+    **/
+    public boolean isDxePhaseComponent() {
+        int moduleType = CommonDefinition.getModuleType(moduleId.getModuleType());
+
+        if ((moduleType == CommonDefinition.ModuleTypeDxeDriver)        ||
+            (moduleType == CommonDefinition.ModuleTypeDxeRuntimeDriver) ||
+            (moduleType == CommonDefinition.ModuleTypeDxeSalDriver)     ||
+            (moduleType == CommonDefinition.ModuleTypeDxeSmmDriver)     ||
+            (moduleType == CommonDefinition.ModuleTypeUefiDriver)       ||
+            (moduleType == CommonDefinition.ModuleTypeUefiApplication)
+            ) {
+            return true;
+        }
+        return false;
+    }
 
     /**
        Generate autogen string for header file and C code file.
        
-       @throws EntityException Fail to generate.
-       
        @param isBuildUsedLibrary  whether the autogen is for library.
-     */
-    public void generateAutoGen(boolean isBuildUsedLibrary) 
-        throws EntityException {
+    **/
+    public void generateAutoGen(boolean isBuildUsedLibrary) {
         String  guidStringCName     = null;
         boolean isByteArray         = false;
         String  printDatum          = null;
@@ -221,20 +185,31 @@ public class UsageInstance {
         cAutogenStr = "";
 
         if (this.modulePcdType == Token.PCD_TYPE.DYNAMIC_EX) {
+            //
+            // For DYNAMIC_EX type PCD, use original token number in SPD or FPD to generate autogen
+            // 
             tokenNumberString =  Long.toString(parentToken.dynamicExTokenNumber, 16);
         } else {
+            //
+            // For Others type PCD, use autogenerated token number to generate autogen
+            // 
             tokenNumberString = Long.toString(parentToken.tokenNumber, 16);
         }
 
-        hAutogenStr += String.format("#define _PCD_TOKEN_%s  0x%s\r\n", 
-                                     parentToken.cName, tokenNumberString);
-        
+        hAutogenStr += String.format("#define _PCD_TOKEN_%s  0x%s\r\n", parentToken.cName, tokenNumberString);
+
+        //
+        // Judge the value of this PCD is byte array type
+        // 
         if (!isBuildUsedLibrary && !parentToken.isDynamicPCD) {
             if (datum.trim().charAt(0) == '{') {
                 isByteArray = true;
             }
         }
 
+        //
+        // "ULL" should be added to value's tail for UINT64 value
+        // 
         if (parentToken.datumType == Token.DATUM_TYPE.UINT64) {
             printDatum = this.datum + "ULL";
         } else {
