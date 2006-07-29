@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.pcd.exception.EntityException;
 
 /** This class is to descript a PCD token object. The information of a token mainly 
@@ -60,19 +61,19 @@ public class Token {
     /// assignedtokenSpaceName as follows.
     /// tokenSpaceName is defined in MSA, SPD, FPD, can be regarded as primary key with cName.
     ///
-    public UUID             tokenSpaceName;
+    public String           tokenSpaceName;
 
     ///
     /// tokenNumber is allocated by platform. tokenNumber indicate an index for this token in
     /// platform token space. For Dynamic, dynamicEx type, this number will be re-adjust by
     /// PCD run-time database autogen tools.
     ///
-    public long              tokenNumber;
+    public long             tokenNumber;
 
     ///
     /// This token number is retrieved from FPD file for DynamicEx type. 
     /// 
-    public long              dynamicExTokenNumber;
+    public long             dynamicExTokenNumber;
 
     ///
     /// All supported PCD type, this value can be retrieved from SPD
@@ -110,11 +111,17 @@ public class Token {
     ///
     public Map<String, UsageInstance>  consumers;
 
-    public Token(String cName, UUID tokenSpaceName) {
+    /**
+       Constructure function for Token class
+       
+       @param cName             The name of token
+       @param tokenSpaceName    The name of token space, it is a guid string
+    **/
+    public Token(String cName, String tokenSpaceName) {
         UUID    nullUUID = new UUID(0, 0);
 
         this.cName                  = cName;
-        this.tokenSpaceName         = (tokenSpaceName == null) ? nullUUID : tokenSpaceName;
+        this.tokenSpaceName         = tokenSpaceName;
         this.tokenNumber            = 0;
         this.datumType              = DATUM_TYPE.UNKNOWN;
         this.datumSize              = -1;
@@ -133,24 +140,23 @@ public class Token {
       @param pcdType    new PCD type found in FPD file for this token.
     **/
     public void updateSupportPcdType(PCD_TYPE pcdType) {
-        int     index = 0;
-        boolean found = false;
-        for (index = 0; index < this.supportedPcdType.size(); index ++) {
-            if (this.supportedPcdType.get(index) == pcdType) {
-                found = true;
-                break;
+        for (int index = 0; index < this.supportedPcdType.size(); index ++) {
+            if (supportedPcdType.get(index) == pcdType) {
+                return;
             }
         }
-        if (!found) {
-            this.supportedPcdType.add(pcdType);
-        }
+
+        //
+        // If not found, add the pcd type to member variable supportedPcdType
+        // 
+        supportedPcdType.add(pcdType);
     }
 
     /**
        Judge whether pcdType is belong to dynamic type. Dynamic type includes
        DYNAMIC and DYNAMIC_EX.
        
-       @param pcdType
+       @param pcdType       the judged pcd type
        
        @return boolean
      */
@@ -164,7 +170,6 @@ public class Token {
     }
 
     public boolean isDynamicEx() {
-        
         for (int i = 0; i < supportedPcdType.size(); i++) {
             if (supportedPcdType.get(i) == PCD_TYPE.DYNAMIC_EX) {
                 return true;
@@ -178,16 +183,13 @@ public class Token {
       Use "TokencName + "-" + SpaceTokenName" as primary key when adding token into database
       
       @param   cName                     Token name.
-      @param   tokenSpaceName            The token space guid defined in MSA or SPD
-      @param   platformtokenSpaceName    The token space guid for current platform token space,
+      @param   tokenSpaceName            The token space guid string defined in MSA or SPD
       
-      @return  primary key for this token in token database.
+      @retval  primary key for this token in token database.
     **/
-    public static String getPrimaryKeyString(String cName, UUID tokenSpaceName) {
-        UUID  nullUUID = new UUID(0, 0);
-
+    public static String getPrimaryKeyString(String cName, String tokenSpaceName) {
         if (tokenSpaceName == null) {
-            return cName + "_" + nullUUID.toString().replace('-', '_');
+            return cName + "_nullTokenSpaceGuid";
         } else {
             return cName + "_" + tokenSpaceName.toString().replace('-', '_');
         }
@@ -196,7 +198,7 @@ public class Token {
     /**
        If skudata list contains more than one data, then Sku mechanism is enable.
        
-       @return boolean
+       @retval boolean  if the number of sku data exceed to 1
      */
     public boolean isSkuEnable() {
         if (this.skuData.size() > 1) {
@@ -204,7 +206,12 @@ public class Token {
         }
         return false;
     }
-    
+
+    /**
+       If Hii type for value of token
+       
+       @return boolean
+    **/
     public boolean isHiiEnable() {
         if (getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.HII_TYPE) {
             return true;
@@ -212,6 +219,11 @@ public class Token {
         return false;
     }
 
+    /**
+       If Vpd type for value of token
+       
+       @return boolean
+    **/
     public boolean isVpdEnable() {
         if (getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.VPD_TYPE) {
             return true;
@@ -268,52 +280,38 @@ public class Token {
       @retval TRUE  - Success to add usage instance.
       @retval FALSE - Fail to add usage instance
     **/
-    public boolean addUsageInstance(UsageInstance usageInstance) 
-        throws EntityException {
+    public boolean addUsageInstance(UsageInstance usageInstance) throws EntityException {
         String exceptionStr;
 
-        if (isUsageInstanceExist(usageInstance.moduleName,
-                                 usageInstance.moduleGUID,
-                                 usageInstance.packageName,
-                                 usageInstance.packageGUID,
-                                 usageInstance.arch,
-                                 usageInstance.version)) {
-            exceptionStr = String.format("PCD %s for module %s has already exist in database, Please check all PCD build entries "+
-                                         "in modules %s in <ModuleSA> to make sure no duplicated definitions!",
+        if (isUsageInstanceExist(usageInstance.moduleId, usageInstance.arch)) {
+            exceptionStr = String.format("[PCD Collection Tool Exception] PCD %s for module %s has already exist in database, Please check all PCD build entries "+
+                                         "in modules %s in <ModuleSA> to make sure no duplicated definitions in FPD file!",
                                          usageInstance.parentToken.cName,
-                                         usageInstance.moduleName,
-                                         usageInstance.moduleName);
+                                         usageInstance.moduleId.getName(),
+                                         usageInstance.moduleId.getName());
             throw new EntityException(exceptionStr);
         }
 
+        //
+        // Put usage instance into usage instance database of this PCD token.
+        // 
         consumers.put(usageInstance.getPrimaryKey(), usageInstance);
+
         return true;
     }
 
     /**
        Judge whether exist an usage instance for this token
        
-       @param moduleName    the name of module
-       @param moduleGuid    the GUID name of modules
-       @param packageName   the name of package contains this module
-       @param packageGuid   the GUID name of package contains this module
+       @param moduleId      The module identification for usage instance
        @param arch          the architecture string
-       @param version       the version string
        
        @return boolean      whether exist an usage instance for this token.
      */
-    public boolean isUsageInstanceExist(String moduleName,
-                                        UUID   moduleGuid,
-                                        String packageName,
-                                        UUID   packageGuid,
-                                        String arch,
-                                        String version) {
-        String keyStr = UsageInstance.getPrimaryKey(moduleName, 
-                                                    moduleGuid, 
-                                                    packageName, 
-                                                    packageGuid, 
-                                                    arch, 
-                                                    version);
+    public boolean isUsageInstanceExist(ModuleIdentification moduleId,
+                                        String               arch) {
+        String keyStr = UsageInstance.getPrimaryKey(moduleId, arch);
+
         return (consumers.get(keyStr) != null);
     }
 
@@ -542,27 +540,14 @@ public class Token {
     }
 
     /**
-      UUID defined in Schems is object, this function is to tranlate this object 
-      to UUID data.
-      
-      @param uuidObj The object comes from schema.
-      
-      @return The traslated UUID instance.
+       Get the sku data who id is 0.
+       
+       @retval DynamicTokenValue    the value of this dyanmic token.
     **/
-    public static UUID getGUIDFromSchemaObject(Object uuidObj) {
-        UUID uuid;
-        if (uuidObj.toString().equalsIgnoreCase("0")) {
-            uuid = new UUID(0,0);
-        } else {
-            uuid = UUID.fromString(uuidObj.toString());
-        }
-
-        return uuid;
-    }
-
     public DynamicTokenValue getDefaultSku() {
         DynamicTokenValue dynamicData;
         int               index;
+
         for (index = 0; index < this.skuData.size(); index ++) {
             if (skuData.get(index).id == 0) {
                 return skuData.get(index).value;
@@ -571,11 +556,22 @@ public class Token {
 
         return null;
     }
-    
+
+    /**
+       Get the number of Sku data for this token
+       
+       @retval int the number of sku data
+    **/
     public int getSkuIdCount () {
         return this.skuData.size();
     }
 
+    /**
+       Get the size of PCD value, this PCD is POINTER type.
+       
+       @param str   the string of the value
+       @param al    
+    **/
     private void getCurrentSizeFromDefaultValue (String str, ArrayList<Integer> al) {
         if (isValidNullValue(str)) {
             al.add(new Integer(0));
@@ -616,10 +612,11 @@ public class Token {
             }
         }
     }
-    //
-    // This method can be used to get the MAX and current size
-    // for pointer type dynamic(ex) PCD entry
-    //
+
+    /**
+       This method can be used to get the MAX and current size
+       for pointer type dynamic(ex) PCD entry
+    **/ 
     public ArrayList<Integer> getPointerTypeSize () {
         ArrayList<Integer> al = new ArrayList<Integer>();
         
@@ -695,6 +692,13 @@ public class Token {
         return false;
     }
 
+    /**
+       Judge the value is NULL value. NULL value means the value is uninitialized value
+       
+       @param judgedValue
+       
+       @return boolean
+     */
     public boolean isValidNullValue(String judgedValue) {
         String      subStr;
         BigInteger  bigIntValue;
@@ -756,7 +760,12 @@ public class Token {
         }
         return false;
     }
-    
+
+    /**
+       Is the string value in Unicode
+       
+       @return boolean
+    **/
     public boolean isHiiDefaultValueUnicodeStringType() {
         DynamicTokenValue dynamicData = getDefaultSku();
         
@@ -766,7 +775,12 @@ public class Token {
         return dynamicData.hiiDefaultValue.startsWith("L\"")
                 && dynamicData.hiiDefaultValue.endsWith("\"");
     }
-    
+
+    /**
+       Is the string value in ANSCI
+       
+       @return boolean
+    **/
     public boolean isHiiDefaultValueASCIIStringType() {
         DynamicTokenValue dynamicData = getDefaultSku();
     

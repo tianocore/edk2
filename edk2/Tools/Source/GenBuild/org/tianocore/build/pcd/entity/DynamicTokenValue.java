@@ -134,26 +134,6 @@ public class DynamicTokenValue {
     }
 
     /**
-       Get UINT16 array which use string to express a number.
-       
-       @return String
-     */
-    public String getStringArrayOfVariableName() {
-        String  strArray;
-        int     index;
-
-        strArray =  "{";
-        for (index = 0; index < variableName.size(); index ++) {
-            strArray += variableName.get(index).toString();
-            if (index != (variableName.size() - 1)) {
-                strArray += ",";
-            }
-        }
-        strArray += "}";
-        return strArray;
-    }
-
-    /**
        Set Vpd case data.
        
        @param vpdOffset

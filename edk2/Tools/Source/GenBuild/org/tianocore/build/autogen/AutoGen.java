@@ -456,25 +456,18 @@ public class AutoGen {
 		GuidGuidToAutogenC(fileBuffer);
 
 		//
-		// Call pcd autogen. PCDAutoGenAction tool only need module name and
-		// isPcdEmulatedDriver as parameter. Library inherits PCD and module's
-		// PCD information has been collected in FPDParser task by
-		// CollectPCDAction.
-		// Note : when PCD image tool ready,
-		// isPCDEmulatedDriver parameter will be removed.
+		// Call pcd autogen. 
 		//
-		 try {
-//		 this.myPcdAutogen = new PCDAutoGenAction(moduleId.getName(),
-//		 moduleId.getGuid(), moduleId.getPackage().getName(), moduleId.getPackage().getGuid(),this.arch,moduleId.getVersion(),false, null);
-         this.myPcdAutogen = new PCDAutoGenAction(moduleId.getName(),null,null,null, this.arch,null,false, null);
-		 this.myPcdAutogen.execute();
-		 } catch (Exception e) {
-		 throw new BuildException("PCD Autogen failed:" + e.getMessage());
-		 }
+                this.myPcdAutogen = new PCDAutoGenAction(moduleId, this.arch, false, null);
+                try {
+                    this.myPcdAutogen.execute();
+                } catch (Exception exp) {
+                    throw new BuildException (exp.getMessage());
+                }
 		
 		if (this.myPcdAutogen != null) {
-            fileBuffer.append("\r\n");
-			fileBuffer.append(this.myPcdAutogen.OutputC());
+                    fileBuffer.append("\r\n");
+                    fileBuffer.append(this.myPcdAutogen.OutputC());
 		}
 
 		if (!saveFile(outputPath + File.separatorChar + "AutoGen.c", fileBuffer)) {
@@ -613,33 +606,21 @@ public class AutoGen {
 		fileBuffer.append("\r\n");
 
 		//
-		// Call pcd autogen. PCDAutoGenAction tool only need module name and
-		// isPcdEmulatedDriver as parameter. Library inherit PCD and module's
-		// PCD information has been collected in FPDParser task by
-		// CollectPCDAction.
-		// Note : when PCD image tool ready,
-		// isPCDEmulatedDriver parameter will be removed.
+		// Call pcd autogen. 
 		//
+                this.myPcdAutogen = new PCDAutoGenAction(this.moduleId,
+                                                         this.arch,
+                                                         true, 
+                                                         SurfaceAreaQuery.getModulePcdEntryNameArray());
 		try {
-//			 this.myPcdAutogen = new PCDAutoGenAction(this.moduleId.getName(),
-//			 this.moduleId.getGuid(),moduleId.getPackage().getName(),moduleId.getPackage().getGuid(), this.arch, moduleId.getVersion(),true, SurfaceAreaQuery.getModulePcdEntryNameArray());
-            this.myPcdAutogen = new PCDAutoGenAction(this.moduleId.getName(),
-                                                     null,
-                                                     null,
-                                                     null,
-                                                     this.arch,
-                                                     null,
-                                                     true, 
-                                                     SurfaceAreaQuery.getModulePcdEntryNameArray());
-                     
-			this.myPcdAutogen.execute();
+                    this.myPcdAutogen.execute();
 		} catch (Exception e) {
-			throw new BuildException(e.getMessage());
+                    throw new BuildException(e.getMessage());
 		}
 
 		if (this.myPcdAutogen != null) {
-            fileBuffer.append("\r\n");
-			fileBuffer.append(this.myPcdAutogen.OutputC());
+                    fileBuffer.append("\r\n");
+                    fileBuffer.append(this.myPcdAutogen.OutputC());
 		}
 
 		if (!saveFile(outputPath + File.separatorChar + "AutoGen.c", fileBuffer)) {
