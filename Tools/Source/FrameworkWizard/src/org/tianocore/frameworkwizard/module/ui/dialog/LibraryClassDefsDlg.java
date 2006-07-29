@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update Library Class Definition of MSA/MBD file
+ The file is used to create, update Library Class Definition section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -39,9 +39,10 @@ import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.Library
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- The class is used to create, update Library Class Definition of MSA/MBD file
- It extends IInternalFrame
- 
+ * The class is used to create, update Library Class Definition of MSA/MBD file
+ * 
+ * It extends IDialog
+ * 
  **/
 public class LibraryClassDefsDlg extends IDialog {
 
@@ -119,7 +120,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JComboBox getJComboBoxLibraryClassName() {
         if (jComboBoxLibraryClassName == null) {
             jComboBoxLibraryClassName = new JComboBox();
-            jComboBoxLibraryClassName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxLibraryClassName.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jComboBoxLibraryClassName.setPreferredSize(new Dimension(320, 20));
             jComboBoxLibraryClassName.setEnabled(true);
         }
@@ -135,7 +136,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JComboBox getJComboBoxUsage() {
         if (jComboBoxUsage == null) {
             jComboBoxUsage = new JComboBox();
-            jComboBoxUsage.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jComboBoxUsage.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jComboBoxUsage.setPreferredSize(new Dimension(320, 20));
         }
         return jComboBoxUsage;
@@ -193,7 +194,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
             jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(415, 110, 65, 20));
+            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(415, 112, 65, 20));
             jButtonGenerateGuid.setPreferredSize(new java.awt.Dimension(65, 20));
             jButtonGenerateGuid.setText("GEN");
             jButtonGenerateGuid.setVisible(false);
@@ -210,7 +211,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 87, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
         }
@@ -238,7 +239,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JScrollPane getJScrollPaneModuleList() {
         if (jScrollPaneModuleList == null) {
             jScrollPaneModuleList = new JScrollPane();
-            jScrollPaneModuleList.setBounds(new java.awt.Rectangle(160, 135, 320, 80));
+            jScrollPaneModuleList.setBounds(new java.awt.Rectangle(168, 137, 320, 80));
             jScrollPaneModuleList.setPreferredSize(new java.awt.Dimension(320, 80));
             jScrollPaneModuleList.setViewportView(getICheckBoxListSupModuleList());
         }
@@ -254,7 +255,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JTextField getJTextFieldHelpText() {
         if (jTextFieldHelpText == null) {
             jTextFieldHelpText = new JTextField();
-            jTextFieldHelpText.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jTextFieldHelpText.setBounds(new java.awt.Rectangle(168, 62, 320, 20));
             jTextFieldHelpText.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jTextFieldHelpText;
@@ -269,7 +270,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 225, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(300, 232, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -285,7 +286,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 225, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(400, 232, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -312,7 +313,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private void init() {
         this.setContentPane(getJScrollPane());
         this.setTitle("Library Class Definitions");
-        this.setBounds(new java.awt.Rectangle(0, 0, 500, 295));
+        this.setBounds(new java.awt.Rectangle(0, 0, 505, 305));
         initFrame();
         this.setViewMode(false);
         this.centerWindow();
@@ -360,37 +361,37 @@ public class LibraryClassDefsDlg extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 110, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 112, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelHelpText = new JLabel();
-            jLabelHelpText.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
+            jLabelHelpText.setBounds(new java.awt.Rectangle(12, 62, 168, 20));
             jLabelHelpText.setText("Help Text");
             jLabelModuleList = new JLabel();
-            jLabelModuleList.setBounds(new java.awt.Rectangle(15, 135, 140, 20));
+            jLabelModuleList.setBounds(new java.awt.Rectangle(12, 137, 168, 20));
             jLabelModuleList.setText("Supported Module Types");
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 110, 140, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 112, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
             jLabelRecommendedInstanceGuid = new JLabel();
-            jLabelRecommendedInstanceGuid.setBounds(new java.awt.Rectangle(15, 110, 200, 20));
+            jLabelRecommendedInstanceGuid.setBounds(new java.awt.Rectangle(12, 112, 200, 20));
             jLabelRecommendedInstanceGuid.setText("Recommended Instance Guid");
             jLabelRecommendedInstanceGuid.setVisible(false);
             jLabelRecommendedInstanceVersion = new JLabel();
-            jLabelRecommendedInstanceVersion.setBounds(new java.awt.Rectangle(15, 85, 200, 20));
+            jLabelRecommendedInstanceVersion.setBounds(new java.awt.Rectangle(12, 87, 200, 20));
             jLabelRecommendedInstanceVersion.setText("Recommended Instance Version");
             jLabelRecommendedInstanceVersion.setVisible(false);
             jLabelLibraryClassName = new JLabel();
-            jLabelLibraryClassName.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
+            jLabelLibraryClassName.setBounds(new java.awt.Rectangle(12, 12, 168, 20));
             jLabelLibraryClassName.setText("Library Class Name");
             jLabelUsage = new JLabel();
-            jLabelUsage.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
+            jLabelUsage.setBounds(new java.awt.Rectangle(12, 37, 168, 20));
             jLabelUsage.setText("Usage");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 245));
+            jContentPane.setPreferredSize(new java.awt.Dimension(495, 255));
 
             jContentPane.add(getJComboBoxLibraryClassName(), null);
             jContentPane.add(jLabelUsage, null);
