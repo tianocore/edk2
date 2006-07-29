@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update PCD of MSA/MBD file
+ The file is used to create, update PcdCode section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -41,8 +41,9 @@ import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdVector;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update PCD of MSA/MBD file It extends
- * IInternalFrame
+ * The class is used to create, update PcdCoded section of the MSA file
+ * 
+ * It extends IDialog
  * 
  */
 public class PCDsDlg extends IDialog implements ItemListener {
@@ -98,7 +99,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JButton jButtonCancel = null;
 
     private JScrollPane jScrollPaneHelpText = null;
-    
+
     private JLabel jLabelUsage = null;
 
     private JComboBox jComboBoxUsage = null;
@@ -107,7 +108,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
     // Not used by UI
     //
     private PcdCodedIdentification id = null;
-    
+
     private EnumerationData ed = new EnumerationData();
 
     private WorkspaceTools wt = new WorkspaceTools();

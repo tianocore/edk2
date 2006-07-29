@@ -40,7 +40,7 @@ import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 /**
  * The class is used to create, update Package Dependencies section of the MSA file
  * 
- * It extends * IDialog
+ * It extends IDialog
  * 
  */
 public class PackageDepDlg extends IDialog implements ItemListener {
@@ -134,11 +134,11 @@ public class PackageDepDlg extends IDialog implements ItemListener {
             jTextFieldPackageVersion.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jTextFieldPackageVersion.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldPackageVersion
-              .setToolTipText("<html>If this module depends on a specific version of a package, <br>"
-                + "enter the package version here.  <br>"
-                + "If the module can use the latest version <br>"
-                + "that does not break backward compatibility, <br>"
-                + "leave this field blank</html>");
+                                    .setToolTipText("<html>If this module depends on a specific version of a package, <br>"
+                                                    + "enter the package version here.  <br>"
+                                                    + "If the module can use the latest version <br>"
+                                                    + "that does not break backward compatibility, <br>"
+                                                    + "leave this field blank</html>");
         }
         return jTextFieldPackageVersion;
     }

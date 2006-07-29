@@ -42,10 +42,9 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.BootModes.BootModesIdentification;
 
 /**
- * The class is used to create, update BootModes of MSA/MBD file It extends
- * IDialog
- * 
- * 
+ * The class is used to create, update BootModes of MSA/MBD file
+ *  
+ * It extends IDialog
  * 
  */
 public class BootModesDlg extends IDialog {
@@ -59,7 +58,7 @@ public class BootModesDlg extends IDialog {
     // Define class members
     //
     private JPanel jContentPane = null;
-private JLabel jLabelTest = null;
+
     private JLabel jLabelBootModeName = null;
 
     private JComboBox jComboBoxBootModeName = null;

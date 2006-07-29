@@ -39,11 +39,11 @@ import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.Library
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update Library Class Definition of MSA/MBD file
+ * The class is used to create, update Library Class Definition section of the MSA file
  * 
  * It extends IDialog
  * 
- **/
+ */
 public class LibraryClassDefsDlg extends IDialog {
 
     ///

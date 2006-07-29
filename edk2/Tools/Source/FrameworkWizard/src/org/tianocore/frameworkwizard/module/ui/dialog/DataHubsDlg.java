@@ -42,10 +42,9 @@ import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.DataHubs.DataHubsIdentification;
 
 /**
- * The class is used to create, update DataHub of MSA/MBD file It extends
- * IInternalFrame
+ * The class is used to create, update DataHub of the MSA file
  * 
- * 
+ * It extends IDialog
  * 
  */
 public class DataHubsDlg extends IDialog {

@@ -40,8 +40,9 @@ import org.tianocore.frameworkwizard.module.Identifications.Ppis.PpisIdentificat
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update Ppi of MSA/MBD file It extends
- * IInternalFrame
+ * The class is used to create, update Ppi section of the MSA file
+ * 
+ * It extends IDialog
  * 
  */
 public class PpisDlg extends IDialog implements ItemListener {

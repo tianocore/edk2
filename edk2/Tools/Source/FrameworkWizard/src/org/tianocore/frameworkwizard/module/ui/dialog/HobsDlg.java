@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update Hob of MSA/MBD file
+ The file is used to create, update Hob section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -38,7 +38,9 @@ import org.tianocore.frameworkwizard.module.Identifications.Hobs.HobsIdentificat
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update Hob of the MSA file It extends JDialog
+ * The class is used to create, update Hob of the MSA file 
+ * 
+ * It extends IDialog
  * 
  */
 public class HobsDlg extends IDialog {

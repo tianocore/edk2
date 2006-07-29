@@ -121,9 +121,9 @@ public class EventsDlg extends IDialog {
             jComboBoxEventsType.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jComboBoxEventsType.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxEventsType
-              .setToolTipText("<html>Select CreateEvents if the Module has an event that is waiting to be signaled.<br>"
-                + "Select SignalEvents if the Module will signal all events in an event group.<br>"
-                + "NOTE: Signal events are named by GUID.</html>");
+                               .setToolTipText("<html>Select CreateEvents if the Module has an event that is waiting to be signaled.<br>"
+                                               + "Select SignalEvents if the Module will signal all events in an event group.<br>"
+                                               + "NOTE: Signal events are named by GUID.</html>");
         }
         return jComboBoxEventsType;
     }
@@ -172,15 +172,15 @@ public class EventsDlg extends IDialog {
             jComboBoxUsage.setBounds(new java.awt.Rectangle(168, 87, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxUsage
-              .setToolTipText("<html><table>"
-                + "<tr><td colspan=2 align=center><b>Create Events</b></td></tr>"
-                + "<tr><td>ALWAYS_CONSUMED</td><td>Module registers a notification function and REQUIRES that it be<br>"
-                + "executed for the module to fully function.</td></tr>"
-                + "<tr><td>SOMETIMES_CONSUMED</td><td>Module registers a notification function and calls the function<br>"
-                + "when it is signaled</td></tr><tr><td colspan=2 align=center><b>Signal Events</b></td></tr>"
-                + "<tr><td>ALWAYS_PRODUCED</td><td>Module will Always signal the event</td></tr>"
-                + "<tr><td>SOMETIMES_PRODUCED</td><td>Module will sometimes signal the event</td></tr>"
-                + "</table></html>");
+                          .setToolTipText("<html><table>"
+                                          + "<tr><td colspan=2 align=center><b>Create Events</b></td></tr>"
+                                          + "<tr><td>ALWAYS_CONSUMED</td><td>Module registers a notification function and REQUIRES that it be<br>"
+                                          + "executed for the module to fully function.</td></tr>"
+                                          + "<tr><td>SOMETIMES_CONSUMED</td><td>Module registers a notification function and calls the function<br>"
+                                          + "when it is signaled</td></tr><tr><td colspan=2 align=center><b>Signal Events</b></td></tr>"
+                                          + "<tr><td>ALWAYS_PRODUCED</td><td>Module will Always signal the event</td></tr>"
+                                          + "<tr><td>SOMETIMES_PRODUCED</td><td>Module will sometimes signal the event</td></tr>"
+                                          + "</table></html>");
         }
         return jComboBoxUsage;
     }
