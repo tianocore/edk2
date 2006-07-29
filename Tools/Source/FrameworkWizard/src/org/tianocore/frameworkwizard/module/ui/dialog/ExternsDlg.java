@@ -37,12 +37,11 @@ import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.module.Identifications.Externs.ExternsIdentification;
 
 /**
- The class is used to create, update Externs section of the MSA file 
- It extends IDialog
- 
-
-
- **/
+ * The class is used to create, update Externs section of the MSA file
+ * 
+ * It extends IDialog
+ * 
+ */
 public class ExternsDlg extends IDialog implements ItemListener {
 
     ///

@@ -39,10 +39,9 @@ import org.tianocore.frameworkwizard.module.Identifications.SystemTables.SystemT
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update SystemTable of MSA/MBD file 
+ * The class is used to create, update SystemTables section of the MSA file
+ * 
  * It extends IDialog
- * 
- * 
  * 
  */
 public class SystemTablesDlg extends IDialog {

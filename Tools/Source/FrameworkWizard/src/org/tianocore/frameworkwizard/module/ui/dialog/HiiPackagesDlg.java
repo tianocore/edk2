@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update Hii Packages section of the  MSA file
+ The file is used to create, update Hii Packages section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials

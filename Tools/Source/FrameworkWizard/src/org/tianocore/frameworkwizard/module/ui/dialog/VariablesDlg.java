@@ -39,7 +39,8 @@ import org.tianocore.frameworkwizard.module.Identifications.Variables.VariablesI
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
 /**
- * The class is used to create, update Variables section of the MSA file 
+ * The class is used to create, update Variables section of the MSA file
+ * 
  * It extends IDialog
  * 
  */
@@ -132,12 +133,12 @@ public class VariablesDlg extends IDialog {
             jComboBoxUsage.setBounds(new java.awt.Rectangle(168, 62, 320, 20));
             jComboBoxUsage.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxUsage
-              .setToolTipText("<html><table>"
-                + "<tr><td>ALWAYS_CONSUMED</td><td>The module requires the variable entry to be set</td></tr>"
-                + "<tr><td>SOMETIMES_CONSUMED</td><td>The module will use the variable entry if it is set.</td></tr>"
-                + "<tr><td>ALWAYS_PRODUCED</td><td>The module will always write the variable.</td></tr>"
-                + "<tr><td>SOMETIMES_PRODUCED</td><td>The module will sometimes write the variable.</td></tr>"
-                + "</table></html>");
+                          .setToolTipText("<html><table>"
+                                          + "<tr><td>ALWAYS_CONSUMED</td><td>The module requires the variable entry to be set</td></tr>"
+                                          + "<tr><td>SOMETIMES_CONSUMED</td><td>The module will use the variable entry if it is set.</td></tr>"
+                                          + "<tr><td>ALWAYS_PRODUCED</td><td>The module will always write the variable.</td></tr>"
+                                          + "<tr><td>SOMETIMES_PRODUCED</td><td>The module will sometimes write the variable.</td></tr>"
+                                          + "</table></html>");
         }
         return jComboBoxUsage;
     }
