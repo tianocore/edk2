@@ -1,6 +1,6 @@
 /** @file
  
- The file is used to create, update DataHub of MSA/MBD file
+ The file is used to create, update Externs section of the MSA file
  
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
@@ -37,8 +37,8 @@ import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.module.Identifications.Externs.ExternsIdentification;
 
 /**
- The class is used to create, update DataHub of MSA/MBD file 
- It extends IInternalFrame
+ The class is used to create, update Externs section of the MSA file 
+ It extends IDialog
  
 
 
@@ -95,7 +95,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JComboBox getJComboBoxType() {
         if (jComboBoxType == null) {
             jComboBoxType = new JComboBox();
-            jComboBoxType.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
+            jComboBoxType.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jComboBoxType.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxType.addItemListener(this);
         }
@@ -123,7 +123,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JComboBox getJComboBoxPcdIsDriver() {
         if (jComboBoxPcdIsDriver == null) {
             jComboBoxPcdIsDriver = new JComboBox();
-            jComboBoxPcdIsDriver.setLocation(new java.awt.Point(160, 35));
+            jComboBoxPcdIsDriver.setLocation(new java.awt.Point(168, 37));
             jComboBoxPcdIsDriver.setPreferredSize(new java.awt.Dimension(320, 20));
             jComboBoxPcdIsDriver.setSize(new java.awt.Dimension(320, 20));
             jComboBoxPcdIsDriver.addItemListener(this);
@@ -140,7 +140,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldC_Name() {
         if (jTextFieldC_Name == null) {
             jTextFieldC_Name = new JTextField();
-            jTextFieldC_Name.setBounds(new java.awt.Rectangle(160, 35, 320, 20));
+            jTextFieldC_Name.setBounds(new java.awt.Rectangle(168, 37, 320, 20));
             jTextFieldC_Name.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jTextFieldC_Name;
@@ -155,7 +155,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 62, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
         }
         return jTextFieldFeatureFlag;
@@ -170,7 +170,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 120, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(300, 122, 90, 20));
             jButtonOk.setText("Ok");
             jButtonOk.addActionListener(this);
         }
@@ -186,7 +186,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 120, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(400, 122, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addActionListener(this);
         }
@@ -202,7 +202,7 @@ public class ExternsDlg extends IDialog implements ItemListener {
      
      **/
     private void init() {
-        this.setSize(508, 200);
+        this.setSize(515, 200);
         this.setContentPane(getJScrollPane());
         this.setTitle("Externs");
         initFrame();
@@ -253,24 +253,24 @@ public class ExternsDlg extends IDialog implements ItemListener {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(160, 85, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 87, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelC_Name = new JLabel();
-            jLabelC_Name.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
+            jLabelC_Name.setBounds(new java.awt.Rectangle(12, 37, 140, 20));
             jLabelC_Name.setText("Enter Value");
             jLabelName = new JLabel();
             jLabelName.setText("Choose Extern Type");
-            jLabelName.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
+            jLabelName.setBounds(new java.awt.Rectangle(12, 12, 168, 20));
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(15, 85, 140, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 62, 168, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 145));
+            jContentPane.setPreferredSize(new java.awt.Dimension(505, 155));
 
             jContentPane.add(jLabelName, null);
             jContentPane.add(getJComboBoxType(), null);
