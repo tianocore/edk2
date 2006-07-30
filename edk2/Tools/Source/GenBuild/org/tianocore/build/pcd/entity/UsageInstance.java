@@ -259,14 +259,27 @@ public class UsageInstance {
                                          parentToken.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName);
             if (!isBuildUsedLibrary) {
-                hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
-                                             parentToken.cName, 
-                                             printDatum);
-                if (isByteArray) {
-                    cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_%s[] = _PCD_VALUE_%s;\r\n",
-                                                 parentToken.cName,
-                                                 parentToken.cName);
+                if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
+                    if (isByteArray) {
+                        hAutogenStr += String.format("#define _PCD_VALUE_%s   (VOID*)_gPcd_FixedAtBuild_%s\r\n", 
+                                                     parentToken.cName, 
+                                                     parentToken.cName);
+                        cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_%s[] = %s;\r\n",
+                                                     parentToken.cName,
+                                                     printDatum);
+                    } else {
+                        hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                                     parentToken.cName, 
+                                                     printDatum);
+                        cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
+                                                     Token.getAutogendatumTypeString(parentToken.datumType),
+                                                     parentToken.cName,
+                                                     parentToken.cName);
+                    }
                 } else {
+                    hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n", 
+                                                 parentToken.cName, 
+                                                 printDatum);
                     cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
                                                  Token.getAutogendatumTypeString(parentToken.datumType),
                                                  parentToken.cName,
