@@ -87,6 +87,11 @@ Usage (
   VOID
   );
 
+char* 
+NormalizePath (
+  char* OldPathName
+  );
+
 int
 main (
   int   argc,
@@ -249,8 +254,8 @@ Returns:
     // Open the file, determine the size, then read it in and write
     // it back out.
     //
-    if ((InFptr = fopen (FileNames->Str, "rb")) == NULL) {
-      Error (NULL, 0, 0, FileNames->Str, "failed to open input file for reading");
+    if ((InFptr = fopen (NormalizePath(FileNames->Str), "rb")) == NULL) {
+      Error (NULL, 0, 0, NormalizePath(FileNames->Str), "failed to open input file for reading");
       goto Done;
     }
     fseek (InFptr, 0, SEEK_END);
@@ -738,4 +743,25 @@ Returns:
   for (i = 0; Msg[i] != NULL; i++) {
     fprintf (stdout, "%s\n", Msg[i]);
   }
+}
+
+char* 
+NormalizePath (
+  char* OldPathName
+  )
+{
+  char* Visitor;
+  
+  if (OldPathName == NULL) {
+    return NULL;
+  }
+  
+  Visitor = OldPathName;
+  while (*Visitor != '\0') {
+    if (*Visitor == '\\') {
+      *Visitor = '/';
+    }
+  }
+  
+  return Visitor;
 }
