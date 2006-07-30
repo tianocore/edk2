@@ -991,5 +991,31 @@
       <DefaultValue>4</DefaultValue>
       <HelpText>kbytes size of runtime memory.</HelpText>
     </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashFvBaseArray</C_Name>
+      <Token>0x31000001</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>VOID*</DatumType>
+      <ValidUsage>DYNAMIC</ValidUsage>
+      <DefaultValue>{}</DefaultValue>
+      <HelpText>
+      This PCD is a array of EFI_PHYSICAL_ADDERSS of each Firmware Volume on the
+      platform. FVB driver will make use of this PCD entry to install EFI_FIRMWARE_BLOCK_PROTOCOL
+      on every FV specified.
+      </HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashFvBaseArrayElementNumber</C_Name>
+      <Token>0x32000002</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT8</DatumType>
+      <ValidUsage>DYNAMIC</ValidUsage>
+      <DefaultValue>3</DefaultValue>
+      <HelpText>
+      This PCD is a number element in the array defined by PcdFlashFvBaseArray in
+      gEfiGenericPlatformTokenSpaceGuid. Normally, we have 3 firmware volumes:
+      FV_MAIN, FV_RECOVERY, NV_STORAGE.
+      </HelpText>
+    </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

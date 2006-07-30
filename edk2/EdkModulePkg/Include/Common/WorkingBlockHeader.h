@@ -32,13 +32,13 @@ Abstract:
 typedef struct {
   EFI_GUID  Signature;
   UINT32    Crc;
-  UINT32    WorkingBlockValid : 1;
-  UINT32    WorkingBlockInvalid : 1;
+  UINT8     WorkingBlockValid : 1;
+  UINT8     WorkingBlockInvalid : 1;
 #define WORKING_BLOCK_VALID   0x1
 #define WORKING_BLOCK_INVALID 0x2
-  UINT32    Reserved : 6;
+  UINT8     Reserved : 6;
   UINT8     Reserved3[3];
-  UINTN     WriteQueueSize;
+  UINT32    WriteQueueSize;
   //
   // UINT8                WriteQueue[WriteQueueSize];
   //
