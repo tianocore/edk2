@@ -105,7 +105,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 
     private JLabel jLabelVarVal = null;
 
-    private JTextField jTextField = null;
+    private JTextField jTextFieldHelp = null;
 
     private JLabel jLabelDefVal = null;
 
@@ -129,27 +129,27 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 
     private StarLabel starLabel = null;
 
-    private JCheckBox jCheckBox = null;
+    private JCheckBox jCheckBoxFeatureFlag = null;
 
-    private JCheckBox jCheckBox1 = null;
+    private JCheckBox jCheckBoxFixedAtBuild = null;
 
-    private JCheckBox jCheckBox2 = null;
+    private JCheckBox jCheckBoxPatchInMod = null;
 
-    private JCheckBox jCheckBox3 = null;
+    private JCheckBox jCheckBoxDyn = null;
 
-    private JCheckBox jCheckBox4 = null;
+    private JCheckBox jCheckBoxDynEx = null;
 
-    private JScrollPane jScrollPane1 = null;
+    private JScrollPane jScrollPaneArch = null;
 
-    private ICheckBoxList iCheckBoxList = null;
+    private ICheckBoxList iCheckBoxListArch = null;
 
-    private JScrollPane jScrollPane2 = null;
+    private JScrollPane jScrollPaneMod = null;
 
-    private ICheckBoxList iCheckBoxList1 = null;
+    private ICheckBoxList iCheckBoxListMod = null;
 
-    private JLabel jLabel = null;
+    private JLabel jLabelSupMod = null;
 
-    private JLabel jLabel1 = null;
+    private JLabel jLabelSupArch = null;
 
     /**
      This method initializes this
@@ -338,14 +338,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     private JPanel getJContentPane1() {
   		if (jContentPane == null) {	
            
-            jLabel1 = new JLabel();
-            jLabel1.setBounds(new java.awt.Rectangle(241,192,89,16));
-            jLabel1.setText("Supported Arch");
-            jLabel1.setEnabled(true);
-            jLabel = new JLabel();
-            jLabel.setBounds(new java.awt.Rectangle(15,193,103,16));
-            jLabel.setText("Supported Module");
-            jLabel.setEnabled(true);
+            jLabelSupArch = new JLabel();
+            jLabelSupArch.setBounds(new java.awt.Rectangle(241,192,89,16));
+            jLabelSupArch.setText("Supported Arch");
+            jLabelSupArch.setEnabled(true);
+            jLabelSupMod = new JLabel();
+            jLabelSupMod.setBounds(new java.awt.Rectangle(15,193,103,16));
+            jLabelSupMod.setText("Supported Module");
+            jLabelSupMod.setEnabled(true);
             starLabel = new StarLabel();
             starLabel.setBounds(new java.awt.Rectangle(2,134,10,20));
             jLabelDefVal = new JLabel();
@@ -404,7 +404,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jContentPane.add(jStarLabel, null);
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel4, null);
-            jContentPane.add(getJTextField(), null);
+            jContentPane.add(getJTextFieldHelp(), null);
             jContentPane.add(jLabelDefVal, null);
             jContentPane.add(getJTextFieldDefaultValue(), null);
             jContentPane.add(getJButtonAdd(), null);
@@ -412,15 +412,15 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jContentPane.add(getJButtonClearAll(), null);
             jContentPane.add(getJScrollPane(), null);
             jContentPane.add(starLabel, null);
-            jContentPane.add(getJCheckBox(), null);
-            jContentPane.add(getJCheckBox1(), null);
-            jContentPane.add(getJCheckBox2(), null);
-            jContentPane.add(getJCheckBox3(), null);
-            jContentPane.add(getJCheckBox4(), null);
-            jContentPane.add(getJScrollPane1(), null);
-            jContentPane.add(getJScrollPane2(), null);
-            jContentPane.add(jLabel, null);
-            jContentPane.add(jLabel1, null);
+            jContentPane.add(getJCheckBoxFeatureFlag(), null);
+            jContentPane.add(getJCheckBoxFixedAtBuild(), null);
+            jContentPane.add(getJCheckBoxPatchInMod(), null);
+            jContentPane.add(getJCheckBoxDyn(), null);
+            jContentPane.add(getJCheckBoxDynEx(), null);
+            jContentPane.add(getJScrollPaneArch(), null);
+            jContentPane.add(getJScrollPaneMod(), null);
+            jContentPane.add(jLabelSupMod, null);
+            jContentPane.add(jLabelSupArch, null);
         }
         return jContentPane;
     }
@@ -454,30 +454,30 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 
             if (arg0.getSource() == jButtonAdd) {
                 //ToDo: check before add
-                boolean[] b = {jCheckBox.isSelected(), jCheckBox1.isSelected(), jCheckBox2.isSelected(), jCheckBox3.isSelected(), jCheckBox4.isSelected()};
+                boolean[] b = {jCheckBoxFeatureFlag.isSelected(), jCheckBoxFixedAtBuild.isSelected(), jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected()};
                 if (!checkValidUsage(b)) {
                     return;
                 }
-                String archList = vectorToString(iCheckBoxList.getAllCheckedItemsString());
+                String archList = vectorToString(iCheckBoxListArch.getAllCheckedItemsString());
                 if (archList.length() == 0) {
                     archList = null;
                 }
-                String modTypeList = vectorToString(iCheckBoxList1.getAllCheckedItemsString());
+                String modTypeList = vectorToString(iCheckBoxListMod.getAllCheckedItemsString());
                 if (modTypeList.length() == 0) {
                     modTypeList = null;
                 }
                 Object[] row = {jTextFieldC_Name.getText(), jTextFieldToken.getText(),
                                 jTextFieldTsGuid.getText(), jComboBoxDataType.getSelectedItem(), 
-                                jTextFieldDefaultValue.getText(), jTextField.getText(),
-                                jCheckBox.isSelected(), jCheckBox1.isSelected(),
-                                jCheckBox2.isSelected(), jCheckBox3.isSelected(), jCheckBox4.isSelected(),
+                                jTextFieldDefaultValue.getText(), jTextFieldHelp.getText(),
+                                jCheckBoxFeatureFlag.isSelected(), jCheckBoxFixedAtBuild.isSelected(),
+                                jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected(),
                                 archList, modTypeList};
                 if (!dataValidation(row)) {
                     return;
                 }
                 model.addRow(row);
                 jTable.changeSelection(model.getRowCount()-1, 0, false, false);
-                String usage = getValidUsage(jCheckBox.isSelected(), jCheckBox1.isSelected(), jCheckBox2.isSelected(), jCheckBox3.isSelected(), jCheckBox4.isSelected());
+                String usage = getValidUsage(jCheckBoxFeatureFlag.isSelected(), jCheckBoxFixedAtBuild.isSelected(), jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected());
                 if (usage.length() == 0) {
                     usage = null;
                 }
@@ -531,13 +531,13 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField() {
-        if (jTextField == null) {
-            jTextField = new JTextField();
-            jTextField.setBounds(new java.awt.Rectangle(156,108,317,20));
-            jTextField.setPreferredSize(new java.awt.Dimension(315,20));
+    private JTextField getJTextFieldHelp() {
+        if (jTextFieldHelp == null) {
+            jTextFieldHelp = new JTextField();
+            jTextFieldHelp.setBounds(new java.awt.Rectangle(156,108,317,20));
+            jTextFieldHelp.setPreferredSize(new java.awt.Dimension(315,20));
         }
-        return jTextField;
+        return jTextFieldHelp;
     }
 
     /**
@@ -610,7 +610,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         resizeComponentWidth(this.jTextFieldToken, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jTextFieldTsGuid, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
+        resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
         
         resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
@@ -805,14 +805,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox() {
-        if (jCheckBox == null) {
-            jCheckBox = new JCheckBox();
-            jCheckBox.setBounds(new java.awt.Rectangle(156,161,100,21));
-            jCheckBox.setText("Feature Flag");
-            jCheckBox.setPreferredSize(new java.awt.Dimension(21,20));
+    private JCheckBox getJCheckBoxFeatureFlag() {
+        if (jCheckBoxFeatureFlag == null) {
+            jCheckBoxFeatureFlag = new JCheckBox();
+            jCheckBoxFeatureFlag.setBounds(new java.awt.Rectangle(156,161,100,21));
+            jCheckBoxFeatureFlag.setText("Feature Flag");
+            jCheckBoxFeatureFlag.setPreferredSize(new java.awt.Dimension(21,20));
         }
-        return jCheckBox;
+        return jCheckBoxFeatureFlag;
     }
 
     /**
@@ -820,14 +820,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox1() {
-        if (jCheckBox1 == null) {
-            jCheckBox1 = new JCheckBox();
-            jCheckBox1.setBounds(new java.awt.Rectangle(312,133,108,20));
-            jCheckBox1.setText("Fixed at Build");
-            jCheckBox1.setPreferredSize(new java.awt.Dimension(21,20));
+    private JCheckBox getJCheckBoxFixedAtBuild() {
+        if (jCheckBoxFixedAtBuild == null) {
+            jCheckBoxFixedAtBuild = new JCheckBox();
+            jCheckBoxFixedAtBuild.setBounds(new java.awt.Rectangle(312,133,108,20));
+            jCheckBoxFixedAtBuild.setText("Fixed at Build");
+            jCheckBoxFixedAtBuild.setPreferredSize(new java.awt.Dimension(21,20));
         }
-        return jCheckBox1;
+        return jCheckBoxFixedAtBuild;
     }
 
     /**
@@ -835,14 +835,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox2() {
-        if (jCheckBox2 == null) {
-            jCheckBox2 = new JCheckBox();
-            jCheckBox2.setBounds(new java.awt.Rectangle(156,133,154,20));
-            jCheckBox2.setText("Patchable in Module");
-            jCheckBox2.setPreferredSize(new java.awt.Dimension(21,20));
+    private JCheckBox getJCheckBoxPatchInMod() {
+        if (jCheckBoxPatchInMod == null) {
+            jCheckBoxPatchInMod = new JCheckBox();
+            jCheckBoxPatchInMod.setBounds(new java.awt.Rectangle(156,133,154,20));
+            jCheckBoxPatchInMod.setText("Patchable in Module");
+            jCheckBoxPatchInMod.setPreferredSize(new java.awt.Dimension(21,20));
         }
-        return jCheckBox2;
+        return jCheckBoxPatchInMod;
     }
 
     /**
@@ -850,14 +850,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox3() {
-        if (jCheckBox3 == null) {
-            jCheckBox3 = new JCheckBox();
-            jCheckBox3.setBounds(new java.awt.Rectangle(278,161,80,20));
-            jCheckBox3.setText("Dynamic");
-            jCheckBox3.setPreferredSize(new java.awt.Dimension(21,20));
+    private JCheckBox getJCheckBoxDyn() {
+        if (jCheckBoxDyn == null) {
+            jCheckBoxDyn = new JCheckBox();
+            jCheckBoxDyn.setBounds(new java.awt.Rectangle(278,161,80,20));
+            jCheckBoxDyn.setText("Dynamic");
+            jCheckBoxDyn.setPreferredSize(new java.awt.Dimension(21,20));
         }
-        return jCheckBox3;
+        return jCheckBoxDyn;
     }
 
     /**
@@ -865,14 +865,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox4() {
-        if (jCheckBox4 == null) {
-            jCheckBox4 = new JCheckBox();
-            jCheckBox4.setBounds(new java.awt.Rectangle(371,161,99,20));
-            jCheckBox4.setText("DynamicEx");
-            jCheckBox4.setPreferredSize(new java.awt.Dimension(21,20));
+    private JCheckBox getJCheckBoxDynEx() {
+        if (jCheckBoxDynEx == null) {
+            jCheckBoxDynEx = new JCheckBox();
+            jCheckBoxDynEx.setBounds(new java.awt.Rectangle(371,161,99,20));
+            jCheckBoxDynEx.setText("DynamicEx");
+            jCheckBoxDynEx.setPreferredSize(new java.awt.Dimension(21,20));
         }
-        return jCheckBox4;
+        return jCheckBoxDynEx;
     }
     
     private String getValidUsage(boolean ff, boolean fab, boolean pim, boolean d, boolean de) {
@@ -930,14 +930,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane1() {
-        if (jScrollPane1 == null) {
-            jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(242,213,188,54));
-            jScrollPane1.setViewportView(getICheckBoxList());
-            jScrollPane1.setPreferredSize(new Dimension(188, 74));
+    private JScrollPane getJScrollPaneArch() {
+        if (jScrollPaneArch == null) {
+            jScrollPaneArch = new JScrollPane();
+            jScrollPaneArch.setBounds(new java.awt.Rectangle(242,213,188,54));
+            jScrollPaneArch.setViewportView(getICheckBoxListArch());
+            jScrollPaneArch.setPreferredSize(new Dimension(188, 74));
         }
-        return jScrollPane1;
+        return jScrollPaneArch;
     }
 
     /**
@@ -945,10 +945,10 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList	
      */
-    private ICheckBoxList getICheckBoxList() {
-        if (iCheckBoxList == null) {
-            iCheckBoxList = new ICheckBoxList();
-            iCheckBoxList.setBounds(new Rectangle(197, 142, 188, 74));
+    private ICheckBoxList getICheckBoxListArch() {
+        if (iCheckBoxListArch == null) {
+            iCheckBoxListArch = new ICheckBoxList();
+            iCheckBoxListArch.setBounds(new Rectangle(197, 142, 188, 74));
             Vector<String> v = new Vector<String>();
             v.add("IA32");
             v.add("X64");
@@ -956,9 +956,9 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             v.add("EBC");
             v.add("ARM");
             v.add("PPC");
-            iCheckBoxList.setAllItems(v);
+            iCheckBoxListArch.setAllItems(v);
         }
-        return iCheckBoxList;
+        return iCheckBoxListArch;
     }
 
     /**
@@ -966,14 +966,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane2() {
-        if (jScrollPane2 == null) {
-            jScrollPane2 = new JScrollPane();
-            jScrollPane2.setBounds(new java.awt.Rectangle(15,213,199,55));
-            jScrollPane2.setViewportView(getICheckBoxList1());
-            jScrollPane2.setPreferredSize(new Dimension(170, 74));
+    private JScrollPane getJScrollPaneMod() {
+        if (jScrollPaneMod == null) {
+            jScrollPaneMod = new JScrollPane();
+            jScrollPaneMod.setBounds(new java.awt.Rectangle(15,213,199,55));
+            jScrollPaneMod.setViewportView(getICheckBoxListMod());
+            jScrollPaneMod.setPreferredSize(new Dimension(170, 74));
         }
-        return jScrollPane2;
+        return jScrollPaneMod;
     }
 
     /**
@@ -981,10 +981,10 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
      * 	
      * @return org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList	
      */
-    private ICheckBoxList getICheckBoxList1() {
-        if (iCheckBoxList1 == null) {
-            iCheckBoxList1 = new ICheckBoxList();
-            iCheckBoxList1.setBounds(new Rectangle(14, 142, 170, 74));
+    private ICheckBoxList getICheckBoxListMod() {
+        if (iCheckBoxListMod == null) {
+            iCheckBoxListMod = new ICheckBoxList();
+            iCheckBoxListMod.setBounds(new Rectangle(14, 142, 170, 74));
             Vector<String> v = new Vector<String>();
             v.add("BASE");
             v.add("SEC");
@@ -998,9 +998,9 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             v.add("UEFI_DRIVER");
             v.add("UEFI_APPLICATION");
             v.add("USER_DEFINED");
-            iCheckBoxList1.setAllItems(v);
+            iCheckBoxListMod.setAllItems(v);
         }
-        return iCheckBoxList1;
+        return iCheckBoxListMod;
     }
     
     protected String vectorToString(Vector<String> v) {

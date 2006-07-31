@@ -53,26 +53,23 @@ public class GenGuidDialog extends JDialog implements ActionListener{
     
     static private JFrame frame;
     private JPanel jContentPane = null;
-    private JPanel jPanel = null;
-    private JPanel jPanel1 = null;
-    private JPanel jPanel2 = null;
-    private JPanel jPanel3 = null;
-    private JPanel jPanel4 = null;
+    private JPanel jPanelEast = null;
+    private JPanel jPanelCenter = null;
     private JTextField jTextField = null;
     private JLabel jLabel = null;
     private JRadioButton jRadioButton = null;
-    private JRadioButton jRadioButton1 = null;
-    private JButton jButton = null;
-    private JButton jButton1 = null;
-    private JButton jButton2 = null;
+    private JRadioButton jRadioButtonReg = null;
+    private JButton jButtonCancel = null;
+    private JButton jButtonNew = null;
+    private JButton jButtonOk = null;
     
 //    private String guid = null;
 
     public void actionPerformed(ActionEvent arg0) {
         // TODO Auto-generated method stub
-        if (arg0.getSource() == jButton1){
+        if (arg0.getSource() == jButtonNew){
             String uuid = Tools.generateUuidString();
-            if (jRadioButton1.isSelected()) {
+            if (jRadioButtonReg.isSelected()) {
                 jTextField.setText(uuid);
             }
             else {
@@ -86,7 +83,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
             }
         }
         
-        if (arg0.getSource() == jRadioButton1){
+        if (arg0.getSource() == jRadioButtonReg){
             
             //ToDo: check text field value against RegExp and transform if needed
             if (jTextField.getText().matches(GenGuidDialog.guidRegistryPat)){
@@ -116,7 +113,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
             
         }
         
-        if (arg0.getSource() == jButton2){
+        if (arg0.getSource() == jButtonOk){
 //            if (jTextField.getText().matches(Tools.guidArrayPat) 
 //                            || jTextField.getText().matches(Tools.guidRegistryPat)){
 //                this.setVisible(false);
@@ -127,7 +124,7 @@ public class GenGuidDialog extends JDialog implements ActionListener{
             this.dispose();
         }
         
-        if (arg0.getSource() == jButton){
+        if (arg0.getSource() == jButtonCancel){
             this.dispose();
         }
     }
@@ -137,54 +134,18 @@ public class GenGuidDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel() {
-        if (jPanel == null) {
+    private JPanel getJPanelEast() {
+        if (jPanelEast == null) {
             FlowLayout flowLayout = new FlowLayout();
             flowLayout.setVgap(10);
-            jPanel = new JPanel();
-            jPanel.setLayout(flowLayout);
-            jPanel.setPreferredSize(new java.awt.Dimension(100,30));
-            jPanel.add(getJButton1(), null);
-            jPanel.add(getJButton2(), null);
-            jPanel.add(getJButton(), null);
+            jPanelEast = new JPanel();
+            jPanelEast.setLayout(flowLayout);
+            jPanelEast.setPreferredSize(new java.awt.Dimension(100,30));
+            jPanelEast.add(getJButtonNew(), null);
+            jPanelEast.add(getJButtonOk(), null);
+            jPanelEast.add(getJButtonCancel(), null);
         }
-        return jPanel;
-    }
-
-    /**
-     * This method initializes jPanel1	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel1() {
-        if (jPanel1 == null) {
-            jPanel1 = new JPanel();
-        }
-        return jPanel1;
-    }
-
-    /**
-     * This method initializes jPanel2	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel2() {
-        if (jPanel2 == null) {
-            jPanel2 = new JPanel();
-        }
-        return jPanel2;
-    }
-
-    /**
-     * This method initializes jPanel3	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel3() {
-        if (jPanel3 == null) {
-            jPanel3 = new JPanel();
-        }
-        return jPanel3;
+        return jPanelEast;
     }
 
     /**
@@ -192,23 +153,23 @@ public class GenGuidDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel4() {
-        if (jPanel4 == null) {
+    private JPanel getJPanelCenter() {
+        if (jPanelCenter == null) {
             jLabel = new JLabel();
             jLabel.setText("GUID Value");
             GridLayout gridLayout = new GridLayout();
             gridLayout.setRows(4);
-            jPanel4 = new JPanel();
-            jPanel4.setLayout(gridLayout);
-            jPanel4.add(getJRadioButton1(), null);
-            jPanel4.add(getJRadioButton(), null);
-            jPanel4.add(jLabel, null);
-            jPanel4.add(getJTextField(), null);
+            jPanelCenter = new JPanel();
+            jPanelCenter.setLayout(gridLayout);
+            jPanelCenter.add(getJRadioButtonReg(), null);
+            jPanelCenter.add(getJRadioButton(), null);
+            jPanelCenter.add(jLabel, null);
+            jPanelCenter.add(getJTextField(), null);
             ButtonGroup bg = new ButtonGroup();
-            bg.add(jRadioButton1);
+            bg.add(jRadioButtonReg);
             bg.add(jRadioButton);
         }
-        return jPanel4;
+        return jPanelCenter;
     }
 
     /**
@@ -245,14 +206,14 @@ public class GenGuidDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JRadioButton	
      */
-    private JRadioButton getJRadioButton1() {
-        if (jRadioButton1 == null) {
-            jRadioButton1 = new JRadioButton();
-            jRadioButton1.setText("Registry Format");
-            jRadioButton1.setSelected(true);
-            jRadioButton1.addActionListener(this);
+    private JRadioButton getJRadioButtonReg() {
+        if (jRadioButtonReg == null) {
+            jRadioButtonReg = new JRadioButton();
+            jRadioButtonReg.setText("Registry Format");
+            jRadioButtonReg.setSelected(true);
+            jRadioButtonReg.addActionListener(this);
         }
-        return jRadioButton1;
+        return jRadioButtonReg;
     }
 
     /**
@@ -260,14 +221,14 @@ public class GenGuidDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton() {
-        if (jButton == null) {
-            jButton = new JButton();
-            jButton.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton.setText("Cancel");
-            jButton.addActionListener(this);
+    private JButton getJButtonCancel() {
+        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonCancel.setText("Cancel");
+            jButtonCancel.addActionListener(this);
         }
-        return jButton;
+        return jButtonCancel;
     }
 
     /**
@@ -275,15 +236,15 @@ public class GenGuidDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton1() {
-        if (jButton1 == null) {
-            jButton1 = new JButton();
-            jButton1.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-            jButton1.setText("New");
-            jButton1.addActionListener(this);
+    private JButton getJButtonNew() {
+        if (jButtonNew == null) {
+            jButtonNew = new JButton();
+            jButtonNew.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonNew.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
+            jButtonNew.setText("New");
+            jButtonNew.addActionListener(this);
         }
-        return jButton1;
+        return jButtonNew;
     }
 
     /**
@@ -291,15 +252,15 @@ public class GenGuidDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton2() {
-        if (jButton2 == null) {
-            jButton2 = new JButton();
-            jButton2.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton2.setText("Ok");
-            jButton2.setActionCommand("GenGuidValue");
-            jButton2.addActionListener(this);
+    private JButton getJButtonOk() {
+        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonOk.setText("Ok");
+            jButtonOk.setActionCommand("GenGuidValue");
+            jButtonOk.addActionListener(this);
         }
-        return jButton2;
+        return jButtonOk;
     }
 
     /**
@@ -329,14 +290,14 @@ public class GenGuidDialog extends JDialog implements ActionListener{
     public GenGuidDialog(ActionListener i){
         super();
         initialize();
-        jButton2.addActionListener(i);
+        jButtonOk.addActionListener(i);
         this.addWindowListener(new WindowAdapter(){
 
             @Override
             public void windowActivated(WindowEvent arg0) {
                 // TODO Auto-generated method stub
                 super.windowActivated(arg0);
-                if ((jRadioButton1.isSelected() && jTextField.getText().matches(GenGuidDialog.guidArrayPat))
+                if ((jRadioButtonReg.isSelected() && jTextField.getText().matches(GenGuidDialog.guidArrayPat))
                                 || (jRadioButton.isSelected() && jTextField.getText().matches(GenGuidDialog.guidRegistryPat))) {
                     jTextField.setText(GenGuidDialog.formatGuidString(jTextField.getText()));
                 }
@@ -373,11 +334,8 @@ public class GenGuidDialog extends JDialog implements ActionListener{
         if (jContentPane == null) {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
-            jContentPane.add(getJPanel(), java.awt.BorderLayout.EAST);
-            jContentPane.add(getJPanel1(), java.awt.BorderLayout.WEST);
-            jContentPane.add(getJPanel2(), java.awt.BorderLayout.NORTH);
-            jContentPane.add(getJPanel3(), java.awt.BorderLayout.SOUTH);
-            jContentPane.add(getJPanel4(), java.awt.BorderLayout.CENTER);
+            jContentPane.add(getJPanelEast(), java.awt.BorderLayout.EAST);
+            jContentPane.add(getJPanelCenter(), java.awt.BorderLayout.CENTER);
         }
         return jContentPane;
     }

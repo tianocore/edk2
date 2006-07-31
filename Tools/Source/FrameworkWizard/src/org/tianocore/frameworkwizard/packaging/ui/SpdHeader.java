@@ -124,7 +124,7 @@ public class SpdHeader extends IInternalFrame {
 
     private JLabel jLabel = null;
 
-    private JTextField jTextField = null;
+    private JTextField jTextFieldUrl = null;
 
     /**
      This method initializes jTextFieldBaseName 
@@ -430,26 +430,26 @@ public class SpdHeader extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField() {
-        if (jTextField == null) {
-            jTextField = new JTextField();
-            jTextField.setBounds(new java.awt.Rectangle(161,195,320,20));
-            jTextField.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextField.addFocusListener(new FocusAdapter(){
+    private JTextField getJTextFieldUrl() {
+        if (jTextFieldUrl == null) {
+            jTextFieldUrl = new JTextField();
+            jTextFieldUrl.setBounds(new java.awt.Rectangle(161,195,320,20));
+            jTextFieldUrl.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldUrl.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
-                   if (jTextField.getText().length() == 0 && sfc.getSpdHdrUrl() == null) {
+                   if (jTextFieldUrl.getText().length() == 0 && sfc.getSpdHdrUrl() == null) {
                        return;
                    }
-                   if (jTextField.getText().equals(sfc.getSpdHdrUrl())) {
+                   if (jTextFieldUrl.getText().equals(sfc.getSpdHdrUrl())) {
                        return;
                    }
                    sfc.setSpdHdrLicense(jTextAreaLicense.getText());
-                   sfc.setSpdHdrUrl(jTextField.getText());
+                   sfc.setSpdHdrUrl(jTextFieldUrl.getText());
                    docConsole.setSaved(false);
                } 
             });
         }
-        return jTextField;
+        return jTextFieldUrl;
     }
 
     public static void main(String[] args) {
@@ -513,7 +513,7 @@ public class SpdHeader extends IInternalFrame {
                 jTextAreaLicense.setText(sfc.getSpdHdrLicense());
             }
             if (sfc.getSpdHdrUrl() != null) {
-                jTextField.setText(sfc.getSpdHdrUrl());
+                jTextFieldUrl.setText(sfc.getSpdHdrUrl());
             }
             if (sfc.getSpdHdrCopyright() != null) {
                 jTextFieldCopyright.setText(sfc.getSpdHdrCopyright());
@@ -624,7 +624,7 @@ public class SpdHeader extends IInternalFrame {
             jContentPane.add(getJTextFieldCopyright(), null);
 
             jContentPane.add(jLabel, null);
-            jContentPane.add(getJTextField(), null);
+            jContentPane.add(getJTextFieldUrl(), null);
         }
         return jContentPane;
     }
@@ -665,7 +665,7 @@ public class SpdHeader extends IInternalFrame {
 		resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth,intPreferredWidth);
-        resizeComponentWidth(this.jTextField, intCurrentWidth,intPreferredWidth);
+        resizeComponentWidth(this.jTextFieldUrl, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jTextFieldCopyright, intCurrentWidth,intPreferredWidth);
 		resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth,intPreferredWidth);
