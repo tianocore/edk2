@@ -31,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <filelist dir="."
         files="
           Source/Common/build.xml
+          Source/PcdTools/build.xml
           Source/GenBuild/build.xml
           Source/FrameworkTasks/build.xml
           Source/Cpptasks/build.xml
@@ -80,6 +81,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/Cpptasks/build.xml
           Source/FrameworkTasks/build.xml
           Source/GenBuild/build.xml
+          Source/PcdTools/build.xml
           Source/Common/build.xml
           Source/SurfaceArea/build.xml
           "/>
@@ -95,6 +97,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/Cpptasks/build.xml
           Source/FrameworkTasks/build.xml
           Source/GenBuild/build.xml
+          Source/PcdTools/build.xml
           Source/Common/build.xml
           Source/SurfaceArea/build.xml
           "/>

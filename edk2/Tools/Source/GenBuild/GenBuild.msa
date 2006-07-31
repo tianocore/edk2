@@ -66,21 +66,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>org/tianocore/build/id/PlatformIdentification.java</Filename>
     <Filename>org/tianocore/build/ModuleBuildFileGenerator.java</Filename>
     <Filename>org/tianocore/build/OutputDirSetup.java</Filename>
-    <Filename>org/tianocore/build/pcd/action/ActionMessage.java</Filename>
-    <Filename>org/tianocore/build/pcd/action/BuildAction.java</Filename>
     <Filename>org/tianocore/build/pcd/action/CollectPCDAction.java</Filename>
     <Filename>org/tianocore/build/pcd/action/PCDAutoGenAction.java</Filename>
-    <Filename>org/tianocore/build/pcd/action/ShowPCDDatabaseAction.java</Filename>
-    <Filename>org/tianocore/build/pcd/action/UIAction.java</Filename>
-    <Filename>org/tianocore/build/pcd/entity/DynamicTokenValue.java</Filename>
-    <Filename>org/tianocore/build/pcd/entity/MemoryDatabaseManager.java</Filename>
-    <Filename>org/tianocore/build/pcd/entity/SkuInstance.java</Filename>
-    <Filename>org/tianocore/build/pcd/entity/Token.java</Filename>
-    <Filename>org/tianocore/build/pcd/entity/UsageInstance.java</Filename>
-    <Filename>org/tianocore/build/pcd/exception/BuildActionException.java</Filename>
-    <Filename>org/tianocore/build/pcd/exception/EntityException.java</Filename>
-    <Filename>org/tianocore/build/pcd/exception/UIException.java</Filename>
-    <Filename>org/tianocore/build/pcd/ui/PCDDatabaseFrame.java</Filename>
     <Filename>org/tianocore/build/toolchain/ConfigReader.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainAttribute.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainConfig.java</Filename>

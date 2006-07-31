@@ -9,7 +9,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
-<project name="GenBuild" default="GenBuild" basedir=".">
+<project name="PcdTools" default="PcdTools" basedir=".">
 
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
@@ -17,12 +17,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <path id="classpath">
     <fileset dir="${WORKSPACE}/Tools/Jars" includes="SurfaceArea.jar"/>
     <fileset dir="${WORKSPACE}/Tools/Jars" includes="Common.jar"/>
-    <fileset dir="${WORKSPACE}/Tools/Jars" includes="PcdTools.jar"/>
     <fileset dir="${env.XMLBEANS_HOME}/lib" includes="*.jar"/>
   </path>
   <property name="buildDir" value="build"/>
   <property name="installLocation" value="${WORKSPACE}/Tools/Jars"/>
-  <target name="GenBuild" depends="install"/>
+  <target name="PcdTools" depends="install"/>
   <target name="source">
     <mkdir dir="${buildDir}"/>
     <javac srcdir="." destdir="${buildDir}">
@@ -35,18 +34,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
   <target name="cleanall">
     <delete dir="${buildDir}"/>
-    <delete file="${installLocation}/GenBuild.jar"/>
+    <delete file="${installLocation}/PcdTools.jar"/>
     <if>
-      <available file="${installLocation}/GenBuild.jar"/>
+      <available file="${installLocation}/PcdTools.jar"/>
       <then>
-        <echo message="You must manually remove the file: ${installLocation}/GenBuild.jar"/>
+        <echo message="You must manually remove the file: ${installLocation}/PcdTools.jar"/>
         <echo message="Java has already loaded the file, and cannot remove it within ANT!"/>
       </then>
     </if>
   </target>
   <target name="install" depends="source">
-    <copy file="GenBuild.tasks" toDir="${buildDir}"/>
-    <jar destfile="${installLocation}/GenBuild.jar"
+    <jar destfile="${installLocation}/PcdTools.jar"
       basedir="${buildDir}"
       includes="**"
     />

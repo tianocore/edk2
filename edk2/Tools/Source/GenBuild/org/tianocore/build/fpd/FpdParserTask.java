@@ -39,7 +39,7 @@ import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PlatformIdentification;
-import org.tianocore.build.pcd.action.ActionMessage;
+import org.tianocore.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.action.CollectPCDAction;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainElement;

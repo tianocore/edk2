@@ -41,17 +41,19 @@ import org.tianocore.ModuleSADocument;
 import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.PcdBuildDefinitionDocument.PcdBuildDefinition;
 import org.tianocore.PlatformSurfaceAreaDocument;
-import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.FpdModuleIdentification;
-import org.tianocore.build.pcd.action.ActionMessage;
-import org.tianocore.build.pcd.entity.DynamicTokenValue;
-import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
-import org.tianocore.build.pcd.entity.SkuInstance;
-import org.tianocore.build.pcd.entity.Token;
-import org.tianocore.build.pcd.entity.UsageInstance;
-import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.pcd.action.ActionMessage;
+import org.tianocore.pcd.entity.CommonDefinition;
+import org.tianocore.pcd.entity.DynamicTokenValue;
+import org.tianocore.pcd.entity.MemoryDatabaseManager;
+import org.tianocore.pcd.entity.SkuInstance;
+import org.tianocore.pcd.entity.Token;
+import org.tianocore.pcd.entity.UsageIdentification;
+import org.tianocore.pcd.entity.UsageInstance;
+import org.tianocore.pcd.exception.EntityException;
 
 /**
     CStructTypeDeclaration   
@@ -1893,6 +1895,8 @@ public class CollectPCDAction {
         String                              datum             = null;
         int                                 maxDatumSize      = 0;
         String[]                            tokenSpaceStrRet  = null;
+        UsageIdentification                 usageId           = null;
+        ModuleIdentification                moduleId          = null;
 
         //
         // ----------------------------------------------
@@ -2112,10 +2116,17 @@ public class CollectPCDAction {
                 // 2.1.4), Create an usage instance for this token.
                 // ------------------------------------------------
                 // 
+                moduleId = modules.get(index).getModuleId().getModule();
+                usageId = new UsageIdentification (moduleId.getName(), 
+                                                   moduleId.getGuid(), 
+                                                   moduleId.getPackage().getName(), 
+                                                   moduleId.getPackage().getGuid(), 
+                                                   modules.get(index).getModuleId().getArch(),
+                                                   moduleId.getVersion(),
+                                                   moduleId.getModuleType());
                 usageInstance = new UsageInstance(token, 
-                                                  modules.get(index).getModuleId().getModule(), 
+                                                  usageId,
                                                   pcdType,
-                                                  modules.get(index).getModuleId().getArch(), 
                                                   datum,
                                                   maxDatumSize);
                 token.addUsageInstance(usageInstance);

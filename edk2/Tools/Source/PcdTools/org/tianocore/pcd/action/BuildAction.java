@@ -14,16 +14,16 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-package org.tianocore.build.pcd.action;
+package org.tianocore.pcd.action;
 
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.Project;
-import org.tianocore.build.pcd.exception.BuildActionException;
+import org.tianocore.pcd.exception.BuildActionException;
 
 /** BuildAction is the parent class for all action related to ant Task. This class will
     define some common utility functionality, such as logMsg, warningMsg..etc.
 **/
-abstract class BuildAction extends Task {
+public abstract class BuildAction extends Task {
     ///
     /// Original message level before this action. This value will 
     /// be restored when quit this action.
@@ -35,14 +35,14 @@ abstract class BuildAction extends Task {
 
       This function will be overrided by child class.
     **/
-    abstract void checkParameter() throws BuildActionException;
+    public abstract void checkParameter() throws BuildActionException;
 
     /**
      performAction is to execute the detail action.
       
      This function will be overrided by child class.
     **/
-    abstract void performAction() throws BuildActionException;
+    public abstract void performAction() throws BuildActionException;
 
     /**
       setMessageLevel function set current message for task instance object.

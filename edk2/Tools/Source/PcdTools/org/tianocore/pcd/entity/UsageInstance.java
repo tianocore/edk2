@@ -15,15 +15,15 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/  
-package org.tianocore.build.pcd.entity;
+package org.tianocore.pcd.entity;
 
 
 import java.util.UUID;
 
 import org.tianocore.ModuleTypeDef;
-import org.tianocore.build.autogen.CommonDefinition;
-import org.tianocore.build.id.ModuleIdentification;
-import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.pcd.entity.CommonDefinition;
+import org.tianocore.pcd.entity.UsageIdentification;
+import org.tianocore.pcd.exception.EntityException;
 
 /**
   This class indicate an usage instance for a PCD token. This instance maybe a module
@@ -39,7 +39,7 @@ public class UsageInstance {
     ///
     /// ModuleIdentification for Usage Instance
     /// 
-    public ModuleIdentification moduleId;
+    public UsageIdentification  usageId;
 
     ///
     /// Arch also is a key for a UsageInstance
@@ -84,15 +84,13 @@ public class UsageInstance {
                                   instance.
     **/
     public UsageInstance(Token                 parentToken,
-                         ModuleIdentification  moduleId,
+                         UsageIdentification   usageId,
                          Token.PCD_TYPE        modulePcdType,
-                         String                arch,
                          String                value,
                          int                   maxDatumSize) {
         this.parentToken      = parentToken;
-        this.moduleId         = moduleId;
+        this.usageId          = usageId;
         this.modulePcdType    = modulePcdType;
-        this.arch             = arch;
         this.datum            = value;
         this.maxDatumSize     = maxDatumSize;
     }
@@ -100,30 +98,12 @@ public class UsageInstance {
     /**
        Get the primary key for usage instance array for every token.
        
-       @param   moduleId      The module Identification for generating primary key
-       @param   arch          Arch string
+       @param   usageId       The identification of UsageInstance
        
        @retval  String        The primary key for this usage instance
     **/
-    public static String getPrimaryKey(ModuleIdentification moduleId,
-                                       String               arch) {
-        String moduleName   = moduleId.getName();
-        String moduleGuid   = moduleId.getGuid();
-        String packageName  = moduleId.getPackage().getName();
-        String packageGuid  = moduleId.getPackage().getGuid();
-        String version      = moduleId.getVersion();
-
-        //
-        // Because currently transition schema not require write moduleGuid, package Name, Packge GUID in
-        // <ModuleSA> section, So currently no expect all paramter must be valid.
-        // BUGBUG: Because currently we can not get version from MSA, So ignore verison.
-        // 
-        return(moduleName                                                                + "_" +
-               ((moduleGuid  != null) ? moduleGuid.toLowerCase()    : "NullModuleGuid")  + "_" +
-               ((packageName != null) ? packageName                 : "NullPackageName") + "_" +
-               ((packageGuid != null) ? packageGuid.toLowerCase()   : "NullPackageGuid") + "_" +
-               ((arch        != null) ? arch                        : "NullArch")        + "_" +
-               "NullVersion");
+    public static String getPrimaryKey(UsageIdentification usageId) {
+        return usageId.toString();
     }
 
     /**
@@ -132,7 +112,7 @@ public class UsageInstance {
        @return String primary key string
     **/
     public String getPrimaryKey() {
-        return UsageInstance.getPrimaryKey(moduleId, arch);
+        return UsageInstance.getPrimaryKey(usageId);
     }
 
     /**
@@ -141,7 +121,7 @@ public class UsageInstance {
        @return boolean whether current module is PEI driver
     **/
     public boolean isPeiPhaseComponent() {
-        int moduleType = CommonDefinition.getModuleType(moduleId.getModuleType());
+        int moduleType = CommonDefinition.getModuleType(usageId.moduleType);
 
         if ((moduleType == CommonDefinition.ModuleTypePeiCore) ||
             (moduleType == CommonDefinition.ModuleTypePeim)) {
@@ -156,7 +136,7 @@ public class UsageInstance {
        @return boolean whether current module is DXE driver
     **/
     public boolean isDxePhaseComponent() {
-        int moduleType = CommonDefinition.getModuleType(moduleId.getModuleType());
+        int moduleType = CommonDefinition.getModuleType(usageId.moduleType);
 
         if ((moduleType == CommonDefinition.ModuleTypeDxeDriver)        ||
             (moduleType == CommonDefinition.ModuleTypeDxeRuntimeDriver) ||
