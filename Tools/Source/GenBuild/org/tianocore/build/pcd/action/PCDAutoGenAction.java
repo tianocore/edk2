@@ -29,11 +29,14 @@ import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
-import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
-import org.tianocore.build.pcd.entity.Token;
-import org.tianocore.build.pcd.entity.UsageInstance;
-import org.tianocore.build.pcd.exception.BuildActionException;
-import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.pcd.entity.MemoryDatabaseManager;
+import org.tianocore.pcd.entity.Token;
+import org.tianocore.pcd.entity.UsageInstance;
+import org.tianocore.pcd.exception.BuildActionException;
+import org.tianocore.pcd.exception.EntityException;
+import org.tianocore.pcd.entity.UsageIdentification;
+import org.tianocore.pcd.action.BuildAction;
+import org.tianocore.pcd.action.ActionMessage;
 
 /** This class is to manage how to generate the PCD information into Autogen.c and
     Autogen.h.
@@ -44,9 +47,9 @@ public class PCDAutoGenAction extends BuildAction {
     ///
     private MemoryDatabaseManager dbManager;
     ///
-    /// The identification for a module.
+    /// The identification for a UsageInstance.
     /// 
-    private ModuleIdentification  moduleId;
+    private UsageIdentification   usageId;
     ///
     /// The arch of current module
     /// 
@@ -72,17 +75,8 @@ public class PCDAutoGenAction extends BuildAction {
   
       @param moduleName   the module name parameter.
     **/
-    public void setModuleId(ModuleIdentification moduleId) {
-        this.moduleId = moduleId;
-    }
-
-    /**
-       set Arch parameter.
-       
-       @param arch
-    **/
-    public void setArch(String arch) {
-        this.arch = arch;
+    public void setUsageId(UsageIdentification usageId) {
+        this.usageId = usageId;
     }
 
     /**
@@ -136,12 +130,18 @@ public class PCDAutoGenAction extends BuildAction {
                             String               arch,
                             boolean              isBuildUsedLibrary,
                             String[]             pcdNameArrayInMsa) {
+        UsageIdentification usageId = new UsageIdentification(moduleId.getName(), 
+                                                              moduleId.getGuid(), 
+                                                              moduleId.getPackage().getName(), 
+                                                              moduleId.getPackage().getGuid(), 
+                                                              arch, 
+                                                              moduleId.getVersion(), 
+                                                              moduleId.getModuleType());
         dbManager       = null;
         hAutoGenString  = "";
         cAutoGenString  = "";
 
-        setModuleId(moduleId);
-        setArch(arch);
+        setUsageId(usageId);
         setIsBuildUsedLibrary(isBuildUsedLibrary);
         setPcdNameArrayInMsa(pcdNameArrayInMsa);
     }
@@ -151,7 +151,7 @@ public class PCDAutoGenAction extends BuildAction {
       
       @throws BuildActionException Bad parameter.
     **/
-    void checkParameter() throws BuildActionException {
+    public void checkParameter() throws BuildActionException {
         
     }
 
@@ -165,7 +165,7 @@ public class PCDAutoGenAction extends BuildAction {
       
       @throws BuildActionException Failed to execute this aciton class.
     **/
-    void performAction() throws BuildActionException {
+    public void performAction() throws BuildActionException {
         ActionMessage.debug(this, 
                             "Starting PCDAutoGenAction to generate autogen.h and autogen.c!...");
         //
@@ -200,13 +200,13 @@ public class PCDAutoGenAction extends BuildAction {
         String[]              guidStringArray = null;
         String                guidStringCName = null;
         String                guidString      = null;
-        String                moduleName      = moduleId.getName();
+        String                moduleName      = usageId.moduleName;
         UsageInstance         usageInstance   = null;
         boolean               found           = false;
 
         usageInstanceArray = null;
         if (!isBuildUsedLibrary) {
-            usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleId, arch);
+            usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(usageId);
             dbManager.UsageInstanceContext = usageInstanceArray;
             dbManager.CurrentModuleName    = moduleName; 
         } else if ((pcdNameArrayInMsa != null) && (pcdNameArrayInMsa.length > 0)) {
@@ -216,7 +216,7 @@ public class PCDAutoGenAction extends BuildAction {
             // these library should be used to autogen.
             // 
             if (usageContext == null) {
-                usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(moduleId, arch);
+                usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(usageId);
             } else {
                 usageInstanceArray = new ArrayList<UsageInstance>();
 

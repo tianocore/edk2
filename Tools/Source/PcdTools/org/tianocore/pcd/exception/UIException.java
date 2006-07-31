@@ -1,7 +1,7 @@
 /** @file
-  EntityException class.
+  UIException class.
 
-  The class handle the exception throwed by entity class.
+  The class handle the exception throwed by UI action class.
  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -13,19 +13,19 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/   
-package org.tianocore.build.pcd.exception;
+package org.tianocore.pcd.exception;
 
 /**
-  The class handle the exception throwed by entity class.
+  The class handle the exception throwed by UI action class.
 **/
-public class EntityException extends Exception {
-    static final long serialVersionUID = -8034897190740066939L;
+public class UIException extends Exception {
+    static final long serialVersionUID = -7034897190740066930L;
     /**
       Constructure function
         
-      @param expStr exception message string.
+      @param reason exception message string.
     **/
-    public EntityException(String expStr) {
-        super("[PCD EntityException]:" + expStr);
+    public UIException(String reason) {
+        super(reason);
     }
 }

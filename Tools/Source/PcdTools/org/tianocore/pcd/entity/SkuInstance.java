@@ -13,7 +13,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/ 
-package org.tianocore.build.pcd.entity;
+package org.tianocore.pcd.entity;
 
 /** Sku instance contains ID and value, A pcd token maybe contains more than one Sku instance.
 **/

@@ -44,6 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>ToolResources.msa</Filename>
     <Filename>JavaResources.msa</Filename>
     <Filename>Source/Common/Common.msa</Filename>
+    <Filename>Source/PcdTools/PcdTools.msa</Filename>
     <Filename>Source/Cpptasks/CppTasks.msa</Filename>
     <Filename>Source/FrameworkTasks/FrameworkTasks.msa</Filename>
     <Filename>Source/FrameworkWizard/FrameworkWizard.msa</Filename>

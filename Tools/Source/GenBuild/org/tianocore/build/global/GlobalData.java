@@ -35,7 +35,7 @@ import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
-import org.tianocore.build.pcd.entity.MemoryDatabaseManager;
+import org.tianocore.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainConfig;
 import org.tianocore.build.toolchain.ToolChainElement;

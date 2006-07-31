@@ -14,10 +14,9 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-package org.tianocore.build.pcd.action;
+package org.tianocore.pcd.action;
 
 import org.apache.tools.ant.Task;
-import org.tianocore.build.pcd.action.BuildAction;
 
 /** ActionMessage class take over all message for loging and waning. This class 
     should dispatch message into different Action class according to instance 

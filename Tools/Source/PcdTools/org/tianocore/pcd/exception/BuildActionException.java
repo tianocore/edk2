@@ -13,7 +13,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/   
-package org.tianocore.build.pcd.exception;
+package org.tianocore.pcd.exception;
 
 import org.apache.tools.ant.BuildException;
 

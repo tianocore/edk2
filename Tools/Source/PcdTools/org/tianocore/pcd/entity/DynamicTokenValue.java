@@ -13,12 +13,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/  
-package org.tianocore.build.pcd.entity;
+package org.tianocore.pcd.entity;
 
 import java.util.List;
 import java.util.UUID;
 
-import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.pcd.exception.EntityException;
 
 /** This class is to descript a value type of dynamic PCD.
     For a dynamic or dynamicEx type PCD data, the value type can be:

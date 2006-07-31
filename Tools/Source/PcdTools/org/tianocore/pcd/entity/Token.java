@@ -13,7 +13,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/  
-package org.tianocore.build.pcd.entity;
+package org.tianocore.pcd.entity;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.tianocore.build.id.ModuleIdentification;
-import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.pcd.entity.UsageIdentification;
+import org.tianocore.pcd.exception.EntityException;
 
 /** This class is to descript a PCD token object. The information of a token mainly 
     comes from MSA, SPD and setting produced by platform developer. 
@@ -118,8 +118,6 @@ public class Token {
        @param tokenSpaceName    The name of token space, it is a guid string
     **/
     public Token(String cName, String tokenSpaceName) {
-        UUID    nullUUID = new UUID(0, 0);
-
         this.cName                  = cName;
         this.tokenSpaceName         = tokenSpaceName;
         this.tokenNumber            = 0;
@@ -283,12 +281,12 @@ public class Token {
     public boolean addUsageInstance(UsageInstance usageInstance) throws EntityException {
         String exceptionStr;
 
-        if (isUsageInstanceExist(usageInstance.moduleId, usageInstance.arch)) {
+        if (isUsageInstanceExist(usageInstance.usageId)) {
             exceptionStr = String.format("[PCD Collection Tool Exception] PCD %s for module %s has already exist in database, Please check all PCD build entries "+
                                          "in modules %s in <ModuleSA> to make sure no duplicated definitions in FPD file!",
                                          usageInstance.parentToken.cName,
-                                         usageInstance.moduleId.getName(),
-                                         usageInstance.moduleId.getName());
+                                         usageInstance.usageId.moduleName,
+                                         usageInstance.usageId.moduleName);
             throw new EntityException(exceptionStr);
         }
 
@@ -303,14 +301,12 @@ public class Token {
     /**
        Judge whether exist an usage instance for this token
        
-       @param moduleId      The module identification for usage instance
-       @param arch          the architecture string
+       @param usageId       The UsageInstance identification for usage instance
        
        @return boolean      whether exist an usage instance for this token.
      */
-    public boolean isUsageInstanceExist(ModuleIdentification moduleId,
-                                        String               arch) {
-        String keyStr = UsageInstance.getPrimaryKey(moduleId, arch);
+    public boolean isUsageInstanceExist(UsageIdentification usageId) {
+        String keyStr = UsageInstance.getPrimaryKey(usageId);
 
         return (consumers.get(keyStr) != null);
     }

@@ -13,7 +13,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-package org.tianocore.build.pcd.entity;
+package org.tianocore.pcd.entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.tianocore.build.id.ModuleIdentification;
-import org.tianocore.build.pcd.exception.EntityException;
+import org.tianocore.pcd.entity.UsageIdentification;
+import org.tianocore.pcd.exception.EntityException;
 
 /** Database hold all PCD information comes from SPD, MSA, FPD file in memory.
 **/
@@ -224,15 +224,13 @@ public class MemoryDatabaseManager {
       Get all PCD record for a module according to module's name, module's GUID,
       package name, package GUID, arch, version information.
      
-      @param moduleId  the id of module.
-      @param arch      the architecture
+      @param usageId   the id of UsageInstance.
       
       @return  all usage instance for this module in memory database.
     **/
-    public List<UsageInstance> getUsageInstanceArrayByModuleName(ModuleIdentification  moduleId,
-                                                                 String                arch) {
+    public List<UsageInstance> getUsageInstanceArrayByModuleName(UsageIdentification usageId) {
 
-        String primaryKey = UsageInstance.getPrimaryKey(moduleId, arch);
+        String primaryKey = UsageInstance.getPrimaryKey(usageId);
 
         return getUsageInstanceArrayByKeyString(primaryKey);
     }

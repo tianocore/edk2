@@ -172,6 +172,7 @@ call ant -f %WORKSPACE%\Tools\build.xml JavaCode
 @REM using the cpp-tasks to create our tools
 @REM
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\PcdTools.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
@@ -235,6 +236,7 @@ set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\saxon8.jar
 set CLASSPATH=%CLASSPATH%;%XMLBEANS_HOME%\lib\resolver.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\SurfaceArea.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\Common.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\PcdTools.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
