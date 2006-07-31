@@ -11,6 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <project name="Tools" default="all" basedir=".">
 
+  <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
 
   <target name="all" depends="C_Code"/>
@@ -60,7 +61,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </echo>
     <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt" overwrite="false"/>
     <copy file="Conf/target.template" tofile="Conf/target.txt" overwrite="false"/>
-    <copy file="Conf/FrameworkDatabase.template" tofile="Conf/FrameworkDatabase.db" overwrite="false"/>
+    <if>
+      <not>
+        <available file="Conf/FrameworkDatabase.db"/>
+      </not>
+      <then>
+        <copy file="Conf/FrameworkDatabase.template" tofile="Conf/FrameworkDatabase.db"/>
+      </then>
+    </if>
   </target>
 
   <target name="clean">
