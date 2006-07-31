@@ -60,6 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </echo>
     <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt" overwrite="false"/>
     <copy file="Conf/target.template" tofile="Conf/target.txt" overwrite="false"/>
+    <copy file="Conf/FrameworkDatabase.template" tofile="Conf/FrameworkDatabase.db" overwrite="false"/>
   </target>
 
   <target name="clean">
