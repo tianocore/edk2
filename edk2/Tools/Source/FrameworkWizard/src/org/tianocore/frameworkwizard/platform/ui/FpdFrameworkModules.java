@@ -37,21 +37,21 @@ public class FpdFrameworkModules extends IInternalFrame {
     private static final long serialVersionUID = 1L;
     static JFrame frame;
     private JSplitPane jSplitPane = null;
-    private JPanel jPanel = null;
-    private JPanel jPanel1 = null;
+    private JPanel jPanelTop = null;
+    private JPanel jPanelBottom = null;
     private JLabel jLabel = null;
-    private JScrollPane jScrollPane = null;
-    private JTable jTable = null;
-    private JPanel jPanel2 = null;
-    private JButton jButton = null;
-    private JLabel jLabel1 = null;
-    private JPanel jPanel3 = null;
-    private JScrollPane jScrollPane1 = null;
-    private JTable jTable1 = null;
-    private JButton jButton1 = null;
-    private JButton jButton2 = null;
-    private NonEditableTableModel model = null;
-    private NonEditableTableModel model1 = null;
+    private JScrollPane jScrollPaneAllModules = null;
+    private JTable jTableAllModules = null;
+    private JPanel jPanelTopSouth = null;
+    private JButton jButtonAddModule = null;
+    private JLabel jLabelModulesAdded = null;
+    private JPanel jPanelBottomSouth = null;
+    private JScrollPane jScrollPaneFpdModules = null;
+    private JTable jTableFpdModules = null;
+    private JButton jButtonSettings = null;
+    private JButton jButtonRemoveModule = null;
+    private NonEditableTableModel modelAllModules = null;
+    private NonEditableTableModel modelFpdModules = null;
     
     private FpdModuleSA settingDlg = null;
     
@@ -71,8 +71,8 @@ public class FpdFrameworkModules extends IInternalFrame {
             jSplitPane = new JSplitPane();
             jSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
             jSplitPane.setDividerLocation(250);
-            jSplitPane.setBottomComponent(getJPanel1());
-            jSplitPane.setTopComponent(getJPanel());
+            jSplitPane.setBottomComponent(getJPanelBottom());
+            jSplitPane.setTopComponent(getJPanelTop());
         }
         return jSplitPane;
     }
@@ -82,17 +82,17 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel() {
-        if (jPanel == null) {
+    private JPanel getJPanelTop() {
+        if (jPanelTop == null) {
             jLabel = new JLabel();
             jLabel.setText("Modules in Workspace");
-            jPanel = new JPanel();
-            jPanel.setLayout(new BorderLayout());
-            jPanel.add(jLabel, java.awt.BorderLayout.NORTH);
-            jPanel.add(getJScrollPane(), java.awt.BorderLayout.CENTER);
-            jPanel.add(getJPanel2(), java.awt.BorderLayout.SOUTH);
+            jPanelTop = new JPanel();
+            jPanelTop.setLayout(new BorderLayout());
+            jPanelTop.add(jLabel, java.awt.BorderLayout.NORTH);
+            jPanelTop.add(getJScrollPaneAllModules(), java.awt.BorderLayout.CENTER);
+            jPanelTop.add(getJPanelTopSouth(), java.awt.BorderLayout.SOUTH);
         }
-        return jPanel;
+        return jPanelTop;
     }
 
     /**
@@ -100,17 +100,17 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel1() {
-        if (jPanel1 == null) {
-            jLabel1 = new JLabel();
-            jLabel1.setText("Modules Added");
-            jPanel1 = new JPanel();
-            jPanel1.setLayout(new BorderLayout());
-            jPanel1.add(jLabel1, java.awt.BorderLayout.NORTH);
-            jPanel1.add(getJPanel3(), java.awt.BorderLayout.SOUTH);
-            jPanel1.add(getJScrollPane1(), java.awt.BorderLayout.CENTER);
+    private JPanel getJPanelBottom() {
+        if (jPanelBottom == null) {
+            jLabelModulesAdded = new JLabel();
+            jLabelModulesAdded.setText("Modules Added");
+            jPanelBottom = new JPanel();
+            jPanelBottom.setLayout(new BorderLayout());
+            jPanelBottom.add(jLabelModulesAdded, java.awt.BorderLayout.NORTH);
+            jPanelBottom.add(getJPanelBottomSouth(), java.awt.BorderLayout.SOUTH);
+            jPanelBottom.add(getJScrollPaneFpdModules(), java.awt.BorderLayout.CENTER);
         }
-        return jPanel1;
+        return jPanelBottom;
     }
 
     /**
@@ -118,13 +118,13 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane() {
-        if (jScrollPane == null) {
-            jScrollPane = new JScrollPane();
-            jScrollPane.setPreferredSize(new java.awt.Dimension(600,200));
-            jScrollPane.setViewportView(getJTable());
+    private JScrollPane getJScrollPaneAllModules() {
+        if (jScrollPaneAllModules == null) {
+            jScrollPaneAllModules = new JScrollPane();
+            jScrollPaneAllModules.setPreferredSize(new java.awt.Dimension(600,200));
+            jScrollPaneAllModules.setViewportView(getJTableAllModules());
         }
-        return jScrollPane;
+        return jScrollPaneAllModules;
     }
 
     /**
@@ -132,20 +132,20 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable() {
-        if (jTable == null) {
-            model = new NonEditableTableModel();
-            jTable = new JTable(model);
-            jTable.setRowHeight(20);
-            model.addColumn("ModuleName");
-            model.addColumn("ModuleVersion");
-            model.addColumn("PackageName");
-            model.addColumn("PackageVersion");
-            model.addColumn("Path");
+    private JTable getJTableAllModules() {
+        if (jTableAllModules == null) {
+            modelAllModules = new NonEditableTableModel();
+            jTableAllModules = new JTable(modelAllModules);
+            jTableAllModules.setRowHeight(20);
+            modelAllModules.addColumn("ModuleName");
+            modelAllModules.addColumn("ModuleVersion");
+            modelAllModules.addColumn("PackageName");
+            modelAllModules.addColumn("PackageVersion");
+            modelAllModules.addColumn("Path");
             
-            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTableAllModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
-        return jTable;
+        return jTableAllModules;
     }
 
     /**
@@ -153,15 +153,15 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel2() {
-        if (jPanel2 == null) {
+    private JPanel getJPanelTopSouth() {
+        if (jPanelTopSouth == null) {
             FlowLayout flowLayout = new FlowLayout();
             flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
-            jPanel2 = new JPanel();
-            jPanel2.setLayout(flowLayout);
-            jPanel2.add(getJButton(), null);
+            jPanelTopSouth = new JPanel();
+            jPanelTopSouth.setLayout(flowLayout);
+            jPanelTopSouth.add(getJButtonAddModule(), null);
         }
-        return jPanel2;
+        return jPanelTopSouth;
     }
 
     /**
@@ -169,19 +169,19 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton() {
-        if (jButton == null) {
-            jButton = new JButton();
-            jButton.setPreferredSize(new java.awt.Dimension(130,20));
-            jButton.setText("Add a Module");
-            jButton.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonAddModule() {
+        if (jButtonAddModule == null) {
+            jButtonAddModule = new JButton();
+            jButtonAddModule.setPreferredSize(new java.awt.Dimension(130,20));
+            jButtonAddModule.setText("Add a Module");
+            jButtonAddModule.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    int selectedRow = jTable.getSelectedRow();
+                    int selectedRow = jTableAllModules.getSelectedRow();
                     if (selectedRow < 0){
                         return;
                     }
                     
-                    String path = model.getValueAt(selectedRow, 4)+"";
+                    String path = modelAllModules.getValueAt(selectedRow, 4)+"";
                     ModuleIdentification mi = miList.get(selectedRow);
                     Vector<String> vArchs = null;
                     try {
@@ -229,7 +229,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                            row[2] = mi.getPackage().getName();
                            
                        }
-                       model1.addRow(row);
+                       modelFpdModules.addRow(row);
                        
                        docConsole.setSaved(false);
                        try{
@@ -243,11 +243,11 @@ public class FpdFrameworkModules extends IInternalFrame {
                     
                     
                     JOptionPane.showMessageDialog(frame, "This Module with Arch "+ archsAdded +" Added Successfully.");
-                    jTable1.changeSelection(model1.getRowCount()-1, 0, false, false);
+                    jTableFpdModules.changeSelection(modelFpdModules.getRowCount()-1, 0, false, false);
                 }
             });
         }
-        return jButton;
+        return jButtonAddModule;
     }
 
     /**
@@ -255,16 +255,16 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel3() {
-        if (jPanel3 == null) {
+    private JPanel getJPanelBottomSouth() {
+        if (jPanelBottomSouth == null) {
             FlowLayout flowLayout1 = new FlowLayout();
             flowLayout1.setAlignment(java.awt.FlowLayout.RIGHT);
-            jPanel3 = new JPanel();
-            jPanel3.setLayout(flowLayout1);
-            jPanel3.add(getJButton1(), null);
-            jPanel3.add(getJButton2(), null);
+            jPanelBottomSouth = new JPanel();
+            jPanelBottomSouth.setLayout(flowLayout1);
+            jPanelBottomSouth.add(getJButtonSettings(), null);
+            jPanelBottomSouth.add(getJButtonRemoveModule(), null);
         }
-        return jPanel3;
+        return jPanelBottomSouth;
     }
 
     /**
@@ -272,13 +272,13 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane1() {
-        if (jScrollPane1 == null) {
-            jScrollPane1 = new JScrollPane();
-            jScrollPane1.setPreferredSize(new java.awt.Dimension(453,200));
-            jScrollPane1.setViewportView(getJTable1());
+    private JScrollPane getJScrollPaneFpdModules() {
+        if (jScrollPaneFpdModules == null) {
+            jScrollPaneFpdModules = new JScrollPane();
+            jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(453,200));
+            jScrollPaneFpdModules.setViewportView(getJTableFpdModules());
         }
-        return jScrollPane1;
+        return jScrollPaneFpdModules;
     }
 
     /**
@@ -286,21 +286,21 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable1() {
-        if (jTable1 == null) {
-            model1 = new NonEditableTableModel();
-            jTable1 = new JTable(model1);
-            jTable1.setRowHeight(20);
-            model1.addColumn("ModuleName");
-            model1.addColumn("ModuleVersion");            
-            model1.addColumn("PackageName");
-            model1.addColumn("PackageVersion");
-            model1.addColumn("SupportedArch");
-            model1.addColumn("Path");
+    private JTable getJTableFpdModules() {
+        if (jTableFpdModules == null) {
+            modelFpdModules = new NonEditableTableModel();
+            jTableFpdModules = new JTable(modelFpdModules);
+            jTableFpdModules.setRowHeight(20);
+            modelFpdModules.addColumn("ModuleName");
+            modelFpdModules.addColumn("ModuleVersion");            
+            modelFpdModules.addColumn("PackageName");
+            modelFpdModules.addColumn("PackageVersion");
+            modelFpdModules.addColumn("SupportedArch");
+            modelFpdModules.addColumn("Path");
             
-            jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
-        return jTable1;
+        return jTableFpdModules;
     }
 
     /**
@@ -308,14 +308,14 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton1() {
-        if (jButton1 == null) {
-            jButton1 = new JButton();
-            jButton1.setPreferredSize(new java.awt.Dimension(130,20));
-            jButton1.setText("Settings");
-            jButton1.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonSettings() {
+        if (jButtonSettings == null) {
+            jButtonSettings = new JButton();
+            jButtonSettings.setPreferredSize(new java.awt.Dimension(130,20));
+            jButtonSettings.setText("Settings");
+            jButtonSettings.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    int selectedRow = jTable1.getSelectedRow();
+                    int selectedRow = jTableFpdModules.getSelectedRow();
                     if (selectedRow < 0){
                         return;
                     }
@@ -335,7 +335,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                 }
             });
         }
-        return jButton1;
+        return jButtonSettings;
     }
 
     /**
@@ -343,14 +343,14 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton2() {
-        if (jButton2 == null) {
-            jButton2 = new JButton();
-            jButton2.setPreferredSize(new java.awt.Dimension(130,20));
-            jButton2.setText("Remove Module");
-            jButton2.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonRemoveModule() {
+        if (jButtonRemoveModule == null) {
+            jButtonRemoveModule = new JButton();
+            jButtonRemoveModule.setPreferredSize(new java.awt.Dimension(130,20));
+            jButtonRemoveModule.setText("Remove Module");
+            jButtonRemoveModule.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    int selectedRow = jTable1.getSelectedRow();
+                    int selectedRow = jTableFpdModules.getSelectedRow();
                     if (selectedRow < 0){
                         return;
                     }
@@ -364,7 +364,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     ModuleIdentification mi = getModuleId(sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3] + " " + sa[4]);
                     mv = mi.getVersion();
                     pv = mi.getPackage().getVersion();
-                    model1.removeRow(selectedRow);
+                    modelFpdModules.removeRow(selectedRow);
                     if (arch == null) {
                         // if no arch specified in ModuleSA
                         fpdMsa.remove(mg+mv+pg+pv);
@@ -383,7 +383,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                 }
             });
         }
-        return jButton2;
+        return jButtonRemoveModule;
     }
 
     /**
@@ -449,7 +449,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         JOptionPane.showMessageDialog(frame, "ShowFPDModules:" + e.getMessage());
                     }
                 }
-                model1.addRow(row);
+                modelFpdModules.addRow(row);
                 ArrayList<String> al = fpdMsa.get(saa[i][0]+row[1]+saa[i][2]+row[3]);
                 if (al == null) {
                     al = new ArrayList<String>();
@@ -490,7 +490,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                 catch (Exception e) {
                     JOptionPane.showMessageDialog(frame, "ShowAllModules:" + e.getMessage());
                 }
-                model.addRow(s);
+                modelAllModules.addRow(s);
                 miList.add(mi);
             }
         }

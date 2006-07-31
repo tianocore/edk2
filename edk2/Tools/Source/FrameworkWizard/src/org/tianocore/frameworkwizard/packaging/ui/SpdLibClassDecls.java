@@ -77,7 +77,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private JPanel jContentPane = null;
 
-    private JTextField jTextFieldAdd = null;
+    private JTextField jTextFieldClass = null;
 
     private JComboBox jComboBoxSelect = null;
 
@@ -133,7 +133,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     
     private ICheckBoxList iCheckBoxListModules = null;
 
-    private ICheckBoxList iCheckBoxList = null;
+    private ICheckBoxList iCheckBoxListArch = null;
 
     private JComboBox jComboBox = null;
 
@@ -163,14 +163,14 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
       	
       @return javax.swing.JTextField	
      **/
-    private JTextField getJTextFieldAdd() {
-        if (jTextFieldAdd == null) {
-            jTextFieldAdd = new JTextField();
-            jTextFieldAdd.setBounds(new java.awt.Rectangle(122,6,390,20));
-            jTextFieldAdd.setPreferredSize(new java.awt.Dimension(260,20));
-            jTextFieldAdd.setEnabled(true);
+    private JTextField getJTextFieldClass() {
+        if (jTextFieldClass == null) {
+            jTextFieldClass = new JTextField();
+            jTextFieldClass.setBounds(new java.awt.Rectangle(122,6,390,20));
+            jTextFieldClass.setPreferredSize(new java.awt.Dimension(260,20));
+            jTextFieldClass.setEnabled(true);
         }
-        return jTextFieldAdd;
+        return jTextFieldClass;
     }
 
     /**
@@ -512,7 +512,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jContentPane.add(jLabelHdr, null);
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
-            jContentPane.add(getJTextFieldAdd(), null);
+            jContentPane.add(getJTextFieldClass(), null);
             jContentPane.add(getJComboBoxSelect(), null);
             jContentPane.add(getJScrollPane(), null);
             jContentPane.add(getJButtonAdd(), null);
@@ -597,12 +597,12 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             //ToDo: check before add
             // LAH WAS String[] row = {null, null, null, jComboBox.getSelectedItem()+"", jTextField2RecInstVer.getText(), null, null};
             String[] row = {null, null, null, null, null, null, null};
-            row[cnClassName] = jTextFieldAdd.getText();
+            row[cnClassName] = jTextFieldClass.getText();
             row[cnHdrFile] = jTextFieldHdr.getText().replace('\\', '/');
             row[cnHelpText] = jTextFieldHelp.getText();
             row[cnRecInstName] = jComboBox.getSelectedItem()+"";
             row[cnRecInstVer] = jTextField2RecInstVer.getText();
-            row[cnSupArch] = vectorToString(iCheckBoxList.getAllCheckedItemsString());
+            row[cnSupArch] = vectorToString(iCheckBoxListArch.getAllCheckedItemsString());
             if (row[cnSupArch].length() == 0) {
                 row[cnSupArch] = null;
             }
@@ -755,7 +755,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jTextFieldAdd, this.getWidth(), intPreferredWidth);
+        resizeComponentWidth(this.jTextFieldClass, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth-10);
         
@@ -849,7 +849,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jScrollPane1Arch = new JScrollPane();
             jScrollPane1Arch.setBounds(new java.awt.Rectangle(218,170,293,73));
             jScrollPane1Arch.setPreferredSize(new java.awt.Dimension(320, 80));
-            jScrollPane1Arch.setViewportView(getICheckBoxList());
+            jScrollPane1Arch.setViewportView(getICheckBoxListArch());
         }
         return jScrollPane1Arch;
     }
@@ -858,10 +858,10 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
      * 	
      * @return org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList	
      */
-    private ICheckBoxList getICheckBoxList() {
-        if (iCheckBoxList == null) {
-            iCheckBoxList = new ICheckBoxList();
-            iCheckBoxList.setBounds(new java.awt.Rectangle(218,171,292,66));
+    private ICheckBoxList getICheckBoxListArch() {
+        if (iCheckBoxListArch == null) {
+            iCheckBoxListArch = new ICheckBoxList();
+            iCheckBoxListArch.setBounds(new java.awt.Rectangle(218,171,292,66));
             Vector<String> v = new Vector<String>();
             v.add("IA32");
             v.add("X64");
@@ -869,9 +869,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             v.add("EBC");
             v.add("ARM");
             v.add("PPC");
-            iCheckBoxList.setAllItems(v);
+            iCheckBoxListArch.setAllItems(v);
         }
-        return iCheckBoxList;
+        return iCheckBoxListArch;
     }
 
     /**
@@ -887,11 +887,11 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             jComboBox.setLocation(new java.awt.Point(218,111));
             jComboBox.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusGained(java.awt.event.FocusEvent e) {
-                    if (jTextFieldAdd.getText().length() == 0) {
+                    if (jTextFieldClass.getText().length() == 0) {
                         return;
                     }
                     jComboBox.removeAllItems();
-                    getLibInstances(jTextFieldAdd.getText());
+                    getLibInstances(jTextFieldClass.getText());
                     Set<String> libNames = libNameGuidMap.keySet();
                     Iterator<String> si = libNames.iterator();
                     while(si.hasNext()) {

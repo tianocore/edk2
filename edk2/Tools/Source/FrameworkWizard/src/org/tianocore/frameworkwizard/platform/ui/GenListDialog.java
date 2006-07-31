@@ -44,14 +44,10 @@ public class GenListDialog extends JDialog implements ActionListener{
     private static final long serialVersionUID = 1L;
 
     private JPanel jContentPane = null;
-    private JPanel jPanel = null;
-    private JPanel jPanel1 = null;
-    private JPanel jPanel2 = null;
-    private JPanel jPanel3 = null;
-    private JPanel jPanel4 = null;
-    private JButton jButton = null;
-    private JButton jButton1 = null;
-    private JButton jButton2 = null;
+    private JPanel jPanelContentEast = null;
+    private JPanel jPanelContentCenter = null;
+    private JButton jButtonCancel = null;
+    private JButton jButtonOk = null;
     private ICheckBoxList checkBoxList = null;
 
 
@@ -60,17 +56,13 @@ public class GenListDialog extends JDialog implements ActionListener{
 
 
     public void actionPerformed(ActionEvent arg0) {
-        // TODO Auto-generated method stub
-        if (arg0.getSource() == jButton1){
-            checkBoxList.setAllItemsUnchecked();
-        }
         
-        if (arg0.getSource() == jButton2){
+        if (arg0.getSource() == jButtonOk){
 
             this.dispose();
         }
         
-        if (arg0.getSource() == jButton){
+        if (arg0.getSource() == jButtonCancel){
             this.dispose();
         }
     }
@@ -80,54 +72,17 @@ public class GenListDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel() {
-        if (jPanel == null) {
+    private JPanel getJPanelContentEast() {
+        if (jPanelContentEast == null) {
             FlowLayout flowLayout = new FlowLayout();
             flowLayout.setVgap(10);
-            jPanel = new JPanel();
-            jPanel.setLayout(flowLayout);
-            jPanel.setPreferredSize(new java.awt.Dimension(100,30));
-            jPanel.add(getJButton1(), null);
-            jPanel.add(getJButton2(), null);
-            jPanel.add(getJButton(), null);
+            jPanelContentEast = new JPanel();
+            jPanelContentEast.setLayout(flowLayout);
+            jPanelContentEast.setPreferredSize(new java.awt.Dimension(100,30));
+            jPanelContentEast.add(getJButtonOk(), null);
+            jPanelContentEast.add(getJButtonCancel(), null);
         }
-        return jPanel;
-    }
-
-    /**
-     * This method initializes jPanel1	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel1() {
-        if (jPanel1 == null) {
-            jPanel1 = new JPanel();
-        }
-        return jPanel1;
-    }
-
-    /**
-     * This method initializes jPanel2	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel2() {
-        if (jPanel2 == null) {
-            jPanel2 = new JPanel();
-        }
-        return jPanel2;
-    }
-
-    /**
-     * This method initializes jPanel3	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel3() {
-        if (jPanel3 == null) {
-            jPanel3 = new JPanel();
-        }
-        return jPanel3;
+        return jPanelContentEast;
     }
 
     /**
@@ -135,14 +90,14 @@ public class GenListDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel4() {
-        if (jPanel4 == null) {
-            jPanel4 = new JPanel();
-            jPanel4.setLayout(new FlowLayout());
-            jPanel4.add(getJScrollPane(), null);
+    private JPanel getJPanelContentCenter() {
+        if (jPanelContentCenter == null) {
+            jPanelContentCenter = new JPanel();
+            jPanelContentCenter.setLayout(new FlowLayout());
+            jPanelContentCenter.add(getJScrollPane(), null);
             
         }
-        return jPanel4;
+        return jPanelContentCenter;
     }
 
     /**
@@ -150,31 +105,14 @@ public class GenListDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton() {
-        if (jButton == null) {
-            jButton = new JButton();
-            jButton.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton.setText("Cancel");
-            jButton.addActionListener(this);
+    private JButton getJButtonCancel() {
+        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonCancel.setText("Cancel");
+            jButtonCancel.addActionListener(this);
         }
-        return jButton;
-    }
-
-    /**
-     * This method initializes jButton1	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButton1() {
-        if (jButton1 == null) {
-            jButton1 = new JButton();
-            jButton1.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
-            jButton1.setText("Clear");
-            jButton1.setVisible(false);
-            jButton1.addActionListener(this);
-        }
-        return jButton1;
+        return jButtonCancel;
     }
 
     /**
@@ -182,15 +120,15 @@ public class GenListDialog extends JDialog implements ActionListener{
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton2() {
-        if (jButton2 == null) {
-            jButton2 = new JButton();
-            jButton2.setPreferredSize(new java.awt.Dimension(80,20));
-            jButton2.setText("Ok");
-            jButton2.setActionCommand("GenGuidValue");
-            jButton2.addActionListener(this);
+    private JButton getJButtonOk() {
+        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonOk.setText("Ok");
+            jButtonOk.setActionCommand("GenGuidValue");
+            jButtonOk.addActionListener(this);
         }
-        return jButton2;
+        return jButtonOk;
     }
 
     /**
@@ -211,17 +149,7 @@ public class GenListDialog extends JDialog implements ActionListener{
         if (checkBoxList == null) {
             checkBoxList = new ICheckBoxList();
             checkBoxList.setBounds(new java.awt.Rectangle(40,20,177,74));
-//            Vector<String> v = new Vector<String>();
-//            v.add("DATA_HUB_RECORD");
-//            v.add("EFI_EVENT");
-//            v.add("EFI_SYSTEM_CONFIGURATION_TABLE");
-//            v.add("EFI_VARIABLE");
-//            v.add("GUID");
-//            v.add("HII_PACKAGE_LIST");
-//            v.add("HOB");
-//            v.add("TOKEN_SPACE_GUID");
-//          
-//            checkBoxList.setAllItems(v);
+
         }
         return checkBoxList;
     }
@@ -256,7 +184,7 @@ public class GenListDialog extends JDialog implements ActionListener{
     
     public GenListDialog(ActionListener i){
         this();
-        jButton2.addActionListener(i);
+        jButtonOk.addActionListener(i);
         
     }
 
@@ -283,11 +211,8 @@ public class GenListDialog extends JDialog implements ActionListener{
         if (jContentPane == null) {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
-            jContentPane.add(getJPanel(), java.awt.BorderLayout.EAST);
-            jContentPane.add(getJPanel1(), java.awt.BorderLayout.WEST);
-            jContentPane.add(getJPanel2(), java.awt.BorderLayout.NORTH);
-            jContentPane.add(getJPanel3(), java.awt.BorderLayout.SOUTH);
-            jContentPane.add(getJPanel4(), java.awt.BorderLayout.CENTER);
+            jContentPane.add(getJPanelContentEast(), java.awt.BorderLayout.EAST);
+            jContentPane.add(getJPanelContentCenter(), java.awt.BorderLayout.CENTER);
         }
         return jContentPane;
     }

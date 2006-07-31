@@ -52,52 +52,49 @@ public class FpdPlatformDefs extends IInternalFrame {
     private static final long serialVersionUID = 1L;
     static JFrame frame;
     private JPanel jContentPane = null;
-    private JPanel jPanel = null;
-    private JPanel jPanel1 = null;
-    private JPanel jPanel2 = null;
-    private JPanel jPanel3 = null;
+    private JPanel jPanelContentEast = null;
+    private JPanel jPanelContentWest = null;
+    private JPanel jPanelContentNorth = null;
     private JTabbedPane jTabbedPane = null;
-    private JButton jButtonOk = null;
-    private JButton jButtonCancel = null;
-    private TargetTableModel imageEntryPointTableModel = null;
+    private TargetTableModel buildTargetTableModel = null;
     
     private SkuInfoTableModel skuInfoTableModel = null;
     private OpeningPlatformType docConsole = null;
     private FpdFileContents ffc = null;
-    private JPanel jPanel4 = null;
-    private JPanel jPanel5 = null;
+    private JPanel jPanelGeneralTab = null;
+    private JPanel jPanelGeneralTabNorth = null;
     private JLabel jLabel = null;
-    private JCheckBox jCheckBox1 = null;
-    private JCheckBox jCheckBox2 = null;
-    private JCheckBox jCheckBox3 = null;
-    private JPanel jPanel6 = null;
-    private JCheckBox jCheckBox4 = null;
-    private JComboBox jComboBox = null;
-    private JTable jTable = null;
-    private JPanel jPanel7 = null;
-    private JLabel jLabel2 = null;
-    private JTextField jTextField1 = null;
-    private JButton jButton2 = null;
-    private JButton jButton3 = null;
-    private JScrollPane jScrollPane2 = null;
-    private JScrollPane jScrollPane3 = null;
-    private JTable jTable2 = null;
-    private JCheckBox jCheckBox = null;
-    private JCheckBox jCheckBox5 = null;
-    private JCheckBox jCheckBox6 = null;
-    private JPanel jPanel8 = null;
-    private JLabel jLabel7 = null;
-    private JLabel jLabel1 = null;
-    private JTextField jTextField = null;
-    private JPanel jPanel9 = null;
-    private JLabel jLabel3 = null;
-    private JLabel jLabel4 = null;
-    private JTextField jTextField2 = null;
-    private JLabel jLabel5 = null;
-    private JTextField jTextField3 = null;
-    private JButton jButton = null;
-    private JButton jButton1 = null;
-    private JLabel jLabel6 = null;
+    private JCheckBox jCheckBoxIa32 = null;
+    private JCheckBox jCheckBoxX64 = null;
+    private JCheckBox jCheckBoxIpf = null;
+    private JPanel jPanelGeneralTabSouth = null;
+    private JCheckBox jCheckBoxInterDir = null;
+    private JComboBox jComboBoxInterDir = null;
+    private JTable jTableBuildTargets = null;
+    private JPanel jPanelGeneralTabCenter = null;
+    private JLabel jLabelBuildTargets = null;
+    private JTextField jTextFieldBuildTarget = null;
+    private JButton jButtonAddBuildTarget = null;
+    private JButton jButtonDelBuildTarget = null;
+    private JScrollPane jScrollPaneBuildTargets = null;
+    private JScrollPane jScrollPaneSkuInfo = null;
+    private JTable jTableSkuInfo = null;
+    private JCheckBox jCheckBoxEbc = null;
+    private JCheckBox jCheckBoxArm = null;
+    private JCheckBox jCheckBoxPpc = null;
+    private JPanel jPanelDir = null;
+    private JLabel jLabelPad = null;
+    private JLabel jLabelOutputDir = null;
+    private JTextField jTextFieldOutputDir = null;
+    private JPanel jPanelSkuInfo = null;
+    private JLabel jLabelSkuInfo = null;
+    private JLabel jLabelSkuId = null;
+    private JTextField jTextFieldSkuId = null;
+    private JLabel jLabelSkuName = null;
+    private JTextField jTextFieldSkuName = null;
+    private JButton jButtonSkuAdd = null;
+    private JButton jButtonSkuDel = null;
+    private JLabel jLabelPadd = null;
     public FpdPlatformDefs() {
         super();
         // TODO Auto-generated constructor stub
@@ -123,30 +120,11 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel() {
-        if (jPanel == null) {
-            jPanel = new JPanel();
+    private JPanel getJPanelContentEast() {
+        if (jPanelContentEast == null) {
+            jPanelContentEast = new JPanel();
         }
-        return jPanel;
-    }
-
-    /**
-     * This method initializes jPanel1	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanel1() {
-        if (jPanel1 == null) {
-            FlowLayout flowLayout = new FlowLayout();
-            flowLayout.setAlignment(java.awt.FlowLayout.RIGHT);
-            flowLayout.setHgap(15);
-            jPanel1 = new JPanel();
-            jPanel1.setLayout(flowLayout);
-            jPanel1.setComponentOrientation(java.awt.ComponentOrientation.LEFT_TO_RIGHT);
-            jPanel1.add(getJButtonCancel(), null);
-            jPanel1.add(getJButtonOk(), null);
-        }
-        return jPanel1;
+        return jPanelContentEast;
     }
 
     /**
@@ -154,11 +132,11 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel2() {
-        if (jPanel2 == null) {
-            jPanel2 = new JPanel();
+    private JPanel getJPanelContentWest() {
+        if (jPanelContentWest == null) {
+            jPanelContentWest = new JPanel();
         }
-        return jPanel2;
+        return jPanelContentWest;
     }
 
     /**
@@ -166,11 +144,11 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel3() {
-        if (jPanel3 == null) {
-            jPanel3 = new JPanel();
+    private JPanel getJPanelContentNorth() {
+        if (jPanelContentNorth == null) {
+            jPanelContentNorth = new JPanel();
         }
-        return jPanel3;
+        return jPanelContentNorth;
     }
 
     /**
@@ -182,43 +160,13 @@ public class FpdPlatformDefs extends IInternalFrame {
         if (jTabbedPane == null) {
             jTabbedPane = new JTabbedPane();
             
-			jTabbedPane.addTab("General", null, getJPanel4(), null);
+			jTabbedPane.addTab("General", null, getJPanelGeneralTab(), null);
            
         }
         return jTabbedPane;
     }
 
     /**
-     * This method initializes jButtonOk	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButtonOk() {
-        if (jButtonOk == null) {
-            jButtonOk = new JButton();
-            jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
-            jButtonOk.setText("Cancel");
-            jButtonOk.setVisible(false);
-        }
-        return jButtonOk;
-    }
-
-    /**
-     * This method initializes jButtonCancel	
-     * 	
-     * @return javax.swing.JButton	
-     */
-    private JButton getJButtonCancel() {
-        if (jButtonCancel == null) {
-            jButtonCancel = new JButton();
-            jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
-            jButtonCancel.setText("Ok");
-            jButtonCancel.setVisible(false);
-        }
-        return jButtonCancel;
-    }
-
-     /**
      * This method initializes this
      * 
      * @return void
@@ -230,11 +178,11 @@ public class FpdPlatformDefs extends IInternalFrame {
         this.setTitle("FPD Platform Definitions");
         this.addInternalFrameListener(new InternalFrameAdapter(){
             public void internalFrameDeactivated(InternalFrameEvent e){
-                if (jTable.isEditing()) {
-                    jTable.getCellEditor().stopCellEditing();
+                if (jTableBuildTargets.isEditing()) {
+                    jTableBuildTargets.getCellEditor().stopCellEditing();
                 }
-                if (jTable2.isEditing()) {
-                    jTable2.getCellEditor().stopCellEditing();
+                if (jTableSkuInfo.isEditing()) {
+                    jTableSkuInfo.getCellEditor().stopCellEditing();
                 }
                
             }
@@ -246,12 +194,12 @@ public class FpdPlatformDefs extends IInternalFrame {
         ffc.getPlatformDefsSupportedArchs(v);
         showToolChain(v);
         
-        imageEntryPointTableModel.setRowCount(0);
+        buildTargetTableModel.setRowCount(0);
         v.removeAllElements();
         ffc.getPlatformDefsBuildTargets(v);
         for (int i = 0; i < v.size(); ++i){
             Object[] row = {v.get(i)};
-            imageEntryPointTableModel.addRow(row);
+            buildTargetTableModel.addRow(row);
         }
         
         String[][] saa = new String[ffc.getPlatformDefsSkuInfoCount()][2];
@@ -262,51 +210,51 @@ public class FpdPlatformDefs extends IInternalFrame {
         
         String interDir = ffc.getPlatformDefsInterDir();
         if (interDir != null) {
-            jComboBox.setSelectedItem(interDir);
+            jComboBoxInterDir.setSelectedItem(interDir);
         }
         
         String outputDir = ffc.getPlatformDefsOutputDir();
         if (outputDir != null) {
-            jTextField.setText(outputDir);
+            jTextFieldOutputDir.setText(outputDir);
         }
     }
     
    private void showToolChain(Vector<Object> v) {
        if (v.contains("IA32")) {
-           jCheckBox1.setSelected(true);
+           jCheckBoxIa32.setSelected(true);
        }
        else{
-           jCheckBox1.setSelected(false);
+           jCheckBoxIa32.setSelected(false);
        }
        if (v.contains("X64")) {
-           jCheckBox2.setSelected(true);
+           jCheckBoxX64.setSelected(true);
        }
        else{
-           jCheckBox2.setSelected(false);
+           jCheckBoxX64.setSelected(false);
        }
        if (v.contains("IPF")) {
-           jCheckBox3.setSelected(true);
+           jCheckBoxIpf.setSelected(true);
        }
        else{
-           jCheckBox3.setSelected(false);
+           jCheckBoxIpf.setSelected(false);
        }
        if (v.contains("EBC")) {
-           jCheckBox.setSelected(true);
+           jCheckBoxEbc.setSelected(true);
        }
        else{
-           jCheckBox.setSelected(false);
+           jCheckBoxEbc.setSelected(false);
        }
        if (v.contains("ARM")) {
-           jCheckBox5.setSelected(true);
+           jCheckBoxArm.setSelected(true);
        }
        else{
-           jCheckBox5.setSelected(false);
+           jCheckBoxArm.setSelected(false);
        }
        if (v.contains("PPC")) {
-           jCheckBox6.setSelected(true);
+           jCheckBoxPpc.setSelected(true);
        }
        else{
-           jCheckBox6.setSelected(false);
+           jCheckBoxPpc.setSelected(false);
        }
    }
    
@@ -315,22 +263,22 @@ public class FpdPlatformDefs extends IInternalFrame {
            docConsole.setSaved(false);
        }
        v.removeAllElements();
-       if (jCheckBox1.isSelected()) {
+       if (jCheckBoxIa32.isSelected()) {
            v.add("IA32");
        }
-       if (jCheckBox2.isSelected()) {
+       if (jCheckBoxX64.isSelected()) {
            v.add("X64");
        }
-       if (jCheckBox3.isSelected()) {
+       if (jCheckBoxIpf.isSelected()) {
            v.add("IPF");
        }
-       if (jCheckBox.isSelected()) {
+       if (jCheckBoxEbc.isSelected()) {
            v.add("EBC");
        }
-       if (jCheckBox5.isSelected()) {
+       if (jCheckBoxArm.isSelected()) {
            v.add("ARM");
        }
-       if (jCheckBox6.isSelected()) {
+       if (jCheckBoxPpc.isSelected()) {
            v.add("PPC");
        }
        
@@ -345,10 +293,9 @@ public class FpdPlatformDefs extends IInternalFrame {
         if (jContentPane == null) {
             jContentPane = new JPanel();
             jContentPane.setLayout(new BorderLayout());
-            jContentPane.add(getJPanel(), java.awt.BorderLayout.EAST);
-            jContentPane.add(getJPanel1(), java.awt.BorderLayout.SOUTH);
-            jContentPane.add(getJPanel2(), java.awt.BorderLayout.WEST);
-            jContentPane.add(getJPanel3(), java.awt.BorderLayout.NORTH);
+            jContentPane.add(getJPanelContentEast(), java.awt.BorderLayout.EAST);
+            jContentPane.add(getJPanelContentWest(), java.awt.BorderLayout.WEST);
+            jContentPane.add(getJPanelContentNorth(), java.awt.BorderLayout.NORTH);
             jContentPane.add(getJTabbedPane(), java.awt.BorderLayout.CENTER);
         }
         return jContentPane;
@@ -359,15 +306,15 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel4() {
-        if (jPanel4 == null) {
-            jPanel4 = new JPanel();
-            jPanel4.setLayout(new BorderLayout());
-            jPanel4.add(getJPanel5(), java.awt.BorderLayout.NORTH);
-            jPanel4.add(getJPanel6(), java.awt.BorderLayout.SOUTH);
-            jPanel4.add(getJPanel7(), java.awt.BorderLayout.CENTER);
+    private JPanel getJPanelGeneralTab() {
+        if (jPanelGeneralTab == null) {
+            jPanelGeneralTab = new JPanel();
+            jPanelGeneralTab.setLayout(new BorderLayout());
+            jPanelGeneralTab.add(getJPanelGeneralTabNorth(), java.awt.BorderLayout.NORTH);
+            jPanelGeneralTab.add(getJPanelGeneralTabSouth(), java.awt.BorderLayout.SOUTH);
+            jPanelGeneralTab.add(getJPanelGeneralTabCenter(), java.awt.BorderLayout.CENTER);
         }
-        return jPanel4;
+        return jPanelGeneralTab;
     }
 
     /**
@@ -375,24 +322,24 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel5() {
-        if (jPanel5 == null) {
+    private JPanel getJPanelGeneralTabNorth() {
+        if (jPanelGeneralTabNorth == null) {
             jLabel = new JLabel();
             jLabel.setText("Supported Archs");
             FlowLayout flowLayout2 = new FlowLayout();
             flowLayout2.setAlignment(FlowLayout.LEFT);
             flowLayout2.setHgap(12);
-            jPanel5 = new JPanel();
-            jPanel5.setLayout(flowLayout2);
-            jPanel5.add(jLabel, null);
-            jPanel5.add(getJCheckBox1(), null);
-            jPanel5.add(getJCheckBox2(), null);
-            jPanel5.add(getJCheckBox3(), null);
-            jPanel5.add(getJCheckBox(), null);
-            jPanel5.add(getJCheckBox5(), null);
-            jPanel5.add(getJCheckBox6(), null);
+            jPanelGeneralTabNorth = new JPanel();
+            jPanelGeneralTabNorth.setLayout(flowLayout2);
+            jPanelGeneralTabNorth.add(jLabel, null);
+            jPanelGeneralTabNorth.add(getJCheckBoxIa32(), null);
+            jPanelGeneralTabNorth.add(getJCheckBoxX64(), null);
+            jPanelGeneralTabNorth.add(getJCheckBoxIpf(), null);
+            jPanelGeneralTabNorth.add(getJCheckBoxEbc(), null);
+            jPanelGeneralTabNorth.add(getJCheckBoxArm(), null);
+            jPanelGeneralTabNorth.add(getJCheckBoxPpc(), null);
         }
-        return jPanel5;
+        return jPanelGeneralTabNorth;
     }
 
     /**
@@ -400,11 +347,11 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox1() {
-        if (jCheckBox1 == null) {
-            jCheckBox1 = new JCheckBox();
-            jCheckBox1.setText("IA32");
-            jCheckBox1.addItemListener(new java.awt.event.ItemListener() {
+    private JCheckBox getJCheckBoxIa32() {
+        if (jCheckBoxIa32 == null) {
+            jCheckBoxIa32 = new JCheckBox();
+            jCheckBoxIa32.setText("IA32");
+            jCheckBoxIa32.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
@@ -416,7 +363,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jCheckBox1;
+        return jCheckBoxIa32;
     }
 
     /**
@@ -424,11 +371,11 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox2() {
-        if (jCheckBox2 == null) {
-            jCheckBox2 = new JCheckBox();
-            jCheckBox2.setText("X64");
-            jCheckBox2.addItemListener(new java.awt.event.ItemListener() {
+    private JCheckBox getJCheckBoxX64() {
+        if (jCheckBoxX64 == null) {
+            jCheckBoxX64 = new JCheckBox();
+            jCheckBoxX64.setText("X64");
+            jCheckBoxX64.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
@@ -440,7 +387,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jCheckBox2;
+        return jCheckBoxX64;
     }
 
     /**
@@ -448,11 +395,11 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox3() {
-        if (jCheckBox3 == null) {
-            jCheckBox3 = new JCheckBox();
-            jCheckBox3.setText("IPF");
-            jCheckBox3.addItemListener(new java.awt.event.ItemListener() {
+    private JCheckBox getJCheckBoxIpf() {
+        if (jCheckBoxIpf == null) {
+            jCheckBoxIpf = new JCheckBox();
+            jCheckBoxIpf.setText("IPF");
+            jCheckBoxIpf.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
@@ -464,7 +411,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jCheckBox3;
+        return jCheckBoxIpf;
     }
     
     /**
@@ -472,24 +419,24 @@ public class FpdPlatformDefs extends IInternalFrame {
      *  
      * @return javax.swing.JTable   
      */
-    private JTable getJTable() {
-        if (jTable == null) {
-            imageEntryPointTableModel = new TargetTableModel();
-            imageEntryPointTableModel.addColumn("Build Target");
-            jTable = new JTable(imageEntryPointTableModel);
-            jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    private JTable getJTableBuildTargets() {
+        if (jTableBuildTargets == null) {
+            buildTargetTableModel = new TargetTableModel();
+            buildTargetTableModel.addColumn("Build Target");
+            jTableBuildTargets = new JTable(buildTargetTableModel);
+            jTableBuildTargets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
-            jTable.getModel().addTableModelListener(new TableModelListener() {
+            jTableBuildTargets.getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent arg0) {
                     // TODO Auto-generated method stub
-                    if (jTable.getSelectedRow() < 0) {
+                    if (jTableBuildTargets.getSelectedRow() < 0) {
                         return;
                     }
                     TableModel m = (TableModel)arg0.getSource();
                     if (arg0.getType() == TableModelEvent.UPDATE){
                         //ToDo Data Validition check.
                         Vector<Object> v = new Vector<Object>();
-                        for (int i = 0; i < jTable.getRowCount(); ++i) {
+                        for (int i = 0; i < jTableBuildTargets.getRowCount(); ++i) {
                             v.add(m.getValueAt(i, 0));
                         }
                         docConsole.setSaved(false);
@@ -498,7 +445,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jTable;
+        return jTableBuildTargets;
     }
 
     /**
@@ -506,17 +453,17 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel6() {
-        if (jPanel6 == null) {
+    private JPanel getJPanelGeneralTabSouth() {
+        if (jPanelGeneralTabSouth == null) {
             FlowLayout flowLayout3 = new FlowLayout();
             flowLayout3.setAlignment(FlowLayout.LEFT);
             flowLayout3.setHgap(20);
-            jPanel6 = new JPanel();
-            jPanel6.setPreferredSize(new java.awt.Dimension(10,200));
-            jPanel6.setLayout(flowLayout3);
-            jPanel6.add(getJPanel8(), null);
+            jPanelGeneralTabSouth = new JPanel();
+            jPanelGeneralTabSouth.setPreferredSize(new java.awt.Dimension(10,200));
+            jPanelGeneralTabSouth.setLayout(flowLayout3);
+            jPanelGeneralTabSouth.add(getJPanelDir(), null);
         }
-        return jPanel6;
+        return jPanelGeneralTabSouth;
     }
 
     /**
@@ -524,12 +471,12 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox4() {
-        if (jCheckBox4 == null) {
-            jCheckBox4 = new JCheckBox();
-            jCheckBox4.setText("Intermediate Directories");
+    private JCheckBox getJCheckBoxInterDir() {
+        if (jCheckBoxInterDir == null) {
+            jCheckBoxInterDir = new JCheckBox();
+            jCheckBoxInterDir.setText("Intermediate Directories");
         }
-        return jCheckBox4;
+        return jCheckBoxInterDir;
     }
 
     /**
@@ -537,24 +484,24 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JComboBox	
      */
-    private JComboBox getJComboBox() {
-        if (jComboBox == null) {
-            jComboBox = new JComboBox();
-            jComboBox.setPreferredSize(new Dimension(100, 20));
-            jComboBox.addItem("UNIFIED");
-            jComboBox.addItem("MODULE");
+    private JComboBox getJComboBoxInterDir() {
+        if (jComboBoxInterDir == null) {
+            jComboBoxInterDir = new JComboBox();
+            jComboBoxInterDir.setPreferredSize(new Dimension(100, 20));
+            jComboBoxInterDir.addItem("UNIFIED");
+            jComboBoxInterDir.addItem("MODULE");
             
-            jComboBox.setSelectedIndex(0);
-            jComboBox.addItemListener(new java.awt.event.ItemListener() {
+            jComboBoxInterDir.setSelectedIndex(0);
+            jComboBoxInterDir.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (docConsole != null){
                         docConsole.setSaved(false);
                     }
-                    ffc.setPlatformDefsInterDir(jComboBox.getSelectedItem()+"");
+                    ffc.setPlatformDefsInterDir(jComboBoxInterDir.getSelectedItem()+"");
                 }
             });
         }
-        return jComboBox;
+        return jComboBoxInterDir;
     }
 
     /**
@@ -562,26 +509,26 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel7() {
-        if (jPanel7 == null) {
-            jLabel2 = new JLabel();
-            jLabel2.setPreferredSize(new Dimension(109, 16));
-            jLabel2.setText("Build Targets");
+    private JPanel getJPanelGeneralTabCenter() {
+        if (jPanelGeneralTabCenter == null) {
+            jLabelBuildTargets = new JLabel();
+            jLabelBuildTargets.setPreferredSize(new Dimension(109, 16));
+            jLabelBuildTargets.setText("Build Targets");
             FlowLayout flowLayout4 = new FlowLayout();
             flowLayout4.setAlignment(FlowLayout.LEFT);
             flowLayout4.setHgap(20);
-            jPanel7 = new JPanel();
-            jPanel7.setPreferredSize(new Dimension(972, 100));
-            jPanel7.setLayout(flowLayout4);
-            jPanel7.add(jLabel2, null);
-            jPanel7.add(getJTextField1(), null);
-            jPanel7.add(getJButton2(), null);
-            jPanel7.add(getJButton3(), null);
-            jPanel7.add(getJScrollPane2(), null);
-            jPanel7.add(getJPanel9(), null);
-            jPanel7.add(getJScrollPane3(), null);
+            jPanelGeneralTabCenter = new JPanel();
+            jPanelGeneralTabCenter.setPreferredSize(new Dimension(972, 100));
+            jPanelGeneralTabCenter.setLayout(flowLayout4);
+            jPanelGeneralTabCenter.add(jLabelBuildTargets, null);
+            jPanelGeneralTabCenter.add(getJTextFieldBuildTarget(), null);
+            jPanelGeneralTabCenter.add(getJButtonAddBuildTarget(), null);
+            jPanelGeneralTabCenter.add(getJButtonDelBuildTarget(), null);
+            jPanelGeneralTabCenter.add(getJScrollPaneBuildTargets(), null);
+            jPanelGeneralTabCenter.add(getJPanelSkuInfo(), null);
+            jPanelGeneralTabCenter.add(getJScrollPaneSkuInfo(), null);
         }
-        return jPanel7;
+        return jPanelGeneralTabCenter;
     }
 
     /**
@@ -589,12 +536,12 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField1() {
-        if (jTextField1 == null) {
-            jTextField1 = new JTextField();
-            jTextField1.setPreferredSize(new Dimension(150, 20));
+    private JTextField getJTextFieldBuildTarget() {
+        if (jTextFieldBuildTarget == null) {
+            jTextFieldBuildTarget = new JTextField();
+            jTextFieldBuildTarget.setPreferredSize(new Dimension(150, 20));
         }
-        return jTextField1;
+        return jTextFieldBuildTarget;
     }
 
     /**
@@ -602,19 +549,19 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton2() {
-        if (jButton2 == null) {
-            jButton2 = new JButton();
-            jButton2.setPreferredSize(new Dimension(70, 20));
-            jButton2.setText("Add");
-            jButton2.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonAddBuildTarget() {
+        if (jButtonAddBuildTarget == null) {
+            jButtonAddBuildTarget = new JButton();
+            jButtonAddBuildTarget.setPreferredSize(new Dimension(70, 20));
+            jButtonAddBuildTarget.setText("Add");
+            jButtonAddBuildTarget.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTextField1.getText().length() > 0) {
-                        String[] row = {jTextField1.getText()};
-                        imageEntryPointTableModel.addRow(row);
+                    if (jTextFieldBuildTarget.getText().length() > 0) {
+                        String[] row = {jTextFieldBuildTarget.getText()};
+                        buildTargetTableModel.addRow(row);
                         Vector<Object> v = new Vector<Object>();
-                        for (int i = 0; i < jTable.getRowCount(); ++i) {
-                            v.add(imageEntryPointTableModel.getValueAt(i, 0));
+                        for (int i = 0; i < jTableBuildTargets.getRowCount(); ++i) {
+                            v.add(buildTargetTableModel.getValueAt(i, 0));
                         }
                         docConsole.setSaved(false);
                         ffc.setPlatformDefsBuildTargets(v);
@@ -622,7 +569,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jButton2;
+        return jButtonAddBuildTarget;
     }
 
     /**
@@ -630,14 +577,14 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton3() {
-        if (jButton3 == null) {
-            jButton3 = new JButton();
-            jButton3.setPreferredSize(new Dimension(70, 20));
-            jButton3.setText("Delete");
-            jButton3.setVisible(false);
+    private JButton getJButtonDelBuildTarget() {
+        if (jButtonDelBuildTarget == null) {
+            jButtonDelBuildTarget = new JButton();
+            jButtonDelBuildTarget.setPreferredSize(new Dimension(70, 20));
+            jButtonDelBuildTarget.setText("Delete");
+            jButtonDelBuildTarget.setVisible(false);
         }
-        return jButton3;
+        return jButtonDelBuildTarget;
     }
 
     /**
@@ -645,13 +592,13 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane2() {
-        if (jScrollPane2 == null) {
-            jScrollPane2 = new JScrollPane();
-            jScrollPane2.setPreferredSize(new Dimension(453, 100));
-            jScrollPane2.setViewportView(getJTable());
+    private JScrollPane getJScrollPaneBuildTargets() {
+        if (jScrollPaneBuildTargets == null) {
+            jScrollPaneBuildTargets = new JScrollPane();
+            jScrollPaneBuildTargets.setPreferredSize(new Dimension(453, 100));
+            jScrollPaneBuildTargets.setViewportView(getJTableBuildTargets());
         }
-        return jScrollPane2;
+        return jScrollPaneBuildTargets;
     }
 
     /**
@@ -659,13 +606,13 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane3() {
-        if (jScrollPane3 == null) {
-            jScrollPane3 = new JScrollPane();
-            jScrollPane3.setPreferredSize(new java.awt.Dimension(453,100));
-            jScrollPane3.setViewportView(getJTable2());
+    private JScrollPane getJScrollPaneSkuInfo() {
+        if (jScrollPaneSkuInfo == null) {
+            jScrollPaneSkuInfo = new JScrollPane();
+            jScrollPaneSkuInfo.setPreferredSize(new java.awt.Dimension(453,100));
+            jScrollPaneSkuInfo.setViewportView(getJTableSkuInfo());
         }
-        return jScrollPane3;
+        return jScrollPaneSkuInfo;
     }
 
     /**
@@ -673,16 +620,16 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JTable	
      */
-    private JTable getJTable2() {
-        if (jTable2 == null) {
+    private JTable getJTableSkuInfo() {
+        if (jTableSkuInfo == null) {
             skuInfoTableModel = new SkuInfoTableModel();
             skuInfoTableModel.addColumn("SKU ID");
             skuInfoTableModel.addColumn("Name");
-            jTable2 = new JTable(skuInfoTableModel);
+            jTableSkuInfo = new JTable(skuInfoTableModel);
             
-            jTable2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTableSkuInfo.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
-            jTable2.getModel().addTableModelListener(new TableModelListener() {
+            jTableSkuInfo.getModel().addTableModelListener(new TableModelListener() {
                 public void tableChanged(TableModelEvent arg0) {
                     // TODO Auto-generated method stub
                     int row = arg0.getFirstRow();
@@ -697,7 +644,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jTable2;
+        return jTableSkuInfo;
     }
 
     /**
@@ -705,12 +652,12 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox() {
-        if (jCheckBox == null) {
-            jCheckBox = new JCheckBox();
-            jCheckBox.setPreferredSize(new java.awt.Dimension(50,20));
-            jCheckBox.setText("EBC");
-            jCheckBox.addItemListener(new java.awt.event.ItemListener() {
+    private JCheckBox getJCheckBoxEbc() {
+        if (jCheckBoxEbc == null) {
+            jCheckBoxEbc = new JCheckBox();
+            jCheckBoxEbc.setPreferredSize(new java.awt.Dimension(50,20));
+            jCheckBoxEbc.setText("EBC");
+            jCheckBoxEbc.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
@@ -722,7 +669,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jCheckBox;
+        return jCheckBoxEbc;
     }
 
     /**
@@ -730,13 +677,13 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox5() {
-        if (jCheckBox5 == null) {
-            jCheckBox5 = new JCheckBox();
-            jCheckBox5.setPreferredSize(new java.awt.Dimension(52,20));
-            jCheckBox5.setText("ARM");
-            jCheckBox5.setVisible(false);
-            jCheckBox5.addItemListener(new java.awt.event.ItemListener() {
+    private JCheckBox getJCheckBoxArm() {
+        if (jCheckBoxArm == null) {
+            jCheckBoxArm = new JCheckBox();
+            jCheckBoxArm.setPreferredSize(new java.awt.Dimension(52,20));
+            jCheckBoxArm.setText("ARM");
+            jCheckBoxArm.setVisible(false);
+            jCheckBoxArm.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
@@ -748,7 +695,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jCheckBox5;
+        return jCheckBoxArm;
     }
 
     /**
@@ -756,13 +703,13 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JCheckBox	
      */
-    private JCheckBox getJCheckBox6() {
-        if (jCheckBox6 == null) {
-            jCheckBox6 = new JCheckBox();
-            jCheckBox6.setPreferredSize(new Dimension(50, 20));
-            jCheckBox6.setText("PPC");
-            jCheckBox6.setVisible(false);
-            jCheckBox6.addItemListener(new java.awt.event.ItemListener() {
+    private JCheckBox getJCheckBoxPpc() {
+        if (jCheckBoxPpc == null) {
+            jCheckBoxPpc = new JCheckBox();
+            jCheckBoxPpc.setPreferredSize(new Dimension(50, 20));
+            jCheckBoxPpc.setText("PPC");
+            jCheckBoxPpc.setVisible(false);
+            jCheckBoxPpc.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
@@ -774,7 +721,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jCheckBox6;
+        return jCheckBoxPpc;
     }
 
     /**
@@ -782,26 +729,26 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel8() {
-        if (jPanel8 == null) {
+    private JPanel getJPanelDir() {
+        if (jPanelDir == null) {
             FlowLayout flowLayout1 = new FlowLayout();
             flowLayout1.setAlignment(java.awt.FlowLayout.LEFT);
-            jLabel1 = new JLabel();
-            jLabel1.setText("Output Directory");
-            jLabel7 = new JLabel();
-            jLabel7.setPreferredSize(new java.awt.Dimension(150,20));
-            jLabel7.setText("");
-            jPanel8 = new JPanel();
-            jPanel8.setLayout(flowLayout1);
-            jPanel8.setPreferredSize(new java.awt.Dimension(450,100));
-            jPanel8.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-            jPanel8.add(getJCheckBox4(), null);
-            jPanel8.add(getJComboBox(), null);
-            jPanel8.add(jLabel7, null);
-            jPanel8.add(jLabel1, null);
-            jPanel8.add(getJTextField(), null);
+            jLabelOutputDir = new JLabel();
+            jLabelOutputDir.setText("Output Directory");
+            jLabelPad = new JLabel();
+            jLabelPad.setPreferredSize(new java.awt.Dimension(150,20));
+            jLabelPad.setText("");
+            jPanelDir = new JPanel();
+            jPanelDir.setLayout(flowLayout1);
+            jPanelDir.setPreferredSize(new java.awt.Dimension(450,100));
+            jPanelDir.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
+            jPanelDir.add(getJCheckBoxInterDir(), null);
+            jPanelDir.add(getJComboBoxInterDir(), null);
+            jPanelDir.add(jLabelPad, null);
+            jPanelDir.add(jLabelOutputDir, null);
+            jPanelDir.add(getJTextFieldOutputDir(), null);
         }
-        return jPanel8;
+        return jPanelDir;
     }
 
     /**
@@ -809,18 +756,18 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField() {
-        if (jTextField == null) {
-            jTextField = new JTextField();
-            jTextField.setPreferredSize(new java.awt.Dimension(300,20));
-            jTextField.addFocusListener(new java.awt.event.FocusAdapter() {
+    private JTextField getJTextFieldOutputDir() {
+        if (jTextFieldOutputDir == null) {
+            jTextFieldOutputDir = new JTextField();
+            jTextFieldOutputDir.setPreferredSize(new java.awt.Dimension(300,20));
+            jTextFieldOutputDir.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     docConsole.setSaved(false);
-                    ffc.setPlatformDefsOutputDir(jTextField.getText());
+                    ffc.setPlatformDefsOutputDir(jTextFieldOutputDir.getText());
                 }
             });
         }
-        return jTextField;
+        return jTextFieldOutputDir;
     }
 
     /**
@@ -828,32 +775,32 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JPanel	
      */
-    private JPanel getJPanel9() {
-        if (jPanel9 == null) {
-            jLabel6 = new JLabel();
-            jLabel6.setPreferredSize(new Dimension(280, 20));
-            jLabel6.setText("                                                 ");
-            jLabel5 = new JLabel();
-            jLabel5.setPreferredSize(new Dimension(40, 20));
-            jLabel5.setText("Name");
-            jLabel4 = new JLabel();
-            jLabel4.setPreferredSize(new Dimension(20, 20));
-            jLabel4.setText("ID");
-            jLabel3 = new JLabel();
-            jLabel3.setPreferredSize(new java.awt.Dimension(150,20));
-            jLabel3.setText("SKU Information");
-            jPanel9 = new JPanel();
-            jPanel9.setPreferredSize(new java.awt.Dimension(450,70));
-            jPanel9.add(jLabel3, null);
-            jPanel9.add(jLabel6, null);
-            jPanel9.add(jLabel4, null);
-            jPanel9.add(getJTextField2(), null);
-            jPanel9.add(jLabel5, null);
-            jPanel9.add(getJTextField3(), null);
-            jPanel9.add(getJButton(), null);
-            jPanel9.add(getJButton1(), null);
+    private JPanel getJPanelSkuInfo() {
+        if (jPanelSkuInfo == null) {
+            jLabelPadd = new JLabel();
+            jLabelPadd.setPreferredSize(new Dimension(280, 20));
+            jLabelPadd.setText("                                                 ");
+            jLabelSkuName = new JLabel();
+            jLabelSkuName.setPreferredSize(new Dimension(40, 20));
+            jLabelSkuName.setText("Name");
+            jLabelSkuId = new JLabel();
+            jLabelSkuId.setPreferredSize(new Dimension(20, 20));
+            jLabelSkuId.setText("ID");
+            jLabelSkuInfo = new JLabel();
+            jLabelSkuInfo.setPreferredSize(new java.awt.Dimension(150,20));
+            jLabelSkuInfo.setText("SKU Information");
+            jPanelSkuInfo = new JPanel();
+            jPanelSkuInfo.setPreferredSize(new java.awt.Dimension(450,70));
+            jPanelSkuInfo.add(jLabelSkuInfo, null);
+            jPanelSkuInfo.add(jLabelPadd, null);
+            jPanelSkuInfo.add(jLabelSkuId, null);
+            jPanelSkuInfo.add(getJTextFieldSkuId(), null);
+            jPanelSkuInfo.add(jLabelSkuName, null);
+            jPanelSkuInfo.add(getJTextFieldSkuName(), null);
+            jPanelSkuInfo.add(getJButtonSkuAdd(), null);
+            jPanelSkuInfo.add(getJButtonSkuDel(), null);
         }
-        return jPanel9;
+        return jPanelSkuInfo;
     }
 
     /**
@@ -861,12 +808,12 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField2() {
-        if (jTextField2 == null) {
-            jTextField2 = new JTextField();
-            jTextField2.setPreferredSize(new Dimension(50, 20));
+    private JTextField getJTextFieldSkuId() {
+        if (jTextFieldSkuId == null) {
+            jTextFieldSkuId = new JTextField();
+            jTextFieldSkuId.setPreferredSize(new Dimension(50, 20));
         }
-        return jTextField2;
+        return jTextFieldSkuId;
     }
 
     /**
@@ -874,12 +821,12 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField3() {
-        if (jTextField3 == null) {
-            jTextField3 = new JTextField();
-            jTextField3.setPreferredSize(new Dimension(150, 20));
+    private JTextField getJTextFieldSkuName() {
+        if (jTextFieldSkuName == null) {
+            jTextFieldSkuName = new JTextField();
+            jTextFieldSkuName.setPreferredSize(new Dimension(150, 20));
         }
-        return jTextField3;
+        return jTextFieldSkuName;
     }
 
     /**
@@ -887,15 +834,15 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton() {
-        if (jButton == null) {
-            jButton = new JButton();
-            jButton.setPreferredSize(new Dimension(70, 20));
-            jButton.setText("Add");
-            jButton.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonSkuAdd() {
+        if (jButtonSkuAdd == null) {
+            jButtonSkuAdd = new JButton();
+            jButtonSkuAdd.setPreferredSize(new Dimension(70, 20));
+            jButtonSkuAdd.setText("Add");
+            jButtonSkuAdd.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTextField2.getText().length() > 0) {
-                        String[] row = {jTextField2.getText(), jTextField3.getText()};
+                    if (jTextFieldSkuId.getText().length() > 0) {
+                        String[] row = {jTextFieldSkuId.getText(), jTextFieldSkuName.getText()};
                         skuInfoTableModel.addRow(row);
                         docConsole.setSaved(false);
                         ffc.genPlatformDefsSkuInfo(row[0], row[1]);
@@ -903,7 +850,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                 }
             });
         }
-        return jButton;
+        return jButtonSkuAdd;
     }
 
     /**
@@ -911,26 +858,26 @@ public class FpdPlatformDefs extends IInternalFrame {
      * 	
      * @return javax.swing.JButton	
      */
-    private JButton getJButton1() {
-        if (jButton1 == null) {
-            jButton1 = new JButton();
-            jButton1.setPreferredSize(new Dimension(70, 20));
-            jButton1.setText("Delete");
-            jButton1.addActionListener(new java.awt.event.ActionListener() {
+    private JButton getJButtonSkuDel() {
+        if (jButtonSkuDel == null) {
+            jButtonSkuDel = new JButton();
+            jButtonSkuDel.setPreferredSize(new Dimension(70, 20));
+            jButtonSkuDel.setText("Delete");
+            jButtonSkuDel.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTable2.isEditing()) {
-                        jTable2.getCellEditor().stopCellEditing();
+                    if (jTableSkuInfo.isEditing()) {
+                        jTableSkuInfo.getCellEditor().stopCellEditing();
                     }
-                    if (jTable2.getSelectedRow() < 1) {
+                    if (jTableSkuInfo.getSelectedRow() < 1) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    ffc.removePlatformDefsSkuInfo(jTable2.getSelectedRow());
-                    skuInfoTableModel.removeRow(jTable2.getSelectedRow());
+                    ffc.removePlatformDefsSkuInfo(jTableSkuInfo.getSelectedRow());
+                    skuInfoTableModel.removeRow(jTableSkuInfo.getSelectedRow());
                 }
             });
         }
-        return jButton1;
+        return jButtonSkuDel;
     }
 
 

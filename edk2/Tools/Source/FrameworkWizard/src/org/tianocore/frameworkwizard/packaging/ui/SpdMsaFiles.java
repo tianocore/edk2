@@ -64,7 +64,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
 
     private JPanel jContentPane = null;
 
-    private JScrollPane jScrollPane1 = null;
+    private JScrollPane jScrollPaneMsa = null;
 
     private JButton jButtonAdd = null;
 
@@ -105,13 +105,13 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
       	
       @return javax.swing.JScrollPane	
      **/
-    private JScrollPane getJScrollPane1() {
-        if (jScrollPane1 == null) {
-            jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(13,177,461,421));
-            jScrollPane1.setViewportView(getJTable());
+    private JScrollPane getJScrollPaneMsa() {
+        if (jScrollPaneMsa == null) {
+            jScrollPaneMsa = new JScrollPane();
+            jScrollPaneMsa.setBounds(new java.awt.Rectangle(13,177,461,421));
+            jScrollPaneMsa.setViewportView(getJTable());
         }
-        return jScrollPane1;
+        return jScrollPaneMsa;
     }
 
     /**
@@ -308,7 +308,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
             jContentPane.setLayout(null);
             jContentPane.add(jLabel, null);
             jContentPane.add(jStarLabel2, null);
-            jContentPane.add(getJScrollPane1(), null);
+            jContentPane.add(getJScrollPaneMsa(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
             jContentPane.add(getJButtonClearAll(), null);
@@ -485,7 +485,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jScrollPane1, this.getWidth(), intPreferredWidth);
+        resizeComponentWidth(this.jScrollPaneMsa, this.getWidth(), intPreferredWidth);
         resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
         relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 25);
     }

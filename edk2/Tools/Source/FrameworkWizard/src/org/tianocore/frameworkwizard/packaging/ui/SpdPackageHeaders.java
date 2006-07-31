@@ -94,7 +94,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
 
     private JScrollPane jScrollPane = null;
 
-    private JScrollPane jScrollPane1 = null;
+    private JScrollPane jScrollPanePkgHdr = null;
 
     private int selectedRow = -1;
 
@@ -331,7 +331,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             
             jContentPane.add(getJTextField(), null);
             jContentPane.add(getJButtonBrowse(), null);
-            jContentPane.add(getJScrollPane1(), null);
+            jContentPane.add(getJScrollPanePkgHdr(), null);
         }
         return jContentPane;
     }
@@ -502,13 +502,13 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
      * 	
      * @return javax.swing.JScrollPane	
      */
-    private JScrollPane getJScrollPane1() {
-        if (jScrollPane1 == null) {
-            jScrollPane1 = new JScrollPane();
-            jScrollPane1.setBounds(new java.awt.Rectangle(13,149,453,258));
-            jScrollPane1.setViewportView(getJTable());
+    private JScrollPane getJScrollPanePkgHdr() {
+        if (jScrollPanePkgHdr == null) {
+            jScrollPanePkgHdr = new JScrollPane();
+            jScrollPanePkgHdr.setBounds(new java.awt.Rectangle(13,149,453,258));
+            jScrollPanePkgHdr.setViewportView(getJTable());
         }
-        return jScrollPane1;
+        return jScrollPanePkgHdr;
     }
 
     /**

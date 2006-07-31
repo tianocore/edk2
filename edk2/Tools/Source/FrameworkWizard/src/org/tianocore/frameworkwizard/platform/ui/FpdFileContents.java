@@ -2465,7 +2465,7 @@ class PcdItemTypeConflictException extends Exception {
     private String details = null;
     
     PcdItemTypeConflictException(String info){
-        details = info;
+        details = "ItemTypeConflict: " + info;
     }
     
     public String getMessage() {
@@ -2482,7 +2482,7 @@ class PcdDeclNotFound extends Exception {
     private String details = null;
     
     PcdDeclNotFound(String info) {
-        details = info;
+        details = "PcdDeclNotFound: " + info;
     }
     
     public String getMessage() {
@@ -2499,7 +2499,7 @@ class PcdValueMalFormed extends Exception {
     private String details = null;
     
     PcdValueMalFormed(String info) {
-        details = info;
+        details = "PcdValueMalFormed: " + info;
     }
     
     public String getMessage() {
