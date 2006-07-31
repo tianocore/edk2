@@ -89,6 +89,7 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 @if "%1"=="/help" goto Usage
 
 @IF NOT EXIST "Tools\Jars\Common.jar" goto NormalBuild
+@IF NOT EXIST "Tools\Jars\PcdTools.jar" goto NormalBuild
 @IF NOT EXIST "Tools\Jars\GenBuild.jar" goto NormalBuild
 @IF NOT EXIST "Tools\Jars\SurfaceArea.jar" goto NormalBuild
 @IF NOT EXIST "Tools\Jars\cpptasks.jar" goto NormalBuild
