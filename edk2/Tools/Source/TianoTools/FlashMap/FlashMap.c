@@ -761,6 +761,7 @@ NormalizePath (
     if (*Visitor == '\\') {
       *Visitor = '/';
     }
+    Visitor++;
   }
   
   return Visitor;
