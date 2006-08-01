@@ -14,7 +14,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
   <property environment="env"/>
 
-  <target name="all" depends="C_Code"/>
+  <target name="all" depends="C_Code">
+    <echo message="The EDK II Tools build has completed!"/>
+  </target>
 
   <target name="C_Code" depends="JavaCode">
     <subant target="" inheritall="false">
@@ -35,6 +37,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           Source/GenBuild/build.xml
           Source/FrameworkTasks/build.xml
           Source/Cpptasks/build.xml
+          Source/FrameworkWizard/build.xml
+          "/>
+    </subant>
+    <echo message="The EDK II Java Tools build has completed!"/>
+  </target>
+
+  <target name="Wizard" depends="SurfaceArea">
+    <subant target="" verbose="true" inheritall="false">
+      <!-- Note: this is an ordered list. The projects have dependencies between them. -->
+      <filelist dir="."
+        files="
           Source/FrameworkWizard/build.xml
           "/>
     </subant>
