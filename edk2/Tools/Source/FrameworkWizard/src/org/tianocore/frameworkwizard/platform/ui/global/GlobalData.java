@@ -428,6 +428,42 @@ public class GlobalData {
         return result;
     }
 
+    public static ModuleIdentification getModuleId(String key){
+        //
+        // Get ModuleGuid, ModuleVersion, PackageGuid, PackageVersion, Arch into string array.
+        //
+        String[] keyPart = key.split(" ");
+        Set<PackageIdentification> spi = GlobalData.getPackageList();
+        Iterator ispi = spi.iterator();
+        
+        while(ispi.hasNext()) {
+            PackageIdentification pi = (PackageIdentification)ispi.next();
+            if ( !pi.getGuid().equalsIgnoreCase(keyPart[2])){ 
+
+                continue;
+            }
+            if (keyPart[3] != null && keyPart[3].length() > 0 && !keyPart[3].equals("null")){
+                if(!pi.getVersion().equals(keyPart[3])){
+                    continue;
+                }
+            }
+            Set<ModuleIdentification> smi = GlobalData.getModules(pi);
+            Iterator ismi = smi.iterator();
+            while(ismi.hasNext()) {
+                ModuleIdentification mi = (ModuleIdentification)ismi.next();
+                if (mi.getGuid().equalsIgnoreCase(keyPart[0])){
+                    if (keyPart[1] != null && keyPart[1].length() > 0 && !keyPart[1].equals("null")){
+                        if(!mi.getVersion().equals(keyPart[1])){
+                            continue;
+                        }
+                    }
+
+                    return mi;
+                }
+            }
+        }
+        return null;
+    }
     
     public static Vector<String> getModuleSupArchs(ModuleIdentification mi) throws Exception{
         Vector<String> vArchs = null;

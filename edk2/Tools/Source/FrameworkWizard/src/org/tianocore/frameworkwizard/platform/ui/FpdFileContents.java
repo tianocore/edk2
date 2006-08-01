@@ -776,7 +776,7 @@ public class FpdFileContents {
                     //
                     // ToDo Error 
                     //
-                    throw new PcdDeclNotFound(mi.getName() + " " + msaPcd.getCName());
+                    throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " in Module " + mi.getName());
                 }
                 //
                 // AddItem to ModuleSA PcdBuildDefinitions
@@ -788,7 +788,7 @@ public class FpdFileContents {
             
         }
         catch (Exception e){
-            e.printStackTrace();
+            
             throw e; 
         }
         
@@ -879,10 +879,10 @@ public class FpdFileContents {
             while(li.hasNext()) {
                 String value = li.next().toString();
                 String[] valuePart= value.split(" ");
-                if (!valuePart[4].equals("DYNAMIC")) {
+                if (!valuePart[5].equals("DYNAMIC")) {
                     //ToDo error for same pcd, other type than dynamic
                     pcdConsumer.remove(listValue);
-                    throw new PcdItemTypeConflictException(value);
+                    throw new PcdItemTypeConflictException(cName, value);
                 }
             }
         }
@@ -891,10 +891,10 @@ public class FpdFileContents {
             while(li.hasNext()) {
                 String value = li.next().toString();
                 String[] valuePart= value.split(" ");
-                if (valuePart[4].equals("DYNAMIC")) {
+                if (valuePart[5].equals("DYNAMIC")) {
                     //ToDo error for same pcd, other type than non-dynamic
                     pcdConsumer.remove(listValue);
-                    throw new PcdItemTypeConflictException(value);
+                    throw new PcdItemTypeConflictException(cName, value);
                 }
             }
         }
@@ -1030,7 +1030,7 @@ public class FpdFileContents {
     
     private ArrayList<String> LookupPlatformPcdData(String pcdKey) {
         
-        return dynPcdMap.get("pcdKey");
+        return dynPcdMap.get(pcdKey);
     }
     
     public int getDynamicPcdBuildDataCount() {
@@ -2464,8 +2464,9 @@ class PcdItemTypeConflictException extends Exception {
     private static final long serialVersionUID = 1L;
     private String details = null;
     
-    PcdItemTypeConflictException(String info){
-        details = "ItemTypeConflict: " + info;
+    PcdItemTypeConflictException(String pcdName, String info){
+        ModuleIdentification mi = GlobalData.getModuleId(info);
+        details = pcdName + " ItemType Conflicts with " + mi.getName() + " in Pkg " + mi.getPackage().getName();
     }
     
     public String getMessage() {

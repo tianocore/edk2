@@ -218,6 +218,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         return;
                     }
                     //ToDo put Arch instead of null
+                    boolean errorOccurred = false;
                     for (int i = 0; i < vArchs.size(); ++i) {
                         String arch = vArchs.get(i);
                         al.add(arch);
@@ -237,12 +238,19 @@ public class FpdFrameworkModules extends IInternalFrame {
                            ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
                        }
                        catch (Exception exception) {
-                           JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
+                           JOptionPane.showMessageDialog(frame, "Adding " + row[0] + " with SupArch " + arch + ": "+ exception.getMessage());
+                           errorOccurred = true;
                        }
                     }
                     
-                    
-                    JOptionPane.showMessageDialog(frame, "This Module with Arch "+ archsAdded +" Added Successfully.");
+                    String s = "This Module with Arch "+ archsAdded;
+                    if (errorOccurred) {
+                        s += " Added with Error. Platform may NOT Be Built."; 
+                    }
+                    else {
+                        s += " Added Successfully.";
+                    }
+                    JOptionPane.showMessageDialog(frame,  s);
                     jTableFpdModules.changeSelection(modelFpdModules.getRowCount()-1, 0, false, false);
                 }
             });
@@ -361,7 +369,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String pg = sa[2];
                     String pv = sa[3];
                     String arch = sa[4];
-                    ModuleIdentification mi = getModuleId(sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3] + " " + sa[4]);
+                    ModuleIdentification mi = GlobalData.getModuleId(sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3] + " " + sa[4]);
                     mv = mi.getVersion();
                     pv = mi.getPackage().getVersion();
                     modelFpdModules.removeRow(selectedRow);
@@ -434,7 +442,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             String[][] saa = new String[ffc.getFrameworkModulesCount()][5];
             ffc.getFrameworkModulesInfo(saa);
             for (int i = 0; i < saa.length; ++i) {
-                ModuleIdentification mi = getModuleId(saa[i][0]+ " "+saa[i][1]+" "+saa[i][2]+" "+saa[i][3]);
+                ModuleIdentification mi = GlobalData.getModuleId(saa[i][0]+ " "+saa[i][1]+" "+saa[i][2]+" "+saa[i][3]);
                 String[] row = {"", "", "", "", "", ""};
                 if (mi != null) {
                     row[0] = mi.getName();
@@ -506,43 +514,6 @@ public class FpdFrameworkModules extends IInternalFrame {
         this.setContentPane(getJSplitPane());
         this.setVisible(true);
         
-    }
-    
-    private ModuleIdentification getModuleId(String key){
-        //
-        // Get ModuleGuid, ModuleVersion, PackageGuid, PackageVersion, Arch into string array.
-        //
-        String[] keyPart = key.split(" ");
-        Set<PackageIdentification> spi = GlobalData.getPackageList();
-        Iterator ispi = spi.iterator();
-        
-        while(ispi.hasNext()) {
-            PackageIdentification pi = (PackageIdentification)ispi.next();
-            if ( !pi.getGuid().equalsIgnoreCase(keyPart[2])){ 
-
-                continue;
-            }
-            if (keyPart[3] != null && keyPart[3].length() > 0 && !keyPart[3].equals("null")){
-                if(!pi.getVersion().equals(keyPart[3])){
-                    continue;
-                }
-            }
-            Set<ModuleIdentification> smi = GlobalData.getModules(pi);
-            Iterator ismi = smi.iterator();
-            while(ismi.hasNext()) {
-                ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                if (mi.getGuid().equalsIgnoreCase(keyPart[0])){
-                    if (keyPart[1] != null && keyPart[1].length() > 0 && !keyPart[1].equals("null")){
-                        if(!mi.getVersion().equals(keyPart[1])){
-                            continue;
-                        }
-                    }
-
-                    return mi;
-                }
-            }
-        }
-        return null;
     }
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
