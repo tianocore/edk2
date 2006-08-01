@@ -100,41 +100,38 @@ Returns:
 }
 
 
-
 /**
-  Call back function on EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+  Returns the next high 32 bits of the platform's monotonic counter.
 
-  Fixup internal data so that the driver is callable in EFI  runtime 
-  in virtual mode. Convert gRT to virtual address. gRT is from 
-  UefiRuntimeServicesTableLib class. It is not fixed up by 
-  UefiRuntimeServicesTableLib instance.
+  The GetNextHighMonotonicCount() function returns the next high 32 bits 
+  of the platform's monotonic counter. The platform's monotonic counter is 
+  comprised of two 32 bit quantities:  the high 32 bits and the low 32 bits.  
+  During boot service time the low 32 bit value is volatile:  it is reset to 
+  zero on every system reset and is increased by 1 on every call to GetNextMonotonicCount().
+  The high 32 bit value is non-volatile and is increased by 1 whenever the system resets 
+  or whenever the low 32 bit count [returned by GetNextMonoticCount()] overflows.
+  The GetNextMonotonicCount() function is only available at boot services time.  
+  If the operating system wishes to extend the platform monotonic counter to runtime, 
+  it may do so by utilizing GetNextHighMonotonicCount().  To do this, before calling 
+  ExitBootServices() the operating system would call GetNextMonotonicCount() to obtain 
+  the current platform monotonic count.  The operating system would then provide an 
+  interface that returns the next count by:  
+    Adding 1 to the last count.
+    Before the lower 32 bits of the count overflows, call GetNextHighMonotonicCount().  
+    This will increase the high 32 bits of the platform's non-volatile portion of the monotonic 
+    count by 1.
 
-  @param  Event     Event whose notification function is being invoked.
-  @param  Context   The context of the Notification context. Not used in
-                    this call back function.
+  This function may only be called at Runtime.
+
+  @param[out]   HighCount	Pointer to returned value.
+
+  @retval EFI_INVALID_PARAMETER If HighCount is NULL.
+  @retval EFI_SUCCESS           Operation is successful.
+  @retval EFI_OUT_OF_RESOURCES  If variable service reports that not enough storage 
+                                is available to hold the variable and its data.
+  @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
 
 **/
-VOID
-EFIAPI
-MonotonicCounterDriverSetVirtualAddressMap (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-/*++
-
-Routine Description:
-
-Arguments:
-
-Returns:
-
---*/
-{
-  gRT->ConvertPointer (0, (VOID **) &gRT);
-}
-
-
-
 EFI_STATUS
 EFIAPI
 MonotonicCounterDriverGetNextHighMonotonicCount (
@@ -150,7 +147,6 @@ Returns:
 
 --*/
 {
-  EFI_STATUS  Status;
   EFI_TPL     OldTpl;
 
   //
@@ -175,15 +171,14 @@ Returns:
   //
   // Update the NvRam store to match the new high part
   //
-  Status = gRT->SetVariable (
-                  mEfiMtcName,
-                  &mEfiMtcGuid,
-                  EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                  sizeof (UINT32),
-                  HighCount
-                  );
+  return EfiSetVariable (
+           mEfiMtcName,
+           &mEfiMtcGuid,
+           EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+           sizeof (UINT32),
+           HighCount
+           );
 
-  return Status;
 }
 
 VOID

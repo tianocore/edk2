@@ -81,8 +81,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Extern>
       <ModuleEntryPoint>MonotonicCounterDriverInitialize</ModuleEntryPoint>
     </Extern>
-    <Extern>
-      <SetVirtualAddressMapCallBack>MonotonicCounterDriverSetVirtualAddressMap</SetVirtualAddressMapCallBack>
-    </Extern>
   </Externs>
 </ModuleSurfaceArea>
