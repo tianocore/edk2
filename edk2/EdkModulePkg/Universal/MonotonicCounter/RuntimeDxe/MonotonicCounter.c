@@ -33,7 +33,6 @@ EFI_HANDLE  mMonotonicCounterHandle = NULL;
 //
 UINT64      mEfiMtc;
 
-
 //
 // Event to use to update the Mtc's high part when wrapping
 //
@@ -99,6 +98,42 @@ Returns:
 
   return EFI_SUCCESS;
 }
+
+
+
+/**
+  Call back function on EFI_EVENT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+
+  Fixup internal data so that the driver is callable in EFI  runtime 
+  in virtual mode. Convert gRT to virtual address. gRT is from 
+  UefiRuntimeServicesTableLib class. It is not fixed up by 
+  UefiRuntimeServicesTableLib instance.
+
+  @param  Event     Event whose notification function is being invoked.
+  @param  Context   The context of the Notification context. Not used in
+                    this call back function.
+
+**/
+VOID
+EFIAPI
+MonotonicCounterDriverSetVirtualAddressMap (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+/*++
+
+Routine Description:
+
+Arguments:
+
+Returns:
+
+--*/
+{
+  gRT->ConvertPointer (0, (VOID **) &gRT);
+}
+
+
 
 EFI_STATUS
 EFIAPI
