@@ -2,17 +2,17 @@
   Token class.
 
   This module contains all classes releted to PCD token.
- 
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
- 
+
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/  
+**/
 package org.tianocore.pcd.entity;
 
 import java.math.BigInteger;
@@ -20,25 +20,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.exception.EntityException;
 
-/** This class is to descript a PCD token object. The information of a token mainly 
-    comes from MSA, SPD and setting produced by platform developer. 
+/**
+   This class is to descript a PCD token object. The information of a token mainly
+   comes from MSA, SPD and setting produced by platform developer.
 **/
 public class Token {
     ///
     /// Enumeration macro defintion for PCD type.
-    /// BUGBUG: Not use upcase charater is to facility for reading. It may be changed
-    ///         in coding review.
-    public enum             PCD_TYPE {FEATURE_FLAG, FIXED_AT_BUILD, PATCHABLE_IN_MODULE, DYNAMIC, 
+    ///
+    public enum             PCD_TYPE {FEATURE_FLAG, FIXED_AT_BUILD, PATCHABLE_IN_MODULE, DYNAMIC,
                                       DYNAMIC_EX, UNKNOWN}
 
     ///
     /// Enumeration macro definition for datum type. All type mainly comes from ProcessBind.h.
-    /// Wizard maybe expand this type as "int, unsigned int, short, unsigned short etc" in 
+    /// Wizard maybe expand this type as "int, unsigned int, short, unsigned short etc" in
     /// prompt dialog.
     ///
     public enum             DATUM_TYPE {UINT8, UINT16, UINT32, UINT64, BOOLEAN, POINTER, UNKNOWN}
@@ -57,7 +56,7 @@ public class Token {
 
     ///
     /// Token space name is the guid defined by token itself in package or module level. This
-    /// name mainly for DynamicEx type. For other PCD type token, his token space name is the 
+    /// name mainly for DynamicEx type. For other PCD type token, his token space name is the
     /// assignedtokenSpaceName as follows.
     /// tokenSpaceName is defined in MSA, SPD, FPD, can be regarded as primary key with cName.
     ///
@@ -71,24 +70,24 @@ public class Token {
     public long             tokenNumber;
 
     ///
-    /// This token number is retrieved from FPD file for DynamicEx type. 
-    /// 
+    /// This token number is retrieved from FPD file for DynamicEx type.
+    ///
     public long             dynamicExTokenNumber;
 
     ///
     /// All supported PCD type, this value can be retrieved from SPD
     /// Currently, only record all PCD type for this token in FPD file.
-    /// 
+    ///
     public List<PCD_TYPE>   supportedPcdType;
 
     ///
     /// If the token's item type is Dynamic or DynamicEx type, isDynamicPCD
     /// is true.
-    /// 
+    ///
     public boolean          isDynamicPCD;
 
     ///
-    /// datumSize is to descript the fix size or max size for this token. 
+    /// datumSize is to descript the fix size or max size for this token.
     /// datumSize is defined in SPD.
     ///
     public int              datumSize;
@@ -102,7 +101,7 @@ public class Token {
 
     ///
     /// skuData contains all value for SkuNumber of token.
-    /// This field is for Dynamic or DynamicEx type PCD, 
+    /// This field is for Dynamic or DynamicEx type PCD,
     ///
     public List<SkuInstance> skuData;
 
@@ -113,7 +112,7 @@ public class Token {
 
     /**
        Constructure function for Token class
-       
+
        @param cName             The name of token
        @param tokenSpaceName    The name of token space, it is a guid string
     **/
@@ -131,10 +130,10 @@ public class Token {
 
     /**
       updateSupportPcdType
-      
+
       SupportPcdType should be gotten from SPD file actually, but now it just
       record all PCD type for this token in FPD file.
-      
+
       @param pcdType    new PCD type found in FPD file for this token.
     **/
     public void updateSupportPcdType(PCD_TYPE pcdType) {
@@ -146,16 +145,16 @@ public class Token {
 
         //
         // If not found, add the pcd type to member variable supportedPcdType
-        // 
+        //
         supportedPcdType.add(pcdType);
     }
 
     /**
        Judge whether pcdType is belong to dynamic type. Dynamic type includes
        DYNAMIC and DYNAMIC_EX.
-       
+
        @param pcdType       the judged pcd type
-       
+
        @return boolean
      */
     public static boolean isDynamic(PCD_TYPE pcdType) {
@@ -173,16 +172,16 @@ public class Token {
                 return true;
             }
         }
-        
+
         return false;
     }
 
     /**
       Use "TokencName + "-" + SpaceTokenName" as primary key when adding token into database
-      
+
       @param   cName                     Token name.
       @param   tokenSpaceName            The token space guid string defined in MSA or SPD
-      
+
       @retval  primary key for this token in token database.
     **/
     public static String getPrimaryKeyString(String cName, String tokenSpaceName) {
@@ -195,7 +194,7 @@ public class Token {
 
     /**
        If skudata list contains more than one data, then Sku mechanism is enable.
-       
+
        @retval boolean  if the number of sku data exceed to 1
      */
     public boolean isSkuEnable() {
@@ -207,7 +206,7 @@ public class Token {
 
     /**
        If Hii type for value of token
-       
+
        @return boolean
     **/
     public boolean isHiiEnable() {
@@ -219,7 +218,7 @@ public class Token {
 
     /**
        If Vpd type for value of token
-       
+
        @return boolean
     **/
     public boolean isVpdEnable() {
@@ -231,7 +230,7 @@ public class Token {
 
     /**
        Get the token primary key in token database.
-       
+
        @return String
      */
     public String getPrimaryKeyString () {
@@ -240,14 +239,14 @@ public class Token {
 
     /**
       Judge datumType is valid
-      
+
       @param type  The datumType want to be judged.
-      
+
       @retval TRUE  - The type is valid.
       @retval FALSE - The type is invalid.
     **/
     public static boolean isValiddatumType(DATUM_TYPE type) {
-        if ((type.ordinal() < DATUM_TYPE.UINT8.ordinal() ) || 
+        if ((type.ordinal() < DATUM_TYPE.UINT8.ordinal() ) ||
             (type.ordinal() > DATUM_TYPE.POINTER.ordinal())) {
             return false;
         }
@@ -256,14 +255,14 @@ public class Token {
 
     /**
       Judge pcdType is valid
-      
+
       @param  type The PCdType want to be judged.
-      
+
       @retval TRUE  - The type is valid.
       @retval FALSE - The type is invalid.
     **/
     public static boolean isValidpcdType(PCD_TYPE  type) {
-        if ((type.ordinal() < PCD_TYPE.FEATURE_FLAG.ordinal() ) || 
+        if ((type.ordinal() < PCD_TYPE.FEATURE_FLAG.ordinal() ) ||
             (type.ordinal() > PCD_TYPE.DYNAMIC_EX.ordinal())) {
             return false;
         }
@@ -272,9 +271,9 @@ public class Token {
 
     /**
       Add an usage instance for token
-      
+
       @param usageInstance   The usage instance
-     
+
       @retval TRUE  - Success to add usage instance.
       @retval FALSE - Fail to add usage instance
     **/
@@ -292,7 +291,7 @@ public class Token {
 
         //
         // Put usage instance into usage instance database of this PCD token.
-        // 
+        //
         consumers.put(usageInstance.getPrimaryKey(), usageInstance);
 
         return true;
@@ -300,9 +299,9 @@ public class Token {
 
     /**
        Judge whether exist an usage instance for this token
-       
+
        @param usageId       The UsageInstance identification for usage instance
-       
+
        @return boolean      whether exist an usage instance for this token.
      */
     public boolean isUsageInstanceExist(UsageIdentification usageId) {
@@ -313,9 +312,9 @@ public class Token {
 
     /**
       Get the PCD_TYPE according to the string of PCD_TYPE
-      
+
       @param pcdTypeStr    The string of PCD_TYPE
-      
+
       @return PCD_TYPE
     **/
     public static PCD_TYPE getpcdTypeFromString(String pcdTypeStr) {
@@ -340,9 +339,9 @@ public class Token {
 
     /**
       Get the string of given datumType. This string will be used for generating autogen files
-     
+
       @param datumType   Given datumType
-     
+
       @return The string of datum type.
     **/
     public static String getStringOfdatumType(DATUM_TYPE  datumType) {
@@ -365,9 +364,9 @@ public class Token {
 
     /**
       Get the datumType according to a string.
-      
+
       @param datumTypeStr    The string of datumType
-     
+
       @return DATUM_TYPE
     **/
     public static DATUM_TYPE getdatumTypeFromString(String datumTypeStr) {
@@ -389,9 +388,9 @@ public class Token {
 
     /**
       Get string of given pcdType
-      
+
       @param pcdType  The given PcdType
-      
+
       @return The string of PCD_TYPE.
     **/
     public static String getStringOfpcdType(PCD_TYPE pcdType) {
@@ -412,9 +411,9 @@ public class Token {
 
     /**
       Get the PCD_USAGE according to a string
-      
+
       @param usageStr  The string of PCD_USAGE
-      
+
       @return The PCD_USAGE
     **/
     public static PCD_USAGE getUsageFromString(String usageStr) {
@@ -437,9 +436,9 @@ public class Token {
 
     /**
       Get the string of given PCD_USAGE
-      
+
       @param   usage   The given PCD_USAGE
-      
+
       @return The string of PDC_USAGE.
     **/
     public static String getStringOfUsage(PCD_USAGE usage) {
@@ -458,14 +457,14 @@ public class Token {
 
     /**
       Get the Defined datumType string for autogen. The string is for generating some MACROs in Autogen.h
-      
+
       @param datumType The given datumType
 
       @return string of datum type for autogen.
     **/
     public static String GetAutogenDefinedatumTypeString(DATUM_TYPE datumType) {
         switch (datumType) {
-        
+
         case UINT8:
             return "8";
         case UINT16:
@@ -485,7 +484,7 @@ public class Token {
 
     /**
       Get the datumType String for Autogen. This string will be used for generating defintions of PCD token in autogen
-      
+
       @param datumType   The given datumType
 
       @return string of datum type.
@@ -511,7 +510,7 @@ public class Token {
 
     /**
       Get the datumType string for generating some MACROs in autogen file of Library
-      
+
       @param   datumType  The given datumType
 
       @return String of datum for genrating bit charater.
@@ -537,11 +536,10 @@ public class Token {
 
     /**
        Get the sku data who id is 0.
-       
+
        @retval DynamicTokenValue    the value of this dyanmic token.
     **/
     public DynamicTokenValue getDefaultSku() {
-        DynamicTokenValue dynamicData;
         int               index;
 
         for (index = 0; index < this.skuData.size(); index ++) {
@@ -555,7 +553,7 @@ public class Token {
 
     /**
        Get the number of Sku data for this token
-       
+
        @retval int the number of sku data
     **/
     public int getSkuIdCount () {
@@ -564,9 +562,9 @@ public class Token {
 
     /**
        Get the size of PCD value, this PCD is POINTER type.
-       
+
        @param str   the string of the value
-       @param al    
+       @param al
     **/
     private void getCurrentSizeFromDefaultValue (String str, ArrayList<Integer> al) {
         if (isValidNullValue(str)) {
@@ -590,11 +588,11 @@ public class Token {
             } else if (str.startsWith("{")) {
                 //
                 // We count the number of "," in the string.
-                // The number of byte is one plus the number of 
+                // The number of byte is one plus the number of
                 // comma.
                 //
                 String str2 = str;
-                
+
                 int cnt = 0;
                 int pos = 0;
                 pos = str2.indexOf(",", 0);
@@ -612,17 +610,17 @@ public class Token {
     /**
        This method can be used to get the MAX and current size
        for pointer type dynamic(ex) PCD entry
-    **/ 
+    **/
     public ArrayList<Integer> getPointerTypeSize () {
         ArrayList<Integer> al = new ArrayList<Integer>();
-        
+
         //
         // For VPD_enabled and HII_enabled, we can only return the MAX size.
         // For the default DATA type dynamic PCD entry, we will return
         // the MAX size and current size for each SKU_ID.
         //
         al.add(new Integer(this.datumSize));
-        
+
         if (!this.isVpdEnable()) {
             int idx;
             if (this.isHiiEnable()){
@@ -637,7 +635,7 @@ public class Token {
                 }
             }
         }
-        
+
         return al;
     }
 
@@ -645,7 +643,7 @@ public class Token {
        Get default value for a token, For HII type, HiiDefaultValue of default
        SKU 0 will be returned; For Default type, the defaultvalue of default SKU
        0 will be returned.
-       
+
        @return String
      */
     public String getDynamicDefaultValue() {
@@ -665,14 +663,12 @@ public class Token {
     //          to support no default value.
     //
     public boolean hasDefaultValue () {
-        int               value         = 0;
-        boolean           isInteger     = true;
         DynamicTokenValue dynamicValue  = null;
 
         if (isSkuEnable()) {
             return true;
         }
-        
+
         if (this.isDynamicPCD) {
             dynamicValue = getDefaultSku();
             switch (dynamicValue.type) {
@@ -690,9 +686,9 @@ public class Token {
 
     /**
        Judge the value is NULL value. NULL value means the value is uninitialized value
-       
+
        @param judgedValue
-       
+
        @return boolean
      */
     public boolean isValidNullValue(String judgedValue) {
@@ -704,7 +700,7 @@ public class Token {
         case UINT16:
         case UINT32:
             if (judgedValue.length() > 2) {
-                if ((judgedValue.charAt(0) == '0')        && 
+                if ((judgedValue.charAt(0) == '0')        &&
                     ((judgedValue.charAt(1) == 'x') || (judgedValue.charAt(1) == 'X'))){
                     subStr      = judgedValue.substring(2, judgedValue.length());
                     bigIntValue = new BigInteger(subStr, 16);
@@ -720,7 +716,7 @@ public class Token {
             break;
         case UINT64:
             if (judgedValue.length() > 2){
-                if ((judgedValue.charAt(0) == '0') && 
+                if ((judgedValue.charAt(0) == '0') &&
                     ((judgedValue.charAt(1) == 'x') ||
                      (judgedValue.charAt(1) == 'X'))) {
                     bigIntValue = new BigInteger(judgedValue.substring(2, judgedValue.length()),  16);
@@ -759,34 +755,34 @@ public class Token {
 
     /**
        Is the string value in Unicode
-       
+
        @return boolean
     **/
     public boolean isHiiDefaultValueUnicodeStringType() {
         DynamicTokenValue dynamicData = getDefaultSku();
-        
+
         if (dynamicData == null)
             return false;
-        
+
         return dynamicData.hiiDefaultValue.startsWith("L\"")
                 && dynamicData.hiiDefaultValue.endsWith("\"");
     }
 
     /**
        Is the string value in ANSCI
-       
+
        @return boolean
     **/
     public boolean isHiiDefaultValueASCIIStringType() {
         DynamicTokenValue dynamicData = getDefaultSku();
-    
+
         if (dynamicData == null)
             return false;
-        
+
         return dynamicData.hiiDefaultValue.startsWith("\"")
         && dynamicData.hiiDefaultValue.endsWith("\"");
     }
-    
+
     /**
        Judege whether current value is UNICODE string type.
        @return boolean
@@ -799,14 +795,14 @@ public class Token {
         }
 
         if (datumType == Token.DATUM_TYPE.POINTER &&
-            str.startsWith("L\"") && 
+            str.startsWith("L\"") &&
             str.endsWith("\"")) {
             return true;
         }
 
         return false;
     }
-    
+
     public boolean isASCIIStringType () {
         String str = getDynamicDefaultValue();
 
@@ -815,7 +811,7 @@ public class Token {
         }
 
         if (datumType == Token.DATUM_TYPE.POINTER &&
-            str.startsWith("\"") && 
+            str.startsWith("\"") &&
             str.endsWith("\"")) {
             return true;
         }
@@ -831,16 +827,16 @@ public class Token {
         }
 
         if (datumType == Token.DATUM_TYPE.POINTER &&
-            str.startsWith("{") && 
+            str.startsWith("{") &&
             str.endsWith("}")) {
             return true;
         }
 
         return false;
-        
+
     }
 
-    public String getStringTypeString () {                       
+    public String getStringTypeString () {
         return getDefaultSku().value.substring(2, getDefaultSku().value.length() - 1);
     }
 }

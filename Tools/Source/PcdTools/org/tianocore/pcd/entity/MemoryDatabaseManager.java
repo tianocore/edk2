@@ -2,13 +2,13 @@
   MemoryDatabaseManager class.
 
   Database hold all PCD information comes from SPD, MSA, FPD file in memory.
- 
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
- 
+
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.exception.EntityException;
 
-/** Database hold all PCD information comes from SPD, MSA, FPD file in memory.
+/**
+  Database hold all PCD information comes from SPD, MSA, FPD file in memory.
 **/
 public class MemoryDatabaseManager {
     ///
@@ -37,18 +37,18 @@ public class MemoryDatabaseManager {
     /// Before build a module, the used libary will be build firstly, the PCD of these
     /// libarry is inheritted by the module, so stored module's PCD information as PCD
     /// context of building libary.
-    /// 
+    ///
     public static List<UsageInstance> UsageInstanceContext = null;
 
     ///
     /// Current module name, if now is buiding library, this value indicate this library
     /// is for building what module.
-    /// 
+    ///
     public static String CurrentModuleName                 = null;
 
     ///
     /// String for PCD PEIM and DXE autogen file
-    /// 
+    ///
     public static String PcdPeimHString                    = "";
     public static String PcdPeimCString                    = "";
     public static String PcdDxeHString                     = "";
@@ -68,9 +68,9 @@ public class MemoryDatabaseManager {
 
     /**
       Judege whether token exists in memory database
-      
+
       @param primaryKey    the primaryKey for searching token
-      
+
       @retval  TRUE  - token already exist in database.
       @retval  FALSE - token does not exist in database.
     **/
@@ -80,7 +80,7 @@ public class MemoryDatabaseManager {
 
     /**
       Add a pcd token into memory database.
-      
+
       @param primaryKey   the primary key for searching token
       @param token        token instance
     **/
@@ -90,9 +90,9 @@ public class MemoryDatabaseManager {
 
     /**
       Get a token instance from memory database with primary key.
-  
+
       @param primaryKey   the primary key for searching token
-    
+
       @return token instance.
     **/
     public Token getTokenByKey(String primaryKey) {
@@ -101,7 +101,7 @@ public class MemoryDatabaseManager {
 
     /**
       Get the number of PCD token record in memory database.
-      
+
       @return the number of PCD token record in memory database.
     **/
     public int getDBSize() {
@@ -110,7 +110,7 @@ public class MemoryDatabaseManager {
 
     /**
       Get the token record array contained all PCD token in memory database.
-      
+
       @return the token record array contained all PCD token in memory database.
     **/
     public Token[] getRecordArray() {
@@ -135,7 +135,7 @@ public class MemoryDatabaseManager {
 
     /**
        Get record array only contains DYNAMIC or DYNAMIC_EX type PCD.
-       
+
        @return ArrayList
      */
     private ArrayList getDynamicRecordArray() {
@@ -155,12 +155,12 @@ public class MemoryDatabaseManager {
 
     /**
       Get the token record array contained all PCD token referenced by PEI phase.
-          The output array is sorted based on descending order of the size of alignment for each feilds.
+      The output array is sorted based on descending order of the size of alignment for each feilds.
 
       @return the token record array contained all PCD token referenced in PEI phase.
       @throws EntityException
     **/
-    public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe) 
+    public void getTwoPhaseDynamicRecordArray(ArrayList<Token> pei, ArrayList<Token> dxe)
         throws EntityException {
         int                     usageInstanceIndex  =   0;
         int                     index               =   0;
@@ -187,8 +187,8 @@ public class MemoryDatabaseManager {
             }
 
             //
-            // If no PEI components reference the PCD entry, 
-            // we check if it is referenced in DXE driver. 
+            // If no PEI components reference the PCD entry,
+            // we check if it is referenced in DXE driver.
             //
             if (!found) {
                 if (token.consumers != null) {
@@ -202,7 +202,7 @@ public class MemoryDatabaseManager {
                         }
                     }
                 }
-                
+
                 if (!found) {
                     if (token.isDynamicPCD && token.consumers.size() == 0) {
                         dxe.add(token);
@@ -223,9 +223,9 @@ public class MemoryDatabaseManager {
     /**
       Get all PCD record for a module according to module's name, module's GUID,
       package name, package GUID, arch, version information.
-     
+
       @param usageId   the id of UsageInstance.
-      
+
       @return  all usage instance for this module in memory database.
     **/
     public List<UsageInstance> getUsageInstanceArrayByModuleName(UsageIdentification usageId) {
@@ -237,14 +237,14 @@ public class MemoryDatabaseManager {
 
     /**
        Get all PCD token for a usage instance according to primary key.
-       
+
        @param primaryKey    the primary key of usage instance.
-       
+
        @return List<UsageInstance>
      */
     public List<UsageInstance> getUsageInstanceArrayByKeyString(String primaryKey) {
         Token[]               tokenArray          = null;
-        int                   recordIndex         = 0; 
+        int                   recordIndex         = 0;
         UsageInstance         usageInstance       = null;
         List<UsageInstance>   returnArray         = new ArrayList<UsageInstance>();
 
@@ -267,7 +267,7 @@ public class MemoryDatabaseManager {
 
     /**
       Get all modules name who contains PCD information
-     
+
       @return Array for module name
     **/
     public List<String> getAllModuleArray()

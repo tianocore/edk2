@@ -17,33 +17,41 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.pcd.entity;
 
 /**
-   
+   The identification for a UsageInstance. 
+   It should be extend from ModuleIdentification in future.
+
 **/
 public class UsageIdentification {
     ///
     /// The module CName: one key of Identification
     /// 
     public String moduleName;
+
     /// 
     /// The module Guid String: one key of Identification
     /// 
     public String moduleGuid;
+
     /// 
     /// The package CName: one key of Identification 
     ///
     public String packageName;
+
     /// 
     /// The package Guid: one key of Identification
     /// 
     public String packageGuid;
+
     /// 
     /// Module's Arch: one key of Identification
     /// 
     public String arch;
+
     /// 
     /// Module's version: one key of Identification
     /// 
     public String version;
+
     ///
     /// Module's type
     /// 
