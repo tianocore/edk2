@@ -25,86 +25,52 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="BUILD_DIR" value="${PACKAGE_DIR}/${ToolName}/tmp"/>
 
   <target name="GenTool" depends="init, Tool">
-    <echo message="Building the EDK Tool: ${ToolName}"/>
+    <echo message="The EDK Tool: ${ToolName} build has completed"/>
   </target>
 
   <target name="init">
-    <echo message="The EDK Tool: ${ToolName}"/>
+    <echo message="Building the EDK Tool: ${ToolName}"/>
     <mkdir dir="${BUILD_DIR}"/>
     <if>
-      <equals arg1="${GCC}" arg2="cygwin"/>
+      <istrue value="${OSX}"/>
       <then>
-        <echo message="Cygwin Family"/>
-        <property name="ToolChain" value="gcc"/>
+        <property name="syslibdirs" value=""/>
+        <property name="syslibs" value=""/>
       </then>
-    <elseif>
-      <os family="dos"/>
-      <then>
-        <echo message="Windows Family"/>
-        <property name="ToolChain" value="msvc"/>
-      </then>
-    </elseif>
-    <elseif>
-      <os family="unix"/>
-      <then>
-        <echo message="UNIX Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    </elseif>
-
-    <else>
-      <echo>
-        Unsupported Operating System
-        Please Contact Intel Corporation
-      </echo>
-    </else>
     </if>
-        <property name="ToolChain" value="gcc"/>
+
     <if>
-      <equals arg1="${ToolChain}" arg2="msvc"/>
+      <istrue value="${cygwin}"/>
       <then>
-        <property name="ext_static" value=".lib"/>
-        <property name="ext_dynamic" value=".dll"/>
-        <property name="ext_exe" value=".exe"/>
+        <property name="syslibdirs" value="${env.CYGWIN_HOME}/lib/e2fsprogs"/>
+        <property name="syslibs" value="uuid"/>
       </then>
-      <elseif>
-        <equals arg1="${ToolChain}" arg2="gcc"/>
-        <then>
-          <property name="ext_static" value=".a"/>
-          <property name="ext_dynamic" value=".so"/>
-          <property name="ext_exe" value=""/>
-        </then>
-      </elseif>
     </if>
-
-    <condition property="syslibdirs" value="">
-      <os family="mac"/>
-    </condition>
     
-    <condition property="syslibs" value="">
-      <os family="mac"/>
-    </condition>
+    <if>
+      <istrue value="${msft}"/>
+      <then>
+        <property name="syslibdirs" value=""/>
+        <property name="syslibs" value="uuid"/>
+      </then>
+    </if>
     
-    <condition property="syslibdirs" value="/lib64">
-      <istrue value="${x86_64_linux}"/>
-    </condition>
-    
-    <condition property="syslibdirs" value="${env.CYGWIN_HOME}/lib/e2fsprogs">
-      <os family="windows"/>
-    </condition>
-    
-    <condition property="syslibs" value="uuid">
-      <os family="windows"/>
-    </condition>
-    
-    <condition property="syslibdirs" value="/usr/lib">
-      <os name="Linux"/>
-    </condition>
-    
-    <condition property="syslibs" value="uuid">
-      <os name="Linux"/>
-    </condition>
-    
+    <if>
+      <istrue value="${linux}"/>
+      <then>
+        <if>
+          <istrue value="${x86_64_linux}"/>
+          <then>
+            <property name="syslibdirs" value="/lib64"/>
+          </then>
+          <else>
+            <property name="syslibdirs" value="/usr/lib"/>
+          </else>
+        </if>
+        <property name="syslibs" value="uuid"/>
+      </then>
+    </if>
+    <echo message="syslibdirs set to: ${syslibdirs}"/>
   </target>
 
   <target name="Tool" depends="init, GenFvImage"/>
@@ -129,27 +95,27 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Common"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
 
-      <linkerarg value="/nodefaultlib:libc.lib" unless="gcc"/>
-      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="gcc"/>
-      <syslibset libs="RpcRT4" unless="gcc"/>
+      <linkerarg value="/nodefaultlib:libc.lib" if="msft"/>
+      <syslibset dir="${syslibdirs}" libs="${syslibs}" if="cyglinux"/>
+      <syslibset libs="RpcRT4" if="msft"/>
     </cc>
   </target>
 
-  <target name="clean" depends="init">
+  <target name="clean">
     <echo message="Removing Intermediate Files Only"/>  
     <delete>
       <fileset dir="${BUILD_DIR}" includes="*.obj"/>
     </delete>
   </target>
 
-  <target name="cleanall" depends="init">
+  <target name="cleanall">
     <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
-    <delete dir="${PACKAGE_DIR}/${ToolName}/tmp">
-      
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_Ia32${ext_exe}"/>
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_X64${ext_exe}"/>
-      <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
-      <fileset dir="${BIN_DIR}" includes="${ToolName}_Ipf${ext_exe}"/>
+    <delete failonerror="false" quiet="true" includeEmptyDirs="true">
+      <fileset dir="${BUILD_DIR}"/>
+      <fileset file="${BIN_DIR}/${ToolName}_Ia32${ext_exe}"/>
+      <fileset file="${BIN_DIR}/${ToolName}_X64${ext_exe}"/>
+      <fileset file="${BIN_DIR}/${ToolName}${ext_exe}"/>
+      <fileset file="${BIN_DIR}/${ToolName}_Ipf${ext_exe}"/>
     </delete>
   </target>
 

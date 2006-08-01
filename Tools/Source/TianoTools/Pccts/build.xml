@@ -13,73 +13,36 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 <!--
     EDK Pccts Tool
   Copyright (c) 2006, Intel Corporation
--->
   <property name="ToolName" value="Pccts"/>
+-->
 
   <taskdef resource="cpptasks.tasks"/>
   <typedef resource="cpptasks.types"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <target name="init">
-    <echo message="The EDK Tool: ${ToolName}"/>
-    <if>
-      <equals arg1="${GCC}" arg2="cygwin"/>
-      <then>
-        <echo message="Cygwin Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    <elseif>
-      <os family="dos"/>
-      <then>
-        <echo message="Windows Family"/>
-        <property name="ToolChain" value="msvc"/>
-      </then>
-    </elseif>
-    <elseif>
-      <os family="unix"/>
-      <then>
-        <echo message="UNIX Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    </elseif>
-
-    <else>
-      <echo>
-        Unsupported Operating System
-        Please Contact Intel Corporation
-      </echo>
-    </else>
-    </if>
-    <if>
-      <equals arg1="${ToolChain}" arg2="msvc"/>
-      <then>
-        <property name="ext_static" value=".lib"/>
-        <property name="ext_dynamic" value=".dll"/>
-        <property name="ext_exe" value=".exe"/>
-      </then>
-      <elseif>
-        <equals arg1="${ToolChain}" arg2="gcc"/>
-        <then>
-          <property name="ext_static" value=".a"/>
-          <property name="ext_dynamic" value=".so"/>
-          <property name="ext_exe" value=""/>
-        </then>
-      </elseif>
-    </if>
+    <echo message="Building the EDK Pccts Tools"/>
   </target>
 
-  <target name="GenTool" depends="init">
-    <echo message="Building the EDK Tool: ${ToolName}"/>
-    <ant dir="${PACKAGE_DIR}/Pccts/antlr" inheritAll="true"/>
-    <ant dir="${PACKAGE_DIR}/Pccts/dlg" inheritAll="true"/>
+  <target name="GenTool" depends="init, Pccts">
+    <echo message="The EDK Pccts Tools build has completed!"/>
   </target>
 
-  <target name="clean" depends="init">
+  <target name="Pccts" depends="init">
+    <subant target="" inheritall="true">
+       <fileset dir="${PACKAGE_DIR}/Pccts/antlr" includes="build.xml"/>
+    </subant>
+    <subant target="" inheritall="true">
+      <fileset dir="${PACKAGE_DIR}/Pccts/dlg" includes="build.xml"/>
+    </subant>
+  </target>
+
+  <target name="clean">
     <ant dir="${PACKAGE_DIR}/Pccts/antlr" target="clean" inheritAll="true"/>
     <ant dir="${PACKAGE_DIR}/Pccts/dlg" target="clean" inheritAll="true"/>
   </target>
 
-  <target name="cleanall" depends="init">
+  <target name="cleanall">
     <ant dir="${PACKAGE_DIR}/Pccts/antlr" target="cleanall" inheritAll="true"/>
     <ant dir="${PACKAGE_DIR}/Pccts/dlg" target="cleanall" inheritAll="true"/>
   </target>

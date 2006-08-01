@@ -20,59 +20,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <property name="tmp" value="tmp"/>
+  <property name="LibName" value="CommonTool"/>
 
   <property name="LINK_OUTPUT_TYPE" value="static"/>
   <property name="BUILD_DIR" value="${PACKAGE_DIR}/Common/tmp"/>
 
   <target name="CommonTools.lib" depends="init, ToolsLibrary">
-    <echo message="Building the EDK CommonTools Library"/>
+    <echo message="The EDK Tool Library: ${LibName} build has completed."/>
   </target>
 
   <target name="init">
-    <echo message="The EDK CommonTools Library"/>
+    <echo message="Building the EDK Tool Library: ${LibName}"/>
     <mkdir dir="${BUILD_DIR}"/>
-    <if>
-      <equals arg1="${GCC}" arg2="cygwin"/>
-      <then>
-        <echo message="Cygwin Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    <elseif>
-      <os family="dos"/>
-      <then>
-        <echo message="Windows Family"/>
-        <property name="ToolChain" value="msvc"/>
-      </then>
-    </elseif>
-    <elseif>
-      <os family="unix"/>
-      <then>
-        <echo message="UNIX Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    </elseif>
-
-    <else>
-      <echo>
-        Unsupported Operating System
-        Please Contact Intel Corporation
-      </echo>
-    </else>
-    </if>
-    <if>
-      <equals arg1="${ToolChain}" arg2="msvc"/>
-      <then>
-        <property name="ext_static" value=".lib"/>
-        <property name="ext_dynamic" value=".dll"/>
-      </then>
-      <elseif>
-        <equals arg1="${ToolChain}" arg2="gcc"/>
-        <then>
-          <property name="ext_static" value=".a"/>
-          <property name="ext_dynamic" value=".so"/>
-        </then>
-      </elseif>
-    </if>
   </target>
 
   <target name="ToolsLibrary" depends="init">
@@ -91,17 +50,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </cc>
   </target>
 
-  <target name="clean" depends="init">
+  <target name="clean">
     <echo message="Removing Intermediate Files Only from ${BUILD_DIR}"/>  
-    <delete>
-      <fileset dir="${BUILD_DIR}" includes="*.obj"/>
-    </delete>
+    <delete dir="${BUILD_DIR}"/>
   </target>
 
-  <target name="cleanall" depends="init">
-    <echo message="Removing Object Files and the Library: CommonTools${ext_static}"/>  
-    <delete dir="${BUILD_DIR}" failonerror="false">
-      <fileset dir="${LIB_DIR}" includes="CommonTools${ext_static}"/>
+  <target name="cleanall">
+    <echo message="Removing Object Files and the Library: ${LibName}${ext_static}"/>  
+    <delete failonerror="false" quiet="true" includeEmptyDirs="true">
+      <fileset dir="${BUILD_DIR}"/>
+      <fileset file="${LIB_DIR}/${LibName}${ext_static}"/>
     </delete>
   </target>
 

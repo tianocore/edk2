@@ -24,60 +24,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="BUILD_DIR_X64" value="${PACKAGE_DIR}/${LibName}/tmp/X64"/>
   <property name="BUILD_DIR_IPF" value="${PACKAGE_DIR}/${LibName}/tmp/Ipf"/>
 
-  <target name="GenTool" depends="init, Tool">
-    <echo message="Building the EDK Tool: ${LibName}"/>
+  <target name="GenTool" depends="init, PeCoffLoaderLib">
+    <echo message="The EDK Library: ${LibName} build has completed!"/>
   </target>
 
   <target name="init">
-    <echo message="The EDK Library: ${LibName}"/>
+    <echo message="Building the EDK Library: ${LibName}"/>
     <mkdir dir="${BUILD_DIR_IA32}"/>
     <mkdir dir="${BUILD_DIR_X64}"/>
     <mkdir dir="${BUILD_DIR_IPF}"/>
-    <if>
-      <equals arg1="${GCC}" arg2="cygwin"/>
-      <then>
-        <echo message="Cygwin Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    <elseif>
-      <os family="dos"/>
-      <then>
-        <echo message="Windows Family"/>
-        <property name="ToolChain" value="msvc"/>
-      </then>
-    </elseif>
-    <elseif>
-      <os family="unix"/>
-      <then>
-        <echo message="UNIX Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    </elseif>
-
-    <else>
-      <echo>
-        Unsupported Operating System
-        Please Contact Intel Corporation
-      </echo>
-    </else>
-    </if>
-        <property name="ToolChain" value="gcc"/>
-    <if>
-      <equals arg1="${ToolChain}" arg2="msvc"/>
-      <then>
-        <property name="ext_static" value=".lib"/>
-        <property name="ext_dynamic" value=".dll"/>
-        <property name="ext_exe" value=".exe"/>
-      </then>
-      <elseif>
-        <equals arg1="${ToolChain}" arg2="gcc"/>
-        <then>
-          <property name="ext_static" value=".a"/>
-          <property name="ext_dynamic" value=".so"/>
-          <property name="ext_exe" value=""/>
-        </then>
-      </elseif>
-    </if>
 
     <condition property="syslibdirs" value="">
       <os family="mac"/>
@@ -105,7 +60,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     
   </target>
 
-  <target name="Tool" depends="init, PeCoffLoader_Ia32, PeCoffLoader_Ipf, PeCoffLoader_X64"/>
+  <target name="PeCoffLoaderLib" depends="init, PeCoffLoader_Ia32, PeCoffLoader_Ipf, PeCoffLoader_X64"/>
 
   <target name="PeCoffLoader_Ia32" >
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
@@ -171,7 +126,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
 
-  <target name="clean" depends="init">
+  <target name="clean">
     <echo message="Removing Intermediate Files Only"/>  
     <delete>
       <fileset dir="${BUILD_DIR_IA32}" includes="*.obj"/>
@@ -180,9 +135,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </delete>
   </target>
 
-  <target name="cleanall" depends="init">
+  <target name="cleanall">
     <echo message="Removing Object Files and the Executable: ${LibName}${ext_exe}"/>  
     <delete dir="${PACKAGE_DIR}/${LibName}/tmp">
+    </delete>
+    <delete failonerror="false" quiet="true" includeEmptyDirs="true">
+      <fileset dir="${BUILD_DIR}"/>
+      <fileset file="${LIB_DIR}/${LibName}_Ia32${ext_static}"/>
+      <fileset file="${BIN_DIR}/${LibName}_X64${ext_static}"/>
+      <fileset file="${BIN_DIR}/${LibName}_IPF${ext_static}"/>
     </delete>
   </target>
 
