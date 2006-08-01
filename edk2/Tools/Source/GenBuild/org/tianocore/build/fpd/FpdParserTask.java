@@ -40,7 +40,7 @@ import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.pcd.action.ActionMessage;
-import org.tianocore.build.pcd.action.CollectPCDAction;
+import org.tianocore.build.pcd.action.PlatformPcdPreprocessActionForBuilding;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainMap;
@@ -386,7 +386,7 @@ public class FpdParserTask extends Task {
             // Pcd Collection. Call CollectPCDAction to collect pcd info.
             //
             try {
-                CollectPCDAction ca = new CollectPCDAction();
+                PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
                 ca.perform(GlobalData.getWorkspacePath(),platformId.getFpdFile().getPath(),ActionMessage.NULL_MESSAGE_LEVEL);
             } catch (Exception e){
                 throw new BuildException(e.getMessage());

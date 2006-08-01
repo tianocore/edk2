@@ -3,13 +3,13 @@
 
   This class is to manage how to generate the PCD information into Autogen.c and
   Autogen.h.
- 
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
- 
+
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -19,21 +19,15 @@ package org.tianocore.build.pcd.action;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.global.GlobalData;
-import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.pcd.entity.Token;
 import org.tianocore.pcd.entity.UsageInstance;
 import org.tianocore.pcd.exception.BuildActionException;
-import org.tianocore.pcd.exception.EntityException;
 import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.action.BuildAction;
 import org.tianocore.pcd.action.ActionMessage;
@@ -46,33 +40,35 @@ public class PCDAutoGenAction extends BuildAction {
     /// The reference of DBManager in GlobalData class.
     ///
     private MemoryDatabaseManager dbManager;
+
     ///
     /// The identification for a UsageInstance.
-    /// 
-    private UsageIdentification   usageId;
     ///
-    /// The arch of current module
-    /// 
-    private String                arch;
+    private UsageIdentification   usageId;
+
     ///
     /// Whether current autogen is for building library used by current module.
-    /// 
+    ///
     private boolean               isBuildUsedLibrary;
+
     ///
     /// The generated string for header file.
     ///
     private String                hAutoGenString;
+
     ///
     /// The generated string for C code file.
     ///
     private String                cAutoGenString;
+
     ///
     /// The name array of <PcdCoded> in a module.
-    /// 
+    ///
     private String[]              pcdNameArrayInMsa;
+
     /**
       Set parameter moduleId
-  
+
       @param moduleName   the module name parameter.
     **/
     public void setUsageId(UsageIdentification usageId) {
@@ -81,7 +77,7 @@ public class PCDAutoGenAction extends BuildAction {
 
     /**
        set isBuildUsedLibrary parameter.
-       
+
        @param isBuildUsedLibrary
     **/
     public void setIsBuildUsedLibrary(boolean isBuildUsedLibrary) {
@@ -90,7 +86,7 @@ public class PCDAutoGenAction extends BuildAction {
 
     /**
        set pcdNameArrayInMsa parameter.
-       
+
        @param pcdNameArrayInMsa
      */
     public void setPcdNameArrayInMsa(String[] pcdNameArrayInMsa) {
@@ -99,7 +95,7 @@ public class PCDAutoGenAction extends BuildAction {
 
     /**
       Get the output of generated string for header file.
-  
+
       @return the string of header file for PCD
     **/
     public String OutputH() {
@@ -108,65 +104,63 @@ public class PCDAutoGenAction extends BuildAction {
 
     /**
       Get the output of generated string for C Code file.
-  
+
       @return the string of C code file for PCD
     **/
     public String OutputC() {
         return cAutoGenString;
     }
 
-   
+
     /**
         Construct function
 
         This function mainly initialize some member variable.
-   
+
         @param moduleId             the identification for module
         @param arch                 the architecture for module
         @param isBuildUsedLibary    Is the current module library.
         @param pcdNameArrayInMsa    the pcd name array got from MSA file.
     **/
-    public PCDAutoGenAction(ModuleIdentification moduleId, 
+    public PCDAutoGenAction(ModuleIdentification moduleId,
                             String               arch,
                             boolean              isBuildUsedLibrary,
                             String[]             pcdNameArrayInMsa) {
-        UsageIdentification usageId = new UsageIdentification(moduleId.getName(), 
-                                                              moduleId.getGuid(), 
-                                                              moduleId.getPackage().getName(), 
-                                                              moduleId.getPackage().getGuid(), 
-                                                              arch, 
-                                                              moduleId.getVersion(), 
-                                                              moduleId.getModuleType());
         dbManager       = null;
         hAutoGenString  = "";
         cAutoGenString  = "";
 
-        setUsageId(usageId);
+        setUsageId(new UsageIdentification(moduleId.getName(),
+                                           moduleId.getGuid(),
+                                           moduleId.getPackage().getName(),
+                                           moduleId.getPackage().getGuid(),
+                                           arch,
+                                           moduleId.getVersion(),
+                                           moduleId.getModuleType()));
         setIsBuildUsedLibrary(isBuildUsedLibrary);
         setPcdNameArrayInMsa(pcdNameArrayInMsa);
     }
 
     /**
       check the parameter for action class.
-      
+
       @throws BuildActionException Bad parameter.
     **/
-    public void checkParameter() throws BuildActionException {
-        
+    public void checkParameter() {
     }
 
     /**
       Core execution function for this action class.
-     
+
       All PCD information of this module comes from memory dabase. The collection
       work should be done before this action execution.
-      Currently, we should generated all PCD information(maybe all dynamic) as array 
-      in Pei emulated driver for simulating PCD runtime database. 
-      
+      Currently, we should generated all PCD information(maybe all dynamic) as array
+      in Pei emulated driver for simulating PCD runtime database.
+
       @throws BuildActionException Failed to execute this aciton class.
     **/
-    public void performAction() throws BuildActionException {
-        ActionMessage.debug(this, 
+    public void performAction() {
+        ActionMessage.debug(this,
                             "Starting PCDAutoGenAction to generate autogen.h and autogen.c!...");
         //
         // Check the PCD memory database manager is valid.
@@ -189,7 +183,7 @@ public class PCDAutoGenAction extends BuildAction {
 
     /**
       Generate the autogen string for a common module.
-     
+
       All PCD information of this module comes from memory dabase. The collection
       work should be done before this action execution.
     **/
@@ -207,23 +201,23 @@ public class PCDAutoGenAction extends BuildAction {
         usageInstanceArray = null;
         if (!isBuildUsedLibrary) {
             usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(usageId);
-            dbManager.UsageInstanceContext = usageInstanceArray;
-            dbManager.CurrentModuleName    = moduleName; 
+            MemoryDatabaseManager.UsageInstanceContext = usageInstanceArray;
+            MemoryDatabaseManager.CurrentModuleName    = moduleName;
         } else if ((pcdNameArrayInMsa != null) && (pcdNameArrayInMsa.length > 0)) {
-            usageContext = dbManager.UsageInstanceContext;
+            usageContext = MemoryDatabaseManager.UsageInstanceContext;
             //
-            // For building library package, although all module are library, but PCD entries of 
+            // For building library package, although all module are library, but PCD entries of
             // these library should be used to autogen.
-            // 
+            //
             if (usageContext == null) {
                 usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(usageId);
             } else {
                 usageInstanceArray = new ArrayList<UsageInstance>();
 
                 //
-                // Try to find all PCD defined in library's PCD in all <PcdEntry> in module's 
+                // Try to find all PCD defined in library's PCD in all <PcdEntry> in module's
                 // <ModuleSA> in FPD file.
-                // 
+                //
                 for (index = 0; index < pcdNameArrayInMsa.length; index++) {
                     found = false;
                     for (index2 = 0; index2 < usageContext.size(); index2 ++) {
@@ -238,14 +232,14 @@ public class PCDAutoGenAction extends BuildAction {
                         //
                         // All library's PCD should instanted in module's <ModuleSA> who
                         // use this library instance. If not, give errors.
-                        // 
+                        //
                         throw new BuildActionException (String.format("[PCD Autogen Error] Module %s use library instance %s, the PCD %s " +
                                                                       "is required by this library instance, but can not find " +
                                                                       "it in the %s's <ModuleSA> in FPD file!",
-                                                                      dbManager.CurrentModuleName,
+                                                                      MemoryDatabaseManager.CurrentModuleName,
                                                                       moduleName,
                                                                       pcdNameArrayInMsa[index],
-                                                                      dbManager.CurrentModuleName
+                                                                      MemoryDatabaseManager.CurrentModuleName
                                                                       ));
                     }
                 }
@@ -258,18 +252,18 @@ public class PCDAutoGenAction extends BuildAction {
 
         //
         // Generate all PCD entry for a module.
-        // 
+        //
         for(index = 0; index < usageInstanceArray.size(); index ++) {
             usageInstance = usageInstanceArray.get(index);
             //
             // Before generate any PCD information into autogen.h/autogen.c for a module,
             // generate TokenSpaceGuid array variable firstly. For every dynamicEx type
-            // PCD in this module the token, they are all reference to TokenSpaceGuid 
+            // PCD in this module the token, they are all reference to TokenSpaceGuid
             // array.
-            // 
+            //
             if (usageInstanceArray.get(index).modulePcdType == Token.PCD_TYPE.DYNAMIC_EX) {
                 guidStringArray = usageInstance.parentToken.tokenSpaceName.split("-");
-                guidStringCName = "_gPcd_TokenSpaceGuid_" + 
+                guidStringCName = "_gPcd_TokenSpaceGuid_" +
                                   usageInstance.parentToken.tokenSpaceName.replaceAll("-", "_");
                 guidString      = String.format("{ 0x%s, 0x%s, 0x%s, {0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s, 0x%s}}",
                                                 guidStringArray[0],
@@ -283,22 +277,21 @@ public class PCDAutoGenAction extends BuildAction {
                                                 (guidStringArray[4].substring(6, 8)),
                                                 (guidStringArray[4].substring(8, 10)),
                                                 (guidStringArray[4].substring(10, 12)));
-                
+
                 Pattern pattern = Pattern.compile("(" + guidStringCName + ")+?");
                 Matcher matcher = pattern.matcher(cAutoGenString + " ");
                 //
                 // Find whether this guid array variable has been generated into autogen.c
                 // For different DyanmicEx pcd token who use same token space guid, the token space
                 // guid array should be only generated once.
-                // 
+                //
                 if (!matcher.find()) {
-                    hAutoGenString += String.format("extern EFI_GUID %s;\r\n",
-                                                    guidStringCName);
+                    hAutoGenString += String.format("extern EFI_GUID %s;\r\n", guidStringCName);
                     if (!isBuildUsedLibrary) {
                         cAutoGenString += String.format("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID %s = %s;\r\n",
                                                         guidStringCName,
                                                         guidString);
-                    } 
+                    }
                 }
             }
 
@@ -306,21 +299,21 @@ public class PCDAutoGenAction extends BuildAction {
             //
             // For every PCD entry for this module(usage instance), autogen string would
             // be appand.
-            // 
+            //
             hAutoGenString += usageInstance.getHAutogenStr() + "\r\n";
             cAutoGenString += usageInstance.getCAutogenStr();
         }
 
         //
-        // Work around code, In furture following code should be modified that get 
+        // Work around code, In furture following code should be modified that get
         // these information from Uplevel Autogen tools.
-        // 
+        //
         if (moduleName.equalsIgnoreCase("PcdPeim")) {
-            hAutoGenString += dbManager.PcdPeimHString;
-            cAutoGenString += dbManager.PcdPeimCString;
+            hAutoGenString += MemoryDatabaseManager.PcdPeimHString;
+            cAutoGenString += MemoryDatabaseManager.PcdPeimCString;
         } else if (moduleName.equalsIgnoreCase("PcdDxe")) {
-            hAutoGenString += dbManager.PcdDxeHString;
-            cAutoGenString += dbManager.PcdDxeCString;
+            hAutoGenString += MemoryDatabaseManager.PcdDxeHString;
+            cAutoGenString += MemoryDatabaseManager.PcdDxeCString;
         }
     }
 
@@ -333,18 +326,17 @@ public class PCDAutoGenAction extends BuildAction {
 
         String WorkSpace = "X:/edk2";
         String logFilePath = WorkSpace  + "/EdkNt32Pkg/Nt32.fpd";
-        String[] nameArray = null;
 
         //
         // At first, CollectPCDAction should be invoked to collect
         // all PCD information from SPD, MSA, FPD.
         //
-        CollectPCDAction collectionAction = new CollectPCDAction();
+        PlatformPcdPreprocessActionForBuilding collectionAction = new PlatformPcdPreprocessActionForBuilding();
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
                             WorkSpace,null);
 
         try {
-            collectionAction.perform(WorkSpace, 
+            collectionAction.perform(WorkSpace,
                                      logFilePath,
                                      ActionMessage.MAX_MESSAGE_LEVEL);
         } catch(Exception e) {
