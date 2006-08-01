@@ -67,6 +67,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>org/tianocore/build/ModuleBuildFileGenerator.java</Filename>
     <Filename>org/tianocore/build/OutputDirSetup.java</Filename>
     <Filename>org/tianocore/build/pcd/action/CollectPCDAction.java</Filename>
+    <Filename>org/tianocore/build/pcd/action/PcdDatabase.java</Filename>
     <Filename>org/tianocore/build/pcd/action/PCDAutoGenAction.java</Filename>
     <Filename>org/tianocore/build/toolchain/ConfigReader.java</Filename>
     <Filename>org/tianocore/build/toolchain/ToolChainAttribute.java</Filename>
