@@ -246,6 +246,16 @@ system will be a superior choice for those wishing to compile with gcc.
 Make sure that you select the e2fsprogs development package when you install
 cygwin. It is necessary for the GenFvImage tool.
 
+----------------------------------------
+A Word on gcc for Processor Architectures
+----------------------------------------
+
+Currently gcc support is limited to IA-32 builds, generating IA-32 PE32 images. 
+
+The X64 bit (Intel 64, etc.) support under the gcc compiler does not support the EFIAPI calling convention (as defined in the UEFI 2.0 specification Chapter 2), so it is not possible to build a working EFI image for an X64 environment.  Since the x64 gcc does not support the EFIAPI calling convention the x64 tools do not support generating a PE32+ image.  The EFIAPI calling convention is very similar to the Microsoft x64 calling convention.
+
+On Itanium® Processors the gcc compiler does not support generating a PE32+ image.
+
 -----------------------
 Notes on Documentation
 -----------------------
