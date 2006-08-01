@@ -175,7 +175,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             String[][] saa = new String[instanceCount][5];
             ffc.getLibraryInstances(key, saa);
             for (int i = 0; i < saa.length; ++i) {
-                ModuleIdentification mi = getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
+                ModuleIdentification mi = GlobalData.getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
                 if (mi != null) {
                     saa[i][0] = mi.getName();
                     saa[i][2] = mi.getVersion();
@@ -218,7 +218,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     private void resolveLibraryInstances(String key) {
-        ModuleIdentification mi = getModuleId(key);
+        ModuleIdentification mi = GlobalData.getModuleId(key);
         PackageIdentification[] depPkgList = null;
         try{
             Map<String, XmlObject> m = GlobalData.getNativeMsa(mi);
@@ -326,7 +326,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     private void removeInstance(String key) {
-        ModuleIdentification mi = getModuleId(key); 
+        ModuleIdentification mi = GlobalData.getModuleId(key); 
         //
         // remove pcd information of instance from current ModuleSA
         //
@@ -361,42 +361,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         
     }
     
-    private ModuleIdentification getModuleId(String key){
-        //
-        // Get ModuleGuid, ModuleVersion, PackageGuid, PackageVersion, Arch into string array.
-        //
-        String[] keyPart = key.split(" ");
-        Set<PackageIdentification> spi = GlobalData.getPackageList();
-        Iterator ispi = spi.iterator();
-        
-        while(ispi.hasNext()) {
-            PackageIdentification pi = (PackageIdentification)ispi.next();
-            if ( !pi.getGuid().equals(keyPart[2])){ 
-
-                continue;
-            }
-            if (keyPart[3] != null && keyPart[3].length() > 0 && !keyPart[3].equals("null")){
-                if(!pi.getVersion().equals(keyPart[3])){
-                    continue;
-                }
-            }
-            Set<ModuleIdentification> smi = GlobalData.getModules(pi);
-            Iterator ismi = smi.iterator();
-            while(ismi.hasNext()) {
-                ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                if (mi.getGuid().equals(keyPart[0])){
-                    if (keyPart[1] != null && keyPart[1].length() > 0 && !keyPart[1].equals("null")){
-                        if(!mi.getVersion().equals(keyPart[1])){
-                            continue;
-                        }
-                    }
-
-                    return mi;
-                }
-            }
-        }
-        return null;
-    }
     
     private String[] getClassProduced(ModuleIdentification mi){
         
@@ -668,11 +632,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         ffc.getLibraryInstances(moduleKey, saa);
         
         try{
-            if (ffc.getPcdBuildDataInfo(getModuleId(moduleKey), cName, sa)) {
+            if (ffc.getPcdBuildDataInfo(GlobalData.getModuleId(moduleKey), cName, sa)) {
                 return;
             }
             for (int j = 0; j < saa.length; ++j) {
-                if (ffc.getPcdBuildDataInfo(getModuleId(saa[j][1] + " " + saa[j][2] + " " + saa[j][3] + " " + saa[j][4]),
+                if (ffc.getPcdBuildDataInfo(GlobalData.getModuleId(saa[j][1] + " " + saa[j][2] + " " + saa[j][3] + " " + saa[j][4]),
                                             cName, sa)) {
                     return;
                 }
@@ -880,8 +844,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         while(li.hasNext()) {
                             String instance = li.next();
                             String[] s = {"", "", "", "", ""};
-                            if (getModuleId(instance) != null) {
-                                s[0] = getModuleId(instance).getName();
+                            if (GlobalData.getModuleId(instance) != null) {
+                                s[0] = GlobalData.getModuleId(instance).getName();
                             }
                             
                             String[] instancePart = instance.split(" ");
@@ -1020,7 +984,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     libInstanceTableModel.getValueAt(row, 2) + " " +
                     libInstanceTableModel.getValueAt(row, 3) + " " +
                     libInstanceTableModel.getValueAt(row, 4);
-                    ModuleIdentification libMi = getModuleId(instanceValue);
+                    ModuleIdentification libMi = GlobalData.getModuleId(instanceValue);
                     ffc.genLibraryInstance(libMi, moduleKey);
                     //
                     // Add pcd information of selected instance to current moduleSA
@@ -1029,7 +993,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         ffc.addFrameworkModulesPcdBuildDefs(libMi, null, ffc.getModuleSA(moduleKey));
                     }
                     catch (Exception exception) {
-                        JOptionPane.showMessageDialog(frame, "PCD Insertion Fail. " + exception.getMessage());
+                        JOptionPane.showMessageDialog(frame, "Adding Instance" + s[0] + ": "+ exception.getMessage());
                     }
                     resolveLibraryInstances(instanceValue);
                 }
