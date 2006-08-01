@@ -25,55 +25,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="BUILD_DIR" value="${PACKAGE_DIR}/${ToolName}/tmp"/>
 
   <target name="GenTool" depends="init, Tool">
-    <echo message="Building the EDK Tool: ${ToolName}"/>
+    <if>
+      <isfalse value="${gcc}"/>
+      <then>
+        <echo message="The EDK Tool: ${ToolName} build has completed!"/>
+      </then>
+    </if>
   </target>
 
   <target name="init">
-    <echo message="The EDK Tool: ${ToolName}"/>
-    <mkdir dir="${BUILD_DIR}"/>
     <if>
-      <equals arg1="${GCC}" arg2="cygwin"/>
+      <istrue value="${gcc}"/>
       <then>
-        <echo message="Cygwin Family"/>
-        <property name="ToolChain" value="gcc"/>
+        <echo message="The EDK Tool: ${ToolName} is not built for GCC!"/>
       </then>
-    <elseif>
-      <os family="dos"/>
-      <then>
-        <echo message="Windows Family"/>
-        <property name="ToolChain" value="msvc"/>
-      </then>
-    </elseif>
-    <elseif>
-      <os family="unix"/>
-      <then>
-        <echo message="UNIX Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    </elseif>
-
-    <else>
-      <echo>
-        Unsupported Operating System
-        Please Contact Intel Corporation
-      </echo>
-    </else>
-    </if>
-    <if>
-      <equals arg1="${ToolChain}" arg2="msvc"/>
-      <then>
-        <property name="ext_static" value=".lib"/>
-        <property name="ext_dynamic" value=".dll"/>
-        <property name="ext_exe" value=".exe"/>
-      </then>
-      <elseif>
-        <equals arg1="${ToolChain}" arg2="gcc"/>
-        <then>
-          <property name="ext_static" value=".a"/>
-          <property name="ext_dynamic" value=".so"/>
-          <property name="ext_exe" value=""/>
-        </then>
-      </elseif>
+      <else>
+        <echo message="Building the EDK Tool: ${ToolName}"/>
+        <mkdir dir="${BUILD_DIR}"/>
+      </else>
     </if>
   </target>
 
@@ -81,7 +50,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
-        libtool="${haveLibtool}"
         optimize="speed">
 
       <fileset dir="${basedir}/${ToolName}" 
@@ -97,17 +65,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </cc>
   </target>
 
-  <target name="clean" depends="init">
+  <target name="clean">
     <echo message="Removing Intermediate Files Only"/>  
-    <delete>
-      <fileset dir="${BUILD_DIR}" includes="*.obj"/>
+    <delete failonerror="false" quiet="true" includeEmptyDirs="true">
+      <fileset dir="${BUILD_DIR}"/>
     </delete>
   </target>
 
-  <target name="cleanall" depends="init">
+  <target name="cleanall">
     <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
-    <delete dir="${BUILD_DIR}">
-      <fileset dir="${BIN_DIR}" includes="${ToolName}${ext_exe}"/>
+    <delete failonerror="false" quiet="true" includeEmptyDirs="true">
+      <fileset dir="${BUILD_DIR}"/>
+      <fileset file="${BIN_DIR}/${ToolName}${ext_exe}"/>
     </delete>
   </target>
 

@@ -40,8 +40,8 @@ PCCTS_H=../h
 #   UNIX  (default)
 #
 CC=cc
-ANTLR=../bin/antlr
-DLG=../bin/dlg
+ANTLR=${WORKSPACE}/Tools/bin/antlr
+DLG=${WORKSPACE}/Tools/bin/dlg
 OBJ_EXT=o
 OUT_OBJ = -o
 ANSI=-ansi
@@ -57,7 +57,7 @@ OBJ=antlr.o scan.o err.o bits.o build.o fset2.o fset.o gen.o \
 
 antlr : $(OBJ) $(SRC)
 		$(CC) $(CFLAGS) -o antlr $(OBJ)
-		mv antlr ../bin
+		mv antlr ${WORKSPACE}/Tools/bin
 
 # what files does PCCTS generate (both ANTLR and DLG)
 PCCTS_GEN=antlr.c scan.c err.c tokens.h mode.h parser.dlg stdpccts.h remap.h

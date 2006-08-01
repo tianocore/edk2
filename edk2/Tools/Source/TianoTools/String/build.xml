@@ -23,57 +23,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="BUILD_DIR" value="${PACKAGE_DIR}/${LibName}/tmp"/>
 
   <target name="GenTool" depends="init, String">
-    <echo message="Building the EDK Tool: ${LibName}"/>
+    <echo message="The EDK Library: ${LibName} build has completed!"/>
   </target>
 
   <target name="init">
-    <echo message="The EDK Library: ${LibName}"/>
+    <echo message="Building the EDK Library: ${LibName}"/>
     <mkdir dir="${BUILD_DIR}"/>
-    <if>
-      <equals arg1="${GCC}" arg2="cygwin"/>
-      <then>
-        <echo message="Cygwin Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    <elseif>
-      <os family="dos"/>
-      <then>
-        <echo message="Windows Family"/>
-        <property name="ToolChain" value="msvc"/>
-      </then>
-    </elseif>
-    <elseif>
-      <os family="unix"/>
-      <then>
-        <echo message="UNIX Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    </elseif>
-
-    <else>
-      <echo>
-        Unsupported Operating System
-        Please Contact Intel Corporation
-      </echo>
-    </else>
-    </if>
-        <property name="ToolChain" value="gcc"/>
-    <if>
-      <equals arg1="${ToolChain}" arg2="msvc"/>
-      <then>
-        <property name="ext_static" value=".lib"/>
-        <property name="ext_dynamic" value=".dll"/>
-        <property name="ext_exe" value=".exe"/>
-      </then>
-      <elseif>
-        <equals arg1="${ToolChain}" arg2="gcc"/>
-        <then>
-          <property name="ext_static" value=".a"/>
-          <property name="ext_dynamic" value=".so"/>
-          <property name="ext_exe" value=""/>
-        </then>
-      </elseif>
-    </if>
 
     <condition property="syslibdirs" value="">
       <os family="mac"/>
@@ -121,16 +76,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
 
-  <target name="clean" depends="init">
+  <target name="clean">
     <echo message="Removing Intermediate Files Only"/>  
     <delete>
       <fileset dir="${BUILD_DIR}" includes="*.obj"/>
     </delete>
   </target>
 
-  <target name="cleanall" depends="init">
-    <echo message="Removing Object Files and the Executable: ${LibName}${ext_exe}"/>  
+  <target name="cleanall">
+    <echo message="Removing Object Files and the Library: ${LibName}${ext_static}"/>  
     <delete dir="${PACKAGE_DIR}/${LibName}/tmp">
+    </delete>
+    <delete failonerror="false" quiet="true" includeEmptyDirs="true">
+      <fileset dir="${BUILD_DIR}"/>
+      <fileset file="${LIB_DIR}/${LibName}${ext_static}"/>
     </delete>
   </target>
 

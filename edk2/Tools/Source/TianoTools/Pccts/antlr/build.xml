@@ -21,51 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
 
   <target name="init">
-    <echo message="The EDK Tool: ${ToolName}"/>
-    <if>
-      <equals arg1="${GCC}" arg2="cygwin"/>
-      <then>
-        <echo message="Cygwin Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    <elseif>
-      <os family="dos"/>
-      <then>
-        <echo message="Windows Family"/>
-        <property name="ToolChain" value="msvc"/>
-      </then>
-    </elseif>
-    <elseif>
-      <os family="unix"/>
-      <then>
-        <echo message="UNIX Family"/>
-        <property name="ToolChain" value="gcc"/>
-      </then>
-    </elseif>
-
-    <else>
-      <echo>
-        Unsupported Operating System
-        Please Contact Intel Corporation
-      </echo>
-    </else>
-    </if>
-		<if>
-		  <equals arg1="${ToolChain}" arg2="msvc"/>
-			<then>
-        <property name="ext_static" value=".lib"/>
-        <property name="ext_dynamic" value=".dll"/>
-        <property name="ext_exe" value=".exe"/>
-			</then>
-			<elseif>
-			  <equals arg1="${ToolChain}" arg2="gcc"/>
-				<then>
-          <property name="ext_static" value=".a"/>
-          <property name="ext_dynamic" value=".so"/>
-          <property name="ext_exe" value=""/>
-				</then>
-			</elseif>
-		</if>
 		<condition property="CheckDepends">
 		  <uptodate targetfile="${WORKSPACE}/Tools/bin/antlr.exe">
 			  <srcfiles dir="." includes="*.c *.h *.g"/>
@@ -76,67 +31,99 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 			<then>
 				<echo message="Executable, antlr.exe, is up to date."/>
 			</then>
+      <else>
+        <echo message="Building the EDK Pccts Tool: ${ToolName}"/>
+      </else>
 		</if>
   </target>
 
   <target name="GenTool" depends="init" unless="CheckDepends">
-    <echo message="Building the EDK Tool: ${ToolName}"/>
     <if>
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
-    	  <exec dir="${basedir}" executable="nmake" failonerror="TRUE">
+    	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="nmake" failonerror="TRUE">
 	    	  <arg line="-f AntlrMS.mak"/>
     		</exec>
 		  </then>
-		<elseif>
-      <equals arg1="${ToolChain}" arg2="gcc"/>
-			<then>
-    	  <exec dir="${basedir}" executable="make" failonerror="TRUE">
-	    	  <arg line="-f makefile"/>
-    		</exec>
-		  </then>
-		</elseif>
+	  	<elseif>
+        <istrue value="${cygwin}"/>
+		    <then>
+    	    <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="TRUE">
+	      	  <arg line="-f makefile.cygwin"/>
+    	  	</exec>
+		    </then>
+      </elseif>
+      <elseif>
+        <istrue value="${gcc}"/>
+        <then>
+    	    <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="TRUE">
+	      	  <arg line="-f makefile"/>
+    	  	</exec>
+        </then>
+		  </elseif>
 		</if>
+    <echo message="The EDK Tool: ${ToolName} build has completed!"/>
 	</target>
 
-  <target name="clean" depends="init">
+  <target name="clean">
     <echo message="Removing Intermediate Files Only"/>  
     <if>
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
-    	  <exec dir="${basedir}" executable="nmake" failonerror="TRUE">
+    	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="nmake" failonerror="TRUE">
 	    	  <arg line="-f AntlrMS.mak clean"/>
     		</exec>
 		  </then>
+    <elseif>
+      <istrue value="${cygwin}"/>
+      <then>
+    	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="TRUE">
+	    	  <arg line="-f makefile.cygwin clean"/>
+    		</exec>
+      </then>
+		</elseif>
 		<elseif>
-      <equals arg1="${ToolChain}" arg2="gcc"/>
-			<then>
-    	  <exec dir="${basedir}" executable="make" failonerror="TRUE">
+      <istrue value="${gcc}"/>
+      <then>
+    	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="TRUE">
 	    	  <arg line="-f makefile clean"/>
     		</exec>
-		  </then>
+      </then>
 		</elseif>
 		</if>
   </target>
 
-  <target name="cleanall" depends="init">
+  <target name="cleanall">
     <echo message="Removing Object Files and the Executable: ${ToolName}${ext_exe}"/>  
     <if>
       <equals arg1="${ToolChain}" arg2="msvc"/>
 			<then>
-    	  <exec dir="${basedir}" executable="nmake" failonerror="FALSE">
+    	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="nmake" failonerror="FALSE">
 	    	  <arg line="-f AntlrMS.mak clean"/>
     		</exec>
 		  </then>
 		<elseif>
-      <equals arg1="${ToolChain}" arg2="gcc"/>
+      <istrue value="${cygwin}"/>
 			<then>
-    	  <exec dir="${basedir}" executable="make" failonerror="FALSE">
-	    	  <arg line="-f makefile clean"/>
+        <echo message="Building antlr with cygwin gcc"/>
+    	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="FALSE">
+	    	  <arg line="-f makefile.cygwin clean"/>
     		</exec>
 		  </then>
 		</elseif>
+		<elseif>
+      <istrue value="${gcc}"/>
+      <then>
+        <echo message="Building antlr with gcc"/>
+    	  <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="FALSE">
+	    	  <arg line="-f makefile clean"/>
+    		</exec>
+      </then>
+		</elseif>
 		</if>
+    <delete failonerror="false" quiet="true" includeEmptyDirs="true">
+      <fileset file="${BIN_DIR}/${ToolName}${ext_exe}"/>
+    </delete>
   </target>
 
 </project>
