@@ -22,6 +22,7 @@ public class SkuInstance {
     /// The id number of this SKU instance
     ///
     public int              id;
+
     ///
     /// The value of this SKU instance
     ///
@@ -38,6 +39,9 @@ public class SkuInstance {
         this.value = value;
     }
 
+    /**
+      Default constructor function.  
+    **/
     public SkuInstance() {
         this.id    = 0;
         this.value = new DynamicTokenValue();
