@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -534,7 +535,24 @@ public class FpdHeader extends IInternalFrame {
         if (ffc.getFpdHdrSpec() != null) {
             jTextFieldSpecification.setText(ffc.getFpdHdrSpec());
         }
-        ffc.setFpdHdrSpec(jTextFieldSpecification.getText());    
+        ffc.setFpdHdrSpec(jTextFieldSpecification.getText());
+        
+        ffc.genPlatformDefsSkuInfo("0", "DEFAULT");
+        Vector<Object> v = new Vector<Object>();
+        ffc.getPlatformDefsSupportedArchs(v);
+        if (v.size() == 0) {
+            v.add("IA32");
+            ffc.setPlatformDefsSupportedArchs(v);
+        }
+        v.removeAllElements();
+        ffc.getPlatformDefsBuildTargets(v);
+        if (v.size() == 0) {
+            v.add("DEBUG");
+            ffc.setPlatformDefsBuildTargets(v);
+        }
+        if (ffc.getPlatformDefsInterDir() == null) {
+            ffc.setPlatformDefsInterDir("UNIFIED");
+        }
     }
 
     /**
