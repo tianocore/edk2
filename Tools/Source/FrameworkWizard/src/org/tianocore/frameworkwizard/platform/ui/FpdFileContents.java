@@ -906,6 +906,25 @@ public class FpdFileContents {
         fpdPcd.setTokenSpaceGuidCName(tsGuid);
         fpdPcd.setDatumType(PcdDataTypes.Enum.forString(dataType));
         fpdPcd.setItemType(PcdItemTypes.Enum.forString(itemType));
+        if (dataType.equals("UINT8")){
+            fpdPcd.setMaxDatumSize(1);
+        }
+        if (dataType.equals("UINT16")) {
+            fpdPcd.setMaxDatumSize(2);
+        }
+        if (dataType.equals("UINT32")) {
+            fpdPcd.setMaxDatumSize(4);
+        }
+        if (dataType.equals("UINT64")){
+            fpdPcd.setMaxDatumSize(8);
+        }
+        if (dataType.equals("BOOLEAN")){
+            fpdPcd.setMaxDatumSize(1);
+        }
+        if (dataType.equals("VOID*")) {
+            int maxSize = setMaxSizeForPointer(fpdPcd.getValue());
+            fpdPcd.setMaxDatumSize(maxSize);
+        }
         
         if (itemType.equals("DYNAMIC") || itemType.equals("DYNAMIC_EX")) {
             ArrayList<String> al = LookupDynamicPcdBuildDefinition(cName + " " + tsGuid);
@@ -932,6 +951,7 @@ public class FpdFileContents {
                     fpdPcd.setValue("");
                 }
             }
+            /*
             if (dataType.equals("UINT8")){
                 fpdPcd.setMaxDatumSize(1);
             }
@@ -951,6 +971,7 @@ public class FpdFileContents {
                 int maxSize = setMaxSizeForPointer(fpdPcd.getValue());
                 fpdPcd.setMaxDatumSize(maxSize);
             }
+            */
         }
     }
     

@@ -93,6 +93,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private DefaultTableModel optionsTableModel = null;
     private FpdFileContents ffc = null;
     private String moduleKey = null;
+    private int moduleSaNum = -1;
     private HashMap<String, ArrayList<String>> classInstanceMap = null;
     private ArrayList<String> classProduced = null;
     private HashMap<String, ArrayList<String>> classConsumed = null;
@@ -135,6 +136,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     
     public void setKey(String k, int i, OpeningPlatformType dc){
         this.moduleKey = k;
+        moduleSaNum = i;
         this.docConsole = dc;
         classProduced = null;
         classConsumed = null;
@@ -196,14 +198,17 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         //
         // display module SA options
         //
+        jTextFieldFvBinding.setText("");
         String fvBinding = ffc.getFvBinding(key);
         if (fvBinding != null) {
             jTextFieldFvBinding.setText(fvBinding);
         }
+        jTextFieldFileGuid.setText("");
         String fileGuid = ffc.getFfsFileNameGuid(key);
         if (fileGuid != null) {
             jTextFieldFileGuid.setText(fileGuid);
         }
+        jTextFieldFfsKey.setText("");
         String ffsKey = ffc.getFfsFormatKey(key);
         if (ffsKey != null) {
             jTextFieldFfsKey.setText(ffsKey);
@@ -471,7 +476,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanelPcd.add(getJPanelPcdSouth(), java.awt.BorderLayout.SOUTH);
             jPanelPcd.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-//                    initPcdBuildDefinition(moduleKey);
+                    initPcdBuildDefinition(moduleSaNum);
                 }
             });
             
@@ -1183,7 +1188,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JTextField getJTextFieldFfsKey() {
         if (jTextFieldFfsKey == null) {
             jTextFieldFfsKey = new JTextField();
-            jTextFieldFfsKey.setPreferredSize(new java.awt.Dimension(150,20));
+            jTextFieldFfsKey.setPreferredSize(new java.awt.Dimension(250,20));
             jTextFieldFfsKey.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     String originalFfsKey = ffc.getFfsFormatKey(moduleKey);
