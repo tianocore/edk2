@@ -873,6 +873,7 @@ public class FpdFileContents {
         //
         // Special dynamic type, if this pcd already exists in other ModuleSA
         //
+        /* Comment out Item type checking temporarily.
         if (itemType.equals("DYNAMIC")) {
             
             ListIterator li = pcdConsumer.listIterator();
@@ -898,7 +899,7 @@ public class FpdFileContents {
                 }
             }
         }
-        
+        */
         PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData fpdPcd = moduleSa.getPcdBuildDefinition().addNewPcdData();
         fpdPcd.setCName(cName);
         fpdPcd.setToken(token);
@@ -2320,7 +2321,7 @@ public class FpdFileContents {
         if (fpdHdr == null) {
             fpdHdr = fpdRoot.addNewPlatformHeader();
         }
-        genPlatformDefsSkuInfo("0", "DEFAULT");
+        
         return fpdHdr;
     }
     
