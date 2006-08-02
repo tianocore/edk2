@@ -36,7 +36,10 @@
 ;------------------------------------------------------------------------------
 InternalX86EnablePaging64 PROC
     cli
-    mov     dword ptr [rsp], @F         ; offset for far retf, seg is the 1st arg
+    pop     rax
+    call    @Base
+@Base:
+    add     dword ptr [rsp], @F - @Base ; offset for far retf, seg is the 1st arg
     mov     rax, cr4                    ; mov eax, cr4
     or      al, (1 SHL 5)
     mov     cr4, rax                    ; enable PAE
