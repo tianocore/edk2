@@ -116,7 +116,7 @@ public class VariablesDlg extends IDialog {
             jTextFieldVariableName.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldVariableName.setLocation(new java.awt.Point(168, 12));
             jTextFieldVariableName
-                                  .setToolTipText("Enter a Hex Word Array, you must provide leading Zeros. 0x000a, 0x0010, 0x00FF");
+                                  .setToolTipText("Enter a string; the tool will convert to Unicode hex");
         }
         return jTextFieldVariableName;
     }
