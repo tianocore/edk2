@@ -51,14 +51,21 @@ import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 import javax.swing.JComboBox;
 
+/**
+ The class is used to provide functions to clone workspace, module, package and platform
+ It extends IDialog
+
+ **/
 public class Clone extends IDialog {
 
-    /**
-     Define class members
-     
-     **/
+    ///
+    /// Define Class Serial Version UID
+    ///
     private static final long serialVersionUID = -5469299324965727137L;
 
+    ///
+    /// Define Class Members
+    ///
     private JPanel jContentPane = null;
 
     private JLabel jLabelType = null;
@@ -93,15 +100,19 @@ public class Clone extends IDialog {
 
     private JButton jButtonGenerateGuid = null;
 
+    private JLabel jLabelBelong = null;
+
+    private JComboBox jComboBoxExistingPackage = null;
+
+    ///
+    /// Define members not for UI
+    ///
+
     private int mode = -1;
 
     private Vector<PackageIdentification> packages = null;
 
     private WorkspaceTools wt = new WorkspaceTools();
-
-    private JLabel jLabelBelong = null;
-
-    private JComboBox jComboBoxExistingPackage = null;
 
     private Identification oldId = null;
 
@@ -114,10 +125,11 @@ public class Clone extends IDialog {
     private PlatformIdentification fid = null;
 
     /**
-     * This method initializes jTextFieldType	
-     * 	
-     * @return javax.swing.JTextField	
-     */
+     This method initializes jTextFieldType	
+     
+     @return javax.swing.JTextField
+     
+     **/
     private JTextField getJTextFieldType() {
         if (jTextFieldType == null) {
             jTextFieldType = new JTextField();
@@ -128,10 +140,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jTextFieldSource	
-     * 	
-     * @return javax.swing.JTextField	
-     */
+     This method initializes jTextFieldSource	
+     
+     @return javax.swing.JTextField	
+     
+     **/
     private JTextField getJTextFieldSource() {
         if (jTextFieldSource == null) {
             jTextFieldSource = new JTextField();
@@ -142,10 +155,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jButtonBrowse	
-     * 	
-     * @return javax.swing.JButton	
-     */
+     This method initializes jButtonBrowse	
+     
+     @return javax.swing.JButton	
+     
+     **/
     private JButton getJButtonBrowse() {
         if (jButtonBrowse == null) {
             jButtonBrowse = new JButton();
@@ -157,10 +171,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jTextFieldDestinationFile	
-     * 	
-     * @return javax.swing.JTextField	
-     */
+     This method initializes jTextFieldDestinationFile	
+     
+     @return javax.swing.JTextField	
+     
+     **/
     private JTextField getJTextFieldFilePath() {
         if (jTextFieldFilePath == null) {
             jTextFieldFilePath = new JTextField();
@@ -170,10 +185,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jTextFieldBaseName	
-     * 	
-     * @return javax.swing.JTextField	
-     */
+     This method initializes jTextFieldBaseName	
+     
+     @return javax.swing.JTextField	
+     
+     **/
     private JTextField getJTextFieldBaseName() {
         if (jTextFieldBaseName == null) {
             jTextFieldBaseName = new JTextField();
@@ -183,10 +199,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jTextFieldGuid	
-     * 	
-     * @return javax.swing.JTextField	
-     */
+     This method initializes jTextFieldGuid	
+     
+     @return javax.swing.JTextField	
+     
+     **/
     private JTextField getJTextFieldGuid() {
         if (jTextFieldGuid == null) {
             jTextFieldGuid = new JTextField();
@@ -196,10 +213,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jTextFieldVersion	
-     * 	
-     * @return javax.swing.JTextField	
-     */
+     This method initializes jTextFieldVersion	
+     
+     @return javax.swing.JTextField	
+     
+     **/
     private JTextField getJTextFieldVersion() {
         if (jTextFieldVersion == null) {
             jTextFieldVersion = new JTextField();
@@ -209,10 +227,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jButtonOk	
-     * 	
-     * @return javax.swing.JButton	
-     */
+     This method initializes jButtonOk	
+     
+     @return javax.swing.JButton	
+     
+     **/
     private JButton getJButtonOk() {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
@@ -224,10 +243,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jButtonCancel	
-     * 	
-     * @return javax.swing.JButton	
-     */
+     This method initializes jButtonCancel	
+     
+     @return javax.swing.JButton	
+     
+     **/
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
@@ -239,10 +259,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jButtonGenerateGuid	
-     * 	
-     * @return javax.swing.JButton	
-     */
+     This method initializes jButtonGenerateGuid	
+     
+     @return javax.swing.JButton	
+     
+     **/
     private JButton getJButtonGenerateGuid() {
         if (jButtonGenerateGuid == null) {
             jButtonGenerateGuid = new JButton();
@@ -254,10 +275,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jComboBoxExistingPackage	
-     * 	
-     * @return javax.swing.JComboBox	
-     */
+     This method initializes jComboBoxExistingPackage	
+     
+     @return javax.swing.JComboBox	
+     
+     **/
     private JComboBox getJComboBoxExistingPackage() {
         if (jComboBoxExistingPackage == null) {
             jComboBoxExistingPackage = new JComboBox();
@@ -267,24 +289,21 @@ public class Clone extends IDialog {
     }
 
     /**
-     
-     @param args
+     This is the default constructor
      
      **/
-    public static void main(String[] args) {
-
-    }
-
-    /**
-     * This is the default constructor
-     */
     public Clone() {
         super();
         init();
     }
 
     /**
-     This is the default constructor
+     This is the override constructor
+     
+     @param parentFrame       The parent frame which starts this frame
+     @param modal             To identify the frame's modal
+     @param fileType          To identify the clone target type
+     @param identification    The clone target's identification
      
      **/
     public Clone(IFrame parentFrame, boolean modal, int fileType, Identification identification) {
@@ -311,10 +330,9 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes this
-     * 
-     * @return void
-     */
+     This method initializes this
+     
+     **/
     private void init() {
         this.setSize(550, 260);
         this.setContentPane(getJContentPane());
@@ -323,12 +341,17 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes this
-     * 
-     * @return void
-     */
+     This method initializes this with given clone target type.
+     Customize the frame interface via different clone target type.
+     
+     @param mode To identify the clone target type
+     
+     **/
     private void init(int mode) {
         init();
+        //
+        // For MODULE_SURFACE_AREA
+        //
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
             this.jTextFieldType.setText(DataType.MODULE_SURFACE_AREA);
             String s = oldId.getPath();
@@ -341,6 +364,9 @@ public class Clone extends IDialog {
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Module Path and Filename");
         }
+        //
+        // For PACKAGE_SURFACE_AREA
+        //
         if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
             this.jTextFieldType.setText(DataType.PACKAGE_SURFACE_AREA);
             String s = oldId.getPath();
@@ -353,6 +379,9 @@ public class Clone extends IDialog {
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Package Path and Filename");
         }
+        //
+        // For PLATFORM_SURFACE_AREA
+        //
         if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
             this.jTextFieldType.setText(DataType.PLATFORM_SURFACE_AREA);
             this.jTextFieldSource.setText(oldId.getPath());
@@ -362,6 +391,9 @@ public class Clone extends IDialog {
                                    .setToolTipText("Select platform path here. For example, C:\\MyWorkspace\\EdkNt32Pkg\\Nt32.fpd");
             this.jLabelDestinationFile.setText("New Platform Path and Filename");
         }
+        //
+        // For WORKSPACE
+        //
         if (mode == DataType.RETURN_TYPE_WORKSPACE) {
             this.jTextFieldType.setText(DataType.WORKSPACE);
             this.jTextFieldSource.setText(Workspace.getCurrentWorkspace());
@@ -380,10 +412,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     * This method initializes jContentPane
-     * 
-     * @return javax.swing.JPanel
-     */
+     This method initializes jContentPane
+     
+     @return javax.swing.JPanel
+     
+     **/
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jLabelBelong = new JLabel();
@@ -446,6 +479,9 @@ public class Clone extends IDialog {
         if (arg0.getSource() == jButtonOk) {
             if (this.check()) {
                 try {
+                    //
+                    // Save to file
+                    //
                     this.save();
                 } catch (IOException e) {
                     Log.wrn("Clone", e.getMessage());
@@ -471,7 +507,7 @@ public class Clone extends IDialog {
         }
 
         //
-        // Use different file ext
+        // Use different file ext for different clone target type
         //
         if (arg0.getSource() == this.jButtonBrowse) {
             JFileChooser fc = new JFileChooser();
@@ -501,9 +537,14 @@ public class Clone extends IDialog {
         }
     }
 
-    //
-    // Check name, guid and version
-    //
+    /**
+     Check name, guid and version.
+     If all of them are valid, save information to new id
+     
+     @retval true   All name, guid and version are valid
+     @retval false  Any one of name, guid and version is invalid
+     
+     **/
     private boolean checkId() {
         //
         // Check Basename
@@ -555,7 +596,8 @@ public class Clone extends IDialog {
     /**
      Check before save
      
-     @return
+     @retval true   All check points are passed
+     @retval false  Any one of check points is failed
      
      **/
     private boolean check() {
@@ -598,10 +640,6 @@ public class Clone extends IDialog {
         // Check for Module
         //
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
-            //            if (trg.indexOf(DataType.DOS_FILE_SEPARATOR) == -1 && trg.indexOf(DataType.UNIX_FILE_SEPARATOR) == -1) {
-            //                Log.err("The module name must include a path");
-            //                return false;
-            //            }
             trg = this.getModulePath();
             if (src.equals(trg)) {
                 Log.wrn("Clone", "The source and destination couldn't be same");
@@ -655,6 +693,14 @@ public class Clone extends IDialog {
         return true;
     }
 
+    /**
+     Save clone target to new location
+     
+     @throws IOException
+     @throws XmlException
+     @throws Exception
+     
+     **/
     private void save() throws IOException, XmlException, Exception {
         String src = this.oldId.getPath();
         String trg = this.jTextFieldFilePath.getText();
@@ -703,7 +749,7 @@ public class Clone extends IDialog {
             msa.getMsaHeader().setVersion(newId.getVersion());
 
             //
-            // Update Cloned From element
+            // Update <Cloned> Section
             //
             updateModuleClonedId(msa, oldId);
 
@@ -743,22 +789,15 @@ public class Clone extends IDialog {
             newId.setPath(trg);
             vFiles = wt.getAllPakcageFilesPath(src);
 
+            //
+            // First copy all files to new directory
+            //
             FileOperation.copyFile(src, trg);
             for (int index = 1; index < vFiles.size(); index++) {
                 String oldFile = vFiles.get(index);
                 String newFile = vFiles.get(index).replace(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
                 FileOperation.copyFile(oldFile, newFile);
             }
-
-            //
-            // First copy all files to new directory
-            //
-            //FileOperation.copyFolder(Tools.getFilePathOnly(src), Tools.getFilePathOnly(trg));
-
-            //
-            // Delete old spd file
-            //
-            //FileOperation.delFile(Tools.getFilePathOnly(trg) + DataType.FILE_SEPARATOR + Tools.getFileNameOnly(src));
 
             //
             // Create new spd file
@@ -774,7 +813,7 @@ public class Clone extends IDialog {
             spd.getSpdHeader().setVersion(newId.getVersion());
 
             //
-            // Update Cloned From element
+            // Update <Cloned> Section
             //
             updatePackageClonedId(spd, oldId);
 
@@ -835,10 +874,23 @@ public class Clone extends IDialog {
         vFiles = null;
     }
 
+    /**
+     Get the path of selected package
+     
+     @return String The path of selected package
+     
+     **/
     private String getSelectPackagePath() {
         return Tools.getFilePathOnly(packages.elementAt(this.jComboBoxExistingPackage.getSelectedIndex()).getPath());
     }
 
+    /**
+     Get the path of source module
+     Since the path of source module is relative, make it up to full path.
+     
+     @return String The full path of source module
+     
+     **/
     private String getModulePath() {
         String trg = this.jTextFieldFilePath.getText();
         trg = Tools.addPathExt(trg, mode);
@@ -847,6 +899,13 @@ public class Clone extends IDialog {
         return trg;
     }
 
+    /**
+     Get the path of source package
+     Since the path of source package is relative, make it up to full path.
+     
+     @return String The full path of source package
+     
+     **/
     private String getPackagePath() {
         String trg = this.jTextFieldFilePath.getText();
         trg = Tools.addPathExt(trg, mode);
@@ -856,11 +915,11 @@ public class Clone extends IDialog {
     }
 
     /**
-     Set target item's Cloned From element
-
-     @param id
-     @return
-
+     Set msa file's <Cloned> section via given identification
+     
+     @param msa ModuleSurfaceArea for clone target
+     @param id Identification of clone source
+     
      **/
     private void updateModuleClonedId(ModuleSurfaceArea msa, Identification id) {
         //
@@ -914,10 +973,10 @@ public class Clone extends IDialog {
     }
 
     /**
-     Set target item's Cloned From element
+     Set spd file's <Cloned> section via given identification
      
-     @param id
-     @return
+     @param spd PackageSurfaceArea for clone target
+     @param id Identification of clone source
      
      **/
     private void updatePackageClonedId(PackageSurfaceArea spd, Identification id) {
@@ -970,10 +1029,10 @@ public class Clone extends IDialog {
     }
 
     /**
-     Set target item's Cloned From element
+     Set fpd file's <Cloned> section via given identification
      
-     @param id
-     @return
+     @param fpd PlatformSurfaceArea for clone target
+     @param id Identification of clone source
      
      **/
     private void updatePlatformClonedId(PlatformSurfaceArea fpd, Identification id) {
@@ -1025,26 +1084,62 @@ public class Clone extends IDialog {
         fpd.setPlatformDefinitions(pd);
     }
 
+    /**
+     Get PlatformIdentification
+     
+     @return PlatformIdentification
+     
+     **/
     public PlatformIdentification getFid() {
         return fid;
     }
 
+    /**
+     Set PlatformIdentification
+     
+     @param fid PlatformIdentification
+     
+     **/
     public void setFid(PlatformIdentification fid) {
         this.fid = fid;
     }
 
+    /**
+     Get ModuleIdentification
+     
+     @return ModuleIdentification
+     
+     **/
     public ModuleIdentification getMid() {
         return mid;
     }
 
+    /**
+     Set ModuleIdentification
+     
+     @param mid ModuleIdentification
+     
+     **/
     public void setMid(ModuleIdentification mid) {
         this.mid = mid;
     }
 
+    /**
+     Get PackageIdentification
+     
+     @return PackageIdentification
+     
+     **/
     public PackageIdentification getPid() {
         return pid;
     }
 
+    /**
+     Set PackageIdentification
+     
+     @param pid PackageIdentification
+     
+     **/
     public void setPid(PackageIdentification pid) {
         this.pid = pid;
     }

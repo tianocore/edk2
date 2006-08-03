@@ -430,13 +430,6 @@ public class VariablesDlg extends IDialog {
             return false;
         }
 
-        if (!isEmpty(this.jTextFieldVariableName.getText())) {
-            if (!DataValidation.isHexWordArrayType(this.jTextFieldVariableName.getText())) {
-                Log.wrn("Update Variables", "Incorrect data type for Variable Name");
-                return false;
-            }
-        }
-
         //
         // Check FeatureFlag
         //

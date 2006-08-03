@@ -221,7 +221,7 @@ public class ModuleVariables extends IInternalFrame {
         if (this.variables != null) {
             if (this.variables.getVariableList().size() > 0) {
                 for (int index = 0; index < this.variables.getVariableList().size(); index++) {
-                    String arg0 = variables.getVariableList().get(index).getVariableName();
+                    String arg0 = Tools.convertUnicodeHexStringToString(variables.getVariableList().get(index).getVariableName());
                     String arg1 = variables.getVariableList().get(index).getGuidCName();
                     String arg2 = null;
                     if (variables.getVariableList().get(index).getUsage() != null) {
@@ -376,7 +376,7 @@ public class ModuleVariables extends IInternalFrame {
                 for (int index = 0; index < count; index++) {
                     Variable p = Variable.Factory.newInstance();
                     if (!isEmpty(vid.getVariables(index).getName())) {
-                        p.setVariableName(vid.getVariables(index).getName());
+                        p.setVariableName(Tools.convertStringToUnicodeHexString(vid.getVariables(index).getName()));
                     }
                     if (!isEmpty(vid.getVariables(index).getGuid())) {
                         p.setGuidCName(vid.getVariables(index).getGuid());
