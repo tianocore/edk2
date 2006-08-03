@@ -672,11 +672,7 @@ Returns:
   //
   // Process until no more arguments
   //
-  while ((Argc > 0) && ((Argv[0][0] == '-') || (Argv[0][0] == '/'))) {
-    //
-    // To simplify string comparisons, replace slashes with dashes
-    //
-    Argv[0][0] = '-';
+  while ((Argc > 0) && (Argv[0][0] == '-')) {
     if (stricmp (Argv[0], "-o") == 0) {
       //
       // Output filename specified with -o
