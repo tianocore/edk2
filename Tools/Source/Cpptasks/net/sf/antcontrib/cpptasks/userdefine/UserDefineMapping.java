@@ -15,32 +15,47 @@
  *  limitations under the License.
  */
 package net.sf.antcontrib.cpptasks.userdefine;
+
+/**
+ * Relationship between {family, command type} and flags
+ * 
+ */
 public class UserDefineMapping {
 
+    /**
+     * Mapping info: include path delimiter <--> family (vendor) + command type
+     */
+    public static final String[][] includePathFlag = { { "MSFT_CC", "/I" },
+                    { "GCC_CC", "-I" }, { "INTEL_CC", "/I" },
+                    { "WINDDK_CC", "/I" }, { "MSFT_ASM", "/I" },
+                    { "GCC_ASM", "-I" }, { "WINDDK_CC", "/I" },
+                    { "MSFT_PP", "/I" }, { "GCC_PP", "-I" },
+                    { "WINDDK_PP", "/I" } };
 
-    // list of Vendor: Microsoft, Intel, Gcc
-    public final String[] families = { "MSFT", "INTEL", "GCC"};
+    /**
+     * Mapping info: output file flag <--> family (vendor) + command type
+     */
+    public static final String[][] outputFileFlag = { { "MSFT_CC", "/Fo" },
+                    { "GCC_CC", "-o" }, { "INTEL_CC", "/Fo" },
+                    { "WINDDK_CC", "/Fo" }, { "MSFT_SLINK", "/OUT:" },
+                    { "GCC_SLINK", "-cr" }, { "INTEL_SLINK", "/OUT:" },
+                    { "WINDDK_SLINK", "/OUT:" }, { "MSFT_DLINK", "/OUT:" },
+                    { "GCC_DLINK", "-o" }, { "INTEL_DLINK", "/OUT:" },
+                    { "WINDDK_DLINK", "/OUT:" }, { "MSFT_ASM", "/Fo" },
+                    { "GCC_ASM", "-o" }, { "WINDDK_ASM", "/Fo" },
+                    { "WINDDK_IPF_ASM", "-o" } };
 
-    // list of Command Type: CC, SLINK, DLINK, ASL, ASM, ASMLINK, PP
-    public final String[] commandType = { "CC", "SLINK", "DLINK", "ASL",
-            "ASM", "ASMLINK", "PP" };
-
-    public final String[][] includePathFlag = { { "MSFT_CC", "/I" },
-            { "GCC_CC", "-I" }, { "INTEL_CC", "/I" }, { "WINDDK_CC", "/I" },
-            { "MSFT_ASM", "/I" }, { "GCC_ASM", "-I" }, { "WINDDK_CC", "/I" },
-            { "MSFT_PP", "/I" }, { "GCC_PP", "-I" }, { "WINDDK_PP", "/I" } };
-
-    public final String[][] outputFileFlag = { { "MSFT_CC", "/Fo" },
-            { "GCC_CC", "-o" }, { "INTEL_CC", "/Fo" }, { "WINDDK_CC", "/Fo" },
-            { "MSFT_SLINK", "/OUT:" }, { "GCC_SLINK", "-cr" },
-            { "INTEL_SLINK", "/OUT:" }, { "WINDDK_SLINK", "/OUT:" },
-            { "MSFT_DLINK", "/OUT:" }, { "GCC_DLINK", "-o" },
-            { "INTEL_DLINK", "/OUT:" }, { "WINDDK_DLINK", "/OUT:" },
-            { "MSFT_ASM", "/Fo" }, { "GCC_ASM", "-o" },
-            { "WINDDK_ASM", "/Fo" },{"WINDDK_IPF_ASM", "-o"} };
-
-    public String getIncludePathDelimiter(String vendor,
-            String commandType) {
+    /**
+     * Get include delimiter with vendow and command type.
+     * 
+     * @param vendor
+     *            Vendor
+     * @param commandType
+     *            Command Type
+     * @return include path delimiter
+     */
+    public static String getIncludePathDelimiter(String vendor,
+                    String commandType) {
         String key = vendor + "_" + commandType;
         for (int i = 0; i < includePathFlag.length; i++) {
             if (includePathFlag[i][0].equalsIgnoreCase(key)) {
@@ -50,7 +65,16 @@ public class UserDefineMapping {
         return "/I";
     }
 
-    public String getOutputFileFlag(String vendor, String commandType) {
+    /**
+     * Get Output Flag with vendor and command type.
+     * 
+     * @param vendor
+     *            Vendor
+     * @param commandType
+     *            Command Type
+     * @return Output File Flag
+     */
+    public static String getOutputFileFlag(String vendor, String commandType) {
         String key = vendor + "_" + commandType;
         for (int i = 0; i < outputFileFlag.length; i++) {
             if (outputFileFlag[i][0].equalsIgnoreCase(key)) {

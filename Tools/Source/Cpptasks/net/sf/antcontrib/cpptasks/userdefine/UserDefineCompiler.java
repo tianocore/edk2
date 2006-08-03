@@ -18,24 +18,28 @@ package net.sf.antcontrib.cpptasks.userdefine;
 
 import net.sf.antcontrib.cpptasks.CCTask;
 
+/**
+ * Adapter for the User-Defined Compiler
+ */
 public class UserDefineCompiler extends CommandLineUserDefine {
 
-    public UserDefineCompiler(CCTask cctask, UserDefineDef userdefineDef) {
+    public UserDefineCompiler (CCTask cctask, UserDefineDef userdefineDef) {
         String cmdType = userdefineDef.getType();
         String toolchainFamily = userdefineDef.getFamily();
-        UserDefineMapping mapping = new UserDefineMapping();
-        
-        if (userdefineDef.getIncludepathDelimiter() == null) {
-            includePathDelimiter = mapping.getIncludePathDelimiter(toolchainFamily, cmdType); 
+
+        if (userdefineDef.getIncludePathDelimiter() == null) {
+            includePathDelimiter = UserDefineMapping.getIncludePathDelimiter(
+                            toolchainFamily, cmdType);
         } else {
-            includePathDelimiter = userdefineDef.getIncludepathDelimiter();
+            includePathDelimiter = userdefineDef.getIncludePathDelimiter();
         }
-        
+
         if (userdefineDef.getOutputDelimiter() == null) {
-            outputDelimiter = mapping.getOutputFileFlag(toolchainFamily, cmdType);
+            outputDelimiter = UserDefineMapping.getOutputFileFlag(
+                            toolchainFamily, cmdType);
         } else {
             outputDelimiter = userdefineDef.getOutputDelimiter();
         }
-        
+
     }
 }

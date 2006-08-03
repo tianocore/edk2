@@ -18,6 +18,10 @@ package net.sf.antcontrib.cpptasks.userdefine;
 
 import net.sf.antcontrib.cpptasks.types.CommandLineArgument;
 
+/**
+ * Collect Arguments. 
+ *
+ */
 public class UserDefineArgument extends CommandLineArgument {
     
     public UserDefineArgument() {
