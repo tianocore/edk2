@@ -906,6 +906,21 @@ public class FpdFileContents {
         fpdPcd.setTokenSpaceGuidCName(tsGuid);
         fpdPcd.setDatumType(PcdDataTypes.Enum.forString(dataType));
         fpdPcd.setItemType(PcdItemTypes.Enum.forString(itemType));
+        
+        if (defaultVal != null){
+            fpdPcd.setValue(defaultVal);
+        }
+        else {
+            if (dataType.equals("UINT8") || dataType.equals("UINT16") || dataType.equals("UINT32") || dataType.equals("UINT64")) {
+                fpdPcd.setValue("0");
+            }
+            if (dataType.equals("BOOLEAN")){
+                fpdPcd.setValue("false");
+            }
+            if (dataType.equals("VOID*")) {
+                fpdPcd.setValue("");
+            }
+        }
         if (dataType.equals("UINT8")){
             fpdPcd.setMaxDatumSize(1);
         }
@@ -926,6 +941,7 @@ public class FpdFileContents {
             fpdPcd.setMaxDatumSize(maxSize);
         }
         
+        
         if (itemType.equals("DYNAMIC") || itemType.equals("DYNAMIC_EX")) {
             ArrayList<String> al = LookupDynamicPcdBuildDefinition(cName + " " + tsGuid);
             //
@@ -937,6 +953,7 @@ public class FpdFileContents {
             }
         }
         else {
+            /*
             if (defaultVal != null){
                 fpdPcd.setValue(defaultVal);
             }
@@ -951,7 +968,7 @@ public class FpdFileContents {
                     fpdPcd.setValue("");
                 }
             }
-            /*
+            
             if (dataType.equals("UINT8")){
                 fpdPcd.setMaxDatumSize(1);
             }
