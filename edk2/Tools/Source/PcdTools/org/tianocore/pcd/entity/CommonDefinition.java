@@ -239,7 +239,7 @@ public class CommonDefinition {
           (componentType < CommonDefinition.ComponentTypeNull)) {
         return null;
       }
-      for (int index = 0; index < CommonDefinition.componentEnum.length; index ++) {
+      for (int index = 0; index < CommonDefinition.componentEnum.length; index++) {
         if (componentType == CommonDefinition.componentEnum[index].type) {
           return CommonDefinition.componentEnum[index].moduleTypeStr;
         }

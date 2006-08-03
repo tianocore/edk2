@@ -35,7 +35,7 @@ public class MemoryDatabaseManager {
 
     ///
     /// Before build a module, the used libary will be build firstly, the PCD of these
-    /// libarry is inheritted by the module, so stored module's PCD information as PCD
+    /// library is inheritted by the module, so stored module's PCD information as PCD
     /// context of building libary.
     ///
     public static List<UsageInstance> UsageInstanceContext = null;
@@ -118,26 +118,26 @@ public class MemoryDatabaseManager {
         Object[]    dataArray   = null;
         Map.Entry   entry       = null;
         int         index       = 0;
+        int         size        = 0;
 
         if (memoryDatabase == null) {
             return null;
         }
-
         dataArray  = memoryDatabase.entrySet().toArray();
+        size       = memoryDatabase.size();
         tokenArray = new Token[memoryDatabase.size()];
-        for (index = 0; index < memoryDatabase.size(); index ++) {
+        for (index = 0; index < size; index++) {
             entry =(Map.Entry) dataArray [index];
             tokenArray[index] =(Token) entry.getValue();
         }
-
         return tokenArray;
     }
 
     /**
        Get record array only contains DYNAMIC or DYNAMIC_EX type PCD.
 
-       @return ArrayList
-     */
+       @return ArrayList the array list contains all dynamic type PCD.
+    **/
     private ArrayList getDynamicRecordArray() {
         Token[]     tokenArray  =   getRecordArray();
         int         index       =   0;
@@ -167,16 +167,17 @@ public class MemoryDatabaseManager {
         ArrayList               tokenArrayList      =   getDynamicRecordArray();
         Object[]                usageInstanceArray  =   null;
         UsageInstance           usageInstance       =   null;
+        int                     size                =   0;
+        int                     consumerSize        =   0;
 
-        //pei = new ArrayList<Token>();
-        //dxe = new ArrayList<Token>();
-
-        for (index = 0; index < tokenArrayList.size(); index++) {
+        size = tokenArrayList.size();
+        for (index = 0; index < size; index++) {
             boolean found   =   false;
             Token       token = (Token) tokenArrayList.get(index);
             if (token.consumers != null) {
                 usageInstanceArray = token.consumers.entrySet().toArray();
-                for (usageInstanceIndex = 0; usageInstanceIndex < token.consumers.size(); usageInstanceIndex ++) {
+                consumerSize       = token.consumers.size();
+                for (usageInstanceIndex = 0; usageInstanceIndex < consumerSize; usageInstanceIndex++) {
                     usageInstance =(UsageInstance) (((Map.Entry)usageInstanceArray[usageInstanceIndex]).getValue());
                     if (usageInstance.isPeiPhaseComponent()) {
                         pei.add(token);
@@ -193,7 +194,8 @@ public class MemoryDatabaseManager {
             if (!found) {
                 if (token.consumers != null) {
                     usageInstanceArray = token.consumers.entrySet().toArray();
-                    for (usageInstanceIndex = 0; usageInstanceIndex < token.consumers.size(); usageInstanceIndex ++) {
+                    consumerSize       = token.consumers.size();
+                    for (usageInstanceIndex = 0; usageInstanceIndex < consumerSize; usageInstanceIndex++) {
                         usageInstance =(UsageInstance) (((Map.Entry)usageInstanceArray[usageInstanceIndex]).getValue());
                         if (usageInstance.isDxePhaseComponent()) {
                             dxe.add(token);
@@ -216,8 +218,6 @@ public class MemoryDatabaseManager {
                 }
             }
         }
-
-        return;
     }
 
     /**
@@ -240,8 +240,8 @@ public class MemoryDatabaseManager {
 
        @param primaryKey    the primary key of usage instance.
 
-       @return List<UsageInstance>
-     */
+       @return List<UsageInstance>  the list contains all usage instances.
+    **/
     public List<UsageInstance> getUsageInstanceArrayByKeyString(String primaryKey) {
         Token[]               tokenArray          = null;
         int                   recordIndex         = 0;
@@ -253,7 +253,7 @@ public class MemoryDatabaseManager {
         //
         // Loop to find all PCD record related to current module
         //
-        for (recordIndex = 0; recordIndex < getDBSize(); recordIndex ++) {
+        for (recordIndex = 0; recordIndex < getDBSize(); recordIndex++) {
             if (tokenArray[recordIndex].consumers.size() != 0) {
                 usageInstance = tokenArray[recordIndex].consumers.get(primaryKey);
                 if (usageInstance != null) {
@@ -272,7 +272,7 @@ public class MemoryDatabaseManager {
     **/
     public List<String> getAllModuleArray()
     {
-        int                       indexToken    = 0;
+        int                       tokenIndex    = 0;
         int                       usageIndex    = 0;
         int                       moduleIndex   = 0;
         Token[]                   tokenArray    = null;
@@ -280,24 +280,26 @@ public class MemoryDatabaseManager {
         List<String>              moduleNames   = new ArrayList<String>();
         UsageInstance             usageInstance = null;
         boolean                   bFound        = false;
+        String                    primaryKey    = null;
 
         tokenArray = getRecordArray();
         //
         // Find all consumer usage instance for retrieving module's name
         //
-        for (indexToken = 0; indexToken < getDBSize(); indexToken ++) {
-            usageInstanceArray = tokenArray[indexToken].consumers.entrySet().toArray();
-            for (usageIndex = 0; usageIndex < tokenArray[indexToken].consumers.size(); usageIndex ++) {
+        for (tokenIndex = 0; tokenIndex < getDBSize(); tokenIndex++) {
+            usageInstanceArray = tokenArray[tokenIndex].consumers.entrySet().toArray();
+            for (usageIndex = 0; usageIndex < tokenArray[tokenIndex].consumers.size(); usageIndex++) {
                 usageInstance = (UsageInstance)((Map.Entry)usageInstanceArray[usageIndex]).getValue();
+                primaryKey    = usageInstance.getPrimaryKey();
                 bFound        = false;
-                for (moduleIndex = 0; moduleIndex < moduleNames.size(); moduleIndex ++) {
-                    if (moduleNames.get(moduleIndex).equalsIgnoreCase(usageInstance.getPrimaryKey())) {
+                for (moduleIndex = 0; moduleIndex < moduleNames.size(); moduleIndex++) {
+                    if (moduleNames.get(moduleIndex).equalsIgnoreCase(primaryKey)) {
                         bFound = true;
                         break;
                     }
                 }
                 if (!bFound) {
-                    moduleNames.add(usageInstance.getPrimaryKey());
+                    moduleNames.add(primaryKey);
                 }
             }
         }
