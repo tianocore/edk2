@@ -25,7 +25,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.TreeMap;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
@@ -99,11 +98,6 @@ public class FpdParserTask extends Task {
     private Map<String, Set<FpdModuleIdentification>> fvs = new HashMap<String, Set<FpdModuleIdentification>>();
 
     ///
-    /// Mapping from sequence number to FV names
-    ///
-    private Map<String, Set<String>> sequences = new TreeMap<String, Set<String>>();
-
-    ///
     /// FpdParserTask can specify some ANT properties. 
     ///
     private Vector<Property> properties = new Vector<Property>();
@@ -153,10 +147,6 @@ public class FpdParserTask extends Task {
         isUnified = OutputManager.getInstance().prepareBuildDir(getProject());
         
         //
-        // Generate FDF (Flash Definition File) file
-        //
-
-        //
         // For every Target and ToolChain
         //
         String[] targetList = GlobalData.getToolChainInfo().getTargets();
@@ -183,7 +173,7 @@ public class FpdParserTask extends Task {
         //
         // Gen build.xml
         //
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, sequences, isUnified);
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, isUnified);
         fileGenerator.genBuildFile();
         
         //
@@ -426,8 +416,7 @@ public class FpdParserTask extends Task {
             SurfaceAreaQuery.pop();
 
             fpdModuleId.setFvBinding(fvBinding);
-            String fvSequence = fpdModuleId.getSequence();
-            updateFvs(fvSequence, fvBinding, fpdModuleId);
+            updateFvs(fvBinding, fpdModuleId);
             
             //
             // Prepare for out put file name
@@ -499,7 +488,7 @@ public class FpdParserTask extends Task {
       @param fvName current FV name
       @param moduleName current module identification
     **/
-    private void updateFvs(String fvSequence, String fvName, FpdModuleIdentification fpdModuleId) {
+    private void updateFvs(String fvName, FpdModuleIdentification fpdModuleId) {
         if (fvName == null || fvName.trim().length() == 0) {
             fvName = "NULL";
         }
@@ -516,19 +505,6 @@ public class FpdParserTask extends Task {
                 Set<FpdModuleIdentification> set = new LinkedHashSet<FpdModuleIdentification>();
                 set.add(fpdModuleId);
                 fvs.put(fvNameArray[i], set);
-            }
-            
-            //
-            // Put fvName to corresponding fvSequence
-            //
-            if (sequences.containsKey(fvSequence)) {
-                Set<String> set = sequences.get(fvSequence);
-                set.add(fvNameArray[i]);
-            }
-            else {
-                Set<String> set = new LinkedHashSet<String>();
-                set.add(fvNameArray[i]);
-                sequences.put(fvSequence, set);
             }
         }
     }

@@ -48,16 +48,6 @@ public class PlatformBuildFileGenerator {
     ///
     private Map<FpdModuleIdentification, String> outfiles;
 
-    ///
-    /// Mapping from FV name to its modules
-    ///
-    private Map<String, Set<FpdModuleIdentification>> fvs;
-
-    ///
-    /// Mapping from sequence number to FV names
-    ///
-    private Map<String, Set<String>> sequences;
-    
     private boolean isUnified = true;
     
     private Project project;
@@ -68,11 +58,9 @@ public class PlatformBuildFileGenerator {
         + "Abstract:\n"
         + "Auto-generated ANT build file for building of EFI Modules/Platforms\n";
 
-    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, Map<String, Set<String>> sequences, boolean isUnified){
+    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, boolean isUnified){
         this.project = project;
         this.outfiles = outfiles;
-        this.fvs = fvs;
-        this.sequences = sequences;
         this.isUnified = isUnified;
         this.platformName = project.getProperty("PLATFORM");
     }
@@ -117,35 +105,21 @@ public class PlatformBuildFileGenerator {
             ele.setAttribute("environment", "env");
             root.appendChild(ele);
             
-            Set<String> sequenceKeys = sequences.keySet();
-            Iterator sequenceIter = sequenceKeys.iterator();
-            String dependsStr = "prebuild";
-            while (sequenceIter.hasNext()) {
-                String num = (String)sequenceIter.next();
-                if (dependsStr.length() > 0) {
-                    dependsStr += " , ";
-                }
-                dependsStr += "modules" + num + ", fvs" + num;
-            }
-            
             //
             // Default Target
             //
             root.appendChild(document.createComment("Default target"));
             ele = document.createElement("target");
             ele.setAttribute("name", "all");
-            ele.setAttribute("depends", dependsStr + ", postbuild");
+            ele.setAttribute("depends", "prebuild, modules, fvs, postbuild");
             root.appendChild(ele);
             
             //
             // Modules and Fvs Target
             //
-            sequenceIter = sequenceKeys.iterator();
-            while (sequenceIter.hasNext()) {
-                String num = (String)sequenceIter.next();
-                applyModules(document, root, num);
-                applyFvs(document, root, num);
-            }
+            applyModules(document, root);
+            
+            applyFvs(document, root);
 
             //
             // Clean Target
@@ -194,82 +168,75 @@ public class PlatformBuildFileGenerator {
         }
     }
     
-    private void applyModules(Document document, Node root, String num) {
+    private void applyModules(Document document, Node root) {
         root.appendChild(document.createComment("Modules target"));
         Element ele = document.createElement("target");
-        ele.setAttribute("name", "modules" + num);
-        
-        Set<String> fvNameSet = sequences.get(num);
+        ele.setAttribute("name", "modules");
 
-        Iterator fvNameIter = fvNameSet.iterator();
-        while (fvNameIter.hasNext()) {
-            String fvName = (String)fvNameIter.next();
-            Set<FpdModuleIdentification> set = fvs.get(fvName);
-            Iterator iter = set.iterator();
-            while (iter.hasNext()) {
-                FpdModuleIdentification fpdModuleId = (FpdModuleIdentification) iter.next();
-                ModuleIdentification moduleId = fpdModuleId.getModule();
-                Element moduleEle = document.createElement("GenBuild");
-                moduleEle.setAttribute("type", "build");
-                //
-                // Inherit Properties.
-                //{"ARCH", "PACKAGE", "PACKAGE_GUID", "PACKAGE_VERSION", "MODULE_DIR"}
-                //
-                
-                //
-                // ARCH
-                //
-                Element property = document.createElement("property");
-                property.setAttribute("name", "ARCH");
-                property.setAttribute("value", fpdModuleId.getArch());
-                moduleEle.appendChild(property);
+        Set<FpdModuleIdentification> set = outfiles.keySet();
+        Iterator iter = set.iterator();
+        while (iter.hasNext()) {
+            FpdModuleIdentification fpdModuleId = (FpdModuleIdentification) iter.next();
+            ModuleIdentification moduleId = fpdModuleId.getModule();
+            Element moduleEle = document.createElement("GenBuild");
+            moduleEle.setAttribute("type", "build");
+            //
+            // Inherit Properties.
+            //{"ARCH", "PACKAGE", "PACKAGE_GUID", "PACKAGE_VERSION", "MODULE_DIR"}
+            //
+            
+            //
+            // ARCH
+            //
+            Element property = document.createElement("property");
+            property.setAttribute("name", "ARCH");
+            property.setAttribute("value", fpdModuleId.getArch());
+            moduleEle.appendChild(property);
 
-                //
-                // MODULE_GUID
-                //
-                property = document.createElement("property");
-                property.setAttribute("name", "MODULE_GUID");
-                property.setAttribute("value", moduleId.getGuid());
-                moduleEle.appendChild(property);
-                
-                //
-                // MODULE_VERSION
-                //
-                property = document.createElement("property");
-                property.setAttribute("name", "MODULE_VERSION");
-                property.setAttribute("value", moduleId.getVersion());
-                moduleEle.appendChild(property);
-                
-                //
-                // PACKAGE_GUID
-                //
-                property = document.createElement("property");
-                property.setAttribute("name", "PACKAGE_GUID");
-                property.setAttribute("value", moduleId.getPackage().getGuid());
-                moduleEle.appendChild(property);
-                
-                //
-                // PACKAGE_VERSION
-                //
-                property = document.createElement("property");
-                property.setAttribute("name", "PACKAGE_VERSION");
-                property.setAttribute("value", moduleId.getPackage().getVersion());
-                moduleEle.appendChild(property);
-                
-                ele.appendChild(moduleEle);
-            }
+            //
+            // MODULE_GUID
+            //
+            property = document.createElement("property");
+            property.setAttribute("name", "MODULE_GUID");
+            property.setAttribute("value", moduleId.getGuid());
+            moduleEle.appendChild(property);
+            
+            //
+            // MODULE_VERSION
+            //
+            property = document.createElement("property");
+            property.setAttribute("name", "MODULE_VERSION");
+            property.setAttribute("value", moduleId.getVersion());
+            moduleEle.appendChild(property);
+            
+            //
+            // PACKAGE_GUID
+            //
+            property = document.createElement("property");
+            property.setAttribute("name", "PACKAGE_GUID");
+            property.setAttribute("value", moduleId.getPackage().getGuid());
+            moduleEle.appendChild(property);
+            
+            //
+            // PACKAGE_VERSION
+            //
+            property = document.createElement("property");
+            property.setAttribute("name", "PACKAGE_VERSION");
+            property.setAttribute("value", moduleId.getPackage().getVersion());
+            moduleEle.appendChild(property);
+            
+            ele.appendChild(moduleEle);
         }
         root.appendChild(ele);
     }
     
-    private void applyFvs(Document document, Node root, String num) {
-        Set<String> fvNameSet = sequences.get(num);
+    private void applyFvs(Document document, Node root) {
         //
         // FVS Target
         //
         root.appendChild(document.createComment("FVs target"));
         Element ele = document.createElement("target");
-        ele.setAttribute("name", "fvs" + num);
+        ele.setAttribute("name", "fvs");
 
         //
         // For every Target and ToolChain
@@ -283,13 +250,11 @@ public class PlatformBuildFileGenerator {
                                         + toolchainList[j] + File.separatorChar + "FV";
                 String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
                 for (int k = 0; k < validFv.length; k++) {
-                    if (fvNameSet.contains(validFv[k]) || ! isListInSequence(validFv[k])) {
-                        String inputFile = fvOutputDir + "" + File.separatorChar + validFv[k].toUpperCase() + ".inf";
-                        Element fvEle = document.createElement("genfvimage");
-                        fvEle.setAttribute("infFile", inputFile);
-                        fvEle.setAttribute("outputDir", fvOutputDir);
-                        ele.appendChild(fvEle);
-                    }
+                    String inputFile = fvOutputDir + "" + File.separatorChar + validFv[k].toUpperCase() + ".inf";
+                    Element fvEle = document.createElement("genfvimage");
+                    fvEle.setAttribute("infFile", inputFile);
+                    fvEle.setAttribute("outputDir", fvOutputDir);
+                    ele.appendChild(fvEle);
                 }
             }
         }
@@ -575,17 +540,5 @@ public class PlatformBuildFileGenerator {
             }
         }
         return root;
-    }
-    
-    private boolean isListInSequence(String fvName) {
-        Set<String> numbers = sequences.keySet();
-        Iterator<String> iter = numbers.iterator();
-        while (iter.hasNext()) {
-            Set<String> fvNameSet = sequences.get(iter.next());
-            if (fvNameSet.contains(fvName)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
