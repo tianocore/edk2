@@ -57,7 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <istrue value="${gcc}"/>
         <then>
     	    <exec dir="${PACKAGE_DIR}/Pccts/antlr" executable="make" failonerror="TRUE">
-	      	  <arg line="-f makefile"/>
+	      	  <arg line="-f makefile BIN_DIR=${BIN_DIR}"/>
     	  	</exec>
         </then>
 		  </elseif>
