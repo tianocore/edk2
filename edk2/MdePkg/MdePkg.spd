@@ -2296,7 +2296,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT8</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>0x07</DefaultValue>
+      <DefaultValue>0x06</DefaultValue>
       <HelpText>The bitmask of flags that specify the enable/disable of
                 Progress Code, Error Code and Debug Code.</HelpText>
     </PcdEntry>
