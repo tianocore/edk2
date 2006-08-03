@@ -14,13 +14,18 @@ package org.tianocore.build.tools;
 
 import org.apache.tools.ant.BuildException;
 
+/**
+  Ant element for Package. 
+
+  @since GenBuild 1.0
+**/
 public class PackageItem {
 
-    private String packageName;
+    private String packageName = null;
     
-    private String packageGuid;
+    private String packageGuid = null;
     
-    private String packageVersion;
+    private String packageVersion = null;
     
     public PackageItem(){
         
@@ -33,26 +38,50 @@ public class PackageItem {
     public String toString(){
         return "[" + packageName + packageGuid + "]";
     }
+    /**
+      Get Package Guid. 
+      @return Package Guid
+    **/
     public String getPackageGuid() {
         return packageGuid;
     }
 
+    /**
+      Set Package Guid. 
+      @param packageGuid Package Guid
+    **/
     public void setPackageGuid(String packageGuid) {
         this.packageGuid = packageGuid;
     }
 
+    /**
+      Get Package Name. 
+      @return Package Name
+    **/
     public String getPackageName() {
         return packageName;
     }
 
+    /**
+      Set Package Name. 
+      @param packageName Package Name
+    **/
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
 
+    /**
+      Get Package Version. 
+      @return Package Version
+    **/
     public String getPackageVersion() {
         return packageVersion;
     }
 
+    /**
+      Set Package Version. 
+      @param packageVersion Package Version
+    **/
     public void setPackageVersion(String packageVersion) {
         this.packageVersion = packageVersion;
     }

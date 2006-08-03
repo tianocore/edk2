@@ -13,8 +13,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 package org.tianocore.build.id;
 
-import org.tianocore.build.global.GlobalData;
 
+/**
+  This class is used to identify with its GUID and Version. 
+
+  @since GenBuild 1.0
+**/
 public class Identification {
 
     String name;
@@ -23,19 +27,29 @@ public class Identification {
     
     String version;
     
-    String type; // Optional
-    
+    /**
+      @param name Name
+      @param guid Guid
+      @param version Version
+    **/
     Identification(String name, String guid, String version){
         this.name = name;
         this.guid = guid;
         this.version = version;
     }
     
+    /**
+      @param guid Guid
+      @param version Version
+    **/
     Identification(String guid, String version){
         this.guid = guid;
         this.version = version;
     }
     
+    /* (non-Javadoc)
+      @see java.lang.Object#equals(java.lang.Object)
+    **/
     public boolean equals(Object obj) {
         if (obj instanceof Identification) {
             Identification id = (Identification)obj;
@@ -57,14 +71,23 @@ public class Identification {
         }
     }
     
+    /**
+      @param name Name
+    **/
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+      @param guid Guid
+    **/
     public void setGuid(String guid) {
         this.guid = guid;
     }
 
+    /**
+      @param version Version
+    **/
     public void setVersion(String version) {
         this.version = version;
     }
@@ -73,14 +96,23 @@ public class Identification {
         return guid;
     }
 
+    /**
+      @return String Name
+    **/
     public String getName() {
         return name;
     }
 
+    /**
+      @return String Version
+    **/
     public String getVersion() {
         return version;
     }
     
+    /* (non-Javadoc)
+      @see java.lang.Object#hashCode()
+    **/
     public int hashCode(){
         return guid.toLowerCase().hashCode();
     }

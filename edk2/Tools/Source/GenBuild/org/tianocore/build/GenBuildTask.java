@@ -16,7 +16,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -719,60 +718,6 @@ public class GenBuildTask extends Ant {
         return result;
     }
 
-    /**
-      Generate the flags string with original format. The format is defined by 
-      Java Regulation Expression "[^\\\\]?(\".*?[^\\\\]\")[ \t,]+". </p>
-      
-      <p>For example: </p>
-      
-      <pre>
-        "/nologo", "/W3", "/WX"
-        "/C", "/DSTRING_DEFINES_FILE=\"BdsStrDefs.h\""
-      </pre>
-      
-      @param add the add flags set
-      @param sub the sub flags set
-      @return flags with original format
-    **/
-    private String getRawFlags(Set<String> add, Set<String> sub) {
-        String result = null;
-        add.removeAll(sub);
-        Iterator iter = add.iterator();
-        while (iter.hasNext()) {
-            String str = (String) iter.next();
-            result += "\"" + str.substring(1, str.length() - 1) + "\", ";
-        }
-        return result;
-    }
-
-    private String parseOptionString(String optionString, Set<String> addSet, Set<String> subSet) {
-        boolean overrideOption = false;
-        Pattern pattern = Pattern.compile("ADD\\.\\[(.+)\\]");
-        Matcher matcher = pattern.matcher(optionString);
-
-        while (matcher.find()) {
-            overrideOption = true;
-            String addOption = optionString.substring(matcher.start(1), matcher.end(1)).trim();
-            putFlagsToSet(addSet, addOption);
-            
-        }
-
-        pattern = Pattern.compile("SUB\\.\\[(.+)\\]");
-        matcher = pattern.matcher(optionString);
-
-        while (matcher.find()) {
-            overrideOption = true;
-            String subOption = optionString.substring(matcher.start(1), matcher.end(1)).trim();
-            putFlagsToSet(subSet, subOption);
-        }
-
-        if (overrideOption == true) {
-            return null;
-        }
-
-        return optionString;
-    }
-    
     private void pushProperties() {
         backupPropertiesStack.push(getProject().getProperties());
     }
