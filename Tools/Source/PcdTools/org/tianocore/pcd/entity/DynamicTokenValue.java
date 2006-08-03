@@ -20,26 +20,33 @@ import java.util.UUID;
 
 import org.tianocore.pcd.exception.EntityException;
 
-/** This class is to descript a value type of dynamic PCD.
-    For a dynamic or dynamicEx type PCD data, the value type can be:
-        1) Hii type: the value of dynamic or dynamicEx is stored into a variable.
-        2) Vpd type: the value of dynamic or dynamicEx is stored into somewhere set
-                     by OEM.
-        3) Default type: the value of dynamic or dynamicEx is stored into PCD dynamic
-                         database.
+/** 
+   This class is to descript a value type of dynamic PCD.
+   For a dynamic or dynamicEx type PCD data, the value type can be:
+       1) Hii type: the value of dynamic or dynamicEx is stored into a variable.
+       2) Vpd type: the value of dynamic or dynamicEx is stored into somewhere set
+                    by OEM.
+       3) Default type: the value of dynamic or dynamicEx is stored into PCD dynamic
+                        database.
 **/
 public class DynamicTokenValue {
     ///
     /// Enumeration macro defintion for value type.
-    /// BUGBUG: Not use upcase charater is to facility for reading. It may be changed
-    ///         in coding review.
+    ///
     public enum        VALUE_TYPE {HII_TYPE, VPD_TYPE, DEFAULT_TYPE}
 
+    ///
+    /// The value type maybe:
+    /// HII_TYPE: the value stored into variable area.
+    /// VPD_TYPE: the value stored into OEM specific area.
+    /// DEFAULT_TYPE: the value stored into PCD runtime database.
+    /// 
     public VALUE_TYPE  type;
 
     ///
     /// ---------------------------------------------------------------------
-    /// Following member is for HII case.
+    /// Following member is for HII case. The value of HII case will be put 
+    /// into variable area in flash.
     /// ---------------------------------------------------------------------
     ///
 
@@ -66,14 +73,21 @@ public class DynamicTokenValue {
 
     ///
     /// ---------------------------------------------------------------------
-    /// Following member is for VPD case.
+    /// Following member is for VPD case. The value of VPD case will be put into
+    /// some flash position pointed by OEM.
     /// ---------------------------------------------------------------------
     ///
+
     public String      vpdOffset;
 
     /// ---------------------------------------------------------------------
-    /// Following member is for default case.
+    /// Following member is for default case. The value of default type will
+    /// be put into PCD runtime database.
     /// ---------------------------------------------------------------------
+
+    ///
+    /// The default value of this PCD in default case.
+    /// 
     public String      value;
 
     /**
@@ -116,15 +130,17 @@ public class DynamicTokenValue {
        BUGBUG: In fact, it is not correctly, variable name should be
                treated as unicode UINT16 array.
 
-       @return String
-     */
+       @return String 
+    **/
     public String getStringOfVariableName()
         throws EntityException {
         String str;
         int    index, num;
+        int    size;
 
-        str = "";
-        for (index = 0; index < variableName.size(); index ++) {
+        str  = "";
+        size = variableName.size();
+        for (index = 0; index < size; index++) {
             num = Integer.decode(variableName.get(index).toString());
             if ((num > 127 ) || (num < 0)) {
                 throw new EntityException(String.format("variable name contains >0x80 character, now is not support!"));
@@ -138,8 +154,8 @@ public class DynamicTokenValue {
     /**
        Set Vpd case data.
 
-       @param vpdOffset
-     */
+       @param vpdOffset the value offset the start address of OEM specific.
+    **/
     public void setVpdData(String vpdOffset) {
         this.type = VALUE_TYPE.VPD_TYPE;
 
@@ -150,7 +166,7 @@ public class DynamicTokenValue {
        Set default case data.
 
        @param value
-     */
+    **/
     public void setValue(String value) {
         this.type = VALUE_TYPE.DEFAULT_TYPE;
 

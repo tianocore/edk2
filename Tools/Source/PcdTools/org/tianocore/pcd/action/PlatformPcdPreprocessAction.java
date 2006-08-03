@@ -162,7 +162,7 @@ public abstract class PlatformPcdPreprocessAction {
         // 2), Loop all modules to process <PcdBuildDeclarations> for each module.
         // -------------------------------------------------------------------
         //
-        for (index = 0; index < modules.size(); index ++) {
+        for (index = 0; index < modules.size(); index++) {
     	    //
     	    // It is legal for a module does not contains ANY pcd build definitions.
     	    //
@@ -179,7 +179,7 @@ public abstract class PlatformPcdPreprocessAction {
             // 2.1), Loop all Pcd entry for a module and add it into memory database.
             // ----------------------------------------------------------------------
             //
-            for (pcdIndex = 0; pcdIndex < pcdBuildDataArray.size(); pcdIndex ++) {
+            for (pcdIndex = 0; pcdIndex < pcdBuildDataArray.size(); pcdIndex++) {
                 pcdBuildData = pcdBuildDataArray.get(pcdIndex);
 
                 tokenSpaceStrRet = getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
@@ -189,7 +189,7 @@ public abstract class PlatformPcdPreprocessAction {
                 }
 
                 primaryKey   = Token.getPrimaryKeyString(pcdBuildData.getCName(), tokenSpaceStrRet[1]);
-                pcdType      = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
+                pcdType      = Token.getPcdTypeFromString(pcdBuildData.getItemType().toString());
                 datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
                 tokenNumber  = Long.decode(pcdBuildData.getToken().toString());
                 if (pcdBuildData.getValue() != null) {
@@ -372,7 +372,7 @@ public abstract class PlatformPcdPreprocessAction {
         //
         List<Token> tokenArray = getUnreferencedDynamicPcd();
         if (tokenArray != null) {
-            for (index = 0; index < tokenArray.size(); index ++) {
+            for (index = 0; index < tokenArray.size(); index++) {
                 pcdDbManager.addTokenToDatabase(tokenArray.get(index).getPrimaryKeyString(),
                                              tokenArray.get(index));
             }
@@ -459,7 +459,7 @@ public abstract class PlatformPcdPreprocessAction {
         //
         // Loop all sku data
         //
-        for (index = 0; index < skuInfoList.size(); index ++) {
+        for (index = 0; index < skuInfoList.size(); index++) {
             skuInstance = new SkuInstance();
             //
             // Although SkuId in schema is BigInteger, but in fact, sku id is 32 bit value.
@@ -633,7 +633,7 @@ public abstract class PlatformPcdPreprocessAction {
             return null;
         }
 
-        for (index2 = 0; index2 < dynamicPcdBuildDataArray.size(); index2 ++) {
+        for (index2 = 0; index2 < dynamicPcdBuildDataArray.size(); index2++) {
             pcdBuildData = dynamicPcdBuildDataArray.get(index2);
             tokenSpaceStrRet = this.getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
 
@@ -648,7 +648,7 @@ public abstract class PlatformPcdPreprocessAction {
                 continue;
             }
 
-            pcdType = Token.getpcdTypeFromString(pcdBuildData.getItemType().toString());
+            pcdType = Token.getPcdTypeFromString(pcdBuildData.getItemType().toString());
             if (pcdType != Token.PCD_TYPE.DYNAMIC_EX) {
                 throw new EntityException (String.format("[FPD file error] It not allowed for DYNAMIC PCD %s who is no used by any module",
                                                          pcdBuildData.getCName()));
@@ -681,7 +681,7 @@ public abstract class PlatformPcdPreprocessAction {
             //
             // Loop all sku data
             //
-            for (index = 0; index < skuInfoList.size(); index ++) {
+            for (index = 0; index < skuInfoList.size(); index++) {
                 skuInstance = new SkuInstance();
                 //
                 // Although SkuId in schema is BigInteger, but in fact, sku id is 32 bit value.
@@ -870,7 +870,7 @@ public abstract class PlatformPcdPreprocessAction {
             //
             // Remove blank space from these string and remove header string "0x"
             //
-            for (index = 0; index < 11; index ++) {
+            for (index = 0; index < 11; index++) {
                 splitStringArray[index] = splitStringArray[index].trim();
                 splitStringArray[index] = splitStringArray[index].substring(2, splitStringArray[index].length());
             }
@@ -878,9 +878,9 @@ public abstract class PlatformPcdPreprocessAction {
             //
             // Add heading '0' to normalize the string length
             //
-            for (index = 3; index < 11; index ++) {
+            for (index = 3; index < 11; index++) {
                 chLen = splitStringArray[index].length();
-                for (chIndex = 0; chIndex < 2 - chLen; chIndex ++) {
+                for (chIndex = 0; chIndex < 2 - chLen; chIndex++) {
                     splitStringArray[index] = "0" + splitStringArray[index];
                 }
             }

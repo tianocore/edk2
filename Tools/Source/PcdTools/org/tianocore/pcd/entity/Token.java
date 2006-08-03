@@ -137,7 +137,8 @@ public class Token {
       @param pcdType    new PCD type found in FPD file for this token.
     **/
     public void updateSupportPcdType(PCD_TYPE pcdType) {
-        for (int index = 0; index < this.supportedPcdType.size(); index ++) {
+        int size = supportedPcdType.size();
+        for (int index = 0; index < size; index++) {
             if (supportedPcdType.get(index) == pcdType) {
                 return;
             }
@@ -156,7 +157,7 @@ public class Token {
        @param pcdType       the judged pcd type
 
        @return boolean
-     */
+    **/
     public static boolean isDynamic(PCD_TYPE pcdType) {
         if ((pcdType == PCD_TYPE.DYNAMIC   ) ||
             (pcdType == PCD_TYPE.DYNAMIC_EX)) {
@@ -166,8 +167,15 @@ public class Token {
         return false;
     }
 
+    /**
+       The pcd type is DynamicEx?
+         
+       @retval true     Is DynamicEx type
+       @retval false    not DynamicEx type
+    **/
     public boolean isDynamicEx() {
-        for (int i = 0; i < supportedPcdType.size(); i++) {
+        int size = supportedPcdType.size();
+        for (int i = 0; i < size; i++) {
             if (supportedPcdType.get(i) == PCD_TYPE.DYNAMIC_EX) {
                 return true;
             }
@@ -196,7 +204,7 @@ public class Token {
        If skudata list contains more than one data, then Sku mechanism is enable.
 
        @retval boolean  if the number of sku data exceed to 1
-     */
+    **/
     public boolean isSkuEnable() {
         if (this.skuData.size() > 1) {
             return true;
@@ -232,7 +240,7 @@ public class Token {
        Get the token primary key in token database.
 
        @return String
-     */
+    **/
     public String getPrimaryKeyString () {
         return Token.getPrimaryKeyString(cName, tokenSpaceName);
     }
@@ -303,7 +311,7 @@ public class Token {
        @param usageId       The UsageInstance identification for usage instance
 
        @return boolean      whether exist an usage instance for this token.
-     */
+    **/
     public boolean isUsageInstanceExist(UsageIdentification usageId) {
         String keyStr = UsageInstance.getPrimaryKey(usageId);
 
@@ -317,7 +325,7 @@ public class Token {
 
       @return PCD_TYPE
     **/
-    public static PCD_TYPE getpcdTypeFromString(String pcdTypeStr) {
+    public static PCD_TYPE getPcdTypeFromString(String pcdTypeStr) {
         if (pcdTypeStr == null) {
             return PCD_TYPE.UNKNOWN;
         }
@@ -345,21 +353,7 @@ public class Token {
       @return The string of datum type.
     **/
     public static String getStringOfdatumType(DATUM_TYPE  datumType) {
-        switch (datumType) {
-        case UINT8:
-            return "UINT8";
-        case UINT16:
-            return "UINT16";
-        case UINT32:
-            return "UINT32";
-        case UINT64:
-            return "UINT64";
-        case POINTER:
-            return "POINTER";
-        case BOOLEAN:
-            return "BOOLEAN";
-        }
-        return "UNKNOWN";
+        return datumType.toString();
     }
 
     /**
@@ -394,19 +388,7 @@ public class Token {
       @return The string of PCD_TYPE.
     **/
     public static String getStringOfpcdType(PCD_TYPE pcdType) {
-        switch (pcdType) {
-        case FEATURE_FLAG:
-            return "FEATURE_FLAG";
-        case FIXED_AT_BUILD:
-            return "FIXED_AT_BUILD";
-        case PATCHABLE_IN_MODULE:
-            return "PATCHABLE_IN_MODULE";
-        case DYNAMIC:
-            return "DYNAMIC";
-        case DYNAMIC_EX:
-            return "DYNAMIC_EX";
-        }
-        return "UNKNOWN";
+        return pcdType.toString();
     }
 
     /**
@@ -442,17 +424,7 @@ public class Token {
       @return The string of PDC_USAGE.
     **/
     public static String getStringOfUsage(PCD_USAGE usage) {
-        switch (usage) {
-        case ALWAYS_PRODUCED:
-            return "ALWAYS_PRODUCED";
-        case ALWAYS_CONSUMED:
-            return "ALWAYS_CONSUMED";
-        case SOMETIMES_PRODUCED:
-            return "SOMETIMES_PRODUCED";
-        case SOMETIMES_CONSUMED:
-            return "SOMETIMES_CONSUMED";
-        }
-        return "UNKNOWN";
+        return usage.toString();
     }
 
     /**
@@ -540,9 +512,9 @@ public class Token {
        @retval DynamicTokenValue    the value of this dyanmic token.
     **/
     public DynamicTokenValue getDefaultSku() {
-        int               index;
-
-        for (index = 0; index < this.skuData.size(); index ++) {
+        int index;
+        int size = skuData.size();
+        for (index = 0; index < size; index++) {
             if (skuData.get(index).id == 0) {
                 return skuData.get(index).value;
             }
@@ -564,7 +536,7 @@ public class Token {
        Get the size of PCD value, this PCD is POINTER type.
 
        @param str   the string of the value
-       @param al
+       @param al    the array list for outer parameter.
     **/
     private void getCurrentSizeFromDefaultValue (String str, ArrayList<Integer> al) {
         if (isValidNullValue(str)) {
@@ -644,8 +616,8 @@ public class Token {
        SKU 0 will be returned; For Default type, the defaultvalue of default SKU
        0 will be returned.
 
-       @return String
-     */
+       @return String get the default value for a DYNAMIC type PCD.
+    **/
     public String getDynamicDefaultValue() {
         DynamicTokenValue dynamicData = getDefaultSku();
         if (hasDefaultValue()) {
@@ -658,10 +630,11 @@ public class Token {
         return null;
     }
 
-    //
-    // BugBug: We need change this algorithm accordingly when schema is updated
-    //          to support no default value.
-    //
+    /**
+        Judge whether a DYNAMIC PCD has default value. 
+
+        @return whether a DYNAMIC PCD has default value.
+    **/
     public boolean hasDefaultValue () {
         DynamicTokenValue dynamicValue  = null;
 
@@ -687,10 +660,10 @@ public class Token {
     /**
        Judge the value is NULL value. NULL value means the value is uninitialized value
 
-       @param judgedValue
+       @param judgedValue   the want want to be judged
 
-       @return boolean
-     */
+       @return boolean  whether the value of PCD is NULL.
+    **/
     public boolean isValidNullValue(String judgedValue) {
         String      subStr;
         BigInteger  bigIntValue;
@@ -742,12 +715,21 @@ public class Token {
             }
             break;
         case POINTER:
-            if (judgedValue.equalsIgnoreCase("")        ||
-                judgedValue.equalsIgnoreCase("\"\"")   ||
+            if (judgedValue.equalsIgnoreCase("\"\"")   ||
                 judgedValue.equalsIgnoreCase("L\"\"")   ||
-                (judgedValue.length() == 0)             ||
-                judgedValue.equalsIgnoreCase("{0}")) {
+                (judgedValue.length() == 0)) {
                 return true;
+            } else if (judgedValue.trim().charAt(0) == '{') {
+                int       start         = judgedValue.indexOf('{');
+                int       end           = judgedValue.lastIndexOf('}');
+                String[]  strValueArray = judgedValue.substring(start + 1, end).split(",");
+                if (strValueArray.length > 1) {
+                    return false;
+                } else {
+                    if (strValueArray[0].matches("(0x)?(0X)?0*")) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
@@ -756,7 +738,7 @@ public class Token {
     /**
        Is the string value in Unicode
 
-       @return boolean
+       @return boolean the string value is UNICODE type string.
     **/
     public boolean isHiiDefaultValueUnicodeStringType() {
         DynamicTokenValue dynamicData = getDefaultSku();
@@ -771,7 +753,7 @@ public class Token {
     /**
        Is the string value in ANSCI
 
-       @return boolean
+       @return boolean whether the dfault value for HII case is string type.
     **/
     public boolean isHiiDefaultValueASCIIStringType() {
         DynamicTokenValue dynamicData = getDefaultSku();
@@ -785,8 +767,9 @@ public class Token {
 
     /**
        Judege whether current value is UNICODE string type.
-       @return boolean
-     */
+
+       @return boolean whether the value is UNICODE string.
+    **/
     public boolean isUnicodeStringType () {
         String str = getDynamicDefaultValue();
 
@@ -803,6 +786,11 @@ public class Token {
         return false;
     }
 
+    /**
+       Judge whether the string type is ANSIC string.
+
+       @return boolean whether the string type is ANSIC string
+    **/
     public boolean isASCIIStringType () {
         String str = getDynamicDefaultValue();
 
@@ -819,6 +807,12 @@ public class Token {
         return false;
     }
 
+    /**
+       Judge whether the string value is byte array.
+
+       @return boolean  whether the string value is byte array.
+
+    **/
     public boolean isByteStreamType () {
         String str = getDynamicDefaultValue();
 
@@ -836,6 +830,11 @@ public class Token {
 
     }
 
+    /**
+       Get string value for ANSIC string type
+         
+       @return String the string value
+    **/
     public String getStringTypeString () {
         return getDefaultSku().value.substring(2, getDefaultSku().value.length() - 1);
     }

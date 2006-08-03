@@ -15,7 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/ 
 package org.tianocore.pcd.entity;
 
-/** Sku instance contains ID and value, A pcd token maybe contains more than one Sku instance.
+/** 
+   Sku instance contains ID and value, A pcd token maybe contains more than one Sku instance.
 **/
 public class SkuInstance {
     ///

@@ -72,7 +72,7 @@ public class UsageInstance {
        Constructure function for UsageInstance
 
        @param parentToken         The token instance for this usgaInstance
-       @param id                  The identification for usage instance
+       @param usageId             The identification for usage instance
        @param modulePcdType       The PCD type for this usage instance
        @param value               The value of this PCD in this usage instance
        @param maxDatumSize        The max datum size of this PCD in this usage
