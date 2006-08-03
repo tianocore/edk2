@@ -32,28 +32,36 @@ import net.sf.antcontrib.cpptasks.types.ConditionalPath;
 import net.sf.antcontrib.cpptasks.types.IncludePath;
 import net.sf.antcontrib.cpptasks.types.LibrarySet;
 
-public class UserDefineDef extends ProcessorDef{
-    
-    public UserDefineDef () {}
-    
+/**
+ * A userdefinedef definition. userdefine elements may be placed either as
+ * children of a cc element or the project element. A userdefine element with an
+ * id attribute may be referenced by userdefine elements with refid or extends
+ * attributes.
+ * 
+ */
+public class UserDefineDef extends ProcessorDef {
+
+    public UserDefineDef () {
+    }
+
     private String type = "CC";
-    
+
     private String family = "MSFT";
-    
+
     private String cmd;
-    
-    private String includepathDelimiter;
-    
+
+    private String includePathDelimiter;
+
     private String outputDelimiter;
-    
+
     private File workdir;
-    
-    private Vector includePaths= new Vector();
-    
+
+    private Vector includePaths = new Vector();
+
     private String outputFile;
-    
-    private Vector _libset = new Vector();
-    
+
+    private Vector allLibraries = new Vector();
+
     public void addLibset(LibrarySet libset) {
         if (isReference()) {
             throw noChildrenAllowed();
@@ -61,15 +69,14 @@ public class UserDefineDef extends ProcessorDef{
         if (libset == null) {
             throw new NullPointerException("libset");
         }
-        
-        _libset.add(libset);
+
+        allLibraries.add(libset);
     }
-    
+
     public void execute() throws org.apache.tools.ant.BuildException {
         throw new org.apache.tools.ant.BuildException(
                         "Not an actual task, but looks like one for documentation purposes");
     }
-
 
     public void addConfiguredArgument(UserDefineArgument arg) {
         if (isReference()) {
@@ -77,15 +84,12 @@ public class UserDefineDef extends ProcessorDef{
         }
         addConfiguredProcessorArg(arg);
     }
-    
+
     /**
      * Creates an include path.
      */
     public IncludePath createIncludePath() {
         Project p = getProject();
-        if (p == null) {
-            throw new java.lang.IllegalStateException("project must be set");
-        }
         if (isReference()) {
             throw noChildrenAllowed();
         }
@@ -93,11 +97,14 @@ public class UserDefineDef extends ProcessorDef{
         includePaths.addElement(path);
         return path;
     }
-    
-    
+
     /**
      * Add a <includepath> if specify the file attribute
      * 
+     * @param activePath
+     *            Active Path Vector
+     * @param file
+     *            File with multiple path
      * @throws BuildException
      *             if the specify file not exist
      */
@@ -112,7 +119,7 @@ public class UserDefineDef extends ProcessorDef{
             fileReader = new FileReader(file);
             in = new BufferedReader(fileReader);
             while ((str = in.readLine()) != null) {
-                if (str.trim() == "") {
+                if (str.trim().endsWith("")) {
                     continue;
                 }
                 str = getProject().replaceProperties(str);
@@ -122,9 +129,11 @@ public class UserDefineDef extends ProcessorDef{
             throw new BuildException(e.getMessage());
         }
     }
-    
+
     /**
      * Returns the specific include path.
+     * 
+     * @return All active include paths
      */
     public String[] getActiveIncludePaths() {
         if (isReference()) {
@@ -133,14 +142,12 @@ public class UserDefineDef extends ProcessorDef{
         }
         return getActivePaths(includePaths);
     }
-    
+
     private String[] getActivePaths(Vector paths) {
         Project p = getProject();
-        if (p == null) {
-            throw new java.lang.IllegalStateException("project not set");
-        }
         Vector activePaths = new Vector(paths.size());
-        for (int i = 0; i < paths.size(); i++) {
+        int length = paths.size();
+        for (int i = 0; i < length; i++) {
             ConditionalPath path = (ConditionalPath) paths.elementAt(i);
             if (path.isActive(p)) {
                 if (path.getFile() == null) {
@@ -157,22 +164,38 @@ public class UserDefineDef extends ProcessorDef{
         activePaths.copyInto(pathNames);
         return pathNames;
     }
-    
-    public String getIncludepathDelimiter() {
+
+    /**
+     * Get include path delimiter.
+     * 
+     * @return Include Path Delimiter
+     */
+    public String getIncludePathDelimiter() {
         if (isReference()) {
             return ((UserDefineDef) getCheckedRef(UserDefineDef.class,
-                            "UserDefineDef")).getIncludepathDelimiter();
+                            "UserDefineDef")).getIncludePathDelimiter();
         }
-        return includepathDelimiter;
+        return includePathDelimiter;
     }
 
-    public void setIncludepathDelimiter(String includepathDelimiter) {
+    /**
+     * Set include path delimiter.
+     * 
+     * @param includePathDelimiter
+     *            include path delimiter
+     */
+    public void setIncludePathDelimiter(String includePathDelimiter) {
         if (isReference()) {
             throw tooManyAttributes();
         }
-        this.includepathDelimiter = includepathDelimiter;
+        this.includePathDelimiter = includePathDelimiter;
     }
 
+    /**
+     * Get type.
+     * 
+     * @return type
+     */
     public String getType() {
         if (isReference()) {
             return ((UserDefineDef) getCheckedRef(UserDefineDef.class,
@@ -181,6 +204,12 @@ public class UserDefineDef extends ProcessorDef{
         return type;
     }
 
+    /**
+     * Set type.
+     * 
+     * @param type
+     *            Type
+     */
     public void setType(String type) {
         if (isReference()) {
             throw tooManyAttributes();
@@ -232,29 +261,28 @@ public class UserDefineDef extends ProcessorDef{
         this.workdir = workdir;
     }
 
-    public String[] get_libset() {
+    public String[] getLibset() {
         Set libs = new LinkedHashSet();
-        Iterator iter = _libset.iterator();
+        Iterator iter = allLibraries.iterator();
         while (iter.hasNext()) {
-            LibrarySet librarySet = (LibrarySet)iter.next();
+            LibrarySet librarySet = (LibrarySet) iter.next();
             File basedir = librarySet.getDir(getProject());
             String[] libStrArray = librarySet.getLibs();
-            for (int i = 0 ; i < libStrArray.length; i ++) {
+            for (int i = 0; i < libStrArray.length; i++) {
                 if (basedir != null) {
                     File libFile = new File(libStrArray[i]);
                     if (libFile.isAbsolute()) {
                         libs.add(libFile.getPath());
+                    } else {
+                        libs.add(basedir.getPath() + File.separatorChar
+                                        + libFile.getPath());
                     }
-                    else {
-                        libs.add(basedir.getPath() + File.separatorChar + libFile.getPath());
-                    }
-                }
-                else {
+                } else {
                     libs.add(libStrArray[i]);
                 }
             }
         }
-        return (String[])libs.toArray(new String[libs.size()]);
+        return (String[]) libs.toArray(new String[libs.size()]);
     }
 
     public String getOutputDelimiter() {
