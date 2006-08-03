@@ -35,13 +35,13 @@ import javax.swing.ImageIcon;
 public class About extends IDialog {
 
     ///
-    /// Define class Serial Version UID
+    /// Define Class Serial Version UID
     ///
     private static final long serialVersionUID = 2958136136667310962L;
 
-    //
-    //Define class members
-    //
+    ///
+    /// Define Class Members
+    ///
     private JPanel jContentPane = null;
 
     private JLabel jLabel = null;
@@ -68,11 +68,6 @@ public class About extends IDialog {
             jButtonOK.addActionListener(this);
         }
         return jButtonOK;
-    }
-
-    public static void main(String[] args) {
-        About a = new About();
-        a.setVisible(true);
     }
 
     /**

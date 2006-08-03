@@ -39,35 +39,6 @@ public class Tools {
     public static String dirForNewSpd = null;
 
     /**
-     Used for test
-     
-     @param args
-     
-     **/
-    public static void main(String[] args) {
-        System.out.println(getCurrentDateTime());
-        //        Vector<String> v = new Vector<String>();
-        //        Vector<String> v1 = new Vector<String>();
-        //        
-        //        v.addElement("CAC");
-        //        v1.addElement("1111");
-        //        v.addElement("1AC");
-        //        v1.addElement("2222");
-        //        v.addElement("ABC");
-        //        v1.addElement("3333");
-        //        v.addElement("0C");
-        //        v1.addElement("4444");
-        //        v.addElement("AAC");
-        //        v1.addElement("5555");
-        //        Vector<Integer> vs = new Vector<Integer>();
-        //        vs = Tools.getVectorSortSequence(v, DataType.Sort_Type_Ascending);
-        //        Tools.sortVectorString(v1, Tools.getVectorSortSequence(v, DataType.Sort_Type_Ascending));
-        //        
-        //        Tools.sortVectorString(v, DataType.Sort_Type_Ascending);
-        //        Tools.sortVectorString(v, DataType.Sort_Type_Descending);
-    }
-
-    /**
      Get current date and time and format it as "yyyy-MM-dd HH:mm"
      
      @return formatted current date and time
@@ -406,5 +377,84 @@ public class Tools {
         }
 
         return strReturn;
+    }
+    
+    public static String convertUnicodeHexStringToString(String str) {
+        //
+        // Handle if str is null or empty
+        //
+        if (str == null) {
+            return "";
+        }
+        if (str.equals("")) {
+            return "";
+        }
+
+        String returnString = "";
+        String[] strArray = str.split(" ");
+        for (int index = 0; index < strArray.length; index++) {
+            String s = strArray[index];
+            if (s.length() == 6 && s.indexOf(DataType.HEX_STRING_HEADER) == 0) {
+                s = s.substring(DataType.HEX_STRING_HEADER.length());
+            } else {
+                Log.err("convertUnicodeHexStringToString", "Wrong input string: " + str);
+                continue;
+            }
+            //
+            // Change hex to dec
+            //
+            int dec = Integer.parseInt(s, 16);
+            
+            returnString = returnString + (char)(dec);
+        }
+        return returnString;
+    }
+
+    /**
+     Convert input string to unicode hex string
+     
+     @param str input string
+     @return unicode hex string
+     
+     **/
+    public static String convertStringToUnicodeHexString(String str) {
+        //
+        // Handle if str is null or empty
+        //
+        if (str == null) {
+            return "";
+        }
+        if (str.equals("")) {
+            return "";
+        }
+
+        //
+        // convert string to hex string
+        //
+        String hexString = "";
+        for (int index = 0; index < str.length(); index++) {
+            int codePoint = str.codePointAt(index);
+            String s = Integer.toHexString(codePoint);
+            //
+            // Make the string to four length
+            //
+            if (s.length() == 3) {
+                s = "0" + s;
+            } else if (s.length() == 2) {
+                s = "00" + s;
+            } else if (s.length() == 1) {
+                s = "000" + s;
+            }
+
+            //
+            // Add the string to return hex string
+            //
+            hexString = hexString + DataType.HEX_STRING_HEADER + s + " ";
+        }
+
+        //
+        // return hex string
+        //
+        return hexString.trim();
     }
 }

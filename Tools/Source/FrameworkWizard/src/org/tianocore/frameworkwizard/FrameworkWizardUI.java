@@ -108,8 +108,8 @@ import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 import org.tianocore.frameworkwizard.workspace.ui.SwitchWorkspace;
 
 /**
- The class is used to show main GUI of ModuleEditor
- It extends IFrame implements MouseListener, TreeSelectionListener
+ The class is used to show main GUI of FrameworkWizard
+ It extends IFrame implements MouseListener, TreeSelectionListener, ComponentListener and MenuListener
 
  **/
 public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSelectionListener, ComponentListener,
@@ -119,9 +119,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     ///
     private static final long serialVersionUID = -7103240960573031772L;
 
-    //
-    // To save information of all files
-    //
+    ///
+    /// Used to save information of all files
+    ///
     private Vector<ModuleIdentification> vModuleList = new Vector<ModuleIdentification>();
 
     private Vector<PackageIdentification> vPackageList = new Vector<PackageIdentification>();
@@ -140,6 +140,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private int currentOpeningPlatformIndex = -1;
 
+    ///
+    /// Used to generate tree structure
+    ///
     private IDefaultMutableTreeNode dmtnRoot = null;
 
     private IDefaultMutableTreeNode dmtnModuleDescription = null;
@@ -148,6 +151,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private IDefaultMutableTreeNode dmtnPlatformDescription = null;
 
+    ///
+    /// Used for UI
+    ///
     private JPanel jContentPane = null;
 
     private JMenuBar jMenuBar = null;
@@ -292,16 +298,19 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private JMenuItem jMenuItemProjectRemoveFar = null;
 
-    //private JToolBar jToolBarFile = null;
-
-    //private JToolBar jToolBarEdit = null;
-
-    //private JToolBar jToolBarWindow = null;
-
-    private static FrameworkWizardUI fwui = null;
-
     private JMenuItem jMenuItemProjectCreateFar = null;
 
+    ///
+    /// A static definition for this class itself
+    ///
+    private static FrameworkWizardUI fwui = null;
+
+    /**
+     If the class hasn't an instnace, new one.
+     
+     @return FrameworkWizardUI The instance of this class
+     
+     **/
     public static FrameworkWizardUI getInstance() {
         if (fwui == null) {
             fwui = new FrameworkWizardUI();
@@ -351,7 +360,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JTabbedPane	
      
-     */
+     **/
     private JTabbedPane getJTabbedPaneEditor() {
         if (jTabbedPaneEditor == null) {
             jTabbedPaneEditor = new JTabbedPane();
@@ -363,7 +372,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                              .setMinimumSize(new java.awt.Dimension(
                                                                     DataType.MAIN_FRAME_EDITOR_PANEL_PREFERRED_SIZE_WIDTH,
                                                                     DataType.MAIN_FRAME_EDITOR_PANEL_PREFERRED_SIZE_HEIGHT));
-            //jTabbedPaneEditor.addChangeListener(this);
             jTabbedPaneEditor.addTab("Module", null, getJDesktopPaneModule(), null);
             jTabbedPaneEditor.addTab("Package", null, getJDesktopPanePackage(), null);
             jTabbedPaneEditor.addTab("Platform", null, getJDesktopPanePlatform(), null);
@@ -376,7 +384,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JTabbedPane	
      
-     */
+     **/
     private JTabbedPane getJTabbedPaneTree() {
         if (jTabbedPaneTree == null) {
             jTabbedPaneTree = new JTabbedPane();
@@ -400,29 +408,35 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      **/
     private JMenu getJMenuFile() {
         if (jMenuFile == null) {
+            //
+            // Set jMenuFile's attributes
+            //
             jMenuFile = new JMenu();
             jMenuFile.setText("File");
             jMenuFile.setMnemonic('F');
+            jMenuFile.addMenuListener(this);
+
+            //
+            // Add sub menu items
+            //
             jMenuFile.add(getJMenuItemFileNew());
             jMenuFile.add(getJMenuItemFileOpen());
             jMenuFile.add(getJMenuItemFileClose());
             jMenuFile.add(getJMenuItemFileCloseAll());
             jMenuFile.addSeparator();
+
             jMenuFile.add(getJMenuFileRecentFiles());
-            //jMenuFile.addSeparator();
             jMenuFile.add(getJMenuItemFileSave());
             jMenuFile.add(getJMenuItemFileSaveAs());
             jMenuFile.add(getJMenuItemFileSaveAll());
             jMenuFile.addSeparator();
+
             jMenuFile.add(getJMenuItemFilePageSetup());
             jMenuFile.add(getJMenuItemFilePrint());
-            //jMenuFile.addSeparator();
             jMenuFile.add(getJMenuItemFileImport());
-            //jMenuFile.addSeparator();
             jMenuFile.add(getJMenuItemFileProperties());
-            //jMenuFile.addSeparator();
+
             jMenuFile.add(getJMenuItemFileExit());
-            jMenuFile.addMenuListener(this);
         }
         return jMenuFile;
     }
@@ -469,22 +483,31 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      **/
     private JMenu getJMenuEdit() {
         if (jMenuEdit == null) {
+            //
+            // Set jMenuEdit's attributes
+            //
             jMenuEdit = new JMenu();
             jMenuEdit.setText("Edit");
             jMenuEdit.setMnemonic('E');
+            jMenuEdit.setVisible(false);
+
+            //
+            // Add sub menu items
+            //
             jMenuEdit.add(getJMenuItemEditUndo());
             jMenuEdit.add(getJMenuItemEditRedo());
             jMenuEdit.addSeparator();
+
             jMenuEdit.add(getJMenuItemEditCut());
             jMenuEdit.add(getJMenuItemEditCopy());
             jMenuEdit.add(getJMenuItemEditPaste());
             jMenuEdit.add(getJMenuItemEditDelete());
             jMenuEdit.addSeparator();
+
             jMenuEdit.add(getJMenuItemEditSelectAll());
             jMenuEdit.add(getJMenuItemEditFind());
             jMenuEdit.add(getJMenuItemEditFindNext());
             jMenuEdit.addSeparator();
-            jMenuEdit.setVisible(false);
         }
         return jMenuEdit;
     }
@@ -571,7 +594,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     private JScrollPane getJScrollPaneTree() {
         if (jScrollPaneTree == null) {
             jScrollPaneTree = new JScrollPane();
-            //jScrollPaneTree.setBounds(new java.awt.Rectangle(0, 1, 290, 545));
             jScrollPaneTree
                            .setPreferredSize(new java.awt.Dimension(
                                                                     DataType.MAIN_FRAME_TREE_PANEL_PREFERRED_SIZE_WIDTH,
@@ -607,12 +629,19 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      **/
     private JMenu getJMenuHelp() {
         if (jMenuHelp == null) {
+            //
+            // Set jMenuHelp's attributes
+            //
             jMenuHelp = new JMenu();
             jMenuHelp.setText("Help");
+
+            //
+            // Add sub menu items
+            //
             jMenuHelp.add(getJMenuItemHelpContents());
             jMenuHelp.add(getJMenuItemHelpIndex());
             jMenuHelp.add(getJMenuItemHelpSearch());
-            //jMenuHelp.addSeparator();
+
             jMenuHelp.add(getJMenuItemHelpAbout());
         }
         return jMenuHelp;
@@ -646,81 +675,12 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditDelete.setMnemonic('D');
             jMenuItemEditDelete.addActionListener(this);
             //
-            //Disabled when no module is open
+            //Disabled first when no module is open
             //
             jMenuItemEditDelete.setEnabled(false);
         }
         return jMenuItemEditDelete;
     }
-
-    //    /**
-    //     This method initializes jPopupMenu 
-    //     
-    //     @return javax.swing.JPopupMenu jPopupMenu
-    //     
-    //     **/
-    //    private JPopupMenu getJPopupMenu() {
-    //        if (jPopupMenu == null) {
-    //            jPopupMenu = new JPopupMenu();
-    //            //
-    //            //Add menu items of popup menu
-    //            //
-    //            jPopupMenu.add(getJMenuItemPopupAdd());
-    //            jPopupMenu.add(getJMenuItemPopupUpdate());
-    //            jPopupMenu.add(getJMenuItemPopupDelete());
-    //            jPopupMenu.setBorder(new BevelBorder(BevelBorder.RAISED));
-    //            jPopupMenu.addMouseListener(this);
-    //        }
-    //        return jPopupMenu;
-    //    }
-    //
-    //    /**
-    //     This method initializes jMenuItemPopupAdd 
-    //     
-    //     @return javax.swing.JMenuItem jMenuItemPopupAdd
-    //     
-    //     **/
-    //    private JMenuItem getJMenuItemPopupAdd() {
-    //        if (jMenuItemPopupAdd == null) {
-    //            jMenuItemPopupAdd = new JMenuItem();
-    //            jMenuItemPopupAdd.setText("Add");
-    //            jMenuItemPopupAdd.addActionListener(this);
-    //            jMenuItemPopupAdd.setEnabled(false);
-    //        }
-    //        return jMenuItemPopupAdd;
-    //    }
-    //
-    //    /**
-    //     This method initializes jMenuItemPopupUpdate 
-    //     
-    //     @return javax.swing.JMenuItem jMenuItemPopupUpdate
-    //     
-    //     **/
-    //    private JMenuItem getJMenuItemPopupUpdate() {
-    //        if (jMenuItemPopupUpdate == null) {
-    //            jMenuItemPopupUpdate = new JMenuItem();
-    //            jMenuItemPopupUpdate.setText("Update");
-    //            jMenuItemPopupUpdate.addActionListener(this);
-    //            jMenuItemPopupUpdate.setEnabled(false);
-    //        }
-    //        return jMenuItemPopupUpdate;
-    //    }
-    //
-    //    /**
-    //     This method initializes jMenuItemPopupDelete 
-    //     
-    //     @return javax.swing.JMenuItem jMenuItemPopupDelete
-    //     
-    //     **/
-    //    private JMenuItem getJMenuItemPopupDelete() {
-    //        if (jMenuItemPopupDelete == null) {
-    //            jMenuItemPopupDelete = new JMenuItem();
-    //            jMenuItemPopupDelete.setText("Delete");
-    //            jMenuItemPopupDelete.addActionListener(this);
-    //            jMenuItemPopupDelete.setEnabled(false);
-    //        }
-    //        return jMenuItemPopupDelete;
-    //    }
 
     /**
      This method initializes jMenuFileNew 
@@ -781,15 +741,22 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      **/
     private JMenu getJMenuTools() {
         if (jMenuTools == null) {
+            //
+            // Set jMenuTools's attributes
+            //
             jMenuTools = new JMenu();
             jMenuTools.setText("Tools");
             jMenuTools.setMnemonic('T');
+            jMenuTools.addMenuListener(this);
+
+            //
+            // Add sub menu items
+            //
             jMenuTools.add(getJMenuItemToolsToolChainConfiguration());
             jMenuTools.addSeparator();
+
             jMenuTools.add(getJMenuItemToolsClone());
-            //jMenuTools.addSeparator();
             jMenuTools.add(getJMenuItemToolsCodeScan());
-            jMenuTools.addMenuListener(this);
         }
         return jMenuTools;
     }
@@ -803,25 +770,36 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      **/
     private JMenu getJMenuWindow() {
         if (jMenuWindow == null) {
+            //
+            // Set jMenuWindow's attribute
+            //
             jMenuWindow = new JMenu();
             jMenuWindow.setText("Window");
             jMenuWindow.setMnemonic('W');
+            jMenuWindow.setVisible(false);
+
+            //
+            // Add sub menu items
+            //
             jMenuWindow.add(getJMenuItemWindowDisplaySide());
             jMenuWindow.add(getJMenuItemWindowDisplayTopBottom());
             jMenuWindow.addSeparator();
+
             jMenuWindow.add(getJMenuItemWindowTabView());
             jMenuWindow.addSeparator();
+
             jMenuWindow.add(getJMenuItemWindowSource());
             jMenuWindow.add(getJMenuItemWindowXML());
             jMenuWindow.addSeparator();
+
             jMenuWindow.add(getJMenuItemWindowPreferences());
-            jMenuWindow.setVisible(false);
         }
         return jMenuWindow;
     }
 
     /**
-     This method initializes jPanelOperation 
+     This method initializes jPanelOperation
+     Reserved
      
      @return javax.swing.JPanel jPanelOperation
      
@@ -839,7 +817,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     /**
-     This method initializes jButtonOk 
+     This method initializes jButtonOk
+     Reserved
      
      @return javax.swing.JButton jButtonOk
      
@@ -856,7 +835,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     /**
-     This method initializes jButtonCancel 
+     This method initializes jButtonCancel
+     Reserved
      
      @return javax.swing.JButton jButtonCancel
      
@@ -877,7 +857,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemFileOpen	
      
      @return javax.swing.JMenuItem jMenuItemFileOpen
-     */
+     
+     **/
     private JMenuItem getJMenuItemFileOpen() {
         if (jMenuItemFileOpen == null) {
             jMenuItemFileOpen = new JMenuItem();
@@ -892,7 +873,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemFileCloseAll	
      
      @return javax.swing.JMenuItem jMenuItemFileOpen
-     */
+     
+     **/
     private JMenuItem getJMenuItemFileCloseAll() {
         if (jMenuItemFileCloseAll == null) {
             jMenuItemFileCloseAll = new JMenuItem();
@@ -907,7 +889,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemFileSaveAll	
      
      @return javax.swing.JMenuItem jMenuItemFileSaveAll
-     */
+     
+     **/
     private JMenuItem getJMenuItemFileSaveAll() {
         if (jMenuItemFileSaveAll == null) {
             jMenuItemFileSaveAll = new JMenuItem();
@@ -923,7 +906,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemFilePageSetup	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemFilePageSetup() {
         if (jMenuItemFilePageSetup == null) {
             jMenuItemFilePageSetup = new JMenuItem();
@@ -940,7 +924,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemFilePrint	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemFilePrint() {
         if (jMenuItemFilePrint == null) {
             jMenuItemFilePrint = new JMenuItem();
@@ -957,7 +942,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemFileImport	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemFileImport() {
         if (jMenuItemFileImport == null) {
             jMenuItemFileImport = new JMenuItem();
@@ -971,10 +957,11 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     /**
-     * This method initializes jMenuItemFileProperties	
-     * 	
-     * @return javax.swing.JMenuItem	
-     */
+     This method initializes jMenuItemFileProperties	
+     
+     @return javax.swing.JMenuItem	
+     
+     **/
     private JMenuItem getJMenuItemFileProperties() {
         if (jMenuItemFileProperties == null) {
             jMenuItemFileProperties = new JMenuItem();
@@ -988,10 +975,11 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     /**
-     * This method initializes jMenuFileRecentFiles	
-     * 	
-     * @return javax.swing.JMenu	
-     */
+     This method initializes jMenuFileRecentFiles	
+     
+     @return javax.swing.JMenu	
+     
+     **/
     private JMenu getJMenuFileRecentFiles() {
         if (jMenuFileRecentFiles == null) {
             jMenuFileRecentFiles = new JMenu();
@@ -1007,8 +995,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     /**
      This method initializes jMenuItemEditUndo	
      
-     @return javax.swing.JMenuItem	
-     */
+     @return javax.swing.JMenuItem
+     
+     **/
     private JMenuItem getJMenuItemEditUndo() {
         if (jMenuItemEditUndo == null) {
             jMenuItemEditUndo = new JMenuItem();
@@ -1024,7 +1013,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemEditRedo	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemEditRedo() {
         if (jMenuItemEditRedo == null) {
             jMenuItemEditRedo = new JMenuItem();
@@ -1040,7 +1030,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemEditCut	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemEditCut() {
         if (jMenuItemEditCut == null) {
             jMenuItemEditCut = new JMenuItem();
@@ -1056,7 +1047,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemEditCopy	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemEditCopy() {
         if (jMenuItemEditCopy == null) {
             jMenuItemEditCopy = new JMenuItem();
@@ -1072,7 +1064,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemEditPaste	
      
      return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemEditPaste() {
         if (jMenuItemEditPaste == null) {
             jMenuItemEditPaste = new JMenuItem();
@@ -1088,7 +1081,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItem	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemEditSelectAll() {
         if (jMenuItemEditSelectAll == null) {
             jMenuItemEditSelectAll = new JMenuItem();
@@ -1104,7 +1098,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      This method initializes jMenuItemEditFind	
      
      @return javax.swing.JMenuItem	
-     */
+     
+     **/
     private JMenuItem getJMenuItemEditFind() {
         if (jMenuItemEditFind == null) {
             jMenuItemEditFind = new JMenuItem();
@@ -1121,7 +1116,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemEditFindNext() {
         if (jMenuItemEditFindNext == null) {
             jMenuItemEditFindNext = new JMenuItem();
@@ -1138,17 +1133,24 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenu	
      
-     */
+     **/
     private JMenu getJMenuView() {
         if (jMenuView == null) {
+            //
+            // Set jMenuView's attributes
+            //
             jMenuView = new JMenu();
             jMenuView.setText("View");
             jMenuView.setMnemonic('V');
+            jMenuView.setVisible(false);
+
+            //
+            // Add sub menu items
+            //
             jMenuView.add(getJMenuViewToolbars());
             jMenuView.add(getJMenuItemViewAdvanced());
             jMenuView.add(getJMenuItemViewStandard());
             jMenuView.add(getJMenuItemViewXML());
-            jMenuView.setVisible(false);
         }
         return jMenuView;
     }
@@ -1158,12 +1160,13 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenu	
      
-     */
+     **/
     private JMenu getJMenuViewToolbars() {
         if (jMenuViewToolbars == null) {
             jMenuViewToolbars = new JMenu();
             jMenuViewToolbars.setText("Toolbars");
             jMenuViewToolbars.setMnemonic('T');
+
             jMenuViewToolbars.add(getJCheckBoxMenuItemViewToolbarsFile());
             jMenuViewToolbars.add(getJCheckBoxMenuItemViewToolbarsEdit());
             jMenuViewToolbars.add(getJCheckBoxMenuItemViewToolbarsWindow());
@@ -1176,7 +1179,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JCheckBoxMenuItem	
      
-     */
+     **/
     private JCheckBoxMenuItem getJCheckBoxMenuItemViewToolbarsFile() {
         if (jCheckBoxMenuItemViewToolbarsFile == null) {
             jCheckBoxMenuItemViewToolbarsFile = new JCheckBoxMenuItem();
@@ -1192,7 +1195,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JCheckBoxMenuItem	
      
-     */
+     **/
     private JCheckBoxMenuItem getJCheckBoxMenuItemViewToolbarsEdit() {
         if (jCheckBoxMenuItemViewToolbarsEdit == null) {
             jCheckBoxMenuItemViewToolbarsEdit = new JCheckBoxMenuItem();
@@ -1208,7 +1211,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JCheckBoxMenuItem	
      
-     */
+     **/
     private JCheckBoxMenuItem getJCheckBoxMenuItemViewToolbarsWindow() {
         if (jCheckBoxMenuItemViewToolbarsWindow == null) {
             jCheckBoxMenuItemViewToolbarsWindow = new JCheckBoxMenuItem();
@@ -1224,7 +1227,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemViewStandard() {
         if (jMenuItemViewStandard == null) {
             jMenuItemViewStandard = new JMenuItem();
@@ -1241,7 +1244,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemViewAdvanced() {
         if (jMenuItemViewAdvanced == null) {
             jMenuItemViewAdvanced = new JMenuItem();
@@ -1258,21 +1261,29 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenu	
      
-     */
+     **/
     private JMenu getJMenuProject() {
         if (jMenuProject == null) {
+            //
+            // Set jMenuProject's attributes
+            //
             jMenuProject = new JMenu();
             jMenuProject.setText("Project");
             jMenuProject.setMnemonic('P');
+
+            //
+            // Add sub menu items
+            //
             jMenuProject.add(getJMenuItemProjectAdmin());
-            //jMenuProject.addSeparator();
+
             jMenuProject.add(getJMenuItemProjectChangeWorkspace());
             jMenuProject.addSeparator();
+
             jMenuProject.add(getJMenuItemProjectCreateFar());
             jMenuProject.add(getJMenuItemProjectInstallFar());
             jMenuProject.add(getJMenuItemProjectUpdateFar());
             jMenuProject.add(getJMenuItemProjectRemoveFar());
-            //jMenuProject.addSeparator();
+
             jMenuProject.add(getJMenuProjectBuildTargets());
         }
         return jMenuProject;
@@ -1283,7 +1294,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemProjectAdmin() {
         if (jMenuItemProjectAdmin == null) {
             jMenuItemProjectAdmin = new JMenuItem();
@@ -1301,7 +1312,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemProjectChangeWorkspace() {
         if (jMenuItemProjectChangeWorkspace == null) {
             jMenuItemProjectChangeWorkspace = new JMenuItem();
@@ -1318,15 +1329,16 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenu	
      
-     */
+     **/
     private JMenu getJMenuProjectBuildTargets() {
         if (jMenuProjectBuildTargets == null) {
             jMenuProjectBuildTargets = new JMenu();
             jMenuProjectBuildTargets.setText("Build Targets");
             jMenuProjectBuildTargets.setMnemonic('T');
+            jMenuProjectBuildTargets.setVisible(false);
+
             jMenuProjectBuildTargets.add(getJCheckBoxMenuItemProjectBuildTargetsDebug());
             jMenuProjectBuildTargets.add(getJCheckBoxMenuItemProjectBuildTargetsRelease());
-            jMenuProjectBuildTargets.setVisible(false);
         }
         return jMenuProjectBuildTargets;
     }
@@ -1336,7 +1348,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JCheckBoxMenuItem	
      
-     */
+     **/
     private JCheckBoxMenuItem getJCheckBoxMenuItemProjectBuildTargetsDebug() {
         if (jCheckBoxMenuItemProjectBuildTargetsDebug == null) {
             jCheckBoxMenuItemProjectBuildTargetsDebug = new JCheckBoxMenuItem();
@@ -1351,7 +1363,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JCheckBoxMenuItem	
      
-     */
+     **/
     private JCheckBoxMenuItem getJCheckBoxMenuItemProjectBuildTargetsRelease() {
         if (jCheckBoxMenuItemProjectBuildTargetsRelease == null) {
             jCheckBoxMenuItemProjectBuildTargetsRelease = new JCheckBoxMenuItem();
@@ -1366,7 +1378,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemToolsToolChainConfiguration() {
         if (jMenuItemToolsToolChainConfiguration == null) {
             jMenuItemToolsToolChainConfiguration = new JMenuItem();
@@ -1382,7 +1394,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemToolsClone() {
         if (jMenuItemToolsClone == null) {
             jMenuItemToolsClone = new JMenuItem();
@@ -1399,7 +1411,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemToolsCodeScan() {
         if (jMenuItemToolsCodeScan == null) {
             jMenuItemToolsCodeScan = new JMenuItem();
@@ -1417,7 +1429,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemWindowDisplaySide() {
         if (jMenuItemWindowDisplaySide == null) {
             jMenuItemWindowDisplaySide = new JMenuItem();
@@ -1434,7 +1446,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemWindowDisplayTopBottom() {
         if (jMenuItemWindowDisplayTopBottom == null) {
             jMenuItemWindowDisplayTopBottom = new JMenuItem();
@@ -1451,7 +1463,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemViewXML() {
         if (jMenuItemViewXML == null) {
             jMenuItemViewXML = new JMenuItem();
@@ -1468,7 +1480,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemWindowTabView() {
         if (jMenuItemWindowTabView == null) {
             jMenuItemWindowTabView = new JMenuItem();
@@ -1485,7 +1497,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemWindowSource() {
         if (jMenuItemWindowSource == null) {
             jMenuItemWindowSource = new JMenuItem();
@@ -1502,7 +1514,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemWindowXML() {
         if (jMenuItemWindowXML == null) {
             jMenuItemWindowXML = new JMenuItem();
@@ -1519,7 +1531,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemWindowPreferences() {
         if (jMenuItemWindowPreferences == null) {
             jMenuItemWindowPreferences = new JMenuItem();
@@ -1536,7 +1548,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemHelpContents() {
         if (jMenuItemHelpContents == null) {
             jMenuItemHelpContents = new JMenuItem();
@@ -1554,7 +1566,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      @return javax.swing.JMenuItem	
      
-     */
+     **/
     private JMenuItem getJMenuItemHelpIndex() {
         if (jMenuItemHelpIndex == null) {
             jMenuItemHelpIndex = new JMenuItem();
@@ -1585,30 +1597,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         return jMenuItemHelpSearch;
     }
 
-    /**
-     * This method initializes jToolBar	
-     * 	
-     * @return javax.swing.JToolBar	
-     */
-    //	private JToolBar getJToolBarFile() {
-    //		if (jToolBarFile == null) {
-    //			jToolBarFile = new JToolBar();
-    //			jToolBarFile.setFloatable(false);
-    //		}
-    //		return jToolBarFile;
-    //	}
-    /**
-     * This method initializes jToolBarEdit	
-     * 	
-     * @return javax.swing.JToolBar	
-     */
-    //	private JToolBar getJToolBarEdit() {
-    //		if (jToolBarEdit == null) {
-    //			jToolBarEdit = new JToolBar();
-    //			jToolBarEdit.setFloatable(false);
-    //		}
-    //		return jToolBarEdit;
-    //	}
     /**
      * This method initializes jMenuItemToolsInstallPackage	
      * 	
@@ -1791,50 +1779,19 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         }
 
         if (arg0.getSource() == jMenuItemProjectCreateFar) {
-            CreateStepOne cso = new CreateStepOne(this, true);
-            int result = cso.showDialog();
-            if (result == DataType.RETURN_TYPE_OK) {
-                String strReturn = "Create Far Done!";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
-                                              JOptionPane.INFORMATION_MESSAGE);
-            }
-            cso.dispose();
+            createFar();
         }
 
         if (arg0.getSource() == jMenuItemProjectInstallFar) {
-            InstallStepOne iso = new InstallStepOne(this, true);
-            int result = iso.showDialog();
-            if (result == DataType.RETURN_TYPE_OK) {
-                String strReturn = "<html>Install Far Done! <br>The WORKSPACE will be refreshed!</html>";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
-                                              JOptionPane.INFORMATION_MESSAGE);
-                this.closeAll();
-            }
-            iso.dispose();
+            installFar();
         }
 
         if (arg0.getSource() == jMenuItemProjectRemoveFar) {
-            DeleteStepOne dso = new DeleteStepOne(this, true);
-            int result = dso.showDialog();
-            if (result == DataType.RETURN_TYPE_OK) {
-                String strReturn = "<html>Delete Far Done! <br>The WORKSPACE will be refreshed!</html>";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
-                                              JOptionPane.INFORMATION_MESSAGE);
-                this.closeAll();
-            }
-            dso.dispose();
+            removeFar();
         }
 
         if (arg0.getSource() == jMenuItemProjectUpdateFar) {
-            UpdateStepOne uso = new UpdateStepOne(this, true);
-            int result = uso.showDialog();
-            if (result == DataType.RETURN_TYPE_OK) {
-                String strReturn = "<html>Update Far Done! <br>The WORKSPACE will be refreshed!</html>";
-                JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
-                                              JOptionPane.INFORMATION_MESSAGE);
-                this.closeAll();
-            }
-            uso.dispose();
+            updateFar();
         }
 
         if (arg0.getSource() == jMenuItemToolsClone) {
@@ -1859,10 +1816,14 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      **/
     private void makeEmptyTree() {
+        //
         // Make root
+        //
         dmtnRoot = new IDefaultMutableTreeNode("WORKSPACE", IDefaultMutableTreeNode.WORKSPACE, -1);
 
+        //
         // Make Module Description
+        //
         dmtnModuleDescription = new IDefaultMutableTreeNode("ModuleDescription", IDefaultMutableTreeNode.MODULE, -1);
 
         //
@@ -1883,7 +1844,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                 dmtnModulePackageModule = new IDefaultMutableTreeNode("Module",
                                                                       IDefaultMutableTreeNode.MODULE_PACKAGE_MODULE,
                                                                       false, this.vPackageList.elementAt(index));
-
+                //
+                // And then add each module in its package
+                //
                 Vector<ModuleIdentification> vModule = wt.getAllModules(this.vPackageList.elementAt(index));
                 for (int indexJ = 0; indexJ < vModule.size(); indexJ++) {
                     if (vModule.get(indexJ).isLibrary()) {
@@ -1907,15 +1870,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             }
         }
 
-        //                if (this.vModuleList.size() > 0) {
-        //                    for (int index = 0; index < this.vModuleList.size(); index++) {
-        //                        dmtnModuleDescription.add(new IDefaultMutableTreeNode(this.vModuleList.elementAt(index).getName(),
-        //                                                                              IDefaultMutableTreeNode.MSA_HEADER, false,
-        //                                                                              this.vModuleList.elementAt(index)));
-        //                    }
-        //                }
-
+        //
         // Make Package Description
+        //
         dmtnPackageDescription = new IDefaultMutableTreeNode("PackageDescription", IDefaultMutableTreeNode.PACKAGE, -1);
         if (this.vPackageList.size() > 0) {
             for (int index = 0; index < this.vPackageList.size(); index++) {
@@ -1925,7 +1882,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             }
         }
 
+        //
         // Make Platform Description
+        //
         dmtnPlatformDescription = new IDefaultMutableTreeNode("PlatformDescription", IDefaultMutableTreeNode.PLATFORM,
                                                               -1);
         if (this.vPlatformList.size() > 0) {
@@ -1936,6 +1895,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             }
         }
 
+        //
+        // Add sub nodes to root node
+        //
         dmtnRoot.add(dmtnModuleDescription);
         dmtnRoot.add(dmtnPackageDescription);
         dmtnRoot.add(dmtnPlatformDescription);
@@ -3069,7 +3031,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             this.saveAll();
         }
         if (result == JOptionPane.NO_OPTION) {
+            //
             // Do nothing
+            //
         }
         if (result == JOptionPane.CANCEL_OPTION) {
             return;
@@ -3179,6 +3143,69 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                           + Workspace.getCurrentWorkspace() + "]");
         }
         sw.dispose();
+    }
+
+    /**
+     To create a Far file from current workspace
+     
+     **/
+    private void createFar() {
+        CreateStepOne cso = new CreateStepOne(this, true);
+        int result = cso.showDialog();
+        if (result == DataType.RETURN_TYPE_OK) {
+            String strReturn = "Create Far Done!";
+            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.INFORMATION_MESSAGE);
+        }
+        cso.dispose();
+    }
+
+    /**
+     To install a Far file to current workspace
+     
+     **/
+    private void installFar() {
+        InstallStepOne iso = new InstallStepOne(this, true);
+        int result = iso.showDialog();
+        if (result == DataType.RETURN_TYPE_OK) {
+            String strReturn = "<html>Install Far Done! <br>The WORKSPACE will be refreshed!</html>";
+            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.INFORMATION_MESSAGE);
+            this.closeAll();
+        }
+        iso.dispose();
+    }
+
+    /**
+     To remove a Far's items from current workspace
+     
+     **/
+    private void removeFar() {
+        DeleteStepOne dso = new DeleteStepOne(this, true);
+        int result = dso.showDialog();
+        if (result == DataType.RETURN_TYPE_OK) {
+            String strReturn = "<html>Delete Far Done! <br>The WORKSPACE will be refreshed!</html>";
+            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.INFORMATION_MESSAGE);
+            this.closeAll();
+        }
+        dso.dispose();
+    }
+
+    /**
+     To update an existing Far file
+     
+     **/
+    private void updateFar() {
+        UpdateStepOne uso = new UpdateStepOne(this, true);
+        int result = uso.showDialog();
+        if (result == DataType.RETURN_TYPE_OK) {
+            String strReturn = "<html>Update Far Done! <br>The WORKSPACE will be refreshed!</html>";
+            JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.INFORMATION_MESSAGE);
+            this.closeAll();
+        }
+        uso.dispose();
     }
 
     /**

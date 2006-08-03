@@ -232,4 +232,9 @@ public class DataType {
     public static final String MODULE_TYPE_LIBRARY = "Library";
 
     public static final String MODULE_TYPE_MODULE = "Module";
+    
+    //
+    // Hex String Header
+    //
+    public static final String HEX_STRING_HEADER = "0x";
 }

@@ -228,6 +228,7 @@ public class SaveFile {
         //Save the file
         //
         msaDoc.save(f, options);
+        cursor.dispose();
     }
 
     /**
@@ -262,6 +263,7 @@ public class SaveFile {
         //Save the file
         //
         spdDoc.save(f, options);
+        cursor.dispose();
     }
 
     /**
@@ -296,6 +298,7 @@ public class SaveFile {
         //Save the file
         //
         fpdDoc.save(f, options);
+        cursor.dispose();
     }
 
     /**
@@ -326,5 +329,6 @@ public class SaveFile {
         //Save the file
         //
         dbDoc.save(f, options);
+        cursor.dispose();
     }
 }

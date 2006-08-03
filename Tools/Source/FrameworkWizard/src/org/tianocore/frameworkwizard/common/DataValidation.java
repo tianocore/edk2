@@ -309,7 +309,7 @@ public class DataValidation {
      
      **/
     public static boolean isHexWordArrayType(String arg0) {
-        return arg0.length() <=6 && isMatch("((\\s)*0x([a-fA-F0-9]){4}(,)?(\\s)*)+", arg0);
+        return arg0.length() >=6 && isMatch("((\\s)*0x([a-fA-F0-9]){4}(,)?(\\s)*)+", arg0);
     }
 
     /**
