@@ -20,7 +20,7 @@ import java.util.UUID;
 
 import org.tianocore.pcd.exception.EntityException;
 
-/** 
+/**
    This class is to descript a value type of dynamic PCD.
    For a dynamic or dynamicEx type PCD data, the value type can be:
        1) Hii type: the value of dynamic or dynamicEx is stored into a variable.
@@ -33,19 +33,19 @@ public class DynamicTokenValue {
     ///
     /// Enumeration macro defintion for value type.
     ///
-    public enum        VALUE_TYPE {HII_TYPE, VPD_TYPE, DEFAULT_TYPE}
+    public static enum        VALUE_TYPE {HII_TYPE, VPD_TYPE, DEFAULT_TYPE}
 
     ///
     /// The value type maybe:
     /// HII_TYPE: the value stored into variable area.
     /// VPD_TYPE: the value stored into OEM specific area.
     /// DEFAULT_TYPE: the value stored into PCD runtime database.
-    /// 
+    ///
     public VALUE_TYPE  type;
 
     ///
     /// ---------------------------------------------------------------------
-    /// Following member is for HII case. The value of HII case will be put 
+    /// Following member is for HII case. The value of HII case will be put
     /// into variable area in flash.
     /// ---------------------------------------------------------------------
     ///
@@ -87,12 +87,12 @@ public class DynamicTokenValue {
 
     ///
     /// The default value of this PCD in default case.
-    /// 
+    ///
     public String      value;
 
     /**
        Constructor function for DynamicTokenValue class.
-         
+
     **/
     public DynamicTokenValue() {
         type               = VALUE_TYPE.DEFAULT_TYPE;
@@ -107,7 +107,7 @@ public class DynamicTokenValue {
     /**
        Set the HII case data.
 
-       @param variableName      The variable name 
+       @param variableName      The variable name
        @param variableGuid      The variable guid
        @param variableOffset    The offset of value in this variable
        @param hiiDefaultValue   Default value for this PCD
@@ -130,7 +130,7 @@ public class DynamicTokenValue {
        BUGBUG: In fact, it is not correctly, variable name should be
                treated as unicode UINT16 array.
 
-       @return String 
+       @return String
     **/
     public String getStringOfVariableName()
         throws EntityException {

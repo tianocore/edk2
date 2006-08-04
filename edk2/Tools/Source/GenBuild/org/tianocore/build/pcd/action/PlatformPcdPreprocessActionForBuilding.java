@@ -39,6 +39,8 @@ import org.tianocore.pcd.entity.Token;
 import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.exception.EntityException;
 import org.tianocore.pcd.action.PlatformPcdPreprocessAction;
+import org.tianocore.build.exception.PlatformPcdPreprocessBuildException;
+import org.tianocore.pcd.exception.PlatformPcdPreprocessException;
 
 /**
    This action class is to collect PCD information from MSA, SPD, FPD xml file.
@@ -46,11 +48,6 @@ import org.tianocore.pcd.action.PlatformPcdPreprocessAction;
    from buildAction or UIAction.
 **/
 public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreprocessAction {
-    ///
-    /// Workspacepath hold the workspace information.
-    ///
-    private String                      workspacePath;
-
     ///
     /// FPD file is the root file.
     ///
@@ -65,15 +62,6 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     /// Cache the fpd docment instance for private usage.
     ///
     private PlatformSurfaceAreaDocument fpdDocInstance;
-
-    /**
-      Set WorkspacePath parameter for this action class.
-
-      @param workspacePath parameter for this action
-    **/
-    public void setWorkspacePath(String workspacePath) {
-        this.workspacePath = workspacePath;
-    }
 
     /**
       Set action message level for CollectPcdAction tool.
@@ -99,17 +87,16 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     /**
       Common function interface for outer.
 
-      @param workspacePath The path of workspace of current build or analysis.
-      @param fpdFilePath   The fpd file path of current build or analysis.
-      @param messageLevel  The message level for this Action.
+      @param fpdFilePath    The fpd file path of current build or analysis.
+      @param messageLevel   The message level for this Action.
 
-      @throws  Exception The exception of this function. Because it can *not* be predict
-                         where the action class will be used. So only Exception can be throw.
+      @throws  PlatformPreprocessBuildException 
+                            The exception of this function. Because it can *not* be predict
+                            where the action class will be used. So only Exception can be throw.
 
     **/
-    public void perform(String workspacePath, String fpdFilePath,
-                        int messageLevel) throws Exception {
-        setWorkspacePath(workspacePath);
+    public void perform(String fpdFilePath, int messageLevel) 
+        throws PlatformPcdPreprocessBuildException {
         setFPDFilePath(fpdFilePath);
         setActionMessageLevel(messageLevel);
         checkParameter();
@@ -132,32 +119,34 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
       @throws  EntityException Exception indicate failed to execute this action.
 
     **/
-    public void execute() throws EntityException {
-        MemoryDatabaseManager pcdDbManager = null;
-
+    public void execute() throws PlatformPcdPreprocessBuildException {
+        String errorMessageHeader = "Fail to initialize Pcd memory database for building. Because:";
         //
         // Get memoryDatabaseManager instance from GlobalData.
-        // The memoryDatabaseManager should be initialized for whatever build
-        // tools or wizard tools
+        // The memoryDatabaseManager should be initialized as static variable
+        // in some Pre-process class.
         //
-        if((pcdDbManager = GlobalData.getPCDMemoryDBManager()) == null) {
-            throw new EntityException("The instance of PCD memory database manager is null");
-        }
-
-        this.setPcdDbManager(pcdDbManager);
+        setPcdDbManager(GlobalData.getPCDMemoryDBManager());
 
         //
         // Collect all PCD information defined in FPD file.
         // Evenry token defind in FPD will be created as an token into
         // memory database.
         //
-        initPcdMemoryDbWithPlatformInfo();
+        try {
+            initPcdMemoryDbWithPlatformInfo();
+        } catch (PlatformPcdPreprocessException exp) {
+            throw new PlatformPcdPreprocessBuildException(errorMessageHeader + exp.getMessage());
+        }
 
         //
         // Generate for PEI, DXE PCD DATABASE's definition and initialization.
         //
-        genPcdDatabaseSourceCode ();
-
+        try {
+            genPcdDatabaseSourceCode ();
+        } catch (EntityException exp) {
+            throw new PlatformPcdPreprocessBuildException(errorMessageHeader + exp.getMessage());
+        }
     }
 
     /**
@@ -166,13 +155,15 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
       @param guidCName      Guid CName string.
 
       @return String[]      Guid information from SPD file.
+      @throws PlatformPcdPreprocessException
+                            Fail to get Guid information from SPD file.
     **/
-    public String[] getGuidInfoFromSpd(String guidCName) throws EntityException {
+    public String[] getGuidInfoFromSpd(String guidCName) throws PlatformPcdPreprocessException {
         String[] tokenSpaceStrRet = null;
         try {
             tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(guidCName);
         } catch ( Exception e ) {
-            throw new EntityException ("Failed get Guid CName " + guidCName + "from SPD file!");
+            throw new PlatformPcdPreprocessException ("Failed get Guid CName " + guidCName + "from SPD file!");
         }
         return tokenSpaceStrRet;
     }
@@ -180,7 +171,6 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     /**
       This function generates source code for PCD Database.
 
-      @param void
       @throws EntityException  If the token does *not* exist in memory database.
 
     **/
@@ -210,11 +200,12 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
       This function maybe provided by some Global class.
 
-      @return List<ModuleInfo> the component array.
+      @return List<ModuleInfo>                  the component array.
+      @throws PlatformPcdPreprocessException    get all modules in <ModuleSA> in FPD file.
 
-     */
+    **/
     public List<ModulePcdInfoFromFpd> getComponentsFromFpd()
-        throws EntityException {
+        throws PlatformPcdPreprocessException {
         List<ModulePcdInfoFromFpd>                  allModules          = new ArrayList<ModulePcdInfoFromFpd>();
         Map<FpdModuleIdentification, XmlObject>     pcdBuildDefinitions = null;
         UsageIdentification                         usageId             = null;
@@ -246,15 +237,14 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
        Override function: Verify the datum value according its datum size and datum type, this
        function maybe moved to FPD verification tools in future.
 
-       @param cName
-       @param moduleName
-       @param datum
-       @param datumType
-       @param maxDatumSize
+       @param cName         The token name
+       @param moduleName    The module who use this PCD token
+       @param datum         The PCD's datum
+       @param datumType     The PCD's datum type
+       @param maxDatumSize  The max size for PCD's Datum.
 
-       @return String
+       @return String       exception strings.
      */
-    /***/
     public String verifyDatum(String            cName,
                               String            moduleName,
                               String            datum,
@@ -584,7 +574,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     **/
     public DynamicPcdBuildDefinitions.PcdBuildData getDynamicInfoFromFpd(Token     token,
                                                                          String    moduleName)
-        throws EntityException {
+        throws PlatformPcdPreprocessException {
         int    index             = 0;
         String exceptionString   = null;
         String dynamicPrimaryKey = null;
@@ -600,9 +590,9 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
             try {
                 fpdDocInstance = (PlatformSurfaceAreaDocument)XmlObject.Factory.parse(new File(fpdFilePath));
             } catch(IOException ioE) {
-                throw new EntityException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
+                throw new PlatformPcdPreprocessException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
             } catch(XmlException xmlE) {
-                throw new EntityException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
+                throw new PlatformPcdPreprocessException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
             }
         }
 
@@ -612,7 +602,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
                                             "PCD entry %s in module %s!",
                                             token.cName,
                                             moduleName);
-            throw new EntityException(exceptionString);
+            throw new PlatformPcdPreprocessException(exceptionString);
         }
 
         dynamicPcdBuildDataArray = dynamicPcdBuildDefinitions.getPcdBuildDataList();
@@ -620,11 +610,11 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
             try {
                 tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName());
             } catch (Exception e) {
-                throw new EntityException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
+                throw new PlatformPcdPreprocessException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
             }
 
             if (tokenSpaceStrRet == null) {
-                throw new EntityException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
+                throw new PlatformPcdPreprocessException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
             }
 
             dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
@@ -640,11 +630,13 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     /**
        Override function: get all <DynamicPcdBuildDefinition> from FPD file.
 
-       @return List<DynamicPcdBuildDefinitions.PcdBuildData>
+       @return List<DynamicPcdBuildDefinitions.PcdBuildData>    All DYNAMIC PCD list in <DynamicPcdBuildDefinitions> in FPD file.
+       @throws PlatformPcdPreprocessBuildException              Failure to get dynamic information list.
+
     **/
     public List<DynamicPcdBuildDefinitions.PcdBuildData>
                                             getAllDynamicPcdInfoFromFpd()
-        throws EntityException {
+        throws PlatformPcdPreprocessException {
         DynamicPcdBuildDefinitions dynamicPcdBuildDefinitions = null;
 
         //
@@ -655,9 +647,9 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
             try {
                 fpdDocInstance = (PlatformSurfaceAreaDocument)XmlObject.Factory.parse(new File(fpdFilePath));
             } catch(IOException ioE) {
-                throw new EntityException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
+                throw new PlatformPcdPreprocessException("File IO error for xml file:" + fpdFilePath + "\n" + ioE.getMessage());
             } catch(XmlException xmlE) {
-                throw new EntityException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
+                throw new PlatformPcdPreprocessException("Can't parse the FPD xml fle:" + fpdFilePath + "\n" + xmlE.getMessage());
             }
         }
 
@@ -672,28 +664,23 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     /**
       check parameter for this action.
 
-      @throws EntityException  Bad parameter.
+      @throws PlatformPcdPreprocessBuildException  Bad parameter.
     **/
-    private void checkParameter() throws EntityException {
+    private void checkParameter() throws PlatformPcdPreprocessBuildException {
         File file = null;
 
-        if((fpdFilePath    == null) ||(workspacePath  == null)) {
-            throw new EntityException("WorkspacePath and FPDFileName should be blank for CollectPCDAtion!");
+        if (fpdFilePath == null) {
+            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be blank for CollectPCDAtion!");
         }
 
-        if(fpdFilePath.length() == 0 || workspacePath.length() == 0) {
-            throw new EntityException("WorkspacePath and FPDFileName should be blank for CollectPCDAtion!");
-        }
-
-        file = new File(workspacePath);
-        if(!file.exists()) {
-            throw new EntityException("WorkpacePath " + workspacePath + " does not exist!");
+        if (fpdFilePath.length() == 0) {
+            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be blank for CollectPCDAtion!");
         }
 
         file = new File(fpdFilePath);
 
         if(!file.exists()) {
-            throw new EntityException("FPD File " + fpdFilePath + " does not exist!");
+            throw new PlatformPcdPreprocessBuildException("FPD File " + fpdFilePath + " does not exist!");
         }
     }
 
@@ -702,10 +689,9 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
       @param argv  parameter from command line
     **/
-    public static void main(String argv[]) throws EntityException {
+    public static void main(String argv[]) throws PlatformPcdPreprocessBuildException {
         PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
         String projectDir = "x:/edk2";
-        ca.setWorkspacePath(projectDir);
         ca.setFPDFilePath(projectDir + "/EdkNt32Pkg/Nt32.fpd");
         ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
         GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",

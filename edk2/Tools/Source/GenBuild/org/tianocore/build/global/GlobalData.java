@@ -107,7 +107,7 @@ public class GlobalData {
     ///
     /// PCD memory database stored all PCD information which collected from FPD,MSA and SPD.
     ///
-//    private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
+    private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
 
     ///
     /// build target + tool chain family/tag name + arch + command types + command options
@@ -129,8 +129,6 @@ public class GlobalData {
 
     private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
     private static Map<FpdModuleIdentification, ToolChainMap> moduleToolChainFamilyOption = new HashMap<FpdModuleIdentification, ToolChainMap>();
-
-    private static final MemoryDatabaseManager pcdDbManager = new MemoryDatabaseManager();
 
     /**
       Parse framework database (DB) and all SPD files listed in DB to initialize
