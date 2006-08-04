@@ -21,9 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.tianocore.pcd.entity.UsageIdentification;
-import org.tianocore.pcd.exception.EntityException;
-
 /**
    This class is to descript a PCD token object. The information of a token mainly
    comes from MSA, SPD and setting produced by platform developer.
@@ -32,7 +29,7 @@ public class Token {
     ///
     /// Enumeration macro defintion for PCD type.
     ///
-    public enum             PCD_TYPE {FEATURE_FLAG, FIXED_AT_BUILD, PATCHABLE_IN_MODULE, DYNAMIC,
+    public static enum      PCD_TYPE {FEATURE_FLAG, FIXED_AT_BUILD, PATCHABLE_IN_MODULE, DYNAMIC,
                                       DYNAMIC_EX, UNKNOWN}
 
     ///
@@ -40,12 +37,12 @@ public class Token {
     /// Wizard maybe expand this type as "int, unsigned int, short, unsigned short etc" in
     /// prompt dialog.
     ///
-    public enum             DATUM_TYPE {UINT8, UINT16, UINT32, UINT64, BOOLEAN, POINTER, UNKNOWN}
+    public static enum      DATUM_TYPE {UINT8, UINT16, UINT32, UINT64, BOOLEAN, POINTER, UNKNOWN}
 
     ///
     /// Enumeration macor defintion for usage of PCD
     ///
-    public enum             PCD_USAGE {ALWAYS_PRODUCED, ALWAYS_CONSUMED, SOMETIMES_PRODUCED,
+    public static enum      PCD_USAGE {ALWAYS_PRODUCED, ALWAYS_CONSUMED, SOMETIMES_PRODUCED,
                                        SOMETIMES_CONSUMED, UNKNOWN}
 
     ///
@@ -169,7 +166,7 @@ public class Token {
 
     /**
        The pcd type is DynamicEx?
-         
+
        @retval true     Is DynamicEx type
        @retval false    not DynamicEx type
     **/
@@ -285,16 +282,9 @@ public class Token {
       @retval TRUE  - Success to add usage instance.
       @retval FALSE - Fail to add usage instance
     **/
-    public boolean addUsageInstance(UsageInstance usageInstance) throws EntityException {
-        String exceptionStr;
-
+    public boolean addUsageInstance(UsageInstance usageInstance) {
         if (isUsageInstanceExist(usageInstance.usageId)) {
-            exceptionStr = String.format("[PCD Collection Tool Exception] PCD %s for module %s has already exist in database, Please check all PCD build entries "+
-                                         "in modules %s in <ModuleSA> to make sure no duplicated definitions in FPD file!",
-                                         usageInstance.parentToken.cName,
-                                         usageInstance.usageId.moduleName,
-                                         usageInstance.usageId.moduleName);
-            throw new EntityException(exceptionStr);
+            return false;
         }
 
         //
@@ -631,7 +621,7 @@ public class Token {
     }
 
     /**
-        Judge whether a DYNAMIC PCD has default value. 
+        Judge whether a DYNAMIC PCD has default value.
 
         @return whether a DYNAMIC PCD has default value.
     **/
@@ -832,7 +822,7 @@ public class Token {
 
     /**
        Get string value for ANSIC string type
-         
+
        @return String the string value
     **/
     public String getStringTypeString () {

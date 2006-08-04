@@ -31,6 +31,7 @@ import org.tianocore.pcd.exception.BuildActionException;
 import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.action.BuildAction;
 import org.tianocore.pcd.action.ActionMessage;
+import org.tianocore.build.exception.PcdAutogenException;
 
 /** This class is to manage how to generate the PCD information into Autogen.c and
     Autogen.h.
@@ -142,7 +143,7 @@ public class PCDAutoGenAction extends BuildAction {
     }
 
     /**
-      check the parameter for action class.
+      Override function: check the parameter for action class.
 
       @throws BuildActionException Bad parameter.
     **/
@@ -162,12 +163,6 @@ public class PCDAutoGenAction extends BuildAction {
     public void performAction() {
         ActionMessage.debug(this,
                             "Starting PCDAutoGenAction to generate autogen.h and autogen.c!...");
-        //
-        // Check the PCD memory database manager is valid.
-        //
-        if(GlobalData.getPCDMemoryDBManager() == null) {
-            throw new BuildActionException("Memory database has not been initlizated!");
-        }
 
         dbManager = GlobalData.getPCDMemoryDBManager();
 
@@ -233,7 +228,7 @@ public class PCDAutoGenAction extends BuildAction {
                         // All library's PCD should instanted in module's <ModuleSA> who
                         // use this library instance. If not, give errors.
                         //
-                        throw new BuildActionException (String.format("[PCD Autogen Error] Module %s use library instance %s, the PCD %s " +
+                        throw new BuildActionException (String.format("Module %s use library instance %s, the PCD %s " +
                                                                       "is required by this library instance, but can not find " +
                                                                       "it in the %s's <ModuleSA> in FPD file!",
                                                                       MemoryDatabaseManager.CurrentModuleName,
@@ -336,9 +331,7 @@ public class PCDAutoGenAction extends BuildAction {
                             WorkSpace,null);
 
         try {
-            collectionAction.perform(WorkSpace,
-                                     logFilePath,
-                                     ActionMessage.MAX_MESSAGE_LEVEL);
+            collectionAction.perform(logFilePath, ActionMessage.MAX_MESSAGE_LEVEL);
         } catch(Exception e) {
             e.printStackTrace();
         }

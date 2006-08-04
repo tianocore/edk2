@@ -17,7 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.pcd.action;
 
 import org.apache.tools.ant.Task;
-import org.tianocore.logger.EdkLog;
 
 /** ActionMessage class take over all message for loging and waning. This class
     should dispatch message into different Action class according to instance

@@ -462,7 +462,7 @@ public class AutoGen {
                 try {
                     this.myPcdAutogen.execute();
                 } catch (Exception exp) {
-                    throw new BuildException (exp.getMessage());
+                    throw new PcdAutogenException (exp.getMessage());
                 }
 		
 		if (this.myPcdAutogen != null) {
@@ -594,7 +594,7 @@ public class AutoGen {
 	 * @throws BuildException
 	 *             Failed to generate AutoGen.c.
 	 */
-	void libGenAutogenC() throws BuildException {
+	void libGenAutogenC() throws BuildException, PcdAutogenException {
 		StringBuffer fileBuffer = new StringBuffer(10240);
 
 		//
@@ -615,7 +615,7 @@ public class AutoGen {
 		try {
                     this.myPcdAutogen.execute();
 		} catch (Exception e) {
-                    throw new BuildException(e.getMessage());
+                    throw new PcdAutogenException(e.getMessage());
 		}
 
 		if (this.myPcdAutogen != null) {

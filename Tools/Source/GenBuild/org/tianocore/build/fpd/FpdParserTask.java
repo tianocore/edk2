@@ -375,12 +375,8 @@ public class FpdParserTask extends Task {
             //
             // Pcd Collection. Call CollectPCDAction to collect pcd info.
             //
-            try {
-                PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
-                ca.perform(GlobalData.getWorkspacePath(),platformId.getFpdFile().getPath(),ActionMessage.NULL_MESSAGE_LEVEL);
-            } catch (Exception e){
-                throw new BuildException(e.getMessage());
-            }
+            PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
+            ca.perform(platformId.getFpdFile().getPath(), ActionMessage.NULL_MESSAGE_LEVEL);
         } catch (Exception e) {
             throw new BuildException("Load FPD file [" + fpdFile.getPath() + "] error. \n" + e.getMessage());
         }
