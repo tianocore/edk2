@@ -11,6 +11,9 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
+#if defined(__GNUC__)
+typedef long long __int64;/*For cygwin build*/
+#endif
 #include "CompressDll.h"
 #include "EfiCompress.h"
 
