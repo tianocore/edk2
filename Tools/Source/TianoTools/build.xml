@@ -158,7 +158,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
     <condition property="cyglinux">
       <or>
-        <istrue value="linux"/>
+        <istrue value="${linux}"/>
         <istrue value="${cygwin}"/>
       </or>
     </condition>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -49,10 +49,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
       <includepath path="${PACKAGE_DIR}/Common"/>
       <includepath path="${env.JAVA_HOME}/include"/>
-      <includepath path="${env.JAVA_HOME}/include/linux" if="cyglinux"/>
+      <includepath path="${env.JAVA_HOME}/include/linux" if="gcc"/>
+      <includepath path="${env.JAVA_HOME}/include/win32" if="cygwin"/>
       <includepath path="${env.JAVA_HOME}/include/win32" if="msft"/>
       <libset dir="${LIB_DIR}" libs="CommonTools"/>
       <syslibset libs="kernel32" if="msft"/>
+      <linkerarg value="-mno-cygwin" if="cygwin"/>
+      <linkerarg value="--add-stdcall-alias" if="cygwin"/>
     </cc>
     <copy file="${result}" tofile="${BIN_DIR}/CompressDll.dll"/>
     <chmod file="${BIN_DIR}/CompressDll.dll" perm="ugo+x"/>

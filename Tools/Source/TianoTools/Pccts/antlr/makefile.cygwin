@@ -167,7 +167,7 @@ PCCTS_H=../h
 BIN_DIR=../../../../bin
 CC=gcc
 COPT=-O
-ANTLR=${BIN_DIR}/antlr.exe
+ANTLR=$(BIN_DIR)/antlr.exe
 DLG=${BIN_DIR}/dlg.exe
 OBJ_EXT=o
 OUT_OBJ = -o
@@ -180,7 +180,7 @@ OBJ=antlr.o scan.o err.o bits.o build.o fset2.o fset.o gen.o  \
         globals.o hash.o lex.o main.o misc.o set.o pred.o egman.o mrhoist.o fcache.o
 
 antlr : $(OBJ) $(SRC)
-		$(CC) $(CFLAGS) -o ${BIN_DIR}/antlr.exe $(OBJ)
+		$(CC) $(CFLAGS) -o $(BIN_DIR)/antlr.exe $(OBJ)
 
 # what files does PCCTS generate (both ANTLR and DLG)
 PCCTS_GEN=antlr.c scan.c err.c tokens.h mode.h parser.dlg stdpccts.h remap.h

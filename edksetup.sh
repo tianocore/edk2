@@ -28,10 +28,22 @@ if [ "$XMLBEANS_HOME" == "" ]
 then
   echo "Please set XMLBEANS_HOME before sourcing this script."
 else
+  
+case "`uname`" in
+  CYGWIN*) 
+    # Convert paths to unix format.
+    # This is to remove possible wrong path when converting CLASSPATH back to windows format
+    export WORKSPACE=`cygpath -u $WORKSPACE`
+    export ANT_HOME=`cygpath -u $ANT_HOME`
+    export XMLBEANS_HOME=`cygpath -u $XMLBEANS_HOME`
+    export FRAMEWORK_TOOLS_PATH=`cygpath -u $FRAMEWORK_TOOLS_PATH`
+    ;;
+esac
 
 # These should be ok as they are.
 export CLASSPATH=$WORKSPACE/Tools/Jars/SurfaceArea.jar:$WORKSPACE/Tools/Jars/frameworktasks.jar:$WORKSPACE/Tools/Jars/cpptasks.jar:$WORKSPACE/Tools/Jars/PcdTools.jar:$WORKSPACE/Tools/Jars/GenBuild.jar:$XMLBEANS_HOME/lib/resolver.jar:$XMLBEANS_HOME/lib/xbean.jar:$XMLBEANS_HOME/lib/xmlpublic.jar:$XMLBEANS_HOME/lib/jsr173_1.0_api.jar:$XMLBEANS_HOME/lib/saxon8.jar:$XMLBEANS_HOME/lib/xbean_xpath.jar
 export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Jars/Common.jar
+export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Jars/PcdTools.jar
 export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/Bin/FrameworkWizard.jar
 export FRAMEWORK_TOOLS_PATH=$WORKSPACE/Tools/bin
 export PATH=$FRAMEWORK_TOOLS_PATH:$ANT_HOME/bin:$JAVA_HOME/bin:$PATH
@@ -45,6 +57,8 @@ case "`uname`" in
   CYGWIN*) 
     # Convert paths to windows format.
     export WORKSPACE=`cygpath -w $WORKSPACE`
+    export ANT_HOME=`cygpath -w -p $ANT_HOME`
+    export XMLBEANS_HOME=`cygpath -w -p $XMLBEANS_HOME`
     export CLASSPATH=`cygpath -w -p $CLASSPATH`
     export FRAMEWORK_TOOLS_PATH=`cygpath -w -p $FRAMEWORK_TOOLS_PATH`
     ;;
