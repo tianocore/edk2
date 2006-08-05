@@ -98,6 +98,21 @@ public class AutoGen {
     // area and it's dependence on library instance surface are.
     //
     private List<PackageIdentification> mDepPkgList = new LinkedList<PackageIdentification>();
+
+	//
+	//  For non library module, add its library instance's construct and destructor to 
+	//  list.
+	//  
+	private List<String> libConstructList = new ArrayList<String>();
+	private	List<String> libDestructList = new ArrayList<String>();
+
+	//
+	// List to store SetVirtalAddressMapCallBack, ExitBootServiceCallBack  
+	// 
+	private List<String> setVirtalAddList = new ArrayList<String>();
+	private List<String> exitBootServiceList = new ArrayList<String>();
+
+	
 	/**
 	 * Construct function
 	 * 
@@ -204,6 +219,7 @@ public class AutoGen {
 	void moduleGenAutogen() throws BuildException {
 
 		try {
+			collectLibInstanceInfo();
 			moduleGenAutogenC();
 			moduleGenAutogenH();
 		} catch (Exception e) {
@@ -1074,10 +1090,10 @@ public class AutoGen {
                 }
                 fileBuffer.append("}\r\n\r\n");
 
-                fileBuffer.append("VOID\n");
-                fileBuffer.append("EFIAPI\n");
+                fileBuffer.append("VOID\r\n");
+                fileBuffer.append("EFIAPI\r\n");
                 fileBuffer.append("ExitDriver (\r\n");
-                fileBuffer.append("  IN EFI_STATUS  Status\n");
+                fileBuffer.append("  IN EFI_STATUS  Status\r\n");
                 fileBuffer.append("  )\r\n\r\n");
                 fileBuffer.append("{\r\n");
                 if (entryPointCount <= 1) {
@@ -1333,128 +1349,17 @@ public class AutoGen {
 	 * @throws BuildException
 	 */
 	void LibInstanceToAutogenC(StringBuffer fileBuffer) throws BuildException {
-		int index;
-
-		String moduleType = SurfaceAreaQuery.getModuleType();
-		List<String> libConstructList = new ArrayList<String>();
-		List<String> libDestructList = new ArrayList<String>();
-
-		String libConstructName = null;
-		String libDestructName = null;
-		ModuleIdentification[] libraryIdList = SurfaceAreaQuery
-				.getLibraryInstance(this.arch);
-
 		try {
-			if (libraryIdList != null) {
-				//
-				// Reorder library instance sequence.
-				//
-				AutogenLibOrder libOrder = new AutogenLibOrder(libraryIdList,
-						this.arch);
-				List<ModuleIdentification> orderList = libOrder
-						.orderLibInstance();
-
-				if (orderList != null) {
-					//
-					// Process library instance one by one.
-					//
-					for (int i = 0; i < orderList.size(); i++) {
-
-						//
-						// Get library instance basename.
-						//
-						ModuleIdentification libInstanceId = orderList.get(i);
-
-						//
-						// Get override map
-						//
-                                                
-						Map<String, XmlObject> libDoc = GlobalData.getDoc(
-								libInstanceId, this.arch);
-						SurfaceAreaQuery.push(libDoc);
-
-						//
-						// Get <PPis>, <Protocols>, <Guids> list of this library
-						// instance.
-						//
-						String[] ppiList = SurfaceAreaQuery.getPpiArray(this.arch);
-						String[] ppiNotifyList = SurfaceAreaQuery
-								.getPpiNotifyArray(this.arch);
-						String[] protocolList = SurfaceAreaQuery
-								.getProtocolArray(this.arch);
-						String[] protocolNotifyList = SurfaceAreaQuery
-								.getProtocolNotifyArray(this.arch);
-						String[] guidList = SurfaceAreaQuery
-								.getGuidEntryArray(this.arch);
-                        PackageIdentification[] pkgList = SurfaceAreaQuery.getDependencePkg(this.arch);
-
-						//
-						// Add those ppi, protocol, guid in global ppi,
-						// protocol, guid
-						// list.
-						//
-						for (index = 0; index < ppiList.length; index++) {
-							this.mPpiList.add(ppiList[index]);
-						}
-
-						for (index = 0; index < ppiNotifyList.length; index++) {
-							this.mPpiList.add(ppiNotifyList[index]);
-						}
-
-						for (index = 0; index < protocolList.length; index++) {
-							this.mProtocolList.add(protocolList[index]);
-						}
-
-						for (index = 0; index < protocolNotifyList.length; index++) {
-							this.mProtocolList.add(protocolNotifyList[index]);
-						}
-
-						for (index = 0; index < guidList.length; index++) {
-							this.mGuidList.add(guidList[index]);
-						}
-                        for (index = 0; index < pkgList.length; index++){
-                            if (!this.mDepPkgList.contains(pkgList[index])){
-                                this.mDepPkgList.add(pkgList[index]);
-                            }
-                        }
-
-						//
-						// If not yet parse this library instance's constructor
-						// element,parse it.
-						//
-						libConstructName = SurfaceAreaQuery
-								.getLibConstructorName();
-						libDestructName = SurfaceAreaQuery
-								.getLibDestructorName();
-
-						SurfaceAreaQuery.pop();
-						//
-						// Add dependent library instance constructor function.
-						//
-						if (libConstructName != null) {
-							libConstructList.add(libConstructName);
-						}
-						//
-						// Add dependent library instance destructor fuction.
-						//
-						if (libDestructName != null) {
-							libDestructList.add(libDestructName);
-						}
-					}
-
-				}
-
-				//
-				// Add library constructor to AutoGen.c
-				//
-				LibConstructorToAutogenC(libConstructList, moduleType,
-						fileBuffer/* autogenC */);
-				//
-				// Add library destructor to AutoGen.c
-				//
-				LibDestructorToAutogenC(libDestructList, moduleType, fileBuffer/* autogenC */);
-			}
-
+            String moduleType = this.moduleId.getModuleType();
+		    //
+			// Add library constructor to AutoGen.c
+			//
+			LibConstructorToAutogenC(libConstructList, moduleType,
+				fileBuffer/* autogenC */);
+			//
+			// Add library destructor to AutoGen.c
+			//
+			LibDestructorToAutogenC(libDestructList, moduleType, fileBuffer/* autogenC */);
 		} catch (Exception e) {
 			throw new BuildException(e.getMessage());
 		}
@@ -1867,15 +1772,12 @@ public class AutoGen {
 	 */
 	void ExternCallBackToAutoGenC(StringBuffer fileBuffer)
 			throws BuildException {
-		String[] setVirtualList = SurfaceAreaQuery
-				.getSetVirtualAddressMapCallBackArray();
-		String[] exitBootList = SurfaceAreaQuery
-				.getExitBootServicesCallBackArray();
-		String moduleType = SurfaceAreaQuery.getModuleType();
+		EdkLog.log(EdkLog.EDK_INFO, "Begin changing set to array!");
+		String moduleType = this.moduleId.getModuleType();
 		boolean UefiOrDxeModule = false;
 		int Count = 0;
 		int i;
-
+        EdkLog.log(EdkLog.EDK_INFO, "HEHE!!");
 		switch (CommonDefinition.getModuleType(moduleType)) {
 		case CommonDefinition.ModuleTypeDxeDriver:
 		case CommonDefinition.ModuleTypeDxeRuntimeDriver:
@@ -1895,9 +1797,9 @@ public class AutoGen {
 			// set count to the number of valid entries
 			//
 			Count = 0;
-			if (setVirtualList != null) {
-				for (i = 0; i < setVirtualList.length; i++) {
-					if (setVirtualList[i].equalsIgnoreCase("")) {
+			if (this.setVirtalAddList != null) {
+				for (i = 0; i < this.setVirtalAddList.size(); i++) {
+					if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
 						break;
 					}
 				}
@@ -1911,7 +1813,7 @@ public class AutoGen {
 			break;
 		}
 
-		if (setVirtualList == null) {
+		if (this.setVirtalAddList == null || this.setVirtalAddList.size() == 0) {
 			if (UefiOrDxeModule) {
 				//
 				// No data so make a NULL list
@@ -1925,13 +1827,13 @@ public class AutoGen {
 			//
 			// Write SetVirtualAddressMap function definition.
 			//
-			for (i = 0; i < setVirtualList.length; i++) {
-				if (setVirtualList[i].equalsIgnoreCase("")) {
+			for (i = 0; i < this.setVirtalAddList.size(); i++) {
+				if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
 					break;
 				}
 				fileBuffer.append("VOID\r\n");
 				fileBuffer.append("EFIAPI\r\n");
-				fileBuffer.append(setVirtualList[i]);
+				fileBuffer.append(this.setVirtalAddList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
 				fileBuffer.append("  IN VOID       *Context\r\n");
@@ -1943,8 +1845,8 @@ public class AutoGen {
 			//
 			fileBuffer
 					.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {");
-			for (i = 0; i < setVirtualList.length; i++) {
-				if (setVirtualList[i].equalsIgnoreCase("")) {
+			for (i = 0; i < this.setVirtalAddList.size(); i++) {
+				if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
 					break;
 				}
 
@@ -1954,7 +1856,7 @@ public class AutoGen {
 					fileBuffer.append(",\r\n  ");
 				}
 
-				fileBuffer.append(setVirtualList[i]);
+				fileBuffer.append(this.setVirtalAddList.get(i));
 			}
 			//
 			//  If module is not DXE_DRIVER, DXE_RUNTIME_DIRVER, UEFI_DRIVER
@@ -1979,9 +1881,9 @@ public class AutoGen {
 			// set count to the number of valid entries.
 			//
 			Count = 0;
-			if (exitBootList != null) {
-				for (i = 0; i < exitBootList.length; i++) {
-					if (exitBootList[i].equalsIgnoreCase("")) {
+			if (this.exitBootServiceList != null) {
+				for (i = 0; i < this.exitBootServiceList.size(); i++) {
+					if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
 						break;
 					}
 				}
@@ -1991,7 +1893,7 @@ public class AutoGen {
 			fileBuffer.append(";\r\n\r\n");
 		}
 
-		if (exitBootList == null) {
+		if (this.exitBootServiceList == null || this.exitBootServiceList.size() == 0) {
 			if (UefiOrDxeModule) {
 				//
 				// No data so make a NULL list.
@@ -2005,14 +1907,14 @@ public class AutoGen {
 			//
 			// Write DriverExitBootServices function definition.
 			//
-			for (i = 0; i < exitBootList.length; i++) {
-				if (exitBootList[i].equalsIgnoreCase("")) {
+			for (i = 0; i < this.exitBootServiceList.size(); i++) {
+				if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
 					break;
 				}
 
 				fileBuffer.append("VOID\r\n");
 				fileBuffer.append("EFIAPI\r\n");
-				fileBuffer.append(exitBootList[i]);
+				fileBuffer.append(this.exitBootServiceList.get(i));
 				fileBuffer.append(" (\r\n");
 				fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
 				fileBuffer.append("  IN VOID       *Context\r\n");
@@ -2024,8 +1926,8 @@ public class AutoGen {
 			//
 			fileBuffer
 					.append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {");
-			for (i = 0; i < exitBootList.length; i++) {
-				if (exitBootList[i].equalsIgnoreCase("")) {
+			for (i = 0; i < this.exitBootServiceList.size(); i++) {
+				if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
 					break;
 				}
 
@@ -2034,7 +1936,7 @@ public class AutoGen {
 				} else {
 					fileBuffer.append(",\r\n  ");
 				}
-				fileBuffer.append(exitBootList[i]);
+				fileBuffer.append(this.exitBootServiceList.get(i));
 			}
 			if (!UefiOrDxeModule) {
 				fileBuffer.append(",\r\n  NULL");
@@ -2071,4 +1973,144 @@ public class AutoGen {
             }
 		}
     }
+    
+    /**
+    *This function first order the library instances, then collect
+    *library instance 's PPI, Protocol, GUID,
+    *SetVirtalAddressMapCallBack, ExitBootServiceCallBack, and
+    *Destructor, Constructor.
+    *
+	**/
+	private void collectLibInstanceInfo(){
+		int index;
+
+		String moduleType = SurfaceAreaQuery.getModuleType();
+		String libConstructName = null;
+		String libDestructName = null;
+		String[] setVirtuals = null;
+		String[] exitBoots = null;
+
+		ModuleIdentification[] libraryIdList = SurfaceAreaQuery
+				.getLibraryInstance(this.arch);
+		try {
+			if (libraryIdList != null) {
+				//
+				// Reorder library instance sequence.
+				//
+				AutogenLibOrder libOrder = new AutogenLibOrder(libraryIdList,
+						this.arch);
+				List<ModuleIdentification> orderList = libOrder
+						.orderLibInstance();
+
+				if (orderList != null) {
+					//
+					// Process library instance one by one.
+					//
+					for (int i = 0; i < orderList.size(); i++) {
+
+						//
+						// Get library instance basename.
+						//
+						ModuleIdentification libInstanceId = orderList.get(i);
+
+						//
+						// Get override map
+						//
+
+						Map<String, XmlObject> libDoc = GlobalData.getDoc(
+								libInstanceId, this.arch);
+						SurfaceAreaQuery.push(libDoc);
+						//
+						// Get <PPis>, <Protocols>, <Guids> list of this library
+						// instance.
+						//
+						String[] ppiList = SurfaceAreaQuery.getPpiArray(this.arch);
+						String[] ppiNotifyList = SurfaceAreaQuery
+								.getPpiNotifyArray(this.arch);
+						String[] protocolList = SurfaceAreaQuery
+								.getProtocolArray(this.arch);
+						String[] protocolNotifyList = SurfaceAreaQuery
+								.getProtocolNotifyArray(this.arch);
+						String[] guidList = SurfaceAreaQuery
+								.getGuidEntryArray(this.arch);
+						PackageIdentification[] pkgList = SurfaceAreaQuery.getDependencePkg(this.arch);
+
+						//
+						// Add those ppi, protocol, guid in global ppi,
+						// protocol, guid
+						// list.
+						//
+						for (index = 0; index < ppiList.length; index++) {
+							this.mPpiList.add(ppiList[index]);
+						}
+
+						for (index = 0; index < ppiNotifyList.length; index++) {
+							this.mPpiList.add(ppiNotifyList[index]);
+						}
+
+						for (index = 0; index < protocolList.length; index++) {
+							this.mProtocolList.add(protocolList[index]);
+						}
+
+						for (index = 0; index < protocolNotifyList.length; index++) {
+							this.mProtocolList.add(protocolNotifyList[index]);
+						}
+
+						for (index = 0; index < guidList.length; index++) {
+							this.mGuidList.add(guidList[index]);
+						}
+						for (index = 0; index < pkgList.length; index++){
+							if (!this.mDepPkgList.contains(pkgList[index])){
+								this.mDepPkgList.add(pkgList[index]);
+							}
+						}
+
+						//
+						// If not yet parse this library instance's constructor
+						// element,parse it.
+						//
+						libConstructName = SurfaceAreaQuery
+								.getLibConstructorName();
+						libDestructName = SurfaceAreaQuery
+								.getLibDestructorName();
+
+						//
+						// Collect SetVirtualAddressMapCallBack and 
+						// ExitBootServiceCallBack.
+						// 
+                        setVirtuals = SurfaceAreaQuery.getSetVirtualAddressMapCallBackArray();
+                        exitBoots = SurfaceAreaQuery.getExitBootServicesCallBackArray();
+                        if (setVirtuals != null) {
+                            for (int j = 0; j < setVirtuals.length; j++) {
+							    this.setVirtalAddList.add(setVirtuals[j]);
+						    }
+						}
+						if (exitBoots != null) {
+							for (int k = 0; k < exitBoots.length; k++) {
+							    this.exitBootServiceList.add(exitBoots[k]);
+						    }
+						}
+						SurfaceAreaQuery.pop();
+						//
+						// Add dependent library instance constructor function.
+						//
+						if (libConstructName != null) {
+							this.libConstructList.add(libConstructName);
+						}
+						//
+						// Add dependent library instance destructor fuction.
+						//
+						if (libDestructName != null) {
+							this.libDestructList.add(libDestructName);
+						}
+					}
+				}
+
+			}
+
+	}catch (Exception e){
+	System.out.println(e.getMessage());
+	System.out.println("Collect library instance failed!");
+}
+}
 }
