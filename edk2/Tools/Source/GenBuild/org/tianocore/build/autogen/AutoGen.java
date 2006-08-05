@@ -1772,12 +1772,10 @@ public class AutoGen {
 	 */
 	void ExternCallBackToAutoGenC(StringBuffer fileBuffer)
 			throws BuildException {
-		EdkLog.log(EdkLog.EDK_INFO, "Begin changing set to array!");
 		String moduleType = this.moduleId.getModuleType();
 		boolean UefiOrDxeModule = false;
 		int Count = 0;
 		int i;
-        EdkLog.log(EdkLog.EDK_INFO, "HEHE!!");
 		switch (CommonDefinition.getModuleType(moduleType)) {
 		case CommonDefinition.ModuleTypeDxeDriver:
 		case CommonDefinition.ModuleTypeDxeRuntimeDriver:
