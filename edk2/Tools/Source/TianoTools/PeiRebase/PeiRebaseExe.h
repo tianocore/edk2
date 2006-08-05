@@ -43,7 +43,7 @@ Abstract:
 //
 // The maximum number of arguments accepted from the command line.
 //
-#define MAX_ARGS  7
+#define MAX_ARGS  9
 
 //
 // The file copy buffer size
@@ -131,7 +131,8 @@ Returns:
 EFI_STATUS
 FfsRebase (
   IN OUT EFI_FFS_FILE_HEADER    *FfsFile,
-  IN EFI_PHYSICAL_ADDRESS       BaseAddress
+  IN EFI_PHYSICAL_ADDRESS       BaseAddress,
+  IN FILE                       *MapFile      OPTIONAL
   )
 /*++
 
