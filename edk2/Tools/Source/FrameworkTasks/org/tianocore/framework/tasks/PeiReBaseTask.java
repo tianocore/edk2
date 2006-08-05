@@ -104,9 +104,10 @@ public class PeiReBaseTask extends Task implements EfiDefine {
         File file = new File(outputFile);
         if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
             argument = inputFile + " " +  "-O " + outputDir + File.separatorChar
-                    + outputFile + " " + this.baseAddr;
+                    + outputFile + " " + this.baseAddr + " "
+                    + "-M " + outputDir + + File.separatorChar + outputFile + ".map";
         } else {
-            argument = inputFile + " " + "-O " + outputFile + " " + this.baseAddr;
+            argument = inputFile + " " + "-O " + outputFile + " " + this.baseAddr+ " " + "-M " + outputFile + ".map";
         }
         
         //
