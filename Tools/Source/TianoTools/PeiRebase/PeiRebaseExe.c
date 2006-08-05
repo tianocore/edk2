@@ -63,11 +63,13 @@ Arguments:
                   format is a hex number preceded by 0x.
   InputFileName   The name of the input FV file.
   OutputFileName  The name of the output FV file.
+  MapFileName     The name of the map file of relocation info.
 
   Arguments come in pair in any order.
     -I InputFileName 
     -O OutputFileName
     -B BaseAddress 
+    -M MapFileName 
 
 Returns:
 
@@ -83,11 +85,13 @@ Returns:
   UINT8                       Index;
   CHAR8                       InputFileName[_MAX_PATH];
   CHAR8                       OutputFileName[_MAX_PATH];
+  CHAR8                       MapFileName[_MAX_PATH];
   EFI_PHYSICAL_ADDRESS        BaseAddress;
   BOOLEAN                     BaseAddressSet;
   EFI_STATUS                  Status;
   FILE                        *InputFile;
   FILE                        *OutputFile;
+  FILE                        *MapFile;
   UINT64                      FvOffset;
   UINT32                      FileCount;
   int                         BytesRead;
@@ -109,11 +113,13 @@ Returns:
     PrintUsage ();
     return STATUS_ERROR;
   }
+
   //
   // Initialize variables
   //
   InputFileName[0]  = 0;
   OutputFileName[0] = 0;
+  MapFileName[0]    = 0;
   BaseAddress       = 0;
   BaseAddressSet    = FALSE;
   FvOffset          = 0;
@@ -121,7 +127,9 @@ Returns:
   ErasePolarity     = FALSE;
   InputFile         = NULL;
   OutputFile        = NULL;
+  MapFile           = NULL;
   FvImage           = NULL;
+
   //
   // Parse the command line arguments
   //
@@ -186,6 +194,17 @@ Returns:
       }
       break;
 
+    case 'M':
+    case 'm':
+      if (strlen (MapFileName) == 0) {
+        strcpy (MapFileName, argv[Index + 1]);
+      } else {
+        PrintUsage ();
+        Error (NULL, 0, 0, argv[Index + 1], "only one -m MapFileName may be specified");
+        return STATUS_ERROR;
+      }
+      break;
+
     default:
       PrintUsage ();
       Error (NULL, 0, 0, argv[Index], "unrecognized argument");
@@ -193,6 +212,18 @@ Returns:
       break;
     }
   }
+
+  //
+  // Create the Map file if we need it
+  //
+  if (strlen (MapFileName) != 0) {
+    MapFile = fopen (MapFileName, "w");
+    if (MapFile == NULL) {
+      Error (NULL, 0, 0, MapFileName, "failed to open map file");
+      goto Finish;
+    }
+  } 
+
   //
   // Open the file containing the FV
   //
@@ -247,7 +278,7 @@ Returns:
     // Rebase this file
     //
     CurrentFileBaseAddress  = BaseAddress + ((UINTN) CurrentFile - (UINTN) FvImage);
-    Status                  = FfsRebase (CurrentFile, CurrentFileBaseAddress);
+    Status                  = FfsRebase (CurrentFile, CurrentFileBaseAddress, MapFile);
 
     if (EFI_ERROR (Status)) {
       switch (Status) {
@@ -275,6 +306,7 @@ Returns:
 
       goto Finish;
     }
+
     //
     // Get the next file
     //
@@ -312,6 +344,10 @@ Finish:
     }
 
     fclose (OutputFile);
+  }
+
+  if (MapFile != NULL) {
+    fclose (MapFile);
   }
 
   if (FvImage != NULL) {
@@ -450,20 +486,22 @@ Returns:
 --*/
 {
   printf (
-    "Usage: %s -I InputFileName -O OutputFileName -B BaseAddress\n",
+    "Usage: %s -I InputFileName -O OutputFileName -B BaseAddress [-M MapFile]\n",
     UTILITY_NAME
     );
   printf ("  Where:\n");
   printf ("    InputFileName is the name of the EFI FV file to rebase.\n");
   printf ("    OutputFileName is the desired output file name.\n");
   printf ("    BaseAddress is the FV base address to rebase agains.\n");
+  printf ("    MapFileName is an optional map file of the relocations\n");
   printf ("  Argument pair may be in any order.\n\n");
 }
 
 EFI_STATUS
 FfsRebase (
   IN OUT EFI_FFS_FILE_HEADER    *FfsFile,
-  IN EFI_PHYSICAL_ADDRESS       BaseAddress
+  IN EFI_PHYSICAL_ADDRESS       BaseAddress,
+  IN FILE                       *MapFile      OPTIONAL
   )
 /*++
 
@@ -476,6 +514,7 @@ Arguments:
 
   FfsFile           A pointer to Ffs file image.
   BaseAddress       The base address to use for rebasing the file image.
+  MapFile           Optional file to dump relocation information into
 
 Returns:
 
@@ -516,6 +555,7 @@ Returns:
   if (FfsFile == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+  
   //
   // Convert the GUID to a string so we can at least report which file
   // if we find an error.
@@ -526,6 +566,7 @@ Returns:
   } else {
     TailSize = 0;
   }
+  
   //
   // Do some cursory checks on the FFS file contents
   //
@@ -534,6 +575,9 @@ Returns:
     Error (NULL, 0, 0, "file does not appear to be a valid FFS file, cannot be rebased", FileGuidString);
     return EFI_INVALID_PARAMETER;
   }
+
+  memset (&ImageContext, 0, sizeof (ImageContext));
+
   //
   // Check if XIP file type. If not XIP, don't rebase.
   //
@@ -544,6 +588,7 @@ Returns:
       ) {
     return EFI_SUCCESS;
   }
+
   //
   // Rebase each PE32 section
   //
@@ -928,6 +973,18 @@ Returns:
     }
   }
 
+  //
+  // If a map file was selected output mapping information for any file that
+  // was rebased.
+  //
+  if (MapFile != NULL) {
+    fprintf (MapFile, "File: %s Base:%08lx", FileGuidString, BaseAddress);
+    if (ImageContext.PdbPointer != NULL) {
+      fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
+    }
+    fprintf (MapFile, "\n");
+  }
+  
   return EFI_SUCCESS;
 }
 
