@@ -96,11 +96,11 @@ public abstract class PlatformPcdPreprocessAction {
 
        @param guidCName the CName of GUID
 
-       @return String[]      Guid information from SPD file.
+       @return String        Guid information from SPD file.
        @throws PlatformPcdPreprocessException
                             Fail to get Guid information from SPD file.
     **/
-    public abstract String[]                getGuidInfoFromSpd(String guidCName)
+    public abstract String                  getGuidInfoFromSpd(String guidCName)
                                             throws PlatformPcdPreprocessException;
 
     /**
@@ -188,7 +188,7 @@ public abstract class PlatformPcdPreprocessAction {
         String                              moduleName        = null;
         String                              datum             = null;
         int                                 maxDatumSize      = 0;
-        String[]                            tokenSpaceStrRet  = null;
+        String                              tokenSpaceStrRet  = null;
 
         //
         // ----------------------------------------------
@@ -239,7 +239,7 @@ public abstract class PlatformPcdPreprocessAction {
                     continue;
                 }
 
-                primaryKey   = Token.getPrimaryKeyString(pcdBuildData.getCName(), tokenSpaceStrRet[1]);
+                primaryKey   = Token.getPrimaryKeyString(pcdBuildData.getCName(), tokenSpaceStrRet);
                 pcdType      = Token.getPcdTypeFromString(pcdBuildData.getItemType().toString());
                 datumType    = Token.getdatumTypeFromString(pcdBuildData.getDatumType().toString());
                 tokenNumber  = Long.decode(pcdBuildData.getToken().toString());
@@ -408,7 +408,7 @@ public abstract class PlatformPcdPreprocessAction {
                     // If the token is not in database, create a new token instance and add
                     // a usage instance into this token in database.
                     //
-                    tokenSpaceStrRet = this.getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
+                    tokenSpaceStrRet = getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
 
                     if (tokenSpaceStrRet == null) {
                         putError("Fail to get Token space guid for token" + token.cName +
@@ -420,7 +420,7 @@ public abstract class PlatformPcdPreprocessAction {
                         continue;
                     }
 
-                    token = new Token(pcdBuildData.getCName(), tokenSpaceStrRet[1]);
+                    token = new Token(pcdBuildData.getCName(), tokenSpaceStrRet);
 
                     token.datumType     = datumType;
                     token.tokenNumber   = tokenNumber;
@@ -512,7 +512,7 @@ public abstract class PlatformPcdPreprocessAction {
         boolean             hasSkuId0       = false;
         long                tokenNumber     = 0;
         String              hiiDefaultValue = null;
-        String[]            variableGuidString = null;
+        String              variableGuidString = null;
 
         List<DynamicPcdBuildDefinitions.PcdBuildData.SkuInfo>   skuInfoList = null;
         DynamicPcdBuildDefinitions.PcdBuildData                 dynamicInfo = null;
@@ -687,7 +687,7 @@ public abstract class PlatformPcdPreprocessAction {
                 }
 
                 skuInstance.value.setHiiData(varNameList,
-                                             translateSchemaStringToUUID(variableGuidString[1]),
+                                             translateSchemaStringToUUID(variableGuidString),
                                              skuInfoList.get(index).getVariableOffset(),
                                              skuInfoList.get(index).getHiiDefaultValue().toString());
                 token.skuData.add(skuInstance);
@@ -738,8 +738,8 @@ public abstract class PlatformPcdPreprocessAction {
         String  temp;
         String  exceptionString;
         String  hiiDefaultValue;
-        String  tokenSpaceStrRet[];
-        String  variableGuidString[];
+        String  tokenSpaceStrRet;
+        String  variableGuidString;
 
         dynamicPcdBuildDataArray = getAllDynamicPcdInfoFromFpd();
         if (dynamicPcdBuildDataArray == null) {
@@ -748,7 +748,7 @@ public abstract class PlatformPcdPreprocessAction {
 
         for (index2 = 0; index2 < dynamicPcdBuildDataArray.size(); index2++) {
             pcdBuildData = dynamicPcdBuildDataArray.get(index2);
-            tokenSpaceStrRet = this.getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
+            tokenSpaceStrRet = getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
 
             if (tokenSpaceStrRet == null) {
                 putError("Fail to get Token space guid for token" + pcdBuildData.getCName());
@@ -756,7 +756,7 @@ public abstract class PlatformPcdPreprocessAction {
             }
 
             primaryKey = Token.getPrimaryKeyString(pcdBuildData.getCName(),
-                                                   tokenSpaceStrRet[1]);
+                                                   tokenSpaceStrRet);
 
             if (pcdDbManager.isTokenInDatabase(primaryKey)) {
                 continue;
@@ -772,7 +772,7 @@ public abstract class PlatformPcdPreprocessAction {
             //
             // Create new token for unreference dynamic PCD token
             //
-            token           = new Token(pcdBuildData.getCName(), tokenSpaceStrRet[1]);
+            token           = new Token(pcdBuildData.getCName(), tokenSpaceStrRet);
             token.datumSize = pcdBuildData.getMaxDatumSize();
 
 
@@ -886,7 +886,7 @@ public abstract class PlatformPcdPreprocessAction {
                     //
                     // Get variable guid string according to the name of guid which will be mapped into a GUID in SPD file.
                     //
-                    variableGuidString = this.getGuidInfoFromSpd(skuInfoList.get(index).getVariableGuid().toString());
+                    variableGuidString = getGuidInfoFromSpd(skuInfoList.get(index).getVariableGuid().toString());
                     if (variableGuidString == null) {
                         exceptionString = String.format("In FPD file, for dynamic PCD %s,  the variable guid %s can be found in all SPD file!",
                                                         token.cName,
@@ -904,7 +904,7 @@ public abstract class PlatformPcdPreprocessAction {
                     }
 
                     skuInstance.value.setHiiData(varNameList,
-                                                 translateSchemaStringToUUID(variableGuidString[1]),
+                                                 translateSchemaStringToUUID(variableGuidString),
                                                  skuInfoList.get(index).getVariableOffset(),
                                                  skuInfoList.get(index).getHiiDefaultValue().toString());
                     token.skuData.add(skuInstance);
