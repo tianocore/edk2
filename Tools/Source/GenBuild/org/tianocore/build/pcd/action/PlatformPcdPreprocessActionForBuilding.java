@@ -28,18 +28,19 @@ import java.util.Map;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions;
+import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.build.exception.PlatformPcdPreprocessBuildException;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.pcd.action.ActionMessage;
-import org.tianocore.pcd.entity.ModulePcdInfoFromFpd;
+import org.tianocore.pcd.action.PlatformPcdPreprocessAction;
 import org.tianocore.pcd.entity.MemoryDatabaseManager;
+import org.tianocore.pcd.entity.ModulePcdInfoFromFpd;
 import org.tianocore.pcd.entity.Token;
 import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.exception.EntityException;
-import org.tianocore.pcd.action.PlatformPcdPreprocessAction;
-import org.tianocore.build.exception.PlatformPcdPreprocessBuildException;
 import org.tianocore.pcd.exception.PlatformPcdPreprocessException;
 
 /**
@@ -120,7 +121,9 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
     **/
     public void execute() throws PlatformPcdPreprocessBuildException {
-        String errorMessageHeader = "Fail to initialize Pcd memory database for building. Because:";
+        String errorMessageHeader   = "Fail to initialize Pcd memory database for building. Because:";
+        String errorsForPreprocess  = null;
+
         //
         // Get memoryDatabaseManager instance from GlobalData.
         // The memoryDatabaseManager should be initialized as static variable
@@ -137,6 +140,10 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
             initPcdMemoryDbWithPlatformInfo();
         } catch (PlatformPcdPreprocessException exp) {
             throw new PlatformPcdPreprocessBuildException(errorMessageHeader + exp.getMessage());
+        }
+        errorsForPreprocess = this.getErrorString();
+        if (errorsForPreprocess != null) {
+            throw new PlatformPcdPreprocessBuildException(errorMessageHeader + "\r\n" + errorsForPreprocess);
         }
 
         //
@@ -228,7 +235,10 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
                                                                  id.getArch(),
                                                                  id.getModule().getVersion(),
                                                                  id.getModule().getModuleType());
-            allModules.add(new ModulePcdInfoFromFpd(usageId, pcdBuildDefinitions.get(id)));
+            allModules.add(
+                new ModulePcdInfoFromFpd(
+                    usageId, 
+                    ((PcdBuildDefinitionDocument)pcdBuildDefinitions.get(id)).getPcdBuildDefinition()));
         }
         return allModules;
     }
@@ -542,7 +552,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
                     return exceptionString;
                 }
             } else {
-                exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*. For VOID* type, you have three format choise:\n "+
+                exceptionString = String.format("[FPD file error] The datum type of PCD %s in %s is VOID*. For VOID* type, you have three format choise:\n"+
                                                 "1) UNICODE string: like L\"xxxx\";\r\n"+
                                                 "2) ANSIC string: like \"xxx\";\r\n"+
                                                 "3) Byte array: like {0x2, 0x45, 0x23}\r\n"+
@@ -602,19 +612,18 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
                                             "PCD entry %s in module %s!",
                                             token.cName,
                                             moduleName);
-            throw new PlatformPcdPreprocessException(exceptionString);
+            putError(exceptionString);
+            return null;
         }
 
         dynamicPcdBuildDataArray = dynamicPcdBuildDefinitions.getPcdBuildDataList();
         for (index = 0; index < dynamicPcdBuildDataArray.size(); index ++) {
-            try {
-                tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName());
-            } catch (Exception e) {
-                throw new PlatformPcdPreprocessException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
-            }
+            tokenSpaceStrRet = this.getGuidInfoFromSpd(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName());
 
             if (tokenSpaceStrRet == null) {
-                throw new PlatformPcdPreprocessException ("Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName());
+                exceptionString = "Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName();
+                putError(exceptionString);
+                continue;
             }
 
             dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
@@ -655,6 +664,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
         dynamicPcdBuildDefinitions = fpdDocInstance.getPlatformSurfaceArea().getDynamicPcdBuildDefinitions();
         if (dynamicPcdBuildDefinitions == null) {
+            putError("There is no <DynamicPcdBuildDefinitions> in FPD file!");
             return null;
         }
 
