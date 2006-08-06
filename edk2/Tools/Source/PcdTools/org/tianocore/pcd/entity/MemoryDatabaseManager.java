@@ -235,6 +235,10 @@ public class MemoryDatabaseManager {
         return getUsageInstanceArrayByKeyString(primaryKey);
     }
 
+    public void clearDatabase() {
+        memoryDatabase.clear();
+    }
+
     /**
        Get all PCD token for a usage instance according to primary key.
 

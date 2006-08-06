@@ -41,8 +41,8 @@ public class ModulePcdInfoFromFpd {
 
     **/
     public ModulePcdInfoFromFpd(UsageIdentification usageId,
-                                XmlObject           pcdBuildDefinition) {
+                                PcdBuildDefinition  pcdBuildDefinition) {
         this.usageId            = usageId;
-        this.pcdBuildDefinition = ((PcdBuildDefinitionDocument)pcdBuildDefinition).getPcdBuildDefinition();
+        this.pcdBuildDefinition = pcdBuildDefinition;
     }
 }
