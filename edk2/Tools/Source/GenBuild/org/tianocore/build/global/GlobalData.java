@@ -779,8 +779,8 @@ public class GlobalData {
     //
     // For PCD get tokenSpaceGUid
     //
-    public synchronized static String[] getGuidInfoFromCname(String cName){
-        String cNameGuid[] = null;
+    public synchronized static String getGuidInfoFromCname(String cName){
+        String cNameGuid = null;
         String guid = null;
         Set set = spdTable.keySet();
         Iterator iter = set.iterator();
@@ -793,9 +793,7 @@ public class GlobalData {
             Spd spd = (Spd) spdTable.get(iter.next());
             guid = spd.getGuidFromCname(cName);
             if (guid != null){
-                cNameGuid = new String[2];
-                cNameGuid[0] = cName;
-                cNameGuid[1] = guid;
+                cNameGuid = guid;
                 break;
             }
         }

@@ -161,12 +161,12 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
       @param guidCName      Guid CName string.
 
-      @return String[]      Guid information from SPD file.
+      @return String        Guid information from SPD file.
       @throws PlatformPcdPreprocessException
                             Fail to get Guid information from SPD file.
     **/
-    public String[] getGuidInfoFromSpd(String guidCName) throws PlatformPcdPreprocessException {
-        String[] tokenSpaceStrRet = null;
+    public String getGuidInfoFromSpd(String guidCName) throws PlatformPcdPreprocessException {
+        String tokenSpaceStrRet = null;
         try {
             tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(guidCName);
         } catch ( Exception e ) {
@@ -590,7 +590,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
         String dynamicPrimaryKey = null;
         DynamicPcdBuildDefinitions                    dynamicPcdBuildDefinitions = null;
         List<DynamicPcdBuildDefinitions.PcdBuildData> dynamicPcdBuildDataArray   = null;
-        String[]                                      tokenSpaceStrRet           = null;
+        String                                        tokenSpaceStrRet           = null;
 
         //
         // If FPD document is not be opened, open and initialize it.
@@ -618,7 +618,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
         dynamicPcdBuildDataArray = dynamicPcdBuildDefinitions.getPcdBuildDataList();
         for (index = 0; index < dynamicPcdBuildDataArray.size(); index ++) {
-            tokenSpaceStrRet = this.getGuidInfoFromSpd(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName());
+            tokenSpaceStrRet = getGuidInfoFromSpd(dynamicPcdBuildDataArray.get(index).getTokenSpaceGuidCName());
 
             if (tokenSpaceStrRet == null) {
                 exceptionString = "Fail to get token space guid for token " + dynamicPcdBuildDataArray.get(index).getCName();
@@ -627,7 +627,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
             }
 
             dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
-                                                          tokenSpaceStrRet[1]);
+                                                          tokenSpaceStrRet);
             if (dynamicPrimaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
                 return dynamicPcdBuildDataArray.get(index);
             }
