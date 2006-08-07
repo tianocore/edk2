@@ -3,6 +3,7 @@ package org.tianocore.frameworkwizard.platform.ui;
 import java.awt.BorderLayout;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -12,6 +13,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import javax.swing.JCheckBox;
@@ -244,7 +247,10 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
             jRadioButtonHii.setSelected(true);
             String[][] saa = new String[ffc.getDynamicPcdSkuInfoCount(i)][7];
             ffc.getDynamicPcdSkuInfos(i, saa);
-            jTextFieldVarName.setText(saa[0][1]);
+            
+            String varDisplayName = Tools.convertUnicodeHexStringToString(saa[0][1]);
+            jTextFieldVarName.setText(varDisplayName);
+            
             jTextFieldVarGuid.setText(saa[0][2]);
             jTextFieldVarOffset.setText(saa[0][3]);
             jTextFieldHiiDefaultValue.setText(saa[0][4]);
@@ -274,7 +280,8 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
         
         else if (saa[i][1] != null) {
             jRadioButtonHii.setSelected(true);
-            jTextFieldVarName.setText(saa[i][1]);
+            String varDisplayName = Tools.convertUnicodeHexStringToString(saa[i][1]);
+            jTextFieldVarName.setText(varDisplayName);
             jTextFieldVarGuid.setText(saa[i][2]);
             jTextFieldVarOffset.setText(saa[i][3]);
             jTextFieldHiiDefaultValue.setText(saa[i][4]);
@@ -507,7 +514,7 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
         }
         return jButtonSkuInfoUpdate;
     }
-
+    
     private void updateSkuInfo (int pcdSelected) {
         int skuCount = ffc.getDynamicPcdSkuInfoCount(pcdSelected);
         
@@ -518,16 +525,40 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
         String value = null;
         String vpdOffset = null;
         if (jRadioButtonHii.isSelected()) {
-            varName = jTextFieldVarName.getText();
+            varName = Tools.convertStringToUnicodeHexString(jTextFieldVarName.getText());
+            if (varName.length() == 0) {
+                JOptionPane.showMessageDialog(this, "Variable Name is Empty.");
+                return;
+            }
             varGuid = jTextFieldVarGuid.getText();
+            if (varGuid.length() == 0) {
+                JOptionPane.showMessageDialog(this, "Variable GUID is Empty.");
+                return;
+            }
             varOffset = jTextFieldVarOffset.getText();
+            if (!DataValidation.isHex64BitDataType(varOffset)) {
+                JOptionPane.showMessageDialog(this, "Variable Offset is NOT Hex64BitDataType.");
+                return;
+            }
             hiiDefault = jTextFieldHiiDefaultValue.getText();
+            if (!DataValidation.isDefaultValueType(hiiDefault)) {
+                JOptionPane.showMessageDialog(this, "Default Value is NOT DefaultValueType.");
+                return;
+            }
         }
         if (jRadioButtonVpd.isSelected()) {
             vpdOffset = jTextFieldVpdOffset.getText();
+            if (!DataValidation.isHex64BitDataType(vpdOffset)) {
+                JOptionPane.showMessageDialog(this, "VPD Offset is NOT Hex64BitDataType.");
+                return;
+            }
         }
         if (jRadioButtonDefaultValue.isSelected()) {
             value = jTextFieldDefaultValue.getText();
+            if (!DataValidation.isDefaultValueType(value)) {
+                JOptionPane.showMessageDialog(this, "Value is NOT DefaultValueType.");
+                return;
+            }
         }
         //
         // SKU disabled. only modify data for default SKU.

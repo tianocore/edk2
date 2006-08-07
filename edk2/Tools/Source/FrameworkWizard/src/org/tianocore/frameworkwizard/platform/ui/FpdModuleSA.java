@@ -791,7 +791,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             selectedInstancesTableModel.addColumn("PackageVersion");
             jTableSelectedInstances = new JTable(selectedInstancesTableModel);
             jTableSelectedInstances.setRowHeight(20);
-            jTableSelectedInstances.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTableSelectedInstances.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
             jTableSelectedInstances.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
         }
@@ -896,7 +896,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             libInstanceTableModel.addColumn("PackageVersion");
             jTableLibInstances = new JTable(libInstanceTableModel);
             jTableLibInstances.setRowHeight(20);
-            jTableLibInstances.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTableLibInstances.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
             jTableLibInstances.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
         }
