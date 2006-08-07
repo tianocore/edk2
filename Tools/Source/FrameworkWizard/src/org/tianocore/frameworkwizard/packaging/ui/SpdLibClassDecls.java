@@ -310,6 +310,10 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             if (name != null && name.length() > 0) {
                 getLibInstances(lib);
                 guid = nameToGuid(name);
+                if (guid == null){
+                  JOptionPane.showMessageDialog(frame, "Recommended Instance NOT exists.");
+                  return;
+                }
             }
             
             String[] sa = new String[7];
@@ -618,6 +622,15 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             //
             getLibInstances(row[cnClassName]);
             String recommendGuid = nameToGuid(row[cnRecInstName]);
+            if (row[cnRecInstName].equals("null")) {
+                row[cnRecInstName] = null;
+            }
+            else{
+                if (recommendGuid == null) {
+                  JOptionPane.showMessageDialog(frame, "Recommended Instance NOT exists.");
+                  return;
+                }
+            }
 
             sfc.genSpdLibClassDeclarations(row[cnClassName], recommendGuid, row[cnHdrFile], row[cnHelpText], row[cnSupArch], null, null, row[cnRecInstVer], null, row[cnSupMod]);
             model.addRow(row);
@@ -939,7 +952,6 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private String nameToGuid(String name) {
         String s = null;
         if (!libNameGuidMap.containsKey(name)) {
-            JOptionPane.showMessageDialog(frame, "Recommended Instance NOT exists.");
             return s;
         }
         
