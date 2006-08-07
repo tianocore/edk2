@@ -171,6 +171,7 @@ typedef struct {
   UINT16                OpCode;
   UINT8                 Length;
   EFI_PHYSICAL_ADDRESS  EntryPoint;
+  EFI_PHYSICAL_ADDRESS  Context;
 } EFI_BOOT_SCRIPT_DISPATCH;
 
 typedef struct {
