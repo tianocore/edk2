@@ -159,9 +159,9 @@ public abstract class PlatformPcdPreprocessAction {
 
     public void putError(String error) {
         if (errorString == null) {
-            errorString = "### ERROR[" + errorCount + "] ###\r\n" + error + "\r\n\r\n";
+            errorString = "### ERROR[" + errorCount + "] ###\r\n" + error + "\r\n";
         } else {
-            errorString += "### ERROR[" + errorCount + "] ###\r\n" + error + "\r\n\r\n";
+            errorString += "### ERROR[" + errorCount + "] ###\r\n" + error + "\r\n";
         }
 
         errorCount++;
