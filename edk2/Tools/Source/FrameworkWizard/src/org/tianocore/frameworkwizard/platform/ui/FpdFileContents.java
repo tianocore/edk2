@@ -1170,11 +1170,11 @@ public class FpdFileContents {
                 DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData pcdBuildData = 
                     (DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitions.PcdBuildData)cursor.getObject();
                 if (pcdBuildData.getCName().equals(cName) && pcdBuildData.getTokenSpaceGuidCName().equals(tsGuid)) {
-                    cursor.removeXml();
-                    if (getDynamicPcdBuildDataCount() == 0) {
+                    
+                    if (getDynamicPcdBuildDataCount() == 1) {
                         cursor.toParent();
-                        cursor.removeXml();
                     }
+                    cursor.removeXml();
                     cursor.dispose();
                     return;
                 }

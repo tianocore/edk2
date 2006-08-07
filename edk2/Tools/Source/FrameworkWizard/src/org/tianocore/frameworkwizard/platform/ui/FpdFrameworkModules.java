@@ -135,7 +135,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JTable getJTableAllModules() {
         if (jTableAllModules == null) {
             modelAllModules = new NonEditableTableModel();
-            jTableAllModules = new JTable(modelAllModules);
+            TableSorter sorter = new TableSorter(modelAllModules);
+            jTableAllModules = new JTable(sorter);
+            sorter.setTableHeader(jTableAllModules.getTableHeader());
             jTableAllModules.setRowHeight(20);
             modelAllModules.addColumn("ModuleName");
             modelAllModules.addColumn("ModuleVersion");
@@ -181,6 +183,8 @@ public class FpdFrameworkModules extends IInternalFrame {
                         return;
                     }
                     
+                    TableSorter sorter = (TableSorter)jTableAllModules.getModel();
+                    selectedRow = sorter.modelIndex(selectedRow);
                     String path = modelAllModules.getValueAt(selectedRow, 4)+"";
                     ModuleIdentification mi = miList.get(selectedRow);
                     Vector<String> vArchs = null;
@@ -297,7 +301,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JTable getJTableFpdModules() {
         if (jTableFpdModules == null) {
             modelFpdModules = new NonEditableTableModel();
-            jTableFpdModules = new JTable(modelFpdModules);
+            TableSorter sorter = new TableSorter(modelFpdModules);
+            jTableFpdModules = new JTable(sorter);
+            sorter.setTableHeader(jTableFpdModules.getTableHeader());
             jTableFpdModules.setRowHeight(20);
             modelFpdModules.addColumn("ModuleName");
             modelFpdModules.addColumn("ModuleVersion");            
@@ -327,6 +333,10 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (selectedRow < 0){
                         return;
                     }
+                    
+                    TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
+                    selectedRow = sorter.modelIndex(selectedRow);
+                    
                     if (settingDlg == null) {
                         settingDlg = new FpdModuleSA(ffc);
                     }
@@ -362,6 +372,10 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (selectedRow < 0){
                         return;
                     }
+                    
+                    TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
+                    selectedRow = sorter.modelIndex(selectedRow);
+                    
                     String[] sa = new String[5];
                     ffc.getFrameworkModuleInfo(selectedRow, sa);
                     String mg = sa[0];
