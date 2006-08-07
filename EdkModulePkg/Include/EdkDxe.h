@@ -68,7 +68,6 @@ Abstract:
 #include <Protocol/GenericMemoryTest.h>
 #include <Protocol/DiskInfo.h>
 #include <Protocol/FvbExtension.h>
-#include <Protocol/SecurityPolicy.h>
 #include <Protocol/FaultTolerantWriteLite.h>
 #include <Protocol/ConsoleControl.h>
 #include <Protocol/OEMBadging.h>

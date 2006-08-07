@@ -330,10 +330,6 @@
       <IncludeHeader>Include/Protocol/ScsiIo.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
-    <IndustryStdHeader Name="SecurityPolicy">
-      <IncludeHeader>Include/Protocol/SecurityPolicy.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
     <IndustryStdHeader Name="UgaIo">
       <IncludeHeader>Include/Protocol/UgaIo.h</IncludeHeader>
       <HelpText/>
