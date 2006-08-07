@@ -220,21 +220,6 @@ public class MemoryDatabaseManager {
         }
     }
 
-    /**
-      Get all PCD record for a module according to module's name, module's GUID,
-      package name, package GUID, arch, version information.
-
-      @param usageId   the id of UsageInstance.
-
-      @return  all usage instance for this module in memory database.
-    **/
-    public List<UsageInstance> getUsageInstanceArrayByModuleName(UsageIdentification usageId) {
-
-        String primaryKey = UsageInstance.getPrimaryKey(usageId);
-
-        return getUsageInstanceArrayByKeyString(primaryKey);
-    }
-
     public void clearDatabase() {
         memoryDatabase.clear();
     }
@@ -246,14 +231,15 @@ public class MemoryDatabaseManager {
 
        @return List<UsageInstance>  the list contains all usage instances.
     **/
-    public List<UsageInstance> getUsageInstanceArrayByKeyString(String primaryKey) {
+    public List<UsageInstance> getUsageInstanceArrayById(UsageIdentification usageId) {
         Token[]               tokenArray          = null;
         int                   recordIndex         = 0;
         UsageInstance         usageInstance       = null;
         List<UsageInstance>   returnArray         = new ArrayList<UsageInstance>();
+        String                primaryKey          = usageId.toString();
 
         tokenArray = getRecordArray();
-
+        
         //
         // Loop to find all PCD record related to current module
         //
@@ -269,19 +255,34 @@ public class MemoryDatabaseManager {
         return returnArray;
     }
 
+    public List<Token> getPcdTokenListForModule(UsageIdentification usageId) {
+        List<UsageInstance> usageList = getUsageInstanceArrayById(usageId);
+        List<Token>         tokenList = new ArrayList<Token>();
+
+        if (usageList == null) {
+            return null;
+        }
+
+        for (int usageIndex = 0; usageIndex < usageList.size(); usageIndex++) {
+            tokenList.add(usageList.get(usageIndex).parentToken);
+        }
+
+        return tokenList;
+    }
+
     /**
       Get all modules name who contains PCD information
 
-      @return Array for module name
+      @return Array for usage's identification
     **/
-    public List<String> getAllModuleArray()
+    public List<UsageIdentification> getAllModuleArray()
     {
         int                       tokenIndex    = 0;
         int                       usageIndex    = 0;
         int                       moduleIndex   = 0;
         Token[]                   tokenArray    = null;
         Object[]                  usageInstanceArray = null;
-        List<String>              moduleNames   = new ArrayList<String>();
+        List<UsageIdentification> usageArray    = new ArrayList<UsageIdentification>();
         UsageInstance             usageInstance = null;
         boolean                   bFound        = false;
         String                    primaryKey    = null;
@@ -296,17 +297,17 @@ public class MemoryDatabaseManager {
                 usageInstance = (UsageInstance)((Map.Entry)usageInstanceArray[usageIndex]).getValue();
                 primaryKey    = usageInstance.getPrimaryKey();
                 bFound        = false;
-                for (moduleIndex = 0; moduleIndex < moduleNames.size(); moduleIndex++) {
-                    if (moduleNames.get(moduleIndex).equalsIgnoreCase(primaryKey)) {
+                for (moduleIndex = 0; moduleIndex < usageArray.size(); moduleIndex++) {
+                    if (usageArray.get(moduleIndex).toString().equalsIgnoreCase(primaryKey)) {
                         bFound = true;
                         break;
                     }
                 }
                 if (!bFound) {
-                    moduleNames.add(primaryKey);
+                    usageArray.add(usageInstance.usageId);
                 }
             }
         }
-        return moduleNames;
+        return usageArray;
     }
 }

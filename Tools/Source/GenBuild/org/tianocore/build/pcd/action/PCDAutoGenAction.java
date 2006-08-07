@@ -195,7 +195,7 @@ public class PCDAutoGenAction extends BuildAction {
 
         usageInstanceArray = null;
         if (!isBuildUsedLibrary) {
-            usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(usageId);
+            usageInstanceArray  = dbManager.getUsageInstanceArrayById(usageId);
             MemoryDatabaseManager.UsageInstanceContext = usageInstanceArray;
             MemoryDatabaseManager.CurrentModuleName    = moduleName;
         } else if ((pcdNameArrayInMsa != null) && (pcdNameArrayInMsa.length > 0)) {
@@ -205,7 +205,7 @@ public class PCDAutoGenAction extends BuildAction {
             // these library should be used to autogen.
             //
             if (usageContext == null) {
-                usageInstanceArray  = dbManager.getUsageInstanceArrayByModuleName(usageId);
+                usageInstanceArray  = dbManager.getUsageInstanceArrayById(usageId);
             } else {
                 usageInstanceArray = new ArrayList<UsageInstance>();
 

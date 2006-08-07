@@ -193,7 +193,7 @@ public class Token {
         if (tokenSpaceName == null) {
             return cName + "_nullTokenSpaceGuid";
         } else {
-            return cName + "_" + tokenSpaceName.toString().replace('-', '_');
+            return cName + "_" + tokenSpaceName.toString().replace('-', '_').toLowerCase();
         }
     }
 
