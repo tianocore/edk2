@@ -2375,9 +2375,6 @@ typedef enum {
 #include <Protocol/DriverDiagnostics.h>
 #include <Protocol/Ebc.h>
 #include <Protocol/EfiNetworkInterfaceIdentifier.h>
-#include <Protocol/FileInfo.h>
-#include <Protocol/FileSystemInfo.h>
-#include <Protocol/FileSystemVolumeLabelInfo.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
 #include <Protocol/PlatformDriverOverride.h>
@@ -2397,7 +2394,9 @@ typedef enum {
 #include <Guid/PcAnsi.h>
 #include <Guid/SmBios.h>
 #include <Guid/SalSystemTable.h>
-
+#include <Guid/FileInfo.h>
+#include <Guid/FileSystemInfo.h>
+#include <Guid/FileSystemVolumeLabelInfo.h>
 
 #if (EFI_SPECIFICATION_VERSION >= 0x00020000)
 //
