@@ -81,9 +81,5 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Constructor>RuntimeDriverLibConstruct</Constructor>
       <Destructor>RuntimeDriverLibDeconstruct</Destructor>
     </Extern>
-    <Extern>
-      <Constructor>RuntimeDriverLibConstruct</Constructor>
-      <Destructor>RuntimeDriverLibDeconstruct</Destructor>
-    </Extern>
   </Externs>
 </ModuleSurfaceArea>
