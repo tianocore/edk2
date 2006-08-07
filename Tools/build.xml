@@ -89,31 +89,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <subant target="clean" inheritall="false">
       <filelist dir="."
         files="
+          Source/FrameworkWizard/build.xml 
+          Source/Cpptasks/build.xml 
+          Source/FrameworkTasks/build.xml 
+          Source/GenBuild/build.xml 
+          Source/PcdTools/build.xml 
+          Source/Common/build.xml 
+          Source/SurfaceArea/build.xml 
           Source/TianoTools/build.xml
-          Source/FrameworkWizard/build.xml
-          Source/Cpptasks/build.xml
-          Source/FrameworkTasks/build.xml
-          Source/GenBuild/build.xml
-          Source/PcdTools/build.xml
-          Source/Common/build.xml
-          Source/SurfaceArea/build.xml
-          "/>
+        "/>
     </subant>
   </target>
 
   <target name="cleanall">
-    <subant target="cleanall" inheritall="false">
+    <subant target="cleanall" inheritall="true">
       <filelist dir="."
         files="
+          Source/FrameworkWizard/build.xml 
+          Source/Cpptasks/build.xml 
+          Source/FrameworkTasks/build.xml 
+          Source/GenBuild/build.xml 
+          Source/PcdTools/build.xml 
+          Source/Common/build.xml 
+          Source/SurfaceArea/build.xml 
           Source/TianoTools/build.xml
-          Source/FrameworkWizard/build.xml
-          Source/Cpptasks/build.xml
-          Source/FrameworkTasks/build.xml
-          Source/GenBuild/build.xml
-          Source/PcdTools/build.xml
-          Source/Common/build.xml
-          Source/SurfaceArea/build.xml
-          "/>
+        "/>
     </subant>
   </target>
 </project>
