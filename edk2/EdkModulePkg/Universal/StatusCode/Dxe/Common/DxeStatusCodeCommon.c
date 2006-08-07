@@ -79,7 +79,6 @@ DXE_STATUS_CODE_CONTROLLER gDxeStatusCode = {
 
 **/
 EFI_STATUS
-EFIAPI
 DxeStatusCodeDriverEntry (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable

@@ -64,9 +64,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
+    <Filename>PeiStatusCode.h</Filename>
     <Filename>SerialStatusCodeWorker.c</Filename>
     <Filename>MemoryStausCodeWorker.c</Filename>
-    <Filename>PeiStatusCode.c</Filename>
     <Filename>PeiStatusCode.c</Filename>
   </SourceFiles>
   <PackageDependencies>
@@ -93,22 +93,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <PcdCoded>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdStatusCodeUseSerial</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdStatusCodeUseMemory</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="FEATURE_FLAG">
       <C_Name>PcdStatusCodeUseOEM</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdStatusCodeMemorySize</C_Name>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
   </PcdCoded>

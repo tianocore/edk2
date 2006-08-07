@@ -140,7 +140,6 @@ ReportDispatcher (
 
 **/
 EFI_STATUS
-EFIAPI
 PeiStatusCodeDriverEntry (
   IN EFI_FFS_FILE_HEADER       *FfsHeader,
   IN EFI_PEI_SERVICES          **PeiServices
