@@ -280,7 +280,7 @@ check out the entire EDK II source tree.
 In a command window, change to the top-level directory of the EDK II source.
 
 To test your tool chain setup and to build the supplied tools, execute:
-    c:\MyWork\edkii\> edksetup ForceRebuild
+    c:\MyWork\edk2\> edksetup ForceRebuild
 
 (The edksetup script is referred to as the setup command throughout the 
 rest of this document.)
@@ -293,7 +293,7 @@ script (without any arguments), any time you want to build.
 
   Set the WORKSPACE environment variable, e.g.:
 
-    c:\> set WORKSPACE=C:\MyWork\edkii
+    c:\> set WORKSPACE=C:\MyWork\edk2
 
 You may need to edit the text files Tools/Conf/target.txt and
 Tools/Conf/tools_def.txt (created by edksetup) using your favorite 
@@ -303,7 +303,7 @@ paths (as per the default installation of the tools), so a customized
 install may require this manual process.
 
 Once this is completed, you are ready to test the build, by executing:
-    c:\MyWork\edkii\> build
+    c:\MyWork\edk2\> build
 
 This command builds the active platform specified in text file target.txt. If 
 the active platform is not specified target.txt, you must execute the build 
@@ -325,7 +325,7 @@ environment variable, TOOL_CHAIN to "gcc" before running the
 edksetup script.  Example: export TOOL_CHAIN=gcc
 
 To test your tool chain setup and to build the supplied tools, execute:
-    c:\MyWork\edkii\> edksetup ForceRebuild
+    c:\MyWork\edk2\> edksetup ForceRebuild
 
 On Linux systems, you must source the edksetup.sh file to load the correct
 settings into your shell.
@@ -347,14 +347,14 @@ rest of this document.
 
 Any changes to the tool source code or XML Schema documents require that
 you execute the following:
-   c:\MyWork\edkii\> edksetup ForceRebuild
+   c:\MyWork\edk2\> edksetup ForceRebuild
 
 You must set the WORKSPACE environment variable, or run the edksetup
 script (without any arguments), any time you want to build.
 
   Set the WORKSPACE environment variable, e.g.:
 
-    c:\> set WORKSPACE=C:\MyWork\edkii
+    c:\> set WORKSPACE=C:\MyWork\edk2
 
 You may need to edit the text files Tools/Conf/target.txt and
 Tools/Conf/tools_def.txt (created by edksetup) using your favorite 
@@ -364,7 +364,7 @@ paths (as per the default installation of the tools), so a customized
 tool installation may require this manual process.
 
 Once this is completed, you are ready to test the build, by executing:
-    c:\MyWork\edkii\> build
+    c:\MyWork\edk2\> build
 
 This command builds the active platform specified in text file target.txt. If 
 the active platform is not specified, go to the sub-directory that contains FPD 
@@ -381,7 +381,7 @@ In the command window:
     c:\<directory>\> build
 or
   cd to the platform (FPD file) that you want to build and execute this command:
-    c:\MyWork\edkii\EdkNt32Pkg\> build
+    c:\MyWork\edk2\EdkNt32Pkg\> build
 
   Note that the active platform specified in target.txt overrides the platform 
   specified by any FPD file in the current directory. For more   information 
@@ -418,7 +418,7 @@ Individual Module Builds
 After running the setup command, you can build individual modules.
   In the command window, cd to the module that you want to build, and
   execute the build command:
-    c:\MyWork\edkii\MdePkg\Library\BaseLib\> build
+    c:\MyWork\edk2\MdePkg\Library\BaseLib\> build
 
   You must set the active platform in target.txt for individual module builds. 
 
