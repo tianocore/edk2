@@ -126,6 +126,7 @@ public class GlobalData {
             //
             // Get package list
             //
+            packageList.clear();
             List<DbPathAndFilename> packages = db.getFrameworkDatabase().getPackageList().getFilenameList();
             
             Iterator iter = packages.iterator();
@@ -133,9 +134,7 @@ public class GlobalData {
                 DbPathAndFilename dbPath = (DbPathAndFilename)iter.next();
                 String fileName = dbPath.getStringValue();
                 Spd spd = new Spd(new File(workspaceDir + File.separatorChar + fileName));
-                if (!packageList.contains(spd.getPackageId())) {
-                    packageList.add(spd.getPackageId());
-                }
+                packageList.add(spd.getPackageId());
                 spdTable.put(spd.getPackageId(), spd);
             }
 
