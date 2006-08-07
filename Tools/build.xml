@@ -102,6 +102,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
 
   <target name="cleanall">
+    <available classname="org.tianocore.frameworkwizard.FrameworkWizardUI" property="FrameworkWizardUI.available"/>
+    <available classname="org.tianocore.build.GenBuildTask" property="GenBuildTask.available"/>
+    <available classname="org.tianocore.framework.tasks.Tool" property="Tool.available"/>
+    <available classname="org.tianocore.pcd.action.BuildAction" property="PcdClass.available"/>
+    <if>
+      <or>
+        <isset property="FrameworkWizardUI.available"/>
+        <isset property="GenBuildTask.available"/>
+        <isset property="Tool.available"/>
+        <isset property="PcdClass.available"/>
+      </or>
+      <then>
+        <fail message="Use ant -noclasspath cleanall, to remove all jar files!"/>
+      </then>
+    </if>
     <subant target="cleanall" inheritall="true">
       <filelist dir="."
         files="
