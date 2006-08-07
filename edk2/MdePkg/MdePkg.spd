@@ -366,6 +366,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <IncludeHeader>Include/Guid/FirmwareFileSystem.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
+    <IndustryStdHeader Name="FileInfo">
+      <IncludeHeader>Include/Guid/FileInfo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FileSystemInfo">
+      <IncludeHeader>Include/Guid/FileSystemInfo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
+    <IndustryStdHeader Name="FileSystemVolumeLabelInfo">
+      <IncludeHeader>Include/Guid/FileSystemVolumeLabelInfo.h</IncludeHeader>
+      <HelpText/>
+    </IndustryStdHeader>
     <IndustryStdHeader Name="FrameworkDevicePath">
       <IncludeHeader>Include/Guid/FrameworkDevicePath.h</IncludeHeader>
       <HelpText/>
@@ -808,18 +820,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </IndustryStdHeader>
     <IndustryStdHeader Name="EfiNetworkInterfaceIdentifier">
       <IncludeHeader>Include/Protocol/EfiNetworkInterfaceIdentifier.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
-    <IndustryStdHeader Name="FileInfo">
-      <IncludeHeader>Include/Protocol/FileInfo.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
-    <IndustryStdHeader Name="FileSystemInfo">
-      <IncludeHeader>Include/Protocol/FileSystemInfo.h</IncludeHeader>
-      <HelpText/>
-    </IndustryStdHeader>
-    <IndustryStdHeader Name="FileSystemVolumeLabelInfo">
-      <IncludeHeader>Include/Protocol/FileSystemVolumeLabelInfo.h</IncludeHeader>
       <HelpText/>
     </IndustryStdHeader>
     <IndustryStdHeader Name="FirmwareVolume">
