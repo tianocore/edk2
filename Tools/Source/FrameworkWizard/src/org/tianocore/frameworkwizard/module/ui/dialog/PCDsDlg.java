@@ -311,7 +311,12 @@ public class PCDsDlg extends IDialog implements ItemListener {
         this.id = inPcdCodedId;
 
         if (this.id != null) {
-            this.jComboBoxCName.setSelectedItem(id.getName());
+            for (int index = 0; index < this.jComboBoxCName.getItemCount(); index++) {
+                if (this.jComboBoxCName.getItemAt(index).toString().equals(id.getName())) {
+                    this.jComboBoxCName.setSelectedIndex(index);
+                    break;
+                }
+            }
             this.jTextFieldTokenSpaceGuid.setText(id.getGuid());
             this.jTextFieldDefaultValue.setText(id.getValue());
             this.jComboBoxUsage.setSelectedItem(id.getUsage());
