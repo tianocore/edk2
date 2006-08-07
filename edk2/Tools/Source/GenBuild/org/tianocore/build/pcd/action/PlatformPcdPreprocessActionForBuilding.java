@@ -359,7 +359,6 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
         dynamicPcdBuildDefinitions = fpdDocInstance.getPlatformSurfaceArea().getDynamicPcdBuildDefinitions();
         if (dynamicPcdBuildDefinitions == null) {
-            putError("There is no <DynamicPcdBuildDefinitions> in FPD file!");
             return null;
         }
 
