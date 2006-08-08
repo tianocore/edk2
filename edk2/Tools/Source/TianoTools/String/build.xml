@@ -62,7 +62,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outtype="static"
         debug="true"
         optimize="speed">
-
+      <compilerarg value="${ExtraArgus}" />
       <compilerarg value="-fshort-wchar" if="gcc"/>
 
       <fileset dir="${basedir}/${LibName}" 
