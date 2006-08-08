@@ -551,8 +551,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     else{
                         int selectedRow = lsm.getMinSelectionIndex();
                         String cName = jTablePcd.getValueAt(selectedRow, 0)+"";
+                        String tsGuid = jTablePcd.getValueAt(selectedRow, 1)+"";
                         String[] pcdInfo = {"", ""};
-                        getPcdInfo(cName, pcdInfo);
+                        getPcdInfo(cName, tsGuid, pcdInfo);
                         jTextAreaPcdHelp.setText(pcdInfo[0]);
                         initComboBox(pcdInfo[1]);
                         jComboBoxItemType.setSelectedItem(pcdInfo[1]);
@@ -632,17 +633,17 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         }
     }
     
-    private void getPcdInfo(String cName, String[] sa) {
+    private void getPcdInfo(String cName, String tsGuid, String[] sa) {
         String[][] saa = new String[ffc.getLibraryInstancesCount(moduleKey)][5];
         ffc.getLibraryInstances(moduleKey, saa);
         
         try{
-            if (ffc.getPcdBuildDataInfo(GlobalData.getModuleId(moduleKey), cName, sa)) {
+            if (ffc.getPcdBuildDataInfo(GlobalData.getModuleId(moduleKey), cName, tsGuid, sa)) {
                 return;
             }
             for (int j = 0; j < saa.length; ++j) {
                 if (ffc.getPcdBuildDataInfo(GlobalData.getModuleId(saa[j][1] + " " + saa[j][2] + " " + saa[j][3] + " " + saa[j][4]),
-                                            cName, sa)) {
+                                            cName, tsGuid, sa)) {
                     return;
                 }
             }

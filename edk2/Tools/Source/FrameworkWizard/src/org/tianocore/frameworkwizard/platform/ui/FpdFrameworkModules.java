@@ -336,6 +336,15 @@ public class FpdFrameworkModules extends IInternalFrame {
                     
                     TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
                     selectedRow = sorter.modelIndex(selectedRow);
+                    try {
+                        if (ffc.adjustPcd(selectedRow)) {
+                            docConsole.setSaved(false);
+                        }
+                    }
+                    catch (Exception exp) {
+                        JOptionPane.showMessageDialog(frame, exp.getMessage());
+                        return;
+                    }
                     
                     if (settingDlg == null) {
                         settingDlg = new FpdModuleSA(ffc);
@@ -355,6 +364,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         }
         return jButtonSettings;
     }
+ 
 
     /**
      * This method initializes jButton2	

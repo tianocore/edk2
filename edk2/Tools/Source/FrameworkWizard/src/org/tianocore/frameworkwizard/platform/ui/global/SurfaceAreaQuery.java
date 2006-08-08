@@ -893,71 +893,10 @@ public class SurfaceAreaQuery {
 		return null;
 	}
 
-	/**
-	 * Get the PcdToken array from module's surface area document. The array
-	 * should contains following data:
-	 * <p>
-	 * -------------------------------------------------------------------
-	 * </p>
-	 * <p>
-	 * CName | ItemType | TokenspaceName | DefaultValue | Usage | HelpText
-	 * </p>
-	 * <p>
-	 * -------------------------------------------------------------------
-	 * </p>
-	 * <p>
-	 * Note: Until new schema applying, now we can only get CName, ItemType,
-	 * </p>
-	 * 
-	 * @return 2-array table contains all information of PCD token retrieved
-	 *         from MSA.
-	 */
-	public static Object[][] etModulePCDTokenArray() {
-		return null;
-		// int index;
-		// Object[][] result;
-		// PCDs.PcdData[] pcds;
-		// String[] xPath = new String[] { "/PcdData" };
-		// XmlObject[] returns = get("PCDs", xPath);
-		//
-		// if ((returns == null) || (returns.length == 0)) {
-		// return null;
-		// }
-		//
-		// pcds = (PCDs.PcdData[]) returns;
-		// result = new Object[pcds.length][6];
-		// for (index = 0; index < pcds.length; index++) {
-		// //
-		// // Get CName
-		// //
-		// result[index][0] = pcds[index].getCName();
-		// //
-		// // Get ItemType: FEATURE_FLAG, FIXED_AT_BUILD, PATCHABLE_IN_MODLE,
-		// // DYNAMIC, DYNAMIC_EX
-		// //
-		// if (pcds[index].getItemType() != null) {
-		// result[index][1] = pcds[index].getItemType().toString();
-		// } else {
-		// result[index][1] = null;
-		// }
-		//
-		// //
-		// // BUGBUG: following field can *not* be got from current MSA until
-		// // schema changed.
-		// //
-		// // result [index][2] = pcds[index].getTokenSpaceName();
-		// result[index][2] = null;
-		// result[index][3] = pcds[index].getDefaultValue();
-		// // result [index][4] = pcds[index].getUsage ();
-		// result[index][4] = null;
-		// // result [index][5] = pcds[index].getHelpText ();
-		// result[index][5] = null;
-		// }
-		// return result;
-	}
+	
 
 	/**
-	 * Retrieve MAS header
+	 * Retrieve MSA header
 	 * 
 	 * @return
 	 * @return
