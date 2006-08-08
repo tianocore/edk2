@@ -76,7 +76,7 @@ goto path_ok
 :check_path
 if "%FRAMEWORK_TOOLS_PATH%"=="%WORKSPACE_TOOLS_PATH%" goto path_ok
 set PATH=%FRAMEWORK_TOOLS_PATH%;%PATH%
-set WORKSPACE_PATH=%WORKSPACE%
+set WORKSPACE_TOOLS_PATH=%WORKSPACE%\Tools\bin
 echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WORKSPACE
 
 :path_ok
