@@ -490,7 +490,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       This function is to get the ffsAligment
       @return  The value of ffsAligment.
     **/
-    public int getFfsAligment() {
+    public int getFfsAlignment() {
         return this.ffsAlignment;
     }
 
@@ -500,7 +500,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       This function is to set ffsAligment 
       @param  ffsAligment     The value of ffsAligment.
     **/
-    public void setFfsAligment(int ffsAligment) {
+    public void setFfsAlignment(int ffsAligment) {
         this.ffsAlignment = ffsAligment;
         if (this.ffsAlignment > 7) {
             throw new BuildException ("FFS_ALIGMENT Scope is 0-7");
