@@ -152,6 +152,8 @@
     <xs:attribute name="ModuleGuid" type="GuidType" use="required"/>
     <xs:attribute name="ModuleVersion" type="VersionDataType" use="optional"/>
     <xs:attribute name="PackageVersion" type="VersionDataType" use="optional"/>
+    <xs:attribute name="ForceDebug" type="xs:boolean" default="false" use="optional"/>
+    <xs:attribute name="BindingOrder" type="xs:int" use="optional"/>
     <xs:attribute name="SupArchList" type="ArchListType" use="optional"/>
   </xs:attributeGroup>
   <xs:attributeGroup name="OptionAttributes">

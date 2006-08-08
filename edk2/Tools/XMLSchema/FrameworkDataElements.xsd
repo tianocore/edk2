@@ -72,7 +72,7 @@
               <xs:element minOccurs="0" maxOccurs="unbounded" name="Attribute">
                 <xs:complexType>
                   <xs:attribute name="Name" type="C_NameType"/>
-                  <xs:attribute name="Value" type="C_NameType"/>
+                  <xs:attribute name="Value" type="xs:string"/>
                 </xs:complexType>
               </xs:element>
               <xs:element minOccurs="0" maxOccurs="1" name="Sections">
@@ -828,7 +828,7 @@
           <xs:complexType>
             <xs:simpleContent>
               <xs:extension base="PathAndFilename">
-                <xs:attribute name="MacroName" type="KeywordType" use="required"/>    
+                <xs:attribute name="MacroName" type="KeywordType" use="required"/>
               </xs:extension>
             </xs:simpleContent>
           </xs:complexType>
