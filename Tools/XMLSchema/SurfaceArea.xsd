@@ -105,6 +105,7 @@
         <xs:element minOccurs="1" maxOccurs="1" name="BuildTargets" type="BuildTargetList"/>
         <xs:element default="UNIFIED" name="IntermediateDirectories" type="IntermediateOutputType"/>
         <xs:element minOccurs="0" maxOccurs="1" name="OutputDirectory" type="xs:anyURI"/>
+        <xs:element minOccurs="0" maxOccurs="1" name="ForceDebugTarget" type="KeywordType"/>
         <!-- SkuInfo is only defined if Sku enabled -->
         <xs:element minOccurs="0" maxOccurs="1" ref="SkuInfo"/>
         <xs:element minOccurs="0" maxOccurs="1" ref="FlashDeviceDefinitions"/>
