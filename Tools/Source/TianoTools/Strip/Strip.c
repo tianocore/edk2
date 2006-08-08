@@ -23,6 +23,7 @@ Abstract:
 #include <stdio.h>
 #include <memory.h>
 #include <string.h>
+#include <stdlib.h>
 
 int
 main (

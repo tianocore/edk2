@@ -24,6 +24,8 @@ Abstract:
 
 #include <Common/UefiBaseTypes.h>
 
+#include <string.h>
+
 #include "CommonLib.h"
 
 /**

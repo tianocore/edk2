@@ -209,7 +209,7 @@ EFI_STATUS
 GenerateDependencyExpression (
   IN     FILE           *InFile,
   IN OUT FILE           *OutFile,
-  IN     UINT8          Padding  OPTIONAL
+  IN     INT8           Padding  OPTIONAL
   )
 /*++
 

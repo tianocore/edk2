@@ -94,10 +94,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <isset property="env.TOOL_CHAIN" />
           <then>
             <property name="ToolChain" value="${env.TOOL_CHAIN}"/>
+            <property name="ExtraArgus" value="-Wno-pointer-sign" />
           </then>
           <else>
             <!-- Default Tool Chain is Microsoft Visual Studio -->
             <property name="ToolChain" value="msvc"/>
+            <property name="ExtraArgus" value="" />
           </else>
         </if>
       </then>

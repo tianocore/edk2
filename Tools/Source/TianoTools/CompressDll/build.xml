@@ -44,6 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       outfile="${BIN_DIR}/${LibName}"
       outputfileproperty="result"
       >
+      <compilerarg value="${ExtraArgus}" />
       <fileset dir="${LibName}" includes="${LibFileSet}" defaultexcludes="TRUE" excludes="*.xml *.inf"/>
       <includepath path="${PACKAGE_DIR}/Include"/>
       <includepath path="${PACKAGE_DIR}/Include/${HostArch}"/>
