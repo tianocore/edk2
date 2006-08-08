@@ -20,6 +20,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
+import org.tianocore.PcdCodedDocument;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.frameworkwizard.platform.ui.id.FpdModuleIdentification;
 import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
@@ -464,7 +465,7 @@ public class GlobalData {
         return null;
     }
     
-    public static Vector<String> getModuleSupArchs(ModuleIdentification mi) throws Exception{
+    public static Vector<String> getModuleSupArchs(ModuleIdentification mi) throws Exception {
         Vector<String> vArchs = null;
         ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)getModuleXmlObject(mi);
         if (msa.getModuleDefinitions() == null || msa.getModuleDefinitions().getSupportedArchitectures() == null) {
@@ -479,6 +480,21 @@ public class GlobalData {
         }
         
         return vArchs;
+    }
+    
+    public static boolean pcdInMsa (String cName, String tsGuid, ModuleIdentification mi) throws Exception {
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)getModuleXmlObject(mi);
+        if (msa.getPcdCoded() == null || msa.getPcdCoded().getPcdEntryList() == null) {
+            return false;
+        }
+        ListIterator li = msa.getPcdCoded().getPcdEntryList().listIterator();
+        while (li.hasNext()) {
+            PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
+            if (msaPcd.getCName().equals(cName) && msaPcd.getTokenSpaceGuidCName().equals(tsGuid)) {
+                return true;
+            }
+        }
+        return false;
     }
     
 }

@@ -102,13 +102,13 @@ public class FpdFileContents {
           }
           ListIterator<ModuleSADocument.ModuleSA> li = l.listIterator();
           while (li.hasNext()) {
-              ModuleSADocument.ModuleSA msa = li.next();
-              if (msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null) {
+              ModuleSADocument.ModuleSA moduleSa = li.next();
+              if (moduleSa.getPcdBuildDefinition() == null || moduleSa.getPcdBuildDefinition().getPcdDataList() == null) {
                   continue;
               }
-              String ModuleInfo = msa.getModuleGuid() + " " + msa.getModuleVersion() +
-               " " + msa.getPackageGuid() + " " + msa.getPackageVersion() + " " + listToString(msa.getSupArchList());
-              List<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> lp = msa.getPcdBuildDefinition().getPcdDataList();
+              String ModuleInfo = moduleSa.getModuleGuid() + " " + moduleSa.getModuleVersion() +
+               " " + moduleSa.getPackageGuid() + " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList());
+              List<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> lp = moduleSa.getPcdBuildDefinition().getPcdDataList();
               ListIterator<PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData> lpi = lp.listIterator();
               while (lpi.hasNext()) {
                   PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = lpi.next();
@@ -230,32 +230,32 @@ public class FpdFileContents {
         }
         ListIterator li = getfpdFrameworkModules().getModuleSAList().listIterator();
         while(li.hasNext()) {
-            ModuleSADocument.ModuleSA msa = (ModuleSADocument.ModuleSA)li.next();
-            if (msa.getModuleGuid().equalsIgnoreCase(s[0]) && msa.getPackageGuid().equalsIgnoreCase(s[2])) {
-                if (msa.getModuleVersion() != null) {
-                    if (!msa.getModuleVersion().equals(s[1])) {
+            ModuleSADocument.ModuleSA moduleSa = (ModuleSADocument.ModuleSA)li.next();
+            if (moduleSa.getModuleGuid().equalsIgnoreCase(s[0]) && moduleSa.getPackageGuid().equalsIgnoreCase(s[2])) {
+                if (moduleSa.getModuleVersion() != null) {
+                    if (!moduleSa.getModuleVersion().equals(s[1])) {
                         continue;
                     }
                 }
-                if (msa.getPackageVersion() != null) {
-                    if (!msa.getPackageVersion().equals(s[3])) {
+                if (moduleSa.getPackageVersion() != null) {
+                    if (!moduleSa.getPackageVersion().equals(s[3])) {
                         continue;
                     }
                 }
                 //ToDo add arch check for s[4]
-                if (msa.getSupArchList() != null) {
-                    if (!listToString(msa.getSupArchList()).equals(s[4])) {
+                if (moduleSa.getSupArchList() != null) {
+                    if (!listToString(moduleSa.getSupArchList()).equals(s[4])) {
                         continue;
                     }
                 }
-                return msa;
+                return moduleSa;
             }
         }
         return null;
     }
     
     private ModuleSADocument.ModuleSA getModuleSA(int i) {
-        ModuleSADocument.ModuleSA msa = null;
+        ModuleSADocument.ModuleSA moduleSa = null;
         if (fpdRoot.getFrameworkModules() == null) {
             return null;
         }
@@ -264,10 +264,10 @@ public class FpdFileContents {
             for (int j = 0; j < i; ++j) {
                 cursor.toNextSibling();
             }
-            msa = (ModuleSADocument.ModuleSA)cursor.getObject();
+            moduleSa = (ModuleSADocument.ModuleSA)cursor.getObject();
         }
         cursor.dispose();
-        return msa;
+        return moduleSa;
     }
     
     public void removeModuleSA(int i) {
@@ -311,6 +311,103 @@ public class FpdFileContents {
         cursor.dispose();
     }
     
+    public boolean adjustPcd (int seqModuleSa) throws Exception {
+        boolean dataModified = false;
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(seqModuleSa);
+        int pcdCount = getPcdDataCount(seqModuleSa);
+        String[][] saaModuleSaPcd = new String[pcdCount][7];
+        getPcdData(seqModuleSa, saaModuleSaPcd);
+        String mg = moduleSa.getModuleGuid();
+        String mv = moduleSa.getModuleVersion();
+        String pg = moduleSa.getPackageGuid();
+        String pv = moduleSa.getPackageVersion();
+        String arch = listToString(moduleSa.getSupArchList());
+        //
+        // delete pcd in ModuleSA but not in MSA files any longer.
+        //
+        String moduleKey = mg + " " + mv + " " + pg + " " + pv + " " + arch;
+        int libCount = getLibraryInstancesCount(moduleKey);
+        String[][] saaLib = new String[libCount][5];
+        getLibraryInstances(moduleKey, saaLib);
+        ModuleIdentification mi = GlobalData.getModuleId(moduleKey);
+        Vector<ModuleIdentification> vMi = new Vector<ModuleIdentification>();
+        vMi.add(mi);
+        try {
+    nextPcd:for (int i = 0; i < saaModuleSaPcd.length; ++i) {
+                if (GlobalData.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], mi)){
+                    continue;
+                }
+                for (int j = 0; j < saaLib.length; ++j) {
+                    String libKey = saaLib[j][1] + " " + saaLib[j][2] + " " + saaLib[j][3] + " " + saaLib[j][4];
+                    ModuleIdentification libMi = GlobalData.getModuleId(libKey);
+                    vMi.add(libMi);
+                    if (GlobalData.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], libMi)) {
+                        continue nextPcd;
+                    }
+                }
+                removePcdData(seqModuleSa, saaModuleSaPcd[i][0], saaModuleSaPcd[i][1]);
+                dataModified = true;
+            }
+        }
+        catch (Exception e) {
+            
+        }
+        //
+        // add new Pcd from MSA file to ModuleSA.
+        //
+        try {
+       
+            for (int i = 0; i < vMi.size(); ++i) {
+                ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea) GlobalData
+                                                                                                                          .getModuleXmlObject(vMi
+                                                                                                                                                 .get(i));
+                if (msa.getPcdCoded() == null || msa.getPcdCoded().getPcdEntryList() == null) {
+                    continue;
+                }
+                ListIterator li = msa.getPcdCoded().getPcdEntryList().listIterator();
+     msaPcdIter:while (li.hasNext()) {
+                    PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry) li.next();
+                    ArrayList<String> al = getDynPcdMapValue(msaPcd.getCName() + " " + msaPcd.getTokenSpaceGuidCName());
+                    if (al != null) {
+                        for (int j = 0; j < al.size(); ++j) {
+                            if (al.get(j).contains(moduleKey)) {
+                                continue msaPcdIter;
+                            }
+                        }
+                    }
+                    
+                    Map<String, XmlObject> m = new HashMap<String, XmlObject>();
+                    m.put("ModuleSurfaceArea", msa);
+                    SurfaceAreaQuery.setDoc(m);
+                    PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null);
+                    PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
+                    if (spdPcd == null) {
+                        //
+                        // ToDo Error 
+                        //
+                        throw new PcdDeclNotFound("No Declaration for PCD Entry " + msaPcd.getCName() + " in Module "
+                                                  + mi.getName());
+                    }
+                    //
+                    // AddItem to ModuleSA PcdBuildDefinitions
+                    //
+                    String defaultVal = msaPcd.getDefaultValue() == null ? spdPcd.getDefaultValue()
+                                                                        : msaPcd.getDefaultValue();
+
+                    genPcdData(msaPcd.getCName(), spdPcd.getToken(), msaPcd.getTokenSpaceGuidCName(),
+                               msaPcd.getPcdItemType().toString(), spdPcd.getDatumType() + "", defaultVal, moduleSa);
+                    dataModified = true;
+                 }
+
+            }
+        }
+        catch (Exception e){
+           throw e;
+        }
+        
+        return dataModified;
+    }
+    
     private void maintainDynPcdMap(String pcdKey, String moduleInfo) {
         
         ArrayList<String> al = dynPcdMap.get(pcdKey);
@@ -340,7 +437,7 @@ public class FpdFileContents {
     //
     // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer Arch"
     //
-    public int getPcdDataCount(int i){
+    public int getPcdDataCount (int i){
         ModuleSADocument.ModuleSA msa = getModuleSA(i);
         
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
@@ -350,7 +447,7 @@ public class FpdFileContents {
         
     }
     
-    public void getPcdData(int i, String[][] saa) {
+    public void getPcdData (int i, String[][] saa) {
         ModuleSADocument.ModuleSA msa = getModuleSA(i);
         
         if (msa == null || msa.getPcdBuildDefinition() == null || msa.getPcdBuildDefinition().getPcdDataList() == null){
@@ -370,13 +467,46 @@ public class FpdFileContents {
         }
     }
     
-    public void updatePcdData(String key, String cName, String tsGuid, String itemType, String maxSize, String value){
-        ModuleSADocument.ModuleSA msa = getModuleSA(key);
-        if (msa == null || msa.getPcdBuildDefinition() == null){
+    public void removePcdData (int seqModuleSa, String cName, String tsGuid) {
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(seqModuleSa);
+        if (moduleSa == null || moduleSa.getPcdBuildDefinition() == null){
             return;
         }
         
-        XmlCursor cursor = msa.getPcdBuildDefinition().newCursor();
+        String mg = moduleSa.getModuleGuid();
+        String mv = moduleSa.getModuleVersion();
+        String pg = moduleSa.getPackageGuid();
+        String pv = moduleSa.getPackageVersion();
+        String arch = listToString(moduleSa.getSupArchList());
+        String moduleKey = mg + " " + mv + " " + pg + " " + pv + " " + arch;
+        
+        XmlCursor cursor = moduleSa.getPcdBuildDefinition().newCursor();
+        if (cursor.toFirstChild()){
+            
+            do {
+                PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
+                if (pcdData.getCName().equals(cName) && pcdData.getTokenSpaceGuidCName().equals(tsGuid)) {
+                    maintainDynPcdMap(cName + " " + tsGuid, moduleKey);
+                    if (getPcdDataCount(seqModuleSa) == 1) {
+                        cursor.toParent();
+                    }
+                    cursor.removeXml();
+                    break;
+                }
+            }
+            while(cursor.toNextSibling());
+            
+        }
+        cursor.dispose();
+    }
+    
+    public void updatePcdData (String key, String cName, String tsGuid, String itemType, String maxSize, String value){
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(key);
+        if (moduleSa == null || moduleSa.getPcdBuildDefinition() == null){
+            return;
+        }
+        
+        XmlCursor cursor = moduleSa.getPcdBuildDefinition().newCursor();
         if (cursor.toFirstChild()){
             do {
                 PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
@@ -400,7 +530,7 @@ public class FpdFileContents {
      * @param sa Results: HelpText, Original item type.
      * @return
      */
-    public boolean getPcdBuildDataInfo(ModuleIdentification mi, String cName, String[] sa) throws Exception{
+    public boolean getPcdBuildDataInfo(ModuleIdentification mi, String cName, String tsGuid, String[] sa) throws Exception{
         try {
            
             ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)GlobalData.getModuleXmlObject(mi);
@@ -420,6 +550,9 @@ public class FpdFileContents {
             while(li.hasNext()) {
                 PcdCodedDocument.PcdCoded.PcdEntry msaPcd = (PcdCodedDocument.PcdCoded.PcdEntry)li.next();
                 if (!msaPcd.getCName().equals(cName)) {
+                    continue;
+                }
+                if (!msaPcd.getTokenSpaceGuidCName().equals(tsGuid)) {
                     continue;
                 }
                 PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
@@ -571,7 +704,7 @@ public class FpdFileContents {
         XmlCursor cursor = instance.newCursor();
         try{
             String comment = "Pkg: " + pn + " Mod: " + mn 
-                + " Path: " + GlobalData.getMsaFile(libMi).getPath();
+                + " Path: " + GlobalData.getMsaFile(libMi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
             cursor.insertComment(comment);
         }
         catch (Exception e){
@@ -830,7 +963,7 @@ public class FpdFileContents {
         XmlCursor cursor = msa.newCursor();
         try{
             String comment = "Mod: " + mi.getName() + " Type: " + mi.getModuleType() + " Path: "
-                            + GlobalData.getMsaFile(mi).getPath();
+                            + GlobalData.getMsaFile(mi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
             cursor.insertComment(comment);
         }
         catch(Exception e){
