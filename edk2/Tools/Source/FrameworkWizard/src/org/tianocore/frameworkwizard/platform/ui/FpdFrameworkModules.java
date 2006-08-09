@@ -35,32 +35,91 @@ public class FpdFrameworkModules extends IInternalFrame {
      * 
      */
     private static final long serialVersionUID = 1L;
+
     static JFrame frame;
+
     private JSplitPane jSplitPane = null;
+
     private JPanel jPanelTop = null;
+
     private JPanel jPanelBottom = null;
+
     private JLabel jLabel = null;
+
     private JScrollPane jScrollPaneAllModules = null;
+
     private JTable jTableAllModules = null;
+
     private JPanel jPanelTopSouth = null;
+
     private JButton jButtonAddModule = null;
+
     private JLabel jLabelModulesAdded = null;
+
     private JPanel jPanelBottomSouth = null;
+
     private JScrollPane jScrollPaneFpdModules = null;
+
     private JTable jTableFpdModules = null;
+
     private JButton jButtonSettings = null;
+
     private JButton jButtonRemoveModule = null;
+
     private NonEditableTableModel modelAllModules = null;
+
     private NonEditableTableModel modelFpdModules = null;
-    
+
     private FpdModuleSA settingDlg = null;
-    
+
     private FpdFileContents ffc = null;
+
     private OpeningPlatformType docConsole = null;
+
     private Map<String, ArrayList<String>> fpdMsa = null;
-    
+
     private ArrayList<ModuleIdentification> miList = null;
 
+    private final int ModNameCol = 0;
+
+    private final int ModVerCol = 1;
+
+    private final int PkgNameCol = 2;
+
+    private final int PkgVerCol = 3;
+
+    private final int ArchCol = 4;
+
+    private final int Path4Col = 4;
+
+    private final int Path5Col = 5;
+    
+    private final int ModNameMinWidth = 168;
+    
+    private final int ModNamePrefWidth = 200;
+
+    private final int PkgNameMinWidth = 100;
+    
+    private final int PkgNamePrefWidth = 110;
+    
+    private final int PkgNameMaxWidth = 150;
+    
+    private final int VerMinWidth = 50;
+    
+    private final int VerMaxWidth = 80;
+    
+    private final int VerPrefWidth = 60;
+    
+    private final int PathPrefWidth = 320;
+    
+    private final int PathMinWidth = 280;
+    
+    private final int ArchPrefWidth = 80;
+    
+    private final int ArchMinWidth = 60;
+    
+    private final int ArchMaxWidth = 100;
+    
     /**
      * This method initializes jSplitPane	
      * 	
@@ -121,7 +180,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JScrollPane getJScrollPaneAllModules() {
         if (jScrollPaneAllModules == null) {
             jScrollPaneAllModules = new JScrollPane();
-            jScrollPaneAllModules.setPreferredSize(new java.awt.Dimension(600,200));
+            jScrollPaneAllModules.setPreferredSize(new java.awt.Dimension(600, 200));
             jScrollPaneAllModules.setViewportView(getJTableAllModules());
         }
         return jScrollPaneAllModules;
@@ -139,12 +198,31 @@ public class FpdFrameworkModules extends IInternalFrame {
             jTableAllModules = new JTable(sorter);
             sorter.setTableHeader(jTableAllModules.getTableHeader());
             jTableAllModules.setRowHeight(20);
-            modelAllModules.addColumn("ModuleName");
-            modelAllModules.addColumn("ModuleVersion");
-            modelAllModules.addColumn("PackageName");
-            modelAllModules.addColumn("PackageVersion");
+            modelAllModules.addColumn("<html>Module<br>Name</html>");
+            modelAllModules.addColumn("<html>Module<br>Version</html>");
+            modelAllModules.addColumn("<html>Package<br>Name</html>");
+            modelAllModules.addColumn("<html>Package<br>Version</html>");
             modelAllModules.addColumn("Path");
-            
+            javax.swing.table.TableColumn column = null;
+            column = jTableAllModules.getColumnModel().getColumn(ModNameCol);
+            column.setPreferredWidth(ModNamePrefWidth);
+            column.setMinWidth(ModNameMinWidth);
+            column = jTableAllModules.getColumnModel().getColumn(ModVerCol);
+            column.setPreferredWidth(VerPrefWidth);
+            column.setMaxWidth(VerMaxWidth);
+            column.setMinWidth(VerMinWidth);
+            column = jTableAllModules.getColumnModel().getColumn(PkgNameCol);
+            column.setPreferredWidth(PkgNamePrefWidth);
+            column.setMinWidth(PkgNameMinWidth);
+            column.setMaxWidth(PkgNameMaxWidth);
+            column = jTableAllModules.getColumnModel().getColumn(PkgVerCol);
+            column.setPreferredWidth(VerPrefWidth);
+            column.setMaxWidth(VerMaxWidth);
+            column.setMinWidth(VerMinWidth);
+            column = jTableAllModules.getColumnModel().getColumn(Path4Col);
+            column.setPreferredWidth(PathPrefWidth);
+            column.setMinWidth(PathMinWidth);
+
             jTableAllModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
         return jTableAllModules;
@@ -174,18 +252,18 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JButton getJButtonAddModule() {
         if (jButtonAddModule == null) {
             jButtonAddModule = new JButton();
-            jButtonAddModule.setPreferredSize(new java.awt.Dimension(130,20));
+            jButtonAddModule.setPreferredSize(new java.awt.Dimension(130, 20));
             jButtonAddModule.setText("Add a Module");
             jButtonAddModule.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     int selectedRow = jTableAllModules.getSelectedRow();
-                    if (selectedRow < 0){
+                    if (selectedRow < 0) {
                         return;
                     }
-                    
-                    TableSorter sorter = (TableSorter)jTableAllModules.getModel();
+
+                    TableSorter sorter = (TableSorter) jTableAllModules.getModel();
                     selectedRow = sorter.modelIndex(selectedRow);
-                    String path = modelAllModules.getValueAt(selectedRow, 4)+"";
+                    String path = modelAllModules.getValueAt(selectedRow, Path4Col) + "";
                     ModuleIdentification mi = miList.get(selectedRow);
                     Vector<String> vArchs = null;
                     try {
@@ -194,18 +272,18 @@ public class FpdFrameworkModules extends IInternalFrame {
                     catch (Exception exp) {
                         JOptionPane.showMessageDialog(frame, exp.getMessage());
                     }
-                    
+
                     if (vArchs == null) {
-                        JOptionPane.showMessageDialog(frame, "No supported Archs specified in MSA file.");
+                        JOptionPane.showMessageDialog(frame, "No Supported Architectures specified in MSA file.");
                         return;
                     }
-                    
+
                     String archsAdded = "";
                     String mg = mi.getGuid();
                     String mv = mi.getVersion();
                     String pg = mi.getPackage().getGuid();
                     String pv = mi.getPackage().getVersion();
-                    
+
                     ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
                     if (al == null) {
                         al = new ArrayList<String>();
@@ -218,7 +296,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     // Archs this Module supported have already been added.
                     //
                     if (vArchs.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "This Module Already Added.");
+                        JOptionPane.showMessageDialog(frame, "This Module has already been added.");
                         return;
                     }
                     //ToDo put Arch instead of null
@@ -227,35 +305,34 @@ public class FpdFrameworkModules extends IInternalFrame {
                         String arch = vArchs.get(i);
                         al.add(arch);
                         archsAdded += arch + " ";
-                        String[] row = {"", mv, "", pv, arch, path};
-                        
-                       if (mi != null) {
-                           row[0] = mi.getName();
-                           row[2] = mi.getPackage().getName();
-                           
-                       }
-                       modelFpdModules.addRow(row);
-                       
-                       docConsole.setSaved(false);
-                       try{
-                           //ToDo : specify archs need to add.
-                           ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
-                       }
-                       catch (Exception exception) {
-                           JOptionPane.showMessageDialog(frame, "Adding " + row[0] + " with SupArch " + arch + ": "+ exception.getMessage());
-                           errorOccurred = true;
-                       }
+                        String[] row = { "", mv, "", pv, arch, path };
+
+                        if (mi != null) {
+                            row[ModNameCol] = mi.getName();
+                            row[PkgNameCol] = mi.getPackage().getName();
+
+                        }
+                        modelFpdModules.addRow(row);
+
+                        docConsole.setSaved(false);
+                        try {
+                            //ToDo : specify archs need to add.
+                            ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
+                        } catch (Exception exception) {
+                            JOptionPane.showMessageDialog(frame, "Adding " + row[ModNameCol] + " with SupArch " + arch
+                                                                 + ": " + exception.getMessage());
+                            errorOccurred = true;
+                        }
                     }
-                    
-                    String s = "This Module with Arch "+ archsAdded;
+
+                    String s = "This Module with Architecture " + archsAdded;
                     if (errorOccurred) {
-                        s += " Added with Error. Platform may NOT Be Built."; 
+                        s += " was added with Error. Platform may NOT Build.";
+                    } else {
+                        s += " was added Successfully.";
                     }
-                    else {
-                        s += " Added Successfully.";
-                    }
-                    JOptionPane.showMessageDialog(frame,  s);
-                    jTableFpdModules.changeSelection(modelFpdModules.getRowCount()-1, 0, false, false);
+                    JOptionPane.showMessageDialog(frame, s);
+                    jTableFpdModules.changeSelection(modelFpdModules.getRowCount() - 1, 0, false, false);
                 }
             });
         }
@@ -287,7 +364,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JScrollPane getJScrollPaneFpdModules() {
         if (jScrollPaneFpdModules == null) {
             jScrollPaneFpdModules = new JScrollPane();
-            jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(453,200));
+            jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(453, 200));
             jScrollPaneFpdModules.setViewportView(getJTableFpdModules());
         }
         return jScrollPaneFpdModules;
@@ -305,13 +382,36 @@ public class FpdFrameworkModules extends IInternalFrame {
             jTableFpdModules = new JTable(sorter);
             sorter.setTableHeader(jTableFpdModules.getTableHeader());
             jTableFpdModules.setRowHeight(20);
-            modelFpdModules.addColumn("ModuleName");
-            modelFpdModules.addColumn("ModuleVersion");            
-            modelFpdModules.addColumn("PackageName");
-            modelFpdModules.addColumn("PackageVersion");
-            modelFpdModules.addColumn("SupportedArch");
+            modelFpdModules.addColumn("<html>Module<br>Name</html>");
+            modelFpdModules.addColumn("<html>Module<br>Version</html>");
+            modelFpdModules.addColumn("<html>Package<br>Name</html>");
+            modelFpdModules.addColumn("<html>Package<br>Version</html>");
+            modelFpdModules.addColumn("<html>Supported<br>Architectures</html>");
             modelFpdModules.addColumn("Path");
-            
+            javax.swing.table.TableColumn column = null;
+            column = jTableFpdModules.getColumnModel().getColumn(ModNameCol);
+            column.setPreferredWidth(ModNamePrefWidth);
+            column.setMinWidth(ModNameMinWidth);
+            column = jTableFpdModules.getColumnModel().getColumn(ModVerCol);
+            column.setPreferredWidth(VerPrefWidth);
+            column.setMaxWidth(VerMaxWidth);
+            column.setMinWidth(VerMinWidth);
+            column = jTableFpdModules.getColumnModel().getColumn(PkgNameCol);
+            column.setPreferredWidth(PkgNamePrefWidth);
+            column.setMinWidth(PkgNameMinWidth);
+            column.setMaxWidth(PkgNameMaxWidth);
+            column = jTableFpdModules.getColumnModel().getColumn(PkgVerCol);
+            column.setPreferredWidth(VerPrefWidth);
+            column.setMaxWidth(VerMaxWidth);
+            column.setMinWidth(VerMinWidth);
+            column = jTableFpdModules.getColumnModel().getColumn(ArchCol);
+            column.setPreferredWidth(ArchPrefWidth);
+            column.setMaxWidth(ArchMaxWidth);
+            column.setMinWidth(ArchMinWidth);
+            column = jTableFpdModules.getColumnModel().getColumn(Path5Col);
+            column.setPreferredWidth(PathPrefWidth);
+            column.setMinWidth(PathMinWidth);
+
             jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         }
         return jTableFpdModules;
@@ -330,11 +430,11 @@ public class FpdFrameworkModules extends IInternalFrame {
             jButtonSettings.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     int selectedRow = jTableFpdModules.getSelectedRow();
-                    if (selectedRow < 0){
+                    if (selectedRow < 0) {
                         return;
                     }
-                    
-                    TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
+
+                    TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
                     selectedRow = sorter.modelIndex(selectedRow);
                     try {
                         if (ffc.adjustPcd(selectedRow)) {
@@ -349,14 +449,14 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (settingDlg == null) {
                         settingDlg = new FpdModuleSA(ffc);
                     }
-                    
+
                     String[] sa = new String[5];
                     ffc.getFrameworkModuleInfo(selectedRow, sa);
-                    String mg = sa[0];
-                    String mv = sa[1];
-                    String pg = sa[2];
-                    String pv = sa[3];
-                    String arch = sa[4];
+                    String mg = sa[ModNameCol];
+                    String mv = sa[ModVerCol];
+                    String pg = sa[PkgNameCol];
+                    String pv = sa[PkgVerCol];
+                    String arch = sa[ArchCol];
                     settingDlg.setKey(mg + " " + mv + " " + pg + " " + pv + " " + arch, selectedRow, docConsole);
                     settingDlg.setVisible(true);
                 }
@@ -364,7 +464,6 @@ public class FpdFrameworkModules extends IInternalFrame {
         }
         return jButtonSettings;
     }
- 
 
     /**
      * This method initializes jButton2	
@@ -374,42 +473,42 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JButton getJButtonRemoveModule() {
         if (jButtonRemoveModule == null) {
             jButtonRemoveModule = new JButton();
-            jButtonRemoveModule.setPreferredSize(new java.awt.Dimension(130,20));
+            jButtonRemoveModule.setPreferredSize(new java.awt.Dimension(130, 20));
             jButtonRemoveModule.setText("Remove Module");
             jButtonRemoveModule.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     int selectedRow = jTableFpdModules.getSelectedRow();
-                    if (selectedRow < 0){
+                    if (selectedRow < 0) {
                         return;
                     }
-                    
-                    TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
+
+                    TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
                     selectedRow = sorter.modelIndex(selectedRow);
-                    
+
                     String[] sa = new String[5];
                     ffc.getFrameworkModuleInfo(selectedRow, sa);
-                    String mg = sa[0];
-                    String mv = sa[1];
-                    String pg = sa[2];
-                    String pv = sa[3];
-                    String arch = sa[4];
-                    ModuleIdentification mi = GlobalData.getModuleId(sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3] + " " + sa[4]);
+                    String mg = sa[ModNameCol];
+                    String mv = sa[ModVerCol];
+                    String pg = sa[PkgNameCol];
+                    String pv = sa[PkgVerCol];
+                    String arch = sa[ArchCol];
+                    ModuleIdentification mi = GlobalData.getModuleId(sa[ModNameCol] + " " + sa[ModVerCol] + " "
+                                                                     + sa[PkgNameCol] + " " + sa[PkgVerCol] + " "
+                                                                     + sa[ArchCol]);
                     mv = mi.getVersion();
                     pv = mi.getPackage().getVersion();
                     modelFpdModules.removeRow(selectedRow);
                     if (arch == null) {
                         // if no arch specified in ModuleSA
-                        fpdMsa.remove(mg+mv+pg+pv);
-                    }
-                    else {
-                        ArrayList<String> al = fpdMsa.get(mg+mv+pg+pv);
+                        fpdMsa.remove(mg + mv + pg + pv);
+                    } else {
+                        ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
                         al.remove(arch);
                         if (al.size() == 0) {
-                            fpdMsa.remove(mg+mv+pg+pv);
+                            fpdMsa.remove(mg + mv + pg + pv);
                         }
                     }
-                    
-                    
+
                     docConsole.setSaved(false);
                     ffc.removeModuleSA(selectedRow);
                 }
@@ -434,17 +533,17 @@ public class FpdFrameworkModules extends IInternalFrame {
         initialize();
     }
 
-    public FpdFrameworkModules(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd){
+    public FpdFrameworkModules(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
         this();
         init(fpd);
-        
+
     }
-    
+
     public FpdFrameworkModules(OpeningPlatformType opt) {
         this(opt.getXmlFpd());
         docConsole = opt;
     }
-    
+
     private void init(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
         try {
             GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
@@ -452,81 +551,85 @@ public class FpdFrameworkModules extends IInternalFrame {
         catch(Exception e){
             JOptionPane.showMessageDialog(frame, "Error occurred when getting module data.");
         }
-        
-        if (ffc == null){
+
+        if (ffc == null) {
             ffc = new FpdFileContents(fpd);
             ffc.initDynPcdMap();
         }
-        
+
         if (fpdMsa == null) {
             fpdMsa = new HashMap<String, ArrayList<String>>();
         }
-        
+
         if (ffc.getFrameworkModulesCount() > 0) {
             String[][] saa = new String[ffc.getFrameworkModulesCount()][5];
             ffc.getFrameworkModulesInfo(saa);
             for (int i = 0; i < saa.length; ++i) {
-                ModuleIdentification mi = GlobalData.getModuleId(saa[i][0]+ " "+saa[i][1]+" "+saa[i][2]+" "+saa[i][3]);
-                String[] row = {"", "", "", "", "", ""};
+                ModuleIdentification mi = GlobalData.getModuleId(saa[i][ModNameCol] + " " + saa[i][ModVerCol] + " "
+                                                                 + saa[i][PkgNameCol] + " " + saa[i][PkgVerCol]);
+                String[] row = { "", "", "", "", "", "" };
                 if (mi != null) {
-                    row[0] = mi.getName();
-                    row[1] = mi.getVersion();
-                    row[2] = mi.getPackage().getName();
-                    row[3] = mi.getPackage().getVersion();
-                    row[4] = saa[i][4];
-                    try{
-                        row[5] = GlobalData.getMsaFile(mi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
-                    }
-                    catch (Exception e) {
-                        JOptionPane.showMessageDialog(frame, "ShowFPDModules:" + e.getMessage());
+                    row[ModNameCol] = mi.getName();
+                    row[ModVerCol] = mi.getVersion();
+                    row[PkgNameCol] = mi.getPackage().getName();
+                    row[PkgVerCol] = mi.getPackage().getVersion();
+                    row[ArchCol] = saa[i][ArchCol];
+                    try {
+                        row[Path5Col] = GlobalData.getMsaFile(mi).getPath().substring(
+                                                                                      System.getenv("WORKSPACE")
+                                                                                            .length() + 1);
+                    } catch (Exception e) {
+                        JOptionPane.showMessageDialog(frame, "Show FPD Modules:" + e.getMessage());
                     }
                 }
                 modelFpdModules.addRow(row);
-                ArrayList<String> al = fpdMsa.get(saa[i][0]+row[1]+saa[i][2]+row[3]);
+                ArrayList<String> al = fpdMsa.get(saa[i][ModNameCol] + row[ModVerCol] + saa[i][PkgNameCol]
+                                                  + row[PkgVerCol]);
                 if (al == null) {
                     al = new ArrayList<String>();
-                    fpdMsa.put(saa[i][0]+row[1]+saa[i][2]+row[3], al);
+                    fpdMsa.put(saa[i][ModNameCol] + row[ModVerCol] + saa[i][PkgNameCol] + row[PkgVerCol], al);
                 }
-                al.add(saa[i][4]);
-                
+                al.add(saa[i][Path4Col]);
+
             }
         }
-        
+
         showAllModules();
-        
+
     }
-    
+
     private void showAllModules() {
-        
+
         if (miList == null) {
             miList = new ArrayList<ModuleIdentification>();
         }
         Set<PackageIdentification> spi = GlobalData.getPackageList();
         Iterator ispi = spi.iterator();
-        
-        while(ispi.hasNext()) {
-            PackageIdentification pi = (PackageIdentification)ispi.next();
-            String[] s = {"", "", "", "", ""};
-            
+
+        while (ispi.hasNext()) {
+            PackageIdentification pi = (PackageIdentification) ispi.next();
+            String[] s = { "", "", "", "", "" };
+
             Set<ModuleIdentification> smi = GlobalData.getModules(pi);
             Iterator ismi = smi.iterator();
-            while(ismi.hasNext()) {
-                ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                s[0] = mi.getName();
-                s[1] = mi.getVersion();
-                s[2] = pi.getName();
-                s[3] = pi.getVersion();
+            while (ismi.hasNext()) {
+                ModuleIdentification mi = (ModuleIdentification) ismi.next();
+                s[ModNameCol] = mi.getName();
+                s[ModVerCol] = mi.getVersion();
+                s[PkgNameCol] = pi.getName();
+                s[PkgVerCol] = pi.getVersion();
                 try {
-                    s[4] = GlobalData.getMsaFile(mi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
-                }
-                catch (Exception e) {
-                    JOptionPane.showMessageDialog(frame, "ShowAllModules:" + e.getMessage());
+                    s[Path4Col] = GlobalData.getMsaFile(mi).getPath()
+                                            .substring(System.getenv("WORKSPACE").length() + 1);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(frame, "Show All Modules:" + e.getMessage());
                 }
                 modelAllModules.addRow(s);
                 miList.add(mi);
             }
         }
     }
+
     /**
      * This method initializes this
      * 
@@ -537,10 +640,10 @@ public class FpdFrameworkModules extends IInternalFrame {
         this.setTitle("Framework Modules");
         this.setContentPane(getJSplitPane());
         this.setVisible(true);
-        
+
     }
 
-}  //  @jve:decl-index=0:visual-constraint="10,10"
+} //  @jve:decl-index=0:visual-constraint="10,10"
 
 class NonEditableTableModel extends DefaultTableModel {
     /**
