@@ -85,11 +85,11 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
     ///
     boolean ffsAttribRecovery        = false;
     ///
-    /// ffsAligenment value is used to set the corresponding bit in the output 
+    /// ffsAttribDataAlignment value is used to set the corresponding bit in the output 
     /// FFS file header.The specified FFS alignment must be a value between 0 
     /// and 7 inclusive
     ///
-    int     ffsAlignment       = 0;
+    int     ffsAttribDataAlignment       = 0;
     ///
     /// ffsAttribChecksum value is used to set the corresponding bit in the 
     /// output FFS file header
@@ -490,8 +490,8 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       This function is to get the ffsAligment
       @return  The value of ffsAligment.
     **/
-    public int getFfsAlignment() {
-        return this.ffsAlignment;
+    public int getFfsAttribDataAlignment() {
+        return this.ffsAttribDataAlignment;
     }
 
     /**
@@ -500,12 +500,12 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       This function is to set ffsAligment 
       @param  ffsAligment     The value of ffsAligment.
     **/
-    public void setFfsAlignment(int ffsAligment) {
-        this.ffsAlignment = ffsAligment;
-        if (this.ffsAlignment > 7) {
+    public void setFfsAttribDataAlignment(int ffsAligment) {
+        this.ffsAttribDataAlignment = ffsAligment;
+        if (this.ffsAttribDataAlignment > 7) {
             throw new BuildException ("FFS_ALIGMENT Scope is 0-7");
         } else {
-            attributes |= (((byte)this.ffsAlignment) << 3);
+            attributes |= (((byte)this.ffsAttribDataAlignment) << 3);
         }
     }
 
