@@ -811,54 +811,54 @@ typedef struct {
 #define EFI_MISC_BIOS_VENDOR_RECORD_NUMBER  0x00000002
 
 typedef struct {
-  UINT32  Reserved1                         :2;
-  UINT32  Unknown                           :1;
-  UINT32  BiosCharacteristicsNotSupported   :1;
-  UINT32  IsaIsSupported                    :1;
-  UINT32  McaIsSupported                    :1;
-  UINT32  EisaIsSupported                   :1;
-  UINT32  PciIsSupported                    :1;
-  UINT32  PcmciaIsSupported                 :1;
-  UINT32  PlugAndPlayIsSupported            :1;
-  UINT32  ApmIsSupported                    :1;
-  UINT32  BiosIsUpgradable                  :1;
-  UINT32  BiosShadowingAllowed              :1;
-  UINT32  VlVesaIsSupported                 :1;
-  UINT32  EscdSupportIsAvailable            :1;
-  UINT32  BootFromCdIsSupported             :1;
-  UINT32  SelectableBootIsSupported         :1;
-  UINT32  RomBiosIsSocketed                 :1;
-  UINT32  BootFromPcmciaIsSupported         :1;
-  UINT32  EDDSpecificationIsSupported       :1;
-  UINT32  JapaneseNecFloppyIsSupported      :1;
-  UINT32  JapaneseToshibaFloppyIsSupported  :1;
-  UINT32  Floppy525_360IsSupported          :1;
-  UINT32  Floppy525_12IsSupported           :1;
-  UINT32  Floppy35_720IsSupported           :1;
-  UINT32  Floppy35_288IsSupported           :1;
-  UINT32  PrintScreenIsSupported            :1;
-  UINT32  Keyboard8042IsSupported           :1;
-  UINT32  SerialIsSupported                 :1;
-  UINT32  PrinterIsSupported                :1;
-  UINT32  CgaMonoIsSupported                :1;
-  UINT32  NecPc98                           :1;
-  UINT32  AcpiIsSupported                   :1;
-  UINT32  UsbLegacyIsSupported              :1;
-  UINT32  AgpIsSupported                    :1;
-  UINT32  I20BootIsSupported                :1;
-  UINT32  Ls120BootIsSupported              :1;
-  UINT32  AtapiZipDriveBootIsSupported      :1;
-  UINT32  Boot1394IsSupported               :1;
-  UINT32  SmartBatteryIsSupported           :1;
-  UINT32  BiosBootSpecIsSupported           :1;
-  UINT32  FunctionKeyNetworkBootIsSupported :1;
-  UINT32  Reserved                          :22;
+  UINT64  Reserved1                         :2;
+  UINT64  Unknown                           :1;
+  UINT64  BiosCharacteristicsNotSupported   :1;
+  UINT64  IsaIsSupported                    :1;
+  UINT64  McaIsSupported                    :1;
+  UINT64  EisaIsSupported                   :1;
+  UINT64  PciIsSupported                    :1;
+  UINT64  PcmciaIsSupported                 :1;
+  UINT64  PlugAndPlayIsSupported            :1;
+  UINT64  ApmIsSupported                    :1;
+  UINT64  BiosIsUpgradable                  :1;
+  UINT64  BiosShadowingAllowed              :1;
+  UINT64  VlVesaIsSupported                 :1;
+  UINT64  EscdSupportIsAvailable            :1;
+  UINT64  BootFromCdIsSupported             :1;
+  UINT64  SelectableBootIsSupported         :1;
+  UINT64  RomBiosIsSocketed                 :1;
+  UINT64  BootFromPcmciaIsSupported         :1;
+  UINT64  EDDSpecificationIsSupported       :1;
+  UINT64  JapaneseNecFloppyIsSupported      :1;
+  UINT64  JapaneseToshibaFloppyIsSupported  :1;
+  UINT64  Floppy525_360IsSupported          :1;
+  UINT64  Floppy525_12IsSupported           :1;
+  UINT64  Floppy35_720IsSupported           :1;
+  UINT64  Floppy35_288IsSupported           :1;
+  UINT64  PrintScreenIsSupported            :1;
+  UINT64  Keyboard8042IsSupported           :1;
+  UINT64  SerialIsSupported                 :1;
+  UINT64  PrinterIsSupported                :1;
+  UINT64  CgaMonoIsSupported                :1;
+  UINT64  NecPc98                           :1;
+  UINT64  AcpiIsSupported                   :1;
+  UINT64  UsbLegacyIsSupported              :1;
+  UINT64  AgpIsSupported                    :1;
+  UINT64  I20BootIsSupported                :1;
+  UINT64  Ls120BootIsSupported              :1;
+  UINT64  AtapiZipDriveBootIsSupported      :1;
+  UINT64  Boot1394IsSupported               :1;
+  UINT64  SmartBatteryIsSupported           :1;
+  UINT64  BiosBootSpecIsSupported           :1;
+  UINT64  FunctionKeyNetworkBootIsSupported :1;
+  UINT64  Reserved                          :22;
 } EFI_MISC_BIOS_CHARACTERISTICS;
 
 typedef struct {
-  UINT32  BiosReserved                      :16;
-  UINT32  SystemReserved                    :16;
-  UINT32  Reserved                          :32;
+  UINT64  BiosReserved                      :16;
+  UINT64  SystemReserved                    :16;
+  UINT64  Reserved                          :32;
 } EFI_MISC_BIOS_CHARACTERISTICS_EXTENSION;
 
 typedef struct {
@@ -1786,8 +1786,26 @@ typedef struct {
 #define EFI_MISC_SMBIOS_STRUCT_ENCAP_RECORD_NUMBER  0x0000001F 
 
 //
-//////////////////////////////////////////////////////////////////////////////
+// Declare the following strutures alias to use them more conviniently.
 //
+typedef EFI_MISC_LAST_PCI_BUS_DATA                        EFI_MISC_LAST_PCI_BUS;
+typedef EFI_MISC_BIOS_VENDOR_DATA                         EFI_MISC_BIOS_VENDOR;
+typedef EFI_MISC_SYSTEM_MANUFACTURER_DATA                 EFI_MISC_SYSTEM_MANUFACTURER;
+typedef EFI_MISC_BASE_BOARD_MANUFACTURER_DATA             EFI_MISC_BASE_BOARD_MANUFACTURER;
+typedef EFI_MISC_CHASSIS_MANUFACTURER_DATA                EFI_MISC_CHASSIS_MANUFACTURER;
+typedef EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR_DATA  EFI_MISC_PORT_INTERNAL_CONNECTOR_DESIGNATOR;
+typedef EFI_MISC_SYSTEM_SLOT_DESIGNATION_DATA             EFI_MISC_SYSTEM_SLOT_DESIGNATION;
+typedef EFI_MISC_ONBOARD_DEVICE_DATA                      EFI_MISC_ONBOARD_DEVICE;
+typedef EFI_MISC_PORTING_DEVICE_TYPE_DATA                 EFI_MISC_ONBOARD_DEVICE_TYPE_DATA;
+typedef EFI_MISC_OEM_STRING_DATA                          EFI_MISC_OEM_STRING;
+typedef EFI_MISC_SYSTEM_OPTION_STRING_DATA                EFI_MISC_SYSTEM_OPTION_STRING;
+typedef EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES_DATA     EFI_MISC_NUMBER_OF_INSTALLABLE_LANGUAGES;
+typedef EFI_MISC_SYSTEM_LANGUAGE_STRING_DATA              EFI_MISC_SYSTEM_LANGUAGE_STRING;
+typedef EFI_MISC_BIS_ENTRY_POINT_DATA                     EFI_MISC_BIS_ENTRY_POINT;
+typedef EFI_MISC_BOOT_INFORMATION_STATUS_DATA             EFI_MISC_BOOT_INFORMATION_STATUS;
+typedef EFI_MISC_SYSTEM_POWER_SUPPLY_DATA                 EFI_MISC_SYSTEM_POWER_SUPPLY;
+typedef EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA         EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION;
+
 typedef union {
   EFI_MISC_LAST_PCI_BUS_DATA                         LastPciBus;
   EFI_MISC_BIOS_VENDOR_DATA                          MiscBiosVendor;
