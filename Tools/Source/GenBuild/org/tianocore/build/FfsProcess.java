@@ -345,20 +345,55 @@ public class FfsProcess {
     **/
     private void dealSection(int mode, Document doc, Element root, XmlCursor cursor, Vector<String> list) {
         String type = cursor.getAttributeText(new QName("SectionType"));
-        list.addElement(type);
+        
+        //
+        // Judge if file is specified? Yes, just use the file, else call Build Macro
+        // If fileName is null, means without FileNames specify in FPD file
+        //
+        String fileName = null;
+        cursor.push();
+        if (cursor.toFirstChild()) {
+            do {
+                if (cursor.getName().getLocalPart().equalsIgnoreCase("Filenames")) {
+                    cursor.push();
+                    if (cursor.toFirstChild()) {
+                        do {
+                            if (cursor.getName().getLocalPart().equalsIgnoreCase("Filename")) {
+                                fileName = cursor.getTextValue();
+                            }
+                        } while (cursor.toNextSibling());
+                    }
+                    cursor.pop();
+                }
+            } while (cursor.toNextSibling());
+        }
+
+        cursor.pop();
+        
+        if (fileName == null) {
+            list.addElement(type);
+        }
         if (mode == MODE_GUID_DEFINED) {
             //
             // <input file="${DEST_DIR_OUTPUT}\Bds.pe32"/>
             //
             Element ele = doc.createElement("input");
-            ele.setAttribute("file", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
+            if (fileName == null) {
+                ele.setAttribute("file", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
+            } else {
+                ele.setAttribute("file", "${PLATFORM_DIR}" + File.separatorChar + fileName);
+            }
             root.appendChild(ele);
         } else {
             //
             // <sectFile fileName= "..."/>
             //
             Element ele = doc.createElement("sectFile");
-            ele.setAttribute("fileName", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
+            if (fileName == null) {
+                ele.setAttribute("fileName", "${DEST_DIR_OUTPUT}" + File.separatorChar + basename + getSectionExt(type));
+            } else {
+                ele.setAttribute("fileName", "${PLATFORM_DIR}" + File.separatorChar + fileName);
+            }
             root.appendChild(ele);
         }
     }
