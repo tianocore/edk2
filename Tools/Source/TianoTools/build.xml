@@ -94,13 +94,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <isset property="env.TOOL_CHAIN" />
           <then>
             <property name="ToolChain" value="${env.TOOL_CHAIN}"/>
-            <property name="ExtraArgus" value="-Wno-pointer-sign" />
           </then>
           <else>
             <!-- Default Tool Chain is Microsoft Visual Studio -->
             <property name="ToolChain" value="msvc"/>
-            <property name="ExtraArgus" value="" />
           </else>
+        </if>
+      </then>
+    </if>
+    
+    <if>
+      <equals arg1="${ToolChain}" arg2="gcc" />
+      <then>
+        <exec executable="gcc" outputproperty="host.gcc.ver">
+          <arg line="-E" />
+          <arg line="-P" />
+          <arg line="-x c" />
+          <arg line="gcc.ver" />
+        </exec>
+        <if>
+          <contains string="${host.gcc.ver}" substring="4" />
+          <then>
+            <property name="ExtraArgus" value="-Wno-pointer-sign" />
+          </then>
         </if>
       </then>
     </if>

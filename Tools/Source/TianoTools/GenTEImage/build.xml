@@ -39,7 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
         optimize="speed">
-      <compilerarg value="${ExtraArgus}" />
+      <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
 
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}" 

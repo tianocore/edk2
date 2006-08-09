@@ -40,7 +40,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outfile="${BIN_DIR}/${ToolName}_Ia32"
         outtype="executable"
         optimize="speed">
-      <compilerarg value="${ExtraArgus}" />
+      <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
+
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}"/>
 
@@ -56,7 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outfile="${BIN_DIR}/${ToolName}_Ipf"
         outtype="executable"
         optimize="speed">
-      <compilerarg value="${ExtraArgus}" />
+      <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}"/>
 
@@ -72,7 +73,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outfile="${BIN_DIR}/${ToolName}_X64"
         outtype="executable"
         optimize="speed">
-      <compilerarg value="${ExtraArgus}" />
+      <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}" />
 

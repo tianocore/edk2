@@ -39,7 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outfile="${LIB_DIR}/CommonTools"
         outtype="static"
         optimize="speed">
-      <compilerarg value="${ExtraArgus}" />
+      <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
       <compilerarg value="-fPIC" if="x86_64_linux"/>
 
       <includepath path="${PACKAGE_DIR}/Include"/>
