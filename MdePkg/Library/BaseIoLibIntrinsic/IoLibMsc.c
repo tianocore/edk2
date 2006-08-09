@@ -46,8 +46,8 @@ void          _ReadWriteBarrier (void);
 //
 // _ReadWriteBarrier() forces memory reads and writes to complete at the point
 // in the call. This is only a hint to the compiler and does emit code.
-// In past versions of the compiler, _ReadWriteBarrier was enforced only 
-// locally and did not affect functions up the call tree. In Visual C++ 
+// In past versions of the compiler, _ReadWriteBarrier was enforced only
+// locally and did not affect functions up the call tree. In Visual C++
 // 2005, _ReadWriteBarrier is enforced all the way up the call tree.
 //
 
@@ -71,8 +71,12 @@ IoRead8 (
   IN      UINTN                     Port
   )
 {
+  UINT8                             Value;
+
   _ReadWriteBarrier ();
-  return (UINT8)_inp ((UINT16)Port);
+  Value = (UINT8)_inp ((UINT16)Port);
+  _ReadWriteBarrier ();
+  return Value;
 }
 
 /**
@@ -98,7 +102,9 @@ IoWrite8 (
   )
 {
   _ReadWriteBarrier ();
-  return (UINT8)_outp ((UINT16)Port, Value);
+  (UINT8)_outp ((UINT16)Port, Value);
+  _ReadWriteBarrier ();
+  return Value;
 }
 
 /**
@@ -121,9 +127,13 @@ IoRead16 (
   IN      UINTN                     Port
   )
 {
+  UINT16                            Value;
+
   ASSERT ((Port & 1) == 0);
   _ReadWriteBarrier ();
-  return _inpw((UINT16)Port);
+  Value = _inpw ((UINT16)Port);
+  _ReadWriteBarrier ();
+  return Value;
 }
 
 /**
@@ -150,7 +160,9 @@ IoWrite16 (
 {
   ASSERT ((Port & 1) == 0);
   _ReadWriteBarrier ();
-  return _outpw ((UINT16)Port, Value);
+  _outpw ((UINT16)Port, Value);
+  _ReadWriteBarrier ();
+  return Value;
 }
 
 /**
@@ -173,9 +185,13 @@ IoRead32 (
   IN      UINTN                     Port
   )
 {
+  UINT32                            Value;
+
   ASSERT ((Port & 3) == 0);
   _ReadWriteBarrier ();
-  return _inpd((UINT16)Port);
+  Value = _inpd ((UINT16)Port);
+  _ReadWriteBarrier ();
+  return Value;
 }
 
 /**
@@ -202,7 +218,9 @@ IoWrite32 (
 {
   ASSERT ((Port & 3) == 0);
   _ReadWriteBarrier ();
-  return _outpd ((UINT16)Port, Value);
+  _outpd ((UINT16)Port, Value);
+  _ReadWriteBarrier ();
+  return Value;
 }
 
 
@@ -226,8 +244,10 @@ MmioRead8 (
   IN      UINTN                     Address
   )
 {
-  _ReadWriteBarrier ();
-  return *(volatile UINT8 *)Address;
+  UINT8                             Value;
+
+  Value = *(volatile UINT8*)Address;
+  return Value;
 }
 
 /**
@@ -250,8 +270,7 @@ MmioWrite8 (
   IN      UINT8                     Value
   )
 {
-  _ReadWriteBarrier ();
-  return *(volatile UINT8 *)Address = Value;
+  return *(volatile UINT8*)Address = Value;
 }
 
 /**
@@ -274,9 +293,11 @@ MmioRead16 (
   IN      UINTN                     Address
   )
 {
+  UINT16                            Value;
+
   ASSERT ((Address & 1) == 0);
-  _ReadWriteBarrier ();
-  return *(volatile UINT16 *)Address;
+  Value = *(volatile UINT16*)Address;
+  return Value;
 }
 
 /**
@@ -300,8 +321,7 @@ MmioWrite16 (
   )
 {
   ASSERT ((Address & 1) == 0);
-  _ReadWriteBarrier ();
-  return *(volatile UINT16 *)Address = Value;
+  return *(volatile UINT16*)Address = Value;
 }
 
 /**
@@ -324,9 +344,11 @@ MmioRead32 (
   IN      UINTN                     Address
   )
 {
+  UINT32                            Value;
+
   ASSERT ((Address & 3) == 0);
-  _ReadWriteBarrier ();
-  return *(volatile UINT32 *)Address;
+  Value = *(volatile UINT32*)Address;
+  return Value;
 }
 
 /**
@@ -350,8 +372,7 @@ MmioWrite32 (
   )
 {
   ASSERT ((Address & 3) == 0);
-  _ReadWriteBarrier ();
-  return *(volatile UINT32 *)Address = Value;
+  return *(volatile UINT32*)Address = Value;
 }
 
 /**
@@ -374,9 +395,11 @@ MmioRead64 (
   IN      UINTN                     Address
   )
 {
+  UINT64                            Value;
+
   ASSERT ((Address & 7) == 0);
-  _ReadWriteBarrier ();
-  return *(volatile UINT64 *)Address;
+  Value = *(volatile UINT64*)Address;
+  return Value;
 }
 
 /**
@@ -400,8 +423,7 @@ MmioWrite64 (
   )
 {
   ASSERT ((Address & 7) == 0);
-  _ReadWriteBarrier ();
-  return *(volatile UINT64 *)Address = Value;
+  return *(volatile UINT64*)Address = Value;
 }
 
 #endif
