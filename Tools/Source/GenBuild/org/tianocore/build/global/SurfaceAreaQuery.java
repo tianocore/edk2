@@ -1304,26 +1304,24 @@ public class SurfaceAreaQuery {
                 ObjectMap.put("Libraries", moduleSA.getLibraries());
             }
             if (((ModuleSADocument.ModuleSA) result[i]).getPcdBuildDefinition() != null) {
-                ObjectMap.put("PcdBuildDefinition", moduleSA
-                        .getPcdBuildDefinition());
+                ObjectMap.put("PcdBuildDefinition", moduleSA.getPcdBuildDefinition());
             }
-            if (((ModuleSADocument.ModuleSA) result[i])
-                    .getModuleSaBuildOptions() != null) {
-                ObjectMap.put("ModuleSaBuildOptions", moduleSA
-                        .getModuleSaBuildOptions());
+            if (((ModuleSADocument.ModuleSA) result[i]).getModuleSaBuildOptions() != null) {
+                ObjectMap.put("ModuleSaBuildOptions", moduleSA.getModuleSaBuildOptions());
             }
 
             //
             // Get Fpd SA Module attribute and create FpdMoudleIdentification.
             //
-            if (moduleSA.getSupArchList() != null) {
+            if (moduleSA.isSetSupArchList()) {
                 arch = moduleSA.getSupArchList().toString();
+            } else {
+                arch = null;
             }
 
             // TBD
             fvBinding = null;
-            saVersion = ((ModuleSADocument.ModuleSA) result[i])
-                    .getModuleVersion();
+            saVersion = ((ModuleSADocument.ModuleSA) result[i]).getModuleVersion();
 
             saGuid = moduleSA.getModuleGuid();
             pkgGuid = moduleSA.getPackageGuid();
@@ -1333,10 +1331,8 @@ public class SurfaceAreaQuery {
             // Create Module Identification which have class member of package
             // identification.
             //
-            PackageIdentification pkgId = new PackageIdentification(null,
-                    pkgGuid, pkgVersion);
-            ModuleIdentification saId = new ModuleIdentification(null, saGuid,
-                    saVersion);
+            PackageIdentification pkgId = new PackageIdentification(null, pkgGuid, pkgVersion);
+            ModuleIdentification saId = new ModuleIdentification(null, saGuid, saVersion);
 
             saId.setPackage(pkgId);
 
@@ -1347,12 +1343,11 @@ public class SurfaceAreaQuery {
             String[] archList = new String[0];
             if (arch == null || arch.trim().length() == 0) {
                 archList = GlobalData.getToolChainInfo().getArchs();
-            }
-            else{
+            } else {
                 archList = arch.split(" ");
             }
             for (int j = 0; j < archList.length; j++) {
-                FpdModuleIdentification fpdSaId = new FpdModuleIdentification(saId,    archList[j]);
+                FpdModuleIdentification fpdSaId = new FpdModuleIdentification(saId, archList[j]);
     
                 if (fvBinding != null) {
                     fpdSaId.setFvBinding(fvBinding);
