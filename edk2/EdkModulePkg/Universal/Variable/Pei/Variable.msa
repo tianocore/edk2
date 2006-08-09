@@ -78,7 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </Extern>
   </Externs>
   <PcdCoded>
-    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdFlashNvStorageVariableBase</C_Name>
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>

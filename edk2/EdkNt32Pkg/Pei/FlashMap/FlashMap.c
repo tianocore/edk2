@@ -202,6 +202,12 @@ Returns:
                         &gEfiFirmwareVolumeBlockProtocolGuid,
                         sizeof (EFI_GUID)
                         );
+
+      //
+      // We also update a PCD entry so that any driver that depend on
+      // PCD entry PcdFlashNvStorageVariableBase will get the information.
+      //
+      PcdSet32 (PcdFlashNvStorageVariableBase, (UINT32) FlashHobData.SubAreaData.Base);
       break;
 
     default:

@@ -48,6 +48,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseMemoryLib</Keyword>
     </LibraryClass>
+    <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>FlashMap.c</Filename>
@@ -89,4 +92,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <ModuleEntryPoint>PeimInitializeFlashMap</ModuleEntryPoint>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>The driver sets the NV Storage FV base address defined by this PCD.  
+        This base address point to an EFI_FIRMWARE_VOLUMN_HEADER struct. Variable PEIM
+        will get the base address from this PCD. In NT emulator, this PCD is a DYNAMIC
+        type, as FD is mapped to process space by WinNT OS. On real platform, it is 
+        normally a FIXED_AT_BUILD type as system memory map is fixed to BIOS.
+      </HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>
