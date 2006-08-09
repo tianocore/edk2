@@ -39,7 +39,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outtype="executable"
         debug="false"
         optimize="speed">
-      <compilerarg value="${ExtraArgus}" />
+      <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
+
       <fileset dir="${basedir}/${ToolName}" 
         includes="${FileSet}" />
 

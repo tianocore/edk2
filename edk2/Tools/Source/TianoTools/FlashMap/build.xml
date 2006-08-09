@@ -38,7 +38,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         outfile="${BIN_DIR}/${ToolName}"
         outtype="executable"
         debug="false">
-      <compilerarg value="${ExtraArgus}" />
+      <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
+
       <defineset>
         <define name="_malloc" value="malloc"/>
         <define name="_free" value="free"/>
