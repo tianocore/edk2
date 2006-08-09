@@ -711,8 +711,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+          <Token>0x30000001</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0</Value>
+        </PcdData>      
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
@@ -877,13 +886,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
+        <PcdData ItemType="DYNAMIC">
           <C_Name>PcdFlashNvStorageVariableBase</C_Name>
           <Token>0x30000001</Token>
           <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
-          <Value>0x00280000</Value>
+          <Value>0</Value>
         </PcdData>      
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
@@ -6809,6 +6818,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </ModuleSA>
   </FrameworkModules>
   <DynamicPcdBuildDefinitions>
+    <PcdBuildData ItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+      <Token>0x30000001</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <MaxDatumSize>4</MaxDatumSize>
+      <SkuInfo>
+        <SkuId>0</SkuId>
+        <Value>0</Value>
+      </SkuInfo>
+    </PcdBuildData>
     <PcdBuildData ItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySize</C_Name>
       <Token>0x00001005</Token>

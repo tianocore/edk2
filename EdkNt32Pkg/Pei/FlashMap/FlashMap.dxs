@@ -23,6 +23,6 @@ Abstract:
 #include <PeimDepex.h>
 
 DEPENDENCY_START
- TRUE
+ PCD_PPI_GUID
 DEPENDENCY_END
 
