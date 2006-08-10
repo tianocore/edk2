@@ -1772,6 +1772,27 @@ public class AutoGen {
 	 */
 	void ExternCallBackToAutoGenC(StringBuffer fileBuffer)
 			throws BuildException {
+		//
+		// Collect module's <SetVirtualAddressMapCallBack> and 
+		// <ExitBootServiceCallBack> and add to setVirtualAddList 
+		//  exitBootServiceList.
+		// 
+        String[] setVirtuals = SurfaceAreaQuery.getSetVirtualAddressMapCallBackArray();
+        String[] exitBoots = SurfaceAreaQuery.getExitBootServicesCallBackArray();
+        if (setVirtuals != null) {
+            for (int j = 0; j < setVirtuals.length; j++) {
+			    this.setVirtalAddList.add(setVirtuals[j]);
+			}
+		}
+		if (exitBoots != null) {
+		    for (int k = 0; k < exitBoots.length; k++) {
+			    this.exitBootServiceList.add(exitBoots[k]);
+			}
+		}
+		//
+		//  Add c code in autogen.c which relate to <SetVirtualAddressMapCallBack>
+		//  and <ExitBootServicesCallBack> 
+		// 
 		String moduleType = this.moduleId.getModuleType();
 		boolean UefiOrDxeModule = false;
 		int Count = 0;

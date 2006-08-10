@@ -764,6 +764,6 @@ NormalizePath (
     Visitor++;
   }
   
-  return Visitor;
+  return OldPathName;
 }
 
