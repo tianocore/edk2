@@ -115,8 +115,6 @@ InternalX86Delay (
 {
   INT32                             Ticks;
 
-  ApicBase = InternalX86GetApicBase ();
-
   //
   // The target timer count is calculated here
   //
