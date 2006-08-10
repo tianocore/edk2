@@ -632,10 +632,8 @@ InitializeFtwLite (
   UINTN                               Length;
   EFI_STATUS                          Status;
   UINTN                               Offset;
-  EFI_FLASH_MAP_ENTRY_DATA            *FlashMapEntry;
   EFI_FV_BLOCK_MAP_ENTRY              *FvbMapEntry;
   UINT32                              LbaIndex;
-  EFI_PEI_HOB_POINTERS                GuidHob;                  
 
   //
   // Allocate Private data of this driver,
@@ -668,29 +666,11 @@ InitializeFtwLite (
 
   FtwLiteDevice->FtwLastRecord      = NULL;
 
-  FtwLiteDevice->SpareAreaLength  = 0;
-  FtwLiteDevice->WorkSpaceLength  = 0;
+  FtwLiteDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
+  FtwLiteDevice->WorkSpaceLength  = (UINTN) PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
 
-  GuidHob.Raw = GetHobList ();
-  while (NULL != (GuidHob.Raw = GetNextGuidHob (&gEfiFlashMapHobGuid, GuidHob.Raw))) {
-    FlashMapEntry = (EFI_FLASH_MAP_ENTRY_DATA *) GET_GUID_HOB_DATA (GuidHob.Guid);
-    //
-    // Get the FTW work space Flash Map SUB area
-    //
-    if ((FlashMapEntry->AreaType == EFI_FLASH_AREA_FTW_STATE) && (FlashMapEntry->NumEntries == 1)) {
-      FtwLiteDevice->WorkSpaceAddress = FlashMapEntry->Entries[0].Base;
-      FtwLiteDevice->WorkSpaceLength  = (UINTN) FlashMapEntry->Entries[0].Length;
-    }
-    //
-    // Get the FTW backup SUB area
-    //
-    if ((FlashMapEntry->AreaType == EFI_FLASH_AREA_FTW_BACKUP) && (FlashMapEntry->NumEntries == 1)) {
-      FtwLiteDevice->SpareAreaAddress = FlashMapEntry->Entries[0].Base;
-      FtwLiteDevice->SpareAreaLength  = (UINTN) FlashMapEntry->Entries[0].Length;
-    }
-
-    GuidHob.Raw = GET_NEXT_HOB (GuidHob);
-  }
+  FtwLiteDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwSpareBase);
+  FtwLiteDevice->SpareAreaLength  = (UINTN) PcdGet32 (PcdFlashNvStorageFtwSpareSize);
 
   ASSERT ((FtwLiteDevice->WorkSpaceLength != 0) && (FtwLiteDevice->SpareAreaLength != 0));
 

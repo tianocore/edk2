@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <PlatformHeader>
     <PlatformName>EdkModuleAll</PlatformName>
@@ -1183,8 +1183,26 @@
         <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bd4d540e-04b0-4b10-8fd5-4a7bb533cf67" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
+        <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+          <Token>0x30000001</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdFlashNvStorageVariableSize</C_Name>
+          <Token>0x30000002</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
+        </PcdData>
         <PcdData ItemType="FIXED_AT_BUILD">
           <C_Name>PcdMaximumUnicodeStringLength</C_Name>
           <Token>0x00000001</Token>
@@ -1431,7 +1449,7 @@
         <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
+        <PcdData ItemType="DYNAMIC">
           <C_Name>PcdFlashNvStorageVariableBase</C_Name>
           <Token>0x30000001</Token>
           <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
@@ -1604,6 +1622,8 @@
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
+        <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -1669,6 +1689,38 @@
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
+          <Token>0x30000013</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFC0000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
+          <Token>0x30000014</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00010000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
+          <Token>0x30000010</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFBE000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
+          <Token>0x30000011</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00002000</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -5747,6 +5799,8 @@
         <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bd4d540e-04b0-4b10-8fd5-4a7bb533cf67" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
+        <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -5812,6 +5866,22 @@
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+          <Token>0x30000001</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdFlashNvStorageVariableSize</C_Name>
+          <Token>0x30000002</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -5995,7 +6065,7 @@
         <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
+        <PcdData ItemType="DYNAMIC">
           <C_Name>PcdFlashNvStorageVariableBase</C_Name>
           <Token>0x30000001</Token>
           <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
@@ -6168,6 +6238,8 @@
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
+        <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -6233,6 +6305,38 @@
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
+          <Token>0x30000013</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFC0000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
+          <Token>0x30000014</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00010000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
+          <Token>0x30000010</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFBE000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
+          <Token>0x30000011</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00002000</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -9686,6 +9790,8 @@
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bd4d540e-04b0-4b10-8fd5-4a7bb533cf67" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
         <Instance ModuleGuid="61999c3c-72a5-4506-a4ff-4271d18a1d14" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
+        <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -9751,6 +9857,22 @@
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+          <Token>0x30000001</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
+        </PcdData>
+        <PcdData ItemType="DYNAMIC">
+          <C_Name>PcdFlashNvStorageVariableSize</C_Name>
+          <Token>0x30000002</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x0</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -9935,7 +10057,7 @@
         <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
+        <PcdData ItemType="DYNAMIC">
           <C_Name>PcdFlashNvStorageVariableBase</C_Name>
           <Token>0x30000001</Token>
           <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
@@ -10108,6 +10230,8 @@
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
+        <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -10173,6 +10297,38 @@
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
+          <Token>0x30000013</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFC0000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
+          <Token>0x30000014</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00010000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
+          <Token>0x30000010</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFBE000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
+          <Token>0x30000011</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00002000</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -13536,7 +13692,7 @@
         <Instance ModuleGuid="9dbf6f25-0da2-4a1d-8e12-e78de6ab4d0e" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
-        <PcdData ItemType="FIXED_AT_BUILD">
+        <PcdData ItemType="DYNAMIC">
           <C_Name>PcdFlashNvStorageVariableBase</C_Name>
           <Token>0x30000001</Token>
           <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
@@ -13709,6 +13865,8 @@
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
+        <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
+        <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -13774,6 +13932,38 @@
           <DatumType>UINT8</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
           <Value>0xAF</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
+          <Token>0x30000013</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFC0000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
+          <Token>0x30000014</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00010000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
+          <Token>0x30000010</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0xFFFBE000</Value>
+        </PcdData>
+        <PcdData ItemType="FIXED_AT_BUILD">
+          <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
+          <Token>0x30000011</Token>
+          <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>UINT32</DatumType>
+          <MaxDatumSize>4</MaxDatumSize>
+          <Value>0x00002000</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -16512,6 +16702,74 @@
       </ModuleSaBuildOptions>
     </ModuleSA>
   </FrameworkModules>
+  <DynamicPcdBuildDefinitions>
+    <PcdBuildData ItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+      <Token>0x30000001</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <MaxDatumSize>4</MaxDatumSize>
+      <SkuInfo>
+        <SkuId>0</SkuId>
+        <Value>0x0</Value>
+      </SkuInfo>
+    </PcdBuildData>
+    <PcdBuildData ItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageVariableSize</C_Name>
+      <Token>0x30000002</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <MaxDatumSize>4</MaxDatumSize>
+      <SkuInfo>
+        <SkuId>0</SkuId>
+        <Value>0x0</Value>
+      </SkuInfo>
+    </PcdBuildData>
+    <PcdBuildData ItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
+      <Token>0x30000010</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <MaxDatumSize>4</MaxDatumSize>
+      <SkuInfo>
+        <SkuId>0</SkuId>
+        <Value>0x0</Value>
+      </SkuInfo>
+    </PcdBuildData>
+    <PcdBuildData ItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
+      <Token>0x30000011</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <MaxDatumSize>4</MaxDatumSize>
+      <SkuInfo>
+        <SkuId>0</SkuId>
+        <Value>0x0</Value>
+      </SkuInfo>
+    </PcdBuildData>
+    <PcdBuildData ItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
+      <Token>0x30000013</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <MaxDatumSize>4</MaxDatumSize>
+      <SkuInfo>
+        <SkuId>0</SkuId>
+        <Value>0x0</Value>
+      </SkuInfo>
+    </PcdBuildData>
+    <PcdBuildData ItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
+      <Token>0x30000014</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <MaxDatumSize>4</MaxDatumSize>
+      <SkuInfo>
+        <SkuId>0</SkuId>
+        <Value>0x0</Value>
+      </SkuInfo>
+    </PcdBuildData>
+  </DynamicPcdBuildDefinitions>      
   <BuildOptions>
     <Options>
       <!--MSFT tool chain options definition : IA32-->

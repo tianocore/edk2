@@ -31,6 +31,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>  
+    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>BaseLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -150,4 +153,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <SetVirtualAddressMapCallBack>VariableClassAddressChangeEvent</SetVirtualAddressMapCallBack>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>
+        The driver gets the Variable store base address from this PCD.  This base address point to
+        an EFI_FIRMWARE_VOLUMN_HEADER struct.
+      </HelpText>
+    </PcdEntry>      
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdFlashNvStorageVariableSize</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>
+        The driver gets the Variable store base address from this PCD.  This base address point to
+        an EFI_FIRMWARE_VOLUMN_HEADER struct.
+      </HelpText>      
+    </PcdEntry>     
+  </PcdCoded>  
 </ModuleSurfaceArea>
