@@ -31,6 +31,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </ModuleDefinitions>
   <LibraryClassDefinitions>
     <LibraryClass Usage="ALWAYS_CONSUMED">
+      <Keyword>PcdLib</Keyword>
+    </LibraryClass>  
+    <LibraryClass Usage="ALWAYS_CONSUMED">
       <Keyword>DebugLib</Keyword>
     </LibraryClass>
     <LibraryClass Usage="ALWAYS_CONSUMED">
@@ -96,4 +99,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <ModuleEntryPoint>InitializeFtwLite</ModuleEntryPoint>
     </Extern>
   </Externs>
+  <PcdCoded>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>To get base address of the FTW spare block section in NV firmware volume.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>To get size of the FTW spare block section in NV firmware volume.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>To get base address of the FTW working block section in NV firmware volume.</HelpText>
+    </PcdEntry>
+    <PcdEntry PcdItemType="FIXED_AT_BUILD" Usage="ALWAYS_CONSUMED">
+      <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>To get size of the FTW working block section in NV firmware volume.</HelpText>
+    </PcdEntry>
+  </PcdCoded>
 </ModuleSurfaceArea>

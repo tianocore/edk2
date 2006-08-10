@@ -176,6 +176,25 @@ Returns:
     FlashHobData.SubAreaData.Base       = FdBase + (EFI_PHYSICAL_ADDRESS) (UINTN) mFlashAreaData[Index].Base;
     FlashHobData.SubAreaData.Length     = (EFI_PHYSICAL_ADDRESS) (UINTN) mFlashAreaData[Index].Length;
 
+    //
+    // We also update a PCD entry so that any driver that depend on
+    // PCD entry will get the information.
+    //
+    if (FlashHobData.AreaType == EFI_FLASH_AREA_EFI_VARIABLES) {
+      PcdSet32 (PcdFlashNvStorageVariableBase, (UINT32) FlashHobData.SubAreaData.Base);
+      PcdSet32 (PcdFlashNvStorageVariableSize, (UINT32) FlashHobData.SubAreaData.Length);
+    }
+
+    if (FlashHobData.AreaType == EFI_FLASH_AREA_FTW_STATE) {
+      PcdSet32 (PcdFlashNvStorageFtwWorkingBase, (UINT32) FlashHobData.SubAreaData.Base);
+      PcdSet32 (PcdFlashNvStorageFtwWorkingSize, (UINT32) FlashHobData.SubAreaData.Length);
+    }
+
+    if (FlashHobData.AreaType == EFI_FLASH_AREA_FTW_BACKUP) {
+      PcdSet32 (PcdFlashNvStorageFtwSpareBase, (UINT32) FlashHobData.SubAreaData.Base);
+      PcdSet32 (PcdFlashNvStorageFtwSpareSize, (UINT32) FlashHobData.SubAreaData.Length);
+    }
+
     switch (FlashHobData.AreaType) {
     case EFI_FLASH_AREA_RECOVERY_BIOS:
     case EFI_FLASH_AREA_MAIN_BIOS:
@@ -202,12 +221,6 @@ Returns:
                         &gEfiFirmwareVolumeBlockProtocolGuid,
                         sizeof (EFI_GUID)
                         );
-
-      //
-      // We also update a PCD entry so that any driver that depend on
-      // PCD entry PcdFlashNvStorageVariableBase will get the information.
-      //
-      PcdSet32 (PcdFlashNvStorageVariableBase, (UINT32) FlashHobData.SubAreaData.Base);
       break;
 
     default:

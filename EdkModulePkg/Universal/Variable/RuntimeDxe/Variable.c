@@ -1254,14 +1254,14 @@ Returns:
   UINT32                          Instance;
   EFI_PHYSICAL_ADDRESS            FvVolHdr;
 
-  EFI_FLASH_MAP_ENTRY_DATA        *FlashMapEntryData;
+  UINT64                          TempVariableStoreHeader;
+
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR GcdDescriptor;
   EFI_FLASH_SUBAREA_ENTRY         VariableStoreEntry;
   UINT64                          BaseAddress;
   UINT64                          Length;
   UINTN                           Index;
   UINT8                           Data;
-  EFI_PEI_HOB_POINTERS            GuidHob;
 
   Status = gBS->AllocatePool (
                   EfiRuntimeServicesData,
@@ -1305,35 +1305,13 @@ Returns:
   // Get non volatile varaible store
   //
 
-  FlashMapEntryData = NULL;
+  TempVariableStoreHeader = (UINT64) PcdGet32 (PcdFlashNvStorageVariableBase);
+  VariableStoreEntry.Base = TempVariableStoreHeader + \
+                              (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
+  VariableStoreEntry.Length = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize) - \
+                                (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
 
-  GuidHob.Raw = GetHobList ();
-  while (NULL != (GuidHob.Raw = GetNextGuidHob (&gEfiFlashMapHobGuid, GuidHob.Raw))) {
-    FlashMapEntryData = (EFI_FLASH_MAP_ENTRY_DATA *) GET_GUID_HOB_DATA (GuidHob.Guid);
-
-    if (FlashMapEntryData->AreaType == EFI_FLASH_AREA_EFI_VARIABLES) {
-      break;
-    }
-    GuidHob.Raw = GET_NEXT_HOB (GuidHob);
-  }
-
-  if (NULL == GuidHob.Raw || FlashMapEntryData == NULL) {
-    gBS->FreePool (mVariableModuleGlobal);
-    gBS->FreePool (VolatileVariableStore);
-    return EFI_NOT_FOUND;
-  }
-
-  //
-  // Currently only one non-volatile variable store is supported
-  //
-  if (FlashMapEntryData->NumEntries != 1) {
-    gBS->FreePool (mVariableModuleGlobal);
-    gBS->FreePool (VolatileVariableStore);
-    return EFI_UNSUPPORTED;
-  }
-
-  CopyMem (&VariableStoreEntry, &FlashMapEntryData->Entries[0], sizeof (VariableStoreEntry));
-
+  VariableStoreEntry.Length = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize);
   //
   // Mark the variable storage region of the FLASH as RUNTIME
   //
