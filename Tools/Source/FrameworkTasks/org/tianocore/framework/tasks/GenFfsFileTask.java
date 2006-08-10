@@ -500,10 +500,10 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       This function is to set ffsAligment 
       @param  ffsAligment     The value of ffsAligment.
     **/
-    public void setFfsAttribDataAlignment(int ffsAligment) {
-        this.ffsAttribDataAlignment = ffsAligment;
-        if (this.ffsAttribDataAlignment > 7) {
-            throw new BuildException ("FFS_ALIGMENT Scope is 0-7");
+    public void setFfsAttribDataAlignment(String ffsAligment) {
+        this.ffsAttribDataAlignment = stringToInt(ffsAligment.replaceAll(" ", "").toLowerCase());
+        if (this.ffsAttribDataAlignment < 0 || this.ffsAttribDataAlignment > 7) {
+            throw new BuildException ("FFS_ATTRIB_DATA_ALIGMENT must be 0-7");
         } else {
             attributes |= (((byte)this.ffsAttribDataAlignment) << 3);
         }
@@ -947,5 +947,37 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
 
     public void setModuleType(String moduleType) {
         this.moduleType = moduleType;
+    }
+
+    /**
+     Convert a string to a integer.
+     
+     @param     intString   The string representing a integer
+     
+     @retval    int     The value of integer represented by the
+                        given string; -1 is returned if the format
+                        of the string is wrong.
+     **/
+    private int stringToInt(String intString) {
+        int value;
+        int hexPrefixPos = intString.indexOf("0x");
+        int radix = 10;
+        String intStringNoPrefix;
+
+        if (hexPrefixPos >= 0) {
+            radix = 16;
+            intStringNoPrefix = intString.substring(hexPrefixPos + 2, intString.length());
+        } else {
+            intStringNoPrefix = intString;
+        }
+
+        try {
+            value = Integer.parseInt(intStringNoPrefix, radix);
+        } catch (NumberFormatException e) {
+            log("Incorrect format of int (" + intString + "). -1 is assumed");
+            return -1;
+        }
+
+        return value;
     }
 }
