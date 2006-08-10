@@ -51,5 +51,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>Source/GenBuild/GenBuild.msa</Filename>
     <Filename>Source/SurfaceArea/SurfaceArea.msa</Filename>
     <Filename>Source/TianoTools/TianoTools.msa</Filename>
+    <Filename>Source/MigrationTools/MigrationTools.msa</Filename>
   </MsaFiles>
 </PackageSurfaceArea>
