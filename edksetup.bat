@@ -178,6 +178,7 @@ set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\MigrationTools.jar
 
 call ant -f %WORKSPACE%\Tools\build.xml C_Code
 
