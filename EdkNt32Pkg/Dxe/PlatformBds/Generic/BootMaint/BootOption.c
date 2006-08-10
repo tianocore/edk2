@@ -1056,6 +1056,27 @@ Returns:
 }
 
 CHAR16 *
+BdsStrCpy (
+  OUT     CHAR16                    *Destination,
+  IN      CONST CHAR16              *Source
+  )
+{
+  CHAR16                            *ReturnValue;
+
+  //
+  // Destination cannot be NULL
+  //
+  ASSERT (Destination != NULL);
+
+  ReturnValue = Destination;
+  while (*Source) {
+    *(Destination++) = *(Source++);
+  }
+  *Destination = 0;
+  return ReturnValue;
+}
+
+CHAR16 *
 BOpt_AppendFileName (
   IN  CHAR16  *Str1,
   IN  CHAR16  *Str2
@@ -1102,13 +1123,13 @@ Returns:
       // DO NOT convert the .. if it is at the end of the string. This will
       // break the .. behavior in changing directories.
       //
-      StrCpy (LastSlash, Ptr + 3);
+      BdsStrCpy (LastSlash, Ptr + 3);
       Ptr = LastSlash;
     } else if (*Ptr == '\\' && *(Ptr + 1) == '.' && *(Ptr + 2) == '\\') {
       //
       // Convert a \.\ to a \
       //
-      StrCpy (Ptr, Ptr + 2);
+      BdsStrCpy (Ptr, Ptr + 2);
       Ptr = LastSlash;
     } else if (*Ptr == '\\') {
       LastSlash = Ptr;
