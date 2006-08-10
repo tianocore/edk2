@@ -1,0 +1,51 @@
+package org.tianocore.migration;
+
+import java.util.regex.*;
+
+public class Func {
+	Func(String r8func,String r8lib,String r9func,String r9lib) {
+		r8funcname = r8func;
+		r8libname = r8lib;
+		r9funcname = r9func;
+		r9libname = r9lib;
+	}
+	Func(String[] linecontext) {
+		r8funcname = linecontext[1];
+		r8libname = linecontext[0];
+		r9funcname = linecontext[2];
+		r9libname = linecontext[3];
+	}
+	public String r8funcname;
+	public String r8libname;
+	public String r9funcname;
+	public String r9libname;
+
+	public static Pattern ptnbrace = Pattern.compile("\\{[^\\{\\}]*\\}",Pattern.MULTILINE);
+	public static Pattern ptnfuncc = Pattern.compile("([a-zA-Z_]\\w*)\\s*\\([^\\)\\(]*\\)",Pattern.MULTILINE);
+	public static Pattern ptnfuncd = Pattern.compile("([a-zA-Z_]\\w*)\\s*\\([^\\)\\(]*\\)\\s*@",Pattern.MULTILINE);
+	public static Pattern ptnlowcase = Pattern.compile("[a-z]");				// must be removed
+	
+	private static String reservedwords = "if for pack while switch return sizeof";
+	
+	public static String register(Matcher mtr, ModuleInfo mi, Database db) {
+		String temp = null;
+
+		temp = mtr.group(1);									// both changed and not changed funcc are registered , for finding all the non-local function calls
+		Matcher mtrlowcase = ptnlowcase.matcher(temp);			// must be removed , so the two funcs can be merged
+		if (!reservedwords.contains(temp) && mtrlowcase.find()) {
+			mi.hashfuncc.add(temp);
+		}
+		return temp;
+	}
+	/*
+	public static String registerFuncD(Matcher mtr, ModuleInfo mi, Database db) {
+		String temp = null;
+
+		temp = mtr.group(1);									// both changed and not changed funcd are registered , for finding all the non-local function calls
+		if (!reservedwords.contains(temp)) {
+			mi.hashfuncd.add(temp);
+		}
+		return temp;
+	}
+	*/
+}
