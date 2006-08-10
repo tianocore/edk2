@@ -1310,8 +1310,6 @@ Returns:
                               (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
   VariableStoreEntry.Length = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize) - \
                                 (((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) (TempVariableStoreHeader)) -> HeaderLength);
-
-  VariableStoreEntry.Length = (UINT64) PcdGet32 (PcdFlashNvStorageVariableSize);
   //
   // Mark the variable storage region of the FLASH as RUNTIME
   //
