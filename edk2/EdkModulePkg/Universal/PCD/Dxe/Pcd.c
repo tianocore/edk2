@@ -61,7 +61,7 @@ PCD_PROTOCOL mPcdInstance = {
 //
 // Static global to reduce the code size
 //
-static EFI_HANDLE NewHandle = NULL;
+static EFI_HANDLE mNewHandle = NULL;
 
 EFI_STATUS
 EFIAPI
@@ -81,7 +81,7 @@ PcdDxeInit (
   BuildPcdDxeDataBase ();
 
   Status = gBS->InstallProtocolInterface (
-                  &NewHandle,
+                  &mNewHandle,
                   &gPcdProtocolGuid,
                   EFI_NATIVE_INTERFACE,
                   &mPcdInstance
