@@ -706,6 +706,18 @@ Returns:
 
     memcpy (CurrentPe32Section.Pe32Section + 1, (VOID *) MemoryImagePointerAligned, (UINT32) ImageSize);
 
+    //
+    // If a map file was selected output mapping information for any file that
+    // was rebased.
+    //
+    if (MapFile != NULL) {
+      fprintf (MapFile, "PE32 File: %s Base:%08lx", FileGuidString, BaseAddress);
+      if (ImageContext.PdbPointer != NULL) {
+        fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
+      }
+      fprintf (MapFile, "\n");
+    }
+
     free ((VOID *) MemoryImagePointer);
 
     //
@@ -929,6 +941,19 @@ Returns:
       GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION) -
       sizeof (EFI_TE_IMAGE_HEADER)
       );
+
+    //
+    // If a map file was selected output mapping information for any file that
+    // was rebased.
+    //
+    if (MapFile != NULL) {
+      fprintf (MapFile, "TE   File: %s Base:%08lx", FileGuidString, BaseAddress);
+      if (ImageContext.PdbPointer != NULL) {
+        fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
+      }
+      fprintf (MapFile, "\n");
+    }
+
     free ((VOID *) MemoryImagePointer);
     free (TEBuffer);
     if (FfsFile->Attributes & FFS_ATTRIB_TAIL_PRESENT) {
@@ -971,18 +996,6 @@ Returns:
       Error (NULL, 0, 0, "no PE32, TE, nor compressed section found in FV file", FileGuidString);
       return EFI_NOT_FOUND;
     }
-  }
-
-  //
-  // If a map file was selected output mapping information for any file that
-  // was rebased.
-  //
-  if (MapFile != NULL) {
-    fprintf (MapFile, "File: %s Base:%08lx", FileGuidString, BaseAddress);
-    if (ImageContext.PdbPointer != NULL) {
-      fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
-    }
-    fprintf (MapFile, "\n");
   }
   
   return EFI_SUCCESS;
