@@ -610,7 +610,7 @@ PeCoffLoaderRelocateImage (
     }
   } else {
     Hdr.Te             = (EFI_TE_IMAGE_HEADER *)(UINTN)(ImageContext->ImageAddress);
-    Adjust            = (UINT64) (BaseAddress - Hdr.Te->ImageBase);
+    Adjust             = (UINT64) (BaseAddress - Hdr.Te->ImageBase);
     Hdr.Te->ImageBase  = (UINT64) (BaseAddress);
 
     //
@@ -1200,13 +1200,13 @@ PeCoffLoaderRelocateImageForRuntime (
     // Use PE32 offset
     //
     NumberOfRvaAndSizes = Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes;
-    DataDirectory = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG]);
+    DataDirectory = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32->OptionalHeader.DataDirectory[0]);
   } else {
     //     
     // Use PE32+ offset
     //
     NumberOfRvaAndSizes = Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
-    DataDirectory = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG]);
+    DataDirectory = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32Plus->OptionalHeader.DataDirectory[0]);
   }    
 
   //
@@ -1258,7 +1258,7 @@ PeCoffLoaderRelocateImageForRuntime (
       case EFI_IMAGE_REL_BASED_HIGH:
         F16 = (UINT16 *) Fixup;
         if (*(UINT16 *) FixupData == *F16) {
-          *F16 = (UINT16) ((*F16 << 16) + ((UINT16) Adjust & 0xffff));
+          *F16 = (UINT16) (*F16 + ((UINT16)(Adjust >> 16)));
         }
 
         FixupData = FixupData + sizeof (UINT16);
@@ -1286,9 +1286,11 @@ PeCoffLoaderRelocateImageForRuntime (
       case EFI_IMAGE_REL_BASED_DIR64:
         F64       = (UINT64 *)Fixup;
         FixupData = ALIGN_POINTER (FixupData, sizeof (UINT64));
-        if (*(UINT32 *) FixupData == *F64) {
+        if (*(UINT64 *) FixupData == *F64) {
           *F64 = *F64 + (UINT64)Adjust;
         }
+
+        FixupData = FixupData + sizeof (UINT64);
         break;
 
       case EFI_IMAGE_REL_BASED_HIGHADJ:
