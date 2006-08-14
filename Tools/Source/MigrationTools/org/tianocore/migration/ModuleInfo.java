@@ -38,7 +38,6 @@ public class ModuleInfo {
 	public String entrypoint = null;
 	
 	public Set<String> localmodulesources = new HashSet<String>();		//contains both .c and .h
-	public Set<String> localmoduleheaders = new HashSet<String>();
 	public Set<String> preprocessedccodes = new HashSet<String>();
 	
 	public Set<String> hashfuncc = new HashSet<String>();
@@ -69,8 +68,7 @@ public class ModuleInfo {
 				if (list[i].contains(".c") || list[i].contains(".C")) {
 					localmodulesources.add(list[i]);
 				} else if (list[i].contains(".h") || list[i].contains(".H")) {
-					localmodulesources.add(list[i]);
-					localmoduleheaders.add(list[i]);	//the case that several .inf or .msa found is not concerned
+					localmodulesources.add(list[i]);	//the case that several .inf or .msa found is not concerned
 				} else if (list[i].contains(".dxs")) {
 					localmodulesources.add(list[i]);
 				} else if (list[i].contains(".uni")) {
@@ -161,7 +159,7 @@ public class ModuleInfo {
 			while ((line = rd.readLine()) != null) {
 				if (line.contains("#include")) {
 					mtcinclude = ptninclude.matcher(line);
-					if (mtcinclude.find() && localmoduleheaders.contains(mtcinclude.group(1))) {
+					if (mtcinclude.find() && localmodulesources.contains(mtcinclude.group(1))) {
 					} else {
 						line = migrationcomment + line;
 					}
