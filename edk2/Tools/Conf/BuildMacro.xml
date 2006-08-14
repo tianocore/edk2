@@ -71,7 +71,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
+      <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
+      <if>
+        <equals arg1="@{FILEPATH}" arg2="." />
+        <then>
+          <var name="OBJECTS" value="${OBJECTS} @{FILENAME}.obj" />
+        </then>
+        <else>
+          <var name="OBJECTS" value="${OBJECTS} @{FILEPATH}/@{FILENAME}.obj" />
+        </else>
+      </if>
     </sequential>
   </macrodef>
 
@@ -120,7 +129,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
+      <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
+      <if>
+        <equals arg1="@{FILEPATH}" arg2="." />
+        <then>
+          <var name="OBJECTS" value="${OBJECTS} @{FILENAME}.obj" />
+        </then>
+        <else>
+          <var name="OBJECTS" value="${OBJECTS} @{FILEPATH}/@{FILENAME}.obj" />
+        </else>
+      </if>
     </sequential>
   </macrodef>
 
@@ -265,7 +283,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
+      <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
+      <if>
+        <equals arg1="@{FILEPATH}" arg2="." />
+        <then>
+          <var name="OBJECTS" value="${OBJECTS} @{FILENAME}.obj" />
+        </then>
+        <else>
+          <var name="OBJECTS" value="${OBJECTS} @{FILEPATH}/@{FILENAME}.obj" />
+        </else>
+      </if>
     </sequential>
   </macrodef>
 
@@ -307,7 +334,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
+      <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
+      <if>
+        <equals arg1="@{FILEPATH}" arg2="." />
+        <then>
+          <var name="OBJECTS" value="${OBJECTS} @{FILENAME}.obj" />
+        </then>
+        <else>
+          <var name="OBJECTS" value="${OBJECTS} @{FILEPATH}/@{FILENAME}.obj" />
+        </else>
+      </if>
     </sequential>
   </macrodef>
 
@@ -364,7 +400,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
+      <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
+      <if>
+        <equals arg1="@{FILEPATH}" arg2="." />
+        <then>
+          <var name="OBJECTS" value="${OBJECTS} @{FILENAME}.obj" />
+        </then>
+        <else>
+          <var name="OBJECTS" value="${OBJECTS} @{FILEPATH}/@{FILENAME}.obj" />
+        </else>
+      </if>
     </sequential>
   </macrodef>
 
@@ -412,7 +457,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <file list="${OBJECTS}" />
+          <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}" />
         </sourcefiles>
         <targetfiles>
           <file name="${BIN_DIR}/@{FILENAME}.lib"/>
@@ -424,7 +469,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                 outputFile="${BIN_DIR}/@{FILENAME}.lib">
               <argument value="${SLINK_FLAGS}"/>
 
-              <argument value="${OBJECTS}"/>
+              <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}"/>
             </command>
           </cc>
         </sequential>
@@ -541,7 +586,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj" />
+      <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
+      <if>
+        <equals arg1="@{FILEPATH}" arg2="." />
+        <then>
+          <var name="OBJECTS" value="${OBJECTS} @{FILENAME}Strings.obj" />
+        </then>
+        <else>
+          <var name="OBJECTS" value="${OBJECTS} @{FILEPATH}/@{FILENAME}Strings.obj" />
+        </else>
+      </if>
     </sequential>
   </macrodef>
 
@@ -595,7 +649,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <delete file="${PLATFORM_DIR}/@{FILENAME}.i" />
         </sequential>
       </OnDependency>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
+      <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
+      <if>
+        <equals arg1="@{FILEPATH}" arg2="." />
+        <then>
+          <var name="OBJECTS" value="${OBJECTS} @{FILENAME}.obj" />
+        </then>
+        <else>
+          <var name="OBJECTS" value="${OBJECTS} @{FILEPATH}/@{FILENAME}.obj" />
+        </else>
+      </if>
     </sequential>
   </macrodef>
 
@@ -635,7 +698,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <OnDependency>
         <sourcefiles>
           <file list="${LIBS}"/>
-          <file list="${OBJECTS}"/>
+          <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}" />
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
@@ -647,7 +710,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib">
               <argument value="${SLINK_FLAGS}"/>
 
-              <argument value="${OBJECTS}"/>
+              <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}"/>
             </command>
           </cc>
           <cc userdefine="on">
