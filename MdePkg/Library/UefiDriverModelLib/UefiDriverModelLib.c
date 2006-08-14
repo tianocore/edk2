@@ -10,13 +10,20 @@
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
-  Module Name:  EfiDriverModelLib.c
+  Module Name:  UefiDriverModelLib.c
 
 **/
 
 
 
 /**
+  The constructor function installs the standard EFI Driver Model Protocols.
+
+  @param[in] ImageHandle The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS The constructor always return EFI_SUCCESS.
+
 **/
 EFI_STATUS
 UefiDriverModelLibConstructor (
@@ -221,6 +228,13 @@ UefiDriverModelLibConstructor (
 }
 
 /**
+  The destructor function uninstalls the standard EFI Driver Model Protocols.
+
+  @param[in] ImageHandle The firmware allocated handle for the EFI image.  
+  @param[in] SystemTable A pointer to the EFI System Table.
+  
+  @retval EFI_SUCCESS The constructor always return EFI_SUCCESS.
+
 **/
 EFI_STATUS
 UefiDriverModelLibDestructor (
