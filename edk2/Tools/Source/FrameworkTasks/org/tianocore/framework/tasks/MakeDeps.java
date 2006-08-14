@@ -354,16 +354,12 @@ public class MakeDeps extends Task {
             //
             String line = null;
             while ((line = lineReader.readLine()) != null) {
-                Pattern pattern = Pattern.compile(target + "[ ]*:[ ]*(.+)");
-                Matcher matcher = pattern.matcher(line);
-
-                while (matcher.find()) {
+                String[] filePath = line.split(" : ");
+                if (filePath.length == 2) {
                     ///
                     /// keep the file name after ":"
                     ///
-                    String filePath = line.substring(matcher.start(1), matcher.end(1));
-                    filePath = cleanupPathName(filePath);
-                    lineSet.add(filePath);
+                    lineSet.add(cleanupPathName(filePath[1]));
                 }
             }
             lineReader.close();
