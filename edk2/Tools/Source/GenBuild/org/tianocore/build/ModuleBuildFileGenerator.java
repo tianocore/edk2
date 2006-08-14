@@ -235,41 +235,6 @@ public class ModuleBuildFileGenerator {
       @param root Root element for current
     **/
     private void applyCleanElement(Document document, Node root) {
-        ModuleIdentification[] libinstances = SurfaceAreaQuery.getLibraryInstance(fpdModuleId.getArch());
-        for (int i = 0; i < libinstances.length; i++) {
-            //
-            // Put package file path to module identification
-            //
-            PackageIdentification packageId = libinstances[i].getPackage();
-            
-            //
-            // Generate ANT script to clean
-            //
-            Element ele = document.createElement("GenBuild");
-            ele.setAttribute("type", "clean");
-            
-            //
-            // Prepare pass down information
-            //
-            Map<String, String> passDownMap = new LinkedHashMap<String, String>();
-            for (int j = 0; j < inheritProperties.length; j ++){
-                passDownMap.put(inheritProperties[j], "${" + inheritProperties[j] + "}");
-            }
-            passDownMap.put("MODULE_GUID", libinstances[i].getGuid());
-            passDownMap.put("MODULE_VERSION", libinstances[i].getVersion());
-            
-            passDownMap.put("PACKAGE_GUID", packageId.getGuid());
-            passDownMap.put("PACKAGE_VERSION", packageId.getVersion());
-            
-            for (int j = 0; j < inheritProperties.length; j ++){
-                Element property = document.createElement("property");
-                property.setAttribute("name", inheritProperties[j]);
-                property.setAttribute("value", passDownMap.get(inheritProperties[j]));
-                ele.appendChild(property);
-            }
-
-            root.appendChild(ele);
-        }
         //
         // <delete includeemptydirs="true">
         //   <fileset dir="${DEST_DIR_OUTPUT}" includes="" excludes="" />
@@ -292,42 +257,6 @@ public class ModuleBuildFileGenerator {
       @param root Root element for current
     **/
     private void applyDeepcleanElement(Document document, Node root) {
-        ModuleIdentification[] libinstances = SurfaceAreaQuery.getLibraryInstance(fpdModuleId.getArch());
-        for (int i = 0; i < libinstances.length; i++) {
-            //
-            // Put package file path to module identification
-            //
-            PackageIdentification packageId = libinstances[i].getPackage();
-            
-            //
-            // Generate ANT script to clean
-            //
-            Element ele = document.createElement("GenBuild");
-            ele.setAttribute("type", "cleanall");
-            
-            //
-            // Prepare pass down information
-            //
-            Map<String, String> passDownMap = new LinkedHashMap<String, String>();
-            for (int j = 0; j < inheritProperties.length; j ++){
-                passDownMap.put(inheritProperties[j], "${" + inheritProperties[j] + "}");
-            }
-            
-            passDownMap.put("MODULE_GUID", libinstances[i].getGuid());
-            passDownMap.put("MODULE_VERSION", libinstances[i].getVersion());
-            
-            passDownMap.put("PACKAGE_GUID", packageId.getGuid());
-            passDownMap.put("PACKAGE_VERSION", packageId.getVersion());
-            
-            for (int j = 0; j < inheritProperties.length; j ++){
-                Element property = document.createElement("property");
-                property.setAttribute("name", inheritProperties[j]);
-                property.setAttribute("value", passDownMap.get(inheritProperties[j]));
-                ele.appendChild(property);
-            }
-
-            root.appendChild(ele);
-        }
         //
         // <delete includeemptydirs="true">
         //   <fileset dir="${DEST_DIR_OUTPUT}" includes="" excludes="" />
@@ -364,7 +293,6 @@ public class ModuleBuildFileGenerator {
     **/
     private void applyLibraryInstance(Document document, Node root) {
         ModuleIdentification[] libinstances = SurfaceAreaQuery.getLibraryInstance(fpdModuleId.getArch());
-//        String propertyLibs = "";
         for (int i = 0; i < libinstances.length; i++) {
             //
             // Put package file path to module identification
@@ -376,7 +304,6 @@ public class ModuleBuildFileGenerator {
             //
             Element ele = document.createElement("GenBuild");
             ele.setAttribute("type", "build");
-//            ele.setAttribute("inheritAll", "false");
             
             //
             // Prepare pass down information
@@ -400,9 +327,7 @@ public class ModuleBuildFileGenerator {
             }
             
             root.appendChild(ele);
-//            propertyLibs += " " + project.getProperty("BIN_DIR") + File.separatorChar + libinstances[i].getName() + ".lib";
         }
-//        project.setProperty("LIBS", propertyLibs.replaceAll("(\\\\)", "/"));
     }
     
      /**
