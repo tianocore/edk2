@@ -36,9 +36,9 @@ public class MsaWriter {
 	private MsaHeaderDocument.MsaHeader msaheader = msa.addNewMsaHeader();
 	private ModuleDefinitionsDocument.ModuleDefinitions md = msa.addNewModuleDefinitions();
 	private SourceFilesDocument.SourceFiles sourcefiles = msa.addNewSourceFiles();	//found local .h files are not written
-	private GuidsDocument.Guids guids = msa.addNewGuids();
-	private ProtocolsDocument.Protocols protocols = msa.addNewProtocols();
-	private PPIsDocument.PPIs ppis = msa.addNewPPIs();
+	private GuidsDocument.Guids guids;
+	private ProtocolsDocument.Protocols protocols;
+	private PPIsDocument.PPIs ppis;
 	private PackageDependenciesDocument.PackageDependencies pd = msa.addNewPackageDependencies();
 	private LibraryClassDefinitionsDocument.LibraryClassDefinitions libclassdefs = msa.addNewLibraryClassDefinitions();
 	private ExternsDocument.Externs externs = msa.addNewExterns();
@@ -74,6 +74,7 @@ public class MsaWriter {
 		} else {
 			msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.moduletype = Query("GuidValue Not Found . Please Input GuidValue")));
 		}
+
 		msaheader.setCopyright("Copyright (c) 2006, Intel Corporation");
 		msaheader.setVersion("1.0");
 		msaheader.setAbstract("Component name for module " + mi.modulename);
@@ -86,6 +87,7 @@ public class MsaWriter {
 				"      reproduced, stored in a retrieval system, or transmitted in any\n" +
 				"      form or by any means without the express written consent of\n" +
 				"      Intel Corporation.");
+		msaheader.setSpecification("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
 		
 		List<Enum> arch = new ArrayList<Enum>();
 		arch.add(SupportedArchitectures.IA_32);
@@ -105,28 +107,37 @@ public class MsaWriter {
 		while (it.hasNext()) {
 			sourcefiles.addNewFilename().setStringValue(it.next());
 		}
-		it = mi.protocol.iterator();
-		while (it.hasNext()) {
-			if ((temp = it.next()) != null) {
-				ProtocolsDocument.Protocols.Protocol pr = protocols.addNewProtocol();
-				pr.setProtocolCName(temp);
-				pr.setUsage(UsageTypes.ALWAYS_CONSUMED);
+		if (!mi.protocol.isEmpty()) {
+			protocols = msa.addNewProtocols();
+			it = mi.protocol.iterator();
+			while (it.hasNext()) {
+				if ((temp = it.next()) != null) {
+					ProtocolsDocument.Protocols.Protocol pr = protocols.addNewProtocol();
+					pr.setProtocolCName(temp);
+					pr.setUsage(UsageTypes.ALWAYS_CONSUMED);
+				}
 			}
 		}
-		it = mi.ppi.iterator();
-		while (it.hasNext()) {
-			if ((temp = it.next()) != null) {
-				PPIsDocument.PPIs.Ppi pp = ppis.addNewPpi();
-				pp.setPpiCName(temp);
-				pp.setUsage(UsageTypes.ALWAYS_CONSUMED);
+		if (!mi.ppi.isEmpty()) {
+			ppis = msa.addNewPPIs();
+			it = mi.ppi.iterator();
+			while (it.hasNext()) {
+				if ((temp = it.next()) != null) {
+					PPIsDocument.PPIs.Ppi pp = ppis.addNewPpi();
+					pp.setPpiCName(temp);
+					pp.setUsage(UsageTypes.ALWAYS_CONSUMED);
+				}
 			}
 		}
-		it = mi.guid.iterator();
-		while (it.hasNext()) {
-			if ((temp = it.next()) != null) {
-				GuidsDocument.Guids.GuidCNames gcn = guids.addNewGuidCNames();
-				gcn.setGuidCName(temp);
-				gcn.setUsage(UsageTypes.ALWAYS_CONSUMED);
+		if (!mi.guid.isEmpty()) {
+			guids = msa.addNewGuids();
+			it = mi.guid.iterator();
+			while (it.hasNext()) {
+				if ((temp = it.next()) != null) {
+					GuidsDocument.Guids.GuidCNames gcn = guids.addNewGuidCNames();
+					gcn.setGuidCName(temp);
+					gcn.setUsage(UsageTypes.ALWAYS_CONSUMED);
+				}
 			}
 		}
 		it = mi.hashrequiredr9libs.iterator();
