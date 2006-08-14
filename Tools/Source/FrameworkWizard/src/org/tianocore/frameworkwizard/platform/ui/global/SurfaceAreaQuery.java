@@ -369,13 +369,13 @@ public class SurfaceAreaQuery {
             while(ispi.hasNext()) {
                 PackageIdentification pi = ispi.next();
                 if (packageVersion != null) {
-                    if (pi.getGuid().equals(packageGuid) && pi.getVersion().equals(packageVersion)) {
+                    if (pi.getGuid().equalsIgnoreCase(packageGuid) && pi.getVersion().equals(packageVersion)) {
                         packageIdList[i] = pi;
                         break;
                     } 
                 }
                 else {
-                    if (pi.getGuid().equals(packageGuid)) {
+                    if (pi.getGuid().equalsIgnoreCase(packageGuid)) {
                         if (pi.getVersion() != null && pi.getVersion().compareTo(ver) > 0){
                             ver = pi.getVersion();
                             packageIdList[i] = pi;
