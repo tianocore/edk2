@@ -142,7 +142,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         //  Check does the BaseName, Guid, FileType set value.
         //
         if (this.baseName.equals("")) {
-            throw new BuildException ("Must set BaseName!\n");
+            throw new BuildException ("Must set OutputFileBasename!\n");
         }
 
         if (this.ffsFileGuid.equals("")) {
@@ -296,7 +296,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
                 if (fileSize == ffsHeader.getSize()) {
                     throw new BuildException (
                                              "FFS_ATTRIB_TAIL_PRESENT=TRUE is " +
-                                             "invalid for 0-length files"
+                                             "invalid for zero length files"
                                              );            
                 }
                 fileSize = fileSize + 2;
@@ -503,7 +503,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
     public void setFfsAttribDataAlignment(String ffsAligment) {
         this.ffsAttribDataAlignment = stringToInt(ffsAligment.replaceAll(" ", "").toLowerCase());
         if (this.ffsAttribDataAlignment < 0 || this.ffsAttribDataAlignment > 7) {
-            throw new BuildException ("FFS_ATTRIB_DATA_ALIGMENT must be 0-7");
+            throw new BuildException ("FFS_ATTRIB_DATA_ALIGMENT must be an integer value from 0 through 7, inclusive");
         } else {
             attributes |= (((byte)this.ffsAttribDataAlignment) << 3);
         }
@@ -664,13 +664,13 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
 
         byte[] buffer = new byte[16];
         if (GuidStr.length()!=36) {
-            throw new BuildException ("Guid length is not correct!");
+            throw new BuildException ("The GUID length [" + GuidStr.length() + "] is not correct!");
         }
 
 
         SplitStr = GuidStr.split("-");
         if (SplitStr.length != 5) {
-            throw new BuildException ("Guid type is not correct!");
+            throw new BuildException ("The GUID format is not correct!");
         }
 
 
@@ -974,7 +974,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         try {
             value = Integer.parseInt(intStringNoPrefix, radix);
         } catch (NumberFormatException e) {
-            log("Incorrect format of int (" + intString + "). -1 is assumed");
+            log("Incorrect format of int [" + intString + "]. -1 is assumed");
             return -1;
         }
 

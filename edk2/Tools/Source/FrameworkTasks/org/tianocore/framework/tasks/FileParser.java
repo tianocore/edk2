@@ -46,7 +46,7 @@ public class  FileParser {
         String str;
         
         if (!file.exists()) {
-            throw new BuildException("The file" + file + "is not exist");           
+            throw new BuildException("The file, " + file + " does not exist!");           
         } 
         try {
             fileReader = new FileReader(file);

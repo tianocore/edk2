@@ -71,7 +71,7 @@ public class ModifyInfTask extends Task implements EfiDefine {
         //
         // set Logger
         //
-        FrameworkLogger logger = new FrameworkLogger(project, "modifytask");
+        FrameworkLogger logger = new FrameworkLogger(project, "modifyinftask");
         EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
         EdkLog.setLogger(logger);
         //

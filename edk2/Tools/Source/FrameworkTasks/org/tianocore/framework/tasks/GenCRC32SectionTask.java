@@ -96,12 +96,14 @@ public class GenCRC32SectionTask extends Task implements EfiDefine{
                 //
                 //  command execution success 
                 //
-                log("gencrc32section succeeded!", Project.MSG_VERBOSE);
+                log("GenCRC32Section succeeded!", Project.MSG_VERBOSE);
             } else {
                 // 
                 // command execution fail
                 //
                 log("ERROR = " + Integer.toHexString(revl));
+// LAH Added This Line
+                throw new BuildException("GenCRC32Section failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

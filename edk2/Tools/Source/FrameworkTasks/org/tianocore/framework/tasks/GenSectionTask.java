@@ -97,13 +97,13 @@ public class GenSectionTask extends Task implements EfiDefine {
             log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                log("gensection succeeded!", Project.MSG_VERBOSE);
+                log("GenSection succeeded!", Project.MSG_VERBOSE);
             } else {
                 //
                 // command execution fail
                 //
                 log("ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("gensection failed!");
+                throw new BuildException("GenSection failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

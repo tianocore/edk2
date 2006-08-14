@@ -102,13 +102,13 @@ public class FwImageTask extends Task implements EfiDefine{
             log(this.peImageName);
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                log("fwimage succeeded!", Project.MSG_VERBOSE);
+                log("FwImage succeeded!", Project.MSG_VERBOSE);
             } else {
                 //
                 // command execution fail
                 //
                 log("ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("fwimage failed!");
+                throw new BuildException("FwImage failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

@@ -210,10 +210,10 @@ public class VfrCompilerTask extends Task implements EfiDefine {
             log(vfrFileName);
             int returnVal = runner.execute();
             if (EFI_SUCCESS == returnVal) {
-                log("VfrCompiler succeeded!", Project.MSG_VERBOSE);
+                log("VfrCompile succeeded!", Project.MSG_VERBOSE);
             } else {
                 log("ERROR = " + Integer.toHexString(returnVal));
-                throw new BuildException("VfrCompiler failed!");
+                throw new BuildException("VfrCompile failed!");
             }
         } catch (IOException e) {
             throw new BuildException(e.getMessage());

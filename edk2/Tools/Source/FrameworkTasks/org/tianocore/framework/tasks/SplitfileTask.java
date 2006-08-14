@@ -105,13 +105,13 @@ public class SplitfileTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_VERBOSE, "splitfile succeeded!");
+                EdkLog.log(EdkLog.EDK_VERBOSE, "SplitFile succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("splitfile failed!");
+                throw new BuildException("SplitFile failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

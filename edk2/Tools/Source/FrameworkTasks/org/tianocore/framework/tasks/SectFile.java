@@ -67,7 +67,7 @@ public class SectFile implements Section {
         /// check if file exist.
         ///     
         if (! sectFile.exists()) {
-            throw new BuildException("The file  " + this.fileName + "  is not exist!\n");     
+            throw new BuildException("The file  " + this.fileName + "  does not exist!\n");     
         }
 
 
@@ -110,7 +110,7 @@ public class SectFile implements Section {
 
         } catch (Exception e) {
             System.out.print(e.getMessage());
-            throw new BuildException("section file2Buffer failed!\n");            
+            throw new BuildException("SectFile, toBuffer failed!\n");            
         }
     }
 }

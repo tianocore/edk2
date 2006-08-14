@@ -119,7 +119,7 @@ public class EfiCompressTask extends Task implements EfiDefine {
                 // command execution fail
                 //
                 EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("Strip failed!");
+                throw new BuildException("EfiCompress failed!");
 
             }
         } catch (Exception e) {
