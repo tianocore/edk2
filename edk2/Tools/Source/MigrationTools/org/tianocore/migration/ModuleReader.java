@@ -44,13 +44,13 @@ public class ModuleReader {
 		Iterator<FilenameDocument.Filename> li = sourcefiles.getFilenameList().iterator();
 		while (li.hasNext()) {
 			if (!mi.localmodulesources.contains(temp = li.next().toString())) {
-				System.out.println("Source File Missing ! : " + temp);
+				System.out.println("Source File Missing! : " + temp);
 			}
 		}
 	}
 	
 	public void readInf(String name) throws Exception {
-		System.out.println("Reading From Inf : " + name);
+		System.out.println("Parsing INF file: " + name);
 		BufferedReader rd = new BufferedReader(new FileReader(modulepath + File.separator + name));
 		String line;
 		String[] linecontext;
@@ -66,7 +66,7 @@ public class ModuleReader {
 						linecontext = line.split(" ");
 						if (linecontext[2].length() != 0) {
 							if (!mi.localmodulesources.contains(linecontext[2])) {
-								System.out.println("Source File Missing ! : " + linecontext[2]);
+								System.out.println("Source File Missing! : " + linecontext[2]);
 							}
 						}
 					}

@@ -70,7 +70,7 @@ public class SourceFileReplacer {
 	public void flush() throws Exception {
 		PrintWriter outfile;
 		String temp = null;
-		if (ui.yesOrNo("Change Source Code is to be doing . See details ?")) {
+		if (ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
 			showdetails = true;
 		}
 		File tempdir = new File(modulepath + File.separator + "result" + File.separator);
@@ -78,7 +78,7 @@ public class SourceFileReplacer {
 		String[] list = new File(modulepath + File.separator + "temp").list();	//what I change is the non-local .h commented-out files
 		for (int i = 0 ; i < list.length ; i++) {
 			if (list[i].contains(".c")) {
-				ui.println("\nModifying file : " + list[i]);
+				ui.println("\nModifying file: " + list[i]);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + list[i])));
 				outfile.append(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + list[i]));
 				outfile.flush();
@@ -93,7 +93,7 @@ public class SourceFileReplacer {
 				} else {
 					continue;
 				}
-				ui.println("\nCopying file : " + temp);
+				ui.println("\nCopying file: " + temp);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + temp)));
 				outfile.append(sourcefiletostring(modulepath + File.separator + "temp" + File.separator + list[i]));
 				outfile.flush();
@@ -167,7 +167,7 @@ public class SourceFileReplacer {
 		// replace BS -> gBS , RT -> gRT
 		Matcher mat = pat.matcher(line);
 		if (mat.find()) {												// add a library here
-			ui.println("Converting all BS->gBS,RT->gRT");
+			ui.println("Converting all BS->gBS, RT->gRT");
 			line = mat.replaceAll("g$1$2$3");							//unknown correctiveness
 		}
 		mat.reset();

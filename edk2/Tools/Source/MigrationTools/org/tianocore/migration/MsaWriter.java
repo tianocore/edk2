@@ -58,12 +58,12 @@ public class MsaWriter {
 		if (mi.modulename != null) {
 			msaheader.setModuleName(mi.modulename);
 		} else {
-			msaheader.setModuleName(mi.modulename = Query("ModuleName Not Found . Please Input ModuleName"));
+			msaheader.setModuleName(mi.modulename = Query("Module Name Not Found!  Please Input ModuleName"));
 		}
 		if (mi.guidvalue != null) {
 			msaheader.setGuidValue(mi.guidvalue);
 		} else {
-			msaheader.setGuidValue(mi.guidvalue = Query("GuidValue Not Found . Please Input GuidValue"));
+			msaheader.setGuidValue(mi.guidvalue = Query("Guid Value Not Found!  Please Input Guid Value"));
 		}
 		if (mi.moduletype != null) {
 			if (mi.moduletype.contains("PEI")) {
@@ -72,7 +72,7 @@ public class MsaWriter {
 				msaheader.setModuleType(ModuleTypeDef.Enum.forString("DXE_DRIVER"));
 			}
 		} else {
-			msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.moduletype = Query("GuidValue Not Found . Please Input GuidValue")));
+			msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.moduletype = Query("Guid Value Not Found!  Please Input Guid Value")));
 		}
 
 		msaheader.setCopyright("Copyright (c) 2006, Intel Corporation");

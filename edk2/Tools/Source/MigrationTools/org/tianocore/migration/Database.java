@@ -46,7 +46,7 @@ public class Database {
 		Func lf;
 		
 		if (rd.ready()) {
-			System.out.println("Found " + filename + " , Importing Library Database");
+			System.out.println("Found " + filename + ", Importing Library Database.");
 			while ((line = rd.readLine()) != null) {
 				if (line.length() != 0) {
 					linecontext = line.split(",");
@@ -64,7 +64,7 @@ public class Database {
 		Guid gu;
 		
 		if (rd.ready()) {
-			System.out.println("Found " + filename + " , Importing " + type + " Database");
+			System.out.println("Found " + filename + ", Importing " + type + " Database.");
 			while ((line = rd.readLine()) != null) {
 				if (line.length() != 0) {
 					linecontext = line.split(",");
@@ -82,7 +82,7 @@ public class Database {
 		Macro mc;
 		
 		if (rd.ready()) {
-			System.out.println("Found " + filename + " , Importing Macro Database");
+			System.out.println("Found " + filename + ", Importing Macro Database.");
 			while ((line = rd.readLine()) != null) {
 				if (line.length() != 0) {
 					linecontext = line.split(",");
