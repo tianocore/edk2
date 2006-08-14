@@ -199,7 +199,7 @@ public abstract class PlatformPcdPreprocessAction {
 
         if (modules == null) {
             throw new PlatformPcdPreprocessException(
-                "No modules in FPD file, Please check whether there are elements in <FrameworkModules> in FPD file!");
+                "No modules found in the FPD file.\nPlease check whether there are elements in <FrameworkModules> in the FPD file!");
         }
 
         //
@@ -230,8 +230,8 @@ public abstract class PlatformPcdPreprocessAction {
                 tokenSpaceStrRet = getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
 
                 if (tokenSpaceStrRet == null) {
-                    putError("Fail to get Token space guid for token" + pcdBuildData.getCName() +
-                             " from all SPD files. You must have an <GuidDeclaration> for this token space Guid");
+                    putError("Failed to get Token Space Guid for token " + pcdBuildData.getCName() +
+                             " from any SPD file. You must have an <GuidDeclaration> for this Token Space Guid!");
                     //
                     // Do not break preprocess, continues to analysis.
                     // All errors will be summary to be shown.
@@ -252,8 +252,8 @@ public abstract class PlatformPcdPreprocessAction {
 
                 if ((pcdType    == Token.PCD_TYPE.FEATURE_FLAG) &&
                     (datumType  != Token.DATUM_TYPE.BOOLEAN)){
-                    exceptionString = String.format("In FPD file, for PCD %s in module %s, the PCD type is FEATRUE_FLAG but "+
-                                                    "datum type of this PCD entry is not BOOLEAN!",
+                    exceptionString = String.format("In FPD file, for PCD %s in module %s, the PCD type is FEATURE_FLAG but "+
+                                                    "datum type for this PCD entry is not BOOLEAN!",
                                                     pcdBuildData.getCName(),
                                                     moduleName);
                     putError(exceptionString);
@@ -274,7 +274,7 @@ public abstract class PlatformPcdPreprocessAction {
                      // Value is required.
                      //
                      if (datum == null) {
-                         exceptionString = String.format("In FPD file, there is no value for PCD entry %s in module %s!",
+                         exceptionString = String.format("In the FPD file, there is no value for PCD entry %s in module %s!",
                                                          pcdBuildData.getCName(),
                                                          moduleName);
                          putError(exceptionString);
@@ -319,7 +319,7 @@ public abstract class PlatformPcdPreprocessAction {
                     // modules.
                     //
                     if (token.datumType != datumType) {
-                        exceptionString = String.format("In FPD file, the datum type of PCD entry %s is %s, which is different with  %s defined in before!",
+                        exceptionString = String.format("In the FPD file, the datum type of the PCD entry %s is %s, which is different from %s which was previously defined!",
                                                         pcdBuildData.getCName(),
                                                         pcdBuildData.getDatumType().toString(),
                                                         Token.getStringOfdatumType(token.datumType));
@@ -335,7 +335,7 @@ public abstract class PlatformPcdPreprocessAction {
                     // Check token number is valid
                     //
                     if (tokenNumber != token.tokenNumber) {
-                        exceptionString = String.format("In FPD file, the token number of PCD entry %s in module %s is different with same PCD entry in other modules!",
+                        exceptionString = String.format("In the FPD file, the token number of PCD entry %s in module %s is different from the same PCD entry in other modules!",
                                                         pcdBuildData.getCName(),
                                                         moduleName);
                         putError(exceptionString);
@@ -350,8 +350,8 @@ public abstract class PlatformPcdPreprocessAction {
                     // For same PCD used in different modules, the PCD type should all be dynamic or non-dynamic.
                     //
                     if (token.isDynamicPCD != Token.isDynamic(pcdType)) {
-                        exceptionString = String.format("In FPD file, for PCD entry %s in module %s, you define dynamic or non-dynamic PCD type which"+
-                                                        " is different with others module's",
+                        exceptionString = String.format("In the FPD file, for PCD entry %s in module %s, you defined dynamic or non-dynamic PCD type which"+
+                                                        " is different from other module's definition.",
                                                         token.cName,
                                                         moduleName);
                         putError(exceptionString);
@@ -372,9 +372,9 @@ public abstract class PlatformPcdPreprocessAction {
                             (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.DEFAULT_TYPE) &&
                             (datum != null)) {
                             if (!datum.equalsIgnoreCase(token.getDefaultSku().value)) {
-                                exceptionString = String.format("In FPD file, for dynamic PCD %s in module %s, the datum in <ModuleSA> is "+
-                                                                "not equal to the datum in <DynamicPcdBuildDefinitions>, it is "+
-                                                                "illega! You could no set <Value> in <ModuleSA> for a dynamic PCD!",
+                                exceptionString = String.format("In the FPD file, for dynamic PCD %s in module %s, the datum in <ModuleSA> is "+
+                                                                "not equal to the datum type in <DynamicPcdBuildDefinitions>. This is "+
+                                                                "illega! You cannot set <Value> in <ModuleSA> for a dynamic PCD!",
                                                                 token.cName,
                                                                 moduleName);
                                 putError(exceptionString);
@@ -388,8 +388,8 @@ public abstract class PlatformPcdPreprocessAction {
 
                         if ((maxDatumSize != 0) &&
                             (maxDatumSize != token.datumSize)){
-                            exceptionString = String.format("In FPD file, for dynamic PCD %s in module %s, the max datum size is %d which "+
-                                                            "is different with <MaxDatumSize> %d defined in <DynamicPcdBuildDefinitions>!",
+                            exceptionString = String.format("In the FPD file, for dynamic PCD %s in module %s, the max datum size is %d which "+
+                                                            "is different than <MaxDatumSize> %d defined in <DynamicPcdBuildDefinitions>!",
                                                             token.cName,
                                                             moduleName,
                                                             maxDatumSize,
@@ -411,8 +411,8 @@ public abstract class PlatformPcdPreprocessAction {
                     tokenSpaceStrRet = getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
 
                     if (tokenSpaceStrRet == null) {
-                        putError("Fail to get Token space guid for token" + token.cName +
-                                 " from all SPD files. You must have an <GuidDeclaration> for this token space Guid");
+                        putError("Failed to get the Token Space Guid for token" + token.cName +
+                                 " from any SPD file. You must have a <GuidDeclaration> for this Token Space Guid!");
                         //
                         // Do not break preprocess, continues to analysis.
                         // All errors will be summary to be shown.
@@ -461,8 +461,8 @@ public abstract class PlatformPcdPreprocessAction {
                                                   datum,
                                                   maxDatumSize);
                 if (!token.addUsageInstance(usageInstance)) {
-                    putError(String.format("PCD %s for module %s(%s) has already exist in database, Please check all PCD build entries "+
-                                           "in modules %s in <ModuleSA> to make sure no duplicated definitions in FPD file!",
+                    putError(String.format("PCD %s for module %s(%s) already exists in the database.\nPlease check all PCD build entries "+
+                                           "in the %s module's <ModuleSA> section to make sure there are no duplicated definitions in the FPD file!",
                                            token.cName,
                                            modules.get(index).usageId.moduleGuid,
                                            moduleName,
@@ -519,9 +519,9 @@ public abstract class PlatformPcdPreprocessAction {
 
         dynamicInfo = getDynamicInfoFromFpd(token, moduleName);
         if (dynamicInfo == null) {
-            exceptionString = String.format("In FPD file, for Dynamic PCD %s used by module %s, "+
-                                            "there is no dynamic information in <DynamicPcdBuildDefinitions> "+
-                                            "in FPD file, but it is required!",
+            exceptionString = String.format("In the FPD file, the Dynamic PCD %s is used by module %s.\n" +
+                                            "However, there is no dynamic information in the <DynamicPcdBuildDefinitions> " +
+                                            "section of the FPD file.  This section is required!",
                                             token.cName,
                                             moduleName);
             putError(exceptionString);
@@ -541,8 +541,8 @@ public abstract class PlatformPcdPreprocessAction {
 
         if ((maxDatumSize != 0) &&
             (maxDatumSize != token.datumSize)) {
-            exceptionString = String.format("In FPD file, for dynamic PCD %s, the datum size in module %s is %d, but "+
-                                            "the datum size in <DynamicPcdBuildDefinitions> is %d, they are not match!",
+            exceptionString = String.format("In the FPD file, for dynamic PCD %s, the datum size in module %s is %d, but "+
+                                            "the datum size in <DynamicPcdBuildDefinitions> is %d, they do not match!",
                                             token.cName,
                                             moduleName,
                                             maxDatumSize,
@@ -552,8 +552,8 @@ public abstract class PlatformPcdPreprocessAction {
         }
         tokenNumber = Long.decode(dynamicInfo.getToken().toString());
         if (tokenNumber != token.tokenNumber) {
-            exceptionString = String.format("In FPD file, for dynamic PCD %s, the token number in module %s is 0x%x, but"+
-                                            "in <DynamicPcdBuildDefinictions>, the token number is 0x%x, they are not match!",
+            exceptionString = String.format("In the FPD file, for dynamic PCD %s, the token number in module %s is 0x%x, but "+
+                                            "in the <DynamicPcdBuildDefinictions> section, the token number is 0x%x, they do not match!",
                                             token.cName,
                                             moduleName,
                                             token.tokenNumber,
@@ -602,9 +602,9 @@ public abstract class PlatformPcdPreprocessAction {
                 if (datum != null) {
                     if ((skuInstance.id == 0)                                   &&
                         !datum.toString().equalsIgnoreCase(skuInfoList.get(index).getValue().toString())) {
-                        exceptionString = "In FPD file, for dynamic PCD " + token.cName + ", the value in module " + moduleName + " is " + datum.toString() + " but the "+
-                                          "value of sku 0 data in <DynamicPcdBuildDefinition> is " + skuInstance.value.value + ". They are must be same!"+
-                                          " or you could not define value for a dynamic PCD in every <ModuleSA>!";
+                        exceptionString = "In the FPD file, for dynamic PCD " + token.cName + ", the value in module " + moduleName + " is " + datum.toString() + " but the "+
+                                          "value of SKU 0 data in <DynamicPcdBuildDefinition> is " + skuInstance.value.value + ". They must be same!"+
+                                          " Also, you cannot define a value for a dynamic PCD in the <ModuleSA> section!";
                         putError(exceptionString);
                         return null;
                     }
@@ -618,8 +618,8 @@ public abstract class PlatformPcdPreprocessAction {
             if (skuInfoList.get(index).getVariableName() != null) {
                 exceptionString = null;
                 if (skuInfoList.get(index).getVariableGuid() == null) {
-                    exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
-                                                    "file, who use HII, but there is no <VariableGuid> defined for Sku %d data!",
+                    exceptionString = String.format("In the FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                    "file, use of HII was defined, but there is no <VariableGuid> defined for SKU %d data!",
                                                     token.cName,
                                                     index);
                     putError(exceptionString);
@@ -627,8 +627,8 @@ public abstract class PlatformPcdPreprocessAction {
                 }
 
                 if (skuInfoList.get(index).getVariableOffset() == null) {
-                    exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
-                                                    "file, who use HII, but there is no <VariableOffset> defined for Sku %d data!",
+                    exceptionString = String.format("In the FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                    "file, use of HII was defined, but there is no <VariableOffset> defined for SKU %d data!",
                                                     token.cName,
                                                     index);
                     putError(exceptionString);
@@ -636,8 +636,8 @@ public abstract class PlatformPcdPreprocessAction {
                 }
 
                 if (skuInfoList.get(index).getHiiDefaultValue() == null) {
-                    exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
-                                                    "file, who use HII, but there is no <HiiDefaultValue> defined for Sku %d data!",
+                    exceptionString = String.format("In the FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
+                                                    "file, use of HII was defined, but there is no <HiiDefaultValue> defined for SKU %d data!",
                                                     token.cName,
                                                     index);
                     putError(exceptionString);
@@ -660,8 +660,8 @@ public abstract class PlatformPcdPreprocessAction {
 
                 offset = Integer.decode(skuInfoList.get(index).getVariableOffset());
                 if (offset > 0xFFFF) {
-                    putError(String.format("In FPD file, for dynamic PCD %s ,  the variable offset defined in sku %d data "+
-                                           "exceed 64K, it is not allowed!",
+                    putError(String.format("In the FPD file, for dynamic PCD %s, the variable offset defined in SKU %d data "+
+                                           "exceeds 64K, which is not allowed!",
                                            token.cName,
                                            index));
                     return null;
@@ -672,7 +672,7 @@ public abstract class PlatformPcdPreprocessAction {
                 //
                 variableGuidString = getGuidInfoFromSpd(skuInfoList.get(index).getVariableGuid().toString());
                 if (variableGuidString == null) {
-                    putError(String.format("In FPD file, for dynamic PCD %s,  the variable guid %s can be found in all SPD file!",
+                    putError(String.format("In the FPD file, for dynamic PCD %s, the variable guid: %s cannot be found in any SPD file!",
                                            token.cName,
                                            skuInfoList.get(index).getVariableGuid().toString()));
                     return null;
@@ -700,16 +700,16 @@ public abstract class PlatformPcdPreprocessAction {
                 continue;
             }
 
-            exceptionString = String.format("In FPD file, for dynamic PCD %s, the dynamic info must "+
-                                            "be one of 'DefaultGroup', 'HIIGroup', 'VpdGroup'.",
+            exceptionString = String.format("In the FPD file, for dynamic PCD %s, the dynamic info must "+
+                                            "be one of: 'DefaultGroup', 'HIIGroup', 'VpdGroup'.",
                                             token.cName);
             putError(exceptionString);
             return null;
         }
 
         if (!hasSkuId0) {
-            exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions>, there are "+
-                                            "no sku id = 0 data, which is required for every dynamic PCD",
+            exceptionString = String.format("In the FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions>, there is "+
+                                            "no SKU ID = 0 data, which is required for every dynamic PCD",
                                             token.cName);
             putError(exceptionString);
             return null;
@@ -751,7 +751,7 @@ public abstract class PlatformPcdPreprocessAction {
             tokenSpaceStrRet = getGuidInfoFromSpd(pcdBuildData.getTokenSpaceGuidCName());
 
             if (tokenSpaceStrRet == null) {
-                putError("Fail to get Token space guid for token" + pcdBuildData.getCName());
+                putError("Failed to get the Token Space Guid for token" + pcdBuildData.getCName());
                 continue;
             }
 
@@ -764,7 +764,7 @@ public abstract class PlatformPcdPreprocessAction {
 
             pcdType = Token.getPcdTypeFromString(pcdBuildData.getItemType().toString());
             if (pcdType != Token.PCD_TYPE.DYNAMIC_EX) {
-                putError(String.format("In FPD file, it not allowed for DYNAMIC PCD %s who is no used by any module",
+                putError(String.format("In the FPD file, it not allowed to define DYNAMIC PCD %s that is not used by any module",
                                        pcdBuildData.getCName()));
                 continue;
             }
@@ -832,8 +832,8 @@ public abstract class PlatformPcdPreprocessAction {
                 if (skuInfoList.get(index).getVariableName() != null) {
                     exceptionString = null;
                     if (skuInfoList.get(index).getVariableGuid() == null) {
-                        exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
-                                                        "file, who use HII, but there is no <VariableGuid> defined for Sku %d data!",
+                        exceptionString = String.format("In the FPD file, for dynamic PCD %s in the <DynamicPcdBuildDefinitions> section of the FPD "+
+                                                        "file, use of HII is defined, but there is no <VariableGuid> defined for SKU %d data!",
                                                         token.cName,
                                                         index);
                         putError(exceptionString);
@@ -841,8 +841,8 @@ public abstract class PlatformPcdPreprocessAction {
                     }
 
                     if (skuInfoList.get(index).getVariableOffset() == null) {
-                        exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
-                                                        "file, who use HII, but there is no <VariableOffset> defined for Sku %d data!",
+                        exceptionString = String.format("In the FPD file, for dynamic PCD %s in the <DynamicPcdBuildDefinitions> section of the FPD "+
+                                                        "file, use of HII is defined, but there is no <VariableOffset> defined for SKU %d data!",
                                                         token.cName,
                                                         index);
                         putError(exceptionString);
@@ -850,8 +850,8 @@ public abstract class PlatformPcdPreprocessAction {
                     }
 
                     if (skuInfoList.get(index).getHiiDefaultValue() == null) {
-                        exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions> section in FPD "+
-                                                        "file, who use HII, but there is no <HiiDefaultValue> defined for Sku %d data!",
+                        exceptionString = String.format("In the FPD file, for dynamic PCD %s in the <DynamicPcdBuildDefinitions> section of the FPD "+
+                                                        "file, use of HII is defined, but there is no <HiiDefaultValue> defined for SKU %d data!",
                                                         token.cName,
                                                         index);
                         putError(exceptionString);
@@ -875,8 +875,8 @@ public abstract class PlatformPcdPreprocessAction {
 
                     offset = Integer.decode(skuInfoList.get(index).getVariableOffset());
                     if (offset > 0xFFFF) {
-                        exceptionString = String.format("In FPD file, for dynamic PCD %s ,  the variable offset defined in sku %d data "+
-                                          "exceed 64K, it is not allowed!",
+                        exceptionString = String.format("In the FPD file, for dynamic PCD %s, the variable offset defined in SKU %d data "+
+                                          "exceeds 64K, which is not allowed!",
                                           token.cName,
                                           index);
                         putError(exceptionString);
@@ -888,7 +888,7 @@ public abstract class PlatformPcdPreprocessAction {
                     //
                     variableGuidString = getGuidInfoFromSpd(skuInfoList.get(index).getVariableGuid().toString());
                     if (variableGuidString == null) {
-                        exceptionString = String.format("In FPD file, for dynamic PCD %s,  the variable guid %s can be found in all SPD file!",
+                        exceptionString = String.format("In the FPD file, for dynamic PCD %s, the variable guid %s cannot be found in any SPD file!",
                                                         token.cName,
                                                         skuInfoList.get(index).getVariableGuid().toString());
                         putError(exceptionString);
@@ -917,15 +917,15 @@ public abstract class PlatformPcdPreprocessAction {
                     continue;
                 }
 
-                exceptionString = String.format("In FPD file, for dynamic PCD %s, the dynamic info must "+
+                exceptionString = String.format("In the FPD file, for dynamic PCD %s, the dynamic info must "+
                                                 "be one of 'DefaultGroup', 'HIIGroup', 'VpdGroup'.",
                                                 token.cName);
                 putError(exceptionString);
             }
 
             if (!hasSkuId0) {
-                exceptionString = String.format("In FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions>, there are "+
-                                                "no sku id = 0 data, which is required for every dynamic PCD",
+                exceptionString = String.format("In the FPD file, for dynamic PCD %s in <DynamicPcdBuildDefinitions>, there is "+
+                                                "no SKU ID = 0 data, which is required for every dynamic PCD",
                                                 token.cName);
                 putError(exceptionString);
                 continue;
@@ -984,7 +984,7 @@ public abstract class PlatformPcdPreprocessAction {
         if ((uuidString.charAt(0) == '0') && ((uuidString.charAt(1) == 'x') || (uuidString.charAt(1) == 'X'))) {
             splitStringArray = uuidString.split("," );
             if (splitStringArray.length != 11) {
-                throw new PlatformPcdPreprocessException ("Wrong format for UUID string: " + uuidString);
+                throw new PlatformPcdPreprocessException ("Wrong format for GUID string: " + uuidString);
             }
 
             //

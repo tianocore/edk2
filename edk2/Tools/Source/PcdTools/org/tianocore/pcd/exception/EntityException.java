@@ -26,6 +26,6 @@ public class EntityException extends Exception {
       @param expStr exception message string.
     **/
     public EntityException(String expStr) {
-        super("[PCD tools Internal Errors]:" + expStr);
+        super("[PCD Tool Internal Error]:" + expStr);
     }
 }
