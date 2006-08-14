@@ -1326,7 +1326,7 @@ public class PcdDatabase {
         case POINTER:
             return "UINT8";
         default:
-            throw new EntityException("Unknown type in getDataTypeCDeclaration");
+            throw new EntityException("Unknown DatumType in getDataTypeCDeclaration");
         }
     }
 
@@ -1486,7 +1486,7 @@ public class PcdDatabase {
                 retStr = retStr +"\r\n" + str;
             }
         } catch (Exception ex) {
-            throw new EntityException("Fatal error when generating PcdDatabase Common Definitions");
+            throw new EntityException("Fatal error when generating PcdDatabase Common Definitions!");
         }
 
         return retStr;
@@ -1509,7 +1509,7 @@ public class PcdDatabase {
                 retStr = retStr +"\r\n" + str;
             }
         } catch (Exception ex) {
-            throw new EntityException("Fatal error when generating PcdDatabase Dxe Definitions");
+            throw new EntityException("Fatal error when generating PcdDatabase Dxe Definitions!");
         }
 
         return retStr;
@@ -1532,7 +1532,7 @@ public class PcdDatabase {
                 retStr = retStr +"\r\n" + str;
             }
         } catch (Exception ex) {
-            throw new EntityException("Fatal error when generating PcdDatabase Pei Definitions");
+            throw new EntityException("Fatal error when generating PcdDatabase Pei Definitions!");
         }
 
         return retStr;
@@ -1585,7 +1585,7 @@ public class PcdDatabase {
         if ((uuidString.charAt(0) == '0') && ((uuidString.charAt(1) == 'x') || (uuidString.charAt(1) == 'X'))) {
             splitStringArray = uuidString.split("," );
             if (splitStringArray.length != 11) {
-                throw new EntityException ("[FPD file error] Wrong format for UUID string: " + uuidString);
+                throw new EntityException ("[FPD file error] Wrong format for GUID string: " + uuidString);
             }
 
             //

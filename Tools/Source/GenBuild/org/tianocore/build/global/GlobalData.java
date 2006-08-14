@@ -162,7 +162,7 @@ public class GlobalData {
         // CONF dir + tools definition file name
         //
         File toolsDefFile = new File(workspaceDir + File.separatorChar + toolsDefFilename);
-        System.out.println("Using file [" + toolsDefFile.getPath() + "] as tools definition file. ");
+        System.out.println("Using tool definiton file [" + toolsDefFile.getPath() + "].");
         toolsDef = new ToolChainConfig(toolsDefFile);
         
         //
@@ -175,7 +175,7 @@ public class GlobalData {
             // validate FrameworkDatabaseFile
             //
             if (! db.validate()) {
-                throw new BuildException("Framework Database file [" + dbFile.getPath() + "] is invalid.");
+                throw new BuildException("Framework Database file [" + dbFile.getPath() + "] format is invalid!");
             }
             //
             // Get package list
@@ -208,7 +208,7 @@ public class GlobalData {
                     // Verify FPD file, if is invalid, throw Exception
                     //
                     if (! fpdDoc.validate()) {
-                        throw new BuildException("Framework Platform Surface Area file [" + fpdFile.getPath() + "] is invalid. ");
+                        throw new BuildException("Framework Platform Surface Area file [" + fpdFile.getPath() + "] format is invalid!");
                     }
                     //
                     // We can change Map to XmlObject
@@ -225,7 +225,7 @@ public class GlobalData {
                 }
             }
         } catch (Exception e) {
-            throw new BuildException("Parse workspace Database [" + dbFile.getPath() + "] Error.\n" + e.getMessage());
+            throw new BuildException("Parse WORKSPACE Database file [" + dbFile.getPath() + "] Error.\n" + e.getMessage());
         }
     }
     
@@ -257,7 +257,7 @@ public class GlobalData {
             }
         }
         if (msaFile == null){
-            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in all packages. ");
+            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
         }
         else {
             return msaFile;
@@ -283,7 +283,7 @@ public class GlobalData {
             }
         }
         if (packageId == null){
-            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in all packages. ");
+            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
         }
         else {
             return packageId;
@@ -387,7 +387,7 @@ public class GlobalData {
     
     public synchronized static Map<String, XmlObject> getNativeMsa(File msaFile) throws BuildException {
         if (! msaFile.exists()) {
-            throw new BuildException("Surface Area file [" + msaFile.getPath() + "] can't found.");
+            throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] can't be found!");
         }
         try {
             ModuleSurfaceAreaDocument doc = (ModuleSurfaceAreaDocument)XmlObject.Factory.parse(msaFile);
@@ -395,7 +395,7 @@ public class GlobalData {
             // Validate File if they accord with XML Schema
             //
             if ( ! doc.validate()){
-                throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] is invalid.");
+                throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] format is invalid!");
             }
             //
             // parse MSA file
@@ -475,7 +475,7 @@ public class GlobalData {
         // If can't find library class declaration in every package
         //
         throw new BuildException("Can not find library class [" + name
-                + "] declaration in every packages. ");
+                + "] declaration in any SPD package!");
     }
 
     /**
@@ -581,7 +581,7 @@ public class GlobalData {
                 return platformId;
             }
         }
-        throw new BuildException("Can't find platform [" + name + "] in current workspace database. ");
+        throw new BuildException("Can't find platform [" + name + "] in the current WORKSPACE database!");
     }
     
     public synchronized static PlatformIdentification getPlatform(String filename) throws BuildException {
@@ -593,7 +593,7 @@ public class GlobalData {
                 return platformId;
             }
         }
-        throw new BuildException("Can't find platform file [" + filename + "] in current workspace database. ");
+        throw new BuildException("Can't find platform file [" + filename + "] in the current WORKSPACE database!");
     }
     
     public synchronized static PackageIdentification refreshPackageIdentification(PackageIdentification packageId) throws BuildException {
@@ -606,7 +606,7 @@ public class GlobalData {
                 return packageId;
             }
         }
-        throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " under current workspace. ");
+        throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " in the current workspace!");
     }
     
     public synchronized static ModuleIdentification refreshModuleIdentification(ModuleIdentification moduleId) throws BuildException {
@@ -617,7 +617,7 @@ public class GlobalData {
         moduleId.setPackage(packageId);
         Spd spd = spdTable.get(packageId);
         if (spd == null) {
-            throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " under current workspace. ");
+            throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " in the current workspace!");
         }
         Set<ModuleIdentification> modules = spd.getModules();
         Iterator<ModuleIdentification> iter = modules.iterator();
@@ -630,7 +630,7 @@ public class GlobalData {
                 return moduleId;
             }
         }
-        throw new BuildException("Can't find module GUID value " + moduleId.getGuid() + " in " + packageId + " under current workspace. ");
+        throw new BuildException("Can't find module GUID value " + moduleId.getGuid() + " in package, " + packageId + ", in the current workspace!");
     }
     
     public synchronized static Set<PackageIdentification> getPackageList(){

@@ -130,7 +130,7 @@ public class FpdParserTask extends Task {
         // Remove !!
         if ( fpdFile == null) {
             if (platformName == null) {
-                throw new BuildException("FpdParserTask parameter error. Please specify platform name or FPD file. ");
+                throw new BuildException("FpdParserTask parameter error. Please specify either the platform name or FPD file!");
             }
             platformId = GlobalData.getPlatformByName(platformName);
             fpdFile = platformId.getFpdFile();
@@ -300,7 +300,7 @@ public class FpdParserTask extends Task {
                 bw.close();
                 fw.close();
             } catch (Exception e) {
-                throw new BuildException("Generate FV file [" + fvFile.getPath() + "] failed. \n" + e.getMessage());
+                throw new BuildException("Generation of the FV file [" + fvFile.getPath() + "] failed!\n" + e.getMessage());
             }
         }
     }
@@ -327,7 +327,7 @@ public class FpdParserTask extends Task {
             XmlObject doc = XmlObject.Factory.parse(fpdFile);
             
             if (!doc.validate()) {
-                throw new BuildException("Platform Surface Area file [" + fpdFile.getPath() + "] is invalid.");
+                throw new BuildException("Platform Surface Area file [" + fpdFile.getPath() + "] format is invalid!");
             }
             
             Map<String, XmlObject> map = new HashMap<String, XmlObject>();
@@ -378,7 +378,7 @@ public class FpdParserTask extends Task {
             PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
             ca.perform(platformId.getFpdFile().getPath(), ActionMessage.NULL_MESSAGE_LEVEL);
         } catch (Exception e) {
-            throw new BuildException("Load FPD file [" + fpdFile.getPath() + "] error. \n" + e.getMessage());
+            throw new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + e.getMessage());
         }
     }
 

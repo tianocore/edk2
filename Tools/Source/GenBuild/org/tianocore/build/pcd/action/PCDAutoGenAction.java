@@ -171,7 +171,7 @@ public class PCDAutoGenAction extends BuildAction {
         }
 
         ActionMessage.debug(this,
-                            "PCD memory database contains " + dbManager.getDBSize() + " PCD tokens");
+                            "PCD memory database contains " + dbManager.getDBSize() + " PCD tokens.");
 
         generateAutogenForModule();
     }
@@ -228,9 +228,9 @@ public class PCDAutoGenAction extends BuildAction {
                         // All library's PCD should instanted in module's <ModuleSA> who
                         // use this library instance. If not, give errors.
                         //
-                        throw new BuildActionException (String.format("Module %s use library instance %s, the PCD %s " +
-                                                                      "is required by this library instance, but can not find " +
-                                                                      "it in the %s's <ModuleSA> in FPD file!",
+                        throw new BuildActionException (String.format("Module %s using library instance %s; the PCD %s " +
+                                                                      "is required by this library instance, but can not be found " +
+                                                                      "in the %s's <ModuleSA> in the FPD file!",
                                                                       MemoryDatabaseManager.CurrentModuleName,
                                                                       moduleName,
                                                                       pcdNameArrayInMsa[index],

@@ -89,7 +89,7 @@ public class ConfigReader {
                 valueList.add(str.substring(index + 1).trim());
             }
         } catch (Exception e) {
-            throw new EdkException("Process file [" + filename + "] error. \n" + e.getMessage());
+            throw new EdkException("ERROR Processing file [" + filename + "].\n" + e.getMessage());
         }
 
         String[][] definitions = new String[2][keyList.size()];
@@ -126,7 +126,7 @@ public class ConfigReader {
                 map.put(key, value);
             }
         } catch (Exception e) {
-            throw new EdkException("Process file [" + ConfigFile.getAbsolutePath() + "] error. \n" + e.getMessage());
+            throw new EdkException("ERROR Processing file [" + ConfigFile.getAbsolutePath() + "].\n" + e.getMessage());
         }
 
         return map;

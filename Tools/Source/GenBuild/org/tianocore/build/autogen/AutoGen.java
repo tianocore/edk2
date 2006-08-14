@@ -243,7 +243,7 @@ public class AutoGen {
 			libGenAutogenH();
 		} catch (Exception e) {
 			throw new BuildException(
-					"Faile to create library AutoGen.c & AutoGen.h!\n"
+					"Failed to create library AutoGen.c & AutoGen.h!\n"
 							+ e.getMessage());
 		}
 	}
@@ -672,7 +672,7 @@ public class AutoGen {
 					libClassList[i]);
 			if (includerName == null) {
 				throw new AutoGenException("Can not find library class ["
-						+ libClassList[i] + "] declaration in every packages. ");
+						+ libClassList[i] + "] declaration in any SPD package. ");
 			}
 			for (int j = 0; j < includerName.length; j++) {
 				String includeNameStr = includerName[j];
@@ -714,7 +714,7 @@ public class AutoGen {
 			if (pkgHeader == null) {
 				throw new AutoGenException("Can not find package ["
 						+ packageNameList[i]
-						+ "] declaration in every packages. ");
+						+ "] declaration in any SPD package. ");
 			} else if (!pkgHeader.equalsIgnoreCase("")) {
 				includeStr = CommonDefinition.include + " <" + pkgHeader
 						+ ">\r\n";
@@ -751,7 +751,7 @@ public class AutoGen {
 		case CommonDefinition.ModuleTypePeiCore:
 			if (entryPointList == null ||entryPointList.length != 1 ) {
 				throw new BuildException(
-						"Module type = 'PEI_CORE', only have one module entry point!");
+						"Module type = 'PEI_CORE', can have only one module entry point!");
 			} else {
 				fileBuffer.append("EFI_STATUS\r\n");
 				fileBuffer.append("EFIAPI\r\n");
@@ -783,7 +783,7 @@ public class AutoGen {
 			fileBuffer.append("const UINT32 _gUefiDriverRevision = 0;\r\n");
 			if (entryPointList == null || entryPointList.length != 1) {
 				throw new BuildException(
-						"Module type = 'DXE_CORE', only have one module entry point!");
+						"Module type = 'DXE_CORE', can have only one module entry point!");
 			} else {
 
 				fileBuffer.append("VOID\r\n");
@@ -1231,7 +1231,7 @@ public class AutoGen {
 				// If can't find Ppi GUID declaration in every package
 				//
 				throw new AutoGenException("Can not find Ppi GUID ["
-						+ ppiKeyWord + "] declaration in every packages. ");
+						+ ppiKeyWord + "] declaration in any SPD package!");
 			}
 		}
 	}
@@ -1288,7 +1288,7 @@ public class AutoGen {
 				// If can't find protocol GUID declaration in every package
 				//
 				throw new BuildException("Can not find protocol Guid ["
-						+ protocolKeyWord + "] declaration in every packages. ");
+						+ protocolKeyWord + "] declaration in any SPD package!");
 			}
 		}
 	}
@@ -1331,7 +1331,7 @@ public class AutoGen {
 				// If can't find GUID declaration in every package
 				//
 				throw new AutoGenException("Can not find Guid [" + guidKeyWord
-						+ "] declaration in every packages. ");
+						+ "] declaration in any SPD package. ");
 			}
 
 		}
@@ -1499,7 +1499,7 @@ public class AutoGen {
 				fileBuffer.append(" (ImageHandle, SystemTable);\r\n");
 				break;
             default:
-                EdkLog.log(EdkLog.EDK_INFO,"Autogen don't know how to deal with module type -"+ moduleType + " !");
+                EdkLog.log(EdkLog.EDK_INFO,"Autogen doesn't know how to deal with module type - " + moduleType + "!");
 			}
 			fileBuffer.append("  ASSERT_EFI_ERROR (Status);\r\n");
 		}
@@ -1985,7 +1985,7 @@ public class AutoGen {
                     fis.close();
                     fos.close();
                 }else {
-                    throw new AutoGenException("The flashMap.h file don't exist!!");
+                    throw new AutoGenException("The file, flashMap.h doesn't exist!");
                 }
             } catch (Exception e){
                 throw new AutoGenException(e.getMessage());

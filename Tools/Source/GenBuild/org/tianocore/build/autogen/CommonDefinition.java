@@ -317,7 +317,7 @@ public class CommonDefinition {
             return guid;
         } else {
             System.out
-                    .println("Check GUID Value, it don't conform to the schema!!!");
+                    .println("Check GUID Value, It doesn't conform to the registry format specified in the schema!!!");
             return "0";
 
         }

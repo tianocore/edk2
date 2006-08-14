@@ -90,7 +90,7 @@ public class OnDependency extends Task {
                 } else {
                     File srcFile = new File(srcFileName);
                     if (!srcFile.exists()) {
-                        throw new BuildException(srcFileName + " doesn't exist !!!");
+                        throw new BuildException("Source File name: " + srcFileName + " doesn't exist!!!");
                     }
                     srcTimeStamp = srcFile.lastModified();
                     timeStampCache.put(srcFileName, new Long(srcTimeStamp));

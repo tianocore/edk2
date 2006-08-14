@@ -164,7 +164,7 @@ public class FfsProcess {
             System.out.println("Warning: this module doesn't specify a FfsFormatKey. ");
             }
         else {
-            throw new BuildException("Can't find FfsFormatKey [" + buildType + "] in FPD file. ");            
+            throw new BuildException("Can't find the FfsFormatKey [" + buildType + "] attribute in the FPD file!");            
         }
 
         if (ffs == null) {

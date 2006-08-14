@@ -63,7 +63,7 @@ public class VariableTask extends Task {
     */
    public void execute() throws BuildException {
        if (name == null || value == null) {
-           throw new BuildException("Name or value must not null.");
+           throw new BuildException("Name or value cannot be null.");
        }
        getProject().setProperty(name, value);
    }
