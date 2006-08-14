@@ -25,12 +25,13 @@
 #define UEFI_DRIVER_MODEL_LIBRARY_DRIVER_CONFIGURATION_PROTOCOL_ENABLED  0x04
 
 //
-// 
+// Bitmask values for the protocols that are enabled
 //
 extern const UINT8                           _gDriverModelProtocolBitmask;
 
 //
-//
+// Data structure that declares pointers to the Driver Model 
+// Protocols.
 //
 typedef struct {
   const EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding;
@@ -40,9 +41,15 @@ typedef struct {
 } EFI_DRIVER_MODEL_PROTOCOL_LIST;
 
 //
-//
+// The number of UEFI Driver Model Protocols that the module
+// produces.  Typically drivers only produce one.
+// When UEFI drivers are merged, they will produce several.
 //
 extern const UINTN                           _gDriverModelProtocolListEntries;
+
+//
+// UEFI Driver Model Protocols arrary
+//
 extern const EFI_DRIVER_MODEL_PROTOCOL_LIST  _gDriverModelProtocolList[];
 
 #endif
