@@ -112,10 +112,10 @@ public class FrameworkBuildTask extends Task{
         //
         File buildFile = null;
         if (msaFiles.size() > 1) {
-            throw new BuildException("More than one MSA file under current directory. It is not allowd. ");
+            throw new BuildException("Having more than one MSA file in a directory is not allowed!");
         }
         else if (msaFiles.size() == 1 && activePlatform == null) {
-            throw new BuildException("If try to build a single module, please set ACTIVE_PLATFORM in file [Tool/Conf/target.txt]. ");
+            throw new BuildException("If trying to build a single module, please set ACTIVE_PLATFORM in file [Tool/Conf/target.txt]. ");
         }
         else if (msaFiles.size() == 1 && activePlatform != null) {
             //
@@ -136,14 +136,14 @@ public class FrameworkBuildTask extends Task{
         // If there is no build files or FPD files or MSA files, stop build
         //
         else {
-            throw new BuildException("Can't find any FPD files or MSA files in current directory. ");
+            throw new BuildException("Can't find any FPD or MSA files in the current directory. ");
         }
 
         //
         // Build every FPD files (PLATFORM build)
         //
         if (buildFile.getName().endsWith(".fpd")) {
-            System.out.println("Start to build FPD file [" + buildFile.getPath() + "] ..>> ");
+            System.out.println("Processing the FPD file [" + buildFile.getPath() + "] ..>> ");
             FpdParserTask fpdParserTask = new FpdParserTask();
             fpdParserTask.setType(type);
             fpdParserTask.setProject(getProject());
@@ -156,8 +156,8 @@ public class FrameworkBuildTask extends Task{
         //
         else if (buildFile.getName().endsWith(".msa")) {
             File tmpFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
-            System.out.println("Using FPD file [" + tmpFile.getPath() + "] as active platform. ");
-            System.out.println("Start to build MSA file [" + buildFile.getPath() + "] ..>> ");
+            System.out.println("Using the FPD file [" + tmpFile.getPath() + "] for the active platform. ");
+            System.out.println("Processing the MSA file [" + buildFile.getPath() + "] ..>> ");
             GenBuildTask genBuildTask = new GenBuildTask();
             genBuildTask.setSingleModuleBuild(true);
             genBuildTask.setType(type);
@@ -204,13 +204,13 @@ public class FrameworkBuildTask extends Task{
                 allFiles[index] = iter.next();
                 index++;
             }
-            System.out.println("Find " + allFiles.length + " FPD and MSA files: ");
+            System.out.println("Finding " + allFiles.length + " FPD and MSA files: ");
             for (int i = 0; i < allFiles.length; i++) {
                 System.out.println("[" + (i + 1) + "]: " + allFiles[i].getName());
             }
             
             boolean flag = true;
-            System.out.print("Please select one file to build:[1] ");
+            System.out.print("Please select one of the following FPD files to build:[1] ");
             do{
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 try {
@@ -293,7 +293,7 @@ public class FrameworkBuildTask extends Task{
             str = getValue("ACTIVE_PLATFORM", targetFileInfo);
             if (str != null && ! str.trim().equals("")) {
                 if ( ! str.endsWith(".fpd")) {
-                    throw new BuildException("FPD file's file extension must be \".fpd\"");
+                    throw new BuildException("FPD file's extension must be \".fpd\"!");
                 }
                 activePlatform = str;
             }

@@ -144,7 +144,7 @@ public class GenBuildTask extends Ant {
             String packageGuid = getProject().getProperty("PACKAGE_GUID");
             String packageVersion = getProject().getProperty("PACKAGE_VERSION");
             if (moduleGuid == null || packageGuid == null) {
-                throw new BuildException("GenBuild parameters error. ");
+                throw new BuildException("GenBuild parameter error.");
             }
             PackageIdentification packageId = new PackageIdentification(packageGuid, packageVersion);
             moduleId = new ModuleIdentification(moduleGuid, moduleVersion);
@@ -225,7 +225,7 @@ public class GenBuildTask extends Ant {
         if (moduleSupportedArchs != null) {
             for (int k = 0; k < archList.length; k++) {
                 if ( ! moduleSupportedArchs.contains(archList[k])) {
-                    throw new BuildException("ARCH [" + archList[k] + "] is not supported by " + moduleId + ". " + moduleId + " only supports [" + moduleSupportedArchs + "].");
+                    throw new BuildException("Specified architecture [" + archList[k] + "] is not supported by " + moduleId + ". The module " + moduleId + " only supports [" + moduleSupportedArchs + "] architectures.");
                 }
             }
         }
@@ -240,7 +240,7 @@ public class GenBuildTask extends Ant {
             // Whether the module is built before
             //
             if (moduleId.isLibrary() == false && GlobalData.hasFpdModuleSA(fpdModuleId) == false) {
-                System.out.println("\nWARNING: " + moduleId + " for " + archList[k] + " is not found in current platform\n");
+                System.out.println("\nWARNING: " + moduleId + " for " + archList[k] + " was not found in current platform FPD file!\n");
                 continue;
             } else if (GlobalData.isModuleBuilt(fpdModuleId)) {
                 return;
@@ -265,7 +265,7 @@ public class GenBuildTask extends Ant {
                     // don't do anything if no tools found
                     // 
                     if (GlobalData.isCommandSet(targetList[i], toolchainList[j], archList[k]) == false) {
-                        System.out.println("Warning: No build issued. No tools found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
+                        System.out.println("Warning: No build issued.  No tools were found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
                         continue;
                     }
 
@@ -336,7 +336,7 @@ public class GenBuildTask extends Ant {
         String filename = getProject().getProperty("PLATFORM_FILE");
         
         if (filename == null){
-            throw new BuildException("Plese set ACTIVE_PLATFORM if you want to build a single module. ");
+            throw new BuildException("Please set ACTIVE_PLATFORM in the file: Tools/Conf/target.txt if you want to build a single module!");
         }
         
         PlatformIdentification platformId = GlobalData.getPlatform(filename);
@@ -608,7 +608,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            GlobalData.log.info("Call user-defined " + moduleId.getName() + "_build.xml");
+            GlobalData.log.info("Calling user-defined " + moduleId.getName() + "_build.xml");
             Ant ant = new Ant();
             ant.setProject(getProject());
             ant.setAntfile(getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml");
@@ -638,7 +638,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            GlobalData.log.info("Call user-defined " + moduleId.getName() + "_build.xml");
+            GlobalData.log.info("Calling user-defined " + moduleId.getName() + "_build.xml");
             Ant ant = new Ant();
             ant.setProject(getProject());
             ant.setAntfile(getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml");

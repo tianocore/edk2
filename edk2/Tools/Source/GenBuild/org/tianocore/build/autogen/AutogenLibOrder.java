@@ -85,7 +85,7 @@ public class AutogenLibOrder {
                 if (this.libInstanceMap.containsKey(libraryList[i])) {
                     throw new Exception(
                             libraryList[i].getName()
-                                    + "this library instance is already exist, please check you library instance list!");
+                                    + "this library instance already exists, please check the library instance list!");
                 } else {
                     this.libInstanceMap.put(libraryList[i], classStr);
                 }
@@ -102,8 +102,8 @@ public class AutogenLibOrder {
                         System.out.println(libClassDeclList[j]
                                 + " class is already implement by "
                                 + this.libClassMap.get(libClassDeclList[j]));
-                        throw new Exception(libClassDeclList
-                                + " is already have library instance!");
+                        throw new Exception("Library Class: " + libClassDeclList
+                                + " already has a library instance!");
                     } else {
                         this.libClassMap.put(libClassDeclList[j], libraryList[i]);
                     }

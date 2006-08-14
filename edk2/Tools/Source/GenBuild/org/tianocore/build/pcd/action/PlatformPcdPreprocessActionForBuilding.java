@@ -121,7 +121,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
     **/
     public void execute() throws PlatformPcdPreprocessBuildException {
-        String errorMessageHeader   = "Fail to initialize Pcd memory database for building. Because:";
+        String errorMessageHeader   = "Failed to initialize the Pcd memory database because: ";
         String errorsForPreprocess  = null;
 
         //
@@ -170,7 +170,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
         try {
             tokenSpaceStrRet = GlobalData.getGuidInfoFromCname(guidCName);
         } catch ( Exception e ) {
-            throw new PlatformPcdPreprocessException ("Failed get Guid CName " + guidCName + "from SPD file!");
+            throw new PlatformPcdPreprocessException ("Failed to get Guid CName " + guidCName + " from the SPD file!");
         }
         return tokenSpaceStrRet;
     }
@@ -303,8 +303,8 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
         dynamicPcdBuildDefinitions = fpdDocInstance.getPlatformSurfaceArea().getDynamicPcdBuildDefinitions();
         if (dynamicPcdBuildDefinitions == null) {
-            exceptionString = String.format("[FPD file error] There are no <PcdDynamicBuildDescriptions> in FPD file but contains Dynamic type "+
-                                            "PCD entry %s in module %s!",
+            exceptionString = String.format("[FPD file error] There are no <PcdDynamicBuildDescriptions> elements in FPD file but there are Dynamic type "+
+                                            "PCD entries %s in module %s!",
                                             token.cName,
                                             moduleName);
             putError(exceptionString);
@@ -374,11 +374,11 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
         File file = null;
 
         if (fpdFilePath == null) {
-            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be blank for CollectPCDAtion!");
+            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be empty for CollectPCDAtion!");
         }
 
         if (fpdFilePath.length() == 0) {
-            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be blank for CollectPCDAtion!");
+            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be empty for CollectPCDAtion!");
         }
 
         file = new File(fpdFilePath);

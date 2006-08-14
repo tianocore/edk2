@@ -93,7 +93,7 @@ public class Spd {
         // If specified package file not exists
         //
         if ( ! packageFile.exists()) {
-            throw new BuildException("Package file [" + packageFile.getPath() + "] not exists. ");
+            throw new BuildException("Package file [" + packageFile.getPath() + "] does not exist!");
         }
         try {
             XmlObject spdDoc = XmlObject.Factory.parse(packageFile);
@@ -101,7 +101,7 @@ public class Spd {
             // Verify SPD file, if is invalid, throw Exception
             //
             if (! spdDoc.validate()) {
-                throw new BuildException("Package Surface Area file [" + packageFile.getPath() + "] is invalid. ");
+                throw new BuildException("Package Surface Area file [" + packageFile.getPath() + "] format is invalid!");
             }
             // We can change Map to XmlObject
             Map<String, XmlObject> spdDocMap = new HashMap<String, XmlObject>();
@@ -127,7 +127,7 @@ public class Spd {
                 moduleId.setPackage(packageId);
                 moduleId.setMsaFile(msaFile);
                 if (msaInfo.containsKey(moduleId)) {
-                    throw new BuildException("Find two modules with the same GUID and Version in " + packageId + ". They are [" + msaInfo.get(moduleId) + "] and [" + msaFile + "] ");
+                    throw new BuildException("Found two modules with the same GUID and Version in package " + packageId + ".\nThey are  module [" + msaInfo.get(moduleId) + "] and MSA file [" + msaFile + "]!");
                 }
                 msaInfo.put(moduleId, msaFile);
             }
@@ -199,7 +199,7 @@ public class Spd {
         }
         catch (Exception e) {
             e.setStackTrace(e.getStackTrace());
-            throw new BuildException("Parse package description file [" + packageId.getSpdFile() + "] Error.\n"
+            throw new BuildException("Parse of the package description file [" + packageId.getSpdFile() + "] failed!\n"
                                      + e.getMessage());
         }
     }
