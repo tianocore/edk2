@@ -72,7 +72,7 @@ public class IncludePath implements NestElement {
      @param     name    The name of include path
      **/
     public void setName(String name){
-        this.path = "-I " + name;
+        this.path = " -I " + name;
     }
 
     /**
