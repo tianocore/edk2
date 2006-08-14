@@ -243,6 +243,7 @@ set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\GenBuild.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\cpptasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Jars\frameworktasks.jar
 set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\FrameworkWizard.jar
+set CLASSPATH=%CLASSPATH%;%WORKSPACE%\Tools\Bin\MigrationTools.jar
 echo CLASSPATH:     %CLASSPATH%
 goto end
 
