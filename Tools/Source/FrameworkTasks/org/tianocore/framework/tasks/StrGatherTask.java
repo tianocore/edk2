@@ -153,13 +153,13 @@ public class StrGatherTask extends Task implements EfiDefine {
             log(this.commandType.substring(2));
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                log("strgather succeeded!", Project.MSG_VERBOSE);
+                log("StrGather succeeded!", Project.MSG_VERBOSE);
             } else {
                 ///
                 /// command execution fail
                 ///
                 log("ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("strgather failed!");
+                throw new BuildException("StrGather failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

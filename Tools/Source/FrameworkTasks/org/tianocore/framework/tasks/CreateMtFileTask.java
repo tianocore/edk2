@@ -121,7 +121,7 @@ public class CreateMtFileTask extends Task implements EfiDefine {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "ERROR = "+ Integer.toHexString(revl));
+                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("CreateMtFile failed!");
             }
         } catch (Exception e) {

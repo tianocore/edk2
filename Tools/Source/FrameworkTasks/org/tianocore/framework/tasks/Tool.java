@@ -49,7 +49,7 @@ public class Tool implements EfiDefine, Section {
         try {
             executeTool ();
         } catch (Exception e) {
-            throw new BuildException("Call tools failed!\n");
+            throw new BuildException("Call to executeTool failed!\n");
         }
 
         ///
@@ -58,7 +58,7 @@ public class Tool implements EfiDefine, Section {
         OutputFile = new File (this.outPutFileName);
         long fileLen = OutputFile.length();
         if (!OutputFile.exists()) {
-            throw new BuildException("The file " + outPutFileName + " is not exist!\n");
+            throw new BuildException("The file " + outPutFileName + " does not exist!\n");
         }
 
         ///
@@ -91,7 +91,7 @@ public class Tool implements EfiDefine, Section {
 
         } catch (Exception e) {
             System.out.print(e.getMessage());
-            throw new BuildException("Call tool2buffer failed!\n");
+            throw new BuildException("Tool call, toBuffer failed!\n");
         }
     }
 
@@ -137,7 +137,7 @@ public class Tool implements EfiDefine, Section {
             crcProcess.waitFor();
         } catch (Exception e) {
             System.out.print (e.getMessage());
-            throw new BuildException("Execute tools fails!\n");
+            throw new BuildException("Execution of externalTool task failed!\n");
         }
     }
 

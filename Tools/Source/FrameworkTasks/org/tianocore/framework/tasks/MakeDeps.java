@@ -187,7 +187,7 @@ public class MakeDeps extends Task {
 
         // change the old DEP file format (makefile compatible) to just file list
         if (!cleanup()) {
-            throw new BuildException(depsFile + " was not generated");
+            throw new BuildException(depsFile + " was not generated!");
         }
     }
 

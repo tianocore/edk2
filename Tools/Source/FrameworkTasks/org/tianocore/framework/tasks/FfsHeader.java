@@ -52,7 +52,7 @@ public class FfsHeader {
         **/     
         public void bufferToStruct (byte[] dataBuffer){
             if (dataBuffer.length != 16) {
-                throw new BuildException ("Buffer is not fitting GUID type!");
+                throw new BuildException ("Buffer is not sized [" + dataBuffer.length + "] for data type, GUID!");
             }
 
             data1 = (int)(dataBuffer[3]& 0xff);

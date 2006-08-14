@@ -62,7 +62,7 @@ public class StripTask extends Task implements EfiDefine {
         //
         // set Logger
         //
-        FrameworkLogger logger = new FrameworkLogger(project, "edkStrip");
+        FrameworkLogger logger = new FrameworkLogger(project, "strip");
         EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
         EdkLog.setLogger(logger);
         //
@@ -72,7 +72,7 @@ public class StripTask extends Task implements EfiDefine {
         String command;
         String argument;
         if (path == null) {
-            command = "strip";
+            command = "Strip";
         } else {
             command = path + File.separatorChar + "Strip";
         }
