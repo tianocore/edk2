@@ -74,14 +74,14 @@ public class ModuleInfo {
 				} else if (list[i].contains(".uni")) {
 					localmodulesources.add(list[i]);
 				} else if (list[i].contains(".inf")) {
-					if (ui.yesOrNo("Found .inf file : " + list[i] + "\nUse this file as this module's .inf ?")) {
+					if (ui.yesOrNo("Found .inf file : " + list[i] + "\nDo you want to use this file as this module's .inf?")) {
 						hasInf = true;
 						infname = list[i];
 					} else {
 						continue;
 					}
 				} else if (list[i].contains(".msa")) {
-					if (ui.yesOrNo("Found .msa file : " + list[i] + "\nUse this file as this module's .msa ?")) {
+					if (ui.yesOrNo("Found .msa file : " + list[i] + "\nDo you want to use this file as this module's .msa?")) {
 						hasMsa = true;
 						msaname = list[i];
 					} else {
@@ -97,7 +97,7 @@ public class ModuleInfo {
 		} else if (hasMsa) {
 			mr.readMsa(msaname);
 		} else {
-			ui.println("No Inf Nor Msa Found");
+			ui.println("No INF nor MSA file found!");
 		}
 		
 		CommentOutNonLocalHFile();
@@ -106,7 +106,7 @@ public class ModuleInfo {
 		new SourceFileReplacer(modulepath, this, db, ui).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
 		
 		// show result
-		if (ui.yesOrNo("Parse Module Information Complete . See details ?")) {
+		if (ui.yesOrNo("Parse of the Module Information has completed. View details?")) {
 			ui.println("\nModule Information : ");
 			ui.println("Entrypoint : " + entrypoint);
 			show(protocol, "Protocol : ");
@@ -129,8 +129,8 @@ public class ModuleInfo {
 		
 		ui.println("Errors Left : " + db.error);
 		ui.println("Complete!");
-		ui.println("Your R9 module is placed at " + modulepath + File.separator + "result");
-		ui.println("Your logfile is placed at " + modulepath);
+		ui.println("Your R9 module was placed here: " + modulepath + File.separator + "result");
+		ui.println("Your logfile was placed here: " + modulepath);
 	}
 	
 	private void show(Set<String> hash, String show) {
