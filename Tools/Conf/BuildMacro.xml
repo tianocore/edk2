@@ -11,6 +11,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 -->
 <project name="common">
   <!--
+    Macro for intialize some properties. This Macro build will be called before source file build.  
+    -->
+  <macrodef name="Build_Init">
+    <sequential>
+      <var name="OBJECTS" value="" />
+      <var name="SDB_FILES" value="" />
+    </sequential>
+  </macrodef>
+
+
+  <!--
     macro definitions for building files with different types
     -->
   <!--
@@ -60,6 +71,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
+      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
     </sequential>
   </macrodef>
 
@@ -108,6 +120,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
+      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
     </sequential>
   </macrodef>
 
@@ -252,6 +265,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
+      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
     </sequential>
   </macrodef>
 
@@ -293,6 +307,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
+      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
     </sequential>
   </macrodef>
 
@@ -349,6 +364,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
+      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
     </sequential>
   </macrodef>
 
@@ -396,7 +412,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
       <OnDependency>
         <sourcefiles>
-          <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+          <file list="${OBJECTS}" />
         </sourcefiles>
         <targetfiles>
           <file name="${BIN_DIR}/@{FILENAME}.lib"/>
@@ -408,7 +424,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                 outputFile="${BIN_DIR}/@{FILENAME}.lib">
               <argument value="${SLINK_FLAGS}"/>
 
-              <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+              <argument value="${OBJECTS}"/>
             </command>
           </cc>
         </sequential>
@@ -525,7 +541,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-
+      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Strings.obj" />
     </sequential>
   </macrodef>
 
@@ -579,6 +595,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <delete file="${PLATFORM_DIR}/@{FILENAME}.i" />
         </sequential>
       </OnDependency>
+      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}.obj" />
     </sequential>
   </macrodef>
 
@@ -618,7 +635,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <OnDependency>
         <sourcefiles>
           <file list="${LIBS}"/>
-          <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+          <file list="${OBJECTS}"/>
         </sourcefiles>
         <targetfiles>
           <file name="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll"/>
@@ -630,7 +647,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
                 outputFile="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib">
               <argument value="${SLINK_FLAGS}"/>
 
-              <fileset casesensitive="on" dir="${DEST_DIR_OUTPUT}" includes="**/*.obj"/>
+              <argument value="${OBJECTS}"/>
             </command>
           </cc>
           <cc userdefine="on">

@@ -285,7 +285,6 @@ public class GenBuildTask extends Ant {
                     // MODULE or BASE_NAME, GUID or FILE_GUID, VERSION, MODULE_TYPE
                     // MODULE_DIR, MODULE_RELATIVE_DIR
                     // SUBSYSTEM, ENTRYPOINT, EBC_TOOL_LIB_PATH
-                    // LIBS, OBJECTS, SDB_FILES
                     //
                     setModuleCommonProperties(archList[k]);
                     
@@ -429,12 +428,7 @@ public class GenBuildTask extends Ant {
             getProject().setProperty("ENTRYPOINT", "_ModuleEntryPoint");
         }
         
-        //
-        // LIBS, OBJECTS, SDB_FILES
-        //
         getProject().setProperty("OBJECTS", "");
-        getProject().setProperty("SDB_FILES", "");
-        getProject().setProperty("LIBS", "");
     }
 
     private void getCompilerFlags(String target, String toolchain, FpdModuleIdentification fpdModuleId) throws EdkException {
