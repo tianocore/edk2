@@ -71,6 +71,10 @@ public class ModuleInfo {
 				} else if (list[i].contains(".h") || list[i].contains(".H")) {
 					localmodulesources.add(list[i]);
 					localmoduleheaders.add(list[i]);	//the case that several .inf or .msa found is not concerned
+				} else if (list[i].contains(".dxs")) {
+					localmodulesources.add(list[i]);
+				} else if (list[i].contains(".uni")) {
+					localmodulesources.add(list[i]);
 				} else if (list[i].contains(".inf")) {
 					if (ui.yesOrNo("Found .inf file : " + list[i] + "\nUse this file as this module's .inf ?")) {
 						hasInf = true;
