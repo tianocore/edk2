@@ -213,7 +213,7 @@ public class MemoryDatabaseManager {
                         // We only support Dynamice(EX) type for PEI and DXE phase.
                         // If it is not referenced in either PEI or DXE, throw exception now.
                         //
-                        throw new EntityException("[PCD tool Internal Error] Dynamic(EX) PCD Entries are referenced in module that is not in PEI phase nor in DXE phase.");
+                        throw new EntityException("[PCD Tool Internal Error] Dynamic(EX) PCD Entries are referenced in a module that is not used in either PEI or DXE phases.");
                     }
                 }
             }

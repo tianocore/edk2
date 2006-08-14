@@ -143,7 +143,7 @@ public class DynamicTokenValue {
         for (index = 0; index < size; index++) {
             num = Integer.decode(variableName.get(index).toString());
             if ((num > 127 ) || (num < 0)) {
-                throw new EntityException(String.format("variable name contains >0x80 character, now is not support!"));
+                throw new EntityException(String.format("The variable name contains more than 0x80 characters; this is not supported at thist time!"));
             }
             str += (char)num;
         }
