@@ -216,7 +216,6 @@ public class SourceFileReplacer {
 							if (r8only.contains(temp.r8thing)) {
 								mi.localmodulesources.add("R8Lib.h");
 								mi.localmodulesources.add("R8Lib.c");
-								mi.localmoduleheaders.add("R8Lib.h");
 								filer8only.add(r8thing);
 								mi.hashr8only.add(r8thing);
 								addr8 = true;
