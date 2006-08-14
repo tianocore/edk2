@@ -414,6 +414,12 @@ public class ModuleBuildFileGenerator {
 
         FileProcess fileProcess = new FileProcess();
         fileProcess.init(project, includes, document);
+        
+        //
+        // Initialize some properties by user
+        //
+        Element initEle = document.createElement("Build_Init");
+        root.appendChild(initEle);
 
         String moduleDir = project.getProperty("MODULE_DIR");
         //
