@@ -35,7 +35,8 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 import org.apache.tools.ant.types.Path;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
  Class MakeDeps is used to wrap MakeDeps.exe as an ANT task.
@@ -112,7 +113,7 @@ public class MakeDeps extends Task {
 
         ///
         /// if there's no source files, we can do nothing about dependency
-        /// 
+        ///
         if (inputFileList.size() == 0) {
             throw new BuildException("No source files specified to scan");
         }
@@ -375,7 +376,7 @@ public class MakeDeps extends Task {
 
             ///
             /// compose the final file content
-            /// 
+            ///
             StringBuffer cleanedLines = new StringBuffer(40960);
             Iterator<String> it = lineSet.iterator();
             while (it.hasNext()) {

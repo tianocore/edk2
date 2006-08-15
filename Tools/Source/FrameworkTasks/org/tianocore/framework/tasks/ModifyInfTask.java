@@ -2,14 +2,14 @@
  ModifyInfTask class.
 
  ModifyInfTask is used to call Modify.exe to generate inf file.
- 
- 
+
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -24,7 +24,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
   ModifyInfTask class.
@@ -36,7 +37,7 @@ public class ModifyInfTask extends Task implements EfiDefine {
     /// tool name
     ///
     private String toolName = "ModifyInf";
-    
+
     ///
     /// input FV inf file
     ///
@@ -54,15 +55,15 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
 	///
 	///  Output dir
-	/// 
+	///
 	private String outputDir = "";
-   
+
     /**
      * execute
-     * 
+     *
      * ModifyInfTask execute function is to assemble tool command line & execute
      * tool command line
-     * 
+     *
      * @throws BuidException
      */
     public void execute() throws BuildException {
@@ -91,12 +92,12 @@ public class ModifyInfTask extends Task implements EfiDefine {
 		File file = new File(outputFVInfFileName);
         if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
 			argument = this.inputFVInfFileName +
-				       this.outputDir + 
+				       this.outputDir +
 					   File.separatorChar +
 					   this.outputFVInfFileName +
 					   this.patternStr;
 		} else {
-			argument = this.inputFVInfFileName + 
+			argument = this.inputFVInfFileName +
 				       this.outputFVInfFileName +
 				       this.patternStr;
 		}
@@ -142,9 +143,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
     /**
      * getinputFVInfFileName
-     * 
+     *
      * This function is to get class member "inputFVInfFileName".
-     * 
+     *
      * @return string of input inf file name.
      */
     public String getinputFVInfFileName() {
@@ -153,9 +154,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
     /**
      * setinputFVInfFileName
-     * 
+     *
      * This function is to set class member "inputFVInfFileName".
-     * 
+     *
      * @param inputFile
      *            string of input inf file name.
      */
@@ -165,9 +166,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
     /**
      * getoutputFVInfFileName
-     * 
+     *
      * This function is to get class member "outputFVInfFileName"
-     * 
+     *
      * @return outputFVInfFileName string of output inf file name.
      */
     public String getoutputFVInfFileName() {
@@ -176,9 +177,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
     /**
      * setoutputFVInfFileName
-     * 
+     *
      * This function is to set class member "outputFVInfFileName"
-     * 
+     *
      * @param outputFVInfFileName
      *            string of output  inf file name.
      */
@@ -188,9 +189,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
     /**
      * getpatternStr
-     * 
+     *
      * This function is to get class member "patternStr"
-     * 
+     *
      * @return patternStr string of pattern.
      */
     public String getpatternStr() {
@@ -199,9 +200,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
     /**
      * setpatternStr
-     * 
+     *
      * This function is to set class member "patternStr"
-     * 
+     *
      * @param patternStr
      *            string of patternStr.
      */
@@ -211,9 +212,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
 	/**
      * getoutputDir
-     * 
+     *
      * This function is to get class member "outputDir"
-     * 
+     *
      * @return outputDir string of output directory.
      */
     public String getoutputDir() {
@@ -222,9 +223,9 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
     /**
      * setoutputDir
-     * 
+     *
      * This function is to set class member "outputDir"
-     * 
+     *
      * @param patternStr
      *            string of output directory.
      */

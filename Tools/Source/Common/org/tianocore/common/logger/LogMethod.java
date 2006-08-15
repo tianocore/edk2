@@ -15,8 +15,8 @@ Module Name:
 Abstract:
 
 --*/
-package org.tianocore.logger;
 
+package org.tianocore.common.logger;
 
 public interface LogMethod {
     public void putMessage(Object msgSource, int msgLevel, String msg);

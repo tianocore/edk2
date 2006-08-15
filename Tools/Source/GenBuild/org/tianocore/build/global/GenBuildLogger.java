@@ -17,20 +17,22 @@ Abstract:
 --*/
 
 package org.tianocore.build.global;
+
 import org.apache.tools.ant.Project;
-import org.tianocore.logger.LogMethod;
+
+import org.tianocore.common.logger.LogMethod;
 
 public class GenBuildLogger implements LogMethod {
     private Project project;
     public GenBuildLogger(Project project) {
         this.project = project;
-        
+
     }
 
     public void putMessage(Object msgSource, int msgLevel, String msg) {
         if (this.project != null){
             this.project.log(msg, Project.MSG_INFO);
         }
-        
+
     }
 }

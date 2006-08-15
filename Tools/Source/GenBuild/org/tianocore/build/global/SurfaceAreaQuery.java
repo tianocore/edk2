@@ -23,8 +23,11 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.w3c.dom.Node;
+
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
+
 import org.tianocore.BuildOptionsDocument;
 import org.tianocore.CNameType;
 import org.tianocore.ExternsDocument;
@@ -57,20 +60,20 @@ import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
+
+import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
-import org.tianocore.logger.EdkLog;
-import org.w3c.dom.Node;
 
 /**
  * SurfaceAreaQuery class is used to query Surface Area information from msa,
  * mbd, spd and fpd files.
- * 
+ *
  * This class should not instantiated. All the public interfaces is static.
- * 
+ *
  * @since GenBuild 1.0
  */
 public class SurfaceAreaQuery {
@@ -105,7 +108,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Set a Surface Area document for query later
-     * 
+     *
      * @param map
      *            A Surface Area document in TopLevelElementName/XmlObject
      *            format.
@@ -120,7 +123,7 @@ public class SurfaceAreaQuery {
      * Push current used Surface Area document into query stack. The given new
      * document will be used for any immediately followed getXXX() callings,
      * untill pop() is called.
-     * 
+     *
      * @param newMap
      *            The TopLevelElementName/XmlObject format of a Surface Area
      *            document.
@@ -180,7 +183,7 @@ public class SurfaceAreaQuery {
     /**
      * Search all XML documents stored in "map" for the specified xPath, using
      * relative path (starting with '$this')
-     * 
+     *
      * @param xPath
      *            xpath query string array
      * @returns An array of XmlObject if elements are found at the specified
@@ -219,7 +222,7 @@ public class SurfaceAreaQuery {
     /**
      * Search XML documents named by "rootName" for the given xPath, using
      * relative path (starting with '$this')
-     * 
+     *
      * @param rootName
      *            The top level element name
      * @param xPath
@@ -255,7 +258,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve SourceFiles/Filename for specified ARCH type
-     * 
+     *
      * @param arch
      *            architecture name
      * @returns An 2 dimension string array if elements are found at the known
@@ -282,7 +285,7 @@ public class SurfaceAreaQuery {
                 outputList.add(new String[] {sourceFileNames[i].getToolCode(),sourceFileNames[i].getStringValue()});
             }
         }
-           
+
         String[][] outputString = new String[outputList.size()][2];
         for (int index = 0; index < outputList.size(); index++) {
             outputString[index][0] = outputList.get(index)[0];
@@ -293,7 +296,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve /PlatformDefinitions/OutputDirectory from FPD
-     * 
+     *
      * @returns Directory names array if elements are found at the known xpath
      * @returns Empty if nothing is found at the known xpath
      */
@@ -317,7 +320,7 @@ public class SurfaceAreaQuery {
         }
         PlatformDefinitionsDocument.PlatformDefinitions item = (PlatformDefinitionsDocument.PlatformDefinitions)returns[0];
         if(item.getIntermediateDirectories() == null) {
-            return null;     
+            return null;
         }
         else {
             return item.getIntermediateDirectories().toString();
@@ -334,7 +337,7 @@ public class SurfaceAreaQuery {
         ModuleSaBuildOptionsDocument.ModuleSaBuildOptions item = (ModuleSaBuildOptionsDocument.ModuleSaBuildOptions)returns[0];
         return item.getFfsFormatKey();
     }
-    
+
     public static String getModuleFvBindingKeyword() {
         String[] xPath = new String[] { "/" };
 
@@ -345,7 +348,7 @@ public class SurfaceAreaQuery {
         ModuleSaBuildOptionsDocument.ModuleSaBuildOptions item = (ModuleSaBuildOptionsDocument.ModuleSaBuildOptions)returns[0];
         return item.getFvBinding();
     }
-    
+
     public static List getModuleSupportedArchs() {
         String[] xPath = new String[] { "/" };
 
@@ -356,17 +359,17 @@ public class SurfaceAreaQuery {
         ModuleDefinitionsDocument.ModuleDefinitions item = (ModuleDefinitionsDocument.ModuleDefinitions)returns[0];
         return item.getSupportedArchitectures();
     }
-    
+
     public static BuildOptionsDocument.BuildOptions.Ffs[] getFpdFfs() {
         String[] xPath = new String[] {"/Ffs"};
-        
+
         Object[] returns = get("BuildOptions", xPath);
         if (returns == null || returns.length == 0) {
             return new BuildOptionsDocument.BuildOptions.Ffs[0];
         }
         return (BuildOptionsDocument.BuildOptions.Ffs[])returns;
     }
-    
+
     public static String getModuleOutputFileBasename() {
         String[] xPath = new String[] { "/" };
 
@@ -377,18 +380,18 @@ public class SurfaceAreaQuery {
         ModuleDefinitionsDocument.ModuleDefinitions item = (ModuleDefinitionsDocument.ModuleDefinitions)returns[0];
         return item.getOutputFileBasename();
     }
-    
+
     /**
      * Retrieve BuildOptions/Option or Arch/Option
-     * 
+     *
      * @param toolChainFamilyFlag
      *            if true, retrieve options for toolchain family; otherwise for
      *            toolchain
-     * 
+     *
      * @returns String[][5] name, target, toolchain, arch, coommand of options
      *          if elements are found at the known xpath. String[0][] if dont
      *          find element.
-     * 
+     *
      * @returns Empty array if nothing is there
      */
     public static String[][] getOptions(String from, String[] xPath, boolean toolChainFamilyFlag) {
@@ -441,7 +444,7 @@ public class SurfaceAreaQuery {
             }
 
             archList = new ArrayList<String>();
-            List archEnumList = option.getSupArchList();            
+            List archEnumList = option.getSupArchList();
             if (archEnumList == null) {
                 archList.add(null);
             } else {
@@ -477,7 +480,7 @@ public class SurfaceAreaQuery {
 
     public static String[][] getModuleBuildOptions(boolean toolChainFamilyFlag) {
         String[] xPath;
-        
+
         if (toolChainFamilyFlag == true) {
             xPath = new String[] {
                     "/Options/Option[not(@ToolChainFamily) and not(@TagName)]",
@@ -488,8 +491,8 @@ public class SurfaceAreaQuery {
                     "/Options/Option[@TagName]", };
         }
         return getOptions("ModuleSaBuildOptions", xPath, toolChainFamilyFlag);
-    }   
-    
+    }
+
     public static String[][] getPlatformBuildOptions(boolean toolChainFamilyFlag) {
         String[] xPath;
 
@@ -513,7 +516,7 @@ public class SurfaceAreaQuery {
         if (returns == null || returns.length == 0) {
             return null;
         }
-        
+
         PlatformDefinitionsDocument.PlatformDefinitions item = (PlatformDefinitionsDocument.PlatformDefinitions)returns[0];
         ToolChainInfo toolChainInfo = new ToolChainInfo();
         toolChainInfo.addTargets(item.getBuildTargets().toString());
@@ -524,7 +527,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve <xxxHeader>/ModuleType
-     * 
+     *
      * @returns The module type name if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -542,10 +545,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve PackageDependencies/Package
-     * 
+     *
      * @param arch
      *            Architecture name
-     * 
+     *
      * @returns package name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -554,17 +557,17 @@ public class SurfaceAreaQuery {
         String packageGuid = null;
         String packageVersion = null;
 
-        
+
         xPath = new String[] { "/Package" };
-        
+
         Object[] returns = get("PackageDependencies", xPath);
         if (returns == null) {
             return new PackageIdentification[0];
         }
 
         //
-        //  Get packageIdentification 
-        // 
+        //  Get packageIdentification
+        //
         List<PackageIdentification> packageIdList = new ArrayList<PackageIdentification>();
         for (int i = 0; i < returns.length; i++) {
             PackageDependenciesDocument.PackageDependencies.Package item = (PackageDependenciesDocument.PackageDependencies.Package) returns[i];
@@ -579,7 +582,7 @@ public class SurfaceAreaQuery {
 
         //
         //  transfer packageIdentification list to array.
-        // 
+        //
         PackageIdentification[] packageIdArray = new PackageIdentification[packageIdList.size()];
         for (int i = 0; i < packageIdList.size(); i++) {
             packageIdArray[i] = new PackageIdentification(null, packageIdList.get(i).getGuid(),packageIdList.get(i).getVersion());
@@ -589,10 +592,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve LibraryClassDefinitions/LibraryClass for specified usage
-     * 
+     *
      * @param usage
      *            Library class usage
-     * 
+     *
      * @returns LibraryClass objects list if elements are found at the known
      *          xpath
      * @returns null if nothing is there
@@ -614,7 +617,7 @@ public class SurfaceAreaQuery {
         List<String> libraryClassName = new ArrayList<String>();
         for (int i = 0; i < libraryClassList.length; i++) {
 			List archList = libraryClassList[i].getSupArchList();
-			
+
 			if (arch == null || contains(archList, arch)) {
                 libraryClassName.add(libraryClassList[i].getKeyword());
 			}
@@ -628,7 +631,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve ModuleEntryPoint names
-     * 
+     *
      * @returns ModuleEntryPoint name list if elements are found at the known
      *          xpath
      * @returns null if nothing is there
@@ -653,10 +656,10 @@ public class SurfaceAreaQuery {
 
     /**
      * retrieve Protocol for specified usage
-     * 
+     *
      * @param usage
      *            Protocol usage arch Architecture
-     * 
+     *
      * @returns Protocol String list if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -693,10 +696,10 @@ public class SurfaceAreaQuery {
 
     /**
      * retrieve Protocol for specified usage
-     * 
+     *
      * @param arch
      *            Architecture
-     * 
+     *
      * @returns Protocol String list if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -716,7 +719,7 @@ public class SurfaceAreaQuery {
         Protocol[] returnlList = (Protocol[]) returns;
 
         List<String> protocolList = new ArrayList<String>();
-        
+
         for (int i = 0; i < returns.length; i++) {
             List archList = returnlList[i].getSupArchList();
             if (archList == null || contains(archList, arch)){
@@ -732,10 +735,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve ProtocolNotify for specified usage
-     * 
+     *
      * @param usage
      *            ProtocolNotify usage
-     * 
+     *
      * @returns String[] if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -754,13 +757,13 @@ public class SurfaceAreaQuery {
         }
 
         List<String> protocolNotifyList = new ArrayList<String>();
-        
+
         for (int i = 0; i < returns.length; i++) {
             List archList = ((ProtocolNotify) returns[i]).getSupArchList();
             if (archList == null || contains(archList, arch)){
                 protocolNotifyList.add(((ProtocolNotify) returns[i]).getProtocolNotifyCName());
             }
-            
+
         }
         String[] protocolNotifyArray = new String[protocolNotifyList.size()];
         for (int i = 0; i < protocolNotifyList.size(); i++) {
@@ -771,10 +774,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve ProtocolNotify for specified usage
-     * 
+     *
      * @param usage
      *            ProtocolNotify usage
-     * 
+     *
      * @returns String[] if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -811,7 +814,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve ModuleUnloadImage names
-     * 
+     *
      * @returns ModuleUnloadImage name list if elements are found at the known
      *          xpath
      * @returns null if nothing is there
@@ -836,7 +839,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve Extern
-     * 
+     *
      * @returns Extern objects list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -853,10 +856,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve PpiNotify for specified arch
-     * 
+     *
      * @param arch
      *            PpiNotify arch
-     * 
+     *
      * @returns String[] if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -874,14 +877,14 @@ public class SurfaceAreaQuery {
             return new String[0];
         }
 
-        
+
         List<String> ppiNotifyList = new ArrayList<String>();
         for (int i = 0; i < returns.length; i++) {
             List archList = ((PPIsDocument.PPIs.PpiNotify) returns[i]).getSupArchList();
             if (archList == null || contains(archList, arch)){
-                ppiNotifyList.add(((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName()); 
+                ppiNotifyList.add(((PPIsDocument.PPIs.PpiNotify) returns[i]).getPpiNotifyCName());
             }
-            
+
         }
         String[] ppiNotifyArray = new String[ppiNotifyList.size()];
         for (int i = 0; i < ppiNotifyList.size(); i++) {
@@ -893,11 +896,11 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve PpiNotify for specified usage and arch
-     * 
+     *
      * @param arch
      *            PpiNotify arch usage PpiNotify usage
-     * 
-     * 
+     *
+     *
      * @returns String[] if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -934,10 +937,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve Ppi for specified arch
-     * 
+     *
      * @param arch
      *            Ppi arch
-     * 
+     *
      * @returns String[] if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -959,9 +962,9 @@ public class SurfaceAreaQuery {
         for (int i = 0; i < returns.length; i++) {
             List archList = ((PPIsDocument.PPIs.Ppi) returns[i]).getSupArchList();
             if (archList == null || contains(archList, arch)){
-                ppiList.add(((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName());    
+                ppiList.add(((PPIsDocument.PPIs.Ppi) returns[i]).getPpiCName());
             }
-            
+
         }
         String[] ppiArray = new String[ppiList.size()];
         for (int i = 0; i < ppiList.size(); i++) {
@@ -972,11 +975,11 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve PpiNotify for specified usage and arch
-     * 
+     *
      * @param arch
      *            PpiNotify arch usage PpiNotify usage
-     * 
-     * 
+     *
+     *
      * @returns String[] if elements are found at the known xpath
      * @returns String[0] if nothing is there
      */
@@ -1013,10 +1016,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve GuidEntry information for specified usage
-     * 
+     *
      * @param arch
      *            GuidEntry arch
-     * 
+     *
      * @returns GuidEntry objects list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1038,9 +1041,9 @@ public class SurfaceAreaQuery {
         for (int i = 0; i < returns.length; i++) {
             List archList = ((GuidsDocument.Guids.GuidCNames) returns[i]).getSupArchList();
             if (archList == null || contains(archList, arch)){
-                guidList.add(((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName());    
+                guidList.add(((GuidsDocument.Guids.GuidCNames) returns[i]).getGuidCName());
             }
-            
+
         }
         String[] guidArray = new String[guidList.size()];
         for (int i = 0; i < guidList.size(); i++) {
@@ -1052,10 +1055,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve GuidEntry information for specified usage
-     * 
+     *
      * @param arch
      *            GuidEntry arch usage GuidEntry usage
-     * 
+     *
      * @returns GuidEntry objects list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1091,12 +1094,12 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve Library instance information
-     * 
+     *
      * @param arch
      *            Architecture name
      * @param usage
      *            Library instance usage
-     * 
+     *
      * @returns library instance name list if elements are found at the known
      *          xpath
      * @returns null if nothing is there
@@ -1112,7 +1115,7 @@ public class SurfaceAreaQuery {
             xPath = new String[] { "/Instance" };
         } else {
             //
-            // Since Schema don't have SupArchList now, so the follow Xpath is 
+            // Since Schema don't have SupArchList now, so the follow Xpath is
             // equal to "/Instance" and [not(@SupArchList) or @SupArchList= arch]
             // don't have effect.
             //
@@ -1167,7 +1170,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive library's constructor name
-     * 
+     *
      * @returns constructor name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1185,7 +1188,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive library's destructor name
-     * 
+     *
      * @returns destructor name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1206,7 +1209,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive DriverBinding names
-     * 
+     *
      * @returns DriverBinding name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1217,7 +1220,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive ComponentName names
-     * 
+     *
      * @returns ComponentName name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1228,7 +1231,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive DriverConfig names
-     * 
+     *
      * @returns DriverConfig name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1239,7 +1242,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive DriverDiag names
-     * 
+     *
      * @returns DriverDiag name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1250,7 +1253,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive SetVirtualAddressMapCallBack names
-     * 
+     *
      * @returns SetVirtualAddressMapCallBack name list if elements are found at
      *          the known xpath
      * @returns null if nothing is there
@@ -1262,7 +1265,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrive ExitBootServicesCallBack names
-     * 
+     *
      * @returns ExitBootServicesCallBack name list if elements are found at the
      *          known xpath
      * @returns null if nothing is there
@@ -1274,7 +1277,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve module surface area file information
-     * 
+     *
      * @returns ModuleSA objects list if elements are found at the known xpath
      * @returns Empty ModuleSA list if nothing is there
      */
@@ -1348,11 +1351,11 @@ public class SurfaceAreaQuery {
             }
             for (int j = 0; j < archList.length; j++) {
                 FpdModuleIdentification fpdSaId = new FpdModuleIdentification(saId, archList[j]);
-    
+
                 if (fvBinding != null) {
                     fpdSaId.setFvBinding(fvBinding);
                 }
-    
+
                 //
                 // Put element to Map<FpdModuleIdentification, Map<String,
                 // Object>>.
@@ -1365,7 +1368,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve valid image names
-     * 
+     *
      * @returns valid iamges name list if elements are found at the known xpath
      * @returns empty list if nothing is there
      */
@@ -1384,37 +1387,37 @@ public class SurfaceAreaQuery {
 
         return result;
     }
-    
+
     public static Node getFpdUserExtensionPreBuild() {
-        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore' and @Identifier='0']" }; 
+        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore' and @Identifier='0']" };
 
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
         if (queryResult == null || queryResult.length == 0) {
             return null;
         }
         UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)queryResult[0];
-        
+
         return a.getDomNode();
     }
-    
+
     public static Node getFpdUserExtensionPostBuild() {
-        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore' and @Identifier='1']" }; 
+        String[] xPath = new String[] { "/UserExtensions[@UserID='TianoCore' and @Identifier='1']" };
 
         Object[] queryResult = get("PlatformSurfaceArea", xPath);
         if (queryResult == null || queryResult.length == 0) {
             return null;
         }
         UserExtensionsDocument.UserExtensions a =  (UserExtensionsDocument.UserExtensions)queryResult[0];
-        
+
         return a.getDomNode();
     }
 
     /**
      * Retrieve FV image option information
-     * 
+     *
      * @param fvName
      *            FV image name
-     * 
+     *
      * @returns option name/value list if elements are found at the known xpath
      * @returns empty list if nothing is there
      */
@@ -1478,10 +1481,10 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve FV image attributes information
-     * 
+     *
      * @param fvName
      *            FV image name
-     * 
+     *
      * @returns attribute name/value list if elements are found at the known
      *          xpath
      * @returns empty list if nothing is there
@@ -1495,7 +1498,7 @@ public class SurfaceAreaQuery {
         }
         ArrayList<String[]> list = new ArrayList<String[]>();
         for (int i = 0; i < queryResult.length; i++) {
-            
+
             FvImagesDocument.FvImages.FvImage.FvImageOptions item = (FvImagesDocument.FvImages.FvImage.FvImageOptions) queryResult[i];
             List<FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue> namevalues = item.getNameValueList();
             Iterator iter = namevalues.iterator();
@@ -1515,7 +1518,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve flash definition file name
-     * 
+     *
      * @returns file name if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1539,21 +1542,21 @@ public class SurfaceAreaQuery {
         }
 
         String[][] result = new String[queryResult.length][2];
-        
+
         for (int i = 0; i < queryResult.length; i++) {
             FvImagesDocument.FvImages.NameValue item = (FvImagesDocument.FvImages.NameValue)queryResult[i];
             result[i][0] = item.getName();
             result[i][1] = item.getValue();
         }
-        return result;   
+        return result;
     }
-    
+
     /**
      * Retrieve FV image component options
-     * 
+     *
      * @param fvName
      *            FV image name
-     * 
+     *
      * @returns name/value pairs list if elements are found at the known xpath
      * @returns empty list if nothing is there
      */
@@ -1580,12 +1583,12 @@ public class SurfaceAreaQuery {
                result[i][0] = list.get(i)[0];
              result[i][1] = list.get(i)[1];
         }
-            return result;  
+            return result;
     }
 
     /**
      * Retrieve PCD tokens
-     * 
+     *
      * @returns CName/ItemType pairs list if elements are found at the known
      *          xpath
      * @returns null if nothing is there
@@ -1603,7 +1606,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve MAS header
-     * 
+     *
      * @return
      * @return
      */
@@ -1635,12 +1638,12 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve Extern Specification
-     * 
+     *
      * @param
-     * 
+     *
      * @return String[] If have specification element in the <extern> String[0]
      *         If no specification element in the <extern>
-     * 
+     *
      */
 
     public static String[] getExternSpecificaiton() {
@@ -1661,7 +1664,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retreive MsaFile which in SPD
-     * 
+     *
      * @param
      * @return String[][3] The string sequence is ModuleName, ModuleGuid,
      *         ModuleVersion, MsaFile String[0][] If no msafile in SPD
@@ -1811,7 +1814,7 @@ public class SurfaceAreaQuery {
 
     /**
      * getSpdPpi() Retrieve the SPD PPI Entry
-     * 
+     *
      * @param
      * @return Map<String, String[2]> if get the PPI entry from SPD. Key - PPI
      *         Name String[0] - PPI CNAME String[1] - PPI Guid Null if no PPI
@@ -1843,7 +1846,7 @@ public class SurfaceAreaQuery {
 
     /**
      * Retrieve module Guid string
-     * 
+     *
      * @returns GUILD string if elements are found at the known xpath
      * @returns null if nothing is there
      */
@@ -1875,7 +1878,7 @@ public class SurfaceAreaQuery {
     /**
     Get name array of PCD in a module. In one module, token space
     is same, and token name should not be conflicted.
-    
+
     @return String[]
     **/
     public static String[] getModulePcdEntryNameArray() {
@@ -1927,7 +1930,7 @@ public class SurfaceAreaQuery {
         }
 
 		ExternsDocument.Externs ext = (ExternsDocument.Externs)returns[0];
-		
+
 		if (ext.getTianoR8FlashMapH()){
 			return true;
 	    }else {

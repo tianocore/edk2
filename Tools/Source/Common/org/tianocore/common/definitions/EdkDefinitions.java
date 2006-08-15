@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-package org.tianocore.definitions;
+package org.tianocore.common.definitions;
 
 /**
   This class includes the common EDK definitions.

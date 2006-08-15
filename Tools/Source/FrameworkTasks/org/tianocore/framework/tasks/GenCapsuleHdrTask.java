@@ -2,14 +2,14 @@
  GenCapsuleHdrTask class.
 
  GenCapsuleHdrTask is used to call GenCapsuleHdr.exe to generate capsule.
- 
- 
+
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -24,7 +24,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
   GenCapsuleHdrTask class.
@@ -36,7 +37,7 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
     /// tool name
     ///
     private String toolName = "GenCapsuleHdr";
-    
+
     ///
     /// script file
     ///
@@ -61,17 +62,17 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
     /// Dump flag
     ///
     private String dump = "";
-    
+
     ///
     /// Split size
     ///
     private String size = "";
-    
+
     ///
     /// capsule into one image flag
     ///
     private String joinFlag = "";
-    
+
     ///
     /// capsule file
     ///
@@ -80,10 +81,10 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * execute
-     * 
+     *
      * GenCapsuleHdrTask execute function is to assemble tool command line & execute
      * tool command line
-     * 
+     *
      * @throws BuidException
      */
     public void execute() throws BuildException {
@@ -160,9 +161,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * getInputFile
-     * 
+     *
      * This function is to get class member "scriptFile".
-     * 
+     *
      * @return string of input file name.
      */
     public String getScriptFile() {
@@ -171,9 +172,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setComponentType
-     * 
+     *
      * This function is to set class member "inputFile".
-     * 
+     *
      * @param inputFile
      *            string of input file name.
      */
@@ -183,9 +184,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * getOutputFile
-     * 
+     *
      * This function is to get class member "outputFile"
-     * 
+     *
      * @return outputFile string of output file name.
      */
     public String getOutputFile() {
@@ -194,9 +195,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setOutputFile
-     * 
+     *
      * This function is to set class member "outputFile"
-     * 
+     *
      * @param outputFile
      *            string of output file name.
      */
@@ -206,9 +207,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * getOutputDir
-     * 
+     *
      * This function is to get class member "outputDir"
-     * 
+     *
      * @return outputDir string of output directory.
      */
     public String getOutputDir() {
@@ -217,9 +218,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setOutputDir
-     * 
+     *
      * This function is to set class member "outputDir"
-     * 
+     *
      * @param outputDir
      *            string of output directory.
      */
@@ -229,9 +230,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * getVerbose
-     * 
+     *
      * This function is to get class member "verbose"
-     * 
+     *
      * @return verbose the flag of verbose.
      */
     public String getVerbose() {
@@ -240,9 +241,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setVerbose
-     * 
+     *
      * This function is to set class member "verbose"
-     * 
+     *
      * @param verbose
      *            True or False.
      */
@@ -254,9 +255,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * getDump
-     * 
+     *
      * This function is to get class member "dump"
-     * 
+     *
      * @return verbose the flag of dump.
      */
     public String getDump() {
@@ -265,9 +266,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setDump
-     * 
+     *
      * This function is to set class member "dump".
-     * 
+     *
      * @param dump
      *            True or False.
      */
@@ -279,9 +280,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * getSize
-     * 
+     *
      * This function is to set class member "size".
-     * 
+     *
      * @return size   string of size value
      */
     public String getSize() {
@@ -290,9 +291,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setSize
-     * 
+     *
      * This function is to set class member "size".
-     * 
+     *
      * @param size  string of size value.
      */
     public void setSize(String size) {
@@ -301,9 +302,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * getCapsuleFile
-     * 
+     *
      * This function is to get class member "capsuleFile"
-     * 
+     *
      * @return capsuleFile   capsule file name
      */
     public String getCapsuleFile() {
@@ -312,9 +313,9 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setCapsuleFile
-     * 
+     *
      * This function is to set class member "capsuleFile"
-     * 
+     *
      * @param capsuleFile   capsule file name
      */
     public void setCapsuleFile(String capsuleFile) {
@@ -323,10 +324,10 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * isJoinFlag
-     * 
+     *
      * This function is to get class member "joinFlag"
-     * 
-     * @return joinFlag    flag of if need to join split capsule  images into 
+     *
+     * @return joinFlag    flag of if need to join split capsule  images into
      *                     a single image.
      */
     public String getJoinFlag() {
@@ -335,16 +336,16 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
     /**
      * setJoinFlag
-     * 
+     *
      * This function is to set class member "joinFlag"
-     * 
-     * @param joinFlag     flag of if need to join split capsule  images into 
-     *                     a single image.       
+     *
+     * @param joinFlag     flag of if need to join split capsule  images into
+     *                     a single image.
      */
     public void setJoinFlag(boolean joinFlag) {
         if (joinFlag){
-            this.joinFlag = "-j ";  
+            this.joinFlag = "-j ";
         }
-        
+
     }
 }

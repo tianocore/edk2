@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 package org.tianocore.build.toolchain;
 
-import org.tianocore.exception.EdkException;
+import org.tianocore.common.exception.EdkException;
 
 public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainKey> {
     static final long serialVersionUID = -8034897190740066933L;

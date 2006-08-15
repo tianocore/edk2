@@ -1,8 +1,8 @@
 /** @file
   ConfigReader class.
-  
-  ConfigReader is used to read tool chain config file with flat format. 
-  
+
+  ConfigReader is used to read tool chain config file with flat format.
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
-import org.tianocore.exception.EdkException;
+import org.tianocore.common.exception.EdkException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-  
+
   ConfigReader is used to read tool chain config file with flat format. Comments
   is line starting with character '#'.
-  
+
   @since GenBuild 1.0
 **/
 public class ConfigReader {
@@ -35,14 +35,14 @@ public class ConfigReader {
 
 
     /**
-      Public construct method. 
+      Public construct method.
     **/
     public ConfigReader () {
     }
 
     /**
       Default filepath is ".".
-    
+
       @param filename the config file name like "target.txt"
       @return the variables defined in file
     **/
@@ -52,8 +52,8 @@ public class ConfigReader {
 
     /**
       Get all variables defined in config file. the config file format is flat
-      with "A=B". If line started with '#' looks as comments. 
-    
+      with "A=B". If line started with '#' looks as comments.
+
       @param confPath the path of config file
       @param filename the file name of the config file
       @return the variables defined in the config file
@@ -78,7 +78,7 @@ public class ConfigReader {
                 // without '=', or start with '='
                 //
                 int index;
-                if (str.length() == 0 || str.startsWith("#") || 
+                if (str.length() == 0 || str.startsWith("#") ||
                     (index = str.indexOf('=')) <= 0) {
                     continue;
                 }
@@ -101,7 +101,7 @@ public class ConfigReader {
 
     public static synchronized ToolChainMap parseToolChainConfig(File ConfigFile) throws EdkException {
         ToolChainMap map = new ToolChainMap();
-    
+
         try {
             FileReader reader = new FileReader(ConfigFile);
             BufferedReader in = new BufferedReader(reader);
@@ -114,7 +114,7 @@ public class ConfigReader {
                 // without '=', or start with '='
                 //
                 int index;
-                if (str.length() == 0 || str.startsWith("#") || 
+                if (str.length() == 0 || str.startsWith("#") ||
                     (index = str.indexOf('=')) <= 0) {
                     continue;
                 }

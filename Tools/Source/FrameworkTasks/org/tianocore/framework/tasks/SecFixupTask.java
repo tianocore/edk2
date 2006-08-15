@@ -2,14 +2,14 @@
  SecFixupTask class.
 
  SecFixupTask is used to call SecFixup.exe to fix up sec image.
- 
- 
+
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -24,11 +24,12 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
  * SecFixupTask class.
- * 
+ *
  * SecFixupTask is used to call SecFixup.exe to fix up sec image.
  */
 public class SecFixupTask extends Task implements EfiDefine {
@@ -59,10 +60,10 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * execute
-     * 
+     *
      * SecFixupTask execute function is to assemble tool command line & execute
      * tool command line
-     * 
+     *
      * @throws BuidException
      */
     public void execute() throws BuildException {
@@ -139,9 +140,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * getSecExeFile
-     * 
+     *
      * This function is to get class member "secExeFile".
-     * 
+     *
      * @return string of sectExe file name.
      */
     public String getSecExeFile() {
@@ -150,9 +151,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * setSecExeFile
-     * 
+     *
      * This function is to set class member "secExeFile".
-     * 
+     *
      * @param secExeFile
      *            string of secExe file name.
      */
@@ -162,9 +163,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * getResetVectorDataFile
-     * 
+     *
      * This function is to get class member "resetVectorDataFile"
-     * 
+     *
      * @return resetVectorDataFile string of resetVectorData file name.
      */
     public String getResetVectorDataFile() {
@@ -173,9 +174,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * setResetVectorDataFile
-     * 
+     *
      * This function is to set class member "resetVectorDataFile"
-     * 
+     *
      * @param resetVectorDataFile
      *            string of resetVectorData file name.
      */
@@ -185,9 +186,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * getOutputFile
-     * 
+     *
      * This function is to get class member "outputFile"
-     * 
+     *
      * @return outputFile string of output file name.
      */
     public String getOutputFile() {
@@ -196,9 +197,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * setOutputFile
-     * 
+     *
      * This function is to set class member "outputFile"
-     * 
+     *
      * @param outputFile
      *            string of output file name.
      */
@@ -208,9 +209,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * getOutputDir
-     * 
+     *
      * This function is to get class member "outputDir"
-     * 
+     *
      * @return outputDir name of output directory
      */
     public String getOutputDir() {
@@ -219,9 +220,9 @@ public class SecFixupTask extends Task implements EfiDefine {
 
     /**
      * setOutputDir
-     * 
+     *
      * This function is to set class member "outputDir"
-     * 
+     *
      * @param outputDir
      *            name of output directory
      */

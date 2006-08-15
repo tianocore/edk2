@@ -1,9 +1,9 @@
 /** @file
- This file is ANT task FpdParserTask. 
- 
+ This file is ANT task FpdParserTask.
+
  FpdParserTask is used to parse FPD (Framework Platform Description) and generate
- build.out.xml. It is for Package or Platform build use. 
- 
+ build.out.xml. It is for Package or Platform build use.
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
@@ -32,61 +32,61 @@ import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
 
+import org.tianocore.common.exception.EdkException;
+import org.tianocore.pcd.action.ActionMessage;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PlatformIdentification;
-import org.tianocore.pcd.action.ActionMessage;
 import org.tianocore.build.pcd.action.PlatformPcdPreprocessActionForBuilding;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainMap;
-import org.tianocore.exception.EdkException;
 
 /**
   <code>FpdParserTask</code> is an ANT task. The main function is parsing Framework
-  Platform Descritpion (FPD) XML file and generating its ANT build script for 
-  corresponding platform.  
+  Platform Descritpion (FPD) XML file and generating its ANT build script for
+  corresponding platform.
 
   <p>The task sets global properties PLATFORM, PLATFORM_DIR, PLATFORM_RELATIVE_DIR
   and BUILD_DIR. </p>
-  
+
   <p>The task generates ${PLATFORM}_build.xml file which will be called by top level
-  build.xml. The task also generate Fv.inf files (File is for Tool GenFvImage) 
+  build.xml. The task also generate Fv.inf files (File is for Tool GenFvImage)
   and flash definition file (File is for Tool FlashMap) if necessary. </p>
-  
+
   <p>FpdParserTask task stores all FPD information to GlobalData. And parse
   tools definition file to set up compiler options for different Target and
   different ToolChainTag. </p>
-  
+
   <p>The method parseFpdFile is also prepared for single module build. </p>
-  
+
   <p>The usage is (take NT32 Platform for example):</p>
 
   <pre>
   &lt;FPDParser platformName="Nt32" /&gt;
   </pre>
 
-  <p>The task will initialize all information through parsing Framework Database, 
+  <p>The task will initialize all information through parsing Framework Database,
   SPD, Tool chain configuration files. </p>
 
   @since GenBuild 1.0
 **/
 public class FpdParserTask extends Task {
-    
+
     private String platformName;
 
     private File fpdFile = null;
-    
+
     private PlatformIdentification platformId;
-    
+
     ///
-    /// 
+    ///
     ///
     private String type;
-    
+
     ///
     /// Mapping from modules identification to out put file name
     ///
@@ -98,10 +98,10 @@ public class FpdParserTask extends Task {
     private Map<String, Set<FpdModuleIdentification>> fvs = new HashMap<String, Set<FpdModuleIdentification>>();
 
     ///
-    /// FpdParserTask can specify some ANT properties. 
+    /// FpdParserTask can specify some ANT properties.
     ///
     private Vector<Property> properties = new Vector<Property>();
-    
+
     private boolean isUnified = true;
 
 
@@ -112,19 +112,19 @@ public class FpdParserTask extends Task {
     }
 
     /**
-     ANT task's entry method. The main steps is described as following: 
-     
+     ANT task's entry method. The main steps is described as following:
+
      <ul>
-     <li>Initialize global information (Framework DB, SPD files and all MSA files 
+     <li>Initialize global information (Framework DB, SPD files and all MSA files
      listed in SPD). This step will execute only once in whole build process;</li>
      <li>Parse specified FPD file; </li>
      <li>Generate FV.inf files; </li>
      <li>Generate PlatformName_build.xml file for Flatform build; </li>
      <li>Collect PCD information. </li>
      </ul>
-     
+
      @throws BuildException
-     Surface area is not valid. 
+     Surface area is not valid.
     **/
     public void execute() throws BuildException {
         // Remove !!
@@ -135,17 +135,17 @@ public class FpdParserTask extends Task {
             platformId = GlobalData.getPlatformByName(platformName);
             fpdFile = platformId.getFpdFile();
         }
-        
+
         //
         // Parse FPD file
         //
         parseFpdFile();
-        
+
         //
         // Prepare BUILD_DIR
         //
         isUnified = OutputManager.getInstance().prepareBuildDir(getProject());
-        
+
         //
         // For every Target and ToolChain
         //
@@ -156,13 +156,13 @@ public class FpdParserTask extends Task {
                 //
                 // Prepare FV_DIR
                 //
-                String ffsCommonDir = getProject().getProperty("BUILD_DIR") + File.separatorChar 
-                                + targetList[i] + File.separatorChar 
+                String ffsCommonDir = getProject().getProperty("BUILD_DIR") + File.separatorChar
+                                + targetList[i] + File.separatorChar
                                 + toolchainList[j];
                 File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
                 fvDir.mkdirs();
                 getProject().setProperty("FV_DIR", fvDir.getPath().replaceAll("(\\\\)", "/"));
-                
+
                 //
                 // Gen Fv.inf files
                 //
@@ -175,11 +175,11 @@ public class FpdParserTask extends Task {
         //
         PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, isUnified);
         fileGenerator.genBuildFile();
-        
+
         //
         // Ant call ${PLATFORM}_build.xml
         //
-        
+
         Ant ant = new Ant();
         ant.setProject(getProject());
         ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
@@ -187,17 +187,17 @@ public class FpdParserTask extends Task {
         ant.setInheritAll(true);
         ant.init();
         ant.execute();
-        
+
 //        GlobalData.log.info("Fpd build end. ");
     }
 
     /**
-      Generate Fv.inf files. The Fv.inf file is composed with four 
-      parts: Options, Attributes, Components and Files. The Fv.inf files 
+      Generate Fv.inf files. The Fv.inf file is composed with four
+      parts: Options, Attributes, Components and Files. The Fv.inf files
       will be under FV_DIR.
-     
+
       @throws BuildException
-                  File write FV.inf files error. 
+                  File write FV.inf files error.
     **/
     private void genFvInfFiles(String ffsCommonDir) throws BuildException {
         String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
@@ -211,14 +211,14 @@ public class FpdParserTask extends Task {
             }
 
             getProject().setProperty("FV_FILENAME", validFv[i]);
-            
+
             File fvFile = new File(getProject().replaceProperties( getProject().getProperty("FV_DIR") + File.separatorChar + validFv[i] + ".inf"));
             fvFile.getParentFile().mkdirs();
 
             try {
                 FileWriter fw = new FileWriter(fvFile);
                 BufferedWriter bw = new BufferedWriter(fw);
-                
+
                 //
                 // Options
                 //
@@ -239,7 +239,7 @@ public class FpdParserTask extends Task {
                     }
                     bw.newLine();
                 }
-                
+
                 //
                 // Attributes;
                 //
@@ -260,7 +260,7 @@ public class FpdParserTask extends Task {
                     }
                     bw.newLine();
                 }
-                
+
                 //
                 // Components
                 //
@@ -281,7 +281,7 @@ public class FpdParserTask extends Task {
                     }
                     bw.newLine();
                 }
-                
+
                 //
                 // Files
                 //
@@ -306,10 +306,10 @@ public class FpdParserTask extends Task {
     }
     /**
       This method is used for Single Module Build.
-      
-      
+
+
       @throws BuildException
-                  FPD file is not valid. 
+                  FPD file is not valid.
     **/
     public void parseFpdFile(File fpdFile) throws BuildException {
         this.fpdFile = fpdFile;
@@ -317,19 +317,19 @@ public class FpdParserTask extends Task {
     }
 
     /**
-      Parse FPD file. 
-     
+      Parse FPD file.
+
       @throws BuildException
-                  FPD file is not valid. 
+                  FPD file is not valid.
      **/
     private void parseFpdFile() throws BuildException {
         try {
             XmlObject doc = XmlObject.Factory.parse(fpdFile);
-            
+
             if (!doc.validate()) {
                 throw new BuildException("Platform Surface Area file [" + fpdFile.getPath() + "] format is invalid!");
             }
-            
+
             Map<String, XmlObject> map = new HashMap<String, XmlObject>();
             map.put("PlatformSurfaceArea", doc);
             SurfaceAreaQuery.setDoc(map);
@@ -345,7 +345,7 @@ public class FpdParserTask extends Task {
             getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
 
             //
-            // Build mode. User-defined output dir. 
+            // Build mode. User-defined output dir.
             //
             String buildMode = SurfaceAreaQuery.getFpdIntermediateDirectories();
             String userDefinedOutputDir = SurfaceAreaQuery.getFpdOutputDirectory();
@@ -356,9 +356,9 @@ public class FpdParserTask extends Task {
             // TBD. Deal PCD and BuildOption related Info
             //
             GlobalData.setFpdBuildOptions(SurfaceAreaQuery.getFpdBuildOptions());
-            
+
             GlobalData.setToolChainPlatformInfo(SurfaceAreaQuery.getFpdToolChainInfo());
-            
+
             //
             // Parse all list modules SA
             //
@@ -371,7 +371,7 @@ public class FpdParserTask extends Task {
             parseToolChainOptions();
 
             SurfaceAreaQuery.setDoc(map);
-            
+
             //
             // Pcd Collection. Call CollectPCDAction to collect pcd info.
             //
@@ -383,9 +383,9 @@ public class FpdParserTask extends Task {
     }
 
 
-    
+
     /**
-      Parse all modules listed in FPD file. 
+      Parse all modules listed in FPD file.
     **/
     private void parseModuleSAFiles() throws EdkException{
         Map<FpdModuleIdentification, Map<String, XmlObject>> moduleSAs = SurfaceAreaQuery.getFpdModules();
@@ -397,11 +397,11 @@ public class FpdParserTask extends Task {
         Iterator iter = keys.iterator();
         while (iter.hasNext()) {
             FpdModuleIdentification fpdModuleId = (FpdModuleIdentification) iter.next();
-            
+
             //
-            // Judge if Module is existed? 
+            // Judge if Module is existed?
             // TBD
-            
+
             GlobalData.registerFpdModuleSA(fpdModuleId, moduleSAs.get(fpdModuleId));
 
             //
@@ -413,7 +413,7 @@ public class FpdParserTask extends Task {
 
             fpdModuleId.setFvBinding(fvBinding);
             updateFvs(fvBinding, fpdModuleId);
-            
+
             //
             // Prepare for out put file name
             //
@@ -424,13 +424,13 @@ public class FpdParserTask extends Task {
             if (baseName == null) {
                 baseName = moduleId.getName();
             }
-            outfiles.put(fpdModuleId, fpdModuleId.getArch() + File.separatorChar 
-                         + moduleId.getGuid() + "-" + baseName 
+            outfiles.put(fpdModuleId, fpdModuleId.getArch() + File.separatorChar
+                         + moduleId.getGuid() + "-" + baseName
                          + getSuffix(moduleId.getModuleType()));
 
             //
             // parse module build options, if any
-            // 
+            //
             SurfaceAreaQuery.push(GlobalData.getDoc(fpdModuleId));
             GlobalData.addModuleToolChainOption(fpdModuleId, parseModuleBuildOptions(false));
             GlobalData.addModuleToolChainFamilyOption(fpdModuleId, parseModuleBuildOptions(true));
@@ -445,7 +445,7 @@ public class FpdParserTask extends Task {
         }
         return parseOptions(options);
     }
-    
+
     private ToolChainMap parsePlatformBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
         String[][] options = SurfaceAreaQuery.getPlatformBuildOptions(toolChainFamilyFlag);
         if (options == null || options.length == 0) {
@@ -469,7 +469,7 @@ public class FpdParserTask extends Task {
 
         return map;
     }
-    
+
     private void parseToolChainFamilyOptions() throws EdkException {
         GlobalData.setPlatformToolChainFamilyOption(parsePlatformBuildOptions(true));
     }
@@ -479,8 +479,8 @@ public class FpdParserTask extends Task {
     }
 
     /**
-      Add the current module to corresponding FV. 
-     
+      Add the current module to corresponding FV.
+
       @param fvName current FV name
       @param moduleName current module identification
     **/
@@ -506,8 +506,8 @@ public class FpdParserTask extends Task {
     }
 
     /**
-      Get the suffix based on module type. Current relationship are listed:  
-      
+      Get the suffix based on module type. Current relationship are listed:
+
       <pre>
       <b>ModuleType</b>     <b>Suffix</b>
       BASE                 .FFS
@@ -524,7 +524,7 @@ public class FpdParserTask extends Task {
       UEFI_APPLICATION     .APP
       USER_DEFINED         .FFS
       </pre>
-     
+
       @param moduleType module type
       @return
       @throws BuildException
@@ -536,13 +536,13 @@ public class FpdParserTask extends Task {
         }
 
         String[][] suffix = { { "BASE", ".FFS"},
-                              { "SEC", ".SEC" }, { "PEI_CORE", ".PEI" }, 
+                              { "SEC", ".SEC" }, { "PEI_CORE", ".PEI" },
                               { "PEIM", ".PEI" }, { "DXE_CORE", ".DXE" },
-                              { "DXE_DRIVER", ".DXE" }, { "DXE_RUNTIME_DRIVER", ".DXE" }, 
-                              { "DXE_SAL_DRIVER", ".DXE" }, { "DXE_SMM_DRIVER", ".DXE" }, 
+                              { "DXE_DRIVER", ".DXE" }, { "DXE_RUNTIME_DRIVER", ".DXE" },
+                              { "DXE_SAL_DRIVER", ".DXE" }, { "DXE_SMM_DRIVER", ".DXE" },
                               { "TOOL", ".FFS" }, { "UEFI_DRIVER", ".DXE" },
                               { "UEFI_APPLICATION", ".APP" }, { "USER_DEFINED", ".FFS" } };
-        
+
         for (int i = 0; i < suffix.length; i++) {
             if (suffix[i][0].equalsIgnoreCase(moduleType)) {
                 return suffix[i][1];
@@ -554,8 +554,8 @@ public class FpdParserTask extends Task {
         return ".FFS";
     }
     /**
-     Add a property. 
-     
+     Add a property.
+
      @param p property
      **/
     public void addProperty(Property p) {
@@ -573,6 +573,6 @@ public class FpdParserTask extends Task {
     public void setType(String type) {
         this.type = type;
     }
-    
+
 
 }

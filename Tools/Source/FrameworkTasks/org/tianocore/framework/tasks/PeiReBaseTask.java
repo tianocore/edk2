@@ -2,14 +2,14 @@
  PeiReBaseTask class.
 
  PeiReBaseTask is used to call PeiReBase.exe to rebase efi fv file.
- 
- 
+
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -24,7 +24,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
   PeiReBaseTask class.
@@ -50,23 +51,23 @@ public class PeiReBaseTask extends Task implements EfiDefine {
     // / Output directory, this variable is added by jave wrap
     // /
     private String outputDir = "";
-    
+
     ///
     /// Base address
     ///
     private String baseAddr = "";
-    
+
     ///
-    /// Architecture 
+    /// Architecture
     ///
     private String arch = "";
-    
+
     /**
      * execute
-     * 
+     *
      * PeiReBaseTask execute function is to assemble tool command line & execute
      * tool command line
-     * 
+     *
      * @throws BuidException
      */
     public void execute() throws BuildException {
@@ -78,7 +79,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
         FrameworkLogger logger = new FrameworkLogger(project, toolName.toLowerCase());
         EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
         EdkLog.setLogger(logger);
-        
+
         //
         // absolute path of efi tools
         //
@@ -97,7 +98,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
         if (path != null) {
             command = path + File.separatorChar + command;
         }
-        
+
         //
         // argument of tools
         //
@@ -109,7 +110,7 @@ public class PeiReBaseTask extends Task implements EfiDefine {
         } else {
             argument = inputFile + " " + "-O " + outputFile + " " + this.baseAddr+ " " + "-M " + outputFile + ".map";
         }
-        
+
         //
         // return value of fwimage execution
         //
@@ -131,9 +132,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
             //
             EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
             EdkLog.log(EdkLog.EDK_INFO, this.inputFileName);
-            
+
             revl = runner.execute();
-            
+
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
@@ -153,9 +154,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * getInputFile
-     * 
+     *
      * This function is to get class member "inputFile".
-     * 
+     *
      * @return string of input file name.
      */
     public String getInputFile() {
@@ -164,9 +165,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * setComponentType
-     * 
+     *
      * This function is to set class member "inputFile".
-     * 
+     *
      * @param inputFile
      *            string of input file name.
      */
@@ -177,9 +178,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * getOutputFile
-     * 
+     *
      * This function is to get class member "outputFile"
-     * 
+     *
      * @return outputFile string of output file name.
      */
     public String getOutputFile() {
@@ -188,9 +189,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * setOutputFile
-     * 
+     *
      * This function is to set class member "outputFile"
-     * 
+     *
      * @param outputFile
      *            string of output file name.
      */
@@ -200,9 +201,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * getOutputDir
-     * 
+     *
      * This function is to get class member "outputDir"
-     * 
+     *
      * @return outputDir string of output directory.
      */
     public String getOutputDir() {
@@ -211,9 +212,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * setOutputDir
-     * 
+     *
      * This function is to set class member "outputDir"
-     * 
+     *
      * @param outputDir
      *            string of output directory.
      */
@@ -223,9 +224,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * getBaseAddr
-     * 
+     *
      * This function is to get class member "baseAddr"
-     * 
+     *
      * @return baseAddr   string of base address.
      */
     public String getBaseAddr() {
@@ -234,9 +235,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * setBaseAddr
-     * 
+     *
      * This function is to set class member "baseAddr"
-     * 
+     *
      * @param baseAddr    string of base address
      */
     public void setBaseAddr(String baseAddr) {
@@ -245,9 +246,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * getArch
-     * 
+     *
      * This function is to get class member "arch".
-     * 
+     *
      * @return arch       Architecture
      */
     public String getArch() {
@@ -256,9 +257,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
 
     /**
      * setArch
-     * 
-     * This function is to set class member "arch" 
-     * 
+     *
+     * This function is to set class member "arch"
+     *
      * @param arch         Architecture
      */
     public void setArch(String arch) {

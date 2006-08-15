@@ -15,10 +15,10 @@ Module Name:
 Abstract:
 
 --*/
-package org.tianocore.logger;
 
-import org.tianocore.logger.LogMethod;
+package org.tianocore.common.logger;
 
+import org.tianocore.common.logger.LogMethod;
 
 public class EdkLog {
     private static final String error    = "ERROR";
@@ -26,7 +26,7 @@ public class EdkLog {
     private static final String info     = "INFO";
     private static final String verbose  = "VERBOSE";
     private static final String debug    = "DEBUG";
-    
+
     public static final int EDK_ERROR   = 0;
     public static final int EDK_WARNING = 1;
     public static final int EDK_INFO    = 2;
@@ -38,9 +38,9 @@ public class EdkLog {
 
     public static void log(int level, String message) {
         if (level <= logLevel){
-            logger.putMessage(null, logLevel, message);  
+            logger.putMessage(null, logLevel, message);
         }
-       
+
     }
 
     public static void log(int logLevel, String message, Exception cause) {
@@ -58,7 +58,7 @@ public class EdkLog {
     public static void setLogger(LogMethod l) {
         logger = l;
     }
-    
+
     public static void setLogLevel (int level){
         logLevel = level;
     }
@@ -72,16 +72,16 @@ public class EdkLog {
        }
        if (levelStr.equalsIgnoreCase(debug)){
            logLevel = EDK_DEBUG;
-       } 
+       }
        if (levelStr.equalsIgnoreCase(info)){
            logLevel = EDK_INFO;
-       } 
+       }
        if (levelStr.equalsIgnoreCase(verbose)){
            logLevel = EDK_VERBOSE;
-       } 
+       }
        if (levelStr.equalsIgnoreCase(warning)){
            logLevel = EDK_WARNING;
-       } 
+       }
     }
     public static int getLogLevel (){
         return logLevel;

@@ -17,18 +17,20 @@ Abstract:
 --*/
 
 package org.tianocore.framework.tasks;
+
 import org.apache.tools.ant.Project;
-import org.tianocore.logger.LogMethod;
+
+import org.tianocore.common.logger.LogMethod;
 
 class FrameworkLogger implements LogMethod {
     private Project project;
     private String  titleName;
     public FrameworkLogger(Project project, String taskName) {
         this.project = project;
-        this.titleName = taskName;        
+        this.titleName = taskName;
     }
 
-    public void putMessage(Object msgSource, int msgLevel, String msg) {        
+    public void putMessage(Object msgSource, int msgLevel, String msg) {
         String frameworkMsg = " [" + this.titleName + "] " + msg;
         this.project.log(frameworkMsg, Project.MSG_INFO);
     }
