@@ -11,7 +11,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   <MsaHeader>
     <ModuleName>Fat</ModuleName>
     <ModuleType>USER_DEFINED</ModuleType>
-    <GuidValue>5058F21C-BC34-11d4-BD18-0080C73C8881</GuidValue>
+    <GuidValue>961578FE-B6B7-44c3-AF35-6BC705CD2B1F</GuidValue>
     <Version>1.0</Version>
     <Abstract>Make a FFS section for an FV that contains the FAT driver.*.FFS files are compressed FFS sections.</Abstract>
     <Description>This is the FAT 32 EFI/Tiano Driver</Description>
@@ -34,6 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Filename SupArchList="IA32">Ia32/Fat.FFS</Filename>
     <Filename SupArchList="IPF">Ipf/Fat.FFS</Filename>
     <Filename SupArchList="X64">X64/Fat.FFS</Filename>
+    <Filename SupArchList="EBC">Ebc/Fat.FFS</Filename>
   </SourceFiles>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
