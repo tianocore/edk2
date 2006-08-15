@@ -39,7 +39,7 @@ public class Tool implements EfiDefine, Section {
 
      @param     buffer  The buffer to put the result with alignment
      **/
-    public void toBuffer (DataOutputStream buffer, DataOutputStream orgBuffer){
+    public void toBuffer (DataOutputStream buffer){
         File           OutputFile;
         byte           data;
 
@@ -72,10 +72,6 @@ public class Tool implements EfiDefine, Section {
             while (i < fileLen) {
                 data = In.readByte();
                 buffer.writeByte(data);
-                //
-                // Add data to org file
-                //
-                orgBuffer.writeByte(data);
                 i ++;
             }
 
@@ -85,7 +81,6 @@ public class Tool implements EfiDefine, Section {
             while ((fileLen & 0x03) != 0) {
                 fileLen++;
                 buffer.writeByte(0);
-                orgBuffer.writeByte(0);
             }
             In.close();
 

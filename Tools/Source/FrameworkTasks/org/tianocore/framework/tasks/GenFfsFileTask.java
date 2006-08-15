@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.tianocore.common.logger.EdkLog;
 
 /**
   GenFfsFileTask
@@ -112,7 +113,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
     /// The path of Framewor_Tools_Paht.
     ///
     static String path = "";  
-
+ 
     /**
       execute
       
@@ -120,18 +121,17 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
       dscriptive information.
     **/
     public void execute() throws BuildException {
-        Section           sect;
-        int               fileSize;
-        int               orgFileSize;
-        int               fileDataSize;
-        int               orgFileDataSize;
-        File              ffsFile;
-        File              ffsOrgFile;
-        FfsHeader         ffsHeader = new FfsHeader();  
-        FfsHeader         orgFfsHeader = new FfsHeader();
+
         String            ffsSuffix = "";
         String            outputPath = "";
-
+        Project project = this.getOwningTarget().getProject();
+        //
+        // set Logger
+        //
+        FrameworkLogger logger = new FrameworkLogger(project, "genFfs");
+        EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
+        EdkLog.setLogger(logger);
+        
         //
         //  Get Fraemwork_Tools_Path
         //
@@ -170,267 +170,8 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         }
 
         String ffsFilePath = outputPath + this.ffsFileGuid + '-' + this.baseName + ffsSuffix;
-        ffsFile = new File (ffsFilePath);  
-        //
-        // Create ffs ORG file. fileName = FfsFileGuid + BaseName + ffsSuffix +
-        // ".org".
-        //
-        ffsOrgFile = new File(ffsFilePath + ".org");
-           
-        log(ffsFile.getName());
-        log(ffsOrgFile.getName());
-        try {
-            //
-            //  Create file output stream -- dataBuffer.
-            //
-            FileOutputStream dataFs     = new FileOutputStream (ffsFile.getAbsolutePath());
-            DataOutputStream dataBuffer = new DataOutputStream (dataFs);
-            
-            //
-            // Create org file output stream -- orgDataBuffer
-            //
-            FileOutputStream orgDataFs     = new FileOutputStream (ffsOrgFile.getAbsolutePath());
-            DataOutputStream orgDataBuffer = new DataOutputStream (orgDataFs);
-            
-            //
-            //  Search SectionList find earch section and call it's 
-            //  ToBuffer function.
-            //
-            Iterator sectionIter = this.sectionList.iterator();
-            while (sectionIter.hasNext()) {
-                sect = (Section)sectionIter.next(); 
-
-                try {
-                    //
-                    //  The last section don't need 4 byte ffsAligment.
-                    //
-                    sect.toBuffer((DataOutputStream)dataBuffer, (DataOutputStream) orgDataBuffer);
-                } catch (Exception e) {
-                    throw new BuildException (e.getMessage());
-                }
-            }
-            dataBuffer.close();
-            orgDataBuffer.close();
-        } catch (Exception e) {
-            throw new BuildException (e.getMessage());
-        }
-
-        //
-        //  Creat Ffs file header
-        //
-        try {
-
-            //
-            //  create input stream to read file data
-            //
-            byte[] fileBuffer  = new byte[(int)ffsFile.length()];
-            FileInputStream fi = new FileInputStream (ffsFile.getAbsolutePath());
-            DataInputStream di = new DataInputStream (fi);
-            di.read(fileBuffer);
-            di.close();
-            
-            //
-            // create input org stream to read file data
-            //
-            byte[] orgFileBuffer = new byte[(int)ffsOrgFile.length()];
-            FileInputStream ofi  = new FileInputStream (ffsOrgFile.getAbsolutePath());
-            DataInputStream odi  = new DataInputStream (ofi);
-            odi.read(orgFileBuffer);
-            odi.close();
-
-            //
-            //  Add GUID to header struct
-            //
-            if (this.ffsFileGuid != null) {
-                stringToGuid (this.ffsFileGuid, ffsHeader.name);
-                //
-                // Add Guid to org header struct
-                //
-                stringToGuid (this.ffsFileGuid, orgFfsHeader.name);
-            }
-
-            ffsHeader.ffsAttributes = this.attributes;
-            if ((ffsHeader.fileType = stringToType(this.ffsFileType))== -1) {
-                throw new BuildException ("FFS_FILE_TYPE unknow!\n");
-            }
-            
-            //
-            // Copy ffsHeader.ffsAttribute and fileType to orgFfsHeader.ffsAttribute
-            // and fileType
-            //            
-            orgFfsHeader.ffsAttributes = ffsHeader.ffsAttributes;
-            orgFfsHeader.fileType      = ffsHeader.fileType;
-            
-            //
-            //  Adjust file size. The function is used to tripe the last 
-            //  section padding of 4 binary boundary. 
-            //  
-            //
-            if (ffsHeader.fileType != EFI_FV_FILETYPE_RAW) {
-
-                fileDataSize = adjustFileSize (fileBuffer);
-                orgFileDataSize = adjustFileSize (orgFileBuffer);
-
-            } else {
-                fileDataSize = fileBuffer.length;
-                orgFileDataSize = orgFileBuffer.length;
-            }
-
-            //
-            //  1. add header size to file size
-            //
-            fileSize = fileDataSize + ffsHeader.getSize();
-            //
-            //     add header size to org file size
-            //
-            orgFileSize = orgFileDataSize + ffsHeader.getSize();
-
-            if ((ffsHeader.ffsAttributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
-                if (ffsHeader.fileType == EFI_FV_FILETYPE_FFS_PAD) {
-
-                    throw new BuildException (
-                                             "FFS_ATTRIB_TAIL_PRESENT=TRUE is " +
-                                             "invalid for PAD files"
-                                             );
-                }
-                if (fileSize == ffsHeader.getSize()) {
-                    throw new BuildException (
-                                             "FFS_ATTRIB_TAIL_PRESENT=TRUE is " +
-                                             "invalid for zero length files"
-                                             );            
-                }
-                fileSize = fileSize + 2;
-                orgFileSize = orgFileSize + 2;
-            }
-
-            //
-            //  2. set file size to header struct
-            //
-            ffsHeader.ffsFileSize[0] = (byte)(fileSize & 0x00FF);
-            ffsHeader.ffsFileSize[1] = (byte)((fileSize & 0x00FF00)>>8);
-            ffsHeader.ffsFileSize[2] = (byte)(((int)fileSize & 0xFF0000)>>16);
-            
-            //
-            //     set file size to org header struct
-            //
-            orgFfsHeader.ffsFileSize[0] = (byte)(orgFileSize & 0x00FF);
-            orgFfsHeader.ffsFileSize[1] = (byte)((orgFileSize & 0x00FF00)>>8);
-            orgFfsHeader.ffsFileSize[2] = (byte)(((int)orgFileSize & 0xFF0000)>>16);
-            
-            //
-            //  Fill in checksums and state, these must be zero for checksumming
-            //
-            ffsHeader.integrityCheck.header = calculateChecksum8 (
-                                                                 ffsHeader.structToBuffer(),
-                                                                 ffsHeader.getSize()
-                                                                 );
-            //
-            // Fill in org file's header check sum and state
-            //
-            orgFfsHeader.integrityCheck.header = calculateChecksum8 (
-                                                                    orgFfsHeader.structToBuffer(),
-                                                                    orgFfsHeader.getSize()
-                                                                    );
-            
-            if ((this.attributes & FFS_ATTRIB_CHECKSUM) != 0) {
-                if ((this.attributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
-                    ffsHeader.integrityCheck.file = calculateChecksum8 (
-                                                                       fileBuffer, 
-                                                                       fileDataSize
-                                                                       );
-                    //
-                    // Add org file header
-                    //
-                    orgFfsHeader.integrityCheck.file = calculateChecksum8 (
-                                                                           orgFileBuffer,
-                                                                           orgFileDataSize
-                                                                           );
-                } else {
-                    ffsHeader.integrityCheck.file = calculateChecksum8 (
-                                                                       fileBuffer,
-                                                                       fileDataSize
-                                                                       );
-                    //
-                    // Add org file header
-                    //
-                    orgFfsHeader.integrityCheck.file = calculateChecksum8 (
-                                                                          orgFileBuffer,
-                                                                          orgFileDataSize
-                                                                          );
-                }
-            } else {
-                ffsHeader.integrityCheck.file = FFS_FIXED_CHECKSUM;
-                orgFfsHeader.integrityCheck.file = FFS_FIXED_CHECKSUM;
-            }
-
-            //
-            //   Set the state now. Spec says the checksum assumes the state is 0.
-            //
-            ffsHeader.ffsState = EFI_FILE_HEADER_CONSTRUCTION | 
-                                 EFI_FILE_HEADER_VALID | 
-                                 EFI_FILE_DATA_VALID;
-            orgFfsHeader.ffsState = ffsHeader.ffsState;
-            
-            //
-            // create output stream to first write header data in file, then write sect data in file.
-            //
-            FileOutputStream headerFfs = new FileOutputStream (ffsFile.getAbsolutePath());
-            DataOutputStream ffsBuffer = new DataOutputStream (headerFfs);
-            
-            FileOutputStream orgHeaderFfs = new FileOutputStream (ffsOrgFile.getAbsolutePath());
-            DataOutputStream orgFfsBuffer = new DataOutputStream (orgHeaderFfs);
-            
-            //
-            //  Add header struct and file data to FFS file
-            //
-            ffsBuffer.write(ffsHeader.structToBuffer());
-            orgFfsBuffer.write(orgFfsHeader.structToBuffer());
-            
-            for (int i = 0; i< fileDataSize; i++) {
-                ffsBuffer.write(fileBuffer[i]);
-            }
-            
-            for (int i = 0; i < orgFileDataSize; i++){
-                orgFfsBuffer.write(orgFileBuffer[i]);
-            }
-
-            //
-            //  If there is a tail, then set it
-            //
-            if ((this.attributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
-                short tailValue ;
-                byte [] tailByte = new byte[2];
-
-                //
-                //  reverse tailvalue , integritycheck.file as hight byte, and 
-                //  integritycheck.header as low byte.
-                //
-                tailValue = (short)(ffsHeader.integrityCheck.header & 0xff);
-                tailValue = (short)((tailValue) | ((ffsHeader.integrityCheck.file << 8) & 0xff00)); 
-                tailValue = (short)~tailValue;
-
-                //
-                //  Change short to byte[2]
-                //
-                tailByte[0] = (byte)(tailValue & 0xff);
-                tailByte[1] = (byte)((tailValue & 0xff00)>>8);  
-                ffsBuffer.write(tailByte[0]);
-                ffsBuffer.write(tailByte[1]);
-                
-                orgFfsBuffer.write(tailByte[0]);
-                orgFfsBuffer.write(tailByte[1]);
-            }
-
-            //
-            //  close output stream. Note if don't close output stream 
-            //  the buffer can't be rewritten to file. 
-            //
-            ffsBuffer.close();
-            orgFfsBuffer.close();
-        } catch (Exception e) {
-            log("genffsfile failed!");
-            throw new BuildException (e.getMessage());
-        }
+        File ffsFile = new File (ffsFilePath);
+        genFfs(ffsFile);
     }   
 
     /**
@@ -941,43 +682,260 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         this.outputDir = outputDir;
     }
 
+    /**
+      getModuleTyp
+      
+      This function is to get string of module type.
+     
+      @return moduleType      The string of module type.
+    **/
     public String getModuleType() {
         return this.moduleType;
     }
 
+    /**
+      setModuleType
+      
+      This function is to set moduleType.
+      
+      @param moduleType       The string of module type.
+    **/
     public void setModuleType(String moduleType) {
         this.moduleType = moduleType;
     }
-
+    
     /**
-     Convert a string to a integer.
-     
-     @param     intString   The string representing a integer
-     
-     @retval    int     The value of integer represented by the
-                        given string; -1 is returned if the format
-                        of the string is wrong.
-     **/
-    private int stringToInt(String intString) {
-        int value;
-        int hexPrefixPos = intString.indexOf("0x");
-        int radix = 10;
-        String intStringNoPrefix;
+    Convert a string to a integer.
+    
+    @param     intString   The string representing a integer
+    
+    @retval    int     The value of integer represented by the
+                       given string; -1 is returned if the format
+                       of the string is wrong.
+    **/
+   private int stringToInt(String intString) {
+       int value;
+       int hexPrefixPos = intString.indexOf("0x");
+       int radix = 10;
+       String intStringNoPrefix;
 
-        if (hexPrefixPos >= 0) {
-            radix = 16;
-            intStringNoPrefix = intString.substring(hexPrefixPos + 2, intString.length());
-        } else {
-            intStringNoPrefix = intString;
-        }
+       if (hexPrefixPos >= 0) {
+           radix = 16;
+           intStringNoPrefix = intString.substring(hexPrefixPos + 2, intString.length());
+       } else {
+           intStringNoPrefix = intString;
+       }
 
+       try {
+           value = Integer.parseInt(intStringNoPrefix, radix);
+       } catch (NumberFormatException e) {
+           log("Incorrect format of int [" + intString + "]. -1 is assumed");
+           return -1;
+       }
+
+       return value;
+   }
+    
+    /**
+      genFfs
+      
+      This function is to generate FFS file.
+      
+       @param ffsFile          Name of FFS file.
+       @param isOrg            Flag to indicate generate ORG ffs file or not.
+    **/
+    private void genFfs(File ffsFile) {
+        Section           sect;
+        int               fileSize;
+        int               fileDataSize;
+        FfsHeader         ffsHeader = new FfsHeader();  
+        FfsHeader         orgFfsHeader = new FfsHeader();
+           
+        EdkLog.log(EdkLog.EDK_INFO, ffsFile.getName());
+      
         try {
-            value = Integer.parseInt(intStringNoPrefix, radix);
-        } catch (NumberFormatException e) {
-            log("Incorrect format of int [" + intString + "]. -1 is assumed");
-            return -1;
+            //
+            //  Create file output stream -- dataBuffer.
+            //
+            FileOutputStream dataFs     = new FileOutputStream (ffsFile.getAbsolutePath());
+            DataOutputStream dataBuffer = new DataOutputStream (dataFs);
+            
+            //
+            //  Search SectionList find earch section and call it's 
+            //  ToBuffer function.
+            //
+            Iterator sectionIter = this.sectionList.iterator();
+            while (sectionIter.hasNext()) {
+                sect = (Section)sectionIter.next(); 
+
+                try {
+                    //
+                    //  The last section don't need 4 byte ffsAligment.
+                    //
+                    sect.toBuffer((DataOutputStream)dataBuffer);
+                } catch (Exception e) {
+                    throw new BuildException (e.getMessage());
+                }
+            }
+            dataBuffer.close();
+        } catch (Exception e) {
+            throw new BuildException (e.getMessage());
         }
 
-        return value;
+        //
+        //  Creat Ffs file header
+        //
+        try {
+
+            //
+            //  create input stream to read file data
+            //
+            byte[] fileBuffer  = new byte[(int)ffsFile.length()];
+            FileInputStream fi = new FileInputStream (ffsFile.getAbsolutePath());
+            DataInputStream di = new DataInputStream (fi);
+            di.read(fileBuffer);
+            di.close();
+            
+            //
+            //  Add GUID to header struct
+            //
+            if (this.ffsFileGuid != null) {
+                stringToGuid (this.ffsFileGuid, ffsHeader.name);
+            }
+
+            ffsHeader.ffsAttributes = this.attributes;
+            if ((ffsHeader.fileType = stringToType(this.ffsFileType))== -1) {
+                throw new BuildException ("FFS_FILE_TYPE unknow!\n");
+            }
+            
+            //
+            // Copy ffsHeader.ffsAttribute and fileType to orgFfsHeader.ffsAttribute
+            // and fileType
+            //            
+            orgFfsHeader.ffsAttributes = ffsHeader.ffsAttributes;
+            orgFfsHeader.fileType      = ffsHeader.fileType;
+            
+            //
+            //  Adjust file size. The function is used to tripe the last 
+            //  section padding of 4 binary boundary. 
+            //  
+            //
+            if (ffsHeader.fileType != EFI_FV_FILETYPE_RAW) {
+
+                fileDataSize = adjustFileSize (fileBuffer);
+            } else {
+                fileDataSize = fileBuffer.length;
+            }
+
+            //
+            //  1. add header size to file size
+            //
+            fileSize = fileDataSize + ffsHeader.getSize();
+
+            if ((ffsHeader.ffsAttributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
+                if (ffsHeader.fileType == EFI_FV_FILETYPE_FFS_PAD) {
+
+                    throw new BuildException (
+                                             "FFS_ATTRIB_TAIL_PRESENT=TRUE is " +
+                                             "invalid for PAD files"
+                                             );
+                }
+                if (fileSize == ffsHeader.getSize()) {
+                    throw new BuildException (
+                                             "FFS_ATTRIB_TAIL_PRESENT=TRUE is " +
+                                             "invalid for 0-length files"
+                                             );            
+                }
+                fileSize = fileSize + 2;
+            }
+
+            //
+            //  2. set file size to header struct
+            //
+            ffsHeader.ffsFileSize[0] = (byte)(fileSize & 0x00FF);
+            ffsHeader.ffsFileSize[1] = (byte)((fileSize & 0x00FF00)>>8);
+            ffsHeader.ffsFileSize[2] = (byte)(((int)fileSize & 0xFF0000)>>16);
+            
+            //
+            //  Fill in checksums and state, these must be zero for checksumming
+            //
+            ffsHeader.integrityCheck.header = calculateChecksum8 (
+                                                                 ffsHeader.structToBuffer(),
+                                                                 ffsHeader.getSize()
+                                                                 );
+            
+            if ((this.attributes & FFS_ATTRIB_CHECKSUM) != 0) {
+                if ((this.attributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
+                    ffsHeader.integrityCheck.file = calculateChecksum8 (
+                                                                       fileBuffer, 
+                                                                       fileDataSize
+                                                                       );
+                } else {
+                    ffsHeader.integrityCheck.file = calculateChecksum8 (
+                                                                       fileBuffer,
+                                                                       fileDataSize
+                                                                       );
+                }
+            } else {
+                ffsHeader.integrityCheck.file = FFS_FIXED_CHECKSUM;
+                orgFfsHeader.integrityCheck.file = FFS_FIXED_CHECKSUM;
+            }
+
+            //
+            //   Set the state now. Spec says the checksum assumes the state is 0.
+            //
+            ffsHeader.ffsState = EFI_FILE_HEADER_CONSTRUCTION | 
+                                 EFI_FILE_HEADER_VALID | 
+                                 EFI_FILE_DATA_VALID;
+            
+            //
+            // create output stream to first write header data in file, then write sect data in file.
+            //
+            FileOutputStream headerFfs = new FileOutputStream (ffsFile.getAbsolutePath());
+            DataOutputStream ffsBuffer = new DataOutputStream (headerFfs);
+            
+            //
+            //  Add header struct and file data to FFS file
+            //
+            ffsBuffer.write(ffsHeader.structToBuffer());
+            ffsBuffer.write(fileBuffer, 0, fileDataSize);
+            
+
+
+            //
+            //  If there is a tail, then set it
+            //
+            if ((this.attributes & FFS_ATTRIB_TAIL_PRESENT) != 0) {
+                short tailValue ;
+                byte [] tailByte = new byte[2];
+
+                //
+                //  reverse tailvalue , integritycheck.file as hight byte, and 
+                //  integritycheck.header as low byte.
+                //
+                tailValue = (short)(ffsHeader.integrityCheck.header & 0xff);
+                tailValue = (short)((tailValue) | ((ffsHeader.integrityCheck.file << 8) & 0xff00)); 
+                tailValue = (short)~tailValue;
+
+                //
+                //  Change short to byte[2]
+                //
+                tailByte[0] = (byte)(tailValue & 0xff);
+                tailByte[1] = (byte)((tailValue & 0xff00)>>8);  
+                ffsBuffer.write(tailByte[0]);
+                ffsBuffer.write(tailByte[1]);
+
+            }
+
+            //
+            //  close output stream. Note if don't close output stream 
+            //  the buffer can't be rewritten to file. 
+            //
+            ffsBuffer.close();
+        } catch (Exception e) {
+            log("genffsfile failed!");
+            throw new BuildException (e.getMessage());
+        }
+
     }
 }

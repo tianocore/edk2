@@ -17,11 +17,8 @@
 
 package org.tianocore.framework.tasks;
 
-import java.io.DataInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -54,18 +51,17 @@ public class CompressSection implements Section, FfsTypes{
       @param Buffer     The point of output buffer
       
     **/
-    public void toBuffer (DataOutputStream buffer, DataOutputStream orgBuffer){
+    public void toBuffer (DataOutputStream buffer){
         
         Section    sect;
-        File       compressOut;
     
         //
         //  Get section file in compress node.
         //
         try{
-            compressOut = new File ("Compress.temp");
-            FileOutputStream fo = new FileOutputStream (compressOut.getName());
-            DataOutputStream Do = new DataOutputStream (fo);
+            
+            ByteArrayOutputStream bo = new ByteArrayOutputStream ();
+            DataOutputStream Do = new DataOutputStream (bo);
             
             //
             //  Get each section which under the compress {};
@@ -79,7 +75,7 @@ public class CompressSection implements Section, FfsTypes{
                 //  Call each section class's toBuffer function.
                 //
                 try {
-                    sect.toBuffer(Do, orgBuffer);
+                    sect.toBuffer(Do);
                 }
                 catch (BuildException e) {
                     System.out.print(e.getMessage());
@@ -90,16 +86,9 @@ public class CompressSection implements Section, FfsTypes{
             Do.close();    
             
             //
-            //  Get contain to Buffer
-            //
-            FileInputStream fi = new FileInputStream (compressOut.getName());
-            DataInputStream di = new DataInputStream (fi);
-            byte[] fileBuffer  = new byte[(int)compressOut.length()];
-            di.read(fileBuffer);
-            
-            //
             //  Call compress
             //
+            byte[] fileBuffer = bo.toByteArray();
             Compress myCompress = new Compress(fileBuffer, fileBuffer.length);            
             
             //
@@ -151,18 +140,10 @@ public class CompressSection implements Section, FfsTypes{
                 buffer.writeByte(0);
             }
             //
-            // orgBuffer 4 Byte aligment
-            //
-            size = (int)compressOut.length();
-            while ((size & 0x03) != 0){
-                size ++;
-                orgBuffer.writeByte(0);
-            }
-            //
             //  Delete temp file
             //
-            di.close();
-            compressOut.delete();
+            //di.close();
+            //compressOut.delete();
                 
         }
         catch (Exception e){
