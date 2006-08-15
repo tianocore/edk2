@@ -23,4 +23,6 @@ public interface UI {
 	public void println(String message);
 	
 	public void println(Set<String> hash);
+	
+	public String choose(String message, Object[] choicelist);
 }

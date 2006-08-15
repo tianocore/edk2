@@ -51,7 +51,7 @@ public class SourceFileReplacer {
 			"EfiLibInstallAllDriverProtocols " +
 			"EfiLibCompareLanguage " +
 			"BufToHexString " +
-			"EfiStrTrim " +
+			"EfiStrTrim " +							//is the r8only lib going to be enlarged????  Caution !!!!
 			"EfiValueToHexStr " +
 			"HexStringToBuf " +
 			"IsHexDigit " +
@@ -69,33 +69,37 @@ public class SourceFileReplacer {
 	
 	public void flush() throws Exception {
 		PrintWriter outfile;
-		String temp = null;
-		if (ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
+		String outname = null;
+		String inname = null;
+		if (ui.yesOrNo("Change Source Code is to be doing . See details ?")) {
 			showdetails = true;
 		}
-		File tempdir = new File(modulepath + File.separator + "result" + File.separator);
-		if (!tempdir.exists()) tempdir.mkdir();
-		String[] list = new File(modulepath + File.separator + "temp").list();	//what I change is the non-local .h commented-out files
-		for (int i = 0 ; i < list.length ; i++) {
-			if (list[i].contains(".c")) {
-				ui.println("\nModifying file: " + list[i]);
-				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + list[i])));
-				outfile.append(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + list[i]));
+		
+		Iterator<String> di = mi.localmodulesources.iterator();
+		while (di.hasNext()) {
+			inname = di.next();
+			if (inname.contains(".c") || inname.contains(".C")) {
+				if (inname.contains(".C")) {
+					outname = inname.replaceFirst(".C", ".c");
+				} else {
+					outname = inname;
+				}
+				ui.println("\nModifying file : " + inname);
+				mi.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
+				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
+				outfile.append(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname));
 				outfile.flush();
 				outfile.close();
-			} else {
-				if (list[i].contains(".h")) {
-					temp = list[i];
-				} else if (list[i].contains(".C")) {
-					temp = list[i].replaceFirst(".C", ".c");
-				} else if (list[i].contains(".H")) {
-					temp = list[i].replaceFirst(".H", ".h");
+			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".dxs") || inname.contains(".uni")) {
+				if (inname.contains(".H")) {
+					outname = inname.replaceFirst(".H", ".h");
 				} else {
-					continue;
+					outname = inname;
 				}
-				ui.println("\nCopying file: " + temp);
-				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + temp)));
-				outfile.append(sourcefiletostring(modulepath + File.separator + "temp" + File.separator + list[i]));
+				ui.println("\nCopying file : " + inname);
+				mi.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
+				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
+				outfile.append(sourcefiletostring(modulepath + File.separator + "temp" + File.separator + inname));
 				outfile.flush();
 				outfile.close();
 			}
@@ -109,10 +113,9 @@ public class SourceFileReplacer {
 	private void addr8only() throws Exception {
 		String paragraph = null;
 		String line = sourcefiletostring(Database.defaultpath + File.separator + "R8Lib.c");
+		mi.ensureDir(modulepath + File.separator + "result" + File.separator + "R8Lib.c");
 		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.c")));
 		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.h")));
-		//outfile1.append("#include \"R8Lib.h\"\n\n");
-		//outfile2.append("#include \"R8Lib.h\"\n\n");
 		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
 		Matcher mtrr8only = ptnr8only.matcher(line);
 		Matcher mtrr8onlyhead;
@@ -134,6 +137,9 @@ public class SourceFileReplacer {
 		outfile1.close();
 		outfile2.flush();
 		outfile2.close();
+		
+		mi.localmodulesources.add("R8Lib.h");
+		mi.localmodulesources.add("R8Lib.c");
 	}
 	
 	private String sourcefiletostring(String filename) throws Exception {
@@ -167,7 +173,7 @@ public class SourceFileReplacer {
 		// replace BS -> gBS , RT -> gRT
 		Matcher mat = pat.matcher(line);
 		if (mat.find()) {												// add a library here
-			ui.println("Converting all BS->gBS, RT->gRT");
+			ui.println("Converting all BS->gBS,RT->gRT");
 			line = mat.replaceAll("g$1$2$3");							//unknown correctiveness
 		}
 		mat.reset();
@@ -214,8 +220,6 @@ public class SourceFileReplacer {
 						while (rt.hasNext()) {
 							temp = rt.next();
 							if (r8only.contains(temp.r8thing)) {
-								mi.localmodulesources.add("R8Lib.h");
-								mi.localmodulesources.add("R8Lib.c");
 								filer8only.add(r8thing);
 								mi.hashr8only.add(r8thing);
 								addr8 = true;
@@ -310,7 +314,7 @@ public class SourceFileReplacer {
 		fileppi.clear();
 		fileprotocol.clear();
 		filer8only.clear();
-		
+
 		return line;
 	}
 	
