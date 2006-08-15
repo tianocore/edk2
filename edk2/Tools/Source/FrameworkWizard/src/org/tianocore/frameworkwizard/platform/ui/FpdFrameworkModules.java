@@ -32,7 +32,7 @@ import java.util.Vector;
 public class FpdFrameworkModules extends IInternalFrame {
 
     /**
-     * 
+     * Initialize Globals
      */
     private static final long serialVersionUID = 1L;
 
@@ -79,17 +79,25 @@ public class FpdFrameworkModules extends IInternalFrame {
     private Map<String, ArrayList<String>> fpdMsa = null;
 
     private ArrayList<ModuleIdentification> miList = null;
-
+    
+    /**
+     * Column settings for displaying all modules in workspace
+     */
     private final int modNameColForAllModTable = 0;
     
     private final int pkgNameColForAllModTable = 1;
     
     private final int pathColForAllModTable = 2;
     
-    private final int pkgVerColForAllModTable = 3;
+    private final int typeColForAllModTable = 3;
+    
+    private final int pkgVerColForAllModTable = 5;
     
     private final int modVerColForAllModTable = 4;
     
+    /**
+     * Column settings for display modules in the FPD file
+     */
     private final int modNameColForFpdModTable = 0;
     
     private final int pkgNameColForFpdModTable = 1;
@@ -98,10 +106,13 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private final int archColForFpdModTable = 3;
     
-    private final int pkgVerColForFpdModTable = 4;
+    private final int pkgVerColForFpdModTable = 5;
 
-    private final int modVerColForFpdModTable = 5;
+    private final int modVerColForFpdModTable = 4;
     
+    /**
+     * FpdFileContents structure
+     */
     private final int ffcModGuid = 0;
     
     private final int ffcModVer = 1;
@@ -111,22 +122,27 @@ public class FpdFrameworkModules extends IInternalFrame {
     private final int ffcPkgVer = 3;
     
     private final int ffcModArch = 4;
-
+    
+    /**
+     * Set Column Widths, Only the PATH should not have a max width.
+     */
     private final int modNameMinWidth = 168;
     
     private final int modNamePrefWidth = 200;
+    
+    private final int modNameMaxWidth = 350;
 
     private final int pkgNameMinWidth = 100;
     
-    private final int pkgNamePrefWidth = 110;
+    private final int pkgNamePrefWidth = 130;
     
     private final int pkgNameMaxWidth = 150;
     
-    private final int verMinWidth = 50;
+    private final int verMinWidth = 60;
     
     private final int verMaxWidth = 80;
     
-    private final int verPrefWidth = 60;
+    private final int verPrefWidth = 70;
     
     private final int pathPrefWidth = 320;
     
@@ -138,10 +154,18 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private final int archMaxWidth = 100;
     
+    private final int typePrefWidth = 145;
+    
+    private final int typeMinWidth = 100;
+    
+    private final int typeMaxWidth = 155;
+    
     /**
-     * This method initializes jSplitPane	
+     * This method initializes jSplitPane
+     * 
+     * This is the main edit window
      * 	
-     * @return javax.swing.JSplitPane	
+     * @return javax.swing.JSplitPane jSplitPane	
      */
     private JSplitPane getJSplitPane() {
         if (jSplitPane == null) {
@@ -155,9 +179,11 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanel	
+     * This method initializes jPanelTop
+     * 
+     * This panel contains the All Modules Table	
      * 	
-     * @return javax.swing.JPanel	
+     * @return javax.swing.JPanel	jPanelTop
      */
     private JPanel getJPanelTop() {
         if (jPanelTop == null) {
@@ -173,9 +199,11 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanel1	
+     * This method initializes jPanelBottom
      * 	
-     * @return javax.swing.JPanel	
+     * This panel contains the FPD Modules Table
+     * 
+     * @return javax.swing.JPanel	jPanelBottom
      */
     private JPanel getJPanelBottom() {
         if (jPanelBottom == null) {
@@ -191,9 +219,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jScrollPane	
+     * This method initializes jScrollPaneAllModules	
      * 	
-     * @return javax.swing.JScrollPane	
+     * @return javax.swing.JScrollPane	jScrollPaneAllModules
      */
     private JScrollPane getJScrollPaneAllModules() {
         if (jScrollPaneAllModules == null) {
@@ -205,9 +233,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jTable	
+     * This method initializes jTableAllModules
      * 	
-     * @return javax.swing.JTable	
+     * @return javax.swing.JTable	jTableAllModules
      */
     private JTable getJTableAllModules() {
         if (jTableAllModules == null) {
@@ -219,13 +247,15 @@ public class FpdFrameworkModules extends IInternalFrame {
             modelAllModules.addColumn("<html>Module<br>Name</html>");
             modelAllModules.addColumn("<html>Package<br>Name</html>");
             modelAllModules.addColumn("Path");
-            modelAllModules.addColumn("<html>Package<br>Version</html>");
+            modelAllModules.addColumn("<html>Module<br>Type</html>");
             modelAllModules.addColumn("<html>Module<br>Version</html>");
+            modelAllModules.addColumn("<html>Package<br>Version</html>");
             
             javax.swing.table.TableColumn column = null;
             column = jTableAllModules.getColumnModel().getColumn(modNameColForAllModTable);
             column.setPreferredWidth(modNamePrefWidth);
             column.setMinWidth(modNameMinWidth);
+            column.setMaxWidth(modNameMaxWidth);
             column = jTableAllModules.getColumnModel().getColumn(modVerColForAllModTable);
             column.setPreferredWidth(verPrefWidth);
             column.setMaxWidth(verMaxWidth);
@@ -238,20 +268,26 @@ public class FpdFrameworkModules extends IInternalFrame {
             column.setPreferredWidth(verPrefWidth);
             column.setMaxWidth(verMaxWidth);
             column.setMinWidth(verMinWidth);
+            column = jTableAllModules.getColumnModel().getColumn(typeColForAllModTable);
+            column.setPreferredWidth(typePrefWidth);
+            column.setMaxWidth(typeMaxWidth);
+            column.setMinWidth(typeMinWidth);
             column = jTableAllModules.getColumnModel().getColumn(pathColForAllModTable);
             column.setPreferredWidth(pathPrefWidth);
             column.setMinWidth(pathMinWidth);
 
             jTableAllModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			jTableAllModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+			// jTableAllModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         }
         return jTableAllModules;
     }
 
     /**
-     * This method initializes jPanel2	
-     * 	
-     * @return javax.swing.JPanel	
+     * This method initializes jPanelTopSouth
+     * 
+     * This panel contains the ADD button
+     * 
+     * @return javax.swing.JPanel   jPanelTopSouth
      */
     private JPanel getJPanelTopSouth() {
         if (jPanelTopSouth == null) {
@@ -265,9 +301,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jButton	
+     * This method initializes jButtonAddModule	
      * 	
-     * @return javax.swing.JButton	
+     * @return javax.swing.JButton	jButtonAddModule
      */
     private JButton getJButtonAddModule() {
         if (jButtonAddModule == null) {
@@ -364,9 +400,11 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanel3	
+     * This method initializes jPanelBottomSouth
+     * 
+     * This panel contains the Settings and Remove Buttons
      * 	
-     * @return javax.swing.JPanel	
+     * @return javax.swing.JPanel	jPanelBottomSouth
      */
     private JPanel getJPanelBottomSouth() {
         if (jPanelBottomSouth == null) {
@@ -381,9 +419,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jScrollPane1	
+     * This method initializes jScrollPaneFpdModules
      * 	
-     * @return javax.swing.JScrollPane	
+     * @return javax.swing.JScrollPane	jScrollPaneFpdModules
      */
     private JScrollPane getJScrollPaneFpdModules() {
         if (jScrollPaneFpdModules == null) {
@@ -395,9 +433,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jTable1	
+     * This method initializes jTableFpdModules
      * 	
-     * @return javax.swing.JTable	
+     * @return javax.swing.JTable	jTableFpdModules
      */
     private JTable getJTableFpdModules() {
         if (jTableFpdModules == null) {
@@ -410,13 +448,14 @@ public class FpdFrameworkModules extends IInternalFrame {
             modelFpdModules.addColumn("<html>Package<br>Name</html>");
             modelFpdModules.addColumn("Path");
             modelFpdModules.addColumn("<html>Supported<br>Architectures</html>");
-            modelFpdModules.addColumn("<html>Package<br>Version</html>");
             modelFpdModules.addColumn("<html>Module<br>Version</html>");
+            modelFpdModules.addColumn("<html>Package<br>Version</html>");
             
             javax.swing.table.TableColumn column = null;
             column = jTableFpdModules.getColumnModel().getColumn(modNameColForFpdModTable);
             column.setPreferredWidth(modNamePrefWidth);
             column.setMinWidth(modNameMinWidth);
+            column.setMaxWidth(modNameMaxWidth);
             column = jTableFpdModules.getColumnModel().getColumn(modVerColForFpdModTable);
             column.setPreferredWidth(verPrefWidth);
             column.setMaxWidth(verMaxWidth);
@@ -438,15 +477,15 @@ public class FpdFrameworkModules extends IInternalFrame {
             column.setMinWidth(pathMinWidth);
 
             jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			jTableFpdModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+			// jTableFpdModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         }
         return jTableFpdModules;
     }
 
     /**
-     * This method initializes jButton1	
+     * This method initializes jButtonSettings
      * 	
-     * @return javax.swing.JButton	
+     * @return javax.swing.JButton	jButtonSettings
      */
     private JButton getJButtonSettings() {
         if (jButtonSettings == null) {
@@ -492,9 +531,9 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
-     * This method initializes jButton2	
+     * This method initializes jButtonRemoveModule
      * 	
-     * @return javax.swing.JButton	
+     * @return javax.swing.JButton	jButtonRemoveModule
      */
     private JButton getJButtonRemoveModule() {
         if (jButtonRemoveModule == null) {
@@ -542,6 +581,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     /**
+     * 
      * @param args
      */
     public static void main(String[] args) {
@@ -632,7 +672,7 @@ public class FpdFrameworkModules extends IInternalFrame {
 
         while (ispi.hasNext()) {
             PackageIdentification pi = (PackageIdentification) ispi.next();
-            String[] s = { "", "", "", "", "" };
+            String[] s = { "", "", "", "", "", "" };
 
             Set<ModuleIdentification> smi = GlobalData.getModules(pi);
             Iterator ismi = smi.iterator();
@@ -640,6 +680,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                 ModuleIdentification mi = (ModuleIdentification) ismi.next();
                 s[modNameColForAllModTable] = mi.getName();
                 s[modVerColForAllModTable] = mi.getVersion();
+                s[typeColForAllModTable] = mi.getModuleType();
                 s[pkgNameColForAllModTable] = pi.getName();
                 s[pkgVerColForAllModTable] = pi.getVersion();
                 try {
