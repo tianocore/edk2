@@ -49,8 +49,19 @@ Returns:
 
 --*/
 {
-  //EfiInitializeDriverLib (ImageHandle, SystemTable);
-
+  //
+  // Porting Guide:
+  // This obsolete Edk library interface installs driver binding protocol.
+  // If the entry point of that module only invoke this function, it can
+  // use UefiDriverModuleLib in MdePkg and expose "DriverBinding" protocol interface
+  // at the <Externs> tag, build tool will auto generate code to handle it.
+  // For example:
+  // <Externs>
+  //   <Extern>
+  //     <DriverBinding>gFatDriverBinding</DriverBinding>
+  //   </Extern>
+  // </Externs>
+  //
   DriverBinding->ImageHandle          = ImageHandle;
 
   DriverBinding->DriverBindingHandle  = DriverBindingHandle;
@@ -110,6 +121,24 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This obsolete Edk library interface installs driver binding protocol
+  // with optional component name, driver configuration & driver diagnotics protocols.
+  // If the entry point of that module only invoke this function, it can
+  // use UefiDriverModuleLib in MdePkg and expose "DriverBinding", "ComponentName",
+  // "DriverConfiguration" and "DriverDiagnostics" protocol interfaces.
+  // at the <Externs> tag, build tool will auto generate code to handle it.
+  // For example:
+  //  <Externs>
+  //    <Extern>
+  //      <DriverBinding>gFatDriverBinding</DriverBinding>
+  //    </Extern>
+  //    <Extern>
+  //      <ComponentName>gFatComponentName</ComponentName>
+  //    </Extern>
+  //  </Externs>
+  //
   EFI_STATUS  Status;
 
   Status = R8_EfiLibInstallDriverBinding (ImageHandle, SystemTable, DriverBinding, DriverBindingHandle);
@@ -181,6 +210,11 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
   UINTN Index;
 
   for (Index = 0; Index < 3; Index++) {
@@ -221,6 +255,11 @@ R8_BufToHexString (
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
   UINTN       Idx;
   UINT8       Byte;
   UINTN       StrLen;
@@ -275,6 +314,11 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
   CHAR16  *p1;
   CHAR16  *p2;
   
@@ -344,6 +388,14 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // Edk II BasePrintLib function UnicodeValueToString does not support 
+  // to convert Value to Hex String. 
+  // Include the source code to user code or use the full PrintLib funtion 
+  // UnicodeVSPrintAsciiFormat (Buffer, MAXIMUM_VALUE_CHARACTERS, "%x", Value) instead.
+  //
+
   CHAR16  TempBuffer[MAXIMUM_VALUE_CHARACTERS];
   CHAR16  *TempStr;
   CHAR16  Prefix;
@@ -436,6 +488,12 @@ R8_HexStringToBuf (
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
+
   UINTN       HexCnt;
   UINTN       Idx;
   UINTN       BufferLength;
@@ -515,6 +573,12 @@ R8_IsHexDigit (
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
+
   if ((Char >= L'0') && (Char <= L'9')) {
     *Digit = (UINT8) (Char - L'0');
     return TRUE;
@@ -552,6 +616,12 @@ R8_NibbleToHexChar (
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
+
   Nibble &= 0x0F;
   if (Nibble <= 0x9) {
     return (CHAR16)(Nibble + L'0');
@@ -585,6 +655,14 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // Edk II HobLib GetNextHob () is an equivelent function with the following exceptions:
+  // 1. GetNextHob () does not allow NULL value as the argument of HobStart by ASSERT ()  
+  // 2. GetNextHob () will return NULL instead of returning HobStart when such kind of
+  //    HOB can be retrieved, so caller does not need to re-check the return HOB type any longer.
+  //
+
   VOID    *Hob;
   //
   // Return input if not found
@@ -622,6 +700,11 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
   EFI_PEI_HOB_POINTERS  Hob;
   UINTN                 Size;
 
@@ -660,6 +743,12 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
+
   EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = HobStart;
@@ -693,6 +782,20 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  // In fact, since EFI_HANDOFF_HOB must be the first Hob,
+  // the following code can retrieve boot mode.
+  //
+  // EFI_HOB_HANDOFF_INFO_TABLE *HandOffHob;
+  //
+  // HandOffHob = GetHobList ();  
+  // ASSERT (HandOffHob->Header.HobType = EFI_HOB_TYPE_HANDOFF);
+  // 
+  // BootMode = HandOffHob->BootMode;
+  //
   EFI_PEI_HOB_POINTERS  Hob;
 
   Hob.Raw = HobStart;
@@ -735,6 +838,21 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  // If Cpu HOB info is indispensable, user is able to ASSERT ()
+  // first to save error handling code
+  // For example:
+  //
+  // EFI_HOB_CPU  *CpuHob;
+  // 
+  // CpuHob = GetHob (EFI_HOB_TYPE_CPU, HobStart);
+  // ASSERT (CpuHob != NULL);
+  // 
+  // ...
+  // 
   EFI_HOB_CPU  *CpuHob;
 
   CpuHob = GetHob (EFI_HOB_TYPE_CPU, HobStart);
@@ -778,29 +896,27 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  // 
   EFI_PEI_HOB_POINTERS  DxeCoreHob;
   
-  DxeCoreHob.Raw  = HobStart;
-  DxeCoreHob.Raw  = GetHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, DxeCoreHob.Raw);
-  while (DxeCoreHob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION && 
-         !EfiCompareGuid (&DxeCoreHob.MemoryAllocationModule->MemoryAllocationHeader.Name, 
-                          &gEfiHobMemeryAllocModuleGuid)) {
-
-    DxeCoreHob.Raw  = GET_NEXT_HOB (DxeCoreHob);
-    DxeCoreHob.Raw  = GetHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, DxeCoreHob.Raw);
-
+  for (DxeCoreHob.Raw = HobStart; 
+      (DxeCoreHob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, DxeCoreHob.Raw)) != NULL;
+       DxeCoreHob.Raw = GET_NEXT_HOB (DxeCoreHob)) {
+    if (CompareGuid (&DxeCoreHob.MemoryAllocationModule->MemoryAllocationHeader.Name, 
+                      &gEfiHobMemeryAllocModuleGuid)) {
+        *BaseAddress  = DxeCoreHob.MemoryAllocationModule->MemoryAllocationHeader.MemoryBaseAddress;
+        *Length       = DxeCoreHob.MemoryAllocationModule->MemoryAllocationHeader.MemoryLength;
+        *EntryPoint   = (VOID *) (UINTN) DxeCoreHob.MemoryAllocationModule->EntryPoint;
+        *FileName     = &DxeCoreHob.MemoryAllocationModule->ModuleName;
+        return EFI_SUCCESS;
+    }
   }
 
-  if (DxeCoreHob.Header->HobType != EFI_HOB_TYPE_MEMORY_ALLOCATION) {
-    return EFI_NOT_FOUND;
-  }
-
-  *BaseAddress  = DxeCoreHob.MemoryAllocationModule->MemoryAllocationHeader.MemoryBaseAddress;
-  *Length       = DxeCoreHob.MemoryAllocationModule->MemoryAllocationHeader.MemoryLength;
-  *EntryPoint   = (VOID *) (UINTN) DxeCoreHob.MemoryAllocationModule->EntryPoint;
-  *FileName     = &DxeCoreHob.MemoryAllocationModule->ModuleName;
-
-  return EFI_SUCCESS;
+  return EFI_NOT_FOUND;
 }
 ////~
 
@@ -833,6 +949,25 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  // Pay attention that caller is REQUIRED to update HobStart with:
+  // *HobStart =  GET_NEXT_HOB (FirmwareVolumeHob)
+  //
+  // If FV HOB info is indispensable, user is able to ASSERT ()
+  // first to save error handling code
+  // For example:
+  //
+  // EFI_HOB_FIRMWARE_VOLUME  *FirmwareVolumeHob;
+  // 
+  // FirmwareVolumeHob = GetHob (EFI_HOB_TYPE_FV, HobStart);
+  // ASSERT (FirmwareVolumeHob != NULL);
+  // 
+  // ...
+  //
+
   EFI_PEI_HOB_POINTERS  FirmwareVolumeHob;
 
   FirmwareVolumeHob.Raw = GetNextHob (EFI_HOB_TYPE_FV, *HobStart);
@@ -879,6 +1014,17 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is changed substantially with R9 counerpart GetNextGuidHob (). 
+  // 1. R9 GetNextGuidHob has two parameters and returns the matched GUID HOB from the StartHob. 
+  // 2. R9 GetNextGuidHob does not strip the HOB header, so caller is required to apply
+  //    GET_GUID_HOB_DATA () and GET_GUID_HOB_DATA_SIZE () to extract the data section and its
+  //    size info respectively.
+  // 3. this function does not skip the starting HOB pointer unconditionally:
+  //    it returns HobStart back if HobStart itself meets the requirement;
+  //    caller is required to use GET_NEXT_HOB() if it wishes to skip current HobStart.
+  //
   EFI_PEI_HOB_POINTERS  GuidHob;
 
   if (Buffer == NULL) {
@@ -962,6 +1108,11 @@ Returns:
 
 --*/
 {
+  //
+  // Porting Guide:
+  // This library interface is simply obsolete. 
+  // Include the source code to user code.
+  //
   EFI_HOB_GUID_TYPE   *GuidHob;
 
   GuidHob = GetNextGuidHob (&gEfiIoBaseHobGuid, HobStart);
