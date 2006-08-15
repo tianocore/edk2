@@ -180,7 +180,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <HelpText/>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">
-      <C_Name>PcdStatusCodeRuntimeMemory</C_Name>
+      <C_Name>PcdStatusCodeRuntimeMemorySize</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText/>
     </PcdEntry>
