@@ -6,6 +6,11 @@ import javax.swing.*;
 import javax.swing.tree.*;
 
 public class MsaTreeEditor extends JPanel {
+	/**
+	 *  Define class Serial Version UID
+	 */
+	private static final long serialVersionUID = 3169905938472150649L;
+
 	MsaTreeEditor(ModuleInfo m, UI u) {
 		mi = m;
 		ui = u;
