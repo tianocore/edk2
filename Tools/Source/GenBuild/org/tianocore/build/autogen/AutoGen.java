@@ -362,7 +362,7 @@ public class AutoGen {
         //
         if (this.myPcdAutogen != null) {
             fileBuffer.append("\r\n");
-            fileBuffer.append(this.myPcdAutogen.OutputH());
+            fileBuffer.append(this.myPcdAutogen.getHAutoGenString());
         }
 
         //
@@ -496,7 +496,7 @@ public class AutoGen {
 
         if (this.myPcdAutogen != null) {
             fileBuffer.append("\r\n");
-            fileBuffer.append(this.myPcdAutogen.OutputC());
+            fileBuffer.append(this.myPcdAutogen.getCAutoGenString());
         }
 
         if (!saveFile(outputPath + File.separatorChar + "AutoGen.c", fileBuffer)) {
@@ -599,7 +599,7 @@ public class AutoGen {
         //
         if (this.myPcdAutogen != null) {
             fileBuffer.append("\r\n");
-            fileBuffer.append(this.myPcdAutogen.OutputH());
+            fileBuffer.append(this.myPcdAutogen.getHAutoGenString());
         }
 
         //
@@ -650,7 +650,7 @@ public class AutoGen {
 
         if (this.myPcdAutogen != null) {
             fileBuffer.append("\r\n");
-            fileBuffer.append(this.myPcdAutogen.OutputC());
+            fileBuffer.append(this.myPcdAutogen.getCAutoGenString());
         }
 
         if (!saveFile(outputPath + File.separatorChar + "AutoGen.c", fileBuffer)) {

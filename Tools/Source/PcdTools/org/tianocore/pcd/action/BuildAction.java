@@ -66,7 +66,10 @@ public abstract class BuildAction extends Task {
       @param logStr     The string contains log information.
     **/
     public static void logMsg(Object action, String logStr) {
-        ((Task) action).log(logStr, Project.MSG_INFO);
+        try {      
+            ((Task) action).log(logStr, Project.MSG_INFO);
+        } catch (Exception exp) {
+        }
     }
 
     /**

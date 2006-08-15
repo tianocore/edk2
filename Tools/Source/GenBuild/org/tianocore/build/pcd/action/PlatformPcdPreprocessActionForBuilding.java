@@ -19,7 +19,6 @@ package org.tianocore.build.pcd.action;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -50,7 +49,7 @@ import org.tianocore.pcd.exception.PlatformPcdPreprocessException;
 **/
 public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreprocessAction {
     ///
-    /// FPD file is the root file.
+    /// FPD file path.
     ///
     private String                      fpdFilePath;
 
@@ -88,7 +87,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     /**
       Common function interface for outer.
 
-      @param fpdFilePath    The fpd file path of current build or analysis.
+      @param fpdFilePath    The fpd file path of current build or processing.
       @param messageLevel   The message level for this Action.
 
       @throws  PlatformPreprocessBuildException 
@@ -98,7 +97,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
     **/
     public void perform(String fpdFilePath, int messageLevel) 
         throws PlatformPcdPreprocessBuildException {
-        setFPDFilePath(fpdFilePath);
+        this.fpdFilePath = fpdFilePath;
         setActionMessageLevel(messageLevel);
         checkParameter();
         execute();
@@ -152,7 +151,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
         try {
             genPcdDatabaseSourceCode ();
         } catch (EntityException exp) {
-            throw new PlatformPcdPreprocessBuildException(errorMessageHeader + exp.getMessage());
+            throw new PlatformPcdPreprocessBuildException(errorMessageHeader + "\r\n" + exp.getMessage());
         }
     }
 
@@ -323,7 +322,7 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
 
             dynamicPrimaryKey = Token.getPrimaryKeyString(dynamicPcdBuildDataArray.get(index).getCName(),
                                                           tokenSpaceStrRet);
-            if (dynamicPrimaryKey.equalsIgnoreCase(token.getPrimaryKeyString())) {
+            if (dynamicPrimaryKey.equals(token.getPrimaryKeyString())) {
                 return dynamicPcdBuildDataArray.get(index);
             }
         }
@@ -374,11 +373,11 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
         File file = null;
 
         if (fpdFilePath == null) {
-            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be empty for CollectPCDAtion!");
+            throw new PlatformPcdPreprocessBuildException("FPDFileName should be empty for CollectPCDAtion!");
         }
 
         if (fpdFilePath.length() == 0) {
-            throw new PlatformPcdPreprocessBuildException("WorkspacePath and FPDFileName should be empty for CollectPCDAtion!");
+            throw new PlatformPcdPreprocessBuildException("FPDFileName should be empty for CollectPCDAtion!");
         }
 
         file = new File(fpdFilePath);
@@ -386,24 +385,5 @@ public class PlatformPcdPreprocessActionForBuilding extends PlatformPcdPreproces
         if(!file.exists()) {
             throw new PlatformPcdPreprocessBuildException("FPD File " + fpdFilePath + " does not exist!");
         }
-    }
-
-    /**
-      Test case function
-
-      @param argv  parameter from command line
-    **/
-    public static void main(String argv[]) throws PlatformPcdPreprocessBuildException {
-        PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
-        String projectDir = "x:/edk2";
-        ca.setFPDFilePath(projectDir + "/EdkNt32Pkg/Nt32.fpd");
-        ca.setActionMessageLevel(ActionMessage.MAX_MESSAGE_LEVEL);
-        GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            projectDir,
-                            "tools_def.txt");
-        System.out.println("After initInfo!");
-        FpdParserTask fpt = new FpdParserTask();
-        fpt.parseFpdFile(new File(projectDir + "/EdkNt32Pkg/Nt32.fpd"));
-        ca.execute();
     }
 }
