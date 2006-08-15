@@ -31,8 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <target name="output">
     <copy file="${MODULE_DIR}\${ARCH}\${BASE_NAME}.FFS" 
       tofile="${BIN_DIR}\${FILE_GUID}-${BASE_NAME}.FFS" />
-    <copy file="${MODULE_DIR}\${ARCH}\${BASE_NAME}.FFS" 
-      tofile="${BIN_DIR}\${FILE_GUID}-${BASE_NAME}.FFS.Org" />
   </target>
     
 </project>
