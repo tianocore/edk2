@@ -34,8 +34,9 @@ import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.entity.UsageInstance;
 import org.tianocore.pcd.exception.BuildActionException;
 
-/** This class is to manage how to generate the PCD information into Autogen.c and
-    Autogen.h.
+/**
+    This class is to manage how to generate the PCD information into Autogen.c
+    and Autogen.h.
 **/
 public class PCDAutoGenAction extends BuildAction {
     ///
@@ -113,7 +114,7 @@ public class PCDAutoGenAction extends BuildAction {
 
       @return the string of header file for PCD
     **/
-    public String OutputH() {
+    public String getHAutoGenString() {
         return hAutoGenString;
     }
 
@@ -122,7 +123,7 @@ public class PCDAutoGenAction extends BuildAction {
 
       @return the string of C code file for PCD
     **/
-    public String OutputC() {
+    public String getCAutoGenString() {
         return cAutoGenString;
     }
 
@@ -317,41 +318,12 @@ public class PCDAutoGenAction extends BuildAction {
             cAutoGenString += usageInstance.getCAutogenStr();
         }
 
-        //
-        // Work around code, In furture following code should be modified that get
-        // these information from Uplevel Autogen tools.
-        //
         if (pcdDriverType == CommonDefinition.PCD_DRIVER_TYPE.PEI_PCD_DRIVER) {
             hAutoGenString += MemoryDatabaseManager.PcdPeimHString;
             cAutoGenString += MemoryDatabaseManager.PcdPeimCString;
         } else if (pcdDriverType == CommonDefinition.PCD_DRIVER_TYPE.DXE_PCD_DRIVER) {
             hAutoGenString += MemoryDatabaseManager.PcdDxeHString;
             cAutoGenString += MemoryDatabaseManager.PcdDxeCString;
-        }
-    }
-
-    /**
-      Test case function
-
-      @param argv  paramter from command line
-    **/
-    public static void main(String argv[]) {
-
-        String WorkSpace = "X:/edk2";
-        String logFilePath = WorkSpace  + "/EdkNt32Pkg/Nt32.fpd";
-
-        //
-        // At first, CollectPCDAction should be invoked to collect
-        // all PCD information from SPD, MSA, FPD.
-        //
-        PlatformPcdPreprocessActionForBuilding collectionAction = new PlatformPcdPreprocessActionForBuilding();
-        GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db",
-                            WorkSpace,null);
-
-        try {
-            collectionAction.perform(logFilePath, ActionMessage.MAX_MESSAGE_LEVEL);
-        } catch(Exception e) {
-            e.printStackTrace();
         }
     }
 }

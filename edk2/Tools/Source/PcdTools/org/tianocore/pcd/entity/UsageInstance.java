@@ -193,20 +193,40 @@ public class UsageInstance {
 
         switch (modulePcdType) {
         case FEATURE_FLAG:
+            //
+            // Example autogen string for following generation:
+            // "extern const BOOLEAN _gPcd_FixedAtBuild_PcdSampleToken";
+            // 
             hAutogenStr += String.format("extern const BOOLEAN _gPcd_FixedAtBuild_%s;\r\n",
                                          parentToken.cName);
+            //
+            // Example autogen string for following generation:
+            // "#define _PCD_GET_MODE_8_PcdSampleToken _gPcd_FixedAtBuild_PcdSampleToken";
+            // 
             hAutogenStr += String.format("#define _PCD_GET_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
                                          Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName,
                                          parentToken.cName);
+            //
+            // Example autogen string for following generation:
+            // "//#define _PCD_SET_MODE_8_PcdSampleToken ASSERT(FALSE) If is not allowed to set value...";
+            // 
             hAutogenStr += String.format("//#define _PCD_SET_MODE_%s_%s ASSERT(FALSE) If is not allowed to set value for a FEATURE_FLAG PCD\r\n",
                                          Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName);
 
             if (!isBuildUsedLibrary) {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_VALUE_PcdSampleToken 0x1000"
+                // 
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n",
                                              parentToken.cName,
                                              printDatum);
+                //
+                // Example autogen string for following generation:
+                // "GLOBAL_REMOVE_IF_UNREFERENCED const BOOLEAN _gPcd_FixedAtBuild_PcdSampleToken = _PCD_VALUE_PcdSampleToken;"
+                // 
                 cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const BOOLEAN _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
                                              parentToken.cName,
                                              parentToken.cName);
@@ -214,47 +234,91 @@ public class UsageInstance {
             break;
         case FIXED_AT_BUILD:
             if (isByteArray) {
+                //
+                // Example autogen string for following generation:
+                // "extern const BOOLEAN _gPcd_FixedAtBuild_PcdSampleToken";
+                // 
                 hAutogenStr += String.format("extern const UINT8 _gPcd_FixedAtBuild_%s[];\r\n",
                                              parentToken.cName);
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_GET_MODE_8_PcdSampleToken (VOID*)_gPcd_FixedAtBuild_PcdSampleToken";
+                // 
                 hAutogenStr += String.format("#define _PCD_GET_MODE_%s_%s  (VOID*)_gPcd_FixedAtBuild_%s\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
                                              parentToken.cName);
             } else {
+                //
+                // Example autogen string for following generation:
+                // "extern const UINT8 _gPcd_FixedAtBuild_PcdSampleToken";
+                // 
                 hAutogenStr += String.format("extern const %s _gPcd_FixedAtBuild_%s;\r\n",
                                              Token.getAutogendatumTypeString(parentToken.datumType),
                                              parentToken.cName);
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_GET_MODE_8_PcdSampleToken _gPcd_FixedAtBuild_PcdSampleToken";
+                // 
                 hAutogenStr += String.format("#define _PCD_GET_MODE_%s_%s  _gPcd_FixedAtBuild_%s\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
                                              parentToken.cName);
             }
 
+            //
+            // Example autogen string for following generation:
+            // "//#define _PCD_SET_MODE_8_PcdSampleToken ASSERT(FALSE) If is not allowed to set value...";
+            // 
             hAutogenStr += String.format("//#define _PCD_SET_MODE_%s_%s ASSERT(FALSE) // It is not allowed to set value for a FIXED_AT_BUILD PCD\r\n",
                                          Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName);
             if (!isBuildUsedLibrary) {
                 if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
                     if (isByteArray) {
+                        //
+                        // Example autogen string for following generation:
+                        // "#define _PCD_VALUE_PcdSampleToken (VOID*)_gPcd_FixedAtBuild_PcdSampleToken"
+                        // 
                         hAutogenStr += String.format("#define _PCD_VALUE_%s   (VOID*)_gPcd_FixedAtBuild_%s\r\n",
                                                      parentToken.cName,
                                                      parentToken.cName);
+                        //
+                        // Example autogen string for following generation:
+                        // "GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_PcdSampleToken[] = 'dfdf';"
+                        // 
                         cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_%s[] = %s;\r\n",
                                                      parentToken.cName,
                                                      printDatum);
                     } else {
+                        //
+                        // Example autogen string for following generation:
+                        // "#define _PCD_VALUE_PcdSampleToken 0x222"
+                        // 
                         hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n",
                                                      parentToken.cName,
                                                      printDatum);
+                        //
+                        // Example autogen string for following generation:
+                        // "GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_PcdSampleToken[] = _PCD_VALUE_PcdSampleToken;"
+                        // 
                         cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
                                                      Token.getAutogendatumTypeString(parentToken.datumType),
                                                      parentToken.cName,
                                                      parentToken.cName);
                     }
                 } else {
+                    //
+                    // Example autogen string for following generation:
+                    // "#define _PCD_VALUE_PcdSampleToken 0x222"
+                    // 
                     hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n",
                                                  parentToken.cName,
                                                  printDatum);
+                    //
+                    // Example autogen string for following generation:
+                    // "GLOBAL_REMOVE_IF_UNREFERENCED const UINT8 _gPcd_FixedAtBuild_PcdSampleToken[] = _PCD_VALUE_PcdSampleToken;"
+                    // 
                     cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED const %s _gPcd_FixedAtBuild_%s = _PCD_VALUE_%s;\r\n",
                                                  Token.getAutogendatumTypeString(parentToken.datumType),
                                                  parentToken.cName,
@@ -264,16 +328,32 @@ public class UsageInstance {
             break;
         case PATCHABLE_IN_MODULE:
             if (isByteArray) {
+                //
+                // Example autogen string for following generation:
+                // "extern UINT8 _gPcd_BinaryPatch_PcdSampleToken[];"
+                // 
                 hAutogenStr += String.format("extern UINT8 _gPcd_BinaryPatch_%s[];\r\n",
                                              parentToken.cName);
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_GET_MODE_8_PcdSampleToken  (VOID*)_gPcd_BinaryPatch_PcdSampleToken"
+                // 
                 hAutogenStr += String.format("#define _PCD_GET_MODE_%s_%s  (VOID*)_gPcd_BinaryPatch_%s\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
                                              parentToken.cName);
             } else {
+                //
+                // Example autogen string for following generation:
+                // "extern UINT8 _gPcd_BinaryPatch_PcdSampleToken;"
+                // 
                 hAutogenStr += String.format("extern %s _gPcd_BinaryPatch_%s;\r\n",
                                              Token.getAutogendatumTypeString(parentToken.datumType),
                                              parentToken.cName);
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_GET_MODE_8_PcdSampleToken  _gPcd_BinaryPatch_PcdSampleToken"
+                // 
                 hAutogenStr += String.format("#define _PCD_GET_MODE_%s_%s  _gPcd_BinaryPatch_%s\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
@@ -284,11 +364,19 @@ public class UsageInstance {
             // Generate _PCD_SET_MODE_xx macro for using set BinaryPatch value via PcdSet macro
             //
             if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_SET_MODE_8_PcdSampleToken(SizeOfBuffer, Buffer) CopyMem (_gPcd_BinaryPatch_PcdSampleToken, (Buffer), (SizeOfBuffer))"
+                // 
                 hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(SizeOfBuffer, Buffer) CopyMem (_gPcd_BinaryPatch_%s, (Buffer), (SizeOfBuffer))\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
                                              parentToken.cName);
             } else {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_SET_MODE_8_PcdSampleToken(Value) (_gPcd_BinaryPatch_PcdSampleToken = (Value))"
+                // 
                 hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(Value) (_gPcd_BinaryPatch_%s = (Value))\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
@@ -296,14 +384,26 @@ public class UsageInstance {
             }
 
             if (!isBuildUsedLibrary) {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_VALUE_PcdSampleToken   0x111"
+                // 
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n",
                                              parentToken.cName,
                                              printDatum);
                 if (isByteArray) {
+                    //
+                    // Example autogen string for following generation:
+                    // "GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_PcdSampleToken[] = _PCD_VALUE_PcdSampleToken;"
+                    // 
                     cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_%s[] = _PCD_VALUE_%s;\r\n",
                                                  parentToken.cName,
                                                  parentToken.cName);
                 } else {
+                    //
+                    // Example autogen string for following generation:
+                    // "GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_PcdSampleToken[] = _PCD_VALUE_PcdSampleToken;"
+                    // 
                     cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED %s _gPcd_BinaryPatch_%s = _PCD_VALUE_%s;\r\n",
                                                  Token.getAutogendatumTypeString(parentToken.datumType),
                                                  parentToken.cName,
@@ -313,18 +413,30 @@ public class UsageInstance {
 
             break;
         case DYNAMIC:
+            //
+            // Example autogen string for following generation:
+            // "#define _PCD_GET_MODE_8_PcdSampleToken  LibPcdGet%s(_PCD_TOKEN_PcdSampleToken)"
+            // 
             hAutogenStr += String.format("#define _PCD_GET_MODE_%s_%s  LibPcdGet%s(_PCD_TOKEN_%s)\r\n",
                                          Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName,
                                          Token.getAutogenLibrarydatumTypeString(parentToken.datumType),
                                          parentToken.cName);
             if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_SET_MODE_8_PcdSampleToken(SizeOfBuffer, Buffer)  LibPcdSet%s(_PCD_TOKEN_PcdSampleToken, (SizeOfBuffer), (Buffer))"
+                // 
                 hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(SizeOfBuffer, Buffer)  LibPcdSet%s(_PCD_TOKEN_%s, (SizeOfBuffer), (Buffer))\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
                                              Token.getAutogenLibrarydatumTypeString(parentToken.datumType),
                                              parentToken.cName);
             } else {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_SET_MODE_8_PcdSampleToken(Value)  LibPcdSet%s(_PCD_TOKEN_PcdSampleToken, (Value))"
+                // 
                 hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(Value)  LibPcdSet%s(_PCD_TOKEN_%s, (Value))\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
@@ -336,6 +448,10 @@ public class UsageInstance {
             guidStringCName = "_gPcd_TokenSpaceGuid_" +
                               parentToken.tokenSpaceName.toString().replaceAll("-", "_");
 
+            //
+            // Example autogen string for following generation:
+            // "#define _PCD_GET_MODE_8_PcdSampleToken LibPcdGetEx%s(&_gPcd_TokenSpaceGuid_00_00_00, _PCD_TOKEN_PcdSampleToken)"
+            // 
             hAutogenStr += String.format("#define _PCD_GET_MODE_%s_%s LibPcdGetEx%s(&%s, _PCD_TOKEN_%s)\r\n",
                                          Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                          parentToken.cName,
@@ -344,6 +460,10 @@ public class UsageInstance {
                                          parentToken.cName);
 
             if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_SET_MODE_8_PcdSampleToken(SizeOfBuffer, Buffer) LibPcdSetEx%s(&_gPcd_TokenSpaceGuid_00_00_00, _PCD_TOKEN_PcdSampleToken, (SizeOfBuffer), (Buffer))"
+                // 
                 hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(SizeOfBuffer, Buffer) LibPcdSetEx%s(&%s, _PCD_TOKEN_%s, (SizeOfBuffer), (Buffer))\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
@@ -351,6 +471,10 @@ public class UsageInstance {
                                              guidStringCName,
                                              parentToken.cName);
             } else {
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_SET_MODE_8_PcdSampleToken(Value) LibPcdSetEx%s(&_gPcd_TokenSpaceGuid_00_00_00, _PCD_TOKEN_PcdSampleToken, (Value))"
+                //
                 hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(Value) LibPcdSetEx%s(&%s, _PCD_TOKEN_%s, (Value))\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,

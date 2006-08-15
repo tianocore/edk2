@@ -58,6 +58,7 @@ public abstract class PlatformPcdPreprocessAction {
     public PlatformPcdPreprocessAction() {
         pcdDbManager = null;
         errorString  = null;
+	errorCount   = 0;
     }
 
     /**
@@ -77,12 +78,13 @@ public abstract class PlatformPcdPreprocessAction {
     public MemoryDatabaseManager getPcdDbManager() {
         return pcdDbManager;
     }
+
     /**
        Abstract function: retrieve module information from FPD file.
 
        In building environement, this function will be implementated by FpdParserTask.
 
-       @return List<ModuleInfo>                  the component array.
+       @return List<ModulePcdInfoFromFpd>        the component array.
        @throws PlatformPcdPreprocessException    get all modules in <ModuleSA> in FPD file.
 
     **/
@@ -100,8 +102,7 @@ public abstract class PlatformPcdPreprocessAction {
        @throws PlatformPcdPreprocessException
                             Fail to get Guid information from SPD file.
     **/
-    public abstract String                  getGuidInfoFromSpd(String guidCName)
-                                            throws PlatformPcdPreprocessException;
+    public abstract String getGuidInfoFromSpd(String guidCName) throws PlatformPcdPreprocessException;
 
     /**
        Abstract function: Verification the PCD data.
@@ -118,11 +119,8 @@ public abstract class PlatformPcdPreprocessAction {
        @return String       exception strings.
 
     **/
-    public abstract String                  verifyDatum(String            cName,
-                                                        String            moduleName,
-                                                        String            datum,
-                                                        Token.DATUM_TYPE  datumType,
-                                                        int               maxDatumSize);
+    public abstract String verifyDatum(String cName, String moduleName, String datum,
+                                       Token.DATUM_TYPE  datumType, int maxDatumSize);
 
     /**
        Abstract function: Get dynamic information for a token
@@ -173,22 +171,23 @@ public abstract class PlatformPcdPreprocessAction {
     **/
     public void initPcdMemoryDbWithPlatformInfo()
         throws PlatformPcdPreprocessException {
-        int                                 index             = 0;
-        int                                 pcdIndex          = 0;
+        int                                 index;
+        int                                 pcdIndex;
         List<PcdBuildDefinition.PcdData>    pcdBuildDataArray = new ArrayList<PcdBuildDefinition.PcdData>();
-        PcdBuildDefinition.PcdData          pcdBuildData      = null;
+        PcdBuildDefinition.PcdData          pcdBuildData;
         Token                               token             = null;
-        List<ModulePcdInfoFromFpd>          modules           = null;
-        String                              primaryKey        = null;
-        String                              exceptionString   = null;
-        UsageInstance                       usageInstance     = null;
+        List<ModulePcdInfoFromFpd>          modules;
+        String                              primaryKey;
+        String                              exceptionString;
+        UsageInstance                       usageInstance;
         Token.PCD_TYPE                      pcdType           = Token.PCD_TYPE.UNKNOWN;
         Token.DATUM_TYPE                    datumType         = Token.DATUM_TYPE.UNKNOWN;
-        long                                tokenNumber       = 0;
-        String                              moduleName        = null;
-        String                              datum             = null;
-        int                                 maxDatumSize      = 0;
-        String                              tokenSpaceStrRet  = null;
+        long                                tokenNumber;
+        String                              moduleName;
+        String                              datum;
+        int                                 maxDatumSize;
+        String                              tokenSpaceStrRet;
+        ModulePcdInfoFromFpd                curModule;
 
         //
         // ----------------------------------------------
@@ -208,16 +207,17 @@ public abstract class PlatformPcdPreprocessAction {
         // -------------------------------------------------------------------
         //
         for (index = 0; index < modules.size(); index++) {
-    	    //
+            curModule = modules.get(index);
+
+            //
     	    // It is legal for a module does not contains ANY pcd build definitions.
     	    //
-    	    if (modules.get(index).pcdBuildDefinition == null) {
+    	    if (curModule.pcdBuildDefinition == null) {
                 continue;
     	    }
 
-            pcdBuildDataArray = modules.get(index).pcdBuildDefinition.getPcdDataList();
-
-            moduleName = modules.get(index).usageId.moduleName;
+            pcdBuildDataArray = curModule.pcdBuildDefinition.getPcdDataList();
+            moduleName        = curModule.usageId.moduleName;
 
             //
             // ----------------------------------------------------------------------
@@ -433,7 +433,7 @@ public abstract class PlatformPcdPreprocessAction {
                 // ------------------------------------------------
                 //
                 usageInstance = new UsageInstance(token,
-                                                  modules.get(index).usageId,
+                                                  curModule.usageId,
                                                   pcdType,
                                                   datum,
                                                   maxDatumSize);
@@ -441,7 +441,7 @@ public abstract class PlatformPcdPreprocessAction {
                     putError(String.format("PCD %s for module %s(%s) already exists in the database.\nPlease check all PCD build entries "+
                                            "in the %s module's <ModuleSA> section to make sure there are no duplicated definitions in the FPD file!",
                                            token.cName,
-                                           modules.get(index).usageId.moduleGuid,
+                                           curModule.usageId.moduleGuid,
                                            moduleName,
                                            moduleName));
                     continue;
