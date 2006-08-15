@@ -71,7 +71,7 @@ public class SourceFileReplacer {
 		PrintWriter outfile;
 		String outname = null;
 		String inname = null;
-		if (ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
+		if (ui.yesOrNo("Change Source Code is to be doing . See details ?")) {
 			showdetails = true;
 		}
 		
@@ -84,7 +84,7 @@ public class SourceFileReplacer {
 				} else {
 					outname = inname;
 				}
-				ui.println("\nModifying file: " + inname);
+				ui.println("\nModifying file : " + inname);
 				mi.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
 				outfile.append(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname));
@@ -96,7 +96,7 @@ public class SourceFileReplacer {
 				} else {
 					outname = inname;
 				}
-				ui.println("\nCopying file: " + inname);
+				ui.println("\nCopying file : " + inname);
 				mi.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
 				outfile.append(sourcefiletostring(modulepath + File.separator + "temp" + File.separator + inname));
@@ -173,7 +173,7 @@ public class SourceFileReplacer {
 		// replace BS -> gBS , RT -> gRT
 		Matcher mat = pat.matcher(line);
 		if (mat.find()) {												// add a library here
-			ui.println("Converting all BS->gBS, RT->gRT");
+			ui.println("Converting all BS->gBS,RT->gRT");
 			line = mat.replaceAll("g$1$2$3");							//unknown correctiveness
 		}
 		mat.reset();
