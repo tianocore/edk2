@@ -106,9 +106,11 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private final int archColForFpdModTable = 3;
     
-    private final int pkgVerColForFpdModTable = 5;
+    private final int pkgVerColForFpdModTable = 6;
 
-    private final int modVerColForFpdModTable = 4;
+    private final int modVerColForFpdModTable = 5;
+    
+    private final int typeColForFpdModTable = 4;
     
     /**
      * FpdFileContents structure
@@ -277,7 +279,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             column.setMinWidth(pathMinWidth);
 
             jTableAllModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			jTableAllModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+
         }
         return jTableAllModules;
     }
@@ -339,6 +341,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String mv = mi.getVersion();
                     String pg = mi.getPackage().getGuid();
                     String pv = mi.getPackage().getVersion();
+                    String mType = mi.getModuleType();
 
                     ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
                     if (al == null) {
@@ -361,7 +364,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                         String arch = vArchs.get(i);
                         al.add(arch);
                         archsAdded += arch + " ";
-                        String[] row = { "", "", "", "", "", "" };
+                        String[] row = { "", "", "", "", "", "", "" };
 
                         if (mi != null) {
                             row[modNameColForFpdModTable] = mi.getName();
@@ -370,6 +373,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                             row[archColForFpdModTable] = arch;
                             row[pkgVerColForFpdModTable] = pv;
                             row[modVerColForFpdModTable] = mv;
+                            row[typeColForFpdModTable] = mType;
 
                         }
                         modelFpdModules.addRow(row);
@@ -379,7 +383,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                             //ToDo : specify archs need to add.
                             ffc.addFrameworkModulesPcdBuildDefs(mi, arch, null);
                         } catch (Exception exception) {
-                            JOptionPane.showMessageDialog(frame, "Adding " + row[modNameColForFpdModTable] + " with SupArch " + arch
+                            JOptionPane.showMessageDialog(frame, "Adding " + row[modNameColForFpdModTable] + " with Supporting Architectures: " + arch
                                                                  + ": " + exception.getMessage());
                             errorOccurred = true;
                         }
@@ -448,8 +452,10 @@ public class FpdFrameworkModules extends IInternalFrame {
             modelFpdModules.addColumn("<html>Package<br>Name</html>");
             modelFpdModules.addColumn("Path");
             modelFpdModules.addColumn("<html>Supported<br>Architectures</html>");
+            modelFpdModules.addColumn("<html>Module<br>Type</html>");
             modelFpdModules.addColumn("<html>Module<br>Version</html>");
             modelFpdModules.addColumn("<html>Package<br>Version</html>");
+
             
             javax.swing.table.TableColumn column = null;
             column = jTableFpdModules.getColumnModel().getColumn(modNameColForFpdModTable);
@@ -475,9 +481,13 @@ public class FpdFrameworkModules extends IInternalFrame {
             column = jTableFpdModules.getColumnModel().getColumn(pathColForFpdModTable);
             column.setPreferredWidth(pathPrefWidth);
             column.setMinWidth(pathMinWidth);
+            column = jTableFpdModules.getColumnModel().getColumn(typeColForFpdModTable);
+            column.setPreferredWidth(typePrefWidth);
+            column.setMaxWidth(typeMaxWidth);
+            column.setMinWidth(typeMinWidth);
 
             jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			jTableFpdModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+
         }
         return jTableFpdModules;
     }
@@ -585,7 +595,7 @@ public class FpdFrameworkModules extends IInternalFrame {
      * @param args
      */
     public static void main(String[] args) {
-        // TODO Auto-generated method stub
+        // Set the pane visable
         new FpdFrameworkModules().setVisible(true);
     }
 
@@ -631,10 +641,11 @@ public class FpdFrameworkModules extends IInternalFrame {
             for (int i = 0; i < saa.length; ++i) {
                 ModuleIdentification mi = GlobalData.getModuleId(saa[i][ffcModGuid] + " " + saa[i][ffcModVer] + " "
                                                                  + saa[i][ffcPkgGuid] + " " + saa[i][ffcPkgVer]);
-                String[] row = { "", "", "", "", "", "" };
+                String[] row = { "", "", "", "", "", "", "" };
                 if (mi != null) {
                     row[modNameColForFpdModTable] = mi.getName();
                     row[modVerColForFpdModTable] = mi.getVersion();
+                    row[typeColForFpdModTable] = mi.getModuleType();
                     row[pkgNameColForFpdModTable] = mi.getPackage().getName();
                     row[pkgVerColForFpdModTable] = mi.getPackage().getVersion();
                     row[archColForFpdModTable] = saa[i][4];
