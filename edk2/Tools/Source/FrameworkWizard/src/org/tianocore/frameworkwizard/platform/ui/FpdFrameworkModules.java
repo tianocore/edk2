@@ -277,7 +277,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             column.setMinWidth(pathMinWidth);
 
             jTableAllModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			// jTableAllModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+			jTableAllModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         }
         return jTableAllModules;
     }
@@ -477,7 +477,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             column.setMinWidth(pathMinWidth);
 
             jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			// jTableFpdModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+			jTableFpdModules.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         }
         return jTableFpdModules;
     }
@@ -656,6 +656,8 @@ public class FpdFrameworkModules extends IInternalFrame {
                 al.add(saa[i][ffcModArch]);
 
             }
+            TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
+            sorter.setSortingStatus(modNameColForFpdModTable, TableSorter.ASCENDING);
         }
 
         showAllModules();
@@ -693,6 +695,9 @@ public class FpdFrameworkModules extends IInternalFrame {
                 miList.add(mi);
             }
         }
+        
+        TableSorter sorter = (TableSorter)jTableAllModules.getModel();
+        sorter.setSortingStatus(modNameColForAllModTable, TableSorter.ASCENDING);
     }
 
     /**

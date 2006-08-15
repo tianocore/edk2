@@ -259,15 +259,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     this.classProduced.add(classProduced[i]);
                 }
             }
-            //
-            // Get classes unresolved
-            //
-//            Iterator<String> lip = this.classProduced.listIterator();
-//            while(lip.hasNext()){
-//                String clsProduced = lip.next();
-//                this.classConsumed.remove(clsProduced);
-//
-//            }
+            
             //
             // find potential instances in all dependency pkgs for classes still in classConsumed.
             //
