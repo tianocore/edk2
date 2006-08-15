@@ -18,16 +18,20 @@ import java.util.regex.*;
 import org.tianocore.*;
 
 public class ModuleReader {
-	ModuleReader(String path, ModuleInfo moduleinfo, Database database) {
+	ModuleReader(String path, ModuleInfo moduleinfo, Database database, UI u) {
 		modulepath = path;
 		mi = moduleinfo;
 		db = database;
+		ui = u;
 	}
 	private String modulepath;
 	private ModuleInfo mi;
 	private Database db;
+	private UI ui;
 	
-	private static Pattern ptninfequation = Pattern.compile("([^ ]*) *= *([^ ]*)");
+	private static Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*=\\s*([^\\s]*)");
+	private static Pattern ptnsection = Pattern.compile("\\[([^\\[\\]]*)\\]([^\\[\\]]*)\\n", Pattern.MULTILINE);
+	private static Pattern ptnfilename = Pattern.compile("[^\\s]+");
 	
 	public void readMsa(String name) throws Exception {
 		ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.parse(new File(modulepath + File.separator + name));
@@ -53,40 +57,48 @@ public class ModuleReader {
 		System.out.println("Parsing INF file: " + name);
 		BufferedReader rd = new BufferedReader(new FileReader(modulepath + File.separator + name));
 		String line;
+		String wholeline;
 		String[] linecontext;
 		boolean inSrc = false;
 		Matcher mtrinfequation;
+		Matcher mtrsection;
+		Matcher mtrfilename;
 
-		while ((line = rd.readLine()) != null) {
-			if (line.length() != 0) {
-				if (inSrc) {
-					if (line.contains("[")) {
-						inSrc = false;
-					} else {
-						linecontext = line.split(" ");
-						if (linecontext[2].length() != 0) {
-							if (!mi.localmodulesources.contains(linecontext[2])) {
-								System.out.println("Source File Missing! : " + linecontext[2]);
-							}
+		wholeline = Common.sourcefiletostring(modulepath + File.separator + name);
+		mtrsection = ptnsection.matcher(wholeline);
+		while (mtrsection.find()) {
+			if (mtrsection.group(1).matches("defines")) {
+				mtrinfequation = ptninfequation.matcher(mtrsection.group(2));
+				while (mtrinfequation.find()) {
+					if (mtrinfequation.group(1).matches("BASE_NAME")) {
+						mi.modulename = mtrinfequation.group(2);
+					}
+					if (mtrinfequation.group(1).matches("FILE_GUID")) {
+						mi.guidvalue = mtrinfequation.group(2);
+					}
+					if (mtrinfequation.group(1).matches("COMPONENT_TYPE")) {
+						mi.moduletype = mtrinfequation.group(2);
+					}
+				}
+			}
+			if (mtrsection.group(1).matches("nmake.common")) {
+				mtrinfequation = ptninfequation.matcher(mtrsection.group(2));
+				while (mtrinfequation.find()) {
+					if (mtrinfequation.group(1).matches("IMAGE_ENTRY_POINT")) {
+						mi.entrypoint = mtrinfequation.group(2);
+					}
+					if (mtrinfequation.group(1).matches("DPX_SOURCE")) {
+						if (!mi.localmodulesources.contains(mtrinfequation.group(2))) {
+							ui.println("DPX File Missing! : " + mtrinfequation.group(2));
 						}
 					}
-				} else {
-					if ((mtrinfequation = ptninfequation.matcher(line)).find()) {
-						if (mtrinfequation.group(1).matches("BASE_NAME")) {
-							mi.modulename = mtrinfequation.group(2);
-						}
-						if (mtrinfequation.group(1).matches("FILE_GUID")) {
-							mi.guidvalue = mtrinfequation.group(2);
-						}
-						if (mtrinfequation.group(1).matches("COMPONENT_TYPE")) {
-							mi.moduletype = mtrinfequation.group(2);
-						}
-						if (mtrinfequation.group(1).matches("IMAGE_ENTRY_POINT")) {
-							mi.entrypoint = mtrinfequation.group(2);
-						}
-					}
-					if (line.contains("sources")) {
-						inSrc = true;
+				}
+			}
+			if (mtrsection.group(1).contains("sources.")) {
+				mtrfilename = ptnfilename.matcher(mtrsection.group(2));
+				while (mtrfilename.find()) {
+					if (!mi.localmodulesources.contains(mtrfilename.group())) {
+						ui.println("Source File Missing! : " + mtrfilename.group());
 					}
 				}
 			}

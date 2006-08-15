@@ -25,8 +25,9 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 	private static final long serialVersionUID = 207759413522910399L;
 	
 	private String modulepath;
+	private ModuleInfo mi;
 	
-	private JButton moduleButton , goButton;
+	private JButton moduleButton, goButton, msaEditorButton;
 	private JTextField moduletext;
 	private JTextArea log;
 	private JFileChooser fc;
@@ -43,6 +44,9 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 		moduleButton = new JButton("Choose ModulePath");
 		moduleButton.addActionListener(this);
 
+		msaEditorButton = new JButton("MsaEditor");
+		msaEditorButton.addActionListener(this);
+		
 		moduletext = new JTextField(30);
 		
 		filebox = new JCheckBox("Output to logfile", true);
@@ -54,9 +58,10 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
         modulePanel.add(filebox);
         modulePanel.add(screenbox);
         modulePanel.add(goButton);
+        modulePanel.add(msaEditorButton);
         add(modulePanel);
 
-        log = new JTextArea(50,25);
+        log = new JTextArea(20,25);
         log.setMargin(new Insets(5,5,5,5));
         log.setEditable(false);
         JScrollPane logScrollPane = new JScrollPane(log);
@@ -99,16 +104,13 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 	public String choose(String message, Object[] choicelist) {
 		return (String)JOptionPane.showInputDialog(this, message,"Choose",JOptionPane.PLAIN_MESSAGE,null,choicelist,choicelist[0]);
 	}
+	
+	public String getInput(String message) {
+		return (String)JOptionPane.showInputDialog(message);
+	}
 
 	//---------------------------------------------------------------------------------------//
-	
-	/*
-	public boolean getOption(String item) {
-		if (item.matches("file")) {
-		}
-	}
-	*/
-	
+
     public void actionPerformed(ActionEvent e) {
         if ( e.getSource() == moduleButton ) {
         	int ret = fc.showOpenDialog(this);
@@ -123,8 +125,15 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
         		logfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "migration.log")));
         		println("Project MsaGen");
         		println("Copyright (c) 2006, Intel Corporation");
-        		new ModuleInfo(modulepath, this, new Database());
+        		mi = new ModuleInfo(modulepath, this, new Database());
         		logfile.flush();
+        	} catch (Exception en) {
+        		println(en.getMessage());
+        	}
+        }
+        if ( e.getSource() == msaEditorButton) {
+        	try {
+            	MsaTreeEditor.init(mi, this);
         	} catch (Exception en) {
         		println(en.getMessage());
         	}
@@ -156,7 +165,7 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 		fp.setOpaque(true);
         frame.setContentPane(fp);
 
-		frame.setSize(800,600);
+		frame.pack();
 		frame.setVisible(true);
     }
 }
