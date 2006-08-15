@@ -39,6 +39,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+/**
+  class PlatformBuildFileGenerator is used to generate ${PLATFORM}_build.xml file. 
+
+  @since GenBuild 1.0
+**/
 public class PlatformBuildFileGenerator {
 
     private String platformName;

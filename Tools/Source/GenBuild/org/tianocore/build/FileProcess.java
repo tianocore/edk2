@@ -156,18 +156,12 @@ public class FileProcess {
       @param root Root node
     **/
     public synchronized void parseFile(String filename, Node root) throws BuildException {
-        boolean flag = false;
         for (int i = 0; i < fileTypes.length; i++) {
             if (filename.endsWith(fileTypes[i][0])) {
-                flag = true;
                 parseFile(filename, fileTypes[i][2], root);
+                return ;
             }
         }
-        /*
-        if (!flag) {
-            throw new BuildException("File [" + filename + "] is not known from its suffix.");
-        }
-        */
     }
 
     /**

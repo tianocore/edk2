@@ -21,14 +21,12 @@ import javax.xml.namespace.QName;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.xmlbeans.XmlCursor;
-import org.apache.xmlbeans.XmlObject;
 import org.tianocore.BuildOptionsDocument;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 /** 
   <p><code>FfsProcess</code> is a class to find the corresponding FFS layout. </p>
@@ -54,11 +52,6 @@ import org.w3c.dom.Node;
 **/
 public class FfsProcess {
 
-    ///
-    /// Xml Document Node for corresponding FFS layout
-    ///
-    private Node ffs;
-    
     private BuildOptionsDocument.BuildOptions.Ffs ffsXmlObject;
 
     ///
@@ -133,18 +126,7 @@ public class FfsProcess {
     **/
     public boolean initSections(String buildType, Project project, FpdModuleIdentification fpdModuleId) throws BuildException {
         //
-        // Firstly, try to find in ModuleSA
-        //
-//        BuildOptionsDocument.BuildOptions.Ffs[] ffsArray = SurfaceAreaQuery.getModuleFfs();
-//        for (int i = 0; i < ffsArray.length; i++) {
-//            if (isMatch(ffsArray[i].getFfsKey(), buildType)) {
-//                ffsXmlObject = ffsArray[i];
-//                return true;
-//            }
-//        }
-        
-        //
-        // secondly, try to sections defined in PLATFORM level
+        // Try to find Ffs layout from FPD file
         //
         SurfaceAreaQuery.push(GlobalData.getFpdBuildOptions());
         BuildOptionsDocument.BuildOptions.Ffs[] ffsArray = SurfaceAreaQuery.getFpdFfs();
@@ -162,16 +144,11 @@ public class FfsProcess {
         //
         if (buildType == null) {
             System.out.println("Warning: this module doesn't specify a FfsFormatKey. ");
-            }
-        else {
+        } else {
             throw new BuildException("Can't find the FfsFormatKey [" + buildType + "] attribute in the FPD file!");            
         }
 
-        if (ffs == null) {
-            return false;
-        } else {
-            return true;
-        }
+        return false;
     }
     
     /**
@@ -185,43 +162,36 @@ public class FfsProcess {
     **/
     public String[] getGenSectionElements(Document document, String basename, String guid, String targetFilename) {
         this.basename = basename;
-        if (ffs == null && ffsXmlObject == null) {
+        if (ffsXmlObject == null) {
             return new String[0];
         }
         Vector<String> sectionList = new Vector<String>();
         XmlCursor cursor = null;
         try {
-            if (ffsXmlObject == null) {
-                cursor = XmlObject.Factory.parse(ffs).newCursor();
-            }
-            else {
-                cursor = ffsXmlObject.newCursor();
-            }
+            cursor = ffsXmlObject.newCursor();
         } catch (Exception e) {
             return null;
         }
         int mode = MODE_NONE;
-        Element root = document.createElement("genffsfile");
-        root.setAttribute("outputDir", "${BIN_DIR}");
-        root.setAttribute("moduleType", "${MODULE_TYPE}");
-        root.setAttribute("BaseName", basename);
-        root.setAttribute("fileGuid", guid);
-        if (ffsXmlObject == null) {
-            cursor.toFirstChild();
-        }
+        Element genffsfileEle = document.createElement("genffsfile");
+        genffsfileEle.setAttribute("outputDir", "${BIN_DIR}");
+        genffsfileEle.setAttribute("moduleType", "${MODULE_TYPE}");
+        genffsfileEle.setAttribute("BaseName", basename);
+        genffsfileEle.setAttribute("fileGuid", guid);
+
         if (cursor.toFirstChild()) {
             do {
                 if (cursor.getName().getLocalPart().equalsIgnoreCase("Attribute")) {
                     String name = cursor.getAttributeText(new QName("Name"));
                     String value = cursor.getAttributeText(new QName("Value"));
-                    root.setAttribute(changeAttributeName(name), value);
+                    genffsfileEle.setAttribute(changeAttributeName(name), value);
                 } else if (cursor.getName().getLocalPart().equalsIgnoreCase("Section")) {
                     cursor.push();
-                    dealSection(mode, document, root, cursor, sectionList);
+                    dealSection(mode, document, genffsfileEle, cursor, sectionList);
                     cursor.pop();
                 } else if (cursor.getName().getLocalPart().equalsIgnoreCase("Sections")) {
                     cursor.push();
-                    dealSections(mode, document, root, cursor, sectionList);
+                    dealSections(mode, document, genffsfileEle, cursor, sectionList);
                     cursor.pop();
                 }
             } while (cursor.toNextSibling());
@@ -246,7 +216,7 @@ public class FfsProcess {
         targetEle.appendChild(fileEle);
         outofdateEle.appendChild(targetEle);
         Element sequentialEle = document.createElement("sequential");
-        sequentialEle.appendChild(root);
+        sequentialEle.appendChild(genffsfileEle);
         outofdateEle.appendChild(sequentialEle);
         ffsNode = outofdateEle;
         return result;

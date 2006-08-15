@@ -86,7 +86,6 @@ public class OutputManager {
       @param type the module build type (MODULE or UNIFIED)
     **/
     public void update(Project project) {
-//        GlobalData.log.info("" + userdir + ":" + type);
         //
         // Default mode is UNIFIED. 
         //
@@ -183,6 +182,7 @@ public class OutputManager {
                 buildDir = GlobalData.getWorkspacePath() + File.separatorChar + userdir;
             }
         }
+        
         //
         // Set to property
         //
