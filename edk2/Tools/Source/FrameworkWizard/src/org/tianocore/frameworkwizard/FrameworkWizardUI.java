@@ -91,7 +91,6 @@ import org.tianocore.frameworkwizard.packaging.ui.SpdGuidDecls;
 import org.tianocore.frameworkwizard.packaging.ui.SpdHeader;
 import org.tianocore.frameworkwizard.packaging.ui.SpdLibClassDecls;
 import org.tianocore.frameworkwizard.packaging.ui.SpdMsaFiles;
-import org.tianocore.frameworkwizard.packaging.ui.SpdPackageDefinitions;
 import org.tianocore.frameworkwizard.packaging.ui.SpdPackageHeaders;
 import org.tianocore.frameworkwizard.packaging.ui.SpdPcdDefs;
 import org.tianocore.frameworkwizard.packaging.ui.SpdPpiDecls;
@@ -2687,10 +2686,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         case IDefaultMutableTreeNode.SPD_HEADER:
             SpdHeader frmSpdHeader = new SpdHeader(spd);
             getJDesktopPanePackage().add(frmSpdHeader, 1);
-            break;
-        case IDefaultMutableTreeNode.SPD_PACKAGEDEFINITIONS:
-            SpdPackageDefinitions frmSpdPackageDefinitions = new SpdPackageDefinitions(spd);
-            getJDesktopPanePackage().add(frmSpdPackageDefinitions, 1);
             break;
         case IDefaultMutableTreeNode.SPD_LIBRARYCLASSDECLARATIONS:
             SpdLibClassDecls frmSlcd = new SpdLibClassDecls(spd);
