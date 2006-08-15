@@ -363,29 +363,6 @@ public abstract class PlatformPcdPreprocessAction {
                     }
 
                     if (token.isDynamicPCD) {
-                        //
-                        // Check datum is equal the datum in dynamic information.
-                        // For dynamic PCD, you can do not write <Value> in sperated every <PcdBuildDefinition> in different <ModuleSA>,
-                        // But if you write, the <Value> must be same as the value in <DynamicPcdBuildDefinitions>.
-                        //
-                        if (!token.isSkuEnable() &&
-                            (token.getDefaultSku().type == DynamicTokenValue.VALUE_TYPE.DEFAULT_TYPE) &&
-                            (datum != null)) {
-                            if (!datum.equalsIgnoreCase(token.getDefaultSku().value)) {
-                                exceptionString = String.format("In the FPD file, for dynamic PCD %s in module %s, the datum in <ModuleSA> is "+
-                                                                "not equal to the datum type in <DynamicPcdBuildDefinitions>. This is "+
-                                                                "illega! You cannot set <Value> in <ModuleSA> for a dynamic PCD!",
-                                                                token.cName,
-                                                                moduleName);
-                                putError(exceptionString);
-                                //
-                                // Do not break preprocess, continues to analysis.
-                                // All errors will be summary to be shown.
-                                // 
-                                continue;
-                            }
-                        }
-
                         if ((maxDatumSize != 0) &&
                             (maxDatumSize != token.datumSize)){
                             exceptionString = String.format("In the FPD file, for dynamic PCD %s in module %s, the max datum size is %d which "+
@@ -595,20 +572,6 @@ public abstract class PlatformPcdPreprocessAction {
 
                 token.skuData.add(skuInstance);
 
-                //
-                // Judege wether is same of datum between module's information
-                // and dynamic information.
-                //
-                if (datum != null) {
-                    if ((skuInstance.id == 0)                                   &&
-                        !datum.toString().equalsIgnoreCase(skuInfoList.get(index).getValue().toString())) {
-                        exceptionString = "In the FPD file, for dynamic PCD " + token.cName + ", the value in module " + moduleName + " is " + datum.toString() + " but the "+
-                                          "value of SKU 0 data in <DynamicPcdBuildDefinition> is " + skuInstance.value.value + ". They must be same!"+
-                                          " Also, you cannot define a value for a dynamic PCD in the <ModuleSA> section!";
-                        putError(exceptionString);
-                        return null;
-                    }
-                }
                 continue;
             }
 
