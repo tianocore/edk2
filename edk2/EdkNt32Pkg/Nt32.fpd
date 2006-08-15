@@ -6820,7 +6820,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <FfsFormatKey>APPLICATION</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="0fd7197b-9bde-44fe-a7e4-d2177a9922e5" ModuleGuid="5058F21C-BC34-11d4-BD18-0080C73C8881">
+    <ModuleSA SupArchList="IA32" PackageGuid="0fd7197b-9bde-44fe-a7e4-d2177a9922e5" ModuleGuid="961578FE-B6B7-44c3-AF35-6BC705CD2B1F">
       <ModuleSaBuildOptions>
         <FvBinding>FV_RECOVERY</FvBinding>
         <FfsFormatKey>CUSTOM_BUILD</FfsFormatKey>
