@@ -96,6 +96,10 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 		}
 	}
 
+	public String choose(String message, Object[] choicelist) {
+		return (String)JOptionPane.showInputDialog(this, message,"Choose",JOptionPane.PLAIN_MESSAGE,null,choicelist,choicelist[0]);
+	}
+
 	//---------------------------------------------------------------------------------------//
 	
 	/*

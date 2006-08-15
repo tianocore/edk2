@@ -39,6 +39,7 @@ public class ModuleInfo {
 	
 	public Set<String> localmodulesources = new HashSet<String>();		//contains both .c and .h
 	public Set<String> preprocessedccodes = new HashSet<String>();
+	public Set<String> msaorinf = new HashSet<String>();				//only a little, hash may be too big for this
 	
 	public Set<String> hashfuncc = new HashSet<String>();
 	public Set<String> hashfuncd = new HashSet<String>();
@@ -54,50 +55,42 @@ public class ModuleInfo {
 	
 	private static String migrationcomment = "//%$//";
 	
-	private void moduleScan() throws Exception {
-		String[] list = new File(modulepath).list();
-		boolean hasInf = false;
-		String infname = null;
-		boolean hasMsa = false;
-		String msaname = null;
+	private void dirScan(String subpath) throws Exception {
+		String[] list = new File(modulepath + File.separator + subpath).list();			// if no sub , separator need?
+		File test;
 		
 		for (int i = 0 ; i < list.length ; i++) {
-			if (new File(list[i]).isDirectory()) {
-				;
+			test = new File(modulepath + File.separator + subpath + list[i]);
+			if (test.isDirectory()) {
+				if (list[i].contains("result") || list[i].contains("temp")) {
+				} else {
+					dirScan(subpath + list[i] + File.separator);
+				}
 			} else {
-				if (list[i].contains(".c") || list[i].contains(".C")) {
-					localmodulesources.add(list[i]);
-				} else if (list[i].contains(".h") || list[i].contains(".H")) {
-					localmodulesources.add(list[i]);	//the case that several .inf or .msa found is not concerned
-				} else if (list[i].contains(".dxs")) {
-					localmodulesources.add(list[i]);
-				} else if (list[i].contains(".uni")) {
-					localmodulesources.add(list[i]);
-				} else if (list[i].contains(".inf")) {
-					if (ui.yesOrNo("Found .inf file : " + list[i] + "\nDo you want to use this file as this module's .inf?")) {
-						hasInf = true;
-						infname = list[i];
-					} else {
-						continue;
-					}
-				} else if (list[i].contains(".msa")) {
-					if (ui.yesOrNo("Found .msa file : " + list[i] + "\nDo you want to use this file as this module's .msa?")) {
-						hasMsa = true;
-						msaname = list[i];
-					} else {
-						continue;
-					}
+				if (list[i].contains(".c") || list[i].contains(".C") || list[i].contains(".h") || 
+					list[i].contains(".H") || list[i].contains(".dxs") || list[i].contains(".uni")) {
+					localmodulesources.add(subpath + list[i]);
+				} else if (list[i].contains(".inf") || list[i].contains(".msa")) {
+					msaorinf.add(subpath + list[i]);
 				}
 			}
 		}
-		
-		ModuleReader mr = new ModuleReader(modulepath, this, db);
-		if (hasInf) {							// this sequence shows using .inf as default
-			mr.readInf(infname);
-		} else if (hasMsa) {
-			mr.readMsa(msaname);
+	}
+	
+	private void moduleScan() throws Exception {
+		dirScan("");
+		String filename = null;
+		if (msaorinf.isEmpty()) {
+			ui.println("No .inf nor .msa file found! Tool Halt!");
+			System.exit(0);
 		} else {
-			ui.println("No INF nor MSA file found!");
+			filename = ui.choose("Found .inf or .msa file in the module\nChoose one Please", msaorinf.toArray());
+		}
+		ModuleReader mr = new ModuleReader(modulepath, this, db);
+		if (filename.contains(".inf")) {
+			mr.readInf(filename);
+		} else if (filename.contains(".msa")) {
+			mr.readMsa(filename);
 		}
 		
 		CommentOutNonLocalHFile();
@@ -106,7 +99,7 @@ public class ModuleInfo {
 		new SourceFileReplacer(modulepath, this, db, ui).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
 		
 		// show result
-		if (ui.yesOrNo("Parse of the Module Information has completed. View details?")) {
+		if (ui.yesOrNo("Parse Module Information Complete . See details ?")) {
 			ui.println("\nModule Information : ");
 			ui.println("Entrypoint : " + entrypoint);
 			show(protocol, "Protocol : ");
@@ -129,8 +122,8 @@ public class ModuleInfo {
 		
 		ui.println("Errors Left : " + db.error);
 		ui.println("Complete!");
-		ui.println("Your R9 module was placed here: " + modulepath + File.separator + "result");
-		ui.println("Your logfile was placed here: " + modulepath);
+		ui.println("Your R9 module is placed at " + modulepath + File.separator + "result");
+		ui.println("Your logfile is placed at " + modulepath);
 	}
 	
 	private void show(Set<String> hash, String show) {
@@ -138,6 +131,19 @@ public class ModuleInfo {
 		ui.println(hash);
 	}
 
+	public void ensureDir(String objFileWhole) {
+		Pattern ptnseparate = Pattern.compile("(.*)\\\\[^\\\\]*");
+		Matcher mtrseparate;
+		File tempdir;
+
+		mtrseparate = ptnseparate.matcher(objFileWhole);
+		if (mtrseparate.find()) {
+			tempdir = new File(mtrseparate.group(1));
+			if (!tempdir.exists()) tempdir.mkdirs();
+		}
+		
+	}
+	
 	// add '//' to all non-local include lines
 	private void CommentOutNonLocalHFile() throws IOException {
 		BufferedReader rd;
@@ -146,20 +152,18 @@ public class ModuleInfo {
 		PrintWriter outfile;
 
 		Pattern ptninclude = Pattern.compile("[\"<](.*[.]h)[\">]");
-		Matcher mtcinclude;
-		
-		File tempdir = new File(modulepath + File.separator + "temp" + File.separator);
-		if (!tempdir.exists()) tempdir.mkdir();
+		Matcher mtrinclude;
 		
 		Iterator<String> ii = localmodulesources.iterator();
 		while ( ii.hasNext() ) {
 			curFile = ii.next();
 			rd = new BufferedReader(new FileReader(modulepath + File.separator + curFile));
+			ensureDir(modulepath + File.separator + "temp" + File.separator + curFile);
 			outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "temp" + File.separator + curFile)));
 			while ((line = rd.readLine()) != null) {
 				if (line.contains("#include")) {
-					mtcinclude = ptninclude.matcher(line);
-					if (mtcinclude.find() && localmodulesources.contains(mtcinclude.group(1))) {
+					mtrinclude = ptninclude.matcher(line);
+					if (mtrinclude.find() && localmodulesources.contains(mtrinclude.group(1))) {
 					} else {
 						line = migrationcomment + line;
 					}
@@ -170,15 +174,7 @@ public class ModuleInfo {
 			outfile.close();
 		}
 	}
-	/*
-	private void search(String line, Pattern ptn, Method md) {
-		matmacro = Func.ptntmacro.matcher(line);
-		while (matmacro.find()) {
-			if ((temp = Func.registerMacro(matmacro, this, db)) != null) {
-			}
-		}
-	}
-	*/
+
 	private void parsePreProcessedSourceCode() throws Exception {
 		//Cl cl = new Cl(modulepath);
 		//cl.execute("Fat.c");
@@ -187,19 +183,20 @@ public class ModuleInfo {
 		//System.out.println("Note!!!! The CL is not implemented now , pls do it manually!!! RUN :");
 		//System.out.println("cl " + modulepath + "\\temp\\*.c" + " -P");
 		//String[] list = new File(modulepath + File.separator + "temp").list();	// without CL , add
-		String[] list = new File(modulepath).list();
-		for (int i = 0 ; i < list.length ; i++) {
-			if (list[i].contains(".c")) {											// without CL , change to .i
-				preprocessedccodes.add(list[i]);
-			}
-		}
-		//
-		Iterator<String> ii = preprocessedccodes.iterator();
 		BufferedReader rd = null;
 		String ifile = null;
 		String line = null;
 		String temp = null;
-		//StringBuffer result = new StringBuffer();
+		
+		Iterator<String> ii = localmodulesources.iterator();
+		while (ii.hasNext()) {
+			temp = ii.next();
+			if (temp.contains(".c")) {
+				preprocessedccodes.add(temp);
+			}
+		}
+		
+		ii = preprocessedccodes.iterator();
 		
 		Pattern patefifuncc = Pattern.compile("g?(BS|RT)\\s*->\\s*([a-zA-Z_]\\w*)",Pattern.MULTILINE);
 		Pattern patentrypoint = Pattern.compile("EFI_([A-Z]*)_ENTRY_POINT\\s*\\(([^\\(\\)]*)\\)",Pattern.MULTILINE);
