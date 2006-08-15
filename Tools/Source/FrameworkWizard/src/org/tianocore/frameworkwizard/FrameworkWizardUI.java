@@ -1851,11 +1851,11 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                 for (int indexJ = 0; indexJ < vModule.size(); indexJ++) {
                     if (vModule.get(indexJ).isLibrary()) {
                         dmtnModulePackageLibrary.add(new IDefaultMutableTreeNode(vModule.get(indexJ).getName(),
-                                                                                 IDefaultMutableTreeNode.MSA_HEADER,
+                                                                                 IDefaultMutableTreeNode.MODULE,
                                                                                  false, vModule.get(indexJ)));
                     } else {
                         dmtnModulePackageModule.add(new IDefaultMutableTreeNode(vModule.get(indexJ).getName(),
-                                                                                IDefaultMutableTreeNode.MSA_HEADER,
+                                                                                IDefaultMutableTreeNode.MODULE,
                                                                                 false, vModule.get(indexJ)));
                     }
                 }
@@ -1877,7 +1877,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         if (this.vPackageList.size() > 0) {
             for (int index = 0; index < this.vPackageList.size(); index++) {
                 dmtnPackageDescription.add(new IDefaultMutableTreeNode(this.vPackageList.elementAt(index).getName(),
-                                                                       IDefaultMutableTreeNode.SPD_HEADER, false,
+                                                                       IDefaultMutableTreeNode.PACKAGE, false,
                                                                        this.vPackageList.elementAt(index)));
             }
         }
@@ -1890,7 +1890,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         if (this.vPlatformList.size() > 0) {
             for (int index = 0; index < this.vPlatformList.size(); index++) {
                 dmtnPlatformDescription.add(new IDefaultMutableTreeNode(this.vPlatformList.elementAt(index).getName(),
-                                                                        IDefaultMutableTreeNode.FPD_PLATFORMHEADER,
+                                                                        IDefaultMutableTreeNode.PLATFORM,
                                                                         false, this.vPlatformList.elementAt(index)));
             }
         }
@@ -2142,7 +2142,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Make the node selected
         //
         iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnModuleDescription, id,
-                                                                     IDefaultMutableTreeNode.MSA_HEADER)));
+                                                                     IDefaultMutableTreeNode.MODULE)));
         //
         // Update opening Module list information
         //
@@ -2160,8 +2160,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             openingModuleList.setTreePathById(id, iTree.getSelectionPath());
         }
         //
-        // Show msa header in editor panel
+        // Select msa header node and show it in editor panel
         //
+        iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnModuleDescription, id,
+                                                                     IDefaultMutableTreeNode.MSA_HEADER)));
         showModuleElement(IDefaultMutableTreeNode.MSA_HEADER, openingModuleList.getOpeningModuleById(id));
         this.currentOpeningModuleIndex = openingModuleList.findIndexOfListById(id);
     }
@@ -2224,7 +2226,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Make the node selected
         //
         iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnModuleDescription, id,
-                                                                     IDefaultMutableTreeNode.MSA_HEADER)));
+                                                                     IDefaultMutableTreeNode.MODULE)));
         //
         // Update opening Module list information
         //
@@ -2242,8 +2244,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             openingModuleList.setTreePathById(id, iTree.getSelectionPath());
         }
         //
-        // Show msa header in editor panel
+        // Select msa header node and show it in editor panel
         //
+        iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnModuleDescription, id,
+                                                                     IDefaultMutableTreeNode.MSA_HEADER)));
         showModuleElement(IDefaultMutableTreeNode.MSA_HEADER, openingModuleList.getOpeningModuleById(id));
         this.currentOpeningModuleIndex = openingModuleList.findIndexOfListById(id);
     }
@@ -2296,7 +2300,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Make the node selected
         //
         iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnPackageDescription, id,
-                                                                     IDefaultMutableTreeNode.SPD_HEADER)));
+                                                                     IDefaultMutableTreeNode.PACKAGE)));
         //
         // Update opening package list information
         //
@@ -2316,6 +2320,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Show spd header in editor panel
         //
+        iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnPackageDescription, id,
+                                                                     IDefaultMutableTreeNode.SPD_HEADER)));
         showPackageElement(IDefaultMutableTreeNode.SPD_HEADER, openingPackageList.getOpeningPackageById(id));
         this.currentOpeningPackageIndex = openingPackageList.findIndexOfListById(id);
     }
@@ -2369,7 +2375,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Make the node selected
         //
         iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnPlatformDescription, id,
-                                                                     IDefaultMutableTreeNode.FPD_PLATFORMHEADER)));
+                                                                     IDefaultMutableTreeNode.PLATFORM)));
         //
         // Update opening package list information
         //
@@ -2389,6 +2395,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Show fpd header in editor panel
         //
+        iTree.setSelectionPath(iTree.getPathOfNode(iTree.getNodeById(this.dmtnPlatformDescription, id,
+                                                                     IDefaultMutableTreeNode.FPD_PLATFORMHEADER)));
         showPlatformElement(IDefaultMutableTreeNode.FPD_PLATFORMHEADER, openingPlatformList.getOpeningPlatformById(id));
         this.currentOpeningPlatformIndex = openingPlatformList.findIndexOfListById(id);
     }
@@ -2506,6 +2514,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     private void insertModuleTreeNode(Identification id) {
+        iTree.addNode(new IDefaultMutableTreeNode("Module Header", IDefaultMutableTreeNode.MSA_HEADER, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Module Definitions", IDefaultMutableTreeNode.MSA_MODULEDEFINITIONS,
                                                   true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Library Class Definitions",
@@ -2528,12 +2537,13 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     private void insertPackageTreeNode(Identification id) {
+        iTree.addNode(new IDefaultMutableTreeNode("Package Header", IDefaultMutableTreeNode.SPD_HEADER, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Package Definitions",
                                                   IDefaultMutableTreeNode.SPD_PACKAGEDEFINITIONS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Library Class Declarations",
                                                   IDefaultMutableTreeNode.SPD_LIBRARYCLASSDECLARATIONS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Msa Files", IDefaultMutableTreeNode.SPD_MSAFILES, false, id));
-        iTree.addNode(new IDefaultMutableTreeNode("Package Headers", IDefaultMutableTreeNode.SPD_PACKAGEHEADERS, true,
+        iTree.addNode(new IDefaultMutableTreeNode("Package Includes", IDefaultMutableTreeNode.SPD_PACKAGEHEADERS, true,
                                                   id));
         iTree.addNode(new IDefaultMutableTreeNode("Guid Declarations", IDefaultMutableTreeNode.SPD_GUIDDECLARATIONS,
                                                   true, id));
@@ -2546,6 +2556,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     private void insertPlatformTreeNode(Identification id) {
+        iTree.addNode(new IDefaultMutableTreeNode("Platform Header", IDefaultMutableTreeNode.FPD_PLATFORMHEADER, true,
+                                                  id));
         iTree.addNode(new IDefaultMutableTreeNode("Platform Definitions",
                                                   IDefaultMutableTreeNode.FPD_PLATFORMDEFINITIONS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Flash", IDefaultMutableTreeNode.FPD_FLASH, true, id));
@@ -2564,35 +2576,40 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         Identification id = null;
         int intCategory = -1;
         String path = null;
+        boolean isOpen = false;
         try {
             id = iTree.getSelectNode().getId();
             intCategory = iTree.getSelectCategory();
-            //          
-            // If the node is not opened yet
-            // Insert top level elements first
-            //
-            //if (intCategory == IDefaultMutableTreeNode.MSA_HEADER || intCategory == IDefaultMutableTreeNode.SPD_MSAFILES) {
-            if (intCategory == IDefaultMutableTreeNode.MSA_HEADER) {
+            isOpen = iTree.getSelectNode().isOpening();
+            
+            if (!isOpen) {
+                //              
+                // If the node is not opened yet
+                // Insert top level elements first
+                //
+                if (intCategory == IDefaultMutableTreeNode.MODULE) {
 
-                if (intCategory == IDefaultMutableTreeNode.MSA_HEADER) {
-                    path = iTree.getSelectNode().getId().getPath();
+                    if (intCategory == IDefaultMutableTreeNode.MODULE) {
+                        path = iTree.getSelectNode().getId().getPath();
+                    }
+                    if (intCategory == IDefaultMutableTreeNode.PACKAGE) {
+                        path = iTree.getSelectNode().getId().getPath();
+                    }
+                    openModule(path);
+                    return;
                 }
-                if (intCategory == IDefaultMutableTreeNode.SPD_MSAFILES) {
+                if (intCategory == IDefaultMutableTreeNode.PACKAGE) {
                     path = iTree.getSelectNode().getId().getPath();
+                    openPackage(path);
+                    return;
                 }
-                openModule(path);
-                return;
+                if (intCategory == IDefaultMutableTreeNode.PLATFORM) {
+                    path = iTree.getSelectNode().getId().getPath();
+                    openPlatform(path);
+                    return;
+                }
             }
-            if (intCategory == IDefaultMutableTreeNode.SPD_HEADER) {
-                path = iTree.getSelectNode().getId().getPath();
-                openPackage(path);
-                return;
-            }
-            if (intCategory == IDefaultMutableTreeNode.FPD_PLATFORMHEADER) {
-                path = iTree.getSelectNode().getId().getPath();
-                openPlatform(path);
-                return;
-            }
+            
             //
             // Show editor panel
             //
@@ -2611,9 +2628,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             }
         } catch (RuntimeException e) {
             Log.log("double click category: " + intCategory);
-            Log.log("double click id path: " + id.getPath());
+            Log.log("double click id path: " + id);
             Log.log("double click exception: " + e.getMessage());
-            e.printStackTrace();
         }
     }
 
