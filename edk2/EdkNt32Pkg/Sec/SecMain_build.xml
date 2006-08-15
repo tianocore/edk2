@@ -88,7 +88,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <includepath path="${DEST_DIR_DEBUG}"/>
          </EXTRA.INC>
        </Build_AUTOGEN>
-       <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/AutoGen.obj" />
       <Build_CCode FILEEXT="c" FILENAME="FwVol" FILEPATH=".">
          <EXTRA.INC>
             <includepath path="${WORKSPACE_DIR}"/>
@@ -103,7 +102,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <includepath path="${DEST_DIR_DEBUG}"/>
          </EXTRA.INC>
       </Build_CCode>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/FwVol.obj" />
       <Build_CCode FILEEXT="c" FILENAME="WinNtThunk" FILEPATH=".">
          <EXTRA.INC>
             <includepath path="${WORKSPACE_DIR}"/>
@@ -118,7 +116,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <includepath path="${DEST_DIR_DEBUG}"/>
          </EXTRA.INC>
       </Build_CCode>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/WinNtThunk.obj" />
       <Build_CCode FILEEXT="c" FILENAME="SecMain" FILEPATH=".">
          <EXTRA.INC>
             <includepath path="${WORKSPACE_DIR}"/>
@@ -133,13 +130,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <includepath path="${DEST_DIR_DEBUG}"/>
          </EXTRA.INC>
       </Build_CCode>
-      <var name="OBJECTS" value="${OBJECTS} ${DEST_DIR_OUTPUT}/SecMain.obj" />
     </target>
+
     <target name="sections" />
+
     <target name="output" >
       <OnDependency>
         <sourcefiles>
-          <file list="${OBJECTS}"/>
+          <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}" />
           <file list="${LIBS}"/>
         </sourcefiles>
         <targetfiles>
@@ -147,27 +145,28 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         </targetfiles>
         
         <sequential>
+          <cc userdefine="on">
+            <command type="SLINK" cmd="${SLINK}" family="${SLINK_FAMILY}"
+                outputFile="${DEST_DIR_OUTPUT}/SecMainLocal.lib">
+                
+              <argument value="${SLINK_FLAGS}"/>
+
+              <fileset dir="${DEST_DIR_OUTPUT}" includes="${OBJECTS}"/>
+            </command>
+          </cc>
+          
+          <var name="LIBS" value="${LIBS} ${DEST_DIR_OUTPUT}/SecMainLocal.lib" />
+         
           <shellscript shell="cmd.exe" tmpsuffix=".cmd" >
             <arg line="/q"/>
             <arg line="/c"/>
             <arg line="call"/>
-            "${DLINK}" /LIBPATH:"${env.MSVCDir}\Lib" /LIBPATH:"${env.MSVCDir}\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib ${OBJECTS} ${LIBS} /base:0x10000000 /out:${BIN_DIR}\SecMain.exe /pdb:${DEST_DIR_DEBUG}\SecMain.pdb
+            "${DLINK}" /LIBPATH:"${env.MSVCDir}\Lib" /LIBPATH:"${env.MSVCDir}\PlatformSdk\Lib" /NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG Kernel32.lib MSVCRTD.lib Gdi32.lib User32.lib Winmm.lib ${LIBS} /base:0x10000000 /out:${BIN_DIR}\SecMain.exe /pdb:${DEST_DIR_DEBUG}\SecMain.pdb
           </shellscript>
         </sequential>
       </OnDependency>
-      <!--      
-      <cc userdefine="on">
-        <command type="LINK">
-          <argument value="/LIBPATH:&quot;${env.MSVCDir}\Lib&quot; /LIBPATH:&quot;${env.MSVCDir}\PlatformSdk\Lib&quot;" />
-          <argument value="/NOLOGO /SUBSYSTEM:CONSOLE /NODEFAULTLIB /IGNORE:4086 /MAP /OPT:REF /DEBUG /MACHINE:I386 /LTCG" />
-          <argument value="Kernel32.lib MsvcRt.lib Gdi32.lib User32.lib Winmm.lib" />
-          <argument value="${OBJECTS}" />
-          <argument value="${LIBS}" />
-          <argument value="/base:0x10000000 /out:${BIN_DIR}\SecMain.exe /pdb:${DEST_DIR_DEBUG}\SecMain.pdb" />
-      </command>
-    </cc>
-    -->
   </target>
+  
   <target name="clean" ></target>
 
   <target name="cleanAll"></target>
