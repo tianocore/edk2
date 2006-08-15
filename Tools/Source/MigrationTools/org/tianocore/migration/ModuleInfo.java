@@ -81,7 +81,7 @@ public class ModuleInfo {
 		dirScan("");
 		String filename = null;
 		if (msaorinf.isEmpty()) {
-			ui.println("No .inf nor .msa file found! Tool Halt!");
+			ui.println("No INF nor MSA file found!");
 			System.exit(0);
 		} else {
 			filename = ui.choose("Found .inf or .msa file in the module\nChoose one Please", msaorinf.toArray());
@@ -99,7 +99,7 @@ public class ModuleInfo {
 		new SourceFileReplacer(modulepath, this, db, ui).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
 		
 		// show result
-		if (ui.yesOrNo("Parse Module Information Complete . See details ?")) {
+		if (ui.yesOrNo("Parse of the Module Information has completed. View details?")) {
 			ui.println("\nModule Information : ");
 			ui.println("Entrypoint : " + entrypoint);
 			show(protocol, "Protocol : ");
@@ -122,8 +122,8 @@ public class ModuleInfo {
 		
 		ui.println("Errors Left : " + db.error);
 		ui.println("Complete!");
-		ui.println("Your R9 module is placed at " + modulepath + File.separator + "result");
-		ui.println("Your logfile is placed at " + modulepath);
+		ui.println("Your R9 module was placed here: " + modulepath + File.separator + "result");
+		ui.println("Your logfile was placed here: " + modulepath);
 	}
 	
 	private void show(Set<String> hash, String show) {
