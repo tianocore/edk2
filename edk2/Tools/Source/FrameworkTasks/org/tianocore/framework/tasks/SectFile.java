@@ -53,10 +53,9 @@ public class SectFile implements Section {
   
      @param   Buffer  buffer to contain the section file content with alignment
      **/
-    public void toBuffer (DataOutputStream buffer, DataOutputStream orgBuffer){
+    public void toBuffer (DataOutputStream buffer){
         File   sectFile;
-        byte   data;
-        long   fileLen;
+        int    fileLen;
 
         ///
         /// open file
@@ -67,7 +66,7 @@ public class SectFile implements Section {
         /// check if file exist.
         ///     
         if (! sectFile.exists()) {
-            throw new BuildException("The file  " + this.fileName + "  does not exist!\n");     
+            throw new BuildException("The file  " + this.fileName + "  is not exist!\n");     
         }
 
 
@@ -78,18 +77,10 @@ public class SectFile implements Section {
 
             FileInputStream fs = new FileInputStream (sectFile.getAbsoluteFile());
             DataInputStream In = new DataInputStream (fs);
-            fileLen            = sectFile.length();
-
-            int i = 0;
-            while (i < fileLen) {
-                data = In.readByte();
-                buffer.writeByte(data);
-                //
-                // Add data to org file 
-                //
-                orgBuffer.writeByte(data);
-                i++;
-            }
+            fileLen            = (int)sectFile.length();
+            byte[] sectBuffer  = new byte[fileLen];
+            In.read(sectBuffer);
+            buffer.write(sectBuffer);
 
             ///
             /// 4 byte alignment
@@ -97,10 +88,6 @@ public class SectFile implements Section {
             while ((fileLen & 0x03)!= 0) {
                 fileLen ++;
                 buffer.writeByte(0);
-                //
-                // Add data to org file 
-                //
-                orgBuffer.writeByte(0);
             } 
 
             ///

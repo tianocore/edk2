@@ -19,5 +19,5 @@ import java.io.DataOutputStream;
  Section interface is for geting the contain buffer form compress, tool, and sectFile  
  **/
 public interface Section {
-    public void toBuffer (DataOutputStream buffer, DataOutputStream orgBuffer);
+    public void toBuffer (DataOutputStream buffer);
 }
