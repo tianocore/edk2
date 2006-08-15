@@ -113,23 +113,18 @@ public class FrameworkBuildTask extends Task{
         File buildFile = null;
         if (msaFiles.size() > 1) {
             throw new BuildException("Having more than one MSA file in a directory is not allowed!");
-        }
-        else if (msaFiles.size() == 1 && activePlatform == null) {
+        } else if (msaFiles.size() == 1 && activePlatform == null) {
             throw new BuildException("If trying to build a single module, please set ACTIVE_PLATFORM in file [Tool/Conf/target.txt]. ");
-        }
-        else if (msaFiles.size() == 1 && activePlatform != null) {
+        } else if (msaFiles.size() == 1 && activePlatform != null) {
             //
             // Build the single module
             //
             buildFile = msaFiles.toArray(new File[1])[0];
-        }
-        else if (activePlatform != null) {
+        } else if (activePlatform != null) {
             buildFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
-        }
-        else if (fpdFiles.size() == 1) {
+        } else if (fpdFiles.size() == 1) {
             buildFile = fpdFiles.toArray(new File[1])[0];
-        }
-        else if (fpdFiles.size() > 1) {
+        } else if (fpdFiles.size() > 1) {
             buildFile = intercommuniteWithUser();
         }
         //
@@ -191,20 +186,16 @@ public class FrameworkBuildTask extends Task{
 
     private File intercommuniteWithUser(){
         File file = null;
-        if (fpdFiles.size() + msaFiles.size() > 1) {
-            File[] allFiles = new File[fpdFiles.size() + msaFiles.size()];
+        if (fpdFiles.size() > 1) {
+            File[] allFiles = new File[fpdFiles.size()];
             int index = 0;
             Iterator<File> iter = fpdFiles.iterator();
             while (iter.hasNext()) {
                 allFiles[index] = iter.next();
                 index++;
             }
-            iter = msaFiles.iterator();
-            while (iter.hasNext()) {
-                allFiles[index] = iter.next();
-                index++;
-            }
-            System.out.println("Finding " + allFiles.length + " FPD and MSA files: ");
+
+            System.out.println("Finding " + allFiles.length + " FPD files: ");
             for (int i = 0; i < allFiles.length; i++) {
                 System.out.println("[" + (i + 1) + "]: " + allFiles[i].getName());
             }
@@ -234,12 +225,8 @@ public class FrameworkBuildTask extends Task{
                     flag = true;
                 }
             } while (flag);
-        }
-        else if (fpdFiles.size() == 1) {
+        } else if (fpdFiles.size() == 1) {
             file = fpdFiles.toArray(new File[1])[0];
-        }
-        else if (msaFiles.size() == 1) {
-            file = msaFiles.toArray(new File[1])[0];
         }
         return file;
     }
@@ -248,8 +235,7 @@ public class FrameworkBuildTask extends Task{
     public void setType(String type) {
         if (type.equalsIgnoreCase("clean") || type.equalsIgnoreCase("cleanall")) {
             this.type = type.toLowerCase();
-        }
-        else {
+        } else {
             this.type = "all";
         }
     }
@@ -265,22 +251,19 @@ public class FrameworkBuildTask extends Task{
             String str = getValue("TARGET", targetFileInfo);
             if (str == null || str.trim().equals("")) {
                 envToolChainInfo.addTargets("*");
-            }
-            else {
+            } else {
                 envToolChainInfo.addTargets(str);
             }
             str = getValue("TOOL_CHAIN_TAG", targetFileInfo);
             if (str == null || str.trim().equals("")) {
                 envToolChainInfo.addTagnames("*");
-            }
-            else {
+            } else {
                 envToolChainInfo.addTagnames(str);
             }
             str = getValue("TARGET_ARCH", targetFileInfo);
             if (str == null || str.trim().equals("")) {
                 envToolChainInfo.addArchs("*");
-            }
-            else {
+            } else {
                 envToolChainInfo.addArchs(str);
             }
             GlobalData.setToolChainEnvInfo(envToolChainInfo);

@@ -175,7 +175,7 @@ public class GlobalData {
             //
             // validate FrameworkDatabaseFile
             //
-            if (! db.validate()) {
+            if (!db.validate()) {
                 throw new BuildException("Framework Database file [" + dbFile.getPath() + "] format is invalid!");
             }
             //
@@ -201,14 +201,14 @@ public class GlobalData {
                 while (iter.hasNext()) {
                     String fileName = iter.next().getStringValue();
                     File fpdFile = new File(workspaceDir + File.separatorChar + fileName);
-                    if ( ! fpdFile.exists() ) {
+                    if ( !fpdFile.exists() ) {
                         throw new BuildException("Platform file [" + fpdFile.getPath() + "] not exists. ");
                     }
                     XmlObject fpdDoc = XmlObject.Factory.parse(fpdFile);
                     //
                     // Verify FPD file, if is invalid, throw Exception
                     //
-                    if (! fpdDoc.validate()) {
+                    if (!fpdDoc.validate()) {
                         throw new BuildException("Framework Platform Surface Area file [" + fpdFile.getPath() + "] format is invalid!");
                     }
                     //
@@ -259,8 +259,7 @@ public class GlobalData {
         }
         if (msaFile == null){
             throw new BuildException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
-        }
-        else {
+        } else {
             return msaFile;
         }
     }
@@ -285,8 +284,7 @@ public class GlobalData {
         }
         if (packageId == null){
             throw new BuildException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
-        }
-        else {
+        } else {
             return packageId;
         }
     }
@@ -320,16 +318,14 @@ public class GlobalData {
     }
 
     /**
-      Query overrided module surface area information. If current is Package
-      or Platform build, also include the information from FPD file.
+      Query module surface area information.
 
       <p>Note that surface area parsing is incremental. That means the method will
-      only parse the MSA and MBD files if necessary. </p>
-
-      @param moduleName the base name of the module
-      @return the overrided module surface area information
-      @throws BuildException
-              MSA or MBD is not valid
+      only parse the MSA files if necessary. </p>
+    
+      @param fpdModuleId Module ID with arch
+      @return ModuleSA info and MSA info for fpdModuleId
+      @throws BuildException Can't find MSA
     **/
     public synchronized static Map<String, XmlObject> getDoc(FpdModuleIdentification fpdModuleId) throws BuildException {
         if (parsedModules.containsKey(fpdModuleId)) {
@@ -387,7 +383,7 @@ public class GlobalData {
     }
 
     public synchronized static Map<String, XmlObject> getNativeMsa(File msaFile) throws BuildException {
-        if (! msaFile.exists()) {
+        if (!msaFile.exists()) {
             throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] can't be found!");
         }
         try {
@@ -395,7 +391,7 @@ public class GlobalData {
             //
             // Validate File if they accord with XML Schema
             //
-            if ( ! doc.validate()){
+            if ( !doc.validate()){
                 throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] format is invalid!");
             }
             //
@@ -438,16 +434,12 @@ public class GlobalData {
         GlobalData.fpdDynamicPcds = fpdDynamicPcds;
     }
 
-    //////////////////////////////////////////////
-    //////////////////////////////////////////////
-
     public static Set<ModuleIdentification> getModules(PackageIdentification packageId){
         Spd spd = spdTable.get(packageId);
         if (spd == null ) {
             Set<ModuleIdentification> dummy = new HashSet<ModuleIdentification>();
             return dummy;
-        }
-        else {
+        } else {
             return spd.getModules();
         }
     }
@@ -611,10 +603,7 @@ public class GlobalData {
     }
 
     public synchronized static ModuleIdentification refreshModuleIdentification(ModuleIdentification moduleId) throws BuildException {
-//        System.out.println("1");
-//        System.out.println("##" + moduleId.getGuid());
         PackageIdentification packageId = getPackageForModule(moduleId);
-//        System.out.println("" + packageId.getGuid());
         moduleId.setPackage(packageId);
         Spd spd = spdTable.get(packageId);
         if (spd == null) {
@@ -637,7 +626,16 @@ public class GlobalData {
     public synchronized static Set<PackageIdentification> getPackageList(){
         return packageList;
     }
-    ///// remove!!
+
+    /**
+      BUGBUG: It is a walk around method. If do not clone, can't query info with
+      XPath correctly. 
+      
+      @param object XmlObject
+      @param deep flag for deep clone
+      @return XmlObject after clone
+      @throws BuildException parse original XmlObject error. 
+    **/
     private static XmlObject cloneXmlObject(XmlObject object, boolean deep) throws BuildException {
         if ( object == null) {
             return null;

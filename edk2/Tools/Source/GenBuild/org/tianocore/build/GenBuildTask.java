@@ -89,11 +89,8 @@ public class GenBuildTask extends Ant {
     ///
     File msaFile;
 
-    ///
-    ///
-    ///
-    private String type = "all"; // = "build";
-
+    private String type = "all"; 
+    
     ///
     /// Module's Identification.
     ///
@@ -123,8 +120,7 @@ public class GenBuildTask extends Ant {
         GenBuildLogger logger = new GenBuildLogger(getProject());
         EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
         EdkLog.setLogger(logger);
-        // remove !!
-        try {
+
         pushProperties();
         //
         // Enable all specified properties
@@ -152,8 +148,7 @@ public class GenBuildTask extends Ant {
             Map<String, XmlObject> doc = GlobalData.getNativeMsa(moduleId);
             SurfaceAreaQuery.setDoc(doc);
             moduleId = SurfaceAreaQuery.getMsaHeader();
-        }
-        else {
+        } else {
             Map<String, XmlObject> doc = GlobalData.getNativeMsa(msaFile);
             SurfaceAreaQuery.setDoc(doc);
             moduleId = SurfaceAreaQuery.getMsaHeader();
@@ -161,8 +156,7 @@ public class GenBuildTask extends Ant {
         String[] producedLibraryClasses = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED",null);
         if (producedLibraryClasses.length == 0) {
             moduleId.setLibrary(false);
-        }
-        else {
+        } else {
             moduleId.setLibrary(true);
         }
 
@@ -174,8 +168,7 @@ public class GenBuildTask extends Ant {
             // Single Module build
             //
             prepareSingleModuleBuild();
-        }
-        else {
+        } else {
             //
             // Platform build. Restore the platform related info
             //
@@ -191,8 +184,8 @@ public class GenBuildTask extends Ant {
         }
 
         //
-        // If single module : intersection MSA supported ARCHs and tools def!!
-        // else, get arch from pass down
+        // If single module : get arch from pass down, otherwise intersection MSA 
+        // supported ARCHs and tools def
         //
         Set<String> archListSupByToolChain = new LinkedHashSet<String>();
         String[] archs = GlobalData.getToolChainInfo().getArchs();
@@ -211,9 +204,8 @@ public class GenBuildTask extends Ant {
                     archSet.add(fpdArchList[i]);
                 }
             }
-        }
-        else {
-            archSet = archListSupByToolChain;
+        } else {
+            archSet = archListSupByToolChain; 
         }
 
         String[] archList = archSet.toArray(new String[archSet.size()]);
@@ -296,20 +288,16 @@ public class GenBuildTask extends Ant {
 
                     if (type.equalsIgnoreCase("all") || type.equalsIgnoreCase("build")) {
                         applyBuild(targetList[i], toolchainList[j], fpdModuleId);
-                    }
-                    else if (type.equalsIgnoreCase("clean")) {
+                    } else if (type.equalsIgnoreCase("clean")) {
                         applyClean(fpdModuleId);
-                    }
-                    else if (type.equalsIgnoreCase("cleanall")) {
+                    } else if (type.equalsIgnoreCase("cleanall")) {
                         applyCleanall(fpdModuleId);
                     }
                 }
             }
         }
+        
         popProperties();
-        }catch (Exception e){
-            throw new BuildException(e.getMessage());
-        }
     }
 
     /**
@@ -331,7 +319,7 @@ public class GenBuildTask extends Ant {
         moduleId.setPackage(packageId);
 
         //
-        // Read ACTIVE_PLATFORM's FPD file (Call FpdParserTask's method)
+        // Read ACTIVE_PLATFORM's FPD file 
         //
         String filename = getProject().getProperty("PLATFORM_FILE");
 
@@ -342,7 +330,7 @@ public class GenBuildTask extends Ant {
         PlatformIdentification platformId = GlobalData.getPlatform(filename);
 
         //
-        // Read FPD file
+        // Read FPD file (Call FpdParserTask's method)
         //
         FpdParserTask fpdParser = new FpdParserTask();
         fpdParser.setProject(getProject());
@@ -360,6 +348,8 @@ public class GenBuildTask extends Ant {
 
     /**
       Set Module-Related information to properties.
+      
+      @param arch current build ARCH
     **/
     private void setModuleCommonProperties(String arch) {
         //
@@ -381,8 +371,7 @@ public class GenBuildTask extends Ant {
         String baseName = SurfaceAreaQuery.getModuleOutputFileBasename();
         if (baseName == null) {
             getProject().setProperty("BASE_NAME", moduleId.getName());
-        }
-        else {
+        } else {
             getProject().setProperty("BASE_NAME", baseName);
         }
         getProject().setProperty("GUID", moduleId.getGuid());
@@ -423,8 +412,7 @@ public class GenBuildTask extends Ant {
         //
         if (arch.equalsIgnoreCase("EBC")) {
             getProject().setProperty("ENTRYPOINT", "EfiStart");
-        }
-        else {
+        } else {
             getProject().setProperty("ENTRYPOINT", "_ModuleEntryPoint");
         }
 
@@ -462,8 +450,7 @@ public class GenBuildTask extends Ant {
             String extName = GlobalData.getCommandSetting(key, fpdModuleId);
             if ( extName != null && ! extName.equalsIgnoreCase("")) {
                 getProject().setProperty(cmd[m] + "_EXT", extName);
-            }
-            else {
+            } else {
                 getProject().setProperty(cmd[m] + "_EXT", "");
             }
 
@@ -483,8 +470,7 @@ public class GenBuildTask extends Ant {
             String spath = GlobalData.getCommandSetting(key, fpdModuleId);
             if (spath != null) {
                 getProject().setProperty(cmd[m] + "_SPATH", spath.replaceAll("(\\\\)", "/"));
-            }
-            else {
+            } else {
                 getProject().setProperty(cmd[m] + "_SPATH", "");
             }
 
@@ -495,8 +481,7 @@ public class GenBuildTask extends Ant {
             String dpath = GlobalData.getCommandSetting(key, fpdModuleId);
             if (dpath != null) {
                 getProject().setProperty(cmd[m] + "_DPATH", dpath.replaceAll("(\\\\)", "/"));
-            }
-            else {
+            } else {
                 getProject().setProperty(cmd[m] + "_DPATH", "");
             }
         }
@@ -543,7 +528,7 @@ public class GenBuildTask extends Ant {
         this.type = type;
     }
 
-    private void applyBuild(String buildTarget, String buildTagname, FpdModuleIdentification fpdModuleId) throws EdkException{
+    private void applyBuild(String buildTarget, String buildTagname, FpdModuleIdentification fpdModuleId) throws BuildException{
         //
         // AutoGen
         //
@@ -555,8 +540,13 @@ public class GenBuildTask extends Ant {
         //
         // Get compiler flags
         //
-        getCompilerFlags(buildTarget, buildTagname, fpdModuleId);
-
+        try {
+            getCompilerFlags(buildTarget, buildTagname, fpdModuleId);
+        }
+        catch (EdkException ee) {
+            throw new BuildException(ee.getMessage());
+        }
+        
         //
         // Prepare LIBS
         //
@@ -573,12 +563,10 @@ public class GenBuildTask extends Ant {
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
             GlobalData.log.info("Call user-defined " + moduleId.getName() + "_build.xml");
-            Ant ant = new Ant();
-            ant.setProject(getProject());
-            ant.setAntfile(getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml");
-            ant.setInheritAll(true);
-            ant.init();
-            ant.execute();
+            
+            String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
+            antCall(antFilename, null);
+            
             return ;
         }
 
@@ -594,12 +582,8 @@ public class GenBuildTask extends Ant {
         //
         // Ant call ${BASE_NAME}_build.xml
         //
-        Ant ant = new Ant();
-        ant.setProject(getProject());
-        ant.setAntfile(getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml");
-        ant.setInheritAll(true);
-        ant.init();
-        ant.execute();
+        String antFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
+        antCall(antFilename, null);
     }
 
     private void applyClean(FpdModuleIdentification fpdModuleId){
@@ -609,27 +593,15 @@ public class GenBuildTask extends Ant {
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
             GlobalData.log.info("Calling user-defined " + moduleId.getName() + "_build.xml");
-            Ant ant = new Ant();
-            ant.setProject(getProject());
-            ant.setAntfile(getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml");
-            ant.setTarget("clean");
-            ant.setInheritAll(true);
-            ant.init();
-            ant.execute();
+            
+            String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
+            antCall(antFilename, "clean");
+            
             return ;
         }
 
-        Ant ant = new Ant();
-        ant.setProject(getProject());
-        ant.setAntfile(getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml");
-        ant.setTarget("clean");
-        ant.setInheritAll(true);
-        ant.init();
-        ant.execute();
-
-        //
-        // Delete current module's DEST_DIR_OUTPUT
-        // TBD
+        String antFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
+        antCall(antFilename, "clean");
     }
 
     private void applyCleanall(FpdModuleIdentification fpdModuleId){
@@ -639,30 +611,28 @@ public class GenBuildTask extends Ant {
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
             GlobalData.log.info("Calling user-defined " + moduleId.getName() + "_build.xml");
-            Ant ant = new Ant();
-            ant.setProject(getProject());
-            ant.setAntfile(getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml");
-            ant.setTarget("cleanall");
-            ant.setInheritAll(true);
-            ant.init();
-            ant.execute();
+
+            String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
+            antCall(antFilename, "cleanall");
+            
             return ;
         }
+        
+        String antFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
+        antCall(antFilename, "cleanall");
+    }
 
+    private void antCall(String antFilename, String target) {
         Ant ant = new Ant();
         ant.setProject(getProject());
-        ant.setAntfile(getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml");
-        ant.setTarget("cleanall");
+        ant.setAntfile(antFilename);
+        if (target != null) {
+            ant.setTarget(target);
+        }
         ant.setInheritAll(true);
         ant.init();
         ant.execute();
-
-        //
-        // Delete current module's DEST_DIR_OUTPUT
-        // TBD
     }
-
-
 
 
     /**
