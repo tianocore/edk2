@@ -36,6 +36,7 @@ import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
+import javax.swing.JCheckBox;
 
 /**
  The class is used to create, update spdHeader of Spd file
@@ -125,6 +126,14 @@ public class SpdHeader extends IInternalFrame {
     private JLabel jLabel = null;
 
     private JTextField jTextFieldUrl = null;
+
+    private StarLabel starLabel = null;
+
+    private StarLabel starLabel1 = null;
+
+    private JCheckBox jCheckBoxRdOnly = null;
+
+    private JCheckBox jCheckBoxRePkg = null;
 
     /**
      This method initializes jTextFieldBaseName 
@@ -290,7 +299,7 @@ public class SpdHeader extends IInternalFrame {
     private JTextField getJTextFieldSpecification() {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
-            jTextFieldSpecification.setBounds(new java.awt.Rectangle(161,330,320,20));
+            jTextFieldSpecification.setBounds(new java.awt.Rectangle(161,369,320,20));
             jTextFieldSpecification.setEditable(false);
             jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320,20));
             jTextFieldSpecification.addFocusListener(new FocusAdapter(){
@@ -345,7 +354,7 @@ public class SpdHeader extends IInternalFrame {
     private JScrollPane getJScrollPaneLicense() {
         if (jScrollPaneLicense == null) {
             jScrollPaneLicense = new JScrollPane();
-            jScrollPaneLicense.setBounds(new java.awt.Rectangle(161,108,320,80));
+            jScrollPaneLicense.setBounds(new java.awt.Rectangle(161,144,320,80));
             jScrollPaneLicense.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneLicense.setPreferredSize(new java.awt.Dimension(320,80));
             jScrollPaneLicense.setViewportView(getJTextAreaLicense());
@@ -362,7 +371,7 @@ public class SpdHeader extends IInternalFrame {
     private JScrollPane getJScrollPaneDescription() {
         if (jScrollPaneDescription == null) {
             jScrollPaneDescription = new JScrollPane();
-            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160,244,320,80));
+            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160,280,320,80));
             jScrollPaneDescription.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneDescription.setViewportView(getJTextAreaDescription());
         }
@@ -378,7 +387,7 @@ public class SpdHeader extends IInternalFrame {
     private JTextField getJTextFieldAbstract() {
         if (jTextFieldAbstract == null) {
             jTextFieldAbstract = new JTextField();
-            jTextFieldAbstract.setBounds(new java.awt.Rectangle(161,220,320,20));
+            jTextFieldAbstract.setBounds(new java.awt.Rectangle(161,256,320,20));
             jTextFieldAbstract.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldAbstract.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e){
@@ -406,7 +415,7 @@ public class SpdHeader extends IInternalFrame {
     private JTextField getJTextFieldCopyright() {
         if (jTextFieldCopyright == null) {
             jTextFieldCopyright = new JTextField();
-            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160,86,320,20));
+            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160,86,320,48));
             jTextFieldCopyright.setPreferredSize(new java.awt.Dimension(320,20));
             jTextFieldCopyright.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
@@ -433,7 +442,7 @@ public class SpdHeader extends IInternalFrame {
     private JTextField getJTextFieldUrl() {
         if (jTextFieldUrl == null) {
             jTextFieldUrl = new JTextField();
-            jTextFieldUrl.setBounds(new java.awt.Rectangle(161,195,320,20));
+            jTextFieldUrl.setBounds(new java.awt.Rectangle(161,231,320,20));
             jTextFieldUrl.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldUrl.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e){
@@ -450,6 +459,53 @@ public class SpdHeader extends IInternalFrame {
             });
         }
         return jTextFieldUrl;
+    }
+
+    /**
+     * This method initializes jCheckBoxRdOnly	
+     * 	
+     * @return javax.swing.JCheckBox	
+     */
+    private JCheckBox getJCheckBoxRdOnly() {
+        if (jCheckBoxRdOnly == null) {
+            jCheckBoxRdOnly = new JCheckBox();
+            jCheckBoxRdOnly.setText("Read Only");
+            jCheckBoxRdOnly.setLocation(new java.awt.Point(17,408));
+            jCheckBoxRdOnly.setSize(new java.awt.Dimension(138,20));
+            jCheckBoxRdOnly.setPreferredSize(new java.awt.Dimension(150,20));
+            jCheckBoxRdOnly.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (docConsole != null) {
+                        docConsole.setSaved(false);
+                    }
+                    sfc.setSpdPkgDefsRdOnly(jCheckBoxRdOnly.isSelected()+"");
+                }
+            });
+        }
+        return jCheckBoxRdOnly;
+    }
+
+    /**
+     * This method initializes jCheckBoxRePkg	
+     * 	
+     * @return javax.swing.JCheckBox	
+     */
+    private JCheckBox getJCheckBoxRePkg() {
+        if (jCheckBoxRePkg == null) {
+            jCheckBoxRePkg = new JCheckBox();
+            jCheckBoxRePkg.setLocation(new java.awt.Point(16,444));
+            jCheckBoxRePkg.setText("RePackagable");
+            jCheckBoxRePkg.setSize(new java.awt.Dimension(140,20));
+            jCheckBoxRePkg.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (docConsole != null) {
+                        docConsole.setSaved(false);
+                    }
+                    sfc.setSpdPkgDefsRePkg(jCheckBoxRePkg.isSelected()+"");
+                }
+            });
+        }
+        return jCheckBoxRePkg;
     }
 
     public static void main(String[] args) {
@@ -531,9 +587,17 @@ public class SpdHeader extends IInternalFrame {
             
             if (!sfc.getSpdPkgDefsRdOnly().equals("true")) {
                 sfc.setSpdPkgDefsRdOnly("false");
+                jCheckBoxRdOnly.setSelected(false);
+            }
+            else{
+                jCheckBoxRdOnly.setSelected(true);
             }
             if (!sfc.getSpdPkgDefsRePkg().equals("true")) {
                 sfc.setSpdPkgDefsRePkg("false");
+                jCheckBoxRePkg.setSelected(false);
+            }
+            else{
+                jCheckBoxRePkg.setSelected(true);
             }
             
     }
@@ -546,28 +610,32 @@ public class SpdHeader extends IInternalFrame {
      **/
     private JPanel getJContentPane() {
         if (jContentPane == null) {
+        	starLabel1 = new StarLabel();
+        	starLabel1.setBounds(new java.awt.Rectangle(2,443,10,20));
+        	starLabel = new StarLabel();
+        	starLabel.setBounds(new java.awt.Rectangle(2,407,10,20));
         	jLabel = new JLabel();
-        	jLabel.setBounds(new java.awt.Rectangle(16,195,140,20));
+        	jLabel.setBounds(new java.awt.Rectangle(16,231,140,20));
         	jLabel.setText("URL");
         	jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.setLocation(new java.awt.Point(0, 0));
             jContentPane.setPreferredSize(new java.awt.Dimension(500, 524));
             jLabelAbstract = new JLabel();
-            jLabelAbstract.setBounds(new java.awt.Rectangle(16,245,140,20));
+            jLabelAbstract.setBounds(new java.awt.Rectangle(16,281,140,20));
             jLabelAbstract.setText("Description");
             jLabelSpecification = new JLabel();
             jLabelSpecification.setText("Specification");
-            jLabelSpecification.setBounds(new java.awt.Rectangle(16,330,140,20));
+            jLabelSpecification.setBounds(new java.awt.Rectangle(16,369,140,20));
             jLabelDescription = new JLabel();
             jLabelDescription.setText("Abstract");
-            jLabelDescription.setBounds(new java.awt.Rectangle(16,220,140,20));
+            jLabelDescription.setBounds(new java.awt.Rectangle(16,256,140,20));
             jLabelCopyright = new JLabel();
             jLabelCopyright.setText("Copyright");
             jLabelCopyright.setBounds(new java.awt.Rectangle(15,86,140,20));
             jLabelLicense = new JLabel();
             jLabelLicense.setText("License");
-            jLabelLicense.setBounds(new java.awt.Rectangle(16,110,140,20));
+            jLabelLicense.setBounds(new java.awt.Rectangle(16,147,140,20));
             jLabelVersion = new JLabel();
             jLabelVersion.setText("Version");
             jLabelVersion.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
@@ -603,16 +671,16 @@ public class SpdHeader extends IInternalFrame {
             jStarLabel3 = new StarLabel();
             jStarLabel3.setLocation(new java.awt.Point(0, 60));
             jStarLabel4 = new StarLabel();
-            jStarLabel4.setLocation(new java.awt.Point(1,110));
+            jStarLabel4.setLocation(new java.awt.Point(1,147));
             jStarLabel5 = new StarLabel();
             jStarLabel5.setLocation(new java.awt.Point(0,86));
             jStarLabel6 = new StarLabel();
-            jStarLabel6.setLocation(new java.awt.Point(1,220));
+            jStarLabel6.setLocation(new java.awt.Point(1,256));
             jStarLabel7 = new StarLabel();
-            jStarLabel7.setLocation(new java.awt.Point(1,330));
+            jStarLabel7.setLocation(new java.awt.Point(1,369));
             jStarLabel7.setEnabled(false);
             jStarLabel9 = new StarLabel();
-            jStarLabel9.setLocation(new java.awt.Point(1,245));
+            jStarLabel9.setLocation(new java.awt.Point(1,281));
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jStarLabel3, null);
@@ -625,6 +693,10 @@ public class SpdHeader extends IInternalFrame {
 
             jContentPane.add(jLabel, null);
             jContentPane.add(getJTextFieldUrl(), null);
+            jContentPane.add(starLabel, null);
+            jContentPane.add(starLabel1, null);
+            jContentPane.add(getJCheckBoxRdOnly(), null);
+            jContentPane.add(getJCheckBoxRePkg(), null);
         }
         return jContentPane;
     }
