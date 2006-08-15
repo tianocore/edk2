@@ -88,6 +88,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </GuidCNames>
   </Guids>
   <Externs>
+    <PcdIsDriver>DXE_PCD_DRIVER</PcdIsDriver>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
