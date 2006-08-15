@@ -643,7 +643,7 @@ Returns:
 
       case EFI_IMAGE_REL_BASED_HIGH:
         F16   = (UINT16 *) Fixup;
-        *F16  = (UINT16) ((*F16 << 16) + (UINT16) Adjust);
+        *F16 = (UINT16) (*F16 + ((UINT16) ((UINT32) Adjust >> 16)));
         if (FixupData != NULL) {
           *(UINT16 *) FixupData = *F16;
           FixupData             = FixupData + sizeof (UINT16);
