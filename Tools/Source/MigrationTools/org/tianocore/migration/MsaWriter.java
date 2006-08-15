@@ -78,7 +78,7 @@ public class MsaWriter {
 		msaheader.setCopyright("Copyright (c) 2006, Intel Corporation");
 		msaheader.setVersion("1.0");
 		msaheader.setAbstract("Component name for module " + mi.modulename);
-		msaheader.setDescription("FIX ME!");							//???
+		msaheader.setDescription("FIX ME!");
 		msaheader.addNewLicense().setStringValue("All rights reserved.\n" +
 				"      This software and associated documentation (if any) is furnished\n" +
 				"      under a license and may only be used or copied in accordance\n" +
@@ -103,9 +103,17 @@ public class MsaWriter {
 		externs.addNewSpecification().setStringValue("EDK_RELEASE_VERSION 0x00020000");
 		externs.addNewExtern().setModuleEntryPoint(mi.entrypoint);
 		
+		FilenameDocument.Filename filename;
 		it = mi.localmodulesources.iterator();
+		//System.out.println(mi.localmodulesources);
 		while (it.hasNext()) {
-			sourcefiles.addNewFilename().setStringValue(it.next());
+			temp = it.next();
+			filename = sourcefiles.addNewFilename();
+			filename.setStringValue(temp);
+			//if (temp.contains("x64" + File.separator)) {
+				//System.out.println("find");
+				//filename.setSupArchList();
+			//}
 		}
 		if (!mi.protocol.isEmpty()) {
 			protocols = msa.addNewProtocols();

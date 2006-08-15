@@ -86,7 +86,7 @@ public class ModuleInfo {
 		} else {
 			filename = ui.choose("Found .inf or .msa file in the module\nChoose one Please", msaorinf.toArray());
 		}
-		ModuleReader mr = new ModuleReader(modulepath, this, db);
+		ModuleReader mr = new ModuleReader(modulepath, this, db, ui);
 		if (filename.contains(".inf")) {
 			mr.readInf(filename);
 		} else if (filename.contains(".msa")) {
@@ -130,19 +130,6 @@ public class ModuleInfo {
 		ui.println(show + hash.size());
 		ui.println(hash);
 	}
-
-	public void ensureDir(String objFileWhole) {
-		Pattern ptnseparate = Pattern.compile("(.*)\\\\[^\\\\]*");
-		Matcher mtrseparate;
-		File tempdir;
-
-		mtrseparate = ptnseparate.matcher(objFileWhole);
-		if (mtrseparate.find()) {
-			tempdir = new File(mtrseparate.group(1));
-			if (!tempdir.exists()) tempdir.mkdirs();
-		}
-		
-	}
 	
 	// add '//' to all non-local include lines
 	private void CommentOutNonLocalHFile() throws IOException {
@@ -158,7 +145,7 @@ public class ModuleInfo {
 		while ( ii.hasNext() ) {
 			curFile = ii.next();
 			rd = new BufferedReader(new FileReader(modulepath + File.separator + curFile));
-			ensureDir(modulepath + File.separator + "temp" + File.separator + curFile);
+			Common.ensureDir(modulepath + File.separator + "temp" + File.separator + curFile);
 			outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "temp" + File.separator + curFile)));
 			while ((line = rd.readLine()) != null) {
 				if (line.contains("#include")) {

@@ -25,4 +25,6 @@ public interface UI {
 	public void println(Set<String> hash);
 	
 	public String choose(String message, Object[] choicelist);
+	
+	public String getInput(String message);
 }

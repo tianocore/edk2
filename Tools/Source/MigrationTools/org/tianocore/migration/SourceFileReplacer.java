@@ -85,7 +85,7 @@ public class SourceFileReplacer {
 					outname = inname;
 				}
 				ui.println("\nModifying file: " + inname);
-				mi.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
+				Common.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
 				outfile.append(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname));
 				outfile.flush();
@@ -97,9 +97,9 @@ public class SourceFileReplacer {
 					outname = inname;
 				}
 				ui.println("\nCopying file: " + inname);
-				mi.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
+				Common.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
-				outfile.append(sourcefiletostring(modulepath + File.separator + "temp" + File.separator + inname));
+				outfile.append(Common.sourcefiletostring(modulepath + File.separator + "temp" + File.separator + inname));
 				outfile.flush();
 				outfile.close();
 			}
@@ -112,8 +112,8 @@ public class SourceFileReplacer {
 	
 	private void addr8only() throws Exception {
 		String paragraph = null;
-		String line = sourcefiletostring(Database.defaultpath + File.separator + "R8Lib.c");
-		mi.ensureDir(modulepath + File.separator + "result" + File.separator + "R8Lib.c");
+		String line = Common.sourcefiletostring(Database.defaultpath + File.separator + "R8Lib.c");
+		Common.ensureDir(modulepath + File.separator + "result" + File.separator + "R8Lib.c");
 		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.c")));
 		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.h")));
 		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
@@ -140,16 +140,6 @@ public class SourceFileReplacer {
 		
 		mi.localmodulesources.add("R8Lib.h");
 		mi.localmodulesources.add("R8Lib.c");
-	}
-	
-	private String sourcefiletostring(String filename) throws Exception {
-		BufferedReader rd = new BufferedReader(new FileReader(filename));
-		StringBuffer wholefile = new StringBuffer();
-		String line;
-		while ((line = rd.readLine()) != null) {
-			wholefile.append(line + "\n");
-		}
-		return wholefile.toString();
 	}
 	
 	// Caution : if there is @ in file , it will be replaced with \n , so is you use Doxygen ... God Bless you!
