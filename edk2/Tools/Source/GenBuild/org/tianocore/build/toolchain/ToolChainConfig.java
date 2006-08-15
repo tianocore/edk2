@@ -1,8 +1,8 @@
 /** @file
   ToolChainConfig class.
-  
+
   ToolChainFactory class parse all config files and get tool chain information.
-  
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.toolchain;
 
 import org.apache.tools.ant.BuildException;
-import org.tianocore.exception.EdkException;
+
+import org.tianocore.common.exception.EdkException;
 import org.tianocore.build.toolchain.ToolChainKey;
 import org.tianocore.build.toolchain.ToolChainMap;
 
@@ -26,9 +27,9 @@ import java.util.Set;
 
 
 /**
- 
+
   ToolChainFactory class parse all config files and get tool chain information.
-  
+
  **/
 public class ToolChainConfig {
     ///
@@ -37,7 +38,7 @@ public class ToolChainConfig {
     private ToolChainMap config = null;
     ///
     /// tool chain information (how many targets, archs, etc.)
-    /// 
+    ///
     private ToolChainInfo info = new ToolChainInfo();
 
     /**
@@ -48,7 +49,7 @@ public class ToolChainConfig {
 
     /**
       Public construct method.
-      
+
       @param toolChainFile File object representing the tool chain configuration file
     **/
     public ToolChainConfig (File toolChainFile) {
@@ -64,7 +65,7 @@ public class ToolChainConfig {
     /**
      Collect target, tool chain tag, arch and command information from key part
      of configuration
-      
+
      @param toolChainDefKey The set of keys in tool chain configuration
      **/
     private void parseToolChainDefKey (Set<ToolChainKey> toolChainDefKey) {
@@ -80,8 +81,8 @@ public class ToolChainConfig {
     }
 
     /**
-     Return the tool chain configuration information in a Map form 
-      
+     Return the tool chain configuration information in a Map form
+
      @return ToolChainMap Tool chain configurations in a ToolChainMap
      **/
     public ToolChainMap getConfig() {
@@ -90,7 +91,7 @@ public class ToolChainConfig {
 
     /**
      Return the tool chain's target, arch, tag and commands information
-     
+
       @return ToolChainInfo
      **/
     public ToolChainInfo getConfigInfo() {
@@ -99,7 +100,7 @@ public class ToolChainConfig {
 
     /**
      override toString()
-     
+
      @return String The converted configuration string in name=value form
      **/
     public String toString() {

@@ -1,9 +1,9 @@
 /** @file
-  This file is ANT task GenBuild. 
- 
-  The file is used to parse a specified Module, and generate its build time 
+  This file is ANT task GenBuild.
+
+  The file is used to parse a specified Module, and generate its build time
   ANT script build.xml, then call the the ANT script to build the module.
- 
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -32,6 +32,8 @@ import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
 
+import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.autogen.AutoGen;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GenBuildLogger;
@@ -43,8 +45,6 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.tools.ModuleItem;
-import org.tianocore.exception.EdkException;
-import org.tianocore.logger.EdkLog;
 
 /**
   <p>
@@ -52,48 +52,48 @@ import org.tianocore.logger.EdkLog;
   system. The main function of this task is to parse module's surface area,
   then generate the corresponding <em>BaseName_build.xml</em> (the real ANT
   build script) and call this to build the module. The whole process including:
-  1. generate AutoGen.c and AutoGen.h; 2. build all dependent library instances; 
+  1. generate AutoGen.c and AutoGen.h; 2. build all dependent library instances;
   3. build all source files inlcude AutoGen.c; 4. generate sections;
-  5. generate FFS file if it is driver module while LIB file if it is Library module. 
+  5. generate FFS file if it is driver module while LIB file if it is Library module.
   </p>
-  
+
   <p>
   The usage is (take module <em>HelloWorld</em> for example):
   </p>
-  
+
   <pre>
-   &lt;GenBuild  
-             msaFilename=&quot;HelloWorld.msa&quot;/&gt; 
+   &lt;GenBuild
+             msaFilename=&quot;HelloWorld.msa&quot;/&gt;
              processTo=&quot;ALL&quot;/&gt;
   </pre>
-  
-  <p><code>processTo</code> provides a way to customize the whole build process. 
-  processTo can be one value of ALL, AUTOGEN, FILES, LIBRARYINSTANCES, SECTIONS, NONE. 
-  Default is ALL, means whole 
+
+  <p><code>processTo</code> provides a way to customize the whole build process.
+  processTo can be one value of ALL, AUTOGEN, FILES, LIBRARYINSTANCES, SECTIONS, NONE.
+  Default is ALL, means whole
   </p>
-  
+
   <p>
   This task calls <code>AutoGen</code> to generate <em>AutoGen.c</em> and
   <em>AutoGen.h</em>. The task also parses the development environment
   configuration files, such as collecting package information, setting compiler
   flags and so on.
   </p>
-  
-  
+
+
   @since GenBuild 1.0
 **/
 public class GenBuildTask extends Ant {
-    
+
     ///
     /// Module surface area file.
     ///
     File msaFile;
 
     ///
-    /// 
+    ///
     ///
     private String type = "all"; // = "build";
-    
+
     ///
     /// Module's Identification.
     ///
@@ -102,9 +102,9 @@ public class GenBuildTask extends Ant {
     private Vector<Property> properties = new Vector<Property>();
 
     private static Stack<Hashtable> backupPropertiesStack = new Stack<Hashtable>();
-    
+
     private boolean isSingleModuleBuild = false;
-    
+
     /**
       Public construct method. It is necessary for ANT task.
     **/
@@ -112,7 +112,7 @@ public class GenBuildTask extends Ant {
     }
 
     /**
-  
+
       @throws BuildException
               From module build, exception from module surface area invalid.
     **/
@@ -134,7 +134,7 @@ public class GenBuildTask extends Ant {
             Property item = iter.next();
             getProject().setProperty(item.getName(), item.getValue());
         }
-        
+
         //
         // GenBuild should specify either msaFile or moduleGuid & packageGuid
         //
@@ -165,7 +165,7 @@ public class GenBuildTask extends Ant {
         else {
             moduleId.setLibrary(true);
         }
-        
+
         //
         // Judge whether it is single module build or not
         //
@@ -183,29 +183,29 @@ public class GenBuildTask extends Ant {
             PlatformIdentification platformId = GlobalData.getPlatform(filename);
             getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
             getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
-            
+
             String packageGuid = getProject().getProperty("PACKAGE_GUID");
             String packageVersion = getProject().getProperty("PACKAGE_VERSION");
             PackageIdentification packageId = new PackageIdentification(packageGuid, packageVersion);
             moduleId.setPackage(packageId);
         }
-        
+
         //
         // If single module : intersection MSA supported ARCHs and tools def!!
         // else, get arch from pass down
         //
-        Set<String> archListSupByToolChain = new LinkedHashSet<String>(); 
-        String[] archs = GlobalData.getToolChainInfo().getArchs(); 
-        
+        Set<String> archListSupByToolChain = new LinkedHashSet<String>();
+        String[] archs = GlobalData.getToolChainInfo().getArchs();
+
         for (int i = 0; i < archs.length; i ++) {
             archListSupByToolChain.add(archs[i]);
         }
-        
+
         Set<String> archSet = new LinkedHashSet<String>();
-        
+
         if ( getProject().getProperty("ARCH") != null) {
             String[] fpdArchList = getProject().getProperty("ARCH").split(" ");
-            
+
             for (int i = 0; i < fpdArchList.length; i++) {
                 if (archListSupByToolChain.contains(fpdArchList[i])) {
                     archSet.add(fpdArchList[i]);
@@ -213,11 +213,11 @@ public class GenBuildTask extends Ant {
             }
         }
         else {
-            archSet = archListSupByToolChain; 
+            archSet = archListSupByToolChain;
         }
-  
+
         String[] archList = archSet.toArray(new String[archSet.size()]);
-        
+
         //
         // Judge if arch is all supported by current module. If not, throw Exception.
         //
@@ -229,13 +229,13 @@ public class GenBuildTask extends Ant {
                 }
             }
         }
-        
+
         for (int k = 0; k < archList.length; k++) {
-            
+
             getProject().setProperty("ARCH", archList[k]);
-            
+
             FpdModuleIdentification fpdModuleId = new FpdModuleIdentification(moduleId, archList[k]);
-            
+
             //
             // Whether the module is built before
             //
@@ -247,7 +247,7 @@ public class GenBuildTask extends Ant {
             } else {
                 GlobalData.registerBuiltModule(fpdModuleId);
             }
-            
+
             //
             // For Every TOOLCHAIN, TARGET
             //
@@ -263,7 +263,7 @@ public class GenBuildTask extends Ant {
                     //
                     // check if any tool is defined for current target + toolchain + arch
                     // don't do anything if no tools found
-                    // 
+                    //
                     if (GlobalData.isCommandSet(targetList[i], toolchainList[j], archList[k]) == false) {
                         System.out.println("Warning: No build issued.  No tools were found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
                         continue;
@@ -278,7 +278,7 @@ public class GenBuildTask extends Ant {
                     System.out.println("Build " + moduleId + " start >>>");
                     System.out.println("Target: " + targetList[i] + " Tagname: " + toolchainList[j] + " Arch: " + archList[k]);
                     SurfaceAreaQuery.setDoc(GlobalData.getDoc(fpdModuleId));
-                    
+
                     //
                     // Prepare for all other common properties
                     // PACKAGE, PACKAGE_GUID, PACKAGE_VERSION, PACKAGE_DIR, PACKAGE_RELATIVE_DIR
@@ -287,13 +287,13 @@ public class GenBuildTask extends Ant {
                     // SUBSYSTEM, ENTRYPOINT, EBC_TOOL_LIB_PATH
                     //
                     setModuleCommonProperties(archList[k]);
-                    
+
                     //
-                    // OutputManage prepare for 
+                    // OutputManage prepare for
                     // BIN_DIR, DEST_DIR_DEBUG, DEST_DIR_OUTPUT, BUILD_DIR, FV_DIR
                     //
                     OutputManager.getInstance().update(getProject());
-                    
+
                     if (type.equalsIgnoreCase("all") || type.equalsIgnoreCase("build")) {
                         applyBuild(targetList[i], toolchainList[j], fpdModuleId);
                     }
@@ -313,13 +313,13 @@ public class GenBuildTask extends Ant {
     }
 
     /**
-      This method is used to prepare Platform-related information. 
-      
+      This method is used to prepare Platform-related information.
+
       <p>In Single Module Build mode, platform-related information is not ready.
-      The method read the system environment variable <code>ACTIVE_PLATFORM</code> 
+      The method read the system environment variable <code>ACTIVE_PLATFORM</code>
       and search in the Framework Database. Note that platform name in the Framework
       Database must be unique. </p>
-     
+
     **/
     private void prepareSingleModuleBuild(){
         //
@@ -327,27 +327,27 @@ public class GenBuildTask extends Ant {
         // TBD: Enhance it!!!!
         //
         PackageIdentification packageId = GlobalData.getPackageForModule(moduleId);
-        
+
         moduleId.setPackage(packageId);
-        
+
         //
         // Read ACTIVE_PLATFORM's FPD file (Call FpdParserTask's method)
         //
         String filename = getProject().getProperty("PLATFORM_FILE");
-        
+
         if (filename == null){
             throw new BuildException("Please set ACTIVE_PLATFORM in the file: Tools/Conf/target.txt if you want to build a single module!");
         }
-        
+
         PlatformIdentification platformId = GlobalData.getPlatform(filename);
-        
+
         //
         // Read FPD file
         //
         FpdParserTask fpdParser = new FpdParserTask();
         fpdParser.setProject(getProject());
         fpdParser.parseFpdFile(platformId.getFpdFile());
-        
+
         //
         // Prepare for Platform related common properties
         // PLATFORM, PLATFORM_DIR, PLATFORM_RELATIVE_DIR
@@ -372,7 +372,7 @@ public class GenBuildTask extends Ant {
         getProject().setProperty("PACKAGE_VERSION", packageId.getVersion());
         getProject().setProperty("PACKAGE_DIR", packageId.getPackageDir().replaceAll("(\\\\)", "/"));
         getProject().setProperty("PACKAGE_RELATIVE_DIR", packageId.getPackageRelativeDir().replaceAll("(\\\\)", "/"));
-        
+
         //
         // MODULE or BASE_NAME, GUID or FILE_GUID, VERSION, MODULE_TYPE
         // MODULE_DIR, MODULE_RELATIVE_DIR
@@ -391,24 +391,24 @@ public class GenBuildTask extends Ant {
         getProject().setProperty("MODULE_TYPE", moduleId.getModuleType());
         getProject().setProperty("MODULE_DIR", moduleId.getMsaFile().getParent().replaceAll("(\\\\)", "/"));
         getProject().setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/"));
-        
+
         //
         // SUBSYSTEM
         //
         String[][] subsystemMap = { { "BASE", "EFI_BOOT_SERVICE_DRIVER"},
-                                    { "SEC", "EFI_BOOT_SERVICE_DRIVER" }, 
-                                    { "PEI_CORE", "EFI_BOOT_SERVICE_DRIVER" }, 
-                                    { "PEIM", "EFI_BOOT_SERVICE_DRIVER" }, 
+                                    { "SEC", "EFI_BOOT_SERVICE_DRIVER" },
+                                    { "PEI_CORE", "EFI_BOOT_SERVICE_DRIVER" },
+                                    { "PEIM", "EFI_BOOT_SERVICE_DRIVER" },
                                     { "DXE_CORE", "EFI_BOOT_SERVICE_DRIVER" },
-                                    { "DXE_DRIVER", "EFI_BOOT_SERVICE_DRIVER" }, 
-                                    { "DXE_RUNTIME_DRIVER", "EFI_RUNTIME_DRIVER" }, 
-                                    { "DXE_SAL_DRIVER", "EFI_BOOT_SERVICE_DRIVER" }, 
-                                    { "DXE_SMM_DRIVER", "EFI_BOOT_SERVICE_DRIVER" }, 
-                                    { "TOOL", "EFI_BOOT_SERVICE_DRIVER" }, 
+                                    { "DXE_DRIVER", "EFI_BOOT_SERVICE_DRIVER" },
+                                    { "DXE_RUNTIME_DRIVER", "EFI_RUNTIME_DRIVER" },
+                                    { "DXE_SAL_DRIVER", "EFI_BOOT_SERVICE_DRIVER" },
+                                    { "DXE_SMM_DRIVER", "EFI_BOOT_SERVICE_DRIVER" },
+                                    { "TOOL", "EFI_BOOT_SERVICE_DRIVER" },
                                     { "UEFI_DRIVER", "EFI_BOOT_SERVICE_DRIVER" },
-                                    { "UEFI_APPLICATION", "EFI_APPLICATION" }, 
-                                    { "USER_DEFINED", "EFI_BOOT_SERVICE_DRIVER"} }; 
-        
+                                    { "UEFI_APPLICATION", "EFI_APPLICATION" },
+                                    { "USER_DEFINED", "EFI_BOOT_SERVICE_DRIVER"} };
+
         String subsystem = "EFI_BOOT_SERVICE_DRIVER";
         for (int i = 0; i < subsystemMap.length; i++) {
             if (moduleId.getModuleType().equalsIgnoreCase(subsystemMap[i][0])) {
@@ -417,7 +417,7 @@ public class GenBuildTask extends Ant {
             }
         }
         getProject().setProperty("SUBSYSTEM", subsystem);
-        
+
         //
         // ENTRYPOINT
         //
@@ -427,7 +427,7 @@ public class GenBuildTask extends Ant {
         else {
             getProject().setProperty("ENTRYPOINT", "_ModuleEntryPoint");
         }
-        
+
         getProject().setProperty("OBJECTS", "");
     }
 
@@ -444,7 +444,7 @@ public class GenBuildTask extends Ant {
             String cmdName = GlobalData.getCommandSetting(key, fpdModuleId);
             File cmdFile = new File(cmdPath + File.separatorChar + cmdName);
             getProject().setProperty(cmd[m], cmdFile.getPath().replaceAll("(\\\\)", "/"));
-            
+
             //
             // set CC_FLAGS
             //
@@ -454,7 +454,7 @@ public class GenBuildTask extends Ant {
             Set<String> subset = new LinkedHashSet<String>();
             putFlagsToSet(addset, cmdFlags);
             getProject().setProperty(cmd[m] + "_FLAGS", getProject().replaceProperties(getFlags(addset, subset)));
-            
+
             //
             // Set CC_EXT
             //
@@ -466,7 +466,7 @@ public class GenBuildTask extends Ant {
             else {
                 getProject().setProperty(cmd[m] + "_EXT", "");
             }
-            
+
             //
             // set CC_FAMILY
             //
@@ -475,7 +475,7 @@ public class GenBuildTask extends Ant {
             if (toolChainFamily != null) {
                 getProject().setProperty(cmd[m] + "_FAMILY", toolChainFamily);
             }
-            
+
             //
             // set CC_SPATH
             //
@@ -487,7 +487,7 @@ public class GenBuildTask extends Ant {
             else {
                 getProject().setProperty(cmd[m] + "_SPATH", "");
             }
-            
+
             //
             // set CC_DPATH
             //
@@ -501,19 +501,19 @@ public class GenBuildTask extends Ant {
             }
         }
     }
-    
+
     public void setMsaFile(File msaFile) {
         this.msaFile = msaFile;
     }
 
     /**
-      Method is for ANT to initialize MSA file. 
-      
+      Method is for ANT to initialize MSA file.
+
       @param msaFilename MSA file name
     **/
     public void setMsaFile(String msaFilename) {
         String moduleDir = getProject().getProperty("MODULE_DIR");
-        
+
         //
         // If is Single Module Build, then use the Base Dir defined in build.xml
         //
@@ -522,17 +522,17 @@ public class GenBuildTask extends Ant {
         }
         msaFile = new File(moduleDir + File.separatorChar + msaFilename);
     }
-    
+
     public void addConfiguredModuleItem(ModuleItem moduleItem) {
         PackageIdentification packageId = new PackageIdentification(moduleItem.getPackageGuid(), moduleItem.getPackageVersion());
         ModuleIdentification moduleId = new ModuleIdentification(moduleItem.getModuleGuid(), moduleItem.getModuleVersion());
         moduleId.setPackage(packageId);
         this.moduleId = moduleId;
     }
-    
+
     /**
-      Add a property. 
-    
+      Add a property.
+
       @param p property
     **/
     public void addProperty(Property p) {
@@ -542,21 +542,21 @@ public class GenBuildTask extends Ant {
     public void setType(String type) {
         this.type = type;
     }
-    
+
     private void applyBuild(String buildTarget, String buildTagname, FpdModuleIdentification fpdModuleId) throws EdkException{
         //
         // AutoGen
         //
-        
+
         AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch());
         autogen.genAutogen();
-        
-        
+
+
         //
         // Get compiler flags
         //
         getCompilerFlags(buildTarget, buildTagname, fpdModuleId);
-        
+
         //
         // Prepare LIBS
         //
@@ -566,7 +566,7 @@ public class GenBuildTask extends Ant {
             propertyLibs += " " + getProject().getProperty("BIN_DIR") + File.separatorChar + libinstances[i].getName() + ".lib";
         }
         getProject().setProperty("LIBS", propertyLibs.replaceAll("(\\\\)", "/"));
-        
+
         //
         // if it is CUSTOM_BUILD
         // then call the exist BaseName_build.xml directly.
@@ -581,7 +581,7 @@ public class GenBuildTask extends Ant {
             ant.execute();
             return ;
         }
-        
+
         //
         // Generate ${BASE_NAME}_build.xml
         // TBD
@@ -590,7 +590,7 @@ public class GenBuildTask extends Ant {
         ModuleBuildFileGenerator fileGenerator = new ModuleBuildFileGenerator(getProject(), ffsKeyword, fpdModuleId);
         String buildFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
         fileGenerator.genBuildFile(buildFilename);
-        
+
         //
         // Ant call ${BASE_NAME}_build.xml
         //
@@ -601,7 +601,7 @@ public class GenBuildTask extends Ant {
         ant.init();
         ant.execute();
     }
-    
+
     private void applyClean(FpdModuleIdentification fpdModuleId){
         //
         // if it is CUSTOM_BUILD
@@ -618,7 +618,7 @@ public class GenBuildTask extends Ant {
             ant.execute();
             return ;
         }
-        
+
         Ant ant = new Ant();
         ant.setProject(getProject());
         ant.setAntfile(getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml");
@@ -626,12 +626,12 @@ public class GenBuildTask extends Ant {
         ant.setInheritAll(true);
         ant.init();
         ant.execute();
-        
+
         //
         // Delete current module's DEST_DIR_OUTPUT
         // TBD
     }
-    
+
     private void applyCleanall(FpdModuleIdentification fpdModuleId){
         //
         // if it is CUSTOM_BUILD
@@ -648,7 +648,7 @@ public class GenBuildTask extends Ant {
             ant.execute();
             return ;
         }
-        
+
         Ant ant = new Ant();
         ant.setProject(getProject());
         ant.setAntfile(getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml");
@@ -656,7 +656,7 @@ public class GenBuildTask extends Ant {
         ant.setInheritAll(true);
         ant.init();
         ant.execute();
-        
+
         //
         // Delete current module's DEST_DIR_OUTPUT
         // TBD
@@ -667,17 +667,17 @@ public class GenBuildTask extends Ant {
 
     /**
       Separate the string and instore in set.
-       
-      <p> String is separated by Java Regulation Expression 
+
+      <p> String is separated by Java Regulation Expression
       "[^\\\\]?(\".*?[^\\\\]\")[ \t,]+". </p>
-      
+
       <p>For example: </p>
-      
+
       <pre>
         "/nologo", "/W3", "/WX"
         "/C", "/DSTRING_DEFINES_FILE=\"BdsStrDefs.h\""
       </pre>
-      
+
       @param set store the separated string
       @param str string to separate
     **/
@@ -693,10 +693,10 @@ public class GenBuildTask extends Ant {
             set.add(item);
         }
     }
-    
+
     /**
-      Generate the final flags string will be used by compile command. 
-      
+      Generate the final flags string will be used by compile command.
+
       @param add the add flags set
       @param sub the sub flags set
       @return final flags after add set substract sub set
@@ -715,7 +715,7 @@ public class GenBuildTask extends Ant {
     private void pushProperties() {
         backupPropertiesStack.push(getProject().getProperties());
     }
-    
+
     private void popProperties() {
         Hashtable backupProperties = backupPropertiesStack.pop();
         Set keys = backupProperties.keySet();

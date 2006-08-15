@@ -1,10 +1,10 @@
 /** @file
-  GlobalData class. 
-  
+  GlobalData class.
+
   GlobalData provide initializing, instoring, querying and update global data.
   It is a bridge to intercommunicate between multiple component, such as AutoGen,
-  PCD and so on.   
- 
+  PCD and so on.
+
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -27,6 +27,10 @@ import java.util.logging.Logger;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.xmlbeans.XmlObject;
+
+import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
+import org.tianocore.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.DbPathAndFilename;
 import org.tianocore.FrameworkDatabaseDocument;
 import org.tianocore.ModuleSurfaceAreaDocument;
@@ -35,44 +39,41 @@ import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
-import org.tianocore.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.build.toolchain.ToolChainAttribute;
 import org.tianocore.build.toolchain.ToolChainConfig;
 import org.tianocore.build.toolchain.ToolChainElement;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.build.toolchain.ToolChainKey;
 import org.tianocore.build.toolchain.ToolChainMap;
-import org.tianocore.exception.EdkException;
-import org.tianocore.logger.EdkLog;
 
 /**
   GlobalData provide initializing, instoring, querying and update global data.
   It is a bridge to intercommunicate between multiple component, such as AutoGen,
-  PCD and so on. 
-  
-  <p>Note that all global information are initialized incrementally. All data will 
+  PCD and so on.
+
+  <p>Note that all global information are initialized incrementally. All data will
   parse and record only of necessary during build time. </p>
-  
+
   @since GenBuild 1.0
 **/
 public class GlobalData {
 
     public static Logger log = Logger.getAnonymousLogger();
-    
+
     ///
     /// Record current WORKSPACE Directory
     ///
     private static String workspaceDir = "";
-    
+
     ///
     /// Be used to ensure Global data will be initialized only once.
     ///
     private static boolean globalFlag = false;
-    
+
     ///
     /// Framework Database information: package list and platform list
     ///
-    private static Set<PackageIdentification> packageList = new HashSet<PackageIdentification>();  
+    private static Set<PackageIdentification> packageList = new HashSet<PackageIdentification>();
 
     private static Set<PlatformIdentification> platformList = new HashSet<PlatformIdentification>();
 
@@ -93,17 +94,17 @@ public class GlobalData {
     private static XmlObject fpdBuildOptions;
 
     private static XmlObject fpdDynamicPcds;
-    
+
     ///
     /// Parsed modules list
     ///
     private static Map<FpdModuleIdentification, Map<String, XmlObject>> parsedModules = new HashMap<FpdModuleIdentification, Map<String, XmlObject>>();
-    
+
     ///
     /// built modules list with ARCH, TARGET, TOOLCHAIN
     ///
     private static Set<FpdModuleIdentification> builtModules = new HashSet<FpdModuleIdentification>();
-    
+
     ///
     /// PCD memory database stored all PCD information which collected from FPD,MSA and SPD.
     ///
@@ -117,7 +118,7 @@ public class GlobalData {
     /// toolsDef - build tool program information
     /// fpdBuildOption - all modules's build options for tool tag or tool chain families
     /// moduleSaBuildOption - build options for a specific module
-    /// 
+    ///
     private static ToolChainConfig toolsDef;
 
     private static ToolChainInfo toolChainInfo;
@@ -133,8 +134,8 @@ public class GlobalData {
     /**
       Parse framework database (DB) and all SPD files listed in DB to initialize
       the environment for next build. This method will only be executed only once
-      in the whole build process.  
-    
+      in the whole build process.
+
       @param workspaceDatabaseFile the file name of framework database
       @param workspaceDir current workspace directory path
       @throws BuildException
@@ -149,11 +150,11 @@ public class GlobalData {
         }
         globalFlag = true;
 
-		// 
+		//
         // Backup workspace directory. It will be used by other method
         //
         GlobalData.workspaceDir = workspaceDir.replaceAll("(\\\\)", "/");
-        
+
         //
         // Parse tools definition file
         //
@@ -164,7 +165,7 @@ public class GlobalData {
         File toolsDefFile = new File(workspaceDir + File.separatorChar + toolsDefFilename);
         System.out.println("Using tool definiton file [" + toolsDefFile.getPath() + "].");
         toolsDef = new ToolChainConfig(toolsDefFile);
-        
+
         //
         // Parse Framework Database
         //
@@ -228,10 +229,10 @@ public class GlobalData {
             throw new BuildException("Parse WORKSPACE Database file [" + dbFile.getPath() + "] Error.\n" + e.getMessage());
         }
     }
-    
+
     /**
-      Get the current WORKSPACE Directory. 
-      
+      Get the current WORKSPACE Directory.
+
       @return current workspace directory
     **/
     public synchronized static String getWorkspacePath() {
@@ -245,7 +246,7 @@ public class GlobalData {
     public synchronized static File getMsaFile(ModuleIdentification moduleId) throws BuildException {
         File msaFile = null;
         //
-        // TBD. Do only when package is null. 
+        // TBD. Do only when package is null.
         //
         Iterator iter = packageList.iterator();
         while (iter.hasNext()) {
@@ -271,7 +272,7 @@ public class GlobalData {
         if (moduleId.getPackage() != null) {
             return moduleId.getPackage();
         }
-        
+
         PackageIdentification packageId = null;
         Iterator iter = packageList.iterator();
         while (iter.hasNext()) {
@@ -289,19 +290,19 @@ public class GlobalData {
             return packageId;
         }
     }
-    
+
     /**
       Difference between build and parse: ToolChain and Target
     **/
     public synchronized static boolean isModuleBuilt(FpdModuleIdentification moduleId) {
         return builtModules.contains(moduleId);
     }
-    
+
     public synchronized static void registerBuiltModule(FpdModuleIdentification fpdModuleId) {
         builtModules.add(fpdModuleId);
     }
 
-    
+
     public synchronized static void registerFpdModuleSA(FpdModuleIdentification fpdModuleId, Map<String, XmlObject> doc) {
         Map<String, XmlObject> result = new HashMap<String, XmlObject>();
         Set keySet = doc.keySet();
@@ -320,11 +321,11 @@ public class GlobalData {
 
     /**
       Query overrided module surface area information. If current is Package
-      or Platform build, also include the information from FPD file. 
-      
-      <p>Note that surface area parsing is incremental. That means the method will 
+      or Platform build, also include the information from FPD file.
+
+      <p>Note that surface area parsing is incremental. That means the method will
       only parse the MSA and MBD files if necessary. </p>
-    
+
       @param moduleName the base name of the module
       @return the overrided module surface area information
       @throws BuildException
@@ -340,12 +341,12 @@ public class GlobalData {
         // First part: get the MSA files info
         //
         doc.putAll(getNativeMsa(moduleId));
-        
+
         //
         // Second part: put build options
         //
         doc.put("BuildOptions", fpdBuildOptions);
-        
+
         //
         // Third part: get Module info from FPD, such as Library instances, PCDs
         //
@@ -365,11 +366,11 @@ public class GlobalData {
         return getDoc(fpdModuleId);
     }
     /**
-      Query the native MSA information with module base name. 
-      
-      <p>Note that MSA parsing is incremental. That means the method will 
+      Query the native MSA information with module base name.
+
+      <p>Note that MSA parsing is incremental. That means the method will
       only to parse the MSA files when never parsed before. </p>
-      
+
       @param moduleName the base name of the module
       @return the native MSA information
       @throws BuildException
@@ -384,7 +385,7 @@ public class GlobalData {
         nativeMsa.put(moduleId, msaMap);
         return msaMap;
     }
-    
+
     public synchronized static Map<String, XmlObject> getNativeMsa(File msaFile) throws BuildException {
         if (! msaFile.exists()) {
             throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] can't be found!");
@@ -418,13 +419,13 @@ public class GlobalData {
             throw new BuildException(ex.getMessage());
         }
     }
-    
+
     public static Map<String, XmlObject> getFpdBuildOptions() {
         Map<String, XmlObject> map = new HashMap<String, XmlObject>();
         map.put("BuildOptions", fpdBuildOptions);
         return map;
     }
-    
+
     public static void setFpdBuildOptions(XmlObject fpdBuildOptions) {
         GlobalData.fpdBuildOptions = cloneXmlObject(fpdBuildOptions, true);
     }
@@ -439,7 +440,7 @@ public class GlobalData {
 
     //////////////////////////////////////////////
     //////////////////////////////////////////////
-    
+
     public static Set<ModuleIdentification> getModules(PackageIdentification packageId){
         Spd spd = spdTable.get(packageId);
         if (spd == null ) {
@@ -572,7 +573,7 @@ public class GlobalData {
         return null;
 
     }
-    
+
     public synchronized static PlatformIdentification getPlatformByName(String name) throws BuildException {
         Iterator iter = platformList.iterator();
         while(iter.hasNext()){
@@ -583,7 +584,7 @@ public class GlobalData {
         }
         throw new BuildException("Can't find platform [" + name + "] in the current WORKSPACE database!");
     }
-    
+
     public synchronized static PlatformIdentification getPlatform(String filename) throws BuildException {
         File file = new File(workspaceDir + File.separatorChar + filename);
         Iterator iter = platformList.iterator();
@@ -595,7 +596,7 @@ public class GlobalData {
         }
         throw new BuildException("Can't find platform file [" + filename + "] in the current WORKSPACE database!");
     }
-    
+
     public synchronized static PackageIdentification refreshPackageIdentification(PackageIdentification packageId) throws BuildException {
         Iterator iter = packageList.iterator();
         while(iter.hasNext()){
@@ -608,7 +609,7 @@ public class GlobalData {
         }
         throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " in the current workspace!");
     }
-    
+
     public synchronized static ModuleIdentification refreshModuleIdentification(ModuleIdentification moduleId) throws BuildException {
 //        System.out.println("1");
 //        System.out.println("##" + moduleId.getGuid());
@@ -632,7 +633,7 @@ public class GlobalData {
         }
         throw new BuildException("Can't find module GUID value " + moduleId.getGuid() + " in package, " + packageId + ", in the current workspace!");
     }
-    
+
     public synchronized static Set<PackageIdentification> getPackageList(){
         return packageList;
     }
@@ -702,7 +703,7 @@ public class GlobalData {
 
     public static String getCommandSetting(String[] commandDescription, FpdModuleIdentification fpdModuleId) throws EdkException {
         ToolChainKey toolChainKey = new ToolChainKey(commandDescription);
-        ToolChainMap toolChainConfig = toolsDef.getConfig(); 
+        ToolChainMap toolChainConfig = toolsDef.getConfig();
         String setting = null;
 
         if (!commandDescription[ToolChainElement.ATTRIBUTE.value].equals(ToolChainAttribute.FLAGS.toString())) {
@@ -731,7 +732,7 @@ public class GlobalData {
             toolChainFamilyKey.setKey(ToolChainAttribute.FLAGS.toString(), ToolChainElement.ATTRIBUTE.value);
 
             option = moduleToolChainFamilyOption.get(fpdModuleId);
-            if (option != null) {                
+            if (option != null) {
                 setting = option.get(toolChainFamilyKey);
             }
         }
@@ -761,7 +762,7 @@ public class GlobalData {
 
         return setting;
     }
-    
+
     public static void setToolChainEnvInfo(ToolChainInfo envInfo) {
         toolChainEnvInfo = envInfo;
     }
@@ -803,17 +804,17 @@ public class GlobalData {
     //
     // For PCD
     //
-    public synchronized static Map<FpdModuleIdentification, XmlObject> 
+    public synchronized static Map<FpdModuleIdentification, XmlObject>
                                getFpdModuleSaXmlObject(String xmlObjectName) {
         Set<FpdModuleIdentification> fpdModuleSASet = fpdModuleSA.keySet();
         Iterator item = fpdModuleSASet.iterator();
-        
+
 
         Map<FpdModuleIdentification, XmlObject> SAPcdBuildDef = new HashMap<FpdModuleIdentification, XmlObject>();
         Map<String, XmlObject> SANode = new HashMap<String, XmlObject>();
         FpdModuleIdentification moduleId;
         while (item.hasNext()) {
-            
+
             moduleId = (FpdModuleIdentification) item.next();
             SANode = fpdModuleSA.get(moduleId);
             try{

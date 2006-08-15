@@ -16,7 +16,8 @@ Abstract:
 
 --*/
 
-package org.tianocore.logger;
+package org.tianocore.common.logger;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

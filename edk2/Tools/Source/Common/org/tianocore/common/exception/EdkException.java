@@ -15,7 +15,8 @@ Module Name:
 Abstract:
 
 --*/
-package org.tianocore.exception;
+
+package org.tianocore.common.exception;
 
 public class EdkException extends Exception {
     static final long serialVersionUID = -8494188017252114029L;
@@ -28,13 +29,13 @@ public class EdkException extends Exception {
 
     public EdkException(String message, boolean traceStack) {
         super(message);
-        
+
     }
-    
+
     public EdkException(){
         super();
     }
-    
+
     public EdkException(Exception e, String message){
         super("[EdkException]:" + message);
         if (isPrintStack){

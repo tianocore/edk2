@@ -2,14 +2,14 @@
  GenTeImageTask class.
 
  GenTeImageTask is used to call GenTEImage.exe to generate TE image .
- 
- 
+
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -24,11 +24,12 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
  * GenTeImageTask class.
- * 
+ *
  * GenTeImageTask is used to call GenAcpiTable.exe to generate ACPI Table image .
  */
 public class GenTeImageTask extends Task implements EfiDefine {
@@ -63,15 +64,15 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * assemble tool command line & execute tool command line
-     * 
+     *
      * @throws BuildException
      */
     /**
      * execute
-     * 
+     *
      * GenTeImgaeTask execute function is to assemble tool command line & execute
      * tool command line
-     * 
+     *
      * @throws BuidException
      */
     public void execute() throws BuildException {
@@ -149,9 +150,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * getInputFile
-     * 
+     *
      * This function is to get class member "inputFile".
-     * 
+     *
      * @return string of input file name.
      */
     public String getInputFile() {
@@ -160,9 +161,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * setComponentType
-     * 
+     *
      * This function is to set class member "inputFile".
-     * 
+     *
      * @param inputFile
      *            string of input file name.
      */
@@ -172,9 +173,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * getOutputFile
-     * 
+     *
      * This function is to get class member "outputFile"
-     * 
+     *
      * @return outputFile string of output file name.
      */
     public String getOutputFile() {
@@ -183,9 +184,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * setOutputFile
-     * 
+     *
      * This function is to set class member "outputFile"
-     * 
+     *
      * @param outputFile
      *            string of output file name.
      */
@@ -195,9 +196,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * getOutputDir
-     * 
+     *
      * This function is to get class member "outputDir"
-     * 
+     *
      * @return outputDir string of output directory.
      */
     public String getOutputDir() {
@@ -206,9 +207,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * setOutputDir
-     * 
+     *
      * This function is to set class member "outputDir"
-     * 
+     *
      * @param outputDir
      *            string of output directory.
      */
@@ -218,9 +219,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * getVerbose
-     * 
+     *
      * This function is to get class member "verbose"
-     * 
+     *
      * @return verbose the flag of verbose.
      */
     public String getVerbose() {
@@ -229,9 +230,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * setVerbose
-     * 
+     *
      * This function is to set class member "verbose"
-     * 
+     *
      * @param verbose
      *            True or False.
      */
@@ -243,9 +244,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * getDump
-     * 
+     *
      * This function is to get class member "dump"
-     * 
+     *
      * @return verbose the flag of dump.
      */
     public String getDump() {
@@ -254,9 +255,9 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
     /**
      * setDump
-     * 
+     *
      * This function is to set class member "dump"
-     * 
+     *
      * @param dump
      *            True or False.
      */

@@ -3,13 +3,13 @@
 
  This class is to generate Autogen.h and Autogen.c according to module surface area
  or library surface area.
- 
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -44,7 +44,8 @@ import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.pcd.action.PCDAutoGenAction;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
  * This class is to generate Autogen.h and Autogen.c according to module surface
@@ -55,9 +56,9 @@ public class AutoGen {
 	// / The output path of Autogen.h and Autogen.c
 	// /
 	private String outputPath;
-    /// 
-    /// The name of FV directory 
-    /// 
+    ///
+    /// The name of FV directory
+    ///
     private String fvDir;
 	// /
 	// / The base name of module or library.
@@ -92,7 +93,7 @@ public class AutoGen {
 	// / dependence on library instance surface area.
 	// /
 	private Set<String> mGuidList = new HashSet<String>();
-    
+
     //
     // The dependence package list which recoreded in module or library surface
     // area and it's dependence on library instance surface are.
@@ -100,24 +101,24 @@ public class AutoGen {
     private List<PackageIdentification> mDepPkgList = new LinkedList<PackageIdentification>();
 
 	//
-	//  For non library module, add its library instance's construct and destructor to 
+	//  For non library module, add its library instance's construct and destructor to
 	//  list.
-	//  
+	//
 	private List<String> libConstructList = new ArrayList<String>();
 	private	List<String> libDestructList = new ArrayList<String>();
 
 	//
-	// List to store SetVirtalAddressMapCallBack, ExitBootServiceCallBack  
-	// 
+	// List to store SetVirtalAddressMapCallBack, ExitBootServiceCallBack
+	//
 	private List<String> setVirtalAddList = new ArrayList<String>();
 	private List<String> exitBootServiceList = new ArrayList<String>();
 
-	
+
 	/**
 	 * Construct function
-	 * 
+	 *
 	 * This function mainly initialize some member variable.
-	 * 
+	 *
 	 * @param outputPath
 	 *            Output path of AutoGen file.
 	 * @param baseName
@@ -135,9 +136,9 @@ public class AutoGen {
 
 	/**
 	 * saveFile function
-	 * 
+	 *
 	 * This function save the content in stringBuffer to file.
-	 * 
+	 *
 	 * @param fileName
 	 *            The name of file.
 	 * @param fileBuffer
@@ -176,10 +177,10 @@ public class AutoGen {
 
 	/**
 	 * genAutogen function
-	 * 
+	 *
 	 * This function call libGenAutoGen or moduleGenAutogen function, which
 	 * dependence on generate library autogen or module autogen.
-	 * 
+	 *
 	 * @throws BuildException
 	 *             Failed to creat AutoGen.c & AutoGen.h.
 	 */
@@ -210,9 +211,9 @@ public class AutoGen {
 
 	/**
 	 * moduleGenAutogen function
-	 * 
+	 *
 	 * This function generates AutoGen.c & AutoGen.h for module.
-	 * 
+	 *
 	 * @throws BuildException
 	 *             Faile to create module AutoGen.c & AutoGen.h.
 	 */
@@ -231,9 +232,9 @@ public class AutoGen {
 
 	/**
 	 * libGenAutogen function
-	 * 
+	 *
 	 * This function generates AutoGen.c & AutoGen.h for library.
-	 * 
+	 *
 	 * @throws BuildException
 	 *             Faile to create library AutoGen.c & AutoGen.h
 	 */
@@ -250,9 +251,9 @@ public class AutoGen {
 
 	/**
 	 * moduleGenAutogenH
-	 * 
+	 *
 	 * This function generates AutoGen.h for module.
-	 * 
+	 *
 	 * @throws BuildException
 	 *             Failed to generate AutoGen.h.
 	 */
@@ -340,9 +341,9 @@ public class AutoGen {
 		fileBuffer.append("\r\n");
 
         //
-        //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to 
+        //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to
         // {DEST_DIR_DRBUG}/FlashMap.h
-        // 
+        //
         if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
             fileBuffer.append(CommonDefinition.include);
             fileBuffer.append("  <");
@@ -372,9 +373,9 @@ public class AutoGen {
 
 	/**
 	 * moduleGenAutogenC
-	 * 
+	 *
 	 * This function generates AutoGen.c for module.
-	 * 
+	 *
 	 * @throws BuildException
 	 *             Failed to generate AutoGen.c.
 	 */
@@ -452,7 +453,7 @@ public class AutoGen {
 		// autogen.c
 		//
         LibInstanceToAutogenC(fileBuffer);
-        
+
         //
         // Get module dependent Package identification.
         //
@@ -461,9 +462,9 @@ public class AutoGen {
             if (!this.mDepPkgList.contains(packages[i])){
                 this.mDepPkgList.add(packages[i]);
             }
-            
+
         }
-      
+
 		//
 		// Write consumed ppi, guid, protocol to autogen.c
 		//
@@ -472,7 +473,7 @@ public class AutoGen {
 		GuidGuidToAutogenC(fileBuffer);
 
 		//
-		// Call pcd autogen. 
+		// Call pcd autogen.
 		//
                 this.myPcdAutogen = new PCDAutoGenAction(moduleId, this.arch, false, null);
                 try {
@@ -480,7 +481,7 @@ public class AutoGen {
                 } catch (Exception exp) {
                     throw new PcdAutogenException (exp.getMessage());
                 }
-		
+
 		if (this.myPcdAutogen != null) {
                     fileBuffer.append("\r\n");
                     fileBuffer.append(this.myPcdAutogen.OutputC());
@@ -494,9 +495,9 @@ public class AutoGen {
 
 	/**
 	 * libGenAutogenH
-	 * 
+	 *
 	 * This function generates AutoGen.h for library.
-	 * 
+	 *
 	 * @throws BuildException
 	 *             Failed to generate AutoGen.c.
 	 */
@@ -537,7 +538,7 @@ public class AutoGen {
 
 		//
 		// Write consumed package's mdouleInfo related *.h file to autogen.h.
-		// 
+		//
 		moduleType = SurfaceAreaQuery.getModuleType();
 		PackageIdentification[] cosumedPkglist = SurfaceAreaQuery
 				.getDependencePkg(this.arch);
@@ -571,9 +572,9 @@ public class AutoGen {
 		fileBuffer.append("\r\n");
 
         //
-        //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to 
+        //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to
         // {DEST_DIR_DRBUG}/FlashMap.h
-        // 
+        //
         if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
             fileBuffer.append(CommonDefinition.include);
             fileBuffer.append("  <");
@@ -604,9 +605,9 @@ public class AutoGen {
 
 	/**
 	 * libGenAutogenC
-	 * 
+	 *
 	 * This function generates AutoGen.h for library.
-	 * 
+	 *
 	 * @throws BuildException
 	 *             Failed to generate AutoGen.c.
 	 */
@@ -622,11 +623,11 @@ public class AutoGen {
 		fileBuffer.append("\r\n");
 
 		//
-		// Call pcd autogen. 
+		// Call pcd autogen.
 		//
                 this.myPcdAutogen = new PCDAutoGenAction(this.moduleId,
                                                          this.arch,
-                                                         true, 
+                                                         true,
                                                          SurfaceAreaQuery.getModulePcdEntryNameArray());
 		try {
                     this.myPcdAutogen.execute();
@@ -646,10 +647,10 @@ public class AutoGen {
 
 	/**
 	 * LibraryClassToAutogenH
-	 * 
+	 *
 	 * This function returns *.h files declared by library classes which are
 	 * consumed or produced by current build module or library.
-	 * 
+	 *
 	 * @param libClassList
 	 *            List of library class which consumed or produce by current
 	 *            build module or library.
@@ -689,9 +690,9 @@ public class AutoGen {
 
 	/**
 	 * IncludesToAutogenH
-	 * 
+	 *
 	 * This function add include file in AutoGen.h file.
-	 * 
+	 *
 	 * @param packageNameList
 	 *            List of module depended package.
 	 * @param moduleType
@@ -727,10 +728,10 @@ public class AutoGen {
 
 	/**
 	 * EntryPointToAutoGen
-	 * 
+	 *
 	 * This function convert <ModuleEntryPoint> & <ModuleUnloadImage>
 	 * information in mas to AutoGen.c
-	 * 
+	 *
 	 * @param entryPointList
 	 *            List of entry point.
 	 * @param fileBuffer
@@ -833,7 +834,7 @@ public class AutoGen {
 							.append("  IN EFI_PEI_SERVICES     **PeiServices\r\n");
 					fileBuffer.append("  );\r\n");
 					entryPointCount++;
-			
+
 			}
 
 			fileBuffer.append("EFI_STATUS\r\n");
@@ -918,7 +919,7 @@ public class AutoGen {
                 fileBuffer.append("  )\r\n\r\n");
                 fileBuffer.append("{\r\n");
 
-                
+
                 for (int i = 0; i < entryPointList.length; i++) {
                     fileBuffer
                             .append("  if (SetJump (&mJumpContext) == 0) {\r\n");
@@ -927,7 +928,7 @@ public class AutoGen {
                     fileBuffer.append(" (ImageHandle, SystemTable));\r\n");
                     fileBuffer.append("    ASSERT (FALSE);\r\n");
                     fileBuffer.append("  }\r\n");
-                
+
                 }
                 fileBuffer.append("  return mDriverEntryPointStatus;\r\n");
                 fileBuffer.append("}\r\n\r\n");
@@ -945,10 +946,10 @@ public class AutoGen {
                 fileBuffer.append("  LongJump (&mJumpContext, (UINTN)-1);\r\n");
                 fileBuffer.append("  ASSERT (FALSE);\r\n");
                 fileBuffer.append("}\r\n\r\n");
-    
+
             }
-                
-			
+
+
 			//
 			// Add "ModuleUnloadImage" for DxeSmmDriver module type;
 			//
@@ -1034,10 +1035,10 @@ public class AutoGen {
 				fileBuffer.append("{\r\n");
 				fileBuffer.append("  return EFI_SUCCESS;\r\n");
 				fileBuffer.append("}\r\n");
-				
+
 			}else {
                 for (int i = 0; i < entryPointList.length; i++) {
-                    
+
                     fileBuffer.append("EFI_STATUS\r\n");
                     fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(entryPointList[i]);
@@ -1114,7 +1115,7 @@ public class AutoGen {
                 fileBuffer.append("}\r\n\r\n");
 
             }
-			
+
 			//
 			// Add ModuleUnloadImage for DxeDriver and UefiDriver module type.
 			//
@@ -1184,10 +1185,10 @@ public class AutoGen {
 
 	/**
 	 * PpiGuidToAutogenc
-	 * 
+	 *
 	 * This function gets GUIDs from SPD file accrodeing to <PPIs> information
 	 * and write those GUIDs to AutoGen.c.
-	 * 
+	 *
 	 * @param fileBuffer
 	 *            String Buffer for Autogen.c file.
 	 * @throws BuildException
@@ -1200,7 +1201,7 @@ public class AutoGen {
 		// Get the all PPI adn PPI Notify from MSA file,
 		// then add those PPI ,and PPI Notify name to list.
 		//
-		
+
 		String[] ppiList = SurfaceAreaQuery.getPpiArray(this.arch);
 		for (int i = 0; i < ppiList.length; i++) {
 			this.mPpiList.add(ppiList[i]);
@@ -1238,10 +1239,10 @@ public class AutoGen {
 
 	/**
 	 * ProtocolGuidToAutogenc
-	 * 
+	 *
 	 * This function gets GUIDs from SPD file accrodeing to <Protocol>
 	 * information and write those GUIDs to AutoGen.c.
-	 * 
+	 *
 	 * @param fileBuffer
 	 *            String Buffer for Autogen.c file.
 	 * @throws BuildException
@@ -1271,8 +1272,8 @@ public class AutoGen {
 		//
 		Iterator protocolIterator = this.mProtocolList.iterator();
 		String protocolKeyWord = null;
-               
-      
+
+
 		while (protocolIterator.hasNext()) {
 			protocolKeyWord = protocolIterator.next().toString();
 			cNameGuid = GlobalData.getProtocolGuid(this.mDepPkgList, protocolKeyWord);
@@ -1295,13 +1296,13 @@ public class AutoGen {
 
 	/**
 	 * GuidGuidToAutogenc
-	 * 
+	 *
 	 * This function gets GUIDs from SPD file accrodeing to <Guids> information
 	 * and write those GUIDs to AutoGen.c.
-	 * 
+	 *
 	 * @param fileBuffer
 	 *            String Buffer for Autogen.c file.
-	 * 
+	 *
 	 */
 	void GuidGuidToAutogenC(StringBuffer fileBuffer) throws AutoGenException {
 		String[] cNameGuid = null;
@@ -1339,11 +1340,11 @@ public class AutoGen {
 
 	/**
 	 * LibInstanceToAutogenC
-	 * 
+	 *
 	 * This function adds dependent library instance to autogen.c,which
 	 * includeing library's constructor, destructor, and library dependent ppi,
 	 * protocol, guid, pcd information.
-	 * 
+	 *
 	 * @param fileBuffer
 	 *            String buffer for AutoGen.c
 	 * @throws BuildException
@@ -1367,10 +1368,10 @@ public class AutoGen {
 
 	/**
 	 * LibConstructorToAutogenc
-	 * 
+	 *
 	 * This function writes library constructor list to AutoGen.c. The library
 	 * constructor's parameter and return value depend on module type.
-	 * 
+	 *
 	 * @param libInstanceList
 	 *            List of library construct name.
 	 * @param moduleType
@@ -1508,10 +1509,10 @@ public class AutoGen {
 
 	/**
 	 * LibDestructorToAutogenc
-	 * 
+	 *
 	 * This function writes library destructor list to AutoGen.c. The library
 	 * destructor's parameter and return value depend on module type.
-	 * 
+	 *
 	 * @param libInstanceList
 	 *            List of library destructor name.
 	 * @param moduleType
@@ -1588,7 +1589,7 @@ public class AutoGen {
             //
             // If no library destructor function, return EFI_SUCCESS.
             //
-            
+
 			for (int i = 0; i < libInstanceList.size(); i++) {
 				if (isFirst) {
 					fileBuffer.append("  EFI_STATUS  Status;\r\n");
@@ -1608,10 +1609,10 @@ public class AutoGen {
 
 	/**
 	 * ExternsDriverBindingToAutoGenC
-	 * 
+	 *
 	 * This function is to write DRIVER_BINDING, COMPONENT_NAME,
 	 * DRIVER_CONFIGURATION, DRIVER_DIAGNOSTIC in AutoGen.c.
-	 * 
+	 *
 	 * @param fileBuffer
 	 *            String buffer for AutoGen.c
 	 */
@@ -1762,10 +1763,10 @@ public class AutoGen {
 
 	/**
 	 * ExternCallBackToAutoGenC
-	 * 
+	 *
 	 * This function adds <SetVirtualAddressMapCallBack> and
 	 * <ExitBootServicesCallBack> infomation to AutoGen.c
-	 * 
+	 *
 	 * @param fileBuffer
 	 *            String buffer for AutoGen.c
 	 * @throws BuildException
@@ -1773,10 +1774,10 @@ public class AutoGen {
 	void ExternCallBackToAutoGenC(StringBuffer fileBuffer)
 			throws BuildException {
 		//
-		// Collect module's <SetVirtualAddressMapCallBack> and 
-		// <ExitBootServiceCallBack> and add to setVirtualAddList 
+		// Collect module's <SetVirtualAddressMapCallBack> and
+		// <ExitBootServiceCallBack> and add to setVirtualAddList
 		//  exitBootServiceList.
-		// 
+		//
         String[] setVirtuals = SurfaceAreaQuery.getSetVirtualAddressMapCallBackArray();
         String[] exitBoots = SurfaceAreaQuery.getExitBootServicesCallBackArray();
         if (setVirtuals != null) {
@@ -1791,8 +1792,8 @@ public class AutoGen {
 		}
 		//
 		//  Add c code in autogen.c which relate to <SetVirtualAddressMapCallBack>
-		//  and <ExitBootServicesCallBack> 
-		// 
+		//  and <ExitBootServicesCallBack>
+		//
 		String moduleType = this.moduleId.getModuleType();
 		boolean UefiOrDxeModule = false;
 		int Count = 0;
@@ -1879,8 +1880,8 @@ public class AutoGen {
 			}
 			//
 			//  If module is not DXE_DRIVER, DXE_RUNTIME_DIRVER, UEFI_DRIVER
-			//  UEFI_APPLICATION and DXE_SAL_DRIVER add the NULL at the end of 
-			//  _gDriverSetVirtualAddressMapEvent list. 
+			//  UEFI_APPLICATION and DXE_SAL_DRIVER add the NULL at the end of
+			//  _gDriverSetVirtualAddressMapEvent list.
 			//
 			if (!UefiOrDxeModule) {
 				fileBuffer.append(",\r\n  NULL");
@@ -1966,15 +1967,15 @@ public class AutoGen {
 	}
 
     private void copyFlashMapHToDebugDir() throws  AutoGenException{
-        
+
         File inFile = new File(fvDir + File.separatorChar + CommonDefinition.flashMapH);
         int size = (int)inFile.length();
         byte[] buffer = new byte[size];
         File outFile = new File (this.outputPath + File.separatorChar + CommonDefinition.tianoR8FlashMapH);
 		//
-		//  If TianoR8FlashMap.h existed and the flashMap.h don't change, 
+		//  If TianoR8FlashMap.h existed and the flashMap.h don't change,
 		//  do nothing.
-		// 
+		//
         if ((!outFile.exists()) ||(inFile.lastModified() - outFile.lastModified()) >= 0) {
 		    try{
                 if (inFile.exists()) {
@@ -1992,7 +1993,7 @@ public class AutoGen {
             }
 		}
     }
-    
+
     /**
     *This function first order the library instances, then collect
     *library instance 's PPI, Protocol, GUID,
@@ -2094,9 +2095,9 @@ public class AutoGen {
 								.getLibDestructorName();
 
 						//
-						// Collect SetVirtualAddressMapCallBack and 
+						// Collect SetVirtualAddressMapCallBack and
 						// ExitBootServiceCallBack.
-						// 
+						//
                         setVirtuals = SurfaceAreaQuery.getSetVirtualAddressMapCallBackArray();
                         exitBoots = SurfaceAreaQuery.getExitBootServicesCallBackArray();
                         if (setVirtuals != null) {

@@ -2,14 +2,14 @@
  FwImageTask class.
 
  FwImageTask is used to call FwImage.ext to generate the FwImage.
-  
- 
+
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -24,7 +24,8 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 
 /**
@@ -34,17 +35,17 @@ import org.tianocore.logger.EdkLog;
 **/
 public class FwImageTask extends Task implements EfiDefine{
     ///
-    /// time&data 
+    /// time&data
     ///
     private String time = "";
     ///
     /// input PE image
-    /// 
+    ///
     private String peImage = "";
     private String peImageName = "";
     ///
     /// output EFI image
-    /// 
+    ///
     private String outImage = "";
     ///
     /// component type
@@ -53,15 +54,15 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
      * assemble tool command line & execute tool command line
-     * 
+     *
      * @throws BuildException
      */
     /**
-      execute 
-      
+      execute
+
       FwimageTask execute function is to assemble tool command line & execute
       tool command line
-      
+
       @throws BuidException
     **/
     public void execute() throws BuildException {
@@ -117,9 +118,9 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       setTime
-      
+
       This function is to set operation of class member "time".
-      
+
       @param time            string of time
     **/
     public void setTime(String time) {
@@ -128,7 +129,7 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       getTime
-      
+
       This function is to get class member "time"
       @return time          string of time
     **/
@@ -138,7 +139,7 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       getPeImage
-      
+
       This function is to get class member "peImage".
       @return                name of PE image
     **/
@@ -148,7 +149,7 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       setPeImage
-      
+
       This function is to set class member "peImage"
       @param  peImage        name of PE image
     **/
@@ -159,7 +160,7 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       getOutImage
-      
+
       This function is to get class member "outImage".
       @return                 name of output EFI image
     **/
@@ -169,7 +170,7 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       setOutImage
-      
+
       This function is to set class member "outImage".
       @param outImage         name of output EFI image
     **/
@@ -179,9 +180,9 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       getComponentType
-      
+
       This function is to get class member "componentType".
-      
+
       @return                 string of componentType
     **/
     public String getComponentType() {
@@ -190,7 +191,7 @@ public class FwImageTask extends Task implements EfiDefine{
 
     /**
       setComponentType
-      
+
       This function is to set class member "componentType".
       @param  componentType   string of component type
     **/

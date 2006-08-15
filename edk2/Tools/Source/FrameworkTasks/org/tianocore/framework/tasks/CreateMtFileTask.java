@@ -2,14 +2,14 @@
  CreateMtFileTask class.
 
  CreateMtFileTask is used to call CreateMtFile.exe to create MT file.
- 
- 
+
+
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
  which accompanies this distribution.  The full text of the license may be found at
  http://opensource.org/licenses/bsd-license.php
- 
+
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -24,7 +24,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
-import org.tianocore.logger.EdkLog;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
   CreateMtFileTask class.
@@ -53,10 +54,10 @@ public class CreateMtFileTask extends Task implements EfiDefine {
 
     /**
      * execute
-     * 
+     *
      * StripTask execute function is to assemble tool command line & execute
      * tool command line
-     * 
+     *
      * @throws BuidException
      */
     public void execute() throws BuildException {
@@ -85,7 +86,7 @@ public class CreateMtFileTask extends Task implements EfiDefine {
         File file = new File(outputFile);
         if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
             argument = outputDir + File.separatorChar +  outputFile + " " + this.fileSize;
-                   
+
         } else {
             argument = outputFile  + " " + this.fileSize;
         }
@@ -111,7 +112,7 @@ public class CreateMtFileTask extends Task implements EfiDefine {
             EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
             EdkLog.log(EdkLog.EDK_INFO, (new File(this.outputFile)).getName());
             revl = runner.execute();
-            
+
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
@@ -131,9 +132,9 @@ public class CreateMtFileTask extends Task implements EfiDefine {
 
     /**
      * getFileSize
-     * 
+     *
      * This function is to get class member "fileSize".
-     * 
+     *
      * @return fileSize       string of file size.
      */
     public String getFileSize() {
@@ -142,9 +143,9 @@ public class CreateMtFileTask extends Task implements EfiDefine {
 
     /**
      * setFileSize
-     * 
+     *
      * This function is to set class member "fileSize".
-     * 
+     *
      * @param fileSize
      *            string of file size value.
      */
@@ -154,9 +155,9 @@ public class CreateMtFileTask extends Task implements EfiDefine {
 
     /**
      * getOutputFile
-     * 
+     *
      * This function is to get class member "outputFile"
-     * 
+     *
      * @return outputFile string of output file name.
      */
     public String getOutputFile() {
@@ -165,9 +166,9 @@ public class CreateMtFileTask extends Task implements EfiDefine {
 
     /**
      * setOutputFile
-     * 
+     *
      * This function is to set class member "outputFile"
-     * 
+     *
      * @param outputFile
      *            string of output file name.
      */
@@ -177,9 +178,9 @@ public class CreateMtFileTask extends Task implements EfiDefine {
 
     /**
      * getOutputDir
-     * 
+     *
      * This function is to get class member "outputDir"
-     * 
+     *
      * @return outputDir string of output directory.
      */
     public String getOutputDir() {
@@ -188,9 +189,9 @@ public class CreateMtFileTask extends Task implements EfiDefine {
 
     /**
      * setOutputDir
-     * 
+     *
      * This function is to set class member "outputDir"
-     * 
+     *
      * @param outputDir
      *            string of output directory.
      */
