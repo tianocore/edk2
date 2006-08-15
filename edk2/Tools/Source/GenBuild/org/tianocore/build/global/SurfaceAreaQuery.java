@@ -60,6 +60,7 @@ import org.tianocore.FilenameDocument.Filename;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
+import org.tianocore.PcdDriverTypes;
 
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.id.FpdModuleIdentification;
@@ -67,6 +68,7 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
+import org.tianocore.build.autogen.CommonDefinition;
 
 /**
  * SurfaceAreaQuery class is used to query Surface Area information from msa,
@@ -1273,6 +1275,30 @@ public class SurfaceAreaQuery {
     public static String[] getExitBootServicesCallBackArray() {
         String[] xPath = new String[] { "/Extern/ExitBootServicesCallBack" };
         return getCNames("Externs", xPath);
+    }
+
+    /**
+      Judge whether current driver is PEI_PCD_DRIVER or DXE_PCD_DRIVER or
+      NOT_PCD_DRIVER.
+      
+      @return CommonDefinition.PCD_DRIVER_TYPE  the type of current driver
+    **/
+    public static CommonDefinition.PCD_DRIVER_TYPE getPcdDriverType() {
+        String[] xPath   = new String[] {"/PcdIsDriver"};
+        Object[] results = get ("Externs", xPath);
+
+        if (results != null && results.length != 0) {
+            PcdDriverTypes type     = (PcdDriverTypes) results[0];
+            String         typeStr  = type.enumValue().toString();
+            if (typeStr.equals(CommonDefinition.PCD_DRIVER_TYPE.PEI_PCD_DRIVER.toString())) {
+                return CommonDefinition.PCD_DRIVER_TYPE.PEI_PCD_DRIVER;
+            } else if (typeStr.equals(CommonDefinition.PCD_DRIVER_TYPE.DXE_PCD_DRIVER.toString())) {
+                return CommonDefinition.PCD_DRIVER_TYPE.DXE_PCD_DRIVER;
+            }
+            return CommonDefinition.PCD_DRIVER_TYPE.UNKNOWN_PCD_DRIVER;
+        }
+
+        return CommonDefinition.PCD_DRIVER_TYPE.NOT_PCD_DRIVER;
     }
 
     /**

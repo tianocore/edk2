@@ -22,16 +22,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.tianocore.build.autogen.CommonDefinition;
+import org.tianocore.build.exception.PcdAutogenException;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.pcd.action.ActionMessage;
+import org.tianocore.pcd.action.BuildAction;
 import org.tianocore.pcd.entity.MemoryDatabaseManager;
 import org.tianocore.pcd.entity.Token;
+import org.tianocore.pcd.entity.UsageIdentification;
 import org.tianocore.pcd.entity.UsageInstance;
 import org.tianocore.pcd.exception.BuildActionException;
-import org.tianocore.pcd.entity.UsageIdentification;
-import org.tianocore.pcd.action.BuildAction;
-import org.tianocore.pcd.action.ActionMessage;
-import org.tianocore.build.exception.PcdAutogenException;
 
 /** This class is to manage how to generate the PCD information into Autogen.c and
     Autogen.h.
@@ -51,6 +52,11 @@ public class PCDAutoGenAction extends BuildAction {
     /// Whether current autogen is for building library used by current module.
     ///
     private boolean               isBuildUsedLibrary;
+
+    ///
+    /// One of PEI_PCD_DRIVER, DXE_PCD_DRIVER, NOT_PCD_DRIVER 
+    /// 
+    private CommonDefinition.PCD_DRIVER_TYPE pcdDriverType;
 
     ///
     /// The generated string for header file.
@@ -76,6 +82,14 @@ public class PCDAutoGenAction extends BuildAction {
         this.usageId = usageId;
     }
 
+    /**
+       Set paramter pcdDriverType
+       
+       @param pcdDriverType the driver type for PCD
+    **/
+    public void setPcdDriverType(CommonDefinition.PCD_DRIVER_TYPE pcdDriverType) {
+        this.pcdDriverType = pcdDriverType;
+    }
     /**
        set isBuildUsedLibrary parameter.
 
@@ -122,11 +136,14 @@ public class PCDAutoGenAction extends BuildAction {
         @param arch                 the architecture for module
         @param isBuildUsedLibary    Is the current module library.
         @param pcdNameArrayInMsa    the pcd name array got from MSA file.
+        @param pcdDriverType        one of PEI_PCD_DRIVER, DXE_PCD_DRIVER,
+                                    NOT_PCD_DRIVER
     **/
     public PCDAutoGenAction(ModuleIdentification moduleId,
                             String               arch,
                             boolean              isBuildUsedLibrary,
-                            String[]             pcdNameArrayInMsa) {
+                            String[]             pcdNameArrayInMsa,
+                            CommonDefinition.PCD_DRIVER_TYPE pcdDriverType) {
         dbManager       = null;
         hAutoGenString  = "";
         cAutoGenString  = "";
@@ -140,6 +157,7 @@ public class PCDAutoGenAction extends BuildAction {
                                            moduleId.getModuleType()));
         setIsBuildUsedLibrary(isBuildUsedLibrary);
         setPcdNameArrayInMsa(pcdNameArrayInMsa);
+        setPcdDriverType(pcdDriverType);
     }
 
     /**
@@ -303,10 +321,10 @@ public class PCDAutoGenAction extends BuildAction {
         // Work around code, In furture following code should be modified that get
         // these information from Uplevel Autogen tools.
         //
-        if (moduleName.equalsIgnoreCase("PcdPeim")) {
+        if (pcdDriverType == CommonDefinition.PCD_DRIVER_TYPE.PEI_PCD_DRIVER) {
             hAutoGenString += MemoryDatabaseManager.PcdPeimHString;
             cAutoGenString += MemoryDatabaseManager.PcdPeimCString;
-        } else if (moduleName.equalsIgnoreCase("PcdDxe")) {
+        } else if (pcdDriverType == CommonDefinition.PCD_DRIVER_TYPE.DXE_PCD_DRIVER) {
             hAutoGenString += MemoryDatabaseManager.PcdDxeHString;
             cAutoGenString += MemoryDatabaseManager.PcdDxeCString;
         }
