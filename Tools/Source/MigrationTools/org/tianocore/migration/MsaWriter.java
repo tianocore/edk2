@@ -51,6 +51,31 @@ public class MsaWriter {
 		return answer;
 	}
 	
+	private void addSourceFiles (String name) {						// furthur modification needed
+		List<Enum> arch = new ArrayList<Enum>();
+		FilenameDocument.Filename filename;
+		filename = sourcefiles.addNewFilename();
+		filename.setStringValue(name);
+		
+		if (name.contains("x64" + File.separator)) {				// filename ???
+			arch.add(SupportedArchitectures.X_64);
+			System.out.println("x64" + File.separator);
+			filename.setSupArchList(arch);
+		} else if (name.contains("Ia32" + File.separator)) {		// filename ???
+			arch.add(SupportedArchitectures.IA_32);
+			System.out.println("Ia32" + File.separator);
+			filename.setSupArchList(arch);
+		} else if (name.contains("Ipf" + File.separator)) {			// filename ???
+			arch.add(SupportedArchitectures.IPF);
+			System.out.println("Ipf" + File.separator);
+			filename.setSupArchList(arch);
+		} else if (name.contains("Ebc" + File.separator)) {			// filename ???
+			arch.add(SupportedArchitectures.EBC);
+			System.out.println("Ebc" + File.separator);
+			filename.setSupArchList(arch);
+		}
+	}
+	
 	private ModuleSurfaceAreaDocument fulfillMsadoc() throws Exception {
 		Iterator<String> it;
 		String temp;
@@ -103,17 +128,9 @@ public class MsaWriter {
 		externs.addNewSpecification().setStringValue("EDK_RELEASE_VERSION 0x00020000");
 		externs.addNewExtern().setModuleEntryPoint(mi.entrypoint);
 		
-		FilenameDocument.Filename filename;
 		it = mi.localmodulesources.iterator();
-		//System.out.println(mi.localmodulesources);
 		while (it.hasNext()) {
-			temp = it.next();
-			filename = sourcefiles.addNewFilename();
-			filename.setStringValue(temp);
-			//if (temp.contains("x64" + File.separator)) {
-				//System.out.println("find");
-				//filename.setSupArchList();
-			//}
+			addSourceFiles(it.next());
 		}
 		if (!mi.protocol.isEmpty()) {
 			protocols = msa.addNewProtocols();
