@@ -1,5 +1,7 @@
 /** @file
-This file is to define  ToolChainElement class.
+ToolChainElement class
+
+ToolChainElement class is defining enumeration value of key part names.
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials

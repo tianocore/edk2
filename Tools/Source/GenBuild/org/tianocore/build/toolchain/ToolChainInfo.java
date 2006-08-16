@@ -1,5 +1,7 @@
 /** @file
-This file is to define  ToolChainInfo class.
+ToolChainInfo class
+
+This file is to define ToolChainInfo class.
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -18,6 +20,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+   ToolChainInfo collects valid build targets, tool chain tag, ARCHs and commands 
+   information for real build use.
+ **/
 public class ToolChainInfo {
     //
     // build target set
@@ -35,10 +41,7 @@ public class ToolChainInfo {
     // build commands set
     // 
     private Set<String> commands = new LinkedHashSet<String>();
-    //
-    // build commands for specific tool chain
-    // 
-    private Map<String, Set<String>> commandMap = new HashMap<String, Set<String>>();
+
     /**
      Add a list of targets in the form of string separated by space
 
@@ -48,134 +51,164 @@ public class ToolChainInfo {
         //
         // targetList some targets separated by space " "
         //
-        if (targetList == null) {
+        if (targetList == null || targetList.length() == 0) {
             targets.add("*");
-            return ;
+        } else {
+            addTargets(targetList.split(" "));
         }
-        addTargets(targetList.split(" "));
     }
+
     /**
      Add a list of targets in the form of string array
      
      @param targetArray target string array
      **/
     public void addTargets(String[] targetArray) {
-        if (targetArray == null ) {
-            return ;
-        }
-        for (int i = 0; i < targetArray.length; i++) {
-            targets.add(targetArray[i]);
+        if (targetArray != null ) {
+            for (int i = 0; i < targetArray.length; i++) {
+                targets.add(targetArray[i]);
+            }
         }
     }
+
     /**
      Add a list of target in the form of set
      
      @param targetSet target string set
      **/
     public void addTargets(Set<String> targetSet) {
-        targets.addAll(targetSet);
+        if (targetSet != null) {
+            targets.addAll(targetSet);
+        }
     }
+
     /**
        Add a list of tool chain tag name in the form of string separated by space
 
-       @param tagnameList
+       @param tagnameList   Tool chain tag name list string
      **/
     public void addTagnames(String tagnameList) {
         //
         // tagnameList some tagnames separated by space " "
         //
-        if (tagnameList == null) {
+        if (tagnameList == null || tagnameList.length() == 0) {
             tagnames.add("*");
-            return ;
+        } else {
+            addTagnames(tagnameList.split(" "));
         }
-        addTagnames(tagnameList.split(" "));
     }
-    
+
+    /**
+       Add a list of tool chain tag name in the form of string array
+       
+       @param tagnameArray  Tool chain tag names array
+     **/
     public void addTagnames(String[] tagnameArray) {
-        if (tagnameArray == null ) {
-            return ;
-        }
-        for (int i = 0; i < tagnameArray.length; i++) {
-            tagnames.add(tagnameArray[i]);
+        if (tagnameArray != null ) {
+            for (int i = 0; i < tagnameArray.length; i++) {
+                tagnames.add(tagnameArray[i]);
+            }
         }
     }
-    
+
+    /**
+       Add a list of tool chain tag name in the form of Set
+       
+       @param tagnameSet    Tool chain tag names set
+     **/
     public void addTagnames(Set<String> tagnameSet) {
-        tagnames.addAll(tagnameSet);
+        if (tagnameSet != null) {
+            tagnames.addAll(tagnameSet);
+        }
     }
-    
+
+    /**
+       Add a list of ARCH in the form of string
+       
+       @param archList  ARCH string
+     **/
     public void addArchs(String archList) {
         //
         // archList some archs separated by space " "
         //
-        if (archList == null) {
+        if (archList == null || archList.length() == 0) {
             archs.add("*");
-            return ;
+        } else {
+            addArchs(archList.split(" "));
         }
-        addArchs(archList.split(" "));
     }
-    
+
+    /**
+       Add a list of ARCH in the form of string array
+       
+       @param archArray ARCH array
+     **/
     public void addArchs(String[] archArray) {
-        if (archArray == null ) {
-            return ;
-        }
-        for (int i = 0; i < archArray.length; i++) {
-            archs.add(archArray[i]);
+        if (archArray != null ) {
+            for (int i = 0; i < archArray.length; i++) {
+                archs.add(archArray[i]);
+            }
         }
     }
-    
+
+    /**
+       Add a list of ARCH in the form of set
+       
+       @param archSet   ARCH set
+     **/
     public void addArchs(Set<String> archSet) {
-        archs.addAll(archSet);
+        if (archSet != null) {
+            archs.addAll(archSet);
+        }
     }
-    
-    public void addCommands(String toolChain, String commandList) {
+
+    /**
+       Add a list of command in the form of string
+       
+       @param commandList   Command list string
+     **/
+    public void addCommands(String commandList) {
         //
         // archList some archs separated by space " "
         //
         if (commandList == null || commandList.length() == 0) {
-            return ;
-        }
-        addCommands(commandList.split(" "));
-    }
-    
-    public void addCommands(String[] commandArray) {
-        if (commandArray == null ) {
-            return ;
-        }
-        for (int i = 0; i < commandArray.length; i++) {
-            commands.add(commandArray[i]);
+            commands.add("*");
+        } else {
+            addCommands(commandList.split(" "));
         }
     }
-    
-    public void addCommands(String toolChain, String[] commandArray) {
-        if (commandArray == null) {
-            return ;
-        }
 
-        Set<String> toolChainCommandSet = commandMap.get(toolChain);
-        if (toolChainCommandSet == null) {
-            toolChainCommandSet = new LinkedHashSet<String>();
-            commandMap.put(toolChain, toolChainCommandSet);
-        }
-        for (int i = 0; i < commandArray.length; i++) {
-            commands.add(commandArray[i]);
-            toolChainCommandSet.add(commandArray[i]);
+    /**
+       Add a list of ARCH in the form of array
+       
+       @param commandArray  Commands array
+     **/
+    public void addCommands(String[] commandArray) {
+        if (commandArray != null ) {
+            for (int i = 0; i < commandArray.length; i++) {
+                commands.add(commandArray[i]);
+            }
         }
     }
-    
-    public void addCommands(String toolChain, Set<String> commandSet) {
-        if (commandSet == null) {
-            return;
+
+    /**
+       Add a list of ARCH in the form of set
+       
+       @param commandSet    Commands set
+     **/
+    public void addCommands(Set<String> commandSet) {
+        if (commandSet != null) {
+            commands.addAll(commandSet);
         }
-        Set<String> toolChainCommandSet = commandMap.get(toolChain);
-        if (toolChainCommandSet == null) {
-            toolChainCommandSet = new LinkedHashSet<String>();
-            commandMap.put(toolChain, toolChainCommandSet);
-        }
-        commands.addAll(commandSet);
-        toolChainCommandSet.addAll(commandSet);
     }
-    
+
+    /**
+       Make a union operation on this ToolChainInfo and the given one.
+
+       @param info  Another ToolChainInfo object to merge with
+       
+       @return ToolChainInfo    Merged ToolChainInfo object
+     **/
     public ToolChainInfo union(ToolChainInfo info) {
         ToolChainInfo result = new ToolChainInfo();
         result.addTargets(union(this.targets, info.targets));
@@ -183,7 +216,14 @@ public class ToolChainInfo {
         result.addArchs(union(this.archs, info.archs));
         return result;
     }
-    
+
+    /**
+       Make a intersection operation on this ToolChainInfo and the given one
+
+       @param info  Another ToolChainInfo object to intersect with
+       
+       @return ToolChainInfo    Intersected ToolChainInfo object
+     **/
     public ToolChainInfo intersection(ToolChainInfo info) {
         ToolChainInfo result = new ToolChainInfo();
         result.addTargets(intersection(this.targets, info.targets));
@@ -191,7 +231,15 @@ public class ToolChainInfo {
         result.addArchs(intersection(this.archs, info.archs));
         return result;
     }
-    
+
+    /**
+       Make a union operation on two Sets
+
+       @param set1  One Set
+       @param set2  Another Set
+       
+       @return Set<String>  Merged Set object
+     **/
     private Set<String> union(Set<String> set1, Set<String> set2) {
         Set<String> result = new LinkedHashSet<String>();
         result.addAll(set1);
@@ -199,51 +247,96 @@ public class ToolChainInfo {
         result.remove("*");
         return result;
     }
-    
+
+    /**
+       Make a intersection operation on two Sets with the consideration of wildcard.
+
+       @param set1  One Set
+       @param set2  Another Set
+       
+       @return Set<String>  The intersected Set object
+     **/
     private Set<String> intersection(Set<String> set1, Set<String> set2) {
         Set<String> result = new LinkedHashSet<String>();
         boolean set1HasWildcard = set1.contains("*");
         boolean set2HasWildcard = set2.contains("*");
 
         if (set1HasWildcard && set2HasWildcard) {
+            //
+            // Both Sets have wildcard, the result will have all elements in them
+            // 
             result.addAll(set1);
             result.addAll(set2);
         } else if (set1HasWildcard) {
+            //
+            // Only set1 has wildcard, then result will have only set2 elements.
+            // 
             result.addAll(set2);
         } else if (set2HasWildcard) {
+            //
+            // Only set2 has wildcard, then result will have only set1 elements.
+            // 
             result.addAll(set1);
         } else {
+            //
+            // No wildcard in both Sets, the result will have the elements in both Sets.
+            // 
             result.addAll(set1);
             result.retainAll(set2);
         }
 
         return result;
     }
-    
+
+    /**
+       Get target array.
+
+       @return String[]
+     **/
     public String[] getTargets() {
         return (String[])targets.toArray(new String[targets.size()]);
     }
-    
+
+    /**
+       Get tool chain tag name array.
+
+       @return String[]
+     **/
     public String[] getTagnames() {
         return (String[])tagnames.toArray(new String[tagnames.size()]);
     }
-    
+
+    /**
+       Get ARCH array.
+
+       @return String[]
+     **/
     public String[] getArchs() {
         return (String[])archs.toArray(new String[archs.size()]);
     }
 
+    /**
+       Get command name array.
+
+       @return String[]
+     **/
     public String[] getCommands() {
         return (String[])commands.toArray(new String[commands.size()]);
     }
 
-    public Set<String> getCommands(String toolChain) {
-        return commandMap.get(toolChain);
-    }
-    
+    /**
+       Override the Object's toString().
+
+       @return String
+     **/
     public String toString() {
         return targets + "\n" + tagnames + "\n" + archs + "\n" + commands;
     }
-    
+
+    /**
+       Remove the wildcard element in the tool chain information because they
+       are useless when retrieved.
+     **/
     public void normalize() {
         targets.remove("*");
         tagnames.remove("*");
