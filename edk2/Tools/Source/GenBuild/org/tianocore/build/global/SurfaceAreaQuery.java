@@ -624,10 +624,9 @@ public class SurfaceAreaQuery {
                 libraryClassName.add(libraryClassList[i].getKeyword());
 			}
         }
-		String[] libraryArray = new String[libraryClassName.size()];
-		for (int i = 0; i < libraryClassName.size(); i++) {
-			libraryArray[i] = libraryClassName.get(i);
-		}
+
+        String[] libraryArray = new String[libraryClassName.size()];
+        libraryClassName.toArray(libraryArray);
         return libraryArray;
     }
 

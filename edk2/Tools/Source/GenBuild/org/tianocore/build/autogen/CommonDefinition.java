@@ -59,6 +59,8 @@ public class CommonDefinition {
     public final static String tianoR8FlashMapH = "TianoR8FlashMap.h";
     public final static String flashMapH = "FlashMap.h";
 
+    public final static String pcdLibName = "PcdLib";
+
     //
     // The defintions for identifying current module
     // is PEI Pcd driver or Dxe Pcd driver.
