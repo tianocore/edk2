@@ -102,7 +102,7 @@ public class GenCRC32SectionTask extends Task implements EfiDefine{
                 // command execution fail
                 //
                 log("ERROR = " + Integer.toHexString(revl));
-// LAH Added This Line
+                // LAH Added This Line
                 throw new BuildException("GenCRC32Section failed!");
             }
         } catch (Exception e) {
