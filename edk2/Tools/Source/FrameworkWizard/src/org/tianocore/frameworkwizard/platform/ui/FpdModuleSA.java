@@ -1086,6 +1086,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jLabelFfsFileGuid = new JLabel();
             jLabelFfsFileGuid.setText("FFS File GUID");
             jLabelFfsFileGuid.setPreferredSize(new java.awt.Dimension(90,16));
+            jLabelFfsFileGuid.setVisible(false);
             jLabelFvBinding = new JLabel();
             jLabelFvBinding.setText("FV Binding");
             jLabelFvBinding.setPreferredSize(new java.awt.Dimension(90,16));
@@ -1145,6 +1146,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTextFieldFileGuid == null) {
             jTextFieldFileGuid = new JTextField();
             jTextFieldFileGuid.setPreferredSize(new java.awt.Dimension(300,20));
+            jTextFieldFileGuid.setVisible(false);
             jTextFieldFileGuid.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     String originalFileGuid = ffc.getFfsFileNameGuid(moduleKey);

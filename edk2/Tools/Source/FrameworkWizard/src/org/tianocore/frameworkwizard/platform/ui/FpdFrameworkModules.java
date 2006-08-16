@@ -345,12 +345,33 @@ public class FpdFrameworkModules extends IInternalFrame {
 
                     ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
                     if (al == null) {
-                        al = new ArrayList<String>();
-                        fpdMsa.put(mg + mv + pg + pv, al);
+                        //
+                        // if existing ModuleSA does not specify version info.
+                        //
+                        al = fpdMsa.get(mg + "null" + pg + "null");
+                        if (al == null) {
+                            al = fpdMsa.get(mg + "null" + pg + pv);
+                            if (al == null){
+                                al = fpdMsa.get(mg + mv + pg + "null");
+                                if (al == null) {
+                                    al = new ArrayList<String>();
+                                    fpdMsa.put(mg + mv + pg + pv, al);    
+                                }
+                            }
+                        }
                     }
+                    //
+                    // filter from module SupArchs what archs has been added.
+                    //
                     for (int i = 0; i < al.size(); ++i) {
                         vArchs.remove(al.get(i));
                     }
+                    //
+                    // check whether archs conform to SupArch of platform.
+                    //
+                    Vector<Object> platformSupArch = new Vector<Object>();
+                    ffc.getPlatformDefsSupportedArchs(platformSupArch);
+                    vArchs.retainAll(platformSupArch);
                     //
                     // Archs this Module supported have already been added.
                     //
@@ -574,6 +595,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (arch == null) {
                         // if no arch specified in ModuleSA
                         fpdMsa.remove(mg + mv + pg + pv);
+                        
                     } else {
                         ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
                         al.remove(arch);
@@ -648,7 +670,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     row[typeColForFpdModTable] = mi.getModuleType();
                     row[pkgNameColForFpdModTable] = mi.getPackage().getName();
                     row[pkgVerColForFpdModTable] = mi.getPackage().getVersion();
-                    row[archColForFpdModTable] = saa[i][4];
+                    row[archColForFpdModTable] = saa[i][ffcModArch];
                     try {
                         row[pathColForFpdModTable] = GlobalData.getMsaFile(mi).getPath().substring(
                                                                                       System.getenv("WORKSPACE")
@@ -656,15 +678,18 @@ public class FpdFrameworkModules extends IInternalFrame {
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, "Show FPD Modules:" + e.getMessage());
                     }
+                    
+                    modelFpdModules.addRow(row);
+                    String fpdMsaKey = saa[i][ffcModGuid] + row[modVerColForFpdModTable]
+                                                                + saa[i][ffcPkgGuid] + row[pkgVerColForFpdModTable];
+                    ArrayList<String> al = fpdMsa.get(fpdMsaKey);
+                    if (al == null) {
+                        al = new ArrayList<String>();
+                        fpdMsa.put(fpdMsaKey, al);
+                    }
+                    al.add(saa[i][ffcModArch]);
                 }
-                modelFpdModules.addRow(row);
-                ArrayList<String> al = fpdMsa.get(saa[i][ffcModGuid] + saa[i][ffcModVer]
-                                                  + saa[i][ffcPkgGuid] + saa[i][ffcPkgVer]);
-                if (al == null) {
-                    al = new ArrayList<String>();
-                    fpdMsa.put(saa[i][ffcModGuid] + saa[i][ffcModVer] + saa[i][ffcPkgGuid] + saa[i][ffcPkgVer], al);
-                }
-                al.add(saa[i][ffcModArch]);
+                
 
             }
             TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
