@@ -146,7 +146,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     
     private final int verPrefWidth = 70;
     
-    private final int pathPrefWidth = 320;
+    private final int pathPrefWidth = 600;
     
     private final int pathMinWidth = 280;
     
@@ -279,6 +279,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             column.setMinWidth(pathMinWidth);
 
             jTableAllModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTableAllModules.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         }
         return jTableAllModules;
@@ -508,6 +509,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             column.setMinWidth(typeMinWidth);
 
             jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTableFpdModules.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
         }
         return jTableFpdModules;
