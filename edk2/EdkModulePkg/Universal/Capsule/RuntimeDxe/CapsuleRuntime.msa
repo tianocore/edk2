@@ -95,12 +95,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <HelpText>Indicate whether platform can support update capsule across a system reset</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
-      <C_Name>MaxSizePopulateCapsule</C_Name>
+      <C_Name>PcdMaxSizePopulateCapsule</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>Indicate the max size the platform can support in case of populated capsules</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="FIXED_AT_BUILD">
-      <C_Name>MaxSizeNonPopulateCapsule</C_Name>
+      <C_Name>PcdMaxSizeNonPopulateCapsule</C_Name>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>Indicate the max size the platform can support in case of non-populated capsules</HelpText>
     </PcdEntry>
