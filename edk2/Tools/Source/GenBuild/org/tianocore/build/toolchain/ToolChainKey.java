@@ -1,4 +1,7 @@
-/*++
+/** @file
+ToolChainKey class
+
+ToolChainKey class is representing the "name" part of tool chain definition.
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -9,36 +12,78 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
---*/
+**/
 
 package org.tianocore.build.toolchain;
 
 import org.tianocore.common.exception.EdkException;
 
+/**
+   ToolChainKey class is the java class form of the "name" of tool chain definition.
+   It's primarily for the key of a Map data structure.
+ **/
 public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainKey> {
     static final long serialVersionUID = -8034897190740066933L;
-    private String delimiter = "_";
 
+    ///
+    /// The part number of key. Currently we only support fixed five parts.
+    /// 
     public final static int keyLength = 5;
 
+    //
+    // Default delimiter which is used for concatenating the parts of key
+    // 
+    private String delimiter = "_";
+
+    //
+    // Key value in string array form
+    // 
     private String[] keySet = null;
 
+    //
+    // Key value in one string form
+    // 
     private String keyString = null;
 
+    //
+    // Key hash value used for hash table 
+    // 
     private int hashValue = 0;
 
-    public ToolChainKey(String keyString, String delimiter) throws Exception {
+    /**
+       Public constructor which can override default delimiter.
+
+       @param keyString     The key string value
+       @param delimiter     Delimiter charater concatenating the key parts
+     **/
+    public ToolChainKey(String keyString, String delimiter) throws EdkException {
         setKey(keyString, delimiter);
     }
 
+    /**
+       Public constructor which uses default delimiter.
+
+       @param keyString     The key string value
+     **/
     public ToolChainKey(String keyString) throws EdkException {
         setKey(keyString);
     }
 
+    /**
+       Public constructor which doesn't use any delimiter.
+
+       @param keySet
+     **/
     public ToolChainKey(String[] keySet) throws EdkException {
         setKey(keySet);
     }
 
+    /**
+       Calculate hash value of the key string (without the delimiter). It's used
+       for Hash Table kind of Map.
+
+       @return int      The hash value
+     **/
     public int hashCode() {
         if (hashValue != 0) {
             return hashValue;
@@ -56,6 +101,15 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
         return hashValue;
     }
 
+    /**
+       Compare the string value of two keys . It's used for Tree kind of Map.
+       
+       @param dstKey    Another key to compare to.
+       
+       @retval  0       Two keys are equal
+       @retval  >0      This key is after the given key
+       @retval  <0      This key is before the given key
+     **/
     public int compareTo(ToolChainKey dstKey) {
         String[] dstKeySet = dstKey.getKeySet();
         int result = 0;
@@ -69,6 +123,13 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
         return result;
     }
 
+    /**
+       Check if this key is the same as the given key.
+
+       @param o     Another key to compare to
+       
+       @return boolean
+     **/
     public boolean equals(Object o) {
         ToolChainKey dstKey = (ToolChainKey)o;
         String[] dstKeySet = dstKey.getKeySet();
@@ -90,11 +151,19 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
         return true;
     }
 
+    /**
+       Set the key value in form of string array.
+
+       @param keySet    The string array of key value
+     **/
     public void setKey(String[] keySet) throws EdkException {
         if (keySet.length != this.keyLength) {
             throw new EdkException("Invalid ToolChain key");
         }
 
+        //
+        // Clone the string array because we don't want to change original one
+        // 
         this.keySet = new String[this.keyLength];
         System.arraycopy(keySet, 0, this.keySet, 0, this.keyLength);
         for (int i = 0; i < this.keyLength; ++i) {
@@ -102,23 +171,45 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
                 this.keySet[i] = "*";
             }
         }
+
+        //
+        // We need to re-generate the single key string and hash value.
+        // 
         this.keyString = null;
         this.hashValue = 0;
     }
 
+    /**
+       Set key value at the specified key part .
+       
+       @param keySetString      The new value of "index" part of key
+       @param index             The key part index
+     **/
     public void setKey(String keySetString, int index) throws EdkException {
         if (index >= this.keyLength) {
             throw new EdkException("Invalid ToolChain key index");
         }
 
+        //
+        // Allow wildcard in key string
+        // 
         if (keySetString == null || keySetString.length() == 0) {
             keySetString = "*";
         }
         this.keySet[index] = keySetString;
+
+        //
+        // We need to re-generate the single key string and hash value.
+        // 
         this.keyString = null;
         this.hashValue = 0;
     }
 
+    /**
+       Set key value in the form of single string.
+       
+       @param keyString     The key value string
+     **/
     public void setKey(String keyString) throws EdkException {
         this.keySet = keyString.split(this.delimiter);
 
@@ -127,32 +218,53 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
         }
 
         this.keyString = keyString;
+        //
+        // We need to re-generate hash value.
+        // 
         this.hashValue = 0;
     }
 
-    public void setKey(String keyString, String delimiter) throws Exception {
+    /**
+       Set key value in the form of single string with specified delimiter.
+       
+       @param keyString     The key value string
+       @param delimiter     The delimiter concatenating the key string
+     **/
+    public void setKey(String keyString, String delimiter) throws EdkException {
         this.keySet = keyString.split(delimiter);
 
         if (this.keySet.length != this.keyLength) {
-            throw new Exception("Invalid ToolChain key");
+            throw new EdkException("Invalid ToolChain key");
         }
 
         this.keyString = keyString;
         this.delimiter = delimiter;
+        //
+        // We need to re-generate hash value.
+        // 
         this.hashValue = 0;
     }
 
+    /**
+       Return the string array form of key
+
+       @return String[]
+     **/
     public String[] getKeySet() {
         return keySet;
     }
 
+    /**
+       Return the single string form of key.
+
+       @return String
+     **/
     public String toString() {
         if (this.keyString == null) {
             StringBuffer keyStringBuf = new StringBuffer(64);
-            int i = 0;
 
-            keyStringBuf.append(this.keySet[i++]);
-            for (; i < this.keyLength; ++i) {
+            keyStringBuf.append(this.keySet[0]);
+            for (int i = 1; i < this.keyLength; ++i) {
                 keyStringBuf.append(this.delimiter);
                 keyStringBuf.append(this.keySet[i]);
             }

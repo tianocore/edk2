@@ -1,5 +1,7 @@
 /** @file
-This file is to define  ToolChainAttribute class.
+ToolChainAttribute class
+
+This file is to define enumeration value for tool chain attribute names.
 
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
@@ -22,9 +24,9 @@ package org.tianocore.build.toolchain;
 public class ToolChainAttribute {
     private static int nextValue = 0;
 
-    //
-    // "NAME", "PATH", "DPATH", "SPATH", "EXT", "FAMILY", "FLAGS"
-    // 
+    ///
+    /// "NAME", "PATH", "DPATH", "SPATH", "EXT", "FAMILY", "FLAGS"
+    /// 
     public final static ToolChainAttribute NAME = new ToolChainAttribute("NAME");
     public final static ToolChainAttribute PATH = new ToolChainAttribute("PATH");
     public final static ToolChainAttribute DPATH = new ToolChainAttribute("DPATH");
@@ -47,8 +49,4 @@ public class ToolChainAttribute {
         return name;
     }
 }
-
-
-
-
 

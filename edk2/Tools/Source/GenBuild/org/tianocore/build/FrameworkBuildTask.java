@@ -112,33 +112,38 @@ public class FrameworkBuildTask extends Task{
         //
         File buildFile = null;
         if (msaFiles.size() > 1) {
-            throw new BuildException("Having more than one MSA file in a directory is not allowed!");
-        } else if (msaFiles.size() == 1 && activePlatform == null) {
-            throw new BuildException("If trying to build a single module, please set ACTIVE_PLATFORM in file [Tool/Conf/target.txt]. ");
-        } else if (msaFiles.size() == 1 && activePlatform != null) {
+            throw new BuildException("More than one MSA file under current directory. It is not allowd. ");
+        }
+        else if (msaFiles.size() == 1 && activePlatform == null) {
+            throw new BuildException("If try to build a single module, please set ACTIVE_PLATFORM in file [Tool/Conf/target.txt]. ");
+        }
+        else if (msaFiles.size() == 1 && activePlatform != null) {
             //
             // Build the single module
             //
             buildFile = msaFiles.toArray(new File[1])[0];
-        } else if (activePlatform != null) {
+        }
+        else if (activePlatform != null) {
             buildFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
-        } else if (fpdFiles.size() == 1) {
+        }
+        else if (fpdFiles.size() == 1) {
             buildFile = fpdFiles.toArray(new File[1])[0];
-        } else if (fpdFiles.size() > 1) {
+        }
+        else if (fpdFiles.size() > 1) {
             buildFile = intercommuniteWithUser();
         }
         //
         // If there is no build files or FPD files or MSA files, stop build
         //
         else {
-            throw new BuildException("Can't find any FPD or MSA files in the current directory. ");
+            throw new BuildException("Can't find any FPD files or MSA files in current directory. ");
         }
 
         //
         // Build every FPD files (PLATFORM build)
         //
         if (buildFile.getName().endsWith(".fpd")) {
-            System.out.println("Processing the FPD file [" + buildFile.getPath() + "] ..>> ");
+            System.out.println("Start to build FPD file [" + buildFile.getPath() + "] ..>> ");
             FpdParserTask fpdParserTask = new FpdParserTask();
             fpdParserTask.setType(type);
             fpdParserTask.setProject(getProject());
@@ -151,8 +156,8 @@ public class FrameworkBuildTask extends Task{
         //
         else if (buildFile.getName().endsWith(".msa")) {
             File tmpFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
-            System.out.println("Using the FPD file [" + tmpFile.getPath() + "] for the active platform. ");
-            System.out.println("Processing the MSA file [" + buildFile.getPath() + "] ..>> ");
+            System.out.println("Using FPD file [" + tmpFile.getPath() + "] as active platform. ");
+            System.out.println("Start to build MSA file [" + buildFile.getPath() + "] ..>> ");
             GenBuildTask genBuildTask = new GenBuildTask();
             genBuildTask.setSingleModuleBuild(true);
             genBuildTask.setType(type);
@@ -186,22 +191,26 @@ public class FrameworkBuildTask extends Task{
 
     private File intercommuniteWithUser(){
         File file = null;
-        if (fpdFiles.size() > 1) {
-            File[] allFiles = new File[fpdFiles.size()];
+        if (fpdFiles.size() + msaFiles.size() > 1) {
+            File[] allFiles = new File[fpdFiles.size() + msaFiles.size()];
             int index = 0;
             Iterator<File> iter = fpdFiles.iterator();
             while (iter.hasNext()) {
                 allFiles[index] = iter.next();
                 index++;
             }
-
-            System.out.println("Finding " + allFiles.length + " FPD files: ");
+            iter = msaFiles.iterator();
+            while (iter.hasNext()) {
+                allFiles[index] = iter.next();
+                index++;
+            }
+            System.out.println("Find " + allFiles.length + " FPD and MSA files: ");
             for (int i = 0; i < allFiles.length; i++) {
                 System.out.println("[" + (i + 1) + "]: " + allFiles[i].getName());
             }
             
             boolean flag = true;
-            System.out.print("Please select one of the following FPD files to build:[1] ");
+            System.out.print("Please select one file to build:[1] ");
             do{
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 try {
@@ -225,8 +234,12 @@ public class FrameworkBuildTask extends Task{
                     flag = true;
                 }
             } while (flag);
-        } else if (fpdFiles.size() == 1) {
+        }
+        else if (fpdFiles.size() == 1) {
             file = fpdFiles.toArray(new File[1])[0];
+        }
+        else if (msaFiles.size() == 1) {
+            file = msaFiles.toArray(new File[1])[0];
         }
         return file;
     }
@@ -235,14 +248,17 @@ public class FrameworkBuildTask extends Task{
     public void setType(String type) {
         if (type.equalsIgnoreCase("clean") || type.equalsIgnoreCase("cleanall")) {
             this.type = type.toLowerCase();
-        } else {
+        }
+        else {
             this.type = "all";
         }
     }
     
     private void readTargetFile(){
         try {
-            String[][] targetFileInfo = ConfigReader.parse(getProject().getProperty("WORKSPACE_DIR"), "Tools" + File.separatorChar + "Conf" + File.separatorChar + targetFilename);
+            String targetFile = getProject().getProperty("WORKSPACE_DIR") + File.separatorChar 
+                + "Tools" + File.separatorChar + "Conf" + File.separatorChar + targetFilename;
+            String[][] targetFileInfo = ConfigReader.parse(targetFile);
             
             //
             // Get ToolChain Info from target.txt
@@ -251,19 +267,22 @@ public class FrameworkBuildTask extends Task{
             String str = getValue("TARGET", targetFileInfo);
             if (str == null || str.trim().equals("")) {
                 envToolChainInfo.addTargets("*");
-            } else {
+            }
+            else {
                 envToolChainInfo.addTargets(str);
             }
             str = getValue("TOOL_CHAIN_TAG", targetFileInfo);
             if (str == null || str.trim().equals("")) {
                 envToolChainInfo.addTagnames("*");
-            } else {
+            }
+            else {
                 envToolChainInfo.addTagnames(str);
             }
             str = getValue("TARGET_ARCH", targetFileInfo);
             if (str == null || str.trim().equals("")) {
                 envToolChainInfo.addArchs("*");
-            } else {
+            }
+            else {
                 envToolChainInfo.addArchs(str);
             }
             GlobalData.setToolChainEnvInfo(envToolChainInfo);
@@ -276,7 +295,7 @@ public class FrameworkBuildTask extends Task{
             str = getValue("ACTIVE_PLATFORM", targetFileInfo);
             if (str != null && ! str.trim().equals("")) {
                 if ( ! str.endsWith(".fpd")) {
-                    throw new BuildException("FPD file's extension must be \".fpd\"!");
+                    throw new BuildException("FPD file's file extension must be \".fpd\"");
                 }
                 activePlatform = str;
             }

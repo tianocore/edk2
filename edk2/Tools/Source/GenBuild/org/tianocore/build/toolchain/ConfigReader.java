@@ -1,8 +1,8 @@
 /** @file
   ConfigReader class.
-
-  ConfigReader is used to read tool chain config file with flat format.
-
+  
+  ConfigReader is used to read tool chain config file with flat format. 
+  
 Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -23,65 +23,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
-
+  
   ConfigReader is used to read tool chain config file with flat format. Comments
   is line starting with character '#'.
-
+  
   @since GenBuild 1.0
 **/
 public class ConfigReader {
 
-    private static String confPath = ".";
-
-
     /**
-      Public construct method.
-    **/
-    public ConfigReader () {
-    }
+      Parse specified tool chain definition file.
+    
+      @param    filename    The config file name with full path
 
-    /**
-      Default filepath is ".".
-
-      @param filename the config file name like "target.txt"
-      @return the variables defined in file
+      @return String[][]    The definition array
     **/
     public static synchronized String[][] parse(String filename) throws EdkException {
-        return parse(confPath, filename);
+        return parse(new File(filename));
     }
 
     /**
-      Get all variables defined in config file. the config file format is flat
-      with "A=B". If line started with '#' looks as comments.
+      Get all definitions in config file. the config file format is flat
+      with "A=B". If line started with '#' looks as comments. 
+    
+      @param    configFile      The config file
 
-      @param confPath the path of config file
-      @param filename the file name of the config file
-      @return the variables defined in the config file
-      @throws BuildException
-              Config file's format is not valid
+      @return   String[][]      The variables defined in the config file
+
+      @throws   EdkException
+                Config file's format is not valid
     **/
-    public static synchronized String[][] parse(String confPath, String filename) throws EdkException {
-        //Map<String, String> map = new TreeMap<String,String>(comparator);
+    public static synchronized String[][] parse(File configFile) throws EdkException {
         List<String> keyList = new ArrayList<String>(256);
         List<String> valueList = new ArrayList<String>(256);
+        int lines = 0;
 
         try {
-            File file = new File(confPath + File.separatorChar + filename);
-            FileReader reader = new FileReader(file);
+            FileReader reader = new FileReader(configFile);
             BufferedReader in = new BufferedReader(reader);
             String str;
 
             while ((str = in.readLine()) != null) {
+                ++lines;
                 str = str.trim();
                 //
-                // if str is empty line, comments (start with '#'),
-                // without '=', or start with '='
+                // skip empty line, comment (start with '#') 
                 //
-                int index;
-                if (str.length() == 0 || str.startsWith("#") ||
-                    (index = str.indexOf('=')) <= 0) {
+                if (str.length() == 0 || str.startsWith("#")) {
                     continue;
                 }
+
+                //
+                // stop if the definition line is not in "name=value" form
+                // 
+                int index;
+                if ((index = str.indexOf('=')) <= 0) {
+                    throw new EdkException("ERROR Processing file [" + configFile.getAbsolutePath() 
+                        + "] (line " + lines + ").\n");
+                }
+
                 //
                 // look as line "A = B"
                 //
@@ -89,7 +89,8 @@ public class ConfigReader {
                 valueList.add(str.substring(index + 1).trim());
             }
         } catch (Exception e) {
-            throw new EdkException("ERROR Processing file [" + filename + "].\n" + e.getMessage());
+            throw new EdkException("ERROR Processing file [" + configFile.getAbsolutePath() 
+                + "] (line " + lines + ").\n" + e.getMessage());
         }
 
         String[][] definitions = new String[2][keyList.size()];
@@ -97,39 +98,6 @@ public class ConfigReader {
         definitions[1] = (String[])valueList.toArray(definitions[1]);
 
         return definitions;
-    }
-
-    public static synchronized ToolChainMap parseToolChainConfig(File ConfigFile) throws EdkException {
-        ToolChainMap map = new ToolChainMap();
-
-        try {
-            FileReader reader = new FileReader(ConfigFile);
-            BufferedReader in = new BufferedReader(reader);
-            String str;
-
-            while ((str = in.readLine()) != null) {
-                str = str.trim();
-                //
-                // if str is empty line, comments (start with '#'),
-                // without '=', or start with '='
-                //
-                int index;
-                if (str.length() == 0 || str.startsWith("#") ||
-                    (index = str.indexOf('=')) <= 0) {
-                    continue;
-                }
-                //
-                // look as line "A = B"
-                //
-                String key = str.substring(0, index).trim().toUpperCase();
-                String value = str.substring(index + 1).trim();
-                map.put(key, value);
-            }
-        } catch (Exception e) {
-            throw new EdkException("ERROR Processing file [" + ConfigFile.getAbsolutePath() + "].\n" + e.getMessage());
-        }
-
-        return map;
     }
 }
 

@@ -164,7 +164,11 @@ public class GlobalData {
         //
         File toolsDefFile = new File(workspaceDir + File.separatorChar + toolsDefFilename);
         System.out.println("Using tool definiton file [" + toolsDefFile.getPath() + "].");
-        toolsDef = new ToolChainConfig(toolsDefFile);
+        try {
+            toolsDef = new ToolChainConfig(toolsDefFile);
+        } catch (Exception e) {
+            throw new BuildException(e.getMessage());
+        }
 
         //
         // Parse Framework Database
