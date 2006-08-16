@@ -54,17 +54,13 @@ public class ModuleReader {
 	}
 	
 	public void readInf(String name) throws Exception {
-		System.out.println("Parsing INF file: " + name);
-		BufferedReader rd = new BufferedReader(new FileReader(modulepath + File.separator + name));
-		String line;
+		System.out.println("\nParsing INF file: " + name);
 		String wholeline;
-		String[] linecontext;
-		boolean inSrc = false;
 		Matcher mtrinfequation;
 		Matcher mtrsection;
 		Matcher mtrfilename;
 
-		wholeline = Common.sourcefiletostring(modulepath + File.separator + name);
+		wholeline = Common.file2string(modulepath + File.separator + name);
 		mtrsection = ptnsection.matcher(wholeline);
 		while (mtrsection.find()) {
 			if (mtrsection.group(1).matches("defines")) {

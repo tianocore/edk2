@@ -113,7 +113,7 @@ public class ModuleInfo {
 			show(hashr8only, "hashr8only : ");
 		}
 		
-		new MsaWriter(modulepath, this, db).flush();
+		new MsaWriter(modulepath, this, db, ui).flush();
 		
 		// remove temp directory
 		//File tempdir = new File(modulepath + File.separator + "temp");

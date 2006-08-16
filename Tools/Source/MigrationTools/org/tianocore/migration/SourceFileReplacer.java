@@ -85,11 +85,14 @@ public class SourceFileReplacer {
 					outname = inname;
 				}
 				ui.println("\nModifying file: " + inname);
+				Common.string2file(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname), modulepath + File.separator + "result" + File.separator + outname);
+				/*
 				Common.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
 				outfile.append(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname));
 				outfile.flush();
 				outfile.close();
+				*/
 			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".dxs") || inname.contains(".uni")) {
 				if (inname.contains(".H")) {
 					outname = inname.replaceFirst(".H", ".h");
@@ -97,11 +100,14 @@ public class SourceFileReplacer {
 					outname = inname;
 				}
 				ui.println("\nCopying file: " + inname);
+				Common.string2file(Common.file2string(modulepath + File.separator + "temp" + File.separator + inname), modulepath + File.separator + "result" + File.separator + outname);
+				/*
 				Common.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
 				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
-				outfile.append(Common.sourcefiletostring(modulepath + File.separator + "temp" + File.separator + inname));
+				outfile.append(Common.file2string(modulepath + File.separator + "temp" + File.separator + inname));
 				outfile.flush();
 				outfile.close();
+				*/
 			}
 		}
 
@@ -112,7 +118,7 @@ public class SourceFileReplacer {
 	
 	private void addr8only() throws Exception {
 		String paragraph = null;
-		String line = Common.sourcefiletostring(Database.defaultpath + File.separator + "R8Lib.c");
+		String line = Common.file2string(Database.defaultpath + File.separator + "R8Lib.c");
 		Common.ensureDir(modulepath + File.separator + "result" + File.separator + "R8Lib.c");
 		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.c")));
 		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.h")));

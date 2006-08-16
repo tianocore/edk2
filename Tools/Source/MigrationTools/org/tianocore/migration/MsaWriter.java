@@ -20,15 +20,17 @@ import org.tianocore.SupportedArchitectures.Enum;
 import org.apache.xmlbeans.*;
 
 public class MsaWriter {
-	MsaWriter(String path, ModuleInfo moduleinfo, Database database) {
+	MsaWriter(String path, ModuleInfo moduleinfo, Database database, UI u) {
 		modulepath = path;
 		mi = moduleinfo;
 		db = database;
+		ui = u;
 	}
 
 	private String modulepath;
 	private ModuleInfo mi;
 	private Database db;
+	private UI ui;
 	
 	private ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
 	
@@ -187,6 +189,7 @@ public class MsaWriter {
         
 		BufferedWriter bw = new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + mi.modulename + ".msa"));
 		fulfillMsadoc().save(bw, options);
+		//MsaTreeEditor.init(mi, ui, msadoc);
 		bw.flush();
 		bw.close();
 	}

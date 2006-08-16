@@ -5,12 +5,44 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import org.tianocore.ModuleSurfaceAreaDocument;
+
 public class MsaTreeEditor extends JPanel {
 	/**
 	 *  Define class Serial Version UID
 	 */
 	private static final long serialVersionUID = 3169905938472150649L;
+/*
+	MsaTreeEditor(ModuleInfo m, UI u, ModuleSurfaceAreaDocument md) {
+		mi = m;
+		ui = u;
+		msadoc = md;
+		
+		//rootNode = msadoc.getDomNode();
+        rootNode = new DefaultMutableTreeNode("Root Node");
+        treeModel = new DefaultTreeModel(rootNode);
 
+        tree = new JTree(treeModel);
+        tree.setEditable(true);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.setShowsRootHandles(false);
+        tree.addMouseListener(mouseadapter);
+
+        JScrollPane scrollPane = new JScrollPane(tree);
+        add(scrollPane);
+        
+        popupmenu = new JPopupMenu();
+        menuitemadd = new JMenuItem("addNode");
+        menuitemdel = new JMenuItem("deleteNode");
+        popupmenu.add(menuitemadd);
+        popupmenu.add(menuitemdel);
+        menuitemadd.addActionListener(actionListener);
+        menuitemdel.addActionListener(actionListener);
+        
+        addNode(rootNode, "1st");
+        addNode(rootNode, "2nd");
+	}
+*/
 	MsaTreeEditor(ModuleInfo m, UI u) {
 		mi = m;
 		ui = u;
@@ -28,8 +60,8 @@ public class MsaTreeEditor extends JPanel {
         add(scrollPane);
         
         popupmenu = new JPopupMenu();
-        JMenuItem menuitemadd = new JMenuItem("addNode");
-        JMenuItem menuitemdel = new JMenuItem("deleteNode");
+        menuitemadd = new JMenuItem("addNode");
+        menuitemdel = new JMenuItem("deleteNode");
         popupmenu.add(menuitemadd);
         popupmenu.add(menuitemdel);
         menuitemadd.addActionListener(actionListener);
@@ -41,10 +73,12 @@ public class MsaTreeEditor extends JPanel {
 	
 	private ModuleInfo mi;
 	private UI ui;
+	//private ModuleSurfaceAreaDocument msadoc;
 	
 	private JTree tree;
 	private DefaultMutableTreeNode rootNode;
 	private DefaultTreeModel treeModel;
+	private JMenuItem menuitemadd, menuitemdel;
 	
 	private JPopupMenu popupmenu;
 	private MouseAdapter mouseadapter = new MouseAdapter() {
@@ -57,21 +91,32 @@ public class MsaTreeEditor extends JPanel {
 	};
 	private ActionListener actionListener = new ActionListener() {
 		public void actionPerformed(ActionEvent ae) {
-			addNode();
+			if (ae.getSource() == menuitemadd) {
+				addNode();
+			} else if (ae.getSource() == menuitemdel) {
+				delNode();
+			}
 		}
 	};
 	
-	public void addNode() {
-		addNode((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()), ui.getInput("Input Node Name"));
-		System.out.println();
+	private void delNode() {
+		treeModel.removeNodeFromParent((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()));
 	}
 	
-	public void addNode(DefaultMutableTreeNode parentNode, Object child) {
+	private void addNode() {
+		addNode((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()), ui.getInput("Input Node Name"));
+	}
+	
+	private void addNode(DefaultMutableTreeNode parentNode, Object child) {
         DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
         treeModel.insertNodeInto(childNode, parentNode, parentNode.getChildCount());
         tree.scrollPathToVisible(new TreePath(childNode.getPath()));
 	}
-
+	/*
+	public static void init(ModuleInfo mi, UI ui, ModuleSurfaceAreaDocument msadoc) throws Exception {
+		init(mi, ui);
+	}
+	*/
 	public static void init(ModuleInfo mi, UI ui) throws Exception {
     	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
