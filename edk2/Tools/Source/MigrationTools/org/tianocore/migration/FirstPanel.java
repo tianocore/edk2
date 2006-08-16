@@ -27,7 +27,7 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 	private String modulepath;
 	private ModuleInfo mi;
 	
-	private JButton moduleButton, goButton, msaEditorButton;
+	private JButton moduleButton, goButton, msaEditorButton, criticButton;
 	private JTextField moduletext;
 	private JTextArea log;
 	private JFileChooser fc;
@@ -47,6 +47,9 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 		msaEditorButton = new JButton("MsaEditor");
 		msaEditorButton.addActionListener(this);
 		
+		criticButton = new JButton("Critic");
+		criticButton.addActionListener(this);
+		
 		moduletext = new JTextField(30);
 		
 		filebox = new JCheckBox("Output to logfile", true);
@@ -59,6 +62,7 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
         modulePanel.add(screenbox);
         modulePanel.add(goButton);
         modulePanel.add(msaEditorButton);
+        modulePanel.add(criticButton);
         add(modulePanel);
 
         log = new JTextArea(20,25);
@@ -134,6 +138,13 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
         if ( e.getSource() == msaEditorButton) {
         	try {
             	MsaTreeEditor.init(mi, this);
+        	} catch (Exception en) {
+        		println(en.getMessage());
+        	}
+        }
+        if ( e.getSource() == criticButton) {
+        	try {
+        		Critic.fireAt(modulepath);
         	} catch (Exception en) {
         		println(en.getMessage());
         	}
