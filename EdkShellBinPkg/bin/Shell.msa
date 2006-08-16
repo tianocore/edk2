@@ -16,20 +16,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <GuidValue>c57ad6b7-0515-40a8-9d21-551652854e37</GuidValue>
     <Version>1.0</Version>
     <Abstract>Component description file for EFI Shell module.</Abstract>
-    <Description>This is a binary package containing multiple binary files, however there is only a single MSA file.</Description>
+    <Description>This is a binary module containing multiple binary shell applications.</Description>
     <Copyright>Copyright (c) 2006, Intel Corporation.</Copyright>
-    <License>All rights reserved. 
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License which accompanies this distribution.
-The full text of the license may be found at
+    <License>All rights reserved. This program and the accompanying materials
+      are licensed and made available under the terms and conditions of the BSD License
+      which accompanies this distribution.  The full text of the license may be found at
       http://opensource.org/licenses/bsd-license.php
-
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
-WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
+      THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+      WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Specification>FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052</Specification>
   </MsaHeader>
   <ModuleDefinitions>
-    <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
+    <SupportedArchitectures>IA32 X64 IPF</SupportedArchitectures>
     <BinaryModule>true</BinaryModule>
     <OutputFileBasename>Shell</OutputFileBasename>
   </ModuleDefinitions>
@@ -84,7 +82,7 @@ WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Filename ToolCode="DUMMY" SupArchList="IA32">ia32/Apps/stall.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IA32">ia32/Apps/timezone.efi</Filename>
     <Filename SupArchList="IA32">ia32/Shell_Full.efi</Filename>
-    <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Shell.efi</Filename>
+    <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Shell_Full.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/Attrib.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/Cls.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/Cp.efi</Filename>
@@ -133,7 +131,7 @@ WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.</License>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/sermode.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/stall.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="IPF">ipf/Apps/timezone.efi</Filename>
-    <Filename SupArchList="IPF">ipf/Shell_Full.efi</Filename>
+    <Filename SupArchList="IPF">ipf/Shell.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Shell_Full.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/Attrib.efi</Filename>
     <Filename ToolCode="DUMMY" SupArchList="X64">x64/Apps/Cls.efi</Filename>
