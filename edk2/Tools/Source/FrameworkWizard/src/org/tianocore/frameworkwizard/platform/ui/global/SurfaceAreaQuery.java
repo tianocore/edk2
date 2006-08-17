@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +38,7 @@ import org.tianocore.LibrariesDocument;
 import org.tianocore.LibraryClassDeclarationsDocument;
 import org.tianocore.LibraryClassDocument;
 import org.tianocore.ModuleSADocument;
+import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.ModuleTypeDef;
 import org.tianocore.MsaFilesDocument;
 import org.tianocore.MsaHeaderDocument;
@@ -341,22 +343,22 @@ public class SurfaceAreaQuery {
 	 * @returns package name list if elements are found at the known xpath
 	 * @returns null if nothing is there
 	 */
-	public static PackageIdentification[] getDependencePkg(String arch) {
-		String[] xPath;
+
+	public static PackageIdentification[] getDependencePkg(String arch, ModuleIdentification mi) throws Exception{
+		
 		String packageGuid = null;
 		String packageVersion = null;
 
-		if (arch == null || arch.equals("")) {
-			xPath = new String[] { "/PackageDependencies/Package" };
-		} else {
-			xPath = new String[] { "/PackageDependencies/Package[not(@SupArchList) or @SupArchList='"
-					+ arch + "']" };
-		}
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea) GlobalData.getModuleXmlObject(mi);
+        if (msa.getPackageDependencies() == null) {
+            return new PackageIdentification[0];
+        }
+        int size = msa.getPackageDependencies().getPackageList().size();
+        XmlObject[] returns = new XmlObject[size];
+        for (int i = 0; i < size; ++i) {
+            returns[i] = msa.getPackageDependencies().getPackageList().get(i);
+        }
 
-		XmlObject[] returns = get("ModuleSurfaceArea", xPath);
-		if (returns == null) {
-			return new PackageIdentification[0];
-		}
 		PackageIdentification[] packageIdList = new PackageIdentification[returns.length];
 		for (int i = 0; i < returns.length; i++) {
 			PackageDependenciesDocument.PackageDependencies.Package item = (PackageDependenciesDocument.PackageDependencies.Package) returns[i];
@@ -401,25 +403,22 @@ public class SurfaceAreaQuery {
 	 *          xpath
 	 * @returns null if nothing is there
 	 */
-	public static String[] getLibraryClasses(String usage) {
-		String[] xPath;
-
-		if (usage == null || usage.equals("")) {
-			xPath = new String[] { "/LibraryClass" };
-		} else {
-			xPath = new String[] { "/LibraryClass[@Usage='" + usage + "']" };
+	public static Vector<String> getLibraryClasses(String usage, ModuleIdentification mi) throws Exception{
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)GlobalData.getModuleXmlObject(mi);
+        Vector<String> libraryClassName = new Vector<String>();
+        if (msa.getLibraryClassDefinitions() == null) {
+            return libraryClassName;
+        }
+        
+        int size = msa.getLibraryClassDefinitions().getLibraryClassList().size();
+		
+		for (int i = 0; i < size; i++) {
+            LibraryClassDocument.LibraryClass libClass = msa.getLibraryClassDefinitions().getLibraryClassList().get(i);
+            if (usage.equals(libClass.getUsage().toString())) {
+                libraryClassName.add(libClass.getKeyword());
+            }
 		}
-
-		XmlObject[] returns = get("LibraryClassDefinitions", xPath);
-		if (returns == null || returns.length == 0) {
-			return new String[0];
-		}
-
-		LibraryClassDocument.LibraryClass[] libraryClassList = (LibraryClassDocument.LibraryClass[]) returns;
-		String[] libraryClassName = new String[libraryClassList.length];
-		for (int i = 0; i < libraryClassList.length; i++) {
-			libraryClassName[i] = libraryClassList[i].getKeyword();
-		}
+        
 		return libraryClassName;
 	}
 

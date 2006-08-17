@@ -934,9 +934,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                     ModuleIdentification mi = (ModuleIdentification) ismi.next();
                     Map<String, XmlObject> m = GlobalData.getNativeMsa(mi);
                     SurfaceAreaQuery.setDoc(m);
-                    String[] classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED");
-                    for (int i = 0; i < classProduced.length; ++i) {
-                        if (classProduced[i].equals(libClass)) {
+                    Vector<String> classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
+                    for (int i = 0; i < classProduced.size(); ++i) {
+                        if (classProduced.get(i).equals(libClass)) {
                             libNameGuidMap.put(mi.getName(), mi.getGuid());
                         }
                     }
