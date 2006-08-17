@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
-import org.tianocore.LibraryClassDocument.LibraryClass;
 
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;

@@ -13,14 +13,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.pcd.action;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.tianocore.build.global.GlobalData;
 import org.tianocore.pcd.entity.DynamicTokenValue;
 import org.tianocore.pcd.entity.Token;
 import org.tianocore.pcd.exception.EntityException;

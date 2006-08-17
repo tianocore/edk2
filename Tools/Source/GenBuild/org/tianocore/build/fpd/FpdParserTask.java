@@ -32,6 +32,7 @@ import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
 
+import org.tianocore.common.definitions.EdkDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.pcd.action.ActionMessage;
 import org.tianocore.build.global.GlobalData;
@@ -530,13 +531,7 @@ public class FpdParserTask extends Task {
             throw new BuildException("Module type is not specified.");
         }
 
-        String[][] suffix = { { "BASE", ".FFS"},
-                              { "SEC", ".SEC" }, { "PEI_CORE", ".PEI" },
-                              { "PEIM", ".PEI" }, { "DXE_CORE", ".DXE" },
-                              { "DXE_DRIVER", ".DXE" }, { "DXE_RUNTIME_DRIVER", ".DXE" },
-                              { "DXE_SAL_DRIVER", ".DXE" }, { "DXE_SMM_DRIVER", ".DXE" },
-                              { "TOOL", ".FFS" }, { "UEFI_DRIVER", ".DXE" },
-                              { "UEFI_APPLICATION", ".APP" }, { "USER_DEFINED", ".FFS" } };
+        String[][] suffix = EdkDefinitions.ModuleTypeExtensions;
 
         for (int i = 0; i < suffix.length; i++) {
             if (suffix[i][0].equalsIgnoreCase(moduleType)) {

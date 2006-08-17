@@ -80,7 +80,7 @@ public class ToolDefinitions {
     public final static String TOOLS_DEF_ATTRIBUTE_SPATH      = "SPATH";
     public final static String TOOLS_DEF_ATTRIBUTE_EXT        = "EXT";
     public final static String TOOLS_DEF_ATTRIBUTE_FAMILY     = "FAMILY";
-    public final static String TOOLS_DEF_ATTRIBUTE_FLAGS      = "FALGS";
+    public final static String TOOLS_DEF_ATTRIBUTE_FLAGS      = "FLAGS";
 
     ///
     /// Tool Chain Families in the Tools Definition file

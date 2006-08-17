@@ -32,6 +32,7 @@ import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
 
+import org.tianocore.common.definitions.ToolDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.autogen.AutoGen;
@@ -49,11 +50,15 @@ import org.tianocore.build.tools.ModuleItem;
 /**
   <p>
   <code>GenBuildTask</code> is an ANT task that can be used in ANT build
-  system. The main function of this task is to parse module's surface area,
+  system. 
+  
+  <p>The main function of this task is to parse module's surface area (MSA),
   then generate the corresponding <em>BaseName_build.xml</em> (the real ANT
   build script) and call this to build the module. The whole process including:
-  1. generate AutoGen.c and AutoGen.h; 2. build all dependent library instances;
-  3. build all source files inlcude AutoGen.c; 4. generate sections;
+  1. generate AutoGen.c and AutoGen.h; 
+  2. build all dependent library instances;
+  3. build all source files inlcude AutoGen.c; 
+  4. generate sections;
   5. generate FFS file if it is driver module while LIB file if it is Library module.
   </p>
 
@@ -426,9 +431,9 @@ public class GenBuildTask extends Ant {
             // Set cmd, like CC, DLINK
             //
             String[] key = new String[]{target, toolchain, fpdModuleId.getArch(), cmd[m], null};
-            key[4] = "PATH";
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_PATH;
             String cmdPath = GlobalData.getCommandSetting(key, fpdModuleId);
-            key[4] = "NAME";
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_NAME;
             String cmdName = GlobalData.getCommandSetting(key, fpdModuleId);
             File cmdFile = new File(cmdPath + File.separatorChar + cmdName);
             getProject().setProperty(cmd[m], cmdFile.getPath().replaceAll("(\\\\)", "/"));
@@ -436,7 +441,7 @@ public class GenBuildTask extends Ant {
             //
             // set CC_FLAGS
             //
-            key[4] = "FLAGS";
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FLAGS;
             String cmdFlags = GlobalData.getCommandSetting(key, fpdModuleId);
             Set<String> addset = new LinkedHashSet<String>();
             Set<String> subset = new LinkedHashSet<String>();
@@ -446,7 +451,7 @@ public class GenBuildTask extends Ant {
             //
             // Set CC_EXT
             //
-            key[4] = "EXT";
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_EXT;
             String extName = GlobalData.getCommandSetting(key, fpdModuleId);
             if ( extName != null && ! extName.equalsIgnoreCase("")) {
                 getProject().setProperty(cmd[m] + "_EXT", extName);
@@ -457,7 +462,7 @@ public class GenBuildTask extends Ant {
             //
             // set CC_FAMILY
             //
-            key[4] = "FAMILY";
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FAMILY;
             String toolChainFamily = GlobalData.getCommandSetting(key, fpdModuleId);
             if (toolChainFamily != null) {
                 getProject().setProperty(cmd[m] + "_FAMILY", toolChainFamily);
@@ -466,7 +471,7 @@ public class GenBuildTask extends Ant {
             //
             // set CC_SPATH
             //
-            key[4] = "SPATH";
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_SPATH;
             String spath = GlobalData.getCommandSetting(key, fpdModuleId);
             if (spath != null) {
                 getProject().setProperty(cmd[m] + "_SPATH", spath.replaceAll("(\\\\)", "/"));
@@ -477,7 +482,7 @@ public class GenBuildTask extends Ant {
             //
             // set CC_DPATH
             //
-            key[4] = "DPATH";
+            key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_DPATH;
             String dpath = GlobalData.getCommandSetting(key, fpdModuleId);
             if (dpath != null) {
                 getProject().setProperty(cmd[m] + "_DPATH", dpath.replaceAll("(\\\\)", "/"));
