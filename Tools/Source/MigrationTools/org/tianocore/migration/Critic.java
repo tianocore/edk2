@@ -13,23 +13,75 @@
 package org.tianocore.migration;
 
 import java.util.regex.*;
+import java.io.*;
 
 public class Critic implements Common.ForDoAll {
 	private static Pattern ptnheadcomment = Pattern.compile("^\\/\\*\\+\\+(.*?)\\-\\-\\*\\/",Pattern.DOTALL);
 	private static Pattern ptnfunccomment = Pattern.compile("([\\w\\d]*\\s*[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)(\\/\\*\\+\\+.*?)(\\-\\-\\*\\/\\s*)(.*?)([\\{;])",Pattern.DOTALL);
 	private static Pattern ptncommentstructure = Pattern.compile("\\/\\*\\+\\+\\s*Routine Description:\\s*(.*?)\\s*Arguments:\\s*(.*?)\\s*Returns:\\s*(.*?)\\s*\\-\\-\\*\\/",Pattern.DOTALL);
-	private static Pattern ptninfequation = Pattern.compile("#%%\\s*([^\\s]*\\s*-\\s*.*\\s*)*",Pattern.MULTILINE);
+	private static Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*-\\s*(.*)\\s*");
 	private static Matcher mtrinfequation;
+	private static Matcher mtrfunccomment;
 	
 	public void toDo(String filepath) throws Exception {
 		if (filepath.contains(".c") || filepath.contains(".h")) {
+			BufferedReader rd = null;
+			String line = null;
+			StringBuffer templine = new StringBuffer();
+			boolean description = false;
+			boolean arguments = false;
+			boolean returns = false;
+			
 			System.out.println("Criticing   " + filepath);
 			String wholeline = Common.file2string(filepath);
 			
 			wholeline = Common.replaceAll(wholeline, ptnheadcomment, "/** @file$1**/");
-			wholeline = Common.replaceAll(wholeline, ptnfunccomment, "$2$3$4$1$5");
-			wholeline = Common.replaceAll(wholeline, ptncommentstructure, "/**\n#%\n$1\n%#\n#%%\n$2\n%%#\n#%%%\n$3\n%%%#\n**/");
-			
+			//wholeline = Common.replaceAll(wholeline, ptnfunccomment, "$2$3$4$1$5");
+			//wholeline = Common.replaceAll(wholeline, ptncommentstructure, "/**\n#%\n$1\n%#\n#%%\n$2\n%%#\n#%%%\n$3\n%%%#\n**/");
+			/*
+			rd = new BufferedReader(new StringReader(wholeline));
+			while ((line = rd.readLine()) != null) {
+				if (line.contains("\\-\\-\\*\\/")) {
+					description = false;
+					arguments = false;
+					returns = false;
+					templine.append(line + "\n");
+				} else if (line.contains("Routine Description:")) {
+					description = true;
+					arguments = false;
+					returns = false;
+				} else if (line.contains("Arguments:")) {
+					description = false;
+					arguments = true;
+					returns = false;
+				} else if (line.contains("Returns:")) {
+					description = false;
+					arguments = false;
+					returns = true;
+				} else if (description) {
+					templine.append(line + "\n");
+					//System.out.println("Description:" + line);
+				} else if (arguments) {
+					mtrinfequation = ptninfequation.matcher(line);
+					if (mtrinfequation.find()) {
+						templine.append("  @param   " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
+					} else {
+						templine.append(line + "\n");
+					}
+					//System.out.println("Arguments:" + line);
+				} else if (returns) {
+					mtrinfequation = ptninfequation.matcher(line);
+					if (mtrinfequation.find()) {
+						templine.append("  @retval   " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
+					} else {
+						templine.append(line + "\n");
+					}
+					//System.out.println("Returns:" + line);
+				} else {
+					templine.append(line + "\n");
+				}
+			}
+			wholeline = templine.toString();*/
 			/* -----slow edition of replacefirst with stringbuffer-----
 			line.append(wholeline);
 			mtrfunccomment = ptnfunccomment.matcher(line);
@@ -37,13 +89,13 @@ public class Critic implements Common.ForDoAll {
 				line.replace(0, line.length()-1, mtrfunccomment.replaceFirst("$2$4$3$1$5"));
 			}
 			*/
-			/* -----slow edition of replacefirst with string-----
+			// -----slow edition of replacefirst with string-----
 			while ((mtrfunccomment = ptnfunccomment.matcher(wholeline)).find()) {
 				//funccomment = mtrfunccomment.group(2);
 				//mtrcommentstructure = ptncommentstructure.matcher(funccomment);
 				wholeline = mtrfunccomment.replaceFirst("$2$4$3$1$5");
 			}
-			*/
+			
 			/*
 			// edit func comment
 			mtrtempcomment = ptntempcomment.matcher(wholeline);
