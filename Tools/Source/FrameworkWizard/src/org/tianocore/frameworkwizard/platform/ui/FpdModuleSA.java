@@ -23,7 +23,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
-import org.apache.xmlbeans.XmlObject;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
@@ -38,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -226,37 +224,35 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         ModuleIdentification mi = GlobalData.getModuleId(key);
         PackageIdentification[] depPkgList = null;
         try{
-            Map<String, XmlObject> m = GlobalData.getNativeMsa(mi);
-            SurfaceAreaQuery.setDoc(m);
             //
             // Get dependency pkg list into which we will search lib instances.
             //
-            depPkgList = SurfaceAreaQuery.getDependencePkg(null);
+            depPkgList = SurfaceAreaQuery.getDependencePkg(null, mi);
             //
             // Get the lib class consumed, produced by this module itself.
             //
-            String[] classConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED");
+            Vector<String> vClassConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
             
             if (this.classConsumed == null) {
                 this.classConsumed = new HashMap<String, ArrayList<String>>();
             }
             
-            for(int i = 0; i < classConsumed.length; ++i){
-                ArrayList<String> consumedBy = this.classConsumed.get(classConsumed[i]);
+            for(int i = 0; i < vClassConsumed.size(); ++i){
+                ArrayList<String> consumedBy = this.classConsumed.get(vClassConsumed.get(i));
                 if (consumedBy == null) {
                     consumedBy = new ArrayList<String>();
                 }
                 consumedBy.add(key);
-                this.classConsumed.put(classConsumed[i], consumedBy);
+                this.classConsumed.put(vClassConsumed.get(i), consumedBy);
             }
             
-            String[] classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED");
+            Vector<String> vClassProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
             if (this.classProduced == null) {
                 this.classProduced = new ArrayList<String>();
             }
-            for(int i = 0; i < classProduced.length; ++i){
-                if (!this.classProduced.contains(classProduced[i])){
-                    this.classProduced.add(classProduced[i]);
+            for(int i = 0; i < vClassProduced.size(); ++i){
+                if (!this.classProduced.contains(vClassProduced.get(i))){
+                    this.classProduced.add(vClassProduced.get(i));
                 }
             }
             
@@ -362,10 +358,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private String[] getClassProduced(ModuleIdentification mi){
         
         try{
-            Map<String, XmlObject> m = GlobalData.getNativeMsa(mi);
-            SurfaceAreaQuery.setDoc(m);
-            String[] clsProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED");
-            return clsProduced;
+            Vector<String> clsProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
+            String[] sClassProduced = new String[clsProduced.size()];
+            for (int i = 0; i < clsProduced.size(); ++i) {
+                sClassProduced[i] = clsProduced.get(i);
+            }
+            return sClassProduced;
             
         }catch (Exception e) {
             e.printStackTrace();
@@ -376,16 +374,17 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     
     private String[] getClassConsumed(ModuleIdentification mi){
         
-        String[] clsConsumed = null;
         try{
-            Map<String, XmlObject> m = GlobalData.getNativeMsa(mi);
-            SurfaceAreaQuery.setDoc(m);
-            clsConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED");
-            
+            Vector<String> clsConsumed = SurfaceAreaQuery.getLibraryClasses("ALWAYS_CONSUMED", mi);
+            String[] sClassConsumed = new String[clsConsumed.size()];
+            for (int i = 0; i < clsConsumed.size(); ++i) {
+                sClassConsumed[i] = clsConsumed.get(i);
+            }
+            return sClassConsumed;
         }catch (Exception e) {
             e.printStackTrace();
         }
-        return clsConsumed;
+        return new String[0];
     }
     
     private void showClassToResolved(){
@@ -397,12 +396,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         while(li.hasNext()){
             
             String[] s = {li.next()};
-            if (classConsumed.get(s[0]) == null) {
-                continue;
-            }
-            if (classConsumed.get(s[0]).size() == 0) {
-                continue;
-            }
+//            if (classConsumed.get(s[0]) == null) {
+//                continue;
+//            }
+//            if (classConsumed.get(s[0]).size() == 0) {
+//                continue;
+//            }
             if (!classProduced.contains(s[0])){
                 libClassTableModel.addRow(s);
             }

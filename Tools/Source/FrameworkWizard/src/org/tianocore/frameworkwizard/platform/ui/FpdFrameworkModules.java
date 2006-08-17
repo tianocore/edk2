@@ -579,6 +579,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (selectedRow < 0) {
                         return;
                     }
+                    docConsole.setSaved(false);
 
                     TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
                     selectedRow = sorter.modelIndex(selectedRow);
@@ -606,7 +607,6 @@ public class FpdFrameworkModules extends IInternalFrame {
                         }
                     }
 
-                    docConsole.setSaved(false);
                     ffc.removeModuleSA(selectedRow);
                 }
             });

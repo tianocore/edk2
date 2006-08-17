@@ -379,7 +379,7 @@ public class FpdFileContents {
                     Map<String, XmlObject> m = new HashMap<String, XmlObject>();
                     m.put("ModuleSurfaceArea", msa);
                     SurfaceAreaQuery.setDoc(m);
-                    PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null);
+                    PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, vMi.get(i));
                     PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
                     if (spdPcd == null) {
                         //
@@ -541,7 +541,7 @@ public class FpdFileContents {
             Map<String, XmlObject> m = new HashMap<String, XmlObject>();
             m.put("ModuleSurfaceArea", msa);
             SurfaceAreaQuery.setDoc(m);
-            PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null);
+            PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, mi);
             //
             // First look through MSA pcd entries.
             //
@@ -896,7 +896,7 @@ public class FpdFileContents {
             Map<String, XmlObject> m = new HashMap<String, XmlObject>();
             m.put("ModuleSurfaceArea", msa);
             SurfaceAreaQuery.setDoc(m);
-            PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null);
+            PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, mi);
             //
             // Implementing InitializePlatformPcdBuildDefinitions
             //
