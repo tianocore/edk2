@@ -79,11 +79,6 @@ public class AutoGen {
     private CommonDefinition.PCD_DRIVER_TYPE pcdDriverType;
 
     ///
-    /// Judge whether this module's library instance use PcdLib library class 
-    /// 
-    private boolean isModuleLibraryInstanceUsePcd;
-
-    ///
     /// The protocl list which records in module or library surface area and
     /// it's dependence on library instance surface area.
     ///
@@ -328,28 +323,6 @@ public class AutoGen {
         //
         String[] libClassList = SurfaceAreaQuery
                                 .getLibraryClasses(CommonDefinition.AlwaysConsumed,this.arch);
-        boolean  isModuleConsumePcdLib = false;
-        List<String> libClassArray     = new ArrayList<String>();
-        for (int index = 0; index < libClassList.length; index++) {
-            libClassArray.add(libClassList[index]);
-            //
-            // Search all library class of a module for PcdLib
-            // 
-            if (libClassList[index].equalsIgnoreCase(CommonDefinition.pcdLibName)) {
-                isModuleConsumePcdLib = true;
-            }
-        }
-
-        //
-        // If module do not use PCD but module's library use PCD.
-        // 
-        if (!isModuleConsumePcdLib && this.isModuleLibraryInstanceUsePcd) {
-            libClassArray.add(CommonDefinition.pcdLibName);
-        }
-
-        libClassList = new String[libClassArray.size()];
-        libClassArray.toArray(libClassList);
-
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -2085,9 +2058,6 @@ public class AutoGen {
                                                       .getProtocolNotifyArray(this.arch);
                         String[] guidList = SurfaceAreaQuery
                                             .getGuidEntryArray(this.arch);
-                        String[] libraryClassList = SurfaceAreaQuery.getLibraryClasses(
-                                                        CommonDefinition.AlwaysConsumed, 
-                                                        this.arch);
                         PackageIdentification[] pkgList = SurfaceAreaQuery.getDependencePkg(this.arch);
 
                         //
@@ -2119,11 +2089,7 @@ public class AutoGen {
                                 this.mDepPkgList.add(pkgList[index]);
                             }
                         }
-                        for (index = 0; index < libraryClassList.length; index++) {
-                            if (libraryClassList[index].equalsIgnoreCase(CommonDefinition.pcdLibName)) {
-                                this.isModuleLibraryInstanceUsePcd = true;
-                            }
-                        }
+
                         //
                         // If not yet parse this library instance's constructor
                         // element,parse it.
