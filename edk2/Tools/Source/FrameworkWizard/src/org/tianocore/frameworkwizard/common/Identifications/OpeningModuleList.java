@@ -19,6 +19,7 @@ import java.util.Vector;
 import javax.swing.tree.TreePath;
 
 import org.tianocore.ModuleSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 public class OpeningModuleList {
     private Vector<OpeningModuleType> vOpeningModuleList = new Vector<OpeningModuleType>();
@@ -34,7 +35,7 @@ public class OpeningModuleList {
         vOpeningModuleList = openingModuleList;
     }
     
-    public void insertToOpeningModuleList(Identification id, ModuleSurfaceAreaDocument.ModuleSurfaceArea xmlMsa) {
+    public void insertToOpeningModuleList(ModuleIdentification id, ModuleSurfaceAreaDocument.ModuleSurfaceArea xmlMsa) {
         vOpeningModuleList.addElement(new OpeningModuleType(id, xmlMsa));
     }
     
@@ -45,7 +46,7 @@ public class OpeningModuleList {
         return null;
     }
     
-    public OpeningModuleType getOpeningModuleById(Identification id) {
+    public OpeningModuleType getOpeningModuleById(ModuleIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningModuleList.elementAt(index);
@@ -53,7 +54,7 @@ public class OpeningModuleList {
         return null;
     }
     
-    public int findIndexOfListById(Identification id) {
+    public int findIndexOfListById(ModuleIdentification id) {
         for (int index = 0; index < vOpeningModuleList.size(); index++) {
             if (vOpeningModuleList.elementAt(index).getId().equals(id)) {
                 return index;
@@ -68,7 +69,7 @@ public class OpeningModuleList {
         }
     }
     
-    public void removeFromOpeningModuleListById(Identification id) {
+    public void removeFromOpeningModuleListById(ModuleIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningModuleList.removeElementAt(findIndexOfListById(id));
@@ -79,7 +80,7 @@ public class OpeningModuleList {
         vOpeningModuleList.removeAllElements();
     }
     
-    public ModuleSurfaceAreaDocument.ModuleSurfaceArea getModuleSurfaceAreaFromId(Identification id) {
+    public ModuleSurfaceAreaDocument.ModuleSurfaceArea getModuleSurfaceAreaFromId(ModuleIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningModuleList.elementAt(index).getXmlMsa();
@@ -87,7 +88,7 @@ public class OpeningModuleList {
         return null;
     }
     
-    public boolean existsModule(Identification id) {
+    public boolean existsModule(ModuleIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return true;
@@ -95,7 +96,7 @@ public class OpeningModuleList {
         return false;
     }
     
-    public void setModuleSaved(Identification id, boolean isSaved) {
+    public void setModuleSaved(ModuleIdentification id, boolean isSaved) {
         setModuleSaved(findIndexOfListById(id), isSaved);
     }
     
@@ -105,7 +106,7 @@ public class OpeningModuleList {
         }
     }
     
-    public boolean getModuleSaved(Identification id) {
+    public boolean getModuleSaved(ModuleIdentification id) {
         return getModuleSaved(findIndexOfListById(id));
     }
     
@@ -116,14 +117,35 @@ public class OpeningModuleList {
         return true;
     }
     
-    public void setTreePathById(Identification id, TreePath treePath) {
+    public void setModuleOpen(ModuleIdentification id, boolean isOpen) {
+        setModuleOpen(findIndexOfListById(id), isOpen);
+    }
+    
+    public void setModuleOpen(int index, boolean isOpen) {
+        if (index > -1) {
+            vOpeningModuleList.elementAt(index).setOpen(isOpen);
+        }
+    }
+    
+    public boolean getModuleOpen(ModuleIdentification id) {
+        return getModuleOpen(findIndexOfListById(id));
+    }
+    
+    public boolean getModuleOpen(int index) {
+        if (index > -1) {
+            return vOpeningModuleList.elementAt(index).isOpen();
+        }
+        return true;
+    }
+    
+    public void setTreePathById(ModuleIdentification id, TreePath treePath) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningModuleList.elementAt(index).setTreePath(treePath);
         }
     }
     
-    public TreePath getTreePathById(Identification id) {
+    public TreePath getTreePathById(ModuleIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningModuleList.elementAt(index).getTreePath();
@@ -138,10 +160,25 @@ public class OpeningModuleList {
         return null;
     }
     
-    public void setNew(Identification id, boolean isNew) {
+    public ModuleIdentification getIdByPath(String path) {
+        ModuleIdentification id = new ModuleIdentification(null, null, null, path);
+        int index = findIndexOfListById(id);
+        if (index > -1) {
+            return vOpeningModuleList.elementAt(index).getId();
+        }
+        return null;
+    }
+    
+    public void setNew(ModuleIdentification id, boolean isNew) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningModuleList.elementAt(index).setNew(isNew);
+        }
+    }
+    
+    public void closeAll() {
+        for (int index = 0; index < this.size(); index++) {
+           this.setModuleOpen(index, false);
         }
     }
     
@@ -158,9 +195,11 @@ public class OpeningModuleList {
         return true;
     }
     
-    public boolean isOpend() {
-        if (this.size() > 0 ) {
-            return true;
+    public boolean isOpen() {
+        for (int index = 0; index < this.size(); index++) {
+            if (this.getModuleOpen(index)) {
+                return true;
+            }
         }
         return false;
     }

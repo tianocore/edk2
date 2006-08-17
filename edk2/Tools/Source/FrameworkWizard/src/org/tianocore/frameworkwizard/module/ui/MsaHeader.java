@@ -18,8 +18,10 @@ package org.tianocore.frameworkwizard.module.ui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 import java.awt.event.FocusEvent;
+import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -104,6 +106,26 @@ public class MsaHeader extends IInternalFrame {
 
     private JComboBox jComboBoxModuleType = null;
 
+    private JLabel jLabelArch = null;
+
+    private JLabel jLabelBinaryModule = null;
+
+    private JComboBox jComboBoxBinaryModule = null;
+
+    private JLabel jLabelOutputFileBasename = null;
+
+    private JTextField jTextFieldOutputFileBasename = null;
+
+    private JScrollPane jScrollPaneCopyright = null;
+
+    private JTextArea jTextAreaCopyright = null;
+
+    private JLabel jLabelURL = null;
+
+    private JTextField jTextFieldURL = null;
+
+    private JScrollPane jScrollPane = null;
+
     private StarLabel jStarLabel1 = null;
 
     private StarLabel jStarLabel2 = null;
@@ -122,21 +144,132 @@ public class MsaHeader extends IInternalFrame {
 
     private StarLabel jStarLabel12 = null;
 
+    private StarLabel jStarLabel13 = null;
+
+    private StarLabel jStarLabel14 = null;
+
+    private StarLabel jStarLabel15 = null;
+
+    private JCheckBox jCheckBoxIa32 = null;
+
+    private JCheckBox jCheckBoxX64 = null;
+
+    private JCheckBox jCheckBoxIpf = null;
+
+    private JCheckBox jCheckBoxEbc = null;
+
+    private JCheckBox jCheckBoxArm = null;
+
+    private JCheckBox jCheckBoxPpc = null;
+
+    //
+    // Not used for UI
+    //
     private MsaHeaderDocument.MsaHeader msaHeader = null;
 
+    private ModuleDefinitionsDocument.ModuleDefinitions md = null;
+
     private ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = null;
-
-    private JTextField jTextFieldCopyright = null;
-
-    private JLabel jLabelURL = null;
-
-    private JTextField jTextFieldURL = null;
-
-    private JScrollPane jScrollPane = null;
 
     private OpeningModuleType omt = null;
 
     private EnumerationData ed = new EnumerationData();
+
+    /**
+     * This method initializes jCheckBoxIa32    
+     *  
+     * @return javax.swing.JCheckBox    
+     */
+    private JCheckBox getJCheckBoxIa32() {
+        if (jCheckBoxIa32 == null) {
+            jCheckBoxIa32 = new JCheckBox();
+            jCheckBoxIa32.setBounds(new java.awt.Rectangle(160, 505, 55, 20));
+            jCheckBoxIa32.setText("IA32");
+            jCheckBoxIa32.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
+            jCheckBoxIa32.addFocusListener(this);
+        }
+        return jCheckBoxIa32;
+    }
+
+    /**
+     * This method initializes jCheckBoxX64 
+     *  
+     * @return javax.swing.JCheckBox    
+     */
+    private JCheckBox getJCheckBoxX64() {
+        if (jCheckBoxX64 == null) {
+            jCheckBoxX64 = new JCheckBox();
+            jCheckBoxX64.setBounds(new java.awt.Rectangle(215, 505, 53, 20));
+            jCheckBoxX64.setText("X64");
+            jCheckBoxX64.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
+            jCheckBoxX64.addFocusListener(this);
+        }
+        return jCheckBoxX64;
+    }
+
+    /**
+     * This method initializes jCheckBoxIpf 
+     *  
+     * @return javax.swing.JCheckBox    
+     */
+    private JCheckBox getJCheckBoxIpf() {
+        if (jCheckBoxIpf == null) {
+            jCheckBoxIpf = new JCheckBox();
+            jCheckBoxIpf.setBounds(new java.awt.Rectangle(270, 505, 52, 20));
+            jCheckBoxIpf.setText("IPF");
+            jCheckBoxIpf.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
+            jCheckBoxIpf.addFocusListener(this);
+        }
+        return jCheckBoxIpf;
+    }
+
+    /**
+     * This method initializes jCheckBoxEbc 
+     *  
+     * @return javax.swing.JCheckBox    
+     */
+    private JCheckBox getJCheckBoxEbc() {
+        if (jCheckBoxEbc == null) {
+            jCheckBoxEbc = new JCheckBox();
+            jCheckBoxEbc.setBounds(new java.awt.Rectangle(325, 505, 53, 20));
+            jCheckBoxEbc.setText("EBC");
+            jCheckBoxEbc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
+            jCheckBoxEbc.addFocusListener(this);
+        }
+        return jCheckBoxEbc;
+    }
+
+    /**
+     * This method initializes jCheckBoxArm 
+     *  
+     * @return javax.swing.JCheckBox    
+     */
+    private JCheckBox getJCheckBoxArm() {
+        if (jCheckBoxArm == null) {
+            jCheckBoxArm = new JCheckBox();
+            jCheckBoxArm.setBounds(new java.awt.Rectangle(380, 505, 54, 20));
+            jCheckBoxArm.setText("ARM");
+            jCheckBoxArm.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
+            jCheckBoxArm.addFocusListener(this);
+        }
+        return jCheckBoxArm;
+    }
+
+    /**
+     * This method initializes jCheckBoxPpc 
+     *  
+     * @return javax.swing.JCheckBox    
+     */
+    private JCheckBox getJCheckBoxPpc() {
+        if (jCheckBoxPpc == null) {
+            jCheckBoxPpc = new JCheckBox();
+            jCheckBoxPpc.setBounds(new java.awt.Rectangle(435, 505, 53, 20));
+            jCheckBoxPpc.setText("PPC");
+            jCheckBoxPpc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
+            jCheckBoxPpc.addFocusListener(this);
+        }
+        return jCheckBoxPpc;
+    }
 
     /**
      This method initializes jTextFieldBaseName 
@@ -260,7 +393,7 @@ public class MsaHeader extends IInternalFrame {
             jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
             jTextFieldSpecification.setSize(new java.awt.Dimension(320, 20));
-            jTextFieldSpecification.setLocation(new java.awt.Point(160, 435));
+            jTextFieldSpecification.setLocation(new java.awt.Point(160, 530));
             jTextFieldSpecification.setEditable(false);
             jTextFieldSpecification.addFocusListener(this);
         }
@@ -314,7 +447,7 @@ public class MsaHeader extends IInternalFrame {
             jScrollPaneLicense = new JScrollPane();
             jScrollPaneLicense.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
             jScrollPaneLicense.setSize(new java.awt.Dimension(320, 120));
-            jScrollPaneLicense.setLocation(new java.awt.Point(160, 285));
+            jScrollPaneLicense.setLocation(new java.awt.Point(160, 305));
             jScrollPaneLicense.setViewportView(getJTextAreaLicense());
             jScrollPaneLicense.setPreferredSize(new java.awt.Dimension(320, 120));
         }
@@ -374,33 +507,16 @@ public class MsaHeader extends IInternalFrame {
     }
 
     /**
-     This method initializes jTextFieldCopyright	
+     This method initializes jTextFieldURL	
      
-     @return javax.swing.JTextField jTextFieldCopyright
+     @return javax.swing.JTextField	
      
      **/
-    private JTextField getJTextFieldCopyright() {
-        if (jTextFieldCopyright == null) {
-            jTextFieldCopyright = new JTextField();
-            jTextFieldCopyright.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldCopyright.setLocation(new java.awt.Point(160, 260));
-            jTextFieldCopyright.setSize(new java.awt.Dimension(320, 20));
-            jTextFieldCopyright.addFocusListener(this);
-            jTextFieldCopyright.setToolTipText("One or more copyright lines");
-        }
-        return jTextFieldCopyright;
-    }
-
-    /**
-     * This method initializes jTextFieldURL	
-     * 	
-     * @return javax.swing.JTextField	
-     */
     private JTextField getJTextFieldURL() {
         if (jTextFieldURL == null) {
             jTextFieldURL = new JTextField();
             jTextFieldURL.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldURL.setLocation(new java.awt.Point(160, 410));
+            jTextFieldURL.setLocation(new java.awt.Point(160, 430));
             jTextFieldURL.setSize(new java.awt.Dimension(320, 20));
             jTextFieldURL.addFocusListener(this);
             jTextFieldURL.setToolTipText("A URL for the latest version of the license");
@@ -409,10 +525,11 @@ public class MsaHeader extends IInternalFrame {
     }
 
     /**
-     * This method initializes jScrollPane	
-     * 	
-     * @return javax.swing.JScrollPane	
-     */
+     This method initializes jScrollPane	
+     
+     @return javax.swing.JScrollPane	
+     
+     **/
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
@@ -421,8 +538,80 @@ public class MsaHeader extends IInternalFrame {
         return jScrollPane;
     }
 
-    public static void main(String[] args) {
+    /**
+     This method initializes jScrollPaneCopyright	
+     
+     @return javax.swing.JScrollPane	
+     
+     **/
+    private JScrollPane getJScrollPaneCopyright() {
+        if (jScrollPaneCopyright == null) {
+            jScrollPaneCopyright = new JScrollPane();
+            jScrollPaneCopyright.setBounds(new java.awt.Rectangle(160, 260, 320, 40));
+            jScrollPaneCopyright.setPreferredSize(new java.awt.Dimension(320, 40));
+            jScrollPaneCopyright.setViewportView(getJTextAreaCopyright());
+            jScrollPaneCopyright.setSize(new java.awt.Dimension(320, 40));
+        }
+        return jScrollPaneCopyright;
+    }
 
+    /**
+     This method initializes jTextAreaCopyright	
+     
+     @return javax.swing.JTextArea	
+     
+     **/
+    private JTextArea getJTextAreaCopyright() {
+        if (jTextAreaCopyright == null) {
+            jTextAreaCopyright = new JTextArea();
+            jTextAreaCopyright.setLineWrap(true);
+            jTextAreaCopyright.addFocusListener(this);
+            jTextAreaCopyright.setWrapStyleWord(true);
+            jTextAreaCopyright.setSelectionStart(0);
+            jTextAreaCopyright.setSelectionEnd(0);
+            jTextAreaCopyright.setBounds(new java.awt.Rectangle(0, 0, 320, 40));
+            jTextAreaCopyright.setToolTipText("One or more copyright lines");
+        }
+        return jTextAreaCopyright;
+    }
+
+    /**
+     * This method initializes jComboBoxBinaryModule    
+     *  
+     * @return javax.swing.JComboBox    
+     */
+    private JComboBox getJComboBoxBinaryModule() {
+        if (jComboBoxBinaryModule == null) {
+            jComboBoxBinaryModule = new JComboBox();
+            jComboBoxBinaryModule.setBounds(new java.awt.Rectangle(160, 480, 320, 20));
+            jComboBoxBinaryModule.setPreferredSize(new java.awt.Dimension(320, 20));
+            jComboBoxBinaryModule.addFocusListener(this);
+            jComboBoxBinaryModule.setToolTipText("<html>Modules are either source modules <br>"
+                                                 + "which can be compiled or binary <br>"
+                                                 + "modules which are linked.  <br>"
+                                                 + "A module cannot contain both. <br>"
+                                                 + "The GUID numbers should be identical <br>"
+                                                 + "for a binary and source MSA, <br>"
+                                                 + "but the BINARY MSA should have <br>"
+                                                 + "a higher version number.</html>");
+        }
+        return jComboBoxBinaryModule;
+    }
+
+    /**
+     * This method initializes jTextFieldOutputFileBasename 
+     *  
+     * @return javax.swing.JTextField   
+     */
+    private JTextField getJTextFieldOutputFileBasename() {
+        if (jTextFieldOutputFileBasename == null) {
+            jTextFieldOutputFileBasename = new JTextField();
+            jTextFieldOutputFileBasename.setBounds(new java.awt.Rectangle(160, 455, 320, 20));
+            jTextFieldOutputFileBasename.setPreferredSize(new java.awt.Dimension(320, 20));
+            jTextFieldOutputFileBasename.addFocusListener(this);
+            jTextFieldOutputFileBasename.setToolTipText("Enter a single word for generated output file names");
+        }
+        return jTextFieldOutputFileBasename;
     }
 
     /**
@@ -458,6 +647,7 @@ public class MsaHeader extends IInternalFrame {
             msa.setModuleDefinitions(md);
         }
         init(msa.getMsaHeader());
+        init(msa.getModuleDefinitions());
         this.setVisible(true);
         this.setViewMode(false);
     }
@@ -469,14 +659,12 @@ public class MsaHeader extends IInternalFrame {
      
      **/
     public void setViewMode(boolean isView) {
-        //this.jButtonOk.setVisible(false);
-        //this.jButtonCancel.setVisible(false);
         if (isView) {
             this.jTextFieldBaseName.setEnabled(!isView);
             this.jTextFieldGuid.setEnabled(!isView);
             this.jTextFieldVersion.setEnabled(!isView);
             this.jTextAreaLicense.setEnabled(!isView);
-            this.jTextFieldCopyright.setEnabled(!isView);
+            this.jTextAreaCopyright.setEnabled(!isView);
             this.jTextAreaDescription.setEnabled(!isView);
             this.jTextFieldSpecification.setEnabled(!isView);
             this.jTextFieldAbstract.setEnabled(!isView);
@@ -493,7 +681,7 @@ public class MsaHeader extends IInternalFrame {
      **/
     private void init() {
         this.setSize(500, 515);
-        this.setPreferredSize(new java.awt.Dimension(490, 520));
+        this.setPreferredSize(new java.awt.Dimension(490, 615));
         this.setContentPane(getJScrollPane());
         this.setTitle("Module Surface Area Header");
         initFrame();
@@ -531,7 +719,7 @@ public class MsaHeader extends IInternalFrame {
                 jTextAreaDescription.setSelectionEnd(0);
             }
             if (this.msaHeader.getCopyright() != null) {
-                this.jTextFieldCopyright.setText(this.msaHeader.getCopyright());
+                this.jTextAreaCopyright.setText(this.msaHeader.getCopyright());
             }
             if (this.msaHeader.getLicense() != null) {
                 this.jTextAreaLicense.setText(this.msaHeader.getLicense().getStringValue());
@@ -548,6 +736,31 @@ public class MsaHeader extends IInternalFrame {
     }
 
     /**
+     This method initializes this
+     Fill values to all fields if these values are not empty
+     
+     @param inMsaHeader  The input data of MsaHeaderDocument.MsaHeader
+     
+     **/
+    private void init(ModuleDefinitionsDocument.ModuleDefinitions inMd) {
+        init();
+        if (inMd != null) {
+            this.md = inMd;
+            if (md.getSupportedArchitectures() != null) {
+                this.setSelectedItems(Tools.convertListToVector(md.getSupportedArchitectures()));
+            }
+            if (md.getBinaryModule()) {
+                this.jComboBoxBinaryModule.setSelectedIndex(1);
+            } else {
+                this.jComboBoxBinaryModule.setSelectedIndex(0);
+            }
+            if (md.getOutputFileBasename() != null) {
+                this.jTextFieldOutputFileBasename.setText(md.getOutputFileBasename());
+            }
+        }
+    }
+
+    /**
      This method initializes jContentPane
      
      @return javax.swing.JPanel jContentPane
@@ -558,7 +771,7 @@ public class MsaHeader extends IInternalFrame {
 
             jLabelURL = new JLabel();
             jLabelURL.setText("License URL");
-            jLabelURL.setLocation(new java.awt.Point(15, 410));
+            jLabelURL.setLocation(new java.awt.Point(15, 430));
             jLabelURL.setSize(new java.awt.Dimension(140, 20));
             jLabelBaseName = new JLabel();
             jLabelBaseName.setText("Module Name");
@@ -588,16 +801,26 @@ public class MsaHeader extends IInternalFrame {
             jLabelCopyright.setSize(new java.awt.Dimension(140, 20));
             jLabelLicense = new JLabel();
             jLabelLicense.setText("License");
-            jLabelLicense.setLocation(new java.awt.Point(15, 285));
+            jLabelLicense.setLocation(new java.awt.Point(15, 305));
             jLabelLicense.setSize(new java.awt.Dimension(140, 20));
+            jLabelOutputFileBasename = new JLabel();
+            jLabelOutputFileBasename.setBounds(new java.awt.Rectangle(15, 455, 140, 20));
+            jLabelOutputFileBasename.setText("Output File Basename");
+            jLabelBinaryModule = new JLabel();
+            jLabelBinaryModule.setBounds(new java.awt.Rectangle(15, 480, 140, 20));
+            jLabelBinaryModule.setText("Binary Module");
+            jLabelArch = new JLabel();
+            jLabelArch.setBounds(new java.awt.Rectangle(15, 505, 140, 20));
+            jLabelArch.setText("Supported Architectures");
             jLabelSpecification = new JLabel();
             jLabelSpecification.setText("Specification");
-            jLabelSpecification.setLocation(new java.awt.Point(14, 435));
+            jLabelSpecification.setLocation(new java.awt.Point(14, 530));
             jLabelSpecification.setSize(new java.awt.Dimension(140, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 470));
+            jContentPane.setPreferredSize(new java.awt.Dimension(490, 565));
+            jContentPane.addFocusListener(this);
 
             jContentPane.add(jLabelBaseName, null);
             jContentPane.add(getJTextFieldBaseName(), null);
@@ -621,7 +844,12 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(getJComboBoxModuleType(), null);
             jContentPane.add(jLabelURL, null);
             jContentPane.add(getJTextFieldURL(), null);
-            jContentPane.add(getJTextFieldCopyright(), null);
+            jContentPane.add(jLabelOutputFileBasename, null);
+            jContentPane.add(getJTextFieldOutputFileBasename(), null);
+            jContentPane.add(jLabelBinaryModule, null);
+            jContentPane.add(getJComboBoxBinaryModule(), null);
+            jContentPane.add(jLabelArch, null);
+
             jStarLabel1 = new StarLabel();
             jStarLabel1.setLocation(new java.awt.Point(0, 10));
             jStarLabel2 = new StarLabel();
@@ -635,11 +863,17 @@ public class MsaHeader extends IInternalFrame {
             jStarLabel7 = new StarLabel();
             jStarLabel7.setLocation(new java.awt.Point(0, 260));
             jStarLabel8 = new StarLabel();
-            jStarLabel8.setLocation(new java.awt.Point(0, 285));
+            jStarLabel8.setLocation(new java.awt.Point(0, 305));
             jStarLabel10 = new StarLabel();
             jStarLabel10.setLocation(new java.awt.Point(0, 110));
             jStarLabel12 = new StarLabel();
-            jStarLabel12.setLocation(new java.awt.Point(0, 435));
+            jStarLabel12.setLocation(new java.awt.Point(0, 455));
+            jStarLabel13 = new StarLabel();
+            jStarLabel13.setLocation(new java.awt.Point(0, 480));
+            jStarLabel14 = new StarLabel();
+            jStarLabel14.setLocation(new java.awt.Point(0, 505));
+            jStarLabel15 = new StarLabel();
+            jStarLabel15.setLocation(new java.awt.Point(0, 530));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
@@ -650,6 +884,17 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(jStarLabel8, null);
             jContentPane.add(jStarLabel10, null);
             jContentPane.add(jStarLabel12, null);
+            jContentPane.add(jStarLabel13, null);
+            jContentPane.add(jStarLabel14, null);
+            jContentPane.add(jStarLabel15, null);
+            jContentPane.add(getJScrollPaneCopyright(), null);
+
+            jContentPane.add(getJCheckBoxIa32(), null);
+            jContentPane.add(getJCheckBoxX64(), null);
+            jContentPane.add(getJCheckBoxIpf(), null);
+            jContentPane.add(getJCheckBoxEbc(), null);
+            jContentPane.add(getJCheckBoxArm(), null);
+            jContentPane.add(getJCheckBoxPpc(), null);
         }
         return jContentPane;
     }
@@ -759,7 +1004,7 @@ public class MsaHeader extends IInternalFrame {
         //
         // Check Copyright
         //
-        if (isEmpty(this.jTextFieldCopyright.getText())) {
+        if (isEmpty(this.jTextAreaCopyright.getText())) {
             Log.wrn("Update Msa Header", "Copyright couldn't be empty");
             //this.jTextFieldCopyright.requestFocus();
             return false;
@@ -799,28 +1044,9 @@ public class MsaHeader extends IInternalFrame {
      **/
     public void save() {
         try {
-            //            this.msaHeader.setModuleName(this.jTextFieldBaseName.getText());
-            //            this.msaHeader.setModuleType(ModuleTypeDef.Enum.forString(this.jComboBoxModuleType.getSelectedItem()
-            //                                                                                                  .toString()));
-            //            this.msaHeader.setGuidValue(this.jTextFieldGuid.getText());
-            //            this.msaHeader.setVersion(this.jTextFieldVersion.getText());
-            //            this.msaHeader.setAbstract(this.jTextFieldAbstract.getText());
-            //            this.msaHeader.setDescription(this.jTextAreaDescription.getText());
-            //            this.msaHeader.setCopyright(this.jTextFieldCopyright.getText());
-            //            if (this.msaHeader.getLicense() != null) {
-            //                this.msaHeader.getLicense().setStringValue(this.jTextAreaLicense.getText());
-            //            } else {
-            //                License mLicense = License.Factory.newInstance();
-            //                mLicense.setStringValue(this.jTextAreaLicense.getText());
-            //                this.msaHeader.setLicense(mLicense);
-            //            }
-            //            if (!isEmpty(this.jTextFieldURL.getText())) {
-            //                this.msaHeader.getLicense().setURL(this.jTextFieldURL.getText());
-            //            }
-            //            this.msaHeader.setSpecification(this.jTextFieldSpecification.getText());
-
             msaHeader.setSpecification(this.jTextFieldSpecification.getText());
             msa.setMsaHeader(msaHeader);
+            msa.setModuleDefinitions(md);
             this.omt.setSaved(false);
         } catch (Exception e) {
             Log.wrn("Save Module", e.getMessage());
@@ -835,6 +1061,8 @@ public class MsaHeader extends IInternalFrame {
     private void initFrame() {
         EnumerationData ed = new EnumerationData();
         Tools.generateComboBoxByVector(jComboBoxModuleType, ed.getVModuleType());
+        Tools.generateComboBoxByVector(jComboBoxBinaryModule, ed.getVBoolean());
+        this.setSelectedItems(ed.getVSupportedArchitectures());
     }
 
     /**
@@ -871,11 +1099,14 @@ public class MsaHeader extends IInternalFrame {
         resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(this.jTextFieldURL, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldCopyright, intCurrentWidth, intPreferredWidth);
+        resizeComponentWidth(this.jScrollPaneCopyright, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth, intPreferredWidth);
         resizeComponentWidth(this.jComboBoxModuleType, intCurrentWidth, intPreferredWidth);
+        resizeComponentWidth(this.jComboBoxBinaryModule, intCurrentWidth, intPreferredWidth);
+        resizeComponentWidth(this.jTextFieldOutputFileBasename, intCurrentWidth, intPreferredWidth);
+
         relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, intPreferredWidth,
                            DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
     }
@@ -999,14 +1230,14 @@ public class MsaHeader extends IInternalFrame {
         //
         // Check Copyright
         //
-        if (arg0.getSource() == this.jTextFieldCopyright) {
-            if (isEmpty(this.jTextFieldCopyright.getText())) {
+        if (arg0.getSource() == this.jTextAreaCopyright) {
+            if (isEmpty(this.jTextAreaCopyright.getText())) {
                 Log.wrn("Update Msa Header", "Copyright couldn't be empty");
                 //this.jTextFieldCopyright.requestFocus();
                 return;
             }
-            if (!this.jTextFieldCopyright.getText().equals(msaHeader.getCopyright())) {
-                this.msaHeader.setCopyright(this.jTextFieldCopyright.getText());
+            if (!this.jTextAreaCopyright.getText().equals(msaHeader.getCopyright())) {
+                this.msaHeader.setCopyright(this.jTextAreaCopyright.getText());
             } else {
                 return;
             }
@@ -1053,6 +1284,143 @@ public class MsaHeader extends IInternalFrame {
             }
         }
 
+        //
+        // Check Output File Basename
+        //
+        if (arg0.getSource() == this.jTextFieldOutputFileBasename) {
+            if (isEmpty(this.jTextFieldOutputFileBasename.getText())) {
+                Log.wrn("Update Msa Header", "Output File Basename couldn't be empty");
+                //                jTextFieldOutputFileBasename.removeFocusListener(this);
+                //                jTextFieldOutputFileBasename.requestFocus();
+                //                jTextFieldOutputFileBasename.addFocusListener(this);
+                return;
+            }
+            if (!this.jTextFieldOutputFileBasename.getText().equals(md.getOutputFileBasename())) {
+                this.md.setOutputFileBasename(this.jTextFieldOutputFileBasename.getText());
+            } else {
+                return;
+            }
+        }
+
+        //
+        // Check Binary Module Type
+        //
+        if (arg0.getSource() == this.jComboBoxBinaryModule) {
+            if (jComboBoxBinaryModule.getSelectedItem().toString().equals(DataType.TRUE)) {
+                if (md.getBinaryModule()) {
+                    return;
+                } else {
+                    md.setBinaryModule(true);
+                }
+            } else if (jComboBoxBinaryModule.getSelectedItem().toString().equals(DataType.FALSE)) {
+                if (md.getBinaryModule()) {
+                    md.setBinaryModule(false);
+                } else {
+                    return;
+                }
+            }
+        }
+
+        //
+        // Check Supported Arch
+        //
+        if (arg0.getSource() == this.jCheckBoxArm || arg0.getSource() == this.jCheckBoxEbc
+            || arg0.getSource() == this.jCheckBoxIa32 || arg0.getSource() == this.jCheckBoxIpf
+            || arg0.getSource() == this.jCheckBoxPpc || arg0.getSource() == this.jCheckBoxX64) {
+            if (!this.getSelectedItemsString().equals(md.getSupportedArchitectures().toString())) {
+                md.setSupportedArchitectures(this.getSelectedItemsVector());
+            } else {
+                return;
+            }
+        }
+
         this.save();
+    }
+
+    private Vector<String> getSelectedItemsVector() {
+        Vector<String> v = new Vector<String>();
+        if (this.jCheckBoxIa32.isSelected()) {
+            v.addElement(jCheckBoxIa32.getText());
+        }
+        if (this.jCheckBoxX64.isSelected()) {
+            v.addElement(jCheckBoxX64.getText());
+        }
+        if (this.jCheckBoxIpf.isSelected()) {
+            v.addElement(jCheckBoxIpf.getText());
+        }
+        if (this.jCheckBoxEbc.isSelected()) {
+            v.addElement(jCheckBoxEbc.getText());
+        }
+        if (this.jCheckBoxArm.isSelected()) {
+            v.addElement(jCheckBoxArm.getText());
+        }
+        if (this.jCheckBoxPpc.isSelected()) {
+            v.addElement(jCheckBoxPpc.getText());
+        }
+        return v;
+    }
+
+    private String getSelectedItemsString() {
+        String s = "";
+        if (this.jCheckBoxIa32.isSelected()) {
+            s = s + jCheckBoxIa32.getText() + " ";
+        }
+        if (this.jCheckBoxX64.isSelected()) {
+            s = s + jCheckBoxX64.getText() + " ";
+        }
+        if (this.jCheckBoxIpf.isSelected()) {
+            s = s + jCheckBoxIpf.getText() + " ";
+        }
+        if (this.jCheckBoxEbc.isSelected()) {
+            s = s + jCheckBoxEbc.getText() + " ";
+        }
+        if (this.jCheckBoxArm.isSelected()) {
+            s = s + jCheckBoxArm.getText() + " ";
+        }
+        if (this.jCheckBoxPpc.isSelected()) {
+            s = s + jCheckBoxPpc.getText() + " ";
+        }
+        return s.trim();
+    }
+
+    private void setAllItemsSelected(boolean isSelected) {
+        this.jCheckBoxIa32.setSelected(isSelected);
+        this.jCheckBoxX64.setSelected(isSelected);
+        this.jCheckBoxIpf.setSelected(isSelected);
+        this.jCheckBoxEbc.setSelected(isSelected);
+        this.jCheckBoxArm.setSelected(isSelected);
+        this.jCheckBoxPpc.setSelected(isSelected);
+    }
+
+    private void setSelectedItems(Vector<String> v) {
+        setAllItemsSelected(false);
+        if (v != null) {
+            for (int index = 0; index < v.size(); index++) {
+                if (v.get(index).equals(this.jCheckBoxIa32.getText())) {
+                    this.jCheckBoxIa32.setSelected(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxIpf.getText())) {
+                    this.jCheckBoxIpf.setSelected(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxX64.getText())) {
+                    this.jCheckBoxX64.setSelected(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxEbc.getText())) {
+                    this.jCheckBoxEbc.setSelected(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxArm.getText())) {
+                    this.jCheckBoxArm.setSelected(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxPpc.getText())) {
+                    this.jCheckBoxPpc.setSelected(true);
+                    continue;
+                }
+            }
+        }
     }
 }

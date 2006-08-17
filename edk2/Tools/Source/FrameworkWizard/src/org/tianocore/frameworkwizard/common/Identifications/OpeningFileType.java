@@ -22,12 +22,11 @@ public class OpeningFileType {
     //
     // Define class members
     //
-    
-    private Identification id = null;
-    
     private boolean isSaved = true;
     
     private boolean isNew = false;
+    
+    private boolean isOpen = false;
     
     private TreePath treePath = null;
     
@@ -35,21 +34,8 @@ public class OpeningFileType {
         
     }
     
-    public OpeningFileType(Identification identification) {
-        this.id = identification;
-    }
-    
-    public OpeningFileType(Identification identification, TreePath treePathValue) {
-        this.id = identification;
+    public OpeningFileType(TreePath treePathValue) {
         this.treePath = treePathValue;
-    }
-
-    public Identification getId() {
-        return id;
-    }
-
-    public void setId(Identification id) {
-        this.id = id;
     }
 
     public boolean isNew() {
@@ -74,5 +60,13 @@ public class OpeningFileType {
 
     public void setTreePath(TreePath treePath) {
         this.treePath = treePath;
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean isOpen) {
+        this.isOpen = isOpen;
     }
 }

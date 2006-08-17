@@ -19,6 +19,7 @@ import java.util.Vector;
 import javax.swing.tree.TreePath;
 
 import org.tianocore.PackageSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
 public class OpeningPackageList {
     private Vector<OpeningPackageType> vOpeningPackageList = new Vector<OpeningPackageType>();
@@ -35,7 +36,7 @@ public class OpeningPackageList {
         vOpeningPackageList = openingPackageList;
     }
     
-    public void insertToOpeningPackageList(Identification id, PackageSurfaceAreaDocument.PackageSurfaceArea xmlMsa) {
+    public void insertToOpeningPackageList(PackageIdentification id, PackageSurfaceAreaDocument.PackageSurfaceArea xmlMsa) {
         vOpeningPackageList.addElement(new OpeningPackageType(id, xmlMsa));
     }
     
@@ -46,7 +47,7 @@ public class OpeningPackageList {
         return null;
     }
     
-    public OpeningPackageType getOpeningPackageById(Identification id) {
+    public OpeningPackageType getOpeningPackageById(PackageIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPackageList.elementAt(index);
@@ -54,7 +55,7 @@ public class OpeningPackageList {
         return null;
     }
     
-    public int findIndexOfListById(Identification id) {
+    public int findIndexOfListById(PackageIdentification id) {
         for (int index = 0; index < vOpeningPackageList.size(); index++) {
             if (vOpeningPackageList.elementAt(index).getId().equals(id)) {
                 return index;
@@ -69,7 +70,7 @@ public class OpeningPackageList {
         }
     }
     
-    public void removeFromOpeningPackageListById(Identification id) {
+    public void removeFromOpeningPackageListById(PackageIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPackageList.removeElementAt(findIndexOfListById(id));
@@ -80,7 +81,7 @@ public class OpeningPackageList {
         vOpeningPackageList.removeAllElements();
     }
     
-    public PackageSurfaceAreaDocument.PackageSurfaceArea getPackageSurfaceAreaFromId(Identification id) {
+    public PackageSurfaceAreaDocument.PackageSurfaceArea getPackageSurfaceAreaFromId(PackageIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPackageList.elementAt(index).getXmlSpd();
@@ -88,7 +89,7 @@ public class OpeningPackageList {
         return null;
     }
     
-    public boolean existsPackage(Identification id) {
+    public boolean existsPackage(PackageIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return true;
@@ -96,7 +97,7 @@ public class OpeningPackageList {
         return false;
     }
     
-    public void setPackageSaved(Identification id, boolean isSaved) {
+    public void setPackageSaved(PackageIdentification id, boolean isSaved) {
         setPackageSaved(findIndexOfListById(id), isSaved);
     }
     
@@ -106,7 +107,7 @@ public class OpeningPackageList {
         }
     }
     
-    public boolean getPackageSaved(Identification id) {
+    public boolean getPackageSaved(PackageIdentification id) {
         return getPackageSaved(findIndexOfListById(id));
     }
     
@@ -117,14 +118,35 @@ public class OpeningPackageList {
         return true;
     }
     
-    public void setTreePathById(Identification id, TreePath treePath) {
+    public void setPackageOpen(PackageIdentification id, boolean isOpem) {
+        setPackageOpen(findIndexOfListById(id), isOpem);
+    }
+    
+    public void setPackageOpen(int index, boolean isOpem) {
+        if (index > -1) {
+            vOpeningPackageList.elementAt(index).setOpen(isOpem);
+        }
+    }
+    
+    public boolean getPackageOpen(PackageIdentification id) {
+        return getPackageOpen(findIndexOfListById(id));
+    }
+    
+    public boolean getPackageOpen(int index) {
+        if (index > -1) {
+            return vOpeningPackageList.elementAt(index).isOpen();
+        }
+        return true;
+    }
+    
+    public void setTreePathById(PackageIdentification id, TreePath treePath) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPackageList.elementAt(index).setTreePath(treePath);
         }
     }
     
-    public TreePath getTreePathById(Identification id) {
+    public TreePath getTreePathById(PackageIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPackageList.elementAt(index).getTreePath();
@@ -139,10 +161,25 @@ public class OpeningPackageList {
         return null;
     }
     
-    public void setNew(Identification id, boolean isNew) {
+    public PackageIdentification getIdByPath(String path) {
+        PackageIdentification id = new PackageIdentification(null, null, null, path);
+        int index = findIndexOfListById(id);
+        if (index > -1) {
+            return vOpeningPackageList.elementAt(index).getId();
+        }
+        return null;
+    }
+    
+    public void setNew(PackageIdentification id, boolean isNew) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPackageList.elementAt(index).setNew(isNew);
+        }
+    }
+    
+    public void closeAll() {
+        for (int index = 0; index < this.size(); index++) {
+           this.setPackageOpen(index, false);
         }
     }
     
@@ -159,9 +196,11 @@ public class OpeningPackageList {
         return true;
     }
     
-    public boolean isOpend() {
-        if (this.size() > 0 ) {
-            return true;
+    public boolean isOpen() {
+        for (int index = 0; index < this.size(); index++) {
+            if (this.getPackageOpen(index)) {
+                return true;
+            }
         }
         return false;
     }

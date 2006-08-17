@@ -17,6 +17,7 @@ package org.tianocore.frameworkwizard.common.Identifications;
 import javax.swing.tree.TreePath;
 
 import org.tianocore.PackageSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
 public class OpeningPackageType extends OpeningFileType {
     //
@@ -24,17 +25,21 @@ public class OpeningPackageType extends OpeningFileType {
     //
     private PackageSurfaceAreaDocument.PackageSurfaceArea xmlSpd = null;
     
+    private PackageIdentification id = null;
+    
     public OpeningPackageType() {
         
     }
     
-    public OpeningPackageType(Identification identification, PackageSurfaceAreaDocument.PackageSurfaceArea spd) {
-        super(identification);
+    public OpeningPackageType(PackageIdentification identification, PackageSurfaceAreaDocument.PackageSurfaceArea spd) {
+        this.id = identification;
         this.xmlSpd = spd;
     }
     
-    public OpeningPackageType(Identification identification, PackageSurfaceAreaDocument.PackageSurfaceArea spd, TreePath treePath) {
-        super(identification, treePath);
+    public OpeningPackageType(PackageIdentification identification, PackageSurfaceAreaDocument.PackageSurfaceArea spd, TreePath treePath) {
+        super(treePath);
+        
+        this.id = identification;
         this.xmlSpd = spd;
     }
 
@@ -44,5 +49,13 @@ public class OpeningPackageType extends OpeningFileType {
 
     public void setXmlSpd(PackageSurfaceAreaDocument.PackageSurfaceArea xmlSpd) {
         this.xmlSpd = xmlSpd;
+    }
+
+    public PackageIdentification getId() {
+        return id;
+    }
+
+    public void setId(PackageIdentification id) {
+        this.id = id;
     }
 }

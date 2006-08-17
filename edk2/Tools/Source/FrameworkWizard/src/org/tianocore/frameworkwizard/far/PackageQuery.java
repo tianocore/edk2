@@ -26,6 +26,7 @@ import org.tianocore.PackageDependenciesDocument;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.frameworkwizard.common.OpenFile;
+import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -35,8 +36,7 @@ public class PackageQuery implements PackageQueryInterface {
         PackageIdentification packageId = null;
         try {
             String path = spdFile.getPath();
-            WorkspaceTools wt = new WorkspaceTools();
-            packageId = new PackageIdentification(wt.getId(path, OpenFile.openSpdFile(path)));
+            packageId = Tools.getId(path, OpenFile.openSpdFile(path));
         } catch (Exception e) {
             e.printStackTrace();
         }

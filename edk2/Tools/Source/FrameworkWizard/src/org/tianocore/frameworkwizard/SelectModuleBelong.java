@@ -28,9 +28,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.MsaHeaderDocument;
 import org.tianocore.SpdHeaderDocument;
+import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
 import org.tianocore.PlatformHeaderDocument.PlatformHeader;
 import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
@@ -109,6 +109,12 @@ public class SelectModuleBelong extends IDialog {
     private PackageIdentification pid = null;
 
     private PlatformIdentification fid = null;
+    
+    private ModuleSurfaceArea msa = null;
+    
+    private PackageSurfaceArea spd = null;
+    
+    private PlatformSurfaceArea fpd = null;
 
     private int mode = -1;
 
@@ -572,7 +578,7 @@ public class SelectModuleBelong extends IDialog {
      
      **/
     private void saveModule() {
-        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = null;
+        msa = null;
         String path = Tools.convertPathToCurrentOsType(this.jTextFieldFilePath.getText());
 
         //
@@ -581,7 +587,7 @@ public class SelectModuleBelong extends IDialog {
         try {
             MsaHeaderDocument.MsaHeader msaHeader = null;
 
-            msa = ModuleSurfaceAreaDocument.ModuleSurfaceArea.Factory.newInstance();
+            msa = ModuleSurfaceArea.Factory.newInstance();
             msaHeader = MsaHeaderDocument.MsaHeader.Factory.newInstance();
 
             msaHeader.setModuleName(this.jTextFieldName.getText());
@@ -618,7 +624,7 @@ public class SelectModuleBelong extends IDialog {
      
      **/
     private void savePackage() {
-        PackageSurfaceArea spd = null;
+        spd = null;
         String path = Tools.convertPathToCurrentOsType(this.jTextFieldFilePath.getText());
 
         //
@@ -664,7 +670,7 @@ public class SelectModuleBelong extends IDialog {
      
      **/
     private void savePlatform() {
-        PlatformSurfaceArea fpd = null;
+        fpd = null;
         String path = Tools.convertPathToCurrentOsType(this.jTextFieldFilePath.getText());
 
         //
@@ -709,27 +715,27 @@ public class SelectModuleBelong extends IDialog {
         return mid;
     }
 
-    public void setMid(ModuleIdentification mid) {
-        this.mid = mid;
-    }
-
     public PlatformIdentification getFid() {
         return fid;
-    }
-
-    public void setFid(PlatformIdentification fid) {
-        this.fid = fid;
     }
 
     public PackageIdentification getPid() {
         return pid;
     }
 
-    public void setPid(PackageIdentification pid) {
-        this.pid = pid;
-    }
-
     private void upLocation(Component c, int size) {
         c.setLocation(c.getLocation().x, c.getLocation().y - size);
+    }
+
+    public PlatformSurfaceArea getFpd() {
+        return fpd;
+    }
+
+    public ModuleSurfaceArea getMsa() {
+        return msa;
+    }
+
+    public PackageSurfaceArea getSpd() {
+        return spd;
     }
 }

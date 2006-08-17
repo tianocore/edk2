@@ -19,6 +19,7 @@ import java.util.Vector;
 import javax.swing.tree.TreePath;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
 public class OpeningPlatformList {
     
@@ -36,7 +37,7 @@ public class OpeningPlatformList {
         vOpeningPlatformList = openingPlatformList;
     }
     
-    public void insertToOpeningPlatformList(Identification id, PlatformSurfaceAreaDocument.PlatformSurfaceArea xmlFpd) {
+    public void insertToOpeningPlatformList(PlatformIdentification id, PlatformSurfaceAreaDocument.PlatformSurfaceArea xmlFpd) {
         vOpeningPlatformList.addElement(new OpeningPlatformType(id, xmlFpd));
     }
     
@@ -47,7 +48,7 @@ public class OpeningPlatformList {
         return null;
     }
     
-    public OpeningPlatformType getOpeningPlatformById(Identification id) {
+    public OpeningPlatformType getOpeningPlatformById(PlatformIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPlatformList.elementAt(index);
@@ -55,7 +56,7 @@ public class OpeningPlatformList {
         return null;
     }
     
-    public int findIndexOfListById(Identification id) {
+    public int findIndexOfListById(PlatformIdentification id) {
         for (int index = 0; index < vOpeningPlatformList.size(); index++) {
             if (vOpeningPlatformList.elementAt(index).getId().equals(id)) {
                 return index;
@@ -70,7 +71,7 @@ public class OpeningPlatformList {
         }
     }
     
-    public void removeFromOpeningPlatformListById(Identification id) {
+    public void removeFromOpeningPlatformListById(PlatformIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPlatformList.removeElementAt(findIndexOfListById(id));
@@ -81,7 +82,7 @@ public class OpeningPlatformList {
         vOpeningPlatformList.removeAllElements();
     }
     
-    public PlatformSurfaceAreaDocument.PlatformSurfaceArea getPlatformSurfaceAreaFromId(Identification id) {
+    public PlatformSurfaceAreaDocument.PlatformSurfaceArea getPlatformSurfaceAreaFromId(PlatformIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPlatformList.elementAt(index).getXmlFpd();
@@ -89,7 +90,7 @@ public class OpeningPlatformList {
         return null;
     }
     
-    public boolean existsPlatform(Identification id) {
+    public boolean existsPlatform(PlatformIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return true;
@@ -98,7 +99,7 @@ public class OpeningPlatformList {
     }
     
     
-    public void setPlatformSaved(Identification id, boolean isSaved) {
+    public void setPlatformSaved(PlatformIdentification id, boolean isSaved) {
         setPlatformSaved(findIndexOfListById(id), isSaved);
     }
     
@@ -108,7 +109,7 @@ public class OpeningPlatformList {
         }
     }
     
-    public boolean getPlatformSaved(Identification id) {
+    public boolean getPlatformSaved(PlatformIdentification id) {
         return getPlatformSaved(findIndexOfListById(id));
     }
     
@@ -119,14 +120,35 @@ public class OpeningPlatformList {
         return true;
     }
     
-    public void setTreePathById(Identification id, TreePath treePath) {
+    public void setPlatformOpen(PlatformIdentification id, boolean isOpen) {
+        setPlatformOpen(findIndexOfListById(id), isOpen);
+    }
+    
+    public void setPlatformOpen(int index, boolean isOpen) {
+        if (index > -1) {
+            vOpeningPlatformList.elementAt(index).setOpen(isOpen);
+        }
+    }
+    
+    public boolean getPlatformOpen(PlatformIdentification id) {
+        return getPlatformOpen(findIndexOfListById(id));
+    }
+    
+    public boolean getPlatformOpen(int index) {
+        if (index > -1) {
+            return vOpeningPlatformList.elementAt(index).isOpen();
+        }
+        return true;
+    }
+    
+    public void setTreePathById(PlatformIdentification id, TreePath treePath) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPlatformList.elementAt(index).setTreePath(treePath);
         }
     }
     
-    public TreePath getTreePathById(Identification id) {
+    public TreePath getTreePathById(PlatformIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPlatformList.elementAt(index).getTreePath();
@@ -141,10 +163,25 @@ public class OpeningPlatformList {
         return null;
     }
     
-    public void setNew(Identification id, boolean isNew) {
+    public PlatformIdentification getIdByPath(String path) {
+        PlatformIdentification id = new PlatformIdentification(null, null, null, path);
+        int index = findIndexOfListById(id);
+        if (index > -1) {
+            return vOpeningPlatformList.elementAt(index).getId();
+        }
+        return null;
+    }
+    
+    public void setNew(PlatformIdentification id, boolean isNew) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPlatformList.elementAt(index).setNew(isNew);
+        }
+    }
+    
+    public void closeAll() {
+        for (int index = 0; index < this.size(); index++) {
+           this.setPlatformOpen(index, false);
         }
     }
     
@@ -161,9 +198,11 @@ public class OpeningPlatformList {
         return true;
     }
     
-    public boolean isOpend() {
-        if (this.size() > 0 ) {
-            return true;
+    public boolean isOpen() {
+        for (int index = 0; index < this.size(); index++) {
+            if (this.getPlatformOpen(index)) {
+                return true;
+            }
         }
         return false;
     }

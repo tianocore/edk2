@@ -17,15 +17,15 @@ package org.tianocore.frameworkwizard.common.ui;
 
 import java.util.Vector;
 
-import javax.swing.JPanel;
 import javax.swing.JCheckBox;
+import javax.swing.JPanel;
 
 import org.tianocore.frameworkwizard.common.DataType;
 
 public class ArchCheckBox extends JPanel {
 
     ///
-    ///
+    /// Define class members
     ///
     private static final long serialVersionUID = 4792669775676953990L;
 
@@ -40,7 +40,7 @@ public class ArchCheckBox extends JPanel {
     private JCheckBox jCheckBoxArm = null;
 
     private JCheckBox jCheckBoxPpc = null;
-
+    
     /**
      * This method initializes jCheckBoxIa32	
      * 	
@@ -129,16 +129,6 @@ public class ArchCheckBox extends JPanel {
             jCheckBoxPpc.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
         }
         return jCheckBoxPpc;
-    }
-
-    /**
-     
-     @param args
-     
-     **/
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
     }
 
     /**

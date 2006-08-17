@@ -723,7 +723,7 @@ public class Clone extends IDialog {
             //
             trg = getModulePath();
             newId.setPath(trg);
-            vFiles = wt.getAllModuleFilesPath(src);
+            vFiles = wt.getAllFilesPathOfModule(src);
 
             //
             // First copy all files to new directory
@@ -787,7 +787,7 @@ public class Clone extends IDialog {
             //
             trg = this.getPackagePath();
             newId.setPath(trg);
-            vFiles = wt.getAllPakcageFilesPath(src);
+            vFiles = wt.getAllFilesPathOfPakcage(src);
 
             //
             // First copy all files to new directory

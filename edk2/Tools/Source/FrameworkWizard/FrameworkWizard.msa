@@ -50,6 +50,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>src/org/tianocore/frameworkwizard/common/DataValidation.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/EnumerationData.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/FileOperation.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/GlobalData.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/IDefaultTableModel.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/IFileFilter.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Log.java</Filename>

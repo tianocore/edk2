@@ -17,6 +17,7 @@ package org.tianocore.frameworkwizard.common.Identifications;
 import javax.swing.tree.TreePath;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
 public class OpeningPlatformType extends OpeningFileType {
     //
@@ -24,17 +25,20 @@ public class OpeningPlatformType extends OpeningFileType {
     //
     private PlatformSurfaceAreaDocument.PlatformSurfaceArea xmlFpd = null;
     
+    private PlatformIdentification id = null;
+    
     public OpeningPlatformType() {
         
     }
     
-    public OpeningPlatformType(Identification identification, PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
-        super(identification);
+    public OpeningPlatformType(PlatformIdentification identification, PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
+        this.id = identification;
         this.xmlFpd = fpd;
     }
     
-    public OpeningPlatformType(Identification identification, PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd, TreePath treePath) {
-        super(identification, treePath);
+    public OpeningPlatformType(PlatformIdentification identification, PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd, TreePath treePath) {
+        super(treePath);
+        this.id = identification;
         this.xmlFpd = fpd;
     }
 
@@ -44,5 +48,13 @@ public class OpeningPlatformType extends OpeningFileType {
 
     public void setXmlFpd(PlatformSurfaceAreaDocument.PlatformSurfaceArea xmlFpd) {
         this.xmlFpd = xmlFpd;
+    }
+
+    public PlatformIdentification getId() {
+        return id;
+    }
+
+    public void setId(PlatformIdentification id) {
+        this.id = id;
     }
 }
