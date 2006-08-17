@@ -17,7 +17,7 @@ import java.io.*;
 
 public class Critic implements Common.ForDoAll {
 	private static Pattern ptnheadcomment = Pattern.compile("^\\/\\*\\+\\+(.*?)\\-\\-\\*\\/",Pattern.DOTALL);
-	private static Pattern ptnfunccomment = Pattern.compile("([\\w\\d]*\\s*[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)(\\/\\*\\+\\+.*?)(\\-\\-\\*\\/\\s*)(.*?)([\\{;])",Pattern.DOTALL);
+	private static Pattern ptnfunccomment = Pattern.compile("([\\w\\d]*\\s*[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)\\/\\*\\+\\+(.*?)\\-\\-\\*\\/(\\s*.*?)([\\{;])",Pattern.DOTALL);
 	private static Pattern ptncommentstructure = Pattern.compile("\\/\\*\\+\\+\\s*Routine Description:\\s*(.*?)\\s*Arguments:\\s*(.*?)\\s*Returns:\\s*(.*?)\\s*\\-\\-\\*\\/",Pattern.DOTALL);
 	private static Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*-\\s*(.*)\\s*");
 	private static Matcher mtrinfequation;
@@ -28,6 +28,7 @@ public class Critic implements Common.ForDoAll {
 			BufferedReader rd = null;
 			String line = null;
 			StringBuffer templine = new StringBuffer();
+			boolean incomment = false;
 			boolean description = false;
 			boolean arguments = false;
 			boolean returns = false;
@@ -36,52 +37,51 @@ public class Critic implements Common.ForDoAll {
 			String wholeline = Common.file2string(filepath);
 			
 			wholeline = Common.replaceAll(wholeline, ptnheadcomment, "/** @file$1**/");
-			//wholeline = Common.replaceAll(wholeline, ptnfunccomment, "$2$3$4$1$5");
+			wholeline = Common.replaceAll(wholeline, ptnfunccomment, "/**$2**/$3$1$4");
 			//wholeline = Common.replaceAll(wholeline, ptncommentstructure, "/**\n#%\n$1\n%#\n#%%\n$2\n%%#\n#%%%\n$3\n%%%#\n**/");
-			/*
+			
 			rd = new BufferedReader(new StringReader(wholeline));
 			while ((line = rd.readLine()) != null) {
-				if (line.contains("\\-\\-\\*\\/")) {
-					description = false;
-					arguments = false;
-					returns = false;
+				if (line.matches("\\/\\*\\*")) {
+					incomment = true;
 					templine.append(line + "\n");
-				} else if (line.contains("Routine Description:")) {
+				} else if (line.matches("\\*\\*\\/")) {
+					incomment = false;
+					templine.append(line + "\n");
+				} else if (incomment && line.contains("Routine Description:")) {
 					description = true;
 					arguments = false;
 					returns = false;
-				} else if (line.contains("Arguments:")) {
+				} else if (incomment && line.contains("Arguments:")) {
 					description = false;
 					arguments = true;
 					returns = false;
-				} else if (line.contains("Returns:")) {
+				} else if (incomment && line.contains("Returns:")) {
 					description = false;
 					arguments = false;
 					returns = true;
-				} else if (description) {
+				} else if (incomment && description) {
 					templine.append(line + "\n");
-					//System.out.println("Description:" + line);
-				} else if (arguments) {
+				} else if (incomment && arguments) {
 					mtrinfequation = ptninfequation.matcher(line);
 					if (mtrinfequation.find()) {
 						templine.append("  @param   " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
 					} else {
 						templine.append(line + "\n");
 					}
-					//System.out.println("Arguments:" + line);
-				} else if (returns) {
+				} else if (incomment && returns) {
 					mtrinfequation = ptninfequation.matcher(line);
 					if (mtrinfequation.find()) {
 						templine.append("  @retval   " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
 					} else {
 						templine.append(line + "\n");
 					}
-					//System.out.println("Returns:" + line);
 				} else {
 					templine.append(line + "\n");
 				}
 			}
-			wholeline = templine.toString();*/
+			wholeline = templine.toString();
+			
 			/* -----slow edition of replacefirst with stringbuffer-----
 			line.append(wholeline);
 			mtrfunccomment = ptnfunccomment.matcher(line);
@@ -89,13 +89,13 @@ public class Critic implements Common.ForDoAll {
 				line.replace(0, line.length()-1, mtrfunccomment.replaceFirst("$2$4$3$1$5"));
 			}
 			*/
-			// -----slow edition of replacefirst with string-----
+			/* -----slow edition of replacefirst with string-----
 			while ((mtrfunccomment = ptnfunccomment.matcher(wholeline)).find()) {
 				//funccomment = mtrfunccomment.group(2);
 				//mtrcommentstructure = ptncommentstructure.matcher(funccomment);
 				wholeline = mtrfunccomment.replaceFirst("$2$4$3$1$5");
 			}
-			
+			*/
 			/*
 			// edit func comment
 			mtrtempcomment = ptntempcomment.matcher(wholeline);
