@@ -158,8 +158,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtVirtualDisk</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the file attribute which will be simulated as 
-        a harddisk in simulator.
+      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or 
+        removable media device
         The item type if this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry PcdItemType="DYNAMIC">

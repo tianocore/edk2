@@ -232,7 +232,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
-      <DefaultValue>L"FW;40960;512"</DefaultValue>
+      <DefaultValue>L"E:RW;245760;512"</DefaultValue>
       <HelpText>This PCD defines physical disk which will be simualted as a 
         harddisk in simulator.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
@@ -244,8 +244,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
-      <HelpText>This PCD defines the file attribute which will be simulated as 
-        a harddisk in simulator.
+      <HelpText>This PCD defines the devices which use a file to emulate a hard disk or 
+        removable media device
         The item type if this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -274,7 +274,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>L".!C:\\D\\work\\Remodel\\mdk\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
+      <DefaultValue>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
       <HelpText>This PCD defines the windows directory who will be mounted as 
         harddisk in simulator.
         The item type of this PCD can only be "DYNAMIC".</HelpText>

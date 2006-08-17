@@ -6250,7 +6250,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>VOID*</DatumType>
           <MaxDatumSize>24</MaxDatumSize>
-          <Value>L"FW;40960;512"</Value>
+          <Value>L"E:RW;245760;512"</Value>
         </PcdData>
         <PcdData ItemType="DYNAMIC">
           <C_Name>PcdWinNtVirtualDisk</C_Name>
@@ -6290,7 +6290,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>VOID*</DatumType>
           <MaxDatumSize>120</MaxDatumSize>
-          <Value>L".!C:\\D\\work\\Remodel\\mdk\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
+          <Value>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
         </PcdData>
         <PcdData ItemType="DYNAMIC">
           <C_Name>PcdWinNtConsole</C_Name>
@@ -7006,7 +7006,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <MaxDatumSize>24</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
-        <Value>L"FW;40960;512"</Value>
+        <Value>L"E:RW;245760;512"</Value>
       </SkuInfo>
     </PcdBuildData>
     <PcdBuildData ItemType="DYNAMIC">
@@ -7028,7 +7028,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <MaxDatumSize>120</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
-        <Value>L".!C:\\D\\work\\Remodel\\mdk\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
+        <Value>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</Value>
       </SkuInfo>
     </PcdBuildData>
     <PcdBuildData ItemType="DYNAMIC">
