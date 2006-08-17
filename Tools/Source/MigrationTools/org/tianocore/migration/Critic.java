@@ -18,10 +18,9 @@ import java.io.*;
 public class Critic implements Common.ForDoAll {
 	private static Pattern ptnheadcomment = Pattern.compile("^\\/\\*\\+\\+(.*?)\\-\\-\\*\\/",Pattern.DOTALL);
 	private static Pattern ptnfunccomment = Pattern.compile("([\\w\\d]*\\s*[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)\\/\\*\\+\\+(.*?)\\-\\-\\*\\/(\\s*.*?)([\\{;])",Pattern.DOTALL);
-	private static Pattern ptncommentstructure = Pattern.compile("\\/\\*\\+\\+\\s*Routine Description:\\s*(.*?)\\s*Arguments:\\s*(.*?)\\s*Returns:\\s*(.*?)\\s*\\-\\-\\*\\/",Pattern.DOTALL);
+	//private static Pattern ptncommentstructure = Pattern.compile("\\/\\*\\+\\+\\s*Routine Description:\\s*(.*?)\\s*Arguments:\\s*(.*?)\\s*Returns:\\s*(.*?)\\s*\\-\\-\\*\\/",Pattern.DOTALL);
 	private static Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*-\\s*(.*)\\s*");
 	private static Matcher mtrinfequation;
-	private static Matcher mtrfunccomment;
 	
 	public void toDo(String filepath) throws Exception {
 		if (filepath.contains(".c") || filepath.contains(".h")) {
@@ -32,6 +31,7 @@ public class Critic implements Common.ForDoAll {
 			boolean description = false;
 			boolean arguments = false;
 			boolean returns = false;
+			boolean inequation = false;
 			
 			System.out.println("Criticing   " + filepath);
 			String wholeline = Common.file2string(filepath);
@@ -65,14 +65,26 @@ public class Critic implements Common.ForDoAll {
 				} else if (incomment && arguments) {
 					mtrinfequation = ptninfequation.matcher(line);
 					if (mtrinfequation.find()) {
+						inequation = true;
 						templine.append("  @param   " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
+					} else if (inequation && line.trim().length() == 0) {
+						inequation = false;
+						templine.append(line + "\n");
+					} else if (inequation && line.trim().length() != 0) {
+						templine.append("#%#%" + line + "\n");
 					} else {
 						templine.append(line + "\n");
 					}
 				} else if (incomment && returns) {
 					mtrinfequation = ptninfequation.matcher(line);
 					if (mtrinfequation.find()) {
+						inequation = true;
 						templine.append("  @retval   " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
+					} else if (inequation && line.trim().length() == 0) {
+						inequation = false;
+						templine.append(line + "\n");
+					} else if (inequation && line.trim().length() != 0) {
+						templine.append("#%#%" + line + "\n");
 					} else {
 						templine.append(line + "\n");
 					}
@@ -81,6 +93,7 @@ public class Critic implements Common.ForDoAll {
 				}
 			}
 			wholeline = templine.toString();
+			wholeline = wholeline.replaceAll("\n#%#%\\s*", " ");
 			
 			/* -----slow edition of replacefirst with stringbuffer-----
 			line.append(wholeline);
