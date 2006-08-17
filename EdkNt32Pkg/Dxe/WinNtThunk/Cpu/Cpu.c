@@ -24,12 +24,6 @@ Abstract:
 
 #include "CpuDriver.h"
 
-//
-// This is the VFR compiler generated header file which defines the
-// string identifiers.
-//
-#include STRING_DEFINES_FILE
-
 #define EFI_CPU_DATA_MAXIMUM_LENGTH 0x100
 
 EFI_STATUS
