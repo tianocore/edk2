@@ -22,17 +22,13 @@ import java.util.Vector;
 import org.apache.xmlbeans.XmlCursor;
 import org.apache.xmlbeans.XmlException;
 import org.tianocore.DbPathAndFilename;
-import org.tianocore.FrameworkDatabaseDocument.FrameworkDatabase;
 import org.tianocore.IndustryStdIncludesDocument.IndustryStdIncludes;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaFilesDocument.MsaFiles;
-import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
-import org.tianocore.PlatformHeaderDocument.PlatformHeader;
-import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.SourceFilesDocument.SourceFiles;
-import org.tianocore.SpdHeaderDocument.SpdHeader;
 import org.tianocore.frameworkwizard.common.DataType;
+import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.OpenFile;
 import org.tianocore.frameworkwizard.common.SaveFile;
@@ -48,75 +44,44 @@ import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
 public class WorkspaceTools {
-    //
-    // Define class members
-    //
-    private FrameworkDatabase fdb = null;
-
-    private Vector<ModuleIdentification> vModuleList = new Vector<ModuleIdentification>();
-
-    private Vector<PackageIdentification> vPackageList = new Vector<PackageIdentification>();
-
-    private Vector<PlatformIdentification> vPlatformList = new Vector<PlatformIdentification>();
-
-    /**
-     
-     Open Framework Database file
-     
-     */
-    private FrameworkDatabase openFrameworkDb() {
-        String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
-        strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
-        try {
-            fdb = OpenFile.openFrameworkDb(strFrameworkDbFilePath);
-        } catch (XmlException e) {
-            Log.err("Open Framework Database " + strFrameworkDbFilePath, e.getMessage());
-            return null;
-        } catch (Exception e) {
-            Log.err("Open Framework Database " + strFrameworkDbFilePath, "Invalid file type");
-            return null;
-        }
-        return fdb;
-    }
 
     public void addFarToDb(List<String> packageList, List<String> platformList, FarHeader far) {
-        FrameworkDatabase fdb = openFrameworkDb();
+        //FrameworkDatabase fdb = openFrameworkDb();
 
         for (int i = 0; i < packageList.size(); i++) {
             DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
             item.setFarGuid(far.getGuidValue());
             item.setStringValue(packageList.get(i));
-            fdb.getPackageList().getFilenameList().add(item);
+            GlobalData.fdb.getPackageList().getFilenameList().add(item);
         }
 
         for (int i = 0; i < platformList.size(); i++) {
             DbPathAndFilename item = DbPathAndFilename.Factory.newInstance();
             item.setFarGuid(far.getGuidValue());
             item.setStringValue(platformList.get(i));
-            fdb.getPlatformList().getFilenameList().add(item);
+            GlobalData.fdb.getPlatformList().getFilenameList().add(item);
         }
 
         DbPathAndFilename farItem = DbPathAndFilename.Factory.newInstance();
         farItem.setFarGuid(far.getGuidValue());
         farItem.setStringValue(far.getFarName());
-        fdb.getFarList().getFilenameList().add(farItem);
+        GlobalData.fdb.getFarList().getFilenameList().add(farItem);
 
         String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
         strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
 
         try {
-            SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+            SaveFile.saveDbFile(strFrameworkDbFilePath, GlobalData.fdb);
         } catch (Exception e) {
             Log.err("Save Database File", e.getMessage());
         }
     }
 
     public void removeFarFromDb(FarIdentification far) {
-        FrameworkDatabase fdb = openFrameworkDb();
         //
         // Remove Packages
         //
-        XmlCursor cursor = fdb.getPackageList().newCursor();
+        XmlCursor cursor = GlobalData.fdb.getPackageList().newCursor();
         cursor.toFirstChild();
         do {
             DbPathAndFilename item = (DbPathAndFilename) cursor.getObject();
@@ -130,7 +95,7 @@ public class WorkspaceTools {
         //
         // Remove Platforms
         //
-        cursor = fdb.getPlatformList().newCursor();
+        cursor = GlobalData.fdb.getPlatformList().newCursor();
         cursor.toFirstChild();
         do {
             DbPathAndFilename item = (DbPathAndFilename) cursor.getObject();
@@ -142,7 +107,7 @@ public class WorkspaceTools {
         //
         // Remove Far
         //
-        cursor = fdb.getFarList().newCursor();
+        cursor = GlobalData.fdb.getFarList().newCursor();
         cursor.toFirstChild();
         do {
             DbPathAndFilename item = (DbPathAndFilename) cursor.getObject();
@@ -155,21 +120,19 @@ public class WorkspaceTools {
         String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
         strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
         try {
-            SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+            SaveFile.saveDbFile(strFrameworkDbFilePath, GlobalData.fdb);
         } catch (Exception e) {
             Log.err("Save Database File", e.getMessage());
         }
     }
 
     public String getPackageFarGuid(Identification packageId) {
-        openFrameworkDb();
-
-        for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
-            DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
+        for (int index = 0; index < GlobalData.fdb.getPackageList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = GlobalData.fdb.getPackageList().getFilenameArray(index);
             String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
             File tempFile = new File(path);
             if (tempFile.getPath().equalsIgnoreCase(packageId.getPath())) {
-                return fdb.getPackageList().getFilenameArray(index).getFarGuid();
+                return GlobalData.fdb.getPackageList().getFilenameArray(index).getFarGuid();
             }
         }
 
@@ -177,14 +140,12 @@ public class WorkspaceTools {
     }
 
     public String getPlatformFarGuid(Identification platformId) {
-        openFrameworkDb();
-
-        for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
-            DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
+        for (int index = 0; index < GlobalData.fdb.getPlatformList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = GlobalData.fdb.getPlatformList().getFilenameArray(index);
             String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
             File tempFile = new File(path);
             if (tempFile.getPath().equalsIgnoreCase(platformId.getPath())) {
-                return fdb.getPlatformList().getFilenameArray(index).getFarGuid();
+                return GlobalData.fdb.getPlatformList().getFilenameArray(index).getFarGuid();
             }
         }
 
@@ -208,23 +169,17 @@ public class WorkspaceTools {
      **/
     public Vector<String> getAllModulesOfPackage(String path) {
         Vector<String> modulePath = new Vector<String>();
-        try {
-            MsaFiles files = OpenFile.openSpdFile(path).getMsaFiles();
-            if (files != null) {
-                for (int index = 0; index < files.getFilenameList().size(); index++) {
-                    String msaPath = files.getFilenameList().get(index);
-                    msaPath = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + msaPath;
-                    msaPath = Tools.convertPathToCurrentOsType(msaPath);
-                    modulePath.addElement(msaPath);
-                }
+        PackageIdentification id = new PackageIdentification(null, null, null, path);
+        MsaFiles files = GlobalData.openingPackageList.getPackageSurfaceAreaFromId(id).getMsaFiles();
+        if (files != null) {
+            for (int index = 0; index < files.getFilenameList().size(); index++) {
+                String msaPath = files.getFilenameList().get(index);
+                msaPath = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + msaPath;
+                msaPath = Tools.convertPathToCurrentOsType(msaPath);
+                modulePath.addElement(msaPath);
             }
-        } catch (IOException e) {
-            Log.err("Get all mdoules of a package " + path, e.getMessage());
-        } catch (XmlException e) {
-            Log.err("Get all mdoules of a package " + path, e.getMessage());
-        } catch (Exception e) {
-            Log.err("Get all mdoules of a package " + path, e.getMessage());
         }
+
         return modulePath;
     }
 
@@ -236,22 +191,16 @@ public class WorkspaceTools {
      **/
     public Vector<String> getAllIndustryStdIncludesOfPackage(String path) {
         Vector<String> includePath = new Vector<String>();
-        try {
-            IndustryStdIncludes files = OpenFile.openSpdFile(path).getIndustryStdIncludes();
-            if (files != null) {
-                for (int index = 0; index < files.getIndustryStdHeaderList().size(); index++) {
-                    String temp = files.getIndustryStdHeaderList().get(index).getIncludeHeader();
-                    temp = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + temp;
-                    temp = Tools.convertPathToCurrentOsType(temp);
-                    includePath.addElement(temp);
-                }
+        PackageIdentification id = new PackageIdentification(null, null, null, path);
+        IndustryStdIncludes files = GlobalData.openingPackageList.getPackageSurfaceAreaFromId(id)
+                                                                 .getIndustryStdIncludes();
+        if (files != null) {
+            for (int index = 0; index < files.getIndustryStdHeaderList().size(); index++) {
+                String temp = files.getIndustryStdHeaderList().get(index).getIncludeHeader();
+                temp = Tools.addFileSeparator(Tools.getFilePathOnly(path)) + temp;
+                temp = Tools.convertPathToCurrentOsType(temp);
+                includePath.addElement(temp);
             }
-        } catch (IOException e) {
-            Log.err("Get all Industry Std Includes of a package " + path, e.getMessage());
-        } catch (XmlException e) {
-            Log.err("Get all Industry Std Includes of a package " + path, e.getMessage());
-        } catch (Exception e) {
-            Log.err("Get all Industry Std Includes of a package " + path, e.getMessage());
         }
         return includePath;
     }
@@ -263,35 +212,14 @@ public class WorkspaceTools {
      
      */
     public Vector<PackageIdentification> getAllPackages() {
-        Identification id = null;
-        vPackageList.removeAllElements();
-
-        openFrameworkDb();
-
-        for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
-            String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
-                          + fdb.getPackageList().getFilenameArray(index).getStringValue();
-            path = Tools.convertPathToCurrentOsType(path);
-            try {
-                id = getId(path, OpenFile.openSpdFile(path));
-                vPackageList.addElement(new PackageIdentification(id));
-            } catch (IOException e) {
-                Log.err("Open Package Surface Area " + path, e.getMessage());
-            } catch (XmlException e) {
-                Log.err("Open Package Surface Area " + path, e.getMessage());
-            } catch (Exception e) {
-                Log.err("Open Package Surface Area " + path, "Invalid file type");
-            }
-        }
-        Sort.sortPackages(vPackageList, DataType.SORT_TYPE_ASCENDING);
-        return vPackageList;
+        return GlobalData.vPackageList;
     }
 
     public Vector<FarIdentification> getAllFars() {
-        openFrameworkDb();
+
         Vector<FarIdentification> v = new Vector<FarIdentification>();
-        for (int index = 0; index < fdb.getFarList().getFilenameList().size(); index++) {
-            DbPathAndFilename item = fdb.getFarList().getFilenameList().get(index);
+        for (int index = 0; index < GlobalData.fdb.getFarList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = GlobalData.fdb.getFarList().getFilenameList().get(index);
             FarIdentification far = new FarIdentification(item.getFarGuid(), item.getMd5Sum(), item.getStringValue());
             v.addElement(far);
         }
@@ -300,18 +228,18 @@ public class WorkspaceTools {
 
     public Vector<PackageIdentification> getPackagesByFar(FarIdentification far) {
         Identification id = null;
-        openFrameworkDb();
+
         Vector<PackageIdentification> v = new Vector<PackageIdentification>();
 
-        for (int index = 0; index < fdb.getPackageList().getFilenameList().size(); index++) {
-            DbPathAndFilename item = fdb.getPackageList().getFilenameArray(index);
+        for (int index = 0; index < GlobalData.fdb.getPackageList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = GlobalData.fdb.getPackageList().getFilenameArray(index);
             String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
             path = Tools.convertPathToCurrentOsType(path);
 
             if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
 
                 try {
-                    id = getId(path, OpenFile.openSpdFile(path));
+                    id = Tools.getId(path, OpenFile.openSpdFile(path));
                     v.addElement(new PackageIdentification(id));
                 } catch (IOException e) {
                     Log.err("Open Package Surface Area " + path, e.getMessage());
@@ -327,17 +255,17 @@ public class WorkspaceTools {
 
     public Vector<PlatformIdentification> getPlatformsByFar(FarIdentification far) {
         Identification id = null;
-        openFrameworkDb();
+
         Vector<PlatformIdentification> v = new Vector<PlatformIdentification>();
 
-        for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
-            DbPathAndFilename item = fdb.getPlatformList().getFilenameArray(index);
+        for (int index = 0; index < GlobalData.fdb.getPlatformList().getFilenameList().size(); index++) {
+            DbPathAndFilename item = GlobalData.fdb.getPlatformList().getFilenameArray(index);
             String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR + item.getStringValue();
             path = Tools.convertPathToCurrentOsType(path);
 
             if (item.getFarGuid() != null && item.getFarGuid().equalsIgnoreCase(far.getGuid())) {
                 try {
-                    id = getId(path, OpenFile.openFpdFile(path));
+                    id = Tools.getId(path, OpenFile.openFpdFile(path));
                     v.addElement(new PlatformIdentification(id));
                 } catch (IOException e) {
                     Log.err("Open Platform Surface Area " + path, e.getMessage());
@@ -361,25 +289,16 @@ public class WorkspaceTools {
     public Vector<ModuleIdentification> getAllModules(PackageIdentification pid) {
         Vector<ModuleIdentification> v = new Vector<ModuleIdentification>();
         Vector<String> modulePaths = this.getAllModulesOfPackage(pid.getPath());
-        Identification id = null;
         String modulePath = null;
 
         for (int index = 0; index < modulePaths.size(); index++) {
-            try {
-                modulePath = modulePaths.get(index);
-                id = getId(modulePath, OpenFile.openMsaFile(modulePath));
-            } catch (IOException e) {
-                Log.err("Open Module Surface Area " + modulePath, e.getMessage());
-            } catch (XmlException e) {
-                Log.err("Open Module Surface Area " + modulePath, e.getMessage());
-            } catch (Exception e) {
-                Log.err("Open Module Surface Area " + modulePath, "Invalid file type " + e.getMessage());
-            }
-            v.addElement(new ModuleIdentification(id, pid));
+            modulePath = modulePaths.get(index);
+            ModuleIdentification id = GlobalData.openingModuleList.getIdByPath(modulePath);
+
+            v.addElement(id);
         }
         Sort.sortModules(v, DataType.SORT_TYPE_ASCENDING);
         return v;
-
     }
 
     /**
@@ -389,39 +308,7 @@ public class WorkspaceTools {
      
      */
     public Vector<ModuleIdentification> getAllModules() {
-        vModuleList.removeAllElements();
-        //
-        // First get all packages
-        //
-        getAllPackages();
-        Vector<String> modulePaths = new Vector<String>();
-        Identification id = null;
-        String packagePath = null;
-        String modulePath = null;
-
-        //
-        // For each package, get all modules list
-        //
-        for (int indexI = 0; indexI < vPackageList.size(); indexI++) {
-            packagePath = vPackageList.elementAt(indexI).getPath();
-            modulePaths = this.getAllModulesOfPackage(packagePath);
-
-            for (int indexJ = 0; indexJ < modulePaths.size(); indexJ++) {
-                try {
-                    modulePath = modulePaths.get(indexJ);
-                    id = getId(modulePath, OpenFile.openMsaFile(modulePath));
-                    vModuleList.addElement(new ModuleIdentification(id, vPackageList.elementAt(indexI)));
-                } catch (IOException e) {
-                    Log.err("Open Module Surface Area " + modulePath, e.getMessage());
-                } catch (XmlException e) {
-                    Log.err("Open Module Surface Area " + modulePath, e.getMessage());
-                } catch (Exception e) {
-                    Log.err("Open Module Surface Area " + modulePath, "Invalid file type");
-                }
-            }
-        }
-        Sort.sortModules(vModuleList, DataType.SORT_TYPE_ASCENDING);
-        return vModuleList;
+        return GlobalData.vModuleList;
     }
 
     /**
@@ -431,28 +318,7 @@ public class WorkspaceTools {
      
      */
     public Vector<PlatformIdentification> getAllPlatforms() {
-        Identification id = null;
-        vPlatformList.removeAllElements();
-
-        openFrameworkDb();
-
-        for (int index = 0; index < fdb.getPlatformList().getFilenameList().size(); index++) {
-            String path = Workspace.getCurrentWorkspace() + DataType.FILE_SEPARATOR
-                          + fdb.getPlatformList().getFilenameArray(index).getStringValue();
-            path = Tools.convertPathToCurrentOsType(path);
-            try {
-                id = getId(path, OpenFile.openFpdFile(path));
-                vPlatformList.addElement(new PlatformIdentification(id));
-            } catch (IOException e) {
-                Log.err("Open Platform Surface Area " + path, e.getMessage());
-            } catch (XmlException e) {
-                Log.err("Open Platform Surface Area " + path, e.getMessage());
-            } catch (Exception e) {
-                Log.err("Open Platform Surface Area " + path, "Invalid file type");
-            }
-        }
-        Sort.sortPlatforms(vPlatformList, DataType.SORT_TYPE_ASCENDING);
-        return vPlatformList;
+        return GlobalData.vPlatformList;
     }
 
     /**
@@ -552,53 +418,28 @@ public class WorkspaceTools {
     }
 
     public Vector<String> getAllLibraryClassDefinitionsFromWorkspace() {
-        //
-        // First get all packages
-        //
-        this.getAllPackages();
-
         Vector<String> vector = new Vector<String>();
-        for (int index = 0; index < this.vPackageList.size(); index++) {
-            try {
-                Vector<String> v = getAllLibraryClassDefinitionsFromPackage(OpenFile
-                                                                                    .openSpdFile(vPackageList
-                                                                                                             .get(index)
-                                                                                                             .getPath()));
-                if (v != null && v.size() > 0) {
-                    vector.addAll(v);
-                }
-            } catch (IOException e) {
-                Log.err("getAllLibraryClassDefinitionsFromWorkspace ", e.getMessage());
-            } catch (XmlException e) {
-                Log.err("getAllLibraryClassDefinitionsFromWorkspace ", e.getMessage());
-            } catch (Exception e) {
-                Log.err("getAllLibraryClassDefinitionsFromWorkspace ", e.getMessage());
+        for (int index = 0; index < GlobalData.vPackageList.size(); index++) {
+            Vector<String> v = getAllLibraryClassDefinitionsFromPackage(GlobalData.openingPackageList
+                                                                                                     .getPackageSurfaceAreaFromId(GlobalData.vPackageList
+                                                                                                                                                         .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
             }
+
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
     public Vector<String> getAllProtocolDeclarationsFromWorkspace() {
-        //
-        // First get all packages
-        //
-        this.getAllPackages();
-
         Vector<String> vector = new Vector<String>();
-        for (int index = 0; index < this.vPackageList.size(); index++) {
-            try {
-                Vector<String> v = getAllProtocolDeclarationsFromPackage(OpenFile.openSpdFile(vPackageList.get(index)
-                                                                                                          .getPath()));
-                if (v != null && v.size() > 0) {
-                    vector.addAll(v);
-                }
-            } catch (IOException e) {
-                Log.err("getAllProtocolDeclarationsFromPackage", e.getMessage());
-            } catch (XmlException e) {
-                Log.err("getAllProtocolDeclarationsFromPackage", e.getMessage());
-            } catch (Exception e) {
-                Log.err("getAllProtocolDeclarationsFromPackage", e.getMessage());
+        for (int index = 0; index < GlobalData.vPackageList.size(); index++) {
+            Vector<String> v = getAllProtocolDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                                  .getPackageSurfaceAreaFromId(GlobalData.vPackageList
+                                                                                                                                                      .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
             }
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
@@ -606,25 +447,13 @@ public class WorkspaceTools {
     }
 
     public Vector<String> getAllPpiDeclarationsFromWorkspace() {
-        //
-        // First get all packages
-        //
-        this.getAllPackages();
-
         Vector<String> vector = new Vector<String>();
-        for (int index = 0; index < this.vPackageList.size(); index++) {
-            try {
-                Vector<String> v = getAllPpiDeclarationsFromPackage(OpenFile.openSpdFile(vPackageList.get(index)
-                                                                                                     .getPath()));
-                if (v != null && v.size() > 0) {
-                    vector.addAll(v);
-                }
-            } catch (IOException e) {
-                Log.err("getAllPpiDeclarationsFromWorkspace", e.getMessage());
-            } catch (XmlException e) {
-                Log.err("getAllPpiDeclarationsFromWorkspace", e.getMessage());
-            } catch (Exception e) {
-                Log.err("getAllPpiDeclarationsFromWorkspace", e.getMessage());
+        for (int index = 0; index < GlobalData.vPackageList.size(); index++) {
+            Vector<String> v = getAllPpiDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                             .getPackageSurfaceAreaFromId(GlobalData.vPackageList
+                                                                                                                                                 .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
             }
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
@@ -632,51 +461,30 @@ public class WorkspaceTools {
     }
 
     public Vector<String> getAllGuidDeclarationsFromWorkspace() {
-        //
-        // First get all packages
-        //
-        this.getAllPackages();
-
         Vector<String> vector = new Vector<String>();
-        for (int index = 0; index < this.vPackageList.size(); index++) {
-            try {
-                Vector<String> v = getAllGuidDeclarationsFromPackage(OpenFile.openSpdFile(vPackageList.get(index)
-                                                                                                      .getPath()));
-                if (v != null && v.size() > 0) {
-                    vector.addAll(v);
-                }
-            } catch (IOException e) {
-                Log.err("getAllGuidDeclarationsFromWorkspace", e.getMessage());
-            } catch (XmlException e) {
-                Log.err("getAllGuidDeclarationsFromWorkspace", e.getMessage());
-            } catch (Exception e) {
-                Log.err("getAllGuidDeclarationsFromWorkspace", e.getMessage());
+        for (int index = 0; index < GlobalData.vPackageList.size(); index++) {
+            Vector<String> v = getAllGuidDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                              .getPackageSurfaceAreaFromId(GlobalData.vPackageList
+                                                                                                                                                  .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
             }
+
         }
         Sort.sortVectorString(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
     }
 
     public PcdVector getAllPcdDeclarationsFromWorkspace() {
-        //
-        // First get all packages
-        //
-        this.getAllPackages();
-
         PcdVector vector = new PcdVector();
-        for (int index = 0; index < this.vPackageList.size(); index++) {
-            try {
-                PcdVector v = getAllPcdDeclarationsFromPackage(OpenFile.openSpdFile(vPackageList.get(index).getPath()));
-                if (v != null && v.size() > 0) {
-                    vector.addAll(v);
-                }
-            } catch (IOException e) {
-                Log.err("getAllPcdDeclarationsFromWorkspace", e.getMessage());
-            } catch (XmlException e) {
-                Log.err("getAllPcdDeclarationsFromWorkspace", e.getMessage());
-            } catch (Exception e) {
-                Log.err("getAllPcdDeclarationsFromWorkspace", e.getMessage());
+        for (int index = 0; index < GlobalData.openingPackageList.size(); index++) {
+            PcdVector v = getAllPcdDeclarationsFromPackage(GlobalData.openingPackageList
+                                                                                        .getPackageSurfaceAreaFromId(GlobalData.vPackageList
+                                                                                                                                            .get(index)));
+            if (v != null && v.size() > 0) {
+                vector.addAll(v);
             }
+
         }
         Sort.sortPcds(vector, DataType.SORT_TYPE_ASCENDING);
         return vector;
@@ -690,7 +498,6 @@ public class WorkspaceTools {
      
      **/
     public PackageIdentification getPackageIdByModuleId(Identification id) {
-        getAllPackages();
         Vector<String> modulePaths = new Vector<String>();
         Identification mid = null;
         String packagePath = null;
@@ -699,57 +506,23 @@ public class WorkspaceTools {
         //
         // For each package, get all modules list
         //
-        for (int indexI = 0; indexI < vPackageList.size(); indexI++) {
-            packagePath = vPackageList.elementAt(indexI).getPath();
+        for (int indexI = 0; indexI < GlobalData.vPackageList.size(); indexI++) {
+            packagePath = GlobalData.vPackageList.elementAt(indexI).getPath();
             modulePaths = this.getAllModulesOfPackage(packagePath);
             for (int indexJ = 0; indexJ < modulePaths.size(); indexJ++) {
                 modulePath = modulePaths.get(indexJ);
-                try {
-                    mid = getId(modulePath, OpenFile.openMsaFile(modulePath));
-                    //
-                    // Check id
-                    //
-                    if (mid.equals(id)) {
-                        return vPackageList.elementAt(indexI);
-                    }
-                } catch (IOException e) {
-                    Log.err("getPackageIdByModuleId " + id.getPath(), e.getMessage());
-                } catch (XmlException e) {
-                    Log.err("getPackageIdByModuleId " + id.getPath(), e.getMessage());
-                } catch (Exception e) {
-                    Log.err("getPackageIdByModuleId " + id.getPath(), e.getMessage());
+                mid = GlobalData.openingModuleList.getIdByPath(modulePath);
+                //
+                // Check id
+                //
+                if (mid.equals(id)) {
+                    return GlobalData.vPackageList.elementAt(indexI);
                 }
+
             }
         }
 
         return null;
-    }
-
-    public Identification getId(String path, ModuleSurfaceArea msa) {
-        MsaHeader head = msa.getMsaHeader();
-        String name = head.getModuleName();
-        String guid = head.getGuidValue();
-        String version = head.getVersion();
-        Identification id = new Identification(name, guid, version, path);
-        return id;
-    }
-
-    public Identification getId(String path, PackageSurfaceArea spd) {
-        SpdHeader head = spd.getSpdHeader();
-        String name = head.getPackageName();
-        String guid = head.getGuidValue();
-        String version = head.getVersion();
-        Identification id = new Identification(name, guid, version, path);
-        return id;
-    }
-
-    public Identification getId(String path, PlatformSurfaceArea fpd) {
-        PlatformHeader head = fpd.getPlatformHeader();
-        String name = head.getPlatformName();
-        String guid = head.getGuidValue();
-        String version = head.getVersion();
-        Identification id = new Identification(name, guid, version, path);
-        return id;
     }
 
     /**
@@ -790,14 +563,15 @@ public class WorkspaceTools {
     public void addPackageToDatabase(PackageIdentification id) throws Exception {
         String path = id.getPath();
         path = Tools.getRelativePath(path, Workspace.getCurrentWorkspace());
-        this.openFrameworkDb();
+
         DbPathAndFilename filename = DbPathAndFilename.Factory.newInstance();
         filename.setStringValue(path);
-        fdb.getPackageList().addNewFilename();
-        fdb.getPackageList().setFilenameArray(fdb.getPackageList().sizeOfFilenameArray() - 1, filename);
+        GlobalData.fdb.getPackageList().addNewFilename();
+        GlobalData.fdb.getPackageList().setFilenameArray(GlobalData.fdb.getPackageList().sizeOfFilenameArray() - 1,
+                                                         filename);
         String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
         strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
-        SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+        SaveFile.saveDbFile(strFrameworkDbFilePath, GlobalData.fdb);
     }
 
     /**
@@ -810,14 +584,15 @@ public class WorkspaceTools {
     public void addPlatformToDatabase(PlatformIdentification id) throws Exception {
         String path = id.getPath();
         path = Tools.getRelativePath(path, Workspace.getCurrentWorkspace());
-        this.openFrameworkDb();
+
         DbPathAndFilename filename = DbPathAndFilename.Factory.newInstance();
         filename.setStringValue(path);
-        fdb.getPlatformList().addNewFilename();
-        fdb.getPlatformList().setFilenameArray(fdb.getPlatformList().sizeOfFilenameArray() - 1, filename);
+        GlobalData.fdb.getPlatformList().addNewFilename();
+        GlobalData.fdb.getPlatformList().setFilenameArray(GlobalData.fdb.getPlatformList().sizeOfFilenameArray() - 1,
+                                                          filename);
         String strFrameworkDbFilePath = Workspace.getCurrentWorkspace() + Workspace.getStrWorkspaceDatabaseFile();
         strFrameworkDbFilePath = Tools.convertPathToCurrentOsType(strFrameworkDbFilePath);
-        SaveFile.saveDbFile(strFrameworkDbFilePath, fdb);
+        SaveFile.saveDbFile(strFrameworkDbFilePath, GlobalData.fdb);
     }
 
     /**
@@ -830,11 +605,13 @@ public class WorkspaceTools {
      @throws Exception
      
      **/
-    public Vector<String> getAllModuleFilesPath(String path) throws IOException, XmlException, Exception {
+    public Vector<String> getAllFilesPathOfModule(String path) {
         Vector<String> v = new Vector<String>();
         path = Tools.convertPathToCurrentOsType(path);
         v.addElement(path);
-        ModuleSurfaceArea msa = OpenFile.openMsaFile(path);
+        ModuleSurfaceArea msa = GlobalData.openingModuleList
+                                                            .getModuleSurfaceAreaFromId(GlobalData.openingModuleList
+                                                                                                                    .getIdByPath(path));
         if (msa != null) {
             //
             // Get all files' path of a module
@@ -862,7 +639,7 @@ public class WorkspaceTools {
      @throws Exception
      
      **/
-    public Vector<String> getAllPakcageFilesPath(String path) throws IOException, XmlException, Exception {
+    public Vector<String> getAllFilesPathOfPakcage(String path) {
         Vector<String> v = new Vector<String>();
         path = Tools.convertPathToCurrentOsType(path);
         //
@@ -885,7 +662,7 @@ public class WorkspaceTools {
         f1 = new Vector<String>();
         f1 = getAllModulesOfPackage(path);
         for (int indexI = 0; indexI < f1.size(); indexI++) {
-            Vector<String> f2 = getAllModuleFilesPath(f1.get(indexI));
+            Vector<String> f2 = getAllFilesPathOfModule(f1.get(indexI));
             for (int indexJ = 0; indexJ < f2.size(); indexJ++) {
                 v.addElement(f2.get(indexJ));
             }

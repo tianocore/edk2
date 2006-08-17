@@ -237,4 +237,11 @@ public class DataType {
     // Hex String Header
     //
     public static final String HEX_STRING_HEADER = "0x";
+    
+    //
+    // The String of Boolean
+    //
+    public static final String TRUE = "True";
+    
+    public static final String FALSE = "False";
 }

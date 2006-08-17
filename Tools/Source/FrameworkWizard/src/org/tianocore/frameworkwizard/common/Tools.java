@@ -27,6 +27,16 @@ import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 
+import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
+import org.tianocore.MsaHeaderDocument.MsaHeader;
+import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
+import org.tianocore.PlatformHeaderDocument.PlatformHeader;
+import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
+import org.tianocore.SpdHeaderDocument.SpdHeader;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
+import org.tianocore.frameworkwizard.platform.PlatformIdentification;
+
 /**
  The class is used to provides some useful interfaces  
  
@@ -456,5 +466,32 @@ public class Tools {
         // return hex string
         //
         return hexString.trim();
+    }
+    
+    public static ModuleIdentification getId(String path, ModuleSurfaceArea msa) {
+        MsaHeader head = msa.getMsaHeader();
+        String name = head.getModuleName();
+        String guid = head.getGuidValue();
+        String version = head.getVersion();
+        ModuleIdentification id = new ModuleIdentification(name, guid, version, path);
+        return id;
+    }
+
+    public static PackageIdentification getId(String path, PackageSurfaceArea spd) {
+        SpdHeader head = spd.getSpdHeader();
+        String name = head.getPackageName();
+        String guid = head.getGuidValue();
+        String version = head.getVersion();
+        PackageIdentification id = new PackageIdentification(name, guid, version, path);
+        return id;
+    }
+
+    public static PlatformIdentification getId(String path, PlatformSurfaceArea fpd) {
+        PlatformHeader head = fpd.getPlatformHeader();
+        String name = head.getPlatformName();
+        String guid = head.getGuidValue();
+        String version = head.getVersion();
+        PlatformIdentification id = new PlatformIdentification(name, guid, version, path);
+        return id;
     }
 }

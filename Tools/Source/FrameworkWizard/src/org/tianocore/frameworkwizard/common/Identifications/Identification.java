@@ -49,7 +49,6 @@ public class Identification {
         if (obj instanceof Identification) {
             Identification id = (Identification) obj;
             if (path.equals(id.path)) {
-                //if ( name.equals(id.name) && guid.equals(id.guid) && version.equals(id.version)) {
                 return true;
             }
             return false;

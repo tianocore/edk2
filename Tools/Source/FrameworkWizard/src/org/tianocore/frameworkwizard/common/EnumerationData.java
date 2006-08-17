@@ -293,8 +293,8 @@ public class EnumerationData {
     
     private void initBoolean() {
         vBoolean.removeAllElements();
-        vBoolean.addElement("False");
-        vBoolean.addElement("True");
+        vBoolean.addElement(DataType.FALSE);
+        vBoolean.addElement(DataType.TRUE);
     }
     
     private void initModuleType() {

@@ -45,6 +45,10 @@ public class ModuleIdentification extends Identification {
         this.isLibrary = library;
     }
     
+    public ModuleIdentification(Identification id) {
+        super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
+    }
+    
     public ModuleIdentification(Identification id, boolean library) {
         super(id.getName(), id.getGuid(), id.getVersion(), id.getPath());
         this.isLibrary = library;
