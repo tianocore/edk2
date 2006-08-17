@@ -706,7 +706,6 @@ public class EnumerationData {
     
     private void initPcdUsage() {
         vPcdUsage.removeAllElements();
-        vPcdUsage.addElement(DataType.EMPTY_SELECT_ITEM);
         vPcdUsage.addElement("ALWAYS_CONSUMED");
         vPcdUsage.addElement("SOMETIMES_CONSUMED");
         vPcdUsage.addElement("ALWAYS_PRODUCED");

@@ -229,9 +229,10 @@ public class PCDsDlg extends IDialog implements ItemListener {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 157, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 182, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
+            jTextFieldFeatureFlag.setEnabled(false);
         }
         return jTextFieldFeatureFlag;
     }
@@ -388,7 +389,8 @@ public class PCDsDlg extends IDialog implements ItemListener {
 
             jLabelFeatureFlag = new JLabel();
             jLabelFeatureFlag.setText("Feature Flag Expression");
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 157, 168, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 182, 168, 20));
+            jLabelFeatureFlag.setEnabled(false);
 
             jLabelTokenSpaceGuid = new JLabel();
             jLabelTokenSpaceGuid.setText("Token Space C Name");
@@ -396,10 +398,10 @@ public class PCDsDlg extends IDialog implements ItemListener {
 
             jLabelArch = new JLabel();
             jLabelArch.setText("Supported Architectures");
-            jLabelArch.setBounds(new java.awt.Rectangle(12, 182, 168, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 157, 168, 20));
             jArchCheckBox = new ArchCheckBox();
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
-            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 182, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 157, 320, 20));
 
             // Hidden field
             jLabelTokenSpaceGuid.setBounds(new java.awt.Rectangle(12, 62, 140, 20));
