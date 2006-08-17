@@ -15,46 +15,36 @@ package org.tianocore.migration;
 import java.util.regex.*;
 
 public class Critic implements Common.ForDoAll {
-	Critic() {
-		filepath = null;
-	}
-	Critic(String path) {
-		filepath = path;
-	}
-	
-	private String filepath = null;
-	
 	private static Pattern ptnheadcomment = Pattern.compile("^\\/\\*\\+\\+(.*?)\\-\\-\\*\\/",Pattern.DOTALL);
-	private static Matcher mtrheadcomment;
 	private static Pattern ptnfunccomment = Pattern.compile("([\\w\\d]*\\s*[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)(\\/\\*\\+\\+.*?)(\\-\\-\\*\\/\\s*)(.*?)([\\{;])",Pattern.DOTALL);
-	private static Matcher mtrfunccomment;
-	private static Pattern ptncommentstructure = Pattern.compile("Routine Description:\\s*(\\w.*?\\w)\\s*Arguments:(\\s*\\w.*?\\w\\s*)Returns:(\\s*\\w.*?\\w\\s*)&%",Pattern.DOTALL);
-	private static Matcher mtrcommentstructure;
-	private static Pattern ptntempcomment = Pattern.compile("\\/\\*\\+\\+(.*?)\\-\\-\\*\\/\\s*[\\w\\d]*\\s*[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)",Pattern.DOTALL);
-	private static Matcher mtrtempcomment;
-	private static Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*-\\s*(\\w.*\\w)");
+	private static Pattern ptncommentstructure = Pattern.compile("\\/\\*\\+\\+\\s*Routine Description:\\s*(.*?)\\s*Arguments:\\s*(.*?)\\s*Returns:\\s*(.*?)\\s*\\-\\-\\*\\/",Pattern.DOTALL);
+	private static Pattern ptninfequation = Pattern.compile("#%%\\s*([^\\s]*\\s*-\\s*.*\\s*)*",Pattern.MULTILINE);
 	private static Matcher mtrinfequation;
 	
 	public void toDo(String filepath) throws Exception {
-		String funccomment = null;
 		if (filepath.contains(".c") || filepath.contains(".h")) {
 			System.out.println("Criticing   " + filepath);
 			String wholeline = Common.file2string(filepath);
 			
-			// find head comment
-			mtrheadcomment = ptnheadcomment.matcher(wholeline);
-			if (mtrheadcomment.find()) {			//as we find only the head comment here, use 'if' not 'while'
-				wholeline = mtrheadcomment.replaceFirst("/** @file$1**/");
-			}
+			wholeline = Common.replaceAll(wholeline, ptnheadcomment, "/** @file$1**/");
+			wholeline = Common.replaceAll(wholeline, ptnfunccomment, "$2$3$4$1$5");
+			wholeline = Common.replaceAll(wholeline, ptncommentstructure, "/**\n#%\n$1\n%#\n#%%\n$2\n%%#\n#%%%\n$3\n%%%#\n**/");
 			
-			// find func comment
-			mtrfunccomment = ptnfunccomment.matcher(wholeline);
+			/* -----slow edition of replacefirst with stringbuffer-----
+			line.append(wholeline);
+			mtrfunccomment = ptnfunccomment.matcher(line);
 			while (mtrfunccomment.find()) {
-				funccomment = mtrfunccomment.group(2) + "&%";
-				mtrcommentstructure = ptncommentstructure.matcher(funccomment);
-				wholeline = mtrfunccomment.replaceAll("$2$4$3$1$5");
+				line.replace(0, line.length()-1, mtrfunccomment.replaceFirst("$2$4$3$1$5"));
 			}
-			
+			*/
+			/* -----slow edition of replacefirst with string-----
+			while ((mtrfunccomment = ptnfunccomment.matcher(wholeline)).find()) {
+				//funccomment = mtrfunccomment.group(2);
+				//mtrcommentstructure = ptncommentstructure.matcher(funccomment);
+				wholeline = mtrfunccomment.replaceFirst("$2$4$3$1$5");
+			}
+			*/
+			/*
 			// edit func comment
 			mtrtempcomment = ptntempcomment.matcher(wholeline);
 			while (mtrtempcomment.find()) {
@@ -62,6 +52,7 @@ public class Critic implements Common.ForDoAll {
 				System.out.println(mtrtempcomment.group());
 				System.out.println("-----------------------------");
 			}
+			*/
 			Common.string2file(wholeline, filepath);
 		}
 	}

@@ -29,6 +29,14 @@ public class Common {
 		return wholefile.toString();
 	}
 
+	public static void string2file(String content, String filename) throws Exception {
+		ensureDir(filename);
+		PrintWriter outfile = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
+		outfile.append(content);
+		outfile.flush();
+		outfile.close();
+	}
+
 	public static void ensureDir(String objFileWhole) {
 		File tempdir;
 		Matcher mtrseparate = ptnseparate.matcher(objFileWhole);
@@ -36,14 +44,6 @@ public class Common {
 			tempdir = new File(mtrseparate.group(1));
 			if (!tempdir.exists()) tempdir.mkdirs();
 		}
-	}
-	
-	public static void string2file(String content, String filename) throws Exception {
-		ensureDir(filename);
-		PrintWriter outfile = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
-		outfile.append(content);
-		outfile.flush();
-		outfile.close();
 	}
 	
 	public static HashSet<String> dirScan(String path) {			// use HashSet, persue speed rather than space
@@ -63,6 +63,14 @@ public class Common {
 		return filelist;
 	}
 
+	public static String replaceAll(String line, Pattern ptn, String des) {
+		Matcher mtr = ptn.matcher(line);
+		if (mtr.find()) {
+			 return mtr.replaceAll(des);
+		}
+		return line;
+	}
+	
 	public static String dirCopy_(String src) throws Exception {
 		Matcher mtrseparate = Common.ptnseparate.matcher(src);
 		if (mtrseparate.find()) {
