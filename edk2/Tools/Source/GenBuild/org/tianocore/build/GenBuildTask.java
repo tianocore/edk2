@@ -55,12 +55,14 @@ import org.tianocore.build.tools.ModuleItem;
   <p>The main function of this task is to parse module's surface area (MSA),
   then generate the corresponding <em>BaseName_build.xml</em> (the real ANT
   build script) and call this to build the module. The whole process including:
+  <pre>
   1. generate AutoGen.c and AutoGen.h; 
   2. build all dependent library instances;
   3. build all source files inlcude AutoGen.c; 
   4. generate sections;
   5. generate FFS file if it is driver module while LIB file if it is Library module.
-  </p>
+  </pre>
+
 
   <p>
   The usage is (take module <em>HelloWorld</em> for example):

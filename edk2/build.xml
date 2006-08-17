@@ -33,9 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         <fail message="WORKSPACE environmental variable not set." />
       </then>
     </if>
-    <!--
-    <ToolChainSetup confPath="${WORKSPACE_DIR}/Tools/Conf" />
-    -->
   </target>
   
   <target name="build">
