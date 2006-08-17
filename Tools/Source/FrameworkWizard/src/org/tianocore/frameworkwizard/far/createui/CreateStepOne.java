@@ -97,8 +97,6 @@ public class CreateStepOne extends IDialog implements MouseListener {
 
     private StarLabel jStarLabel12 = null;
 
-    private JTextField jTextFieldCopyright = null;
-
     private JLabel jLabelURL = null;
 
     private JTextField jTextFieldURL = null;
@@ -112,6 +110,10 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JButton jButtonNext = null;
 
     private FarHeader farHeader = new FarHeader();
+
+    private JScrollPane jScrollPaneCopyright = null;
+
+    private JTextArea jTextAreaCopyright = null;
 
     /**
      * This method initializes jTextFieldBaseName
@@ -215,7 +217,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
             jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
-            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 290, 520, 20));
+            jTextFieldSpecification.setBounds(new java.awt.Rectangle(160, 310, 520, 20));
             jTextFieldSpecification.setEditable(false);
         }
         return jTextFieldSpecification;
@@ -231,7 +233,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
         if (jScrollPaneLicense == null) {
             jScrollPaneLicense = new JScrollPane();
             jScrollPaneLicense.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneLicense.setBounds(new java.awt.Rectangle(160, 200, 520, 60));
+            jScrollPaneLicense.setBounds(new java.awt.Rectangle(160, 220, 520, 60));
             jScrollPaneLicense.setViewportView(getJTextAreaLicense());
         }
         return jScrollPaneLicense;
@@ -269,21 +271,6 @@ public class CreateStepOne extends IDialog implements MouseListener {
     }
 
     /**
-     * This method initializes jTextFieldCopyright
-     * 
-     * @return javax.swing.JTextField jTextFieldCopyright
-     * 
-     */
-    private JTextField getJTextFieldCopyright() {
-        if (jTextFieldCopyright == null) {
-            jTextFieldCopyright = new JTextField();
-            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160, 175, 520, 20));
-            jTextFieldCopyright.setToolTipText("One or more copyright lines");
-        }
-        return jTextFieldCopyright;
-    }
-
-    /**
      * This method initializes jTextFieldURL
      * 
      * @return javax.swing.JTextField
@@ -291,7 +278,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JTextField getJTextFieldURL() {
         if (jTextFieldURL == null) {
             jTextFieldURL = new JTextField();
-            jTextFieldURL.setBounds(new java.awt.Rectangle(160, 265, 520, 20));
+            jTextFieldURL.setBounds(new java.awt.Rectangle(160, 285, 520, 20));
             jTextFieldURL.setToolTipText("A URL for the latest version of the license");
         }
         return jTextFieldURL;
@@ -318,7 +305,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JButton getJButtonCancel() {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
-            jButtonCancel.setBounds(new java.awt.Rectangle(590, 330, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(590, 350, 90, 20));
             jButtonCancel.setText("Cancel");
             jButtonCancel.addMouseListener(this);
         }
@@ -333,11 +320,37 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private JButton getJButtonNext() {
         if (jButtonNext == null) {
             jButtonNext = new JButton();
-            jButtonNext.setBounds(new java.awt.Rectangle(480, 330, 90, 20));
+            jButtonNext.setBounds(new java.awt.Rectangle(480, 350, 90, 20));
             jButtonNext.setText("Next");
             jButtonNext.addMouseListener(this);
         }
         return jButtonNext;
+    }
+
+    /**
+     * This method initializes jScrollPaneCopyright	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPaneCopyright() {
+        if (jScrollPaneCopyright == null) {
+            jScrollPaneCopyright = new JScrollPane();
+            jScrollPaneCopyright.setBounds(new java.awt.Rectangle(160, 175, 520, 40));
+            jScrollPaneCopyright.setViewportView(getJTextAreaCopyright());
+        }
+        return jScrollPaneCopyright;
+    }
+
+    /**
+     * This method initializes jTextAreaCopyright	
+     * 	
+     * @return javax.swing.JTextArea	
+     */
+    private JTextArea getJTextAreaCopyright() {
+        if (jTextAreaCopyright == null) {
+            jTextAreaCopyright = new JTextArea();
+        }
+        return jTextAreaCopyright;
     }
 
     public static void main(String[] args) {
@@ -367,7 +380,8 @@ public class CreateStepOne extends IDialog implements MouseListener {
             this.jTextFieldGuid.setEnabled(!isView);
             this.jTextFieldVersion.setEnabled(!isView);
             this.jTextAreaLicense.setEnabled(!isView);
-            this.jTextFieldCopyright.setEnabled(!isView);
+            this.jScrollPaneCopyright.setEnabled(!isView);
+            this.jTextAreaCopyright.setEnabled(!isView);
             this.jTextAreaDescription.setEnabled(!isView);
             this.jTextFieldSpecification.setEnabled(!isView);
             this.jTextFieldAbstract.setEnabled(!isView);
@@ -381,7 +395,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
      * 
      */
     private void initialize() {
-        this.setSize(700, 400);
+        this.setSize(700, 425);
         this.setContentPane(getJScrollPane());
         this.setTitle("Create Framework Archive(FAR) - Step 1: Set FAR's baseic information");
         this.centerWindow();
@@ -398,7 +412,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
 
             jLabelURL = new JLabel();
             jLabelURL.setText("License URL");
-            jLabelURL.setBounds(new java.awt.Rectangle(35, 265, 120, 20));
+            jLabelURL.setBounds(new java.awt.Rectangle(35, 285, 120, 20));
             jLabelBaseName = new JLabel();
             jLabelBaseName.setText("FAR Name");
             jLabelBaseName.setBounds(new java.awt.Rectangle(35, 10, 120, 20));
@@ -419,10 +433,10 @@ public class CreateStepOne extends IDialog implements MouseListener {
             jLabelCopyright.setBounds(new java.awt.Rectangle(35, 175, 120, 20));
             jLabelLicense = new JLabel();
             jLabelLicense.setText("License");
-            jLabelLicense.setBounds(new java.awt.Rectangle(35, 200, 120, 20));
+            jLabelLicense.setBounds(new java.awt.Rectangle(35, 220, 120, 20));
             jLabelSpecification = new JLabel();
             jLabelSpecification.setText("Specification");
-            jLabelSpecification.setBounds(new java.awt.Rectangle(35, 290, 120, 20));
+            jLabelSpecification.setBounds(new java.awt.Rectangle(35, 310, 120, 20));
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
@@ -445,7 +459,6 @@ public class CreateStepOne extends IDialog implements MouseListener {
             jContentPane.add(getJTextFieldAbstract(), null);
             jContentPane.add(jLabelURL, null);
             jContentPane.add(getJTextFieldURL(), null);
-            jContentPane.add(getJTextFieldCopyright(), null);
             jStarLabel1 = new StarLabel();
             jStarLabel1.setLocation(new java.awt.Point(20, 10));
             jStarLabel4 = new StarLabel();
@@ -457,11 +470,11 @@ public class CreateStepOne extends IDialog implements MouseListener {
             jStarLabel7 = new StarLabel();
             jStarLabel7.setLocation(new java.awt.Point(20, 175));
             jStarLabel8 = new StarLabel();
-            jStarLabel8.setLocation(new java.awt.Point(20, 200));
+            jStarLabel8.setLocation(new java.awt.Point(20, 220));
             jStarLabel10 = new StarLabel();
             jStarLabel10.setLocation(new java.awt.Point(20, 85));
             jStarLabel12 = new StarLabel();
-            jStarLabel12.setLocation(new java.awt.Point(20, 290));
+            jStarLabel12.setLocation(new java.awt.Point(20, 310));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel4, null);
@@ -473,6 +486,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
             jContentPane.add(jStarLabel12, null);
             jContentPane.add(getJButtonCancel(), null);
             jContentPane.add(getJButtonNext(), null);
+            jContentPane.add(getJScrollPaneCopyright(), null);
         }
         return jContentPane;
     }
@@ -542,11 +556,11 @@ public class CreateStepOne extends IDialog implements MouseListener {
         //
         // Check Copyright
         //
-        if (isEmpty(this.jTextFieldCopyright.getText())) {
+        if (isEmpty(this.jTextAreaCopyright.getText())) {
             Log.wrn("Create far", "Copyright couldn't be empty");
             return false;
         }
-        farHeader.setCopyright(this.jTextFieldCopyright.getText());
+        farHeader.setCopyright(this.jTextAreaCopyright.getText());
 
         //
         // Check License
