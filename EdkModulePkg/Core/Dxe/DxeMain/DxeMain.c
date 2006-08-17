@@ -394,12 +394,6 @@ Returns:
   EFI_PHYSICAL_ADDRESS               MemoryBaseAddress;
   UINT64                             MemoryLength;
 
-#ifdef EFI_DXE_PERFORMANCE
-  UINT64                             Tick;
-
-  GetTimerValue (&Tick);
-#endif
-
   mHobStart = HobStart;
 
   //
