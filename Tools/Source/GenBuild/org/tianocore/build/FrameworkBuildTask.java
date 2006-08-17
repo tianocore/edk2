@@ -29,6 +29,41 @@ import org.tianocore.build.toolchain.ConfigReader;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.common.definitions.ToolDefinitions;
 
+/**
+  <p>
+  <code>FrameworkBuildTask</code> is an Ant task. The main function is finding
+  and processing a FPD or MSA file, then building a platform or stand-alone 
+  module. 
+  
+  <p>
+  The task search current directory and find out all MSA and FPD files by file
+  extension. Base on ACTIVE_PLATFORM policy, decide to build a platform or a
+  stand-alone module. The ACTIVE_PLATFORM policy is: 
+  
+  <pre>
+  1. More than one MSA files, report error; 
+  2. Only one MSA file, but ACTIVE_PLATFORM is not specified, report error;
+  3. Only one MSA file, and ACTIVE_PLATFORM is also specified, build this module;
+  4. No MSA file, and ACTIVE_PLATFORM is specified, build the active platform;
+  5. No MSA file, no ACTIVE_PLATFORM, and no FPD file, report error;
+  6. No MSA file, no ACTIVE_PLATFORM, and only one FPD file, build the platform;
+  7. No MSA file, no ACTIVE_PLATFORM, and more than one FPD files, list all platform
+  and let user choose one. 
+  </pre>
+  
+  <p>
+  Framework build task also parse target file [${WORKSPACE_DIR}/Tools/Conf/target.txt].
+  And load all system environment variables to Ant properties.  
+  
+  <p>
+  The usage for this task is : 
+  
+  <pre>
+  &lt;FrameworkBuild type="cleanall" /&gt;
+  </pre>
+  
+  @since GenBuild 1.0
+**/
 public class FrameworkBuildTask extends Task{
 
     private Set<File> buildFiles = new LinkedHashSet<File>();
@@ -102,8 +137,6 @@ public class FrameworkBuildTask extends Task{
         File workspacePath = new File(getProject().getProperty("WORKSPACE"));
         getProject().setProperty("WORKSPACE_DIR", workspacePath.getPath().replaceAll("(\\\\)", "/"));
         GlobalData.initInfo(dbFilename, workspacePath.getPath(), toolsDefFilename);
-        
-
         
         //
         // If find MSA file and ACTIVE_PLATFORM is set, build the module; 
