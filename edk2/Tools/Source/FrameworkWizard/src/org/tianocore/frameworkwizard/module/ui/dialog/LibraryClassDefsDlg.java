@@ -211,9 +211,10 @@ public class LibraryClassDefsDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 87, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168,197,320,20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
+            jTextFieldFeatureFlag.setEnabled(false);
         }
         return jTextFieldFeatureFlag;
     }
@@ -239,7 +240,7 @@ public class LibraryClassDefsDlg extends IDialog {
     private JScrollPane getJScrollPaneModuleList() {
         if (jScrollPaneModuleList == null) {
             jScrollPaneModuleList = new JScrollPane();
-            jScrollPaneModuleList.setBounds(new java.awt.Rectangle(168, 137, 320, 80));
+            jScrollPaneModuleList.setBounds(new java.awt.Rectangle(168, 112, 320, 80));
             jScrollPaneModuleList.setPreferredSize(new java.awt.Dimension(320, 80));
             jScrollPaneModuleList.setViewportView(getICheckBoxListSupModuleList());
         }
@@ -361,22 +362,23 @@ public class LibraryClassDefsDlg extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 112, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 87, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
             jLabelHelpText = new JLabel();
             jLabelHelpText.setBounds(new java.awt.Rectangle(12, 62, 168, 20));
             jLabelHelpText.setText("Help Text");
             jLabelModuleList = new JLabel();
-            jLabelModuleList.setBounds(new java.awt.Rectangle(12, 137, 168, 20));
+            jLabelModuleList.setBounds(new java.awt.Rectangle(12, 112, 168, 20));
             jLabelModuleList.setText("Supported Module Types");
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(12, 112, 168, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 87, 168, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12,197,168,20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
+            jLabelFeatureFlag.setEnabled(false);
             jLabelRecommendedInstanceGuid = new JLabel();
-            jLabelRecommendedInstanceGuid.setBounds(new java.awt.Rectangle(12, 112, 200, 20));
+            jLabelRecommendedInstanceGuid.setBounds(new java.awt.Rectangle(12, 87, 200, 20));
             jLabelRecommendedInstanceGuid.setText("Recommended Instance Guid");
             jLabelRecommendedInstanceGuid.setVisible(false);
             jLabelRecommendedInstanceVersion = new JLabel();

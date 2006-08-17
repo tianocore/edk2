@@ -206,9 +206,10 @@ public class EventsDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 157, 320, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 182, 320, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldFeatureFlag.setToolTipText("Postfix expression that must evaluate to TRUE or FALSE");
+            jTextFieldFeatureFlag.setEnabled(false);
         }
         return jTextFieldFeatureFlag;
     }
@@ -381,14 +382,15 @@ public class EventsDlg extends IDialog {
             jLabelHelpText.setText("Help Text");
 
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 157, 168, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 182, 168, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
+            jLabelFeatureFlag.setEnabled(false);
 
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(12, 182, 168, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 157, 168, 20));
             jLabelArch.setText("Supported Architectures");
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 182, 320, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 157, 320, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(320, 20));
 
             jContentPane = new JPanel();

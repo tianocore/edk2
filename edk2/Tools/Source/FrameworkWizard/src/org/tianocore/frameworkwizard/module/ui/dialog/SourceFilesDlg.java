@@ -213,9 +213,10 @@ public class SourceFilesDlg extends IDialog {
     private JTextField getJTextFieldFeatureFlag() {
         if (jTextFieldFeatureFlag == null) {
             jTextFieldFeatureFlag = new JTextField();
-            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 112, 340, 20));
+            jTextFieldFeatureFlag.setBounds(new java.awt.Rectangle(168, 137, 340, 20));
             jTextFieldFeatureFlag.setPreferredSize(new java.awt.Dimension(340, 20));
             jTextFieldFeatureFlag.setToolTipText("RESERVED FOR FUTURE USE");
+            jTextFieldFeatureFlag.setEnabled(false);
         }
         return jTextFieldFeatureFlag;
     }
@@ -348,11 +349,12 @@ public class SourceFilesDlg extends IDialog {
     private JPanel getJContentPane() {
         if (jContentPane == null) {
             jArchCheckBox = new ArchCheckBox();
-            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 137, 340, 20));
+            jArchCheckBox.setBounds(new java.awt.Rectangle(168, 112, 340, 20));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(340, 20));
             jLabelFeatureFlag = new JLabel();
-            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 112, 155, 20));
+            jLabelFeatureFlag.setBounds(new java.awt.Rectangle(12, 137, 155, 20));
             jLabelFeatureFlag.setText("Feature Flag Expression");
+            jLabelFeatureFlag.setEnabled(false);
             jLabelToolCode = new JLabel();
             jLabelToolCode.setBounds(new java.awt.Rectangle(12, 62, 155, 20));
             jLabelToolCode.setText("Tool Code");
@@ -360,7 +362,7 @@ public class SourceFilesDlg extends IDialog {
             jLabelTagName.setBounds(new java.awt.Rectangle(12, 37, 155, 20));
             jLabelTagName.setText("Tag Name");
             jLabelArch = new JLabel();
-            jLabelArch.setBounds(new java.awt.Rectangle(12, 137, 155, 20));
+            jLabelArch.setBounds(new java.awt.Rectangle(12, 112, 155, 20));
             jLabelArch.setText("Supported Architectures");
             jLabelToolChainFamily = new JLabel();
             jLabelToolChainFamily.setBounds(new java.awt.Rectangle(12, 87, 155, 20));
