@@ -2830,7 +2830,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             break;
         //
         // Current is package
-        //    
+        //
         case 1:
             if (this.currentOpeningPackageIndex > -1) {
                 if (!GlobalData.openingPackageList.getPackageSaved(currentOpeningPackageIndex)) {
@@ -3005,6 +3005,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             closeAll();
             this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- ["
                           + Workspace.getCurrentWorkspace() + "]");
+            //
+            // Reinit Global Data
+            //
+            GlobalData.init();
         }
         sw.dispose();
     }
