@@ -6249,7 +6249,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           <Token>0x00001000</Token>
           <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>VOID*</DatumType>
-          <MaxDatumSize>24</MaxDatumSize>
+          <MaxDatumSize>32</MaxDatumSize>
           <Value>L"E:RW;245760;512"</Value>
         </PcdData>
         <PcdData ItemType="DYNAMIC">
@@ -7003,7 +7003,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Token>0x00001000</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
-      <MaxDatumSize>24</MaxDatumSize>
+      <MaxDatumSize>32</MaxDatumSize>
       <SkuInfo>
         <SkuId>0</SkuId>
         <Value>L"E:RW;245760;512"</Value>
