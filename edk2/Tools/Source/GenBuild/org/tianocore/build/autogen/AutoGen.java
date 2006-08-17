@@ -33,13 +33,8 @@ import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.xmlbeans.XmlObject;
-import org.tianocore.GuidsDocument;
-import org.tianocore.LibraryClassDocument.LibraryClass;
-import org.tianocore.PPIsDocument;
-import org.tianocore.ProtocolsDocument;
 import org.tianocore.build.exception.*;
 import org.tianocore.build.global.GlobalData;
-import org.tianocore.build.global.Spd;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
@@ -2043,7 +2038,6 @@ public class AutoGen {
     private void collectLibInstanceInfo(){
         int index;
 
-        String moduleType = SurfaceAreaQuery.getModuleType();
         String libConstructName = null;
         String libDestructName = null;
         String[] setVirtuals = null;

@@ -25,6 +25,7 @@ import org.tianocore.BuildOptionsDocument;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
+import org.tianocore.common.definitions.EdkDefinitions;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -82,19 +83,7 @@ public class FfsProcess {
     ///
     /// mapping from section type to section output file extension
     ///
-    public static final String[][] sectionExt = { { "EFI_SECTION_FREEFORM_SUBTYPE_GUID", ".sec" },
-                                                 { "EFI_SECTION_VERSION", ".ver" },
-                                                 { "EFI_SECTION_USER_INTERFACE", ".ui" },
-                                                 { "EFI_SECTION_DXE_DEPEX", ".dpx" },
-                                                 { "EFI_SECTION_PEI_DEPEX", ".dpx" }, 
-                                                 { "EFI_SECTION_PE32", ".pe32" },
-                                                 { "EFI_SECTION_PIC", ".pic" }, 
-                                                 { "EFI_SECTION_TE", ".tes" },
-                                                 { "EFI_SECTION_RAW", ".sec" }, 
-                                                 { "EFI_SECTION_COMPRESSION", ".sec" },
-                                                 { "EFI_SECTION_GUID_DEFINED", ".sec" },
-                                                 { "EFI_SECTION_COMPATIBILITY16", ".sec" },
-                                                 { "EFI_SECTION_FIRMWARE_VOLUME_IMAGE", ".sec" } };
+    public static final String[][] sectionExt = EdkDefinitions.SectionTypeExtensions;
 
     /**
       search in the type, if componentType is listed in type, return true; 

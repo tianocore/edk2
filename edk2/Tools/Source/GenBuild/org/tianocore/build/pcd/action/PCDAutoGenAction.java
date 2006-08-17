@@ -16,14 +16,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.pcd.action;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.tianocore.build.autogen.CommonDefinition;
-import org.tianocore.build.exception.PcdAutogenException;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.pcd.action.ActionMessage;

@@ -30,7 +30,6 @@ import org.tianocore.DynamicPcdBuildDefinitionsDocument.DynamicPcdBuildDefinitio
 import org.tianocore.PcdBuildDefinitionDocument;
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.build.exception.PlatformPcdPreprocessBuildException;
-import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.pcd.action.ActionMessage;

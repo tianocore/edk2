@@ -113,7 +113,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
     public int compareTo(ToolChainKey dstKey) {
         String[] dstKeySet = dstKey.getKeySet();
         int result = 0;
-        for (int i = 0; i < this.keyLength; ++i) {
+        for (int i = 0; i < ToolChainKey.keyLength; ++i) {
             result = this.keySet[i].compareToIgnoreCase(dstKeySet[i]);
             if (result != 0) {
                 break;
@@ -138,11 +138,11 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
             return true;
         }
 
-        if (dstKeySet.length != this.keyLength) {
+        if (dstKeySet.length != ToolChainKey.keyLength) {
             return false;
         }
 
-        for (int i = 0; i < this.keyLength; ++i) {
+        for (int i = 0; i < ToolChainKey.keyLength; ++i) {
             if (!this.keySet[i].equalsIgnoreCase(dstKeySet[i])) {
                 return false;
             }
@@ -157,16 +157,16 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
        @param keySet    The string array of key value
      **/
     public void setKey(String[] keySet) throws EdkException {
-        if (keySet.length != this.keyLength) {
+        if (keySet.length != ToolChainKey.keyLength) {
             throw new EdkException("Invalid ToolChain key");
         }
 
         //
         // Clone the string array because we don't want to change original one
         // 
-        this.keySet = new String[this.keyLength];
-        System.arraycopy(keySet, 0, this.keySet, 0, this.keyLength);
-        for (int i = 0; i < this.keyLength; ++i) {
+        this.keySet = new String[ToolChainKey.keyLength];
+        System.arraycopy(keySet, 0, this.keySet, 0, ToolChainKey.keyLength);
+        for (int i = 0; i < ToolChainKey.keyLength; ++i) {
             if (this.keySet[i] == null || this.keySet[i].length() == 0) {
                 this.keySet[i] = "*";
             }
@@ -186,7 +186,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
        @param index             The key part index
      **/
     public void setKey(String keySetString, int index) throws EdkException {
-        if (index >= this.keyLength) {
+        if (index >= ToolChainKey.keyLength) {
             throw new EdkException("Invalid ToolChain key index");
         }
 
@@ -213,7 +213,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
     public void setKey(String keyString) throws EdkException {
         this.keySet = keyString.split(this.delimiter);
 
-        if (this.keySet.length != this.keyLength) {
+        if (this.keySet.length != ToolChainKey.keyLength) {
             throw new EdkException("Invalid ToolChain key");
         }
 
@@ -233,7 +233,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
     public void setKey(String keyString, String delimiter) throws EdkException {
         this.keySet = keyString.split(delimiter);
 
-        if (this.keySet.length != this.keyLength) {
+        if (this.keySet.length != ToolChainKey.keyLength) {
             throw new EdkException("Invalid ToolChain key");
         }
 
@@ -264,7 +264,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
             StringBuffer keyStringBuf = new StringBuffer(64);
 
             keyStringBuf.append(this.keySet[0]);
-            for (int i = 1; i < this.keyLength; ++i) {
+            for (int i = 1; i < ToolChainKey.keyLength; ++i) {
                 keyStringBuf.append(this.delimiter);
                 keyStringBuf.append(this.keySet[i]);
             }
