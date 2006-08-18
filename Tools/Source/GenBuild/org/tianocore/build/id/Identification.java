@@ -110,6 +110,15 @@ public class Identification {
         return version;
     }
     
+    public String toGuidString() {
+        if (version == null || version.trim().equalsIgnoreCase("")) {
+            return "[" + guid + "]";
+        }
+        else {
+            return "[" + guid + "] and version [" + version + "]"; 
+        }
+    }
+    
     /* (non-Javadoc)
       @see java.lang.Object#hashCode()
     **/
