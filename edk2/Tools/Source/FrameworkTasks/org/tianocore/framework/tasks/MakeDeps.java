@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -47,7 +45,6 @@ public class MakeDeps extends Task {
     // private members, use set/get to access them
     //
     private static final String cmdName = "MakeDeps";
-    private static final String target  = "dummy";
     private String              includePath = null;
     private String              depsFile = null;
     private String              subDir = null;

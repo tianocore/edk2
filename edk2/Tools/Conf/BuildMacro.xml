@@ -649,7 +649,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
               <fileset casesensitive="on" file="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.c"/>
             </command>
           </cc>
-          <delete file="${PLATFORM_DIR}/@{FILENAME}.i" />
         </sequential>
       </OnDependency>
       <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->

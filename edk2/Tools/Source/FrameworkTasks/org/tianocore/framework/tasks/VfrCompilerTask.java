@@ -38,6 +38,7 @@ import org.apache.tools.ant.types.Commandline;
 public class VfrCompilerTask extends Task implements EfiDefine {
     private String createListFile = "";
     private String outPutDir = "";
+    private File outPutFile;
     private String createIfrBinFile = "";
     private String processerArg ="";
     private String vfrFile = "";
@@ -79,6 +80,9 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @param     outPutDir   The directory name for ouput file
      **/
     public void setOutPutDir(String outPutDir) {
+        if (outPutDir != null) {
+            outPutFile = new File(outPutDir);
+        }
         this.outPutDir = " -od " + outPutDir;
     }
 
@@ -204,7 +208,12 @@ public class VfrCompilerTask extends Task implements EfiDefine {
 
             Execute runner = new Execute(streamHandler,null);
             runner.setAntRun(project);
+            
             runner.setCommandline(commandLine.getCommandline());
+            
+            if (outPutFile != null && outPutFile.exists()) {
+                runner.setWorkingDirectory(outPutFile); 
+            }
 
             log(Commandline.toString(commandLine.getCommandline()), Project.MSG_VERBOSE);
             log(vfrFileName);

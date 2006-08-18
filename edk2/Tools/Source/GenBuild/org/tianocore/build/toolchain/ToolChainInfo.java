@@ -328,7 +328,10 @@ public class ToolChainInfo {
        @return String
      **/
     public String toString() {
-        return targets + "\n" + tagnames + "\n" + archs + "\n" + commands;
+        return  "  TARGET :" + targets + "\n" + 
+                "  TAGNAME:" + tagnames + "\n" + 
+                "  ARCH   :" + archs + "\n" + 
+                "  COMMAND:" + commands;
     }
 
     /**

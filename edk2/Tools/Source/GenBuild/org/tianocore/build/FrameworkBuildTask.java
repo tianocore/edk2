@@ -179,6 +179,18 @@ public class FrameworkBuildTask extends Task{
             fpdParserTask.setProject(getProject());
             fpdParserTask.setFpdFile(buildFile);
             fpdParserTask.execute();
+            
+            //
+            // If cleanall delete the Platform_build.xml
+            //
+            if (type.compareTo("cleanall") == 0) {
+                File platformBuildFile = 
+                    new File(getProject().getProperty("PLATFORM_DIR") 
+                                    + File.separatorChar 
+                                    + getProject().getProperty("PLATFORM") 
+                                    + "_build.xml");
+                platformBuildFile.deleteOnExit();
+            }
         }
         
         //
