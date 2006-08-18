@@ -82,31 +82,34 @@ public class SurfaceAreaQuery {
 
     public static String prefix = "http://www.TianoCore.org/2006/Edk2.0";
 
-    // /
-    // / Contains name/value pairs of Surface Area document object. The name is
-    // / always the top level element name.
-    // /
+    //
+    // Contains name/value pairs of Surface Area document object. The name is
+    // always the top level element name.
+    //
     private static Map<String, XmlObject> map = null;
 
-    // /
-    // / mapStack is used to do nested query
-    // /
+    //
+    // mapStack is used to do nested query
+    //
     private static Stack<Map<String, XmlObject>> mapStack = new Stack<Map<String, XmlObject>>();
 
-    // /
-    // / prefix of name space
-    // /
+    //
+    // prefix of name space
+    //
     private static String nsPrefix = "sans";
 
-    // /
-    // / xmlbeans needs a name space for each Xpath element
-    // /
+    //
+    // xmlbeans needs a name space for each Xpath element
+    //
     private static String ns = null;
 
-    // /
-    // / keep the namep declaration for xmlbeans Xpath query
-    // /
+    //
+    // keep the namep declaration for xmlbeans Xpath query
+    //
     private static String queryDeclaration = null;
+
+    private static StringBuffer normQueryString = new StringBuffer(4096);
+    private static Pattern xPathPattern = Pattern.compile("([^/]*)(/|//)([^/]+)");
 
     /**
      * Set a Surface Area document for query later
@@ -150,13 +153,12 @@ public class SurfaceAreaQuery {
     // / /ns:MsaHeader/ns:ModuleType
     // /
     private static String normalizeQueryString(String[] exp, String from) {
-        StringBuffer normQueryString = new StringBuffer(4096);
+        normQueryString.setLength(0);
 
         int i = 0;
         while (i < exp.length) {
             String newExp = from + exp[i];
-            Pattern pattern = Pattern.compile("([^/]*)(/|//)([^/]+)");
-            Matcher matcher = pattern.matcher(newExp);
+            Matcher matcher = xPathPattern.matcher(newExp);
 
             while (matcher.find()) {
                 String starter = newExp.substring(matcher.start(1), matcher

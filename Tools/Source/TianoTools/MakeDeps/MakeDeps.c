@@ -652,9 +652,6 @@ Returns:
   //
   // Go through the symbols and do replacements
   //
-  strcpy (Str, TargetFileName);
-  ReplaceSymbols (Str, sizeof (Str));
-  fprintf (mGlobals.OutFptr, "%s : ", Str);
   strcpy (Str, DependentFile);
   ReplaceSymbols (Str, sizeof (Str));
   fprintf (mGlobals.OutFptr, "%s\n", Str);

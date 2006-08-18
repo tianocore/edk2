@@ -25,6 +25,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
+import org.tianocore.build.global.PropertyManager;
 import org.tianocore.build.toolchain.ConfigReader;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.common.definitions.ToolDefinitions;
@@ -135,7 +136,7 @@ public class FrameworkBuildTask extends Task{
         // Global Data initialization
         //
         File workspacePath = new File(getProject().getProperty("WORKSPACE"));
-        getProject().setProperty("WORKSPACE_DIR", workspacePath.getPath().replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(getProject(), "WORKSPACE_DIR", workspacePath.getPath().replaceAll("(\\\\)", "/"));
         GlobalData.initInfo(dbFilename, workspacePath.getPath(), toolsDefFilename);
         
         //
@@ -203,7 +204,7 @@ public class FrameworkBuildTask extends Task{
             GenBuildTask genBuildTask = new GenBuildTask();
             genBuildTask.setSingleModuleBuild(true);
             genBuildTask.setType(type);
-            getProject().setProperty("PLATFORM_FILE", activePlatform);
+            PropertyManager.setProperty(getProject(), "PLATFORM_FILE", activePlatform);
             genBuildTask.setProject(getProject());
             genBuildTask.setMsaFile(buildFile);
             genBuildTask.execute();
@@ -226,7 +227,7 @@ public class FrameworkBuildTask extends Task{
             // If system environment variable is not in ANT properties, add it
             //
             if (getProject().getProperty(name) == null) {
-                getProject().setProperty(name, sysProperties.get(name));
+                PropertyManager.setProperty(getProject(), name, sysProperties.get(name));
             }
         }
     }

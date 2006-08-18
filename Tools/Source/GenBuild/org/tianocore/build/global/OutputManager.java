@@ -16,6 +16,7 @@ package org.tianocore.build.global;
 
 import org.apache.tools.ant.Project;
 import java.io.File;
+import org.tianocore.build.global.PropertyManager;
 
 /**
   OutputManager class is used to setup output directories (BIN_DIR, DEST_DIR_OUTPUT, 
@@ -143,11 +144,11 @@ public class OutputManager {
         //
         // Set properties
         //
-        project.setProperty("BUILD_DIR", buildDir.replaceAll("(\\\\)", "/"));
-        project.setProperty("FV_DIR", fvDir.replaceAll("(\\\\)", "/"));
-        project.setProperty("BIN_DIR", binDir.replaceAll("(\\\\)", "/"));
-        project.setProperty("DEST_DIR_DEBUG", (destDir + File.separatorChar + "DEBUG").replaceAll("(\\\\)", "/"));
-        project.setProperty("DEST_DIR_OUTPUT", (destDir + File.separatorChar + "OUTPUT").replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(project, "BUILD_DIR", buildDir.replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(project, "FV_DIR", fvDir.replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(project, "BIN_DIR", binDir.replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(project, "DEST_DIR_DEBUG", (destDir + File.separatorChar + "DEBUG").replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(project, "DEST_DIR_OUTPUT", (destDir + File.separatorChar + "OUTPUT").replaceAll("(\\\\)", "/"));
         
         //
         // Create all directory if necessary
@@ -186,7 +187,7 @@ public class OutputManager {
         //
         // Set to property
         //
-        project.setProperty("BUILD_DIR", buildDir.replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(project, "BUILD_DIR", buildDir.replaceAll("(\\\\)", "/"));
         
         //
         // Create all directory if necessary
