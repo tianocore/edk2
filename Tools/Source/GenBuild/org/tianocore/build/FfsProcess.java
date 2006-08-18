@@ -32,8 +32,7 @@ import org.w3c.dom.Element;
 /** 
   <p><code>FfsProcess</code> is a class to find the corresponding FFS layout. </p>
   
-  <p>Property <code>COMMON_FILE</code> specified which file to search. The element
-  in <code>COMMON_FILE</code> is like following: </p>
+  <p>The FFS Layout is like following: </p>
   
   <pre>
     &lt;Ffs type="APPLICATION"&gt;
@@ -104,14 +103,13 @@ public class FfsProcess {
     }
 
     /**
-      Find the corresponding FFS layout in <code>COMMON_FILE</code> if it
-      does not specify in module's surface area. 
+      Find the corresponding FFS layout in <code>FPD</code>. 
       
       @param buildType Current module's component type
       @param project Ant project
       @return whether find the corresponding FFS layout
       @throws BuildException
-              If specified COMMON_FILE XML file is not valide.
+              If can't find FFS Layout in FPD.
     **/
     public boolean initSections(String buildType, Project project, FpdModuleIdentification fpdModuleId) throws BuildException {
         //

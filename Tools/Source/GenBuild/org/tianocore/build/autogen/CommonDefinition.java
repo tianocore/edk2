@@ -26,9 +26,7 @@ import java.util.Set;
   
 **/
 public class CommonDefinition {
-    public final static String spdSuffix = ".spd";
-    public final static String mbdSuffix = ".mbd";
-    public final static String msaSuffix = ".msa";
+
     public final static String LibraryStr = "LIBRARY";
     public final static String autoGenHbegin = "extern int __make_me_compile_correctly;\r\n";
     public final static String include = "#include";
@@ -58,18 +56,18 @@ public class CommonDefinition {
     public final static String tianoR8FlashMapH = "TianoR8FlashMap.h";
     public final static String flashMapH = "FlashMap.h";
 
-    //
-    // The defintions for identifying current module
-    // is PEI Pcd driver or Dxe Pcd driver.
-    // 
+    ///
+    /// The defintions for identifying current module
+    /// is PEI Pcd driver or Dxe Pcd driver.
+    /// 
     public static enum   PCD_DRIVER_TYPE { NOT_PCD_DRIVER,
         PEI_PCD_DRIVER, 
         DXE_PCD_DRIVER,
         UNKNOWN_PCD_DRIVER};
 
-    //
-    // AutoGen.h and AutoGen.c file's header
-    //
+    ///
+    /// AutoGen.h and AutoGen.c file's header
+    ///
     public final static String autogenHNotation = 
     "/**\r\n" +
     "  DO NOT EDIT\r\n" +
@@ -90,9 +88,9 @@ public class CommonDefinition {
     "       Auto-generated AutoGen.c for building module or library.\r\n" +
     "**/\r\n\r\n";
 
-    //
-    // module type
-    //
+    ///
+    /// module type
+    ///
     public final static int ModuleTypeBase = 0;
     public final static int ModuleTypeSec = 1;
     public final static int ModuleTypePeiCore = 2;
@@ -106,35 +104,9 @@ public class CommonDefinition {
     public final static int ModuleTypeUefiApplication = 10;
     public final static int ModuleTypeUnknown = 11;
 
-
-    //
-    // component type
-    //                           
-    public final static int  ComponentTypeNull = 0;
-    public final static int  ComponentTypeApriori = 1;
-    public final static int  ComponentTypeSec = 2;
-    public final static int  ComponentTypeLibrary = 3;
-    public final static int  ComponentTypeFvImageFile = 4;
-    public final static int  ComponentTypeBsDriver = 5;
-    public final static int  ComponentTypeRtDriver = 6;
-    public final static int  ComponentTypeSalRtDriver =7;
-    public final static int  ComponentTypePe32Peim = 8;
-    public final static int  ComponentTypePicPeim =9;
-    public final static int  ComponentTypeCombinedPeimDriver =10;
-    public final static int  ComponentTypePeiCore = 11;
-    public final static int  ComponentTypeDxeCore = 12;
-    public final static int  ComponentTypeApplication = 13;
-    public final static int  ComponentTypeBsDriverEfi = 14;
-    public final static int  ComponentTypeShellApp = 15;
-    public final static int  ComponentTypeBinary =16;
-    public final static int  ComponentTypeLogo = 17;
-    public final static int  ComponentTypeCustomBuild = 18;
-    public final static int  ComponentTypeUnknown = 19;
-
-
-    //
-    // Usaged style
-    //
+    ///
+    /// Usaged style
+    ///
     public final static String AlwaysConsumed = "ALWAYS_CONSUMED";
     public final static String AlwaysProduced = "ALWAYS_PRODUCED";
 
@@ -156,9 +128,9 @@ public class CommonDefinition {
         }
     }
 
-    //
-    // Module type
-    //
+    ///
+    /// Module type
+    ///
     public static final MyEnum[] moduleEnum = new MyEnum[] {
         new MyEnum("BASE", ModuleTypeBase),
         new MyEnum("SEC", ModuleTypeSec),
@@ -171,30 +143,6 @@ public class CommonDefinition {
         new MyEnum("DXE_SMM_DRIVER", ModuleTypeDxeSmmDriver),
         new MyEnum("UEFI_DRIVER", ModuleTypeUefiDriver),
         new MyEnum("UEFI_APPLICATION", ModuleTypeUefiApplication)};
-
-    //
-    // Component type
-    //
-    public static final MyEnum[] componentEnum = new MyEnum[]{
-        new MyEnum("APRIORI", ComponentTypeApriori),
-        new MyEnum("SEC", ComponentTypeSec),
-        new MyEnum("LIBRARY", ComponentTypeLibrary),
-        new MyEnum("FV_IMAGE_FILE", ComponentTypeFvImageFile),
-        new MyEnum("BS_DRIVER", ComponentTypeBsDriver),
-        new MyEnum("RT_DRIVER", ComponentTypeRtDriver),
-        new MyEnum("SAL_RT_DRIVER", ComponentTypeSalRtDriver),
-        new MyEnum("PE32_PEIM", ComponentTypePe32Peim),
-        new MyEnum("PIC_PEIM", ComponentTypePicPeim),
-        new MyEnum("COMBINED_PEIM_DRIVER", ComponentTypeCombinedPeimDriver),
-        new MyEnum("PEI_CORE", ComponentTypePeiCore),
-        new MyEnum("DXE_CORE", ComponentTypeDxeCore),
-        new MyEnum("APPLICATION", ComponentTypeApplication),
-        new MyEnum("BS_DRIVER_EFI", ComponentTypeBsDriverEfi),
-        new MyEnum("SHELLAPP", ComponentTypeShellApp),
-        new MyEnum("BINARY", ComponentTypeBinary),
-        new MyEnum("LOGO", ComponentTypeLogo),
-        new MyEnum("CUSTOM_BUILD", ComponentTypeCustomBuild)
-    };
 
     /**
       getModuleType
@@ -216,71 +164,14 @@ public class CommonDefinition {
     }
 
     /**
-      getComponentType
+      formateGuidName
       
-      This function get the component type value according commponet type 
-      string.
+      This function is to formate GUID to ANSI c form.
       
-      @param    componentTypeStr  String of component type.
-      @return
+      @param guidNameCon
+                 String of GUID.
+      @return Formated GUID.
     **/
-    static public int getComponentType (String componentTypeStr){
-        int returnValue = -1;
-        for (int i = 0; i < CommonDefinition.componentEnum.length; i++) {
-            returnValue = CommonDefinition.componentEnum[i].ForInt(componentTypeStr);
-            if (returnValue != -1) {
-                return returnValue;
-            }
-        }
-        return CommonDefinition.ComponentTypeUnknown;
-    }
-
-    /**
-    getComponentTypeString
-    
-    This function get the commponet type string according component type value.
-    
-    @param    componentType  Integer value of component type.
-    @return
-    **/
-    static public String getComponentTypeString (int componentType) {
-        if ((componentType > CommonDefinition.ComponentTypeUnknown) || 
-            (componentType < CommonDefinition.ComponentTypeNull)) {
-            return null;
-        }
-        for (int index = 0; index < CommonDefinition.componentEnum.length; index ++) {
-            if (componentType == CommonDefinition.componentEnum[index].type) {
-                return CommonDefinition.componentEnum[index].moduleTypeStr;
-            }
-        }
-        return null;
-    }
-
-    /**
-      isLibraryComponent 
-      
-      This function is to check does componet is library according to commponet
-      type value.
-      
-      @param   componentType     Integer value of component type.
-      @return
-    **/
-    static public boolean isLibraryComponent (int componentType) {
-        if (ComponentTypeLibrary == componentType) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * formateGuidName
-     * 
-     * This function is to formate GUID to ANSI c form.
-     * 
-     * @param guidNameCon
-     *            String of GUID.
-     * @return Formated GUID.
-     */
     public static String formatGuidName(String guidNameConv) {
         String[] strList;
         String guid = "";
@@ -332,14 +223,14 @@ public class CommonDefinition {
     }
 
     /**
-     * Remove deuplicat string in list
-     * 
-     * This function is to duplicat string in list
-     * 
-     * @param String[]
-     *            String list.
-     * @return String[] String list which remove the duplicate string.
-     */
+      Remove deuplicat string in list
+      
+      This function is to duplicat string in list
+      
+      @param String[]
+                 String list.
+      @return String[] String list which remove the duplicate string.
+    **/
     public static String[] remDupString (String[] orgList){
         Set<String> strList = new LinkedHashSet<String>();
         String[] desList ;

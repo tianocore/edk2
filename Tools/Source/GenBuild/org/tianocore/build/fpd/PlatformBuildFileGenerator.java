@@ -12,6 +12,7 @@
 package org.tianocore.build.fpd;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +53,12 @@ public class PlatformBuildFileGenerator {
     /// Mapping from modules identification to out put file name
     ///
     private Map<FpdModuleIdentification, String> outfiles;
+    
+    ///
+    /// Mapping from FV name to its modules
+    ///
+    private Map<String, Set<FpdModuleIdentification>> fvs = new HashMap<String, Set<FpdModuleIdentification>>();
+
 
     private boolean isUnified = true;
     
@@ -63,10 +70,11 @@ public class PlatformBuildFileGenerator {
         + "Abstract:\n"
         + "Auto-generated ANT build file for building EFI Modules and Platforms\n";
 
-    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, boolean isUnified){
+    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, boolean isUnified){
         this.project = project;
         this.outfiles = outfiles;
         this.isUnified = isUnified;
+        this.fvs = fvs;
         this.platformName = project.getProperty("PLATFORM");
     }
     
@@ -173,66 +181,117 @@ public class PlatformBuildFileGenerator {
         }
     }
     
+    /**
+      1. Get All valid Fv Image Names in sequence
+      2. For each FV, get modules by sequences
+      3. Get other modules
+      
+      @param document XML document
+      @param root Node
+    **/
     private void applyModules(Document document, Node root) {
         root.appendChild(document.createComment("Modules target"));
         Element ele = document.createElement("target");
         ele.setAttribute("name", "modules");
 
-        Set<FpdModuleIdentification> set = outfiles.keySet();
-        Iterator iter = set.iterator();
-        while (iter.hasNext()) {
-            FpdModuleIdentification fpdModuleId = (FpdModuleIdentification) iter.next();
-            ModuleIdentification moduleId = fpdModuleId.getModule();
-            Element moduleEle = document.createElement("GenBuild");
-            moduleEle.setAttribute("type", "build");
-            //
-            // Inherit Properties.
-            //{"ARCH", "PACKAGE", "PACKAGE_GUID", "PACKAGE_VERSION", "MODULE_DIR"}
-            //
-            
-            //
-            // ARCH
-            //
-            Element property = document.createElement("property");
-            property.setAttribute("name", "ARCH");
-            property.setAttribute("value", fpdModuleId.getArch());
-            moduleEle.appendChild(property);
-
-            //
-            // MODULE_GUID
-            //
-            property = document.createElement("property");
-            property.setAttribute("name", "MODULE_GUID");
-            property.setAttribute("value", moduleId.getGuid());
-            moduleEle.appendChild(property);
-            
-            //
-            // MODULE_VERSION
-            //
-            property = document.createElement("property");
-            property.setAttribute("name", "MODULE_VERSION");
-            property.setAttribute("value", moduleId.getVersion());
-            moduleEle.appendChild(property);
-            
-            //
-            // PACKAGE_GUID
-            //
-            property = document.createElement("property");
-            property.setAttribute("name", "PACKAGE_GUID");
-            property.setAttribute("value", moduleId.getPackage().getGuid());
-            moduleEle.appendChild(property);
-            
-            //
-            // PACKAGE_VERSION
-            //
-            property = document.createElement("property");
-            property.setAttribute("name", "PACKAGE_VERSION");
-            property.setAttribute("value", moduleId.getPackage().getVersion());
-            moduleEle.appendChild(property);
-            
-            ele.appendChild(moduleEle);
+        //
+        // Get all valid FV name
+        //
+        String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
+        
+        //
+        // For each valid FV, get all modules in sequence
+        //
+        for (int i = 0; i < validFv.length; i++) {
+            if (fvs.containsKey(validFv[i])) {
+                Set<FpdModuleIdentification> set = fvs.get(validFv[i]);
+                Iterator<FpdModuleIdentification> iter = set.iterator();
+                while (iter.hasNext()) {
+                    FpdModuleIdentification fpdModuleId = iter.next();
+                    applySingleModule(document, ele, fpdModuleId);
+                }
+            }
         }
+        
+        //
+        // Get all other modules
+        //
+        Iterator<String> fvsNameIter = fvs.keySet().iterator();
+        
+        while (fvsNameIter.hasNext()) {
+            String fvName = fvsNameIter.next();
+            if (!isContain(validFv, fvName)) {
+                Set<FpdModuleIdentification> set = fvs.get(fvName);
+                Iterator iter = set.iterator();
+                while (iter.hasNext()) {
+                    FpdModuleIdentification fpdModuleId = (FpdModuleIdentification) iter.next();
+                    applySingleModule(document, ele, fpdModuleId);
+                }
+            }
+        }
+
         root.appendChild(ele);
+    }
+    
+    private void applySingleModule(Document document, Node root, FpdModuleIdentification fpdModuleId) {
+        ModuleIdentification moduleId = fpdModuleId.getModule();
+        Element moduleEle = document.createElement("GenBuild");
+        moduleEle.setAttribute("type", "build");
+        //
+        // Inherit Properties.
+        //{"ARCH", "PACKAGE", "PACKAGE_GUID", "PACKAGE_VERSION", "MODULE_DIR"}
+        //
+        
+        //
+        // ARCH
+        //
+        Element property = document.createElement("property");
+        property.setAttribute("name", "ARCH");
+        property.setAttribute("value", fpdModuleId.getArch());
+        moduleEle.appendChild(property);
+
+        //
+        // MODULE_GUID
+        //
+        property = document.createElement("property");
+        property.setAttribute("name", "MODULE_GUID");
+        property.setAttribute("value", moduleId.getGuid());
+        moduleEle.appendChild(property);
+        
+        //
+        // MODULE_VERSION
+        //
+        property = document.createElement("property");
+        property.setAttribute("name", "MODULE_VERSION");
+        property.setAttribute("value", moduleId.getVersion());
+        moduleEle.appendChild(property);
+        
+        //
+        // PACKAGE_GUID
+        //
+        property = document.createElement("property");
+        property.setAttribute("name", "PACKAGE_GUID");
+        property.setAttribute("value", moduleId.getPackage().getGuid());
+        moduleEle.appendChild(property);
+        
+        //
+        // PACKAGE_VERSION
+        //
+        property = document.createElement("property");
+        property.setAttribute("name", "PACKAGE_VERSION");
+        property.setAttribute("value", moduleId.getPackage().getVersion());
+        moduleEle.appendChild(property);
+        
+        root.appendChild(moduleEle);
+    }
+    
+    private boolean isContain(String[] list, String item) {
+        for (int i = 0; i < list.length; i++) {
+            if (list[i].equalsIgnoreCase(item)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private void applyFvs(Document document, Node root) {
