@@ -34,6 +34,7 @@ import org.apache.tools.ant.Project;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
+import org.tianocore.build.global.PropertyManager;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
@@ -483,7 +484,7 @@ public class ModuleBuildFileGenerator {
         for (int i = 0; i < sourceFiles.length; i++) {
             str += " " + sourceFiles[i][1];
         }
-        project.setProperty("SOURCE_FILES", str.replaceAll("(\\\\)", "/"));
+        PropertyManager.setProperty(project, "SOURCE_FILES", str.replaceAll("(\\\\)", "/"));
     }
 
     /**
