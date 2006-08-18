@@ -743,7 +743,6 @@ public class MsaHeader extends IInternalFrame {
      
      **/
     private void init(ModuleDefinitionsDocument.ModuleDefinitions inMd) {
-        init();
         if (inMd != null) {
             this.md = inMd;
             if (md.getSupportedArchitectures() != null) {
