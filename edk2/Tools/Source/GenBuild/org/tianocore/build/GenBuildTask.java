@@ -55,6 +55,7 @@ import org.tianocore.build.tools.ModuleItem;
   <p>The main function of this task is to parse module's surface area (MSA),
   then generate the corresponding <em>BaseName_build.xml</em> (the real ANT
   build script) and call this to build the module. The whole process including:
+  
   <pre>
   1. generate AutoGen.c and AutoGen.h; 
   2. build all dependent library instances;
@@ -69,24 +70,26 @@ import org.tianocore.build.tools.ModuleItem;
   </p>
 
   <pre>
-   &lt;GenBuild
-             msaFilename=&quot;HelloWorld.msa&quot;/&gt;
-             processTo=&quot;ALL&quot;/&gt;
+    &lt;GenBuild 
+       msaFile="${PACKAGE_DIR}/Application/HelloWorld/HelloWorld.msa"
+       type="cleanall" /&gt;
   </pre>
-
-  <p><code>processTo</code> provides a way to customize the whole build process.
-  processTo can be one value of ALL, AUTOGEN, FILES, LIBRARYINSTANCES, SECTIONS, NONE.
-  Default is ALL, means whole
-  </p>
 
   <p>
   This task calls <code>AutoGen</code> to generate <em>AutoGen.c</em> and
-  <em>AutoGen.h</em>. The task also parses the development environment
-  configuration files, such as collecting package information, setting compiler
-  flags and so on.
+  <em>AutoGen.h</em>. 
   </p>
 
-
+  <p>
+  This task will also set properties for current module, such as PACKAGE, 
+  PACKAGE_GUID, PACKAGE_VERSION, PACKAGE_DIR, PACKAGE_RELATIVE_DIR 
+  (relative to Workspace), MODULE or BASE_NAME, GUID, VERSION, MODULE_DIR, 
+  MODULE_RELATIVE_DIR (relative to Package), CONFIG_DIR, BIN_DIR, 
+  DEST_DIR_DEBUG, DEST_DIR_OUTPUT, TARGET, ARCH, TOOLCHAIN, TOOLCHAIN_FAMILY, 
+  SUBSYSTEM, ENTRYPOINT, EBC_TOOL_LIB_PATH, all compiler command related 
+  properties (CC, CC_FLAGS, CC_DPATH, CC_SPATH, CC_FAMILY, CC_EXT). 
+  </p>
+  
   @since GenBuild 1.0
 **/
 public class GenBuildTask extends Ant {
@@ -569,7 +572,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            GlobalData.log.info("Call user-defined " + moduleId.getName() + "_build.xml");
+            System.out.println("Call user-defined " + moduleId.getName() + "_build.xml");
             
             String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
             antCall(antFilename, null);
@@ -599,7 +602,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            GlobalData.log.info("Calling user-defined " + moduleId.getName() + "_build.xml");
+            System.out.println("Calling user-defined " + moduleId.getName() + "_build.xml");
             
             String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
             antCall(antFilename, "clean");
@@ -617,7 +620,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            GlobalData.log.info("Calling user-defined " + moduleId.getName() + "_build.xml");
+            System.out.println("Calling user-defined " + moduleId.getName() + "_build.xml");
 
             String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
             antCall(antFilename, "cleanall");

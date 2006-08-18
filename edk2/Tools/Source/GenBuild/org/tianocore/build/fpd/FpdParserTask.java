@@ -55,8 +55,7 @@ import org.tianocore.build.toolchain.ToolChainMap;
   and BUILD_DIR. </p>
 
   <p>The task generates ${PLATFORM}_build.xml file which will be called by top level
-  build.xml. The task also generate Fv.inf files (File is for Tool GenFvImage)
-  and flash definition file (File is for Tool FlashMap) if necessary. </p>
+  build.xml. The task also generate Fv.inf files (File is for Tool GenFvImage). </p>
 
   <p>FpdParserTask task stores all FPD information to GlobalData. And parse
   tools definition file to set up compiler options for different Target and
@@ -69,9 +68,6 @@ import org.tianocore.build.toolchain.ToolChainMap;
   <pre>
   &lt;FPDParser platformName="Nt32" /&gt;
   </pre>
-
-  <p>The task will initialize all information through parsing Framework Database,
-  SPD, Tool chain configuration files. </p>
 
   @since GenBuild 1.0
 **/
@@ -101,7 +97,6 @@ public class FpdParserTask extends Task {
     private Vector<Property> properties = new Vector<Property>();
 
     private boolean isUnified = true;
-
 
     /**
       Public construct method. It is necessary for ANT task.
@@ -174,7 +169,7 @@ public class FpdParserTask extends Task {
         //
         // Gen build.xml
         //
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, isUnified);
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified);
         fileGenerator.genBuildFile();
 
         //

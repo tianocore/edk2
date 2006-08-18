@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.xmlbeans.XmlObject;
@@ -57,9 +56,6 @@ import org.tianocore.build.toolchain.ToolChainMap;
   @since GenBuild 1.0
 **/
 public class GlobalData {
-
-    public static Logger log = Logger.getAnonymousLogger();
-
     ///
     /// Record current WORKSPACE Directory
     ///
@@ -654,10 +650,10 @@ public class GlobalData {
         return result;
     }
 
-    ////// Tool Chain Related, try to refine and put some logic process to ToolChainFactory
-
+    ///
+    /// Tool Chain Related, try to refine and put some logic process to ToolChainFactory
+    ///
     public static ToolChainInfo getToolChainInfo() {
-//        GlobalData.log.info(toolsDef.getConfigInfo() + "" + toolChainEnvInfo + toolChainPlatformInfo);
         if (toolChainInfo == null) {
             toolChainInfo = toolsDef.getConfigInfo().intersection(toolChainEnvInfo);
             if (toolChainPlatformInfo != null) {
@@ -665,12 +661,11 @@ public class GlobalData {
             }
             toolChainInfo.addCommands(toolsDef.getConfigInfo().getCommands());
             toolChainInfo.normalize();
-            GlobalData.log.info(toolChainInfo + "");
+            System.out.println("Current build tool chain information summary: ");
+            System.out.println(toolChainInfo + "");
         }
         return toolChainInfo;
     }
-
-
 
     public static void setPlatformToolChainFamilyOption(ToolChainMap map) {
         platformToolChainFamilyOption = map;
