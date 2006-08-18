@@ -716,7 +716,12 @@ DetectIDEController (
   //
   // Master Error register is not 0x81, Go on check Slave
   //
-
+  
+  //
+  // Stall 10ms to wait for slave device ready
+  //
+  gBS->Stall (10000);
+  
   //
   // select slave
   //
