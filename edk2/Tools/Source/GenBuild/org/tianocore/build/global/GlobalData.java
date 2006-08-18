@@ -412,7 +412,7 @@ public class GlobalData {
             return msaMap;
         }
         catch (Exception ex){
-            throw new BuildException(ex.getMessage());
+            throw new BuildException("Parsing MSA file [" + msaFile.getPath() + "] error. \n" + ex.getMessage() );
         }
     }
 
@@ -598,7 +598,7 @@ public class GlobalData {
                 return packageId;
             }
         }
-        throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " in the current workspace!");
+        throw new BuildException("Can't find package GUID value " + packageId.toGuidString() + " in the current workspace!");
     }
 
     public synchronized static ModuleIdentification refreshModuleIdentification(ModuleIdentification moduleId) throws BuildException {
@@ -606,7 +606,7 @@ public class GlobalData {
         moduleId.setPackage(packageId);
         Spd spd = spdTable.get(packageId);
         if (spd == null) {
-            throw new BuildException("Can't find package GUID value " + packageId.getGuid() + " in the current workspace!");
+            throw new BuildException("Can't find package GUID value " + packageId.toGuidString() + " in the current workspace!");
         }
         Set<ModuleIdentification> modules = spd.getModules();
         Iterator<ModuleIdentification> iter = modules.iterator();
@@ -619,7 +619,7 @@ public class GlobalData {
                 return moduleId;
             }
         }
-        throw new BuildException("Can't find module GUID value " + moduleId.getGuid() + " in package, " + packageId + ", in the current workspace!");
+        throw new BuildException("Can't find module GUID value " + moduleId.toGuidString() + " in " + packageId + " under the current workspace!");
     }
 
     public synchronized static Set<PackageIdentification> getPackageList(){

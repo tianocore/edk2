@@ -198,8 +198,7 @@ public class Spd {
             }
         }
         catch (Exception e) {
-            e.setStackTrace(e.getStackTrace());
-            throw new BuildException("Parse of the package description file [" + packageId.getSpdFile() + "] failed!\n"
+            throw new BuildException("Parse of the package description file [" + packageFile.getPath() + "] failed!\n"
                                      + e.getMessage());
         }
     }
