@@ -52,7 +52,7 @@ import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.platform.ui.ListEditor;
-import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
+import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
 import org.tianocore.frameworkwizard.platform.ui.id.PackageIdentification;
@@ -920,19 +920,19 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private void getLibInstances(String libClass){
         libNameGuidMap.clear();
         try {
-            GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
+            WorkspaceProfile.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
         
-            Set<PackageIdentification> spi = GlobalData.getPackageList();
+            Set<PackageIdentification> spi = WorkspaceProfile.getPackageList();
             Iterator ispi = spi.iterator();
             
             while (ispi.hasNext()) {
                 PackageIdentification pi = (PackageIdentification) ispi.next();
 
-                Set<ModuleIdentification> smi = GlobalData.getModules(pi);
+                Set<ModuleIdentification> smi = WorkspaceProfile.getModules(pi);
                 Iterator ismi = smi.iterator();
                 while (ismi.hasNext()) {
                     ModuleIdentification mi = (ModuleIdentification) ismi.next();
-                    Map<String, XmlObject> m = GlobalData.getNativeMsa(mi);
+                    Map<String, XmlObject> m = WorkspaceProfile.getNativeMsa(mi);
                     SurfaceAreaQuery.setDoc(m);
                     Vector<String> classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
                     for (int i = 0; i < classProduced.size(); ++i) {

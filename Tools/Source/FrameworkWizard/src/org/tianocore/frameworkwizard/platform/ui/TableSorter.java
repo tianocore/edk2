@@ -158,7 +158,7 @@ public class TableSorter extends AbstractTableModel {
         return getViewToModel()[viewIndex].modelIndex;
     }
 
-    private int[] getModelToView() {
+    public int[] getModelToView() {
         if (modelToView == null) {
             int n = getViewToModel().length;
             modelToView = new int[n];

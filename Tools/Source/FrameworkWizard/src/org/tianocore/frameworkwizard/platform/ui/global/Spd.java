@@ -79,7 +79,7 @@ public class Spd {
                 if (!msaFile.exists()) {
                     continue;
                 }
-                Map<String, XmlObject> msaDoc = GlobalData.getNativeMsa( msaFile );
+                Map<String, XmlObject> msaDoc = WorkspaceProfile.getNativeMsa( msaFile );
                 SurfaceAreaQuery.push(msaDoc);
                 ModuleIdentification moduleId = SurfaceAreaQuery.getMsaHeader();
                 SurfaceAreaQuery.pop();

@@ -1,7 +1,7 @@
 package org.tianocore.frameworkwizard.platform.ui.id;
 import java.io.File;
 
-import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
+import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 
 public class PlatformIdentification extends Identification{
     
@@ -34,6 +34,6 @@ public class PlatformIdentification extends Identification{
     }
     
     public String getPlatformRelativeDir(){
-        return fpdFile.getParent().substring(GlobalData.getWorkspacePath().length());
+        return fpdFile.getParent().substring(WorkspaceProfile.getWorkspacePath().length());
     }
 }

@@ -25,7 +25,7 @@ import javax.swing.table.TableModel;
 
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
-import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
+import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
 import org.tianocore.frameworkwizard.platform.ui.id.PackageIdentification;
@@ -151,6 +151,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         // display pcd for key.
         //
         model.setRowCount(0);
+        jTextAreaPcdHelp.setText("");
+        jComboBoxItemType.setSelectedIndex(-1);
+        jTextFieldMaxDatumSize.setText("");
+        jTextFieldPcdDefault.setText("");
         int pcdCount = ffc.getPcdDataCount(i);
         if (pcdCount != 0) {
             String[][] saa = new String[pcdCount][7];
@@ -175,7 +179,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             String[][] saa = new String[instanceCount][5];
             ffc.getLibraryInstances(key, saa);
             for (int i = 0; i < saa.length; ++i) {
-                ModuleIdentification mi = GlobalData.getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
+                ModuleIdentification mi = WorkspaceProfile.getModuleId(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
                 if (mi != null) {
                     saa[i][0] = mi.getName();
                     saa[i][2] = mi.getVersion();
@@ -221,7 +225,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     private void resolveLibraryInstances(String key) {
-        ModuleIdentification mi = GlobalData.getModuleId(key);
+        ModuleIdentification mi = WorkspaceProfile.getModuleId(key);
         PackageIdentification[] depPkgList = null;
         try{
             //
@@ -288,7 +292,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         ArrayList<String> al = new ArrayList<String>();
         
         for (int i = 0; i < depPkgList.length; ++i) {
-            Set<ModuleIdentification> smi = GlobalData.getModules(depPkgList[i]);
+            Set<ModuleIdentification> smi = WorkspaceProfile.getModules(depPkgList[i]);
             Iterator ismi = smi.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
@@ -319,7 +323,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     }
     
     private void removeInstance(String key) {
-        ModuleIdentification mi = GlobalData.getModuleId(key); 
+        ModuleIdentification mi = WorkspaceProfile.getModuleId(key); 
         //
         // remove pcd information of instance from current ModuleSA
         //
@@ -629,11 +633,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         ffc.getLibraryInstances(moduleKey, saa);
         
         try{
-            if (ffc.getPcdBuildDataInfo(GlobalData.getModuleId(moduleKey), cName, tsGuid, sa)) {
+            if (ffc.getPcdBuildDataInfo(WorkspaceProfile.getModuleId(moduleKey), cName, tsGuid, sa)) {
                 return;
             }
             for (int j = 0; j < saa.length; ++j) {
-                if (ffc.getPcdBuildDataInfo(GlobalData.getModuleId(saa[j][1] + " " + saa[j][2] + " " + saa[j][3] + " " + saa[j][4]),
+                if (ffc.getPcdBuildDataInfo(WorkspaceProfile.getModuleId(saa[j][1] + " " + saa[j][2] + " " + saa[j][3] + " " + saa[j][4]),
                                             cName, tsGuid, sa)) {
                     return;
                 }
@@ -841,8 +845,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                         while(li.hasNext()) {
                             String instance = li.next();
                             String[] s = {"", "", "", "", ""};
-                            if (GlobalData.getModuleId(instance) != null) {
-                                s[0] = GlobalData.getModuleId(instance).getName();
+                            if (WorkspaceProfile.getModuleId(instance) != null) {
+                                s[0] = WorkspaceProfile.getModuleId(instance).getName();
                             }
                             
                             String[] instancePart = instance.split(" ");
@@ -981,7 +985,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     libInstanceTableModel.getValueAt(row, 2) + " " +
                     libInstanceTableModel.getValueAt(row, 3) + " " +
                     libInstanceTableModel.getValueAt(row, 4);
-                    ModuleIdentification libMi = GlobalData.getModuleId(instanceValue);
+                    ModuleIdentification libMi = WorkspaceProfile.getModuleId(instanceValue);
                     ffc.genLibraryInstance(libMi, moduleKey);
                     //
                     // Add pcd information of selected instance to current moduleSA
@@ -1438,6 +1442,10 @@ private JComboBox getJComboBoxItemType() {
                 if (jComboBoxItemType.getItemCount() == 3) {
                     if (!jComboBoxItemType.getSelectedItem().equals("DYNAMIC")) {
                         pcdDynamicToNonDynamic(jTablePcd.getValueAt(row, 0)+"", jTablePcd.getValueAt(row, 1)+"");
+                        if (jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
+                            jTextFieldPcdDefault.setText("");
+                            jTextFieldPcdDefault.setEnabled(true);
+                        }
                     }
                     else{
                         pcdNonDynamicToDynamic(jTablePcd.getValueAt(row, 0)+"", jTablePcd.getValueAt(row, 1)+"");

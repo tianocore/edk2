@@ -481,6 +481,12 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                         return;
                     }
                     else{
+                        jTextFieldDefaultValue.setText("");
+                        jTextFieldVpdOffset.setText("");
+                        jTextFieldVarName.setText("");
+                        jTextFieldVarGuid.setText("");
+                        jTextFieldVarOffset.setText("");
+                        jTextFieldHiiDefaultValue.setText("");
                         int selected = lsm.getMinSelectionIndex();
                         displaySkuInfoDetails(selected);
                     }
