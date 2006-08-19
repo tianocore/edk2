@@ -909,8 +909,8 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             JOptionPane.showMessageDialog(frame, "C_Name is NOT C_NameType.");
             return false;
         }
-        if (!(DataValidation.isHexDoubleWordDataType(row[1].toString()) || 
-                        DataValidation.isInt(row[1].toString(), 0, 0xffffffff))) {
+        if (!DataValidation.isHexDoubleWordDataType(row[1].toString()) && 
+                        !DataValidation.isInt(row[1].toString(), Integer.MIN_VALUE, Integer.MAX_VALUE)) {
             JOptionPane.showMessageDialog(frame, "Token is NOT correct.");
             return false;
         }

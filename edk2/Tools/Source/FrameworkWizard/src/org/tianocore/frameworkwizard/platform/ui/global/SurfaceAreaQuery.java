@@ -349,7 +349,7 @@ public class SurfaceAreaQuery {
 		String packageGuid = null;
 		String packageVersion = null;
 
-        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea) GlobalData.getModuleXmlObject(mi);
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea) WorkspaceProfile.getModuleXmlObject(mi);
         if (msa.getPackageDependencies() == null) {
             return new PackageIdentification[0];
         }
@@ -365,7 +365,7 @@ public class SurfaceAreaQuery {
 			packageGuid = item.getPackageGuid();
 			packageVersion = item.getPackageVersion();
 
-            Set<PackageIdentification> spi = GlobalData.getPackageList();
+            Set<PackageIdentification> spi = WorkspaceProfile.getPackageList();
             Iterator<PackageIdentification> ispi = spi.iterator();
             String ver = "";
             while(ispi.hasNext()) {
@@ -404,7 +404,7 @@ public class SurfaceAreaQuery {
 	 * @returns null if nothing is there
 	 */
 	public static Vector<String> getLibraryClasses(String usage, ModuleIdentification mi) throws Exception{
-        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)GlobalData.getModuleXmlObject(mi);
+        ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)WorkspaceProfile.getModuleXmlObject(mi);
         Vector<String> libraryClassName = new Vector<String>();
         if (msa.getLibraryClassDefinitions() == null) {
             return libraryClassName;
@@ -1018,7 +1018,7 @@ public class SurfaceAreaQuery {
 		if (returns == null) {
 			return packageIncludeMap;
 		}
-		GlobalData.log.info("" + returns[0].getClass().getName());
+		WorkspaceProfile.log.info("" + returns[0].getClass().getName());
 		for (int i = 0; i < returns.length; i++) {
 			PackageHeadersDocument.PackageHeaders.IncludePkgHeader includeHeader = (PackageHeadersDocument.PackageHeaders.IncludePkgHeader) returns[i];
 			packageIncludeMap.put(includeHeader.getModuleType().toString(),

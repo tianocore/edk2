@@ -1,7 +1,7 @@
 package org.tianocore.frameworkwizard.platform.ui.id;
 import java.io.File;
 
-import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
+import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 
 public class PackageIdentification extends Identification{
     
@@ -48,12 +48,12 @@ public class PackageIdentification extends Identification{
     
     public String getPackageRelativeDir()throws Exception{
         prepareSpdFile();
-        return spdFile.getParent().substring(GlobalData.getWorkspacePath().length() + 1);
+        return spdFile.getParent().substring(WorkspaceProfile.getWorkspacePath().length() + 1);
     }
     
     private void prepareSpdFile() throws Exception{
         if (spdFile == null) {
-            spdFile = GlobalData.getPackageFile(this);
+            spdFile = WorkspaceProfile.getPackageFile(this);
         }
     }
 }

@@ -2,7 +2,7 @@ package org.tianocore.frameworkwizard.platform.ui.id;
 
 import java.io.File;
 
-import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
+import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 
 public class ModuleIdentification extends Identification {
     
@@ -34,7 +34,7 @@ public class ModuleIdentification extends Identification {
 
     private void prepareMsaFile()throws Exception{
         if (msaFile == null) {
-            msaFile = GlobalData.getModuleFile(this);
+            msaFile = WorkspaceProfile.getModuleFile(this);
         }
     }
     public void setMsaFile(File msaFile) {
