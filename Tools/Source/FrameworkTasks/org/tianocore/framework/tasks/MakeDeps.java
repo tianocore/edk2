@@ -363,7 +363,10 @@ public class MakeDeps extends Task {
             String line = null;
             while ((line = lineReader.readLine()) != null) {
                 File sourceFile = new File(line);
-                if (sourceFile.lastModified() > depsFileTimeStamp) {
+                //
+                // If a file cannot be found (moved or removed) or newer, regenerate the dep file
+                // 
+                if ((!sourceFile.exists()) || (sourceFile.lastModified() > depsFileTimeStamp)) {
                     ret = false;
                     break;
                 }
