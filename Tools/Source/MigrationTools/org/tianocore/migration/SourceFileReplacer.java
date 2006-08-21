@@ -18,18 +18,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class SourceFileReplacer {
-	SourceFileReplacer(String path, String outpath, ModuleInfo moduleinfo, Database database, UI fp) {
+	SourceFileReplacer(String path, String outpath, ModuleInfo moduleinfo) {
 		modulepath = path;
 		outputpath = outpath;
 		mi = moduleinfo;
-		db = database;
-		ui = fp;
 	}
 	private String modulepath;
 	private String outputpath;
 	private ModuleInfo mi;
-	private Database db;
-	private UI ui;
 	private boolean showdetails = false;
 	
 	private class r8tor9 {
@@ -72,7 +68,7 @@ public final class SourceFileReplacer {
 	public void flush() throws Exception {
 		String outname = null;
 		String inname = null;
-		if (ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
+		if (MigrationTool.ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
 			showdetails = true;
 		}
 		
@@ -85,7 +81,7 @@ public final class SourceFileReplacer {
 				} else {
 					outname = inname;
 				}
-				ui.println("\nModifying file: " + inname);
+				MigrationTool.ui.println("\nModifying file: " + inname);
 				Common.string2file(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname), outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".dxs") || inname.contains(".uni")) {
 				if (inname.contains(".H")) {
@@ -93,7 +89,7 @@ public final class SourceFileReplacer {
 				} else {
 					outname = inname;
 				}
-				ui.println("\nCopying file: " + inname);
+				MigrationTool.ui.println("\nCopying file: " + inname);
 				Common.string2file(Common.file2string(modulepath + File.separator + "temp" + File.separator + inname), outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			}
 		}
@@ -156,7 +152,7 @@ public final class SourceFileReplacer {
 		// replace BS -> gBS , RT -> gRT
 		Matcher mat = pat.matcher(line);
 		if (mat.find()) {												// add a library here
-			ui.println("Converting all BS->gBS, RT->gRT");
+			MigrationTool.ui.println("Converting all BS->gBS, RT->gRT");
 			line = mat.replaceAll("g$1$2$3");							//unknown correctiveness
 		}
 		mat.reset();
@@ -173,7 +169,7 @@ public final class SourceFileReplacer {
 		Pattern patentrypoint = Pattern.compile("EFI_DRIVER_ENTRY_POINT[^\\}]*\\}");
 		Matcher matentrypoint = patentrypoint.matcher(line);
 		if (matentrypoint.find()) {
-			ui.println("Deleting Entry_Point");
+			MigrationTool.ui.println("Deleting Entry_Point");
 			line = matentrypoint.replaceAll("");
 		}
 		*/
@@ -191,10 +187,10 @@ public final class SourceFileReplacer {
 				mi.hashrequiredr9libs.add("UefiRuntimeServicesTableLib");		//a
 				mi.hashrequiredr9libs.add("DxeServicesTableLib");				//l
 			} else {															//
-				mi.hashrequiredr9libs.add(db.getR9Lib(r8thing));				// add a library here
+				mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));				// add a library here
 			}
 			
-			if ((r9thing = db.getR9Func(r8thing)) != null) {
+			if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {
 				if (!r8thing.equals(r9thing)) {
 					if (line.contains(r8thing)) {
 						line = line.replaceAll(r8thing, r9thing);
@@ -220,8 +216,8 @@ public final class SourceFileReplacer {
 		it = mi.hashnonlocalmacro.iterator();
 		while (it.hasNext()) {						//macros are all assumed MdePkg currently
 			r8thing = it.next();
-			//mi.hashrequiredr9libs.add(db.getR9Lib(r8thing));		
-			if ((r9thing = db.getR9Macro(r8thing)) != null) {
+			//mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));		
+			if ((r9thing = MigrationTool.db.getR9Macro(r8thing)) != null) {
 				if (line.contains(r8thing)) {
 					line = line.replaceAll(r8thing, r9thing);
 					filemacro.add(new r8tor9(r8thing, r9thing));
@@ -288,7 +284,7 @@ public final class SourceFileReplacer {
 		show(fileppi, "ppi");
 		show(fileprotocol, "protocol");
 		if (!filer8only.isEmpty()) {
-			ui.println("Converting r8only : " + filer8only);
+			MigrationTool.ui.println("Converting r8only : " + filer8only);
 		}
 
 		filefunc.clear();
@@ -306,12 +302,12 @@ public final class SourceFileReplacer {
 		r8tor9 temp;
 		if (showdetails) {
 			if (!hash.isEmpty()) {
-				ui.print("Converting " + sh + " : ");
+				MigrationTool.ui.print("Converting " + sh + " : ");
 				while (it.hasNext()) {
 					temp = it.next();
-					ui.print("[" + temp.r8thing + "->" + temp.r9thing + "] ");
+					MigrationTool.ui.print("[" + temp.r8thing + "->" + temp.r9thing + "] ");
 				}
-				ui.println("");
+				MigrationTool.ui.println("");
 			}
 		}
 	}
@@ -323,7 +319,7 @@ public final class SourceFileReplacer {
 		it = hash.iterator();
 		while (it.hasNext()) {
 			r8thing = it.next();
-			if ((r9thing = db.getR9Guidname(r8thing)) != null) {
+			if ((r9thing = MigrationTool.db.getR9Guidname(r8thing)) != null) {
 				if (!r8thing.equals(r9thing)) {
 					if (line.contains(r8thing)) {
 						line = line.replaceAll(r8thing, r9thing);
