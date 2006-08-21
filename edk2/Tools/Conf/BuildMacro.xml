@@ -586,9 +586,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           </cc>
         </sequential>
       </OnDependency>
-      <!-- The Module contain Unicode file need those flags -->
-      <var name="CC_FLAGS" value="${CC_FLAGS} /DSTRING_ARRAY_NAME=${BASE_NAME}Strings /FI${DEST_DIR_DEBUG}/${BASE_NAME}StrDefs.h" />
-      
+
       <!-- Since fileset can't scan file start with ./, remove ./ in previous. -->
       <if>
         <equals arg1="@{FILEPATH}" arg2="." />
