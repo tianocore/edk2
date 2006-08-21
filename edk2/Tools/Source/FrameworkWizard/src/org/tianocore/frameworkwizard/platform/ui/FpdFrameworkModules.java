@@ -25,7 +25,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
@@ -528,11 +530,27 @@ public class FpdFrameworkModules extends IInternalFrame {
 
             jTableFpdModules.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTableFpdModules.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-
+            
+            jTableFpdModules.getModel().addTableModelListener(this);
         }
         return jTableFpdModules;
     }
 
+    public void tableChanged(TableModelEvent arg0) {
+        if (arg0.getType() == TableModelEvent.UPDATE){
+            int row = arg0.getFirstRow();
+            int column = arg0.getColumn();
+            TableModel m = (TableModel)arg0.getSource();
+            
+            if (column != forceDbgColForFpdModTable) {
+                return;
+            }
+            String s = m.getValueAt(row, column)+"";
+            boolean dbgEnable = new Boolean(s);
+            ffc.setModuleSAForceDebug(row, dbgEnable);
+            docConsole.setSaved(false);
+        }
+    }
     /**
      * This method initializes jButtonSettings
      * 	
