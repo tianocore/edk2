@@ -1,3 +1,17 @@
+/** @file
+ 
+ The file is used to create, update FrameworkModules of Fpd file
+ 
+ Copyright (c) 2006, Intel Corporation
+ All rights reserved. This program and the accompanying materials
+ are licensed and made available under the terms and conditions of the BSD License
+ which accompanies this distribution.  The full text of the license may be found at
+ http://opensource.org/licenses/bsd-license.php
+ 
+ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+ 
+ **/
 package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.BorderLayout;
@@ -35,6 +49,8 @@ public class FpdFrameworkModules extends IInternalFrame {
      * Initialize Globals
      */
     private static final long serialVersionUID = 1L;
+    
+    public static final int forceDbgColForFpdModTable = 7;
 
     static JFrame frame;
 
@@ -68,7 +84,7 @@ public class FpdFrameworkModules extends IInternalFrame {
 
     private NonEditableTableModel modelAllModules = null;
 
-    private NonEditableTableModel modelFpdModules = null;
+    private FpdModulesTableModel modelFpdModules = null;
 
     private FpdModuleSA settingDlg = null;
 
@@ -321,7 +337,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     }
 
                     TableSorter sorter = (TableSorter) jTableAllModules.getModel();
-                    selectedRow = sorter.modelIndex(selectedRow);
+                    selectedRow = sorter.getModelRowIndex(selectedRow);
                     String path = modelAllModules.getValueAt(selectedRow, pathColForAllModTable) + "";
                     ModuleIdentification mi = miList.get(selectedRow);
                     Vector<String> vArchs = null;
@@ -419,7 +435,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     }
                     JOptionPane.showMessageDialog(frame, s);
                     TableSorter sorterFpdModules = (TableSorter)jTableFpdModules.getModel();
-                    int viewIndex = sorterFpdModules.getModelToView()[modelFpdModules.getRowCount() - 1];
+                    int viewIndex = sorterFpdModules.getViewIndexArray()[modelFpdModules.getRowCount() - 1];
                     jTableFpdModules.changeSelection(viewIndex, 0, false, false);
                 }
             });
@@ -467,7 +483,7 @@ public class FpdFrameworkModules extends IInternalFrame {
      */
     private JTable getJTableFpdModules() {
         if (jTableFpdModules == null) {
-            modelFpdModules = new NonEditableTableModel();
+            modelFpdModules = new FpdModulesTableModel();
             TableSorter sorter = new TableSorter(modelFpdModules);
             jTableFpdModules = new JTable(sorter);
             sorter.setTableHeader(jTableFpdModules.getTableHeader());
@@ -479,7 +495,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             modelFpdModules.addColumn("<html>Module<br>Type</html>");
             modelFpdModules.addColumn("<html>Module<br>Version</html>");
             modelFpdModules.addColumn("<html>Package<br>Version</html>");
-
+            modelFpdModules.addColumn("<html>Force<br>Debug</html>");
             
             javax.swing.table.TableColumn column = null;
             column = jTableFpdModules.getColumnModel().getColumn(modNameColForFpdModTable);
@@ -535,7 +551,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     }
 
                     TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
-                    selectedRow = sorter.modelIndex(selectedRow);
+                    selectedRow = sorter.getModelRowIndex(selectedRow);
                     try {
                         if (ffc.adjustPcd(selectedRow)) {
                             docConsole.setSaved(false);
@@ -584,7 +600,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     docConsole.setSaved(false);
 
                     TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
-                    selectedRow = sorter.modelIndex(selectedRow);
+                    selectedRow = sorter.getModelRowIndex(selectedRow);
 
                     String[] sa = new String[5];
                     ffc.getFrameworkModuleInfo(selectedRow, sa);
@@ -667,7 +683,7 @@ public class FpdFrameworkModules extends IInternalFrame {
             for (int i = 0; i < saa.length; ++i) {
                 ModuleIdentification mi = WorkspaceProfile.getModuleId(saa[i][ffcModGuid] + " " + saa[i][ffcModVer] + " "
                                                                  + saa[i][ffcPkgGuid] + " " + saa[i][ffcPkgVer]);
-                String[] row = { "", "", "", "", "", "", "" };
+                Object[] row = { "", "", "", "", "", "", "", "" };
                 if (mi != null) {
                     row[modNameColForFpdModTable] = mi.getName();
                     row[modVerColForFpdModTable] = mi.getVersion();
@@ -692,11 +708,12 @@ public class FpdFrameworkModules extends IInternalFrame {
                     }
                     al.add(saa[i][ffcModArch]);
                 }
+                row[forceDbgColForFpdModTable] = ffc.getModuleSAForceDebug(i);
                 modelFpdModules.addRow(row);
 
             }
             TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
-            sorter.setSortingStatus(modNameColForFpdModTable, TableSorter.ASCENDING);
+            sorter.setSortState(modNameColForFpdModTable, TableSorter.ASCENDING);
         }
 
         showAllModules();
@@ -736,7 +753,7 @@ public class FpdFrameworkModules extends IInternalFrame {
         }
         
         TableSorter sorter = (TableSorter)jTableAllModules.getModel();
-        sorter.setSortingStatus(modNameColForAllModTable, TableSorter.ASCENDING);
+        sorter.setSortState(modNameColForAllModTable, TableSorter.ASCENDING);
     }
 
     /**
@@ -761,6 +778,28 @@ class NonEditableTableModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
     public boolean isCellEditable(int row, int col) {
+        return false;
+    }
+}
+
+class FpdModulesTableModel extends DefaultTableModel {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
+    public Class<?> getColumnClass (int c) {
+        if (getValueAt(0, c) != null){
+            return getValueAt(0, c).getClass();
+        }
+        return String.class;
+    }
+    
+    public boolean isCellEditable (int row, int col) {
+        if (col == FpdFrameworkModules.forceDbgColForFpdModTable) {
+            return true;
+        }
         return false;
     }
 }
