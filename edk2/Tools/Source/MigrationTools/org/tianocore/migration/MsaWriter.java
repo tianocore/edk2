@@ -20,19 +20,15 @@ import org.tianocore.SupportedArchitectures.Enum;
 import org.apache.xmlbeans.*;
 
 public class MsaWriter {
-	MsaWriter(String path, String outpath, ModuleInfo moduleinfo, Database database, UI u) {
+	MsaWriter(String path, String outpath, ModuleInfo moduleinfo) {
 		modulepath = path;
 		outputpath = outpath;
 		mi = moduleinfo;
-		db = database;
-		ui = u;
 	}
 
 	private String modulepath;
 	private String outputpath;
 	private ModuleInfo mi;
-	private Database db;
-	private UI ui;
 	
 	private ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.newInstance();
 	

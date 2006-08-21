@@ -18,17 +18,6 @@ import java.util.regex.*;
 import org.tianocore.*;
 
 public final class ModuleReader {
-	ModuleReader(String path, ModuleInfo moduleinfo, Database database, UI u) {
-		//modulepath = path;
-		//mi = moduleinfo;
-		db = database;
-		ui = u;
-	}
-	//private static String modulepath;
-	//private static ModuleInfo mi;
-	private static Database db;
-	private static UI ui;
-	
 	private static final Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*=\\s*([^\\s]*)");
 	private static final Pattern ptnsection = Pattern.compile("\\[([^\\[\\]]*)\\]([^\\[\\]]*)\\n", Pattern.MULTILINE);
 	private static final Pattern ptnfilename = Pattern.compile("[^\\s]+");
@@ -37,11 +26,11 @@ public final class ModuleReader {
 		ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.parse(new File(mi.modulepath + File.separator + name));
 		ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = msadoc.getModuleSurfaceArea();
 		MsaHeaderDocument.MsaHeader msaheader = msa.getMsaHeader();
-		
+
 		mi.modulename = msaheader.getModuleName();
 		mi.guidvalue = msaheader.getGuidValue();
 		mi.moduletype = msaheader.getModuleType().toString();		// ???
-		
+
 		SourceFilesDocument.SourceFiles sourcefiles = msa.getSourceFiles();
 		
 		String temp;
@@ -85,7 +74,7 @@ public final class ModuleReader {
 					}
 					if (mtrinfequation.group(1).matches("DPX_SOURCE")) {
 						if (!mi.localmodulesources.contains(mtrinfequation.group(2))) {
-							ui.println("DPX File Missing! : " + mtrinfequation.group(2));
+							MigrationTool.ui.println("DPX File Missing! : " + mtrinfequation.group(2));
 						}
 					}
 				}
@@ -94,7 +83,7 @@ public final class ModuleReader {
 				mtrfilename = ptnfilename.matcher(mtrsection.group(2));
 				while (mtrfilename.find()) {
 					if (!mi.localmodulesources.contains(mtrfilename.group())) {
-						ui.println("Source File Missing! : " + mtrfilename.group());
+						MigrationTool.ui.println("Source File Missing! : " + mtrfilename.group());
 					}
 				}
 			}

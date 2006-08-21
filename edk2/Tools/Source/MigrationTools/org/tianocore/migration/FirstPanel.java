@@ -128,21 +128,11 @@ public final class FirstPanel extends JPanel implements ActionListener, UI {
     public void actionPerformed(ActionEvent e) {
         if ( e.getSource() == moduleButton ) {
         	modulepath = getFilepath();
-        	/*
-        	int ret = fc.showOpenDialog(this);
-        	if (ret == JFileChooser.APPROVE_OPTION) {
-        		modulepath = fc.getSelectedFile().getAbsolutePath();
-        		moduletext.setText(modulepath);
-                log.append("ModulePath: " + modulepath + "\n");
-        	}
-        	*/
         }
         if ( e.getSource() == goButton ) {
         	try {
         		logfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "migration.log")));
-        		println("Project MsaGen");
-        		println("Copyright (c) 2006, Intel Corporation");
-        		Common.toDoAll(modulepath, ModuleInfo.class.getMethod("seekModule", String.class), null, null, Common.DIR);
+        		ModuleInfo.triger(modulepath);
         		logfile.flush();
         	} catch (Exception en) {
         		println(en.getMessage());

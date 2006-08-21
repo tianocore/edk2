@@ -15,13 +15,9 @@ package org.tianocore.migration;
 import java.io.*;
 import java.util.*;
 
-public class Database {
-	Database() throws Exception {
-		if (System.getenv("WORKSPACE") == null) {
-			DatabasePath = "C:" + File.separator + "tianocore" + File.separator + "edk2" + File.separator + "Tools" + File.separator + "Conf" + File.separator + "Migration";
-		} else {
-			DatabasePath = System.getenv("WORKSPACE") + File.separator + "Tools" + File.separator + "Conf" + File.separator + "Migration";
-		}
+public final class Database {
+	Database(String path) throws Exception {
+		DatabasePath = path;
 		
 		importDBLib("Library.csv");
 		importDBGuid("Guid.csv", "Guid");
@@ -124,7 +120,7 @@ public class Database {
 	public String getR9Macro(String r8macro) {
 		return hashmacro.get(r8macro).r9name;			// the verification job of if the macro exists in the database is done when registering it
 	}
-	
+
 	public String getR9Guidname(String r8Guid) {
 		String temp = null;
 		try {
@@ -134,7 +130,7 @@ public class Database {
 		}
 		return temp;
 	}
-	
+
 	public String getGuidType(String r8Guid) {
 		String temp = null;
 		try {
@@ -143,5 +139,13 @@ public class Database {
 			error.add("getR9Guidname :" + r8Guid);
 		}
 		return temp;
+	}
+
+	public static Database init() throws Exception {
+		if (System.getenv("WORKSPACE") == null) {
+			return new Database("C:" + File.separator + "tianocore" + File.separator + "edk2" + File.separator + "Tools" + File.separator + "Conf" + File.separator + "Migration");
+		} else {
+			return new Database(System.getenv("WORKSPACE") + File.separator + "Tools" + File.separator + "Conf" + File.separator + "Migration");
+		}
 	}
 }

@@ -104,7 +104,7 @@ public class MsaTreeEditor extends JPanel {
 	}
 	
 	private void addNode() {
-		addNode((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()), ui.getInput("Input Node Name"));
+		addNode((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()), MigrationTool.ui.getInput("Input Node Name"));
 	}
 	
 	private void addNode(DefaultMutableTreeNode parentNode, Object child) {

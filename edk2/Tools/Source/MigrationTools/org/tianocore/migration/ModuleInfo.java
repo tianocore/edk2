@@ -24,16 +24,16 @@ public class ModuleInfo {
 	ModuleInfo(String modulepath) throws Exception {
 		this.modulepath = modulepath;
 		
-		ui.println("Choose where to place the result");
-		if ((outputpath = ui.getFilepath()) == null) {
+		MigrationTool.ui.println("Choose where to place the result");
+		if ((outputpath = MigrationTool.ui.getFilepath()) == null) {
 			outputpath = modulepath; 
 		}
-		ui.println(outputpath);
+		MigrationTool.ui.println(outputpath);
 		
 		moduleScan();
 	}
 
-	public static UI ui = null;				//if MIM is still usefull, this can be given to it
+	//public static UI ui = null;				//if MIM is still usefull, this can be given to it
 	public static Database db = null;			//if MIM is still usefull, this can be given to it
 	
 	public String modulepath = null;
@@ -68,10 +68,10 @@ public class ModuleInfo {
 		
 		String filename = null;
 		if (msaorinf.isEmpty()) {
-			ui.println("No INF nor MSA file found!");
+			MigrationTool.ui.println("No INF nor MSA file found!");
 			System.exit(0);
 		} else {
-			filename = ui.choose("Found .inf or .msa file for module\n" + modulepath + "\nChoose one Please", msaorinf.toArray());
+			filename = MigrationTool.ui.choose("Found .inf or .msa file for module\n" + modulepath + "\nChoose one Please", msaorinf.toArray());
 		}
 		//ModuleReader mr = new ModuleReader(modulepath, this, db, ui);
 		if (filename.contains(".inf")) {
@@ -83,12 +83,12 @@ public class ModuleInfo {
 		CommentOutNonLocalHFile();
 		parsePreProcessedSourceCode();
 
-		new SourceFileReplacer(modulepath, outputpath, this, db, ui).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
+		new SourceFileReplacer(modulepath, outputpath, this).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
 		
 		// show result
-		if (ui.yesOrNo("Parse of the Module Information has completed. View details?")) {
-			ui.println("\nModule Information : ");
-			ui.println("Entrypoint : " + entrypoint);
+		if (MigrationTool.ui.yesOrNo("Parse of the Module Information has completed. View details?")) {
+			MigrationTool.ui.println("\nModule Information : ");
+			MigrationTool.ui.println("Entrypoint : " + entrypoint);
 			show(protocol, "Protocol : ");
 			show(ppi, "Ppi : ");
 			show(guid, "Guid : ");
@@ -100,20 +100,20 @@ public class ModuleInfo {
 			show(hashr8only, "hashr8only : ");
 		}
 		
-		new MsaWriter(modulepath, outputpath, this, db, ui).flush();
+		new MsaWriter(modulepath, outputpath, this).flush();
 
 		Common.deleteDir(modulepath + File.separator + "temp");
 		//Common.toDoAll(modulepath + File.separator + "temp", Common.class.getMethod("deleteDir", String.class), null, null, Common.DIR);
 		
-		ui.println("Errors Left : " + db.error);
-		ui.println("Complete!");
-		ui.println("Your R9 module was placed here: " + modulepath + File.separator + "result");
-		ui.println("Your logfile was placed here: " + modulepath);
+		MigrationTool.ui.println("Errors Left : " + MigrationTool.db.error);
+		MigrationTool.ui.println("Complete!");
+		MigrationTool.ui.println("Your R9 module was placed here: " + modulepath + File.separator + "result");
+		MigrationTool.ui.println("Your logfile was placed here: " + modulepath);
 	}
 	
 	private void show(Set<String> hash, String show) {
-		ui.println(show + hash.size());
-		ui.println(hash);
+		MigrationTool.ui.println(show + hash.size());
+		MigrationTool.ui.println(hash);
 	}
 	
 	// add '//' to all non-local include lines
@@ -204,7 +204,7 @@ public class ModuleInfo {
 			matguid = Guid.ptnguid.matcher(line);										// several ways to implement this , which one is faster ? :
 			while (matguid.find()) {													// 1.currently , find once , then call to identify which is it
 				if ((temp = Guid.register(matguid, this, db)) != null) {				// 2.use 3 different matchers , search 3 times to find each
-					//matguid.appendReplacement(result, db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
+					//matguid.appendReplacement(result, MigrationTool.db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
 				}
 			}
 			//matguid.appendTail(result);
@@ -221,8 +221,8 @@ public class ModuleInfo {
 			matfuncc = Func.ptnfuncc.matcher(line);
 			while (matfuncc.find()) {
 				if ((temp = Func.register(matfuncc, this, db)) != null) {
-					//ui.println(ifile + "  dofunc  " + temp);
-					//matfuncc.appendReplacement(result, db.getR9Func(temp));
+					//MigrationTool.ui.println(ifile + "  dofunc  " + temp);
+					//matfuncc.appendReplacement(result, MigrationTool.db.getR9Func(temp));
 				}
 			}
 			//matfuncc.appendTail(result);
@@ -268,10 +268,9 @@ public class ModuleInfo {
 			msaorinf.add(temp[temp.length - 1]);
 		}
 	}
-	
+
 	public static final void seekModule(String filepath) throws Exception {
 		if (isModule(filepath)) {
-			//System.out.println("I'm in");
 			new ModuleInfo(filepath);
 		}
 	}
@@ -287,10 +286,10 @@ public class ModuleInfo {
 		}
 		return false;
 	}
-/*
-	public static final void main(String[] args) throws Exception {
-		ui = FirstPanel.init();
-		db = new Database();
+	
+	public static final void triger(String path) throws Exception {
+		MigrationTool.ui.println("Project Migration");
+		MigrationTool.ui.println("Copyright (c) 2006, Intel Corporation");
+		Common.toDoAll(path, ModuleInfo.class.getMethod("seekModule", String.class), null, null, Common.DIR);
 	}
-	*/
 }
