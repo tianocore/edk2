@@ -708,12 +708,12 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jTextFieldName, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldAdd, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldVersion, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
-        relocateComponentX(this.jButtonGen, this.getWidth(), this.getPreferredSize().width, 40);
+        Tools.resizeComponentWidth(this.jTextFieldName, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldAdd, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldVersion, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
+        Tools.relocateComponentX(this.jButtonGen, this.getWidth(), this.getPreferredSize().width, 40);
         
     }
     

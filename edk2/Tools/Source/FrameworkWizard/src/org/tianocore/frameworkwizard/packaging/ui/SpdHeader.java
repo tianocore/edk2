@@ -734,16 +734,16 @@ public class SpdHeader extends IInternalFrame {
         int intPreferredWidth = 500;
         int intCurrentWidth = this.getJContentPane().getWidth();
         
-		resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth,intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth,intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth,intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldUrl, intCurrentWidth,intPreferredWidth);
-		resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth,intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldCopyright, intCurrentWidth,intPreferredWidth);
-		resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth,intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth,intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth,intPreferredWidth);
-		relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, jButtonGenerateGuid.getWidth(),30);
+        Tools.resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldUrl, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldCopyright, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth,intPreferredWidth);
+        Tools.relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, jButtonGenerateGuid.getWidth(),30);
 	}
 
     private JScrollPane getTopScrollPane() {

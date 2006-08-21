@@ -17,7 +17,6 @@ package org.tianocore.frameworkwizard;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -55,6 +54,7 @@ import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
+import org.tianocore.frameworkwizard.common.find.FindPPIsResult;
 import org.tianocore.frameworkwizard.common.ui.IDefaultMutableTreeNode;
 import org.tianocore.frameworkwizard.common.ui.IDesktopManager;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
@@ -105,8 +105,7 @@ import org.tianocore.frameworkwizard.workspace.ui.SwitchWorkspace;
  It extends IFrame implements MouseListener, TreeSelectionListener, ComponentListener and MenuListener
 
  **/
-public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSelectionListener, ComponentListener,
-                                             MenuListener {
+public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSelectionListener, MenuListener {
     ///
     /// Define class Serial Version UID
     ///
@@ -217,8 +216,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private JMenuItem jMenuItemEditSelectAll = null;
 
-    private JMenuItem jMenuItemEditFind = null;
-
     private JMenuItem jMenuItemEditFindNext = null;
 
     private JMenu jMenuView = null;
@@ -280,6 +277,20 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     private JMenuItem jMenuItemProjectRemoveFar = null;
 
     private JMenuItem jMenuItemProjectCreateFar = null;
+
+    private JMenu jMenuEditFind = null;
+
+    private JMenuItem jMenuItemEditFindPcd = null;
+
+    private JMenuItem jMenuItemEditFindLibraryClass = null;
+
+    private JMenuItem jMenuItemEditFindPpi = null;
+
+    private JMenuItem jMenuItemEditFindProtocol = null;
+
+    private JMenuItem jMenuItemEditFindGuid = null;
+
+    private JMenuItem jMenuItemEditFindLibraryInstance = null;
 
     ///
     /// A static definition for this class itself
@@ -477,18 +488,18 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             jMenuEdit.add(getJMenuItemEditUndo());
             jMenuEdit.add(getJMenuItemEditRedo());
-            jMenuEdit.addSeparator();
+            //jMenuEdit.addSeparator();
 
             jMenuEdit.add(getJMenuItemEditCut());
             jMenuEdit.add(getJMenuItemEditCopy());
             jMenuEdit.add(getJMenuItemEditPaste());
             jMenuEdit.add(getJMenuItemEditDelete());
-            jMenuEdit.addSeparator();
+            //jMenuEdit.addSeparator();
 
             jMenuEdit.add(getJMenuItemEditSelectAll());
-            jMenuEdit.add(getJMenuItemEditFind());
+            jMenuEdit.add(getJMenuEditFind());
             jMenuEdit.add(getJMenuItemEditFindNext());
-            jMenuEdit.addSeparator();
+            //jMenuEdit.addSeparator();
         }
         return jMenuEdit;
     }
@@ -654,6 +665,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditDelete = new JMenuItem();
             jMenuItemEditDelete.setText("Delete");
             jMenuItemEditDelete.setMnemonic('D');
+            jMenuItemEditDelete.setVisible(false);
+            jMenuItemEditDelete.setEnabled(false);
             jMenuItemEditDelete.addActionListener(this);
             //
             //Disabled first when no module is open
@@ -985,6 +998,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditUndo.setText("Undo");
             jMenuItemEditUndo.setMnemonic('U');
             jMenuItemEditUndo.setEnabled(false);
+            jMenuItemEditUndo.setVisible(false);
             jMenuItemEditUndo.addActionListener(this);
         }
         return jMenuItemEditUndo;
@@ -1002,6 +1016,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditRedo.setText("Redo");
             jMenuItemEditRedo.setMnemonic('R');
             jMenuItemEditRedo.setEnabled(false);
+            jMenuItemEditRedo.setVisible(false);
             jMenuItemEditRedo.addActionListener(this);
         }
         return jMenuItemEditRedo;
@@ -1019,6 +1034,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditCut.setText("Cut");
             jMenuItemEditCut.setMnemonic('t');
             jMenuItemEditCut.setEnabled(false);
+            jMenuItemEditCut.setVisible(false);
             jMenuItemEditCut.addActionListener(this);
         }
         return jMenuItemEditCut;
@@ -1036,6 +1052,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditCopy.setText("Copy");
             jMenuItemEditCopy.setMnemonic('C');
             jMenuItemEditCopy.setEnabled(false);
+            jMenuItemEditCopy.setVisible(false);
             jMenuItemEditCopy.addActionListener(this);
         }
         return jMenuItemEditCopy;
@@ -1053,6 +1070,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditPaste.setText("Paste");
             jMenuItemEditPaste.setMnemonic('P');
             jMenuItemEditPaste.setEnabled(false);
+            jMenuItemEditPaste.setVisible(false);
             jMenuItemEditPaste.addActionListener(this);
         }
         return jMenuItemEditPaste;
@@ -1070,26 +1088,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditSelectAll.setText("Select All");
             jMenuItemEditSelectAll.setMnemonic('A');
             jMenuItemEditSelectAll.setEnabled(false);
+            jMenuItemEditSelectAll.setVisible(false);
             jMenuItemEditSelectAll.addActionListener(this);
         }
         return jMenuItemEditSelectAll;
-    }
-
-    /**
-     This method initializes jMenuItemEditFind	
-     
-     @return javax.swing.JMenuItem	
-     
-     **/
-    private JMenuItem getJMenuItemEditFind() {
-        if (jMenuItemEditFind == null) {
-            jMenuItemEditFind = new JMenuItem();
-            jMenuItemEditFind.setText("Find");
-            jMenuItemEditFind.setMnemonic('F');
-            jMenuItemEditFind.setEnabled(false);
-            jMenuItemEditFind.addActionListener(this);
-        }
-        return jMenuItemEditFind;
     }
 
     /**
@@ -1104,6 +1106,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditFindNext.setText("Find Next");
             jMenuItemEditFindNext.setMnemonic('n');
             jMenuItemEditFindNext.setEnabled(false);
+            jMenuItemEditFindNext.setVisible(false);
             jMenuItemEditFindNext.addActionListener(this);
         }
         return jMenuItemEditFindNext;
@@ -1642,6 +1645,119 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         return jMenuItemProjectCreateFar;
     }
 
+    /**
+     * This method initializes jMenuEditFind	
+     * 	
+     * @return javax.swing.JMenu	
+     */
+    private JMenu getJMenuEditFind() {
+        if (jMenuEditFind == null) {
+            jMenuEditFind = new JMenu();
+            jMenuEditFind.setText("Find");
+            jMenuEditFind.setMnemonic('F');
+
+            jMenuEditFind.add(getJMenuItemEditFindPpi());
+            jMenuEditFind.add(getJMenuItemEditFindProtocol());
+            jMenuEditFind.add(getJMenuItemEditFindGuid());
+            jMenuEditFind.add(getJMenuItemEditFindPcd());
+            jMenuEditFind.addSeparator();
+
+            jMenuEditFind.add(getJMenuItemEditFindLibraryClass());
+            jMenuEditFind.add(getJMenuItemEditFindLibraryInstance());
+        }
+        return jMenuEditFind;
+    }
+
+    /**
+     * This method initializes jMenuItemEditFindPcd	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemEditFindPcd() {
+        if (jMenuItemEditFindPcd == null) {
+            jMenuItemEditFindPcd = new JMenuItem();
+            jMenuItemEditFindPcd.setText("All PCD entries");
+            jMenuItemEditFindPcd.setMnemonic('P');
+            jMenuItemEditFindPcd.addActionListener(this);
+        }
+        return jMenuItemEditFindPcd;
+    }
+
+    /**
+     * This method initializes jMenuItemEditFindLibraryClass	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemEditFindLibraryClass() {
+        if (jMenuItemEditFindLibraryClass == null) {
+            jMenuItemEditFindLibraryClass = new JMenuItem();
+            jMenuItemEditFindLibraryClass.setText("All Library Classes");
+            jMenuItemEditFindLibraryClass.setMnemonic('C');
+            jMenuItemEditFindLibraryClass.addActionListener(this);
+        }
+        return jMenuItemEditFindLibraryClass;
+    }
+
+    /**
+     * This method initializes jMenuItemEditFindPpi	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemEditFindPpi() {
+        if (jMenuItemEditFindPpi == null) {
+            jMenuItemEditFindPpi = new JMenuItem();
+            jMenuItemEditFindPpi.setText("All PPIs");
+            jMenuItemEditFindPpi.setMnemonic('I');
+            jMenuItemEditFindPpi.addActionListener(this);
+        }
+        return jMenuItemEditFindPpi;
+    }
+
+    /**
+     * This method initializes jMenuItemEditFindProtocol	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemEditFindProtocol() {
+        if (jMenuItemEditFindProtocol == null) {
+            jMenuItemEditFindProtocol = new JMenuItem();
+            jMenuItemEditFindProtocol.setText("All Protocols");
+            jMenuItemEditFindProtocol.setMnemonic('r');
+            jMenuItemEditFindProtocol.addActionListener(this);
+        }
+        return jMenuItemEditFindProtocol;
+    }
+
+    /**
+     * This method initializes jMenuItemEditFindGuid	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemEditFindGuid() {
+        if (jMenuItemEditFindGuid == null) {
+            jMenuItemEditFindGuid = new JMenuItem();
+            jMenuItemEditFindGuid.setText("All GUIDs");
+            jMenuItemEditFindGuid.setMnemonic('G');
+            jMenuItemEditFindGuid.addActionListener(this);
+        }
+        return jMenuItemEditFindGuid;
+    }
+
+    /**
+     * This method initializes jMenuItemEditFindLibraryInstance	
+     * 	
+     * @return javax.swing.JMenuItem	
+     */
+    private JMenuItem getJMenuItemEditFindLibraryInstance() {
+        if (jMenuItemEditFindLibraryInstance == null) {
+            jMenuItemEditFindLibraryInstance = new JMenuItem();
+            jMenuItemEditFindLibraryInstance.setText("All Library Instances");
+            jMenuItemEditFindLibraryInstance.setMnemonic('n');
+            jMenuItemEditFindLibraryInstance.addActionListener(this);
+        }
+        return jMenuItemEditFindLibraryInstance;
+    }
+
     /* (non-Javadoc)
      * @see org.tianocore.packaging.common.ui.IFrame#main(java.lang.String[])
      *
@@ -1692,7 +1808,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         this.setSize(DataType.MAIN_FRAME_PREFERRED_SIZE_WIDTH, DataType.MAIN_FRAME_PREFERRED_SIZE_HEIGHT);
         this.setResizable(true);
         this.setJMenuBar(getjJMenuBar());
-        this.addComponentListener(this);
         this.setContentPane(getJContentPane());
         this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- ["
                       + Workspace.getCurrentWorkspace() + "]");
@@ -1730,67 +1845,71 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Operations of Menu
         //
-        if (arg0.getSource() == jMenuItemFileNew) {
+        if (arg0.getSource() == this.jMenuItemFileNew) {
             this.fileNew();
         }
 
-        if (arg0.getSource() == jMenuItemFileOpen) {
+        if (arg0.getSource() == this.jMenuItemFileOpen) {
             this.open();
         }
 
-        if (arg0.getSource() == jMenuItemFileClose) {
+        if (arg0.getSource() == this.jMenuItemFileClose) {
             this.close();
         }
 
-        if (arg0.getSource() == jMenuItemFileCloseAll) {
+        if (arg0.getSource() == this.jMenuItemFileCloseAll) {
             this.closeAll();
         }
 
-        if (arg0.getSource() == jMenuItemFileSave) {
+        if (arg0.getSource() == this.jMenuItemFileSave) {
             this.save();
         }
 
-        if (arg0.getSource() == jMenuItemFileSaveAs) {
+        if (arg0.getSource() == this.jMenuItemFileSaveAs) {
             this.saveAs();
         }
 
-        if (arg0.getSource() == jMenuItemFileSaveAll) {
+        if (arg0.getSource() == this.jMenuItemFileSaveAll) {
             this.saveAll();
         }
 
-        if (arg0.getSource() == jMenuItemFileExit) {
+        if (arg0.getSource() == this.jMenuItemFileExit) {
             this.exit();
         }
 
-        if (arg0.getSource() == jMenuItemProjectChangeWorkspace) {
-            changeWorkspace();
+        if (arg0.getSource() == this.jMenuItemEditFindPpi) {
+            this.findPpi();
         }
 
-        if (arg0.getSource() == jMenuItemProjectCreateFar) {
-            createFar();
+        if (arg0.getSource() == this.jMenuItemProjectChangeWorkspace) {
+            this.changeWorkspace();
         }
 
-        if (arg0.getSource() == jMenuItemProjectInstallFar) {
-            installFar();
+        if (arg0.getSource() == this.jMenuItemProjectCreateFar) {
+            this.createFar();
         }
 
-        if (arg0.getSource() == jMenuItemProjectRemoveFar) {
-            removeFar();
+        if (arg0.getSource() == this.jMenuItemProjectInstallFar) {
+            this.installFar();
         }
 
-        if (arg0.getSource() == jMenuItemProjectUpdateFar) {
-            updateFar();
+        if (arg0.getSource() == this.jMenuItemProjectRemoveFar) {
+            this.removeFar();
         }
 
-        if (arg0.getSource() == jMenuItemToolsClone) {
-            cloneItem();
+        if (arg0.getSource() == this.jMenuItemProjectUpdateFar) {
+            this.updateFar();
         }
 
-        if (arg0.getSource() == jMenuItemToolsToolChainConfiguration) {
-            setupToolChainConfiguration();
+        if (arg0.getSource() == this.jMenuItemToolsClone) {
+            this.cloneItem();
         }
 
-        if (arg0.getSource() == jMenuItemHelpAbout) {
+        if (arg0.getSource() == this.jMenuItemToolsToolChainConfiguration) {
+            this.setupToolChainConfiguration();
+        }
+
+        if (arg0.getSource() == this.jMenuItemHelpAbout) {
             About a = new About(this, true);
             int result = a.showDialog();
             if (result == DataType.RETURN_TYPE_OK) {
@@ -2014,8 +2133,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Add new MsaHeader node to the tree
         //
-        IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(mid.getName(), IDefaultMutableTreeNode.MODULE,
-                                                                   true, mid);
+        IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(mid.getName(), IDefaultMutableTreeNode.MODULE, true,
+                                                                   mid);
         //
         // First find the module belongs to which package
         //
@@ -2276,26 +2395,13 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         }
     }
 
-    public void componentHidden(ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void componentMoved(ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void componentResized(ComponentEvent arg0) {
-        this.jSplitPane.setSize(this.getWidth() - DataType.MAIN_FRAME_WIDTH_SPACING,
-                                this.getHeight() - DataType.MAIN_FRAME_HEIGHT_SPACING);
-        this.jSplitPane.validate();
-        resizeDesktopPanel();
-    }
-
-    public void componentShown(ComponentEvent arg0) {
-        // TODO Auto-generated method stub
-
+        if (this.jSplitPane != null) {
+            this.jSplitPane.setSize(this.getWidth() - DataType.MAIN_FRAME_WIDTH_SPACING,
+                                    this.getHeight() - DataType.MAIN_FRAME_HEIGHT_SPACING);
+            this.jSplitPane.validate();
+            resizeDesktopPanel();
+        }
     }
 
     /**
@@ -2667,18 +2773,18 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                         Log.err("Upddate MsaFiles of Package", e.getMessage());
                         return;
                     }
-                    
+
                     //
                     // Update Global Data
                     //
                     GlobalData.openingModuleList.insertToOpeningModuleList(mid, smb.getMsa());
                     GlobalData.vModuleList.addElement(mid);
-                    
+
                     //
                     // Create new node on the tree
                     //
                     addModuleToTree(mid);
-                    
+
                     //
                     // Open the node
                     //
@@ -2987,6 +3093,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         }
         this.dispose();
         System.exit(0);
+    }
+
+    /**
+     To find all defined PPIs in workspace
+     
+     **/
+    private void findPpi() {
+        FindPPIsResult fpr = FindPPIsResult.getInstance();
+        fpr.setVisible(true);
     }
 
     /**

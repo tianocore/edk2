@@ -168,6 +168,10 @@ public class DataType {
     public static final int SPACE_TO_BOTTOM_FOR_REMOVE_BUTTON = 30;
 
     public static final int SPACE_TO_BOTTOM_FOR_UPDATE_BUTTON = 30;
+    
+    public static final int SPACE_TO_RIGHT_FOR_CLOSE_BUTTON = 240;
+    
+    public static final int SPACE_TO_BOTTOM_FOR_CLOSE_BUTTON = 25;
 
     public static final int SPACE_TO_RIGHT_FOR_PROTOCOL_NOTIFY = 25;
 

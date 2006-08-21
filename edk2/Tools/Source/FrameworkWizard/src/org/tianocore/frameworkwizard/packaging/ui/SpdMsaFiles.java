@@ -485,9 +485,9 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jScrollPaneMsa, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
-        relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 25);
+        Tools.resizeComponentWidth(this.jScrollPaneMsa, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
+        Tools.relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 25);
     }
     
     public static void main(String[] args){

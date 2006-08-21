@@ -52,7 +52,7 @@ import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.platform.ui.ListEditor;
-import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
+import org.tianocore.frameworkwizard.platform.ui.global.GlobalData;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
 import org.tianocore.frameworkwizard.platform.ui.id.PackageIdentification;
@@ -768,9 +768,9 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jTextFieldClass, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth-10);
+        Tools.resizeComponentWidth(this.jTextFieldClass, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth-10);
         
     }
     /**
@@ -920,19 +920,19 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private void getLibInstances(String libClass){
         libNameGuidMap.clear();
         try {
-            WorkspaceProfile.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
+            GlobalData.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
         
-            Set<PackageIdentification> spi = WorkspaceProfile.getPackageList();
+            Set<PackageIdentification> spi = GlobalData.getPackageList();
             Iterator ispi = spi.iterator();
             
             while (ispi.hasNext()) {
                 PackageIdentification pi = (PackageIdentification) ispi.next();
 
-                Set<ModuleIdentification> smi = WorkspaceProfile.getModules(pi);
+                Set<ModuleIdentification> smi = GlobalData.getModules(pi);
                 Iterator ismi = smi.iterator();
                 while (ismi.hasNext()) {
                     ModuleIdentification mi = (ModuleIdentification) ismi.next();
-                    Map<String, XmlObject> m = WorkspaceProfile.getNativeMsa(mi);
+                    Map<String, XmlObject> m = GlobalData.getNativeMsa(mi);
                     SurfaceAreaQuery.setDoc(m);
                     Vector<String> classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
                     for (int i = 0; i < classProduced.size(); ++i) {

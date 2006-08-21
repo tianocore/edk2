@@ -683,16 +683,16 @@ public class FpdHeader extends IInternalFrame {
 	public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jTextFieldBaseName, this.getWidth(), intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldGuid, this.getWidth(), intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldVersion, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldUrl, this.getWidth(), intPreferredWidth);
-		resizeComponentWidth(this.jScrollPaneLicense, this.getWidth(), intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldCopyright, this.getWidth(), intPreferredWidth);
-		resizeComponentWidth(this.jScrollPaneDescription, this.getWidth(), intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldSpecification, this.getWidth(), intPreferredWidth);
-		resizeComponentWidth(this.jTextFieldAbstract, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldBaseName, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldGuid, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldVersion, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldUrl, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPaneLicense, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldCopyright, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPaneDescription, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldSpecification, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldAbstract, this.getWidth(), intPreferredWidth);
 		
-		relocateComponentX(this.jButtonGenerateGuid, this.getWidth(), jButtonGenerateGuid.getWidth(), 25);
+        Tools.relocateComponentX(this.jButtonGenerateGuid, this.getWidth(), jButtonGenerateGuid.getWidth(), 25);
 	}
 }

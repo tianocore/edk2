@@ -1093,20 +1093,20 @@ public class MsaHeader extends IInternalFrame {
         int intCurrentWidth = this.getJContentPane().getWidth();
         int intPreferredWidth = this.getJContentPane().getPreferredSize().width;
 
-        resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldURL, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jScrollPaneCopyright, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jComboBoxModuleType, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jComboBoxBinaryModule, intCurrentWidth, intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldOutputFileBasename, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldURL, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPaneCopyright, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jComboBoxModuleType, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jComboBoxBinaryModule, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldOutputFileBasename, intCurrentWidth, intPreferredWidth);
 
-        relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, intPreferredWidth,
+        Tools.relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, intPreferredWidth,
                            DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
     }
 
