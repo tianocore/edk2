@@ -27,4 +27,6 @@ public interface UI {
 	public String choose(String message, Object[] choicelist);
 	
 	public String getInput(String message);
+	
+	public String getFilepath();		// necessary ?
 }

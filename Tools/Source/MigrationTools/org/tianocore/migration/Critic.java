@@ -15,23 +15,23 @@ package org.tianocore.migration;
 import java.util.regex.*;
 import java.io.*;
 
-public class Critic implements Common.ForDoAll {
+public class Critic {
 	private static Pattern ptnheadcomment = Pattern.compile("^\\/\\*\\+\\+(.*?)\\-\\-\\*\\/",Pattern.DOTALL);
 	private static Pattern ptnfunccomment = Pattern.compile("([\\};\\/]\\s*)([\\w\\s]*?[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)\\/\\*\\+\\+(.*?)\\-\\-\\*\\/(\\s*.*?)([\\{;])",Pattern.DOTALL);
 	//private static Pattern ptncommentstructure = Pattern.compile("\\/\\*\\+\\+\\s*Routine Description:\\s*(.*?)\\s*Arguments:\\s*(.*?)\\s*Returns:\\s*(.*?)\\s*\\-\\-\\*\\/",Pattern.DOTALL);
-	private static Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*-\\s*(.*)\\s*");
-	private static Matcher mtrinfequation;
+	private static Pattern ptncommentequation = Pattern.compile("([^\\s]*)\\s+-\\s+(.*)\\s*");
+	private static Matcher mtrcommentequation;
+	private static Pattern ptnnewcomment = Pattern.compile("(\\s*@(param|retval)\\s+[^\\s]+)\\s+(.*)");
+	private static Matcher mtrnewcomment;
 	
-	public void toDo(String filepath) throws Exception {
+	private static final int totallinelength = 82;
+	
+	public static final void critic(String filepath) throws Exception {
 		if (filepath.contains(".c") || filepath.contains(".h")) {
 			BufferedReader rd = null;
 			String line = null;
 			StringBuffer templine = new StringBuffer();
 			boolean incomment = false;
-			boolean description = false;
-			boolean arguments = false;
-			boolean returns = false;
-			boolean inequation = false;
 
 			System.out.println("Criticing   " + filepath);
 			String wholeline = Common.file2string(filepath);
@@ -40,7 +40,12 @@ public class Critic implements Common.ForDoAll {
 			wholeline = Common.replaceAll(wholeline, ptnheadcomment, "/** @file$1**/");
 			wholeline = Common.replaceAll(wholeline, ptnfunccomment, "$1/**$3**/$4$2$5");
 			//wholeline = Common.replaceAll(wholeline, ptncommentstructure, "/**\n#%\n$1\n%#\n#%%\n$2\n%%#\n#%%%\n$3\n%%%#\n**/");
-			
+
+			// first scan
+			boolean description = false;
+			boolean arguments = false;
+			boolean returns = false;
+			boolean inequation = false;
 			rd = new BufferedReader(new StringReader(wholeline));
 			while ((line = rd.readLine()) != null) {
 				if (line.matches("\\/\\*\\*")) {
@@ -62,30 +67,103 @@ public class Critic implements Common.ForDoAll {
 					arguments = false;
 					returns = true;
 				} else if (incomment && description) {
-					templine.append(line + "\n");
+					templine.append("  " + line.trim() + "\n");
 				} else if (incomment && arguments) {
-					mtrinfequation = ptninfequation.matcher(line);
-					if (mtrinfequation.find()) {
+					mtrcommentequation = ptncommentequation.matcher(line);
+					if (mtrcommentequation.find()) {
 						inequation = true;
-						templine.append("  @param " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
+						templine.append("  @param  " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
 					} else if (inequation && line.trim().length() == 0) {
 						inequation = false;
 						templine.append(line + "\n");
 					} else if (inequation && line.trim().length() != 0) {
 						templine.append("#%#%" + line + "\n");
 					} else {
-						templine.append(line + "\n");
+						templine.append("  " + line.trim() + "\n");
 					}
 				} else if (incomment && returns) {
-					mtrinfequation = ptninfequation.matcher(line);
-					if (mtrinfequation.find()) {
+					mtrcommentequation = ptncommentequation.matcher(line);
+					if (mtrcommentequation.find()) {
 						inequation = true;
-						templine.append("  @retval " + mtrinfequation.group(1) + "     " + mtrinfequation.group(2) + "\n");
+						templine.append("  @retval " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
 					} else if (inequation && line.trim().length() == 0) {
 						inequation = false;
 						templine.append(line + "\n");
 					} else if (inequation && line.trim().length() != 0) {
 						templine.append("#%#%" + line + "\n");
+					} else {
+						templine.append("  " + line.trim() + "\n");
+					}
+				} else {
+					templine.append(line + "\n");
+				}
+			}
+			wholeline = templine.toString();
+			wholeline = wholeline.replaceAll("\n#%#%\\s*", " ");
+			//
+			
+			// secend scan
+			int startmax = 0;
+			rd = new BufferedReader(new StringReader(wholeline));
+			while ((line = rd.readLine()) != null) {
+				if (line.matches("\\/\\*\\*")) {
+					incomment = true;
+					templine.append(line + "\n");
+				} else if (line.matches("\\*\\*\\/")) {
+					incomment = false;
+					templine.append(line + "\n");
+				} else if (incomment) {
+					mtrnewcomment = ptnnewcomment.matcher(line);
+					if (mtrnewcomment.find()) {
+						startmax = mtrnewcomment.group(1).length() > startmax ? mtrnewcomment.group(1).length() : startmax;
+					}
+				}
+			}
+			startmax++;
+			//
+			
+			// third scan
+			int n = 0;
+			String temp = null;
+			String[] tempcont = null;
+			int count = 0;
+			templine = new StringBuffer();
+			rd = new BufferedReader(new StringReader(wholeline));
+			while ((line = rd.readLine()) != null) {
+				if (line.matches("\\/\\*\\*")) {
+					incomment = true;
+					templine.append(line + "\n");
+				} else if (line.matches("\\*\\*\\/")) {
+					incomment = false;
+					templine.append(line + "\n");
+				} else if (incomment) {
+					mtrnewcomment = ptnnewcomment.matcher(line);
+					if (mtrnewcomment.find()) {
+						n = startmax - mtrnewcomment.group(1).length();
+						templine.append(mtrnewcomment.group(1));
+						while (n-- >= 0) {
+							templine.append(" ");
+						}
+						temp = mtrnewcomment.group(3);
+						tempcont = temp.split(" ");							// use \\s+ ?
+						
+						count = 0;
+						for (int i = 0; i < tempcont.length; i++) {
+							count += tempcont[i].length();
+							if (count <= (totallinelength - startmax)) {
+								templine.append(tempcont[i] + " ");
+								count += 1;
+							} else {
+								templine.append("\n");
+								n = startmax;
+								while (n-- >= 0) {
+									templine.append(" ");
+								}
+								templine.append(tempcont[i] + " ");
+								count = tempcont[i].length() + 1;
+							}
+						}
+						templine.append("\n");
 					} else {
 						templine.append(line + "\n");
 					}
@@ -94,7 +172,7 @@ public class Critic implements Common.ForDoAll {
 				}
 			}
 			wholeline = templine.toString();
-			wholeline = wholeline.replaceAll("\n#%#%\\s*", " ");
+			//
 			
 			/* -----slow edition of replacefirst with stringbuffer-----
 			line.append(wholeline);
@@ -123,9 +201,9 @@ public class Critic implements Common.ForDoAll {
 		}
 	}
 	
-	public static void fireAt(String path) throws Exception {
-		Critic critic = new Critic();
-		Common.toDoAll(Common.dirCopy_(path), critic);
+	public static final void fireAt(String path) throws Exception {
+		Common.toDoAll(Common.dirCopy_(path), Critic.class.getMethod("critic", String.class), null, null, Common.FILE);
+		//Common.toDoAll(Common.dirCopy_(path), critic, Common.FILE);
 		System.out.println("Critic Done");
 	}
 }

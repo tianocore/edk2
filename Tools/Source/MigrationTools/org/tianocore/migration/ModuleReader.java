@@ -17,24 +17,24 @@ import java.util.*;
 import java.util.regex.*;
 import org.tianocore.*;
 
-public class ModuleReader {
+public final class ModuleReader {
 	ModuleReader(String path, ModuleInfo moduleinfo, Database database, UI u) {
-		modulepath = path;
-		mi = moduleinfo;
+		//modulepath = path;
+		//mi = moduleinfo;
 		db = database;
 		ui = u;
 	}
-	private String modulepath;
-	private ModuleInfo mi;
-	private Database db;
-	private UI ui;
+	//private static String modulepath;
+	//private static ModuleInfo mi;
+	private static Database db;
+	private static UI ui;
 	
-	private static Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*=\\s*([^\\s]*)");
-	private static Pattern ptnsection = Pattern.compile("\\[([^\\[\\]]*)\\]([^\\[\\]]*)\\n", Pattern.MULTILINE);
-	private static Pattern ptnfilename = Pattern.compile("[^\\s]+");
+	private static final Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*=\\s*([^\\s]*)");
+	private static final Pattern ptnsection = Pattern.compile("\\[([^\\[\\]]*)\\]([^\\[\\]]*)\\n", Pattern.MULTILINE);
+	private static final Pattern ptnfilename = Pattern.compile("[^\\s]+");
 	
-	public void readMsa(String name) throws Exception {
-		ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.parse(new File(modulepath + File.separator + name));
+	public static final void readMsa(String name, ModuleInfo mi) throws Exception {
+		ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.parse(new File(mi.modulepath + File.separator + name));
 		ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = msadoc.getModuleSurfaceArea();
 		MsaHeaderDocument.MsaHeader msaheader = msa.getMsaHeader();
 		
@@ -53,14 +53,14 @@ public class ModuleReader {
 		}
 	}
 	
-	public void readInf(String name) throws Exception {
+	public static final void readInf(String name, ModuleInfo mi) throws Exception {
 		System.out.println("\nParsing INF file: " + name);
 		String wholeline;
 		Matcher mtrinfequation;
 		Matcher mtrsection;
 		Matcher mtrfilename;
 
-		wholeline = Common.file2string(modulepath + File.separator + name);
+		wholeline = Common.file2string(mi.modulepath + File.separator + name);
 		mtrsection = ptnsection.matcher(wholeline);
 		while (mtrsection.find()) {
 			if (mtrsection.group(1).matches("defines")) {

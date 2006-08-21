@@ -21,16 +21,24 @@ import java.util.regex.*;
 information and all the temporary data.
 */
 public class ModuleInfo {
-	ModuleInfo(String modulepath, UI ui, Database db) throws Exception {
+	ModuleInfo(String modulepath) throws Exception {
 		this.modulepath = modulepath;
-		this.ui = ui;
-		this.db = db;
+		
+		ui.println("Choose where to place the result");
+		if ((outputpath = ui.getFilepath()) == null) {
+			outputpath = modulepath; 
+		}
+		ui.println(outputpath);
+		
 		moduleScan();
 	}
+
+	private static UI ui = null;				//if MIM is still usefull, this can be given to it
+	private static Database db = null;			//if MIM is still usefull, this can be given to it
 	
-	private String modulepath = null;
-	private Database db = null;
-	private UI ui = null;
+	public String modulepath = null;
+	
+	public String outputpath = null;
 	
 	public String modulename = null;
 	public String guidvalue = null;
@@ -55,48 +63,27 @@ public class ModuleInfo {
 	
 	private static String migrationcomment = "//%$//";
 	
-	private void dirScan(String subpath) throws Exception {
-		String[] list = new File(modulepath + File.separator + subpath).list();			// if no sub , separator need?
-		File test;
-		
-		for (int i = 0 ; i < list.length ; i++) {
-			test = new File(modulepath + File.separator + subpath + list[i]);
-			if (test.isDirectory()) {
-				if (list[i].contains("result") || list[i].contains("temp")) {
-				} else {
-					dirScan(subpath + list[i] + File.separator);
-				}
-			} else {
-				if (list[i].contains(".c") || list[i].contains(".C") || list[i].contains(".h") || 
-					list[i].contains(".H") || list[i].contains(".dxs") || list[i].contains(".uni")) {
-					localmodulesources.add(subpath + list[i]);
-				} else if (list[i].contains(".inf") || list[i].contains(".msa")) {
-					msaorinf.add(subpath + list[i]);
-				}
-			}
-		}
-	}
-	
 	private void moduleScan() throws Exception {
-		dirScan("");
+		Common.toDoAll(modulepath, ModuleInfo.class.getMethod("enroll", String.class), this, null, Common.FILE);
+		
 		String filename = null;
 		if (msaorinf.isEmpty()) {
 			ui.println("No INF nor MSA file found!");
 			System.exit(0);
 		} else {
-			filename = ui.choose("Found .inf or .msa file in the module\nChoose one Please", msaorinf.toArray());
+			filename = ui.choose("Found .inf or .msa file for module\n" + modulepath + "\nChoose one Please", msaorinf.toArray());
 		}
-		ModuleReader mr = new ModuleReader(modulepath, this, db, ui);
+		//ModuleReader mr = new ModuleReader(modulepath, this, db, ui);
 		if (filename.contains(".inf")) {
-			mr.readInf(filename);
+			ModuleReader.readInf(filename, this);
 		} else if (filename.contains(".msa")) {
-			mr.readMsa(filename);
+			ModuleReader.readMsa(filename, this);
 		}
 		
 		CommentOutNonLocalHFile();
 		parsePreProcessedSourceCode();
-		
-		new SourceFileReplacer(modulepath, this, db, ui).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
+
+		new SourceFileReplacer(modulepath, outputpath, this, db, ui).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
 		
 		// show result
 		if (ui.yesOrNo("Parse of the Module Information has completed. View details?")) {
@@ -113,12 +100,10 @@ public class ModuleInfo {
 			show(hashr8only, "hashr8only : ");
 		}
 		
-		new MsaWriter(modulepath, this, db, ui).flush();
-		
-		// remove temp directory
-		//File tempdir = new File(modulepath + File.separator + "temp");
-		//System.out.println("Deleting Dir");
-		//if (tempdir.exists()) tempdir.d;
+		new MsaWriter(modulepath, outputpath, this, db, ui).flush();
+
+		Common.deleteDir(modulepath + File.separator + "temp");
+		//Common.toDoAll(modulepath + File.separator + "temp", Common.class.getMethod("deleteDir", String.class), null, null, Common.DIR);
 		
 		ui.println("Errors Left : " + db.error);
 		ui.println("Complete!");
@@ -140,7 +125,7 @@ public class ModuleInfo {
 
 		Pattern ptninclude = Pattern.compile("[\"<](.*[.]h)[\">]");
 		Matcher mtrinclude;
-		
+
 		Iterator<String> ii = localmodulesources.iterator();
 		while ( ii.hasNext() ) {
 			curFile = ii.next();
@@ -218,7 +203,7 @@ public class ModuleInfo {
 			// find guid
 			matguid = Guid.ptnguid.matcher(line);										// several ways to implement this , which one is faster ? :
 			while (matguid.find()) {													// 1.currently , find once , then call to identify which is it
-				if ((temp = Guid.register(matguid, this, db)) != null) {			// 2.use 3 different matchers , search 3 times to find each
+				if ((temp = Guid.register(matguid, this, db)) != null) {				// 2.use 3 different matchers , search 3 times to find each
 					//matguid.appendReplacement(result, db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
 				}
 			}
@@ -272,7 +257,39 @@ public class ModuleInfo {
 		}
 	}
 	
-	public static void main(String[] args) throws Exception {
-		FirstPanel.init();
+	public final void enroll(String filepath) throws Exception {
+		String[] temp;
+		if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 
+				filepath.contains(".H") || filepath.contains(".dxs") || filepath.contains(".uni")) {
+			temp = filepath.split("\\\\");
+			localmodulesources.add(temp[temp.length - 1]);
+		} else if (filepath.contains(".inf") || filepath.contains(".msa")) {
+			temp = filepath.split("\\\\");
+			msaorinf.add(temp[temp.length - 1]);
+		}
+	}
+	
+	public static final void seekModule(String filepath) throws Exception {
+		if (isModule(filepath)) {
+			//System.out.println("I'm in");
+			new ModuleInfo(filepath);
+		}
+	}
+
+	private static final boolean isModule(String path) {
+		String[] list = new File(path).list();
+		for (int i = 0 ; i < list.length ; i++) {
+			if (!new File(list[i]).isDirectory()) {
+				if (list[i].contains(".inf") || list[i].contains(".msa")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public static final void main(String[] args) throws Exception {
+		ui = FirstPanel.init();
+		db = new Database();
 	}
 }
