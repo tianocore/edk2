@@ -17,14 +17,16 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SourceFileReplacer {
-	SourceFileReplacer(String path, ModuleInfo moduleinfo, Database database, UI fp) {
+public final class SourceFileReplacer {
+	SourceFileReplacer(String path, String outpath, ModuleInfo moduleinfo, Database database, UI fp) {
 		modulepath = path;
+		outputpath = outpath;
 		mi = moduleinfo;
 		db = database;
 		ui = fp;
 	}
 	private String modulepath;
+	private String outputpath;
 	private ModuleInfo mi;
 	private Database db;
 	private UI ui;
@@ -47,7 +49,7 @@ public class SourceFileReplacer {
 	private Set<r8tor9> fileprotocol = new HashSet<r8tor9>();
 	private Set<String> filer8only = new HashSet<String>();
 	
-	private String r8only = "EfiLibInstallDriverBinding " +
+	private static final String r8only = "EfiLibInstallDriverBinding " +
 			"EfiLibInstallAllDriverProtocols " +
 			"EfiLibCompareLanguage " +
 			"BufToHexString " +
@@ -68,7 +70,6 @@ public class SourceFileReplacer {
 			"GetIoPortSpaceAddressHobInfo ";
 	
 	public void flush() throws Exception {
-		PrintWriter outfile;
 		String outname = null;
 		String inname = null;
 		if (ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
@@ -85,14 +86,7 @@ public class SourceFileReplacer {
 					outname = inname;
 				}
 				ui.println("\nModifying file: " + inname);
-				Common.string2file(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname), modulepath + File.separator + "result" + File.separator + outname);
-				/*
-				Common.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
-				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
-				outfile.append(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname));
-				outfile.flush();
-				outfile.close();
-				*/
+				Common.string2file(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname), outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".dxs") || inname.contains(".uni")) {
 				if (inname.contains(".H")) {
 					outname = inname.replaceFirst(".H", ".h");
@@ -100,14 +94,7 @@ public class SourceFileReplacer {
 					outname = inname;
 				}
 				ui.println("\nCopying file: " + inname);
-				Common.string2file(Common.file2string(modulepath + File.separator + "temp" + File.separator + inname), modulepath + File.separator + "result" + File.separator + outname);
-				/*
-				Common.ensureDir(modulepath + File.separator + "result" + File.separator + outname);
-				outfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + outname)));
-				outfile.append(Common.file2string(modulepath + File.separator + "temp" + File.separator + inname));
-				outfile.flush();
-				outfile.close();
-				*/
+				Common.string2file(Common.file2string(modulepath + File.separator + "temp" + File.separator + inname), outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			}
 		}
 
@@ -120,8 +107,8 @@ public class SourceFileReplacer {
 		String paragraph = null;
 		String line = Common.file2string(Database.defaultpath + File.separator + "R8Lib.c");
 		Common.ensureDir(modulepath + File.separator + "result" + File.separator + "R8Lib.c");
-		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.c")));
-		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "result" + File.separator + "R8Lib.h")));
+		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
+		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
 		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
 		Matcher mtrr8only = ptnr8only.matcher(line);
 		Matcher mtrr8onlyhead;

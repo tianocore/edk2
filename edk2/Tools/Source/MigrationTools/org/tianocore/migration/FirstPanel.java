@@ -18,7 +18,7 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
-public class FirstPanel extends JPanel implements ActionListener, UI {
+public final class FirstPanel extends JPanel implements ActionListener, UI {
 	/**
 	 *  Define class Serial Version UID
 	 */
@@ -61,7 +61,7 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
         modulePanel.add(filebox);
         modulePanel.add(screenbox);
         modulePanel.add(goButton);
-        modulePanel.add(msaEditorButton);
+        //modulePanel.add(msaEditorButton);
         modulePanel.add(criticButton);
         add(modulePanel);
 
@@ -115,21 +115,34 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 
 	//---------------------------------------------------------------------------------------//
 
+	public String getFilepath() {
+		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			log.append(fc.getSelectedFile().getAbsolutePath() + "\n");
+			return fc.getSelectedFile().getAbsolutePath();
+		}
+		return null;
+	}
+
+	//---------------------------------------------------------------------------------------//
+
     public void actionPerformed(ActionEvent e) {
         if ( e.getSource() == moduleButton ) {
+        	modulepath = getFilepath();
+        	/*
         	int ret = fc.showOpenDialog(this);
         	if (ret == JFileChooser.APPROVE_OPTION) {
         		modulepath = fc.getSelectedFile().getAbsolutePath();
         		moduletext.setText(modulepath);
                 log.append("ModulePath: " + modulepath + "\n");
         	}
+        	*/
         }
         if ( e.getSource() == goButton ) {
         	try {
         		logfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "migration.log")));
         		println("Project MsaGen");
         		println("Copyright (c) 2006, Intel Corporation");
-        		mi = new ModuleInfo(modulepath, this, new Database());
+        		Common.toDoAll(modulepath, ModuleInfo.class.getMethod("seekModule", String.class), null, null, Common.DIR);
         		logfile.flush();
         	} catch (Exception en) {
         		println(en.getMessage());
@@ -159,7 +172,7 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 
     //---------------------------------------------------------------------------------------//
     
-    public static void init() throws Exception {
+    public static FirstPanel init() throws Exception {
     	
     	//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
     	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -178,5 +191,7 @@ public class FirstPanel extends JPanel implements ActionListener, UI {
 
 		frame.pack();
 		frame.setVisible(true);
+		
+		return fp;
     }
 }

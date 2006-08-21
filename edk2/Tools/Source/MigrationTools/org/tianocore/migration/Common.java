@@ -15,11 +15,30 @@ package org.tianocore.migration;
 import java.io.*;
 import java.util.regex.*;
 import java.util.*;
+import java.lang.reflect.*;
 
-public class Common {
-	public static Pattern ptnseparate = Pattern.compile("(.*)\\\\([^\\\\]*)");
+public final class Common {
+	public static final int BOTH = 0;
+	public static final int FILE = 1;
+	public static final int DIR = 2;
 	
-	public static String file2string(String filename) throws Exception {
+	public static final Pattern ptnseparate = Pattern.compile("(.*)\\\\([^\\\\]*)");
+
+	//-------------------------------------regex------------------------------------------//
+	
+	public static final String replaceAll(String line, Pattern ptn, String des) {
+		Matcher mtr = ptn.matcher(line);
+		if (mtr.find()) {
+			 return mtr.replaceAll(des);
+		}
+		return line;
+	}
+
+	//-------------------------------------regex------------------------------------------//
+	
+	//-----------------------------------file&string---------------------------------------//
+	
+	public static final String file2string(String filename) throws Exception {
 		BufferedReader rd = new BufferedReader(new FileReader(filename));
 		StringBuffer wholefile = new StringBuffer();
 		String line;
@@ -29,7 +48,7 @@ public class Common {
 		return wholefile.toString();
 	}
 
-	public static void string2file(String content, String filename) throws Exception {
+	public static final void string2file(String content, String filename) throws Exception {
 		ensureDir(filename);
 		PrintWriter outfile = new PrintWriter(new BufferedWriter(new FileWriter(filename)));
 		outfile.append(content);
@@ -37,7 +56,11 @@ public class Common {
 		outfile.close();
 	}
 
-	public static void ensureDir(String objFileWhole) {
+	//-----------------------------------file&string---------------------------------------//
+
+	//--------------------------------------dir--------------------------------------------//
+	
+	public static final void ensureDir(String objFileWhole) {
 		File tempdir;
 		Matcher mtrseparate = ptnseparate.matcher(objFileWhole);
 		if (mtrseparate.find()) {
@@ -46,32 +69,21 @@ public class Common {
 		}
 	}
 	
-	public static HashSet<String> dirScan(String path) {			// use HashSet, persue speed rather than space
-		HashSet<String> filelist = new HashSet<String>();
-		String[] list = new File(path).list();
-		File test;
-
+	public static final void deleteDir(String objFileWhole) {
+		String[] list = new File(objFileWhole).list();
+		File temp;
 		for (int i = 0 ; i < list.length ; i++) {
-			test = new File(path + File.separator + list[i]);
-			if (test.isDirectory()) {
-				dirScan(path + File.separator + list[i]);
+			temp = new File(objFileWhole + File.separator + list[i]);
+			if (temp.isDirectory()) {
+				deleteDir(objFileWhole + File.separator + list[i]);
 			} else {
-				filelist.add(path + File.separator + list[i]);
+				temp.delete();
 			}
 		}
-		
-		return filelist;
-	}
-
-	public static String replaceAll(String line, Pattern ptn, String des) {
-		Matcher mtr = ptn.matcher(line);
-		if (mtr.find()) {
-			 return mtr.replaceAll(des);
-		}
-		return line;
+		new File(objFileWhole).delete();
 	}
 	
-	public static String dirCopy_(String src) throws Exception {
+	public static final String dirCopy_(String src) throws Exception {
 		Matcher mtrseparate = Common.ptnseparate.matcher(src);
 		if (mtrseparate.find()) {
 			dirCopy(src, mtrseparate.group(1) + File.separator + "_" + mtrseparate.group(2));
@@ -79,7 +91,7 @@ public class Common {
 		return mtrseparate.group(1) + File.separator + "_" + mtrseparate.group(2);
 	}
 	
-	public static void dirCopy(String src, String des) throws Exception {
+	public static final void dirCopy(String src, String des) throws Exception {
 		String[] list = new File(src).list();
 		File test;
 
@@ -90,6 +102,36 @@ public class Common {
 			} else {
 				ensureDir(des + File.separator + list[i]);
 				string2file(file2string(src + File.separator + list[i]), des + File.separator + list[i]);
+			}
+		}
+	}
+
+	//--------------------------------------dir--------------------------------------------//
+
+	//-------------------------------like python walk-----------------------------------------//
+	
+	public static final void toDoAll(String path, Method md, Object obj, Object[] args, int type) throws Exception {
+		String[] list = new File(path).list();
+		ArrayList<Object> _args = new ArrayList<Object>();
+		
+		_args.add(path);
+		if (args != null) {
+			for (int i = 0; i < args.length; i++) {
+				_args.add(args[i]);
+			}
+		}
+
+		if (type == DIR || type == BOTH) {
+			md.invoke(obj, _args.toArray());
+		}
+		for (int i = 0 ; i < list.length ; i++) {
+			if (new File(path + File.separator + list[i]).isDirectory()) {
+				toDoAll(path + File.separator + list[i], md, obj, args, type);
+			} else {
+				if (type == FILE || type == BOTH) {
+					_args.set(0, path + File.separator + list[i]);
+					md.invoke(obj, _args.toArray());
+				}
 			}
 		}
 	}
