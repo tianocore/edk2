@@ -125,30 +125,12 @@ public class DynamicTokenValue {
     }
 
     /**
-       Get the string like L"xxx" for a variable Name.
-
-       BUGBUG: In fact, it is not correctly, variable name should be
-               treated as unicode UINT16 array.
+       Get the variable Name.
 
        @return String
     **/
-    public String getStringOfVariableName()
-        throws EntityException {
-        String str;
-        int    index, num;
-        int    size;
-
-        str  = "";
-        size = variableName.size();
-        for (index = 0; index < size; index++) {
-            num = Integer.decode(variableName.get(index).toString());
-            if ((num > 127 ) || (num < 0)) {
-                throw new EntityException(String.format("The variable name contains more than 0x80 characters; this is not supported at thist time!"));
-            }
-            str += (char)num;
-        }
-
-        return str;
+    public List getStringOfVariableName() {
+        return variableName;
     }
 
     /**

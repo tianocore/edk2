@@ -53,16 +53,42 @@ class CStructTypeDeclaration {
 
 **/
 class StringTable {
-    private ArrayList<String>   al;
+    class UnicodeString {
+        //
+        // In Schema, we define VariableName in DynamicPcdBuildDefinitions in FPD
+        // file to be HexWordArrayType. For example, Unicode String L"Setup" is 
+        // <VariableName>0x0053 0x0065 0x0074 0x0075 0x0070</VariableName>. 
+        // We use raw to differentiate if the String is in form of L"Setup" (raw is false) or
+        // in form of {0x0053, 0x0065, 0x0074, 0x0075, 0x0070}
+        //
+        // This str is the string that can be pasted directly into the C structure. 
+        // For example, this str can be two forms:
+        //      
+        //      L"Setup",
+        //      {0x0053, 0065, 0x0074, 0x0075, 0x0070, 0x0000}, //This is another form of L"Setup"
+        //
+        public String      str;
+        //
+        // This len includes the NULL character at the end of the String.
+        //
+        public int         len;
+        
+        public UnicodeString (String str, int len) {
+            this.str = str;
+            this.len = len;
+        }
+    }
+    
+    private ArrayList<UnicodeString>   al;
     private ArrayList<String>   alComments;
     private String              phase;
-    int                         len;
+    int                         stringTableCharNum;
 
     public StringTable (String phase) {
         this.phase = phase;
-        al = new ArrayList<String>();
+        al = new ArrayList<UnicodeString>();
         alComments = new ArrayList<String>();
-        len = 0;
+        stringTableCharNum = 0;
     }
 
     public String getSizeMacro () {
@@ -73,7 +99,7 @@ class StringTable {
         //
         // We have at least one Unicode Character in the table.
         //
-        return len == 0 ? 1 : len;
+        return stringTableCharNum == 0 ? 1 : stringTableCharNum;
     }
 
     public String getExistanceMacro () {
@@ -112,7 +138,7 @@ class StringTable {
             // If there is any String in the StringTable
             //
             for (int i = 0; i < al.size(); i++) {
-                String str = al.get(i);
+                UnicodeString uStr = al.get(i);
                 String stringTableName;
 
                 if (i == 0) {
@@ -126,7 +152,7 @@ class StringTable {
                     cDeclCode += tab;
                 }
                 cDeclCode += String.format("%-20s%s[%d]; /* %s */", "UINT16",
-                                           stringTableName, str.length() + 1,
+                                           stringTableName, uStr.len,
                                            alComments.get(i))
                              + newLine;
 
@@ -134,7 +160,7 @@ class StringTable {
                     cInstCode = "/* StringTable */" + newLine;
                 }
 
-                cInstCode += tab + String.format("L\"%s\" /* %s */", al.get(i), alComments.get(i));
+                cInstCode += tab + String.format("%s /* %s */", uStr.str, alComments.get(i));
                 if (i != al.size() - 1) {
                     cInstCode += commaNewLine;
                 }
@@ -151,11 +177,28 @@ class StringTable {
             instTable.put(stringTable, cInstCode);
         }
     }
+    
+    public int add (List inputStr, Token token) {
+        String str;
+        
+        str = "{";
+        
+        for (int i = 0; i < inputStr.size(); i++) {
+            str += " " + inputStr.get(i) + ",";
+        }
+        
+        str +=  " 0x0000";
+            
+        str += "}";
+        //
+        // This is a raw Unicode String
+        //
+        return addToTable (str, inputStr.size() + 1, token);
+    }
 
     public int add (String inputStr, Token token) {
-        int i;
-        int pos;
 
+        int len;
         String str = inputStr;
 
         //
@@ -163,27 +206,48 @@ class StringTable {
         // "L\"Bootmode\"" or "Bootmode".
         // We drop the L\" and \" for the first type.
         if (str.startsWith("L\"") && str.endsWith("\"")) {
-            str = str.substring(2, str.length() - 1);
+            //
+            // Substract the character of "L", """, """.
+            // and add in the NULL character. So it is 2.
+            //
+            len = str.length() - 2;
+        } else {
+            //
+            // Include the NULL character.
+            //
+            len = str.length() + 1;
+            str = "L\"" + str + "\"";
         }
+        
+        //
+        // After processing, this is L"A String Sample" type of string.
+        //
+        return addToTable (str, len, token);
+    }
+    
+    private int addToTable (String inputStr, int len, Token token) {
+        int i;
+        int pos;
+
         //
         // Check if StringTable has this String already.
         // If so, return the current pos.
         //
         for (i = 0, pos = 0; i < al.size(); i++) {
-            String s = al.get(i);;
+            UnicodeString s = al.get(i);;
 
-            if (str.equals(s)) {
+            if (inputStr.equals(s.str)) {
                 return pos;
             }
-            pos = s.length() + 1;
+            pos += s.len;
         }
 
-        i = len;
+        i = stringTableCharNum;
         //
         // Include the NULL character at the end of String
         //
-        len += str.length() + 1;
-        al.add(str);
+        stringTableCharNum += len;
+        al.add(new UnicodeString(inputStr, len));
         alComments.add(token.getPrimaryKeyString());
 
         return i;
