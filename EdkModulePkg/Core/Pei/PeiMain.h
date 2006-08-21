@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -138,7 +138,7 @@ PeiCore (
 
 Routine Description:
 
-  Main entry point to Pei Core. After switching stack in the PEI core, 
+  Main entry point to Pei Core. After switching stack in the PEI core,
   it will restart with the old core data.
 
 Arguments:
@@ -180,10 +180,10 @@ Arguments:
 
   PeiServices               - Calling context.
 
-  DependencyExpression      - Pointer to a dependency expression.  The Grammar adheres to 
+  DependencyExpression      - Pointer to a dependency expression.  The Grammar adheres to
                               the BNF described above and is stored in postfix notation.
-  Runnable                  - is True if the driver can be scheduled and False if the driver 
-                              cannot be scheduled.  This is the value that the schedulers 
+  Runnable                  - is True if the driver can be scheduled and False if the driver
+                              cannot be scheduled.  This is the value that the schedulers
                               should use for deciding the state of the driver.
 
 Returns:
@@ -222,7 +222,7 @@ Returns:
 
   EFI_SUCCESS   - Successfully dispatched PEIM.
   EFI_NOT_FOUND - The dispatch failed.
-            
+
 --*/
 ;
 
@@ -273,7 +273,7 @@ Arguments:
 
     FwVolHeader - Pointer to the FV header of the volume to search.
                      This parameter must point to a valid FFS volume.
-                     
+
     PeimFileHeader  - Pointer to the current file from which to begin searching.
                   This pointer will be updated upon return to reflect the file found.
 
@@ -375,9 +375,9 @@ Routine Description:
 Arguments:
 
   CoreData   - The PEI core Private Data
-  
+
 Returns:
-        
+
 --*/
 ;
 
@@ -432,7 +432,7 @@ Arguments:
   NewHandOffHob - The new handoff HOB list.
 
 Returns:
-            
+
 --*/
 ;
 
@@ -518,7 +518,7 @@ Arguments:
 
 Returns:
 
-  Status -  EFI_SUCCESS   if the PPI is in the database           
+  Status -  EFI_SUCCESS   if the PPI is in the database
             EFI_NOT_FOUND if the PPI is not in the database
 --*/
 ;
@@ -610,12 +610,12 @@ PeiGetBootMode (
 
 Routine Description:
 
-  This service enables PEIMs to ascertain the present value of the boot mode.  
+  This service enables PEIMs to ascertain the present value of the boot mode.
 
 Arguments:
 
   PeiServices    - The PEI core services table.
-  BootMode       - A pointer to contain the value of the boot mode. 
+  BootMode       - A pointer to contain the value of the boot mode.
 
 Returns:
 
@@ -635,7 +635,7 @@ PeiSetBootMode (
 
 Routine Description:
 
-  This service enables PEIMs to update the boot mode variable.    
+  This service enables PEIMs to update the boot mode variable.
 
 Arguments:
 
@@ -744,7 +744,7 @@ Returns:
   EFI_SUCCESS                 - Get the pointer of HOB List
   EFI_NOT_AVAILABLE_YET       - the HOB List is not yet published
   EFI_INVALID_PARAMETER       - HobList is NULL (in debug mode)
-            
+
 --*/
 ;
 
@@ -775,7 +775,7 @@ Returns:
           - EFI_INVALID_PARAMETER if Hob is NULL
           - EFI_NOT_AVAILABLE_YET if HobList is still not available.
           - EFI_OUT_OF_RESOURCES if there is no more memory to grow the Hoblist.
-            
+
 --*/
 ;
 
@@ -825,16 +825,16 @@ Routine Description:
 
 Arguments:
     PeiServices - Pointer to the PEI Core Services Table.
-    
+
     SearchType - Filter to find only files of this type.
       Type EFI_FV_FILETYPE_ALL causes no filtering to be done.
-      
+
     FwVolHeader - Pointer to the FV header of the volume to search.
       This parameter must point to a valid FFS volume.
-      
+
     FileHeader  - Pointer to the current file from which to begin searching.
       This pointer will be updated upon return to reflect the file found.
-  
+
 Returns:
     EFI_NOT_FOUND - No files matching the search criteria were found
     EFI_SUCCESS
@@ -895,9 +895,9 @@ Arguments:
 
 Returns:
   Pointer to the Firmware Volume instance requested
-  
+
   EFI_INVALID_PARAMETER     - FwVolHeader is NULL
-  
+
   EFI_SUCCESS               - Firmware volume instance successfully found.
 
 --*/
@@ -955,7 +955,7 @@ Arguments:
 Returns:
 
   Status  - EFI_SUCCESS
-            
+
 --*/
 ;
 
@@ -971,7 +971,7 @@ PeiAllocatePages (
 
 Routine Description:
 
-  Memory allocation service on permanent memory, 
+  Memory allocation service on permanent memory,
   not usable prior to the memory installation.
 
 Arguments:
@@ -1004,7 +1004,7 @@ PeiAllocatePool (
 
 Routine Description:
 
-  Memory allocation service on the CAR.  
+  Memory allocation service on the CAR.
 
 Arguments:
 
@@ -1019,7 +1019,7 @@ Returns:
   Status - EFI_SUCCESS              The allocation was successful
            EFI_OUT_OF_RESOURCES     There is not enough heap to satisfy the requirement
                                     to allocate the requested size.
-                                    
+
 --*/
 ;
 
@@ -1038,15 +1038,15 @@ Routine Description:
 Arguments:
 
   PeiServices                 - Calling context.
-  
+
   PeimFileHeader              - Peim file's header.
-  
+
   EntryPoint                  - Entry point of that Peim file.
 
 Returns:
 
   Status code.
-            
+
 --*/
 ;
 
@@ -1070,15 +1070,15 @@ Routine Description:
 Arguments:
 
   PeiServices - The PEI core services table.
-  
+
   CodeType    - Type of Status Code.
-  
+
   Value       - Value to output for Status Code.
-  
+
   Instance    - Instance Number of this status code.
-  
+
   CallerId    - ID of the caller of this status code.
-  
+
   Data        - Optional data associated with this status code.
 
 Returns:
@@ -1109,10 +1109,42 @@ Returns:
 
   Status  - EFI_NOT_AVAILABLE_YET. PPI not available yet.
           - EFI_DEVICE_ERROR.   Did not reset system.
-          
-  Otherwise, resets the system. 
+
+  Otherwise, resets the system.
 
 --*/
 ;
+
+/**
+  Transfers control to a function starting with a new stack.
+
+  Transfers control to the function specified by EntryPoint using the new stack
+  specified by NewStack and passing in the parameters specified by Context1 and
+  Context2. Context1 and Context2 are optional and may be NULL. The function
+  EntryPoint must never return.
+
+  If EntryPoint is NULL, then ASSERT().
+  If NewStack is NULL, then ASSERT().
+
+  @param  EntryPoint  A pointer to function to call with the new stack.
+  @param  Context1    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  Context2    A pointer to the context to pass into the EntryPoint
+                      function.
+  @param  NewStack    A pointer to the new stack to use for the EntryPoint
+                      function.
+  @param  NewBsp      A pointer to the new BSP for the EntryPoint on IPF. It's
+                      Reserved on other architectures.
+
+**/
+VOID
+EFIAPI
+PeiSwitchStacks (
+  IN      SWITCH_STACK_ENTRY_POINT  EntryPoint,
+  IN      VOID                      *Context1,  OPTIONAL
+  IN      VOID                      *Context2,  OPTIONAL
+  IN      VOID                      *NewStack,
+  IN      VOID                      *NewBsp
+  );
 
 #endif

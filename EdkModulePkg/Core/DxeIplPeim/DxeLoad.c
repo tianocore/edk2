@@ -130,7 +130,7 @@ Returns:
              NULL
              );
 
-  if (EFI_ERROR (Status) && (BootMode != BOOT_ON_S3_RESUME)) {   
+  if (EFI_ERROR (Status) && (BootMode != BOOT_ON_S3_RESUME)) {
     //
     // The DxeIpl has not yet been shadowed
     //
@@ -396,11 +396,12 @@ Returns:
     );
 
   DEBUG ((EFI_D_INFO, "DXE Core Entry\n"));
-  SwitchStack (
+  SwitchIplStacks (
     (SWITCH_STACK_ENTRY_POINT)(UINTN)DxeCoreEntryPoint,
     HobList.Raw,
-    (VOID *) (UINTN) BspStore,
-    TopOfStack
+    NULL,
+    TopOfStack,
+    (VOID *) (UINTN) BspStore
     );
 
   //
@@ -757,7 +758,7 @@ Returns:
   EFI_FIRMWARE_VOLUME_HEADER      *FvHeader;
   EFI_COMPRESSION_SECTION         *CompressionSection;
   EFI_FFS_FILE_HEADER             *FfsFileHeader;
-  
+
   FfsFileHeader = *RealFfsFileHeader;
 
   Status = PeiServicesFfsFindSectionData (

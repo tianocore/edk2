@@ -410,6 +410,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename SupArchList="IPF">Ipf/CpuPause.s</Filename>
     <Filename SupArchList="IPF">Ipf/CpuFlushTlb.s</Filename>
     <Filename SupArchList="IPF">Ipf/GetInterruptState.s</Filename>
+    <Filename SupArchList="IPF">Ipf/Non-existing.c</Filename>
     <Filename SupArchList="EBC">Math64.c</Filename>
     <Filename SupArchList="EBC">Unaligned.c</Filename>
     <Filename SupArchList="EBC">Ebc/SwitchStack.c</Filename>

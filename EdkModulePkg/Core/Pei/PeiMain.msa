@@ -71,9 +71,11 @@
     <Filename>Reset/Reset.c</Filename>
     <Filename>Security/Security.c</Filename>
     <Filename>StatusCode/StatusCode.c</Filename>
-    <Filename SupArchList="IPF">ipf/SwitchToCacheMode.c</Filename>
-    <Filename SupArchList="IPF">ipf/IpfCpuCore.i</Filename>
-    <Filename SupArchList="IPF">ipf/IpfCpuCore.s</Filename>
+    <Filename SupArchList="IPF">Ipf/SwitchToCacheMode.c</Filename>
+    <Filename SupArchList="IPF">Ipf/IpfCpuCore.i</Filename>
+    <Filename SupArchList="IPF">Ipf/IpfCpuCore.s</Filename>
+    <Filename SupArchList="IPF">Ipf/Stack.c</Filename>
+    <Filename SupArchList="IA32 X64 EBC">Dispatcher/Stack.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
