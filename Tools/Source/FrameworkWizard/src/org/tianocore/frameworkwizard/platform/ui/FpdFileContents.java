@@ -797,6 +797,19 @@ public class FpdFileContents {
         msa.getModuleSaBuildOptions().setFfsFormatKey(ffsKey);
     }
     
+    public void setModuleSAForceDebug(int i, boolean dbgEnable) {
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(i);
+        moduleSa.setForceDebug(dbgEnable);
+    }
+    
+    public boolean getModuleSAForceDebug (int i) {
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(i);
+        if (moduleSa.getForceDebug() == true) {
+            return true;
+        }
+        return false;
+    }
+    
     public void getModuleSAOptions(String moduleKey, String[][] saa) {
         ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
         if (msa == null || msa.getModuleSaBuildOptions() == null || msa.getModuleSaBuildOptions().getOptions() == null

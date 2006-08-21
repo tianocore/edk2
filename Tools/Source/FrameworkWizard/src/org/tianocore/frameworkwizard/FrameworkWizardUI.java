@@ -54,7 +54,7 @@ import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
-import org.tianocore.frameworkwizard.common.find.FindPPIsResult;
+//import org.tianocore.frameworkwizard.common.find.FindPPIsResult;
 import org.tianocore.frameworkwizard.common.ui.IDefaultMutableTreeNode;
 import org.tianocore.frameworkwizard.common.ui.IDesktopManager;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
@@ -1878,7 +1878,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         }
 
         if (arg0.getSource() == this.jMenuItemEditFindPpi) {
-            this.findPpi();
+//            this.findPpi();
         }
 
         if (arg0.getSource() == this.jMenuItemProjectChangeWorkspace) {
@@ -3099,10 +3099,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      To find all defined PPIs in workspace
      
      **/
-    private void findPpi() {
-        //FindPPIsResult fpr = FindPPIsResult.getInstance();
-        //fpr.setVisible(true);
-    }
+//    private void findPpi() {
+//        FindPPIsResult fpr = FindPPIsResult.getInstance();
+//        fpr.setVisible(true);
+//    }
 
     /**
      Switch current workspace to others
