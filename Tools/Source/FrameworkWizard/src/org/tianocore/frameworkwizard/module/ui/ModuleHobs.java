@@ -448,12 +448,16 @@ public class ModuleHobs extends IInternalFrame {
         int intPreferredWidth = this.getJContentPane().getPreferredSize().width;
         int intPreferredHeight = this.getJContentPane().getPreferredSize().height;
 
-        resizeComponent(this.jScrollPaneTable, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight);
-        relocateComponent(this.jButtonAdd, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
-                          DataType.SPACE_TO_RIGHT_FOR_ADD_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_ADD_BUTTON);
-        relocateComponent(this.jButtonRemove, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
-                          DataType.SPACE_TO_RIGHT_FOR_REMOVE_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_REMOVE_BUTTON);
-        relocateComponent(this.jButtonUpdate, intCurrentWidth, intCurrentHeight, intPreferredWidth, intPreferredHeight,
-                          DataType.SPACE_TO_RIGHT_FOR_UPDATE_BUTTON, DataType.SPACE_TO_BOTTOM_FOR_UPDATE_BUTTON);
+        Tools.resizeComponent(this.jScrollPaneTable, intCurrentWidth, intCurrentHeight, intPreferredWidth,
+                              intPreferredHeight);
+        Tools.relocateComponent(this.jButtonAdd, intCurrentWidth, intCurrentHeight, intPreferredWidth,
+                                intPreferredHeight, DataType.SPACE_TO_RIGHT_FOR_ADD_BUTTON,
+                                DataType.SPACE_TO_BOTTOM_FOR_ADD_BUTTON);
+        Tools.relocateComponent(this.jButtonRemove, intCurrentWidth, intCurrentHeight, intPreferredWidth,
+                                intPreferredHeight, DataType.SPACE_TO_RIGHT_FOR_REMOVE_BUTTON,
+                                DataType.SPACE_TO_BOTTOM_FOR_REMOVE_BUTTON);
+        Tools.relocateComponent(this.jButtonUpdate, intCurrentWidth, intCurrentHeight, intPreferredWidth,
+                                intPreferredHeight, DataType.SPACE_TO_RIGHT_FOR_UPDATE_BUTTON,
+                                DataType.SPACE_TO_BOTTOM_FOR_UPDATE_BUTTON);
     }
 }

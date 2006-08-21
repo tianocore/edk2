@@ -593,10 +593,10 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jComboBoxSelect, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
-        relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 30);
+        Tools.resizeComponentWidth(this.jComboBoxSelect, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
+        Tools.relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 30);
     }
     
     public static void main(String[] args){

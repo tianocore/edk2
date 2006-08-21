@@ -39,6 +39,7 @@ import javax.swing.table.TableModel;
 import org.tianocore.PackageSurfaceAreaDocument;
 
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
@@ -606,14 +607,14 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
-        resizeComponentWidth(this.jTextFieldC_Name, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldToken, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldTsGuid, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
-        resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldC_Name, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldToken, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldTsGuid, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
         
-        resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
 //        relocateComponentX(this.jButtonClearAll, this.getWidth(), DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
 //        relocateComponentX(this.jButtonRemove, this.getWidth(), DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
 //        relocateComponentX(this.jButtonAdd, this.getWidth(), DataType.SPACE_TO_RIGHT_FOR_GENERATE_BUTTON);
@@ -909,8 +910,8 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             JOptionPane.showMessageDialog(frame, "C_Name is NOT C_NameType.");
             return false;
         }
-        if (!DataValidation.isHexDoubleWordDataType(row[1].toString()) && 
-                        !DataValidation.isInt(row[1].toString(), Integer.MIN_VALUE, Integer.MAX_VALUE)) {
+        if (!(DataValidation.isHexDoubleWordDataType(row[1].toString()) || 
+                        DataValidation.isInt(row[1].toString(), 0, 0xffffffff))) {
             JOptionPane.showMessageDialog(frame, "Token is NOT correct.");
             return false;
         }

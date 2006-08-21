@@ -15,7 +15,6 @@
 
 package org.tianocore.frameworkwizard.common.ui;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -152,104 +151,6 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
     public void componentShown(ComponentEvent arg0) {
         // TODO Auto-generated method stub
 
-    }
-
-    /**
-     * To reset the width of input component via container width
-     * 
-     * @param c
-     * @param containerWidth
-     * 
-     */
-    public void resizeComponentWidth(Component c, int containerWidth, int preferredWidth) {
-        int newWidth = c.getPreferredSize().width + (containerWidth - preferredWidth);
-        if (newWidth < c.getPreferredSize().width) {
-            newWidth = c.getPreferredSize().width;
-        }
-        c.setSize(new java.awt.Dimension(newWidth, c.getHeight()));
-        c.validate();
-    }
-
-    /**
-     * To reset the height of input component via container height
-     * 
-     * @param c
-     * @param containerHeight
-     * 
-     */
-    public void resizeComponentHeight(Component c, int containerHeight, int preferredHeight) {
-        int newHeight = c.getPreferredSize().height + (containerHeight - preferredHeight);
-        if (newHeight < c.getPreferredSize().height) {
-            newHeight = c.getPreferredSize().height;
-        }
-        c.setSize(new java.awt.Dimension(c.getWidth(), newHeight));
-        c.validate();
-    }
-
-    /**
-     * To reset the size of input component via container size
-     * 
-     * @param c
-     * @param containerWidth
-     * @param containerHeight
-     * 
-     */
-    public void resizeComponent(Component c, int containerWidth, int containerHeight, int preferredWidth,
-                                int preferredHeight) {
-        resizeComponentWidth(c, containerWidth, preferredWidth);
-        resizeComponentHeight(c, containerHeight, preferredHeight);
-    }
-
-    /**
-     * To relocate the input component
-     * 
-     * @param c
-     * @param containerWidth
-     * @param spaceToRight
-     * 
-     */
-    public void relocateComponentX(Component c, int containerWidth, int preferredWidth, int spaceToRight) {
-        int intGapToRight = spaceToRight + c.getPreferredSize().width;
-        int newLocationX = containerWidth - intGapToRight;
-        if (newLocationX < preferredWidth - intGapToRight) {
-            newLocationX = preferredWidth - intGapToRight;
-        }
-        c.setLocation(newLocationX, c.getLocation().y);
-        c.validate();
-    }
-
-    /**
-     * To relocate the input component
-     * 
-     * @param c
-     * @param containerHeight
-     * @param spaceToBottom
-     * 
-     */
-    public void relocateComponentY(Component c, int containerHeight, int preferredHeight, int spaceToBottom) {
-        int intGapToBottom = spaceToBottom + c.getPreferredSize().height;
-        int newLocationY = containerHeight - intGapToBottom;
-        if (newLocationY < preferredHeight - spaceToBottom) {
-            newLocationY = preferredHeight - spaceToBottom;
-        }
-        c.setLocation(c.getLocation().x, newLocationY);
-        c.validate();
-    }
-
-    /**
-     * To relocate the input component
-     * 
-     * @param c
-     * @param containerWidth
-     * @param containerHeight
-     * @param spaceToBottom
-     * @param spaceToRight
-     * 
-     */
-    public void relocateComponent(Component c, int containerWidth, int containerHeight, int preferredWidht,
-                                  int preferredHeight, int spaceToRight, int spaceToBottom) {
-        relocateComponentX(c, containerWidth, preferredWidht, spaceToRight);
-        relocateComponentY(c, containerHeight, preferredHeight, spaceToBottom);
     }
 
     public void showStandard() {

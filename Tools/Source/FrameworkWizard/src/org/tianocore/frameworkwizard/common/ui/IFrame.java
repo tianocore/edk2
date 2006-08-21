@@ -19,6 +19,8 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -30,7 +32,7 @@ import javax.swing.JOptionPane;
  It extends JFrame implements ActionListener and WindowListener
  
  **/
-public class IFrame extends JFrame implements ActionListener, WindowListener {
+public class IFrame extends JFrame implements ActionListener, WindowListener, ComponentListener {
 
     ///
     /// Define class Serial Version UID
@@ -77,6 +79,7 @@ public class IFrame extends JFrame implements ActionListener, WindowListener {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(this);
+        this.addComponentListener(this);
     }
 
     /**
@@ -238,4 +241,24 @@ public class IFrame extends JFrame implements ActionListener, WindowListener {
    public void showDialog() {
        this.setVisible(true);
    }
+
+public void componentResized(ComponentEvent arg0) {
+    // TODO Auto-generated method stub
+    
+}
+
+public void componentMoved(ComponentEvent arg0) {
+    // TODO Auto-generated method stub
+    
+}
+
+public void componentShown(ComponentEvent arg0) {
+    // TODO Auto-generated method stub
+    
+}
+
+public void componentHidden(ComponentEvent arg0) {
+    // TODO Auto-generated method stub
+    
+}
 }
