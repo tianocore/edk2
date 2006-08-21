@@ -33,8 +33,8 @@ public class ModuleInfo {
 		moduleScan();
 	}
 
-	private static UI ui = null;				//if MIM is still usefull, this can be given to it
-	private static Database db = null;			//if MIM is still usefull, this can be given to it
+	public static UI ui = null;				//if MIM is still usefull, this can be given to it
+	public static Database db = null;			//if MIM is still usefull, this can be given to it
 	
 	public String modulepath = null;
 	
@@ -287,9 +287,10 @@ public class ModuleInfo {
 		}
 		return false;
 	}
-
+/*
 	public static final void main(String[] args) throws Exception {
 		ui = FirstPanel.init();
 		db = new Database();
 	}
+	*/
 }
