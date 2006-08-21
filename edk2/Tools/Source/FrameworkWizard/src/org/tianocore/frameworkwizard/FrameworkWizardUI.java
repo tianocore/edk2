@@ -3100,8 +3100,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      
      **/
     private void findPpi() {
-        FindPPIsResult fpr = FindPPIsResult.getInstance();
-        fpr.setVisible(true);
+        //FindPPIsResult fpr = FindPPIsResult.getInstance();
+        //fpr.setVisible(true);
     }
 
     /**
