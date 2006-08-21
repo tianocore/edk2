@@ -208,12 +208,13 @@ Returns:
                 //in order to provide buffer protection against possible illegal stack
                 //access that might corrupt the stack.
                 //
-                SwitchStack (
+                PeiSwitchStacks (
                   (SWITCH_STACK_ENTRY_POINT)(UINTN)TempPtr.Raw,
                   PeiStartupDescriptor,
                   (VOID*)PrivateDataInMem,
-                  (VOID*)((UINTN)PrivateData->StackBase + (UINTN)PrivateData->StackSize)
-                );
+                  (VOID*)((UINTN)PrivateData->StackBase + (UINTN)PrivateData->StackSize),
+                  (VOID*)(UINTN)PrivateData->StackBase
+                  );
               }
             }
           }
@@ -345,7 +346,7 @@ Returns:
       DebugFoundPeimPoint++;
       DebugNotDispatchedBitmap >>= 1;
     }
-  
+
   DEBUG_CODE_END ();
 
   return EFI_NOT_FOUND;
