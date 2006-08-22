@@ -99,6 +99,7 @@ import org.tianocore.frameworkwizard.platform.ui.FpdPlatformDefs;
 import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 import org.tianocore.frameworkwizard.workspace.ui.SwitchWorkspace;
+import org.tianocore.frameworkwizard.toolchain.Preferences;
 
 /**
  The class is used to show main GUI of FrameworkWizard
@@ -238,11 +239,11 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private JMenuItem jMenuItemProjectChangeWorkspace = null;
 
-    private JMenu jMenuProjectBuildTargets = null;
+    private JMenuItem jMenuItemToolsBuildPreferences = null;
 
-    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsDebug = null;
+//    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsDebug = null;
 
-    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsRelease = null;
+//    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsRelease = null;
 
     private JMenuItem jMenuItemToolsToolChainConfiguration = null;
 
@@ -746,11 +747,13 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             // Add sub menu items
             //
-            jMenuTools.add(getJMenuItemToolsToolChainConfiguration());
-            jMenuTools.addSeparator();
 
             jMenuTools.add(getJMenuItemToolsClone());
             jMenuTools.add(getJMenuItemToolsCodeScan());
+            jMenuTools.addSeparator();
+            
+            jMenuTools.add(getJMenuItemToolsToolChainConfiguration());
+            jMenuTools.add(getJMenuItemToolsBuildPreferences());
         }
         return jMenuTools;
     }
@@ -1268,7 +1271,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuProject.add(getJMenuItemProjectUpdateFar());
             jMenuProject.add(getJMenuItemProjectRemoveFar());
 
-            jMenuProject.add(getJMenuProjectBuildTargets());
         }
         return jMenuProject;
     }
@@ -1309,52 +1311,20 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     /**
-     This method initializes jMenuProjectBuildTargets	
+     This method initializes jMenuProjectBuildPreferences	
      
      @return javax.swing.JMenu	
      
      **/
-    private JMenu getJMenuProjectBuildTargets() {
-        if (jMenuProjectBuildTargets == null) {
-            jMenuProjectBuildTargets = new JMenu();
-            jMenuProjectBuildTargets.setText("Build Targets");
-            jMenuProjectBuildTargets.setMnemonic('T');
-            jMenuProjectBuildTargets.setVisible(false);
-
-            jMenuProjectBuildTargets.add(getJCheckBoxMenuItemProjectBuildTargetsDebug());
-            jMenuProjectBuildTargets.add(getJCheckBoxMenuItemProjectBuildTargetsRelease());
+    private JMenuItem getJMenuItemToolsBuildPreferences() {
+        if (jMenuItemToolsBuildPreferences == null) {
+            jMenuItemToolsBuildPreferences = new JMenuItem();
+            jMenuItemToolsBuildPreferences.setText("Build Preferences");
+            jMenuItemToolsBuildPreferences.setMnemonic('P');
+            jMenuItemToolsBuildPreferences.setEnabled(true);
+            jMenuItemToolsBuildPreferences.addActionListener(this);
         }
-        return jMenuProjectBuildTargets;
-    }
-
-    /**
-     This method initializes jCheckBoxMenuItemProjectBuildTargetsDebug	
-     
-     @return javax.swing.JCheckBoxMenuItem	
-     
-     **/
-    private JCheckBoxMenuItem getJCheckBoxMenuItemProjectBuildTargetsDebug() {
-        if (jCheckBoxMenuItemProjectBuildTargetsDebug == null) {
-            jCheckBoxMenuItemProjectBuildTargetsDebug = new JCheckBoxMenuItem();
-            jCheckBoxMenuItemProjectBuildTargetsDebug.setText("Debug");
-            jCheckBoxMenuItemProjectBuildTargetsDebug.setEnabled(false);
-        }
-        return jCheckBoxMenuItemProjectBuildTargetsDebug;
-    }
-
-    /**
-     This method initializes jCheckBoxMenuItemProjectBuildTargetsRelease	
-     
-     @return javax.swing.JCheckBoxMenuItem	
-     
-     **/
-    private JCheckBoxMenuItem getJCheckBoxMenuItemProjectBuildTargetsRelease() {
-        if (jCheckBoxMenuItemProjectBuildTargetsRelease == null) {
-            jCheckBoxMenuItemProjectBuildTargetsRelease = new JCheckBoxMenuItem();
-            jCheckBoxMenuItemProjectBuildTargetsRelease.setText("Release");
-            jCheckBoxMenuItemProjectBuildTargetsRelease.setEnabled(false);
-        }
-        return jCheckBoxMenuItemProjectBuildTargetsRelease;
+        return jMenuItemToolsBuildPreferences;
     }
 
     /**
@@ -1879,6 +1849,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
         if (arg0.getSource() == this.jMenuItemEditFindPpi) {
 //            this.findPpi();
+        }
+        
+        if (arg0.getSource() == jMenuItemToolsBuildPreferences) {
+            configBuildPreferences();
         }
 
         if (arg0.getSource() == this.jMenuItemProjectChangeWorkspace) {
@@ -3200,6 +3174,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         tcc.showDialog();
     }
 
+    private void configBuildPreferences() {
+       Preferences bt = Preferences.getInstance();
+       bt.showDialog();
+    }
     /**
      Clone selected item
      
