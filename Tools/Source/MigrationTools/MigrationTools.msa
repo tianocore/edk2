@@ -42,7 +42,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>org/tianocore/migration/SourceFileReplacer.java</Filename>
     <Filename>org/tianocore/migration/UI.java</Filename>
     <Filename>org/tianocore/migration/MsaTreeEditor.java</Filename> 
-    <Filename>org/tianocore/migration/MigrationTool.java</Filename> 
     <Filename>org/tianocore/migration/Critic.java</Filename> 
     <Filename>org/tianocore/migration/Common.java</Filename>
   </SourceFiles>
