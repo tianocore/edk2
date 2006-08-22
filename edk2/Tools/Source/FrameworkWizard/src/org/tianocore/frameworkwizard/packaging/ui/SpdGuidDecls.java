@@ -67,7 +67,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
 
     private JPanel jContentPane = null;
 
-    private JTextField jTextFieldAdd = null;
+    private JTextField jTextFieldGuid = null;
 
     private JScrollPane jScrollPane = null;
 
@@ -107,11 +107,11 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
 
     private JScrollPane topScrollPane = null;  //  @jve:decl-index=0:visual-constraint="10,213"
 
-    private JLabel jLabelVer = null;
+    private JLabel jLabelCName = null;
 
     private GenGuidDialog guidDialog = null;
 
-    private JTextField jTextFieldVersion = null;
+    private JTextField jTextFieldCName = null;
 
     private JLabel jLabelHelp = null;
 
@@ -142,18 +142,18 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     }
 
     /**
-      This method initializes jTextFieldAdd	
+      This method initializes jTextFieldGuid	
       	
       @return javax.swing.JTextField	
      **/
-    protected JTextField getJTextFieldAdd() {
-        if (jTextFieldAdd == null) {
-            jTextFieldAdd = new JTextField();
-            jTextFieldAdd.setBounds(new java.awt.Rectangle(137,35,337,20));
-            jTextFieldAdd.setPreferredSize(new java.awt.Dimension(335,20));
+    protected JTextField getJTextFieldGuid() {
+        if (jTextFieldGuid == null) {
+            jTextFieldGuid = new JTextField();
+            jTextFieldGuid.setBounds(new java.awt.Rectangle(137,60,435,20));
+            jTextFieldGuid.setPreferredSize(new java.awt.Dimension(200,20));
             
         }
-        return jTextFieldAdd;
+        return jTextFieldGuid;
     }
 
     /**
@@ -466,11 +466,11 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             jLabelHelp.setText("HelpText");
             jLabelHelp.setSize(new java.awt.Dimension(109,20));
             jLabelHelp.setLocation(new java.awt.Point(14,85));
-            jLabelVer = new JLabel();
-            jLabelVer.setBounds(new java.awt.Rectangle(14,60,111,20));
-            jLabelVer.setText("C_Name");
+            jLabelCName = new JLabel();
+            jLabelCName.setBounds(new java.awt.Rectangle(14,35,111,20));
+            jLabelCName.setText("C_Name");
             jLabelGuid = new JLabel();
-            jLabelGuid.setBounds(new java.awt.Rectangle(15,35,112,20));
+            jLabelGuid.setBounds(new java.awt.Rectangle(15,60,112,20));
             jLabelGuid.setText("Guid Value");
             jLabelName = new JLabel();
             jLabelName.setBounds(new java.awt.Rectangle(15,10,113,20));
@@ -491,9 +491,9 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jStarLabel3, null);
             jContentPane.add(jStarLabel4, null);
-            jContentPane.add(jLabelVer, null);
-            jContentPane.add(getJTextFieldVersion(), null);
-            jContentPane.add(getJTextFieldAdd(), null);
+            jContentPane.add(jLabelCName, null);
+            jContentPane.add(getJTextFieldCName(), null);
+            jContentPane.add(getJTextFieldGuid(), null);
             jContentPane.add(getJScrollPane(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
@@ -545,8 +545,8 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             //ToDo: check before add
             String[] row = {"", "", "", "", "", "", ""};
             row[3] = jTextFieldHelp.getText();
-            row[2] = jTextFieldAdd.getText();
-            row[1] = jTextFieldVersion.getText();
+            row[2] = jTextFieldGuid.getText();
+            row[1] = jTextFieldCName.getText();
             row[0] = jTextFieldName.getText();
             row[4] = vectorToString(iCheckBoxListArch.getAllCheckedItemsString());
             if (row[4].length() == 0) {
@@ -565,9 +565,12 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
                 return;
             }
             
+            if (addRow(row) == -1) {
+                return;
+            }
             model.addRow(row);
             jTable.changeSelection(model.getRowCount()-1, 0, false, false);
-            addRow(row);
+            
         }
         //
         // remove selected line
@@ -592,11 +595,11 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         }
         
         if (arg0.getSource() == jButtonGen) {
-            jTextFieldAdd.setText(Tools.generateUuidString());
+            jTextFieldGuid.setText(Tools.generateUuidString());
         }
         
         if (arg0.getActionCommand().equals("GenGuidValue")) {
-            jTextFieldAdd.setText(guidDialog.getGuid());
+            jTextFieldGuid.setText(guidDialog.getGuid());
         }
         
     }
@@ -621,7 +624,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         return true;
     }
     
-    protected void addRow(String[] row) {
+    protected int addRow(String[] row) {
         Vector<String> vArch = iCheckBoxListArch.getAllCheckedItemsString();
         if (vArch.size() == 0) {
             vArch = null;
@@ -634,10 +637,15 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
         if (vguidType.size() == 0) {
             vguidType = null;
         }
+        if (vguidType == null) {
+            JOptionPane.showMessageDialog(this, "You must select one GUID type.");
+            return -1;
+        }
         if (docConsole != null) {
             docConsole.setSaved(false);
         }
         sfc.genSpdGuidDeclarations(row[0], row[1], row[2], row[3], vArch, vModType, vguidType);
+        return 0;
     }
     
     protected void removeRow(int i){
@@ -692,25 +700,25 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     }
 
     /**
-     * This method initializes jTextFieldVersion	
+     * This method initializes jTextFieldCName	
      * 	
      * @return javax.swing.JTextField	
      */
-    protected JTextField getJTextFieldVersion() {
-        if (jTextFieldVersion == null) {
-            jTextFieldVersion = new JTextField();
-            jTextFieldVersion.setBounds(new java.awt.Rectangle(137,60,225,20));
-            jTextFieldVersion.setPreferredSize(new java.awt.Dimension(225,20));
+    protected JTextField getJTextFieldCName() {
+        if (jTextFieldCName == null) {
+            jTextFieldCName = new JTextField();
+            jTextFieldCName.setBounds(new java.awt.Rectangle(137,35,337,20));
+            jTextFieldCName.setPreferredSize(new java.awt.Dimension(335,20));
         }
-        return jTextFieldVersion;
+        return jTextFieldCName;
     }
 
     public void componentResized(ComponentEvent arg0) {
         int intPreferredWidth = 500;
         
         Tools.resizeComponentWidth(this.jTextFieldName, this.getWidth(), intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldAdd, this.getWidth(), intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldVersion, this.getWidth(), intPreferredWidth);
+
+        Tools.resizeComponentWidth(this.jTextFieldCName, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
         Tools.relocateComponentX(this.jButtonGen, this.getWidth(), this.getPreferredSize().width, 40);

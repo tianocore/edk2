@@ -109,13 +109,14 @@ public class SpdPpiDecls extends SpdGuidDecls {
         sfc.updateSpdPpiDecl(row, name, cName, guid, help, archList, modTypeList, guidTypeList);
     }
     
-    protected void addRow(String[] row) {
+    protected int addRow(String[] row) {
         
         if (!dataValidation(row)){
-            return;
+            return -1;
         }
         docConsole.setSaved(false);
         sfc.genSpdPpiDeclarations(row[0], row[1], row[2], row[3], stringToVector(row[4]), stringToVector(row[5]), stringToVector(row[6]));
+        return 0;
     }
     
     protected void removeRow(int i){

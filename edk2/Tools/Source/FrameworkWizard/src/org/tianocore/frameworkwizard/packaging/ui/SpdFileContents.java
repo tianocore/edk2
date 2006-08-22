@@ -730,6 +730,17 @@ public class SpdFileContents {
         }
     }
 
+    public void getSpdGuidDeclWithType (Vector<String> vGuidCName, String type) {
+        if (psaRoot.getGuidDeclarations() == null) {
+            return;
+        }
+        List<GuidDeclarationsDocument.GuidDeclarations.Entry> l = psaRoot.getGuidDeclarations().getEntryList();
+        for (int i = 0; i < l.size(); ++i) {
+            if (l.get(i).getGuidTypeList() == null || l.get(i).getGuidTypeList().contains(type)) {
+                vGuidCName.add(l.get(i).getCName());
+            }
+        }
+    }
     /**
     Get the number of GUID declarations from the size of List
     

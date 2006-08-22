@@ -21,7 +21,6 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -68,7 +67,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
 
     private JPanel jContentPane = null;
 
-    private JRadioButton jRadioButtonSelect = null;
+    private JLabel jLabelSelect = null;
 
     private JComboBox jComboBoxSelect = null;
 
@@ -117,15 +116,14 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
       	
       @return javax.swing.JRadioButton	
      **/
-    private JRadioButton getJRadioButtonSelect() {
-        if (jRadioButtonSelect == null) {
-            jRadioButtonSelect = new JRadioButton();
-            jRadioButtonSelect.setBounds(new java.awt.Rectangle(9,10,198,20));
-            jRadioButtonSelect.setText("Select Existing ModuleType");
-            jRadioButtonSelect.addActionListener(this);
-            jRadioButtonSelect.setSelected(true);
+    private JLabel getJLabelSelect() {
+        if (jLabelSelect == null) {
+            jLabelSelect = new JLabel();
+            jLabelSelect.setBounds(new java.awt.Rectangle(14,10,198,20));
+            jLabelSelect.setText("Select ModuleType");
+
         }
-        return jRadioButtonSelect;
+        return jLabelSelect;
     }
 
     /**
@@ -321,7 +319,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
             jContentPane.add(jLabel, null);
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
-            jContentPane.add(getJRadioButtonSelect(), null);
+            jContentPane.add(getJLabelSelect(), null);
             jContentPane.add(getJComboBoxSelect(), null);
             jContentPane.add(getJButtonAdd(), null);
             jContentPane.add(getJButtonRemove(), null);
@@ -374,9 +372,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         if (arg0.getSource() == jButtonAdd) {
             String strLibClass = "";
             
-            if (jRadioButtonSelect.isSelected()) {
-                strLibClass = jComboBoxSelect.getSelectedItem().toString();
-            }
+            strLibClass = jComboBoxSelect.getSelectedItem().toString();
             //ToDo: check before add
             String[] row = {"", ""};
             row[0] = strLibClass;
