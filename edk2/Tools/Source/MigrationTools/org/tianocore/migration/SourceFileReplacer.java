@@ -78,7 +78,7 @@ public final class SourceFileReplacer {
 	private static final void addr8only() throws Exception {
 		String paragraph = null;
 		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
-		Common.ensureDir(mi.modulepath + File.separator + "result" + File.separator + "R8Lib.c");
+		//Common.ensureDir(mi.modulepath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c");
 		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
 		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
 		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);

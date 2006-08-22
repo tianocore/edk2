@@ -88,7 +88,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         cst.gridx = 1;
         cst.gridy = 0;
         gridbag.setConstraints(criticButton, cst);
-        add(criticButton);
+        //add(criticButton);
         
         JPanel checkboxPanel = new JPanel();
         checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS));
