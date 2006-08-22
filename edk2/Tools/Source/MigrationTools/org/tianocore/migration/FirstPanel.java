@@ -18,7 +18,7 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 
-public final class FirstPanel extends JPanel implements ActionListener, UI {
+public final class FirstPanel extends JPanel implements ActionListener, ItemListener, UI {
 	/**
 	 *  Define class Serial Version UID
 	 */
@@ -31,12 +31,17 @@ public final class FirstPanel extends JPanel implements ActionListener, UI {
 	private JTextField moduletext;
 	private JTextArea log;
 	private JFileChooser fc;
-	private JCheckBox filebox, screenbox;
+	private JCheckBox filebox, screenbox, mibox, criticbox, defaultpathbox;
 	
 	private boolean tofile = true, toscreen = true;
 	private PrintWriter logfile;
 
 	FirstPanel() throws Exception {
+        GridBagLayout gridbag = new GridBagLayout();
+        setLayout(gridbag);
+        
+		GridBagConstraints cst = new GridBagConstraints();
+		
 		goButton = new JButton("Go");
 		goButton.addActionListener(this);
 		goButton.setActionCommand("go");
@@ -53,22 +58,53 @@ public final class FirstPanel extends JPanel implements ActionListener, UI {
 		moduletext = new JTextField(30);
 		
 		filebox = new JCheckBox("Output to logfile", true);
+		filebox.addItemListener(this);
 		screenbox = new JCheckBox("Specify logfile", false);
+		screenbox.addItemListener(this);
+		mibox = new JCheckBox("Show ModuleInfo", false);
+		mibox.addItemListener(this);
+		criticbox = new JCheckBox("Run Critic", true);
+		criticbox.addItemListener(this);
+		defaultpathbox = new JCheckBox("Use Default Output Path", true);
+		defaultpathbox.addItemListener(this);
 		
         JPanel modulePanel = new JPanel();
         modulePanel.add(moduleButton);
         modulePanel.add(moduletext);
-        modulePanel.add(filebox);
-        modulePanel.add(screenbox);
         modulePanel.add(goButton);
         //modulePanel.add(msaEditorButton);
-        modulePanel.add(criticButton);
+        cst.gridx = 0;
+        cst.gridy = 0;
+        //cst.gridwidth = GridBagConstraints.REMAINDER;
+        gridbag.setConstraints(modulePanel, cst);
         add(modulePanel);
 
-        log = new JTextArea(20,25);
+        cst.gridx = 1;
+        cst.gridy = 0;
+        gridbag.setConstraints(criticButton, cst);
+        add(criticButton);
+        
+        JPanel checkboxPanel = new JPanel();
+        checkboxPanel.setLayout(new BoxLayout(checkboxPanel, BoxLayout.Y_AXIS));
+        checkboxPanel.add(filebox);
+        checkboxPanel.add(screenbox);
+        checkboxPanel.add(mibox);
+        checkboxPanel.add(criticbox);
+        checkboxPanel.add(defaultpathbox);
+        cst.gridx = 1;
+        cst.gridy = 1;
+        //cst.gridheight = 2;
+        gridbag.setConstraints(checkboxPanel, cst);
+        add(checkboxPanel);
+        
+        log = new JTextArea(10,20);
         log.setMargin(new Insets(5,5,5,5));
         log.setEditable(false);
         JScrollPane logScrollPane = new JScrollPane(log);
+        cst.gridx = 0;
+        cst.gridy = 1;
+        cst.fill = GridBagConstraints.BOTH;
+        gridbag.setConstraints(logScrollPane, cst);
         add(logScrollPane);
         
 		fc = new JFileChooser();
@@ -155,8 +191,36 @@ public final class FirstPanel extends JPanel implements ActionListener, UI {
     }
     
     public void itemStateChanged(ItemEvent e) {
-    	if (e.getStateChange() == ItemEvent.DESELECTED) {
-    		System.out.println("changed");
+    	if (e.getSource() == filebox) {
+        	if (e.getStateChange() == ItemEvent.DESELECTED) {
+        		System.out.println("filebox DESELECTED");
+        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
+        		System.out.println("filebox SELECTED");
+        	}
+    	} else if (e.getSource() == screenbox) {
+        	if (e.getStateChange() == ItemEvent.DESELECTED) {
+        		System.out.println("screenbox DESELECTED");
+        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
+        		System.out.println("screenbox SELECTED");
+        	}
+    	} else if (e.getSource() == mibox) {
+        	if (e.getStateChange() == ItemEvent.DESELECTED) {
+        		System.out.println("mibox DESELECTED");
+        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
+        		System.out.println("mibox SELECTED");
+        	}
+    	} else if (e.getSource() == criticbox) {
+        	if (e.getStateChange() == ItemEvent.DESELECTED) {
+        		System.out.println("criticbox DESELECTED");
+        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
+        		System.out.println("criticbox SELECTED");
+        	}
+    	} else if (e.getSource() == defaultpathbox) {
+        	if (e.getStateChange() == ItemEvent.DESELECTED) {
+        		System.out.println("defaultpathbox DESELECTED");
+        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
+        		System.out.println("defaultpathbox SELECTED");
+        	}
     	}
     }
 
@@ -175,7 +239,8 @@ public final class FirstPanel extends JPanel implements ActionListener, UI {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         FirstPanel fp = new FirstPanel();
-		fp.setLayout(new BoxLayout(fp, BoxLayout.Y_AXIS));
+		//fp.setLayout(new GridBagLayout());
+		//fp.setLayout(new BoxLayout(fp, BoxLayout.Y_AXIS));
 		fp.setOpaque(true);
         frame.setContentPane(fp);
 
