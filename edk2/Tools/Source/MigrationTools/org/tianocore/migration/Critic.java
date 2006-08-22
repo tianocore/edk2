@@ -15,13 +15,13 @@ package org.tianocore.migration;
 import java.util.regex.*;
 import java.io.*;
 
-public class Critic {
-	private static Pattern ptnheadcomment = Pattern.compile("^\\/\\*\\+\\+(.*?)\\-\\-\\*\\/",Pattern.DOTALL);
-	private static Pattern ptnfunccomment = Pattern.compile("([\\};\\/\">]\\s*)([\\w\\s]*?[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)\\/\\*\\+\\+(.*?)\\-\\-\\*\\/(\\s*.*?)([\\{;])",Pattern.DOTALL);		// find function with {;">/ , may be unsafe
+public final class Critic {
+	private static final Pattern ptnheadcomment = Pattern.compile("^\\/\\*\\+\\+(.*?)\\-\\-\\*\\/",Pattern.DOTALL);
+	private static final Pattern ptnfunccomment = Pattern.compile("([\\};\\/\">]\\s*)([\\w\\s]*?[_\\w][_\\w\\d]*\\s*\\([^\\)\\(]*\\)\\s*)\\/\\*\\+\\+(.*?)\\-\\-\\*\\/(\\s*.*?)([\\{;])",Pattern.DOTALL);		// find function with {;">/ , may be unsafe
 	//private static Pattern ptncommentstructure = Pattern.compile("\\/\\*\\+\\+\\s*Routine Description:\\s*(.*?)\\s*Arguments:\\s*(.*?)\\s*Returns:\\s*(.*?)\\s*\\-\\-\\*\\/",Pattern.DOTALL);
-	private static Pattern ptncommentequation = Pattern.compile("([^\\s]*)\\s+-\\s+(.*)\\s*");
+	private static final Pattern ptncommentequation = Pattern.compile("([^\\s]*)\\s+-\\s+(.*)\\s*");
 	private static Matcher mtrcommentequation;
-	private static Pattern ptnnewcomment = Pattern.compile("(\\s*@(param|retval)\\s+[^\\s]+)\\s+(.*)");
+	private static final Pattern ptnnewcomment = Pattern.compile("(\\s*@(param|retval)\\s+[^\\s]+)\\s+(.*)");
 	private static Matcher mtrnewcomment;
 	
 	private static final int totallinelength = 82;
