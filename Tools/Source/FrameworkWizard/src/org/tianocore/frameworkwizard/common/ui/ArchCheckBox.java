@@ -40,7 +40,7 @@ public class ArchCheckBox extends JPanel {
     private JCheckBox jCheckBoxArm = null;
 
     private JCheckBox jCheckBoxPpc = null;
-    
+
     /**
      * This method initializes jCheckBoxIa32	
      * 	
@@ -155,7 +155,7 @@ public class ArchCheckBox extends JPanel {
         this.add(getJCheckBoxPpc(), null);
         this.setToolTipText(DataType.SUP_ARCH_LIST_HELP_TEXT);
     }
-    
+
     public Vector<String> getSelectedItemsVector() {
         Vector<String> v = new Vector<String>();
         if (this.jCheckBoxIa32.isSelected()) {
@@ -178,7 +178,7 @@ public class ArchCheckBox extends JPanel {
         }
         return v;
     }
-    
+
     public String getSelectedItemsString() {
         String s = "";
         if (this.jCheckBoxIa32.isSelected()) {
@@ -201,7 +201,7 @@ public class ArchCheckBox extends JPanel {
         }
         return s.trim();
     }
-    
+
     public void setAllItemsSelected(boolean isSelected) {
         this.jCheckBoxIa32.setSelected(isSelected);
         this.jCheckBoxX64.setSelected(isSelected);
@@ -210,7 +210,7 @@ public class ArchCheckBox extends JPanel {
         this.jCheckBoxArm.setSelected(isSelected);
         this.jCheckBoxPpc.setSelected(isSelected);
     }
-    
+
     public void setSelectedItems(Vector<String> v) {
         setAllItemsSelected(false);
         if (v != null) {
@@ -237,6 +237,79 @@ public class ArchCheckBox extends JPanel {
                 }
                 if (v.get(index).equals(this.jCheckBoxPpc.getText())) {
                     this.jCheckBoxPpc.setSelected(true);
+                    continue;
+                }
+            }
+        }
+    }
+
+    public void setAllItemsEnabled(boolean isEnabled) {
+        this.jCheckBoxIa32.setEnabled(isEnabled);
+        this.jCheckBoxX64.setEnabled(isEnabled);
+        this.jCheckBoxIpf.setEnabled(isEnabled);
+        this.jCheckBoxEbc.setEnabled(isEnabled);
+        this.jCheckBoxArm.setEnabled(isEnabled);
+        this.jCheckBoxPpc.setEnabled(isEnabled);
+    }
+
+    public void setEnabledItems(Vector<String> v) {
+        setAllItemsEnabled(false);
+        if (v != null) {
+            for (int index = 0; index < v.size(); index++) {
+                if (v.get(index).equals(this.jCheckBoxIa32.getText())) {
+                    this.jCheckBoxIa32.setEnabled(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxIpf.getText())) {
+                    this.jCheckBoxIpf.setEnabled(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxX64.getText())) {
+                    this.jCheckBoxX64.setEnabled(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxEbc.getText())) {
+                    this.jCheckBoxEbc.setEnabled(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxArm.getText())) {
+                    this.jCheckBoxArm.setEnabled(true);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxPpc.getText())) {
+                    this.jCheckBoxPpc.setEnabled(true);
+                    continue;
+                }
+            }
+        }
+    }
+
+    public void setDisabledItems(Vector<String> v) {
+        setAllItemsEnabled(true);
+        if (v != null) {
+            for (int index = 0; index < v.size(); index++) {
+                if (v.get(index).equals(this.jCheckBoxIa32.getText())) {
+                    this.jCheckBoxIa32.setEnabled(false);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxIpf.getText())) {
+                    this.jCheckBoxIpf.setEnabled(false);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxX64.getText())) {
+                    this.jCheckBoxX64.setEnabled(false);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxEbc.getText())) {
+                    this.jCheckBoxEbc.setEnabled(false);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxArm.getText())) {
+                    this.jCheckBoxArm.setEnabled(false);
+                    continue;
+                }
+                if (v.get(index).equals(this.jCheckBoxPpc.getText())) {
+                    this.jCheckBoxPpc.setEnabled(false);
                     continue;
                 }
             }

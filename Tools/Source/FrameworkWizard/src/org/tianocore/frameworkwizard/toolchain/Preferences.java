@@ -198,6 +198,8 @@ public class Preferences extends IFrame {
 
     private Vector<String> vArchList = null;
 
+    private Vector<String> vDisableArchList = null;
+
     //
     // Not used by UI
     //
@@ -246,7 +248,8 @@ public class Preferences extends IFrame {
             jComboBoxActivePlatform.setBounds(new java.awt.Rectangle(valueColumn, activePlatformRow, valueWidth,
                                                                      oneRowHeight));
             jComboBoxActivePlatform.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
-            jComboBoxActivePlatform.setToolTipText("<html>Select &quot;Do Not Set&quot; if you want to build a platform"
+            jComboBoxActivePlatform
+                                   .setToolTipText("<html>Select &quot;Do Not Set&quot; if you want to build a platform"
                                                    + "<br>from the directory where the FPD file exists,"
                                                    + "<br>otherwise scroll down to select the platform.</html>");
 
@@ -299,7 +302,7 @@ public class Preferences extends IFrame {
     private ICheckBoxList getICheckBoxListTagName() {
         if (iCheckBoxListTagName == null) {
             iCheckBoxListTagName = new ICheckBoxList();
-            
+
             if (toolsDefTagNames != null) {
                 toolsDefTagNames.trim();
                 String aTagNames[] = toolsDefTagNames.trim().split(" ");
@@ -312,7 +315,7 @@ public class Preferences extends IFrame {
                 Vector<String> defaultTags = stringToVector("MYTOOLS");
                 iCheckBoxListTagName.setAllItems(defaultTags);
             }
-            
+
             iCheckBoxListTagName.setAllItemsUnchecked();
             iCheckBoxListTagName.setToolTipText("<html>"
                                                 + "Specify the TagName(s) from the tool configuration file to use"
@@ -358,7 +361,7 @@ public class Preferences extends IFrame {
 
     private ICheckBoxList getICheckBoxListBuildTarget() {
         if (iCheckBoxListBuildTarget == null) {
-            
+
             String aBuildTargets[] = toolsDefTargetNames.trim().split(" ");
             Vector<String> vBuildTargets = new Vector<String>();
             for (int i = 0; i < aBuildTargets.length; i++) {
@@ -613,6 +616,23 @@ public class Preferences extends IFrame {
                     lineCounter++;
                 }
                 reader.close();
+                // Only enable Architecture selection based on tool chain installations
+                String turnOff = "";
+                if (!toolsDefArchNames.contains("EBC"))
+                    turnOff = "EBC ";
+                if (!toolsDefArchNames.contains("PPC"))
+                    turnOff += "PPC ";
+                if (!toolsDefArchNames.contains("IPF"))
+                    turnOff += "IPF ";
+                if (!toolsDefArchNames.contains("X64"))
+                    turnOff += "X64 ";
+                if (!toolsDefArchNames.contains("IA32"))
+                    turnOff += "X64 ";
+                if (!toolsDefArchNames.contains("ARM"))
+                    turnOff += "ARM ";
+                turnOff = turnOff.trim();
+                vDisableArchList = stringToVector(turnOff);
+
                 if (!toolsDefTargetNames.matches("[A-Z]+")) {
                     toolsDefTargetNames = toolsDefTargetNames.replace("* ", "").trim();
                     if (Debug)
@@ -751,6 +771,7 @@ public class Preferences extends IFrame {
 
             jContentPane.add(jLabelTargetArch, null);
 
+            jArchCheckBox.setDisabledItems(vDisableArchList);
             jArchCheckBox.setSelectedItems(vArchList);
             jContentPane.add(jArchCheckBox, null);
 
