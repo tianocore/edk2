@@ -16,6 +16,11 @@ public class MigrationTool {
 	public static UI ui = null;
 	public static Database db = null;
 	
+	public static final String migrationcomment = "//%$//";
+	
+	public static boolean printModuleInfo = false;
+	public static boolean doCritic = false;
+	
 	public static void main(String[] args) throws Exception {
 		ui = FirstPanel.init();
 		db = Database.init();
