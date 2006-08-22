@@ -5,8 +5,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.tianocore.ModuleSurfaceAreaDocument;
-
 public class MsaTreeEditor extends JPanel {
 	/**
 	 *  Define class Serial Version UID
