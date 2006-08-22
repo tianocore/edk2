@@ -41,12 +41,12 @@ public class ModifyInfTask extends Task implements EfiDefine {
     ///
     /// input FV inf file
     ///
-    private String inputFVInfFileName = "";
+    private String inputFVInfFile = "";
 
     ///
     /// output FV inf file
     ///
-    private String outputFVInfFileName = "";
+    private String outputFVInfFile = "";
 
     ///
     /// pattern string
@@ -89,16 +89,16 @@ public class ModifyInfTask extends Task implements EfiDefine {
         //
         // argument of tools
         //
-		File file = new File(outputFVInfFileName);
+		File file = new File(outputFVInfFile);
         if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-			argument = this.inputFVInfFileName +
+			argument = this.inputFVInfFile +
 				       this.outputDir +
 					   File.separatorChar +
-					   this.outputFVInfFileName +
+					   this.outputFVInfFile +
 					   this.patternStr;
 		} else {
-			argument = this.inputFVInfFileName +
-				       this.outputFVInfFileName +
+			argument = this.inputFVInfFile +
+				       this.outputFVInfFile +
 				       this.patternStr;
 		}
         //
@@ -121,7 +121,7 @@ public class ModifyInfTask extends Task implements EfiDefine {
             // Set debug log information.
             //
             EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFVInfFileName)).getName());
+            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFVInfFile)).getName());
             revl = runner.execute();
 
             if (EFI_SUCCESS == revl) {
@@ -142,49 +142,49 @@ public class ModifyInfTask extends Task implements EfiDefine {
     }
 
     /**
-     * getinputFVInfFileName
+     * getinputFVInfFile
      *
-     * This function is to get class member "inputFVInfFileName".
+     * This function is to get class member "inputFVInfFile".
      *
      * @return string of input inf file name.
      */
-    public String getinputFVInfFileName() {
-        return this.inputFVInfFileName;
+    public String getinputFVInfFile() {
+        return this.inputFVInfFile;
     }
 
     /**
-     * setinputFVInfFileName
+     * setinputFVInfFile
      *
-     * This function is to set class member "inputFVInfFileName".
+     * This function is to set class member "inputFVInfFile".
      *
      * @param inputFile
      *            string of input inf file name.
      */
-    public void setinputFVInfFileName(String inputFVInfFileName) {
-        this.inputFVInfFileName = inputFVInfFileName + " ";
+    public void setinputFVInfFile(String inputFVInfFileName) {
+        this.inputFVInfFile= inputFVInfFileName + " ";
     }
 
     /**
-     * getoutputFVInfFileName
+     * getoutputFVInfFile
      *
-     * This function is to get class member "outputFVInfFileName"
+     * This function is to get class member "outputFVInfFile"
      *
-     * @return outputFVInfFileName string of output inf file name.
+     * @return outputFVInfFile string of output inf file name.
      */
-    public String getoutputFVInfFileName() {
-        return this.outputFVInfFileName;
+    public String getoutputFVInfFile() {
+        return this.outputFVInfFile;
     }
 
     /**
-     * setoutputFVInfFileName
+     * setoutputFVInfFile
      *
-     * This function is to set class member "outputFVInfFileName"
+     * This function is to set class member "outputFVInfFile"
      *
-     * @param outputFVInfFileName
+     * @param outputFVInfFile
      *            string of output  inf file name.
      */
-    public void setoutputFVInfFileName(String outputFVInfFileName) {
-        this.outputFVInfFileName = outputFVInfFileName  + " ";
+    public void setoutputFVInfFile(String outputFVInfFileName) {
+        this.outputFVInfFile = outputFVInfFileName  + " ";
     }
 
     /**
