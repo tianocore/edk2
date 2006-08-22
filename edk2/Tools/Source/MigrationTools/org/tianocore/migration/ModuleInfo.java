@@ -23,11 +23,11 @@ public class ModuleInfo {
 	ModuleInfo(String modulepath) throws Exception {
 		this.modulepath = modulepath;
 		
-		MigrationTool.ui.println("Choose where to place the result");
-		if ((outputpath = MigrationTool.ui.getFilepath()) == null) {
+		ModuleInfo.ui.println("Choose where to place the result");
+		if ((outputpath = ModuleInfo.ui.getFilepath()) == null) {
 			outputpath = modulepath; 
 		}
-		MigrationTool.ui.println(outputpath);
+		ModuleInfo.ui.println(outputpath);
 		
 		mainFlow();
 	}
@@ -64,9 +64,9 @@ public class ModuleInfo {
 		SourceFileReplacer.flush(this);	// some adding library actions are taken here,so it must be put before "MsaWriter"
 		
 		// show result
-		if (MigrationTool.printModuleInfo) {
-			MigrationTool.ui.println("\nModule Information : ");
-			MigrationTool.ui.println("Entrypoint : " + entrypoint);
+		if (ModuleInfo.printModuleInfo) {
+			ModuleInfo.ui.println("\nModule Information : ");
+			ModuleInfo.ui.println("Entrypoint : " + entrypoint);
 			show(protocol, "Protocol : ");
 			show(ppi, "Ppi : ");
 			show(guid, "Guid : ");
@@ -80,21 +80,21 @@ public class ModuleInfo {
 		
 		new MsaWriter(this).flush();
 
-		if (MigrationTool.doCritic) {
+		if (ModuleInfo.doCritic) {
     		Critic.fireAt(outputpath + File.separator + "Migration_" + modulename);
 		}
 		
 		Common.deleteDir(modulepath + File.separator + "temp");
 		
-		MigrationTool.ui.println("Errors Left : " + MigrationTool.db.error);
-		MigrationTool.ui.println("Complete!");
-		MigrationTool.ui.println("Your R9 module was placed here: " + modulepath + File.separator + "result");
-		MigrationTool.ui.println("Your logfile was placed here: " + modulepath);
+		ModuleInfo.ui.println("Errors Left : " + ModuleInfo.db.error);
+		ModuleInfo.ui.println("Complete!");
+		ModuleInfo.ui.println("Your R9 module was placed here: " + modulepath + File.separator + "result");
+		ModuleInfo.ui.println("Your logfile was placed here: " + modulepath);
 	}
 	
 	private void show(Set<String> hash, String show) {
-		MigrationTool.ui.println(show + hash.size());
-		MigrationTool.ui.println(hash);
+		ModuleInfo.ui.println(show + hash.size());
+		ModuleInfo.ui.println(hash);
 	}
 	
 	public final void enroll(String filepath) throws Exception {
@@ -128,8 +128,23 @@ public class ModuleInfo {
 	}
 
 	public static final void triger(String path) throws Exception {
-		MigrationTool.ui.println("Project Migration");
-		MigrationTool.ui.println("Copyright (c) 2006, Intel Corporation");
+		ModuleInfo.ui.println("Project Migration");
+		ModuleInfo.ui.println("Copyright (c) 2006, Intel Corporation");
 		Common.toDoAll(path, ModuleInfo.class.getMethod("seekModule", String.class), null, null, Common.DIR);
+	}
+	
+	//---------------------------------------------------------------------------//
+	
+	public static UI ui = null;
+	public static Database db = null;
+	
+	public static final String migrationcomment = "//%$//";
+	
+	public static boolean printModuleInfo = false;
+	public static boolean doCritic = false;
+	
+	public static void main(String[] args) throws Exception {
+		ui = FirstPanel.init();
+		db = Database.init();
 	}
 }

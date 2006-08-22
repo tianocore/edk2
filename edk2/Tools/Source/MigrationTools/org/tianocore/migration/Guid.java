@@ -45,8 +45,8 @@ public class Guid {
 		String temp = null;
 		
 		temp = mtr.group();
-		if (MigrationTool.db.hasGuid(temp)) {		// only changed guids registered, because both changed and not changed guids are included in database
-			type = MigrationTool.db.getGuidType(temp);
+		if (ModuleInfo.db.hasGuid(temp)) {		// only changed guids registered, because both changed and not changed guids are included in database
+			type = ModuleInfo.db.getGuidType(temp);
 			if (type.matches("Protocol")) {
 				mi.protocol.add(temp);
 			} else if (type.matches("Ppi")) {

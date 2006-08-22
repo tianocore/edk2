@@ -12,4 +12,4 @@
 export CLASSPATH=$CLASSPATH:$WORKSPACE/Tools/bin/MigrationTools.jar
 
 # Run Migration Tool
-java org.tianocore.migration.MigrationTool
+java org.tianocore.migration.ModuleInfo

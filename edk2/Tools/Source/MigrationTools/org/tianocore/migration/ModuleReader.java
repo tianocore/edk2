@@ -32,10 +32,10 @@ public final class ModuleReader {
 		
 		String filename = null;
 		if (mi.msaorinf.isEmpty()) {
-			MigrationTool.ui.println("No INF nor MSA file found!");
+			ModuleInfo.ui.println("No INF nor MSA file found!");
 			System.exit(0);
 		} else {
-			filename = MigrationTool.ui.choose("Found .inf or .msa file for module\n" + mi.modulepath + "\nChoose one Please", mi.msaorinf.toArray());
+			filename = ModuleInfo.ui.choose("Found .inf or .msa file for module\n" + mi.modulepath + "\nChoose one Please", mi.msaorinf.toArray());
 		}
 		if (filename.contains(".inf")) {
 			readInf(filename);
@@ -100,7 +100,7 @@ public final class ModuleReader {
 					}
 					if (mtrinfequation.group(1).matches("DPX_SOURCE")) {
 						if (!mi.localmodulesources.contains(mtrinfequation.group(2))) {
-							MigrationTool.ui.println("DPX File Missing! : " + mtrinfequation.group(2));
+							ModuleInfo.ui.println("DPX File Missing! : " + mtrinfequation.group(2));
 						}
 					}
 				}
@@ -109,7 +109,7 @@ public final class ModuleReader {
 				mtrfilename = ptnfilename.matcher(mtrsection.group(2));
 				while (mtrfilename.find()) {
 					if (!mi.localmodulesources.contains(mtrfilename.group())) {
-						MigrationTool.ui.println("Source File Missing! : " + mtrfilename.group());
+						ModuleInfo.ui.println("Source File Missing! : " + mtrfilename.group());
 					}
 				}
 			}
@@ -137,7 +137,7 @@ public final class ModuleReader {
 					mtrinclude = ptninclude.matcher(line);
 					if (mtrinclude.find() && mi.localmodulesources.contains(mtrinclude.group(1))) {
 					} else {
-						line = MigrationTool.migrationcomment + line;
+						line = ModuleInfo.migrationcomment + line;
 					}
 				}
 				outfile.append(line + '\n');
@@ -204,7 +204,7 @@ public final class ModuleReader {
 			matguid = Guid.ptnguid.matcher(line);										// several ways to implement this , which one is faster ? :
 			while (matguid.find()) {													// 1.currently , find once , then call to identify which is it
 				if ((temp = Guid.register(matguid, mi, MigrationTool.db)) != null) {				// 2.use 3 different matchers , search 3 times to find each
-					//matguid.appendReplacement(result, MigrationTool.db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
+					//matguid.appendReplacement(result, ModuleInfo.db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
 				}
 			}
 			//matguid.appendTail(result);
@@ -221,8 +221,8 @@ public final class ModuleReader {
 			matfuncc = Func.ptnfuncc.matcher(line);
 			while (matfuncc.find()) {
 				if ((temp = Func.register(matfuncc, mi, MigrationTool.db)) != null) {
-					//MigrationTool.ui.println(ifile + "  dofunc  " + temp);
-					//matfuncc.appendReplacement(result, MigrationTool.db.getR9Func(temp));
+					//ModuleInfo.ui.println(ifile + "  dofunc  " + temp);
+					//matfuncc.appendReplacement(result, ModuleInfo.db.getR9Func(temp));
 				}
 			}
 			//matfuncc.appendTail(result);
