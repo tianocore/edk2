@@ -203,7 +203,7 @@ public final class ModuleReader {
 			// find guid
 			matguid = Guid.ptnguid.matcher(line);										// several ways to implement this , which one is faster ? :
 			while (matguid.find()) {													// 1.currently , find once , then call to identify which is it
-				if ((temp = Guid.register(matguid, mi, MigrationTool.db)) != null) {				// 2.use 3 different matchers , search 3 times to find each
+				if ((temp = Guid.register(matguid, mi, ModuleInfo.db)) != null) {				// 2.use 3 different matchers , search 3 times to find each
 					//matguid.appendReplacement(result, ModuleInfo.db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
 				}
 			}
@@ -220,7 +220,7 @@ public final class ModuleReader {
 			// find function call
 			matfuncc = Func.ptnfuncc.matcher(line);
 			while (matfuncc.find()) {
-				if ((temp = Func.register(matfuncc, mi, MigrationTool.db)) != null) {
+				if ((temp = Func.register(matfuncc, mi, ModuleInfo.db)) != null) {
 					//ModuleInfo.ui.println(ifile + "  dofunc  " + temp);
 					//matfuncc.appendReplacement(result, ModuleInfo.db.getR9Func(temp));
 				}
@@ -231,7 +231,7 @@ public final class ModuleReader {
 			// find macro
 			matmacro = Macro.ptntmacro.matcher(line);
 			while (matmacro.find()) {
-				if ((temp = Macro.register(matmacro, mi, MigrationTool.db)) != null) {
+				if ((temp = Macro.register(matmacro, mi, ModuleInfo.db)) != null) {
 				}
 			}
 			
@@ -243,7 +243,7 @@ public final class ModuleReader {
 
 			matfuncd = Func.ptnfuncd.matcher(line);
 			while (matfuncd.find()) {
-				if ((temp = Func.register(matfuncd, mi, MigrationTool.db)) != null) {
+				if ((temp = Func.register(matfuncd, mi, ModuleInfo.db)) != null) {
 				}
 			}
 		}
