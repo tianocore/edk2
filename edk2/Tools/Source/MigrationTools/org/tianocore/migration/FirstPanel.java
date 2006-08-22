@@ -59,12 +59,18 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 		
 		filebox = new JCheckBox("Output to logfile", true);
 		filebox.addItemListener(this);
+		
 		screenbox = new JCheckBox("Specify logfile", false);
 		screenbox.addItemListener(this);
-		mibox = new JCheckBox("Show ModuleInfo", false);
+		
+		mibox = new JCheckBox("Print ModuleInfo", false);
 		mibox.addItemListener(this);
+		MigrationTool.printModuleInfo = false;
+		
 		criticbox = new JCheckBox("Run Critic", true);
 		criticbox.addItemListener(this);
+		MigrationTool.doCritic = true;
+		
 		defaultpathbox = new JCheckBox("Use Default Output Path", true);
 		defaultpathbox.addItemListener(this);
 		
@@ -205,14 +211,16 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         	}
     	} else if (e.getSource() == mibox) {
         	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		System.out.println("mibox DESELECTED");
+        		MigrationTool.printModuleInfo = false;
         	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		System.out.println("mibox SELECTED");
+        		MigrationTool.printModuleInfo = true;
         	}
     	} else if (e.getSource() == criticbox) {
         	if (e.getStateChange() == ItemEvent.DESELECTED) {
+        		MigrationTool.doCritic = false;
         		System.out.println("criticbox DESELECTED");
         	} else if (e.getStateChange() == ItemEvent.SELECTED) {
+        		MigrationTool.doCritic = true;
         		System.out.println("criticbox SELECTED");
         	}
     	} else if (e.getSource() == defaultpathbox) {
