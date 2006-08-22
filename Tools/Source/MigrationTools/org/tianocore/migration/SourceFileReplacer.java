@@ -18,17 +18,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class SourceFileReplacer {
-	SourceFileReplacer(String path, String outpath, ModuleInfo moduleinfo) {
-		modulepath = path;
-		outputpath = outpath;
-		mi = moduleinfo;
-	}
-	private String modulepath;
-	private String outputpath;
-	private ModuleInfo mi;
-	private boolean showdetails = false;
+	private static ModuleInfo mi;
+	private static boolean showdetails = false;
 	
-	private class r8tor9 {
+	private static class r8tor9 {
 		r8tor9(String r8, String r9) {
 			r8thing = r8;
 			r9thing = r9;
@@ -38,34 +31,17 @@ public final class SourceFileReplacer {
 	}
 	
 	// these sets are used only for printing log of the changes in current file
-	private Set<r8tor9> filefunc = new HashSet<r8tor9>();
-	private Set<r8tor9> filemacro = new HashSet<r8tor9>();
-	private Set<r8tor9> fileguid = new HashSet<r8tor9>();
-	private Set<r8tor9> fileppi = new HashSet<r8tor9>();
-	private Set<r8tor9> fileprotocol = new HashSet<r8tor9>();
-	private Set<String> filer8only = new HashSet<String>();
+	private static final Set<r8tor9> filefunc = new HashSet<r8tor9>();
+	private static final Set<r8tor9> filemacro = new HashSet<r8tor9>();
+	private static final Set<r8tor9> fileguid = new HashSet<r8tor9>();
+	private static final Set<r8tor9> fileppi = new HashSet<r8tor9>();
+	private static final Set<r8tor9> fileprotocol = new HashSet<r8tor9>();
+	private static final Set<String> filer8only = new HashSet<String>();
 	
-	private static final String r8only = "EfiLibInstallDriverBinding " +
-			"EfiLibInstallAllDriverProtocols " +
-			"EfiLibCompareLanguage " +
-			"BufToHexString " +
-			"EfiStrTrim " +							//is the r8only lib going to be enlarged????  Caution !!!!
-			"EfiValueToHexStr " +
-			"HexStringToBuf " +
-			"IsHexDigit " +
-			"NibbleToHexChar " +
-			"GetHob " +
-			"GetHobListSize " +
-			"GetHobVersion " +
-			"GetHobBootMode " +
-			"GetCpuHobInfo " +
-			"GetDxeCoreHobInfo " +
-			"GetNextFirmwareVolumeHob " +
-			"GetNextGuidHob " +
-			"GetPalEntryHobInfo " +
-			"GetIoPortSpaceAddressHobInfo ";
-	
-	public void flush() throws Exception {
+	public static final void flush(ModuleInfo moduleinfo) throws Exception {
+		
+		mi = moduleinfo;
+		
 		String outname = null;
 		String inname = null;
 		if (MigrationTool.ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
@@ -82,7 +58,7 @@ public final class SourceFileReplacer {
 					outname = inname;
 				}
 				MigrationTool.ui.println("\nModifying file: " + inname);
-				Common.string2file(sourcefilereplace(modulepath + File.separator + "temp" + File.separator + inname), outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
+				Common.string2file(sourcefilereplace(mi.modulepath + File.separator + "temp" + File.separator + inname), mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".dxs") || inname.contains(".uni")) {
 				if (inname.contains(".H")) {
 					outname = inname.replaceFirst(".H", ".h");
@@ -90,7 +66,7 @@ public final class SourceFileReplacer {
 					outname = inname;
 				}
 				MigrationTool.ui.println("\nCopying file: " + inname);
-				Common.string2file(Common.file2string(modulepath + File.separator + "temp" + File.separator + inname), outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
+				Common.string2file(Common.file2string(mi.modulepath + File.separator + "temp" + File.separator + inname), mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			}
 		}
 
@@ -99,12 +75,12 @@ public final class SourceFileReplacer {
 		}
 	}
 	
-	private void addr8only() throws Exception {
+	private static final void addr8only() throws Exception {
 		String paragraph = null;
-		String line = Common.file2string(Database.defaultpath + File.separator + "R8Lib.c");
-		Common.ensureDir(modulepath + File.separator + "result" + File.separator + "R8Lib.c");
-		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
-		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
+		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
+		Common.ensureDir(mi.modulepath + File.separator + "result" + File.separator + "R8Lib.c");
+		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
+		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
 		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
 		Matcher mtrr8only = ptnr8only.matcher(line);
 		Matcher mtrr8onlyhead;
@@ -132,7 +108,7 @@ public final class SourceFileReplacer {
 	}
 	
 	// Caution : if there is @ in file , it will be replaced with \n , so is you use Doxygen ... God Bless you!
-	private String sourcefilereplace(String filename) throws Exception {
+	private static final String sourcefilereplace(String filename) throws Exception {
 		BufferedReader rd = new BufferedReader(new FileReader(filename));
 		StringBuffer wholefile = new StringBuffer();
 		String line;
@@ -198,7 +174,7 @@ public final class SourceFileReplacer {
 						Iterator<r8tor9> rt = filefunc.iterator();
 						while (rt.hasNext()) {
 							temp = rt.next();
-							if (r8only.contains(temp.r8thing)) {
+							if (MigrationTool.db.r8only.contains(temp.r8thing)) {
 								filer8only.add(r8thing);
 								mi.hashr8only.add(r8thing);
 								addr8 = true;
@@ -297,7 +273,7 @@ public final class SourceFileReplacer {
 		return line;
 	}
 	
-	private void show(Set<r8tor9> hash, String sh) {
+	private static final void show(Set<r8tor9> hash, String sh) {
 		Iterator<r8tor9> it = hash.iterator();
 		r8tor9 temp;
 		if (showdetails) {
@@ -312,7 +288,7 @@ public final class SourceFileReplacer {
 		}
 	}
 	
-	private void replaceGuid(String line, Set<String> hash, String kind, Set<r8tor9> filehash) {
+	private static final void replaceGuid(String line, Set<String> hash, String kind, Set<r8tor9> filehash) {
 		Iterator<String> it;
 		String r8thing;
 		String r9thing;

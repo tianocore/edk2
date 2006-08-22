@@ -83,7 +83,7 @@ public class ModuleInfo {
 		CommentOutNonLocalHFile();
 		parsePreProcessedSourceCode();
 
-		new SourceFileReplacer(modulepath, outputpath, this).flush();	// some adding library actions are taken here,so it must be put before "MsaWriter"
+		SourceFileReplacer.flush(this);	// some adding library actions are taken here,so it must be put before "MsaWriter"
 		
 		// show result
 		if (MigrationTool.ui.yesOrNo("Parse of the Module Information has completed. View details?")) {
@@ -100,7 +100,7 @@ public class ModuleInfo {
 			show(hashr8only, "hashr8only : ");
 		}
 		
-		new MsaWriter(modulepath, outputpath, this).flush();
+		new MsaWriter(this).flush();
 
 		Common.deleteDir(modulepath + File.separator + "temp");
 		//Common.toDoAll(modulepath + File.separator + "temp", Common.class.getMethod("deleteDir", String.class), null, null, Common.DIR);
