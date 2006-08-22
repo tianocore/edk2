@@ -210,8 +210,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  volatile static UINT64 Mask = 0xffffffff;
-  return InternalX86GetTimerTick (InternalX86GetApicBase ()) & Mask;
+  return (UINT32)InternalX86GetTimerTick (InternalX86GetApicBase ());
 }
 
 /**
