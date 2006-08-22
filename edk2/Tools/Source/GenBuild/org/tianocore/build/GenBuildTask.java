@@ -16,13 +16,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build;
 
 import java.io.File;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,8 +106,6 @@ public class GenBuildTask extends Ant {
     private ModuleIdentification moduleId;
 
     private Vector<Property> properties = new Vector<Property>();
-
-    private static Stack<Hashtable> backupPropertiesStack = new Stack<Hashtable>();
 
     private boolean isSingleModuleBuild = false;
 
@@ -570,6 +566,11 @@ public class GenBuildTask extends Ant {
         PropertyManager.setProperty("LIBS", propertyLibs.replaceAll("(\\\\)", "/"));
 
         //
+        // Get all includepath and set to INCLUDE_PATHS
+        //
+        String[] includes = prepareIncludePaths(fpdModuleId);
+        
+        //
         // if it is CUSTOM_BUILD
         // then call the exist BaseName_build.xml directly.
         //
@@ -587,7 +588,7 @@ public class GenBuildTask extends Ant {
         // TBD
         //
         String ffsKeyword = SurfaceAreaQuery.getModuleFfsKeyword();
-        ModuleBuildFileGenerator fileGenerator = new ModuleBuildFileGenerator(getProject(), ffsKeyword, fpdModuleId);
+        ModuleBuildFileGenerator fileGenerator = new ModuleBuildFileGenerator(getProject(), ffsKeyword, fpdModuleId, includes);
         String buildFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
         fileGenerator.genBuildFile(buildFilename);
 
@@ -697,4 +698,89 @@ public class GenBuildTask extends Ant {
     public void setSingleModuleBuild(boolean isSingleModuleBuild) {
         this.isSingleModuleBuild = isSingleModuleBuild;
     }
+    
+    private String[] prepareIncludePaths(FpdModuleIdentification fpdModuleId) {
+        //
+        // Prepare the includes: PackageDependencies and Output debug direactory
+        //
+        Set<String> includes = new LinkedHashSet<String>();
+        String arch = fpdModuleId.getArch();
+        
+        //
+        // WORKSPACE
+        //
+        includes.add("${WORKSPACE_DIR}" + File.separatorChar);
+        
+        //
+        // Module iteself
+        //
+        includes.add("${MODULE_DIR}");
+        includes.add("${MODULE_DIR}" + File.separatorChar + archDir(arch));
+        
+        //
+        // Packages in PackageDenpendencies
+        //
+        PackageIdentification[] packageDependencies = SurfaceAreaQuery.getDependencePkg(fpdModuleId.getArch());
+        for (int i = 0; i < packageDependencies.length; i++) {
+            GlobalData.refreshPackageIdentification(packageDependencies[i]);
+            File packageFile = packageDependencies[i].getSpdFile();
+            includes.add(packageFile.getParent() + File.separatorChar + "Include");
+            includes.add(packageFile.getParent() + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
+        }
+
+        //
+        // All Dependency Library Instance's PackageDependencies
+        //
+        ModuleIdentification[] libinstances = SurfaceAreaQuery.getLibraryInstance(fpdModuleId.getArch());
+        for (int i = 0; i < libinstances.length; i++) {
+            SurfaceAreaQuery.push(GlobalData.getDoc(libinstances[i], fpdModuleId.getArch()));
+            PackageIdentification[] libraryPackageDependencies = SurfaceAreaQuery.getDependencePkg(fpdModuleId.getArch());
+            for (int j = 0; j < libraryPackageDependencies.length; j++) {
+                GlobalData.refreshPackageIdentification(libraryPackageDependencies[j]);
+                File packageFile = libraryPackageDependencies[j].getSpdFile();
+                includes.add(packageFile.getParent() + File.separatorChar + "Include");
+                includes.add(packageFile.getParent() + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
+            }
+            SurfaceAreaQuery.pop();
+        }
+        
+        
+        //
+        // The package which the module belongs to
+        // TBD
+        includes.add(fpdModuleId.getModule().getPackage().getPackageDir() + File.separatorChar + "Include");
+        includes.add(fpdModuleId.getModule().getPackage().getPackageDir() + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
+
+        //
+        // Debug files output directory
+        //
+        includes.add("${DEST_DIR_DEBUG}");
+        
+        //
+        // set to INCLUDE_PATHS property
+        //
+        Iterator<String> iter = includes.iterator();
+        StringBuffer includePaths = new StringBuffer();
+        while (iter.hasNext()) {
+            includePaths.append(iter.next());
+            includePaths.append("; ");
+        }
+        PropertyManager.setProperty("INCLUDE_PATHS", getProject().replaceProperties(includePaths.toString()).replaceAll("(\\\\)", "/"));
+        
+        return includes.toArray(new String[includes.size()]);
+    }
+    
+    /**
+     Return the name of the directory that corresponds to the architecture.
+     This is a translation from the XML Schema tag to a directory that
+     corresponds to our directory name coding convention.
+    
+     **/
+   private String archDir(String arch) {
+       return arch.replaceFirst("X64", "x64")
+                  .replaceFirst("IPF", "Ipf")
+                  .replaceFirst("IA32", "Ia32")
+                  .replaceFirst("ARM", "Arm")
+                  .replaceFirst("EBC", "Ebc");
+   }    
 }

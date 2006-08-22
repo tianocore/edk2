@@ -76,58 +76,22 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <target name="sourcefiles">
       <Build_AUTOGEN FILEEXT="c" FILENAME="AutoGen" FILEPATH=".">
          <EXTRA.INC>
-            <includepath path="${WORKSPACE_DIR}"/>
-            <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include\${ARCH}"/>
-            <includepath path="${DEST_DIR_DEBUG}"/>
+            <includepath path="${INCLUDE_PATHS}"/>
          </EXTRA.INC>
        </Build_AUTOGEN>
       <Build_CCode FILEEXT="c" FILENAME="FwVol" FILEPATH=".">
          <EXTRA.INC>
-            <includepath path="${WORKSPACE_DIR}"/>
-            <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include\${ARCH}"/>
-            <includepath path="${DEST_DIR_DEBUG}"/>
+            <includepath path="${INCLUDE_PATHS}"/>
          </EXTRA.INC>
       </Build_CCode>
       <Build_CCode FILEEXT="c" FILENAME="WinNtThunk" FILEPATH=".">
          <EXTRA.INC>
-            <includepath path="${WORKSPACE_DIR}"/>
-            <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include\${ARCH}"/>
-            <includepath path="${DEST_DIR_DEBUG}"/>
+            <includepath path="${INCLUDE_PATHS}"/>
          </EXTRA.INC>
       </Build_CCode>
       <Build_CCode FILEEXT="c" FILENAME="SecMain" FILEPATH=".">
          <EXTRA.INC>
-            <includepath path="${WORKSPACE_DIR}"/>
-            <includepath path="${MODULE_DIR}"/>
-            <includepath path="${MODULE_DIR}\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\MdePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkModulePkg\Include\${ARCH}"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include"/>
-            <includepath path="${WORKSPACE_DIR}\EdkNt32Pkg\Include\${ARCH}"/>
-            <includepath path="${DEST_DIR_DEBUG}"/>
+            <includepath path="${INCLUDE_PATHS}"/>
          </EXTRA.INC>
       </Build_CCode>
     </target>
