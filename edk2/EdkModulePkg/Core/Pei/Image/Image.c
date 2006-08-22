@@ -131,7 +131,7 @@ Returns:
   //
   // Print debug message: Loading PEIM at 0x12345678 EntryPoint=0x12345688 Driver.efi
   //
-  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%08x EntryPoint=0x%08x ", Pe32Data, *EntryPoint));
+  DEBUG ((EFI_D_INFO | EFI_D_LOAD, "Loading PEIM at 0x%08x EntryPoint=0x%08x ", (UINTN) ImageAddress, *EntryPoint));
   DEBUG_CODE_BEGIN ();
     EFI_IMAGE_DATA_DIRECTORY            *DirectoryEntry;
     EFI_IMAGE_DEBUG_DIRECTORY_ENTRY     *DebugEntry;

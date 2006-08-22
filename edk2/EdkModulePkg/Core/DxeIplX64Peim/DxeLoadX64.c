@@ -27,15 +27,6 @@ Abstract:
 BOOLEAN gInMemory = FALSE;
 
 //
-// GUID for EM64T
-//
-#define EFI_PPI_NEEDED_BY_DXE \
-  { \
-    0x4d37da42, 0x3a0c, 0x4eda, 0xb9, 0xeb, 0xbc, 0x0e, 0x1d, 0xb4, 0x71, 0x3b \
-  }
-EFI_GUID mPpiNeededByDxeGuid = EFI_PPI_NEEDED_BY_DXE;
-
-//
 // Module Globals used in the DXE to PEI handoff
 // These must be module globals, so the stack can be switched
 //
@@ -256,12 +247,8 @@ Returns:
   //
   // Install the PEI Protocols that are shared between PEI and DXE
   //
-#ifdef EFI_NT_EMULATOR
-  PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderProtocol ();
-  ASSERT (PeiEfiPeiPeCoffLoader != NULL);
-#else
   PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderX64Protocol ();
-#endif 
+  ASSERT (PeiEfiPeiPeCoffLoader != NULL);
 
   //
   // Allocate 128KB for the Stack
@@ -310,15 +297,6 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Transfer control to the DXE Core
-  // The handoff state is simply a pointer to the HOB list
-  //
-  // PEI_PERF_END (PeiServices, L"DxeIpl", NULL, 0);
-
-  Status = PeiServicesInstallPpi (&mPpiSignal);
-  ASSERT_EFI_ERROR (Status);
-
-  //
   // Load the GDT of Go64. Since the GDT of 32-bit Tiano locates in the BS_DATA \
   // memory, it may be corrupted when copying FV to high-end memory 
   LoadGo64Gdt();
@@ -340,6 +318,14 @@ Returns:
              &DxeCoreSize,
              &DxeCoreEntryPoint
              );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Transfer control to the DXE Core
+  // The handoff state is simply a pointer to the HOB list
+  //
+
+  Status = PeiServicesInstallPpi (&mPpiSignal);
   ASSERT_EFI_ERROR (Status);
 
   //

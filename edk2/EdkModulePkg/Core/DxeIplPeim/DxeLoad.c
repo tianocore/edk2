@@ -371,7 +371,6 @@ Returns:
   // Transfer control to the DXE Core
   // The handoff state is simply a pointer to the HOB list
   //
-//  PERF_END (PeiServices, L"DxeIpl", NULL, 0);
 
   Status = PeiServicesInstallPpi (&mPpiSignal);
 
