@@ -14,7 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build;
 
 import java.io.File;
-import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -84,7 +83,7 @@ public class FileProcess {
     ///
     /// Current module's include pathes
     ///
-    private Set<String> includes;
+    private String[] includes;
     
     ///
     /// Xml Document.
@@ -109,7 +108,7 @@ public class FileProcess {
       @param sourceFiles Modules source files
       @param document XML document
     **/
-    public void init(Project project, Set<String> includes, Document document) {
+    public void init(Project project, String[] includes, Document document) {
         this.document = document;
         this.includes = includes;
         this.project = project;
@@ -252,11 +251,10 @@ public class FileProcess {
         ele.setAttribute("FILEPATH", sourceFilepath);
         ele.setAttribute("FILENAME", sourceFilename);
         ele.setAttribute("FILEEXT", sourceFileext.substring(1));
-        String[] includePaths = includes.toArray(new String[includes.size()]);
         Element includesEle = document.createElement("EXTRA.INC");
-        for (int i = 0; i < includePaths.length; i++) {
+        for (int i = 0; i < includes.length; i++) {
             Element includeEle = document.createElement("includepath");
-            includeEle.setAttribute("path", project.replaceProperties(includePaths[i]));
+            includeEle.setAttribute("path", project.replaceProperties(includes[i]));
             includesEle.appendChild(includeEle);
         }
         ele.appendChild(includesEle);
