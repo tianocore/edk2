@@ -200,8 +200,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setBounds(new java.awt.Rectangle(12,351,608,253));
-            jScrollPane.setPreferredSize(new java.awt.Dimension(500,419));
+            jScrollPane.setBounds(new java.awt.Rectangle(12,351,400,253));
             jScrollPane.setViewportView(getJTable());
         }
         return jScrollPane;

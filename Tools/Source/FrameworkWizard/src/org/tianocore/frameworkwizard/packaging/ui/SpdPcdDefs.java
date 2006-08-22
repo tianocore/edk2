@@ -102,7 +102,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 
     private JLabel jLabelTokenSpace = null;
 
-    private JTextField jTextFieldTsGuid = null;
+    private JComboBox jComboBoxTsGuid = null;
 
     private JLabel jLabelVarVal = null;
 
@@ -270,11 +270,12 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 }
             }
         });
-        initFrame();
+        
         this.setVisible(true);
     }
 
     private void init(SpdFileContents sfc){
+        initFrame(sfc);
         if (sfc.getSpdPcdDefinitionCount() == 0) {
             return ;
         }
@@ -379,7 +380,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jContentPane.add(jLabelItemType, null);
             jContentPane.add(jLabelC_Name, null);
             jContentPane.add(jLabelTokenSpace, null);
-            jContentPane.add(getJTextFieldTsGuid(), null);
+            jContentPane.add(getJComboBoxTsGuid(), null);
             jContentPane.add(jLabelVarVal, null);
             jContentPane.add(getJTextFieldC_Name(), null);
             jContentPane.add(jLabelToken, null);
@@ -431,7 +432,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
  			jContentPane.add(jLabelTokenSpace, null);
     
      **/
-    private void initFrame() {
+    private void initFrame(SpdFileContents sfc) {
 
         jComboBoxDataType.addItem("UINT8");
         jComboBoxDataType.addItem("UINT16");
@@ -440,11 +441,17 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         jComboBoxDataType.addItem("VOID*");
         jComboBoxDataType.addItem("BOOLEAN");
         jComboBoxDataType.setSelectedIndex(0);
+        
+        Vector<String> vGuidCName = new Vector<String>();
+        sfc.getSpdGuidDeclWithType(vGuidCName, "TOKEN_SPACE_GUID");
+        for (int i = 0; i < vGuidCName.size(); ++i) {
+            jComboBoxTsGuid.addItem(vGuidCName.get(i));
+        }
     }
 
     public void actionPerformed(ActionEvent arg0) {
         
-        docConsole.setSaved(false);
+        
             if (arg0.getSource() == jButtonOk) {
                 this.save();
                 this.dispose();
@@ -455,6 +462,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
 
             if (arg0.getSource() == jButtonAdd) {
                 //ToDo: check before add
+          
                 boolean[] b = {jCheckBoxFeatureFlag.isSelected(), jCheckBoxFixedAtBuild.isSelected(), jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected()};
                 if (!checkValidUsage(b)) {
                     return;
@@ -468,7 +476,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                     modTypeList = null;
                 }
                 Object[] row = {jTextFieldC_Name.getText(), jTextFieldToken.getText(),
-                                jTextFieldTsGuid.getText(), jComboBoxDataType.getSelectedItem(), 
+                                jComboBoxTsGuid.getSelectedItem(), jComboBoxDataType.getSelectedItem(), 
                                 jTextFieldDefaultValue.getText(), jTextFieldHelp.getText(),
                                 jCheckBoxFeatureFlag.isSelected(), jCheckBoxFixedAtBuild.isSelected(),
                                 jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected(),
@@ -476,6 +484,11 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 if (!dataValidation(row)) {
                     return;
                 }
+                
+                if (tokenCNameExisted(jTextFieldToken.getText(), jTextFieldC_Name.getText())) {
+                    return;
+                }
+                
                 model.addRow(row);
                 jTable.changeSelection(model.getRowCount()-1, 0, false, false);
                 String usage = getValidUsage(jCheckBoxFeatureFlag.isSelected(), jCheckBoxFixedAtBuild.isSelected(), jCheckBoxPatchInMod.isSelected(), jCheckBoxDyn.isSelected(), jCheckBoxDynEx.isSelected());
@@ -483,6 +496,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                     usage = null;
                 }
                 sfc.genSpdPcdDefinitions(row[0]+"", row[1]+"", row[3]+"", usage, row[2]+"", row[4]+"", row[5]+"", archList, modTypeList);
+                docConsole.setSaved(false);
             }
             //
             // remove selected line
@@ -495,6 +509,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 if (rowSelected >= 0) {
                     model.removeRow(rowSelected);
                     sfc.removeSpdPcdDefinition(rowSelected);
+                    docConsole.setSaved(false);
                 }
             }
 
@@ -504,6 +519,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
                 }
                 model.setRowCount(0);
                 sfc.removeSpdPcdDefinition();
+                docConsole.setSaved(false);
             }
             
     }
@@ -513,18 +529,17 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
     }
 
     /**
-     * This method initializes jTextFieldTsGuid	
+     * This method initializes jComboBoxTsGuid	
      * 	
-     * @return javax.swing.JTextField	
+     * @return javax.swing.JComboBox	
      */
-    private JTextField getJTextFieldTsGuid() {
-        if (jTextFieldTsGuid == null) {
-            jTextFieldTsGuid = new JTextField();
-            jTextFieldTsGuid.setPreferredSize(new java.awt.Dimension(315,20));
-            jTextFieldTsGuid.setSize(new java.awt.Dimension(317,20));
-            jTextFieldTsGuid.setLocation(new java.awt.Point(156,58));
+    private JComboBox getJComboBoxTsGuid() {
+        if (jComboBoxTsGuid == null) {
+            jComboBoxTsGuid = new JComboBox();
+            jComboBoxTsGuid.setBounds(new java.awt.Rectangle(156,58,315,20));
+    
         }
-        return jTextFieldTsGuid;
+        return jComboBoxTsGuid;
     }
 
     /**
@@ -609,7 +624,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         
         Tools.resizeComponentWidth(this.jTextFieldC_Name, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldToken, this.getWidth(), intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldTsGuid, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jComboBoxTsGuid, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldDefaultValue, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextFieldHelp, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
@@ -812,6 +827,16 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jCheckBoxFeatureFlag.setBounds(new java.awt.Rectangle(156,161,100,21));
             jCheckBoxFeatureFlag.setText("Feature Flag");
             jCheckBoxFeatureFlag.setPreferredSize(new java.awt.Dimension(21,20));
+            jCheckBoxFeatureFlag.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (jCheckBoxFeatureFlag.isSelected()) {
+                        jCheckBoxPatchInMod.setSelected(false);
+                        jCheckBoxFixedAtBuild.setSelected(false);
+                        jCheckBoxDyn.setSelected(false);
+                        jCheckBoxDynEx.setSelected(false);
+                    }
+                }
+            });
         }
         return jCheckBoxFeatureFlag;
     }
@@ -827,6 +852,13 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jCheckBoxFixedAtBuild.setBounds(new java.awt.Rectangle(312,133,108,20));
             jCheckBoxFixedAtBuild.setText("Fixed at Build");
             jCheckBoxFixedAtBuild.setPreferredSize(new java.awt.Dimension(21,20));
+            jCheckBoxFixedAtBuild.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (jCheckBoxFixedAtBuild.isSelected()) {
+                        jCheckBoxFeatureFlag.setSelected(false);
+                    }
+                }
+            });
         }
         return jCheckBoxFixedAtBuild;
     }
@@ -842,6 +874,13 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jCheckBoxPatchInMod.setBounds(new java.awt.Rectangle(156,133,154,20));
             jCheckBoxPatchInMod.setText("Patchable in Module");
             jCheckBoxPatchInMod.setPreferredSize(new java.awt.Dimension(21,20));
+            jCheckBoxPatchInMod.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (jCheckBoxPatchInMod.isSelected()) {
+                        jCheckBoxFeatureFlag.setSelected(false);
+                    }
+                }
+            });
         }
         return jCheckBoxPatchInMod;
     }
@@ -857,6 +896,13 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jCheckBoxDyn.setBounds(new java.awt.Rectangle(278,161,80,20));
             jCheckBoxDyn.setText("Dynamic");
             jCheckBoxDyn.setPreferredSize(new java.awt.Dimension(21,20));
+            jCheckBoxDyn.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (jCheckBoxDyn.isSelected()) {
+                        jCheckBoxFeatureFlag.setSelected(false);
+                    }
+                }
+            });
         }
         return jCheckBoxDyn;
     }
@@ -872,6 +918,13 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jCheckBoxDynEx.setBounds(new java.awt.Rectangle(371,161,99,20));
             jCheckBoxDynEx.setText("DynamicEx");
             jCheckBoxDynEx.setPreferredSize(new java.awt.Dimension(21,20));
+            jCheckBoxDynEx.addItemListener(new java.awt.event.ItemListener() {
+                public void itemStateChanged(java.awt.event.ItemEvent e) {
+                    if (jCheckBoxDynEx.isSelected()) {
+                        jCheckBoxFeatureFlag.setSelected(false);
+                    }
+                }
+            });
         }
         return jCheckBoxDynEx;
     }
@@ -895,6 +948,28 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
         }
         
         return usage.trim();
+    }
+    
+    private boolean tokenCNameExisted(String token, String cName) {
+        Integer inputToken = Integer.decode(token);
+        
+        for (int i = 0; i < jTable.getRowCount(); ++i) {
+            if (jTable.getValueAt(i, 0).equals(cName)) {
+                JOptionPane.showMessageDialog(frame, "C_Name already existed in table.");
+                return true;
+            }
+            if (jTable.getValueAt(i, 1).equals(token)) {
+                JOptionPane.showMessageDialog(frame, "Token already existed in table.");
+                return true;
+            }
+            Integer tokenValue = Integer.decode(jTable.getValueAt(i, 1)+"");
+            if (tokenValue.equals(inputToken)) {
+                JOptionPane.showMessageDialog(frame, "Same token value already existed in table.");
+                return true;
+            }
+            
+        }
+        return false;
     }
     
     private boolean checkValidUsage(boolean[] b) {
