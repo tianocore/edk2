@@ -406,7 +406,7 @@ public class HiiPackagesDlg extends IDialog {
         // Check Hii Package Name
         //
         if (isEmpty(this.jTextFieldName.getText())) {
-            Log.wrn("Update Hii Packages", "Hii Package Name Record must not be empty");
+            Log.wrn("Update Hii Packages", "Hii Package Name Record must be entered!");
             return false;
         }
 

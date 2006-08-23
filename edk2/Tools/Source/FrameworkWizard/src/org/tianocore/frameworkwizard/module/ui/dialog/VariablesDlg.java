@@ -428,7 +428,7 @@ public class VariablesDlg extends IDialog {
         // Check VariableName
         //
         if (isEmpty(this.jTextFieldVariableName.getText())) {
-            Log.wrn("Update Variables", "Variable Name must not be empty");
+            Log.wrn("Update Variables", "Variable Name must be entered!");
             return false;
         }
 

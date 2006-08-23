@@ -454,7 +454,7 @@ public class SourceFilesDlg extends IDialog {
         // Check Filename
         //
         if (isEmpty(this.jTextFieldFileName.getText())) {
-            Log.wrn("Update Source Files", "File Name couldn't be empty");
+            Log.wrn("Update Source Files", "File Name must be entered!");
             return false;
         }
         if (!DataValidation.isFilename(this.jTextFieldFileName.getText())) {

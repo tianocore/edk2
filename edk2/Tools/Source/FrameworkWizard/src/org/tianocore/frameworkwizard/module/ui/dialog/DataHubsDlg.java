@@ -397,7 +397,7 @@ public class DataHubsDlg extends IDialog {
         // Check DataHubRecord
         //
         if (isEmpty(this.jTextFieldDataHubRecord.getText())) {
-            Log.wrn("Update Hubs", "Data Hub Record must not be empty");
+            Log.wrn("Update Hubs", "Data Hub Record must be entered!");
             return false;
         }
 
