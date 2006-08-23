@@ -19,7 +19,7 @@ import java.util.*;
 	Class ModuleInfo is built for scanning the source files, it contains all the needed
 information and all the temporary data.
 */
-public class ModuleInfo {
+public final class ModuleInfo {
 	ModuleInfo(String modulepath) throws Exception {
 		this.modulepath = modulepath;
 		
@@ -43,21 +43,21 @@ public class ModuleInfo {
 	public String moduletype = null;
 	public String entrypoint = null;
 	
-	public Set<String> localmodulesources = new HashSet<String>();		//contains both .c and .h
-	public Set<String> preprocessedccodes = new HashSet<String>();
-	public Set<String> msaorinf = new HashSet<String>();				//only a little, hash may be too big for this
+	public final Set<String> localmodulesources = new HashSet<String>();		//contains both .c and .h
+	public final Set<String> preprocessedccodes = new HashSet<String>();
+	public final Set<String> msaorinf = new HashSet<String>();				//only a little, hash may be too big for this
 	
-	public Set<String> hashfuncc = new HashSet<String>();
-	public Set<String> hashfuncd = new HashSet<String>();
-	public Set<String> hashnonlocalfunc = new HashSet<String>();
-	public Set<String> hashnonlocalmacro = new HashSet<String>();
-	public Set<String> hashEFIcall = new HashSet<String>();
-	public Set<String> hashr8only = new HashSet<String>();
+	public final Set<String> hashfuncc = new HashSet<String>();
+	public final Set<String> hashfuncd = new HashSet<String>();
+	public final Set<String> hashnonlocalfunc = new HashSet<String>();
+	public final Set<String> hashnonlocalmacro = new HashSet<String>();
+	public final Set<String> hashEFIcall = new HashSet<String>();
+	public final Set<String> hashr8only = new HashSet<String>();
 	
-	public Set<String> hashrequiredr9libs = new HashSet<String>();	// hashrequiredr9libs is now all added in SourceFileReplacer 
-	public Set<String> guid = new HashSet<String>();
-	public Set<String> protocol = new HashSet<String>();
-	public Set<String> ppi = new HashSet<String>();
+	public final Set<String> hashrequiredr9libs = new HashSet<String>();	// hashrequiredr9libs is now all added in SourceFileReplacer 
+	public final Set<String> guid = new HashSet<String>();
+	public final Set<String> protocol = new HashSet<String>();
+	public final Set<String> ppi = new HashSet<String>();
 
 	public final void enroll(String filepath) throws Exception {
 		String[] temp;
