@@ -22,6 +22,7 @@ public final class Common {
 	public static final int FILE = 1;
 	public static final int DIR = 2;
 	
+	public static final String strseparate = "(.*)\\\\([^\\\\]*)";
 	public static final Pattern ptnseparate = Pattern.compile("(.*)\\\\([^\\\\]*)");
 
 	//-------------------------------------regex------------------------------------------//

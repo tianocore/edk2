@@ -23,11 +23,15 @@ public class ModuleInfo {
 	ModuleInfo(String modulepath) throws Exception {
 		this.modulepath = modulepath;
 		
-		ModuleInfo.ui.println("Choose where to place the result");
-		if ((outputpath = ModuleInfo.ui.getFilepath()) == null) {
-			outputpath = modulepath; 
+		if (ModuleInfo.defaultoutput) {
+			this.outputpath = this.modulepath.replaceAll(Common.strseparate, "$1");
+		} else {
+			ModuleInfo.ui.println("Choose where to place the result");
+			if ((outputpath = ModuleInfo.ui.getFilepath()) == null) {
+				outputpath = modulepath; 
+			}
+			ModuleInfo.ui.println("Output to: " + outputpath);
 		}
-		ModuleInfo.ui.println(outputpath);
 	}
 
 	public String modulepath = null;
@@ -67,7 +71,7 @@ public class ModuleInfo {
 		}
 	}
 
-	private static final boolean isModule(String path) {
+	public static final boolean isModule(String path) {
 		String[] list = new File(path).list();
 		for (int i = 0 ; i < list.length ; i++) {
 			if (!new File(list[i]).isDirectory()) {
@@ -112,8 +116,8 @@ public class ModuleInfo {
 		
 		ModuleInfo.ui.println("Errors Left : " + ModuleInfo.db.error);
 		ModuleInfo.ui.println("Complete!");
-		ModuleInfo.ui.println("Your R9 module was placed here: " + mi.modulepath + File.separator + "result");
-		ModuleInfo.ui.println("Your logfile was placed here: " + mi.modulepath);
+		//ModuleInfo.ui.println("Your R9 module was placed here: " + mi.modulepath + File.separator + "result");
+		//ModuleInfo.ui.println("Your logfile was placed here: " + mi.modulepath);
 	}
 	
 	private static final void show(Set<String> hash, String show) {
@@ -140,6 +144,7 @@ public class ModuleInfo {
 	
 	public static boolean printModuleInfo = false;
 	public static boolean doCritic = false;
+	public static boolean defaultoutput = false;
 	
 	public static void main(String[] args) throws Exception {
 		ui = FirstPanel.init();
