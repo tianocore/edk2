@@ -177,7 +177,7 @@ public class ExitConfirm extends JDialog implements ActionListener, WindowListen
         String strTitle = "Exit";
         String strMessage = "Do you really want to quit now?";
         String strResume = "All unsaved module information will be lost.";
-        String strExit = "To continue editing module, click Resume. To quit the program, click Exit.";
+        String strExit = "To continue editing the module, click Resume. To quit the program, click Exit.";
         setWarningMessage(strTitle, strMessage, strResume, strExit);
     }
 
