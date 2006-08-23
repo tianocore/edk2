@@ -101,7 +101,7 @@ public class PackageDepDlg extends IDialog implements ItemListener {
             jComboBoxPackageName = new JComboBox();
             jComboBoxPackageName.setBounds(new java.awt.Rectangle(168, 12, 320, 20));
             jComboBoxPackageName.setPreferredSize(new java.awt.Dimension(320, 20));
-            jComboBoxPackageName.setToolTipText("If your Module requires a package list that here.");
+            jComboBoxPackageName.setToolTipText("If your Module requires a package, list that here.");
             jComboBoxPackageName.addItemListener(this);
         }
         return jComboBoxPackageName;

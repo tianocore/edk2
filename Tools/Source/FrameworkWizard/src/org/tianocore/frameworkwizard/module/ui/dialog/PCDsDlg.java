@@ -499,7 +499,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
         if (!isEmpty(this.jTextFieldTokenSpaceGuid.getText())) {
             if (!DataValidation.isC_NameType(this.jTextFieldTokenSpaceGuid.getText())) {
                 Log.wrn("Update PcdCoded",
-                        "Incorrect data type for the selected pcd entry, please check in in spd file");
+                        "Incorrect data type for the selected pcd entry, please check the datatype specified in the spd file");
                 return false;
             }
         }
@@ -577,7 +577,7 @@ public class PCDsDlg extends IDialog implements ItemListener {
                 || pcd.getPcd(index).getType() == null || pcd.getPcd(index).getHelp() == null
                 || isEmpty(pcd.getPcd(index).getHelp())) {
                 Log.wrn("select pcd entry when editing msa",
-                        "The selected is defined incorrectly.\r\nPlease check it in spd file");
+                        "The selected value is defined incorrectly.\r\nPlease check it in the spd file");
             } else {
                 this.jTextFieldTokenSpaceGuid.setText(pcd.getPcd(index).getGuidCName());
                 Tools.generateComboBoxByVector(this.jComboBoxItemType, pcd.getPcd(index).getType());

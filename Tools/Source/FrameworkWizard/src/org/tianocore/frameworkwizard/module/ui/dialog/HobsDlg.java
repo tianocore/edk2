@@ -440,7 +440,7 @@ public class HobsDlg extends IDialog {
         // Check Name
         //
         if (isEmpty(this.jComboBoxGuidC_Name.getSelectedItem().toString())) {
-            Log.wrn("Update Hobs", "Hob Guid C Name must not be empty");
+            Log.wrn("Update Hobs", "Hob Guid C Name must be entered!");
             return false;
         }
 
