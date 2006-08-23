@@ -114,8 +114,8 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         add(logScrollPane);
         
 		fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-	}
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+     	}
 	
 	//---------------------------------------------------------------------------------------//
 	
