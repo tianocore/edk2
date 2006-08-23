@@ -143,7 +143,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldBaseName.addFocusListener(new FocusAdapter(){
                public void focusLost(FocusEvent e) {
                    if (!DataValidation.isUiNameType(jTextFieldBaseName.getText())) {
-                       JOptionPane.showMessageDialog(frame, "Package Name is NOT UiNameType.");
+                       JOptionPane.showMessageDialog(frame, "Package Name does not match the UiNameType datatype.");
                        return;
                    }
                    if (jTextFieldBaseName.getText().equals(ffc.getFpdHdrPlatformName())) {
@@ -171,7 +171,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldGuid.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isGuid(jTextFieldGuid.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Guid is NOT GuidType.");
+                        JOptionPane.showMessageDialog(frame, "Guid must be in registry (8-4-4-4-12) format.");
                         return;
                     }
                     if (jTextFieldGuid.getText().equals(ffc.getFpdHdrGuidValue())) {
@@ -199,7 +199,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldVersion.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isVersion(jTextFieldVersion.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Version is NOT version type.");
+                        JOptionPane.showMessageDialog(frame, "Version does not match the Version datatype.");
                         return;
                     }
                     if (jTextFieldVersion.getText().equals(ffc.getFpdHdrVer())) {
@@ -243,7 +243,7 @@ public class FpdHeader extends IInternalFrame {
             jTextAreaLicense.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (jTextAreaLicense.getText().length() == 0) {
-                        JOptionPane.showMessageDialog(frame, "License contents could NOT be empty.");
+                        JOptionPane.showMessageDialog(frame, "License must be entered!");
                         return;
                     }
                     if (jTextAreaLicense.getText().equals(ffc.getFpdHdrLicense())) {
@@ -270,7 +270,7 @@ public class FpdHeader extends IInternalFrame {
             jTextAreaDescription.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (jTextAreaDescription.getText().length() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Description contents could NOT be empty.");
+                        JOptionPane.showMessageDialog(frame, "Description must be entered.");
                         return;
                     }
                     if (jTextAreaDescription.getText().equals(ffc.getFpdHdrDescription())) {
@@ -386,7 +386,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldAbstract.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isAbstract(jTextFieldAbstract.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Abstract could NOT be empty.");
+                        JOptionPane.showMessageDialog(frame, "Abstract must be entered.");
                         return;
                     }
                     if (jTextFieldAbstract.getText().equals(ffc.getFpdHdrAbs())) {
@@ -414,7 +414,7 @@ public class FpdHeader extends IInternalFrame {
             jTextFieldCopyright.addFocusListener(new FocusAdapter(){
                 public void focusLost(FocusEvent e) {
                     if (!DataValidation.isCopyright(jTextFieldCopyright.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Copyright contents could not be empty.");
+                        JOptionPane.showMessageDialog(frame, "Copyright must be entered.");
                         return;
                     }
                     if (jTextFieldCopyright.getText().equals(ffc.getFpdHdrCopyright())) {

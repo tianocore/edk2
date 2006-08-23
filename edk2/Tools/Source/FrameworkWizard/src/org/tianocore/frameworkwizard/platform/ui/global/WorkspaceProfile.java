@@ -174,7 +174,7 @@ public class WorkspaceProfile {
             }
         }
         if (msaFile == null){
-            throw new Exception("Can't find Module [" + moduleId.getName() + "] in all packages. ");
+            throw new Exception("Can not find Module [" + moduleId.getName() + "] in any packages in this workspace.");
         }
         else {
             return msaFile;
@@ -371,7 +371,7 @@ public class WorkspaceProfile {
                 return platformId;
             }
         }
-        throw new Exception("Can't find platform [" + name + "] in current workspace. ");
+        throw new Exception("Can not find platform [" + name + "] in the current workspace. ");
     }
     
     public synchronized static File getPackageFile(PackageIdentification packageId) throws Exception {
@@ -383,7 +383,7 @@ public class WorkspaceProfile {
                 return packageItem.getSpdFile();
             }
         }
-        throw new Exception("Can't find " + packageId + " in current workspace. ");
+        throw new Exception("Can not find " + packageId + " in the current workspace. ");
     }
     
     public synchronized static File getModuleFile(ModuleIdentification moduleId) throws Exception {
