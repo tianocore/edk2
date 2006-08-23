@@ -282,7 +282,10 @@ Returns:
 
     ASSERT_EFI_ERROR (Status);
     Status = PeiRecovery->LoadRecoveryCapsule (PeiServices, PeiRecovery);
-    ASSERT_EFI_ERROR (Status);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((EFI_D_ERROR, "Load Recovery Capsule Failed.(Status = %r)\n", Status));
+      CpuDeadLoop ();
+    }
   }
 
   //
@@ -362,8 +365,10 @@ Returns:
 
   //
   // If we get here, then the DXE Core returned.  This is an error
+  // Dxe Core should not return.
   //
-  ASSERT_EFI_ERROR (Status);
+  ASSERT (FALSE);
+  CpuDeadLoop ();
 
   return EFI_OUT_OF_RESOURCES;
 }
