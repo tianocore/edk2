@@ -69,9 +69,9 @@ public class Mainfest implements ManifestInterface {
 
     final static String farHeader_Description = "Description";
 
-    final static String farHeader_CopyRight = "CopyRight";
+    final static String farHeader_CopyRight = "Copyright";
 
-    final static String farHeader_License = "Licese";
+    final static String farHeader_License = "License";
 
     final static String farHeader_Specification = "Specification";
 
@@ -99,7 +99,7 @@ public class Mainfest implements ManifestInterface {
     //
     final static String farPackageList_FarPackage = "FarPackage";
 
-    final static String farPackage_FarfileName = "FarFileName";
+    final static String farPackage_FarfileName = "FarFilename";
 
     final static String farPackage_DefaultPath = "DefaultPath";
 
