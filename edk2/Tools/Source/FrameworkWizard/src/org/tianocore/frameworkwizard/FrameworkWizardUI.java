@@ -1905,7 +1905,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Make Module Description
         //
-        dmtnModuleDescription = new IDefaultMutableTreeNode("ModuleDescription", IDefaultMutableTreeNode.MODULE, -1);
+        dmtnModuleDescription = new IDefaultMutableTreeNode("Modules", IDefaultMutableTreeNode.MODULE, -1);
 
         //
         // First add package
@@ -1954,7 +1954,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Make Package Description
         //
-        dmtnPackageDescription = new IDefaultMutableTreeNode("PackageDescription", IDefaultMutableTreeNode.PACKAGE, -1);
+        dmtnPackageDescription = new IDefaultMutableTreeNode("Packages", IDefaultMutableTreeNode.PACKAGE, -1);
         if (GlobalData.vPackageList.size() > 0) {
             for (int index = 0; index < GlobalData.vPackageList.size(); index++) {
                 dmtnPackageDescription.add(new IDefaultMutableTreeNode(GlobalData.vPackageList.elementAt(index)
@@ -1967,7 +1967,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Make Platform Description
         //
-        dmtnPlatformDescription = new IDefaultMutableTreeNode("PlatformDescription", IDefaultMutableTreeNode.PLATFORM,
+        dmtnPlatformDescription = new IDefaultMutableTreeNode("Platforms", IDefaultMutableTreeNode.PLATFORM,
                                                               -1);
         if (GlobalData.vPlatformList.size() > 0) {
             for (int index = 0; index < GlobalData.vPlatformList.size(); index++) {
@@ -2179,7 +2179,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             // The module is not in existing packages
             //
-            Log.wrn("Open Module", "The module hasn't been added to any package of current workspace!");
+            Log.wrn("Open Module", "The module does not belong to any package in the current workspace!");
             return;
         }
 
@@ -2225,7 +2225,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             // The package is not in current workspace
             //
-            Log.wrn("Open Package", "The package hasn't been added to current workspace!");
+            Log.wrn("Open Package", "The package has not been installed in the current workspace!");
             return;
         }
 
@@ -2271,7 +2271,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             //
             // The platform is not in current workspace
             //
-            Log.wrn("Open Platform", "The platform hasn't been added to current workspace!");
+            Log.wrn("Open Platform", "The platform has not been installed in the current workspace!");
             return;
         }
 
@@ -2416,8 +2416,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         iTree.addNode(new IDefaultMutableTreeNode("Data Hubs", IDefaultMutableTreeNode.MSA_DATAHUBS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Hii Packages", IDefaultMutableTreeNode.MSA_HIIPACKAGES, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Guids", IDefaultMutableTreeNode.MSA_GUIDS, true, id));
-        iTree.addNode(new IDefaultMutableTreeNode("Externs", IDefaultMutableTreeNode.MSA_EXTERNS, true, id));
-        iTree.addNode(new IDefaultMutableTreeNode("PcdCoded", IDefaultMutableTreeNode.MSA_PCDS, true, id));
+        iTree.addNode(new IDefaultMutableTreeNode("External Defintions", IDefaultMutableTreeNode.MSA_EXTERNS, true, id));
+        iTree.addNode(new IDefaultMutableTreeNode("Pcd Coded", IDefaultMutableTreeNode.MSA_PCDS, true, id));
     }
 
     private void insertPackageTreeNode(Identification id) {
@@ -2442,10 +2442,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                                                   id));
         iTree.addNode(new IDefaultMutableTreeNode("Platform Definitions",
                                                   IDefaultMutableTreeNode.FPD_PLATFORMDEFINITIONS, true, id));
-        iTree.addNode(new IDefaultMutableTreeNode("Flash", IDefaultMutableTreeNode.FPD_FLASH, true, id));
+        iTree.addNode(new IDefaultMutableTreeNode("Flash Information", IDefaultMutableTreeNode.FPD_FLASH, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Framework Modules", IDefaultMutableTreeNode.FPD_FRAMEWORKMODULES,
                                                   true, id));
-        iTree.addNode(new IDefaultMutableTreeNode("Pcd Dynamic Build Declarations",
+        iTree.addNode(new IDefaultMutableTreeNode("Dynamic PCD Build Declarations",
                                                   IDefaultMutableTreeNode.FPD_PCDDYNAMICBUILDDECLARATIONS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Build Options", IDefaultMutableTreeNode.FPD_BUILDOPTIONS, true, id));
     }
@@ -2735,16 +2735,16 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                     try {
                         wt.addModuleToPackage(mid, psa);
                     } catch (IOException e) {
-                        Log.wrn("Upddate MsaFiles of Package", e.getMessage());
-                        Log.err("Upddate MsaFiles of Package", e.getMessage());
+                        Log.wrn("Update MsaFiles in Package", e.getMessage());
+                        Log.err("Update MsaFiles in Package", e.getMessage());
                         return;
                     } catch (XmlException e) {
-                        Log.wrn("Upddate MsaFiles of Package", e.getMessage());
-                        Log.err("Upddate MsaFiles of Package", e.getMessage());
+                        Log.wrn("Update MsaFiles in Package", e.getMessage());
+                        Log.err("Update MsaFiles in Package", e.getMessage());
                         return;
                     } catch (Exception e) {
-                        Log.wrn("Upddate MsaFiles of Package", e.getMessage());
-                        Log.err("Upddate MsaFiles of Package", e.getMessage());
+                        Log.wrn("Update MsaFiles in Package", e.getMessage());
+                        Log.err("Update MsaFiles in Package", e.getMessage());
                         return;
                     }
 
@@ -3110,7 +3110,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         CreateStepOne cso = new CreateStepOne(this, true);
         int result = cso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
-            String strReturn = "Create Far Done!";
+            String strReturn = "Far Creation Completed!";
             JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
         }
@@ -3125,7 +3125,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         InstallStepOne iso = new InstallStepOne(this, true);
         int result = iso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
-            String strReturn = "<html>Install Far Done! <br>The WORKSPACE will be refreshed!</html>";
+            String strReturn = "<html>Far Installalation completed!<br>Refreshing the WORKSPACE!</html>";
             JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
@@ -3141,7 +3141,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         DeleteStepOne dso = new DeleteStepOne(this, true);
         int result = dso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
-            String strReturn = "<html>Delete Far Done! <br>The WORKSPACE will be refreshed!</html>";
+            String strReturn = "<html>Far Deletion completed!<br>Refreshing the WORKSPACE!</html>";
             JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
@@ -3157,7 +3157,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         UpdateStepOne uso = new UpdateStepOne(this, true);
         int result = uso.showDialog();
         if (result == DataType.RETURN_TYPE_OK) {
-            String strReturn = "<html>Update Far Done! <br>The WORKSPACE will be refreshed!</html>";
+            String strReturn = "<html>Far Update completed!<br>Refreshing the WORKSPACE!</html>";
             JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
@@ -3221,15 +3221,15 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             c.dispose();
         }
         if (result == DataType.RETURN_TYPE_WORKSPACE) {
-            Tools.showInformationMessage("Workspace Clone Finished");
+            Tools.showInformationMessage("Workspace Clone Completed!");
         }
         if (result == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
-            Tools.showInformationMessage("Module Surface Area Clone Finished");
+            Tools.showInformationMessage("Module Clone Completed!");
             GlobalData.vModuleList.addElement(c.getMid());
             addModuleToTree(c.getMid());
         }
         if (result == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
-            Tools.showInformationMessage("Package Surface Area Clone Finished");
+            Tools.showInformationMessage("Package Clone Completed!");
             GlobalData.vPackageList.addElement(c.getPid());
             //
             // Add new SpdHeader node to the tree

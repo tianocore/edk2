@@ -348,7 +348,7 @@ public class SelectModuleBelong extends IDialog {
         if (jContentPane == null) {
             jLabelIsLibrary = new JLabel();
             jLabelIsLibrary.setBounds(new java.awt.Rectangle(15, 35, 120, 20));
-            jLabelIsLibrary.setText("Is a Library");
+            jLabelIsLibrary.setText("Is this a Library");
             jLabelVersion = new JLabel();
             jLabelVersion.setBounds(new java.awt.Rectangle(15, 135, 120, 20));
             jLabelVersion.setText("Version");
@@ -357,13 +357,13 @@ public class SelectModuleBelong extends IDialog {
             jLabelGuid.setText("Guid");
             jLabelName = new JLabel();
             jLabelName.setBounds(new java.awt.Rectangle(15, 85, 120, 20));
-            jLabelName.setText("Name");
+            jLabelName.setText("Module Name");
             jLabelFilePath = new JLabel();
             jLabelFilePath.setBounds(new java.awt.Rectangle(15, 60, 120, 20));
             jLabelFilePath.setText("File Path");
             jLabelPackage = new JLabel();
             jLabelPackage.setBounds(new java.awt.Rectangle(15, 10, 120, 20));
-            jLabelPackage.setText("Choose Package");
+            jLabelPackage.setText("Choose a Package");
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
             jContentPane.setSize(new java.awt.Dimension(490, 198));
@@ -478,19 +478,19 @@ public class SelectModuleBelong extends IDialog {
         // Check if all required fields are not empty
         //
         if (isEmpty(this.jTextFieldFilePath.getText())) {
-            Log.wrn("New File", "File Path couldn't be empty");
+            Log.wrn("New File", "A File Path must be entered!");
             return false;
         }
         if (isEmpty(this.jTextFieldName.getText())) {
-            Log.wrn("New File", "Name couldn't be empty");
+            Log.wrn("New File", "A Name must be entered");
             return false;
         }
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.wrn("New File", "Guid Value couldn't be empty");
+            Log.wrn("New File", "The Guid must be entered!");
             return false;
         }
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.wrn("New File", "Version couldn't be empty");
+            Log.wrn("New File", "A Version number must be entered!");
             return false;
         }
 
@@ -498,11 +498,11 @@ public class SelectModuleBelong extends IDialog {
         // Check if all fields have correct data types 
         //
         if (!DataValidation.isBaseName(this.jTextFieldName.getText())) {
-            Log.wrn("New File", "Incorrect data type for Base Name");
+            Log.wrn("New File", "Incorrect data type for the Name!");
             return false;
         }
         if (!DataValidation.isGuid((this.jTextFieldGuid).getText())) {
-            Log.wrn("New File", "Incorrect data type for Guid");
+            Log.wrn("New File", "Incorrect data type for Guid, which must be in registry format! (8-4-4-4-12)");
             return false;
         }
 
@@ -516,7 +516,7 @@ public class SelectModuleBelong extends IDialog {
 
             for (int index = 0; index < msaFile.size(); index++) {
                 if (msaFile.elementAt(index).equals(modulePath)) {
-                    Log.wrn("New File", "This module is already existing in selected package");
+                    Log.wrn("New File", "This module is already exists in the selected package!");
                     return false;
                 }
             }
@@ -531,7 +531,7 @@ public class SelectModuleBelong extends IDialog {
             if (vPackageList != null && vPackageList.size() > 0) {
                 for (int index = 0; index < vPackageList.size(); index++) {
                     if (vPackageList.get(index).getPath().equals(path)) {
-                        Log.wrn("New File", "This package is already existing in database");
+                        Log.wrn("New File", "This package is already exists in this workspace!");
                         return false;
                     }
                 }
@@ -547,7 +547,7 @@ public class SelectModuleBelong extends IDialog {
             if (vPlatfromList != null && vPlatfromList.size() > 0) {
                 for (int index = 0; index < vPlatfromList.size(); index++) {
                     if (vPlatfromList.get(index).getPath().equals(path)) {
-                        Log.wrn("New File", "This platform is already existing in database");
+                        Log.wrn("New File", "This platform is already exists in this workspace!");
                         return false;
                     }
                 }
@@ -642,7 +642,7 @@ public class SelectModuleBelong extends IDialog {
 
             spd.setSpdHeader(spdHeader);
         } catch (Exception e) {
-            Log.wrn("Save PackageSurfaceArea Document", e.getMessage());
+            Log.wrn("Save Package Surface Area Description Document", e.getMessage());
             return;
         }
 
@@ -688,7 +688,7 @@ public class SelectModuleBelong extends IDialog {
 
             fpd.setPlatformHeader(fpdHeader);
         } catch (Exception e) {
-            Log.wrn("Save FrameworkPlatformDescription Document", e.getMessage());
+            Log.wrn("Save Framework Platform Description Document", e.getMessage());
             return;
         }
 

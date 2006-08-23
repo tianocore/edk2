@@ -40,8 +40,8 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
             jTextPane.setBackground(new java.awt.Color(238,238,238));
             jTextPane.setEditable(false);
             helpContent = helpContent
-            + "The coding for the Property is: TARGET_TAGNAME_ARCH_COMMAND_ATTR" + DataType.UNIX_LINE_SEPARATOR
-            + "The Value, is either afull path, full path and filename or a reserved word." + DataType.UNIX_LINE_SEPARATOR
+            + "The template for the Property is: TARGET_TAGNAME_ARCH_COMMAND_ATTR" + DataType.UNIX_LINE_SEPARATOR
+            + "The Value, is either a full path, full path and filename or a reserved word." + DataType.UNIX_LINE_SEPARATOR
             + DataType.UNIX_LINE_SEPARATOR
             + DataType.UNIX_LINE_SEPARATOR
             + "TARGET  - DEBUG and RELEASE are predefined, however the user may define one or more of their own TARGET types in this file." + DataType.UNIX_LINE_SEPARATOR
@@ -112,7 +112,7 @@ public class ToolChainConfigHelp extends JFrame implements ActionListener {
     private void initialize() {
         this.setSize(625, 520);
         this.setResizable(false);
-        this.setTitle("How to Setup Tool Chain Configuration");
+        this.setTitle("How to Modify a Tool Chain Configuration");
         this.setContentPane(getJContentPane());
     }
 
