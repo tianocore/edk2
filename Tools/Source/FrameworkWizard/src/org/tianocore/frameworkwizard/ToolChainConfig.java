@@ -138,7 +138,7 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
         if (jButtonOpen == null) {
             jButtonOpen = new JButton();
             jButtonOpen.setBounds(new java.awt.Rectangle(40, 405, 120, 20));
-            jButtonOpen.setText("Open a file");
+            jButtonOpen.setText("Open File");
             jButtonOpen.addActionListener(this);
         }
         return jButtonOpen;
@@ -154,7 +154,7 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
         if (jButtonSave == null) {
             jButtonSave = new JButton();
             jButtonSave.setBounds(new java.awt.Rectangle(170, 405, 120, 20));
-            jButtonSave.setText("Save to a file");
+            jButtonSave.setText("Save File");
             jButtonSave.addActionListener(this);
         }
         return jButtonSave;
@@ -300,7 +300,7 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
                 e.printStackTrace();
             }
         } else {
-            Log.log("Open file", this.currentFile + " Not Found");
+            Log.log("File Open Error: ", this.currentFile + " File Not Found");
         }
 
         showTable();
@@ -452,12 +452,12 @@ public class ToolChainConfig extends IFrame implements ListSelectionListener, Ta
      **/
     private boolean check() {
         if (isEmpty(this.jTextFieldName.getText())) {
-            Log.wrn("Add Tool Chain", "Name couldn't be empty!");
+            Log.wrn("Add Tool Chain", "The Property Name must be entered!");
             return false;
         }
 
         if (isEmpty(this.jTextFieldValue.getText())) {
-            Log.wrn("Add Tool Chain", "Value couldn't be empty");
+            Log.wrn("Add Tool Chain", "The Property Value must be entered!");
             return false;
         }
         return true;
