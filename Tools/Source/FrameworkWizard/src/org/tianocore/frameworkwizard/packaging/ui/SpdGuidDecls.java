@@ -182,11 +182,11 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
            jTable.setRowHeight(20);
            jTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
            model.addColumn("Name");
-           model.addColumn("C_Name");
+           model.addColumn("The C Name");
            model.addColumn("GUID Value");
-           model.addColumn("HelpText");
-           model.addColumn("SupportedArch");
-           model.addColumn("SupportedModuleType");
+           model.addColumn("Help Text");
+           model.addColumn("Supported Architectures");
+           model.addColumn("Supported Module Types");
            model.addColumn("GuidTypes");
            jTable.getColumnModel().getColumn(2).setCellEditor(new GuidEditor());
 
@@ -468,7 +468,7 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
             jLabelHelp.setLocation(new java.awt.Point(14,85));
             jLabelCName = new JLabel();
             jLabelCName.setBounds(new java.awt.Rectangle(14,35,111,20));
-            jLabelCName.setText("C_Name");
+            jLabelCName.setText("C Name");
             jLabelGuid = new JLabel();
             jLabelGuid.setBounds(new java.awt.Rectangle(15,60,112,20));
             jLabelGuid.setText("Guid Value");
@@ -606,19 +606,19 @@ public class SpdGuidDecls extends IInternalFrame implements TableModelListener{
     
     protected boolean dataValidation(String[] row){
         if (!DataValidation.isUiNameType(row[0])) {
-            JOptionPane.showMessageDialog(this, "Name is NOT UiNameType.");
+            JOptionPane.showMessageDialog(this, "Name must start with an alpha character.");
             return false;
         }
         if (!DataValidation.isGuid(row[2])) {
-            JOptionPane.showMessageDialog(this, "Guid Value is NOT GuidType.");
+            JOptionPane.showMessageDialog(this, "Guid Value must be in registry format, 8-4-4-4-12.");
             return false;
         }
         if (!DataValidation.isC_NameType(row[1])) {
-            JOptionPane.showMessageDialog(this, "C_Name is NOT C_NameType.");
+            JOptionPane.showMessageDialog(this, "C Name does not match C Name datatype.");
             return false;
         }
         if (row[3].length() == 0) {
-            JOptionPane.showMessageDialog(this, "HelpText could NOT be empty.");
+            JOptionPane.showMessageDialog(this, "Help Text must be entered!");
             return false;
         }
         return true;

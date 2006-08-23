@@ -342,11 +342,11 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
            
             jLabelSupArch = new JLabel();
             jLabelSupArch.setBounds(new java.awt.Rectangle(241,192,89,16));
-            jLabelSupArch.setText("Supported Arch");
+            jLabelSupArch.setText("Supported Architectures");
             jLabelSupArch.setEnabled(true);
             jLabelSupMod = new JLabel();
             jLabelSupMod.setBounds(new java.awt.Rectangle(15,193,103,16));
-            jLabelSupMod.setText("Supported Module");
+            jLabelSupMod.setText("Supported Module type");
             jLabelSupMod.setEnabled(true);
             starLabel = new StarLabel();
             starLabel.setBounds(new java.awt.Rectangle(2,134,10,20));
@@ -357,7 +357,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jLabelVarVal.setBounds(new java.awt.Rectangle(11,133,84,20));
             jLabelVarVal.setText("Valid Usage");
             jLabelC_Name = new JLabel();
-            jLabelC_Name.setText("C_Name");
+            jLabelC_Name.setText("C Name");
             jLabelC_Name.setBounds(new java.awt.Rectangle(11,9,140,20));
             jLabelTokenSpace = new JLabel();
             jLabelTokenSpace.setBounds(new java.awt.Rectangle(11,58,140,20));
