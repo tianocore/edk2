@@ -119,7 +119,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JButton jButtonUpdatePcd = null;
     private JComboBox jComboBoxFeatureFlagValue = null;
     private OpeningPlatformType docConsole = null;
-    private JLabel jLabelPad = null;
+    private JPanel jPanelCustomToolChain = null;
+    private JPanel jPanelToolchainS = null;
+    private JPanel jPanelToolchainC = null;
     /**
      * This is the default constructor
      */
@@ -196,7 +198,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         }
     }
     
-    public void initModuleSAOptions(String key) {
+    public void initFvInfo (String key) {
         //
         // display module SA options
         //
@@ -215,6 +217,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (ffsKey != null) {
             jTextFieldFfsKey.setText(ffsKey);
         }
+    }
+    
+    public void initToolChainOptions(String key) {
         
         optionsTableModel.setRowCount(0);
         String[][] saa = new String[ffc.getModuleSAOptionsCount(key)][6];
@@ -449,8 +454,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         if (jTabbedPane == null) {
             jTabbedPane = new JTabbedPane();
             jTabbedPane.addTab("PCD Build Definition", null, getJPanelPcd(), null);
-            jTabbedPane.addTab("Module SA Options", null, getJPanelModuleSaOpts(), null);
             jTabbedPane.addTab("Libraries", null, getJPanelLibrary(), null);
+            jTabbedPane.addTab("FV Info", null, getJPanelModuleSaOpts(), null);
+            jTabbedPane.addTab("Custom Toolchain", null, getJPanelCustomToolChain(), null);
+            
         }
         return jTabbedPane;
     }
@@ -1078,9 +1085,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private JPanel getJPanelModuleSaOpts() {
         if (jPanelModuleSaOpts == null) {
-            jLabelPad = new JLabel();
-            jLabelPad.setText("");
-            jLabelPad.setPreferredSize(new java.awt.Dimension(250,16));
             FlowLayout flowLayout4 = new FlowLayout();
             flowLayout4.setAlignment(java.awt.FlowLayout.LEFT);
             jLabelFfsFormatKey = new JLabel();
@@ -1101,13 +1105,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jPanelModuleSaOpts.add(getJTextFieldFileGuid(), null);
             jPanelModuleSaOpts.add(jLabelFfsFormatKey, null);
             jPanelModuleSaOpts.add(getJTextFieldFfsKey(), null);
-            jPanelModuleSaOpts.add(getJScrollPaneModuleSaOptions(), null);
-            jPanelModuleSaOpts.add(jLabelPad, null);
-            jPanelModuleSaOpts.add(getJButtonNew(), null);
-            jPanelModuleSaOpts.add(getJButtonDeleteOption(), null);
             jPanelModuleSaOpts.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-                    initModuleSAOptions(moduleKey);
+                    initFvInfo(moduleKey);
                 }
             });
         }
@@ -1213,7 +1213,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JScrollPane getJScrollPaneModuleSaOptions() {
         if (jScrollPaneModuleSaOptions == null) {
             jScrollPaneModuleSaOptions = new JScrollPane();
-            jScrollPaneModuleSaOptions.setPreferredSize(new java.awt.Dimension(600,200));
+            jScrollPaneModuleSaOptions.setPreferredSize(new java.awt.Dimension(600,350));
             jScrollPaneModuleSaOptions.setViewportView(getJTableModuleSaOptions());
         }
         return jScrollPaneModuleSaOptions;
@@ -1562,6 +1562,50 @@ private JComboBox getJComboBoxFeatureFlagValue() {
         jComboBoxFeatureFlagValue.addItem("false");
     }
     return jComboBoxFeatureFlagValue;
+}
+/**
+ * This method initializes jPanelCustomToolChain	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanelCustomToolChain() {
+    if (jPanelCustomToolChain == null) {
+        jPanelCustomToolChain = new JPanel();
+        jPanelCustomToolChain.setLayout(new BorderLayout());
+        jPanelCustomToolChain.add(getJPanelToolchainS(), java.awt.BorderLayout.SOUTH);
+        jPanelCustomToolChain.add(getJPanelToolchainC(), java.awt.BorderLayout.CENTER);
+        jPanelCustomToolChain.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentShown(java.awt.event.ComponentEvent e) {
+                initToolChainOptions(moduleKey);
+            }
+        });
+    }
+    return jPanelCustomToolChain;
+}
+/**
+ * This method initializes jPanelToolchainS	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanelToolchainS() {
+    if (jPanelToolchainS == null) {
+        jPanelToolchainS = new JPanel();
+        jPanelToolchainS.add(getJButtonNew(), null);
+        jPanelToolchainS.add(getJButtonDeleteOption(), null);
+    }
+    return jPanelToolchainS;
+}
+/**
+ * This method initializes jPanelToolchainC	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanelToolchainC() {
+    if (jPanelToolchainC == null) {
+        jPanelToolchainC = new JPanel();
+        jPanelToolchainC.add(getJScrollPaneModuleSaOptions(), null);
+    }
+    return jPanelToolchainC;
 }
 
 
