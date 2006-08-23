@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </target>
   <target name="source" depends="init" unless="jar.newer">
     <mkdir dir="${buildDir}"/>
-    <javac srcdir="net" destdir="${buildDir}">
+    <javac srcdir="net" destdir="${buildDir}" source="1.4">
       <classpath>
         <fileset dir="${workspace}/Tools/Jars">
           <include name="*.jar"/>
