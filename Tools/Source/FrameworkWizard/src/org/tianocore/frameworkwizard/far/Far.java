@@ -230,7 +230,7 @@ public class Far {
                         //  Check Md5
                         //
                         if (!ffItem.getMd5Value().equalsIgnoreCase(FarMd5.md5(totalBuffer))){
-                            throw new Exception (ffItem.getRelativeFilename() + " Md5 is invaild!");
+                            throw new Exception (ffItem.getRelativeFilename() + " MD5 Checksum is invaild!");
                         }
                         outputStream.write(totalBuffer);
                         fis.close();
