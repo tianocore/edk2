@@ -92,8 +92,8 @@ public class IComboBox extends JComboBox implements KeyListener, MouseListener, 
         this.addKeyListener(this);
         this.getEditor().getEditorComponent().addKeyListener(this);
         this.getEditor().getEditorComponent().addFocusListener(this);
-        this.setToolTipText("<html>Double Click to add an entry and finished by press ENTER. <br>"
-                            + "Press DELETE can remove selected entry.</html>");
+        this.setToolTipText("<html>Double Click to add an entry, then finish by press ENTER.<br>"
+                            + "Selecting DELETE will remove selected entry.</html>");
     }
 
     public void keyPressed(KeyEvent arg0) {

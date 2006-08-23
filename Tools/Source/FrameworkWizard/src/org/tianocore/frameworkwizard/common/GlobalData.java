@@ -182,11 +182,11 @@ public class GlobalData {
                 }
             }
         } catch (IOException e) {
-            Log.err("Get all mdoules of a package " + path, e.getMessage());
+            Log.err("Get all modules from a package " + path, e.getMessage());
         } catch (XmlException e) {
-            Log.err("Get all mdoules of a package " + path, e.getMessage());
+            Log.err("Get all modules from a package " + path, e.getMessage());
         } catch (Exception e) {
-            Log.err("Get all mdoules of a package " + path, e.getMessage());
+            Log.err("Get all modules from a package " + path, e.getMessage());
         }
         return modulePath;
     }

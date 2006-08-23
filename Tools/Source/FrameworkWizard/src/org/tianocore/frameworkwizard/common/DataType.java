@@ -214,7 +214,7 @@ public class DataType {
     // First defined here
     // Will be replaced by resource file later
     //
-    public static final String SUP_ARCH_LIST_HELP_TEXT = "<html>Selecting a checkbox means supporting the selected architectures;<br> None of boxes are checked means supporting all architectures<html>";
+    public static final String SUP_ARCH_LIST_HELP_TEXT = "<html>Selecting a checkbox is a restriction of only the selected architectures;<br>If none of boxes are selected, all architectures are supported.<html>";
 
     //
     // Project name and version

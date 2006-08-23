@@ -408,7 +408,7 @@ public class Tools {
             if (s.length() == 6 && s.indexOf(DataType.HEX_STRING_HEADER) == 0) {
                 s = s.substring(DataType.HEX_STRING_HEADER.length());
             } else {
-                Log.err("convertUnicodeHexStringToString", "Wrong input string: " + str);
+                Log.err("convertUnicodeHexStringToString", "Incorrect input string: " + str);
                 continue;
             }
             //
