@@ -1,12 +1,12 @@
 /** @file
-  Copyright (c) 2006, Intel Corporation                                                         
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006, Intel Corporation
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -48,7 +48,7 @@ IDEReadPortB (
 }
 
 /**
-  Reads multiple words of data from the IDE data port. 
+  Reads multiple words of data from the IDE data port.
   Call the IO abstraction once to do the complete read,
   not one word at a time
 
@@ -167,7 +167,7 @@ IDEWritePortW (
 }
 
 /**
-  Write multiple words of data to the IDE data port. 
+  Write multiple words of data to the IDE data port.
   Call the IO abstraction once to do the complete read,
   not one word at a time
 
@@ -297,10 +297,10 @@ BadIdeDeviceCheck (
   use fixed addresses. In Native-PCI mode, get base addresses from BARs in
   the PCI IDE controller's Configuration Space.
 
-  The steps to get IDE IO port registers' base addresses for each channel 
+  The steps to get IDE IO port registers' base addresses for each channel
   as follows:
 
-  1. Examine the Programming Interface byte of the Class Code fields in PCI IDE 
+  1. Examine the Programming Interface byte of the Class Code fields in PCI IDE
   controller's Configuration Space to determine the operating mode.
 
   2. a) In 'Compatibility' mode, use fixed addresses shown in the Table 1 below.
@@ -331,11 +331,11 @@ BadIdeDeviceCheck (
 
   Table 2. BARs for Register Mapping
   </pre>
-  @note Refer to Intel ICH4 datasheet, Control Block Offset: 03F4h for 
-  primary, 0374h for secondary. So 2 bytes extra offset should be 
+  @note Refer to Intel ICH4 datasheet, Control Block Offset: 03F4h for
+  primary, 0374h for secondary. So 2 bytes extra offset should be
   added to the base addresses read from BARs.
 
-  For more details, please refer to PCI IDE Controller Specification and Intel 
+  For more details, please refer to PCI IDE Controller Specification and Intel
   ICH4 Datasheet.
 
   @param  PciIo Pointer to the EFI_PCI_IO_PROTOCOL instance
@@ -370,13 +370,13 @@ GetIdeRegistersBaseAddr (
   if ((PciData.Hdr.ClassCode[0] & IDE_PRIMARY_OPERATING_MODE) == 0) {
     IdeRegsBaseAddr[IdePrimary].CommandBlockBaseAddr  = 0x1f0;
     IdeRegsBaseAddr[IdePrimary].ControlBlockBaseAddr  = 0x3f6;
-    IdeRegsBaseAddr[IdePrimary].BusMasterBaseAddr     = 
+    IdeRegsBaseAddr[IdePrimary].BusMasterBaseAddr     =
     (UINT16)((PciData.Device.Bar[4] & 0x0000fff0));
   } else {
     //
     // The BARs should be of IO type
     //
-    if ((PciData.Device.Bar[0] & bit0) == 0 || 
+    if ((PciData.Device.Bar[0] & bit0) == 0 ||
         (PciData.Device.Bar[1] & bit0) == 0) {
       return EFI_UNSUPPORTED;
     }
@@ -415,8 +415,8 @@ GetIdeRegistersBaseAddr (
 }
 
 /**
-  This function is used to requery IDE resources. The IDE controller will 
-  probably switch between native and legacy modes during the EFI->CSM->OS 
+  This function is used to requery IDE resources. The IDE controller will
+  probably switch between native and legacy modes during the EFI->CSM->OS
   transfer. We do this everytime before an BlkIo operation to ensure its
   succeess.
 
@@ -543,7 +543,7 @@ DiscoverIdeDevice (
   if (Status == EFI_SUCCESS) {
     SataFlag = TRUE;
   }
-    
+
   //
   // If a channel has not been checked, check it now. Then set it to "checked" state
   // After this step, all devices in this channel have been checked.
@@ -553,7 +553,7 @@ DiscoverIdeDevice (
   if ((EFI_ERROR (Status)) && !SataFlag) {
     return EFI_NOT_FOUND;
   }
-  
+
   //
   // Device exists. test if it is an ATA device
   //
@@ -596,19 +596,19 @@ DiscoverIdeDevice (
 }
 
 /**
-  This function is called by DiscoverIdeDevice(). It is used for detect 
-  whether the IDE device exists in the specified Channel as the specified 
+  This function is called by DiscoverIdeDevice(). It is used for detect
+  whether the IDE device exists in the specified Channel as the specified
   Device Number.
 
-  There is two IDE channels: one is Primary Channel, the other is 
-  Secondary Channel.(Channel is the logical name for the physical "Cable".) 
+  There is two IDE channels: one is Primary Channel, the other is
+  Secondary Channel.(Channel is the logical name for the physical "Cable".)
   Different channel has different register group.
 
-  On each IDE channel, at most two IDE devices attach, 
-  one is called Device 0 (Master device), the other is called Device 1 
-  (Slave device). The devices on the same channel co-use the same register 
-  group, so before sending out a command for a specified device via command 
-  register, it is a must to select the current device to accept the command 
+  On each IDE channel, at most two IDE devices attach,
+  one is called Device 0 (Master device), the other is called Device 1
+  (Slave device). The devices on the same channel co-use the same register
+  group, so before sending out a command for a specified device via command
+  register, it is a must to select the current device to accept the command
   by set the device number in the Head/Device Register.
 
   @param[in] *IdeDev
@@ -617,7 +617,7 @@ DiscoverIdeDevice (
 
   @retval TRUE
   successfully detects device.
-  
+
   @retval FALSE
   any failure during detection process will return this
   value.
@@ -658,7 +658,7 @@ DetectIDEController (
       return EFI_NOT_FOUND;
     }
   }
-      
+
   //
   // Select slave device
   //
@@ -712,16 +712,18 @@ DetectIDEController (
     MasterDeviceExist = FALSE;
     DeviceStatus      = EFI_NOT_FOUND;
   }
-    
+
   //
   // Master Error register is not 0x81, Go on check Slave
   //
-  
+
   //
-  // Stall 10ms to wait for slave device ready
+  // Stall 20ms to wait for slave device ready if master device not exists
   //
-  gBS->Stall (10000);
-  
+  if (!MasterDeviceExist) {
+    gBS->Stall (20000);
+  }
+
   //
   // select slave
   //
@@ -773,20 +775,20 @@ DetectIDEController (
 }
 
 /**
-  This function is used to poll for the DRQ bit clear in the Status 
-  Register. DRQ is cleared when the device is finished transferring data. 
+  This function is used to poll for the DRQ bit clear in the Status
+  Register. DRQ is cleared when the device is finished transferring data.
   So this function is called after data transfer is finished.
 
   @param[in] *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
-  
+
   @param[in] TimeoutInMilliSeconds
   used to designate the timeout for the DRQ clear.
 
   @retval EFI_SUCCESS
   DRQ bit clear within the time out.
-  
+
   @retval EFI_TIMEOUT
   DRQ bit not clear within the time out.
 
@@ -846,21 +848,21 @@ DRQClear (
 }
 
 /**
-  This function is used to poll for the DRQ bit clear in the Alternate 
-  Status Register. DRQ is cleared when the device is finished 
+  This function is used to poll for the DRQ bit clear in the Alternate
+  Status Register. DRQ is cleared when the device is finished
   transferring data. So this function is called after data transfer
   is finished.
 
   @param[in] *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
-  
+
   @param[in] TimeoutInMilliSeconds
   used to designate the timeout for the DRQ clear.
 
   @retval EFI_SUCCESS
   DRQ bit clear within the time out.
-  
+
   @retval EFI_TIMEOUT
   DRQ bit not clear within the time out.
 
@@ -920,25 +922,25 @@ DRQClear2 (
 }
 
 /**
-  This function is used to poll for the DRQ bit set in the 
+  This function is used to poll for the DRQ bit set in the
   Status Register.
   DRQ is set when the device is ready to transfer data. So this function
-  is called after the command is sent to the device and before required 
+  is called after the command is sent to the device and before required
   data is transferred.
 
   @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure,used
   to record all the information of the IDE device.
-  
+
   @param[in] UINTN     IN    TimeoutInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
   DRQ bit set within the time out.
-  
+
   @retval EFI_TIMEOUT
   DRQ bit not set within the time out.
-  
+
   @retval EFI_ABORTED
   DRQ bit not set caused by the command abort.
 
@@ -998,24 +1000,24 @@ DRQReady (
 }
 
 /**
-  This function is used to poll for the DRQ bit set in the 
-  Alternate Status Register. DRQ is set when the device is ready to 
-  transfer data. So this function is called after the command 
+  This function is used to poll for the DRQ bit set in the
+  Alternate Status Register. DRQ is set when the device is ready to
+  transfer data. So this function is called after the command
   is sent to the device and before required data is transferred.
 
   @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
-  
+
   @param[in] UINTN     IN    TimeoutInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
   DRQ bit set within the time out.
-  
+
   @retval EFI_TIMEOUT
   DRQ bit not set within the time out.
-  
+
   @retval EFI_ABORTED
   DRQ bit not set caused by the command abort.
 
@@ -1075,20 +1077,20 @@ DRQReady2 (
 }
 
 /**
-  This function is used to poll for the BSY bit clear in the 
+  This function is used to poll for the BSY bit clear in the
   Status Register. BSY is clear when the device is not busy.
   Every command must be sent after device is not busy.
 
   @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
-  
+
   @param[in] UINTN     IN    TimeoutInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
   BSY bit clear within the time out.
-  
+
   @retval EFI_TIMEOUT
   BSY bit not clear within the time out.
 
@@ -1136,20 +1138,20 @@ WaitForBSYClear (
 // WaitForBSYClear2
 //
 /**
-  This function is used to poll for the BSY bit clear in the 
+  This function is used to poll for the BSY bit clear in the
   Alternate Status Register. BSY is clear when the device is not busy.
   Every command must be sent after device is not busy.
 
   @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
-  
+
   @param[in] UINTN     IN    TimeoutInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
   BSY bit clear within the time out.
-  
+
   @retval EFI_TIMEOUT
   BSY bit not clear within the time out.
 
@@ -1194,21 +1196,21 @@ WaitForBSYClear2 (
 // DRDYReady
 //
 /**
-  This function is used to poll for the DRDY bit set in the 
-  Status Register. DRDY bit is set when the device is ready 
-  to accept command. Most ATA commands must be sent after 
+  This function is used to poll for the DRDY bit set in the
+  Status Register. DRDY bit is set when the device is ready
+  to accept command. Most ATA commands must be sent after
   DRDY set except the ATAPI Packet Command.
 
   @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
-  
+
   @param[in] UINTN     IN    TimeoutInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
   DRDY bit set within the time out.
-  
+
   @retval EFI_TIMEOUT
   DRDY bit not set within the time out.
 
@@ -1265,21 +1267,21 @@ DRDYReady (
 // DRDYReady2
 //
 /**
-  This function is used to poll for the DRDY bit set in the 
-  Alternate Status Register. DRDY bit is set when the device is ready 
-  to accept command. Most ATA commands must be sent after 
+  This function is used to poll for the DRDY bit set in the
+  Alternate Status Register. DRDY bit is set when the device is ready
+  to accept command. Most ATA commands must be sent after
   DRDY set except the ATAPI Packet Command.
 
   @param[in] IDE_BLK_IO_DEV  IN    *IdeDev
   pointer pointing to IDE_BLK_IO_DEV data structure, used
   to record all the information of the IDE device.
-  
+
   @param[in] UINTN     IN    TimeoutInMilliSeconds
   used to designate the timeout for the DRQ ready.
 
   @retval EFI_SUCCESS
   DRDY bit set within the time out.
-  
+
   @retval EFI_TIMEOUT
   DRDY bit not set within the time out.
 
@@ -1336,23 +1338,23 @@ DRDYReady2 (
 // SwapStringChars
 //
 /**
-  This function is a helper function used to change the char order in a 
+  This function is a helper function used to change the char order in a
   string. It is designed specially for the PrintAtaModuleName() function.
   After the IDE device is detected, the IDE driver gets the device module
-  name by sending ATA command called ATA Identify Command or ATAPI 
-  Identify Command to the specified IDE device. The module name returned 
-  is a string of ASCII characters: the first character is bit8--bit15 
-  of the first word, the second character is bit0--bit7 of the first word 
-  and so on. Thus the string can not be print directly before it is 
-  preprocessed by this func to change the order of characters in 
+  name by sending ATA command called ATA Identify Command or ATAPI
+  Identify Command to the specified IDE device. The module name returned
+  is a string of ASCII characters: the first character is bit8--bit15
+  of the first word, the second character is bit0--bit7 of the first word
+  and so on. Thus the string can not be print directly before it is
+  preprocessed by this func to change the order of characters in
   each word in the string.
 
   @param[in] CHAR8 IN    *Destination
   Indicates the destination string.
-  
+
   @param[in] CHAR8 IN    *Source
   Indicates the source string.
-  
+
   @param[in] UINT8 IN    Size
   the length of the string
 
@@ -1396,7 +1398,7 @@ ReleaseIdeResources (
   //
   // Release all the resourses occupied by the IDE_BLK_IO_DEV
   //
-  
+
   if (IdeBlkIoDevice->SenseData != NULL) {
     gBS->FreePool (IdeBlkIoDevice->SenseData);
     IdeBlkIoDevice->SenseData = NULL;
