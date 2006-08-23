@@ -223,8 +223,8 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
            model.addColumn("Help Text");
            model.addColumn("Recommended Instance");
            model.addColumn("Version");
-           model.addColumn("Sup. Arch");
-           model.addColumn("Mod. Types");
+           model.addColumn("Supported Architectures");
+           model.addColumn("Supported Module Types");
            
            Vector<String> vArch = new Vector<String>();
            vArch.add("IA32");
@@ -310,7 +310,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                 getLibInstances(lib);
                 guid = nameToGuid(name);
                 if (guid == null){
-                  JOptionPane.showMessageDialog(frame, "Recommended Instance NOT exists.");
+                  JOptionPane.showMessageDialog(frame, "Recommended Instance does not exist.");
                   return;
                 }
             }
@@ -626,7 +626,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             }
             else{
                 if (recommendGuid == null) {
-                  JOptionPane.showMessageDialog(frame, "Recommended Instance NOT exists.");
+                  JOptionPane.showMessageDialog(frame, "Recommended Instance does not exist.");
                   return;
                 }
             }
@@ -663,25 +663,25 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
 
     private boolean dataValidation(String[] row) {
         if (!DataValidation.isKeywordType(row[cnClassName])) {
-            JOptionPane.showMessageDialog(frame, "Library Class is NOT KeyWord Type.");
+            JOptionPane.showMessageDialog(frame, "Library Class name entered does not match KeyWord datatype.");
             return false;
         }
         if (!DataValidation.isPathAndFilename(row[cnHdrFile])) {
-            JOptionPane.showMessageDialog(frame, "Include Header is NOT PathAndFilename Type.");
+            JOptionPane.showMessageDialog(frame, "Include Header does not match the PathAndFilename datatype.");
             return false;
         }
         if (row[cnHelpText].length() == 0) {
-            JOptionPane.showMessageDialog(frame, "Help Text Must NOT be empty.");
+            JOptionPane.showMessageDialog(frame, "Help Text must be entered!");
             return false;
         }
         if (row[cnRecInstVer] != null && row[cnRecInstVer].length() > 0) {
             if (row[cnRecInstName] == null || row[cnRecInstName].length() == 0) {
-                JOptionPane.showMessageDialog(frame, "Recommended Instance Version must associate with Instance Name.");
+                JOptionPane.showMessageDialog(frame, "Recommended Instance Version must associate with the Instance Name.");
                 return false;
             }
             
             if (!DataValidation.isVersionDataType(row[cnRecInstVer])) {
-                JOptionPane.showMessageDialog(frame, "Recommended Instance Version is NOT VersionDataType.");
+                JOptionPane.showMessageDialog(frame, "Recommended Instance Version does not match Version datatype.");
                 return false;
             }
         }
@@ -743,7 +743,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                         theFile = chooser.getSelectedFile();
                         String file = theFile.getPath();
                         if (!file.startsWith(dirPrefix)) {
-                            JOptionPane.showMessageDialog(frame, "You can only select files in current package!");
+                            JOptionPane.showMessageDialog(frame, "You can only select files in current package directory structure!");
                             return;
                         }
                         
@@ -943,7 +943,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
             }
         }
         catch(Exception e){
-            JOptionPane.showMessageDialog(frame, "Search Instances Fail.");
+            JOptionPane.showMessageDialog(frame, "Search Instances Failed.");
         }
         
     }
