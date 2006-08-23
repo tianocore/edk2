@@ -1145,7 +1145,7 @@ public class FpdFileContents {
                 
                 if (value > 0xFF) {
 //                   "[FPD file error] The datum type of PCD %s in %s is VOID*, "+
-//                   "it is byte array in fact. But the element of %s exceed the byte range",
+//                   "it must be a byte array. But the element of %s exceed the byte range",
                     throw new PcdValueMalFormed (datum);                               
                 }
             }

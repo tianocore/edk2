@@ -356,7 +356,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Architecture.");
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -380,7 +380,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Architecture.");
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -404,7 +404,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Architecture.");
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -662,7 +662,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Architecture.");
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -688,7 +688,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Architecture.");
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
@@ -714,7 +714,7 @@ public class FpdPlatformDefs extends IInternalFrame {
                     Vector<Object> v = new Vector<Object>();
                     getToolChain(v);
                     if (v.size() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Arch.");
+                        JOptionPane.showMessageDialog(frame, "Platform must contain at least ONE supported Architecture.");
                         return;
                     }
                     ffc.setPlatformDefsSupportedArchs(v);
