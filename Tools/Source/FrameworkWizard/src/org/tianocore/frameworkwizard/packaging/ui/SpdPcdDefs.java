@@ -366,7 +366,7 @@ public class SpdPcdDefs extends IInternalFrame implements TableModelListener{
             jLabelDataType.setText("Data Type");
             jLabelDataType.setBounds(new java.awt.Rectangle(11,83,140,20));
             jLabelToken = new JLabel();
-            jLabelToken.setText("Token");
+            jLabelToken.setText("Token Number");
             jLabelToken.setBounds(new java.awt.Rectangle(11,33,140,20));
             jLabelItemType = new JLabel();
             jLabelItemType.setText("Help Text");

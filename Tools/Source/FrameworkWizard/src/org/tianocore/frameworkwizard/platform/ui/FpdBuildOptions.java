@@ -56,6 +56,7 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.Vector;
 import java.awt.Dimension;
+import javax.swing.JSplitPane;
 
 public class FpdBuildOptions extends IInternalFrame {
 
@@ -89,14 +90,12 @@ public class FpdBuildOptions extends IInternalFrame {
     private JPanel jPanelFfsTabCenter = null;
     private JPanel jPanelFfsTabCenterN = null;
     private JPanel jPanelFfsTabCenterS = null;
-    private JPanel jPanelFfsTabCenterE = null;
     private JLabel jLabelFfsKey = null;
     private JTextField jTextFieldFfsKey = null;
     private JButton jButtonFfsAdd = null;
     private JButton jButtonFfsDel = null;
     private JScrollPane jScrollPaneFfsAttribs = null;
     private JTable jTableFfsAttribs = null;
-    private JPanel jPanelFfsTabCenterC = null;
     private JPanel jPanelOptionsTab = null;
     private JLabel jLabelOptionContents = null;
     private JTextField jTextFieldOptionContents = null;
@@ -148,6 +147,20 @@ public class FpdBuildOptions extends IInternalFrame {
     private JTable jTableFfsSections = null;
     private JButton jButtonAntTaskFileBrowse = null;
     private JTextField jTextFieldToolChainFamily = null;
+    private JSplitPane jSplitPaneFfsC = null;
+    private JPanel jPanelFfsCTop = null;
+    private JSplitPane jSplitPaneFfsCBottom = null;
+    private JPanel jPanelFfsCBottomTop = null;
+    private JPanel jPanelFfsCBottomBottom = null;
+    private JPanel jPanelSectionN = null;
+    private JPanel jPanelSectionC = null;
+    private JPanel jPanelSectionsN = null;
+    private JPanel jPanelSectionsC = null;
+    private JPanel jPanelSubSectionN = null;
+    private JPanel jPanelSubSectionC = null;
+    private JPanel jPanelOptionsContainer = null;
+    private JPanel jPanelUserDefCenterN = null;
+    private JPanel jPanelUserDefCenterC = null;
     /**
      * This method initializes jPanel	
      * 	
@@ -239,7 +252,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jLabelAntTaskFile.setText("ANT Task File");
             jLabelAntTaskFile.setPreferredSize(new java.awt.Dimension(80,20));
             FlowLayout flowLayout8 = new FlowLayout();
-            flowLayout8.setAlignment(java.awt.FlowLayout.LEFT);
+            flowLayout8.setAlignment(java.awt.FlowLayout.CENTER);
             jLabelAntTaskId = new JLabel();
             jLabelAntTaskId.setText("ID");
             jPanelUserDefNorth = new JPanel();
@@ -263,16 +276,11 @@ public class FpdBuildOptions extends IInternalFrame {
             jLabelAntCmdOpts = new JLabel();
             jLabelAntCmdOpts.setText("ANT Command Options");
             jLabelAntCmdOpts.setPreferredSize(new java.awt.Dimension(131,20));
-            FlowLayout flowLayout3 = new FlowLayout();
-            flowLayout3.setHgap(5);
-            flowLayout3.setAlignment(java.awt.FlowLayout.LEFT);
             jPanelUserDefCenter = new JPanel();
-            jPanelUserDefCenter.setLayout(flowLayout3);
-            jPanelUserDefCenter.add(jLabelAntCmdOpts, null);
-            jPanelUserDefCenter.add(getJTextField4(), null);
-            jPanelUserDefCenter.add(getJButtonAntTaskAdd(), null);
-            jPanelUserDefCenter.add(getJButtonAntTaskDel(), null);
-            jPanelUserDefCenter.add(getJScrollPaneAntTasks(), null);
+            jPanelUserDefCenter.setLayout(new BorderLayout());
+
+            jPanelUserDefCenter.add(getJPanelUserDefCenterN(), java.awt.BorderLayout.NORTH);
+            jPanelUserDefCenter.add(getJPanelUserDefCenterC(), java.awt.BorderLayout.CENTER);
         }
         return jPanelUserDefCenter;
     }
@@ -359,7 +367,7 @@ public class FpdBuildOptions extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextField4() {
+    private JTextField getJTextFieldAntCmdOpts() {
         if (jTextFieldAntCmdOpts == null) {
             jTextFieldAntCmdOpts = new JTextField();
             jTextFieldAntCmdOpts.setPreferredSize(new java.awt.Dimension(270,20));
@@ -376,7 +384,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneAntTasks() {
         if (jScrollPaneAntTasks == null) {
             jScrollPaneAntTasks = new JScrollPane();
-            jScrollPaneAntTasks.setPreferredSize(new java.awt.Dimension(600,100));
+            jScrollPaneAntTasks.setPreferredSize(new java.awt.Dimension(600,400));
             jScrollPaneAntTasks.setViewportView(getJTableAntTasks());
         }
         return jScrollPaneAntTasks;
@@ -470,8 +478,7 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanelFfsTabCenter.setLayout(new BorderLayout());
             jPanelFfsTabCenter.add(getJPanelFfsTabCenterN(), java.awt.BorderLayout.NORTH);
             jPanelFfsTabCenter.add(getJPanelFfsTabCenterS(), java.awt.BorderLayout.SOUTH);
-            jPanelFfsTabCenter.add(getJPanelFfsTabCenterE(), java.awt.BorderLayout.EAST);
-            jPanelFfsTabCenter.add(getJPanelFfsTabCenterC(), java.awt.BorderLayout.CENTER);
+            jPanelFfsTabCenter.add(getJSplitPaneFfsC(), java.awt.BorderLayout.CENTER);
         }
         return jPanelFfsTabCenter;
     }
@@ -522,18 +529,6 @@ public class FpdBuildOptions extends IInternalFrame {
             jPanelFfsTabCenterS.add(getJPanelFfsAttribButtonGroup(), null);
         }
         return jPanelFfsTabCenterS;
-    }
-
-    /**
-     * This method initializes jPanel17	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanelFfsTabCenterE() {
-        if (jPanelFfsTabCenterE == null) {
-            jPanelFfsTabCenterE = new JPanel();
-        }
-        return jPanelFfsTabCenterE;
     }
 
     /**
@@ -609,6 +604,7 @@ public class FpdBuildOptions extends IInternalFrame {
                     }
                     docConsole.setSaved(false);
                     ffc.removeBuildOptionsFfs(jTableFfs.getSelectedRow());
+                    ffsTableModel.removeRow(jTableFfs.getSelectedRow());
                 }
             });
         }
@@ -670,37 +666,6 @@ public class FpdBuildOptions extends IInternalFrame {
     }
 
     /**
-     * This method initializes jPanel19	
-     * 	
-     * @return javax.swing.JPanel	
-     */
-    private JPanel getJPanelFfsTabCenterC() {
-        if (jPanelFfsTabCenterC == null) {
-            jLabelFfsSections = new JLabel();
-            jLabelFfsSections.setText("Sections");
-            jLabelFfsSubSections = new JLabel();
-            jLabelFfsSubSections.setText("Sub-Sections");
-            jLabelFfsSection = new JLabel();
-            jLabelFfsSection.setText("Section");
-            jPanelFfsTabCenterC = new JPanel();
-            jPanelFfsTabCenterC.setLayout(new FlowLayout());
-            jPanelFfsTabCenterC.add(jLabelFfsSection, null);
-            jPanelFfsTabCenterC.add(getJButtonFfsSectionNew(), null);
-            jPanelFfsTabCenterC.add(getJButtonFfsSectionRemove(), null);
-            jPanelFfsTabCenterC.add(getJScrollPaneFfsSection(), null);
-            jPanelFfsTabCenterC.add(jLabelFfsSections, null);
-            jPanelFfsTabCenterC.add(getJButtonFfsSectionsNew(), null);
-            jPanelFfsTabCenterC.add(getJButtonFfsSectionsRemove(), null);
-            jPanelFfsTabCenterC.add(getJScrollPaneFfsSections(), null);
-            jPanelFfsTabCenterC.add(jLabelFfsSubSections, null);
-            jPanelFfsTabCenterC.add(getJButtonFfsSubSectionNew(), null);
-            jPanelFfsTabCenterC.add(getJButtonFfsSubSectionRemove(), null);
-            jPanelFfsTabCenterC.add(getJScrollPaneFfsSubSection(), null);
-        }
-        return jPanelFfsTabCenterC;
-    }
-
-    /**
      * This method initializes jPanel20	
      * 	
      * @return javax.swing.JPanel	
@@ -723,26 +688,9 @@ public class FpdBuildOptions extends IInternalFrame {
             jLabelOptionContents.setText("Option Contents");
             jPanelOptionsTab = new JPanel();
             jPanelOptionsTab.setLayout(flowLayout9);
-            jPanelOptionsTab.add(jLabelBuildTargets, null);
-            jPanelOptionsTab.add(getJTextFieldBuildTargets(), null);
-            jPanelOptionsTab.add(jLabelToolChainFamily, null);
-            jPanelOptionsTab.add(getJTextFieldToolChainFamily(), null);
-            jPanelOptionsTab.add(jLabelToolCmd, null);
-            jPanelOptionsTab.add(getJTextFieldToolCmd(), null);
-            jPanelOptionsTab.add(jLabelSupArch, null);
-            jPanelOptionsTab.add(getJCheckBoxIA32(), null);
-            jPanelOptionsTab.add(getJCheckBoxIpf(), null);
-            jPanelOptionsTab.add(getJCheckBoxX64(), null);
-            jPanelOptionsTab.add(getJCheckBoxEBC(), null);
-            jPanelOptionsTab.add(getJCheckBoxARM(), null);
-            jPanelOptionsTab.add(getJCheckBoxPPC(), null);
-            jPanelOptionsTab.add(jLabelTagName, null);
-            jPanelOptionsTab.add(getJTextFieldTagName(), null);
-            jPanelOptionsTab.add(jLabelOptionContents, null);
-            jPanelOptionsTab.add(getJTextFieldOptionContents(), null);
-            jPanelOptionsTab.add(getJButtonOptionsAdd(), null);
-            jPanelOptionsTab.add(getJButtonOptionsDel(), null);
+            jPanelOptionsTab.add(getJPanelOptionsContainer(), null);
             jPanelOptionsTab.add(getJScrollPaneOptions(), null);
+            
         }
         return jPanelOptionsTab;
     }
@@ -781,7 +729,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneOptions() {
         if (jScrollPaneOptions == null) {
             jScrollPaneOptions = new JScrollPane();
-            jScrollPaneOptions.setPreferredSize(new java.awt.Dimension(630,200));
+            jScrollPaneOptions.setPreferredSize(new java.awt.Dimension(650,400));
             jScrollPaneOptions.setViewportView(getJTableOptions());
         }
         return jScrollPaneOptions;
@@ -1672,6 +1620,240 @@ public class FpdBuildOptions extends IInternalFrame {
             jTextFieldToolChainFamily.setPreferredSize(new java.awt.Dimension(85,20));
         }
         return jTextFieldToolChainFamily;
+    }
+
+    /**
+     * This method initializes jSplitPaneFfsC	
+     * 	
+     * @return javax.swing.JSplitPane	
+     */
+    private JSplitPane getJSplitPaneFfsC() {
+        if (jSplitPaneFfsC == null) {
+            jSplitPaneFfsC = new JSplitPane();
+            jSplitPaneFfsC.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+            jSplitPaneFfsC.setDividerLocation(130);
+            jSplitPaneFfsC.setTopComponent(getJPanelFfsCTop());
+            jSplitPaneFfsC.setBottomComponent(getJSplitPaneFfsCBottom());
+            jSplitPaneFfsC.setDividerSize(5);
+        }
+        return jSplitPaneFfsC;
+    }
+
+    /**
+     * This method initializes jPanelFfsCTop	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFfsCTop() {
+        if (jPanelFfsCTop == null) {
+            jPanelFfsCTop = new JPanel();
+            jPanelFfsCTop.setLayout(new BorderLayout());
+            jPanelFfsCTop.add(getJPanelSectionN(), java.awt.BorderLayout.NORTH);
+            jPanelFfsCTop.add(getJPanelSectionC(), java.awt.BorderLayout.CENTER);
+        }
+        return jPanelFfsCTop;
+    }
+
+    /**
+     * This method initializes jSplitPaneFfsCBottom	
+     * 	
+     * @return javax.swing.JSplitPane	
+     */
+    private JSplitPane getJSplitPaneFfsCBottom() {
+        if (jSplitPaneFfsCBottom == null) {
+            jSplitPaneFfsCBottom = new JSplitPane();
+            jSplitPaneFfsCBottom.setDividerSize(5);
+            jSplitPaneFfsCBottom.setDividerLocation(130);
+            jSplitPaneFfsCBottom.setTopComponent(getJPanelFfsCBottomTop());
+            jSplitPaneFfsCBottom.setBottomComponent(getJPanelFfsCBottomBottom());
+            jSplitPaneFfsCBottom.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        }
+        return jSplitPaneFfsCBottom;
+    }
+
+    /**
+     * This method initializes jPanelFfsCBottomTop	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFfsCBottomTop() {
+        if (jPanelFfsCBottomTop == null) {
+            jPanelFfsCBottomTop = new JPanel();
+            jPanelFfsCBottomTop.setLayout(new BorderLayout());
+            jPanelFfsCBottomTop.add(getJPanelSectionsN(), java.awt.BorderLayout.NORTH);
+            jPanelFfsCBottomTop.add(getJPanelSectionsC(), java.awt.BorderLayout.CENTER);
+        }
+        return jPanelFfsCBottomTop;
+    }
+
+    /**
+     * This method initializes jPanelFfsCBottomBottom	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFfsCBottomBottom() {
+        if (jPanelFfsCBottomBottom == null) {
+            jPanelFfsCBottomBottom = new JPanel();
+            jPanelFfsCBottomBottom.setLayout(new BorderLayout());
+            jPanelFfsCBottomBottom.add(getJPanelSubSectionN(), java.awt.BorderLayout.NORTH);
+            jPanelFfsCBottomBottom.add(getJPanelSubSectionC(), java.awt.BorderLayout.CENTER);
+        }
+        return jPanelFfsCBottomBottom;
+    }
+
+    /**
+     * This method initializes jPanelSectionN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelSectionN() {
+        if (jPanelSectionN == null) {
+            jPanelSectionN = new JPanel();
+            jLabelFfsSection = new JLabel();
+            jLabelFfsSection.setText("Section");
+            jPanelSectionN.add(jLabelFfsSection, null);
+            jPanelSectionN.add(getJButtonFfsSectionNew(), null);
+            jPanelSectionN.add(getJButtonFfsSectionRemove(), null);
+        }
+        return jPanelSectionN;
+    }
+
+    /**
+     * This method initializes jPanelSectionC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelSectionC() {
+        if (jPanelSectionC == null) {
+            jPanelSectionC = new JPanel();
+            jPanelSectionC.add(getJScrollPaneFfsSection(), null);
+        }
+        return jPanelSectionC;
+    }
+
+    /**
+     * This method initializes jPanelSectionsN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelSectionsN() {
+        if (jPanelSectionsN == null) {
+            jPanelSectionsN = new JPanel();
+            jLabelFfsSections = new JLabel();
+            jLabelFfsSections.setText("Sections");
+            jPanelSectionsN.add(jLabelFfsSections, null);
+            jPanelSectionsN.add(getJButtonFfsSectionsNew(), null);
+            jPanelSectionsN.add(getJButtonFfsSectionsRemove(), null);
+        }
+        return jPanelSectionsN;
+    }
+
+    /**
+     * This method initializes jPanelSectionsC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelSectionsC() {
+        if (jPanelSectionsC == null) {
+            jPanelSectionsC = new JPanel();
+            jPanelSectionsC.add(getJScrollPaneFfsSections(), null);
+        }
+        return jPanelSectionsC;
+    }
+
+    /**
+     * This method initializes jPanelSubSectionN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelSubSectionN() {
+        if (jPanelSubSectionN == null) {
+            jPanelSubSectionN = new JPanel();
+            jLabelFfsSubSections = new JLabel();
+            jLabelFfsSubSections.setText("Sub-Sections");
+            jPanelSubSectionN.add(jLabelFfsSubSections, null);
+            jPanelSubSectionN.add(getJButtonFfsSubSectionNew(), null);
+            jPanelSubSectionN.add(getJButtonFfsSubSectionRemove(), null);
+        }
+        return jPanelSubSectionN;
+    }
+
+    /**
+     * This method initializes jPanelSubSectionC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelSubSectionC() {
+        if (jPanelSubSectionC == null) {
+            jPanelSubSectionC = new JPanel();
+            jPanelSubSectionC.add(getJScrollPaneFfsSubSection(), null);
+        }
+        return jPanelSubSectionC;
+    }
+
+    /**
+     * This method initializes jPanelOptionsContainer	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelOptionsContainer() {
+        if (jPanelOptionsContainer == null) {
+            FlowLayout flowLayout = new FlowLayout();
+            flowLayout.setAlignment(java.awt.FlowLayout.LEFT);
+            jPanelOptionsContainer = new JPanel();
+            jPanelOptionsContainer.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
+            jPanelOptionsContainer.setLayout(flowLayout);
+            jPanelOptionsContainer.setPreferredSize(new java.awt.Dimension(650,100));
+            jPanelOptionsContainer.add(jLabelBuildTargets, null);
+            jPanelOptionsContainer.add(getJTextFieldBuildTargets(), null);
+            jPanelOptionsContainer.add(jLabelToolChainFamily, null);
+            jPanelOptionsContainer.add(getJTextFieldToolChainFamily(), null);
+            jPanelOptionsContainer.add(jLabelToolCmd, null);
+            jPanelOptionsContainer.add(getJTextFieldToolCmd(), null);
+            jPanelOptionsContainer.add(jLabelSupArch, null);
+            jPanelOptionsContainer.add(getJCheckBoxIA32(), null);
+            jPanelOptionsContainer.add(getJCheckBoxIpf(), null);
+            jPanelOptionsContainer.add(getJCheckBoxX64(), null);
+            jPanelOptionsContainer.add(getJCheckBoxEBC(), null);
+            jPanelOptionsContainer.add(getJCheckBoxARM(), null);
+            jPanelOptionsContainer.add(getJCheckBoxPPC(), null);
+            jPanelOptionsContainer.add(jLabelTagName, null);
+            jPanelOptionsContainer.add(getJTextFieldTagName(), null);
+            jPanelOptionsContainer.add(jLabelOptionContents, null);
+            jPanelOptionsContainer.add(getJTextFieldOptionContents(), null);
+            jPanelOptionsContainer.add(getJButtonOptionsAdd(), null);
+            jPanelOptionsContainer.add(getJButtonOptionsDel(), null);
+        }
+        return jPanelOptionsContainer;
+    }
+
+    /**
+     * This method initializes jPanelUserDefCenterN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelUserDefCenterN() {
+        if (jPanelUserDefCenterN == null) {
+            jPanelUserDefCenterN = new JPanel();
+            jPanelUserDefCenterN.add(jLabelAntCmdOpts, null);
+            jPanelUserDefCenterN.add(getJTextFieldAntCmdOpts(), null);
+            jPanelUserDefCenterN.add(getJButtonAntTaskAdd(), null);
+            jPanelUserDefCenterN.add(getJButtonAntTaskDel(), null);
+        }
+        return jPanelUserDefCenterN;
+    }
+
+    /**
+     * This method initializes jPanelUserDefCenterC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelUserDefCenterC() {
+        if (jPanelUserDefCenterC == null) {
+            jPanelUserDefCenterC = new JPanel();
+            jPanelUserDefCenterC.add(getJScrollPaneAntTasks(), null);
+        }
+        return jPanelUserDefCenterC;
     }
 
     /**
