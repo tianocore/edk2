@@ -202,7 +202,8 @@ public final class Critic {
 	}
 	
 	public static final void fireAt(String path) throws Exception {
-		Common.toDoAll(Common.dirCopy_(path), Critic.class.getMethod("critic", String.class), null, null, Common.FILE);
+		//Common.toDoAll(Common.dirCopy_(path), Critic.class.getMethod("critic", String.class), null, null, Common.FILE);
+		Common.toDoAll(path, Critic.class.getMethod("critic", String.class), null, null, Common.FILE);
 		//Common.toDoAll(Common.dirCopy_(path), critic, Common.FILE);
 		System.out.println("Critic Done");
 	}

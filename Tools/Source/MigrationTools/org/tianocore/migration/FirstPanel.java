@@ -73,6 +73,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 		
 		defaultpathbox = new JCheckBox("Use Default Output Path", true);
 		defaultpathbox.addItemListener(this);
+		ModuleInfo.defaultoutput = true;
 		
         JPanel modulePanel = new JPanel();
         modulePanel.add(moduleButton);
@@ -218,16 +219,14 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
     	} else if (e.getSource() == criticbox) {
         	if (e.getStateChange() == ItemEvent.DESELECTED) {
         		ModuleInfo.doCritic = false;
-        		System.out.println("criticbox DESELECTED");
         	} else if (e.getStateChange() == ItemEvent.SELECTED) {
         		ModuleInfo.doCritic = true;
-        		System.out.println("criticbox SELECTED");
         	}
     	} else if (e.getSource() == defaultpathbox) {
         	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		System.out.println("defaultpathbox DESELECTED");
+        		ModuleInfo.defaultoutput = false;
         	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		System.out.println("defaultpathbox SELECTED");
+        		ModuleInfo.defaultoutput = true;
         	}
     	}
     }
