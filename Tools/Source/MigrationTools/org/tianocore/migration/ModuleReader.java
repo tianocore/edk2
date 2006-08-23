@@ -27,9 +27,9 @@ public final class ModuleReader {
 	
 	public static final void ModuleScan(ModuleInfo m) throws Exception {
 		mi = m;
-		
+
 		Common.toDoAll(mi.modulepath, ModuleInfo.class.getMethod("enroll", String.class), mi, null, Common.FILE);
-		
+
 		String filename = null;
 		if (mi.msaorinf.isEmpty()) {
 			ModuleInfo.ui.println("No INF nor MSA file found!");
@@ -42,7 +42,7 @@ public final class ModuleReader {
 		} else if (filename.contains(".msa")) {
 			readMsa(filename);
 		}
-		
+
 		CommentOutNonLocalHFile();
 		parsePreProcessedSourceCode();
 

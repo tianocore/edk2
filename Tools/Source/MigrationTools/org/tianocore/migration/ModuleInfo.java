@@ -60,14 +60,11 @@ public final class ModuleInfo {
 	public final Set<String> ppi = new HashSet<String>();
 
 	public final void enroll(String filepath) throws Exception {
-		String[] temp;
 		if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 
 				filepath.contains(".H") || filepath.contains(".dxs") || filepath.contains(".uni")) {
-			temp = filepath.split("\\\\");
-			localmodulesources.add(temp[temp.length - 1]);
+			localmodulesources.add(filepath.replace(modulepath + "\\", ""));
 		} else if (filepath.contains(".inf") || filepath.contains(".msa")) {
-			temp = filepath.split("\\\\");
-			msaorinf.add(temp[temp.length - 1]);
+			msaorinf.add(filepath.replace(modulepath + "\\", ""));
 		}
 	}
 
