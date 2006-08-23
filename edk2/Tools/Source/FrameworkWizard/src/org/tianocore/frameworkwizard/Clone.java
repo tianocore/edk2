@@ -360,7 +360,7 @@ public class Clone extends IDialog {
             initExistingPackage();
             this.jButtonBrowse.setVisible(false);
             this.jTextFieldFilePath
-                                   .setToolTipText("Input module name here. For example, Application\\HelloWorld\\HelloWorld.msa");
+                                   .setToolTipText("<html>Input the module's relative path and filename, for example:<br>Application\\HelloWorld\\HelloWorld.msa</html>");
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Module Path and Filename");
         }
@@ -375,7 +375,7 @@ public class Clone extends IDialog {
             this.jLabelBelong.setEnabled(false);
             this.jComboBoxExistingPackage.setEnabled(false);
             this.jButtonBrowse.setVisible(false);
-            this.jTextFieldFilePath.setToolTipText("Input package name here. For example, MdePkg\\MdePkg.fpd");
+            this.jTextFieldFilePath.setToolTipText("<html>Input the package's relative path and file name, for example:<br>MdePkg\\MdePkg.fpd</html>");
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Package Path and Filename");
         }
@@ -388,7 +388,7 @@ public class Clone extends IDialog {
             this.jLabelBelong.setEnabled(false);
             this.jComboBoxExistingPackage.setEnabled(false);
             this.jTextFieldFilePath
-                                   .setToolTipText("Select platform path here. For example, C:\\MyWorkspace\\EdkNt32Pkg\\Nt32.fpd");
+                                   .setToolTipText("<html>Select the platform's relative path and filename. For example:<br>C:\\MyWorkspace\\EdkNt32Pkg\\Nt32.fpd</html>");
             this.jLabelDestinationFile.setText("New Platform Path and Filename");
         }
         //
@@ -406,7 +406,7 @@ public class Clone extends IDialog {
             this.jButtonGenerateGuid.setEnabled(false);
             this.jLabelVersion.setEnabled(false);
             this.jTextFieldVersion.setEnabled(false);
-            this.jTextFieldFilePath.setToolTipText("Input workspace path here. For example, C:\\MyWorkspace");
+            this.jTextFieldFilePath.setToolTipText("<html>Input the workspace path, for example:<br>C:\\MyWorkspace</html>");
             this.jLabelDestinationFile.setText("New Workspace Path");
         }
     }
@@ -421,7 +421,7 @@ public class Clone extends IDialog {
         if (jContentPane == null) {
             jLabelBelong = new JLabel();
             jLabelBelong.setBounds(new java.awt.Rectangle(15, 60, 190, 20));
-            jLabelBelong.setText("Clone to Package");
+            jLabelBelong.setText("Clone Package");
             jLabelVersion = new JLabel();
             jLabelVersion.setBounds(new java.awt.Rectangle(15, 160, 190, 20));
             jLabelVersion.setText("Version");
@@ -550,11 +550,11 @@ public class Clone extends IDialog {
         // Check Basename
         //
         if (isEmpty(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Clone", "Base Name couldn't be empty!");
+            Log.wrn("Clone", "The Name is required!");
             return false;
         }
         if (!DataValidation.isBaseName(this.jTextFieldBaseName.getText())) {
-            Log.wrn("Clone", "Incorrect data type for Base Name");
+            Log.wrn("Clone", "<html>Incorrect data type for the Name, it must<br>be a single word, starting with an alpha character.</html>");
             return false;
         }
 
@@ -562,11 +562,11 @@ public class Clone extends IDialog {
         // Check Guid
         //
         if (isEmpty(this.jTextFieldGuid.getText())) {
-            Log.wrn("Clone", "Guid couldn't be empty!");
+            Log.wrn("Clone", "A Guid is required!!");
             return false;
         }
         if (!DataValidation.isGuid(this.jTextFieldGuid.getText())) {
-            Log.wrn("Clone", "Incorrect data type for Guid");
+            Log.wrn("Clone", "<html>Incorrect data type for Guid, which must<br>be in registry format (8-4-4-4-12) for example:<br>d3adb123-eef1-466d-39ac-02febcaf5997</html>");
             return false;
         }
 
@@ -574,11 +574,11 @@ public class Clone extends IDialog {
         // Check Version
         //
         if (isEmpty(this.jTextFieldVersion.getText())) {
-            Log.wrn("Clone", "Version couldn't be empty!");
+            Log.wrn("Clone", "A Version must be entered!");
             return false;
         }
         if (!DataValidation.isVersion(this.jTextFieldVersion.getText())) {
-            Log.wrn("Clone", "Incorrect data type for Version");
+            Log.wrn("Clone", "<html>Incorrect data type for Version, which must<br>be one or more digits, optionally followed by sequence<br>of one or more dot,  one or more digits; examples:<br>1.0 1.0.1 12.25.256</html>");
             return false;
         }
 
@@ -610,19 +610,19 @@ public class Clone extends IDialog {
         // Common Check
         //
         if (!srcFile.exists()) {
-            Log.wrn("Clone", "The source doesn't exist");
+            Log.wrn("Clone", "The source file does not exist!");
             return false;
         }
         if (isEmpty(trg)) {
-            Log.wrn("Clone", "The destination file path couldn't be empty");
+            Log.wrn("Clone", "The destination file path must be entered!");
             return false;
         }
         if (src.equals(trg)) {
-            Log.wrn("Clone", "The source and destination couldn't be same");
+            Log.wrn("Clone", "The source and destination can not be same!");
             return false;
         }
         if (trgFile.exists()) {
-            Log.wrn("Clone", "The destination already exists");
+            Log.wrn("Clone", "The destination already exists!");
             return false;
         }
 
@@ -631,7 +631,7 @@ public class Clone extends IDialog {
         //
         if (mode == DataType.RETURN_TYPE_WORKSPACE) {
             if (trg.indexOf(src + DataType.FILE_SEPARATOR) == 0) {
-                Log.wrn("Clone", "The new workspace couldn't be in current workspace!");
+                Log.wrn("Clone", "The new workspace can not be located within the current workspace!");
                 return false;
             }
         }
@@ -642,12 +642,12 @@ public class Clone extends IDialog {
         if (mode == DataType.RETURN_TYPE_MODULE_SURFACE_AREA) {
             trg = this.getModulePath();
             if (src.equals(trg)) {
-                Log.wrn("Clone", "The source and destination couldn't be same");
+                Log.wrn("Clone", "The source and destination paths for cloning a module must be different!");
                 return false;
             }
             trgFile = new File(trg);
             if (trgFile.exists()) {
-                Log.wrn("Clone", "The target module already exists");
+                Log.wrn("Clone", "The target module already exists!");
                 return false;
             }
             return checkId();
@@ -658,17 +658,17 @@ public class Clone extends IDialog {
         //
         if (mode == DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA) {
             if (trg.indexOf(DataType.DOS_FILE_SEPARATOR) == -1 && trg.indexOf(DataType.UNIX_FILE_SEPARATOR) == -1) {
-                Log.wrn("Clone", "The package name must include a path");
+                Log.wrn("Clone", "The package name must include a path!");
                 return false;
             }
             trg = this.getPackagePath();
             if (Tools.getFilePathOnly(src).equals(Tools.getFilePathOnly(trg))) {
-                Log.wrn("Clone", "The source and destination couldn't be same");
+                Log.wrn("Clone", "The source and destination paths for cloning a package must be different!");
                 return false;
             }
             trgFile = new File(trg);
             if (trgFile.exists()) {
-                Log.wrn("Clone", "The target package already exists");
+                Log.wrn("Clone", "The target package already exists!");
                 return false;
             }
             return checkId();
@@ -679,12 +679,12 @@ public class Clone extends IDialog {
         //
         if (mode == DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA) {
             if (trg.indexOf(Workspace.getCurrentWorkspace()) != 0) {
-                Log.wrn("Clone", "The target platform must be in current workspace");
+                Log.wrn("Clone", "The platform clone must be located in the current workspace!");
                 return false;
             }
             trgFile = new File(trg);
             if (trgFile.exists()) {
-                Log.wrn("Clone", "The target platform already exists");
+                Log.wrn("Clone", "The target platform already exists.");
                 return false;
             }
             return checkId();
