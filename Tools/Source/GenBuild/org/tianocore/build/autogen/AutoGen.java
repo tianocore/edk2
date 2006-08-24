@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -39,13 +40,13 @@ import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.pcd.action.PCDAutoGenAction;
-
 import org.tianocore.common.logger.EdkLog;
+import org.tianocore.common.definitions.ToolDefinitions;
 
 /**
- * This class is to generate Autogen.h and Autogen.c according to module surface
- * area or library surface area.
- */
+  This class is to generate Autogen.h and Autogen.c according to module surface
+  area or library surface area.
+**/
 public class AutoGen {
     ///
     /// The output path of Autogen.h and Autogen.c
@@ -96,38 +97,40 @@ public class AutoGen {
     ///
     private Set<String> mGuidList = new HashSet<String>();
 
-    //
-    // The dependence package list which recoreded in module or library surface
-    // area and it's dependence on library instance surface are.
-    //
+    ///
+    /// The dependence package list which recoreded in module or library surface
+    /// area and it's dependence on library instance surface area.
+    ///
     private List<PackageIdentification> mDepPkgList = new LinkedList<PackageIdentification>();
 
-    //
-    //  For non library module, add its library instance's construct and destructor to
-    //  list.
-    //
+    ///
+    ///  For non library module, add its library instance's construct and destructor to
+    ///  list.
+    ///
     private List<String> libConstructList = new ArrayList<String>();
     private List<String> libDestructList = new ArrayList<String>();
 
-    //
-    // List to store SetVirtalAddressMapCallBack, ExitBootServiceCallBack
-    //
+    ///
+    /// List to store SetVirtalAddressMapCallBack, ExitBootServiceCallBack
+    ///
     private List<String> setVirtalAddList = new ArrayList<String>();
     private List<String> exitBootServiceList = new ArrayList<String>();
 
 
     /**
-     * Construct function
-     *
-     * This function mainly initialize some member variable.
-     *
-     * @param outputPath
-     *            Output path of AutoGen file.
-     * @param baseName
-     *            Module base name.
-     * @param arch
-     *            Target architecture.
-     */
+      Construct function
+     
+      This function mainly initialize some member variable.
+      
+      @param fvDir
+                 Absolute path of FV directory.
+      @param outputPath
+                 Output path of AutoGen file.
+      @param moduleId
+                 Module identification.
+      @param arch
+                 Target architecture.
+    **/
     public AutoGen(String fvDir, String outputPath, ModuleIdentification moduleId, String arch) {
         this.outputPath = outputPath;
         this.moduleId = moduleId;
@@ -137,55 +140,72 @@ public class AutoGen {
     }
 
     /**
-     * saveFile function
-     *
-     * This function save the content in stringBuffer to file.
-     *
-     * @param fileName
-     *            The name of file.
-     * @param fileBuffer
-     *            The content of AutoGen file in buffer.
-     * @return "true" successful, "false" failed.
-     */
+      saveFile function
+     
+      This function save the content in stringBuffer to file.
+     
+      @param fileName
+                 The name of file.
+      @param fileBuffer
+                 The content of AutoGen file in buffer.
+      @return boolean           
+                 "true"  successful
+                 "false" failed
+    **/
     private boolean saveFile(String fileName, StringBuffer fileBuffer) {
-        try {
-            File autoGenH = new File(fileName);
+        
+        File autoGenH = new File(fileName);
 
             //
             // if the file exists, compare their content
             //
-            if (autoGenH.exists()) {
-                FileReader fIn = new FileReader(autoGenH);
-                char[] oldFileBuffer = new char[(int) autoGenH.length()];
-                fIn.read(oldFileBuffer, 0, (int) autoGenH.length());
+        if (autoGenH.exists()) {
+            char[] oldFileBuffer = new char[(int) autoGenH.length()];
+			try {
+				FileReader fIn = new FileReader(autoGenH);
+				fIn.read(oldFileBuffer, 0, (int) autoGenH.length());
                 fIn.close();
+			} catch (IOException e) {
+				EdkLog.log(EdkLog.EDK_INFO, this.moduleId.getName() 
+					                        + "'s " 
+					                        + fileName 
+					                        + " is exist, but can't be open!!");
+				return false;
+			}
 
-                //
-                // if we got the same file, don't re-generate it to prevent
-                // sources depending on it from re-building
-                //
-                if (fileBuffer.toString().compareTo(new String(oldFileBuffer)) == 0) {
-                    return true;
-                }
+            //
+            // if we got the same file, don't re-generate it to prevent
+            // sources depending on it from re-building
+            //
+            if (fileBuffer.toString().compareTo(new String(oldFileBuffer)) == 0) {
+                return true;
             }
-            FileWriter fOut = new FileWriter(autoGenH);
-            fOut.write(fileBuffer.toString());
-            fOut.close();
-        } catch (Exception e) {
-            return false;
         }
+        
+		try {
+			FileWriter fOut = new FileWriter(autoGenH);
+            fOut.write(fileBuffer.toString());
+			fOut.flush();
+            fOut.close();
+		} catch (IOException e) {
+			EdkLog.log(EdkLog.EDK_INFO, this.moduleId.getName() 
+					                        + "'s " 
+					                        + fileName 
+					                        + " can't be create!!");
+			return false;
+		} 
         return true;
     }
 
     /**
-     * genAutogen function
-     *
-     * This function call libGenAutoGen or moduleGenAutogen function, which
-     * dependence on generate library autogen or module autogen.
-     *
-     * @throws BuildException
-     *             Failed to creat AutoGen.c & AutoGen.h.
-     */
+      genAutogen function
+     
+      This function call libGenAutoGen or moduleGenAutogen function, which
+      dependence on generate library autogen or module autogen.
+     
+      @throws BuildException
+                  Failed to creat AutoGen.c & AutoGen.h.
+    **/
     public void genAutogen() throws BuildException {
         try {
             //
@@ -212,13 +232,13 @@ public class AutoGen {
     }
 
     /**
-     * moduleGenAutogen function
-     *
-     * This function generates AutoGen.c & AutoGen.h for module.
-     *
-     * @throws BuildException
-     *             Faile to create module AutoGen.c & AutoGen.h.
-     */
+      moduleGenAutogen function
+     
+      This function generates AutoGen.c & AutoGen.h for module.
+     
+      @throws BuildException
+                  Faile to create module AutoGen.c & AutoGen.h.
+    **/
     void moduleGenAutogen() throws BuildException {
 
         try {
@@ -233,13 +253,13 @@ public class AutoGen {
     }
 
     /**
-     * libGenAutogen function
-     *
-     * This function generates AutoGen.c & AutoGen.h for library.
-     *
-     * @throws BuildException
-     *             Faile to create library AutoGen.c & AutoGen.h
-     */
+      libGenAutogen function
+     
+      This function generates AutoGen.c & AutoGen.h for library.
+     
+      @throws BuildException
+                  Faile to create library AutoGen.c & AutoGen.h
+    **/
     void libGenAutogen() throws BuildException {
         try {
             libGenAutogenC();
@@ -252,13 +272,13 @@ public class AutoGen {
     }
 
     /**
-     * moduleGenAutogenH
-     *
-     * This function generates AutoGen.h for module.
-     *
-     * @throws BuildException
-     *             Failed to generate AutoGen.h.
-     */
+      moduleGenAutogenH
+     
+      This function generates AutoGen.h for module.
+     
+      @throws BuildException
+                  Failed to generate AutoGen.h.
+    **/
     void moduleGenAutogenH() throws AutoGenException {
 
         Set<String> libClassIncludeH;
@@ -271,14 +291,21 @@ public class AutoGen {
         //
         // Write Autogen.h header notation
         //
-        fileBuffer.append(CommonDefinition.autogenHNotation);
+        fileBuffer.append(CommonDefinition.AUTOGENHNOTATION);
 
         //
         // Add #ifndef ${BaseName}_AUTOGENH
         // #def ${BseeName}_AUTOGENH
         //
-        fileBuffer.append("#ifndef    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") +"\r\n");
-        fileBuffer.append("#define    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") +"\r\n\r\n");
+        fileBuffer.append(CommonDefinition.IFNDEF 
+			              + CommonDefinition.AUTOGENH
+			              + this.moduleId.getGuid().replaceAll("-", "_") 
+			              + ToolDefinitions.LINE_SEPARATOR);
+        fileBuffer.append(CommonDefinition.DEFINE 
+			              + CommonDefinition.AUTOGENH
+			              + this.moduleId.getGuid().replaceAll("-", "_") 
+			              + ToolDefinitions.LINE_SEPARATOR 
+			              + ToolDefinitions.LINE_SEPARATOR);
 
         //
         // Write the specification version and release version at the begine
@@ -293,14 +320,14 @@ public class AutoGen {
         // Add "extern int __make_me_compile_correctly;" at begin of
         // AutoGen.h.
         //
-        fileBuffer.append(CommonDefinition.autoGenHbegin);
+        fileBuffer.append(CommonDefinition.AUTOGENHBEGIN);
 
         //
         // Put EFI_SPECIFICATION_VERSION, and EDK_RELEASE_VERSION.
         //
         String[] specList = SurfaceAreaQuery.getExternSpecificaiton();
         for (int i = 0; i < specList.length; i++) {
-            fileBuffer.append(CommonDefinition.marcDefineStr + specList[i]
+            fileBuffer.append(CommonDefinition.DEFINE + specList[i]
                               + "\r\n");
         }
         //
@@ -322,7 +349,7 @@ public class AutoGen {
         // Write library class's related *.h file to autogen.h.
         //
         String[] libClassList = SurfaceAreaQuery
-                                .getLibraryClasses(CommonDefinition.AlwaysConsumed,this.arch);
+                                .getLibraryClasses(CommonDefinition.ALWAYSCONSUMED,this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -332,7 +359,7 @@ public class AutoGen {
         }
 
         libClassList = SurfaceAreaQuery
-                       .getLibraryClasses(CommonDefinition.AlwaysProduced, this.arch);
+                       .getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -347,9 +374,9 @@ public class AutoGen {
         // {DEST_DIR_DRBUG}/FlashMap.h
         //
         if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
-            fileBuffer.append(CommonDefinition.include);
+            fileBuffer.append(CommonDefinition.INCLUDE);
             fileBuffer.append("  <");
-            fileBuffer.append(CommonDefinition.tianoR8FlashMapH + ">\r\n");
+            fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\r\n");
             copyFlashMapHToDebugDir();
         }
 
@@ -374,25 +401,25 @@ public class AutoGen {
     }
 
     /**
-     * moduleGenAutogenC
-     *
-     * This function generates AutoGen.c for module.
-     *
-     * @throws BuildException
-     *             Failed to generate AutoGen.c.
-     */
+      moduleGenAutogenC
+     
+      This function generates AutoGen.c for module.
+     
+      @throws BuildException
+                  Failed to generate AutoGen.c.
+    **/
     void moduleGenAutogenC() throws AutoGenException {
 
         StringBuffer fileBuffer = new StringBuffer(8192);
         //
         // Write Autogen.c header notation
         //
-        fileBuffer.append(CommonDefinition.autogenCNotation);
+        fileBuffer.append(CommonDefinition.AUTOGENCNOTATION);
 
         //
         // Write #include <AutoGen.h> at beginning of AutoGen.c
         //
-        fileBuffer.append(CommonDefinition.includeAutogenH);
+        fileBuffer.append(CommonDefinition.INCLUDEAUTOGENH);
 
         //
         // Get the native MSA file infomation. Since before call autogen,
@@ -419,7 +446,10 @@ public class AutoGen {
         // Write EntryPoint to autgoGen.c
         //
         String[] entryPointList = SurfaceAreaQuery.getModuleEntryPointArray();
-        EntryPointToAutoGen(CommonDefinition.remDupString(entryPointList), fileBuffer);
+		String[] unloadImageList = SurfaceAreaQuery.getModuleUnloadImageArray();
+        EntryPointToAutoGen(CommonDefinition.remDupString(entryPointList), 
+			                CommonDefinition.remDupString(unloadImageList),
+			                fileBuffer);
 
         pcdDriverType = SurfaceAreaQuery.getPcdDriverType();
 
@@ -501,13 +531,13 @@ public class AutoGen {
     }
 
     /**
-     * libGenAutogenH
-     *
-     * This function generates AutoGen.h for library.
-     *
-     * @throws BuildException
-     *             Failed to generate AutoGen.c.
-     */
+      libGenAutogenH
+     
+      This function generates AutoGen.h for library.
+     
+      @throws BuildException
+                  Failed to generate AutoGen.c.
+    **/
     void libGenAutogenH() throws AutoGenException {
 
         Set<String> libClassIncludeH;
@@ -519,14 +549,21 @@ public class AutoGen {
         //
         // Write Autogen.h header notation
         //
-        fileBuffer.append(CommonDefinition.autogenHNotation);
+        fileBuffer.append(CommonDefinition.AUTOGENHNOTATION);
 
         //
         // Add #ifndef ${BaseName}_AUTOGENH
         // #def ${BseeName}_AUTOGENH
         //
-        fileBuffer.append("#ifndef    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") + "\r\n");
-        fileBuffer.append("#define    " + "_AUTOGENH_" + this.moduleId.getGuid().replaceAll("-", "_") + "\r\n\r\n");
+        fileBuffer.append(CommonDefinition.IFNDEF 
+			              + CommonDefinition.AUTOGENH
+			              + this.moduleId.getGuid().replaceAll("-", "_") 
+			              + ToolDefinitions.LINE_SEPARATOR);
+        fileBuffer.append(CommonDefinition.DEFINE 
+			              + CommonDefinition.AUTOGENH
+			              + this.moduleId.getGuid().replaceAll("-", "_") 
+			              + ToolDefinitions.LINE_SEPARATOR 
+			              + ToolDefinitions.LINE_SEPARATOR);
 
         //
         // Write EFI_SPECIFICATION_VERSION and EDK_RELEASE_VERSION
@@ -534,10 +571,10 @@ public class AutoGen {
         // Note: the specification version and release version should
         // be get from module surface area instead of hard code.
         //
-        fileBuffer.append(CommonDefinition.autoGenHbegin);
+        fileBuffer.append(CommonDefinition.AUTOGENHBEGIN);
         String[] specList = SurfaceAreaQuery.getExternSpecificaiton();
         for (int i = 0; i < specList.length; i++) {
-            fileBuffer.append(CommonDefinition.marcDefineStr + specList[i]
+            fileBuffer.append(CommonDefinition.DEFINE + specList[i]
                               + "\r\n");
         }
         // fileBuffer.append(CommonDefinition.autoGenHLine1);
@@ -558,7 +595,7 @@ public class AutoGen {
         // Write library class's related *.h file to autogen.h
         //
         String[] libClassList = SurfaceAreaQuery
-                                .getLibraryClasses(CommonDefinition.AlwaysConsumed, this.arch);
+                                .getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -568,7 +605,7 @@ public class AutoGen {
         }
 
         libClassList = SurfaceAreaQuery
-                       .getLibraryClasses(CommonDefinition.AlwaysProduced, this.arch);
+                       .getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -576,16 +613,16 @@ public class AutoGen {
                 fileBuffer.append(item.next().toString());
             }
         }
-        fileBuffer.append("\r\n");
+        fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);
 
         //
         //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to
         // {DEST_DIR_DRBUG}/FlashMap.h
         //
         if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
-            fileBuffer.append(CommonDefinition.include);
+            fileBuffer.append(CommonDefinition.INCLUDE);
             fileBuffer.append("  <");
-            fileBuffer.append(CommonDefinition.tianoR8FlashMapH + ">\r\n");
+            fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\r\n");
             copyFlashMapHToDebugDir();
         }
 
@@ -611,23 +648,23 @@ public class AutoGen {
     }
 
     /**
-     * libGenAutogenC
-     *
-     * This function generates AutoGen.h for library.
-     *
-     * @throws BuildException
-     *             Failed to generate AutoGen.c.
-     */
+      libGenAutogenC
+     
+      This function generates AutoGen.h for library.
+     
+      @throws BuildException
+                  Failed to generate AutoGen.c.
+    **/
     void libGenAutogenC() throws BuildException, PcdAutogenException {
         StringBuffer fileBuffer = new StringBuffer(10240);
 
         //
         // Write Autogen.c header notation
         //
-        fileBuffer.append(CommonDefinition.autogenCNotation);
+        fileBuffer.append(CommonDefinition.AUTOGENCNOTATION);
 
-        fileBuffer.append(CommonDefinition.autoGenCLine1);
-        fileBuffer.append("\r\n");
+        fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);
+        fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);
 
         //
         // Call pcd autogen.
@@ -644,7 +681,7 @@ public class AutoGen {
         }
 
         if (this.myPcdAutogen != null) {
-            fileBuffer.append("\r\n");
+            fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);
             fileBuffer.append(this.myPcdAutogen.getCAutoGenString());
         }
 
@@ -654,20 +691,20 @@ public class AutoGen {
     }
 
     /**
-     * LibraryClassToAutogenH
-     *
-     * This function returns *.h files declared by library classes which are
-     * consumed or produced by current build module or library.
-     *
-     * @param libClassList
-     *            List of library class which consumed or produce by current
-     *            build module or library.
-     * @return includeStrList List of *.h file.
-     */
+      LibraryClassToAutogenH
+     
+      This function returns *.h files declared by library classes which are
+      consumed or produced by current build module or library.
+     
+      @param libClassList
+                 List of library class which consumed or produce by current
+                 build module or library.
+      @return includeStrList List of *.h file.
+    **/
     Set<String> LibraryClassToAutogenH(String[] libClassList)
     throws AutoGenException {
-        Set<String> includStrList = new LinkedHashSet<String>();
-        String includerName[];
+        Set<String> includeStrList = new LinkedHashSet<String>();
+        String includeName[];
         String str = "";
 
         //
@@ -675,37 +712,37 @@ public class AutoGen {
         // library class name.
         //
         for (int i = 0; i < libClassList.length; i++) {
-            includerName = GlobalData.getLibraryClassHeaderFiles(
+            includeName = GlobalData.getLibraryClassHeaderFiles(
                                                                 SurfaceAreaQuery.getDependencePkg(this.arch),
                                                                 libClassList[i]);
-            if (includerName == null) {
+            if (includeName == null) {
                 throw new AutoGenException("Can not find library class ["
                                            + libClassList[i] + "] declaration in any SPD package. ");
             }
-            for (int j = 0; j < includerName.length; j++) {
-                String includeNameStr = includerName[j];
+            for (int j = 0; j < includeName.length; j++) {
+                String includeNameStr = includeName[j];
                 if (includeNameStr != null) {
-                    str = CommonDefinition.include + " " + "<";
+                    str = CommonDefinition.INCLUDE + " " + "<";
                     str = str + includeNameStr + ">\r\n";
-                    includStrList.add(str);
+                    includeStrList.add(str);
                     includeNameStr = null;
                 }
             }
         }
-        return includStrList;
+        return includeStrList;
     }
 
     /**
-     * IncludesToAutogenH
-     *
-     * This function add include file in AutoGen.h file.
-     *
-     * @param packageNameList
-     *            List of module depended package.
-     * @param moduleType
-     *            Module type.
-     * @return
-     */
+      IncludesToAutogenH
+     
+      This function add include file in AutoGen.h file.
+     
+      @param packageNameList
+                 List of module depended package.
+      @param moduleType
+                 Module type.
+      @return
+    **/
     List<String> depPkgToAutogenH(PackageIdentification[] packageNameList,
                                   String moduleType) throws AutoGenException {
 
@@ -724,7 +761,7 @@ public class AutoGen {
                                            + packageNameList[i]
                                            + "] declaration in any SPD package. ");
             } else if (!pkgHeader.equalsIgnoreCase("")) {
-                includeStr = CommonDefinition.include + " <" + pkgHeader
+                includeStr = CommonDefinition.INCLUDE + " <" + pkgHeader
                              + ">\r\n";
                 includeStrList.add(includeStr);
             }
@@ -734,21 +771,23 @@ public class AutoGen {
     }
 
     /**
-     * EntryPointToAutoGen
-     *
-     * This function convert <ModuleEntryPoint> & <ModuleUnloadImage>
-     * information in mas to AutoGen.c
-     *
-     * @param entryPointList
-     *            List of entry point.
-     * @param fileBuffer
-     *            String buffer fo AutoGen.c.
-     * @throws Exception
-     */
-    void EntryPointToAutoGen(String[] entryPointList, StringBuffer fileBuffer)
+      EntryPointToAutoGen
+     
+      This function convert <ModuleEntryPoint> & <ModuleUnloadImage>
+      information in mas to AutoGen.c
+     
+      @param entryPointList
+                 List of entry point.
+      @param fileBuffer
+                 String buffer fo AutoGen.c.
+      @throws Exception
+    **/
+    void EntryPointToAutoGen(String[] entryPointList, String[] unloadImageList, StringBuffer fileBuffer)
     throws BuildException {
 
         String typeStr = SurfaceAreaQuery.getModuleType();
+		int unloadImageCount = 0;
+        int entryPointCount  = 0;
 
         //
         // The parameters and return value of entryPoint is difference
@@ -815,7 +854,7 @@ public class AutoGen {
             break;
 
         case CommonDefinition.ModuleTypePeim:
-            int entryPointCount = 0;
+            entryPointCount = 0;
             fileBuffer
             .append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT32 _gPeimRevision = 0;\r\n");
             if (entryPointList == null || entryPointList.length == 0) {
@@ -960,26 +999,27 @@ public class AutoGen {
             //
             // Add "ModuleUnloadImage" for DxeSmmDriver module type;
             //
-            entryPointList = SurfaceAreaQuery.getModuleUnloadImageArray();
-            entryPointList = CommonDefinition.remDupString(entryPointList);
-            entryPointCount = 0;
+            //entryPointList = SurfaceAreaQuery.getModuleUnloadImageArray();
+            //entryPointList = CommonDefinition.remDupString(entryPointList);
+            //entryPointCount = 0;
 
-            if (entryPointList != null) {
-                for (int i = 0; i < entryPointList.length; i++) {
+			unloadImageCount = 0;
+            if (unloadImageList != null) {
+                for (int i = 0; i < unloadImageList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
                     fileBuffer.append("EFIAPI\r\n");
-                    fileBuffer.append(entryPointList[i]);
+                    fileBuffer.append(unloadImageList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer
                     .append("  IN EFI_HANDLE        ImageHandle\r\n");
                     fileBuffer.append("  );\r\n");
-                    entryPointCount++;
+                    unloadImageCount++;
                 }
             }
 
             fileBuffer
             .append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverUnloadImageCount = ");
-            fileBuffer.append(Integer.toString(entryPointCount));
+            fileBuffer.append(Integer.toString(unloadImageCount));
             fileBuffer.append(";\r\n\r\n");
 
             fileBuffer.append("EFI_STATUS\r\n");
@@ -989,28 +1029,28 @@ public class AutoGen {
             fileBuffer.append("  )\r\n");
             fileBuffer.append("{\r\n");
 
-            if (entryPointCount == 0) {
+            if (unloadImageCount == 0) {
                 fileBuffer.append("  return EFI_SUCCESS;\r\n");
-            } else if (entryPointCount == 1) {
+            } else if (unloadImageCount == 1) {
                 fileBuffer.append("  return ");
-                fileBuffer.append(entryPointList[0]);
+                fileBuffer.append(unloadImageList[0]);
                 fileBuffer.append("(ImageHandle);\r\n");
             } else {
                 fileBuffer.append("  EFI_STATUS  Status;\r\n\r\n");
                 fileBuffer.append("  Status = EFI_SUCCESS;\r\n\r\n");
-                for (int i = 0; i < entryPointList.length; i++) {
+                for (int i = 0; i < unloadImageList.length; i++) {
                     if (i == 0) {
                         fileBuffer.append("     Status = ");
-                        fileBuffer.append(entryPointList[i]);
+                        fileBuffer.append(unloadImageList[i]);
                         fileBuffer.append("(ImageHandle);\r\n");
                     } else {
                         fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
                         fileBuffer.append("    ");
-                        fileBuffer.append(entryPointList[i]);
+                        fileBuffer.append(unloadImageList[i]);
                         fileBuffer.append("(ImageHandle);\r\n");
                         fileBuffer.append("  } else {\r\n");
                         fileBuffer.append("    Status = ");
-                        fileBuffer.append(entryPointList[i]);
+                        fileBuffer.append(unloadImageList[i]);
                         fileBuffer.append("(ImageHandle);\r\n");
                         fileBuffer.append("  }\r\n");
                     }
@@ -1126,28 +1166,29 @@ public class AutoGen {
             //
             // Add ModuleUnloadImage for DxeDriver and UefiDriver module type.
             //
-            entryPointList = SurfaceAreaQuery.getModuleUnloadImageArray();
+            //entryPointList = SurfaceAreaQuery.getModuleUnloadImageArray();
             //
             // Remover duplicate unload entry point.
             //
-            entryPointList = CommonDefinition.remDupString(entryPointList);
-            entryPointCount = 0;
-            if (entryPointList != null) {
-                for (int i = 0; i < entryPointList.length; i++) {
+            //entryPointList = CommonDefinition.remDupString(entryPointList);
+            //entryPointCount = 0;
+			unloadImageCount = 0;
+            if (unloadImageList != null) {
+                for (int i = 0; i < unloadImageList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
                     fileBuffer.append("EFIAPI\r\n");
-                    fileBuffer.append(entryPointList[i]);
+                    fileBuffer.append(unloadImageList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer
                     .append("  IN EFI_HANDLE        ImageHandle\r\n");
                     fileBuffer.append("  );\r\n");
-                    entryPointCount++;
+                    unloadImageCount++;
                 }
             }
 
             fileBuffer
             .append("GLOBAL_REMOVE_IF_UNREFERENCED const UINT8  _gDriverUnloadImageCount = ");
-            fileBuffer.append(Integer.toString(entryPointCount));
+            fileBuffer.append(Integer.toString(unloadImageCount));
             fileBuffer.append(";\r\n\r\n");
 
             fileBuffer.append("EFI_STATUS\n");
@@ -1157,28 +1198,28 @@ public class AutoGen {
             fileBuffer.append("  )\r\n");
             fileBuffer.append("{\r\n");
 
-            if (entryPointCount == 0) {
+            if (unloadImageCount == 0) {
                 fileBuffer.append("  return EFI_SUCCESS;\r\n");
-            } else if (entryPointCount == 1) {
+            } else if (unloadImageCount == 1) {
                 fileBuffer.append("  return ");
-                fileBuffer.append(entryPointList[0]);
+                fileBuffer.append(unloadImageList[0]);
                 fileBuffer.append("(ImageHandle);\r\n");
             } else {
                 fileBuffer.append("  EFI_STATUS  Status;\r\n\r\n");
                 fileBuffer.append("  Status = EFI_SUCCESS;\r\n\r\n");
-                for (int i = 0; i < entryPointList.length; i++) {
+                for (int i = 0; i < unloadImageList.length; i++) {
                     if (i == 0) {
                         fileBuffer.append("  Status = ");
-                        fileBuffer.append(entryPointList[i]);
+                        fileBuffer.append(unloadImageList[i]);
                         fileBuffer.append("(ImageHandle);\r\n");
                     } else {
                         fileBuffer.append("  if (EFI_ERROR (Status)) {\r\n");
                         fileBuffer.append("    ");
-                        fileBuffer.append(entryPointList[i]);
+                        fileBuffer.append(unloadImageList[i]);
                         fileBuffer.append("(ImageHandle);\r\n");
                         fileBuffer.append("  } else {\r\n");
                         fileBuffer.append("    Status = ");
-                        fileBuffer.append(entryPointList[i]);
+                        fileBuffer.append(unloadImageList[i]);
                         fileBuffer.append("(ImageHandle);\r\n");
                         fileBuffer.append("  }\r\n");
                     }
@@ -1191,16 +1232,16 @@ public class AutoGen {
     }
 
     /**
-     * PpiGuidToAutogenc
-     *
-     * This function gets GUIDs from SPD file accrodeing to <PPIs> information
-     * and write those GUIDs to AutoGen.c.
-     *
-     * @param fileBuffer
-     *            String Buffer for Autogen.c file.
-     * @throws BuildException
-     *             Guid must set value!
-     */
+      PpiGuidToAutogenc
+     
+      This function gets GUIDs from SPD file accrodeing to <PPIs> information
+      and write those GUIDs to AutoGen.c.
+     
+      @param fileBuffer
+                 String Buffer for Autogen.c file.
+      @throws BuildException
+                  Guid must set value!
+    **/
     void PpiGuidToAutogenC(StringBuffer fileBuffer) throws AutoGenException {
         String[] cNameGuid = null;
 
@@ -1245,16 +1286,16 @@ public class AutoGen {
     }
 
     /**
-     * ProtocolGuidToAutogenc
-     *
-     * This function gets GUIDs from SPD file accrodeing to <Protocol>
-     * information and write those GUIDs to AutoGen.c.
-     *
-     * @param fileBuffer
-     *            String Buffer for Autogen.c file.
-     * @throws BuildException
-     *             Protocol name must set.
-     */
+      ProtocolGuidToAutogenc
+     
+      This function gets GUIDs from SPD file accrodeing to <Protocol>
+      information and write those GUIDs to AutoGen.c.
+     
+      @param fileBuffer
+                 String Buffer for Autogen.c file.
+      @throws BuildException
+                  Protocol name must set.
+    **/
     void ProtocolGuidToAutogenC(StringBuffer fileBuffer) throws BuildException {
         String[] cNameGuid = null;
 
@@ -1302,15 +1343,15 @@ public class AutoGen {
     }
 
     /**
-     * GuidGuidToAutogenc
-     *
-     * This function gets GUIDs from SPD file accrodeing to <Guids> information
-     * and write those GUIDs to AutoGen.c.
-     *
-     * @param fileBuffer
-     *            String Buffer for Autogen.c file.
-     *
-     */
+      GuidGuidToAutogenc
+     
+      This function gets GUIDs from SPD file accrodeing to <Guids> information
+      and write those GUIDs to AutoGen.c.
+     
+      @param fileBuffer
+                 String Buffer for Autogen.c file.
+     
+    **/
     void GuidGuidToAutogenC(StringBuffer fileBuffer) throws AutoGenException {
         String[] cNameGuid = null;
         String guidKeyWord = null;
@@ -1346,16 +1387,16 @@ public class AutoGen {
     }
 
     /**
-     * LibInstanceToAutogenC
-     *
-     * This function adds dependent library instance to autogen.c,which
-     * includeing library's constructor, destructor, and library dependent ppi,
-     * protocol, guid, pcd information.
-     *
-     * @param fileBuffer
-     *            String buffer for AutoGen.c
-     * @throws BuildException
-     */
+      LibInstanceToAutogenC
+     
+      This function adds dependent library instance to autogen.c,which
+      includeing library's constructor, destructor, and library dependent ppi,
+      protocol, guid, pcd information.
+     
+      @param fileBuffer
+                 String buffer for AutoGen.c
+      @throws BuildException
+    **/
     void LibInstanceToAutogenC(StringBuffer fileBuffer) throws BuildException {
         try {
             String moduleType = this.moduleId.getModuleType();
@@ -1374,19 +1415,19 @@ public class AutoGen {
     }
 
     /**
-     * LibConstructorToAutogenc
-     *
-     * This function writes library constructor list to AutoGen.c. The library
-     * constructor's parameter and return value depend on module type.
-     *
-     * @param libInstanceList
-     *            List of library construct name.
-     * @param moduleType
-     *            Module type.
-     * @param fileBuffer
-     *            String buffer for AutoGen.c
-     * @throws Exception
-     */
+      LibConstructorToAutogenc
+     
+      This function writes library constructor list to AutoGen.c. The library
+      constructor's parameter and return value depend on module type.
+     
+      @param libInstanceList
+                 List of library construct name.
+      @param moduleType
+                 Module type.
+      @param fileBuffer
+                 String buffer for AutoGen.c
+      @throws Exception
+    **/
     void LibConstructorToAutogenC(List<String> libInstanceList,
                                   String moduleType, StringBuffer fileBuffer) throws Exception {
         boolean isFirst = true;
@@ -1515,19 +1556,19 @@ public class AutoGen {
     }
 
     /**
-     * LibDestructorToAutogenc
-     *
-     * This function writes library destructor list to AutoGen.c. The library
-     * destructor's parameter and return value depend on module type.
-     *
-     * @param libInstanceList
-     *            List of library destructor name.
-     * @param moduleType
-     *            Module type.
-     * @param fileBuffer
-     *            String buffer for AutoGen.c
-     * @throws Exception
-     */
+      LibDestructorToAutogenc
+     
+      This function writes library destructor list to AutoGen.c. The library
+      destructor's parameter and return value depend on module type.
+     
+      @param libInstanceList
+                 List of library destructor name.
+      @param moduleType
+                 Module type.
+      @param fileBuffer
+                 String buffer for AutoGen.c
+      @throws Exception
+    **/
     void LibDestructorToAutogenC(List<String> libInstanceList,
                                  String moduleType, StringBuffer fileBuffer) throws Exception {
         boolean isFirst = true;
@@ -1615,14 +1656,14 @@ public class AutoGen {
     }
 
     /**
-     * ExternsDriverBindingToAutoGenC
-     *
-     * This function is to write DRIVER_BINDING, COMPONENT_NAME,
-     * DRIVER_CONFIGURATION, DRIVER_DIAGNOSTIC in AutoGen.c.
-     *
-     * @param fileBuffer
-     *            String buffer for AutoGen.c
-     */
+      ExternsDriverBindingToAutoGenC
+     
+      This function is to write DRIVER_BINDING, COMPONENT_NAME,
+      DRIVER_CONFIGURATION, DRIVER_DIAGNOSTIC in AutoGen.c.
+     
+      @param fileBuffer
+                 String buffer for AutoGen.c
+    **/
     void ExternsDriverBindingToAutoGenC(StringBuffer fileBuffer)
     throws BuildException {
 
@@ -1769,15 +1810,15 @@ public class AutoGen {
     }
 
     /**
-     * ExternCallBackToAutoGenC
-     *
-     * This function adds <SetVirtualAddressMapCallBack> and
-     * <ExitBootServicesCallBack> infomation to AutoGen.c
-     *
-     * @param fileBuffer
-     *            String buffer for AutoGen.c
-     * @throws BuildException
-     */
+      ExternCallBackToAutoGenC
+     
+      This function adds <SetVirtualAddressMapCallBack> and
+      <ExitBootServicesCallBack> infomation to AutoGen.c
+     
+      @param fileBuffer
+                 String buffer for AutoGen.c
+      @throws BuildException
+    **/
     void ExternCallBackToAutoGenC(StringBuffer fileBuffer)
     throws BuildException {
         //
@@ -1973,12 +2014,21 @@ public class AutoGen {
 
     }
 
+    /**
+      copyFlashMapHToDebugDir
+      
+      This function is to copy the falshmap.h to debug directory and change 
+      its name to TianoR8FlashMap.h
+      
+      @param 
+      @return
+    **/
     private void copyFlashMapHToDebugDir() throws  AutoGenException{
 
-        File inFile = new File(fvDir + File.separatorChar + CommonDefinition.flashMapH);
+        File inFile = new File(fvDir + File.separatorChar + CommonDefinition.FLASHMAPH);
         int size = (int)inFile.length();
         byte[] buffer = new byte[size];
-        File outFile = new File (this.outputPath + File.separatorChar + CommonDefinition.tianoR8FlashMapH);
+        File outFile = new File (this.outputPath + File.separatorChar + CommonDefinition.TIANOR8PLASHMAPH);
         //
         //  If TianoR8FlashMap.h existed and the flashMap.h don't change,
         //  do nothing.
@@ -2002,11 +2052,13 @@ public class AutoGen {
     }
 
     /**
-    *This function first order the library instances, then collect
-    *library instance 's PPI, Protocol, GUID,
-    *SetVirtalAddressMapCallBack, ExitBootServiceCallBack, and
-    *Destructor, Constructor.
-    *
+      This function first order the library instances, then collect
+      library instance 's PPI, Protocol, GUID,
+      SetVirtalAddressMapCallBack, ExitBootServiceCallBack, and
+      Destructor, Constructor.
+      
+      @param
+      @return    
     **/
     private void collectLibInstanceInfo(){
         int index;

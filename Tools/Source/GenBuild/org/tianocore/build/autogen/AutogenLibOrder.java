@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
-
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
@@ -75,7 +74,7 @@ public class AutogenLibOrder {
             // libInstanceMap.
             //
             libClassConsmList = SurfaceAreaQuery
-                    .getLibraryClasses(CommonDefinition.AlwaysConsumed, arch);
+                    .getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch);
             if (libClassConsmList != null) {
                 String[] classStr = new String[libClassConsmList.length];
                 for (int k = 0; k < libClassConsmList.length; k++) {
@@ -94,7 +93,7 @@ public class AutogenLibOrder {
             // Add library class and library instance map.
             //
             libClassDeclList = SurfaceAreaQuery
-                    .getLibraryClasses(CommonDefinition.AlwaysProduced, arch);
+                    .getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch);
             if (libClassDeclList != null) {
                 for (int j = 0; j < libClassDeclList.length; j++) {
                     if (this.libClassMap.containsKey(libClassDeclList[j])) {
@@ -114,12 +113,12 @@ public class AutogenLibOrder {
         //
         // Check is the library instance list meet the require;
         //
-        for (int s = 0; s < this.libInstanceList.size(); s++) {
-            String[] libClass = this.libInstanceMap.get(this.libInstanceList
-                    .get(s));
-            if (libClass != null) {
-                for (int t = 0; t < libClass.length; t++) {
-                    if (this.libClassMap.get(libClass[t]) == null) {
+        //for (int s = 0; s < this.libInstanceList.size(); s++) {
+        //    String[] libClass = this.libInstanceMap.get(this.libInstanceList
+        //            .get(s));
+        //    if (libClass != null) {
+        //        for (int t = 0; t < libClass.length; t++) {
+        //            if (this.libClassMap.get(libClass[t]) == null) {
                         //
                         // Note: There exist a kind of module which depend on 
                         // library class with no instance or whose instance will
@@ -130,10 +129,10 @@ public class AutogenLibOrder {
                         // will be a warnig message given here after a standard 
                         // log way has been decided.
                         //
-                    }
-                }
-            }
-        }
+        //           }
+        //       }
+        //   }
+        //}
     }
 
     /**
