@@ -45,7 +45,6 @@ public class MakeDeps extends Task {
     // private members, use set/get to access them
     //
     private static final String cmdName = "MakeDeps";
-    private String              includePath = null;
     private String              depsFile = null;
     private String              subDir = null;
     private boolean             quietMode = true;
@@ -84,12 +83,12 @@ public class MakeDeps extends Task {
         /// compose full tool path
         ///
         if (toolPath == null || toolPath.length() == 0) {
-            toolPath = "./" + cmdName;
+            toolPath = cmdName;
         } else {
             if (toolPath.endsWith("/") || toolPath.endsWith("\\")) {
                 toolPath = toolPath + cmdName;
             } else {
-                toolPath = toolPath + "/" + cmdName;
+                toolPath = toolPath + File.separator + cmdName;
             }
         }
 
@@ -98,10 +97,10 @@ public class MakeDeps extends Task {
         ///
         StringBuffer args = new StringBuffer(4096);
         if (ignoreError) {
-            args.append(" -ignorenotfound");
+            args.append(" -ignorenotfound ");
         }
         if (quietMode) {
-            args.append(" -q");
+            args.append(" -q ");
         }
         if (subDir != null && subDir.length() > 0) {
             args.append(" -s ");
@@ -118,43 +117,20 @@ public class MakeDeps extends Task {
         ///
         /// compose source file arguments
         ///
-        Iterator iterator = inputFileList.iterator();
-        while (iterator.hasNext()) {
-            Input inputFile = (Input)iterator.next();
-            String inputFileString = cleanupPathName(inputFile.getFile());
-            args.append(" -f ");
-            args.append(inputFileString);
+        for (int i = 0, listLength = inputFileList.size(); i < listLength; ++i) {
+            args.append(inputFileList.get(i).toString());
         }
 
-        ///
-        /// compose search pathes argument
-        ///
-        StringBuffer includePathArg = new StringBuffer(4096);
-        if (includePath != null && includePath.length() > 0) {
-            StringTokenizer pathTokens = new StringTokenizer(includePath, ";");
-            while (pathTokens.hasMoreTokens()) {
-                String tmpPath = pathTokens.nextToken().trim();
-                if (tmpPath.length() == 0) {
-                    continue;
-                }
-
-                includePathArg.append(" -i ");
-                includePathArg.append(cleanupPathName(tmpPath));
-            }
+        for (int i = 0, listLength = includePathList.size(); i < listLength; ++i) {
+            args.append(includePathList.get(i).toString());
         }
-        iterator = includePathList.iterator();
-        while (iterator.hasNext()) {
-            IncludePath path = (IncludePath)iterator.next();
-            includePathArg.append(cleanupPathName(path.getPath()));
-        }
-        args.append(includePathArg);
 
         ///
         /// We don't need a real target. So just a "dummy" is given
         ///
         args.append(" -target dummy");
         args.append(" -o ");
-        args.append(cleanupPathName(depsFile));
+        args.append(depsFile);
 
         ///
         /// prepare to execute the tool
@@ -180,7 +156,7 @@ public class MakeDeps extends Task {
 
         if (result != 0) {
             EdkLog.log(EdkLog.EDK_INFO, "MakeDeps failed!");
-            return;
+            throw new BuildException("MakeDeps: failed to generate dependency file!");
         }
     }
 
@@ -255,7 +231,7 @@ public class MakeDeps extends Task {
      @param     dir     The name of sub-directory in which source files will be scanned
      **/
     public void setSubDir(String dir) {
-        subDir = dir;
+        subDir = cleanupPathName(dir);
     }
 
     /**
@@ -268,30 +244,12 @@ public class MakeDeps extends Task {
     }
 
     /**
-     Set method for "IncludePath" attribute
-
-     @param     path    The name of include path
-     **/
-    public void setIncludePath(String path) {
-        includePath = cleanupPathName(path);
-    }
-
-    /**
-     Get method for "IncludePath" attribute
-
-     @returns   The name of include path
-     **/
-    public String getIncludePath() {
-        return includePath;
-    }
-
-    /**
      Set method for "ExtraDeps" attribute
 
      @param     deps    The name of dependency file specified separately
      **/
     public void setExtraDeps(String deps) {
-        extraDeps = deps;
+        extraDeps = cleanupPathName(deps);
     }
 
     /**
@@ -333,26 +291,29 @@ public class MakeDeps extends Task {
             return false;
         }
 
-        ///
-        /// If the source file(s) is newer than dependency list file, we need to
-        /// re-generate the dependency list file
-        ///
+        //
+        // If the source file(s) is newer than dependency list file, we need to
+        // re-generate the dependency list file
+        //
         long depsFileTimeStamp = df.lastModified();
-        Iterator iterator = inputFileList.iterator();
+        Iterator<Input> iterator = (Iterator<Input>)inputFileList.iterator();
         while (iterator.hasNext()) {
-            Input inputFile = (Input)iterator.next();
-            File sf = new File(inputFile.getFile());
-            if (sf.lastModified() > depsFileTimeStamp) {
-                return false;
+            Input inputFile = iterator.next();
+            List<String> fileList = inputFile.getNameList();
+            for (int i = 0, length = fileList.size(); i < length; ++i) {
+                File sf = new File(fileList.get(i));
+                if (sf.lastModified() > depsFileTimeStamp) {
+                    return false;
+                }
             }
         }
 
-        ///
-        /// If the source files haven't been changed since last time the dependency
-        /// list file was generated, we need to check each file in the file list to
-        /// see if any of them is changed or not. If anyone of them is newer than
-        /// the dependency list file, MakeDeps.exe is needed to run again.
-        ///
+        //
+        // If the source files haven't been changed since last time the dependency
+        // list file was generated, we need to check each file in the file list to
+        // see if any of them is changed or not. If anyone of them is newer than
+        // the dependency list file, MakeDeps.exe is needed to run again.
+        //
         LineNumberReader    lineReader = null;
         FileReader          fileReader = null;
         boolean             ret = true;

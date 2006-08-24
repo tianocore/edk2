@@ -137,7 +137,7 @@ public class EfiRomTask extends Task implements EfiDefine {
             argList.add("-b");
             Iterator binList = this.binaryFileList.iterator();
             while (binList.hasNext()){
-                argList.add(((Input)binList.next()).getFile());
+                argList.addAll(((Input)binList.next()).getNameList());
             }
         }
 
@@ -148,7 +148,7 @@ public class EfiRomTask extends Task implements EfiDefine {
             argList.add("-e");
             Iterator pe32List = this.pe32FileList.iterator();
             while (pe32List.hasNext()){
-                argList.add(((Input)pe32List.next()).getFile());
+                argList.addAll(((Input)pe32List.next()).getNameList());
             }
         }
 
@@ -159,7 +159,7 @@ public class EfiRomTask extends Task implements EfiDefine {
             argList.add("-ec");
             Iterator pe32ComprList = this.pe32ComprFileList.iterator();
             while (pe32ComprList.hasNext()){
-                argList.add(((Input)pe32ComprList.next()).getFile());
+                argList.addAll(((Input)pe32ComprList.next()).getNameList());
             }
         }
 

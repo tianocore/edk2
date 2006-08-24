@@ -31,7 +31,7 @@ public class Tool implements EfiDefine, Section {
     String toolName     = "";
     List<Object>   toolArgList  = new ArrayList<Object>();
     String outputPath;
-    String outPutFileName ;
+    File outputFile ;
     List<Input>    inputFiles = new ArrayList<Input>();
 
     /**
@@ -40,9 +40,6 @@ public class Tool implements EfiDefine, Section {
      @param     buffer  The buffer to put the result with alignment
      **/
     public void toBuffer (DataOutputStream buffer){
-        File           OutputFile;
-        byte           data;
-
         ///
         /// call extern tool
         ///
@@ -55,25 +52,25 @@ public class Tool implements EfiDefine, Section {
         ///
         /// check if file exist
         ///
-        OutputFile = new File (this.outPutFileName);
-        long fileLen = OutputFile.length();
-        if (!OutputFile.exists()) {
-            throw new BuildException("The file " + outPutFileName + " does not exist!\n");
+        //File OutputFile = new File (this.outPutFileName);
+        if (!outputFile.exists()) {
+            throw new BuildException("The file " + outputFile.getPath() + " does not exist!\n");
         }
 
         ///
         /// Read output file and write it's cotains to buffer
         ///
+        FileInputStream fs = null;
+        DataInputStream in = null;
         try {
-            FileInputStream fs  = new FileInputStream (this.outPutFileName);
-            DataInputStream In  = new DataInputStream (fs);
+            fs  = new FileInputStream (outputFile);
+            in  = new DataInputStream (fs);
 
-            int i = 0;
-            while (i < fileLen) {
-                data = In.readByte();
-                buffer.writeByte(data);
-                i ++;
-            }
+
+            int fileLen = (int)outputFile.length();
+            byte[] data  = new byte[fileLen];
+            in.read(data);
+            buffer.write(data, 0, fileLen);
 
             ///
             /// 4 byte alignment
@@ -82,11 +79,20 @@ public class Tool implements EfiDefine, Section {
                 fileLen++;
                 buffer.writeByte(0);
             }
-            In.close();
-
         } catch (Exception e) {
             System.out.print(e.getMessage());
             throw new BuildException("Tool call, toBuffer failed!\n");
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (fs != null) {
+                    fs.close();
+                }
+            } catch (Exception e) {
+                System.out.println("WARNING: Cannot close " + outputFile.getPath());
+            }
         }
     }
 
@@ -114,16 +120,15 @@ public class Tool implements EfiDefine, Section {
         ///
         /// input files for tools
         ///
-        argument = argument + "-i ";
+        argument += " -i ";
         while (inputIter.hasNext()) {
             file = (Input)inputIter.next();
-            argument = argument + file.getFile() + " ";
+            argument += file.toString(" ");
         }
 
-        outPutFileName = outputPath + File.separatorChar + (new File(file.getFile())).getName() + ".crc";
-        argument       = argument + " -o " + outPutFileName; 
-
         try {
+            outputFile = File.createTempFile("temp", ".crc", new File(outputPath));
+            argument   = argument + " -o " + outputFile.getPath();
 
             ///
             /// execute command line
