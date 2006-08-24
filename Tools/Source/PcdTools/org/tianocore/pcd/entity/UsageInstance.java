@@ -368,8 +368,14 @@ public class UsageInstance {
                 // Example autogen string for following generation:
                 // "#define _PCD_SET_MODE_8_PcdSampleToken(SizeOfBuffer, Buffer) CopyMem (_gPcd_BinaryPatch_PcdSampleToken, (Buffer), (SizeOfBuffer))"
                 // 
-                hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(SizeOfBuffer, Buffer) CopyMem (_gPcd_BinaryPatch_%s, (Buffer), (SizeOfBuffer))\r\n",
+                hAutogenStr += String.format("#define _PCD_PATCHABLE_%s_SIZE %d\r\n",
+                                             parentToken.cName,
+                                             parentToken.datumSize);
+                hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(SizeOfBuffer, Buffer) "+
+                                             "LibPatchPcdSetPtr (_gPcd_BinaryPatch_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, "+
+                                             "(SizeOfBuffer), (Buffer))\r\n",
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                             parentToken.cName,
                                              parentToken.cName,
                                              parentToken.cName);
             } else {
@@ -396,8 +402,9 @@ public class UsageInstance {
                     // Example autogen string for following generation:
                     // "GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_PcdSampleToken[] = _PCD_VALUE_PcdSampleToken;"
                     // 
-                    cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_%s[] = _PCD_VALUE_%s;\r\n",
+                    cAutogenStr += String.format("GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_%s[%d] = _PCD_VALUE_%s;\r\n",
                                                  parentToken.cName,
+                                                 parentToken.datumSize,
                                                  parentToken.cName);
                 } else {
                     //
