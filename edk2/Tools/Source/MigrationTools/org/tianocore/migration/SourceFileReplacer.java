@@ -44,9 +44,12 @@ public final class SourceFileReplacer {
 		
 		String outname = null;
 		String inname = null;
+		/*
 		if (ModuleInfo.ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
 			showdetails = true;
 		}
+		*/
+		showdetails = true;			// set this as default now, may be changed in the future
 		
 		Iterator<String> di = mi.localmodulesources.iterator();
 		while (di.hasNext()) {

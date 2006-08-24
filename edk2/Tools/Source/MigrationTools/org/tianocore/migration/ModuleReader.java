@@ -35,7 +35,11 @@ public final class ModuleReader {
 			ModuleInfo.ui.println("No INF nor MSA file found!");
 			System.exit(0);
 		} else {
-			filename = ModuleInfo.ui.choose("Found .inf or .msa file for module\n" + mi.modulepath + "\nChoose one Please", mi.msaorinf.toArray());
+			if (mi.msaorinf.size() == 1) {
+				filename = (String)mi.msaorinf.toArray()[0];
+			} else {
+				filename = ModuleInfo.ui.choose("Found .inf or .msa file for module\n" + mi.modulepath + "\nChoose one Please", mi.msaorinf.toArray());
+			}
 		}
 		if (filename.contains(".inf")) {
 			readInf(filename);
