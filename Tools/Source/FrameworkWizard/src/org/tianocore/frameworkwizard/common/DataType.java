@@ -248,4 +248,31 @@ public class DataType {
     public static final String TRUE = "True";
     
     public static final String FALSE = "False";
+    
+    //
+    // The Sting for USAGE type
+    //
+    public final static String USAGE_TYPE_ALWAYS_CONSUMED = "ALWAYS_CONSUMED";
+    
+    public final static String USAGE_TYPE_SOMETIMES_CONSUMED = "SOMETIMES_CONSUMED";
+    
+    public final static String USAGE_TYPE_ALWAYS_PRODUCED = "ALWAYS_PRODUCED";
+    
+    public final static String USAGE_TYPE_SOMETIMES_PRODUCED = "SOMETIMES_PRODUCED";
+    
+    public final static String USAGE_TYPE_PRIVATE = "PRIVATE";
+    
+    //
+    // The String for PPI type
+    //
+    public final static String PPI_TYPE_PPI = "Ppi";
+    
+    public final static String PPI_TYPE_PPI_NOTIFY = "Ppi Notify";
+    
+    //
+    // The String for Protocol type
+    //
+    public final static String PROTOCOL_TYPE_PROTOCOL = "Protocol";
+    
+    public final static String PROTOCOL_TYPE_PROTOCOL_NOTIFY = "Protocol Notify";
 }

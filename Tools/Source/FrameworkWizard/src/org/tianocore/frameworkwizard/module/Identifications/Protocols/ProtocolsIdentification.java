@@ -17,6 +17,9 @@ package org.tianocore.frameworkwizard.module.Identifications.Protocols;
 
 import java.util.Vector;
 
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
+
 public class ProtocolsIdentification {
 
     //
@@ -33,6 +36,10 @@ public class ProtocolsIdentification {
     private String featureFlag = null;
     
     private String help = null;
+    
+    private ModuleIdentification belongModule = null;
+    
+    private PackageIdentification declaredBy = null;
 
     public ProtocolsIdentification(String arg0, String arg1, String arg2, String arg3, Vector<String> arg4, String arg5) {
         this.name = (arg0 == null ? "" : arg0);
@@ -96,5 +103,21 @@ public class ProtocolsIdentification {
 
     public void setHelp(String help) {
         this.help = help;
+    }
+    
+    public ModuleIdentification getBelongModule() {
+        return belongModule;
+    }
+
+    public void setBelongModule(ModuleIdentification belongModule) {
+        this.belongModule = belongModule;
+    }
+    
+    public PackageIdentification getDeclaredBy() {
+        return declaredBy;
+    }
+
+    public void setDeclaredBy(PackageIdentification declaredBy) {
+        this.declaredBy = declaredBy;
     }
 }

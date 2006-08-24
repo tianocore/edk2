@@ -17,6 +17,9 @@ package org.tianocore.frameworkwizard.module.Identifications.Guids;
 
 import java.util.Vector;
 
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
+
 public class GuidsIdentification {
 
     //
@@ -31,6 +34,10 @@ public class GuidsIdentification {
     private String featureFlag = null;
     
     private String help = null;
+    
+    private ModuleIdentification belongModule = null;
+    
+    private PackageIdentification declaredBy = null;
 
     public GuidsIdentification(String arg0, String arg1, String arg2, Vector<String> arg3, String arg4) {
         this.name = (arg0 == null ? "" : arg0);
@@ -85,5 +92,21 @@ public class GuidsIdentification {
 
     public void setHelp(String help) {
         this.help = help;
+    }
+    
+    public ModuleIdentification getBelongModule() {
+        return belongModule;
+    }
+
+    public void setBelongModule(ModuleIdentification belongModule) {
+        this.belongModule = belongModule;
+    }
+
+    public PackageIdentification getDeclaredBy() {
+        return declaredBy;
+    }
+
+    public void setDeclaredBy(PackageIdentification declaredBy) {
+        this.declaredBy = declaredBy;
     }
 }

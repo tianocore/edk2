@@ -17,6 +17,9 @@ package org.tianocore.frameworkwizard.module.Identifications.PcdCoded;
 
 import java.util.Vector;
 
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
+
 public class PcdCodedIdentification {
 
     //
@@ -37,6 +40,10 @@ public class PcdCodedIdentification {
     private String type = null;
     
     private String usage = null;
+    
+    private ModuleIdentification belongModule = null;
+    
+    private PackageIdentification declaredBy = null;
 
     public PcdCodedIdentification(String arg0, String arg1, String arg2, Vector<String> arg3, String arg4, String arg5, String arg6, String arg7) {
         this.name = (arg0 == null ? "" : arg0);
@@ -118,5 +125,21 @@ public class PcdCodedIdentification {
 
     public void setUsage(String usage) {
         this.usage = usage;
+    }
+    
+    public ModuleIdentification getBelongModule() {
+        return belongModule;
+    }
+
+    public void setBelongModule(ModuleIdentification belongModule) {
+        this.belongModule = belongModule;
+    }
+
+    public PackageIdentification getDeclaredBy() {
+        return declaredBy;
+    }
+
+    public void setDeclaredBy(PackageIdentification declaredBy) {
+        this.declaredBy = declaredBy;
     }
 }

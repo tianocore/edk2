@@ -17,6 +17,9 @@ package org.tianocore.frameworkwizard.module.Identifications.LibraryClass;
 
 import java.util.Vector;
 
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
+
 public class LibraryClassIdentification {
     private String libraryClassName = null;
 
@@ -33,6 +36,10 @@ public class LibraryClassIdentification {
     private Vector<String> supModuleList = null;
     
     private String help = null;
+    
+    private ModuleIdentification belongModule = null;
+    
+    private PackageIdentification declaredBy = null;
 
     public LibraryClassIdentification() {
 
@@ -120,5 +127,21 @@ public class LibraryClassIdentification {
 
     public void setHelp(String help) {
         this.help = help;
+    }
+
+    public ModuleIdentification getBelongModule() {
+        return belongModule;
+    }
+
+    public void setBelongModule(ModuleIdentification belongModule) {
+        this.belongModule = belongModule;
+    }
+
+    public PackageIdentification getDeclaredBy() {
+        return declaredBy;
+    }
+
+    public void setDeclaredBy(PackageIdentification declaredBy) {
+        this.declaredBy = declaredBy;
     }
 }
