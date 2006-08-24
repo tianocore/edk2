@@ -34,7 +34,7 @@ public final class ModuleInfo {
 		}
 	}
 
-	public String modulepath = null;
+	public final String modulepath;
 	
 	public String outputpath = null;
 	
