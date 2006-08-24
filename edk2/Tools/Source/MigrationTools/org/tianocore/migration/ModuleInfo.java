@@ -27,7 +27,7 @@ public final class ModuleInfo {
 			this.outputpath = this.modulepath.replaceAll(Common.strseparate, "$1");
 		} else {
 			ModuleInfo.ui.println("Choose where to place the result");
-			if ((outputpath = ModuleInfo.ui.getFilepath()) == null) {
+			if ((outputpath = ModuleInfo.ui.getFilepath("Please choose where to place the output module")) == null) {
 				outputpath = modulepath; 
 			}
 			ModuleInfo.ui.println("Output to: " + outputpath);
@@ -85,9 +85,10 @@ public final class ModuleInfo {
 	private static final void manipulate(ModuleInfo mi) throws Exception {
 		
 		ModuleReader.ModuleScan(mi);
-		
+		//ModuleInfo.ui.yesOrNo("go on replace?");
 		SourceFileReplacer.flush(mi);	// some adding library actions are taken here,so it must be put before "MsaWriter"
-		
+
+		//ModuleInfo.ui.yesOrNo("go on show?");
 		// show result
 		if (ModuleInfo.printModuleInfo) {
 			ModuleInfo.ui.println("\nModule Information : ");
@@ -102,13 +103,16 @@ public final class ModuleInfo {
 			show(mi.hashnonlocalfunc, "nonlocal : ");
 			show(mi.hashr8only, "hashr8only : ");
 		}
-		
+
+		//ModuleInfo.ui.yesOrNo("go on msawrite?");
 		new MsaWriter(mi).flush();
+		//ModuleInfo.ui.yesOrNo("go on critic?");
 
 		if (ModuleInfo.doCritic) {
     		Critic.fireAt(mi.outputpath + File.separator + "Migration_" + mi.modulename);
 		}
-		
+
+		//ModuleInfo.ui.yesOrNo("go on delete?");
 		Common.deleteDir(mi.modulepath + File.separator + "temp");
 		
 		ModuleInfo.ui.println("Errors Left : " + ModuleInfo.db.error);

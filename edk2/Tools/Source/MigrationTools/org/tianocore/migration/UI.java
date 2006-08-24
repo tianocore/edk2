@@ -28,5 +28,5 @@ public interface UI {
 	
 	public String getInput(String message);
 	
-	public String getFilepath();		// necessary ?
+	public String getFilepath(String title);		// necessary ?
 }
