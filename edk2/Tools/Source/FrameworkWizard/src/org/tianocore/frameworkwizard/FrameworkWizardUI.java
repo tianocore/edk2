@@ -54,7 +54,7 @@ import org.tianocore.frameworkwizard.common.Identifications.Identification;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningModuleType;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
-//import org.tianocore.frameworkwizard.common.find.FindPPIsResult;
+import org.tianocore.frameworkwizard.common.find.FindResult;
 import org.tianocore.frameworkwizard.common.ui.IDefaultMutableTreeNode;
 import org.tianocore.frameworkwizard.common.ui.IDesktopManager;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
@@ -241,9 +241,9 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
     private JMenuItem jMenuItemToolsBuildPreferences = null;
 
-//    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsDebug = null;
+    //    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsDebug = null;
 
-//    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsRelease = null;
+    //    private JCheckBoxMenuItem jCheckBoxMenuItemProjectBuildTargetsRelease = null;
 
     private JMenuItem jMenuItemToolsToolChainConfiguration = null;
 
@@ -482,7 +482,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuEdit = new JMenu();
             jMenuEdit.setText("Edit");
             jMenuEdit.setMnemonic('E');
-            jMenuEdit.setVisible(false);
+            jMenuEdit.setVisible(true);
 
             //
             // Add sub menu items
@@ -751,7 +751,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuTools.add(getJMenuItemToolsClone());
             jMenuTools.add(getJMenuItemToolsCodeScan());
             jMenuTools.addSeparator();
-            
+
             jMenuTools.add(getJMenuItemToolsToolChainConfiguration());
             jMenuTools.add(getJMenuItemToolsBuildPreferences());
         }
@@ -1630,8 +1630,6 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuEditFind.add(getJMenuItemEditFindProtocol());
             jMenuEditFind.add(getJMenuItemEditFindGuid());
             jMenuEditFind.add(getJMenuItemEditFindPcd());
-            jMenuEditFind.addSeparator();
-
             jMenuEditFind.add(getJMenuItemEditFindLibraryClass());
             jMenuEditFind.add(getJMenuItemEditFindLibraryInstance());
         }
@@ -1724,6 +1722,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             jMenuItemEditFindLibraryInstance.setText("All Library Instances");
             jMenuItemEditFindLibraryInstance.setMnemonic('n');
             jMenuItemEditFindLibraryInstance.addActionListener(this);
+            jMenuItemEditFindLibraryInstance.setVisible(false);
         }
         return jMenuItemEditFindLibraryInstance;
     }
@@ -1848,9 +1847,29 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         }
 
         if (arg0.getSource() == this.jMenuItemEditFindPpi) {
-//            this.findPpi();
+            this.findPpi();
+        }
+
+        if (arg0.getSource() == this.jMenuItemEditFindProtocol) {
+            this.findProtocol();
+        }
+
+        if (arg0.getSource() == this.jMenuItemEditFindGuid) {
+            this.findGuid();
+        }
+
+        if (arg0.getSource() == this.jMenuItemEditFindPcd) {
+            this.findPcd();
+        }
+
+        if (arg0.getSource() == this.jMenuItemEditFindLibraryClass) {
+            this.findLibraryClass();
         }
         
+        if (arg0.getSource() == this.jMenuItemEditFindLibraryInstance) {
+            this.findLibraryInstance();
+        }
+
         if (arg0.getSource() == jMenuItemToolsBuildPreferences) {
             configBuildPreferences();
         }
@@ -1967,8 +1986,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         // Make Platform Description
         //
-        dmtnPlatformDescription = new IDefaultMutableTreeNode("Platforms", IDefaultMutableTreeNode.PLATFORM,
-                                                              -1);
+        dmtnPlatformDescription = new IDefaultMutableTreeNode("Platforms", IDefaultMutableTreeNode.PLATFORM, -1);
         if (GlobalData.vPlatformList.size() > 0) {
             for (int index = 0; index < GlobalData.vPlatformList.size(); index++) {
                 dmtnPlatformDescription.add(new IDefaultMutableTreeNode(GlobalData.vPlatformList.elementAt(index)
@@ -2416,7 +2434,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         iTree.addNode(new IDefaultMutableTreeNode("Data Hubs", IDefaultMutableTreeNode.MSA_DATAHUBS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Hii Packages", IDefaultMutableTreeNode.MSA_HIIPACKAGES, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Guids", IDefaultMutableTreeNode.MSA_GUIDS, true, id));
-        iTree.addNode(new IDefaultMutableTreeNode("External Defintions", IDefaultMutableTreeNode.MSA_EXTERNS, true, id));
+        iTree
+             .addNode(new IDefaultMutableTreeNode("External Defintions", IDefaultMutableTreeNode.MSA_EXTERNS, true, id));
         iTree.addNode(new IDefaultMutableTreeNode("Pcd Coded", IDefaultMutableTreeNode.MSA_PCDS, true, id));
     }
 
@@ -3073,10 +3092,55 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      To find all defined PPIs in workspace
      
      **/
-//    private void findPpi() {
-//        FindPPIsResult fpr = FindPPIsResult.getInstance();
-//        fpr.setVisible(true);
-//    }
+    private void findPpi() {
+        FindResult fr = FindResult.getInstance("PPI");
+        fr.setVisible(true);
+    }
+
+    /**
+     To find all defined PROTOCOLs in workspace
+     
+     **/
+    private void findProtocol() {
+        FindResult fr = FindResult.getInstance("PROTOCOL");
+        fr.setVisible(true);
+    }
+
+    /**
+     To find all defined PROTOCOLs in workspace
+     
+     **/
+    private void findGuid() {
+        FindResult fr = FindResult.getInstance("GUID");
+        fr.setVisible(true);
+    }
+
+    /**
+     To find all defined PROTOCOLs in workspace
+     
+     **/
+    private void findPcd() {
+        FindResult fr = FindResult.getInstance("PCD");
+        fr.setVisible(true);
+    }
+
+    /**
+     To find all defined Library Classes in workspace
+     
+     **/
+    private void findLibraryClass() {
+        FindResult fr = FindResult.getInstance("LIBRARY_CLASS");
+        fr.setVisible(true);
+    }
+
+    /**
+     To find all defined Library Instances in workspace
+     
+     **/
+    private void findLibraryInstance() {
+        FindResult fr = FindResult.getInstance("LIBRARY_INSTANCE");
+        fr.setVisible(true);
+    }
 
     /**
      Switch current workspace to others
@@ -3175,9 +3239,10 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
     }
 
     private void configBuildPreferences() {
-       Preferences bt = Preferences.getInstance();
-       bt.showDialog();
+        Preferences bt = Preferences.getInstance();
+        bt.showDialog();
     }
+
     /**
      Clone selected item
      

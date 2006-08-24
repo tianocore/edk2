@@ -389,7 +389,7 @@ public class Tools {
 
         return strReturn;
     }
-    
+
     public static String convertUnicodeHexStringToString(String str) {
         //
         // Handle if str is null or empty
@@ -415,8 +415,8 @@ public class Tools {
             // Change hex to dec
             //
             int dec = Integer.parseInt(s, 16);
-            
-            returnString = returnString + (char)(dec);
+
+            returnString = returnString + (char) (dec);
         }
         return returnString;
     }
@@ -468,7 +468,7 @@ public class Tools {
         //
         return hexString.trim();
     }
-    
+
     public static ModuleIdentification getId(String path, ModuleSurfaceArea msa) {
         MsaHeader head = msa.getMsaHeader();
         String name = head.getModuleName();
@@ -495,7 +495,7 @@ public class Tools {
         PlatformIdentification id = new PlatformIdentification(name, guid, version, path);
         return id;
     }
-    
+
     /**
      * To reset the width of input component via container width
      * 
@@ -537,7 +537,7 @@ public class Tools {
      * 
      */
     public static void resizeComponent(Component c, int containerWidth, int containerHeight, int preferredWidth,
-                                int preferredHeight) {
+                                       int preferredHeight) {
         resizeComponentWidth(c, containerWidth, preferredWidth);
         resizeComponentHeight(c, containerHeight, preferredHeight);
     }
@@ -589,32 +589,47 @@ public class Tools {
      * 
      */
     public static void relocateComponent(Component c, int containerWidth, int containerHeight, int preferredWidht,
-                                  int preferredHeight, int spaceToRight, int spaceToBottom) {
+                                         int preferredHeight, int spaceToRight, int spaceToBottom) {
         relocateComponentX(c, containerWidth, preferredWidht, spaceToRight);
         relocateComponentY(c, containerHeight, preferredHeight, spaceToBottom);
     }
-    
+
     /**
      Move the component to the center of screen 
-         
+     
      @param c
      @param width
-    
-    **/
+     
+     **/
     public static void centerComponent(Component c, int width) {
         c.setLocation(width / 2 - c.getWidth() / 2, c.getLocation().y);
         c.validate();
     }
-    
+
     /**
-    Move the component to the center of screen and adjust the y location 
-        
-    @param c
-    @param width
-   
-   **/
-   public static void centerComponent(Component c, int width, int containerHeight, int preferredHeight, int spaceToBottom) {
-       relocateComponentY(c, containerHeight, preferredHeight, spaceToBottom);
-       centerComponent(c, width);
-   }
+     Move the component to the center of screen and adjust the y location 
+     
+     @param c
+     @param width
+     
+     **/
+    public static void centerComponent(Component c, int width, int containerHeight, int preferredHeight,
+                                       int spaceToBottom) {
+        relocateComponentY(c, containerHeight, preferredHeight, spaceToBottom);
+        centerComponent(c, width);
+    }
+
+    /**
+     Find the count of searchString in wholeString
+     
+     @param wholeString
+     @param searchString
+     @return
+
+     **/
+    public static int getSpecificStringCount(String wholeString, String searchString) {
+        int count = 0;
+        count = wholeString.split(searchString).length;
+        return count;
+    }
 }

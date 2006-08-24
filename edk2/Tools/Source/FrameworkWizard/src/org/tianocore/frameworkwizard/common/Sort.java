@@ -18,8 +18,18 @@ package org.tianocore.frameworkwizard.common;
 import java.util.Vector;
 
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.Guids.GuidsIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.Guids.GuidsVector;
+import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.LibraryClassIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.LibraryClass.LibraryClassVector;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdCodedIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdCodedVector;
 import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdIdentification;
 import org.tianocore.frameworkwizard.module.Identifications.PcdCoded.PcdVector;
+import org.tianocore.frameworkwizard.module.Identifications.Ppis.PpisIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.Ppis.PpisVector;
+import org.tianocore.frameworkwizard.module.Identifications.Protocols.ProtocolsIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.Protocols.ProtocolsVector;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 
@@ -206,6 +216,135 @@ public class Sort {
                         PcdIdentification temp = v.getPcd(indexI);
                         v.setPcd(v.getPcd(indexJ), indexI);
                         v.setPcd(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     Sort all ppi entries
+     
+     @param v
+     @param mode
+     
+     **/
+    public static void sortPpis(PpisVector v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.getPpis(indexJ).getName().compareTo(v.getPpis(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.getPpis(indexI).getName().compareTo(v.getPpis(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        PpisIdentification temp = v.getPpis(indexI);
+                        v.setPpis(v.getPpis(indexJ), indexI);
+                        v.setPpis(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     Sort all protocol entries
+     
+     @param v
+     @param mode
+     
+     **/
+    public static void sortProtocols(ProtocolsVector v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.getProtocols(indexJ).getName().compareTo(v.getProtocols(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.getProtocols(indexI).getName().compareTo(v.getProtocols(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        ProtocolsIdentification temp = v.getProtocols(indexI);
+                        v.setProtocols(v.getProtocols(indexJ), indexI);
+                        v.setProtocols(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     Sort all guid entries
+     
+     @param v
+     @param mode
+     
+     **/
+    public static void sortGuids(GuidsVector v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.getGuids(indexJ).getName().compareTo(v.getGuids(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.getGuids(indexI).getName().compareTo(v.getGuids(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        GuidsIdentification temp = v.getGuids(indexI);
+                        v.setGuids(v.getGuids(indexJ), indexI);
+                        v.setGuids(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     Sort all pcd coded entries
+     
+     @param v
+     @param mode
+     
+     **/
+    public static void sortPcdCodeds(PcdCodedVector v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.getPcdCoded(indexJ).getName().compareTo(v.getPcdCoded(indexI).getName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.getPcdCoded(indexI).getName().compareTo(v.getPcdCoded(indexJ).getName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        PcdCodedIdentification temp = v.getPcdCoded(indexI);
+                        v.setPcdCoded(v.getPcdCoded(indexJ), indexI);
+                        v.setPcdCoded(temp, indexJ);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     Sort all pcd coded entries
+     
+     @param v
+     @param mode
+     
+     **/
+    public static void sortLibraryClass(LibraryClassVector v, int mode) {
+        if (v != null) {
+            //
+            // sort by name
+            //
+            for (int indexI = 0; indexI < v.size(); indexI++) {
+                for (int indexJ = indexI + 1; indexJ < v.size(); indexJ++) {
+                    if ((v.getLibraryClass(indexJ).getLibraryClassName().compareTo(
+                                                                                   v.getLibraryClass(indexI)
+                                                                                    .getLibraryClassName()) < 0 && mode == DataType.SORT_TYPE_ASCENDING)
+                        || (v.getLibraryClass(indexI).getLibraryClassName().compareTo(
+                                                                                      v.getLibraryClass(indexJ)
+                                                                                       .getLibraryClassName()) < 0 && mode == DataType.SORT_TYPE_DESCENDING)) {
+                        LibraryClassIdentification temp = v.getLibraryClass(indexI);
+                        v.setLibraryClass(v.getLibraryClass(indexJ), indexI);
+                        v.setLibraryClass(temp, indexJ);
                     }
                 }
             }

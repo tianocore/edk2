@@ -59,6 +59,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>src/org/tianocore/frameworkwizard/common/Sort.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Tools.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/XmlConfig.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/find/Find.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/find/FindResult.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/find/GuidId.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/find/LibraryClassId.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/find/PcdId.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/find/PpiId.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/common/find/ProtocolId.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Identifications/Identification.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningFileType.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/Identifications/OpeningModuleList.java</Filename>
