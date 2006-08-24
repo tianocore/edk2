@@ -18,7 +18,6 @@ import java.awt.event.ComponentEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -42,20 +41,17 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-
-import org.apache.xmlbeans.XmlObject;
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPackageType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
 import org.tianocore.frameworkwizard.platform.ui.ListEditor;
-import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
-import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
-import org.tianocore.frameworkwizard.platform.ui.id.PackageIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 
 /**
@@ -919,20 +915,10 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
     private void getLibInstances(String libClass){
         libNameGuidMap.clear();
         try {
-            WorkspaceProfile.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
-        
-            Set<PackageIdentification> spi = WorkspaceProfile.getPackageList();
-            Iterator ispi = spi.iterator();
-            
-            while (ispi.hasNext()) {
-                PackageIdentification pi = (PackageIdentification) ispi.next();
-
-                Set<ModuleIdentification> smi = WorkspaceProfile.getModules(pi);
-                Iterator ismi = smi.iterator();
+                Iterator ismi = GlobalData.vModuleList.iterator();
                 while (ismi.hasNext()) {
                     ModuleIdentification mi = (ModuleIdentification) ismi.next();
-                    Map<String, XmlObject> m = WorkspaceProfile.getNativeMsa(mi);
-                    SurfaceAreaQuery.setDoc(m);
+                    
                     Vector<String> classProduced = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED", mi);
                     for (int i = 0; i < classProduced.size(); ++i) {
                         if (classProduced.get(i).equals(libClass)) {
@@ -940,7 +926,7 @@ public class SpdLibClassDecls extends IInternalFrame implements TableModelListen
                         }
                     }
                 }
-            }
+           
         }
         catch(Exception e){
             JOptionPane.showMessageDialog(frame, "Search Instances Failed.");

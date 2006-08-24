@@ -24,11 +24,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.frameworkwizard.common.DataValidation;
+import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
-import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
-import org.tianocore.frameworkwizard.platform.ui.id.PackageIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -37,7 +38,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.JTextField;
@@ -185,7 +185,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 if (mi != null) {
                     saa[i][0] = mi.getName();
                     saa[i][2] = mi.getVersion();
-                    saa[i][4] = mi.getPackage().getVersion();
+                    saa[i][4] = mi.getPackageId().getVersion();
                     //
                     // re-evaluate lib instance usage when adding a already-selected lib instance.
                     //
@@ -297,11 +297,12 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         ArrayList<String> al = new ArrayList<String>();
         
         for (int i = 0; i < depPkgList.length; ++i) {
-            Set<ModuleIdentification> smi = WorkspaceProfile.getModules(depPkgList[i]);
-            Iterator ismi = smi.iterator();
+            Iterator ismi = GlobalData.vModuleList.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                
+                if (!mi.getPackageId().getGuid().equalsIgnoreCase(depPkgList[i].getGuid())) {
+                    continue;
+                }
                 String[] clsProduced = getClassProduced(mi);
                 
                 boolean isPotential = false;
