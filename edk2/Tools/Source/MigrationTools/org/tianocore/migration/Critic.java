@@ -54,45 +54,49 @@ public final class Critic {
 				} else if (line.matches("\\*\\*\\/")) {
 					incomment = false;
 					templine.append(line + "\n");
-				} else if (incomment && line.contains("Routine Description:")) {
-					description = true;
-					arguments = false;
-					returns = false;
-				} else if (incomment && line.contains("Arguments:")) {
-					description = false;
-					arguments = true;
-					returns = false;
-				} else if (incomment && line.contains("Returns:")) {
-					description = false;
-					arguments = false;
-					returns = true;
-				} else if (incomment && description) {
-					templine.append("  " + line.trim() + "\n");
-				} else if (incomment && arguments) {
-					mtrcommentequation = ptncommentequation.matcher(line);
-					if (mtrcommentequation.find()) {
-						inequation = true;
-						templine.append("  @param  " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
-					} else if (inequation && line.trim().length() == 0) {
-						inequation = false;
-						templine.append(line + "\n");
-					} else if (inequation && line.trim().length() != 0) {
-						templine.append("#%#%" + line + "\n");
-					} else {
-						templine.append("  " + line.trim() + "\n");
-					}
-				} else if (incomment && returns) {
-					mtrcommentequation = ptncommentequation.matcher(line);
-					if (mtrcommentequation.find()) {
-						inequation = true;
-						templine.append("  @retval " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
-					} else if (inequation && line.trim().length() == 0) {
-						inequation = false;
-						templine.append(line + "\n");
-					} else if (inequation && line.trim().length() != 0) {
-						templine.append("#%#%" + line + "\n");
-					} else {
-						templine.append("  " + line.trim() + "\n");
+				} else if (incomment) {
+					if (line.contains("Routine Description:")) {
+						description = true;
+						arguments = false;
+						returns = false;
+					} else if (line.contains("Arguments:")) {
+						description = false;
+						arguments = true;
+						returns = false;
+					} else if (line.contains("Returns:")) {
+						description = false;
+						arguments = false;
+						returns = true;
+					} else if (description) {
+						if (line.trim().length() != 0) {
+							templine.append("  " + line.trim() + "\n");
+						}
+					} else if (arguments) {
+						mtrcommentequation = ptncommentequation.matcher(line);
+						if (mtrcommentequation.find()) {
+							inequation = true;
+							templine.append("  @param  " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
+						} else if (inequation && line.trim().length() == 0) {
+							inequation = false;
+							templine.append(line + "\n");
+						} else if (inequation && line.trim().length() != 0) {
+							templine.append("#%#%" + line + "\n");
+						} else {
+							templine.append("  " + line.trim() + "\n");
+						}
+					} else if (returns) {
+						mtrcommentequation = ptncommentequation.matcher(line);
+						if (mtrcommentequation.find()) {
+							inequation = true;
+							templine.append("  @retval " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
+						} else if (inequation && line.trim().length() == 0) {
+							inequation = false;
+							templine.append(line + "\n");
+						} else if (inequation && line.trim().length() != 0) {
+							templine.append("#%#%" + line + "\n");
+						} else {
+							templine.append("  " + line.trim() + "\n");
+						}
 					}
 				} else {
 					templine.append(line + "\n");
