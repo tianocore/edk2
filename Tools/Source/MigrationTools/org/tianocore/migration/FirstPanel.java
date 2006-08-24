@@ -158,7 +158,8 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 
 	//---------------------------------------------------------------------------------------//
 
-	public String getFilepath() {
+	public String getFilepath(String title) {
+		fc.setDialogTitle(title);
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			log.append(fc.getSelectedFile().getAbsolutePath() + "\n");
 			return fc.getSelectedFile().getAbsolutePath();
@@ -170,7 +171,8 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 
     public void actionPerformed(ActionEvent e) {
         if ( e.getSource() == moduleButton ) {
-        	modulepath = getFilepath();
+        	modulepath = getFilepath("Please choose a starting path");
+        	moduletext.setText(modulepath);
         }
         if ( e.getSource() == goButton ) {
         	try {
