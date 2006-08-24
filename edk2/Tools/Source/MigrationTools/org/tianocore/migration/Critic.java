@@ -50,6 +50,9 @@ public final class Critic {
 			while ((line = rd.readLine()) != null) {
 				if (line.matches("\\/\\*\\*")) {
 					incomment = true;
+					description = false;
+					arguments = false;
+					returns = false;
 					templine.append(line + "\n");
 				} else if (line.matches("\\*\\*\\/")) {
 					incomment = false;
