@@ -24,7 +24,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 	 */
 	private static final long serialVersionUID = 207759413522910399L;
 	
-	private String modulepath;
+	private String startpath;
 	private ModuleInfo mi;
 	
 	private JButton moduleButton, goButton, msaEditorButton, criticButton;
@@ -171,13 +171,13 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 
     public void actionPerformed(ActionEvent e) {
         if ( e.getSource() == moduleButton ) {
-        	modulepath = getFilepath("Please choose a starting path");
-        	moduletext.setText(modulepath);
+        	startpath = getFilepath("Please choose a starting path");
+        	moduletext.setText(startpath);
         }
         if ( e.getSource() == goButton ) {
         	try {
-        		logfile = new PrintWriter(new BufferedWriter(new FileWriter(modulepath + File.separator + "migration.log")));
-        		ModuleInfo.triger(modulepath);
+        		logfile = new PrintWriter(new BufferedWriter(new FileWriter(startpath.replaceAll(Common.strseparate, "$1") + File.separator + "migration.log")));
+        		ModuleInfo.triger(startpath);
         		logfile.flush();
         	} catch (Exception en) {
         		println(en.getMessage());
@@ -192,7 +192,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         }
         if ( e.getSource() == criticButton) {
         	try {
-        		Critic.fireAt(modulepath);
+        		Critic.fireAt(startpath);
         	} catch (Exception en) {
         		println(en.getMessage());
         	}
