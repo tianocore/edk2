@@ -44,7 +44,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
     private String vfrFile = "";
     private String vfrFileName = "";
 
-    private List<Object> includepathList = new ArrayList<Object>();
+    private List<IncludePath> includepathList = new ArrayList<IncludePath>();
 
     /**
      get class member of createList file
@@ -170,21 +170,11 @@ public class VfrCompilerTask extends Task implements EfiDefine {
         List<Object> includePath = new ArrayList<Object>();     
         String incPath = "";        
 
-        int  count = includepathList.size();    
-        IncludePath path;
+        int count = includepathList.size();    
         for (int i = 0; i < count; i++) {
-            path = (IncludePath) includepathList.get(i);
-            if (path.getFile() != null) {
-                FileParser.loadFile( project,includePath,path.getFile(), "-I");             
-            }
+            incPath += includepathList.get(i).toString();
         }
-        for (int i = 0; i < count; i++) {
-            incPath = incPath + " " + includepathList.get(i);
-        }
-        count =  includePath.size();
-        for (int i = 0; i < count; i++) {
-            incPath = incPath + " " + includePath.get(i);
-        }
+
         String argument = this.createIfrBinFile +
                           this.processerArg + 
                           incPath +

@@ -30,7 +30,7 @@ import org.apache.tools.ant.types.Commandline;
   GenCRC32SectionTask is to call GenCRC32Section.exe to generate crc32 section. 
   
 **/
-public class GenCRC32SectionTask extends Task implements EfiDefine{
+public class GenCRC32SectionTask extends Task implements EfiDefine {
     ///
     /// output file
     ///
@@ -38,7 +38,7 @@ public class GenCRC32SectionTask extends Task implements EfiDefine{
     ///
     /// inputFile list
     ///
-    private List<Object> inputFileList = new ArrayList<Object>();
+    private List<NestElement> inputFileList = new ArrayList<NestElement>();
     
     ///
     /// Project
@@ -69,7 +69,11 @@ public class GenCRC32SectionTask extends Task implements EfiDefine{
         // 
         // string line of input files 
         // 
-        String inputFiles = list2Str(inputFileList, ""); 
+        String inputFiles = " -i "; 
+        for (int i = 0; i < inputFileList.size(); ++i) {
+            inputFiles += inputFileList.get(i).toString(" ");
+        }
+
         // 
         // assemble argument 
         //
@@ -133,47 +137,5 @@ public class GenCRC32SectionTask extends Task implements EfiDefine{
      */
     public void setOutputFile(String outputFile) {
         this.outputFile = " -o " + outputFile;
-    };
-    
-    /**
-     * transfer List to String
-     * @param list : nested element list
-     * @param tag : interval tag of parameter
-     * @return string line of parameters 
-     */
-    private String list2Str(List list, String tag) {
-        /*
-         * string line for return
-         */
-        String paraStr = " -i"; 
-        /*
-         * nested element in list
-         */
-        NestElement element; 
-        /*
-         * iterator of nested element list
-         */
-        Iterator elementIter = list.iterator(); 
-        /*
-         * string parameter list
-         */
-        List<Object> strList = new ArrayList<Object>();   
-        
-        while (elementIter.hasNext()) {
-            element = (NestElement) elementIter.next();
-            if (null != element.getFile()) {
-                FileParser.loadFile(project, strList, element.getFile(), tag);
-            } else {
-                paraStr = paraStr + element.getName();
-            }
-        }
-        /*
-         * iterator of string parameter list
-         */
-        Iterator strIter = strList.iterator();  
-        while (strIter.hasNext()) {
-            paraStr = paraStr + " " + strIter.next();
-        }
-        return paraStr;
-    }   
+    }
 }

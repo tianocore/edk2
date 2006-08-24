@@ -13,10 +13,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.framework.tasks;
 
+import java.io.File;
 import java.util.*;
+
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
@@ -57,9 +59,9 @@ public class StrGatherTask extends Task implements EfiDefine {
 
     private String outputDatabase = "";
 
-    private List<Object> databaseList = new ArrayList<Object>();
+    private List<Database> databaseList = new ArrayList<Database>();
 
-    private List<Object> inputFileList = new ArrayList<Object>();
+    private List<InputFile> inputFileList = new ArrayList<InputFile>();
 
     ///
     /// parse options newDatabase -- "ture/false" unquoteString -- "ture/false"
@@ -68,14 +70,14 @@ public class StrGatherTask extends Task implements EfiDefine {
 
     private String unquotedString = "";
 
-    private List<Object> includePathList = new ArrayList<Object>();
+    private List<IncludePath> includePathList = new ArrayList<IncludePath>();
 
     ///
     /// scan options ignoreNotFound -- "ture/false"
     ///
     private String ignoreNotFound = "";
 
-    private List<Object> skipExtList = new ArrayList<Object>();
+    private List<SkipExt> skipExtList = new ArrayList<SkipExt>();
 
     ///
     /// dump options
@@ -113,16 +115,16 @@ public class StrGatherTask extends Task implements EfiDefine {
         if (path == null) {
             command = "StrGather";
         } else {
-            command = path + "/" + "StrGather";
+            command = path + File.separator + "StrGather";
         }
 
         ///
         /// transfer nested elements into string
         ///
-        String databases = list2Str(databaseList, "-db");
-        String skipExts = list2Str(skipExtList, "-skipext");
-        String includePaths = list2Str(includePathList, "-I");
-        String inputFiles = list2Str(inputFileList, "");
+        String databases = list2Str(databaseList);
+        String skipExts = list2Str(skipExtList);
+        String includePaths = list2Str(includePathList);
+        String inputFiles = list2Str(inputFileList);
 
         ///
         /// assemble argument
@@ -461,63 +463,20 @@ public class StrGatherTask extends Task implements EfiDefine {
     }
 
     /**
-     transfer List to String
-     
-     @param     list    nested element list
-     @param     tag     interval tag of parameter
+       Compose the content in each NestElement into a single string.
 
-     @returns string line of parameters
+       @param list  The NestElement list
+       
+       @return String
      **/
-    private String list2Str(List list, String tag) {
-        ///
-        /// string line for return
-        ///
-        String paraStr = "";
-        ///
-        /// nested element in list
-        ///
-        NestElement element;
-        ///
-        /// iterator of nested element list
-        ///
-        Iterator elementIter = list.iterator();
-        ///
-        /// string parameter list
-        ///
-        List<Object> strList = new ArrayList<Object>();
-
-        while (elementIter.hasNext()) {
-            element = (NestElement) elementIter.next();
-            if (null != element.getFile()) {
-                ///
-                /// nested element include file
-                ///
-                FileParser.loadFile(project, strList, element.getFile(), tag);
-            } 
-
-            if (element.getName().length() > 0) {
-                ///
-                /// nested element include name 
-                ///
-                paraStr = paraStr + " " + element.getName();
-            }
-
-            List<String> nameList = element.getList();
-            if (nameList.size() > 0) {
-                Iterator nameIter = nameList.iterator();
-                while (nameIter.hasNext()) {
-                    paraStr = paraStr + " " + tag + " " + (String)nameIter.next();
-                }
-            }
+    private String list2Str(List list) {
+        int listLength = list.size();
+        String str = "";
+        for (int i = 0; i < listLength; ++i) {
+            NestElement e = (NestElement)list.get(i);
+            str += e.toString();
         }
-        ///
-        /// iterator of string parameter list
-        ///
-        Iterator strIter = strList.iterator();
-        while (strIter.hasNext()) {
-            paraStr = paraStr + " " + strIter.next();
-        }
-        return paraStr;
+
+        return str;
     }
-
 }

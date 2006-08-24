@@ -15,30 +15,10 @@ package org.tianocore.framework.tasks;
 
 /**
  Input class is defined to be as nested elements of other elements, to specify 
- the path of file(s)
+ the path of file(s).
  **/
-public class Input {
-    private String filePath;
-    
-    public Input() {
-        
-    }
-
-    /**
-     Standard set method of ANT task, for "file" attribute
-
-     @param     path    The path of a file
-     **/
-    public void setFile(String path) {
-        filePath = path;
-    }
-
-    /**
-     Standard get method of ANT task, for "file" attribute
-
-     @returns   The path of current specified file.
-     **/
-    public String getFile() {
-        return filePath;
+public class Input extends NestElement {
+    public String toString() {
+        return super.toString(" -f ");
     }
 }

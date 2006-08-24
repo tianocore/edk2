@@ -178,7 +178,7 @@ public class FlashMapTask extends Task implements EfiDefine {
             argList.add("-mcmerge");
             Iterator mciList = mciFileArray.iterator();
             while (mciList.hasNext()) {
-                argList.add(((Input) mciList.next()).getFile());
+                argList.addAll(((Input) mciList.next()).getNameList());
             }
         }
 

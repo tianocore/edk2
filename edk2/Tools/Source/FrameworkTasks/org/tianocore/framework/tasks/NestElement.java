@@ -15,26 +15,255 @@ package org.tianocore.framework.tasks;
 
 import java.io.File;
 import java.util.List;
+import java.util.ArrayList;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.util.StringTokenizer;
+
+import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.BuildException;
 
 /**
- Interface NestElement is just to define common interfaces for nested element
+ Interface NestElement is to define common interfaces for nested element
  **/
-public interface NestElement {
+public class NestElement extends DataType {
+    //
+    // The name list. All the name strings got from setXXX methods will be put
+    // in here.
+    //
+    private List<String> nameList = new ArrayList<String>();
+
     /**
-     nested element Interface for up-casting  
+       Handle "name" attribute. No delimiter and special treatment are assumed.
+
+       @param name  A single string value of "name" attribute 
      **/
-    
-    public String getName();
+    public void setName(String name) {
+        if (name.length() > 0) {
+            nameList.add(name);
+        }
+    }
 
-    public void setName(String name);
+    /**
+       Handle "list" attribute. The value of "list" is assumed as string 
+       separated by space, tab, comma or semmicolon.
 
-    public String toString();
+       @param nameList  The value of "list" separated by " \t,;"
+     **/
+    public void setList(String nameList) {
+        if (nameList.length() == 0) {
+            return;
+        }
 
-    public File getFile();
+        StringTokenizer tokens = new StringTokenizer(nameList, " \t,;", false);
+        while (tokens.hasMoreTokens()) {
+            String name = tokens.nextToken().trim();
+            if (name.length() > 0) {
+                this.nameList.add(name);
+            }
+        }
+    }
 
-    public void setFile(File file);
+    /**
+       Handle "ListFile" attribute. The value of "ListFile" should be the path of
+       a file which contains name strings, one name per line.
 
-    public void setList(String fileNameList);
+       @param listFileName  The file path
+     **/
+    public void setListFile(String listFileName) {
+        FileReader fileReader = null;
+        BufferedReader in = null;
+        String str;
 
-    public List<String> getList();
+        //
+        // Check if the file exists or not
+        // 
+        File file = new File(listFileName);
+        if (!file.exists()) {
+            throw new BuildException("The file, " + file + " does not exist!");           
+        } 
+
+        try {
+            fileReader = new FileReader(file);
+            in = new BufferedReader(fileReader);
+
+            //
+            // Read line by line
+            // 
+            while((str = in.readLine()) != null){
+                str = str.trim();
+                if (str.length() == 0){
+                    continue;
+                }
+
+                //getProject().replaceProperties(str);
+                nameList.add(str);
+            }
+        } catch (Exception e){
+            throw new BuildException(e.getMessage());            
+        } finally {
+            try {
+                //
+                // close the file
+                // 
+                if (in != null) {
+                    in.close();
+                }
+                if (fileReader != null) {
+                    fileReader.close();
+                }
+            } catch (Exception e) {
+                throw new BuildException(e.getMessage());            
+            }
+        }
+    }
+
+    /**
+       Handle "file" attribute. The value of "file" should be a path.
+
+       @param file  The path name of a file
+     **/
+    public void setFile(String file) {
+        setPath(file);
+    }
+
+    /**
+       Handle "path" attribute. The value of "path" may contain compound path
+       separator (/ or \) which should be cleaned up. Because the "path" string
+       will always be passed to external native program which may not handle 
+       non-native path separator, the clean-up action is a must. And the value
+       of "path" may contains several path separated by space, tab, comma or
+       semmicolon. We need to split it and put each part in nameList.
+
+       @param path  String value of a file system path
+     **/
+    public void setPath(String path) {
+        if (path.length() == 0) {
+            return;
+        }
+
+        //
+        // split the value of "path" into separated single path
+        // 
+        StringTokenizer tokens = new StringTokenizer(path, " \t,;", false);
+        while (tokens.hasMoreTokens()) {
+            String pathName = tokens.nextToken().trim();
+            if (pathName.length() > 0) {
+                //
+                // Make clean the path string before storing it
+                // 
+                this.nameList.add(cleanupPath(pathName));
+            }
+        }
+    }
+
+    /**
+       Handle "FileName" attribute. The value of "FileName" should be the path
+       of a file which contains path strings, one path per line.
+
+       @param pathFileName
+     **/
+    public void setPathFile(String pathFileName) {
+        FileReader fileReader = null;
+        BufferedReader in = null;
+        String path;
+
+        //
+        // Check if the file exists or not
+        // 
+        File file = new File(pathFileName);
+        if (!file.exists()) {
+            throw new BuildException("The file, " + file + " does not exist!");           
+        } 
+
+        try {
+            fileReader = new FileReader(file);
+            in = new BufferedReader(fileReader);
+
+            //
+            // Read the file line by line, skipping empty ones
+            // 
+            while((path = in.readLine()) != null){
+                path = path.trim();
+                if (path.length() == 0){
+                    continue;
+                }
+                //getProject().replaceProperties(path);
+
+                //
+                // Make clean the path string before storing it.
+                // 
+                nameList.add(cleanupPath(path));
+            }
+        } catch (Exception e){
+            throw new BuildException(e.getMessage());            
+        } finally {
+            try {
+                //
+                // close the file
+                // 
+                if (in != null) {
+                    in.close();
+                }
+                if (fileReader != null) {
+                    fileReader.close();
+                }
+            } catch (Exception e) {
+                throw new BuildException(e.getMessage());            
+            }
+        }
+    }
+
+    /**
+       Return the name list.
+
+       @return List<String> The list contains the name(path) strings
+     **/
+    public List<String> getNameList() {
+        return nameList;
+    }
+
+    /**
+       Compose and return the the name/path string without any delimiter. The trick
+       here is that it's actually used to return the value of nameList which
+       has just one name/string.
+
+       @return String
+     **/
+    public String toString() {
+        return toString("");
+    }
+
+    /**
+       Compose and return the name/path string concatenated by leading "prefix".
+
+       @param prefix    The string will be put before each name/string in nameList
+       
+       @return String   The string concatenated with "prefix"
+     **/
+    public String toString(String prefix) {
+        StringBuffer string = new StringBuffer(1024);
+        int length = nameList.size();
+
+        for (int i = 0; i < length; ++i) {
+            string.append(prefix);
+            string.append(nameList.get(i));
+        }
+
+        return string.toString();
+    }
+
+    //
+    // Remove any duplicated path separator or inconsistent path separator
+    //
+    private String cleanupPath(String path) {
+        String separator = "\\" + File.separator;
+        String duplicateSeparator = separator + "{2}";
+
+        path = Path.translateFile(path);
+        path = path.replaceAll(duplicateSeparator, separator);
+
+        return path;
+    }
 }
