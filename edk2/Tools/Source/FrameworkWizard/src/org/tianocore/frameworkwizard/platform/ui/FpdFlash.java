@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -36,11 +37,14 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
@@ -59,6 +63,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.JComboBox;
 import java.awt.Dimension;
+import javax.swing.JSplitPane;
 
 public class FpdFlash extends IInternalFrame {
 
@@ -124,6 +129,284 @@ public class FpdFlash extends IInternalFrame {
     private JScrollPane jScrollPane = null;
     private JTable jTableFvImageOpts = null;
     private JButton jButtonUpdateFvImage = null;
+    private JButton jButtonTest = null;
+    private JPanel jPanelFdfN = null;
+    private JPanel jPanelFdfS = null;
+    private JSplitPane jSplitPaneFdfC = null;
+    private JPanel jPanelFdfCTop = null;
+    private JPanel jPanelFdfCBottom = null;
+    private JPanel jPanelFdfCTopN = null;
+    private JPanel jPanelFdfCTopS = null;
+    private JPanel jPanelFdfCTopC = null;
+    private JPanel jPanelFdfCBottomN = null;
+    private JPanel jPanelFdfCBottomC = null;
+    private JLabel jLabelFvInFdf = null;
+    private JLabel jLabelFvAdditional = null;
+    private JScrollPane jScrollPaneFvInFdf = null;
+    private JTable jTableFvInFdf = null;
+    private NonEditableTableModel fvInFdfTableModel = null;  //  @jve:decl-index=0:visual-constraint=""
+    private JButton jButtonFvInFdfOptions = null;
+    private JScrollPane jScrollPaneFvAdditional = null;
+    private JTable jTableFvAdditional = null;
+    private DefaultTableModel fvAddtionalTableModel = null;  //  @jve:decl-index=0:visual-constraint=""
+    private JButton jButtonAddFv = null;
+    private JButton jButtonDelFv = null;
+    private JButton jButtonAddFvOptions = null;
+    
+    private NonEditableTableModel nonEditableTableModel = null;  //  @jve:decl-index=0:visual-constraint=""
+    
+    private JPanel jPanelModOrder = null;
+    private JPanel jPanelModOrderN = null;
+    private JPanel jPanelModOrderS = null;
+    private JPanel jPanelModOrderC = null;
+    private JScrollPane jScrollPaneModInFv = null;
+    private JTable jTableModInFv = null;
+    private JPanel jPanelController = null;
+    private JScrollPane jScrollPaneFpdModules = null;
+    private JTable jTableFpdModules = null;
+    private JButton jButtonUp = null;
+    private JButton jButtonInsert = null;
+    private JButton jButtonRemove = null;
+    private JButton jButtonDown = null;
+    private JButton jButtonOk = null;
+    private JButton jButtonCancel = null;
+    
+    /**
+     * This method initializes jPanelModOrder   
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelModOrder() {
+//        if (jPanelModOrder == null) {
+            jPanelModOrder = new JPanel();
+            jPanelModOrder.setLayout(new BorderLayout());
+            jPanelModOrder.add(getJPanelModOrderN(), java.awt.BorderLayout.NORTH);
+            jPanelModOrder.add(getJPanelModOrderS(), java.awt.BorderLayout.SOUTH);
+            jPanelModOrder.add(getJPanelModOrderC(), java.awt.BorderLayout.CENTER);
+            jPanelModOrder.addComponentListener(new java.awt.event.ComponentAdapter() {
+                public void componentShown(java.awt.event.ComponentEvent e) {
+                    System.out.println("componentShown()" + jTabbedPane.getTitleAt(jTabbedPane.getSelectedIndex())); // TODO Auto-generated Event stub componentShown()
+                }
+            });
+//        }
+        return jPanelModOrder;
+    }
+
+    /**
+     * This method initializes jPanelModOrderN  
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelModOrderN() {
+//        if (jPanelModOrderN == null) {
+            jPanelModOrderN = new JPanel();
+//        }
+        return jPanelModOrderN;
+    }
+
+    /**
+     * This method initializes jPanelModOrderS  
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelModOrderS() {
+//        if (jPanelModOrderS == null) {
+            FlowLayout flowLayout6 = new FlowLayout();
+            flowLayout6.setAlignment(java.awt.FlowLayout.RIGHT);
+            jPanelModOrderS = new JPanel();
+            jPanelModOrderS.setLayout(flowLayout6);
+            jPanelModOrderS.add(getJButtonOk(), null);
+            jPanelModOrderS.add(getJButtonCancel(), null);
+//        }
+        return jPanelModOrderS;
+    }
+
+    /**
+     * This method initializes jPanelModOrderC  
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelModOrderC() {
+//        if (jPanelModOrderC == null) {
+            jPanelModOrderC = new JPanel();
+            jPanelModOrderC.add(getJScrollPaneModInFv(), null);
+            jPanelModOrderC.add(getJPanelController(), null);
+            jPanelModOrderC.add(getJScrollPaneFpdModules(), null);
+//        }
+        return jPanelModOrderC;
+    }
+
+    /**
+     * This method initializes jScrollPaneModInFv   
+     *  
+     * @return javax.swing.JScrollPane  
+     */
+    private JScrollPane getJScrollPaneModInFv() {
+//        if (jScrollPaneModInFv == null) {
+            jScrollPaneModInFv = new JScrollPane();
+            jScrollPaneModInFv.setPreferredSize(new java.awt.Dimension(150,500));
+            jScrollPaneModInFv.setViewportView(getJTableModInFv());
+//        }
+        return jScrollPaneModInFv;
+    }
+
+    /**
+     * This method initializes jTableModInFv    
+     *  
+     * @return javax.swing.JTable   
+     */
+    private JTable getJTableModInFv() {
+//        if (jTableModInFv == null) {
+            NonEditableTableModel modInFvTableModel = new NonEditableTableModel();
+            modInFvTableModel.addColumn("Module Orders in FV");
+            jTableModInFv = new JTable(modInFvTableModel);
+            jTableModInFv.setRowHeight(20);
+//        }
+        return jTableModInFv;
+    }
+
+    /**
+     * This method initializes jPanelController 
+     *  
+     * @return javax.swing.JPanel   
+     */
+    private JPanel getJPanelController() {
+//        if (jPanelController == null) {
+            FlowLayout flowLayout5 = new FlowLayout();
+            flowLayout5.setVgap(50);
+            flowLayout5.setHgap(50);
+            jPanelController = new JPanel();
+            jPanelController.setLayout(flowLayout5);
+            jPanelController.setPreferredSize(new java.awt.Dimension(150,500));
+            jPanelController.add(getJButtonUp(), null);
+            jPanelController.add(getJButtonInsert(), null);
+            jPanelController.add(getJButtonRemove(), null);
+            jPanelController.add(getJButtonDown(), null);
+//        }
+        return jPanelController;
+    }
+
+    /**
+     * This method initializes jScrollPaneFpdModules    
+     *  
+     * @return javax.swing.JScrollPane  
+     */
+    private JScrollPane getJScrollPaneFpdModules() {
+//        if (jScrollPaneFpdModules == null) {
+            jScrollPaneFpdModules = new JScrollPane();
+            jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(150,500));
+            jScrollPaneFpdModules.setViewportView(getJTableFpdModules());
+//        }
+        return jScrollPaneFpdModules;
+    }
+
+    /**
+     * This method initializes jTableFpdModules 
+     *  
+     * @return javax.swing.JTable   
+     */
+    private JTable getJTableFpdModules() {
+//        if (jTableFpdModules == null) {
+            NonEditableTableModel fpdModTableModel = new NonEditableTableModel();
+            fpdModTableModel.addColumn("Modules in Platform");
+            jTableFpdModules = new JTable(fpdModTableModel);
+            jTableFpdModules.setRowHeight(20);
+//        }
+        return jTableFpdModules;
+    }
+
+    /**
+     * This method initializes jButtonUp    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonUp() {
+//        if (jButtonUp == null) {
+            jButtonUp = new JButton();
+            jButtonUp.setPreferredSize(new java.awt.Dimension(60,20));
+            jButtonUp.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 14));
+            jButtonUp.setText("^");
+//        }
+        return jButtonUp;
+    }
+
+    /**
+     * This method initializes jButtonInsert    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonInsert() {
+//        if (jButtonInsert == null) {
+            jButtonInsert = new JButton();
+            jButtonInsert.setText("<<");
+            jButtonInsert.setPreferredSize(new java.awt.Dimension(60,20));
+//        }
+        return jButtonInsert;
+    }
+
+    /**
+     * This method initializes jButtonRemove    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonRemove() {
+//        if (jButtonRemove == null) {
+            jButtonRemove = new JButton();
+            jButtonRemove.setPreferredSize(new java.awt.Dimension(60,20));
+            jButtonRemove.setText(">>");
+//        }
+        return jButtonRemove;
+    }
+
+    /**
+     * This method initializes jButtonDown  
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonDown() {
+//        if (jButtonDown == null) {
+            jButtonDown = new JButton();
+            jButtonDown.setPreferredSize(new java.awt.Dimension(60,20));
+            jButtonDown.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 10));
+            jButtonDown.setText("v");
+//        }
+        return jButtonDown;
+    }
+    
+    /**
+     * This method initializes jButtonOk    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonOk() {
+//        if (jButtonOk == null) {
+            jButtonOk = new JButton();
+            jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonOk.setText("Ok");
+//        }
+        return jButtonOk;
+    }
+
+    /**
+     * This method initializes jButtonCancel    
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getJButtonCancel() {
+//        if (jButtonCancel == null) {
+            jButtonCancel = new JButton();
+            jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonCancel.setText("Cancel");
+            jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    getJTabbedPane().setSelectedIndex(0);
+                }
+            });
+//        }
+        return jButtonCancel;
+    }
+
+    
     public FpdFlash() {
         super();
         // TODO Auto-generated constructor stub
@@ -205,8 +488,8 @@ public class FpdFlash extends IInternalFrame {
     private JTabbedPane getJTabbedPane() {
         if (jTabbedPane == null) {
             jTabbedPane = new JTabbedPane();
-            jTabbedPane.addTab("FV Images", null, getJPanelFvImages(), null);
-            jTabbedPane.addTab("Flash Definition File", null, getJPanelFdf(), null);
+            jTabbedPane.addTab("General", null, getJPanelFdf(), null);
+            jTabbedPane.addTab("FV Parameters", null, getJPanelFvImages(), null);
             
         }
         return jTabbedPane;
@@ -246,7 +529,7 @@ public class FpdFlash extends IInternalFrame {
             jLabelFvPropName.setEnabled(false);
             jLabelFvPropName.setPreferredSize(new java.awt.Dimension(38,20));
             FlowLayout flowLayout2 = new FlowLayout();
-            flowLayout2.setAlignment(java.awt.FlowLayout.CENTER);
+            flowLayout2.setAlignment(java.awt.FlowLayout.LEFT);
             flowLayout2.setHgap(15);
             jPanelFvImageN = new JPanel();
             jPanelFvImageN.setPreferredSize(new java.awt.Dimension(576,100));
@@ -289,7 +572,7 @@ public class FpdFlash extends IInternalFrame {
     private JCheckBox getJCheckBoxFvProperty() {
         if (jCheckBoxFvProperty == null) {
             jCheckBoxFvProperty = new JCheckBox();
-            jCheckBoxFvProperty.setText("FV Properties");
+            jCheckBoxFvProperty.setText("Global FV Variables");
             jCheckBoxFvProperty.addItemListener(new ItemListener(){
 
                 public void itemStateChanged(ItemEvent arg0) {
@@ -952,25 +1235,24 @@ public class FpdFlash extends IInternalFrame {
      */
     private JPanel getJPanelFdf() {
         if (jPanelFdf == null) {
-            FlowLayout flowLayout1 = new FlowLayout();
-            flowLayout1.setAlignment(FlowLayout.LEFT);
             jPanelFdf = new JPanel();
-            jPanelFdf.setLayout(flowLayout1);
-            jPanelFdf.add(getJCheckBoxFdf(), null);
-            jPanelFdf.add(getJTextFieldFdf(), null);
-            jPanelFdf.add(getJButtonFdfBrowse(), null);
-            jPanelFdf.addComponentListener(new ComponentAdapter(){
-                public void componentShown(ComponentEvent e) {
-                    if (ffc.getFlashDefinitionFile() != null) {
-                        jTextFieldFdf.setText(ffc.getFlashDefinitionFile());
-                    }
-                }
-                public void componentHidden(ComponentEvent e) {
-                    if (jCheckBoxFdf.isSelected()) {
-                        ffc.genFlashDefinitionFile(jTextFieldFdf.getText());
-                    }
-                }
-            });
+            jPanelFdf.setLayout(new BorderLayout());
+
+            jPanelFdf.add(getJPanelFdfN(), java.awt.BorderLayout.NORTH);
+            jPanelFdf.add(getJPanelFdfS(), java.awt.BorderLayout.SOUTH);
+            jPanelFdf.add(getJSplitPaneFdfC(), java.awt.BorderLayout.CENTER);
+//            jPanelFdf.addComponentListener(new ComponentAdapter(){
+//                public void componentShown(ComponentEvent e) {
+//                    if (ffc.getFlashDefinitionFile() != null) {
+//                        jTextFieldFdf.setText(ffc.getFlashDefinitionFile());
+//                    }
+//                }
+//                public void componentHidden(ComponentEvent e) {
+//                    if (jCheckBoxFdf.isSelected()) {
+//                        ffc.genFlashDefinitionFile(jTextFieldFdf.getText());
+//                    }
+//                }
+//            });
         }
         return jPanelFdf;
     }
@@ -1055,6 +1337,16 @@ public class FpdFlash extends IInternalFrame {
                             return;
                         }
                         jTextFieldFdf.setText(filePath.substring(wsDir.length() + 1).replace('\\', '/'));
+                        ffc.genFlashDefinitionFile(jTextFieldFdf.getText());
+                        docConsole.setSaved(false);
+                        Vector<FvInfoFromFdf> vFvInfo = new Vector<FvInfoFromFdf>();
+                        getFvInfoFromFdf(filePath, vFvInfo);
+                        getFvInFdfTableModel().setRowCount(0);
+                        for (int j = 0; j < vFvInfo.size(); ++j) {
+                            FvInfoFromFdf fvInfo = vFvInfo.get(j);
+                            String[] row = {fvInfo.getFvName(), fvInfo.getSize(), fvInfo.getEfiFileName()};
+                            getFvInFdfTableModel().addRow(row);
+                        }
                     }
                 }
                 
@@ -1232,6 +1524,352 @@ public class FpdFlash extends IInternalFrame {
     }
 
     /**
+     * This method initializes jButtonTest	
+     * 	
+     * @return javax.swing.JButton	
+     */
+//    private JButton getJButtonTest() {
+//        if (jButtonTest == null) {
+//            jButtonTest = new JButton();
+//            jButtonTest.addActionListener(new java.awt.event.ActionListener() {
+//                public void actionPerformed(java.awt.event.ActionEvent e) {
+//                    docConsole.setSaved(false);
+//                    String[][] includeModules = {{"1", "a"}, {"2", "b"}};
+//                    ffc.genBuildOptionsUserExtensions("FV_RECOVERY", "FvRecovery.inf", null, includeModules);
+//                    int i = ffc.getUserExtsIncModCount("FV_RECOVERY");
+//                    String[][] saa = new String[i][2];
+//                    ffc.getUserExtsIncMods("FV_RECOVERY", saa);
+//                    jTextFieldFdf.setText(saa[0][0] + saa[0][1] + saa[1][0] + saa[1][1]);
+//                    
+//                }
+//            });
+//        }
+//        return jButtonTest;
+//    }
+
+    /**
+     * This method initializes jPanelFdfN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfN() {
+        if (jPanelFdfN == null) {
+            jPanelFdfN = new JPanel();
+            jPanelFdfN.add(getJCheckBoxFdf(), null);
+            jPanelFdfN.add(getJTextFieldFdf(), null);
+            jPanelFdfN.add(getJButtonFdfBrowse(), null);
+        }
+        return jPanelFdfN;
+    }
+
+    /**
+     * This method initializes jPanelFdfS	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfS() {
+        if (jPanelFdfS == null) {
+            FlowLayout flowLayout4 = new FlowLayout();
+            flowLayout4.setAlignment(java.awt.FlowLayout.RIGHT);
+            jPanelFdfS = new JPanel();
+            jPanelFdfS.setLayout(flowLayout4);
+            jPanelFdfS.add(getJButtonAddFv(), null);
+            jPanelFdfS.add(getJButtonDelFv(), null);
+            jPanelFdfS.add(getJButtonAddFvOptions(), null);
+        }
+        return jPanelFdfS;
+    }
+
+    /**
+     * This method initializes jSplitPaneFdfC	
+     * 	
+     * @return javax.swing.JSplitPane	
+     */
+    private JSplitPane getJSplitPaneFdfC() {
+        if (jSplitPaneFdfC == null) {
+            jSplitPaneFdfC = new JSplitPane();
+            jSplitPaneFdfC.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+            jSplitPaneFdfC.setDividerSize(5);
+            jSplitPaneFdfC.setTopComponent(getJPanelFdfCTop());
+            jSplitPaneFdfC.setBottomComponent(getJPanelFdfCBottom());
+            jSplitPaneFdfC.setDividerLocation(280);
+        }
+        return jSplitPaneFdfC;
+    }
+
+    /**
+     * This method initializes jPanelFdfCTop	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfCTop() {
+        if (jPanelFdfCTop == null) {
+            jPanelFdfCTop = new JPanel();
+            jPanelFdfCTop.setLayout(new BorderLayout());
+            jPanelFdfCTop.add(getJPanelFdfCTopN(), java.awt.BorderLayout.NORTH);
+            jPanelFdfCTop.add(getJPanelFdfCTopS(), java.awt.BorderLayout.SOUTH);
+            jPanelFdfCTop.add(getJPanelFdfCTopC(), java.awt.BorderLayout.CENTER);
+        }
+        return jPanelFdfCTop;
+    }
+
+    /**
+     * This method initializes jPanelFdfCBottom	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfCBottom() {
+        if (jPanelFdfCBottom == null) {
+            jPanelFdfCBottom = new JPanel();
+            jPanelFdfCBottom.setLayout(new BorderLayout());
+            jPanelFdfCBottom.add(getJPanelFdfCBottomN(), java.awt.BorderLayout.NORTH);
+            jPanelFdfCBottom.add(getJPanelFdfCBottomC(), java.awt.BorderLayout.CENTER);
+        }
+        return jPanelFdfCBottom;
+    }
+
+    /**
+     * This method initializes jPanelFdfCTopN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfCTopN() {
+        if (jPanelFdfCTopN == null) {
+            jLabelFvInFdf = new JLabel();
+            jLabelFvInFdf.setText("FVs in Flash Definition File");
+            jPanelFdfCTopN = new JPanel();
+            jPanelFdfCTopN.add(jLabelFvInFdf, null);
+        }
+        return jPanelFdfCTopN;
+    }
+
+    /**
+     * This method initializes jPanelFdfCTopS	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfCTopS() {
+        if (jPanelFdfCTopS == null) {
+            FlowLayout flowLayout1 = new FlowLayout();
+            flowLayout1.setAlignment(java.awt.FlowLayout.RIGHT);
+            jPanelFdfCTopS = new JPanel();
+            jPanelFdfCTopS.setLayout(flowLayout1);
+            jPanelFdfCTopS.add(getJButtonFvInFdfOptions(), null);
+        }
+        return jPanelFdfCTopS;
+    }
+
+    /**
+     * This method initializes jPanelFdfCTopC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfCTopC() {
+        if (jPanelFdfCTopC == null) {
+            jPanelFdfCTopC = new JPanel();
+            jPanelFdfCTopC.add(getJScrollPaneFvInFdf(), null);
+        }
+        return jPanelFdfCTopC;
+    }
+
+    /**
+     * This method initializes jPanelFdfCBottomN	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfCBottomN() {
+        if (jPanelFdfCBottomN == null) {
+            jLabelFvAdditional = new JLabel();
+            jLabelFvAdditional.setText("Additional FVs");
+            jPanelFdfCBottomN = new JPanel();
+            jPanelFdfCBottomN.add(jLabelFvAdditional, null);
+        }
+        return jPanelFdfCBottomN;
+    }
+
+    /**
+     * This method initializes jPanelFdfCBottomC	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelFdfCBottomC() {
+        if (jPanelFdfCBottomC == null) {
+            jPanelFdfCBottomC = new JPanel();
+            jPanelFdfCBottomC.add(getJScrollPaneFvAdditional(), null);
+        }
+        return jPanelFdfCBottomC;
+    }
+
+    /**
+     * This method initializes jScrollPaneFvInFdf	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPaneFvInFdf() {
+        if (jScrollPaneFvInFdf == null) {
+            jScrollPaneFvInFdf = new JScrollPane();
+            jScrollPaneFvInFdf.setPreferredSize(new java.awt.Dimension(653,200));
+            jScrollPaneFvInFdf.setViewportView(getJTableFvInFdf());
+        }
+        return jScrollPaneFvInFdf;
+    }
+
+    /**
+     * This method initializes jTableFvInFdf	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTableFvInFdf() {
+        if (jTableFvInFdf == null) {
+            jTableFvInFdf = new JTable();
+            jTableFvInFdf.setRowHeight(20);
+            jTableFvInFdf.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            jTableFvInFdf.setModel(getFvInFdfTableModel());
+        }
+        return jTableFvInFdf;
+    }
+
+    /**
+     * This method initializes fvInFdfTableModel	
+     * 	
+     * @return org.tianocore.frameworkwizard.platform.ui.NonEditableTableModel	
+     */
+    private NonEditableTableModel getFvInFdfTableModel() {
+        if (fvInFdfTableModel == null) {
+            fvInFdfTableModel = new NonEditableTableModel();
+            fvInFdfTableModel.addColumn("FV Name");
+            fvInFdfTableModel.addColumn("Size");
+            fvInFdfTableModel.addColumn("Corresponding File Name");
+        }
+        return fvInFdfTableModel;
+    }
+
+    /**
+     * This method initializes jButtonFvInFdfOptions	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButtonFvInFdfOptions() {
+        if (jButtonFvInFdfOptions == null) {
+            jButtonFvInFdfOptions = new JButton();
+            jButtonFvInFdfOptions.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonFvInFdfOptions.setText("Options");
+            jButtonFvInFdfOptions.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    int selectedRow = jTableFvInFdf.getSelectedRow();
+                    if (selectedRow <= 0) {
+                        return;
+                    }
+                    fvInFdfTableModel.moveRow(selectedRow, selectedRow, selectedRow - 1);
+                    jTableFvInFdf.changeSelection(selectedRow - 1, 0, false, false);
+                }
+            });
+        }
+        return jButtonFvInFdfOptions;
+    }
+
+    /**
+     * This method initializes jScrollPaneFvAdditional	
+     * 	
+     * @return javax.swing.JScrollPane	
+     */
+    private JScrollPane getJScrollPaneFvAdditional() {
+        if (jScrollPaneFvAdditional == null) {
+            jScrollPaneFvAdditional = new JScrollPane();
+            jScrollPaneFvAdditional.setPreferredSize(new java.awt.Dimension(653,200));
+            jScrollPaneFvAdditional.setViewportView(getJTableFvAdditional());
+        }
+        return jScrollPaneFvAdditional;
+    }
+
+    /**
+     * This method initializes jTableFvAdditional	
+     * 	
+     * @return javax.swing.JTable	
+     */
+    private JTable getJTableFvAdditional() {
+        if (jTableFvAdditional == null) {
+            jTableFvAdditional = new JTable();
+            jTableFvAdditional.setRowHeight(20);
+            jTableFvAdditional.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+            jTableFvAdditional.setModel(getFvAddtionalTableModel());
+        }
+        return jTableFvAdditional;
+    }
+
+    /**
+     * This method initializes fvAddtionalTableModel	
+     * 	
+     * @return javax.swing.table.DefaultTableModel	
+     */
+    private DefaultTableModel getFvAddtionalTableModel() {
+        if (fvAddtionalTableModel == null) {
+            fvAddtionalTableModel = new DefaultTableModel();
+            fvAddtionalTableModel.addColumn("FV Name");
+            fvAddtionalTableModel.addColumn("Size");
+            fvAddtionalTableModel.addColumn("Corresponding File Name");
+        }
+        return fvAddtionalTableModel;
+    }
+
+    /**
+     * This method initializes jButtonAddFv	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButtonAddFv() {
+        if (jButtonAddFv == null) {
+            jButtonAddFv = new JButton();
+            jButtonAddFv.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonAddFv.setText("New");
+        }
+        return jButtonAddFv;
+    }
+
+    /**
+     * This method initializes jButtonDelFv	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButtonDelFv() {
+        if (jButtonDelFv == null) {
+            jButtonDelFv = new JButton();
+            jButtonDelFv.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonDelFv.setText("Delete");
+        }
+        return jButtonDelFv;
+    }
+
+    /**
+     * This method initializes jButtonAddFvOptions	
+     * 	
+     * @return javax.swing.JButton	
+     */
+    private JButton getJButtonAddFvOptions() {
+        if (jButtonAddFvOptions == null) {
+            jButtonAddFvOptions = new JButton();
+            jButtonAddFvOptions.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonAddFvOptions.setText("Options");
+        }
+        return jButtonAddFvOptions;
+    }
+
+    
+
+    /**
+     * This method initializes nonEditableTableModel	
+     * 	
+     * @return org.tianocore.frameworkwizard.platform.ui.NonEditableTableModel	
+     */
+    private NonEditableTableModel getNonEditableTableModel() {
+        if (nonEditableTableModel == null) {
+            nonEditableTableModel = new NonEditableTableModel();
+        }
+        return nonEditableTableModel;
+    }
+
+    
+    /**
      * @param args
      */
     public static void main(String[] args) {
@@ -1269,13 +1907,7 @@ public class FpdFlash extends IInternalFrame {
             return;
         }
         String[][] saa = new String[ffc.getFvImagesFvImageCount()][2];
-//        ArrayList<LinkedHashMap<String, String>> options = new ArrayList<LinkedHashMap<String, String>>(ffc.getFvImagesFvImageCount());
-//
-//        for (int j = 0; j < ffc.getFvImagesFvImageCount(); ++j){
-//            options.add(new LinkedHashMap<String, String>());
-//        }
         ffc.getFvImagesFvImages(saa);
-        
        
         int i = 0;
         while (i < saa.length) {
@@ -1284,10 +1916,34 @@ public class FpdFlash extends IInternalFrame {
             ++i;
         }
         
-//        String fdfFile = ffc.getFlashDefinitionFile();
-//        if (fdfFile != null) {
-//            jTextField3.setText(fdfFile);
-//        }
+        saa = new String[ffc.getFvImagesNameValueCount()][2];
+        ffc.getFvImagesNameValues(saa);
+        for (int m = 0; m < saa.length; ++m) {
+            fvPropertyTableModel.addRow(saa[m]);
+        }
+        
+        jTextFieldFdf.setText("");
+        String fdfFile = ffc.getFlashDefinitionFile();
+        if (fdfFile != null) {
+            jTextFieldFdf.setText(fdfFile);
+        }
+        
+        String fdfPath = System.getenv("WORKSPACE") + File.separator + fdfFile;
+        Vector<FvInfoFromFdf> vFvInfo = new Vector<FvInfoFromFdf>();
+        getFvInfoFromFdf(fdfPath, vFvInfo);
+        getFvInFdfTableModel().setRowCount(0);
+        for (int j = 0; j < vFvInfo.size(); ++j) {
+            FvInfoFromFdf fvInfo = vFvInfo.get(j);
+            String[] row = {fvInfo.getFvName(), fvInfo.getSize(), fvInfo.getEfiFileName()};
+            getFvInFdfTableModel().addRow(row);
+        }
+        
+
+        for (int k = 0; k < vFvInfo.size(); ++k) {
+            FvInfoFromFdf fvInfo = vFvInfo.get(k);
+            getJTabbedPane().addTab(fvInfo.getFvName(), null, getJPanelModOrder(), null);
+
+        }
     }
     
     private void getOptionNameValue(Map<String, String> m){
@@ -1312,6 +1968,118 @@ public class FpdFlash extends IInternalFrame {
         }
         return jContentPane;
     }
+    
+    private void getFvInfoFromFdf(String fdfPath, Vector<FvInfoFromFdf> vFvInfo) {
+        File fdf = new File(fdfPath);
+        if (!fdf.exists()) {
+            return;
+        }
+        int lines = 0;
+
+        try {
+            FileReader reader = new FileReader(fdf);
+            BufferedReader in = new BufferedReader(reader);
+            String str;
+
+            while ((str = in.readLine()) != null) {
+                ++lines;
+                str = str.trim();
+                //
+                // skip empty line, comment (start with //) 
+                //
+                if (str.length() == 0 || str.startsWith("//")) {
+                    continue;
+                }
+                //
+                // dig into Region {} section, create FvInfoFromFdf object for it.
+                //
+                if (str.startsWith("Region") && str.endsWith("{")) {
+                    FvInfoFromFdf fvInfo = new FvInfoFromFdf();
+                    boolean nameFound = false;
+                    boolean sizeFound = false;
+                    while ((str = in.readLine()) != null) {
+                        ++lines;
+                        str = str.trim();
+                        //
+                        // skip empty line, comment (start with //) 
+                        //
+                        if (str.length() == 0 || str.startsWith("//")) {
+                            continue;
+                        }
+                        
+                        if (str.startsWith("Name")) {
+                            int firstQuote = str.indexOf("\"");
+                            int lastQuote = str.lastIndexOf("\"");
+                            fvInfo.setFvName(str.substring(firstQuote + 1, lastQuote));
+                            nameFound = true;
+                        }
+                        
+                        if (str.startsWith("Size")) {
+                            int equalIndex = str.indexOf("=");
+                            int commaIndex = str.indexOf(",");
+                            fvInfo.setSize(str.substring(equalIndex + 1, commaIndex).trim());
+                            sizeFound = true;
+                        }
+                        
+                        if (nameFound && sizeFound) {
+                            break;
+                        }
+                    }
+                    
+                    vFvInfo.add(fvInfo);
+                }
+                //
+                // dig into File {} section, supply file name information to existing FvInfoFromFdf object.
+                //
+                if (str.startsWith("File")) {
+                    boolean fileNameFound = false;
+                    boolean fvFound = false;
+                    String fileName = "";
+                    String fvName = "";
+                    while ((str = in.readLine()) != null) {
+                        ++lines;
+                        str = str.trim();
+                        //
+                        // skip empty line, comment (start with //) 
+                        //
+                        if (str.length() == 0 || str.startsWith("//")) {
+                            continue;
+                        }
+                        
+                        if (str.startsWith("Name")) {
+                            int firstQuote = str.indexOf("\"");
+                            int lastQuote = str.lastIndexOf("\"");
+                            fileName = str.substring(firstQuote + 1, lastQuote);
+                            fileNameFound = true;
+                        }
+                        
+                        if (str.startsWith("Region")) {
+                            int firstQuote = str.indexOf("\"");
+                            int lastQuote = str.lastIndexOf("\"");
+                            fvName = str.substring(firstQuote + 1, lastQuote);
+                            fvFound = true;
+                        }
+                        
+                        if (fileNameFound && fvFound) {
+                            break;
+                        }
+                    }
+                    
+                    for (int i = 0; i <vFvInfo.size(); ++i) {
+                        if (vFvInfo.get(i).getFvName().equals(fvName)) {
+                            vFvInfo.get(i).setEfiFileName(fileName);
+                        }
+                    }
+                }
+   
+            }
+        } catch (Exception e) {
+           
+        }
+
+    }
+        
+    
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
@@ -1327,3 +2095,39 @@ class ImageParaTableModel extends DefaultTableModel {
     }
 }
 
+class FvInfoFromFdf {
+    private String fvName;
+    private String size;
+    private String efiFileName;
+    
+    public FvInfoFromFdf () {
+        fvName = "";
+        size = "";
+        efiFileName = "";
+    }
+    public FvInfoFromFdf (String f, String s, String e) {
+        this();
+        fvName = f;
+        size = s;
+        efiFileName = e;
+    }
+    public String getEfiFileName() {
+        return efiFileName;
+    }
+    public void setEfiFileName(String efiFileName) {
+        this.efiFileName = efiFileName;
+    }
+    public String getFvName() {
+        return fvName;
+    }
+    public void setFvName(String fvName) {
+        this.fvName = fvName;
+    }
+    public String getSize() {
+        return size;
+    }
+    public void setSize(String size) {
+        this.size = size;
+    }
+    
+}

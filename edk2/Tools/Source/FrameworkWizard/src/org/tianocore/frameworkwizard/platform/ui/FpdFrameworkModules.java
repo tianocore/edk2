@@ -30,19 +30,18 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
+import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
-import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
-import org.tianocore.frameworkwizard.platform.ui.id.PackageIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
 import java.awt.FlowLayout;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 public class FpdFrameworkModules extends IInternalFrame {
@@ -358,9 +357,9 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String archsAdded = "";
                     String mg = mi.getGuid();
                     String mv = mi.getVersion();
-                    String pg = mi.getPackage().getGuid();
-                    String pv = mi.getPackage().getVersion();
-                    String mType = mi.getModuleType();
+                    String pg = mi.getPackageId().getGuid();
+                    String pv = mi.getPackageId().getVersion();
+                    String mType = SurfaceAreaQuery.getModuleType(mi);
 
                     ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
                     if (al == null) {
@@ -408,7 +407,7 @@ public class FpdFrameworkModules extends IInternalFrame {
 
                         if (mi != null) {
                             row[modNameColForFpdModTable] = mi.getName();
-                            row[pkgNameColForFpdModTable] = mi.getPackage().getName();
+                            row[pkgNameColForFpdModTable] = mi.getPackageId().getName();
                             row[pathColForFpdModTable] = path;
                             row[archColForFpdModTable] = arch;
                             row[pkgVerColForFpdModTable] = pv;
@@ -629,7 +628,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String arch = sa[ffcModArch];
                     ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv + " " + arch);
                     mv = mi.getVersion();
-                    pv = mi.getPackage().getVersion();
+                    pv = mi.getPackageId().getVersion();
                     modelFpdModules.removeRow(selectedRow);
                     if (arch == null) {
                         // if no arch specified in ModuleSA
@@ -679,12 +678,6 @@ public class FpdFrameworkModules extends IInternalFrame {
     }
 
     private void init(PlatformSurfaceAreaDocument.PlatformSurfaceArea fpd) {
-        try {
-            WorkspaceProfile.initInfo("Tools" + File.separator + "Conf" + File.separator + "FrameworkDatabase.db", System.getenv("WORKSPACE"));
-        }
-        catch(Exception e){
-            JOptionPane.showMessageDialog(frame, "Error occurred when getting module data.");
-        }
 
         if (ffc == null) {
             ffc = new FpdFileContents(fpd);
@@ -705,14 +698,12 @@ public class FpdFrameworkModules extends IInternalFrame {
                 if (mi != null) {
                     row[modNameColForFpdModTable] = mi.getName();
                     row[modVerColForFpdModTable] = mi.getVersion();
-                    row[typeColForFpdModTable] = mi.getModuleType();
-                    row[pkgNameColForFpdModTable] = mi.getPackage().getName();
-                    row[pkgVerColForFpdModTable] = mi.getPackage().getVersion();
+                    row[typeColForFpdModTable] = SurfaceAreaQuery.getModuleType(mi);
+                    row[pkgNameColForFpdModTable] = mi.getPackageId().getName();
+                    row[pkgVerColForFpdModTable] = mi.getPackageId().getVersion();
                     row[archColForFpdModTable] = saa[i][ffcModArch];
                     try {
-                        row[pathColForFpdModTable] = WorkspaceProfile.getMsaFile(mi).getPath().substring(
-                                                                                      System.getenv("WORKSPACE")
-                                                                                            .length() + 1);
+                        row[pathColForFpdModTable] = mi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(frame, "Show FPD Modules:" + e.getMessage());
                     }
@@ -743,32 +734,26 @@ public class FpdFrameworkModules extends IInternalFrame {
         if (miList == null) {
             miList = new ArrayList<ModuleIdentification>();
         }
-        Set<PackageIdentification> spi = WorkspaceProfile.getPackageList();
-        Iterator ispi = spi.iterator();
 
-        while (ispi.hasNext()) {
-            PackageIdentification pi = (PackageIdentification) ispi.next();
             String[] s = { "", "", "", "", "", "" };
-
-            Set<ModuleIdentification> smi = WorkspaceProfile.getModules(pi);
-            Iterator ismi = smi.iterator();
+            
+            Iterator ismi = GlobalData.vModuleList.iterator();
             while (ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification) ismi.next();
                 s[modNameColForAllModTable] = mi.getName();
                 s[modVerColForAllModTable] = mi.getVersion();
-                s[typeColForAllModTable] = mi.getModuleType();
-                s[pkgNameColForAllModTable] = pi.getName();
-                s[pkgVerColForAllModTable] = pi.getVersion();
+                s[typeColForAllModTable] = SurfaceAreaQuery.getModuleType(mi);
+                s[pkgNameColForAllModTable] = mi.getPackageId().getName();
+                s[pkgVerColForAllModTable] = mi.getPackageId().getVersion();
                 try {
-                    s[pathColForAllModTable] = WorkspaceProfile.getMsaFile(mi).getPath()
-                                            .substring(System.getenv("WORKSPACE").length() + 1);
+                    s[pathColForAllModTable] = mi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(frame, "Show All Modules:" + e.getMessage());
                 }
                 modelAllModules.addRow(s);
                 miList.add(mi);
             }
-        }
+        
         
         TableSorter sorter = (TableSorter)jTableAllModules.getModel();
         sorter.setSortState(modNameColForAllModTable, TableSorter.ASCENDING);

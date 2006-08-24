@@ -494,7 +494,7 @@ public class FpdHeader extends IInternalFrame {
     private void init() {
         //this.setSize(500, 515);
         this.setContentPane(getJContentPane());
-        this.setTitle("Package Surface Area Header");
+        this.setTitle("Platform Surface Area Header");
         initFrame();
       
     }

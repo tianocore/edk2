@@ -60,8 +60,8 @@ import org.tianocore.UserDefinedAntTasksDocument;
 import org.tianocore.UserExtensionsDocument;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
-import org.tianocore.frameworkwizard.platform.ui.id.ModuleIdentification;
-import org.tianocore.frameworkwizard.platform.ui.id.PackageIdentification;
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
 /**
  This class processes fpd file contents such as add remove xml elements. 
@@ -702,14 +702,14 @@ public class FpdFileContents {
         String mn = libMi.getName();
         String mg = libMi.getGuid();
         String mv = libMi.getVersion();
-        String pn = libMi.getPackage().getName();
-        String pg = libMi.getPackage().getGuid();
-        String pv = libMi.getPackage().getVersion();
+        String pn = libMi.getPackageId().getName();
+        String pg = libMi.getPackageId().getGuid();
+        String pv = libMi.getPackageId().getVersion();
         LibrariesDocument.Libraries.Instance instance = libs.addNewInstance();
         XmlCursor cursor = instance.newCursor();
         try{
             String comment = "Pkg: " + pn + " Mod: " + mn 
-                + " Path: " + WorkspaceProfile.getMsaFile(libMi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
+                + " Path: " + libMi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
             cursor.insertComment(comment);
         }
         catch (Exception e){
@@ -947,12 +947,10 @@ public class FpdFileContents {
     
     private PcdDeclarationsDocument.PcdDeclarations.PcdEntry LookupPcdDeclaration (PcdCodedDocument.PcdCoded.PcdEntry msaPcd, PackageIdentification[] depPkgs) {
         
-        Map<String, XmlObject> m = new HashMap<String, XmlObject>();
         PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = null;
         for (int i = 0; i < depPkgs.length; ++i) {
-            m.put("PackageSurfaceArea", WorkspaceProfile.getPackageXmlObject(depPkgs[i]));
-            SurfaceAreaQuery.setDoc(m);
-            XmlObject[] xo = SurfaceAreaQuery.getSpdPcdDeclarations();
+
+            XmlObject[] xo = SurfaceAreaQuery.getSpdPcdDeclarations(depPkgs[i]);
             if (xo == null) {
                 continue;
             }
@@ -980,8 +978,8 @@ public class FpdFileContents {
         ModuleSADocument.ModuleSA msa = getfpdFrameworkModules().addNewModuleSA();
         XmlCursor cursor = msa.newCursor();
         try{
-            String comment = "Mod: " + mi.getName() + " Type: " + mi.getModuleType() + " Path: "
-                            + WorkspaceProfile.getMsaFile(mi).getPath().substring(System.getenv("WORKSPACE").length() + 1);
+            String comment = "Mod: " + mi.getName() + " Type: " + SurfaceAreaQuery.getModuleType(mi) + " Path: "
+                            + mi.getPath().substring(System.getenv("WORKSPACE").length() + 1);
             cursor.insertComment(comment);
         }
         catch(Exception e){
@@ -2693,7 +2691,7 @@ class PcdItemTypeConflictException extends Exception {
     
     PcdItemTypeConflictException(String pcdName, String info){
         ModuleIdentification mi = WorkspaceProfile.getModuleId(info);
-        details = pcdName + " ItemType Conflicts with " + mi.getName() + " in Pkg " + mi.getPackage().getName();
+        details = pcdName + " ItemType Conflicts with " + mi.getName() + " in Pkg " + mi.getPackageId().getName();
     }
     
     public String getMessage() {
