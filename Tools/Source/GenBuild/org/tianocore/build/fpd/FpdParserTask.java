@@ -433,7 +433,7 @@ public class FpdParserTask extends Task {
     private ToolChainMap parseModuleBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
         String[][] options = SurfaceAreaQuery.getModuleBuildOptions(toolChainFamilyFlag);
         if (options == null || options.length == 0) {
-            return null;
+            return new ToolChainMap();
         }
         return parseOptions(options);
     }
@@ -441,7 +441,7 @@ public class FpdParserTask extends Task {
     private ToolChainMap parsePlatformBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
         String[][] options = SurfaceAreaQuery.getPlatformBuildOptions(toolChainFamilyFlag);
         if (options == null || options.length == 0) {
-            return null;
+            return new ToolChainMap();
         }
         return parseOptions(options);
     }
