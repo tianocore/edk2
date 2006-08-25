@@ -25,9 +25,10 @@ import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.Scanner;
 
 import javax.swing.*;
-// import javax.swing.JScrollPane;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JFrame;
 
@@ -78,7 +79,9 @@ public class Preferences extends IFrame {
 
     private final int rowFive = rowFour + threeRowHeight + sepHeight;
 
-    private final int buttonRow = rowFive + oneRowHeight + sepHeight + sepHeight;
+    private final int rowSix = rowFive + oneRowHeight + sepHeight;
+
+    private final int buttonRow = rowSix + oneRowHeight + sepHeight + sepHeight;
 
     private final int dialogHeight = buttonRow + twoRowHeight + twoRowHeight;
 
@@ -97,6 +100,22 @@ public class Preferences extends IFrame {
 
     private JFrame frame;
 
+    private final int activePlatformId = 0;
+
+    private final int buildTargetId = 1;
+
+    private final int targetArchId = 2;
+
+    private final int toolDefFileId = 3;
+
+    private final int tagNameId = 4;
+
+    private final int threadEnableId = 5;
+
+    private final int threadCountId = 6;
+
+    private final int maxTargetLines = threadCountId + 1;
+
     private JPanel jContentPane = null;
 
     private JLabel jLabelToolsConfigFile = null;
@@ -105,13 +124,9 @@ public class Preferences extends IFrame {
 
     private final int toolConfigFileRow = rowOne;
 
-    private final int toolDefFileId = 3;
-
     private JLabel jLabelActivePlatform = null;
 
     private JComboBox jComboBoxActivePlatform = null;
-
-    private final int activePlatformId = 0;
 
     private final int activePlatformRow = rowTwo;
 
@@ -123,8 +138,6 @@ public class Preferences extends IFrame {
 
     private final int toolChainTagNameRow = rowThree;
 
-    private final int tagNameId = 4;
-
     private JLabel jLabelBuildTarget = null;
 
     private JScrollPane jScrollPaneBuildTarget = null;
@@ -133,15 +146,25 @@ public class Preferences extends IFrame {
 
     private final int buildTargetRow = rowFour;
 
-    private final int buildTargetId = 1;
-
     private JLabel jLabelTargetArch = null;
 
     private ArchCheckBox jArchCheckBox = null;
 
     private final int targetArchRow = rowFive;
 
-    private final int targetArchId = 2;
+    private JLabel jLabelEnableThreads = null;
+
+    private JLabel jLabelThreadCount = null;
+
+    private final int threadRow = rowSix;
+
+    private JCheckBox jCheckBoxEnableThreads = null;
+
+    private JTextField jTextFieldThreadCount = null;
+    
+    private String threadCount;
+    
+    private boolean threadEnabled = false;
 
     private JButton jButtonBrowse = null;
 
@@ -174,9 +197,9 @@ public class Preferences extends IFrame {
 
     // private String[] toolsConfContents;
 
-    private String[] targetLines = new String[5];
+    private String[] targetLines = new String[maxTargetLines];
 
-    private int targetLineNumber[] = new int[5];
+    private int targetLineNumber[] = new int[maxTargetLines];
 
     private String toolsConfFile;
 
@@ -195,6 +218,8 @@ public class Preferences extends IFrame {
     private String toolsDefIdentifier = null;
 
     private int targetLineNumberMax;
+    
+    private final int toolDefFieldCount = 5;
 
     private Vector<String> vArchList = null;
 
@@ -359,6 +384,31 @@ public class Preferences extends IFrame {
         return jScrollPaneBuildTarget;
     }
 
+    private JCheckBox getCheckBoxEnableThreads() {
+        if (jCheckBoxEnableThreads == null) {
+            jCheckBoxEnableThreads = new JCheckBox();
+            jCheckBoxEnableThreads.setBounds(valueColumn, threadRow, 20, oneRowHeight);
+            jCheckBoxEnableThreads.setToolTipText("Select this if you want to enable parallel compilation.");
+            jCheckBoxEnableThreads.setSelected(threadEnabled);
+            jCheckBoxEnableThreads.addActionListener(this);
+            
+        }
+        return jCheckBoxEnableThreads;
+    }
+
+    private JTextField getTextFieldThreadCount() {
+        if (jTextFieldThreadCount == null) {
+            jTextFieldThreadCount = new JTextField();
+            jTextFieldThreadCount.setBounds(valueColumn + 215, threadRow, 30, oneRowHeight);
+            if (threadCount.length() > 0)
+                jTextFieldThreadCount.setText(threadCount);
+            jTextFieldThreadCount.setToolTipText("<html>Recommended setting is N+1,<br> where N is the number of physical processors or cores in the system</html>");
+            // If CheckBoxEnableThreads is selected, then enable editing
+
+        }
+        return jTextFieldThreadCount;
+    }
+
     private ICheckBoxList getICheckBoxListBuildTarget() {
         if (iCheckBoxListBuildTarget == null) {
 
@@ -498,7 +548,7 @@ public class Preferences extends IFrame {
      */
     private void init() {
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < maxTargetLines; i++) {
             targetLines[i] = null;
             targetLineNumber[i] = -1;
         }
@@ -578,8 +628,8 @@ public class Preferences extends IFrame {
         } else {
             toolsConfFile = defaultToolsConf;
         }
-        String[] toolsDefFields = new String[5];
-        for (int i = 0; i < 5; i++)
+        String[] toolsDefFields = new String[toolDefFieldCount];
+        for (int i = 0; i < toolDefFieldCount; i++)
             toolsDefFields[i] = null;
         File toolDefFile = new File(toolsConfFile);
         if (toolDefFile.exists()) {
@@ -695,6 +745,23 @@ public class Preferences extends IFrame {
                             targetLines[tagNameId] = rLine.trim();
                         targetLineNumber[tagNameId] = targetLineNumberMax;
                     }
+                    
+                    if (rLine.startsWith("MULTIPLE_THREAD")) {
+                        // Handle Thread Enable flag
+                        targetLines[threadEnableId] = rLine.trim();
+                        targetLineNumber[threadEnableId] = targetLineNumberMax;
+                        if ((rLine.trim().toLowerCase().contains("enabled")) || (rLine.trim().toLowerCase().contains("true"))) { 
+                            threadEnabled = true;
+                        } else {
+                            threadEnabled = false;
+                        }
+                    }
+                    
+                    if (rLine.startsWith("MAX_CONCURRENT_THREAD_NUMBER")) {
+                        // Handle Thread Enable flag
+                        targetLines[threadCountId] = rLine.trim();
+                        targetLineNumber[threadCountId] = targetLineNumberMax;
+                    }
                     targetLineNumberMax++;
                 }
                 reader.close();
@@ -709,11 +776,17 @@ public class Preferences extends IFrame {
                     }
                 }
 
+                if (targetLines[threadCountId] != null) {
+                    String tcLine[] = new String[2];
+                    tcLine = targetLines[threadCountId].trim().split("=");
+                    threadCount = tcLine[1];
+                } else
+                    threadCount = "";
+                
                 if (Debug == true)
-                    for (int i = 0; i <= tagNameId; i++)
+                    for (int i = 0; i <= maxTargetLines; i++)
                         System.out.println("targetLines[" + i + "] contains: " + targetLines[i] + " index is: "
                                            + targetLineNumber[i]);
-
             } catch (IOException e) {
                 Log.log(this.targetFile + " Read Error ", e.getMessage());
                 e.printStackTrace();
@@ -748,9 +821,18 @@ public class Preferences extends IFrame {
             jLabelTargetArch = new JLabel();
             jLabelTargetArch.setBounds(new java.awt.Rectangle(labelColumn, targetArchRow, labelWidth, oneRowHeight));
             jLabelTargetArch.setText("Build Architectures");
+
             jArchCheckBox = new ArchCheckBox();
             jArchCheckBox.setBounds(new java.awt.Rectangle(valueColumn, targetArchRow, valueWidth, oneRowHeight));
             jArchCheckBox.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
+
+            jLabelEnableThreads = new JLabel();
+            jLabelEnableThreads.setBounds(new java.awt.Rectangle(labelColumn, threadRow, labelWidth, oneRowHeight));
+            jLabelEnableThreads.setText("Enable Compiler Threading");
+
+            jLabelThreadCount = new JLabel();
+            jLabelThreadCount.setBounds(new java.awt.Rectangle(valueColumn + 60, threadRow, labelWidth, oneRowHeight));
+            jLabelThreadCount.setText("Number of threads to start");
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
@@ -774,6 +856,12 @@ public class Preferences extends IFrame {
             jArchCheckBox.setDisabledItems(vDisableArchList);
             jArchCheckBox.setSelectedItems(vArchList);
             jContentPane.add(jArchCheckBox, null);
+
+            jContentPane.add(jLabelEnableThreads, null);
+            jContentPane.add(getCheckBoxEnableThreads(), null);
+
+            jContentPane.add(jLabelThreadCount, null);
+            jContentPane.add(getTextFieldThreadCount(), null);
 
             jContentPane.add(getJButtonSave(), null);
             jContentPane.add(getJButtonCancel(), null);
@@ -807,7 +895,15 @@ public class Preferences extends IFrame {
         if (arg0.getSource() == jButtonCancel) {
             this.exit();
         }
+        
+        if (arg0.getSource() == jCheckBoxEnableThreads) {
+            if (jCheckBoxEnableThreads.isSelected() == false) {
+                threadCount = "";
+                jTextFieldThreadCount.setText(threadCount);
+            }
+        }
     }
+    
 
     private void updateActivePlatform() {
         int lineAP;
@@ -841,10 +937,10 @@ public class Preferences extends IFrame {
         if (Debug)
             System.out.println("Tool Config File: " + jTextFieldToolsConfigFile.getText());
         if (jTextFieldToolsConfigFile.getText() == null) {
-            targetFileContents[lineTDF] = "";
+            targetFileContents[lineTDF] = "#MT#";
             targetLines[toolDefFileId] = "";
         } else {
-            targetFileContents[lineTDF] = "TOOL_CHAIN_CONF = " + jTextFieldToolsConfigFile.getText() + "\r\n";
+            targetFileContents[lineTDF] = "TOOL_CHAIN_CONF = " + jTextFieldToolsConfigFile.getText();
             targetLines[toolDefFileId] = targetFileContents[lineTDF];
         }
     }
@@ -865,10 +961,10 @@ public class Preferences extends IFrame {
             System.out.println("Tag Name(s): " + sTagNames);
 
         if (sTagNames.length() > 0) {
-            targetFileContents[lineTTN] = "TOOL_CHAIN_TAG = " + sTagNames + "\r\n";
+            targetFileContents[lineTTN] = "TOOL_CHAIN_TAG = " + sTagNames;
             targetLines[tagNameId] = targetFileContents[lineTTN];
         } else {
-            targetFileContents[lineTTN] = "";
+            targetFileContents[lineTTN] = "#MT#";
             targetLines[tagNameId] = "";
         }
     }
@@ -887,10 +983,10 @@ public class Preferences extends IFrame {
         if (Debug)
             System.out.println("Build Target(s): " + sBuildTargets);
         if (sBuildTargets.length() > 0) {
-            targetFileContents[lineBT] = "TARGET = " + sBuildTargets + "\r\n";
+            targetFileContents[lineBT] = "TARGET = " + sBuildTargets;
             targetLines[buildTargetId] = targetFileContents[lineBT];
         } else {
-            targetFileContents[lineBT] = "";
+            targetFileContents[lineBT] = "#MT#";
             targetLines[buildTargetId] = "";
         }
 
@@ -911,15 +1007,69 @@ public class Preferences extends IFrame {
             targetLineNumberMax++;
         }
         if (sArchList == "") {
-            targetFileContents[lineSA] = "";
+            targetFileContents[lineSA] = "#MT#";
             targetLines[targetArchId] = "";
         } else {
-            targetFileContents[lineSA] = "TARGET_ARCH = " + sArchList + "\r\n";
+            targetFileContents[lineSA] = "TARGET_ARCH = " + sArchList;
             targetLines[targetArchId] = targetFileContents[lineSA];
         }
 
     }
 
+    private void updateEnableThreads() {
+        int lineET;
+        if (targetLines[threadEnableId] != null) {
+            lineET = targetLineNumber[threadEnableId];
+        } else {
+            lineET = targetLineNumberMax;
+            targetLineNumber[threadEnableId] = lineET;
+            targetLineNumberMax++;
+        }
+        if (jCheckBoxEnableThreads.isSelected() == true) {
+            targetFileContents[lineET] = "MULTIPLE_THREAD = enabled";
+            targetLines[threadEnableId] = targetFileContents[lineET];
+        } else {
+            targetFileContents[lineET] = "#MT#";
+            targetLines[threadEnableId] = "";
+        }
+    }
+    
+    private void updateThreadCount() {
+        int lineTC;
+
+        if (targetLines[threadCountId] != null) {
+            lineTC = targetLineNumber[threadCountId];
+        } else {
+            lineTC = targetLineNumberMax;
+            targetLineNumber[threadCountId] = lineTC;
+            targetLineNumberMax++;
+        }
+        if (jCheckBoxEnableThreads.isSelected() == true) {
+            // Threading must be enabled
+            if (jTextFieldThreadCount.getText().length() > 0) {
+                // Thread Count must be greater than 0
+                Scanner scan = new Scanner(jTextFieldThreadCount.getText().trim()); 
+                if (scan.nextInt() > 0) {      
+                    targetFileContents[lineTC] = "MAX_CONCURRENT_THREAD_NUMBER = " + jTextFieldThreadCount.getText().trim();
+                    targetLines[threadCountId] = targetFileContents[lineTC];
+                } else {
+                    Log.wrn("Build Preferences", "Threading Enabled, but thread count is not set, setting to default of 1.");
+                    targetFileContents[lineTC] = "MAX_CONCURRENT_THREAD_NUMBER = 1";
+                    targetLines[threadCountId] = "MAX_CONCURRENT_THREAD_NUMBER = 1";
+                }
+            } else {
+                Log.wrn("Build Preferences", "Threading Enabled, but thread count is not set, setting to default of 1.");
+                targetFileContents[lineTC] = "MAX_CONCURRENT_THREAD_NUMBER = 1";
+                targetLines[threadCountId] = "MAX_CONCURRENT_THREAD_NUMBER = 1";
+            }
+        } else {
+            // Don't track threads if threading is not enabled
+            targetFileContents[lineTC] = "#MT#";
+            targetLines[threadCountId] = "";
+            threadCount = "";
+        }
+        
+    }
     private String vectorToString(Vector<String> v) {
         String s = " ";
         for (int i = 0; i < v.size(); ++i) {
@@ -947,13 +1097,16 @@ public class Preferences extends IFrame {
         updateToolTagNames();
         updateBuildTargets();
         updateArchitectures();
+        updateEnableThreads();
+        updateThreadCount();
 
         try {
             copy(targetFile, targetFile + ".bak");
             FileWriter fileWriter = new FileWriter(targetFile);
             BufferedWriter writer = new BufferedWriter(fileWriter);
             for (int i = 0; i < targetLineNumberMax; i++) {
-                writer.write(targetFileContents[i] + "\r\n");
+                if (! targetFileContents[i].contains("#MT#"))
+                    writer.write(targetFileContents[i] + "\n");
             }
             writer.close();
         } catch (IOException e) {
