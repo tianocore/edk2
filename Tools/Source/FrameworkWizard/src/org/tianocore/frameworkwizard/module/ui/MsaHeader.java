@@ -57,6 +57,10 @@ public class MsaHeader extends IInternalFrame {
     ///
     private static final long serialVersionUID = -8152099582923006900L;
 
+    private int dialogWidth = 500;
+    
+    private int dialogHeight = 630;
+    
     //
     //Define class members
     //
@@ -148,7 +152,7 @@ public class MsaHeader extends IInternalFrame {
 
     private StarLabel jStarLabel14 = null;
 
-    private StarLabel jStarLabel15 = null;
+//    private StarLabel jStarLabel15 = null;
 
     private JCheckBox jCheckBoxIa32 = null;
 
@@ -161,7 +165,7 @@ public class MsaHeader extends IInternalFrame {
     private JCheckBox jCheckBoxArm = null;
 
     private JCheckBox jCheckBoxPpc = null;
-
+    
     //
     // Not used for UI
     //
@@ -390,10 +394,14 @@ public class MsaHeader extends IInternalFrame {
     private JTextField getJTextFieldSpecification() {
         if (jTextFieldSpecification == null) {
             jTextFieldSpecification = new JTextField();
+            
             jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320, 20));
             jTextFieldSpecification.setText("FRAMEWORK_BUILD_PACKAGING_SPECIFICATION   0x00000052");
+            jTextFieldSpecification.setBorder(null);
+            
+            
             jTextFieldSpecification.setSize(new java.awt.Dimension(320, 20));
-            jTextFieldSpecification.setLocation(new java.awt.Point(160, 530));
+            jTextFieldSpecification.setLocation(new java.awt.Point(2, dialogHeight - 30));
             jTextFieldSpecification.setEditable(false);
             jTextFieldSpecification.addFocusListener(this);
         }
@@ -680,8 +688,8 @@ public class MsaHeader extends IInternalFrame {
      
      **/
     private void init() {
-        this.setSize(500, 515);
-        this.setPreferredSize(new java.awt.Dimension(490, 615));
+        this.setSize(dialogWidth, dialogHeight);
+        this.setPreferredSize(new java.awt.Dimension(dialogWidth, dialogHeight));
         this.setContentPane(getJScrollPane());
         this.setTitle("Module Surface Area Header");
         initFrame();
@@ -818,7 +826,8 @@ public class MsaHeader extends IInternalFrame {
 
             jContentPane = new JPanel();
             jContentPane.setLayout(null);
-            jContentPane.setPreferredSize(new java.awt.Dimension(490, 565));
+            jContentPane.setPreferredSize(new java.awt.Dimension(dialogWidth - 10, dialogHeight - 10));
+            
             jContentPane.addFocusListener(this);
 
             jContentPane.add(jLabelBaseName, null);
@@ -831,7 +840,7 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(jLabelLicense, null);
             jContentPane.add(jLabelCopyright, null);
             jContentPane.add(jLabelDescription, null);
-            jContentPane.add(jLabelSpecification, null);
+//            jContentPane.add(jLabelSpecification, null);
             jContentPane.add(getJTextFieldSpecification(), null);
             jContentPane.add(getJButtonOk(), null);
             jContentPane.add(getJButtonCancel(), null);
@@ -871,8 +880,8 @@ public class MsaHeader extends IInternalFrame {
             jStarLabel13.setLocation(new java.awt.Point(0, 480));
             jStarLabel14 = new StarLabel();
             jStarLabel14.setLocation(new java.awt.Point(0, 505));
-            jStarLabel15 = new StarLabel();
-            jStarLabel15.setLocation(new java.awt.Point(0, 530));
+//            jStarLabel15 = new StarLabel();
+//            jStarLabel15.setLocation(new java.awt.Point(0, 530));
 
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
@@ -885,7 +894,7 @@ public class MsaHeader extends IInternalFrame {
             jContentPane.add(jStarLabel12, null);
             jContentPane.add(jStarLabel13, null);
             jContentPane.add(jStarLabel14, null);
-            jContentPane.add(jStarLabel15, null);
+//            jContentPane.add(jStarLabel15, null);
             jContentPane.add(getJScrollPaneCopyright(), null);
 
             jContentPane.add(getJCheckBoxIa32(), null);
@@ -1027,6 +1036,9 @@ public class MsaHeader extends IInternalFrame {
             return false;
         }
         if (!DataValidation.isSpecification(this.jTextFieldSpecification.getText())) {
+            // TODO Add code to check the specification number.
+            // Future releases of Schema may require that we process these files
+            // differently.
             Log.wrn("Update Msa Header", "Incorrect data type for Specification");
             //this.jTextFieldSpecification.requestFocus();
             return false;
