@@ -184,6 +184,32 @@ public class FpdFileContents {
         return fpdFrameworkModules;
     }
     
+    public void getFrameworkModuleGuid (String fvName, Vector<String> vGuid) {
+        if (getFrameworkModulesCount() == 0){
+            return;
+        }
+        
+        ListIterator li = getfpdFrameworkModules().getModuleSAList().listIterator();
+        while(li.hasNext()) {
+            ModuleSADocument.ModuleSA moduleSa = (ModuleSADocument.ModuleSA)li.next();
+            if (moduleSa.getModuleSaBuildOptions() == null) {
+                continue;
+            }
+            String fvBinding = moduleSa.getModuleSaBuildOptions().getFvBinding();
+            if (fvBinding == null) {
+                continue;
+            }
+            
+            String[] fvNames = fvBinding.split(" ");
+            for (int i = 0; i < fvNames.length; ++i) {
+                if (fvNames[i].equals(fvName) || fvNames[i].replaceAll("_", "").equals(fvName)) {
+                    vGuid.add(moduleSa.getModuleGuid());
+                    break;
+                }
+            }
+        }
+    }
+    
     public int getFrameworkModulesCount() {
         if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0){
             removeElement(getfpdFrameworkModules());
@@ -201,13 +227,13 @@ public class FpdFileContents {
         ListIterator li = getfpdFrameworkModules().getModuleSAList().listIterator();
         int i = 0;
         while(li.hasNext()) {
-            ModuleSADocument.ModuleSA msa = (ModuleSADocument.ModuleSA)li.next();
-            saa[i][0] = msa.getModuleGuid();
-            saa[i][1] = msa.getModuleVersion();
+            ModuleSADocument.ModuleSA moduleSa = (ModuleSADocument.ModuleSA)li.next();
+            saa[i][0] = moduleSa.getModuleGuid();
+            saa[i][1] = moduleSa.getModuleVersion();
             
-            saa[i][2] = msa.getPackageGuid();
-            saa[i][3] = msa.getPackageVersion();
-            saa[i][4] = listToString(msa.getSupArchList());
+            saa[i][2] = moduleSa.getPackageGuid();
+            saa[i][3] = moduleSa.getPackageVersion();
+            saa[i][4] = listToString(moduleSa.getSupArchList());
             ++i;
         }
     }
@@ -739,11 +765,18 @@ public class FpdFileContents {
         if (msa == null ) {
             return;
         }
-        if(msa.getModuleSaBuildOptions() == null){
-            msa.addNewModuleSaBuildOptions().setFvBinding(fvBinding);
-            return;
+        if (fvBinding == null || fvBinding.length() == 0) {
+            if(msa.getModuleSaBuildOptions() != null){
+                msa.getModuleSaBuildOptions().unsetFvBinding();
+            }
         }
-        msa.getModuleSaBuildOptions().setFvBinding(fvBinding);
+        else {
+            if(msa.getModuleSaBuildOptions() == null){
+                msa.addNewModuleSaBuildOptions().setFvBinding(fvBinding);
+                return;
+            }
+            msa.getModuleSaBuildOptions().setFvBinding(fvBinding);
+        }
     }
     
     public String getFfsFileNameGuid(String moduleKey){
@@ -1496,7 +1529,7 @@ public class FpdFileContents {
         return fpdBuildOpts;
     }
     
-    public void genBuildOptionsUserExtensions(String fvName, String infName, String outputFileName, String[][] includeModules) {
+    public void genBuildOptionsUserExtensions(String fvName, String outputFileName, String[][] includeModules) {
         UserExtensionsDocument.UserExtensions userExts = getfpdBuildOpts().addNewUserExtensions();
         userExts.setUserID("IMAGES");
         userExts.setIdentifier(new BigInteger("1"));
@@ -1508,7 +1541,7 @@ public class FpdFileContents {
         cursor.toNextToken();
         
         cursor.beginElement("InfFileName");
-        cursor.insertChars(infName);
+        cursor.insertChars(fvName + ".inf");
         cursor.toNextToken();
         
         cursor.beginElement("IncludeModules");
@@ -1581,6 +1614,32 @@ public class FpdFileContents {
         }
         
     }
+    
+    public void removeBuildOptionsUserExtensions (String fvName) {
+        if (getfpdBuildOpts().getUserExtensionsList() == null) {
+            return;
+        }
+        
+        ListIterator<UserExtensionsDocument.UserExtensions> li = getfpdBuildOpts().getUserExtensionsList().listIterator();
+        while (li.hasNext()) {
+            UserExtensionsDocument.UserExtensions ues = li.next();
+            if (!ues.getUserID().equals("IMAGES")) {
+                continue;
+            }
+            XmlCursor cursor = ues.newCursor();
+            cursor.toFirstChild();
+            String elementName = cursor.getTextValue();
+            if (elementName.equals(fvName)) {
+                cursor.toParent();
+                cursor.removeXml();
+                cursor.dispose();
+                return;
+            }
+            cursor.dispose();
+        }
+        
+    }
+    
     
     public void genBuildOptionsUserDefAntTask (String id, String fileName, String execOrder) {
         UserDefinedAntTasksDocument.UserDefinedAntTasks udats = getfpdBuildOpts().getUserDefinedAntTasks();
