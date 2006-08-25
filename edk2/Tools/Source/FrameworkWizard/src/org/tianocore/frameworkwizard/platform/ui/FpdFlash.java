@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 
 import javax.swing.AbstractAction;
 import javax.swing.DefaultCellEditor;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -26,15 +25,16 @@ import javax.swing.JButton;
 import javax.swing.ListSelectionModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
-
+import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
+import org.tianocore.frameworkwizard.platform.ui.FpdFrameworkModules;
+import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.BufferedReader;
@@ -129,7 +129,6 @@ public class FpdFlash extends IInternalFrame {
     private JScrollPane jScrollPane = null;
     private JTable jTableFvImageOpts = null;
     private JButton jButtonUpdateFvImage = null;
-    private JButton jButtonTest = null;
     private JPanel jPanelFdfN = null;
     private JPanel jPanelFdfS = null;
     private JSplitPane jSplitPaneFdfC = null;
@@ -153,259 +152,6 @@ public class FpdFlash extends IInternalFrame {
     private JButton jButtonDelFv = null;
     private JButton jButtonAddFvOptions = null;
     
-    private NonEditableTableModel nonEditableTableModel = null;  //  @jve:decl-index=0:visual-constraint=""
-    
-    private JPanel jPanelModOrder = null;
-    private JPanel jPanelModOrderN = null;
-    private JPanel jPanelModOrderS = null;
-    private JPanel jPanelModOrderC = null;
-    private JScrollPane jScrollPaneModInFv = null;
-    private JTable jTableModInFv = null;
-    private JPanel jPanelController = null;
-    private JScrollPane jScrollPaneFpdModules = null;
-    private JTable jTableFpdModules = null;
-    private JButton jButtonUp = null;
-    private JButton jButtonInsert = null;
-    private JButton jButtonRemove = null;
-    private JButton jButtonDown = null;
-    private JButton jButtonOk = null;
-    private JButton jButtonCancel = null;
-    
-    /**
-     * This method initializes jPanelModOrder   
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelModOrder() {
-//        if (jPanelModOrder == null) {
-            jPanelModOrder = new JPanel();
-            jPanelModOrder.setLayout(new BorderLayout());
-            jPanelModOrder.add(getJPanelModOrderN(), java.awt.BorderLayout.NORTH);
-            jPanelModOrder.add(getJPanelModOrderS(), java.awt.BorderLayout.SOUTH);
-            jPanelModOrder.add(getJPanelModOrderC(), java.awt.BorderLayout.CENTER);
-            jPanelModOrder.addComponentListener(new java.awt.event.ComponentAdapter() {
-                public void componentShown(java.awt.event.ComponentEvent e) {
-                    System.out.println("componentShown()" + jTabbedPane.getTitleAt(jTabbedPane.getSelectedIndex())); // TODO Auto-generated Event stub componentShown()
-                }
-            });
-//        }
-        return jPanelModOrder;
-    }
-
-    /**
-     * This method initializes jPanelModOrderN  
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelModOrderN() {
-//        if (jPanelModOrderN == null) {
-            jPanelModOrderN = new JPanel();
-//        }
-        return jPanelModOrderN;
-    }
-
-    /**
-     * This method initializes jPanelModOrderS  
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelModOrderS() {
-//        if (jPanelModOrderS == null) {
-            FlowLayout flowLayout6 = new FlowLayout();
-            flowLayout6.setAlignment(java.awt.FlowLayout.RIGHT);
-            jPanelModOrderS = new JPanel();
-            jPanelModOrderS.setLayout(flowLayout6);
-            jPanelModOrderS.add(getJButtonOk(), null);
-            jPanelModOrderS.add(getJButtonCancel(), null);
-//        }
-        return jPanelModOrderS;
-    }
-
-    /**
-     * This method initializes jPanelModOrderC  
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelModOrderC() {
-//        if (jPanelModOrderC == null) {
-            jPanelModOrderC = new JPanel();
-            jPanelModOrderC.add(getJScrollPaneModInFv(), null);
-            jPanelModOrderC.add(getJPanelController(), null);
-            jPanelModOrderC.add(getJScrollPaneFpdModules(), null);
-//        }
-        return jPanelModOrderC;
-    }
-
-    /**
-     * This method initializes jScrollPaneModInFv   
-     *  
-     * @return javax.swing.JScrollPane  
-     */
-    private JScrollPane getJScrollPaneModInFv() {
-//        if (jScrollPaneModInFv == null) {
-            jScrollPaneModInFv = new JScrollPane();
-            jScrollPaneModInFv.setPreferredSize(new java.awt.Dimension(150,500));
-            jScrollPaneModInFv.setViewportView(getJTableModInFv());
-//        }
-        return jScrollPaneModInFv;
-    }
-
-    /**
-     * This method initializes jTableModInFv    
-     *  
-     * @return javax.swing.JTable   
-     */
-    private JTable getJTableModInFv() {
-//        if (jTableModInFv == null) {
-            NonEditableTableModel modInFvTableModel = new NonEditableTableModel();
-            modInFvTableModel.addColumn("Module Orders in FV");
-            jTableModInFv = new JTable(modInFvTableModel);
-            jTableModInFv.setRowHeight(20);
-//        }
-        return jTableModInFv;
-    }
-
-    /**
-     * This method initializes jPanelController 
-     *  
-     * @return javax.swing.JPanel   
-     */
-    private JPanel getJPanelController() {
-//        if (jPanelController == null) {
-            FlowLayout flowLayout5 = new FlowLayout();
-            flowLayout5.setVgap(50);
-            flowLayout5.setHgap(50);
-            jPanelController = new JPanel();
-            jPanelController.setLayout(flowLayout5);
-            jPanelController.setPreferredSize(new java.awt.Dimension(150,500));
-            jPanelController.add(getJButtonUp(), null);
-            jPanelController.add(getJButtonInsert(), null);
-            jPanelController.add(getJButtonRemove(), null);
-            jPanelController.add(getJButtonDown(), null);
-//        }
-        return jPanelController;
-    }
-
-    /**
-     * This method initializes jScrollPaneFpdModules    
-     *  
-     * @return javax.swing.JScrollPane  
-     */
-    private JScrollPane getJScrollPaneFpdModules() {
-//        if (jScrollPaneFpdModules == null) {
-            jScrollPaneFpdModules = new JScrollPane();
-            jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(150,500));
-            jScrollPaneFpdModules.setViewportView(getJTableFpdModules());
-//        }
-        return jScrollPaneFpdModules;
-    }
-
-    /**
-     * This method initializes jTableFpdModules 
-     *  
-     * @return javax.swing.JTable   
-     */
-    private JTable getJTableFpdModules() {
-//        if (jTableFpdModules == null) {
-            NonEditableTableModel fpdModTableModel = new NonEditableTableModel();
-            fpdModTableModel.addColumn("Modules in Platform");
-            jTableFpdModules = new JTable(fpdModTableModel);
-            jTableFpdModules.setRowHeight(20);
-//        }
-        return jTableFpdModules;
-    }
-
-    /**
-     * This method initializes jButtonUp    
-     *  
-     * @return javax.swing.JButton  
-     */
-    private JButton getJButtonUp() {
-//        if (jButtonUp == null) {
-            jButtonUp = new JButton();
-            jButtonUp.setPreferredSize(new java.awt.Dimension(60,20));
-            jButtonUp.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 14));
-            jButtonUp.setText("^");
-//        }
-        return jButtonUp;
-    }
-
-    /**
-     * This method initializes jButtonInsert    
-     *  
-     * @return javax.swing.JButton  
-     */
-    private JButton getJButtonInsert() {
-//        if (jButtonInsert == null) {
-            jButtonInsert = new JButton();
-            jButtonInsert.setText("<<");
-            jButtonInsert.setPreferredSize(new java.awt.Dimension(60,20));
-//        }
-        return jButtonInsert;
-    }
-
-    /**
-     * This method initializes jButtonRemove    
-     *  
-     * @return javax.swing.JButton  
-     */
-    private JButton getJButtonRemove() {
-//        if (jButtonRemove == null) {
-            jButtonRemove = new JButton();
-            jButtonRemove.setPreferredSize(new java.awt.Dimension(60,20));
-            jButtonRemove.setText(">>");
-//        }
-        return jButtonRemove;
-    }
-
-    /**
-     * This method initializes jButtonDown  
-     *  
-     * @return javax.swing.JButton  
-     */
-    private JButton getJButtonDown() {
-//        if (jButtonDown == null) {
-            jButtonDown = new JButton();
-            jButtonDown.setPreferredSize(new java.awt.Dimension(60,20));
-            jButtonDown.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 10));
-            jButtonDown.setText("v");
-//        }
-        return jButtonDown;
-    }
-    
-    /**
-     * This method initializes jButtonOk    
-     *  
-     * @return javax.swing.JButton  
-     */
-    private JButton getJButtonOk() {
-//        if (jButtonOk == null) {
-            jButtonOk = new JButton();
-            jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
-            jButtonOk.setText("Ok");
-//        }
-        return jButtonOk;
-    }
-
-    /**
-     * This method initializes jButtonCancel    
-     *  
-     * @return javax.swing.JButton  
-     */
-    private JButton getJButtonCancel() {
-//        if (jButtonCancel == null) {
-            jButtonCancel = new JButton();
-            jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
-            jButtonCancel.setText("Cancel");
-            jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    getJTabbedPane().setSelectedIndex(0);
-                }
-            });
-//        }
-        return jButtonCancel;
-    }
-
     
     public FpdFlash() {
         super();
@@ -489,7 +235,7 @@ public class FpdFlash extends IInternalFrame {
         if (jTabbedPane == null) {
             jTabbedPane = new JTabbedPane();
             jTabbedPane.addTab("General", null, getJPanelFdf(), null);
-            jTabbedPane.addTab("FV Parameters", null, getJPanelFvImages(), null);
+            jTabbedPane.addTab("Advanced", null, getJPanelFvImages(), null);
             
         }
         return jTabbedPane;
@@ -1093,7 +839,7 @@ public class FpdFlash extends IInternalFrame {
             
             TableColumn typeCol = jTableFvInfo.getColumnModel().getColumn(1);
             JComboBox cb = new JComboBox();
-            cb.addItem("ValidImageNames");
+            cb.addItem("ImageName");
             cb.addItem("Attributes");
             cb.addItem("Options");
             cb.addItem("Components");
@@ -1111,6 +857,14 @@ public class FpdFlash extends IInternalFrame {
                     }
                     else{
                         int selectedRow = lsm.getMinSelectionIndex();
+                        if (fvImageParaTableModel.getValueAt(selectedRow, 1).equals("ImageName")) {
+                            String[] fvNames = fvImageParaTableModel.getValueAt(selectedRow, 0).toString().split(" ");
+                            for (int i = 0; i < fvNames.length; ++i) {
+                                String[] row = {fvNames[i]};
+                                fvImageNameTableModel.addRow(row);
+                            }
+                            return;
+                        }
                         LinkedHashMap<String, String> optionMap = new LinkedHashMap<String, String>();
                         ffc.getFvImagesFvImageOptions(selectedRow, optionMap);
                         if (optionMap.size() > 0){
@@ -1187,13 +941,6 @@ public class FpdFlash extends IInternalFrame {
                             return;
                         }
                         
-//                        jLabel5.setEnabled(selected);
-//                        jTextField4.setEnabled(selected);
-//                        jLabel6.setEnabled(selected);
-//                        jTextField5.setEnabled(selected);
-//                        jButton7.setEnabled(selected);
-//                        jButton8.setEnabled(selected);
-
                 }
                 
             });
@@ -1523,11 +1270,6 @@ public class FpdFlash extends IInternalFrame {
         return jButtonUpdateFvImage;
     }
 
-    /**
-     * This method initializes jButtonTest	
-     * 	
-     * @return javax.swing.JButton	
-     */
 //    private JButton getJButtonTest() {
 //        if (jButtonTest == null) {
 //            jButtonTest = new JButton();
@@ -1757,11 +1499,9 @@ public class FpdFlash extends IInternalFrame {
             jButtonFvInFdfOptions.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     int selectedRow = jTableFvInFdf.getSelectedRow();
-                    if (selectedRow <= 0) {
+                    if (selectedRow < 0) {
                         return;
                     }
-                    fvInFdfTableModel.moveRow(selectedRow, selectedRow, selectedRow - 1);
-                    jTableFvInFdf.changeSelection(selectedRow - 1, 0, false, false);
                 }
             });
         }
@@ -1853,21 +1593,6 @@ public class FpdFlash extends IInternalFrame {
         }
         return jButtonAddFvOptions;
     }
-
-    
-
-    /**
-     * This method initializes nonEditableTableModel	
-     * 	
-     * @return org.tianocore.frameworkwizard.platform.ui.NonEditableTableModel	
-     */
-    private NonEditableTableModel getNonEditableTableModel() {
-        if (nonEditableTableModel == null) {
-            nonEditableTableModel = new NonEditableTableModel();
-        }
-        return nonEditableTableModel;
-    }
-
     
     /**
      * @param args
@@ -1941,7 +1666,7 @@ public class FpdFlash extends IInternalFrame {
 
         for (int k = 0; k < vFvInfo.size(); ++k) {
             FvInfoFromFdf fvInfo = vFvInfo.get(k);
-            getJTabbedPane().addTab(fvInfo.getFvName(), null, getJPanelModOrder(), null);
+            getJTabbedPane().addTab(fvInfo.getFvName(), null, new ModuleOrderPane(), null);
 
         }
     }
@@ -2079,7 +1804,397 @@ public class FpdFlash extends IInternalFrame {
 
     }
         
-    
+    private class ModuleOrderPane extends JPanel {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        private JPanel jPanelModOrderN = null;
+        private JPanel jPanelModOrderS = null;
+        private JPanel jPanelModOrderC = null;
+        private JScrollPane jScrollPaneModInFv = null;
+        private JTable jTableModInFv = null;
+        private JPanel jPanelController = null;
+        private JScrollPane jScrollPaneFpdModules = null;
+        private JTable jTableFpdModules = null;
+        private JButton jButtonUp = null;
+        private JButton jButtonInsert = null;
+        private JButton jButtonRemove = null;
+        private JButton jButtonDown = null;
+        private JButton jButtonOk = null;
+        private JButton jButtonCancel = null;
+        private NonEditableTableModel modInFvTableModel = null;
+        private NonEditableTableModel fpdModTableModel = null;
+        
+        public ModuleOrderPane() {
+            super(new BorderLayout());
+            add(getJPanelModOrderN(), java.awt.BorderLayout.NORTH);
+            add(getJPanelModOrderS(), java.awt.BorderLayout.SOUTH);
+            add(getJPanelModOrderC(), java.awt.BorderLayout.CENTER);
+            addComponentListener(new java.awt.event.ComponentAdapter() {
+                public void componentShown(java.awt.event.ComponentEvent e) {
+                    String title = jTabbedPane.getTitleAt(jTabbedPane.getSelectedIndex()); // TODO Auto-generated Event stub componentShown()
+                    showModulesInFv(title);
+                    showAllModulesInPlatform();
+                }
+            });
+        }
+        
+        private void showModulesInFv(String fvName) {
+            int size = ffc.getUserExtsIncModCount(fvName);
+            
+            if (size != -1) {
+                String[][] saa = new String[size][2];
+                ffc.getUserExtsIncMods(fvName, saa);
+
+                for (int i = 0; i < size; ++i) {
+                    String name = getModuleName(saa[i][0]);
+                    String[] row = { name };
+                    modInFvTableModel.addRow(row);
+                }
+            }
+            //
+            // From ModuleSAs, get module guids with FvBinding = fvName.
+            //
+            Vector<String> vGuid = new Vector<String>();
+            ffc.getFrameworkModuleGuid(fvName, vGuid);
+            //
+            // If BuildOptions->UserExtensions already contain these module info,
+            // no need to add them into table again.
+            //
+            Iterator<String> iter = vGuid.iterator();
+            while (iter.hasNext()){
+                String guid = iter.next();
+                String moduleName = getModuleName(guid);
+                if (existedInTable(moduleName, modInFvTableModel)) {
+                    vGuid.remove(guid);
+                }
+            }
+            
+            for (int j = 0; j < vGuid.size(); ++j) {
+                String[] row = {getModuleName(vGuid.get(j))};
+                modInFvTableModel.addRow(row);
+            }
+        }
+        
+        private void showAllModulesInPlatform() {
+            int size = ffc.getFrameworkModulesCount();
+            String[][] saa = new String[size][5];
+            ffc.getFrameworkModulesInfo(saa);
+            
+            for (int i = 0; i < size; ++i) {
+                String name = getModuleName(saa[i][0]);
+                if (existedInTable(name, modInFvTableModel) || existedInTable(name, fpdModTableModel)) {
+                    continue;
+                }
+                String[] row = {name};
+                fpdModTableModel.addRow(row);
+            }
+            
+            TableSorter sorter = (TableSorter)jTableFpdModules.getModel();
+            sorter.setSortState(0, TableSorter.ASCENDING);
+        }
+        
+        private String getModuleName (String guid) {
+            
+            for (int i = 0; i < GlobalData.vModuleList.size(); ++i) {
+                String mg = GlobalData.vModuleList.get(i).getGuid();
+                if (mg == null) {
+                    continue;
+                }
+                if (mg.equalsIgnoreCase(guid)) {
+                    return GlobalData.vModuleList.get(i).getName();
+                }
+            }
+            
+            return "";
+        }
+        
+        private boolean existedInTable (String name, DefaultTableModel model) {
+            int size = model.getDataVector().size();
+            for (int i = 0; i < size; ++i) {
+                if (((Vector)model.getDataVector().elementAt(i)).contains(name)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        /**
+         * This method initializes jPanelModOrderN  
+         *  
+         * @return javax.swing.JPanel   
+         */
+        private JPanel getJPanelModOrderN() {
+            if (jPanelModOrderN == null) {
+                jPanelModOrderN = new JPanel();
+            }
+            return jPanelModOrderN;
+        }
+
+        /**
+         * This method initializes jPanelModOrderS  
+         *  
+         * @return javax.swing.JPanel   
+         */
+        private JPanel getJPanelModOrderS() {
+            if (jPanelModOrderS == null) {
+                FlowLayout flowLayout6 = new FlowLayout();
+                flowLayout6.setAlignment(java.awt.FlowLayout.RIGHT);
+                jPanelModOrderS = new JPanel();
+                jPanelModOrderS.setLayout(flowLayout6);
+                jPanelModOrderS.add(getJButtonOk(), null);
+                jPanelModOrderS.add(getJButtonCancel(), null);
+            }
+            return jPanelModOrderS;
+        }
+
+        /**
+         * This method initializes jPanelModOrderC  
+         *  
+         * @return javax.swing.JPanel   
+         */
+        private JPanel getJPanelModOrderC() {
+            if (jPanelModOrderC == null) {
+                jPanelModOrderC = new JPanel();
+                jPanelModOrderC.add(getJScrollPaneModInFv(), null);
+                jPanelModOrderC.add(getJPanelController(), null);
+                jPanelModOrderC.add(getJScrollPaneFpdModules(), null);
+            }
+            return jPanelModOrderC;
+        }
+
+        /**
+         * This method initializes jScrollPaneModInFv   
+         *  
+         * @return javax.swing.JScrollPane  
+         */
+        private JScrollPane getJScrollPaneModInFv() {
+            if (jScrollPaneModInFv == null) {
+                jScrollPaneModInFv = new JScrollPane();
+                jScrollPaneModInFv.setPreferredSize(new java.awt.Dimension(200,500));
+                jScrollPaneModInFv.setViewportView(getJTableModInFv());
+            }
+            return jScrollPaneModInFv;
+        }
+
+        /**
+         * This method initializes jTableModInFv    
+         *  
+         * @return javax.swing.JTable   
+         */
+        private JTable getJTableModInFv() {
+            if (jTableModInFv == null) {
+                modInFvTableModel = new NonEditableTableModel();
+                modInFvTableModel.addColumn("Module Orders in FV");
+                jTableModInFv = new JTable(modInFvTableModel);
+                jTableModInFv.setRowHeight(20);
+                jTableModInFv.setShowGrid(false);
+            }
+            return jTableModInFv;
+        }
+
+        /**
+         * This method initializes jPanelController 
+         *  
+         * @return javax.swing.JPanel   
+         */
+        private JPanel getJPanelController() {
+            if (jPanelController == null) {
+                FlowLayout flowLayout5 = new FlowLayout();
+                flowLayout5.setVgap(50);
+                flowLayout5.setHgap(50);
+                jPanelController = new JPanel();
+                jPanelController.setLayout(flowLayout5);
+                jPanelController.setPreferredSize(new java.awt.Dimension(150,500));
+                jPanelController.add(getJButtonUp(), null);
+                jPanelController.add(getJButtonInsert(), null);
+                jPanelController.add(getJButtonRemove(), null);
+                jPanelController.add(getJButtonDown(), null);
+            }
+            return jPanelController;
+        }
+
+        /**
+         * This method initializes jScrollPaneFpdModules    
+         *  
+         * @return javax.swing.JScrollPane  
+         */
+        private JScrollPane getJScrollPaneFpdModules() {
+            if (jScrollPaneFpdModules == null) {
+                jScrollPaneFpdModules = new JScrollPane();
+                jScrollPaneFpdModules.setPreferredSize(new java.awt.Dimension(200,500));
+                jScrollPaneFpdModules.setViewportView(getJTableFpdModules());
+            }
+            return jScrollPaneFpdModules;
+        }
+
+        /**
+         * This method initializes jTableFpdModules 
+         *  
+         * @return javax.swing.JTable   
+         */
+        private JTable getJTableFpdModules() {
+            if (jTableFpdModules == null) {
+                fpdModTableModel = new NonEditableTableModel();
+                TableSorter sorter = new TableSorter(fpdModTableModel);
+                jTableFpdModules = new JTable(sorter);
+                jTableFpdModules.setRowHeight(20);
+                jTableFpdModules.setShowGrid(false);
+                fpdModTableModel.addColumn("Modules in Platform");
+            }
+            return jTableFpdModules;
+        }
+
+        /**
+         * This method initializes jButtonUp    
+         *  
+         * @return javax.swing.JButton  
+         */
+        private JButton getJButtonUp() {
+            if (jButtonUp == null) {
+                jButtonUp = new JButton();
+                jButtonUp.setPreferredSize(new java.awt.Dimension(60,20));
+                jButtonUp.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 14));
+                jButtonUp.setText("^");
+                jButtonUp.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        int selectedRow = jTableModInFv.getSelectedRow();
+                        if (selectedRow <= 0) {
+                            return;
+                        }
+                        modInFvTableModel.moveRow(selectedRow, selectedRow, selectedRow - 1);
+                        jTableModInFv.changeSelection(selectedRow - 1, 0, false, false);
+                    }
+                });
+            }
+            return jButtonUp;
+        }
+
+        /**
+         * This method initializes jButtonInsert    
+         *  
+         * @return javax.swing.JButton  
+         */
+        private JButton getJButtonInsert() {
+            if (jButtonInsert == null) {
+                jButtonInsert = new JButton();
+                jButtonInsert.setText("<<");
+                jButtonInsert.setPreferredSize(new java.awt.Dimension(60,20));
+                jButtonInsert.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        int selectedRowRight = jTableFpdModules.getSelectedRow();
+                        if (selectedRowRight < 0) {
+                            return;
+                        }
+                        
+                        int rowInModel = ((TableSorter)jTableFpdModules.getModel()).getModelRowIndex(selectedRowRight);
+                        
+                        String[] row = {jTableFpdModules.getValueAt(selectedRowRight, 0)+""};
+                        int selectedRowLeft = jTableModInFv.getSelectedRow();
+                        if (selectedRowLeft < 0) {
+                            modInFvTableModel.addRow(row);
+                            jTableModInFv.changeSelection(jTableModInFv.getRowCount() - 1, 0, false, false);
+                            fpdModTableModel.removeRow(rowInModel);
+                        }
+                        else {
+                            modInFvTableModel.insertRow(selectedRowLeft, row);
+                            jTableModInFv.changeSelection(selectedRowLeft, 0, false, false);
+                        }
+                    }
+                });
+            }
+            return jButtonInsert;
+        }
+
+        /**
+         * This method initializes jButtonRemove    
+         *  
+         * @return javax.swing.JButton  
+         */
+        private JButton getJButtonRemove() {
+            if (jButtonRemove == null) {
+                jButtonRemove = new JButton();
+                jButtonRemove.setPreferredSize(new java.awt.Dimension(60,20));
+                jButtonRemove.setText(">>");
+                jButtonRemove.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        int selectedRowLeft = jTableModInFv.getSelectedRow();
+                        if (selectedRowLeft < 0) {
+                            return;
+                        }
+                        
+                        String[] row = {jTableModInFv.getValueAt(selectedRowLeft, 0)+""};
+                        fpdModTableModel.addRow(row);
+                        int viewIndex = ((TableSorter) jTableFpdModules.getModel()).getViewIndexArray()[jTableFpdModules
+                                                                                                                        .getRowCount() - 1];
+                        jTableFpdModules.changeSelection(viewIndex, 0, false, false);
+                        modInFvTableModel.removeRow(selectedRowLeft);
+                    }
+                });
+            }
+            return jButtonRemove;
+        }
+
+        /**
+         * This method initializes jButtonDown  
+         *  
+         * @return javax.swing.JButton  
+         */
+        private JButton getJButtonDown() {
+            if (jButtonDown == null) {
+                jButtonDown = new JButton();
+                jButtonDown.setPreferredSize(new java.awt.Dimension(60,20));
+                jButtonDown.setFont(new java.awt.Font("Dialog", java.awt.Font.BOLD, 10));
+                jButtonDown.setText("v");
+                jButtonDown.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        int selectedRow = jTableModInFv.getSelectedRow();
+                        if (selectedRow >= jTableModInFv.getRowCount() - 1) {
+                            return;
+                        }
+                        modInFvTableModel.moveRow(selectedRow, selectedRow, selectedRow + 1);
+                        jTableModInFv.changeSelection(selectedRow + 1, 0, false, false);
+                    }
+                });
+            }
+            return jButtonDown;
+        }
+        
+        /**
+         * This method initializes jButtonOk    
+         *  
+         * @return javax.swing.JButton  
+         */
+        private JButton getJButtonOk() {
+            if (jButtonOk == null) {
+                jButtonOk = new JButton();
+                jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
+                jButtonOk.setText("Ok");
+            }
+            return jButtonOk;
+        }
+
+        /**
+         * This method initializes jButtonCancel    
+         *  
+         * @return javax.swing.JButton  
+         */
+        private JButton getJButtonCancel() {
+            if (jButtonCancel == null) {
+                jButtonCancel = new JButton();
+                jButtonCancel.setPreferredSize(new java.awt.Dimension(80,20));
+                jButtonCancel.setText("Cancel");
+                jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        jTabbedPane.setSelectedIndex(0);
+                    }
+                });
+            }
+            return jButtonCancel;
+        }
+    }
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
