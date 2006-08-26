@@ -1865,7 +1865,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         if (arg0.getSource() == this.jMenuItemEditFindLibraryClass) {
             this.findLibraryClass();
         }
-        
+
         if (arg0.getSource() == this.jMenuItemEditFindLibraryInstance) {
             this.findLibraryInstance();
         }
@@ -2477,38 +2477,35 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         Identification id = null;
         int intCategory = -1;
         String path = null;
-        boolean isOpen = false;
+
         try {
             id = iTree.getSelectNode().getId();
             intCategory = iTree.getSelectCategory();
-            isOpen = iTree.getSelectNode().isOpening();
 
-            if (!isOpen) {
-                //              
-                // If the node is not opened yet
-                // Insert top level elements first
-                //
+            //              
+            // If the node is not opened yet
+            // Insert top level elements first
+            //
+            if (intCategory == IDefaultMutableTreeNode.MODULE) {
+
                 if (intCategory == IDefaultMutableTreeNode.MODULE) {
-
-                    if (intCategory == IDefaultMutableTreeNode.MODULE) {
-                        path = iTree.getSelectNode().getId().getPath();
-                    }
-                    if (intCategory == IDefaultMutableTreeNode.PACKAGE) {
-                        path = iTree.getSelectNode().getId().getPath();
-                    }
-                    openModule(path);
-                    return;
+                    path = iTree.getSelectNode().getId().getPath();
                 }
                 if (intCategory == IDefaultMutableTreeNode.PACKAGE) {
                     path = iTree.getSelectNode().getId().getPath();
-                    openPackage(path);
-                    return;
                 }
-                if (intCategory == IDefaultMutableTreeNode.PLATFORM) {
-                    path = iTree.getSelectNode().getId().getPath();
-                    openPlatform(path);
-                    return;
-                }
+                openModule(path);
+                return;
+            }
+            if (intCategory == IDefaultMutableTreeNode.PACKAGE) {
+                path = iTree.getSelectNode().getId().getPath();
+                openPackage(path);
+                return;
+            }
+            if (intCategory == IDefaultMutableTreeNode.PLATFORM) {
+                path = iTree.getSelectNode().getId().getPath();
+                openPlatform(path);
+                return;
             }
 
             //
