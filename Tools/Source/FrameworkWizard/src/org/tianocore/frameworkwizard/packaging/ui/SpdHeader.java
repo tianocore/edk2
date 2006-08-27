@@ -29,7 +29,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Tools;
@@ -47,6 +46,52 @@ import javax.swing.JCheckBox;
  **/
 public class SpdHeader extends IInternalFrame {
 
+    private int dialogWidth = 560;
+
+    private int labelColumn = 12;
+
+    private int labelWidth = 155;
+
+    private int buttonWidth = 60;
+
+    private final int valueColumn = 168;
+
+    private final int valueWidth = 320;
+    
+    private final int specWidth = 420;
+    
+    private int shortValueWidth = valueWidth - (buttonWidth + 5);
+
+    private final int oneRowHeight = 20;
+
+    private final int threeRowHeight = 60;
+
+    private final int fourRowHeight = 80;
+
+    private final int rowSep = 5;
+
+    private final int rowOne = 12;
+
+    private final int rowTwo = rowOne + oneRowHeight + rowSep;
+
+    private final int rowThree = rowTwo + oneRowHeight + rowSep;
+
+    private final int rowFour = rowThree + oneRowHeight + rowSep;
+
+    private final int rowFive = rowFour + threeRowHeight + rowSep;
+
+    private final int rowSix = rowFive + fourRowHeight + rowSep;
+
+    private final int rowSeven = rowSix + oneRowHeight + rowSep;
+
+    private final int rowEight = rowSeven + oneRowHeight + rowSep;
+
+    private final int rowNine = rowEight + fourRowHeight + rowSep;
+
+    private final int rowTen = rowNine + oneRowHeight + rowSep;
+
+    private int dialogHeight = rowTen + threeRowHeight;
+
     ///
     /// Define class Serial Version UID
     ///
@@ -56,48 +101,50 @@ public class SpdHeader extends IInternalFrame {
     //Define class members
     //
     static JFrame frame;
-    
+
     private JPanel jContentPane = null;
 
-    private JLabel jLabelBaseName = null;
+    private JLabel jPackageNameLabel = null;
 
-    private JTextField jTextFieldBaseName = null;
+    private JTextField jPackageNameTextField = null;
 
-    private JLabel jLabelGuid = null;
+    private JLabel jGuidLabel = null;
 
-    private JTextField jTextFieldGuid = null;
+    private JTextField jGuidTextField = null;
 
-    private JLabel jLabelVersion = null;
+    private JLabel jVersionLabel = null;
 
-    private JTextField jTextFieldVersion = null;
+    private JTextField jVersionTextField = null;
 
-    private JButton jButtonGenerateGuid = null;
+    private JButton jGenerateGuidButton = null;
 
-    private JLabel jLabelLicense = null;
+    private JLabel jLicenseLabel = null;
 
-    private JTextArea jTextAreaLicense = null;
+    private JTextArea jLicenseTextArea = null;
 
     private JLabel jLabelCopyright = null;
 
-    private JLabel jLabelDescription = null;
+    private JLabel jDescriptionLabel = null;
 
-    private JTextArea jTextAreaDescription = null;
+    private JTextArea jDescriptionTextArea = null;
 
-    private JLabel jLabelSpecification = null;
+    //    private JLabel jLabelSpecification = null;
 
-    private JTextField jTextFieldSpecification = null;
+    private JTextField jSpecificationTextField = null;
 
     private JButton jButtonOk = null;
 
     private JButton jButtonCancel = null;
 
-    private JScrollPane jScrollPaneLicense = null;
+    private JScrollPane jLicenseScrollPane = null;
 
-    private JScrollPane jScrollPaneDescription = null;
+    private JScrollPane jDescriptionScrollPane = null;
+    
+    private JScrollPane jCopyrightScrollPane = null;
 
-    private JLabel jLabelAbstract = null;
+    private JLabel jAbstractLabel = null;
 
-    private JTextField jTextFieldAbstract = null;
+    private JTextField jAbstractTextField = null;
 
     private StarLabel jStarLabel1 = null;
 
@@ -112,203 +159,206 @@ public class SpdHeader extends IInternalFrame {
     private StarLabel jStarLabel6 = null;
 
     private StarLabel jStarLabel7 = null;
+    
+    private StarLabel jStarLabel8 = null;
 
     private StarLabel jStarLabel9 = null;
-    
+
     private SpdFileContents sfc = null;
-    
+
     private OpeningPackageType docConsole = null;
 
-    private JTextField jTextFieldCopyright = null;
-    
+    private JTextArea jCopyrightTextArea = null;
+
     private JScrollPane topScrollPane = null;
 
-    private JLabel jLabel = null;
+    private JLabel jUrlLabel = null;
 
-    private JTextField jTextFieldUrl = null;
-
-    private StarLabel starLabel = null;
-
-    private StarLabel starLabel1 = null;
+    private JTextField jUrlTextField = null;
 
     private JCheckBox jCheckBoxRdOnly = null;
 
     private JCheckBox jCheckBoxRePkg = null;
 
     /**
-     This method initializes jTextFieldBaseName 
+     This method initializes jPackageNameTextField 
      
-     @return javax.swing.JTextField jTextFieldBaseName
+     @return javax.swing.JTextField jPackageNameTextField
      
      **/
-    private JTextField getJTextFieldBaseName() {
-        if (jTextFieldBaseName == null) {
-            jTextFieldBaseName = new JTextField();
-            jTextFieldBaseName.setBounds(new java.awt.Rectangle(160, 10, 320, 20));
-            jTextFieldBaseName.setPreferredSize(new java.awt.Dimension(320,20));
-            jTextFieldBaseName.addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent e){
-                    if (!DataValidation.isUiNameType(jTextFieldBaseName.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Package Name is NOT UiNameType.");
+    private JTextField getJPackageNameTextField() {
+        if (jPackageNameTextField == null) {
+            jPackageNameTextField = new JTextField();
+            jPackageNameTextField.setBounds(new java.awt.Rectangle(valueColumn, rowOne, valueWidth, oneRowHeight));
+            jPackageNameTextField.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
+            jPackageNameTextField.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (!DataValidation.isUiNameType(jPackageNameTextField.getText())) {
+                        JOptionPane.showMessageDialog(frame, "Package Name must start with a letter.");
                         return;
                     }
-                    if (jTextFieldBaseName.getText().equals(sfc.getSpdHdrPkgName())) {
+                    if (jPackageNameTextField.getText().equals(sfc.getSpdHdrPkgName())) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    sfc.setSpdHdrPkgName(jTextFieldBaseName.getText());
+                    sfc.setSpdHdrPkgName(jPackageNameTextField.getText());
                 }
             });
         }
-        return jTextFieldBaseName;
+        return jPackageNameTextField;
     }
 
     /**
-     This method initializes jTextFieldGuid 
+     This method initializes jGuidTextField 
      
-     @return javax.swing.JTextField jTextFieldGuid
+     @return javax.swing.JTextField jGuidTextField
      
      **/
-    private JTextField getJTextFieldGuid() {
-        if (jTextFieldGuid == null) {
-            jTextFieldGuid = new JTextField();
-            jTextFieldGuid.setBounds(new java.awt.Rectangle(160, 35, 250, 20));
-            jTextFieldGuid.setPreferredSize(new java.awt.Dimension(250,20));
-            jTextFieldGuid.addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent e){
-                    if (!DataValidation.isGuid(jTextFieldGuid.getText())) {
-                        JOptionPane.showMessageDialog(frame, "Guid is NOT GuidType.");
+    private JTextField getJGuidTextField() {
+        if (jGuidTextField == null) {
+            jGuidTextField = new JTextField();
+            jGuidTextField.setBounds(new java.awt.Rectangle(valueColumn, rowTwo, shortValueWidth, oneRowHeight));
+            jGuidTextField.setPreferredSize(new java.awt.Dimension(shortValueWidth, oneRowHeight));
+            jGuidTextField.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (!DataValidation.isGuid(jGuidTextField.getText())) {
+                        JOptionPane.showMessageDialog(frame, "Guid must be in registry (8-4-4-4-12) format.");
                         return;
                     }
-                    if (jTextFieldGuid.getText().equals(sfc.getSpdHdrGuidValue())) {
+                    if (jGuidTextField.getText().equals(sfc.getSpdHdrGuidValue())) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    sfc.setSpdHdrGuidValue(jTextFieldGuid.getText());
+                    sfc.setSpdHdrGuidValue(jGuidTextField.getText());
                 }
             });
         }
-        return jTextFieldGuid;
+        return jGuidTextField;
     }
 
     /**
-     This method initializes jTextFieldVersion 
+     This method initializes jVersionTextField 
      
-     @return javax.swing.JTextField jTextFieldVersion
-     
-     **/
-    private JTextField getJTextFieldVersion() {
-        if (jTextFieldVersion == null) {
-            jTextFieldVersion = new JTextField();
-            jTextFieldVersion.setBounds(new java.awt.Rectangle(160, 60, 320, 20));
-            jTextFieldVersion.setPreferredSize(new java.awt.Dimension(320,20));
-            jTextFieldVersion.addFocusListener(new FocusAdapter(){
-               public void focusLost(FocusEvent e){
-                   if (!DataValidation.isVersion(jTextFieldVersion.getText())) {
-                       JOptionPane.showMessageDialog(frame, "Version is NOT version type.");
-                       return;
-                   }
-                   if (jTextFieldVersion.getText().equals(sfc.getSpdHdrVer())){
-                       return;
-                   }
-                   docConsole.setSaved(false);
-                   sfc.setSpdHdrVer(jTextFieldVersion.getText());
-               } 
-            });
-        }
-        return jTextFieldVersion;
-    }
-
-    /**
-     This method initializes jButtonGenerateGuid 
-     
-     @return javax.swing.JButton jButtonGenerateGuid
+     @return javax.swing.JTextField jVersionTextField
      
      **/
-    private JButton getJButtonGenerateGuid() {
-        if (jButtonGenerateGuid == null) {
-            jButtonGenerateGuid = new JButton();
-            jButtonGenerateGuid.setBounds(new java.awt.Rectangle(415, 35, 65, 20));
-            jButtonGenerateGuid.setText("GEN");
-            jButtonGenerateGuid.addActionListener(this);
-        }
-        return jButtonGenerateGuid;
-    }
-
-    /**
-     This method initializes jTextAreaLicense 
-     
-     @return javax.swing.JTextArea jTextAreaLicense
-     
-     **/
-    private JTextArea getJTextAreaLicense() {
-        if (jTextAreaLicense == null) {
-            jTextAreaLicense = new JTextArea();
-            jTextAreaLicense.setText("");
-            jTextAreaLicense.setLineWrap(true);
-            jTextAreaLicense.addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent e){
-                    if (jTextAreaLicense.getText().length() == 0) {
-                        JOptionPane.showMessageDialog(frame, "License contents could NOT be empty.");
+    private JTextField getJVersionTextField() {
+        if (jVersionTextField == null) {
+            jVersionTextField = new JTextField();
+            jVersionTextField.setBounds(new java.awt.Rectangle(valueColumn, rowThree, valueWidth, oneRowHeight));
+            jVersionTextField.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
+            jVersionTextField.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (!DataValidation.isVersion(jVersionTextField.getText())) {
+                        JOptionPane.showMessageDialog(frame, "Version must start with a number.");
                         return;
                     }
-                    if (jTextAreaLicense.getText().equals(sfc.getSpdHdrLicense())) {
+                    if (jVersionTextField.getText().equals(sfc.getSpdHdrVer())) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    sfc.setSpdHdrLicense(jTextAreaLicense.getText());
+                    sfc.setSpdHdrVer(jVersionTextField.getText());
                 }
             });
         }
-        return jTextAreaLicense;
+        return jVersionTextField;
     }
 
     /**
-     This method initializes jTextAreaDescription 
+     This method initializes jGenerateGuidButton 
      
-     @return javax.swing.JTextArea jTextAreaDescription
+     @return javax.swing.JButton jGenerateGuidButton
      
      **/
-    private JTextArea getJTextAreaDescription() {
-        if (jTextAreaDescription == null) {
-            jTextAreaDescription = new JTextArea();
-            jTextAreaDescription.setLineWrap(true);
-            jTextAreaDescription.addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent e){
-                    if (jTextAreaDescription.getText().length() == 0) {
-                        JOptionPane.showMessageDialog(frame, "Description contents could NOT be empty.");
+    private JButton getJGenerateGuidButton() {
+        if (jGenerateGuidButton == null) {
+            jGenerateGuidButton = new JButton();
+            jGenerateGuidButton.setBounds(new java.awt.Rectangle(valueColumn + shortValueWidth + 5, rowTwo, buttonWidth, oneRowHeight));
+            jGenerateGuidButton.setText("GEN");
+            jGenerateGuidButton.addActionListener(this);
+        }
+        return jGenerateGuidButton;
+    }
+
+    /**
+     This method initializes jLicenseTextArea 
+     
+     @return javax.swing.JTextArea jLicenseTextArea
+     
+     **/
+    private JTextArea getJLicenseTextArea() {
+        if (jLicenseTextArea == null) {
+            jLicenseTextArea = new JTextArea();
+            //            jLicenseTextArea.setText("");
+            jLicenseTextArea.setLineWrap(true);
+            jLicenseTextArea.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (jLicenseTextArea.getText().length() == 0) {
+                        JOptionPane.showMessageDialog(frame, "License is a required field.");
                         return;
                     }
-                    if (jTextAreaDescription.getText().equals(sfc.getSpdHdrDescription())) {
+                    if (jLicenseTextArea.getText().equals(sfc.getSpdHdrLicense())) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    sfc.setSpdHdrDescription(jTextAreaDescription.getText());
+                    sfc.setSpdHdrLicense(jLicenseTextArea.getText());
                 }
             });
         }
-        return jTextAreaDescription;
+        return jLicenseTextArea;
     }
 
     /**
-     This method initializes jTextFieldSpecification 
+     This method initializes jDescriptionTextArea 
      
-     @return javax.swing.JTextField jTextFieldSpecification
+     @return javax.swing.JTextArea jDescriptionTextArea
      
      **/
-    private JTextField getJTextFieldSpecification() {
-        if (jTextFieldSpecification == null) {
-            jTextFieldSpecification = new JTextField();
-            jTextFieldSpecification.setBounds(new java.awt.Rectangle(161,369,320,20));
-            jTextFieldSpecification.setEditable(false);
-            jTextFieldSpecification.setPreferredSize(new java.awt.Dimension(320,20));
-            jTextFieldSpecification.addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent e){
-                    sfc.setSpdHdrSpec(jTextFieldSpecification.getText());
+    private JTextArea getJDescriptionTextArea() {
+        if (jDescriptionTextArea == null) {
+            jDescriptionTextArea = new JTextArea();
+            jDescriptionTextArea.setLineWrap(true);
+            jDescriptionTextArea.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (jDescriptionTextArea.getText().length() == 0) {
+                        JOptionPane
+                                   .showMessageDialog(frame,
+                                                      "Description is a required field, and should reflect the contents of the package.");
+                        return;
+                    }
+                    if (jDescriptionTextArea.getText().equals(sfc.getSpdHdrDescription())) {
+                        return;
+                    }
+                    docConsole.setSaved(false);
+                    sfc.setSpdHdrDescription(jDescriptionTextArea.getText());
                 }
             });
         }
-        return jTextFieldSpecification;
+        return jDescriptionTextArea;
+    }
+
+    /**
+     This method initializes jSpecificationTextField 
+     
+     @return javax.swing.JTextField jSpecificationTextField
+     
+     **/
+    private JTextField getJSpecificationTextField() {
+        if (jSpecificationTextField == null) {
+            jSpecificationTextField = new JTextField();
+            jSpecificationTextField.setBounds(new java.awt.Rectangle(labelColumn, dialogHeight - 40, specWidth, oneRowHeight));
+            jSpecificationTextField.setEditable(false);
+            jSpecificationTextField.setPreferredSize(new java.awt.Dimension(specWidth, oneRowHeight));
+            jSpecificationTextField.setLocation(new java.awt.Point(2, dialogHeight - oneRowHeight));
+            jSpecificationTextField.setBorder(null);
+
+            //            jSpecificationTextField.addFocusListener(new FocusAdapter(){
+            //                public void focusLost(FocusEvent e){
+            //                    sfc.setSpdHdrSpec(jSpecificationTextField.getText());
+            //                }
+            //            });
+        }
+        return jSpecificationTextField;
     }
 
     /**
@@ -321,7 +371,7 @@ public class SpdHeader extends IInternalFrame {
         if (jButtonOk == null) {
             jButtonOk = new JButton();
             jButtonOk.setText("OK");
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 445, 90, 20));
+            jButtonOk.setBounds(new java.awt.Rectangle(290, 445, 90, oneRowHeight));
             jButtonOk.setVisible(false);
             jButtonOk.addActionListener(this);
         }
@@ -338,7 +388,7 @@ public class SpdHeader extends IInternalFrame {
         if (jButtonCancel == null) {
             jButtonCancel = new JButton();
             jButtonCancel.setText("Cancel");
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 445, 90, 20));
+            jButtonCancel.setBounds(new java.awt.Rectangle(390, 445, 90, oneRowHeight));
             jButtonCancel.setVisible(false);
             jButtonCancel.addActionListener(this);
         }
@@ -346,92 +396,102 @@ public class SpdHeader extends IInternalFrame {
     }
 
     /**
-     This method initializes jScrollPaneLicense 
+     This method initializes jLicenseScrollPane 
      
-     @return javax.swing.JScrollPane jScrollPaneLicense
+     @return javax.swing.JScrollPane jLicenseScrollPane
      
      **/
-    private JScrollPane getJScrollPaneLicense() {
-        if (jScrollPaneLicense == null) {
-            jScrollPaneLicense = new JScrollPane();
-            jScrollPaneLicense.setBounds(new java.awt.Rectangle(161,144,320,80));
-            jScrollPaneLicense.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneLicense.setPreferredSize(new java.awt.Dimension(320,80));
-            jScrollPaneLicense.setViewportView(getJTextAreaLicense());
+    private JScrollPane getJLicenseScrollPane() {
+        if (jLicenseScrollPane == null) {
+            jLicenseScrollPane = new JScrollPane();
+            jLicenseScrollPane.setBounds(new java.awt.Rectangle(valueColumn, rowFive, valueWidth, fourRowHeight));
+            jLicenseScrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            jLicenseScrollPane.setPreferredSize(new java.awt.Dimension(valueWidth, fourRowHeight));
+            jLicenseScrollPane.setViewportView(getJLicenseTextArea());
         }
-        return jScrollPaneLicense;
+        return jLicenseScrollPane;
     }
 
     /**
-     This method initializes jScrollPaneDescription 
+     This method initializes jDescriptionScrollPane 
      
-     @return javax.swing.JScrollPane jScrollPaneDescription
+     @return javax.swing.JScrollPane jDescriptionScrollPane
      
      **/
-    private JScrollPane getJScrollPaneDescription() {
-        if (jScrollPaneDescription == null) {
-            jScrollPaneDescription = new JScrollPane();
-            jScrollPaneDescription.setBounds(new java.awt.Rectangle(160,280,320,80));
-            jScrollPaneDescription.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-            jScrollPaneDescription.setViewportView(getJTextAreaDescription());
+    private JScrollPane getJDescriptionScrollPane() {
+        if (jDescriptionScrollPane == null) {
+            jDescriptionScrollPane = new JScrollPane();
+            jDescriptionScrollPane.setBounds(new java.awt.Rectangle(valueColumn, rowEight, valueWidth, fourRowHeight));
+            jDescriptionScrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            jDescriptionScrollPane.setPreferredSize(new java.awt.Dimension(valueWidth, fourRowHeight));
+            jDescriptionScrollPane.setViewportView(getJDescriptionTextArea());
         }
-        return jScrollPaneDescription;
+        return jDescriptionScrollPane;
     }
 
     /**
-     This method initializes jTextFieldAbstract 
+     This method initializes jAbstractTextField 
      
-     @return javax.swing.JTextField jTextFieldAbstract
+     @return javax.swing.JTextField jAbstractTextField
      
      **/
-    private JTextField getJTextFieldAbstract() {
-        if (jTextFieldAbstract == null) {
-            jTextFieldAbstract = new JTextField();
-            jTextFieldAbstract.setBounds(new java.awt.Rectangle(161,256,320,20));
-            jTextFieldAbstract.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldAbstract.addFocusListener(new FocusAdapter(){
-                public void focusLost(FocusEvent e){
-                    if (!DataValidation.isAbstract(jTextFieldAbstract.getText())) {
+    private JTextField getJAbstractTextField() {
+        if (jAbstractTextField == null) {
+            jAbstractTextField = new JTextField();
+            jAbstractTextField.setBounds(new java.awt.Rectangle(valueColumn, rowSeven, valueWidth, oneRowHeight));
+            jAbstractTextField.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
+            jAbstractTextField.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (!DataValidation.isAbstract(jAbstractTextField.getText())) {
                         JOptionPane.showMessageDialog(frame, "Abstract could NOT be empty.");
                         return;
                     }
-                    if (jTextFieldAbstract.getText().equals(sfc.getSpdHdrAbs())) {
+                    if (jAbstractTextField.getText().equals(sfc.getSpdHdrAbs())) {
                         return;
                     }
                     docConsole.setSaved(false);
-                    sfc.setSpdHdrAbs(jTextFieldAbstract.getText());
+                    sfc.setSpdHdrAbs(jAbstractTextField.getText());
                 }
             });
         }
-        return jTextFieldAbstract;
+        return jAbstractTextField;
     }
 
+    private JScrollPane getCopyrightScrollPane() {
+        if (jCopyrightScrollPane == null) {
+            jCopyrightScrollPane = new JScrollPane();
+            jCopyrightScrollPane.setBounds(new java.awt.Rectangle(valueColumn, rowFour, valueWidth, threeRowHeight));
+            jCopyrightScrollPane.setHorizontalScrollBarPolicy(javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            jCopyrightScrollPane.setPreferredSize(new java.awt.Dimension(valueWidth, threeRowHeight));
+            jCopyrightScrollPane.setViewportView(getJCopyrightTextArea());
+        }
+        return jCopyrightScrollPane;
+    }
     /**
-      This method initializes jTextFieldCopyright	
-      	
-      @return javax.swing.JTextField jTextFieldCopyright
+     This method initializes jTextFieldCopyright	
+     
+     @return javax.swing.JTextField jTextFieldCopyright
      
      **/
-    private JTextField getJTextFieldCopyright() {
-        if (jTextFieldCopyright == null) {
-            jTextFieldCopyright = new JTextField();
-            jTextFieldCopyright.setBounds(new java.awt.Rectangle(160,86,320,48));
-            jTextFieldCopyright.setPreferredSize(new java.awt.Dimension(320,20));
-            jTextFieldCopyright.addFocusListener(new FocusAdapter(){
-               public void focusLost(FocusEvent e){
-                   if (!DataValidation.isCopyright(jTextFieldCopyright.getText())) {
-                       JOptionPane.showMessageDialog(frame, "Copyright contents could not be empty.");
-                       return;
-                   }
-                   if (jTextFieldCopyright.getText().equals(sfc.getSpdHdrCopyright())) {
-                       return;
-                   }
-                   docConsole.setSaved(false);
-                   sfc.setSpdHdrCopyright(jTextFieldCopyright.getText());
-               } 
+    private JTextArea getJCopyrightTextArea() {
+        if (jCopyrightTextArea == null) {
+            jCopyrightTextArea = new JTextArea();
+            jCopyrightTextArea.setWrapStyleWord(true);
+            jCopyrightTextArea.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (!DataValidation.isCopyright(jCopyrightTextArea.getText())) {
+                        JOptionPane.showMessageDialog(frame, "Copyright must be entered.");
+                        return;
+                    }
+                    if (jCopyrightTextArea.getText().equals(sfc.getSpdHdrCopyright())) {
+                        return;
+                    }
+                    docConsole.setSaved(false);
+                    sfc.setSpdHdrCopyright(jCopyrightTextArea.getText());
+                }
             });
         }
-        return jTextFieldCopyright;
+        return jCopyrightTextArea;
     }
 
     /**
@@ -439,26 +499,26 @@ public class SpdHeader extends IInternalFrame {
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextFieldUrl() {
-        if (jTextFieldUrl == null) {
-            jTextFieldUrl = new JTextField();
-            jTextFieldUrl.setBounds(new java.awt.Rectangle(161,231,320,20));
-            jTextFieldUrl.setPreferredSize(new java.awt.Dimension(320, 20));
-            jTextFieldUrl.addFocusListener(new FocusAdapter(){
-               public void focusLost(FocusEvent e){
-                   if (jTextFieldUrl.getText().length() == 0 && sfc.getSpdHdrUrl() == null) {
-                       return;
-                   }
-                   if (jTextFieldUrl.getText().equals(sfc.getSpdHdrUrl())) {
-                       return;
-                   }
-                   sfc.setSpdHdrLicense(jTextAreaLicense.getText());
-                   sfc.setSpdHdrUrl(jTextFieldUrl.getText());
-                   docConsole.setSaved(false);
-               } 
+    private JTextField getJUrlTextField() {
+        if (jUrlTextField == null) {
+            jUrlTextField = new JTextField();
+            jUrlTextField.setBounds(new java.awt.Rectangle(valueColumn, rowSix, valueWidth, oneRowHeight));
+            jUrlTextField.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
+            jUrlTextField.addFocusListener(new FocusAdapter() {
+                public void focusLost(FocusEvent e) {
+                    if (jUrlTextField.getText().length() == 0 && sfc.getSpdHdrUrl() == null) {
+                        return;
+                    }
+                    if (jUrlTextField.getText().equals(sfc.getSpdHdrUrl())) {
+                        return;
+                    }
+                    sfc.setSpdHdrLicense(jLicenseTextArea.getText());
+                    sfc.setSpdHdrUrl(jUrlTextField.getText());
+                    docConsole.setSaved(false);
+                }
             });
         }
-        return jTextFieldUrl;
+        return jUrlTextField;
     }
 
     /**
@@ -470,15 +530,15 @@ public class SpdHeader extends IInternalFrame {
         if (jCheckBoxRdOnly == null) {
             jCheckBoxRdOnly = new JCheckBox();
             jCheckBoxRdOnly.setText("Read Only");
-            jCheckBoxRdOnly.setLocation(new java.awt.Point(17,408));
-            jCheckBoxRdOnly.setSize(new java.awt.Dimension(138,20));
-            jCheckBoxRdOnly.setPreferredSize(new java.awt.Dimension(150,20));
+            jCheckBoxRdOnly.setLocation(new java.awt.Point(labelColumn, rowNine));
+            jCheckBoxRdOnly.setSize(new java.awt.Dimension(labelWidth, oneRowHeight));
+            // jCheckBoxRdOnly.setPreferredSize(new java.awt.Dimension(150, oneRowHeight));
             jCheckBoxRdOnly.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (docConsole != null) {
                         docConsole.setSaved(false);
                     }
-                    sfc.setSpdPkgDefsRdOnly(jCheckBoxRdOnly.isSelected()+"");
+                    sfc.setSpdPkgDefsRdOnly(jCheckBoxRdOnly.isSelected() + "");
                 }
             });
         }
@@ -493,15 +553,15 @@ public class SpdHeader extends IInternalFrame {
     private JCheckBox getJCheckBoxRePkg() {
         if (jCheckBoxRePkg == null) {
             jCheckBoxRePkg = new JCheckBox();
-            jCheckBoxRePkg.setLocation(new java.awt.Point(16,444));
+            jCheckBoxRePkg.setLocation(new java.awt.Point(labelColumn, rowTen));
             jCheckBoxRePkg.setText("RePackagable");
-            jCheckBoxRePkg.setSize(new java.awt.Dimension(140,20));
+            jCheckBoxRePkg.setSize(new java.awt.Dimension(labelWidth, oneRowHeight));
             jCheckBoxRePkg.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (docConsole != null) {
                         docConsole.setSaved(false);
                     }
-                    sfc.setSpdPkgDefsRePkg(jCheckBoxRePkg.isSelected()+"");
+                    sfc.setSpdPkgDefsRePkg(jCheckBoxRePkg.isSelected() + "");
                 }
             });
         }
@@ -533,11 +593,12 @@ public class SpdHeader extends IInternalFrame {
         sfc = new SpdFileContents(inPsa);
         init(sfc);
     }
-    
-    public SpdHeader(OpeningPackageType opt){
+
+    public SpdHeader(OpeningPackageType opt) {
         this(opt.getXmlSpd());
         docConsole = opt;
     }
+
     /**
      This method initializes this
      
@@ -556,50 +617,48 @@ public class SpdHeader extends IInternalFrame {
      
      **/
     private void init(SpdFileContents sfc) {
-            if (sfc.getSpdHdrPkgName() != null) {
-                jTextFieldBaseName.setText(sfc.getSpdHdrPkgName());
-            }
-            if (sfc.getSpdHdrGuidValue() != null) {
-                jTextFieldGuid.setText(sfc.getSpdHdrGuidValue());
-            }
-            if (sfc.getSpdHdrVer() != null) {
-               jTextFieldVersion.setText(sfc.getSpdHdrVer());
-            }
-            if (sfc.getSpdHdrLicense() != null) {
-                jTextAreaLicense.setText(sfc.getSpdHdrLicense());
-            }
-            if (sfc.getSpdHdrUrl() != null) {
-                jTextFieldUrl.setText(sfc.getSpdHdrUrl());
-            }
-            if (sfc.getSpdHdrCopyright() != null) {
-                jTextFieldCopyright.setText(sfc.getSpdHdrCopyright());
-            }
-            if (sfc.getSpdHdrAbs() != null) {
-                jTextFieldAbstract.setText(sfc.getSpdHdrAbs());
-            }
-            if (sfc.getSpdHdrDescription() != null) {
-                jTextAreaDescription.setText(sfc.getSpdHdrDescription());
-            }
-            if (sfc.getSpdHdrSpec() != null) {
-                jTextFieldSpecification.setText(sfc.getSpdHdrSpec());
-            }
-            sfc.setSpdHdrSpec(jTextFieldSpecification.getText());
-            
-            if (!sfc.getSpdPkgDefsRdOnly().equals("true")) {
-                sfc.setSpdPkgDefsRdOnly("false");
-                jCheckBoxRdOnly.setSelected(false);
-            }
-            else{
-                jCheckBoxRdOnly.setSelected(true);
-            }
-            if (!sfc.getSpdPkgDefsRePkg().equals("true")) {
-                sfc.setSpdPkgDefsRePkg("false");
-                jCheckBoxRePkg.setSelected(false);
-            }
-            else{
-                jCheckBoxRePkg.setSelected(true);
-            }
-            
+        if (sfc.getSpdHdrPkgName() != null) {
+            jPackageNameTextField.setText(sfc.getSpdHdrPkgName());
+        }
+        if (sfc.getSpdHdrGuidValue() != null) {
+            jGuidTextField.setText(sfc.getSpdHdrGuidValue());
+        }
+        if (sfc.getSpdHdrVer() != null) {
+            jVersionTextField.setText(sfc.getSpdHdrVer());
+        }
+        if (sfc.getSpdHdrLicense() != null) {
+            jLicenseTextArea.setText(sfc.getSpdHdrLicense());
+        }
+        if (sfc.getSpdHdrUrl() != null) {
+            jUrlTextField.setText(sfc.getSpdHdrUrl());
+        }
+        if (sfc.getSpdHdrCopyright() != null) {
+            jCopyrightTextArea.setText(sfc.getSpdHdrCopyright());
+        }
+        if (sfc.getSpdHdrAbs() != null) {
+            jAbstractTextField.setText(sfc.getSpdHdrAbs());
+        }
+        if (sfc.getSpdHdrDescription() != null) {
+            jDescriptionTextArea.setText(sfc.getSpdHdrDescription());
+        }
+        if (sfc.getSpdHdrSpec() != null) {
+            jSpecificationTextField.setText(sfc.getSpdHdrSpec());
+        }
+        sfc.setSpdHdrSpec(jSpecificationTextField.getText());
+
+        if (!sfc.getSpdPkgDefsRdOnly().equals("true")) {
+            sfc.setSpdPkgDefsRdOnly("false");
+            jCheckBoxRdOnly.setSelected(false);
+        } else {
+            jCheckBoxRdOnly.setSelected(true);
+        }
+        if (!sfc.getSpdPkgDefsRePkg().equals("true")) {
+            sfc.setSpdPkgDefsRePkg("false");
+            jCheckBoxRePkg.setSelected(false);
+        } else {
+            jCheckBoxRePkg.setSelected(true);
+        }
+
     }
 
     /**
@@ -610,77 +669,55 @@ public class SpdHeader extends IInternalFrame {
      **/
     private JPanel getJContentPane() {
         if (jContentPane == null) {
-        	starLabel1 = new StarLabel();
-        	starLabel1.setBounds(new java.awt.Rectangle(2,443,10,20));
-        	starLabel = new StarLabel();
-        	starLabel.setBounds(new java.awt.Rectangle(2,407,10,20));
-        	jLabel = new JLabel();
-        	jLabel.setBounds(new java.awt.Rectangle(16,231,140,20));
-        	jLabel.setText("URL");
-        	jContentPane = new JPanel();
-            jContentPane.setLayout(null);
-            jContentPane.setLocation(new java.awt.Point(0, 0));
-            jContentPane.setPreferredSize(new java.awt.Dimension(500, 524));
-            jLabelAbstract = new JLabel();
-            jLabelAbstract.setBounds(new java.awt.Rectangle(16,281,140,20));
-            jLabelAbstract.setText("Description");
-            jLabelSpecification = new JLabel();
-            jLabelSpecification.setText("Specification");
-            jLabelSpecification.setBounds(new java.awt.Rectangle(16,369,140,20));
-            jLabelDescription = new JLabel();
-            jLabelDescription.setText("Abstract");
-            jLabelDescription.setBounds(new java.awt.Rectangle(16,256,140,20));
+            jStarLabel1 = new StarLabel();
+            jStarLabel1.setLocation(new java.awt.Point(2, rowOne));
+            jStarLabel2 = new StarLabel();
+            jStarLabel2.setLocation(new java.awt.Point(2, rowTwo));
+            jStarLabel3 = new StarLabel();
+            jStarLabel3.setLocation(new java.awt.Point(2, rowThree));
+            jStarLabel4 = new StarLabel();
+            jStarLabel4.setLocation(new java.awt.Point(2, rowFour));
+            jStarLabel5 = new StarLabel();
+            jStarLabel5.setLocation(new java.awt.Point(2, rowFive));
+            jStarLabel6 = new StarLabel();
+            jStarLabel6.setLocation(new java.awt.Point(2, rowSeven));
+            jStarLabel7 = new StarLabel();
+            jStarLabel7.setLocation(new java.awt.Point(2, rowEight));
+            jStarLabel8 = new StarLabel();
+            jStarLabel8.setLocation(new java.awt.Point(2, rowNine));
+            jStarLabel9 = new StarLabel();
+            jStarLabel9.setLocation(new java.awt.Point(2, rowTen));
+
+            jPackageNameLabel = new JLabel();
+            jPackageNameLabel.setText("Package Name");
+            jPackageNameLabel.setBounds(new java.awt.Rectangle(labelColumn, rowOne, labelWidth, oneRowHeight));
+            jGuidLabel = new JLabel();
+            jGuidLabel.setBounds(new java.awt.Rectangle(labelColumn, rowTwo, labelWidth, oneRowHeight));
+            jGuidLabel.setText("Guid");
+            jVersionLabel = new JLabel();
+            jVersionLabel.setText("Version");
+            jVersionLabel.setBounds(new java.awt.Rectangle(labelColumn, rowThree, labelWidth, oneRowHeight));
             jLabelCopyright = new JLabel();
             jLabelCopyright.setText("Copyright");
-            jLabelCopyright.setBounds(new java.awt.Rectangle(15,86,140,20));
-            jLabelLicense = new JLabel();
-            jLabelLicense.setText("License");
-            jLabelLicense.setBounds(new java.awt.Rectangle(16,147,140,20));
-            jLabelVersion = new JLabel();
-            jLabelVersion.setText("Version");
-            jLabelVersion.setBounds(new java.awt.Rectangle(15, 60, 140, 20));
-            jLabelGuid = new JLabel();
-            jLabelGuid.setPreferredSize(new java.awt.Dimension(25, 15));
-            jLabelGuid.setBounds(new java.awt.Rectangle(15, 35, 140, 20));
-            jLabelGuid.setText("Guid");
-            jLabelBaseName = new JLabel();
-            jLabelBaseName.setText("Package Name");
-            jLabelBaseName.setBounds(new java.awt.Rectangle(15, 10, 140, 20));
-            jContentPane.add(jLabelBaseName, null);
-            jContentPane.add(getJTextFieldBaseName(), null);
-            jContentPane.add(jLabelGuid, null);
-            jContentPane.add(getJTextFieldGuid(), null);
-            jContentPane.add(jLabelVersion, null);
-            jContentPane.add(getJTextFieldVersion(), null);
-            jContentPane.add(getJButtonGenerateGuid(), null);
-            jContentPane.add(jLabelLicense, null);
-            jContentPane.add(jLabelCopyright, null);
-            jContentPane.add(jLabelDescription, null);
-            jContentPane.add(jLabelSpecification, null);
-            jContentPane.add(getJTextFieldSpecification(), null);
-            jContentPane.add(getJButtonOk(), null);
-            jContentPane.add(getJButtonCancel(), null);
-            jContentPane.add(getJScrollPaneLicense(), null);
-            jContentPane.add(getJScrollPaneDescription(), null);
-            jContentPane.add(jLabelAbstract, null);
-            jContentPane.add(getJTextFieldAbstract(), null);
-            jStarLabel1 = new StarLabel();
-            jStarLabel1.setLocation(new java.awt.Point(0, 10));
-            jStarLabel2 = new StarLabel();
-            jStarLabel2.setLocation(new java.awt.Point(0, 35));
-            jStarLabel3 = new StarLabel();
-            jStarLabel3.setLocation(new java.awt.Point(0, 60));
-            jStarLabel4 = new StarLabel();
-            jStarLabel4.setLocation(new java.awt.Point(1,147));
-            jStarLabel5 = new StarLabel();
-            jStarLabel5.setLocation(new java.awt.Point(0,86));
-            jStarLabel6 = new StarLabel();
-            jStarLabel6.setLocation(new java.awt.Point(1,256));
-            jStarLabel7 = new StarLabel();
-            jStarLabel7.setLocation(new java.awt.Point(1,369));
-            jStarLabel7.setEnabled(false);
-            jStarLabel9 = new StarLabel();
-            jStarLabel9.setLocation(new java.awt.Point(1,281));
+            jLabelCopyright.setBounds(new java.awt.Rectangle(labelColumn, rowFour, labelWidth, oneRowHeight));
+            jLicenseLabel = new JLabel();
+            jLicenseLabel.setText("License");
+            jLicenseLabel.setBounds(new java.awt.Rectangle(labelColumn, rowFive, labelWidth, oneRowHeight));
+            jUrlLabel = new JLabel();
+            jUrlLabel.setBounds(new java.awt.Rectangle(labelColumn, rowSix, labelWidth, oneRowHeight));
+            jUrlLabel.setText("URL");
+            jAbstractLabel = new JLabel();
+            jAbstractLabel.setBounds(new java.awt.Rectangle(labelColumn, rowSeven, labelWidth, oneRowHeight));
+            jAbstractLabel.setText("Abstract");
+            jDescriptionLabel = new JLabel();
+            jDescriptionLabel.setText("Description");
+            jDescriptionLabel.setBounds(new java.awt.Rectangle(labelColumn, rowEight, labelWidth, oneRowHeight));
+
+            jContentPane = new JPanel();
+            jContentPane.setLayout(null);
+            jContentPane.setLocation(new java.awt.Point(0, 0));
+            jContentPane.setPreferredSize(new java.awt.Dimension(dialogWidth - 20, dialogHeight - 20));
+
             jContentPane.add(jStarLabel1, null);
             jContentPane.add(jStarLabel2, null);
             jContentPane.add(jStarLabel3, null);
@@ -688,15 +725,34 @@ public class SpdHeader extends IInternalFrame {
             jContentPane.add(jStarLabel5, null);
             jContentPane.add(jStarLabel6, null);
             jContentPane.add(jStarLabel7, null);
+            jContentPane.add(jStarLabel8, null);
             jContentPane.add(jStarLabel9, null);
-            jContentPane.add(getJTextFieldCopyright(), null);
 
-            jContentPane.add(jLabel, null);
-            jContentPane.add(getJTextFieldUrl(), null);
-            jContentPane.add(starLabel, null);
-            jContentPane.add(starLabel1, null);
+            jContentPane.add(jPackageNameLabel, null);
+            jContentPane.add(getJPackageNameTextField(), null);
+            jContentPane.add(jGuidLabel, null);
+            jContentPane.add(getJGuidTextField(), null);
+            jContentPane.add(jVersionLabel, null);
+            jContentPane.add(getJVersionTextField(), null);
+            jContentPane.add(getJGenerateGuidButton(), null);
+            jContentPane.add(jLabelCopyright, null);
+            jContentPane.add(getCopyrightScrollPane(), null);
+            jContentPane.add(jLicenseLabel, null);
+            jContentPane.add(getJLicenseScrollPane(), null);
+            jContentPane.add(jUrlLabel, null);
+            jContentPane.add(getJUrlTextField(), null);
+            jContentPane.add(jAbstractLabel, null);
+            jContentPane.add(getJAbstractTextField(), null);
+            jContentPane.add(jDescriptionLabel, null);
+            jContentPane.add(getJDescriptionScrollPane(), null);
+
+//            jContentPane.add(getJButtonOk(), null);
+//            jContentPane.add(getJButtonCancel(), null);
+
             jContentPane.add(getJCheckBoxRdOnly(), null);
             jContentPane.add(getJCheckBoxRePkg(), null);
+            jContentPane.add(getJSpecificationTextField(), null);
+
         }
         return jContentPane;
     }
@@ -708,46 +764,46 @@ public class SpdHeader extends IInternalFrame {
      *
      */
     public void actionPerformed(ActionEvent arg0) {
-        
-        if (arg0.getSource() == jButtonGenerateGuid) {
+
+        if (arg0.getSource() == jGenerateGuidButton) {
             //ToDo: invoke GuidValueEditor
-            jTextFieldGuid.setText(Tools.generateUuidString());
+            jGuidTextField.setText(Tools.generateUuidString());
             docConsole.setSaved(false);
-            sfc.setSpdHdrGuidValue(jTextFieldGuid.getText());
+            sfc.setSpdHdrGuidValue(jGuidTextField.getText());
         }
     }
-    
+
     /**
      This method initializes Package type and Compontent type
      
      **/
     private void initFrame() {
-        
+
     }
 
-	/* (non-Javadoc)
-	 * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
-	 * 
-	 * Override componentResized to resize all components when frame's size is changed
-	 */
-	public void componentResized(ComponentEvent arg0) {
-        int intPreferredWidth = 500;
+    /* (non-Javadoc)
+     * @see java.awt.event.ComponentListener#componentResized(java.awt.event.ComponentEvent)
+     * 
+     * Override componentResized to resize all components when frame's size is changed
+     */
+    public void componentResized(ComponentEvent arg0) {
+        int intPreferredWidth = dialogWidth;
         int intCurrentWidth = this.getJContentPane().getWidth();
-        
-        Tools.resizeComponentWidth(this.jTextFieldBaseName, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldGuid, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldVersion, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldUrl, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jScrollPaneLicense, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldCopyright, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jScrollPaneDescription, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldSpecification, intCurrentWidth,intPreferredWidth);
-        Tools.resizeComponentWidth(this.jTextFieldAbstract, intCurrentWidth,intPreferredWidth);
-        Tools.relocateComponentX(this.jButtonGenerateGuid, intCurrentWidth, jButtonGenerateGuid.getWidth(),30);
-	}
+
+//        Tools.resizeComponentWidth(this.jPackageNameTextField, intCurrentWidth, intPreferredWidth);
+//        Tools.resizeComponentWidth(this.jGuidTextField, intCurrentWidth, intPreferredWidth);
+//        Tools.resizeComponentWidth(this.jVersionTextField, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jUrlTextField, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jLicenseScrollPane, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jCopyrightTextArea, intCurrentWidth, intPreferredWidth);
+        Tools.resizeComponentWidth(this.jDescriptionScrollPane, intCurrentWidth, intPreferredWidth);
+        //        Tools.resizeComponentWidth(this.jSpecificationTextField, intCurrentWidth,intPreferredWidth);
+        Tools.resizeComponentWidth(this.jAbstractTextField, intCurrentWidth, intPreferredWidth);
+//        Tools.relocateComponentX(this.jGenerateGuidButton, intCurrentWidth, jGenerateGuidButton.getWidth(), 30);
+    }
 
     private JScrollPane getTopScrollPane() {
-        if (topScrollPane == null){
+        if (topScrollPane == null) {
             topScrollPane = new JScrollPane();
             topScrollPane.setViewportView(getJContentPane());
         }
