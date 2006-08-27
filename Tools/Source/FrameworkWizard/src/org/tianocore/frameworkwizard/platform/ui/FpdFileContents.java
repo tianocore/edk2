@@ -760,31 +760,110 @@ public class FpdFileContents {
         return msa.getModuleSaBuildOptions().getFvBinding();
     }
     
-    public void setFvBinding(String moduleKey, String fvBinding){
-        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
-        if (msa == null ) {
+    public void setFvBinding(ModuleSADocument.ModuleSA moduleSa, String fvBinding) {
+        if (moduleSa == null ) {
             return;
         }
         if (fvBinding == null || fvBinding.length() == 0) {
-            if(msa.getModuleSaBuildOptions() != null){
-                msa.getModuleSaBuildOptions().unsetFvBinding();
+            if(moduleSa.getModuleSaBuildOptions() != null){
+                moduleSa.getModuleSaBuildOptions().unsetFvBinding();
             }
         }
         else {
-            if(msa.getModuleSaBuildOptions() == null){
-                msa.addNewModuleSaBuildOptions().setFvBinding(fvBinding);
+            if(moduleSa.getModuleSaBuildOptions() == null){
+                moduleSa.addNewModuleSaBuildOptions().setFvBinding(fvBinding);
                 return;
             }
-            msa.getModuleSaBuildOptions().setFvBinding(fvBinding);
+            moduleSa.getModuleSaBuildOptions().setFvBinding(fvBinding);
+        }
+    }
+    
+    public void setFvBinding(String moduleKey, String fvBinding){
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(moduleKey);
+        setFvBinding (moduleSa, fvBinding);
+    }
+    
+    public void removeFvBinding (ModuleSADocument.ModuleSA moduleSa, String fvName) {
+        if (moduleSa == null || moduleSa.getModuleSaBuildOptions() == null || moduleSa.getModuleSaBuildOptions().getFvBinding() == null) {
+            return;
+        }
+        
+        String fvNameList = moduleSa.getModuleSaBuildOptions().getFvBinding();
+        String[] fvNamesArray = fvNameList.split(" ");
+        int occursAt = -1;
+        for (int i = 0; i < fvNamesArray.length; ++i) {
+            if (fvNamesArray[i].equals(fvName)) {
+                occursAt = i;
+                break;
+            }
+        }
+        // jump over where the input fvName occurs in the original Fv list.
+        if (occursAt != -1) {
+            String newFvNameList = " ";
+            for (int i = 0; i < fvNamesArray.length; ++i) {
+                if (i == occursAt) {
+                    continue;
+                }
+                newFvNameList += fvNamesArray[i];
+            }
+            setFvBinding (moduleSa, newFvNameList.trim());
+        }
+
+    }
+    
+    /**
+     * @param fvName The FV name that to be removed from FvBinding List.
+     */
+    public void removeFvBindingAll (String fvName) {
+        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0){
+            removeElement(getfpdFrameworkModules());
+            fpdFrameworkModules = null;
+            return;
+        }
+        
+        Iterator<ModuleSADocument.ModuleSA> li = getfpdFrameworkModules().getModuleSAList().iterator();
+        while (li.hasNext()) {
+            ModuleSADocument.ModuleSA moduleSa = li.next();
+            removeFvBinding (moduleSa, fvName); 
+        }
+    }
+    
+    public void appendFvBinding (String moduleKey, String fvName) {
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(moduleKey);
+        appendFvBinding (moduleSa, fvName);
+    }
+    
+    public void appendFvBinding (ModuleSADocument.ModuleSA moduleSa, String fvName) {
+        if (moduleSa == null) {
+            return;
+        }
+        
+        if (moduleSa.getModuleSaBuildOptions() == null || moduleSa.getModuleSaBuildOptions().getFvBinding() == null) {
+            setFvBinding(moduleSa, fvName);
+            return;
+        }
+        
+        String fvNameList = moduleSa.getModuleSaBuildOptions().getFvBinding();
+        String newFvNameList = fvNameList + " " + fvName;
+        setFvBinding (moduleSa, newFvNameList.trim());
+    }
+    
+    public void updateFvBindingInModuleSA (ModuleIdentification mi, String fvName) {
+        Vector<Object> vSupArchs = new Vector<Object>();
+        getPlatformDefsSupportedArchs(vSupArchs);
+        String moduleInfo = mi.getGuid() + " " + mi.getVersion() + " " + mi.getPackageId().getGuid() + " " + mi.getPackageId().getVersion();
+        for (int i = 0; i < vSupArchs.size(); ++i) {
+            String moduleKey = moduleInfo + " " + vSupArchs.get(i);
+            appendFvBinding (moduleKey, fvName);
         }
     }
     
     public String getFfsFileNameGuid(String moduleKey){
-        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
-        if (msa == null || msa.getModuleSaBuildOptions() == null) {
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(moduleKey);
+        if (moduleSa == null || moduleSa.getModuleSaBuildOptions() == null) {
             return null;
         }
-        return msa.getModuleSaBuildOptions().getFfsFileNameGuid();
+        return moduleSa.getModuleSaBuildOptions().getFfsFileNameGuid();
     }
     
     public void setFfsFileNameGuid(String moduleKey, String fileGuid){
@@ -1529,7 +1608,7 @@ public class FpdFileContents {
         return fpdBuildOpts;
     }
     
-    public void genBuildOptionsUserExtensions(String fvName, String outputFileName, String[][] includeModules) {
+    public void genBuildOptionsUserExtensions(String fvName, String outputFileName, Vector<String[]> includeModules) {
         UserExtensionsDocument.UserExtensions userExts = getfpdBuildOpts().addNewUserExtensions();
         userExts.setUserID("IMAGES");
         userExts.setIdentifier(new BigInteger("1"));
@@ -1545,10 +1624,10 @@ public class FpdFileContents {
         cursor.toNextToken();
         
         cursor.beginElement("IncludeModules");
-        for (int i = 0; i < includeModules.length; ++i) {
+        for (int i = 0; i < includeModules.size(); ++i) {
             cursor.beginElement("Module");
-            cursor.insertAttributeWithValue("ModuleGuid", includeModules[i][0]);
-            cursor.insertAttributeWithValue("BaseName", includeModules[i][1]);
+            cursor.insertAttributeWithValue("ModuleGuid", includeModules.get(i)[0]);
+            cursor.insertAttributeWithValue("BaseName", includeModules.get(i)[1]);
             cursor.toEndToken();
             cursor.toNextToken();
         }
