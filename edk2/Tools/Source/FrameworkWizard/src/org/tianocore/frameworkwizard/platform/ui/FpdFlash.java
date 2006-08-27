@@ -35,11 +35,15 @@ import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -988,18 +992,20 @@ public class FpdFlash extends IInternalFrame {
             jPanelFdf.add(getJPanelFdfN(), java.awt.BorderLayout.NORTH);
             jPanelFdf.add(getJPanelFdfS(), java.awt.BorderLayout.SOUTH);
             jPanelFdf.add(getJSplitPaneFdfC(), java.awt.BorderLayout.CENTER);
-//            jPanelFdf.addComponentListener(new ComponentAdapter(){
-//                public void componentShown(ComponentEvent e) {
+            jPanelFdf.addComponentListener(new ComponentAdapter(){
+                public void componentShown(ComponentEvent e) {
 //                    if (ffc.getFlashDefinitionFile() != null) {
 //                        jTextFieldFdf.setText(ffc.getFlashDefinitionFile());
+//                        initFvInFdfTable(System.getenv("WORKSPACE") + File.separator + jTextFieldFdf.getText());
+//    
 //                    }
-//                }
-//                public void componentHidden(ComponentEvent e) {
-//                    if (jCheckBoxFdf.isSelected()) {
-//                        ffc.genFlashDefinitionFile(jTextFieldFdf.getText());
-//                    }
-//                }
-//            });
+                }
+                public void componentHidden(ComponentEvent e) {
+                    if (jCheckBoxFdf.isSelected()) {
+                        ffc.genFlashDefinitionFile(jTextFieldFdf.getText());
+                    }
+                }
+            });
         }
         return jPanelFdf;
     }
@@ -1041,6 +1047,7 @@ public class FpdFlash extends IInternalFrame {
         if (jTextFieldFdf == null) {
             jTextFieldFdf = new JTextField();
             jTextFieldFdf.setEnabled(false);
+            jTextFieldFdf.setEditable(false);
             jTextFieldFdf.setPreferredSize(new Dimension(300, 20));
             jTextFieldFdf.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
@@ -1086,14 +1093,7 @@ public class FpdFlash extends IInternalFrame {
                         jTextFieldFdf.setText(filePath.substring(wsDir.length() + 1).replace('\\', '/'));
                         ffc.genFlashDefinitionFile(jTextFieldFdf.getText());
                         docConsole.setSaved(false);
-                        Vector<FvInfoFromFdf> vFvInfo = new Vector<FvInfoFromFdf>();
-                        getFvInfoFromFdf(filePath, vFvInfo);
-                        getFvInFdfTableModel().setRowCount(0);
-                        for (int j = 0; j < vFvInfo.size(); ++j) {
-                            FvInfoFromFdf fvInfo = vFvInfo.get(j);
-                            String[] row = {fvInfo.getFvName(), fvInfo.getSize(), fvInfo.getEfiFileName()};
-                            getFvInFdfTableModel().addRow(row);
-                        }
+                        initFvInFdfTable(filePath);
                     }
                 }
                 
@@ -1102,6 +1102,32 @@ public class FpdFlash extends IInternalFrame {
         return jButtonFdfBrowse;
     }
 
+    private void initFvInFdfTable(String fdfPath){
+        Vector<FvInfoFromFdf> vFvInfo = new Vector<FvInfoFromFdf>();
+        getFvInfoFromFdf(fdfPath, vFvInfo);
+        getFvInFdfTableModel().setRowCount(0);
+        for (int j = 0; j < vFvInfo.size(); ++j) {
+            FvInfoFromFdf fvInfo = vFvInfo.get(j);
+            String[] row = {fvInfo.getFvName(), fvInfo.getSize(), fvInfo.getEfiFileName()};
+            getFvInFdfTableModel().addRow(row);
+        }
+
+        for (int k = 0; k < vFvInfo.size(); ++k) {
+            FvInfoFromFdf fvInfo = vFvInfo.get(k);
+            addTabForFv(fvInfo);
+        }
+    }
+    
+    private void addTabForFv (FvInfoFromFdf fvInfo) {
+        String fvName = fvInfo.getFvName();
+        String outputFile = fvInfo.getEfiFileName();
+        for (int i = 2; i < jTabbedPane.getTabCount(); ++i) {
+            if (jTabbedPane.getTitleAt(i).equals(fvName)) {
+                return;
+            }
+        }
+        jTabbedPane.addTab(fvName, null, new ModuleOrderPane(fvName, outputFile), null);
+    }
     /**
      * This method initializes jTextField4	
      * 	
@@ -1495,6 +1521,7 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonFvInFdfOptions == null) {
             jButtonFvInFdfOptions = new JButton();
             jButtonFvInFdfOptions.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonFvInFdfOptions.setEnabled(false);
             jButtonFvInFdfOptions.setText("Options");
             jButtonFvInFdfOptions.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -1561,7 +1588,13 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonAddFv == null) {
             jButtonAddFv = new JButton();
             jButtonAddFv.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonAddFv.setEnabled(false);
             jButtonAddFv.setText("New");
+            jButtonAddFv.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
+                }
+            });
         }
         return jButtonAddFv;
     }
@@ -1575,7 +1608,13 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonDelFv == null) {
             jButtonDelFv = new JButton();
             jButtonDelFv.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonDelFv.setEnabled(false);
             jButtonDelFv.setText("Delete");
+            jButtonDelFv.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
+                }
+            });
         }
         return jButtonDelFv;
     }
@@ -1589,7 +1628,13 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonAddFvOptions == null) {
             jButtonAddFvOptions = new JButton();
             jButtonAddFvOptions.setPreferredSize(new java.awt.Dimension(80,20));
+            jButtonAddFvOptions.setEnabled(false);
             jButtonAddFvOptions.setText("Options");
+            jButtonAddFvOptions.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent e) {
+                    System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
+                }
+            });
         }
         return jButtonAddFvOptions;
     }
@@ -1654,21 +1699,7 @@ public class FpdFlash extends IInternalFrame {
         }
         
         String fdfPath = System.getenv("WORKSPACE") + File.separator + fdfFile;
-        Vector<FvInfoFromFdf> vFvInfo = new Vector<FvInfoFromFdf>();
-        getFvInfoFromFdf(fdfPath, vFvInfo);
-        getFvInFdfTableModel().setRowCount(0);
-        for (int j = 0; j < vFvInfo.size(); ++j) {
-            FvInfoFromFdf fvInfo = vFvInfo.get(j);
-            String[] row = {fvInfo.getFvName(), fvInfo.getSize(), fvInfo.getEfiFileName()};
-            getFvInFdfTableModel().addRow(row);
-        }
-        
-
-        for (int k = 0; k < vFvInfo.size(); ++k) {
-            FvInfoFromFdf fvInfo = vFvInfo.get(k);
-            getJTabbedPane().addTab(fvInfo.getFvName(), null, new ModuleOrderPane(), null);
-
-        }
+        initFvInFdfTable(fdfPath);
     }
     
     private void getOptionNameValue(Map<String, String> m){
@@ -1798,7 +1829,11 @@ public class FpdFlash extends IInternalFrame {
                 }
    
             }
-        } catch (Exception e) {
+            
+            reader.close();
+            in.close();
+        }
+        catch (Exception e) {
            
         }
 
@@ -1826,19 +1861,22 @@ public class FpdFlash extends IInternalFrame {
         private JButton jButtonCancel = null;
         private NonEditableTableModel modInFvTableModel = null;
         private NonEditableTableModel fpdModTableModel = null;
+        private HashMap<String, ModuleIdentification> mGuidToModuleId = null;
+        private ArrayList<String> listModGuidInFv = null;
+        private String title = null;
+        private String outputFileName = null;
         
-        public ModuleOrderPane() {
+        public ModuleOrderPane(String tabTitle, String file) {
             super(new BorderLayout());
+            title = tabTitle;
+            outputFileName = file;
+            mGuidToModuleId = new HashMap<String, ModuleIdentification>();
+            listModGuidInFv = new ArrayList<String>();
             add(getJPanelModOrderN(), java.awt.BorderLayout.NORTH);
             add(getJPanelModOrderS(), java.awt.BorderLayout.SOUTH);
             add(getJPanelModOrderC(), java.awt.BorderLayout.CENTER);
-            addComponentListener(new java.awt.event.ComponentAdapter() {
-                public void componentShown(java.awt.event.ComponentEvent e) {
-                    String title = jTabbedPane.getTitleAt(jTabbedPane.getSelectedIndex()); // TODO Auto-generated Event stub componentShown()
-                    showModulesInFv(title);
-                    showAllModulesInPlatform();
-                }
-            });
+            showModulesInFv(title);
+            showAllModulesInPlatform();
         }
         
         private void showModulesInFv(String fvName) {
@@ -1849,6 +1887,7 @@ public class FpdFlash extends IInternalFrame {
                 ffc.getUserExtsIncMods(fvName, saa);
 
                 for (int i = 0; i < size; ++i) {
+                    listModGuidInFv.add(saa[i][0].toLowerCase());
                     String name = getModuleName(saa[i][0]);
                     String[] row = { name };
                     modInFvTableModel.addRow(row);
@@ -1866,16 +1905,16 @@ public class FpdFlash extends IInternalFrame {
             Iterator<String> iter = vGuid.iterator();
             while (iter.hasNext()){
                 String guid = iter.next();
-                String moduleName = getModuleName(guid);
-                if (existedInTable(moduleName, modInFvTableModel)) {
-                    vGuid.remove(guid);
+//                String moduleName = getModuleName(guid);
+//                if (existedInTable(moduleName, modInFvTableModel)) {
+//                    vGuid.remove(guid);
+//                }
+                if (!listModGuidInFv.contains(guid.toLowerCase())) {
+                    String[] row = {getModuleName(guid)};
+                    modInFvTableModel.addRow(row);
                 }
             }
-            
-            for (int j = 0; j < vGuid.size(); ++j) {
-                String[] row = {getModuleName(vGuid.get(j))};
-                modInFvTableModel.addRow(row);
-            }
+
         }
         
         private void showAllModulesInPlatform() {
@@ -1899,12 +1938,14 @@ public class FpdFlash extends IInternalFrame {
         private String getModuleName (String guid) {
             
             for (int i = 0; i < GlobalData.vModuleList.size(); ++i) {
-                String mg = GlobalData.vModuleList.get(i).getGuid();
+                ModuleIdentification mi = GlobalData.vModuleList.get(i);
+                String mg = mi.getGuid();
                 if (mg == null) {
                     continue;
                 }
                 if (mg.equalsIgnoreCase(guid)) {
-                    return GlobalData.vModuleList.get(i).getName();
+                    mGuidToModuleId.put(guid.toLowerCase(), mi);
+                    return mi.getName();
                 }
             }
             
@@ -1920,6 +1961,8 @@ public class FpdFlash extends IInternalFrame {
             }
             return false;
         }
+        
+        
         
         /**
          * This method initializes jPanelModOrderN  
@@ -1991,6 +2034,7 @@ public class FpdFlash extends IInternalFrame {
                 jTableModInFv = new JTable(modInFvTableModel);
                 jTableModInFv.setRowHeight(20);
                 jTableModInFv.setShowGrid(false);
+                
             }
             return jTableModInFv;
         }
@@ -2043,6 +2087,7 @@ public class FpdFlash extends IInternalFrame {
                 jTableFpdModules.setRowHeight(20);
                 jTableFpdModules.setShowGrid(false);
                 fpdModTableModel.addColumn("Modules in Platform");
+
             }
             return jTableFpdModules;
         }
@@ -2096,12 +2141,12 @@ public class FpdFlash extends IInternalFrame {
                         if (selectedRowLeft < 0) {
                             modInFvTableModel.addRow(row);
                             jTableModInFv.changeSelection(jTableModInFv.getRowCount() - 1, 0, false, false);
-                            fpdModTableModel.removeRow(rowInModel);
                         }
                         else {
                             modInFvTableModel.insertRow(selectedRowLeft, row);
                             jTableModInFv.changeSelection(selectedRowLeft, 0, false, false);
                         }
+                        fpdModTableModel.removeRow(rowInModel);
                     }
                 });
             }
@@ -2171,7 +2216,43 @@ public class FpdFlash extends IInternalFrame {
             if (jButtonOk == null) {
                 jButtonOk = new JButton();
                 jButtonOk.setPreferredSize(new java.awt.Dimension(80,20));
-                jButtonOk.setText("Ok");
+                jButtonOk.setText("Save");
+                jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        // need reset FvBindings in ModuleSA.
+                        ffc.removeFvBindingAll(title);
+                        //
+                        // collect module order information to store them into <BuildOptions> -> <UserExtensions>.
+                        // also update the FvBinding info in <ModuleSA>.
+                        //
+                        Vector<String[]> vModInFv = new Vector<String[]>();
+                        for (int i = 0; i < jTableModInFv.getRowCount(); ++i) {
+                            String moduleName = jTableModInFv.getValueAt(i, 0)+"";
+                            if (moduleName.length() == 0) {
+                                continue;
+                            }
+                            ModuleIdentification mi = null;
+                            Set<String> key = mGuidToModuleId.keySet();
+                            Iterator<String> iter = key.iterator();
+                            while (iter.hasNext()) {
+                                String guid = iter.next();
+                                mi = mGuidToModuleId.get(guid);
+                                if (mi.getName().equals(moduleName)) {
+                                    String[] sa = {guid, WorkspaceProfile.getModuleBaseName(mi)};
+                                    vModInFv.add(sa);
+                                    ffc.updateFvBindingInModuleSA (mi, title);
+                                    break;
+                                }
+                            }
+                            
+                        }
+                        ffc.removeBuildOptionsUserExtensions(title);
+                        ffc.genBuildOptionsUserExtensions(title, outputFileName, vModInFv);
+                        
+                        docConsole.setSaved(false);
+                        jTabbedPane.setSelectedIndex(0);
+                    }
+                });
             }
             return jButtonOk;
         }
