@@ -17,15 +17,21 @@ import java.util.*;
 import java.util.regex.*;
 
 public final class Database {
-	Database(String path) throws Exception {
+	private static final Database INSTANCE = Database.init();
+	
+	Database(String path) {
 		DatabasePath = path;
-		
-		importDBLib("Library.csv");
-		importDBGuid("Guid.csv", "Guid");
-		importDBGuid("Ppi.csv", "Ppi");
-		importDBGuid("Protocol.csv", "Protocol");
-		importDBMacro("Macro.csv");
-		importListR8Only();
+
+		try {
+			importDBLib("Library.csv");
+			importDBGuid("Guid.csv", "Guid");
+			importDBGuid("Ppi.csv", "Ppi");
+			importDBGuid("Protocol.csv", "Protocol");
+			importDBMacro("Macro.csv");
+			importListR8Only();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	public String DatabasePath;
@@ -165,12 +171,16 @@ public final class Database {
 	//-------------------------------------has------------------------------------------//
 	
 	//-------------------------------------init------------------------------------------//
-	
-	public static Database init() throws Exception {
+
+	private static final Database init() {
 		if (System.getenv("WORKSPACE") == null) {
 			return new Database("C:" + File.separator + "tianocore" + File.separator + "edk2" + File.separator + "Tools" + File.separator + "Conf" + File.separator + "Migration");
 		} else {
 			return new Database(System.getenv("WORKSPACE") + File.separator + "Tools" + File.separator + "Conf" + File.separator + "Migration");
 		}
+	}
+	
+	public static final Database getInstance() {
+		return INSTANCE;
 	}
 }

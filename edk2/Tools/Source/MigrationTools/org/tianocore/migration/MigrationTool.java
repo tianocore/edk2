@@ -4,6 +4,15 @@ import java.io.File;
 import java.util.Set;
 
 public class MigrationTool {
+	public static UI ui = null;
+	public static Database db = null;
+
+	public static final String MIGRATIONCOMMENT = "//%$//";
+
+	public static boolean printModuleInfo = false;
+	public static boolean doCritic = false;
+	public static boolean defaultoutput = false;
+
 	private static final void manipulate(ModuleInfo mi) throws Exception {
 
 		ModuleReader.ModuleScan(mi);
@@ -60,17 +69,8 @@ public class MigrationTool {
 		Common.toDoAll(path, MigrationTool.class.getMethod("seekModule", String.class), null, null, Common.DIR);
 	}
 
-	public static UI ui = null;
-	public static Database db = null;
-
-	public static final String MIGRATIONCOMMENT = "//%$//";
-
-	public static boolean printModuleInfo = false;
-	public static boolean doCritic = false;
-	public static boolean defaultoutput = false;
-
 	public static void main(String[] args) throws Exception {
-		ui = FirstPanel.init();
-		db = Database.init();
+		ui = FirstPanel.getInstance();
+		db = Database.getInstance();
 	}
 }
