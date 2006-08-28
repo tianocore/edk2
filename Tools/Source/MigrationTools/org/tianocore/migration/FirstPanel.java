@@ -24,6 +24,8 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 	 */
 	private static final long serialVersionUID = 207759413522910399L;
 	
+	private static final FirstPanel INSTANCE = FirstPanel.init();
+	
 	private String startpath;
 	private ModuleInfo mi;
 	
@@ -36,7 +38,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 	private boolean tofile = true, toscreen = true;
 	private PrintWriter logfile;
 
-	FirstPanel() throws Exception {
+	FirstPanel() {
         GridBagLayout gridbag = new GridBagLayout();
         setLayout(gridbag);
         
@@ -235,14 +237,17 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 
     //---------------------------------------------------------------------------------------//
     
-    public static FirstPanel init() throws Exception {
-    	
-    	//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    	//UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-    	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-    	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-    	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+    private static final FirstPanel init() {
+    	try {
+        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        	//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        	//UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+        	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+        	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+    	} catch (Exception e) {
+    		System.out.println(e.getMessage());
+    	}
     	
 		JFrame frame = new JFrame("MigrationTools");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -257,5 +262,9 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 		frame.setVisible(true);
 		
 		return fp;
+    }
+    
+    public static final FirstPanel getInstance() {
+    	return INSTANCE;
     }
 }
