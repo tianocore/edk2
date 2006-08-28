@@ -29,7 +29,7 @@ if not exist %WORKSPACE%\Tools\bin\MigrationTools.jar (
 )
 
 @REM Run Migration
-call "java" org.tianocore.migration.ModuleInfo
+call "java" org.tianocore.migration.MigrationTool
 
 goto end
 

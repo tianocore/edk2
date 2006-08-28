@@ -32,13 +32,13 @@ public final class ModuleReader {
 
 		String filename = null;
 		if (mi.msaorinf.isEmpty()) {
-			ModuleInfo.ui.println("No INF nor MSA file found!");
+			MigrationTool.ui.println("No INF nor MSA file found!");
 			System.exit(0);
 		} else {
 			if (mi.msaorinf.size() == 1) {
 				filename = (String)mi.msaorinf.toArray()[0];
 			} else {
-				filename = ModuleInfo.ui.choose("Found .inf or .msa file for module\n" + mi.modulepath + "\nChoose one Please", mi.msaorinf.toArray());
+				filename = MigrationTool.ui.choose("Found .inf or .msa file for module\n" + mi.modulepath + "\nChoose one Please", mi.msaorinf.toArray());
 			}
 		}
 		if (filename.contains(".inf")) {
@@ -104,7 +104,7 @@ public final class ModuleReader {
 					}
 					if (mtrinfequation.group(1).matches("DPX_SOURCE")) {
 						if (!mi.localmodulesources.contains(mtrinfequation.group(2))) {
-							ModuleInfo.ui.println("DPX File Missing! : " + mtrinfequation.group(2));
+							MigrationTool.ui.println("DPX File Missing! : " + mtrinfequation.group(2));
 						}
 					}
 				}
@@ -113,7 +113,7 @@ public final class ModuleReader {
 				mtrfilename = ptnfilename.matcher(mtrsection.group(2));
 				while (mtrfilename.find()) {
 					if (!mi.localmodulesources.contains(mtrfilename.group())) {
-						ModuleInfo.ui.println("Source File Missing! : " + mtrfilename.group());
+						MigrationTool.ui.println("Source File Missing! : " + mtrfilename.group());
 					}
 				}
 			}
@@ -141,7 +141,7 @@ public final class ModuleReader {
 					mtrinclude = ptninclude.matcher(line);
 					if (mtrinclude.find() && mi.localmodulesources.contains(mtrinclude.group(1))) {
 					} else {
-						line = ModuleInfo.migrationcomment + line;
+						line = MigrationTool.MIGRATIONCOMMENT + line;
 					}
 				}
 				outfile.append(line + '\n');
@@ -207,8 +207,8 @@ public final class ModuleReader {
 			// find guid
 			matguid = Guid.ptnguid.matcher(line);										// several ways to implement this , which one is faster ? :
 			while (matguid.find()) {													// 1.currently , find once , then call to identify which is it
-				if ((temp = Guid.register(matguid, mi, ModuleInfo.db)) != null) {				// 2.use 3 different matchers , search 3 times to find each
-					//matguid.appendReplacement(result, ModuleInfo.db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
+				if ((temp = Guid.register(matguid, mi, MigrationTool.db)) != null) {				// 2.use 3 different matchers , search 3 times to find each
+					//matguid.appendReplacement(result, MigrationTool.db.getR9Guidname(temp));		// search the database for all 3 kinds of guids , high cost
 				}
 			}
 			//matguid.appendTail(result);
@@ -224,9 +224,9 @@ public final class ModuleReader {
 			// find function call
 			matfuncc = Func.ptnfuncc.matcher(line);
 			while (matfuncc.find()) {
-				if ((temp = Func.register(matfuncc, mi, ModuleInfo.db)) != null) {
-					//ModuleInfo.ui.println(ifile + "  dofunc  " + temp);
-					//matfuncc.appendReplacement(result, ModuleInfo.db.getR9Func(temp));
+				if ((temp = Func.register(matfuncc, mi, MigrationTool.db)) != null) {
+					//MigrationTool.ui.println(ifile + "  dofunc  " + temp);
+					//matfuncc.appendReplacement(result, MigrationTool.db.getR9Func(temp));
 				}
 			}
 			//matfuncc.appendTail(result);
@@ -235,7 +235,7 @@ public final class ModuleReader {
 			// find macro
 			matmacro = Macro.ptntmacro.matcher(line);
 			while (matmacro.find()) {
-				if ((temp = Macro.register(matmacro, mi, ModuleInfo.db)) != null) {
+				if ((temp = Macro.register(matmacro, mi, MigrationTool.db)) != null) {
 				}
 			}
 			
@@ -247,7 +247,7 @@ public final class ModuleReader {
 
 			matfuncd = Func.ptnfuncd.matcher(line);
 			while (matfuncd.find()) {
-				if ((temp = Func.register(matfuncd, mi, ModuleInfo.db)) != null) {
+				if ((temp = Func.register(matfuncd, mi, MigrationTool.db)) != null) {
 				}
 			}
 		}

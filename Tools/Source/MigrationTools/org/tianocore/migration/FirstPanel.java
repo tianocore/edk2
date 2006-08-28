@@ -65,15 +65,15 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 		
 		mibox = new JCheckBox("Print ModuleInfo", false);
 		mibox.addItemListener(this);
-		ModuleInfo.printModuleInfo = false;
+		MigrationTool.printModuleInfo = false;
 		
 		criticbox = new JCheckBox("Run Critic", true);
 		criticbox.addItemListener(this);
-		ModuleInfo.doCritic = true;
+		MigrationTool.doCritic = true;
 		
 		defaultpathbox = new JCheckBox("Use Default Output Path", true);
 		defaultpathbox.addItemListener(this);
-		ModuleInfo.defaultoutput = true;
+		MigrationTool.defaultoutput = true;
 		
         JPanel modulePanel = new JPanel();
         modulePanel.add(moduleButton);
@@ -177,7 +177,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         if ( e.getSource() == goButton ) {
         	try {
         		logfile = new PrintWriter(new BufferedWriter(new FileWriter(startpath.replaceAll(Common.strseparate, "$1") + File.separator + "migration.log")));
-        		ModuleInfo.triger(startpath);
+        		MigrationTool.triger(startpath);
         		logfile.flush();
         	} catch (Exception en) {
         		println(en.getMessage());
@@ -214,21 +214,21 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         	}
     	} else if (e.getSource() == mibox) {
         	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		ModuleInfo.printModuleInfo = false;
+        		MigrationTool.printModuleInfo = false;
         	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		ModuleInfo.printModuleInfo = true;
+        		MigrationTool.printModuleInfo = true;
         	}
     	} else if (e.getSource() == criticbox) {
         	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		ModuleInfo.doCritic = false;
+        		MigrationTool.doCritic = false;
         	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		ModuleInfo.doCritic = true;
+        		MigrationTool.doCritic = true;
         	}
     	} else if (e.getSource() == defaultpathbox) {
         	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		ModuleInfo.defaultoutput = false;
+        		MigrationTool.defaultoutput = false;
         	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		ModuleInfo.defaultoutput = true;
+        		MigrationTool.defaultoutput = true;
         	}
     	}
     }
