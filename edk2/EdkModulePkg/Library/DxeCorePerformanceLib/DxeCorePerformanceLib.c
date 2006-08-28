@@ -236,7 +236,7 @@ StartGauge (
     //
     mGaugeData = CopyMem (mGaugeData, OldGaugeData, OldGaugeDataSize);
     
-    gBS->FreePool (OldGaugeData); 
+    FreePool (OldGaugeData); 
   }
   
   GaugeEntryArray               = (GAUGE_DATA_ENTRY *) (mGaugeData + 1);
@@ -421,6 +421,12 @@ DxeCorePerformanceLibConstructor (
 {
   EFI_STATUS                Status;
 
+  if (!PerformanceMeasurementEnabled ()) {
+    //
+    // Do not initialize performance infrastructure if not required.
+    //
+    return EFI_SUCCESS;
+  }
   //
   // Install the protocol interfaces.
   //

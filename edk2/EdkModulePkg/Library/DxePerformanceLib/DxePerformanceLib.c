@@ -27,24 +27,30 @@ STATIC PERFORMANCE_PROTOCOL    *mPerformance = NULL;
   The constructor function locates Performance protocol from protocol database.
   It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
 
-  @param  ImageHandle   The firmware allocated handle for the EFI image.
-  @param  SystemTable   A pointer to the EFI System Table.
-  
-  @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
+  @retval EFI_SUCCESS     Performance protocol is successfully located.
+  @retval Other           Performance protocol is not located to log performance.  
 
 **/
 EFI_STATUS
-EFIAPI
-PerformanceLibConstructor (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+GetPerformanceProtocol (
+  VOID
   )
 {
   EFI_STATUS            Status;
+  PERFORMANCE_PROTOCOL  *Performance;
 
-  Status = gBS->LocateProtocol (&gPerformanceProtocolGuid, NULL, (VOID **) &mPerformance);
-  ASSERT_EFI_ERROR (Status);
-  ASSERT (mPerformance != NULL);
+  if (mPerformance != NULL) {
+    return EFI_SUCCESS;
+  }
+
+  Status = gBS->LocateProtocol (&gPerformanceProtocolGuid, NULL, (VOID **) &Performance);
+  if (!EFI_ERROR (Status)) {
+    ASSERT (Performance != NULL);
+    //
+    // Cache performance protocol.
+    //
+    mPerformance = Performance;
+  }
 
   return Status;
 }
@@ -79,9 +85,14 @@ StartPerformanceMeasurement (
   )
 {
   EFI_STATUS  Status;
+
+  Status = GetPerformanceProtocol ();
+  if (EFI_ERROR (Status)) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
   
   Status = mPerformance->StartGauge (Handle, Token, Module, TimeStamp);
-
+  
   return (RETURN_STATUS) Status;
 }
 
@@ -118,6 +129,11 @@ EndPerformanceMeasurement (
   )
 {
   EFI_STATUS  Status;
+
+  Status = GetPerformanceProtocol ();
+  if (EFI_ERROR (Status)) {
+    return RETURN_NOT_FOUND;
+  }
 
   Status = mPerformance->EndGauge (Handle, Token, Module, TimeStamp);
 
@@ -180,6 +196,11 @@ GetPerformanceMeasurement (
   ASSERT (Module != NULL);
   ASSERT (StartTimeStamp != NULL);
   ASSERT (EndTimeStamp != NULL);
+
+  Status = GetPerformanceProtocol ();
+  if (EFI_ERROR (Status)) {
+    return 0;
+  }
 
   Status = mPerformance->GetGauge (LogEntryKey++, &GaugeData);
   
