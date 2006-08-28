@@ -133,7 +133,8 @@ echo Resetting the PATH variable to include the FRAMEWORK_TOOLS_PATH for this WO
 
 goto skipbuild
 
-:ForceBuild
+:ForceBuild 
+@if "%CLASSPATH%"=="" set CLASSPATH=  
 call ant -noclasspath -f %WORKSPACE%\Tools\build.xml cleanall
 
 :NormalBuild
