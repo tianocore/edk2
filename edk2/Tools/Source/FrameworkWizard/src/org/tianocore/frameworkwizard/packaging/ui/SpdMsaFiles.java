@@ -333,7 +333,6 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
      */
     public void actionPerformed(ActionEvent arg0) {
         
-        docConsole.setSaved(false);
         if (arg0.getSource() == jButtonOk) {
             this.save();
             this.dispose();
@@ -350,9 +349,16 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
                 JOptionPane.showMessageDialog(this, "Msa File is NOT PathAndFilename type.");
                 return;
             }
+            
+            String dirPrefix = Tools.dirForNewSpd.substring(0, Tools.dirForNewSpd.lastIndexOf(File.separator));
+            if (!new File(dirPrefix + File.separator + jTextField.getText()).exists()) {
+                JOptionPane.showMessageDialog(this, "File NOT Exists in Current Package.");
+                return;
+            }
             model.addRow(row);
             jTable.changeSelection(model.getRowCount()-1, 0, false, false);
             sfc.genSpdMsaFiles(row[0], null, null, null);
+            docConsole.setSaved(false);
         }
         //
         // remove selected line
@@ -365,6 +371,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
             if (rowSelected >= 0) {
                 model.removeRow(rowSelected);
                 sfc.removeSpdMsaFile(rowSelected);
+                docConsole.setSaved(false);
             }
         }
 
@@ -374,6 +381,7 @@ public class SpdMsaFiles extends IInternalFrame implements TableModelListener{
             }
             model.setRowCount(0);
             sfc.removeSpdMsaFile();
+            docConsole.setSaved(false);
         }
 
     }
