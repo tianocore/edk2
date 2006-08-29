@@ -631,25 +631,18 @@ public class FpdFileContents {
                 if (moduleSA.getPcdBuildDefinition() != null) {
                     XmlCursor cursor = moduleSA.getPcdBuildDefinition().newCursor();
                     if (cursor.toFirstChild()) {
-                        PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData) cursor
-                                                                                                                                                      .getObject();
-                        if (msaPcd.getCName().equals(pcdData.getCName())
-                            && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
-
-                            maintainDynPcdMap(pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName(), moduleKey);
-                            cursor.removeXml();
-                            break;
-                        }
-                        while (cursor.toNextSibling()) {
-                            pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData) cursor.getObject();
+                        do {
+                            PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData) cursor
+                                                                                                                                                          .getObject();
                             if (msaPcd.getCName().equals(pcdData.getCName())
                                 && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
+
                                 maintainDynPcdMap(pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName(),
                                                   moduleKey);
                                 cursor.removeXml();
                                 break;
                             }
-                        }
+                        } while (cursor.toNextSibling());
                     }
                     cursor.dispose();
                 }
