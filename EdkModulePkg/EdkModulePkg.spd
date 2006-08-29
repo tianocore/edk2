@@ -988,6 +988,15 @@
       <HelpText>kbytes size of runtime memory.</HelpText>
     </PcdEntry>
     <PcdEntry>
+      <C_Name>PcdMaxPeiPerformanceLogEntries</C_Name>
+      <Token>0x0001002f</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT8</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
+      <DefaultValue>28</DefaultValue>
+      <HelpText>Maximun number of performance log entries during PEI phase.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
       <C_Name>PcdFlashFvBaseArray</C_Name>
       <Token>0x31000001</Token>
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>

@@ -33,10 +33,6 @@ Abstract:
 //
 #define PEI_PERFORMANCE_STRING_SIZE     8
 #define PEI_PERFORMANCE_STRING_LENGTH   (PEI_PERFORMANCE_STRING_SIZE - 1)
-//
-// Bugbug: This macro will be replaced by a binary patchable PCD entry in EdkModulePkg
-//
-#define MAX_PEI_PERFORMANCE_LOG_ENTRIES 28
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
