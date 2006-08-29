@@ -828,6 +828,131 @@ public class Token {
     public String getStringTypeString () {
         return getDefaultSku().value.substring(2, getDefaultSku().value.length() - 1);
     }
+
+    /**
+       Judge whether a datum string is byte array.
+       
+       @param datum             datum string
+       
+       @return boolean          true - is byte array, false - not byte array
+    **/
+    public static boolean isByteArrayDatum(String datum) {
+        if (datum == null) {
+            return false;
+        }
+
+        String trimedStr = datum.trim();
+
+        if (trimedStr.length() == 0) {
+            return false;
+        }
+
+        if (trimedStr.startsWith("{") && 
+            trimedStr.endsWith("}")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+       Judge whether a datum string is unicode.
+       
+       @param datum             datum string
+       
+       @return boolean          true - is unicode, false - not unicode
+    **/
+    public static boolean isUnicodeDatum(String datum) {
+        if (datum  == null) {
+            return false;
+        }
+
+        String trimedStr = datum.trim();
+        if (trimedStr.length() == 0) {
+            return false;
+        }
+
+        if (trimedStr.startsWith("L")  &&
+            trimedStr.charAt(1) == '"' &&
+            trimedStr.endsWith("\"")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+       Judge whether a datum string is ANSCI string.
+       
+       @param datum             datum string
+       
+       @return boolean          true - is ANSIC, false - not ANSIC
+    **/
+    public static boolean isAnsciDatum(String datum) {
+        if (datum == null) {
+            return false;
+        }
+
+        String trimedStr = datum.trim();
+
+        if (trimedStr.length() == 0) {
+            return false;
+        }
+
+        if (datum.startsWith("\"") &&
+            datum.endsWith("\"")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+       Get byte array string for POINTER type Datum.
+       
+       @param datum         the datum whose type is POINTER
+       
+       @return String       the byte array string
+    **/
+    public String getByteArrayForPointerDatum(String datum) {
+        String byteArray = "{";
+
+        if (datumType != Token.DATUM_TYPE.POINTER) {
+            return null;
+        }
+
+        if (Token.isAnsciDatum(datum)) {
+            String trimedStr = datum.trim();
+            trimedStr = trimedStr.substring(1, trimedStr.length() - 1);
+            char charArray[] = trimedStr.toCharArray();
+            for (int index = 0; index < charArray.length; index++) {
+                byteArray += String.format("0x%02x ", (byte)charArray[index]);
+                if (index != (charArray.length - 1)) {
+                    byteArray += ",";
+                }
+            }
+        } else if (Token.isUnicodeDatum(datum)) {
+            String trimedStr = datum.trim();
+            trimedStr = trimedStr.substring(2, trimedStr.length() - 1);
+            for (int index = 0; index < trimedStr.length(); index++) {
+                short unicodeVal = (short)trimedStr.codePointAt(index);
+                byteArray += String.format("0x%02x, 0x%02x", 
+                                           (byte)unicodeVal,
+                                           (byte)((unicodeVal & 0xFF00) >> 8));
+                if (index != (trimedStr.length() - 1)) {
+                    byteArray += " ,";
+                }
+            }
+        } else if (Token.isByteArrayDatum(datum)){
+            return datum;
+        } else {
+            return null;
+        }
+
+        byteArray += "}";
+
+        return byteArray;
+    }
 }
 
 
