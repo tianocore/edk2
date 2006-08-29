@@ -77,5 +77,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <HelpText>The bitmask of flags that specify the enable/disable of
                 Performance Measurement.</HelpText>
     </PcdEntry>
+    <PcdEntry PcdItemType="DYNAMIC">
+      <C_Name>PcdMaxPeiPerformanceLogEntries</C_Name>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <HelpText>Maximun number of performance log entries during PEI phase.</HelpText>
+    </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>

@@ -57,7 +57,7 @@ InternalGetPerformanceHobLog (
     // PEI Performance HOB was not found, then build one.
     //
     PeiPerformanceLogSize = sizeof (PEI_PERFORMANCE_LOG_HEADER) + 
-                            sizeof (PEI_PERFORMANCE_LOG_ENTRY) * MAX_PEI_PERFORMANCE_LOG_ENTRIES;
+                            sizeof (PEI_PERFORMANCE_LOG_ENTRY) * PcdGet8 (PcdMaxPeiPerformanceLogEntries);
     PeiPerformanceLog     = BuildGuidHob (&gPeiPerformanceHobGuid, PeiPerformanceLogSize);
     PeiPerformanceLog     = ZeroMem (PeiPerformanceLog, PeiPerformanceLogSize);
   }
@@ -152,7 +152,7 @@ StartPerformanceMeasurement (
 
   PeiPerformanceLog = InternalGetPerformanceHobLog ();
   
-  if (PeiPerformanceLog->NumberOfEntries >= MAX_PEI_PERFORMANCE_LOG_ENTRIES) {
+  if (PeiPerformanceLog->NumberOfEntries >= PcdGet8 (PcdMaxPeiPerformanceLogEntries)) {
     return RETURN_OUT_OF_RESOURCES;
   }
   Index                       = PeiPerformanceLog->NumberOfEntries++;

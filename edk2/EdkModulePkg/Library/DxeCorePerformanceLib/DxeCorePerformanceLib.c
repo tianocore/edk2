@@ -438,7 +438,7 @@ DxeCorePerformanceLibConstructor (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  mMaxGaugeRecords = INIT_DXE_GAUGE_DATA_ENTRIES + MAX_PEI_PERFORMANCE_LOG_ENTRIES;
+  mMaxGaugeRecords = INIT_DXE_GAUGE_DATA_ENTRIES + PcdGet8 (PcdMaxPeiPerformanceLogEntries);
 
   mGaugeData = AllocateZeroPool (sizeof (GAUGE_DATA_HEADER) + (sizeof (GAUGE_DATA_ENTRY) * mMaxGaugeRecords));
   ASSERT (mGaugeData != NULL);
