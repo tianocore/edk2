@@ -192,10 +192,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     resolveLibraryInstances(saa[i][1] + " " + saa[i][2] + " " + saa[i][3] + " " + saa[i][4]);
                     selectedInstancesTableModel.addRow(saa[i]);
                 }
-                
-                
             }
         }
+        showClassToResolved();
     }
     
     public void initFvInfo (String key) {
@@ -286,7 +285,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 
             }
             
-            showClassToResolved();
+//            showClassToResolved();
         }
         catch(Exception e) {
             e.printStackTrace();
@@ -417,6 +416,21 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             }
         }
         libInstanceTableModel.setRowCount(0);
+    }
+    
+    private void addLibInstance (ModuleIdentification libMi) {
+        
+        ffc.genLibraryInstance(libMi, moduleKey);
+        //
+        // Add pcd information of selected instance to current moduleSA
+        //
+        try{
+            ffc.addFrameworkModulesPcdBuildDefs(libMi, null, ffc.getModuleSA(moduleKey));
+        }
+        catch (Exception exception) {
+            JOptionPane.showMessageDialog(frame, "Adding Instance" + libMi.getName() + ": "+ exception.getMessage());
+        }
+        
     }
     /**
      * This method initializes this
@@ -994,17 +1008,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     libInstanceTableModel.getValueAt(row, 3) + " " +
                     libInstanceTableModel.getValueAt(row, 4);
                     ModuleIdentification libMi = WorkspaceProfile.getModuleId(instanceValue);
-                    ffc.genLibraryInstance(libMi, moduleKey);
-                    //
-                    // Add pcd information of selected instance to current moduleSA
-                    //
-                    try{
-                        ffc.addFrameworkModulesPcdBuildDefs(libMi, null, ffc.getModuleSA(moduleKey));
-                    }
-                    catch (Exception exception) {
-                        JOptionPane.showMessageDialog(frame, "Adding Instance" + s[0] + ": "+ exception.getMessage());
-                    }
+                    addLibInstance (libMi);
                     resolveLibraryInstances(instanceValue);
+                    showClassToResolved();
                 }
             });
         }
