@@ -42,6 +42,7 @@ import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.PlatformSurfaceAreaDocument;
+import org.tianocore.frameworkwizard.toolchain.ToolChainId;
 
 /**
  * The class is used to update the target.txt file.
@@ -224,7 +225,7 @@ public class Preferences extends IFrame {
     private Vector<String> vArchList = null;
 
     private Vector<String> vDisableArchList = null;
-
+    
     //
     // Not used by UI
     //
@@ -574,7 +575,6 @@ public class Preferences extends IFrame {
          * Read Current target.txt file first
          * Read TOOL_CHAIN_CONF file if specified, otherwise use tools_def.txt
          */
-
         readTargetTxtFile();
         boolean haveBuildTargets = readToolDefinitionFile();
         if (!haveBuildTargets) {
