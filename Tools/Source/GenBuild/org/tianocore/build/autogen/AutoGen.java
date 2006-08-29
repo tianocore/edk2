@@ -1843,175 +1843,22 @@ public class AutoGen {
         //  and <ExitBootServicesCallBack>
         //
         String moduleType = this.moduleId.getModuleType();
-        boolean UefiOrDxeModule = false;
-        int Count = 0;
-        int i;
         switch (CommonDefinition.getModuleType(moduleType)) {
         case CommonDefinition.ModuleTypeDxeDriver:
         case CommonDefinition.ModuleTypeDxeRuntimeDriver:
         case CommonDefinition.ModuleTypeDxeSalDriver:
         case CommonDefinition.ModuleTypeUefiDriver:
-        case CommonDefinition.ModuleTypeUefiApplication:
-            //
-            // Entry point lib for these module types needs to know the count
-            // of entryPoint.
-            //
-            UefiOrDxeModule = true;
-            fileBuffer
-            .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverSetVirtualAddressMapEventCount = ");
-
-            //
-            // If the list is not valid or has no entries set count to zero else
-            // set count to the number of valid entries
-            //
-            Count = 0;
-            if (this.setVirtalAddList != null) {
-                for (i = 0; i < this.setVirtalAddList.size(); i++) {
-                    if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
-                        break;
-                    }
-                }
-                Count = i;
-            }
-
-            fileBuffer.append(Integer.toString(Count));
-            fileBuffer.append(";\r\n\r\n");
+		case CommonDefinition.ModuleTypeUefiApplication:
+			//
+			//  If moduleType is one of above, call setVirtualAddressToAutogenC,
+			//  and setExitBootServiceToAutogenC.
+			// 
+            setVirtualAddressToAutogenC(fileBuffer);
+			setExitBootServiceToAutogenC(fileBuffer);
             break;
         default:
             break;
         }
-
-        if (this.setVirtalAddList == null || this.setVirtalAddList.size() == 0) {
-            if (UefiOrDxeModule) {
-                //
-                // No data so make a NULL list
-                //
-                fileBuffer
-                .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {\r\n");
-                fileBuffer.append("  NULL\r\n");
-                fileBuffer.append("};\r\n\r\n");
-            }
-        } else {
-            //
-            // Write SetVirtualAddressMap function definition.
-            //
-            for (i = 0; i < this.setVirtalAddList.size(); i++) {
-                if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
-                    break;
-                }
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(this.setVirtalAddList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
-                fileBuffer.append("  IN VOID       *Context\r\n");
-                fileBuffer.append("  );\r\n\r\n");
-            }
-
-            //
-            // Write SetVirtualAddressMap entry point array.
-            //
-            fileBuffer
-            .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {");
-            for (i = 0; i < this.setVirtalAddList.size(); i++) {
-                if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
-                    break;
-                }
-
-                if (i == 0) {
-                    fileBuffer.append("\r\n  ");
-                } else {
-                    fileBuffer.append(",\r\n  ");
-                }
-
-                fileBuffer.append(this.setVirtalAddList.get(i));
-            }
-            //
-            //  If module is not DXE_DRIVER, DXE_RUNTIME_DIRVER, UEFI_DRIVER
-            //  UEFI_APPLICATION and DXE_SAL_DRIVER add the NULL at the end of
-            //  _gDriverSetVirtualAddressMapEvent list.
-            //
-            if (!UefiOrDxeModule) {
-                fileBuffer.append(",\r\n  NULL");
-            }
-            fileBuffer.append("\r\n};\r\n\r\n");
-        }
-
-        if (UefiOrDxeModule) {
-            //
-            // Entry point lib for these module types needs to know the count.
-            //
-            fileBuffer
-            .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverExitBootServicesEventCount = ");
-
-            //
-            // If the list is not valid or has no entries set count to zero else
-            // set count to the number of valid entries.
-            //
-            Count = 0;
-            if (this.exitBootServiceList != null) {
-                for (i = 0; i < this.exitBootServiceList.size(); i++) {
-                    if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
-                        break;
-                    }
-                }
-                Count = i;
-            }
-            fileBuffer.append(Integer.toString(Count));
-            fileBuffer.append(";\r\n\r\n");
-        }
-
-        if (this.exitBootServiceList == null || this.exitBootServiceList.size() == 0) {
-            if (UefiOrDxeModule) {
-                //
-                // No data so make a NULL list.
-                //
-                fileBuffer
-                .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {\r\n");
-                fileBuffer.append("  NULL\r\n");
-                fileBuffer.append("};\r\n\r\n");
-            }
-        } else {
-            //
-            // Write DriverExitBootServices function definition.
-            //
-            for (i = 0; i < this.exitBootServiceList.size(); i++) {
-                if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
-                    break;
-                }
-
-                fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
-                fileBuffer.append(this.exitBootServiceList.get(i));
-                fileBuffer.append(" (\r\n");
-                fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
-                fileBuffer.append("  IN VOID       *Context\r\n");
-                fileBuffer.append("  );\r\n\r\n");
-            }
-
-            //
-            // Write DriverExitBootServices entry point array.
-            //
-            fileBuffer
-            .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {");
-            for (i = 0; i < this.exitBootServiceList.size(); i++) {
-                if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
-                    break;
-                }
-
-                if (i == 0) {
-                    fileBuffer.append("\r\n  ");
-                } else {
-                    fileBuffer.append(",\r\n  ");
-                }
-                fileBuffer.append(this.exitBootServiceList.get(i));
-            }
-            if (!UefiOrDxeModule) {
-                fileBuffer.append(",\r\n  NULL");
-            }
-            fileBuffer.append("\r\n};\r\n\r\n");
-        }
-
     }
 
     /**
@@ -2190,4 +2037,155 @@ public class AutoGen {
             System.out.println("Collect library instance failed!");
         }
     }
+	private void setVirtualAddressToAutogenC(StringBuffer fileBuffer){
+        //
+        // Entry point lib for these module types needs to know the count
+        // of entryPoint.
+        //
+		fileBuffer
+            .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverSetVirtualAddressMapEventCount = ");
+
+            //
+            // If the list is not valid or has no entries set count to zero else
+            // set count to the number of valid entries
+            //
+            int Count = 0;
+			int i = 0;
+            if (this.setVirtalAddList != null) {
+                for (i = 0; i < this.setVirtalAddList.size(); i++) {
+                    if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
+                        break;
+                    }
+                }
+                Count = i;
+            }
+
+            fileBuffer.append(Integer.toString(Count));
+            fileBuffer.append(";\r\n\r\n");
+            if (this.setVirtalAddList == null || this.setVirtalAddList.size() == 0) {
+                //
+                // No data so make a NULL list
+                //
+                fileBuffer
+                .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {\r\n");
+                fileBuffer.append("  NULL\r\n");
+                fileBuffer.append("};\r\n\r\n");
+            } else {
+                //
+                // Write SetVirtualAddressMap function definition.
+                //
+                for (i = 0; i < this.setVirtalAddList.size(); i++) {
+                    if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
+                        break;
+                    }
+                    fileBuffer.append("VOID\r\n");
+                    fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append(this.setVirtalAddList.get(i));
+                    fileBuffer.append(" (\r\n");
+                    fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
+                    fileBuffer.append("  IN VOID       *Context\r\n");
+                    fileBuffer.append("  );\r\n\r\n");
+                 }
+
+                //
+                // Write SetVirtualAddressMap entry point array.
+                //
+                fileBuffer
+                .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverSetVirtualAddressMapEvent[] = {");
+                for (i = 0; i < this.setVirtalAddList.size(); i++) {
+                    if (this.setVirtalAddList.get(i).equalsIgnoreCase("")) {
+                        break;
+                    }
+
+                    if (i == 0) {
+                        fileBuffer.append("\r\n  ");
+                    } else {
+                        fileBuffer.append(",\r\n  ");
+                    }
+
+                    fileBuffer.append(this.setVirtalAddList.get(i));
+                }
+                //
+                // add the NULL at the end of _gDriverSetVirtualAddressMapEvent list.
+                //
+                fileBuffer.append(",\r\n  NULL");
+                fileBuffer.append("\r\n};\r\n\r\n");
+			}
+	}
+
+
+	private void setExitBootServiceToAutogenC(StringBuffer fileBuffer){
+		//
+        // Entry point lib for these module types needs to know the count.
+        //
+        fileBuffer
+        .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED  const UINTN _gDriverExitBootServicesEventCount = ");
+
+        //
+        // If the list is not valid or has no entries set count to zero else
+        // set count to the number of valid entries.
+        //
+        int Count = 0;
+		int i = 0; 
+        if (this.exitBootServiceList != null) {
+            for (i = 0; i < this.exitBootServiceList.size(); i++) {
+                if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
+                    break;
+                }
+            }
+            Count = i;
+        }
+        fileBuffer.append(Integer.toString(Count));
+        fileBuffer.append(";\r\n\r\n");
+
+		if (this.exitBootServiceList == null || this.exitBootServiceList.size() == 0) {
+            //      
+            // No data so make a NULL list.
+            //
+            fileBuffer
+            .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {\r\n");
+            fileBuffer.append("  NULL\r\n");
+            fileBuffer.append("};\r\n\r\n");
+        } else {
+            //
+            // Write DriverExitBootServices function definition.
+            //
+            for (i = 0; i < this.exitBootServiceList.size(); i++) {
+                if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
+                    break;
+                }
+
+                fileBuffer.append("VOID\r\n");
+                fileBuffer.append("EFIAPI\r\n");
+                fileBuffer.append(this.exitBootServiceList.get(i));
+                fileBuffer.append(" (\r\n");
+                fileBuffer.append("  IN EFI_EVENT  Event,\r\n");
+                fileBuffer.append("  IN VOID       *Context\r\n");
+                fileBuffer.append("  );\r\n\r\n");
+            }
+
+            //
+            // Write DriverExitBootServices entry point array.
+            //
+            fileBuffer
+            .append("\r\nGLOBAL_REMOVE_IF_UNREFERENCED const EFI_EVENT_NOTIFY _gDriverExitBootServicesEvent[] = {");
+            for (i = 0; i < this.exitBootServiceList.size(); i++) {
+                if (this.exitBootServiceList.get(i).equalsIgnoreCase("")) {
+                    break;
+                }
+
+                if (i == 0) {
+                    fileBuffer.append("\r\n  ");
+                } else {
+                    fileBuffer.append(",\r\n  ");
+                }
+                fileBuffer.append(this.exitBootServiceList.get(i));
+            }
+            
+            fileBuffer.append(",\r\n  NULL");
+            fileBuffer.append("\r\n};\r\n\r\n");
+        }
+
+	}
+
 }
