@@ -327,7 +327,7 @@ public class UsageInstance {
             }
             break;
         case PATCHABLE_IN_MODULE:
-            if (isByteArray) {
+            if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
                 //
                 // Example autogen string for following generation:
                 // "extern UINT8 _gPcd_BinaryPatch_PcdSampleToken[];"
@@ -342,6 +342,21 @@ public class UsageInstance {
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
                                              parentToken.cName);
+                //
+                // Example autogen string for following generation:
+                // "#define _PCD_SET_MODE_8_PcdSampleToken(SizeOfBuffer, Buffer) CopyMem (_gPcd_BinaryPatch_PcdSampleToken, (Buffer), (SizeOfBuffer))"
+                // 
+                hAutogenStr += String.format("#define _PCD_PATCHABLE_%s_SIZE %d\r\n",
+                                             parentToken.cName,
+                                             parentToken.datumSize);
+                hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(SizeOfBuffer, Buffer) "+
+                                             "LibPatchPcdSetPtr (_gPcd_BinaryPatch_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, "+
+                                             "(SizeOfBuffer), (Buffer))\r\n",
+                                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
+                                             parentToken.cName,
+                                             parentToken.cName,
+                                             parentToken.cName);
+
             } else {
                 //
                 // Example autogen string for following generation:
@@ -358,27 +373,6 @@ public class UsageInstance {
                                              Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
                                              parentToken.cName,
                                              parentToken.cName);
-            }
-
-            //
-            // Generate _PCD_SET_MODE_xx macro for using set BinaryPatch value via PcdSet macro
-            //
-            if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
-                //
-                // Example autogen string for following generation:
-                // "#define _PCD_SET_MODE_8_PcdSampleToken(SizeOfBuffer, Buffer) CopyMem (_gPcd_BinaryPatch_PcdSampleToken, (Buffer), (SizeOfBuffer))"
-                // 
-                hAutogenStr += String.format("#define _PCD_PATCHABLE_%s_SIZE %d\r\n",
-                                             parentToken.cName,
-                                             parentToken.datumSize);
-                hAutogenStr += String.format("#define _PCD_SET_MODE_%s_%s(SizeOfBuffer, Buffer) "+
-                                             "LibPatchPcdSetPtr (_gPcd_BinaryPatch_%s, (UINTN)_PCD_PATCHABLE_%s_SIZE, "+
-                                             "(SizeOfBuffer), (Buffer))\r\n",
-                                             Token.GetAutogenDefinedatumTypeString(parentToken.datumType),
-                                             parentToken.cName,
-                                             parentToken.cName,
-                                             parentToken.cName);
-            } else {
                 //
                 // Example autogen string for following generation:
                 // "#define _PCD_SET_MODE_8_PcdSampleToken(Value) (_gPcd_BinaryPatch_PcdSampleToken = (Value))"
@@ -390,6 +384,9 @@ public class UsageInstance {
             }
 
             if (!isBuildUsedLibrary) {
+                if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
+                    printDatum = parentToken.getByteArrayForPointerDatum(printDatum);
+                }
                 //
                 // Example autogen string for following generation:
                 // "#define _PCD_VALUE_PcdSampleToken   0x111"
@@ -397,7 +394,7 @@ public class UsageInstance {
                 hAutogenStr += String.format("#define _PCD_VALUE_%s   %s\r\n",
                                              parentToken.cName,
                                              printDatum);
-                if (isByteArray) {
+                if (parentToken.datumType == Token.DATUM_TYPE.POINTER) {
                     //
                     // Example autogen string for following generation:
                     // "GLOBAL_REMOVE_IF_UNREFERENCED UINT8 _gPcd_BinaryPatch_PcdSampleToken[] = _PCD_VALUE_PcdSampleToken;"
