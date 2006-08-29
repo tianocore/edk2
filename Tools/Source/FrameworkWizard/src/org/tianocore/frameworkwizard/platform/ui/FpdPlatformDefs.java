@@ -23,6 +23,7 @@ import javax.swing.ListSelectionModel;
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
+import org.tianocore.frameworkwizard.toolchain.ToolChainId;
 
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -44,31 +45,33 @@ import java.util.Vector;
 
 public class FpdPlatformDefs extends IInternalFrame {
 
+    private static boolean Debug = false;
+
     private final int dialogWidth = 600;
 
     private final int oneRowHeight = 20;
 
     private final int twoRowHeight = 40;
 
-//    private final int threeRowHeight = 60;
+    //    private final int threeRowHeight = 60;
 
     private final int fourRowHeight = 80;
 
     private final int sepHeight = 6;
 
-//    private final int sepWidth = 10;
+    //    private final int sepWidth = 10;
 
     private final int buttonWidth = 90;
 
     private final int rowOne = 12;
 
-    private final int rowTwo = rowOne + oneRowHeight + sepHeight;
+    private final int rowTwo = rowOne + oneRowHeight + sepHeight * 3;
 
     private final int rowThree = rowTwo + oneRowHeight + sepHeight;
 
     private final int rowFour = rowThree + oneRowHeight + sepHeight;
 
-    private final int rowFive = rowFour + fourRowHeight + sepHeight;
+    private final int rowFive = rowFour + fourRowHeight + sepHeight * 3;
 
     private final int rowSix = rowFive + oneRowHeight + sepHeight;
 
@@ -78,7 +81,7 @@ public class FpdPlatformDefs extends IInternalFrame {
 
     private final int rowNine = rowEight + oneRowHeight + sepHeight;
 
-    private final int rowTen = rowNine + fourRowHeight + sepHeight + sepHeight;
+    private final int rowTen = rowNine + fourRowHeight + sepHeight + sepHeight * 3;
 
     private final int rowEleven = rowTen + oneRowHeight + sepHeight;
 
@@ -99,11 +102,6 @@ public class FpdPlatformDefs extends IInternalFrame {
     private final int tableHeight = fourRowHeight;
 
     private final int tableWidth = valueWidth;
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
 
     static JFrame frame;
 
@@ -133,13 +131,15 @@ public class FpdPlatformDefs extends IInternalFrame {
 
     private JComboBox jComboBoxInterDir = null;
 
+    private JComboBox jBuildTargetComboBox = null;
+
     private JTable jTableBuildTargets = null;
 
     private JPanel jArchitectureSelections = null;
 
     private JLabel jLabelBuildTargets = null;
 
-    private JTextField jTextFieldBuildTarget = null;
+    //    private JTextField jTextFieldBuildTarget = null;
 
     private JButton jButtonAddBuildTarget = null;
 
@@ -180,6 +180,13 @@ public class FpdPlatformDefs extends IInternalFrame {
     private JLabel jLabelOutputInfo = null;
 
     private int selectedRow = -1;
+
+    /**
+     *  The following are not used by the UI 
+     */
+    private static final long serialVersionUID = 1L;
+
+    private ToolChainId tid = new ToolChainId();
 
     public FpdPlatformDefs() {
         super();
@@ -399,7 +406,9 @@ public class FpdPlatformDefs extends IInternalFrame {
             jPanelGeneralContainer.add(getArchitectureSelections(), null);
 
             jPanelGeneralContainer.add(jLabelBuildTargets, null);
-            jPanelGeneralContainer.add(getJTextFieldBuildTarget(), null);
+            // jPanelGeneralContainer.add(getJTextFieldBuildTarget(), null);
+            jPanelGeneralContainer.add(getJBuildTargetComboBox(), null);
+
             jPanelGeneralContainer.add(getJButtonAddBuildTarget(), null);
             jPanelGeneralContainer.add(getJButtonDelBuildTarget(), null);
             jPanelGeneralContainer.add(getJScrollPaneBuildTargets(), null);
@@ -441,6 +450,8 @@ public class FpdPlatformDefs extends IInternalFrame {
             jArchitectureSelections.setBounds(new java.awt.Rectangle(valueColumn, rowOne, valueWidth, oneRowHeight));
             jArchitectureSelections.setPreferredSize(new java.awt.Dimension(valueWidth, oneRowHeight));
             jArchitectureSelections.setLocation(new java.awt.Point(valueColumn, rowOne));
+            jArchitectureSelections.setToolTipText("<html>A Platform may support one or more architectures," 
+                                                   + "<br>at least one architecture must be selected!</html>");
         }
         return jArchitectureSelections;
     }
@@ -602,20 +613,58 @@ public class FpdPlatformDefs extends IInternalFrame {
     }
 
     /**
+     * Use a ComboBox for BuildTargets
+     * 
+     * @return javax.swing.JComboBox jBuildTargetComboBox
+     */
+    private JComboBox getJBuildTargetComboBox() {
+        if (jBuildTargetComboBox == null) {
+            String toolBt = null;
+            if (tid.getToolsDefTargetNames() == null)
+                toolBt = "DEBUG RELEASE";
+            else
+                toolBt = tid.getToolsDefTargetNames().trim();
+
+            if ((toolBt.contains("*")) || (toolBt.length() < 1)) {
+                toolBt = "DEBUG RELEASE";
+            }
+            if (Debug)
+                System.out.println("Using Build Targets: " + toolBt.trim());
+
+            toolBt = toolBt.replaceAll(" ", ":");
+            toolBt = " :" + toolBt;
+            if (Debug)
+                System.out.println("Using Build Targets: " + toolBt.trim());
+            String[] buildTargets = toolBt.trim().split(":");
+
+            jBuildTargetComboBox = new JComboBox(buildTargets);
+            jBuildTargetComboBox.setEditable(true);
+            jBuildTargetComboBox.setPreferredSize(new Dimension(valueWidth, oneRowHeight));
+            jBuildTargetComboBox.setBounds(new java.awt.Rectangle(valueColumn, rowTwo, valueWidth, oneRowHeight));
+            jBuildTargetComboBox.setLocation(new java.awt.Point(valueColumn, rowTwo));
+            jBuildTargetComboBox.setToolTipText("<html>Select a defined Target and then click Add,<br>"
+                                                + "or enter a new, one word TargetName and then click Add.<br>"
+                                                + "Remember to define the Targetname in the tool defintion file."
+                                                + "</html>");
+
+        }
+        return jBuildTargetComboBox;
+    }
+
+    /**
      * This method initializes jTextField1	
      * 	
      * @return javax.swing.JTextField	
      */
-    private JTextField getJTextFieldBuildTarget() {
-        if (jTextFieldBuildTarget == null) {
-            jTextFieldBuildTarget = new JTextField();
-            jTextFieldBuildTarget.setPreferredSize(new Dimension(valueWidth, oneRowHeight));
-            jTextFieldBuildTarget.setBounds(new java.awt.Rectangle(valueColumn, rowTwo, valueWidth, oneRowHeight));
-            jTextFieldBuildTarget.setLocation(new java.awt.Point(valueColumn, rowTwo));
-        }
-        return jTextFieldBuildTarget;
-    }
-
+    //    private JTextField getJTextFieldBuildTarget() {
+    //        if (jTextFieldBuildTarget == null) {
+    //            jTextFieldBuildTarget = new JTextField();
+    //            jTextFieldBuildTarget.setPreferredSize(new Dimension(valueWidth, oneRowHeight));
+    //            jTextFieldBuildTarget.setBounds(new java.awt.Rectangle(valueColumn, rowTwo, valueWidth, oneRowHeight));
+    //            jTextFieldBuildTarget.setLocation(new java.awt.Point(valueColumn, rowTwo));
+    //        }
+    //        return jTextFieldBuildTarget;
+    //   }
     /**
      * This method initializes jButton2	
      * 	
@@ -633,16 +682,26 @@ public class FpdPlatformDefs extends IInternalFrame {
 
             jButtonAddBuildTarget.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (jTextFieldBuildTarget.getText().length() > 0) {
-                        String[] row = { jTextFieldBuildTarget.getText() };
-                        jTextFieldBuildTarget.setText("");
+                    // Used with Text Field
+                    // if (jTextFieldBuildTarget.getText().length() > 0) {
+                    //    String[] row = { jTextFieldBuildTarget.getText() };
+                    //    jTextFieldBuildTarget.setText("");
+                    //    buildTargetTableModel.addRow(row);
+                    //    Vector<Object> v = new Vector<Object>();
+                    //    for (int i = 0; i < jTableBuildTargets.getRowCount(); ++i) {
+                    //        v.add(buildTargetTableModel.getValueAt(i, 0));
+                    //    }
+                    //    docConsole.setSaved(false);
+                    //    ffc.setPlatformDefsBuildTargets(v);
+                    // }
+                    // Use with ComboBox
+                    if (jBuildTargetComboBox.getSelectedItem().toString().length() > 0) {
+                        String[] row = { jBuildTargetComboBox.getSelectedItem().toString() };
                         buildTargetTableModel.addRow(row);
                         Vector<Object> v = new Vector<Object>();
                         for (int i = 0; i < jTableBuildTargets.getRowCount(); ++i) {
                             v.add(buildTargetTableModel.getValueAt(i, 0));
                         }
-                        docConsole.setSaved(false);
-                        ffc.setPlatformDefsBuildTargets(v);
                     }
                 }
             });
@@ -716,6 +775,8 @@ public class FpdPlatformDefs extends IInternalFrame {
             jTableBuildTargets = new JTable(buildTargetTableModel);
             jTableBuildTargets.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             jTableBuildTargets.setRowHeight(oneRowHeight);
+            jTableBuildTargets.setToolTipText("<html>Select one of the Targets from the table and<br>"
+                                              + "click Delete to remove the target from the platform.</html>");
             buildTargetTableModel.addColumn("Build Target");
 
             jTableBuildTargets.getModel().addTableModelListener(new TableModelListener() {
@@ -753,6 +814,7 @@ public class FpdPlatformDefs extends IInternalFrame {
             jTextFieldSkuId.setPreferredSize(new Dimension(40, oneRowHeight));
             jTextFieldSkuId.setBounds(new java.awt.Rectangle(valueColumn, rowSix, 40, oneRowHeight));
             jTextFieldSkuId.setLocation(new java.awt.Point(valueColumn, rowSix));
+            jTextFieldSkuId.setToolTipText("Enter a unique integer value.");
         }
         return jTextFieldSkuId;
     }
@@ -768,6 +830,9 @@ public class FpdPlatformDefs extends IInternalFrame {
             jTextFieldSkuName.setPreferredSize(new Dimension(valueWidth, oneRowHeight));
             jTextFieldSkuName.setBounds(new java.awt.Rectangle(valueColumn, rowSeven, valueWidth, oneRowHeight));
             jTextFieldSkuName.setLocation(new java.awt.Point(valueColumn, rowSeven));
+            jTextFieldSkuName.setToolTipText("<html>Enter a name to help identify this SKU.<br>"
+                                             + "This entry is not used by the build system, it is<br>"
+                                             + "used only by this user interface.</html>");
         }
         return jTextFieldSkuName;
     }
@@ -843,7 +908,10 @@ public class FpdPlatformDefs extends IInternalFrame {
             jScrollPaneSkuInfo.setPreferredSize(new Dimension(tableWidth - 20, tableHeight - 20));
             jScrollPaneSkuInfo.setBounds(new java.awt.Rectangle(valueColumn, rowNine, tableWidth - 5, tableHeight - 5));
             jScrollPaneSkuInfo.setLocation(new java.awt.Point(valueColumn, rowNine));
-            jScrollPaneSkuInfo.setBorder(null);
+
+            jScrollPaneSkuInfo
+                              .setBorder(javax.swing.BorderFactory
+                                                                  .createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
 
             jScrollPaneSkuInfo.setViewportView(getJTableSkuInfo());
         }
@@ -861,6 +929,10 @@ public class FpdPlatformDefs extends IInternalFrame {
             skuInfoTableModel.addColumn("SKU ID");
             skuInfoTableModel.addColumn("Name");
             jTableSkuInfo = new JTable(skuInfoTableModel);
+            jTableSkuInfo.setToolTipText("<html>SKU ID 0 must always be defined as the default.<br>"
+                                         + "0 can mean either SKU disabled, or it can be the<br>"
+                                         + "default value if more than one SKU is defined, and the<br>"
+                                         + "platform is not jumpered to use one of the other SKU values.</html>");
 
             jTableSkuInfo.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -896,6 +968,10 @@ public class FpdPlatformDefs extends IInternalFrame {
             jComboBoxInterDir.addItem("UNIFIED");
             jComboBoxInterDir.addItem("MODULE");
             jComboBoxInterDir.setSelectedIndex(0);
+            jComboBoxInterDir.setToolTipText("<html>Select UNIFIED to generate intermediate directories under<br>"
+                                             + "under platform directory tree.<br>"
+                                             + "Select MODULE to generate intermediate directories under the<br>"
+                                             + "individual module directories.</html>");
             jComboBoxInterDir.addItemListener(new java.awt.event.ItemListener() {
                 public void itemStateChanged(java.awt.event.ItemEvent e) {
                     if (docConsole != null) {
@@ -920,6 +996,7 @@ public class FpdPlatformDefs extends IInternalFrame {
             jTextFieldOutputDir.setBounds(new java.awt.Rectangle(valueColumn + 30, rowTwelve, valueWidth - 30,
                                                                  oneRowHeight));
             jTextFieldOutputDir.setLocation(new java.awt.Point(valueColumn + 30, rowTwelve));
+            jTextFieldOutputDir.setToolTipText("Select the name or URL for the output directory tree.");
             jTextFieldOutputDir.addFocusListener(new java.awt.event.FocusAdapter() {
                 public void focusLost(java.awt.event.FocusEvent e) {
                     docConsole.setSaved(false);
