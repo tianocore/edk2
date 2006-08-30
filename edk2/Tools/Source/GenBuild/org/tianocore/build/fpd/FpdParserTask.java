@@ -153,7 +153,7 @@ public class FpdParserTask extends Task {
                 // Prepare FV_DIR
                 //
                 String ffsCommonDir = getProject().getProperty("BUILD_DIR") + File.separatorChar
-                                + targetList[i] + File.separatorChar
+                                + targetList[i] + "_"
                                 + toolchainList[j];
                 File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
                 fvDir.mkdirs();
