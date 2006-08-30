@@ -4885,7 +4885,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseExEnabled</C_Name>
@@ -4893,7 +4893,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseGetSizeEnabled</C_Name>
@@ -4901,7 +4901,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseSetEnabled</C_Name>
@@ -4909,7 +4909,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -8905,7 +8905,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseExEnabled</C_Name>
@@ -8913,7 +8913,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseGetSizeEnabled</C_Name>
@@ -8921,7 +8921,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseSetEnabled</C_Name>
@@ -8929,7 +8929,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
@@ -12929,7 +12929,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseExEnabled</C_Name>
@@ -12937,7 +12937,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseGetSizeEnabled</C_Name>
@@ -12945,7 +12945,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseSetEnabled</C_Name>
@@ -12953,7 +12953,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
