@@ -29,7 +29,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 	private String startpath;
 	private ModuleInfo mi;
 	
-	private JButton moduleButton, goButton, msaEditorButton, criticButton;
+	private JButton moduleButton, goButton, msaEditorButton, criticButton, specifyCommentButton;
 	private JTextField moduletext;
 	private JTextArea log;
 	private JFileChooser fc;
@@ -56,6 +56,9 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 		
 		criticButton = new JButton("Critic");
 		criticButton.addActionListener(this);
+		
+		specifyCommentButton = new JButton("Comment Style");
+		specifyCommentButton.addActionListener(this);
 		
 		moduletext = new JTextField(30);
 		
@@ -90,7 +93,9 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 
         cst.gridx = 1;
         cst.gridy = 0;
-        gridbag.setConstraints(criticButton, cst);
+        gridbag.setConstraints(specifyCommentButton, cst);
+        add(specifyCommentButton);
+        //gridbag.setConstraints(criticButton, cst);
         //add(criticButton);
         
         JPanel checkboxPanel = new JPanel();
@@ -195,6 +200,13 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         if ( e.getSource() == criticButton) {
         	try {
         		Critic.fireAt(startpath);
+        	} catch (Exception en) {
+        		println(en.getMessage());
+        	}
+        }
+        if ( e.getSource() == specifyCommentButton) {
+        	try {											// input examine is not imposed but should be added
+        		MigrationTool.MIGRATIONCOMMENT = getInput("Please type in wanted comment style used by the tool\nbe sure to start with '//', or you won't enjoy the result");
         	} catch (Exception en) {
         		println(en.getMessage());
         	}
