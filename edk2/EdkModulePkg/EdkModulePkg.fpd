@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <PlatformSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <PlatformHeader>
     <PlatformName>EdkModuleAll</PlatformName>
@@ -237,7 +237,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseExEnabled</C_Name>
@@ -245,7 +245,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseGetSizeEnabled</C_Name>
@@ -253,7 +253,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
         <PcdData ItemType="FEATURE_FLAG">
           <C_Name>PcdPeiPcdDatabaseSetEnabled</C_Name>
@@ -261,7 +261,7 @@
           <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
           <DatumType>BOOLEAN</DatumType>
           <MaxDatumSize>1</MaxDatumSize>
-          <Value>true</Value>
+          <Value>TRUE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
