@@ -7,7 +7,7 @@ public class MigrationTool {
 	public static UI ui = null;
 	public static Database db = null;
 
-	public static final String MIGRATIONCOMMENT = "//%$//";
+	public static String MIGRATIONCOMMENT = "//%$//";
 
 	public static boolean printModuleInfo = false;
 	public static boolean doCritic = false;
