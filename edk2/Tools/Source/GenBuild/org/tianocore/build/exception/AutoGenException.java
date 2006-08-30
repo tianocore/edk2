@@ -27,12 +27,13 @@ public class AutoGenException extends GenBuildException {
       @param expStr exception message string.
     **/
     public AutoGenException(String expStr) {
-        super("[AutoGenException]:" + expStr);
+        super(expStr);
     }
     
     public AutoGenException() {
-        super();
+
     }
+
     public AutoGenException(Exception e, String messsge){
         super(e, messsge);
     }
