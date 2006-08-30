@@ -591,7 +591,7 @@ public class SpdPackageHeaders extends IInternalFrame implements TableModelListe
         
         Tools.resizeComponentWidth(this.jComboBoxSelect, this.getWidth(), intPreferredWidth);
         Tools.resizeComponentWidth(this.jTextField, this.getWidth(), intPreferredWidth);
-        Tools.resizeComponentWidth(this.jScrollPane, this.getWidth(), intPreferredWidth);
+        Tools.resizeComponentWidth(this.jScrollPanePkgHdr, this.getWidth(), intPreferredWidth);
         Tools.relocateComponentX(this.jButtonBrowse, this.getWidth(), this.getPreferredSize().width, 30);
     }
     

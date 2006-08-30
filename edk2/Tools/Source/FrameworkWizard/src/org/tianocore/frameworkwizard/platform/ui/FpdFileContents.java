@@ -1147,7 +1147,7 @@ public class FpdFileContents {
                 fpdPcd.setValue("0");
             }
             if (dataType.equals("BOOLEAN")){
-                fpdPcd.setValue("false");
+                fpdPcd.setValue("FALSE");
             }
             if (dataType.equals("VOID*")) {
                 fpdPcd.setValue("");
