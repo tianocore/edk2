@@ -310,7 +310,7 @@ public class PlatformBuildFileGenerator {
             String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
             for(int j = 0; j < toolchainList.length; j++){
                 String fvOutputDir = project.getProperty("BUILD_DIR") + File.separatorChar 
-                                        + targetList[i] + File.separatorChar 
+                                        + targetList[i] + "_" 
                                         + toolchainList[j] + File.separatorChar + "FV";
                 String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
                 for (int k = 0; k < validFv.length; k++) {
@@ -422,9 +422,12 @@ public class PlatformBuildFileGenerator {
         if (isUnified) {
             String[] targetList = GlobalData.getToolChainInfo().getTargets();
             for (int i = 0; i < targetList.length; ++i) {
-                Element cleanAllEle = document.createElement("delete");
-                cleanAllEle.setAttribute("dir", project.getProperty("BUILD_DIR") + File.separatorChar + targetList[i]);
-                ele.appendChild(cleanAllEle);
+                String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
+                for(int j = 0; j < toolchainList.length; j++) {
+                    Element cleanAllEle = document.createElement("delete");
+                    cleanAllEle.setAttribute("dir", project.getProperty("BUILD_DIR") + File.separatorChar + targetList[i] + "_" + toolchainList[j]);
+                    ele.appendChild(cleanAllEle);
+                }
             }
         } else {
             Set set = outfiles.keySet();
@@ -517,7 +520,7 @@ public class PlatformBuildFileGenerator {
                     // Prepare FV_DIR
                     //
                     String ffsCommonDir = project.getProperty("BUILD_DIR") + File.separatorChar 
-                                    + targetList[i] + File.separatorChar 
+                                    + targetList[i] + "_" 
                                     + toolchainList[j];
                     File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
                     Element fvEle = document.createElement("var");
@@ -561,7 +564,7 @@ public class PlatformBuildFileGenerator {
                     // Prepare FV_DIR
                     //
                     String ffsCommonDir = project.getProperty("BUILD_DIR") + File.separatorChar 
-                                    + targetList[i] + File.separatorChar 
+                                    + targetList[i] + "_" 
                                     + toolchainList[j];
                     File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
                     Element fvEle = document.createElement("var");

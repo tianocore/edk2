@@ -128,11 +128,11 @@ public class OutputManager {
         // Define BIN_DIR and FV_DIR
         //
         String binDir = buildDir + File.separatorChar + project.getProperty("TARGET")
-                                 + File.separatorChar + project.getProperty("TOOLCHAIN") 
+                                 + "_" + project.getProperty("TOOLCHAIN") 
                                  + File.separatorChar + project.getProperty("ARCH") ;
         
         String fvDir = buildDir + File.separatorChar + project.getProperty("TARGET")
-                                + File.separatorChar + project.getProperty("TOOLCHAIN") 
+                                + "_" + project.getProperty("TOOLCHAIN") 
                                 + File.separatorChar + "FV";
         
         //
