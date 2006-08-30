@@ -457,11 +457,9 @@
     <Entry Name="GenericPlatformTokenSpace">
       <C_Name>gEfiGenericPlatformTokenSpaceGuid</C_Name>
       <GuidValue>18D15EA6-9E14-40a1-B39C-59C44DA9D891</GuidValue>
-      <HelpText>
-        This is the token space GUID for platform generic PCD definitions.
-        Now FlashLayout and Platform CPU belong to this space.
-      </HelpText>      
-    </Entry> 
+      <HelpText>This is the token space GUID for platform generic PCD definitions.
+        Now FlashLayout and Platform CPU belong to this space.</HelpText>
+    </Entry>
     <Entry Name="EdkModulePkgTokenSpace">
       <C_Name>gEfiEdkModulePkgTokenSpaceGuid</C_Name>
       <GuidValue>8CC4092F-F60E-46d1-B41C-1E761DF50582</GuidValue>
@@ -1003,11 +1001,9 @@
       <DatumType>VOID*</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>{}</DefaultValue>
-      <HelpText>
-      This PCD is a array of EFI_PHYSICAL_ADDERSS of each Firmware Volume on the
+      <HelpText>This PCD is a array of EFI_PHYSICAL_ADDERSS of each Firmware Volume on the
       platform. FVB driver will make use of this PCD entry to install EFI_FIRMWARE_BLOCK_PROTOCOL
-      on every FV specified.
-      </HelpText>
+      on every FV specified.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdFlashFvBaseArrayElementNumber</C_Name>
@@ -1016,11 +1012,45 @@
       <DatumType>UINT8</DatumType>
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>3</DefaultValue>
-      <HelpText>
-      This PCD is a number element in the array defined by PcdFlashFvBaseArray in
+      <HelpText>This PCD is a number element in the array defined by PcdFlashFvBaseArray in
       gEfiGenericPlatformTokenSpaceGuid. Normally, we have 3 firmware volumes:
-      FV_MAIN, FV_RECOVERY, NV_STORAGE.
-      </HelpText>
+      FV_MAIN, FV_RECOVERY, NV_STORAGE.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdPeiPcdDatabaseSetEnabled</C_Name>
+      <Token>0x00010030</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>This feature flag can be used to enable or disable the SET capability of PCD service PEIM. If a platform does not do PCD SET operation in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdPeiPcdDatabaseGetSizeEnabled</C_Name>
+      <Token>0x00010031</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>This feature flag can be used to enable or disable the GET size capability of PCD service PEIM. If a platform does not do PCD get size operation in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdPeiPcdDatabaseCallbackOnSetEnabled</C_Name>
+      <Token>0x00010032</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>This feature flag can be used to enable or disable the Callback On SET capability of PCD service PEIM. If a platform does not register any callback on set  in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdPeiPcdDatabaseExEnabled</C_Name>
+      <Token>0x00010033</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>This feature flag can be used to enable or disable the PCD service PEIM to handle DynamicEX PCD. If a platform has no module to use DynamicEX  in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>

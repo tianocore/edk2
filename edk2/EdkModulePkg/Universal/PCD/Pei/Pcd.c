@@ -174,6 +174,10 @@ PeiPcdGetSize (
   UINTN               Size;
   UINTN               MaxSize;
 
+  if (!FeaturePcdGet(PcdPeiPcdDatabaseGetSizeEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+
   PeiPcdDb = GetPcdDatabase ();
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -281,6 +285,10 @@ PeiPcdGetSizeEx (
   IN UINTN                             ExTokenNumber
   )
 {
+  if ((!FeaturePcdGet (PcdPeiPcdDatabaseGetSizeEnabled)) ||  !FeaturePcdGet (PcdPeiPcdDatabaseExEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+
   return PeiPcdGetSize (GetExPcdTokenNumber (Guid, ExTokenNumber));
 }
 
@@ -446,6 +454,10 @@ PeiRegisterCallBackOnSet (
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
+  if (!FeaturePcdGet(PcdPeiPcdDatabaseCallbackOnSetEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+
   ASSERT (CallBackFunction != NULL);
   
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, TRUE);
@@ -461,6 +473,10 @@ PcdUnRegisterCallBackOnSet (
   IN  PCD_PPI_CALLBACK            CallBackFunction
   )
 {
+  if (!FeaturePcdGet(PcdPeiPcdDatabaseCallbackOnSetEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+
   ASSERT (CallBackFunction != NULL);
   
   return PeiRegisterCallBackWorker (ExTokenNumber, Guid, CallBackFunction, FALSE);

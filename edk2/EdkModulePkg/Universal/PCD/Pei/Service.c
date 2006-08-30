@@ -337,6 +337,10 @@ SetWorker (
   VOID                *InternalData;
   UINTN               MaxSize;
 
+  if (!FeaturePcdGet(PcdPeiPcdDatabaseSetEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+  
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
   // We have to decrement TokenNumber by 1 to make it usable
@@ -462,6 +466,10 @@ ExSetWorker (
 {
   UINTN                     TokenNumber;
 
+  if (!FeaturePcdGet(PcdPeiPcdDatabaseSetEnabled)) {
+    return EFI_UNSUPPORTED;
+  }
+
   TokenNumber = GetExPcdTokenNumber (Guid, ExTokenNumber);
 
   InvokeCallbackOnSet (ExTokenNumber, Guid, TokenNumber, Data, *Size);
@@ -480,6 +488,11 @@ ExGetWorker (
   IN UINTN            GetSize
   )
 {
+  if (!FeaturePcdGet (PcdPeiPcdDatabaseExEnabled)) {
+    ASSERT (FALSE);
+    return 0;
+  }
+  
   return GetWorker (GetExPcdTokenNumber (Guid, ExTokenNumber), GetSize);
 }
 
