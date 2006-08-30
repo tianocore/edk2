@@ -852,7 +852,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneFfsSection() {
         if (jScrollPaneFfsSection == null) {
             jScrollPaneFfsSection = new JScrollPane();
-            jScrollPaneFfsSection.setPreferredSize(new java.awt.Dimension(500, 80));
+//            jScrollPaneFfsSection.setPreferredSize(new java.awt.Dimension(500, 80));
             jScrollPaneFfsSection.setViewportView(getJTableFfsSection());
         }
         return jScrollPaneFfsSection;
@@ -916,7 +916,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneFfsSubSection() {
         if (jScrollPaneFfsSubSection == null) {
             jScrollPaneFfsSubSection = new JScrollPane();
-            jScrollPaneFfsSubSection.setPreferredSize(new java.awt.Dimension(500, 90));
+//            jScrollPaneFfsSubSection.setPreferredSize(new java.awt.Dimension(500, 90));
             jScrollPaneFfsSubSection.setViewportView(getJTableFfsSubSection());
         }
         return jScrollPaneFfsSubSection;
@@ -1165,7 +1165,7 @@ public class FpdBuildOptions extends IInternalFrame {
     private JScrollPane getJScrollPaneFfsSections() {
         if (jScrollPaneFfsSections == null) {
             jScrollPaneFfsSections = new JScrollPane();
-            jScrollPaneFfsSections.setPreferredSize(new java.awt.Dimension(500, 80));
+//            jScrollPaneFfsSections.setPreferredSize(new java.awt.Dimension(500, 80));
             jScrollPaneFfsSections.setViewportView(getJTableFfsSections());
         }
         return jScrollPaneFfsSections;

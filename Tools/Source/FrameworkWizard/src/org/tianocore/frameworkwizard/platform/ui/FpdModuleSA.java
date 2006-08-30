@@ -1565,8 +1565,8 @@ private JComboBox getJComboBoxFeatureFlagValue() {
         jComboBoxFeatureFlagValue = new JComboBox();
         jComboBoxFeatureFlagValue.setPreferredSize(new java.awt.Dimension(100,20));
         jComboBoxFeatureFlagValue.setVisible(false);
-        jComboBoxFeatureFlagValue.addItem("true");
-        jComboBoxFeatureFlagValue.addItem("false");
+        jComboBoxFeatureFlagValue.addItem("TRUE");
+        jComboBoxFeatureFlagValue.addItem("FALSE");
     }
     return jComboBoxFeatureFlagValue;
 }
