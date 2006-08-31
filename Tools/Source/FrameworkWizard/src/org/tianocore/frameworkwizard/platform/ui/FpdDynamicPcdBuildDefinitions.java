@@ -206,7 +206,12 @@ public class FpdDynamicPcdBuildDefinitions extends IInternalFrame {
                     }
                     else{
                         int selectedRow = lsm.getMinSelectionIndex();
-                        
+                        jTextFieldDefaultValue.setText("");
+                        jTextFieldVpdOffset.setText("");
+                        jTextFieldVarName.setText("");
+                        jTextFieldVarGuid.setText("");
+                        jTextFieldVarOffset.setText("");
+                        jTextFieldHiiDefaultValue.setText("");
                         displayDetails(selectedRow);
                     }
                 }
