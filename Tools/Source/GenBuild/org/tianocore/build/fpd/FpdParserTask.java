@@ -305,21 +305,17 @@ public class FpdParserTask extends Task {
       @throws BuildException
                   FPD file is not valid.
     **/
-    public void parseFpdFile(File fpdFile, ModuleIdentification singleModuleId) throws BuildException {
+    public void parseFpdFile(File fpdFile) throws BuildException {
         this.fpdFile = fpdFile;
-        parseFpdFile(singleModuleId);
     }
 
-    private void parseFpdFile() throws BuildException {
-        parseFpdFile(null);
-    }
     /**
       Parse FPD file.
 
       @throws BuildException
                   FPD file is not valid.
      **/
-    private void parseFpdFile(ModuleIdentification singleModuleId) throws BuildException {
+    private void parseFpdFile() throws BuildException {
         try {
             XmlObject doc = XmlObject.Factory.parse(fpdFile);
 
@@ -359,7 +355,7 @@ public class FpdParserTask extends Task {
             //
             // Parse all list modules SA
             //
-            parseModuleSAFiles(singleModuleId);
+            parseModuleSAFiles();
 
             //
             // TBD. Deal PCD and BuildOption related Info
@@ -379,12 +375,10 @@ public class FpdParserTask extends Task {
         }
     }
 
-
-
     /**
       Parse all modules listed in FPD file.
     **/
-    private void parseModuleSAFiles(ModuleIdentification singleModuleId) throws EdkException{
+    private void parseModuleSAFiles() throws EdkException{
         Map<FpdModuleIdentification, Map<String, XmlObject>> moduleSAs = SurfaceAreaQuery.getFpdModules();
 
         //
@@ -395,18 +389,6 @@ public class FpdParserTask extends Task {
         while (iter.hasNext()) {
             FpdModuleIdentification fpdModuleId = (FpdModuleIdentification) iter.next();
 
-            //
-            // If is stand-alone module build, just parse this module, pass others
-            //
-            if (singleModuleId != null) {
-                //
-                // pass others modules
-                //
-                if ( ! fpdModuleId.getModule().equals(singleModuleId)) {
-                    continue ;
-                }
-            }
-            
             //
             // Judge if Module is existed?
             // TBD
