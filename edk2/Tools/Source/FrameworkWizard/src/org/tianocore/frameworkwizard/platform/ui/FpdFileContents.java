@@ -746,11 +746,15 @@ public class FpdFileContents {
     }
     
     public String getFvBinding(String moduleKey){
-        ModuleSADocument.ModuleSA msa = getModuleSA(moduleKey);
-        if (msa == null || msa.getModuleSaBuildOptions() == null) {
+        ModuleSADocument.ModuleSA moduleSa = getModuleSA(moduleKey);
+        return getFvBinding (moduleSa);
+    }
+    
+    public String getFvBinding (ModuleSADocument.ModuleSA moduleSa) {
+        if (moduleSa == null || moduleSa.getModuleSaBuildOptions() == null) {
             return null;
         }
-        return msa.getModuleSaBuildOptions().getFvBinding();
+        return moduleSa.getModuleSaBuildOptions().getFvBinding();
     }
     
     public void setFvBinding(ModuleSADocument.ModuleSA moduleSa, String fvBinding) {
@@ -774,6 +778,23 @@ public class FpdFileContents {
     public void setFvBinding(String moduleKey, String fvBinding){
         ModuleSADocument.ModuleSA moduleSa = getModuleSA(moduleKey);
         setFvBinding (moduleSa, fvBinding);
+    }
+    
+    private int fvBindingForModuleSA (ModuleSADocument.ModuleSA moduleSa, String fvName) {
+        if (moduleSa == null || moduleSa.getModuleSaBuildOptions() == null || moduleSa.getModuleSaBuildOptions().getFvBinding() == null) {
+            return -1;
+        }
+        
+        String fvNameList = moduleSa.getModuleSaBuildOptions().getFvBinding();
+        String[] fvNamesArray = fvNameList.split(" ");
+        int occursAt = -1;
+        for (int i = 0; i < fvNamesArray.length; ++i) {
+            if (fvNamesArray[i].equals(fvName)) {
+                occursAt = i;
+                break;
+            }
+        }
+        return occursAt;
     }
     
     public void removeFvBinding (ModuleSADocument.ModuleSA moduleSa, String fvName) {
@@ -818,6 +839,37 @@ public class FpdFileContents {
         while (li.hasNext()) {
             ModuleSADocument.ModuleSA moduleSa = li.next();
             removeFvBinding (moduleSa, fvName); 
+        }
+    }
+    
+    public void appendFvBindingAll (String fvName) {
+        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0){
+            removeElement(getfpdFrameworkModules());
+            fpdFrameworkModules = null;
+            return;
+        }
+        
+        Iterator<ModuleSADocument.ModuleSA> li = getfpdFrameworkModules().getModuleSAList().iterator();
+        while (li.hasNext()) {
+            ModuleSADocument.ModuleSA moduleSa = li.next();
+            appendFvBinding (moduleSa, fvName); 
+        }
+    }
+    
+    public void appendFvBindingFor (String oldFvName, String newFvName) {
+        if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0){
+            removeElement(getfpdFrameworkModules());
+            fpdFrameworkModules = null;
+            return;
+        }
+        
+        Iterator<ModuleSADocument.ModuleSA> li = getfpdFrameworkModules().getModuleSAList().iterator();
+        while (li.hasNext()) {
+            ModuleSADocument.ModuleSA moduleSa = li.next();
+            String fvBinding = getFvBinding (moduleSa);
+            if (fvBinding != null && fvBindingForModuleSA (moduleSa, oldFvName) >= 0) {
+                appendFvBinding (moduleSa, newFvName); 
+            }
         }
     }
     
@@ -1602,23 +1654,28 @@ public class FpdFileContents {
     }
     
     public void genBuildOptionsUserExtensions(String fvName, String outputFileName, Vector<String[]> includeModules) {
+        QName elementFvName = new QName (xmlNs, "FvName");
+        QName elementIncludeModules = new QName(xmlNs, "IncludeModules");
+        QName elementInfFileName = new QName(xmlNs, "InfFileName");
+        QName elementModule = new QName(xmlNs, "Module");
+        
         UserExtensionsDocument.UserExtensions userExts = getfpdBuildOpts().addNewUserExtensions();
         userExts.setUserID("IMAGES");
         userExts.setIdentifier(new BigInteger("1"));
         XmlCursor cursor = userExts.newCursor();
         cursor.toEndToken();
         
-        cursor.beginElement("FvName");
+        cursor.beginElement(elementFvName);
         cursor.insertChars(fvName);
         cursor.toNextToken();
         
-        cursor.beginElement("InfFileName");
+        cursor.beginElement(elementInfFileName);
         cursor.insertChars(fvName + ".inf");
         cursor.toNextToken();
         
-        cursor.beginElement("IncludeModules");
+        cursor.beginElement(elementIncludeModules);
         for (int i = 0; i < includeModules.size(); ++i) {
-            cursor.beginElement("Module");
+            cursor.beginElement(elementModule);
             cursor.insertAttributeWithValue("ModuleGuid", includeModules.get(i)[0]);
             cursor.insertAttributeWithValue("BaseName", includeModules.get(i)[1]);
             cursor.toEndToken();
@@ -1632,6 +1689,7 @@ public class FpdFileContents {
             return -1;
         }
         ListIterator<UserExtensionsDocument.UserExtensions> li = getfpdBuildOpts().getUserExtensionsList().listIterator();
+        QName elementIncludeModules = new QName(xmlNs, "IncludeModules");
         while (li.hasNext()) {
             UserExtensionsDocument.UserExtensions ues = li.next();
             if (!ues.getUserID().equals("IMAGES")) {
@@ -1641,7 +1699,7 @@ public class FpdFileContents {
             cursor.toFirstChild();
             String elementName = cursor.getTextValue();
             if (elementName.equals(fvName)) {
-                cursor.toNextSibling(new QName("", "IncludeModules"));
+                cursor.toNextSibling(elementIncludeModules);
                 if (cursor.toFirstChild()) {
                     int i = 1;
                     for (i = 1; cursor.toNextSibling(); ++i);
@@ -1660,6 +1718,45 @@ public class FpdFileContents {
         if (getfpdBuildOpts().getUserExtensionsList() == null) {
             return;
         }
+        
+        XmlCursor cursor = getfpdBuildOpts().newCursor();
+        QName elementUserExts = new QName (xmlNs, "UserExtensions");
+        QName attribUserId = new QName ("UserID");
+        QName elementFvName = new QName (xmlNs, "FvName");
+        QName elementIncludeModules = new QName(xmlNs, "IncludeModules");
+        QName attribModuleGuid = new QName("ModuleGuid");
+        QName attribBaseName = new QName("BaseName");
+        
+        if (cursor.toChild(elementUserExts)) {
+            do {
+                cursor.push();
+                if (cursor.getAttributeText(attribUserId).equals("IMAGES")) {
+                    cursor.toChild(elementFvName);
+                    String elementName = cursor.getTextValue();
+                    if (elementName.equals(fvName)) {
+                        cursor.toNextSibling(elementIncludeModules);
+                        if (cursor.toFirstChild()) {
+                            int i = 0;
+                            do {
+                                saa[i][0] = cursor.getAttributeText(attribModuleGuid);
+                                saa[i][1] = cursor.getAttributeText(attribBaseName);
+                                ++i;
+                            }while (cursor.toNextSibling());
+                        }
+                        break;
+                    }
+                }
+                cursor.pop();
+            }while (cursor.toNextSibling(elementUserExts));
+        }
+        cursor.dispose();
+        
+    }
+    
+    public void updateBuildOptionsUserExtensions (String oldFvName, String newFvName) {
+        if (getfpdBuildOpts().getUserExtensionsList() == null) {
+            return;
+        }
         ListIterator<UserExtensionsDocument.UserExtensions> li = getfpdBuildOpts().getUserExtensionsList().listIterator();
         while (li.hasNext()) {
             UserExtensionsDocument.UserExtensions ues = li.next();
@@ -1669,18 +1766,8 @@ public class FpdFileContents {
             XmlCursor cursor = ues.newCursor();
             cursor.toFirstChild();
             String elementName = cursor.getTextValue();
-            if (elementName.equals(fvName)) {
-                cursor.toNextSibling(new QName("", "IncludeModules"));
-                if (cursor.toFirstChild()) {
-                    int i = 0;
-                    do {
-                        saa[i][0] = cursor.getAttributeText(new QName("ModuleGuid"));
-                        saa[i][1] = cursor.getAttributeText(new QName("BaseName"));
-                        ++i;
-                    }while (cursor.toNextSibling());
-                }
-                cursor.dispose();
-                return;
+            if (elementName.equals(oldFvName)) {
+                cursor.setTextValue(newFvName);
             }
             cursor.dispose();
         }
@@ -2501,6 +2588,31 @@ public class FpdFileContents {
         }
     }
     
+    public void getFvImagesFvImageFvImageNames (Vector<String> vImageNames) {
+        
+    }
+    
+    public void AddFvImageFvImageNames (String[] fvNames) {
+        FvImagesDocument.FvImages fis = getfpdFlash().getFvImages();
+        if (fis == null || fis.getFvImageList() == null) {
+            genFvImagesFvImage (fvNames, "ImageName", null);
+            return;
+        }
+        
+        ListIterator<FvImagesDocument.FvImages.FvImage> li = fis.getFvImageList().listIterator();
+        while (li.hasNext()) {
+            FvImagesDocument.FvImages.FvImage fi = li.next();
+            if (fi.getType().toString().equals("ImageName")) {
+                for (int i = 0; i < fvNames.length; ++i) {
+                    fi.addFvImageNames(fvNames[i]);
+                }
+                return;
+            }
+        }
+        genFvImagesFvImage (fvNames, "ImageName", null);
+        
+    }
+    
     public void genFvImagesFvImage(String[] names, String types, Map<String, String> options) {
       
         FvImagesDocument.FvImages fis = null;
@@ -2557,6 +2669,32 @@ public class FpdFileContents {
             }
             cursor.removeXml();
         }
+        cursor.dispose();
+    }
+    
+    public void updateFvImageNameAll (String oldFvName, String newFvName) {
+        if (getfpdFlash().getFvImages() == null || getfpdFlash().getFvImages().getFvImageList() == null) {
+            return;
+        }
+        ListIterator<FvImagesDocument.FvImages.FvImage> li = getfpdFlash().getFvImages().getFvImageList().listIterator();
+        while (li.hasNext()) {
+            FvImagesDocument.FvImages.FvImage fi = li.next();
+            updateFvImageNamesInFvImage (fi, oldFvName, newFvName);
+        }
+    }
+    
+    public void updateFvImageNamesInFvImage (FvImagesDocument.FvImages.FvImage fi, String oldFvName, String newFvName) {
+        QName qFvImageNames = new QName(xmlNs, "FvImageNames");
+        XmlCursor cursor = fi.newCursor();
+        
+        if (cursor.toChild(qFvImageNames)) {
+            do {
+                if (cursor.getTextValue().equals(oldFvName)){
+                    cursor.setTextValue(newFvName);
+                }
+            }while (cursor.toNextSibling(qFvImageNames));
+        }
+        
         cursor.dispose();
     }
     
