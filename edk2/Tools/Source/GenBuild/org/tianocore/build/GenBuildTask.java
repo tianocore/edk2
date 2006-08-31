@@ -342,7 +342,7 @@ public class GenBuildTask extends Ant {
         //
         FpdParserTask fpdParser = new FpdParserTask();
         fpdParser.setProject(getProject());
-        fpdParser.parseFpdFile(platformId.getFpdFile(), moduleId);
+        fpdParser.parseFpdFile(platformId.getFpdFile());
         PropertyManager.setProperty("ARCH", fpdParser.getAllArchForModule(moduleId));
 
         //
