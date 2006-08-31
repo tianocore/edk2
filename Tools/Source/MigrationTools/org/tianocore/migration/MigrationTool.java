@@ -13,7 +13,7 @@ public class MigrationTool {
 	public static boolean doCritic = false;
 	public static boolean defaultoutput = false;
 
-	private static final void manipulate(ModuleInfo mi) throws Exception {
+	private static final void mainFlow(ModuleInfo mi) throws Exception {
 
 		ModuleReader.ModuleScan(mi);
 		//MigrationTool.ui.yesOrNo("go on replace?");
@@ -59,11 +59,11 @@ public class MigrationTool {
 
 	public static final void seekModule(String filepath) throws Exception {
 		if (ModuleInfo.isModule(filepath)) {
-			manipulate(new ModuleInfo(filepath));
+			mainFlow(new ModuleInfo(filepath));
 		}
 	}
 
-	public static final void triger(String path) throws Exception {
+	public static final void startMigrateAll(String path) throws Exception {
 		MigrationTool.ui.println("Project Migration");
 		MigrationTool.ui.println("Copyright (c) 2006, Intel Corporation");
 		Common.toDoAll(path, MigrationTool.class.getMethod("seekModule", String.class), null, null, Common.DIR);

@@ -60,7 +60,13 @@ public final class Common {
 	//-----------------------------------file&string---------------------------------------//
 
 	//--------------------------------------dir--------------------------------------------//
-	
+	/*
+	public static final HashSet<String> walkDir(String path, int mode) throws Exception {
+		HashSet<String> pathlist = new HashSet<String>();
+		Common.toDoAll(path, Common.class.getMethod("walkDir", String.class), null, null, mode);
+		return pathlist;
+	}
+	*/
 	public static final void ensureDir(String objFileWhole) {
 		File tempdir;
 		Matcher mtrseparate = ptnseparate.matcher(objFileWhole);
@@ -137,16 +143,21 @@ public final class Common {
 		}
 	}
 	
-	public static void toDoAll(String path, ForDoAll fda) throws Exception { // filter of file type can be done in toDo
+	public static void toDoAll(String path, ForDoAll fda, int type) throws Exception { // filter of file type can be done in toDo
 		String[] list = new File(path).list();
 		File test;
 
+		if (type == DIR || type == BOTH) {
+			fda.toDo(path);
+		}
 		for (int i = 0 ; i < list.length ; i++) {
 			test = new File(path + File.separator + list[i]);
 			if (test.isDirectory()) {
-				toDoAll(path + File.separator + list[i], fda);
+				toDoAll(path + File.separator + list[i], fda, type);
 			} else {
-				fda.toDo(path + File.separator + list[i]);
+				if (type == FILE || type == BOTH) {
+					fda.toDo(path + File.separator + list[i]);
+				}
 			}
 		}
 	}
@@ -154,4 +165,42 @@ public final class Common {
 	public static interface ForDoAll {
 		public void toDo(String filepath) throws Exception;
 	}
+	/*
+	// this PathIterator is based on HashSet, an thread implementation is required.
+	private final class PathIterator implements ForDoAll{
+		PathIterator(String path) throws Exception {
+			startpath = path;
+			Common.toDoAll(startpath, this, mode);
+		}
+		PathIterator(String path, int md) throws Exception {
+			startpath = path;
+			mode = md;
+			Common.toDoAll(startpath, this, mode);
+		}
+		private String startpath;
+		private int mode = Common.BOTH;
+		private HashSet<String> pathlist = new HashSet<String>();
+		private Iterator<String> it = pathlist.iterator();
+		
+		public final void toDo(String path) throws Exception {
+			pathlist.add(path);
+		}
+		
+		public final String next() {
+			return it.next();
+		}
+		
+		public final boolean hasNext() {
+			return it.hasNext();
+		}
+		
+		public final String toString() {
+			return pathlist.toString();
+		}
+	}
+	
+	public final PathIterator getPathIterator(String path, int md) throws Exception {
+		return new PathIterator(path, md);
+	}
+	*/
 }
