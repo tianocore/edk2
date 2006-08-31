@@ -184,7 +184,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         if ( e.getSource() == goButton ) {
         	try {
         		logfile = new PrintWriter(new BufferedWriter(new FileWriter(startpath.replaceAll(Common.strseparate, "$1") + File.separator + "migration.log")));
-        		MigrationTool.triger(startpath);
+        		MigrationTool.startMigrateAll(startpath);
         		logfile.flush();
         	} catch (Exception en) {
         		println(en.getMessage());
