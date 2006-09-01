@@ -41,6 +41,7 @@ public final class ModuleReader {
 				filename = MigrationTool.ui.choose("Found .inf or .msa file for module\n" + mi.modulepath + "\nChoose one Please", mi.msaorinf.toArray());
 			}
 		}
+
 		if (filename.contains(".inf")) {
 			readInf(filename);
 		} else if (filename.contains(".msa")) {
