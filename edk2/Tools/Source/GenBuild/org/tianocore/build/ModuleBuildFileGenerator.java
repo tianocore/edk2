@@ -65,11 +65,14 @@ public class ModuleBuildFileGenerator {
     
     private String[] includes;
     
-    public ModuleBuildFileGenerator(Project project, String ffsKeyword, FpdModuleIdentification fpdModuleId, String[] includes) {
+    private SurfaceAreaQuery saq = null;
+    
+    public ModuleBuildFileGenerator(Project project, String ffsKeyword, FpdModuleIdentification fpdModuleId, String[] includes, SurfaceAreaQuery saq) {
         this.project = project;
         this.fpdModuleId = fpdModuleId;
         this.ffsKeyword = ffsKeyword;
         this.includes = includes;
+        this.saq = saq;
     }
     
     /**
@@ -88,7 +91,7 @@ public class ModuleBuildFileGenerator {
               Error throws during BaseName_build.xml generating. 
     **/
     public void genBuildFile(String buildFilename) throws BuildException {
-        FfsProcess fp = new FfsProcess();
+        FfsProcess fp = new FfsProcess(saq);
         DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder dombuilder = domfac.newDocumentBuilder();
@@ -293,7 +296,7 @@ public class ModuleBuildFileGenerator {
       @param root Root element for current
     **/
     private void applyLibraryInstance(Document document, Node root) {
-        ModuleIdentification[] libinstances = SurfaceAreaQuery.getLibraryInstance(fpdModuleId.getArch());
+        ModuleIdentification[] libinstances = saq.getLibraryInstance(fpdModuleId.getArch());
         for (int i = 0; i < libinstances.length; i++) {
             //
             // Put package file path to module identification
@@ -341,7 +344,7 @@ public class ModuleBuildFileGenerator {
         //
         // sourceFiles[][0] is FileType, [][1] is File name relative to Module_Dir
         //
-        String[][] sourceFiles = SurfaceAreaQuery.getSourceFiles(fpdModuleId.getArch());
+        String[][] sourceFiles = saq.getSourceFiles(fpdModuleId.getArch());
 
         FileProcess fileProcess = new FileProcess();
         fileProcess.init(project, includes, document);

@@ -65,16 +65,15 @@ public class AutogenLibOrder {
             // Add libraryInstance in to libInstanceList.
             // 
             Map<String, XmlObject> libDoc = GlobalData.getDoc(libraryList[i], arch);
-            SurfaceAreaQuery.push(libDoc);
-            libInstanceNode = new LibraryInstanceNode (libraryList[i],SurfaceAreaQuery.getLibConstructorName(), SurfaceAreaQuery.getLibDestructorName());
+            SurfaceAreaQuery saq = new SurfaceAreaQuery(libDoc);
+            libInstanceNode = new LibraryInstanceNode (libraryList[i],saq.getLibConstructorName(), saq.getLibDestructorName());
             libInstanceList.add(libInstanceNode);
             
             //
             // Add library instance and consumed library class list to
             // libInstanceMap.
             //
-            libClassConsmList = SurfaceAreaQuery
-                    .getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch);
+            libClassConsmList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, arch);
             if (libClassConsmList != null) {
                 String[] classStr = new String[libClassConsmList.length];
                 for (int k = 0; k < libClassConsmList.length; k++) {
@@ -92,8 +91,7 @@ public class AutogenLibOrder {
             //
             // Add library class and library instance map.
             //
-            libClassDeclList = SurfaceAreaQuery
-                    .getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch);
+            libClassDeclList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, arch);
             if (libClassDeclList != null) {
                 for (int j = 0; j < libClassDeclList.length; j++) {
                     if (this.libClassMap.containsKey(libClassDeclList[j])) {
@@ -107,7 +105,6 @@ public class AutogenLibOrder {
                     }
                 }
             }
-            SurfaceAreaQuery.pop();
         }
 
         //

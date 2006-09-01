@@ -62,6 +62,8 @@ public class PlatformBuildFileGenerator {
 
     private boolean isUnified = true;
     
+    private SurfaceAreaQuery saq = null;
+    
     private Project project;
     
     private String info = "DO NOT EDIT \n" 
@@ -70,11 +72,12 @@ public class PlatformBuildFileGenerator {
         + "Abstract:\n"
         + "Auto-generated ANT build file for building EFI Modules and Platforms\n";
 
-    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, boolean isUnified){
+    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, boolean isUnified, SurfaceAreaQuery saq){
         this.project = project;
         this.outfiles = outfiles;
         this.isUnified = isUnified;
         this.fvs = fvs;
+        this.saq = saq;
         this.platformName = project.getProperty("PLATFORM");
     }
     
@@ -197,7 +200,7 @@ public class PlatformBuildFileGenerator {
         //
         // Get all valid FV name
         //
-        String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
+        String[] validFv = saq.getFpdValidImageNames();
         
         //
         // For each valid FV, get all modules in sequence
@@ -312,7 +315,7 @@ public class PlatformBuildFileGenerator {
                 String fvOutputDir = project.getProperty("BUILD_DIR") + File.separatorChar 
                                         + targetList[i] + "_" 
                                         + toolchainList[j] + File.separatorChar + "FV";
-                String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
+                String[] validFv = saq.getFpdValidImageNames();
                 for (int k = 0; k < validFv.length; k++) {
                     String inputFile = fvOutputDir + "" + File.separatorChar + validFv[k].toUpperCase() + ".inf";
                     Element fvEle = document.createElement("genfvimage");
@@ -507,7 +510,7 @@ public class PlatformBuildFileGenerator {
         Element ele = document.createElement("target");
         ele.setAttribute("name", "prebuild");
         
-        Node node = SurfaceAreaQuery.getFpdUserExtensionPreBuild();
+        Node node = saq.getFpdUserExtensionPreBuild();
         if (node != null) {
             //
             // For every Target and ToolChain
@@ -551,7 +554,7 @@ public class PlatformBuildFileGenerator {
         Element ele = document.createElement("target");
         ele.setAttribute("name", "postbuild");
         
-        Node node = SurfaceAreaQuery.getFpdUserExtensionPostBuild();
+        Node node = saq.getFpdUserExtensionPostBuild();
         if (node != null) {
             //
             // For every Target and ToolChain

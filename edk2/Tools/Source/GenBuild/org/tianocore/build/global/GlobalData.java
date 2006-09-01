@@ -185,7 +185,7 @@ public class GlobalData {
                 List<DbPathAndFilename> packages = db.getFrameworkDatabase().getPackageList().getFilenameList();
                 Iterator<DbPathAndFilename> iter = packages.iterator();
                 while (iter.hasNext()) {
-                    String fileName = iter.next().getStringValue();
+                    String fileName = iter.next().getStringValue().trim();
                     Spd spd = new Spd(new File(workspaceDir + File.separatorChar + fileName));
                     packageList.add(spd.getPackageId());
                     spdTable.put(spd.getPackageId(), spd);
@@ -199,7 +199,7 @@ public class GlobalData {
                 List<DbPathAndFilename> platforms = db.getFrameworkDatabase().getPlatformList().getFilenameList();
                 Iterator<DbPathAndFilename> iter = platforms.iterator();
                 while (iter.hasNext()) {
-                    String fileName = iter.next().getStringValue();
+                    String fileName = iter.next().getStringValue().trim();
                     File fpdFile = new File(workspaceDir + File.separatorChar + fileName);
                     if ( !fpdFile.exists() ) {
                         throw new BuildException("Platform file [" + fpdFile.getPath() + "] not exists. ");
@@ -219,8 +219,8 @@ public class GlobalData {
                     //
                     Map<String, XmlObject> fpdDocMap = new HashMap<String, XmlObject>();
                     fpdDocMap.put("PlatformSurfaceArea", fpdDoc);
-                    SurfaceAreaQuery.setDoc(fpdDocMap);
-                    PlatformIdentification platformId = SurfaceAreaQuery.getFpdHeader();
+                    SurfaceAreaQuery saq = new SurfaceAreaQuery(fpdDocMap);
+                    PlatformIdentification platformId = saq.getFpdHeader();
                     platformId.setFpdFile(fpdFile);
                     platformList.add(platformId);
                 }

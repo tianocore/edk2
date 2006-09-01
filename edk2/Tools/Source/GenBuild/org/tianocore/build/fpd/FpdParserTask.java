@@ -96,6 +96,8 @@ public class FpdParserTask extends Task {
     ///
     private Vector<Property> properties = new Vector<Property>();
 
+    SurfaceAreaQuery saq = null;
+    
     private boolean isUnified = true;
 
     /**
@@ -169,7 +171,7 @@ public class FpdParserTask extends Task {
         //
         // Gen build.xml
         //
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified);
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq);
         fileGenerator.genBuildFile();
 
         //
@@ -194,12 +196,12 @@ public class FpdParserTask extends Task {
                   File write FV.inf files error.
     **/
     private void genFvInfFiles(String ffsCommonDir) throws BuildException {
-        String[] validFv = SurfaceAreaQuery.getFpdValidImageNames();
+        String[] validFv = saq.getFpdValidImageNames();
         for (int i = 0; i < validFv.length; i++) {
             //
             // Get all global variables from FPD and set them to properties
             //
-            String[][] globalVariables = SurfaceAreaQuery.getFpdGlobalVariable();
+            String[][] globalVariables = saq.getFpdGlobalVariable();
             for (int j = 0; j < globalVariables.length; j++) {
                 getProject().setProperty(globalVariables[j][0], globalVariables[j][1]);
             }
@@ -216,7 +218,7 @@ public class FpdParserTask extends Task {
                 //
                 // Options
                 //
-                String[][] options = SurfaceAreaQuery.getFpdOptions(validFv[i]);
+                String[][] options = saq.getFpdOptions(validFv[i]);
                 if (options.length > 0) {
                     bw.write("[options]");
                     bw.newLine();
@@ -237,7 +239,7 @@ public class FpdParserTask extends Task {
                 //
                 // Attributes;
                 //
-                String[][] attributes = SurfaceAreaQuery.getFpdAttributes(validFv[i]);
+                String[][] attributes = saq.getFpdAttributes(validFv[i]);
                 if (attributes.length > 0) {
                     bw.write("[attributes]");
                     bw.newLine();
@@ -258,7 +260,7 @@ public class FpdParserTask extends Task {
                 //
                 // Components
                 //
-                String[][] components = SurfaceAreaQuery.getFpdComponents(validFv[i]);
+                String[][] components = saq.getFpdComponents(validFv[i]);
                 if (components.length > 0) {
                     bw.write("[components]");
                     bw.newLine();
@@ -325,12 +327,12 @@ public class FpdParserTask extends Task {
 
             Map<String, XmlObject> map = new HashMap<String, XmlObject>();
             map.put("PlatformSurfaceArea", doc);
-            SurfaceAreaQuery.setDoc(map);
+            saq = new SurfaceAreaQuery(map);
 
             //
             // Initialize
             //
-            platformId = SurfaceAreaQuery.getFpdHeader();
+            platformId = saq.getFpdHeader();
             platformId.setFpdFile(fpdFile);
             getProject().setProperty("PLATFORM", platformId.getName());
             getProject().setProperty("PLATFORM_FILE", platformId.getRelativeFpdFile().replaceAll("(\\\\)", "/"));
@@ -340,17 +342,17 @@ public class FpdParserTask extends Task {
             //
             // Build mode. User-defined output dir.
             //
-            String buildMode = SurfaceAreaQuery.getFpdIntermediateDirectories();
-            String userDefinedOutputDir = SurfaceAreaQuery.getFpdOutputDirectory();
+            String buildMode = saq.getFpdIntermediateDirectories();
+            String userDefinedOutputDir = saq.getFpdOutputDirectory();
 
             OutputManager.getInstance().setup(userDefinedOutputDir, buildMode);
 
             //
             // TBD. Deal PCD and BuildOption related Info
             //
-            GlobalData.setFpdBuildOptions(SurfaceAreaQuery.getFpdBuildOptions());
+            GlobalData.setFpdBuildOptions(saq.getFpdBuildOptions());
 
-            GlobalData.setToolChainPlatformInfo(SurfaceAreaQuery.getFpdToolChainInfo());
+            GlobalData.setToolChainPlatformInfo(saq.getFpdToolChainInfo());
 
             //
             // Parse all list modules SA
@@ -363,7 +365,7 @@ public class FpdParserTask extends Task {
             parseToolChainFamilyOptions();
             parseToolChainOptions();
 
-            SurfaceAreaQuery.setDoc(map);
+            saq.push(map);
 
             //
             // Pcd Collection. Call CollectPCDAction to collect pcd info.
@@ -379,7 +381,7 @@ public class FpdParserTask extends Task {
       Parse all modules listed in FPD file.
     **/
     private void parseModuleSAFiles() throws EdkException{
-        Map<FpdModuleIdentification, Map<String, XmlObject>> moduleSAs = SurfaceAreaQuery.getFpdModules();
+        Map<FpdModuleIdentification, Map<String, XmlObject>> moduleSAs = saq.getFpdModules();
 
         //
         // For every Module lists in FPD file.
@@ -397,8 +399,8 @@ public class FpdParserTask extends Task {
             //
             // Put fpdModuleId to the corresponding FV
             //
-            SurfaceAreaQuery.push(GlobalData.getDoc(fpdModuleId));
-            String fvBinding = SurfaceAreaQuery.getModuleFvBindingKeyword();
+            saq.push(GlobalData.getDoc(fpdModuleId));
+            String fvBinding = saq.getModuleFvBindingKeyword();
 
             fpdModuleId.setFvBinding(fvBinding);
             updateFvs(fvBinding, fpdModuleId);
@@ -408,7 +410,7 @@ public class FpdParserTask extends Task {
             //
             ModuleIdentification moduleId = fpdModuleId.getModule();
 
-            String baseName = SurfaceAreaQuery.getModuleOutputFileBasename();
+            String baseName = saq.getModuleOutputFileBasename();
             
             if (baseName == null) {
                 baseName = moduleId.getName();
@@ -422,12 +424,12 @@ public class FpdParserTask extends Task {
             //
             GlobalData.addModuleToolChainOption(fpdModuleId, parseModuleBuildOptions(false));
             GlobalData.addModuleToolChainFamilyOption(fpdModuleId, parseModuleBuildOptions(true));
-            SurfaceAreaQuery.pop();
+            saq.pop();
         }
     }
 
     private ToolChainMap parseModuleBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
-        String[][] options = SurfaceAreaQuery.getModuleBuildOptions(toolChainFamilyFlag);
+        String[][] options = saq.getModuleBuildOptions(toolChainFamilyFlag);
         if (options == null || options.length == 0) {
             return new ToolChainMap();
         }
@@ -435,7 +437,7 @@ public class FpdParserTask extends Task {
     }
 
     private ToolChainMap parsePlatformBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
-        String[][] options = SurfaceAreaQuery.getPlatformBuildOptions(toolChainFamilyFlag);
+        String[][] options = saq.getPlatformBuildOptions(toolChainFamilyFlag);
         if (options == null || options.length == 0) {
             return new ToolChainMap();
         }
