@@ -103,7 +103,14 @@ SerialStatusCodeReportWorker (
     //
     // Print ERROR information into output buffer.
     //
-    CharCount = AsciiSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, "ERROR: C%x:V%x I%x", CodeType, Value, Instance);
+    CharCount = AsciiSPrint (
+                  Buffer, 
+                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  "ERROR: C%x:V%x I%x", 
+                  CodeType, 
+                  Value, 
+                  Instance
+                  );
 
     //
     // Make sure we don't try to print values that weren't intended to be printed, especially NULL GUID pointers.
@@ -133,9 +140,22 @@ SerialStatusCodeReportWorker (
                    "\n\r"
                    );
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) {
-    CharCount = AsciiSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, "PROGRESS CODE: V%x I%x\n\r", Value, Instance);
+    CharCount = AsciiSPrint (
+                  Buffer, 
+                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  "PROGRESS CODE: V%x I%x\n\r", 
+                  Value, 
+                  Instance
+                  );
   } else {
-    CharCount = AsciiSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, "Undefined: C%x:V%x I%x\n\r", CodeType, Value, Instance);
+    CharCount = AsciiSPrint (
+                  Buffer, 
+                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  "Undefined: C%x:V%x I%x\n\r", 
+                  CodeType, 
+                  Value, 
+                  Instance
+                  );
   }
 
   //

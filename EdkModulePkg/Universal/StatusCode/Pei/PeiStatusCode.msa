@@ -75,6 +75,9 @@
     <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gMemoryStatusCodeRecordGuid</GuidCName>
     </GuidCNames>
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
+      <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
+    </GuidCNames>
   </Guids>
   <Externs>
     <Specification>EFI_SPECIFICATION_VERSION 0x00020000</Specification>

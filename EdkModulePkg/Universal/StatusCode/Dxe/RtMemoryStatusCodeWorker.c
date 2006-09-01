@@ -34,7 +34,9 @@ RtMemoryStatusCodeInitializeWorker (
   //
   RtMemoryStatusCodeTable = 
     (RUNTIME_MEMORY_STATUSCODE_HEADER *) AllocatePool (
-                                           sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) + PcdGet16 (PcdStatusCodeRuntimeMemorySize) * 1024
+                                           sizeof (RUNTIME_MEMORY_STATUSCODE_HEADER) +
+                                           PcdGet16 (PcdStatusCodeRuntimeMemorySize) *
+                                           1024
                                            );
 
   ASSERT (NULL != RtMemoryStatusCodeTable);
@@ -110,7 +112,6 @@ RtMemoryStatusCodeReportWorker (
     //
     RtMemoryStatusCodeTable->RecordIndex = 0;
   }
-
 
   return EFI_SUCCESS;
 }
