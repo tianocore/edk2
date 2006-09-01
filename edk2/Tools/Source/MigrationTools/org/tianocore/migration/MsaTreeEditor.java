@@ -4,12 +4,16 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.tree.*;
+import javax.xml.parsers.*;
+import org.w3c.dom.*;
 
 public class MsaTreeEditor extends JPanel {
 	/**
 	 *  Define class Serial Version UID
 	 */
 	private static final long serialVersionUID = 3169905938472150649L;
+	
+	private 
 /*
 	MsaTreeEditor(ModuleInfo m, UI u, ModuleSurfaceAreaDocument md) {
 		mi = m;
@@ -41,7 +45,7 @@ public class MsaTreeEditor extends JPanel {
         addNode(rootNode, "2nd");
 	}
 */
-	MsaTreeEditor() {
+	MsaTreeEditor() throws Exception {
         rootNode = new DefaultMutableTreeNode("Root Node");
         treeModel = new DefaultTreeModel(rootNode);
 
@@ -52,18 +56,21 @@ public class MsaTreeEditor extends JPanel {
         tree.addMouseListener(mouseadapter);
 
         JScrollPane scrollPane = new JScrollPane(tree);
+        //scrollPane.setSize(800, 600);
         add(scrollPane);
         
         popupmenu = new JPopupMenu();
-        menuitemadd = new JMenuItem("addNode");
-        menuitemdel = new JMenuItem("deleteNode");
+        menuitemadd = new JMenuItem("Add Node");
+        menuitemdel = new JMenuItem("Delete Node");
+        menuitemedit = new JMenuItem("Edit Node");
         popupmenu.add(menuitemadd);
         popupmenu.add(menuitemdel);
+        popupmenu.add(menuitemedit);
         menuitemadd.addActionListener(actionListener);
         menuitemdel.addActionListener(actionListener);
-        
-        addNode(rootNode, "1st");
-        addNode(rootNode, "2nd");
+        menuitemedit.addActionListener(actionListener);
+
+		genDomTree(MigrationTool.ui.getFilepath("Select a msa file", JFileChooser.FILES_AND_DIRECTORIES));
 	}
 	
 	//private ModuleSurfaceAreaDocument msadoc;
@@ -71,7 +78,7 @@ public class MsaTreeEditor extends JPanel {
 	private JTree tree;
 	private DefaultMutableTreeNode rootNode;
 	private DefaultTreeModel treeModel;
-	private JMenuItem menuitemadd, menuitemdel;
+	private JMenuItem menuitemadd, menuitemdel, menuitemedit;
 	
 	private JPopupMenu popupmenu;
 	private MouseAdapter mouseadapter = new MouseAdapter() {
@@ -88,9 +95,17 @@ public class MsaTreeEditor extends JPanel {
 				addNode();
 			} else if (ae.getSource() == menuitemdel) {
 				delNode();
+			} else if (ae.getSource() == menuitemedit) {
+				editNode();
 			}
 		}
 	};
+	
+	private void editNode() {
+		DefaultMutableTreeNode node = (DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent());
+		Element element = (Element)node.getUserObject();
+		System.out.println(element.getTextContent());
+	}
 	
 	private void delNode() {
 		treeModel.removeNodeFromParent((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()));
@@ -100,17 +115,36 @@ public class MsaTreeEditor extends JPanel {
 		addNode((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()), MigrationTool.ui.getInput("Input Node Name"));
 	}
 	
-	private void addNode(DefaultMutableTreeNode parentNode, Object child) {
+	private DefaultMutableTreeNode addNode(DefaultMutableTreeNode parentNode, Object child) {
         DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
         treeModel.insertNodeInto(childNode, parentNode, parentNode.getChildCount());
         tree.scrollPathToVisible(new TreePath(childNode.getPath()));
+        return childNode;
 	}
-	/*
-	public static void init(ModuleInfo mi, UI ui, ModuleSurfaceAreaDocument msadoc) throws Exception {
-		init(mi, ui);
+
+	private final void handleNode(Node node, DefaultMutableTreeNode parentNode) {
+		DefaultMutableTreeNode curNode = null;
+		if (node.getNodeType() == Node.ELEMENT_NODE) {
+			System.out.println("elem");
+			curNode = addNode(parentNode, node);
+		} else if (node.getNodeType() == Node.DOCUMENT_NODE){
+			System.out.println("doc");
+			curNode = addNode(parentNode, "MsaDocum");			// can Docum be with Root Node?
+		}
+
+		NodeList nodelist = node.getChildNodes();
+		for (int i = 0; i < nodelist.getLength(); i++) {
+			handleNode(nodelist.item(i), curNode);
+		}
 	}
-	*/
-	public static void init() throws Exception {
+	
+	private final void genDomTree(String filename) throws Exception {
+		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		Document document = builder.parse(filename);
+		handleNode(document, rootNode);
+	}
+	
+	public static final void init() throws Exception {
     	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 		JFrame frame = new JFrame("MsaTreeEditor");
