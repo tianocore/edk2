@@ -1,7 +1,7 @@
 package org.tianocore.migration;
 
 import java.io.File;
-import java.util.Set;
+import java.util.*;
 
 public class MigrationTool {
 	public static UI ui = null;
@@ -12,10 +12,13 @@ public class MigrationTool {
 	public static boolean printModuleInfo = false;
 	public static boolean doCritic = false;
 	public static boolean defaultoutput = false;
+	
+	public static final HashMap<ModuleInfo, String> ModuleInfoMap = new HashMap<ModuleInfo, String>();
 
 	private static final void mainFlow(ModuleInfo mi) throws Exception {
 
 		ModuleReader.ModuleScan(mi);
+		
 		//MigrationTool.ui.yesOrNo("go on replace?");
 		SourceFileReplacer.flush(mi);	// some adding library actions are taken here,so it must be put before "MsaWriter"
 
@@ -40,7 +43,7 @@ public class MigrationTool {
 		//MigrationTool.ui.yesOrNo("go on critic?");
 
 		if (MigrationTool.doCritic) {
-			Critic.fireAt(mi.outputpath + File.separator + "Migration_" + mi.modulename);
+			Critic.fireAt(ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename);
 		}
 
 		//MigrationTool.ui.yesOrNo("go on delete?");
@@ -57,9 +60,17 @@ public class MigrationTool {
 		MigrationTool.ui.println(hash);
 	}
 
+	private static final String assignOutPutPath(String inputpath) {
+		if (MigrationTool.defaultoutput) {
+			return inputpath.replaceAll(Common.strseparate, "$1");
+		} else {
+			return MigrationTool.ui.getFilepath("Please choose where to place the output module");
+		}
+	}
+	
 	public static final void seekModule(String filepath) throws Exception {
 		if (ModuleInfo.isModule(filepath)) {
-			mainFlow(new ModuleInfo(filepath));
+			ModuleInfoMap.put(new ModuleInfo(filepath), assignOutPutPath(filepath));
 		}
 	}
 
@@ -67,6 +78,13 @@ public class MigrationTool {
 		MigrationTool.ui.println("Project Migration");
 		MigrationTool.ui.println("Copyright (c) 2006, Intel Corporation");
 		Common.toDoAll(path, MigrationTool.class.getMethod("seekModule", String.class), null, null, Common.DIR);
+		
+		Iterator<ModuleInfo> miit = ModuleInfoMap.keySet().iterator();
+		while (miit.hasNext()) {
+			mainFlow(miit.next());
+		}
+		
+		ModuleInfoMap.clear();
 	}
 
 	public static void main(String[] args) throws Exception {

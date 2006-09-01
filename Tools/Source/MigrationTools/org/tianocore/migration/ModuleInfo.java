@@ -22,21 +22,9 @@ information and all the temporary data.
 public final class ModuleInfo {
 	ModuleInfo(String modulepath) throws Exception {
 		this.modulepath = modulepath;
-		
-		if (MigrationTool.defaultoutput) {
-			this.outputpath = this.modulepath.replaceAll(Common.strseparate, "$1");
-		} else {
-			MigrationTool.ui.println("Choose where to place the result");
-			if ((outputpath = MigrationTool.ui.getFilepath("Please choose where to place the output module")) == null) {
-				outputpath = modulepath; 
-			}
-			MigrationTool.ui.println("Output to: " + outputpath);
-		}
 	}
 
 	public final String modulepath;
-	
-	public String outputpath = null;
 	
 	public String modulename = null;
 	public String guidvalue = null;
@@ -60,11 +48,15 @@ public final class ModuleInfo {
 	public final Set<String> ppi = new HashSet<String>();
 
 	public final void enroll(String filepath) throws Exception {
+		String temp = null;
 		if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 
 				filepath.contains(".H") || filepath.contains(".dxs") || filepath.contains(".uni")) {
 			localmodulesources.add(filepath.replace(modulepath + "\\", ""));
 		} else if (filepath.contains(".inf") || filepath.contains(".msa")) {
-			msaorinf.add(filepath.replace(modulepath + "\\", ""));
+			temp = filepath.replace(modulepath + "\\", "");
+			if (!temp.contains(File.separator)) {								// .inf in subdirectory is not regarded
+				msaorinf.add(temp);
+			}
 		}
 	}
 

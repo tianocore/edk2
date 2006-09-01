@@ -165,42 +165,4 @@ public final class Common {
 	public static interface ForDoAll {
 		public void toDo(String filepath) throws Exception;
 	}
-	/*
-	// this PathIterator is based on HashSet, an thread implementation is required.
-	private final class PathIterator implements ForDoAll{
-		PathIterator(String path) throws Exception {
-			startpath = path;
-			Common.toDoAll(startpath, this, mode);
-		}
-		PathIterator(String path, int md) throws Exception {
-			startpath = path;
-			mode = md;
-			Common.toDoAll(startpath, this, mode);
-		}
-		private String startpath;
-		private int mode = Common.BOTH;
-		private HashSet<String> pathlist = new HashSet<String>();
-		private Iterator<String> it = pathlist.iterator();
-		
-		public final void toDo(String path) throws Exception {
-			pathlist.add(path);
-		}
-		
-		public final String next() {
-			return it.next();
-		}
-		
-		public final boolean hasNext() {
-			return it.hasNext();
-		}
-		
-		public final String toString() {
-			return pathlist.toString();
-		}
-	}
-	
-	public final PathIterator getPathIterator(String path, int md) throws Exception {
-		return new PathIterator(path, md);
-	}
-	*/
 }

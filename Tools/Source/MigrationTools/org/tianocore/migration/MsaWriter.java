@@ -181,7 +181,7 @@ public class MsaWriter {
         options.setSavePrettyPrintIndent(2);
         options.setUseDefaultNamespace();
         
-		BufferedWriter bw = new BufferedWriter(new FileWriter(mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + mi.modulename + ".msa"));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + mi.modulename + ".msa"));
 		fulfillMsadoc().save(bw, options);
 		//MsaTreeEditor.init(mi, ui, msadoc);
 		bw.flush();

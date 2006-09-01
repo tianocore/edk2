@@ -61,7 +61,7 @@ public final class SourceFileReplacer {
 					outname = inname;
 				}
 				MigrationTool.ui.println("\nModifying file: " + inname);
-				Common.string2file(sourcefilereplace(mi.modulepath + File.separator + "temp" + File.separator + inname), mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
+				Common.string2file(sourcefilereplace(mi.modulepath + File.separator + "temp" + File.separator + inname), MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".dxs") || inname.contains(".uni")) {
 				if (inname.contains(".H")) {
 					outname = inname.replaceFirst(".H", ".h");
@@ -69,7 +69,7 @@ public final class SourceFileReplacer {
 					outname = inname;
 				}
 				MigrationTool.ui.println("\nCopying file: " + inname);
-				Common.string2file(Common.file2string(mi.modulepath + File.separator + "temp" + File.separator + inname), mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + outname);
+				Common.string2file(Common.file2string(mi.modulepath + File.separator + "temp" + File.separator + inname), MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + outname);
 			}
 		}
 
@@ -82,8 +82,8 @@ public final class SourceFileReplacer {
 		String paragraph = null;
 		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
 		//Common.ensureDir(mi.modulepath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c");
-		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
-		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(mi.outputpath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
+		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
+		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
 		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
 		Matcher mtrr8only = ptnr8only.matcher(line);
 		Matcher mtrr8onlyhead;
