@@ -27,12 +27,11 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 	private static final FirstPanel INSTANCE = FirstPanel.init();
 	
 	private String startpath;
-	private ModuleInfo mi;
 	
 	private JButton moduleButton, goButton, msaEditorButton, criticButton, specifyCommentButton;
 	private JTextField moduletext;
 	private JTextArea log;
-	private JFileChooser fc;
+	private JFileChooser fc = new JFileChooser();
 	private JCheckBox filebox, screenbox, mibox, criticbox, defaultpathbox;
 	
 	private boolean tofile = true, toscreen = true;
@@ -120,9 +119,6 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         cst.fill = GridBagConstraints.BOTH;
         gridbag.setConstraints(logScrollPane, cst);
         add(logScrollPane);
-        
-		fc = new JFileChooser();
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
      	}
 	
 	//---------------------------------------------------------------------------------------//
@@ -165,8 +161,9 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 
 	//---------------------------------------------------------------------------------------//
 
-	public String getFilepath(String title) {
+	public String getFilepath(String title, int mode) {
 		fc.setDialogTitle(title);
+		fc.setFileSelectionMode(mode);
 		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
 			log.append(fc.getSelectedFile().getAbsolutePath() + "\n");
 			return fc.getSelectedFile().getAbsolutePath();
@@ -178,7 +175,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
 
     public void actionPerformed(ActionEvent e) {
         if ( e.getSource() == moduleButton ) {
-        	startpath = getFilepath("Please choose a starting path");
+        	startpath = getFilepath("Please choose a starting path", JFileChooser.DIRECTORIES_ONLY);
         	moduletext.setText(startpath);
         }
         if ( e.getSource() == goButton ) {
@@ -192,7 +189,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         }
         if ( e.getSource() == msaEditorButton) {
         	try {
-            	MsaTreeEditor.init(mi, this);
+            	MsaTreeEditor.init();
         	} catch (Exception en) {
         		println(en.getMessage());
         	}

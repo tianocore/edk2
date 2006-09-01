@@ -41,10 +41,7 @@ public class MsaTreeEditor extends JPanel {
         addNode(rootNode, "2nd");
 	}
 */
-	MsaTreeEditor(ModuleInfo m, UI u) {
-		mi = m;
-		ui = u;
-		
+	MsaTreeEditor() {
         rootNode = new DefaultMutableTreeNode("Root Node");
         treeModel = new DefaultTreeModel(rootNode);
 
@@ -69,8 +66,6 @@ public class MsaTreeEditor extends JPanel {
         addNode(rootNode, "2nd");
 	}
 	
-	private ModuleInfo mi;
-	private UI ui;
 	//private ModuleSurfaceAreaDocument msadoc;
 	
 	private JTree tree;
@@ -115,13 +110,13 @@ public class MsaTreeEditor extends JPanel {
 		init(mi, ui);
 	}
 	*/
-	public static void init(ModuleInfo mi, UI ui) throws Exception {
+	public static void init() throws Exception {
     	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
 		JFrame frame = new JFrame("MsaTreeEditor");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		MsaTreeEditor mte = new MsaTreeEditor(mi, ui);
+		MsaTreeEditor mte = new MsaTreeEditor();
 		mte.setLayout(new GridBagLayout());
 		mte.setOpaque(true);
         frame.setContentPane(mte);
