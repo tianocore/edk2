@@ -15,7 +15,6 @@
 package org.tianocore.frameworkwizard.platform.ui;
 
 import java.awt.BorderLayout;
-import javax.swing.BoxLayout;
 
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -49,7 +48,6 @@ import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
-import org.tianocore.frameworkwizard.common.ui.ArchCheckBox;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,8 +63,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private final int oneRowHeight = 20;
 
     private final int twoRowHeight = 40;
-
-    private final int threeRowHeight = 60;
 
     private final int sepHeight = 6;
 
@@ -99,8 +95,6 @@ public class FpdBuildOptions extends IInternalFrame {
     private final int next2LastButtonLoc = lastButtonXLoc - buttonWidth - sepWidth;
 
     private final int firstButtonLoc = next2LastButtonLoc - buttonWidth - sepWidth;
-
-    private final int starColumn = 2;
 
     private final int labelColumn = 12;
 

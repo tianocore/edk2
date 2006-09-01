@@ -1828,6 +1828,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
 
         if (arg0.getSource() == this.jMenuItemFileCloseAll) {
             this.closeAll();
+            this.makeEmptyTree();
         }
 
         if (arg0.getSource() == this.jMenuItemFileSave) {
@@ -3002,7 +3003,14 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         GlobalData.openingModuleList.closeAll();
         GlobalData.openingPackageList.closeAll();
         GlobalData.openingPlatformList.closeAll();
-        this.makeEmptyTree();
+    }
+
+    /**
+     Refresh all global data from disk to memory
+     
+     **/
+    private void refresh() {
+        GlobalData.init();
     }
 
     /**
@@ -3190,6 +3198,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
+            this.refresh();
+            this.makeEmptyTree();
         }
         iso.dispose();
     }
@@ -3206,6 +3216,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
+            this.refresh();
+            this.makeEmptyTree();
         }
         dso.dispose();
     }
@@ -3222,6 +3234,8 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
             JOptionPane.showConfirmDialog(null, strReturn, "Done", JOptionPane.DEFAULT_OPTION,
                                           JOptionPane.INFORMATION_MESSAGE);
             this.closeAll();
+            this.refresh();
+            this.makeEmptyTree();
         }
         uso.dispose();
     }

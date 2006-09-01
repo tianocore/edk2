@@ -42,7 +42,6 @@ import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.PlatformSurfaceAreaDocument;
-import org.tianocore.frameworkwizard.toolchain.ToolChainId;
 
 /**
  * The class is used to update the target.txt file.
