@@ -900,7 +900,7 @@
       <Token>0x00010025</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT16</DatumType>
-      <ValidUsage>DYNAMIC</ValidUsage>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
       <DefaultValue>4</DefaultValue>
       <HelpText>kbytes size of GUID'ed HOB, if the GUID'ed HOB is full, create new GUID'ed HOB with this size.</HelpText>
     </PcdEntry>
@@ -981,7 +981,7 @@
       <Token>0x0001002e</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT16</DatumType>
-      <ValidUsage>DYNAMIC</ValidUsage>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
       <DefaultValue>4</DefaultValue>
       <HelpText>kbytes size of runtime memory.</HelpText>
     </PcdEntry>
