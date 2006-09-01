@@ -20,7 +20,7 @@
 
   @param   PacketIndex    Index of records packet. 
  
-  @return                 The function always return EFI_SUCCESS
+  @return                 Always return pointer of memory status code packet.
 
 **/
 MEMORY_STATUSCODE_PACKET_HEADER *
@@ -36,7 +36,10 @@ CreateMemoryStatusCodePacket (
   PacketHeader =
     (MEMORY_STATUSCODE_PACKET_HEADER *) BuildGuidHob (
                                           &gMemoryStatusCodeRecordGuid, 
-                                          (PcdGet16 (PcdStatusCodeMemorySize) * 1024) + sizeof (MEMORY_STATUSCODE_PACKET_HEADER));
+                                          PcdGet16 (PcdStatusCodeMemorySize) * 
+                                          1024 +
+                                          sizeof (MEMORY_STATUSCODE_PACKET_HEADER)
+                                          );
   ASSERT (PacketHeader != NULL);
 
   PacketHeader->MaxRecordsNumber = (PcdGet16 (PcdStatusCodeMemorySize) * 1024)/ sizeof (MEMORY_STATUSCODE_RECORD);

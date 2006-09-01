@@ -52,7 +52,8 @@ ReportDispatcher (
 
 //
 // Declaration of status code protocol.
-// 
+//
+STATIC
 EFI_STATUS_CODE_PROTOCOL  mEfiStatusCodeProtocol  = {
   ReportDispatcher
 };

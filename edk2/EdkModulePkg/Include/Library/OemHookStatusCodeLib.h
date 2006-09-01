@@ -22,8 +22,11 @@
 
   Initialize OEM status code device .
 
+
+  @return    Status of initialization of OEM status code device.
+ 
 **/
-VOID
+EFI_STATUS
 EFIAPI
 OemHookStatusCodeInitialize (
   VOID

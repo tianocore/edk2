@@ -120,6 +120,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <GuidCName>gEfiStatusCodeDataTypeStringGuid</GuidCName>
     </GuidCNames>
     <GuidCNames Usage="SOMETIMES_CONSUMED">
+      <GuidCName>gEfiStatusCodeSpecificDataGuid</GuidCName>
+    </GuidCNames>
+    <GuidCNames Usage="SOMETIMES_CONSUMED">
       <GuidCName>gEfiStatusCodeGuid</GuidCName>
     </GuidCNames>
   </Guids>

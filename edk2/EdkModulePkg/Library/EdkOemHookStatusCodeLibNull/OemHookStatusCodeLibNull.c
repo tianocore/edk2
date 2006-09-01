@@ -18,14 +18,16 @@
 
   Initialize OEM status code device .
 
+  @return     Always return EFI_SUCCESS.
+
 **/
-VOID
+EFI_STATUS
 EFIAPI
 OemHookStatusCodeInitialize (
   VOID
   )
 {
-  return;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -53,7 +55,7 @@ OemHookStatusCodeInitialize (
 
   @param  Data          This optional parameter may be used to pass additional data
  
-  @return               The function always return EFI_SUCCESS.
+  @return               The function always return EFI_UNSUPPORTED.
 
 **/
 EFI_STATUS

@@ -22,6 +22,8 @@
 
   Programmed hardware of Serial port.
 
+  @return  Status of Serial Port Device initialization.
+
 **/
 EFI_STATUS
 EFIAPI

@@ -19,8 +19,8 @@
 
 /**
   Report status code to all supported device.
- * 
- * 
+  
+  
   @param  PeiServices
 
   @param  Type          Indicates the type of status code being reported.  
@@ -53,11 +53,12 @@ ReportDispatcher (
   IN EFI_STATUS_CODE_DATA     *Data OPTIONAL
   );
 
-
+STATIC
 EFI_PEI_PROGRESS_CODE_PPI     mStatusCodePpi           = { 
   ReportDispatcher
   };
 
+STATIC
 EFI_PEI_PPI_DESCRIPTOR        mStatusCodePpiDescriptor = {
   EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
   &gEfiPeiStatusCodePpiGuid,
@@ -66,8 +67,8 @@ EFI_PEI_PPI_DESCRIPTOR        mStatusCodePpiDescriptor = {
 
 /**
   Report status code to all supported device.
- * 
- * 
+  
+  
   @param  PeiServices
 
   @param  CodeType      Indicates the type of status code being reported.  
@@ -154,13 +155,16 @@ PeiStatusCodeDriverEntry (
   // if enable UseOEM, then initialize Oem status code.
   //
   if (FeaturePcdGet (PcdStatusCodeUseSerial)) {
-    SerialPortInitialize();
+    Status = SerialPortInitialize();
+    ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseMemory)) {
-    MemoryStatusCodeInitializeWorker ();
+    Status = MemoryStatusCodeInitializeWorker ();
+    ASSERT_EFI_ERROR  (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseOEM)) {
-    OemHookStatusCodeInitialize ();
+    Status = OemHookStatusCodeInitialize ();
+    ASSERT_EFI_ERROR  (Status);
   }
 
   //

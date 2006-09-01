@@ -18,14 +18,18 @@
 //
 // Initialize FIFO to cache records.
 //
+STATIC 
 EFI_LOCK                  mFifoLock        = EFI_INITIALIZE_LOCK_VARIABLE  (EFI_TPL_HIGH_LEVEL);
+STATIC
 LIST_ENTRY                mRecordsFifo     = INITIALIZE_LIST_HEAD_VARIABLE (mRecordsFifo);
+STATIC
 UINTN                     mNumberOfRecords = 0;
-
+STATIC
 EFI_EVENT                 mLogDataHubEvent;
 //
 // Cache data hub protocol.
 //
+STATIC
 EFI_DATA_HUB_PROTOCOL     *mDataHubProtocol;
 
 

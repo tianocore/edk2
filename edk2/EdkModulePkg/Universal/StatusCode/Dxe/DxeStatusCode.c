@@ -40,6 +40,7 @@ InitializationDispatcherWorker (
   )
 {
   EFI_PEI_HOB_POINTERS              Hob;
+  EFI_STATUS                        Status;
   MEMORY_STATUSCODE_PACKET_HEADER   *PacketHeader;
   MEMORY_STATUSCODE_RECORD          *Record;
   UINTN                             ExpectedPacketIndex = 0;
@@ -52,19 +53,24 @@ InitializationDispatcherWorker (
   // if enable UseDataHub, then initialize data hub status code worker.
   //
   if (FeaturePcdGet (PcdStatusCodeUseEfiSerial)) {
-    EfiSerialStatusCodeInitializeWorker ();
+    Status = EfiSerialStatusCodeInitializeWorker ();
+    ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseHardSerial)) {
-    SerialPortInitialize ();
+    Status = SerialPortInitialize ();
+    ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseRuntimeMemory)) {
-    RtMemoryStatusCodeInitializeWorker ();
+    Status = RtMemoryStatusCodeInitializeWorker ();
+    ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseDataHub)) {
-    DataHubStatusCodeInitializeWorker ();
+    Status = DataHubStatusCodeInitializeWorker ();
+    ASSERT_EFI_ERROR (Status);
   }
   if (FeaturePcdGet (PcdStatusCodeUseOEM)) {
-    OemHookStatusCodeInitialize ();
+    Status = OemHookStatusCodeInitialize ();
+    ASSERT_EFI_ERROR (Status);
   }
 
   //
