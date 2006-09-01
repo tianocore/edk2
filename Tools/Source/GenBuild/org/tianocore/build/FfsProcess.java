@@ -84,6 +84,12 @@ public class FfsProcess {
     ///
     public static final String[][] sectionExt = EdkDefinitions.SectionTypeExtensions;
 
+    private SurfaceAreaQuery saq = null;
+    
+    public FfsProcess(SurfaceAreaQuery saq) {
+        this.saq = saq;
+    }
+    
     /**
       search in the type, if componentType is listed in type, return true; 
       otherwise return false.
@@ -115,9 +121,9 @@ public class FfsProcess {
         //
         // Try to find Ffs layout from FPD file
         //
-        SurfaceAreaQuery.push(GlobalData.getFpdBuildOptions());
-        BuildOptionsDocument.BuildOptions.Ffs[] ffsArray = SurfaceAreaQuery.getFpdFfs();
-        SurfaceAreaQuery.pop();
+        saq.push(GlobalData.getFpdBuildOptions());
+        BuildOptionsDocument.BuildOptions.Ffs[] ffsArray = saq.getFpdFfs();
+        saq.pop();
         for (int i = 0; i < ffsArray.length; i++) {
             if (isMatch(ffsArray[i].getFfsKey(), buildType)) {
                 ffsXmlObject = ffsArray[i];

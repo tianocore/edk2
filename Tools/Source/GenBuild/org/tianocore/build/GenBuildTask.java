@@ -108,6 +108,8 @@ public class GenBuildTask extends Ant {
     private Vector<Property> properties = new Vector<Property>();
 
     private boolean isSingleModuleBuild = false;
+    
+    private SurfaceAreaQuery saq = null;
 
     /**
       Public construct method. It is necessary for ANT task.
@@ -154,14 +156,14 @@ public class GenBuildTask extends Ant {
             moduleId = new ModuleIdentification(moduleGuid, moduleVersion);
             moduleId.setPackage(packageId);
             Map<String, XmlObject> doc = GlobalData.getNativeMsa(moduleId);
-            SurfaceAreaQuery.setDoc(doc);
-            moduleId = SurfaceAreaQuery.getMsaHeader();
+            saq = new SurfaceAreaQuery(doc);
+            moduleId = saq.getMsaHeader();
         } else {
             Map<String, XmlObject> doc = GlobalData.getNativeMsa(msaFile);
-            SurfaceAreaQuery.setDoc(doc);
-            moduleId = SurfaceAreaQuery.getMsaHeader();
+            saq = new SurfaceAreaQuery(doc);
+            moduleId = saq.getMsaHeader();
         }
-        String[] producedLibraryClasses = SurfaceAreaQuery.getLibraryClasses("ALWAYS_PRODUCED",null);
+        String[] producedLibraryClasses = saq.getLibraryClasses("ALWAYS_PRODUCED",null);
         if (producedLibraryClasses.length == 0) {
             moduleId.setLibrary(false);
         } else {
@@ -221,7 +223,7 @@ public class GenBuildTask extends Ant {
         //
         // Judge if arch is all supported by current module. If not, throw Exception.
         //
-        List moduleSupportedArchs = SurfaceAreaQuery.getModuleSupportedArchs();
+        List moduleSupportedArchs = saq.getModuleSupportedArchs();
         if (moduleSupportedArchs != null) {
             for (int k = 0; k < archList.length; k++) {
                 if ( ! moduleSupportedArchs.contains(archList[k])) {
@@ -277,7 +279,7 @@ public class GenBuildTask extends Ant {
 
                     System.out.println("Build " + moduleId + " start >>>");
                     System.out.println("Target: " + targetList[i] + " Tagname: " + toolchainList[j] + " Arch: " + archList[k]);
-                    SurfaceAreaQuery.setDoc(GlobalData.getDoc(fpdModuleId));
+                    saq.push(GlobalData.getDoc(fpdModuleId));
 
                     //
                     // Prepare for all other common properties
@@ -377,7 +379,7 @@ public class GenBuildTask extends Ant {
         // MODULE_DIR, MODULE_RELATIVE_DIR
         //
         PropertyManager.setProperty("MODULE", moduleId.getName());
-        String baseName = SurfaceAreaQuery.getModuleOutputFileBasename();
+        String baseName = saq.getModuleOutputFileBasename();
         if (baseName == null) {
             PropertyManager.setProperty("BASE_NAME", moduleId.getName());
         } else {
@@ -539,12 +541,10 @@ public class GenBuildTask extends Ant {
 
     private void applyBuild(String buildTarget, String buildTagname, FpdModuleIdentification fpdModuleId) throws BuildException{
         //
-        // AutoGen
+        // Call AutoGen to generate AutoGen.c and AutoGen.h
         //
-
-        AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch());
+        AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch(), saq);
         autogen.genAutogen();
-
 
         //
         // Get compiler flags
@@ -559,7 +559,7 @@ public class GenBuildTask extends Ant {
         //
         // Prepare LIBS
         //
-        ModuleIdentification[] libinstances = SurfaceAreaQuery.getLibraryInstance(fpdModuleId.getArch());
+        ModuleIdentification[] libinstances = saq.getLibraryInstance(fpdModuleId.getArch());
         String propertyLibs = "";
         for (int i = 0; i < libinstances.length; i++) {
             propertyLibs += " " + getProject().getProperty("BIN_DIR") + File.separatorChar + libinstances[i].getName() + ".lib";
@@ -588,8 +588,8 @@ public class GenBuildTask extends Ant {
         // Generate ${BASE_NAME}_build.xml
         // TBD
         //
-        String ffsKeyword = SurfaceAreaQuery.getModuleFfsKeyword();
-        ModuleBuildFileGenerator fileGenerator = new ModuleBuildFileGenerator(getProject(), ffsKeyword, fpdModuleId, includes);
+        String ffsKeyword = saq.getModuleFfsKeyword();
+        ModuleBuildFileGenerator fileGenerator = new ModuleBuildFileGenerator(getProject(), ffsKeyword, fpdModuleId, includes, saq);
         String buildFilename = getProject().getProperty("DEST_DIR_OUTPUT") + File.separatorChar + moduleId.getName() + "_build.xml";
         fileGenerator.genBuildFile(buildFilename);
 
@@ -721,7 +721,7 @@ public class GenBuildTask extends Ant {
         //
         // Packages in PackageDenpendencies
         //
-        PackageIdentification[] packageDependencies = SurfaceAreaQuery.getDependencePkg(fpdModuleId.getArch());
+        PackageIdentification[] packageDependencies = saq.getDependencePkg(fpdModuleId.getArch());
         for (int i = 0; i < packageDependencies.length; i++) {
             GlobalData.refreshPackageIdentification(packageDependencies[i]);
             File packageFile = packageDependencies[i].getSpdFile();
@@ -732,17 +732,17 @@ public class GenBuildTask extends Ant {
         //
         // All Dependency Library Instance's PackageDependencies
         //
-        ModuleIdentification[] libinstances = SurfaceAreaQuery.getLibraryInstance(fpdModuleId.getArch());
+        ModuleIdentification[] libinstances = saq.getLibraryInstance(fpdModuleId.getArch());
         for (int i = 0; i < libinstances.length; i++) {
-            SurfaceAreaQuery.push(GlobalData.getDoc(libinstances[i], fpdModuleId.getArch()));
-            PackageIdentification[] libraryPackageDependencies = SurfaceAreaQuery.getDependencePkg(fpdModuleId.getArch());
+            saq.push(GlobalData.getDoc(libinstances[i], fpdModuleId.getArch()));
+            PackageIdentification[] libraryPackageDependencies = saq.getDependencePkg(fpdModuleId.getArch());
             for (int j = 0; j < libraryPackageDependencies.length; j++) {
                 GlobalData.refreshPackageIdentification(libraryPackageDependencies[j]);
                 File packageFile = libraryPackageDependencies[j].getSpdFile();
                 includes.add(packageFile.getParent() + File.separatorChar + "Include");
                 includes.add(packageFile.getParent() + File.separatorChar + "Include" + File.separatorChar + archDir(arch));
             }
-            SurfaceAreaQuery.pop();
+            saq.pop();
         }
         
         

@@ -116,6 +116,7 @@ public class AutoGen {
     private List<String> setVirtalAddList = new ArrayList<String>();
     private List<String> exitBootServiceList = new ArrayList<String>();
 
+    private SurfaceAreaQuery saq = null;
 
     /**
       Construct function
@@ -131,12 +132,12 @@ public class AutoGen {
       @param arch
                  Target architecture.
     **/
-    public AutoGen(String fvDir, String outputPath, ModuleIdentification moduleId, String arch) {
+    public AutoGen(String fvDir, String outputPath, ModuleIdentification moduleId, String arch, SurfaceAreaQuery saq) {
         this.outputPath = outputPath;
         this.moduleId = moduleId;
         this.arch = arch;
         this.fvDir = fvDir;
-
+        this.saq = saq;
     }
 
     /**
@@ -314,7 +315,7 @@ public class AutoGen {
         // be got from module surface area instead of hard code by it's
         // moduleType.
         //
-        moduleType = SurfaceAreaQuery.getModuleType();
+        moduleType = saq.getModuleType();
 
         //
         // Add "extern int __make_me_compile_correctly;" at begin of
@@ -325,7 +326,7 @@ public class AutoGen {
         //
         // Put EFI_SPECIFICATION_VERSION, and EDK_RELEASE_VERSION.
         //
-        String[] specList = SurfaceAreaQuery.getExternSpecificaiton();
+        String[] specList = saq.getExternSpecificaiton();
         for (int i = 0; i < specList.length; i++) {
             fileBuffer.append(CommonDefinition.DEFINE + specList[i]
                               + "\r\n");
@@ -335,8 +336,7 @@ public class AutoGen {
         //
         // PackageIdentification[] consumedPkgIdList = SurfaceAreaQuery
         // .getDependencePkg(this.arch);
-        PackageIdentification[] consumedPkgIdList = SurfaceAreaQuery
-                                                    .getDependencePkg(this.arch);
+        PackageIdentification[] consumedPkgIdList = saq.getDependencePkg(this.arch);
         if (consumedPkgIdList != null) {
             headerFileList = depPkgToAutogenH(consumedPkgIdList, moduleType);
             item = headerFileList.iterator();
@@ -348,8 +348,7 @@ public class AutoGen {
         //
         // Write library class's related *.h file to autogen.h.
         //
-        String[] libClassList = SurfaceAreaQuery
-                                .getLibraryClasses(CommonDefinition.ALWAYSCONSUMED,this.arch);
+        String[] libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSCONSUMED,this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -358,8 +357,7 @@ public class AutoGen {
             }
         }
 
-        libClassList = SurfaceAreaQuery
-                       .getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch);
+        libClassList = saq.getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
             item = libClassIncludeH.iterator();
@@ -373,7 +371,7 @@ public class AutoGen {
         //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to
         // {DEST_DIR_DRBUG}/FlashMap.h
         //
-        if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
+        if (saq.isHaveTianoR8FlashMap()) {
             fileBuffer.append(CommonDefinition.INCLUDE);
             fileBuffer.append("  <");
             fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\r\n");
@@ -427,7 +425,7 @@ public class AutoGen {
         // process <Externs> it should be set the DOC as the Native MSA info.
         //
         Map<String, XmlObject> doc = GlobalData.getNativeMsa(this.moduleId);
-        SurfaceAreaQuery.push(doc);
+        saq.push(doc);
         //
         // Write <Extern>
         // DriverBinding/ComponentName/DriverConfiguration/DriverDialog
@@ -445,24 +443,23 @@ public class AutoGen {
         //
         // Write EntryPoint to autgoGen.c
         //
-        String[] entryPointList = SurfaceAreaQuery.getModuleEntryPointArray();
-		String[] unloadImageList = SurfaceAreaQuery.getModuleUnloadImageArray();
+        String[] entryPointList = saq.getModuleEntryPointArray();
+		String[] unloadImageList = saq.getModuleUnloadImageArray();
         EntryPointToAutoGen(CommonDefinition.remDupString(entryPointList), 
 			                CommonDefinition.remDupString(unloadImageList),
 			                fileBuffer);
 
-        pcdDriverType = SurfaceAreaQuery.getPcdDriverType();
+        pcdDriverType = saq.getPcdDriverType();
 
         //
         // Restore the DOC which include the FPD module info.
         //
-        SurfaceAreaQuery.pop();
+        saq.pop();
 
         //
         // Write Guid to autogen.c
         //
-        String guid = CommonDefinition.formatGuidName(SurfaceAreaQuery
-                                                      .getModuleGuid());
+        String guid = CommonDefinition.formatGuidName(saq.getModuleGuid());
 
         fileBuffer
         .append("GLOBAL_REMOVE_IF_UNREFERENCED EFI_GUID gEfiCallerIdGuid = {");
@@ -490,7 +487,7 @@ public class AutoGen {
         //
         // Get module dependent Package identification.
         //
-        PackageIdentification[] packages = SurfaceAreaQuery.getDependencePkg(this.arch);
+        PackageIdentification[] packages = saq.getDependencePkg(this.arch);
         for (int i = 0; i < packages.length; i++) {
             if (!this.mDepPkgList.contains(packages[i])) {
                 this.mDepPkgList.add(packages[i]);
@@ -572,7 +569,7 @@ public class AutoGen {
         // be get from module surface area instead of hard code.
         //
         fileBuffer.append(CommonDefinition.AUTOGENHBEGIN);
-        String[] specList = SurfaceAreaQuery.getExternSpecificaiton();
+        String[] specList = saq.getExternSpecificaiton();
         for (int i = 0; i < specList.length; i++) {
             fileBuffer.append(CommonDefinition.DEFINE + specList[i]
                               + "\r\n");
@@ -583,8 +580,8 @@ public class AutoGen {
         //
         // Write consumed package's mdouleInfo related *.h file to autogen.h.
         //
-        moduleType = SurfaceAreaQuery.getModuleType();
-        PackageIdentification[] cosumedPkglist = SurfaceAreaQuery
+        moduleType = saq.getModuleType();
+        PackageIdentification[] cosumedPkglist = saq
                                                  .getDependencePkg(this.arch);
         headerFileList = depPkgToAutogenH(cosumedPkglist, moduleType);
         item = headerFileList.iterator();
@@ -594,7 +591,7 @@ public class AutoGen {
         //
         // Write library class's related *.h file to autogen.h
         //
-        String[] libClassList = SurfaceAreaQuery
+        String[] libClassList = saq
                                 .getLibraryClasses(CommonDefinition.ALWAYSCONSUMED, this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
@@ -604,7 +601,7 @@ public class AutoGen {
             }
         }
 
-        libClassList = SurfaceAreaQuery
+        libClassList = saq
                        .getLibraryClasses(CommonDefinition.ALWAYSPRODUCED, this.arch);
         if (libClassList != null) {
             libClassIncludeH = LibraryClassToAutogenH(libClassList);
@@ -619,7 +616,7 @@ public class AutoGen {
         //  If is TianoR8FlashMap, copy {Fv_DIR}/FlashMap.h to
         // {DEST_DIR_DRBUG}/FlashMap.h
         //
-        if (SurfaceAreaQuery.isHaveTianoR8FlashMap()) {
+        if (saq.isHaveTianoR8FlashMap()) {
             fileBuffer.append(CommonDefinition.INCLUDE);
             fileBuffer.append("  <");
             fileBuffer.append(CommonDefinition.TIANOR8PLASHMAPH + ">\r\n");
@@ -672,7 +669,7 @@ public class AutoGen {
         this.myPcdAutogen = new PCDAutoGenAction(moduleId,
                                                  arch,
                                                  true,
-                                                 SurfaceAreaQuery.getModulePcdEntryNameArray(),
+                                                 saq.getModulePcdEntryNameArray(),
                                                  pcdDriverType);
         try {
             this.myPcdAutogen.execute();
@@ -713,7 +710,7 @@ public class AutoGen {
         //
         for (int i = 0; i < libClassList.length; i++) {
             includeName = GlobalData.getLibraryClassHeaderFiles(
-                                                                SurfaceAreaQuery.getDependencePkg(this.arch),
+                            saq.getDependencePkg(this.arch),
                                                                 libClassList[i]);
             if (includeName == null) {
                 throw new AutoGenException("Can not find library class ["
@@ -785,7 +782,7 @@ public class AutoGen {
     void EntryPointToAutoGen(String[] entryPointList, String[] unloadImageList, StringBuffer fileBuffer)
     throws BuildException {
 
-        String typeStr = SurfaceAreaQuery.getModuleType();
+        String typeStr = saq.getModuleType();
 		int unloadImageCount = 0;
         int entryPointCount  = 0;
 
@@ -1250,12 +1247,12 @@ public class AutoGen {
         // then add those PPI ,and PPI Notify name to list.
         //
 
-        String[] ppiList = SurfaceAreaQuery.getPpiArray(this.arch);
+        String[] ppiList = saq.getPpiArray(this.arch);
         for (int i = 0; i < ppiList.length; i++) {
             this.mPpiList.add(ppiList[i]);
         }
 
-        String[] ppiNotifyList = SurfaceAreaQuery.getPpiNotifyArray(this.arch);
+        String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
         for (int i = 0; i < ppiNotifyList.length; i++) {
             this.mPpiList.add(ppiNotifyList[i]);
         }
@@ -1299,7 +1296,7 @@ public class AutoGen {
     void ProtocolGuidToAutogenC(StringBuffer fileBuffer) throws BuildException {
         String[] cNameGuid = null;
 
-        String[] protocolList = SurfaceAreaQuery.getProtocolArray(this.arch);
+        String[] protocolList = saq.getProtocolArray(this.arch);
 
         //
         // Add result to Autogen global list.
@@ -1308,7 +1305,7 @@ public class AutoGen {
             this.mProtocolList.add(protocolList[i]);
         }
 
-        String[] protocolNotifyList = SurfaceAreaQuery
+        String[] protocolNotifyList = saq
                                       .getProtocolNotifyArray(this.arch);
 
         for (int i = 0; i < protocolNotifyList.length; i++) {
@@ -1356,7 +1353,7 @@ public class AutoGen {
         String[] cNameGuid = null;
         String guidKeyWord = null;
 
-        String[] guidList = SurfaceAreaQuery.getGuidEntryArray(this.arch);
+        String[] guidList = saq.getGuidEntryArray(this.arch);
 
         for (int i = 0; i < guidList.length; i++) {
             this.mGuidList.add(guidList[i]);
@@ -1673,7 +1670,7 @@ public class AutoGen {
         // 3.DRIVER_CONFIGURATION 4. DRIVER_DIAGNOSTIC
         //
 
-        String[] drvBindList = SurfaceAreaQuery.getDriverBindingArray();
+        String[] drvBindList = saq.getDriverBindingArray();
 
         //
         // If component name protocol,component configuration protocol,
@@ -1684,9 +1681,9 @@ public class AutoGen {
             return;
         }
 
-        String[] compNamList = SurfaceAreaQuery.getComponentNameArray();
-        String[] compConfList = SurfaceAreaQuery.getDriverConfigArray();
-        String[] compDiagList = SurfaceAreaQuery.getDriverDiagArray();
+        String[] compNamList = saq.getComponentNameArray();
+        String[] compConfList = saq.getDriverConfigArray();
+        String[] compDiagList = saq.getDriverDiagArray();
 
         int BitMask = 0;
 
@@ -1826,8 +1823,8 @@ public class AutoGen {
         // <ExitBootServiceCallBack> and add to setVirtualAddList
         //  exitBootServiceList.
         //
-        String[] setVirtuals = SurfaceAreaQuery.getSetVirtualAddressMapCallBackArray();
-        String[] exitBoots = SurfaceAreaQuery.getExitBootServicesCallBackArray();
+        String[] setVirtuals = saq.getSetVirtualAddressMapCallBackArray();
+        String[] exitBoots = saq.getExitBootServicesCallBackArray();
         if (setVirtuals != null) {
             for (int j = 0; j < setVirtuals.length; j++) {
                 this.setVirtalAddList.add(setVirtuals[j]);
@@ -1915,8 +1912,7 @@ public class AutoGen {
         String[] setVirtuals = null;
         String[] exitBoots = null;
 
-        ModuleIdentification[] libraryIdList = SurfaceAreaQuery
-                                               .getLibraryInstance(this.arch);
+        ModuleIdentification[] libraryIdList = saq.getLibraryInstance(this.arch);
         try {
             if (libraryIdList != null) {
                 //
@@ -1943,21 +1939,17 @@ public class AutoGen {
                         //
 
                         Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstanceId, this.arch);
-                        SurfaceAreaQuery.push(libDoc);
+                        saq.push(libDoc);
                         //
                         // Get <PPis>, <Protocols>, <Guids> list of this library
                         // instance.
                         //
-                        String[] ppiList = SurfaceAreaQuery.getPpiArray(this.arch);
-                        String[] ppiNotifyList = SurfaceAreaQuery
-                                                 .getPpiNotifyArray(this.arch);
-                        String[] protocolList = SurfaceAreaQuery
-                                                .getProtocolArray(this.arch);
-                        String[] protocolNotifyList = SurfaceAreaQuery
-                                                      .getProtocolNotifyArray(this.arch);
-                        String[] guidList = SurfaceAreaQuery
-                                            .getGuidEntryArray(this.arch);
-                        PackageIdentification[] pkgList = SurfaceAreaQuery.getDependencePkg(this.arch);
+                        String[] ppiList = saq.getPpiArray(this.arch);
+                        String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
+                        String[] protocolList = saq.getProtocolArray(this.arch);
+                        String[] protocolNotifyList = saq.getProtocolNotifyArray(this.arch);
+                        String[] guidList = saq.getGuidEntryArray(this.arch);
+                        PackageIdentification[] pkgList = saq.getDependencePkg(this.arch);
 
                         //
                         // Add those ppi, protocol, guid in global ppi,
@@ -1993,17 +1985,15 @@ public class AutoGen {
                         // If not yet parse this library instance's constructor
                         // element,parse it.
                         //
-                        libConstructName = SurfaceAreaQuery
-                                           .getLibConstructorName();
-                        libDestructName = SurfaceAreaQuery
-                                          .getLibDestructorName();
+                        libConstructName = saq.getLibConstructorName();
+                        libDestructName = saq.getLibDestructorName();
 
                         //
                         // Collect SetVirtualAddressMapCallBack and
                         // ExitBootServiceCallBack.
                         //
-                        setVirtuals = SurfaceAreaQuery.getSetVirtualAddressMapCallBackArray();
-                        exitBoots = SurfaceAreaQuery.getExitBootServicesCallBackArray();
+                        setVirtuals = saq.getSetVirtualAddressMapCallBackArray();
+                        exitBoots = saq.getExitBootServicesCallBackArray();
                         if (setVirtuals != null) {
                             for (int j = 0; j < setVirtuals.length; j++) {
                                 this.setVirtalAddList.add(setVirtuals[j]);
@@ -2014,7 +2004,7 @@ public class AutoGen {
                                 this.exitBootServiceList.add(exitBoots[k]);
                             }
                         }
-                        SurfaceAreaQuery.pop();
+                        saq.pop();
                         //
                         // Add dependent library instance constructor function.
                         //

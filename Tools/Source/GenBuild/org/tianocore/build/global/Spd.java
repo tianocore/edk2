@@ -106,24 +106,24 @@ public class Spd {
             // We can change Map to XmlObject
             Map<String, XmlObject> spdDocMap = new HashMap<String, XmlObject>();
             spdDocMap.put("PackageSurfaceArea", spdDoc);
-            SurfaceAreaQuery.setDoc(spdDocMap);
+            SurfaceAreaQuery saq = new SurfaceAreaQuery(spdDocMap);
             //
             //
             //
-            packageId = SurfaceAreaQuery.getSpdHeader();
+            packageId = saq.getSpdHeader();
             packageId.setSpdFile(packageFile);
             
             //
             // initialize Msa Files
             // MSA file is absolute file path
             //
-            String[] msaFilenames = SurfaceAreaQuery.getSpdMsaFile();
+            String[] msaFilenames = saq.getSpdMsaFile();
             for (int i = 0; i < msaFilenames.length; i++){
                 File msaFile = new File(packageId.getPackageDir() + File.separatorChar + msaFilenames[i]);
                 Map<String, XmlObject> msaDoc = GlobalData.getNativeMsa( msaFile );
-                SurfaceAreaQuery.push(msaDoc);
-                ModuleIdentification moduleId = SurfaceAreaQuery.getMsaHeader();
-                SurfaceAreaQuery.pop();
+                saq.push(msaDoc);
+                ModuleIdentification moduleId = saq.getMsaHeader();
+                saq.pop();
                 moduleId.setPackage(packageId);
                 moduleId.setMsaFile(msaFile);
                 if (msaInfo.containsKey(moduleId)) {
@@ -135,7 +135,7 @@ public class Spd {
             //
             // initialize Package header files
             //
-            Map<String, String> packageHeaders = SurfaceAreaQuery.getSpdPackageHeaderFiles();
+            Map<String, String> packageHeaders = saq.getSpdPackageHeaderFiles();
             Set keys = packageHeaders.keySet();
             Iterator iter = keys.iterator();
             while (iter.hasNext()){
@@ -153,7 +153,7 @@ public class Spd {
             //
             // initialize Guid Info
             //
-            guidInfo.putAll(SurfaceAreaQuery.getSpdGuid());
+            guidInfo.putAll(saq.getSpdGuid());
             
             //
             // For Pcd get TokenSpaceGuid
@@ -169,17 +169,17 @@ public class Spd {
             //
             // initialize PPI info
             //
-            ppiInfo.putAll(SurfaceAreaQuery.getSpdPpi());
+            ppiInfo.putAll(saq.getSpdPpi());
             
             //
             // initialize Protocol info
             //
-            protocolInfo.putAll(SurfaceAreaQuery.getSpdProtocol());
+            protocolInfo.putAll(saq.getSpdProtocol());
             
             //
             // initialize library class declaration
             //
-            Map<String, String[]> libraryClassHeaders = SurfaceAreaQuery.getSpdLibraryClasses();
+            Map<String, String[]> libraryClassHeaders = saq.getSpdLibraryClasses();
             keys = libraryClassHeaders.keySet();
             iter = keys.iterator();
             while (iter.hasNext()){
