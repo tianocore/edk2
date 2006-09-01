@@ -14,9 +14,11 @@
 
 **/
 
-/**
+/*
 
   Programmed hardware of Serial port.
+
+  @return    Always return EFI_UNSUPPORTED.
 
 **/
 EFI_STATUS
