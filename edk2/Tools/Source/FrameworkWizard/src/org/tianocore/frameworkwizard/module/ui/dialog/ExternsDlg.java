@@ -403,9 +403,16 @@ public class ExternsDlg extends IDialog implements ItemListener {
             if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_PCD_IS_DRIVER)) {
                 this.jComboBoxPcdIsDriver.setVisible(true);
                 this.jTextFieldC_Name.setVisible(false);
+                this.jLabelArch.setEnabled(false);
+                this.jArchCheckBox.setAllItemsEnabled(false);
+            } else if (jComboBoxType.getSelectedItem().toString().equals(EnumerationData.EXTERNS_SPECIFICATION)) {
+                this.jLabelArch.setEnabled(false);
+                this.jArchCheckBox.setAllItemsEnabled(false);
             } else {
                 this.jComboBoxPcdIsDriver.setVisible(false);
                 this.jTextFieldC_Name.setVisible(true);
+                this.jLabelArch.setEnabled(true);
+                this.jArchCheckBox.setAllItemsEnabled(true);
             }
         }
     }
