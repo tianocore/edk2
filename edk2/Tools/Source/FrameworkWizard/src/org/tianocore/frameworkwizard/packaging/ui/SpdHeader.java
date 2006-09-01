@@ -128,13 +128,7 @@ public class SpdHeader extends IInternalFrame {
 
     private JTextArea jDescriptionTextArea = null;
 
-    //    private JLabel jLabelSpecification = null;
-
     private JTextField jSpecificationTextField = null;
-
-    private JButton jButtonOk = null;
-
-    private JButton jButtonCancel = null;
 
     private JScrollPane jLicenseScrollPane = null;
 
@@ -359,40 +353,6 @@ public class SpdHeader extends IInternalFrame {
             //            });
         }
         return jSpecificationTextField;
-    }
-
-    /**
-     This method initializes jButtonOk 
-     
-     @return javax.swing.JButton jButtonOk
-     
-     **/
-    private JButton getJButtonOk() {
-        if (jButtonOk == null) {
-            jButtonOk = new JButton();
-            jButtonOk.setText("OK");
-            jButtonOk.setBounds(new java.awt.Rectangle(290, 445, 90, oneRowHeight));
-            jButtonOk.setVisible(false);
-            jButtonOk.addActionListener(this);
-        }
-        return jButtonOk;
-    }
-
-    /**
-     This method initializes jButtonCancel 
-     
-     @return javax.swing.JButton jButtonCancel
-     
-     **/
-    private JButton getJButtonCancel() {
-        if (jButtonCancel == null) {
-            jButtonCancel = new JButton();
-            jButtonCancel.setText("Cancel");
-            jButtonCancel.setBounds(new java.awt.Rectangle(390, 445, 90, oneRowHeight));
-            jButtonCancel.setVisible(false);
-            jButtonCancel.addActionListener(this);
-        }
-        return jButtonCancel;
     }
 
     /**
