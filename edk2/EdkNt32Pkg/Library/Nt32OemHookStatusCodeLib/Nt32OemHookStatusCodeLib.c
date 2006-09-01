@@ -30,8 +30,10 @@ HANDLE                      mStdOut;
 
   Initialize OEM status code device .
 
+  @return    Always return EFI_SUCCESS.
+
 **/
-VOID
+EFI_SUCCESS
 EFIAPI
 OemHookStatusCodeInitialize (
   VOID
@@ -71,7 +73,7 @@ OemHookStatusCodeInitialize (
   //
   mStdOut = mWinNt->GetStdHandle (STD_OUTPUT_HANDLE);
 
-  return;
+  return EFI_SUCCESS;
 }
 
 /**
