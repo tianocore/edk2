@@ -309,6 +309,7 @@ public class FpdParserTask extends Task {
     **/
     public void parseFpdFile(File fpdFile) throws BuildException {
         this.fpdFile = fpdFile;
+        parseFpdFile();
     }
 
     /**
