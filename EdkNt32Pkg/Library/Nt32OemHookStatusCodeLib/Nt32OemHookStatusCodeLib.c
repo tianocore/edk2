@@ -33,7 +33,7 @@ HANDLE                      mStdOut;
   @return    Always return EFI_SUCCESS.
 
 **/
-EFI_SUCCESS
+EFI_STATUS
 EFIAPI
 OemHookStatusCodeInitialize (
   VOID
