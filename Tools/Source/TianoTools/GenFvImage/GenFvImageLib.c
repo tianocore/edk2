@@ -1354,9 +1354,7 @@ Returns:
   UINT32                    EntryPoint;
   UINT32                    BaseOfCode;
   UINT16                    MachineType;
-  EFI_TE_IMAGE_HEADER       *TeHdr;
 
-  TeHdr = NULL;
   //
   // Verify input parameters.
   //
@@ -1431,27 +1429,31 @@ Returns:
   //
   if (Status == EFI_NOT_FOUND) {
     Status = GetSectionByType (FfsFile, EFI_SECTION_TE, 1, &Pe32Section);
-    if (Status == EFI_NOT_FOUND) {
-      BaseOfCode = 0x60;
-    } else {
-      TeHdr       = (EFI_TE_IMAGE_HEADER *) ((UINTN) Pe32Section.Pe32Section + sizeof (EFI_COMMON_SECTION_HEADER));
-      BaseOfCode  = TeHdr->BaseOfCode - TeHdr->StrippedSize;
-    }
-  } else if (EFI_ERROR (Status)) {
-    Error (NULL, 0, 0, "could not parse a PE32 section from the PEI file", NULL);
-    return Status;
-  } else {
+  }
+
+  if (Status == EFI_SUCCESS) {
     Status = GetPe32Info (
               (VOID *) ((UINTN) Pe32Section.Pe32Section + sizeof (EFI_SECTION_PE32)),
               &EntryPoint,
               &BaseOfCode,
               &MachineType
               );
-    if (EFI_ERROR (Status)) {
-      Error (NULL, 0, 0, "GetPe32Info() could not get PE32 entry point for PEI file", NULL);
-      return Status;
-    }
+  } else if (Status == EFI_NOT_FOUND) {
+    //
+    // For PIC, hardcode.
+    //
+    BaseOfCode = 0x60;
+    Status = EFI_SUCCESS;
+  } else {
+    Error (NULL, 0, 0, "could not parse a PE32 section from the PEI file", NULL);
+    return Status;
   }
+
+  if (EFI_ERROR (Status)) {
+    Error (NULL, 0, 0, "GetPe32Info() could not get PE32 entry point for PEI file", NULL);
+    return Status;
+  }
+
   //
   // Open the source file
   //
@@ -1508,9 +1510,9 @@ Returns:
       TokenAddress += BaseAddress;
 
       //
-      // If PE32 then find the start of code.  For PIC it is hardcoded.
+      // If PE32 or TE section then find the start of code.  For PIC it is hardcoded.
       //
-      if (TeHdr == NULL && Pe32Section.Pe32Section) {
+      if (Pe32Section.Pe32Section) {
         //
         // Add the offset of the PE32 section
         //
@@ -1520,20 +1522,13 @@ Returns:
         // Add the size of the PE32 section header
         //
         TokenAddress += sizeof (EFI_PE32_SECTION);
-      } else if (TeHdr != NULL) {
-        //
-        // Add the Te section and FfsHeader
-        //
-        //
-        //  BUGBUG: Don't know why this is 0x28 bytes.
-        //
-        TokenAddress += (UINTN) TeHdr - (UINTN) FfsFile + 0x28;
       } else {
         //
-        // BUGBUG: Don't know why this is 0x28 bytes.
+        // For PIC hardcoded.
         //
         TokenAddress += 0x28;
       }
+
       //
       // Add the beginning of the code
       //
@@ -2114,12 +2109,17 @@ Returns:
     Error (NULL, 0, 0, "could not find the PEI core in the FV", NULL);
     return EFI_ABORTED;
   }
+
   //
-  // PEI Core found, now find PE32 section
+  // PEI Core found, now find PE32 or TE section
   //
   Status = GetSectionByType (PeiCoreFile, EFI_SECTION_PE32, 1, &Pe32Section);
+  if (Status == EFI_NOT_FOUND) {
+    Status = GetSectionByType (PeiCoreFile, EFI_SECTION_TE, 1, &Pe32Section);
+  }
+
   if (EFI_ERROR (Status)) {
-    Error (NULL, 0, 0, "could not find PE32 section in PEI core file", NULL);
+    Error (NULL, 0, 0, "could not find PE32 or TE section in PEI core file", NULL);
     return EFI_ABORTED;
   }
 
@@ -2129,6 +2129,7 @@ Returns:
             &BaseOfCode,
             &MachineType
             );
+
   if (EFI_ERROR (Status)) {
     Error (NULL, 0, 0, "could not get PE32 entry point for PEI core", NULL);
     return EFI_ABORTED;
@@ -2322,9 +2323,9 @@ GetPe32Info (
 
 Routine Description:
 
-  Retrieves the PE32 entry point offset and machine type.  See EfiImage.h for
-  machine types.  The entry point offset is from the beginning of the PE32
-  buffer passed in.
+  Retrieves the PE32 entry point offset and machine type from PE image or TeImage.  
+  See EfiImage.h for machine types.  The entry point offset is from the beginning 
+  of the PE32 buffer passed in.
 
 Arguments:
 
@@ -2344,6 +2345,7 @@ Returns:
 {
   EFI_IMAGE_DOS_HEADER  *DosHeader;
   EFI_IMAGE_NT_HEADERS  *NtHeader;
+  EFI_TE_IMAGE_HEADER   *TeHeader;
 
   //
   // Verify input parameters
@@ -2351,36 +2353,52 @@ Returns:
   if (Pe32 == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  //
-  // First is the DOS header
-  //
-  DosHeader = (EFI_IMAGE_DOS_HEADER *) Pe32;
 
   //
-  // Verify DOS header is expected
+  // First check whether it is one TE Image.
   //
-  if (DosHeader->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
-    printf ("ERROR: Unknown magic number in the DOS header, 0x%04X.\n", DosHeader->e_magic);
-    return EFI_UNSUPPORTED;
+  TeHeader = (EFI_TE_IMAGE_HEADER *) Pe32;
+  if (TeHeader->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
+    //
+    // By TeImage Header to get output
+    //
+    *EntryPoint   = TeHeader->AddressOfEntryPoint + sizeof (EFI_TE_IMAGE_HEADER) - TeHeader->StrippedSize;
+    *BaseOfCode   = TeHeader->BaseOfCode + sizeof (EFI_TE_IMAGE_HEADER) - TeHeader->StrippedSize;
+    *MachineType  = TeHeader->Machine;
+  } else {
+  
+    //
+    // Then check whether 
+    // First is the DOS header
+    //
+    DosHeader = (EFI_IMAGE_DOS_HEADER *) Pe32;
+  
+    //
+    // Verify DOS header is expected
+    //
+    if (DosHeader->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
+      printf ("ERROR: Unknown magic number in the DOS header, 0x%04X.\n", DosHeader->e_magic);
+      return EFI_UNSUPPORTED;
+    }
+    //
+    // Immediately following is the NT header.
+    //
+    NtHeader = (EFI_IMAGE_NT_HEADERS *) ((UINTN) Pe32 + DosHeader->e_lfanew);
+  
+    //
+    // Verify NT header is expected
+    //
+    if (NtHeader->Signature != EFI_IMAGE_NT_SIGNATURE) {
+      printf ("ERROR: Unrecognized image signature 0x%08X.\n", NtHeader->Signature);
+      return EFI_UNSUPPORTED;
+    }
+    //
+    // Get output
+    //
+    *EntryPoint   = NtHeader->OptionalHeader.AddressOfEntryPoint;
+    *BaseOfCode   = NtHeader->OptionalHeader.BaseOfCode;
+    *MachineType  = NtHeader->FileHeader.Machine;
   }
-  //
-  // Immediately following is the NT header.
-  //
-  NtHeader = (EFI_IMAGE_NT_HEADERS *) ((UINTN) Pe32 + DosHeader->e_lfanew);
-
-  //
-  // Verify NT header is expected
-  //
-  if (NtHeader->Signature != EFI_IMAGE_NT_SIGNATURE) {
-    printf ("ERROR: Unrecognized image signature 0x%08X.\n", NtHeader->Signature);
-    return EFI_UNSUPPORTED;
-  }
-  //
-  // Get output
-  //
-  *EntryPoint   = NtHeader->OptionalHeader.AddressOfEntryPoint;
-  *BaseOfCode   = NtHeader->OptionalHeader.BaseOfCode;
-  *MachineType  = NtHeader->FileHeader.Machine;
 
   //
   // Verify machine type is supported
