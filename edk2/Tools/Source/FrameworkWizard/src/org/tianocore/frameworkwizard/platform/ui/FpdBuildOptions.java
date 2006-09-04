@@ -1802,7 +1802,11 @@ public class FpdBuildOptions extends IInternalFrame {
             vArch.add("ARM");
             vArch.add("PPC");
             jTableOptions.getColumnModel().getColumn(2).setCellEditor(new ListEditor(vArch));
+            
+            jTableOptions.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor());
+            
             jTableOptions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	    jTableOptions.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTableOptions.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                 public void valueChanged(ListSelectionEvent e) {
                     selectedRow = -1;

@@ -988,7 +988,9 @@ public class FpdFileContents {
             
             if (opt.getSupArchList() != null){
                 saa[i][4] = listToString(opt.getSupArchList());
-
+            }
+            else {
+                saa[i][4] = "";
             }
             
             saa[i][5] = opt.getStringValue();
@@ -2589,7 +2591,19 @@ public class FpdFileContents {
     }
     
     public void getFvImagesFvImageFvImageNames (Vector<String> vImageNames) {
+        FvImagesDocument.FvImages fis = getfpdFlash().getFvImages();
+        if (fis == null || fis.getFvImageList() == null) {
+            return;
+        }
         
+        ListIterator<FvImagesDocument.FvImages.FvImage> li = fis.getFvImageList().listIterator();
+        while (li.hasNext()) {
+            FvImagesDocument.FvImages.FvImage fi = li.next();
+            if (fi.getType().toString().equals("ImageName")) {
+                vImageNames.addAll(fi.getFvImageNamesList());
+                return;
+            }
+        }
     }
     
     public void AddFvImageFvImageNames (String[] fvNames) {
@@ -2672,6 +2686,10 @@ public class FpdFileContents {
         cursor.dispose();
     }
     
+    /**
+     * @param oldFvName
+     * @param newFvName The New FV Name. If null, remove the old FvImageNames entry.
+     */
     public void updateFvImageNameAll (String oldFvName, String newFvName) {
         if (getfpdFlash().getFvImages() == null || getfpdFlash().getFvImages().getFvImageList() == null) {
             return;
@@ -2683,6 +2701,11 @@ public class FpdFileContents {
         }
     }
     
+    /**
+     * @param fi
+     * @param oldFvName The FV Name to be replaced.
+     * @param newFvName The New FV Name. If null, remove the old FvImageNames entry.
+     */
     public void updateFvImageNamesInFvImage (FvImagesDocument.FvImages.FvImage fi, String oldFvName, String newFvName) {
         QName qFvImageNames = new QName(xmlNs, "FvImageNames");
         XmlCursor cursor = fi.newCursor();
@@ -2690,7 +2713,18 @@ public class FpdFileContents {
         if (cursor.toChild(qFvImageNames)) {
             do {
                 if (cursor.getTextValue().equals(oldFvName)){
-                    cursor.setTextValue(newFvName);
+                    if (newFvName != null) {
+                        cursor.setTextValue(newFvName);
+                    }
+                    else {
+                        if (fi.getFvImageNamesList().size() == 1) {
+                            removeElement(fi);
+                            break;
+                        }
+                        else {
+                            cursor.removeXml();
+                        }
+                    }
                 }
             }while (cursor.toNextSibling(qFvImageNames));
         }
@@ -2738,18 +2772,50 @@ public class FpdFileContents {
         cursor.dispose();
     }
     
-    public int getFvImagesFvImageCount() {
+    public int getFvImagesFvImageCount(String type) {
         
         if (getfpdFlash().getFvImages() == null || getfpdFlash().getFvImages().getFvImageList() == null) {
             return 0;
         }
-        return getfpdFlash().getFvImages().getFvImageList().size();
+        List<FvImagesDocument.FvImages.FvImage> l = getfpdFlash().getFvImages().getFvImageList();
+        ListIterator li = l.listIterator();
+        int i = 0;
+        while(li.hasNext()) {
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)li.next();
+            if (!fi.getType().toString().equals(type) && !type.equals("ALL")) {
+                continue;
+            }
+            
+            ++i;
+        }
+        
+        return i;
     }
     
-    /**Only Get Fv image setting - name and type.
+    public Vector<FvImagesDocument.FvImages.FvImage> getFvImagesFvImageWithName (String fvName, String type) {
+        Vector<FvImagesDocument.FvImages.FvImage> vFvImage = new Vector<FvImagesDocument.FvImages.FvImage>();
+        if (getfpdFlash().getFvImages() == null || getfpdFlash().getFvImages().getFvImageList() == null) {
+            return vFvImage;
+        }
+        List<FvImagesDocument.FvImages.FvImage> l = getfpdFlash().getFvImages().getFvImageList();
+        ListIterator li = l.listIterator();
+        while(li.hasNext()) {
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)li.next();
+            if (!fi.getType().toString().equals(type) && !type.equals("ALL")) {
+                continue;
+            }
+            if (fi.getFvImageNamesList().contains(fvName)) {
+                vFvImage.add(fi);
+            }
+        }
+        
+        return vFvImage;
+    }
+    /**
      * @param saa
+     * @param type "ALL" means all FvImage types: ImageName, Options, Attributes, Components.
      */
-    public void getFvImagesFvImages(String[][] saa) {
+    public void getFvImagesFvImages(String[][] saa, String type) {
     
         if (getfpdFlash().getFvImages() == null) {
             return;
@@ -2762,6 +2828,9 @@ public class FpdFileContents {
         int i = 0;
         while(li.hasNext()) {
             FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)li.next();
+            if (!fi.getType().toString().equals(type) && !type.equals("ALL")) {
+                continue;
+            }
             //
             // get FvImageNames array, space separated
             //
@@ -2780,6 +2849,108 @@ public class FpdFileContents {
         }
     }
     
+    /**Add name-value pair to FvImage element with type.
+     * @param fvName FV name to add name-value pair.
+     * @param type FvImage attribute.
+     * @param name
+     * @param value
+     */
+    public void setTypedNamedFvImageNameValue (String fvName, String type, String name, String value) {
+        if (getfpdFlash().getFvImages() == null) {
+            return;
+        }
+        List<FvImagesDocument.FvImages.FvImage> l = getfpdFlash().getFvImages().getFvImageList();
+        if (l == null) {
+            return;
+        }
+        ListIterator li = l.listIterator();
+        while(li.hasNext()) {
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)li.next();
+            if (!fi.getType().toString().equals(type) && !type.equals("ALL")) {
+                continue;
+            }
+            if (!fi.getFvImageNamesList().contains(fvName)) {
+                continue;
+            }
+            setFvImagesFvImageNameValue (fi, name, value, null);
+        }
+    }
+    
+    /**Add to all FvImage elements with type, the name-value pair.
+     * @param type
+     * @param name
+     * @param value
+     */
+    public void setTypedFvImageNameValue (String type, String name, String value) {
+        if (getfpdFlash().getFvImages() == null) {
+            return;
+        }
+        List<FvImagesDocument.FvImages.FvImage> l = getfpdFlash().getFvImages().getFvImageList();
+        if (l == null) {
+            return;
+        }
+        ListIterator li = l.listIterator();
+        while(li.hasNext()) {
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)li.next();
+            if (!fi.getType().toString().equals(type) && !type.equals("ALL")) {
+                continue;
+            }
+            setFvImagesFvImageNameValue (fi, name, value, null);
+        }
+    }
+    
+    /**Add to FvImage the name-value pair, or replace old name with newName, or generate new name-value pair if not exists before.
+     * @param fi
+     * @param name
+     * @param value
+     * @param newName
+     */
+    public void setFvImagesFvImageNameValue (FvImagesDocument.FvImages.FvImage fi, String name, String value, String newName) {
+        if (fi.getFvImageOptions() == null || fi.getFvImageOptions().getNameValueList() == null) {
+            return;
+        }
+        
+        XmlCursor cursor = fi.getFvImageOptions().newCursor();
+        if (cursor.toFirstChild()) {
+            do {
+                FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = (FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue)cursor.getObject();
+                if (nv.getName().equals(name)) {
+                    nv.setValue(value);
+                    if (newName != null) {
+                        nv.setName(newName);
+                    }
+                    cursor.dispose();
+                    return;
+                }
+            }while (cursor.toNextSibling());
+        }
+        
+        FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = fi.getFvImageOptions().addNewNameValue();
+        nv.setName(name);
+        nv.setValue(value);
+        if (newName != null) {
+            nv.setName(newName);
+        }
+        cursor.dispose();
+    }
+    
+    public void getFvImagesFvImageOptions (String fvName, Map<String, String> m) {
+        Vector<FvImagesDocument.FvImages.FvImage> vFvImage = getFvImagesFvImageWithName (fvName, "Options");
+        for (int i = 0; i < vFvImage.size(); ++i) {
+            FvImagesDocument.FvImages.FvImage fi = vFvImage.get(i);
+            if (fi == null || fi.getFvImageOptions() == null || fi.getFvImageOptions().getNameValueList() == null) {
+                continue;
+            }
+
+            ListIterator<FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue> li = fi.getFvImageOptions()
+                                                                                            .getNameValueList()
+                                                                                            .listIterator();
+            while (li.hasNext()) {
+                FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = li.next();
+                m.put(nv.getName(), nv.getValue());
+            }
+        }
+    }
     /**Get FvImage Options for FvImage i
      * @param i the ith FvImage
      */
