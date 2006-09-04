@@ -35,6 +35,7 @@ import org.apache.xmlbeans.XmlObject;
 import org.tianocore.common.definitions.EdkDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.pcd.action.ActionMessage;
+import org.tianocore.build.FrameworkBuildTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
@@ -339,6 +340,13 @@ public class FpdParserTask extends Task {
             getProject().setProperty("PLATFORM_FILE", platformId.getRelativeFpdFile().replaceAll("(\\\\)", "/"));
             getProject().setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
             getProject().setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
+            
+            if( !FrameworkBuildTask.multithread) {
+                FrameworkBuildTask.originalProperties.put("PLATFORM", platformId.getName());
+                FrameworkBuildTask.originalProperties.put("PLATFORM_FILE", platformId.getRelativeFpdFile().replaceAll("(\\\\)", "/"));
+                FrameworkBuildTask.originalProperties.put("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
+                FrameworkBuildTask.originalProperties.put("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
+            }
 
             //
             // Build mode. User-defined output dir.

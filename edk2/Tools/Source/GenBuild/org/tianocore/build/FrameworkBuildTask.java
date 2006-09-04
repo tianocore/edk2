@@ -16,6 +16,7 @@ package org.tianocore.build;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -26,7 +27,6 @@ import org.apache.tools.ant.Task;
 import org.tianocore.build.fpd.FpdParserForThread;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
-import org.tianocore.build.global.PropertyManager;
 import org.tianocore.build.toolchain.ConfigReader;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.common.definitions.ToolDefinitions;
@@ -74,6 +74,11 @@ public class FrameworkBuildTask extends Task{
     
     private Set<File> msaFiles = new LinkedHashSet<File>();
     
+    //
+    // This is only for none-multi-thread build to reduce overriding message
+    //
+    public static Hashtable<String, String> originalProperties = new Hashtable<String, String>();
+    
     String toolsDefFilename = ToolDefinitions.DEFAULT_TOOLS_DEF_FILE_PATH;
     
     String targetFilename = ToolDefinitions.TARGET_FILE_PATH;
@@ -81,17 +86,17 @@ public class FrameworkBuildTask extends Task{
     String dbFilename = ToolDefinitions.FRAMEWORK_DATABASE_FILE_PATH;
     
     String activePlatform = null;
-    
+
     ///
     /// The flag to present current is multi-thread enabled
     ///
     public static boolean multithread = false;
-    
+
     ///
     /// The concurrent thread number
     ///
     public static int MAX_CONCURRENT_THREAD_NUMBER = 1;
-    
+
     ///
     /// there are three type: all (build), clean and cleanall
     ///
@@ -147,7 +152,7 @@ public class FrameworkBuildTask extends Task{
         // Global Data initialization
         //
         File workspacePath = new File(getProject().getProperty("WORKSPACE"));
-        PropertyManager.setProperty(getProject(), "WORKSPACE_DIR", workspacePath.getPath().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("WORKSPACE_DIR", workspacePath.getPath().replaceAll("(\\\\)", "/"));
         GlobalData.initInfo(dbFilename, workspacePath.getPath(), toolsDefFilename);
         
         //
@@ -228,7 +233,10 @@ public class FrameworkBuildTask extends Task{
             GenBuildTask genBuildTask = new GenBuildTask();
             genBuildTask.setSingleModuleBuild(true);
             genBuildTask.setType(type);
-            PropertyManager.setProperty(getProject(), "PLATFORM_FILE", activePlatform);
+            getProject().setProperty("PLATFORM_FILE", activePlatform);
+            if( !multithread) {
+                originalProperties.put("PLATFORM_FILE", activePlatform);
+            }
             genBuildTask.setProject(getProject());
             genBuildTask.setMsaFile(buildFile);
             genBuildTask.execute();
@@ -242,8 +250,7 @@ public class FrameworkBuildTask extends Task{
     **/
     private void backupSystemProperties() {
         Map<String, String> sysProperties = System.getenv();
-        Set<String> keys = sysProperties.keySet();
-        Iterator<String> iter = keys.iterator();
+        Iterator<String> iter = sysProperties.keySet().iterator();
         while (iter.hasNext()) {
             String name = iter.next();
             
@@ -251,9 +258,17 @@ public class FrameworkBuildTask extends Task{
             // If system environment variable is not in ANT properties, add it
             //
             if (getProject().getProperty(name) == null) {
-                PropertyManager.setProperty(getProject(), name, sysProperties.get(name));
+                getProject().setProperty(name, sysProperties.get(name));
             }
         }
+        
+        Hashtable allProperties = getProject().getProperties();
+        Iterator piter = allProperties.keySet().iterator();
+        while (piter.hasNext()) {
+            String name = (String)piter.next();
+            originalProperties.put(new String(name), new String((String)allProperties.get(name)));
+        }
+        
     }
 
     private File intercommuniteWithUser(){

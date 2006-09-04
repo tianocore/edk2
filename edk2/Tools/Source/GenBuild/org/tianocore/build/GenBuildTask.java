@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build;
 
 import java.io.File;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -26,6 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
 import org.apache.xmlbeans.XmlObject;
@@ -38,7 +41,6 @@ import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GenBuildLogger;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
-import org.tianocore.build.global.PropertyManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
@@ -125,22 +127,24 @@ public class GenBuildTask extends Ant {
               From module build, exception from module surface area invalid.
     **/
     public void execute() throws BuildException {
-    	//
+    	if (!FrameworkBuildTask.multithread) {
+            cleanupProperties();
+        }
+        
+        //
         // set Logger
         //
         GenBuildLogger logger = new GenBuildLogger(getProject());
         EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
         EdkLog.setLogger(logger);
 
-        PropertyManager.setProject(getProject());
-        PropertyManager.save();
         //
         // Enable all specified properties
         //
         Iterator<Property> iter = properties.iterator();
         while (iter.hasNext()) {
             Property item = iter.next();
-            PropertyManager.setProperty(item.getName(), item.getValue());
+            getProject().setProperty(item.getName(), item.getValue());
         }
 
         //
@@ -181,14 +185,6 @@ public class GenBuildTask extends Ant {
             //
             prepareSingleModuleBuild();
         } else {
-            //
-            // Platform build. Restore the platform related info
-            //
-            String filename = getProject().getProperty("PLATFORM_FILE");
-            PlatformIdentification platformId = GlobalData.getPlatform(filename);
-            PropertyManager.setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
-            PropertyManager.setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
-
             String packageGuid = getProject().getProperty("PACKAGE_GUID");
             String packageVersion = getProject().getProperty("PACKAGE_VERSION");
             PackageIdentification packageId = new PackageIdentification(packageGuid, packageVersion);
@@ -236,7 +232,7 @@ public class GenBuildTask extends Ant {
 
         for (int k = 0; k < archList.length; k++) {
 
-            PropertyManager.setProperty("ARCH", archList[k]);
+            getProject().setProperty("ARCH", archList[k]);
 
             FpdModuleIdentification fpdModuleId = new FpdModuleIdentification(moduleId, archList[k]);
 
@@ -261,7 +257,7 @@ public class GenBuildTask extends Ant {
                 // Prepare for target related common properties
                 // TARGET
                 //
-                PropertyManager.setProperty("TARGET", targetList[i]);
+                getProject().setProperty("TARGET", targetList[i]);
                 String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
                 for(int j = 0; j < toolchainList.length; j ++){
                     //
@@ -277,7 +273,7 @@ public class GenBuildTask extends Ant {
                     // Prepare for toolchain related common properties
                     // TOOLCHAIN
                     //
-                    PropertyManager.setProperty("TOOLCHAIN", toolchainList[j]);
+                    getProject().setProperty("TOOLCHAIN", toolchainList[j]);
 
                     System.out.println("Build " + moduleId + " start >>>");
                     System.out.println("Target: " + targetList[i] + " Tagname: " + toolchainList[j] + " Arch: " + archList[k]);
@@ -308,8 +304,6 @@ public class GenBuildTask extends Ant {
                 }
             }
         }
-        
-        PropertyManager.restore();
     }
 
     /**
@@ -347,17 +341,30 @@ public class GenBuildTask extends Ant {
         FpdParserTask fpdParser = new FpdParserTask();
         fpdParser.setProject(getProject());
         fpdParser.parseFpdFile(platformId.getFpdFile());
-        PropertyManager.setProperty("ARCH", fpdParser.getAllArchForModule(moduleId));
-
-        //
-        // Prepare for Platform related common properties
-        // PLATFORM, PLATFORM_DIR, PLATFORM_RELATIVE_DIR
-        //
-        PropertyManager.setProperty("PLATFORM", platformId.getName());
-        PropertyManager.setProperty("PLATFORM_DIR", platformId.getFpdFile().getParent().replaceAll("(\\\\)", "/"));
-        PropertyManager.setProperty("PLATFORM_RELATIVE_DIR", platformId.getPlatformRelativeDir().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("ARCH", fpdParser.getAllArchForModule(moduleId));
     }
 
+    private void cleanupProperties() {
+        Project newProject = new Project();
+
+        Hashtable<String, String> passdownProperties = FrameworkBuildTask.originalProperties;
+        Iterator<String> iter = passdownProperties.keySet().iterator();
+        while (iter.hasNext()) {
+            String item = iter.next();
+            newProject.setProperty(item, passdownProperties.get(item));
+        }
+
+        newProject.setInputHandler(getProject().getInputHandler());
+
+        Iterator listenerIter = getProject().getBuildListeners().iterator();
+        while (listenerIter.hasNext()) {
+            newProject.addBuildListener((BuildListener) listenerIter.next());
+        }
+
+        getProject().initSubProject(newProject);
+
+        setProject(newProject);
+    }
 
     /**
       Set Module-Related information to properties.
@@ -370,29 +377,29 @@ public class GenBuildTask extends Ant {
         // PACKAGE, PACKAGE_GUID, PACKAGE_VERSION, PACKAGE_DIR, PACKAGE_RELATIVE_DIR
         //
         PackageIdentification packageId = moduleId.getPackage();
-        PropertyManager.setProperty("PACKAGE", packageId.getName());
-        PropertyManager.setProperty("PACKAGE_GUID", packageId.getGuid());
-        PropertyManager.setProperty("PACKAGE_VERSION", packageId.getVersion());
-        PropertyManager.setProperty("PACKAGE_DIR", packageId.getPackageDir().replaceAll("(\\\\)", "/"));
-        PropertyManager.setProperty("PACKAGE_RELATIVE_DIR", packageId.getPackageRelativeDir().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("PACKAGE", packageId.getName());
+        getProject().setProperty("PACKAGE_GUID", packageId.getGuid());
+        getProject().setProperty("PACKAGE_VERSION", packageId.getVersion());
+        getProject().setProperty("PACKAGE_DIR", packageId.getPackageDir().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("PACKAGE_RELATIVE_DIR", packageId.getPackageRelativeDir().replaceAll("(\\\\)", "/"));
 
         //
         // MODULE or BASE_NAME, GUID or FILE_GUID, VERSION, MODULE_TYPE
         // MODULE_DIR, MODULE_RELATIVE_DIR
         //
-        PropertyManager.setProperty("MODULE", moduleId.getName());
+        getProject().setProperty("MODULE", moduleId.getName());
         String baseName = saq.getModuleOutputFileBasename();
         if (baseName == null) {
-            PropertyManager.setProperty("BASE_NAME", moduleId.getName());
+            getProject().setProperty("BASE_NAME", moduleId.getName());
         } else {
-            PropertyManager.setProperty("BASE_NAME", baseName);
+            getProject().setProperty("BASE_NAME", baseName);
         }
-        PropertyManager.setProperty("GUID", moduleId.getGuid());
-        PropertyManager.setProperty("FILE_GUID", moduleId.getGuid());
-        PropertyManager.setProperty("VERSION", moduleId.getVersion());
-        PropertyManager.setProperty("MODULE_TYPE", moduleId.getModuleType());
-        PropertyManager.setProperty("MODULE_DIR", moduleId.getMsaFile().getParent().replaceAll("(\\\\)", "/"));
-        PropertyManager.setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("GUID", moduleId.getGuid());
+        getProject().setProperty("FILE_GUID", moduleId.getGuid());
+        getProject().setProperty("VERSION", moduleId.getVersion());
+        getProject().setProperty("MODULE_TYPE", moduleId.getModuleType());
+        getProject().setProperty("MODULE_DIR", moduleId.getMsaFile().getParent().replaceAll("(\\\\)", "/"));
+        getProject().setProperty("MODULE_RELATIVE_DIR", moduleId.getModuleRelativePath().replaceAll("(\\\\)", "/"));
 
         //
         // SUBSYSTEM
@@ -418,18 +425,18 @@ public class GenBuildTask extends Ant {
                 break ;
             }
         }
-        PropertyManager.setProperty("SUBSYSTEM", subsystem);
+        getProject().setProperty("SUBSYSTEM", subsystem);
 
         //
         // ENTRYPOINT
         //
         if (arch.equalsIgnoreCase("EBC")) {
-            PropertyManager.setProperty("ENTRYPOINT", "EfiStart");
+            getProject().setProperty("ENTRYPOINT", "EfiStart");
         } else {
-            PropertyManager.setProperty("ENTRYPOINT", "_ModuleEntryPoint");
+            getProject().setProperty("ENTRYPOINT", "_ModuleEntryPoint");
         }
 
-        PropertyManager.setProperty("OBJECTS", "");
+        getProject().setProperty("OBJECTS", "");
     }
 
     private void getCompilerFlags(String target, String toolchain, FpdModuleIdentification fpdModuleId) throws EdkException {
@@ -444,7 +451,7 @@ public class GenBuildTask extends Ant {
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_NAME;
             String cmdName = GlobalData.getCommandSetting(key, fpdModuleId);
             File cmdFile = new File(cmdPath + File.separatorChar + cmdName);
-            PropertyManager.setProperty(cmd[m], cmdFile.getPath().replaceAll("(\\\\)", "/"));
+            getProject().setProperty(cmd[m], cmdFile.getPath().replaceAll("(\\\\)", "/"));
 
             //
             // set CC_FLAGS
@@ -454,7 +461,7 @@ public class GenBuildTask extends Ant {
             Set<String> addset = new LinkedHashSet<String>();
             Set<String> subset = new LinkedHashSet<String>();
             putFlagsToSet(addset, cmdFlags);
-            PropertyManager.setProperty(cmd[m] + "_FLAGS", getProject().replaceProperties(getFlags(addset, subset)));
+            getProject().setProperty(cmd[m] + "_FLAGS", getProject().replaceProperties(getFlags(addset, subset)));
 
             //
             // Set CC_EXT
@@ -462,9 +469,9 @@ public class GenBuildTask extends Ant {
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_EXT;
             String extName = GlobalData.getCommandSetting(key, fpdModuleId);
             if ( extName != null && ! extName.equalsIgnoreCase("")) {
-                PropertyManager.setProperty(cmd[m] + "_EXT", extName);
+                getProject().setProperty(cmd[m] + "_EXT", extName);
             } else {
-                PropertyManager.setProperty(cmd[m] + "_EXT", "");
+                getProject().setProperty(cmd[m] + "_EXT", "");
             }
 
             //
@@ -473,7 +480,7 @@ public class GenBuildTask extends Ant {
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_FAMILY;
             String toolChainFamily = GlobalData.getCommandSetting(key, fpdModuleId);
             if (toolChainFamily != null) {
-                PropertyManager.setProperty(cmd[m] + "_FAMILY", toolChainFamily);
+                getProject().setProperty(cmd[m] + "_FAMILY", toolChainFamily);
             }
 
             //
@@ -482,9 +489,9 @@ public class GenBuildTask extends Ant {
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_SPATH;
             String spath = GlobalData.getCommandSetting(key, fpdModuleId);
             if (spath != null) {
-                PropertyManager.setProperty(cmd[m] + "_SPATH", spath.replaceAll("(\\\\)", "/"));
+                getProject().setProperty(cmd[m] + "_SPATH", spath.replaceAll("(\\\\)", "/"));
             } else {
-                PropertyManager.setProperty(cmd[m] + "_SPATH", "");
+                getProject().setProperty(cmd[m] + "_SPATH", "");
             }
 
             //
@@ -493,9 +500,9 @@ public class GenBuildTask extends Ant {
             key[4] = ToolDefinitions.TOOLS_DEF_ATTRIBUTE_DPATH;
             String dpath = GlobalData.getCommandSetting(key, fpdModuleId);
             if (dpath != null) {
-                PropertyManager.setProperty(cmd[m] + "_DPATH", dpath.replaceAll("(\\\\)", "/"));
+                getProject().setProperty(cmd[m] + "_DPATH", dpath.replaceAll("(\\\\)", "/"));
             } else {
-                PropertyManager.setProperty(cmd[m] + "_DPATH", "");
+                getProject().setProperty(cmd[m] + "_DPATH", "");
             }
         }
     }
@@ -566,7 +573,7 @@ public class GenBuildTask extends Ant {
         for (int i = 0; i < libinstances.length; i++) {
             propertyLibs += " " + getProject().getProperty("BIN_DIR") + File.separatorChar + libinstances[i].getName() + ".lib";
         }
-        PropertyManager.setProperty("LIBS", propertyLibs.replaceAll("(\\\\)", "/"));
+        getProject().setProperty("LIBS", propertyLibs.replaceAll("(\\\\)", "/"));
 
         //
         // Get all includepath and set to INCLUDE_PATHS
@@ -768,7 +775,7 @@ public class GenBuildTask extends Ant {
             includePaths.append(iter.next());
             includePaths.append("; ");
         }
-        PropertyManager.setProperty("INCLUDE_PATHS", getProject().replaceProperties(includePaths.toString()).replaceAll("(\\\\)", "/"));
+        getProject().setProperty("INCLUDE_PATHS", getProject().replaceProperties(includePaths.toString()).replaceAll("(\\\\)", "/"));
         
         return includes.toArray(new String[includes.size()]);
     }
