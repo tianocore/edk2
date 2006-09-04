@@ -31,7 +31,6 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.SurfaceAreaQuery;
-import org.tianocore.build.global.PropertyManager;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
@@ -46,7 +45,7 @@ public class ModuleBuildFileGenerator {
     /// Pass: TARGET, TOOLCHAIN, ARCH
     /// PACKAGE, PACKAGE_GUID, PACKAGE_VERSION
     ///
-    String[] inheritProperties = {"ARCH", "MODULE_GUID", "MODULE_VERSION", "PLATFORM_FILE", "PACKAGE_GUID", "PACKAGE_VERSION"};
+    String[] inheritProperties = {"ARCH", "MODULE_GUID", "MODULE_VERSION", "PACKAGE_GUID", "PACKAGE_VERSION"};
 
     ///
     /// The information at the header of <em>build.xml</em>.
@@ -418,7 +417,7 @@ public class ModuleBuildFileGenerator {
         for (int i = 0; i < sourceFiles.length; i++) {
             str += " " + sourceFiles[i][1];
         }
-        PropertyManager.setProperty(project, "SOURCE_FILES", str.replaceAll("(\\\\)", "/"));
+        project.setProperty("SOURCE_FILES", str.replaceAll("(\\\\)", "/"));
     }
 
     /**
