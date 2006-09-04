@@ -67,30 +67,11 @@ AcquireRecordBuffer (
 
   @param   Record        Point to record buffer which is acquired by AcquirRecordBuffer()
  
-  @retval  EFI_SUCCESS   If DataRecord is valid.
-  @retval  !EFI_SUCCESS  The record list has empty.
-
 **/
 VOID
 FreeRecordBuffer (
   IN  DATAHUB_STATUSCODE_RECORD  *Record
   )
-/*++
-
-Routine Description:
-
-  Release a mRecordBuffer entry allocated by AquireEmptyRecordBuffer ().
-
-Arguments:
-
-  RecordBuffer          - Data to free
-
-Returns:
-
-  EFI_SUCCESS           - If DataRecord is valid
-  EFI_UNSUPPORTED       - The record list has empty
-
---*/
 {
   ASSERT (Record != NULL);
   ASSERT (mNumberOfRecords != 0);
@@ -222,7 +203,7 @@ LogDataHubEventCallBack (
   )
 {
   DATAHUB_STATUSCODE_RECORD         *Record;
-  UINTN                             Size;
+  UINT32                            Size;
   UINT64                            DataRecordClass;
   LIST_ENTRY                        *Node;
 
@@ -238,7 +219,7 @@ LogDataHubEventCallBack (
     //
     // Add in the size of the header we added.
     //
-    Size = sizeof (DATAHUB_STATUSCODE_RECORD) + Record->Data.Size;
+    Size = sizeof (DATAHUB_STATUSCODE_RECORD) + (UINT32) Record->Data.Size;
 
     if ((Record->CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) {
       DataRecordClass = EFI_DATA_RECORD_CLASS_PROGRESS_CODE;
@@ -266,7 +247,7 @@ LogDataHubEventCallBack (
                         &gEfiStatusCodeRuntimeProtocolGuid,
                         DataRecordClass,
                         Record,
-                        (UINT32) Size
+                        Size
                         );
 
     FreeRecordBuffer (Record);

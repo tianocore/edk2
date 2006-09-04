@@ -46,8 +46,8 @@ SerialPortInitialize (
 UINTN
 EFIAPI
 SerialPortWrite (
-  IN UINT8 	   *Buffer,
-  IN UINTN 	   NumberOfBytes
+  IN UINT8     *Buffer,
+  IN UINTN     NumberOfBytes
 )
 {
   return 0;
@@ -70,8 +70,8 @@ SerialPortWrite (
 UINTN
 EFIAPI
 SerialPortRead (
-  OUT UINT8 	*Buffer,
-  IN  UINTN 	NumberOfBytes
+  OUT UINT8     *Buffer,
+  IN  UINTN     NumberOfBytes
 )
 {
   return 0;
