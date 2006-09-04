@@ -187,4 +187,23 @@ public class MsaWriter {
 		bw.flush();
 		bw.close();
 	}
+
+	private static void flush(String path, ModuleSurfaceAreaDocument msadoc) throws Exception {
+        XmlOptions options = new XmlOptions();
+
+        options.setCharacterEncoding("UTF-8");
+        options.setSavePrettyPrint();
+        options.setSavePrettyPrintIndent(2);
+        options.setUseDefaultNamespace();
+
+		BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+		msadoc.save(bw, options);
+		bw.flush();
+		bw.close();
+	}
+	
+	public static final void parse(String msafile) throws Exception {
+		ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.parse(msafile);
+		flush("c:\\temp.msa", msadoc);
+	}
 }

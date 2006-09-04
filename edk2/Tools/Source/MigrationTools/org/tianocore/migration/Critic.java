@@ -26,7 +26,13 @@ public final class Critic {
 	
 	private static final int totallinelength = 82;
 	
-	public static final void critic(String filepath) throws Exception {
+	public static final void run(String filepath) throws Exception {
+		if (MigrationTool.doCritic) {
+			critic(filepath);
+		}
+	}
+	
+	private static final void critic(String filepath) throws Exception {
 		if (filepath.contains(".c") || filepath.contains(".h")) {
 			BufferedReader rd = null;
 			String line = null;
@@ -180,66 +186,15 @@ public final class Critic {
 			}
 			wholeline = templine.toString();
 			//
-			
-			/* -----slow edition of replacefirst with stringbuffer-----
-			line.append(wholeline);
-			mtrfunccomment = ptnfunccomment.matcher(line);
-			while (mtrfunccomment.find()) {
-				line.replace(0, line.length()-1, mtrfunccomment.replaceFirst("$2$4$3$1$5"));
-			}
-			*/
-			/* -----slow edition of replacefirst with string-----
-			while ((mtrfunccomment = ptnfunccomment.matcher(wholeline)).find()) {
-				//funccomment = mtrfunccomment.group(2);
-				//mtrcommentstructure = ptncommentstructure.matcher(funccomment);
-				wholeline = mtrfunccomment.replaceFirst("$2$4$3$1$5");
-			}
-			*/
-			/*
-			// edit func comment
-			mtrtempcomment = ptntempcomment.matcher(wholeline);
-			while (mtrtempcomment.find()) {
-				System.out.println("-----------------------------");
-				System.out.println(mtrtempcomment.group());
-				System.out.println("-----------------------------");
-			}
-			*/
+
 			Common.string2file(wholeline, filepath);
 		}
 	}
 	
 	public static final void fireAt(String path) throws Exception {
 		//Common.toDoAll(Common.dirCopy_(path), Critic.class.getMethod("critic", String.class), null, null, Common.FILE);
-		Common.toDoAll(path, Critic.class.getMethod("critic", String.class), null, null, Common.FILE);
+		Common.toDoAll(path, Critic.class.getMethod("run", String.class), null, null, Common.FILE);
 		//Common.toDoAll(Common.dirCopy_(path), critic, Common.FILE);
 		System.out.println("Critic Done");
 	}
 }
-//analyze func comment
-/*if (mtrcommentstructure.find()) {
-	newcomment.append("/*++\n\n" + mtrcommentstructure.group(1) + "\n\n");
-	
-	//System.out.println("-------1-------");
-	//System.out.println(mtrcommentstructure.group(1));
-	
-	// arg
-	//System.out.println("-------2-------");
-	//System.out.println(mtrcommentstructure.group(2));
-	mtrinfequation = ptninfequation.matcher(mtrcommentstructure.group(2));
-	while (mtrinfequation.find()) {
-		newcomment.append("@param   " + mtrinfequation.group(1) + "            " + mtrinfequation.group(2) + "\n");
-		//System.out.println("@param   " + mtrinfequation.group(1) + "   " + mtrinfequation.group(2));
-	}
-	newcomment.append("\n");
-	// return
-	//System.out.println("-------3-------");
-	//System.out.println(mtrcommentstructure.group(3));
-	mtrinfequation = ptninfequation.matcher(mtrcommentstructure.group(3));
-	while (mtrinfequation.find()) {
-		newcomment.append("@retval   " + mtrinfequation.group(1) + "            " + mtrinfequation.group(2) + "\n");
-		//System.out.println("@retval   " + mtrinfequation.group(1) + "   " + mtrinfequation.group(2));
-	}
-	System.out.println(newcomment);
-} else {
-	System.out.println("Error: Comment Style Incorrect");
-}*/

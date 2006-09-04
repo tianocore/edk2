@@ -204,6 +204,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         if ( e.getSource() == specifyCommentButton) {
         	try {											// input examine is not imposed but should be added
         		MigrationTool.MIGRATIONCOMMENT = getInput("Please type in wanted comment style used by the tool\nbe sure to start with '//', or you won't enjoy the result");
+        		//MsaWriter.parse("C:\\tianocore\\edk2\\MdePkg\\Library\\BaseLib\\BaseLib.msa");
         	} catch (Exception en) {
         		println(en.getMessage());
         	}
