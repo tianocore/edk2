@@ -39,6 +39,9 @@
                         Type EFI_STATUS_CODE_DATA is defined in "Related Definitions" below.  
                         The contents of this data type may have additional GUID-specific data.  The standard GUIDs and 
                         their associated data structures are defined in the Intel? Platform Innovation Framework for EFI Status Codes Specification.
+
+  @return               Always return EFI_SUCCESS.
+
 **/
 EFI_STATUS 
 EFIAPI
