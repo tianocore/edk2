@@ -111,6 +111,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Protocol Usage="ALWAYS_CONSUMED">
       <ProtocolCName>gEfiDataHubProtocolGuid</ProtocolCName>
     </Protocol>
+    <Protocol Usage="ALWAYS_CONSUMED">
+      <ProtocolCName>gEfiStatusCodeRuntimeProtocolGuid</ProtocolCName>
+    </Protocol>
   </Protocols>
   <Guids> 
     <GuidCNames Usage="SOMETIMES_CONSUMED">

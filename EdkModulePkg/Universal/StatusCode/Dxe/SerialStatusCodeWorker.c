@@ -32,10 +32,10 @@ EfiSerialStatusCodeInitializeWorker (
   EFI_STATUS Status;
 
   Status = gBS->LocateProtocol (
-            &gEfiSerialIoProtocolGuid,
-            NULL,
-            (VOID **) &mSerialIoProtocol
-            );
+             &gEfiSerialIoProtocolGuid,
+             NULL,
+             (VOID **) &mSerialIoProtocol
+             );
 
   ASSERT_EFI_ERROR (Status);
 
