@@ -51,10 +51,10 @@ public final class ModuleInfo {
 		String temp = null;
 		if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 
 				filepath.contains(".H") || filepath.contains(".dxs") || filepath.contains(".uni")) {
-			localmodulesources.add(filepath.replace(modulepath + "\\", ""));
+			localmodulesources.add(filepath.replace(modulepath + File.separator, ""));
 		} else if (filepath.contains(".inf") || filepath.contains(".msa")) {
-			temp = filepath.replace(modulepath + "\\", "");
-			if (!temp.contains(File.separator)) {								// .inf in subdirectory is not regarded
+			temp = filepath.replace(modulepath + File.separator, "");
+			if (!temp.contains(File.separator)) {							// .inf in subdirectory is not regarded
 				msaorinf.add(temp);
 			}
 		}
