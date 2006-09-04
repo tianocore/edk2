@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
+import javax.swing.DefaultCellEditor;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -1241,6 +1242,16 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             optionsTableModel.addColumn("Contents");
             jTableModuleSaOptions = new JTable(optionsTableModel);
             jTableModuleSaOptions.setRowHeight(20);
+            
+            javax.swing.table.TableColumn toolFamilyCol = jTableModuleSaOptions.getColumnModel().getColumn(1);
+            JComboBox cb = new JComboBox();
+            cb.addItem("MSFT");
+            cb.addItem("GCC");
+            cb.addItem("CYGWIN");
+            cb.addItem("INTEL");
+            cb.addItem("USER_DEFINED");
+            toolFamilyCol.setCellEditor(new DefaultCellEditor(cb));
+            
             Vector<String> vArch = new Vector<String>();
             vArch.add("IA32");
             vArch.add("X64");
@@ -1249,6 +1260,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             vArch.add("ARM");
             vArch.add("PPC");
             jTableModuleSaOptions.getColumnModel().getColumn(4).setCellEditor(new ListEditor(vArch));
+            
+            jTableModuleSaOptions.getColumnModel().getColumn(5).setCellEditor(new LongTextEditor());
+            
             jTableModuleSaOptions.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			jTableModuleSaOptions.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
             jTableModuleSaOptions.getModel().addTableModelListener(new TableModelListener() {
