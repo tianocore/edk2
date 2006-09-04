@@ -97,7 +97,9 @@ public class GenBuildTask extends Ant {
     /// Module surface area file.
     ///
     File msaFile;
-
+    
+    public ModuleIdentification parentId;
+    
     private String type = "all"; 
     
     ///
@@ -783,5 +785,10 @@ public class GenBuildTask extends Ant {
                   .replaceFirst("IA32", "Ia32")
                   .replaceFirst("ARM", "Arm")
                   .replaceFirst("EBC", "Ebc");
-   }    
+   }
+   
+   
+   public void setExternalProperties(Vector<Property> v) {
+       this.properties = v;
+   }
 }

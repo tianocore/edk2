@@ -31,7 +31,7 @@ public class OnDependency extends Task {
     ///
     /// cache the modified timestamp of files accessed, to speed up the depencey check
     /// 
-    private static Map<String, Long> timeStampCache = new HashMap<String, Long>();
+    private Map<String, Long> timeStampCache = new HashMap<String, Long>();
     ///
     /// source files list
     ///

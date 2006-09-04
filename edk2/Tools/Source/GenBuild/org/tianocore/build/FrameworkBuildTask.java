@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.tianocore.build.fpd.FpdParserForThread;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.PropertyManager;
@@ -80,6 +81,16 @@ public class FrameworkBuildTask extends Task{
     String dbFilename = ToolDefinitions.FRAMEWORK_DATABASE_FILE_PATH;
     
     String activePlatform = null;
+    
+    ///
+    /// The flag to present current is multi-thread enabled
+    ///
+    public static boolean multithread = false;
+    
+    ///
+    /// The concurrent thread number
+    ///
+    public static int MAX_CONCURRENT_THREAD_NUMBER = 1;
     
     ///
     /// there are three type: all (build), clean and cleanall
@@ -175,6 +186,19 @@ public class FrameworkBuildTask extends Task{
         //
         if (buildFile.getName().endsWith(ToolDefinitions.FPD_EXTENSION)) {
             System.out.println("Processing the FPD file [" + buildFile.getPath() + "] ..>> ");
+            //
+            // Iff for platform build will enable the multi-thread if set in target.txt
+            //
+            if (multithread && type.equalsIgnoreCase("all")) {
+                System.out.println("Multi-thread build is enabled. ");
+                FpdParserForThread fpdParserForThread = new FpdParserForThread();
+                fpdParserForThread.setType(type);
+                fpdParserForThread.setProject(getProject());
+                fpdParserForThread.setFpdFile(buildFile);
+                fpdParserForThread.execute();
+                return ;
+            }
+            
             FpdParserTask fpdParserTask = new FpdParserTask();
             fpdParserTask.setType(type);
             fpdParserTask.setProject(getProject());
@@ -329,6 +353,23 @@ public class FrameworkBuildTask extends Task{
                     throw new BuildException("FPD file's extension must be \"" + ToolDefinitions.FPD_EXTENSION + "\"!");
                 }
                 activePlatform = str;
+            }
+            
+            str = getValue("MULTIPLE_THREAD", targetFileInfo);
+            if (str != null && str.trim().equalsIgnoreCase("Enable")) {
+                multithread = true;
+            }
+            
+            str = getValue("MAX_CONCURRENT_THREAD_NUMBER", targetFileInfo);
+            if (str != null ) {
+                try {
+                    int threadNum = Integer.parseInt(str);
+                    if (threadNum > 0) {
+                        MAX_CONCURRENT_THREAD_NUMBER = threadNum;
+                    }
+                } catch (Exception enuma) {
+                    
+                }
             }
         }
         catch (Exception ex) {

@@ -87,6 +87,8 @@ public class GlobalData {
 
     private static Map<FpdModuleIdentification, Map<String, XmlObject>> fpdModuleSA= new HashMap<FpdModuleIdentification, Map<String, XmlObject>>();
 
+    private static Map<String, XmlObject> fpdBuildOptionsMap = new HashMap<String, XmlObject>();
+    
     private static XmlObject fpdBuildOptions;
 
     private static XmlObject fpdDynamicPcds;
@@ -416,14 +418,13 @@ public class GlobalData {
         }
     }
 
-    public static Map<String, XmlObject> getFpdBuildOptions() {
-        Map<String, XmlObject> map = new HashMap<String, XmlObject>();
-        map.put("BuildOptions", fpdBuildOptions);
-        return map;
+    public static Map<String, XmlObject> getFpdBuildOptionsMap() {
+        return fpdBuildOptionsMap;
     }
 
     public static void setFpdBuildOptions(XmlObject fpdBuildOptions) {
         GlobalData.fpdBuildOptions = cloneXmlObject(fpdBuildOptions, true);
+        fpdBuildOptionsMap.put("BuildOptions", GlobalData.fpdBuildOptions);
     }
 
     public static XmlObject getFpdDynamicPcds() {
