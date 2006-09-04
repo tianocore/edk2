@@ -77,19 +77,19 @@ public class FpdParserTask extends Task {
 
     private File fpdFile = null;
 
-    private PlatformIdentification platformId;
+    PlatformIdentification platformId;
 
     private String type;
 
     ///
     /// Mapping from modules identification to out put file name
     ///
-    private Map<FpdModuleIdentification, String> outfiles = new LinkedHashMap<FpdModuleIdentification, String>();
+    Map<FpdModuleIdentification, String> outfiles = new LinkedHashMap<FpdModuleIdentification, String>();
 
     ///
     /// Mapping from FV name to its modules
     ///
-    private Map<String, Set<FpdModuleIdentification>> fvs = new HashMap<String, Set<FpdModuleIdentification>>();
+    Map<String, Set<FpdModuleIdentification>> fvs = new HashMap<String, Set<FpdModuleIdentification>>();
 
     ///
     /// FpdParserTask can specify some ANT properties.
@@ -98,7 +98,7 @@ public class FpdParserTask extends Task {
 
     SurfaceAreaQuery saq = null;
     
-    private boolean isUnified = true;
+    boolean isUnified = true;
 
     /**
       Public construct method. It is necessary for ANT task.
@@ -195,7 +195,7 @@ public class FpdParserTask extends Task {
       @throws BuildException
                   File write FV.inf files error.
     **/
-    private void genFvInfFiles(String ffsCommonDir) throws BuildException {
+    void genFvInfFiles(String ffsCommonDir) throws BuildException {
         String[] validFv = saq.getFpdValidImageNames();
         for (int i = 0; i < validFv.length; i++) {
             //
@@ -318,7 +318,7 @@ public class FpdParserTask extends Task {
       @throws BuildException
                   FPD file is not valid.
      **/
-    private void parseFpdFile() throws BuildException {
+    void parseFpdFile() throws BuildException {
         try {
             XmlObject doc = XmlObject.Factory.parse(fpdFile);
 
@@ -381,7 +381,7 @@ public class FpdParserTask extends Task {
     /**
       Parse all modules listed in FPD file.
     **/
-    private void parseModuleSAFiles() throws EdkException{
+    void parseModuleSAFiles() throws EdkException{
         Map<FpdModuleIdentification, Map<String, XmlObject>> moduleSAs = saq.getFpdModules();
 
         //
@@ -429,7 +429,7 @@ public class FpdParserTask extends Task {
         }
     }
 
-    private ToolChainMap parseModuleBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
+    ToolChainMap parseModuleBuildOptions(boolean toolChainFamilyFlag) throws EdkException {
         String[][] options = saq.getModuleBuildOptions(toolChainFamilyFlag);
         if (options == null || options.length == 0) {
             return new ToolChainMap();
@@ -475,7 +475,7 @@ public class FpdParserTask extends Task {
       @param fvName current FV name
       @param moduleName current module identification
     **/
-    private void updateFvs(String fvName, FpdModuleIdentification fpdModuleId) {
+    void updateFvs(String fvName, FpdModuleIdentification fpdModuleId) {
         if (fvName == null || fvName.trim().length() == 0) {
             fvName = "NULL";
         }

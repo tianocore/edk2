@@ -91,7 +91,7 @@ public class ModuleBuildFileGenerator {
               Error throws during BaseName_build.xml generating. 
     **/
     public void genBuildFile(String buildFilename) throws BuildException {
-        FfsProcess fp = new FfsProcess(saq);
+        FfsProcess fp = new FfsProcess();
         DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder dombuilder = domfac.newDocumentBuilder();
@@ -143,7 +143,9 @@ public class ModuleBuildFileGenerator {
             //
             // Parse all sourfiles but files specified in sections
             //
-            applyLibraryInstance(document, ele);
+            if (!FrameworkBuildTask.multithread) {
+                applyLibraryInstance(document, ele);
+            }
             root.appendChild(ele);
 
             //
