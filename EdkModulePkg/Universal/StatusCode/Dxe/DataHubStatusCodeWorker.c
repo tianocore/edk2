@@ -111,6 +111,7 @@ FreeRecordBuffer (
   @param  Data          This optional parameter may be used to pass additional data
  
   @retval EFI_OUT_OF_RESOURCES   Can not acquire record buffer.
+  @retval EFI_DEVICE_ERROR       EFI serial device can not work after ExitBootService() is called .
   @retval EFI_SUCCESS            Success to cache status code and signal log data event.
 
 **/
@@ -133,10 +134,10 @@ DataHubStatusCodeReportWorker (
   // See whether in runtime phase or not.
   //
   if (EfiAtRuntime ()) {
-    return EFI_SUCCESS;
+    return EFI_DEVICE_ERROR;
   }
 
-  Record = (DATAHUB_STATUSCODE_RECORD *) AcquireRecordBuffer ();
+  Record = AcquireRecordBuffer ();
   if (Record == NULL) {
     //
     // There are no empty record buffer in private buffers

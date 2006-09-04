@@ -149,7 +149,7 @@ ReportDispatcher (
   // Use atom operation to avoid the reentant of report.
   // If current status is not zero, then the function is reentrancy.
   //
-  if (InterlockedCompareExchange32 (&gDxeStatusCode.StatusCodeNestStatus, 0, 1)) {
+  if (1 == InterlockedCompareExchange32 (&gDxeStatusCode.StatusCodeNestStatus, 0, 1)) {
     return EFI_DEVICE_ERROR;
   }
 
