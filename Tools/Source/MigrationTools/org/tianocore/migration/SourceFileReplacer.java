@@ -44,11 +44,7 @@ public final class SourceFileReplacer {
 		
 		String outname = null;
 		String inname = null;
-		/*
-		if (MigrationTool.ui.yesOrNo("Changes will be made to the Source Code.  View details?")) {
-			showdetails = true;
-		}
-		*/
+
 		showdetails = true;			// set this as default now, may be changed in the future
 		
 		Iterator<String> di = mi.localmodulesources.iterator();
@@ -81,7 +77,6 @@ public final class SourceFileReplacer {
 	private static final void addr8only() throws Exception {
 		String paragraph = null;
 		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
-		//Common.ensureDir(mi.modulepath + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c");
 		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
 		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
 		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
@@ -115,9 +110,6 @@ public final class SourceFileReplacer {
 		BufferedReader rd = new BufferedReader(new FileReader(filename));
 		StringBuffer wholefile = new StringBuffer();
 		String line;
-		String r8thing;
-		String r9thing;
-		r8tor9 temp;
 		boolean addr8 = false;
 
 		Pattern pat = Pattern.compile("g?(BS|RT)(\\s*->\\s*)([a-zA-Z_]\\w*)", Pattern.MULTILINE);					// ! only two level () bracket allowed !
@@ -153,6 +145,8 @@ public final class SourceFileReplacer {
 		}
 		*/
 		// start replacing names
+		String r8thing;
+		String r9thing;
 		Iterator<String> it;
 		// Converting non-locla function
 		it = mi.hashnonlocalfunc.iterator();
@@ -168,7 +162,8 @@ public final class SourceFileReplacer {
 			} else {															//
 				mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));				// add a library here
 			}
-			
+
+			r8tor9 temp;
 			if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {
 				if (!r8thing.equals(r9thing)) {
 					if (line.contains(r8thing)) {
