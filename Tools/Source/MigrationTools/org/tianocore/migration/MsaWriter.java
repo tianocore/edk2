@@ -87,11 +87,14 @@ public class MsaWriter {
 			msaheader.setGuidValue(mi.guidvalue = Query("Guid Value Not Found!  Please Input Guid Value"));
 		}
 		if (mi.moduletype != null) {
+			msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.getModuleType()));
+			/*
 			if (mi.moduletype.contains("PEI")) {
 				msaheader.setModuleType(ModuleTypeDef.Enum.forString("PEIM"));
 			} else {
 				msaheader.setModuleType(ModuleTypeDef.Enum.forString("DXE_DRIVER"));
 			}
+			*/
 		} else {
 			msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.moduletype = Query("Guid Value Not Found!  Please Input Guid Value")));
 		}

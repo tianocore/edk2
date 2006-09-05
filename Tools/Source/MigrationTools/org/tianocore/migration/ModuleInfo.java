@@ -15,6 +15,8 @@ package org.tianocore.migration;
 import java.io.*;
 import java.util.*;
 
+import org.tianocore.ModuleTypeDef;
+
 /*
 	Class ModuleInfo is built for scanning the source files, it contains all the needed
 information and all the temporary data.
@@ -47,6 +49,14 @@ public final class ModuleInfo {
 	public final Set<String> protocol = new HashSet<String>();
 	public final Set<String> ppi = new HashSet<String>();
 
+	public final String getModuleType() {
+		if (moduletype.contains("PEI")) {
+			return "PEIM";
+		} else {
+			return "DXE_DRIVER";
+		}
+	}
+	
 	public final void enroll(String filepath) throws Exception {
 		String temp = null;
 		if (filepath.contains(".c") || filepath.contains(".C") || filepath.contains(".h") || 

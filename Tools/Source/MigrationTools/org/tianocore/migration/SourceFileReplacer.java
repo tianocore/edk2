@@ -39,7 +39,6 @@ public final class SourceFileReplacer {
 	private static final Set<String> filer8only = new HashSet<String>();
 	
 	public static final void flush(ModuleInfo moduleinfo) throws Exception {
-		
 		mi = moduleinfo;
 		
 		String outname = null;
@@ -48,6 +47,8 @@ public final class SourceFileReplacer {
 		showdetails = true;			// set this as default now, may be changed in the future
 		
 		Iterator<String> di = mi.localmodulesources.iterator();
+		String tempinpath = mi.modulepath + File.separator + "temp" + File.separator;
+		String tempoutpath = MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator;
 		while (di.hasNext()) {
 			inname = di.next();
 			if (inname.contains(".c") || inname.contains(".C")) {
@@ -57,20 +58,36 @@ public final class SourceFileReplacer {
 					outname = inname;
 				}
 				MigrationTool.ui.println("\nModifying file: " + inname);
-				Common.string2file(sourcefilereplace(mi.modulepath + File.separator + "temp" + File.separator + inname), MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + outname);
-			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".dxs") || inname.contains(".uni")) {
+				Common.string2file(sourcefilereplace(Common.file2string(tempinpath + inname)), tempoutpath + outname);
+			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".uni")) {
 				if (inname.contains(".H")) {
 					outname = inname.replaceFirst(".H", ".h");
 				} else {
 					outname = inname;
 				}
 				MigrationTool.ui.println("\nCopying file: " + inname);
-				Common.string2file(Common.file2string(mi.modulepath + File.separator + "temp" + File.separator + inname), MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + outname);
+				Common.string2file(Common.file2string(tempinpath + inname), tempoutpath + outname);
+			} else if (inname.contains(".dxs")) {
+				outname = inname;
+				MigrationTool.ui.println("\nModifying file: " + inname);
+				Common.string2file(convertdxs(Common.file2string(tempinpath + inname)), tempoutpath + outname);
 			}
 		}
 
 		if (!mi.hashr8only.isEmpty()) {
 			addr8only();
+		}
+	}
+	
+	private static final String addincludefile(String wholeline, String hfile) {
+		return wholeline.replaceFirst("(\\*/\\s)", "$1\n#include " + hfile + "\n");
+	}
+	
+	private static final String convertdxs(String wholeline) {
+		if (mi.getModuleType().equals("PEIM")) {
+			return addincludefile(wholeline, "\\<PeimDepex.h\\>");
+		} else {
+			return addincludefile(wholeline, "\\<DxeDepex.h\\>");
 		}
 	}
 	
@@ -106,25 +123,17 @@ public final class SourceFileReplacer {
 	}
 	
 	// Caution : if there is @ in file , it will be replaced with \n , so is you use Doxygen ... God Bless you!
-	private static final String sourcefilereplace(String filename) throws Exception {
-		BufferedReader rd = new BufferedReader(new FileReader(filename));
-		StringBuffer wholefile = new StringBuffer();
-		String line;
+	private static final String sourcefilereplace(String wholeline) throws Exception {
 		boolean addr8 = false;
 
 		Pattern pat = Pattern.compile("g?(BS|RT)(\\s*->\\s*)([a-zA-Z_]\\w*)", Pattern.MULTILINE);					// ! only two level () bracket allowed !
 		//Pattern ptnpei = Pattern.compile("\\(\\*\\*?PeiServices\\)[.-][>]?\\s*(\\w*[#$]*)(\\s*\\(([^\\(\\)]*(\\([^\\(\\)]*\\))?[^\\(\\)]*)*\\))", Pattern.MULTILINE);
 
-		while ((line = rd.readLine()) != null) {
-			wholefile.append(line + "\n");
-		}
-		line = wholefile.toString();
-		
 		// replace BS -> gBS , RT -> gRT
-		Matcher mat = pat.matcher(line);
+		Matcher mat = pat.matcher(wholeline);
 		if (mat.find()) {												// add a library here
 			MigrationTool.ui.println("Converting all BS->gBS, RT->gRT");
-			line = mat.replaceAll("g$1$2$3");							//unknown correctiveness
+			wholeline = mat.replaceAll("g$1$2$3");							//unknown correctiveness
 		}
 		mat.reset();
 		while (mat.find()) {
@@ -166,8 +175,8 @@ public final class SourceFileReplacer {
 			r8tor9 temp;
 			if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {
 				if (!r8thing.equals(r9thing)) {
-					if (line.contains(r8thing)) {
-						line = line.replaceAll(r8thing, r9thing);
+					if (wholeline.contains(r8thing)) {
+						wholeline = wholeline.replaceAll(r8thing, r9thing);
 						filefunc.add(new r8tor9(r8thing, r9thing));
 						Iterator<r8tor9> rt = filefunc.iterator();
 						while (rt.hasNext()) {
@@ -183,7 +192,7 @@ public final class SourceFileReplacer {
 			}
 		}															//is any of the guids changed?
 		if (addr8 == true) {
-			line = line.replaceFirst("\\*/\n", "\\*/\n#include \"R8Lib.h\"\n");
+			wholeline = addincludefile(wholeline, "\"R8Lib.h\"");
 		}
 		
 		// Converting macro
@@ -192,64 +201,64 @@ public final class SourceFileReplacer {
 			r8thing = it.next();
 			//mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));		
 			if ((r9thing = MigrationTool.db.getR9Macro(r8thing)) != null) {
-				if (line.contains(r8thing)) {
-					line = line.replaceAll(r8thing, r9thing);
+				if (wholeline.contains(r8thing)) {
+					wholeline = wholeline.replaceAll(r8thing, r9thing);
 					filemacro.add(new r8tor9(r8thing, r9thing));
 				}
 			}
 		}
 
 		// Converting guid
-		replaceGuid(line, mi.guid, "guid", fileguid);
-		replaceGuid(line, mi.ppi, "ppi", fileppi);
-		replaceGuid(line, mi.protocol, "protocol", fileprotocol);
+		replaceGuid(wholeline, mi.guid, "guid", fileguid);
+		replaceGuid(wholeline, mi.ppi, "ppi", fileppi);
+		replaceGuid(wholeline, mi.protocol, "protocol", fileprotocol);
 
 		// Converting Pei
 		// First , find all (**PeiServices)-> or (*PeiServices). with arg "PeiServices" , change name and add #%
 		Pattern ptnpei = Pattern.compile("\\(\\*\\*?PeiServices\\)[.-][>]?\\s*(\\w*)(\\s*\\(\\s*PeiServices\\s*,\\s*)", Pattern.MULTILINE);
 		if (mi.moduletype.contains("PEIM")) {
-			Matcher mtrpei = ptnpei.matcher(line);
+			Matcher mtrpei = ptnpei.matcher(wholeline);
 			while (mtrpei.find()) {										// ! add a library here !
-				line = mtrpei.replaceAll("PeiServices$1#%$2");
+				wholeline = mtrpei.replaceAll("PeiServices$1#%$2");
 				mi.hashrequiredr9libs.add("PeiServicesLib");
 			}
 			mtrpei.reset();
-			if (line.contains("PeiServicesCopyMem")) {
-				line = line.replaceAll("PeiServicesCopyMem#%", "CopyMem");
+			if (wholeline.contains("PeiServicesCopyMem")) {
+				wholeline = wholeline.replaceAll("PeiServicesCopyMem#%", "CopyMem");
 				mi.hashrequiredr9libs.add("BaseMemoryLib");
 			}
-			if (line.contains("PeiServicesSetMem")) {
-				line = line.replaceAll("PeiServicesSetMem#%", "SetMem");
+			if (wholeline.contains("PeiServicesSetMem")) {
+				wholeline = wholeline.replaceAll("PeiServicesSetMem#%", "SetMem");
 				mi.hashrequiredr9libs.add("BaseMemoryLib");
 			}
 
 			// Second , find all #% to drop the arg "PeiServices"
 			Pattern ptnpeiarg = Pattern.compile("#%+(\\s*\\(+\\s*)PeiServices\\s*,\\s*", Pattern.MULTILINE);
-			Matcher mtrpeiarg = ptnpeiarg.matcher(line);
+			Matcher mtrpeiarg = ptnpeiarg.matcher(wholeline);
 			while (mtrpeiarg.find()) {
-				line = mtrpeiarg.replaceAll("$1");
+				wholeline = mtrpeiarg.replaceAll("$1");
 			}
 		}
 		
 		Matcher mtrmac;
-		mtrmac = Pattern.compile("EFI_IDIV_ROUND\\((.*), (.*)\\)").matcher(line);
+		mtrmac = Pattern.compile("EFI_IDIV_ROUND\\((.*), (.*)\\)").matcher(wholeline);
 		if (mtrmac.find()) {
-			line = mtrmac.replaceAll("\\($1 \\/ $2 \\+ \\(\\(\\(2 \\* \\($1 \\% $2\\)\\) \\< $2\\) \\? 0 \\: 1\\)\\)");
+			wholeline = mtrmac.replaceAll("\\($1 \\/ $2 \\+ \\(\\(\\(2 \\* \\($1 \\% $2\\)\\) \\< $2\\) \\? 0 \\: 1\\)\\)");
 		}
-		mtrmac = Pattern.compile("EFI_MIN\\((.*), (.*)\\)").matcher(line);
+		mtrmac = Pattern.compile("EFI_MIN\\((.*), (.*)\\)").matcher(wholeline);
 		if (mtrmac.find()) {
-			line = mtrmac.replaceAll("\\(\\($1 \\< $2\\) \\? $1 \\: $2\\)");
+			wholeline = mtrmac.replaceAll("\\(\\($1 \\< $2\\) \\? $1 \\: $2\\)");
 		}
-		mtrmac = Pattern.compile("EFI_MAX\\((.*), (.*)\\)").matcher(line);
+		mtrmac = Pattern.compile("EFI_MAX\\((.*), (.*)\\)").matcher(wholeline);
 		if (mtrmac.find()) {
-			line = mtrmac.replaceAll("\\(\\($1 \\> $2\\) \\? $1 \\: $2\\)");
+			wholeline = mtrmac.replaceAll("\\(\\($1 \\> $2\\) \\? $1 \\: $2\\)");
 		}
-		mtrmac = Pattern.compile("EFI_UINTN_ALIGNED\\((.*)\\)").matcher(line);
+		mtrmac = Pattern.compile("EFI_UINTN_ALIGNED\\((.*)\\)").matcher(wholeline);
 		if (mtrmac.find()) {
-			line = mtrmac.replaceAll("\\(\\(\\(UINTN\\) $1\\) \\& \\(sizeof \\(UINTN\\) \\- 1\\)\\)");
+			wholeline = mtrmac.replaceAll("\\(\\(\\(UINTN\\) $1\\) \\& \\(sizeof \\(UINTN\\) \\- 1\\)\\)");
 		}
-		if (line.contains("EFI_UINTN_ALIGN_MASK")) {
-			line = line.replaceAll("EFI_UINTN_ALIGN_MASK", "(sizeof (UINTN) - 1)");
+		if (wholeline.contains("EFI_UINTN_ALIGN_MASK")) {
+			wholeline = wholeline.replaceAll("EFI_UINTN_ALIGN_MASK", "(sizeof (UINTN) - 1)");
 		}
 
 		show(filefunc, "function");
@@ -268,7 +277,7 @@ public final class SourceFileReplacer {
 		fileprotocol.clear();
 		filer8only.clear();
 
-		return line;
+		return wholeline;
 	}
 	
 	private static final void show(Set<r8tor9> hash, String sh) {
