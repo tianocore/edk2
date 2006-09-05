@@ -1167,8 +1167,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <element name="EXTRA.ARG" optional="yes"/>
 
     <sequential>
-      <mkdir dir="${BUILD_DIR}/${TARGET}_${TOOLCHAIN}/Microcode"/>
-      <flashmap MCIFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" MCOFILE="${BUILD_DIR}/${TARGET}_${TOOLCHAIN}/Microcode/@{FILENAME}.bin"/>
+      <mkdir dir="${TARGET_DIR}/Microcode"/>
+      <flashmap MCIFile="${MODULE_DIR}/@{FILEPATH}/@{FILENAME}.@{FILEEXT}" MCOFILE="${TARGET_DIR}/Microcode/@{FILENAME}.bin"/>
     </sequential>
   </macrodef> 
 

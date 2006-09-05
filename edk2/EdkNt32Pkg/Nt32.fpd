@@ -7330,7 +7330,7 @@
     </concat>
     <!--Generate Run.cmd file. This file will call SecMain.exe to start shell.-->
     <pathconvert property="SecMainPath" targetos="windows">
-      <path path="${FV_DIR}/../IA32"/>
+      <path path="${TARGET_DIR}/IA32"/>
     </pathconvert>
     <echo file="${PLATFORM_DIR}/run.cmd">@REM
       @REM Copyright (c) 2006, Intel Corporation
