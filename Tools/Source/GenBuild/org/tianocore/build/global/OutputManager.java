@@ -124,15 +124,17 @@ public class OutputManager {
         }
         
         //
+        // Define TARGET_DIR
+        //
+        String targetDir = buildDir + File.separatorChar + project.getProperty("TARGET")
+                                    + "_" + project.getProperty("TOOLCHAIN");
+        
+        //
         // Define BIN_DIR and FV_DIR
         //
-        String binDir = buildDir + File.separatorChar + project.getProperty("TARGET")
-                                 + "_" + project.getProperty("TOOLCHAIN") 
-                                 + File.separatorChar + project.getProperty("ARCH") ;
+        String binDir = targetDir + File.separatorChar + project.getProperty("ARCH") ;
         
-        String fvDir = buildDir + File.separatorChar + project.getProperty("TARGET")
-                                + "_" + project.getProperty("TOOLCHAIN") 
-                                + File.separatorChar + "FV";
+        String fvDir = targetDir + File.separatorChar + "FV";
         
         //
         // Define DEST_DIR_OUTPUT and DEST_DIR_DEBUG
@@ -144,6 +146,7 @@ public class OutputManager {
         // Set properties
         //
         project.setProperty("BUILD_DIR", buildDir.replaceAll("(\\\\)", "/"));
+        project.setProperty("TARGET_DIR", targetDir.replaceAll("(\\\\)", "/"));
         project.setProperty("FV_DIR", fvDir.replaceAll("(\\\\)", "/"));
         project.setProperty("BIN_DIR", binDir.replaceAll("(\\\\)", "/"));
         project.setProperty("DEST_DIR_DEBUG", (destDir + File.separatorChar + "DEBUG").replaceAll("(\\\\)", "/"));

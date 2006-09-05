@@ -531,6 +531,11 @@ public class PlatformBuildFileGenerator {
                     fvEle.setAttribute("value", fvDir.getPath().replaceAll("(\\\\)", "/"));
                     ele.appendChild(fvEle);
                     
+                    Element targetDirEle = document.createElement("var");
+                    targetDirEle.setAttribute("name", "TARGET_DIR");
+                    targetDirEle.setAttribute("value", ffsCommonDir.replaceAll("(\\\\)", "/"));
+                    ele.appendChild(targetDirEle);
+                    
                     NodeList childNodes = node.getChildNodes();
                     for (int k = 0; k < childNodes.getLength(); k++) {
                         Node childItem = childNodes.item(k);
@@ -538,7 +543,6 @@ public class PlatformBuildFileGenerator {
                             ele.appendChild(recursiveNode(childItem, document));
                         }
                     }
-                
                 }
             }
         }
@@ -574,6 +578,11 @@ public class PlatformBuildFileGenerator {
                     fvEle.setAttribute("name", "FV_DIR");
                     fvEle.setAttribute("value", fvDir.getPath().replaceAll("(\\\\)", "/"));
                     ele.appendChild(fvEle);
+                    
+                    Element targetDirEle = document.createElement("var");
+                    targetDirEle.setAttribute("name", "TARGET_DIR");
+                    targetDirEle.setAttribute("value", ffsCommonDir.replaceAll("(\\\\)", "/"));
+                    ele.appendChild(targetDirEle);
                     
                     NodeList childNodes = node.getChildNodes();
                     for (int k = 0; k < childNodes.getLength(); k++) {
