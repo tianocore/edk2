@@ -166,8 +166,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
       <C_Name>PcdFlashNvStorageVariableSize</C_Name>
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>
-        The driver gets the Variable store base address from this PCD.  This base address point to
-        an EFI_FIRMWARE_VOLUMN_HEADER struct.
+        The driver gets the NvStorage Variable Size from this PCD.
       </HelpText>      
     </PcdEntry>     
   </PcdCoded>  
