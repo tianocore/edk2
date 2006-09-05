@@ -35,10 +35,10 @@ Abstract:
 // The point type always equal to PHYSICAL_MODE on IA32/X64/EBC architecture
 // Otherwise, VIRTUAL_MODE/PHYSICAL_MODE would be used on Ipf architecture, 
 // 
-enum {
+typedef enum {
   PHYSICAL_MODE,
   VIRTUAL_MODE
-};
+} PROCESSOR_MODE;
 
 typedef struct {
   UINTN                     Signature;
@@ -124,7 +124,8 @@ EfiSerialStatusCodeInitializeWorker (
 
   @param  Data          This optional parameter may be used to pass additional data
  
-  @return               The function always return EFI_SUCCESS.
+  @retval EFI_SUCCESS         Success to report status code to serial I/O.
+  @retval EFI_DEVICE_ERROR    EFI serial device can not work after ExitBootService() is called .
 
 **/
 EFI_STATUS
@@ -218,6 +219,7 @@ DataHubStatusCodeInitializeWorker (
   @param  Data          This optional parameter may be used to pass additional data
  
   @retval EFI_OUT_OF_RESOURCES   Can not acquire record buffer.
+  @retval EFI_DEVICE_ERROR       EFI serial device can not work after ExitBootService() is called .
   @retval EFI_SUCCESS            Success to cache status code and signal log data event.
 
 **/

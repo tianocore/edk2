@@ -50,6 +50,9 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
 )
 {
+  ASSERT (NULL != Buffer);
+  ASSERT (0 != NumberOfBytes);
+
   return 0;
 }
 
@@ -74,6 +77,9 @@ SerialPortRead (
   IN  UINTN     NumberOfBytes
 )
 {
+  ASSERT (NULL != Buffer);
+  ASSERT (0 != NumberOfBytes);
+
   return 0;
 }
 
