@@ -57,6 +57,15 @@
 //
 #pragma warning ( disable : 4127 )
 
+//
+// This warning is caused by functions defined but not used. For precompiled header only.
+//
+#pragma warning ( disable : 4505 )
+
+//
+// This warning is caused by empty (after preprocessing) souce file. For precompiled header only.
+//
+#pragma warning ( disable : 4206 )
 
 #endif
 
