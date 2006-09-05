@@ -19,18 +19,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <!-- All Properties --> 
   <property name="BASE_NAME" value="Fat" /> 
   
-  <!-- Default target --> 
-  <target name="main" depends="libraries, sourcefiles, sections, output" /> 
-  <!-- Compile all dependency Library instances. --> 
-  <target name="libraries" />
-
-  <target name="sourcefiles" />
-  
-  <target name="sections" />
-
-  <target name="output">
-    <copy file="${MODULE_DIR}\${ARCH}\${BASE_NAME}.FFS" 
-      tofile="${BIN_DIR}\${FILE_GUID}-${BASE_NAME}.FFS" />
+  <!-- Default target -->
+  <target name="main">
+    <copy file="${MODULE_DIR}/${ARCH}/${BASE_NAME}.FFS" 
+      tofile="${BIN_DIR}/${FILE_GUID}-${BASE_NAME}.FFS" />
   </target>
-    
+
+  <target name="clean">
+    <delete includeemptydirs="true">
+       <fileset dir="${DEST_DIR_OUTPUT}" excludes="*.xml" includes="**/*"/>
+    </delete>
+  </target>
+
+  <target name="cleanall">
+    <delete includeemptydirs="true">
+       <fileset dir="${DEST_DIR_OUTPUT}" excludes="*.xml" includes="**/*"/>
+    </delete>
+    <delete includeemptydirs="true">
+       <fileset dir="${DEST_DIR_DEBUG}" includes="**/*"/>
+    </delete>
+  </target>
+
 </project>
