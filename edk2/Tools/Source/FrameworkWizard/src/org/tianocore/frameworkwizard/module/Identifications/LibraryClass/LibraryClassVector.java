@@ -21,12 +21,7 @@ public class LibraryClassVector {
     private Vector<LibraryClassIdentification> vLibraryClass = new Vector<LibraryClassIdentification>();
     
     public int findLibraryClass(LibraryClassIdentification lib) {
-        for (int index = 0; index < vLibraryClass.size(); index++) {
-            if (vLibraryClass.elementAt(index).equals(lib)) {
-                return index;
-            }
-        }
-        return -1;
+        return findLibraryClass(lib.getLibraryClassName());
     }
     
     public int findLibraryClass(String name) {
@@ -47,7 +42,9 @@ public class LibraryClassVector {
     }
     
     public void addLibraryClass(LibraryClassIdentification lib) {
-        vLibraryClass.addElement(lib);
+        if (findLibraryClass(lib) == -1) {
+            vLibraryClass.addElement(lib);
+        }
     }
     
     public void setLibraryClass(LibraryClassIdentification lib, int index) {
