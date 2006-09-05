@@ -33,9 +33,6 @@ SerialPortInitialize (
 /**
   Write data to serial device. 
  
-  If the buffer is NULL, then ASSERT(); 
-  if NumberOfBytes is zero, then ASSERT(). 
-
   @param  Buffer           Point of data buffer which need to be writed.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
@@ -50,9 +47,6 @@ SerialPortWrite (
   IN UINTN     NumberOfBytes
 )
 {
-  ASSERT (NULL != Buffer);
-  ASSERT (0 != NumberOfBytes);
-
   return 0;
 }
 
@@ -60,9 +54,6 @@ SerialPortWrite (
 /**
   Read data from serial device and save the datas in buffer.
  
-  If the buffer is NULL, then ASSERT(); 
-  if NumberOfBytes is zero, then ASSERT(). 
-
   @param  Buffer           Point of data buffer which need to be writed.
   @param  NumberOfBytes    Number of output bytes which are cached in Buffer.
 
@@ -77,9 +68,6 @@ SerialPortRead (
   IN  UINTN     NumberOfBytes
 )
 {
-  ASSERT (NULL != Buffer);
-  ASSERT (0 != NumberOfBytes);
-
   return 0;
 }
 
