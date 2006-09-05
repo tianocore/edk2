@@ -18,6 +18,7 @@ Abstract:
 
 package org.tianocore.common.logger;
 
+import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,10 +29,16 @@ class DefaultLogger implements LogMethod {
     };
 
     public DefaultLogger() {
-
     }
 
     public void putMessage(Object msgSource, int msgLevel, String msg) {
+        if (msgLevel < 0 || msgLevel > levelMap.length) {
+            msgLevel = 2;
+        }
         logger.log(levelMap[msgLevel], msg);
+    }
+    
+    public void flushToFile(File file){
+        
     }
 }
