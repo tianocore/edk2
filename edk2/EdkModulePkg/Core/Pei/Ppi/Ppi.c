@@ -197,9 +197,9 @@ Returns:
     //
     if ((PpiList->Flags & EFI_PEI_PPI_DESCRIPTOR_PPI) == 0) {
       PrivateData->PpiData.PpiListEnd = LastCallbackInstall;
-      DEBUG((EFI_D_INFO, "ERROR -> InstallPpi: %g %x\n", PpiList->Guid, PpiList->Ppi));
+      DEBUG((EFI_D_ERROR, "ERROR -> InstallPpi: %g %x\n", PpiList->Guid, PpiList->Ppi));
       return  EFI_INVALID_PARAMETER;
-    } 
+    }
 
     DEBUG((EFI_D_INFO, "Install PPI: %g\n", PpiList->Guid)); 
     PrivateData->PpiData.PpiListPtrs[Index].Ppi = PpiList;    
@@ -450,7 +450,7 @@ Returns:
     //
     if ((NotifyList->Flags & EFI_PEI_PPI_DESCRIPTOR_NOTIFY_TYPES) == 0) {
         PrivateData->PpiData.NotifyListEnd = LastCallbackNotify;
-        DEBUG((EFI_D_INFO, "ERROR -> InstallNotify: %g %x\n", NotifyList->Guid, NotifyList->Notify));
+        DEBUG((EFI_D_ERROR, "ERROR -> InstallNotify: %g %x\n", NotifyList->Guid, NotifyList->Notify));
       return  EFI_INVALID_PARAMETER;
     }
      
