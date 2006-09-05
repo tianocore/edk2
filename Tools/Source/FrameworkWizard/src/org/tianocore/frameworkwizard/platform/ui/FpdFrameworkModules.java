@@ -717,6 +717,13 @@ public class FpdFrameworkModules extends IInternalFrame {
                     }
                     al.add(saa[i][ffcModArch]);
                 }
+                else {
+                    row[modNameColForFpdModTable] = saa[i][ffcModGuid];
+                    row[modVerColForFpdModTable] = saa[i][ffcModVer];
+                    row[pkgNameColForFpdModTable] = saa[i][ffcPkgGuid];
+                    row[pkgVerColForFpdModTable] = saa[i][ffcPkgVer];
+                    row[archColForFpdModTable] = saa[i][ffcModArch];
+                }
                 row[forceDbgColForFpdModTable] = ffc.getModuleSAForceDebug(i);
                 modelFpdModules.addRow(row);
 

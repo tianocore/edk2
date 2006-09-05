@@ -205,15 +205,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/FpdModuleSA.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/FpdPlatformDefs.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/GenListDialog.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/GenLongTextDialog.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/ListEditor.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/global/GlobalData.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/global/Spd.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/LongTextEditor.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/TableSorter.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/platform/ui/global/SurfaceAreaQuery.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/FpdModuleIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/Identification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/ModuleIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/PackageIdentification.java</Filename>
-    <Filename>src/org/tianocore/frameworkwizard/platform/ui/id/PlatformIdentification.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/platform/ui/global/WorkspaceProfile.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/Workspace.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/WorkspaceTools.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/workspace/ui/SwitchWorkspace.java</Filename>
