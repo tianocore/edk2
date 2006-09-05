@@ -27,7 +27,7 @@ public final class PathIterator implements Common.ForDoAll {
 	private HashSet<String> pathlist = new HashSet<String>();
 	private Iterator<String> it = null;
 
-	public final void toDo(String path) throws Exception {
+	public final void run(String path) throws Exception {
 		pathlist.add(path);
 	}
 
@@ -41,5 +41,13 @@ public final class PathIterator implements Common.ForDoAll {
 
 	public final String toString() {
 		return pathlist.toString();
+	}
+	
+	public boolean dirFilter(String filepath) {
+		return true;
+	}
+	
+	public boolean fileFilter(String filepath) {
+		return true;
 	}
 }

@@ -148,7 +148,9 @@ public final class Common {
 		File test;
 
 		if (type == DIR || type == BOTH) {
-			fda.toDo(path);
+			if (fda.dirFilter(path)) {
+				fda.run(path);
+			}
 		}
 		for (int i = 0 ; i < list.length ; i++) {
 			test = new File(path + File.separator + list[i]);
@@ -156,13 +158,19 @@ public final class Common {
 				toDoAll(path + File.separator + list[i], fda, type);
 			} else {
 				if (type == FILE || type == BOTH) {
-					fda.toDo(path + File.separator + list[i]);
+					if (fda.fileFilter(path + File.separator + list[i])) {
+						fda.run(path + File.separator + list[i]);
+					}
 				}
 			}
 		}
 	}
 	
 	public static interface ForDoAll {
-		public void toDo(String filepath) throws Exception;
+		public void run(String filepath) throws Exception;
+		
+		public boolean dirFilter(String filepath);
+		
+		public boolean fileFilter(String filepath);
 	}
 }
