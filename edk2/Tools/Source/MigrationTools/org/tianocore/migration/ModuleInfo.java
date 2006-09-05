@@ -15,8 +15,6 @@ package org.tianocore.migration;
 import java.io.*;
 import java.util.*;
 
-import org.tianocore.ModuleTypeDef;
-
 /*
 	Class ModuleInfo is built for scanning the source files, it contains all the needed
 information and all the temporary data.
