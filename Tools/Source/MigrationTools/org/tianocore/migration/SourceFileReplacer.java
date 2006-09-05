@@ -17,9 +17,10 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class SourceFileReplacer {
-	private static ModuleInfo mi;
-	private static boolean showdetails = false;
+public final class SourceFileReplacer implements Common.ForDoAll {
+	private static final SourceFileReplacer SFReplacer = new SourceFileReplacer();
+	private ModuleInfo mi;
+	private static boolean showdetails = true;		// set this as default now, may be changed in the future
 	
 	private static class r8tor9 {
 		r8tor9(String r8, String r9) {
@@ -38,52 +39,11 @@ public final class SourceFileReplacer {
 	private static final Set<r8tor9> fileprotocol = new HashSet<r8tor9>();
 	private static final Set<String> filer8only = new HashSet<String>();
 	
-	public static final void flush(ModuleInfo moduleinfo) throws Exception {
-		mi = moduleinfo;
-		
-		String outname = null;
-		String inname = null;
-
-		showdetails = true;			// set this as default now, may be changed in the future
-		
-		Iterator<String> di = mi.localmodulesources.iterator();
-		String tempinpath = mi.modulepath + File.separator + "temp" + File.separator;
-		String tempoutpath = MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator;
-		while (di.hasNext()) {
-			inname = di.next();
-			if (inname.contains(".c") || inname.contains(".C")) {
-				if (inname.contains(".C")) {
-					outname = inname.replaceFirst(".C", ".c");
-				} else {
-					outname = inname;
-				}
-				MigrationTool.ui.println("\nModifying file: " + inname);
-				Common.string2file(sourcefilereplace(Common.file2string(tempinpath + inname)), tempoutpath + outname);
-			} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".uni")) {
-				if (inname.contains(".H")) {
-					outname = inname.replaceFirst(".H", ".h");
-				} else {
-					outname = inname;
-				}
-				MigrationTool.ui.println("\nCopying file: " + inname);
-				Common.string2file(Common.file2string(tempinpath + inname), tempoutpath + outname);
-			} else if (inname.contains(".dxs")) {
-				outname = inname;
-				MigrationTool.ui.println("\nModifying file: " + inname);
-				Common.string2file(convertdxs(Common.file2string(tempinpath + inname)), tempoutpath + outname);
-			}
-		}
-
-		if (!mi.hashr8only.isEmpty()) {
-			addr8only();
-		}
-	}
-	
 	private static final String addincludefile(String wholeline, String hfile) {
 		return wholeline.replaceFirst("(\\*/\\s)", "$1\n#include " + hfile + "\n");
 	}
 	
-	private static final String convertdxs(String wholeline) {
+	private final String convertdxs(String wholeline) {
 		if (mi.getModuleType().equals("PEIM")) {
 			return addincludefile(wholeline, "\\<PeimDepex.h\\>");
 		} else {
@@ -91,7 +51,7 @@ public final class SourceFileReplacer {
 		}
 	}
 	
-	private static final void addr8only() throws Exception {
+	private final void addr8only() throws Exception {
 		String paragraph = null;
 		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
 		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
@@ -123,7 +83,7 @@ public final class SourceFileReplacer {
 	}
 	
 	// Caution : if there is @ in file , it will be replaced with \n , so is you use Doxygen ... God Bless you!
-	private static final String sourcefilereplace(String wholeline) throws Exception {
+	private final String sourcefilereplace(String wholeline) throws Exception {
 		boolean addr8 = false;
 
 		Pattern pat = Pattern.compile("g?(BS|RT)(\\s*->\\s*)([a-zA-Z_]\\w*)", Pattern.MULTILINE);					// ! only two level () bracket allowed !
@@ -311,5 +271,61 @@ public final class SourceFileReplacer {
 				}
 			}
 		}
+	}
+	
+	//-----------------------------------ForDoAll-----------------------------------//
+	public void run(String filepath) throws Exception {
+		String outname = null;
+		String inname = filepath.replace(mi.modulepath + File.separator, "");
+		String tempinpath = mi.modulepath + File.separator + "temp" + File.separator;
+		String tempoutpath = MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator;
+
+		if (inname.contains(".c") || inname.contains(".C")) {
+			if (inname.contains(".C")) {
+				outname = inname.replaceFirst(".C", ".c");
+			} else {
+				outname = inname;
+			}
+			MigrationTool.ui.println("\nModifying file: " + inname);
+			Common.string2file(sourcefilereplace(Common.file2string(tempinpath + inname)), tempoutpath + outname);
+		} else if (inname.contains(".h") || inname.contains(".H") || inname.contains(".uni")) {
+			if (inname.contains(".H")) {
+				outname = inname.replaceFirst(".H", ".h");
+			} else {
+				outname = inname;
+			}
+			MigrationTool.ui.println("\nCopying file: " + inname);
+			Common.string2file(Common.file2string(tempinpath + inname), tempoutpath + outname);
+		} else if (inname.contains(".dxs")) {
+			outname = inname;
+			MigrationTool.ui.println("\nModifying file: " + inname);
+			Common.string2file(convertdxs(Common.file2string(tempinpath + inname)), tempoutpath + outname);
+		}
+	}
+	
+	public boolean dirFilter(String filepath) {
+		return true;
+	}
+	
+	public boolean fileFilter(String filepath) {
+		return true;
+	}
+	//-----------------------------------ForDoAll-----------------------------------//
+	
+	private final void setModuleInfo(ModuleInfo moduleinfo) {
+		mi = moduleinfo;
+	}
+	
+	private final void start() throws Exception {
+		Common.toDoAll(mi.localmodulesources, this);
+		
+		if (!mi.hashr8only.isEmpty()) {
+			addr8only();
+		}
+	}
+	
+	public static final void fireAt(ModuleInfo moduleinfo) throws Exception {
+		SFReplacer.setModuleInfo(moduleinfo);
+		SFReplacer.start();
 	}
 }

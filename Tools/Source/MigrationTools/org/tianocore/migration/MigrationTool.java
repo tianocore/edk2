@@ -34,7 +34,7 @@ public class MigrationTool {
 		ModuleReader.ModuleScan(mi);
 		
 		//MigrationTool.ui.yesOrNo("go on replace?");
-		SourceFileReplacer.flush(mi);	// some adding library actions are taken here,so it must be put before "MsaWriter"
+		SourceFileReplacer.fireAt(mi);	// some adding library actions are taken here,so it must be put before "MsaWriter"
 
 		//MigrationTool.ui.yesOrNo("go on show?");
 		// show result

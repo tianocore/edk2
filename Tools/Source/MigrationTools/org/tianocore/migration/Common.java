@@ -142,8 +142,15 @@ public final class Common {
 			}
 		}
 	}
+
+	public static final void toDoAll(Set<String> set, ForDoAll fda) throws Exception {
+		Iterator<String> di = set.iterator();
+		while (di.hasNext()) {
+			fda.run(di.next());
+		}
+	}
 	
-	public static void toDoAll(String path, ForDoAll fda, int type) throws Exception { // filter of file type can be done in toDo
+	public static final void toDoAll(String path, ForDoAll fda, int type) throws Exception { // filter of file type can be done in toDo
 		String[] list = new File(path).list();
 		File test;
 
