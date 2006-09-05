@@ -294,8 +294,9 @@ public class WorkspaceTools {
         for (int index = 0; index < modulePaths.size(); index++) {
             modulePath = modulePaths.get(index);
             ModuleIdentification id = GlobalData.openingModuleList.getIdByPath(modulePath);
-
-            v.addElement(id);
+            if (id != null) {
+                v.addElement(id);    
+            }
         }
         Sort.sortModules(v, DataType.SORT_TYPE_ASCENDING);
         return v;
