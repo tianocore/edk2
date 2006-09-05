@@ -44,6 +44,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <Filename>src/org/tianocore/frameworkwizard/FrameworkWizardUI.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/NewFileChooser.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/SelectModuleBelong.java</Filename>
+    <Filename>src/org/tianocore/frameworkwizard/SplashScreen.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/ToolChainConfig.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/ToolChainConfigHelp.java</Filename>
     <Filename>src/org/tianocore/frameworkwizard/common/DataType.java</Filename>

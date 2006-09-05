@@ -1754,6 +1754,12 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
      **/
     private void init() {
         //
+        // Show splash screen
+        //
+        SplashScreen ss = new SplashScreen();
+        ss.setVisible(true);
+        
+        //
         // Set current workspace and check
         // Check if exists WORKSPACE
         // 
@@ -1770,6 +1776,11 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Init Global Data
         //
         GlobalData.init();
+        
+        //
+        // Close splash screen
+        //
+        ss.dispose();
 
         //
         // Init the frame
