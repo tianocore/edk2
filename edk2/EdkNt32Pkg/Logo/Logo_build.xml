@@ -20,30 +20,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="BASE_NAME" value="Logo" /> 
   
   <!-- Default target --> 
-  <target name="main" depends="libraries, sourcefiles, sections, output" /> 
-  <!-- Compile all dependency Library instances. --> 
-  <target name="libraries" />
+  <target name="main" depends="sourcefiles, sections, output" /> 
 
   <target name="sourcefiles">
-    <copy file="${MODULE_DIR}\Logo.bmp" 
-      tofile="${DEST_DIR_OUTPUT}\Logo.bmp" />
-    <!--
-    <Build_Graphics FILENAME="logo" FILEPATH="." FILEEXT="bmp"></Build_Graphics>
-    -->
+    <copy file="${MODULE_DIR}/Logo.bmp" 
+      tofile="${DEST_DIR_OUTPUT}/Logo.bmp" />
   </target>
   
   <target name="sections">
     <OnDependency>
       <sourcefiles>
-        <file name="${DEST_DIR_OUTPUT}\logo.bmp"/>
+        <file name="${DEST_DIR_OUTPUT}/logo.bmp"/>
       </sourcefiles>
       <targetfiles>
-        <file name="${DEST_DIR_OUTPUT}\Logo.bin"/>
+        <file name="${DEST_DIR_OUTPUT}/Logo.sec"/>
       </targetfiles>
       
       <sequential>
-        <gensection inputfile="${DEST_DIR_OUTPUT}\logo.bmp" 
-          outputfile="${DEST_DIR_OUTPUT}\Logo.bin" 
+        <gensection inputfile="${DEST_DIR_OUTPUT}/logo.bmp" 
+          outputfile="${DEST_DIR_OUTPUT}/Logo.sec" 
           sectiontype="EFI_SECTION_RAW" />
       </sequential>
     </OnDependency>
@@ -52,24 +47,37 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <target name="output">
     <OnDependency>
       <sourcefiles>
-        <file name="${DEST_DIR_OUTPUT}\Logo.bin"/>
+        <file name="${DEST_DIR_OUTPUT}/Logo.sec"/>
       </sourcefiles>
       <targetfiles>
-        <file name="${BIN_DIR}\${FILE_GUID}-Logo.FFS"/>
+        <file name="${BIN_DIR}/${FILE_GUID}-Logo.FFS"/>
       </targetfiles>
-      
+
       <sequential>
-        <genffsfile BaseName="Logo" ffsATTRIBCHECKSUM="TRUE"
-          ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" fileGuid="${FILE_GUID}"
-          outputDir="${BIN_DIR}">
-          <compress compressName="dummy">
-            <tool outputPath="${DEST_DIR_OUTPUT}" toolName="${WORKSPACE_DIR}\Tools\Bin\GenCRC32Section">
-              <input file="${DEST_DIR_OUTPUT}\Logo.bin" />
-            </tool>
-          </compress>
+        <genffsfile BaseName="Logo" 
+                    ffsATTRIBCHECKSUM="TRUE"
+                    ffsFILETYPE="EFI_FV_FILETYPE_FREEFORM" 
+                    fileGuid="${FILE_GUID}"
+                    outputDir="${BIN_DIR}">
+          <sectFile fileName="${DEST_DIR_OUTPUT}/Logo.sec"/>
         </genffsfile>
       </sequential>
     </OnDependency>
   </target>
-    
+
+  <target name="clean">
+    <delete includeemptydirs="true">
+       <fileset dir="${DEST_DIR_OUTPUT}" excludes="*.xml" includes="**/*"/>
+    </delete>
+  </target>
+
+  <target name="cleanall">
+    <delete includeemptydirs="true">
+       <fileset dir="${DEST_DIR_OUTPUT}" excludes="*.xml" includes="**/*"/>
+    </delete>
+    <delete includeemptydirs="true">
+       <fileset dir="${DEST_DIR_DEBUG}" includes="**/*"/>
+    </delete>
+  </target>
+
 </project>
