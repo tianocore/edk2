@@ -25,9 +25,6 @@
     <LibraryClass Usage="ALWAYS_PRODUCED">
       <Keyword>SerialPortLib</Keyword>
     </LibraryClass>
-    <LibraryClass Usage="ALWAYS_CONSUMED">
-      <Keyword>DebugLib</Keyword>
-    </LibraryClass>
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>SerialPortLibNull.c</Filename>
