@@ -16,7 +16,6 @@ import java.awt.BorderLayout;
 import javax.swing.JPanel;
 
 import javax.swing.AbstractAction;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -64,7 +63,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.JComboBox;
 import java.awt.Dimension;
@@ -161,7 +159,8 @@ public class FpdFlash extends IInternalFrame {
     private int selectedRowInFvAdditionalTable = -1;
     private String oldFvName = null;
     private Vector<String> vBlockSize = new Vector<String>();
-    private String erasePolarity = null;
+    private String determinedFvBlockSize = null;
+    private String erasePolarity = "";
     boolean memModified = false;
     
     
@@ -183,6 +182,11 @@ public class FpdFlash extends IInternalFrame {
     public FpdFlash(OpeningPlatformType opt) {
         this(opt.getXmlFpd());
         docConsole = opt;
+        if (memModified) {
+            docConsole.setSaved(false);
+            JOptionPane.showMessageDialog(frame, "Platform Synced with FDF file.");
+            memModified = false;
+        }
     }
     
     /**
@@ -1178,23 +1182,45 @@ public class FpdFlash extends IInternalFrame {
     private void initFvInFdfTable(String fdfPath){
         Vector<FvInfoFromFdf> vFvInfo = new Vector<FvInfoFromFdf>();
         getFvInfoFromFdf(fdfPath, vFvInfo);
-        getFlashInfoFromFdf (fdfPath, vBlockSize, erasePolarity);
-        ffc.setTypedFvImageNameValue("Attributes", "ErasePolarity", erasePolarity);
+        getFlashInfoFromFdf (fdfPath);
+        if (!erasePolarity.equals("1") && !erasePolarity.equals("0")) {
+            JOptionPane.showMessageDialog(frame, "FDF file does NOT contain valid Erase Polarity.");
+        }
+        else {
+            ffc.setTypedFvImageNameValue("Attributes", "ErasePolarity", erasePolarity);
+        }
+        
         // BugBug: assume all blocks have same size;
-        String blkSize = vBlockSize.get(0);
+        
+        String blkSize = "0x10000";
+        if (vBlockSize.size() > 0) {
+            blkSize = vBlockSize.get(0);
+            if (!DataValidation.isInt(blkSize) && !DataValidation.isHexDoubleWordDataType(blkSize)) {
+                JOptionPane.showMessageDialog(frame, "FDF file does NOT contain valid FV block size. Default size 0x10000 will be used.");
+                blkSize = "0x10000";
+            }
+        }
+        determinedFvBlockSize = blkSize;
         
         getFvInFdfTableModel().setRowCount(0);
         for (int j = 0; j < vFvInfo.size(); ++j) {
             FvInfoFromFdf fvInfo = vFvInfo.get(j);
             String[] row = {fvInfo.getFvName(), fvInfo.getSize(), fvInfo.getEfiFileName()};
+            // if FV addtional table contains the same FV from fdf file, remove that row.
+            for (int k = 0; k < jTableFvAdditional.getRowCount(); ++k) {
+                if (fvAdditionalTableModel.getValueAt(k, 0).equals(row[0])) {
+                    fvAdditionalTableModel.removeRow(k);
+                }
+            }
             getFvInFdfTableModel().addRow(row);
             try {
                 int blockSize = Integer.decode(blkSize);
                 int fvSize = Integer.decode(row[1]);
                 int numBlocks = fvSize/blockSize;
+                HashMap<String, String> mOptions = new HashMap<String, String>();
                 // if no options for this FV before, generate a new options entry for this FV.
                 if (ffc.getFvImagesFvImageWithName(row[0], "Options") == null) {
-                    HashMap<String, String> mOptions = new HashMap<String, String>();
+                    
                     mOptions.put("EFI_BLOCK_SIZE", blkSize);
                     mOptions.put("EFI_NUM_BLOCKS", numBlocks+"");
                     mOptions.put("EFI_FILE_NAME", row[2]);
@@ -1202,9 +1228,20 @@ public class FpdFlash extends IInternalFrame {
                     memModified = true;
                 }
                 else {
-                    ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_BLOCK_SIZE", blkSize);
-                    ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_NUM_BLOCKS", numBlocks + "");
-                    ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_FILE_NAME", row[2]);
+                    ffc.getFvImagesFvImageOptions(row[0], mOptions);
+                    if (mOptions.get("EFI_BLOCK_SIZE") == null || !mOptions.get("EFI_BLOCK_SIZE").equalsIgnoreCase(blkSize)) {
+                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_BLOCK_SIZE", blkSize);
+                        memModified = true;
+                    }
+                    if (mOptions.get("EFI_NUM_BLOCKS") == null || Integer.decode(mOptions.get("EFI_NUM_BLOCKS")) != numBlocks) {
+                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_NUM_BLOCKS", numBlocks + "");
+                        memModified = true;
+                    }
+                    if (mOptions.get("EFI_FILE_NAME") == null || !mOptions.get("EFI_FILE_NAME").equals(row[2])) {
+                        ffc.setTypedNamedFvImageNameValue(row[0], "Options", "EFI_FILE_NAME", row[2]);
+                        memModified = true;
+                    }
+                    
                 }
             }
             catch (NumberFormatException e){
@@ -1683,6 +1720,7 @@ public class FpdFlash extends IInternalFrame {
                     int row = arg0.getFirstRow();
                     int col = arg0.getColumn();
                     TableModel m = (TableModel) arg0.getSource();
+                    
                     if (arg0.getType() == TableModelEvent.UPDATE) {
                         if (col == 0) {
                             String newFvName = m.getValueAt(row, 0) + "";
@@ -1712,10 +1750,54 @@ public class FpdFlash extends IInternalFrame {
                                 String[] fvNames = {newFvName};
                                 ffc.AddFvImageFvImageNames(fvNames);
                             }
-                            
+                            docConsole.setSaved(false);
                             oldFvName = newFvName;
                         }
-                        docConsole.setSaved(false);
+                        
+                        if (col == 1) {
+                            String fvSize = m.getValueAt(row, col) + "";
+                            if (!DataValidation.isInt(fvSize) && !DataValidation.isHexDoubleWordDataType(fvSize)) {
+                                JOptionPane.showMessageDialog(frame, "FV size should be Integer or Hex format.");
+                                return;
+                            }
+                            HashMap<String, String> mFvOpts = new HashMap<String, String>();
+                            ffc.getFvImagesFvImageOptions(oldFvName, mFvOpts);
+                            String blkSize = mFvOpts.get("EFI_BLOCK_SIZE");
+                            if (blkSize == null) {
+                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", determinedFvBlockSize);
+                                int fs = Integer.decode(fvSize);
+                                int bs = Integer.decode(determinedFvBlockSize);
+                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
+                                docConsole.setSaved(false);
+                            }
+                            else {
+                                if (!DataValidation.isInt(blkSize) && !DataValidation.isHexDoubleWordDataType(blkSize)) {
+                                    int retVal = JOptionPane.showConfirmDialog(frame, "Confirm", "FPD file contains error block size format. Would you like to replace it with a default value?", JOptionPane.YES_NO_OPTION);
+                                    if (retVal == JOptionPane.YES_OPTION) {
+                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", determinedFvBlockSize);
+                                        int fs = Integer.decode(fvSize);
+                                        int bs = Integer.decode(determinedFvBlockSize);
+                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
+                                        docConsole.setSaved(false);
+                                        return;
+                                    }
+                                    else {
+                                        return;
+                                    }
+                                    
+                                }
+                                int fs = Integer.decode(fvSize);
+                                int bs = Integer.decode(blkSize);
+                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
+                                docConsole.setSaved(false);
+                            }
+                        }
+                        
+                        if (col == 2) {
+                            ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_FILE_NAME", m.getValueAt(row, col)+"");
+                            docConsole.setSaved(false);
+                        }
+                        
                     }
                 }
             });
@@ -1879,12 +1961,12 @@ public class FpdFlash extends IInternalFrame {
         
         jTextFieldFdf.setText("");
         String fdfFile = ffc.getFlashDefinitionFile();
-        if (fdfFile != null) {
+        if (fdfFile != null && fdfFile.length() > 0) {
             jTextFieldFdf.setText(fdfFile);
+            String fdfPath = System.getenv("WORKSPACE") + File.separator + fdfFile;
+            initFvInFdfTable(fdfPath);
         }
         
-        String fdfPath = System.getenv("WORKSPACE") + File.separator + fdfFile;
-        initFvInFdfTable(fdfPath);
         initFvAdditionalTable();
     }
     
@@ -1911,7 +1993,7 @@ public class FpdFlash extends IInternalFrame {
         return jContentPane;
     }
     
-    private void getFlashInfoFromFdf (String fdfPath, Vector<String> vBlockSize, String erasePolarity) {
+    private void getFlashInfoFromFdf (String fdfPath) {
         File fdf = new File(fdfPath);
         if (!fdf.exists()) {
             return;
@@ -1936,7 +2018,7 @@ public class FpdFlash extends IInternalFrame {
                 // ErasePolarity
                 //
                 if (str.startsWith("ErasePolarity")) {
-                    erasePolarity = str.substring(str.indexOf("=") + 1, str.lastIndexOf(","));
+                    erasePolarity = str.substring(str.indexOf("=") + 1, str.lastIndexOf(",")).trim();
                 }
                 //
                 // dig into Block section.

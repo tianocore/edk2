@@ -2698,6 +2698,9 @@ public class FpdFileContents {
         while (li.hasNext()) {
             FvImagesDocument.FvImages.FvImage fi = li.next();
             updateFvImageNamesInFvImage (fi, oldFvName, newFvName);
+            if (fi.getFvImageNamesList().size() == 0) {
+                li.remove();
+            }
         }
     }
     
@@ -2712,18 +2715,13 @@ public class FpdFileContents {
         
         if (cursor.toChild(qFvImageNames)) {
             do {
-                if (cursor.getTextValue().equals(oldFvName)){
+                String xmlValue = cursor.getTextValue();
+                if (xmlValue.equals(oldFvName)){
                     if (newFvName != null) {
                         cursor.setTextValue(newFvName);
                     }
                     else {
-                        if (fi.getFvImageNamesList().size() == 1) {
-                            removeElement(fi);
-                            break;
-                        }
-                        else {
                             cursor.removeXml();
-                        }
                     }
                 }
             }while (cursor.toNextSibling(qFvImageNames));
