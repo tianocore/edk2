@@ -104,15 +104,9 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 				mi.hashrequiredr9libs.add("UefiRuntimeServicesTableLib");
 			}
 		}
-		/*
 		// remove EFI_DRIVER_ENTRY_POINT
-		Pattern patentrypoint = Pattern.compile("EFI_DRIVER_ENTRY_POINT[^\\}]*\\}");
-		Matcher matentrypoint = patentrypoint.matcher(line);
-		if (matentrypoint.find()) {
-			MigrationTool.ui.println("Deleting Entry_Point");
-			line = matentrypoint.replaceAll("");
-		}
-		*/
+		wholeline = wholeline.replaceAll("(EFI_\\w+_ENTRY_POINT)", MigrationTool.MIGRATIONCOMMENT + " $1");
+		
 		// start replacing names
 		String r8thing;
 		String r9thing;
