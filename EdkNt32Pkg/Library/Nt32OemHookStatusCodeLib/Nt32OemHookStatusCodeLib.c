@@ -18,12 +18,14 @@
 
 //
 // Cache of WinNtThunk protocol 
-// 
+//
+STATIC
 EFI_WIN_NT_THUNK_PROTOCOL   *mWinNt;
 
 //
 // Cache of standard output handle . 
-// 
+//
+STATIC
 HANDLE                      mStdOut;
 
 /**
@@ -47,11 +49,11 @@ OemHookStatusCodeInitialize (
     // Locate NtThunkPpi for retrieving standard output handle
     //
     Status = PeiServicesLocatePpi (
-              &gPeiNtThunkPpiGuid,
-              0,
-              NULL,
-              (VOID **) &NtThunkPpi
-              );
+               &gPeiNtThunkPpiGuid,
+               0,
+               NULL,
+               (VOID **) &NtThunkPpi
+               );
 
     ASSERT_EFI_ERROR (Status);
 
@@ -181,7 +183,14 @@ OemHookStatusCodeReport (
     //
     // Print ERROR information into output buffer.
     //
-    CharCount = AsciiSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, "ERROR: C%x:V%x I%x", CodeType, Value, Instance);
+    CharCount = AsciiSPrint (
+                  Buffer, 
+                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  "ERROR: C%x:V%x I%x", 
+                  CodeType, 
+                  Value, 
+                  Instance
+                  );
 
     //
     // Make sure we don't try to print values that weren't intended to be printed, especially NULL GUID pointers.
@@ -196,7 +205,7 @@ OemHookStatusCodeReport (
                      );
     }
 
-    if (Data) {
+    if (Data != NULL) {
       CharCount += AsciiSPrint (
                      &Buffer[CharCount - 1],
                      (EFI_STATUS_CODE_DATA_MAX_SIZE - (sizeof (Buffer[0]) * CharCount)),
@@ -211,9 +220,22 @@ OemHookStatusCodeReport (
                    "\n\r"
                    );
   } else if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) == EFI_PROGRESS_CODE) {
-    CharCount = AsciiSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, "PROGRESS CODE: V%x I%x\n\r", Value, Instance);
+    CharCount = AsciiSPrint (
+                  Buffer, 
+                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  "PROGRESS CODE: V%x I%x\n\r", 
+                  Value, 
+                  Instance
+                  );
   } else {
-    CharCount = AsciiSPrint (Buffer, EFI_STATUS_CODE_DATA_MAX_SIZE, "Undefined: C%x:V%x I%x\n\r", CodeType, Value, Instance);
+    CharCount = AsciiSPrint (
+                  Buffer, 
+                  EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                  "Undefined: C%x:V%x I%x\n\r", 
+                  CodeType, 
+                  Value, 
+                  Instance
+                  );
   }
 
   //
