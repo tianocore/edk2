@@ -117,6 +117,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 RuntimeDriverLibConstruct (
   IN EFI_HANDLE           ImageHandle,
   IN EFI_SYSTEM_TABLE     *SystemTable
@@ -194,6 +195,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 RuntimeDriverLibDeconstruct (
   VOID
   )
