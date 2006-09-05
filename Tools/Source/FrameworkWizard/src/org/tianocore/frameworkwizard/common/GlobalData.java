@@ -93,10 +93,13 @@ public class GlobalData {
 
                     } catch (IOException e) {
                         Log.err("Open Module Surface Area " + modulePath, e.getMessage());
+                        continue;
                     } catch (XmlException e) {
                         Log.err("Open Module Surface Area " + modulePath, e.getMessage());
+                        continue;
                     } catch (Exception e) {
                         Log.err("Open Module Surface Area " + modulePath, "Invalid file type");
+                        continue;
                     }
                     id = Tools.getId(modulePath, msa);
                     mid = new ModuleIdentification(id, vPackageList.elementAt(indexI));
@@ -122,10 +125,13 @@ public class GlobalData {
                     spd = OpenFile.openSpdFile(path);
                 } catch (IOException e) {
                     Log.err("Open Package Surface Area " + path, e.getMessage());
+                    continue;
                 } catch (XmlException e) {
                     Log.err("Open Package Surface Area " + path, e.getMessage());
+                    continue;
                 } catch (Exception e) {
                     Log.err("Open Package Surface Area " + path, "Invalid file type");
+                    continue;
                 }
                 id = Tools.getId(path, spd);
                 vPackageList.addElement(id);
@@ -150,10 +156,13 @@ public class GlobalData {
                     fpd = OpenFile.openFpdFile(path);
                 } catch (IOException e) {
                     Log.err("Open Platform Surface Area " + path, e.getMessage());
+                    continue;
                 } catch (XmlException e) {
                     Log.err("Open Platform Surface Area " + path, e.getMessage());
+                    continue;
                 } catch (Exception e) {
                     Log.err("Open Platform Surface Area " + path, "Invalid file type");
+                    continue;
                 }
                 id = Tools.getId(path, fpd);
                 vPlatformList.addElement(new PlatformIdentification(id));
