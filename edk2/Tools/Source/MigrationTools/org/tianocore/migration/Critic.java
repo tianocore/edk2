@@ -27,7 +27,7 @@ public final class Critic {
 	private static final int totallinelength = 82;
 	
 	public static final void run(String filepath) throws Exception {
-		if (MigrationTool.doCritic) {
+		if (MigrationTool.doCritic) {					// this is left here to set an example for future structure
 			critic(filepath);
 		}
 	}
