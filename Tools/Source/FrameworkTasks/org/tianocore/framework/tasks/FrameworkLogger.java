@@ -19,7 +19,7 @@ Abstract:
 package org.tianocore.framework.tasks;
 
 import org.apache.tools.ant.Project;
-
+import java.io.File;
 import org.tianocore.common.logger.LogMethod;
 
 class FrameworkLogger implements LogMethod {
