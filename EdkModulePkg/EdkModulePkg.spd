@@ -995,28 +995,6 @@
       <HelpText>Maximun number of performance log entries during PEI phase.</HelpText>
     </PcdEntry>
     <PcdEntry>
-      <C_Name>PcdFlashFvBaseArray</C_Name>
-      <Token>0x31000001</Token>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>VOID*</DatumType>
-      <ValidUsage>DYNAMIC</ValidUsage>
-      <DefaultValue>{}</DefaultValue>
-      <HelpText>This PCD is a array of EFI_PHYSICAL_ADDERSS of each Firmware Volume on the
-      platform. FVB driver will make use of this PCD entry to install EFI_FIRMWARE_BLOCK_PROTOCOL
-      on every FV specified.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdFlashFvBaseArrayElementNumber</C_Name>
-      <Token>0x32000002</Token>
-      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>UINT8</DatumType>
-      <ValidUsage>DYNAMIC</ValidUsage>
-      <DefaultValue>3</DefaultValue>
-      <HelpText>This PCD is a number element in the array defined by PcdFlashFvBaseArray in
-      gEfiGenericPlatformTokenSpaceGuid. Normally, we have 3 firmware volumes:
-      FV_MAIN, FV_RECOVERY, NV_STORAGE.</HelpText>
-    </PcdEntry>
-    <PcdEntry>
       <C_Name>PcdPeiPcdDatabaseSetEnabled</C_Name>
       <Token>0x00010030</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
@@ -1051,6 +1029,60 @@
       <ValidUsage>FEATURE_FLAG</ValidUsage>
       <DefaultValue>FALSE</DefaultValue>
       <HelpText>This feature flag can be used to enable or disable the PCD service PEIM to handle DynamicEX PCD. If a platform has no module to use DynamicEX  in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashNvStorageVariableBase</C_Name>
+      <Token>0x30000001</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
+      <DefaultValue>0xFFFB0000</DefaultValue>
+      <HelpText>Base address of the variable section in NV firmware volume.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashNvStorageVariableSize</C_Name>
+      <Token>0x30000002</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
+      <DefaultValue>0x0000A000</DefaultValue>
+      <HelpText>Size of the variable section in NV firmware volume..</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashNvStorageFtwSpareBase</C_Name>
+      <Token>0x30000013</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
+      <DefaultValue>0xFFFC0000</DefaultValue>
+      <HelpText>Base address of the FTW spare block section in NV firmware volume.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashNvStorageFtwSpareSize</C_Name>
+      <Token>0x30000014</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
+      <DefaultValue>0x00010000</DefaultValue>
+      <HelpText>Size of the FTW spare block section in NV firmware volume.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashNvStorageFtwWorkingBase</C_Name>
+      <Token>0x30000010</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
+      <DefaultValue>0xFFFBE000</DefaultValue>
+      <HelpText>Base address of the FTW working block section in NV firmware volume.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdFlashNvStorageFtwWorkingSize</C_Name>
+      <Token>0x30000011</Token>
+      <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>UINT32</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
+      <DefaultValue>0x00002000</DefaultValue>
+      <HelpText>Size of the FTW working block section in NV firmware volume.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
