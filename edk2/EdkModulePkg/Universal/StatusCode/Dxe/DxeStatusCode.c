@@ -137,7 +137,7 @@ InitializationDispatcherWorker (
       //
       // See whether there is gap of packet or not
       //
-      if (HobStart) {
+      if (NULL != HobStart) {
         HobStart  = NULL;
         Hob.Raw   = HobStart;
         continue;

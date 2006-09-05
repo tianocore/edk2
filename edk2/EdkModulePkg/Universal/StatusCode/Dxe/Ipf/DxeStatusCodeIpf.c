@@ -1,5 +1,5 @@
 /** @file
-  Status code driver for IA32/X64/EBC architecture.
+* Status code driver for IPF architecture.
 
   Copyright (c) 2006, Intel Corporation                                                         
   All rights reserved. This program and the accompanying materials                          
@@ -76,8 +76,8 @@ ReportEsalServiceEntry (
     // Use atom operation to avoid the reentant of report.
     // If current status is not zero, then the function is reentrancy.
     //
-    if (InterlockedCompareExchange32 (&DxeStatusCode->StatusCodeNestStatus, 0, 1)) {
-      ReturnVal.Status = EFI_DEVICE_ERROR ;
+    if (1 == InterlockedCompareExchange32 (&DxeStatusCode->StatusCodeNestStatus, 0, 1)) {
+      ReturnVal.Status = EFI_DEVICE_ERROR;
       return ReturnVal;
     }
 
@@ -150,6 +150,8 @@ DxeStatusCodeDriverEntry (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+  EFI_STATUS Status;
+
   //
   // Dispatch initialization request to supported devices
   //
@@ -158,13 +160,14 @@ DxeStatusCodeDriverEntry (
   //
   // Initialize ESAL capabilities.
   //
-  RegisterEsalClass (
-    &gEfiExtendedSalStatusCodeServicesProtocolGuid,
-    &gDxeStatusCode,
-    ReportEsalServiceEntry,
-    StatusCode,
-    NULL
-    );
+  Status = RegisterEsalClass (
+             &gEfiExtendedSalStatusCodeServicesProtocolGuid,
+             &gDxeStatusCode,
+             ReportEsalServiceEntry,
+             StatusCode,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }
