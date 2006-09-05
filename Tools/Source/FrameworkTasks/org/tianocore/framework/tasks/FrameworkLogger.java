@@ -34,4 +34,7 @@ class FrameworkLogger implements LogMethod {
         String frameworkMsg = " [" + this.titleName + "] " + msg;
         this.project.log(frameworkMsg, Project.MSG_INFO);
     }
+    
+    public void flushToFile(File file) {
+    }
 }
