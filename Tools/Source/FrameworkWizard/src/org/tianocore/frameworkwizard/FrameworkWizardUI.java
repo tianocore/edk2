@@ -17,6 +17,8 @@ package org.tianocore.frameworkwizard;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowEvent;
@@ -106,7 +108,8 @@ import org.tianocore.frameworkwizard.toolchain.Preferences;
  It extends IFrame implements MouseListener, TreeSelectionListener, ComponentListener and MenuListener
 
  **/
-public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSelectionListener, MenuListener {
+public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListener, TreeSelectionListener,
+                                             MenuListener {
     ///
     /// Define class Serial Version UID
     ///
@@ -1758,7 +1761,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         //
         SplashScreen ss = new SplashScreen();
         ss.setVisible(true);
-        
+
         //
         // Set current workspace and check
         // Check if exists WORKSPACE
@@ -1776,7 +1779,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         // Init Global Data
         //
         GlobalData.init();
-        
+
         //
         // Close splash screen
         //
@@ -2016,6 +2019,7 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         dmtnRoot.add(dmtnPlatformDescription);
         iTree = new ITree(dmtnRoot);
         iTree.addMouseListener(this);
+        iTree.addKeyListener(this);
         jScrollPaneTree.setViewportView(iTree);
     }
 
@@ -2493,6 +2497,13 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
         try {
             id = iTree.getSelectNode().getId();
             intCategory = iTree.getSelectCategory();
+
+            //
+            // If id is null, return directly
+            //
+            if (id == null) {
+                return;
+            }
 
             //              
             // If the node is not opened yet
@@ -3399,6 +3410,24 @@ public class FrameworkWizardUI extends IFrame implements MouseListener, TreeSele
                 } else {
                     jMenuItemToolsClone.setEnabled(true);
                 }
+            }
+        }
+    }
+
+    public void keyTyped(KeyEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void keyPressed(KeyEvent arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void keyReleased(KeyEvent arg0) {
+        if (arg0.getSource() == this.iTree) {
+            if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+                this.doubleClickModuleTreeNode();
             }
         }
     }
