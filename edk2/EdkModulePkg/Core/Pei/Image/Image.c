@@ -105,10 +105,10 @@ Returns:
       }
 
       //
-      // Got the entry point from ImageEntryPoint
+      // Got the entry point from ImageEntryPoint and ImageStartAddress
       //
+      Pe32Data    = (VOID *) ((UINTN) ImageAddress);
       *EntryPoint = (VOID *) ((UINTN) ImageEntryPoint);
-      return EFI_SUCCESS;
     } else {
       //
       // Retrieve the entry point from the TE image header
@@ -171,23 +171,27 @@ Returns:
     // is present in the image. You have to check the NumberOfRvaAndSizes in
     // the optional header to verify a desired directory entry is there.
     //
-    DebugEntry      = NULL;
-    DirectoryEntry  = NULL;
-    TEImageAdjust   = 0;
+    DebugEntry          = NULL;
+    DirectoryEntry      = NULL;
+    NumberOfRvaAndSizes = 0;
+    TEImageAdjust       = 0;
+    
     if (TEImageHeader == NULL) {
       if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
         //     
-        // Use PE32 offset
+        // Use PE32 offset get Debug Directory Entry
         //
         NumberOfRvaAndSizes = Hdr.Pe32->OptionalHeader.NumberOfRvaAndSizes;
         DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG]);
-      } else {
+        DebugEntry     = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) ((UINTN) Pe32Data + DirectoryEntry->VirtualAddress);
+      } else if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
         //     
-        // Use PE32+ offset
+        // Use PE32+ offset get Debug Directory Entry
         //
         NumberOfRvaAndSizes = Hdr.Pe32Plus->OptionalHeader.NumberOfRvaAndSizes;
         DirectoryEntry = (EFI_IMAGE_DATA_DIRECTORY *)&(Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG]);
-      }    
+        DebugEntry     = (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *) ((UINTN) Pe32Data + DirectoryEntry->VirtualAddress);
+      }
 
       if (NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY_DEBUG) {
         DirectoryEntry = NULL;
