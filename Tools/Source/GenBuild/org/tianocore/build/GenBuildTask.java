@@ -35,10 +35,8 @@ import org.apache.xmlbeans.XmlObject;
 
 import org.tianocore.common.definitions.ToolDefinitions;
 import org.tianocore.common.exception.EdkException;
-import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.autogen.AutoGen;
 import org.tianocore.build.fpd.FpdParserTask;
-import org.tianocore.build.global.GenBuildLogger;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.global.SurfaceAreaQuery;
@@ -130,13 +128,6 @@ public class GenBuildTask extends Ant {
     	if (!FrameworkBuildTask.multithread) {
             cleanupProperties();
         }
-        
-        //
-        // set Logger
-        //
-        GenBuildLogger logger = new GenBuildLogger(getProject());
-        EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
 
         //
         // Enable all specified properties

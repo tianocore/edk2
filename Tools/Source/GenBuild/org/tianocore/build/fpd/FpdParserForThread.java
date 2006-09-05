@@ -1,9 +1,6 @@
 /** @file
  This file is ANT task FpdParserTask. 
  
- FpdParserTask is used to parse FPD (Framework Platform Description) and generate
- build.out.xml. It is for Package or Platform build use. 
- 
  Copyright (c) 2006, Intel Corporation
  All rights reserved. This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
@@ -37,31 +34,6 @@ import org.tianocore.build.GenBuildThread;
 import org.tianocore.common.exception.EdkException;
 
 /**
-  <code>FpdParserTask</code> is an ANT task. The main function is parsing Framework
-  Platform Descritpion (FPD) XML file and generating its ANT build script for 
-  corresponding platform.  
-
-  <p>The task sets global properties PLATFORM, PLATFORM_DIR, PLATFORM_RELATIVE_DIR
-  and BUILD_DIR. </p>
-  
-  <p>The task generates ${PLATFORM}_build.xml file which will be called by top level
-  build.xml. The task also generate Fv.inf files (File is for Tool GenFvImage) 
-  and flash definition file (File is for Tool FlashMap) if necessary. </p>
-  
-  <p>FpdParserTask task stores all FPD information to GlobalData. And parse
-  tools definition file to set up compiler options for different Target and
-  different ToolChainTag. </p>
-  
-  <p>The method parseFpdFile is also prepared for single module build. </p>
-  
-  <p>The usage is (take NT32 Platform for example):</p>
-
-  <pre>
-  &lt;FPDParser platformName="Nt32" /&gt;
-  </pre>
-
-  <p>The task will initialize all information through parsing Framework Database, 
-  SPD, Tool chain configuration files. </p>
 
   @since GenBuild 1.0
 **/
@@ -94,19 +66,8 @@ public class FpdParserForThread extends FpdParserTask {
     }
 
     /**
-     ANT task's entry method. The main steps is described as following: 
      
-     <ul>
-     <li>Initialize global information (Framework DB, SPD files and all MSA files 
-     listed in SPD). This step will execute only once in whole build process;</li>
-     <li>Parse specified FPD file; </li>
-     <li>Generate FV.inf files; </li>
-     <li>Generate PlatformName_build.xml file for Flatform build; </li>
-     <li>Collect PCD information. </li>
-     </ul>
-     
-     @throws BuildException
-     Surface area is not valid. 
+
     **/
     public void execute() throws BuildException {
         //

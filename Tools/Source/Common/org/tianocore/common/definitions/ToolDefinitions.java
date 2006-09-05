@@ -97,4 +97,7 @@ public class ToolDefinitions {
     public final static String TARGET_KEY_TOOLCHAIN           = "TOOL_CHAIN_TAG";
     public final static String TARGET_KEY_ARCH                = "TARGET_ARCH";
     public final static String TARGET_KEY_TOOLS_DEF           = "TOOL_CHAIN_CONF";
+    public final static String TARGET_KEY_MULTIPLE_THREAD     = "MULTIPLE_THREAD";
+    public final static String TARGET_KEY_MAX_CONCURRENT_THREAD_NUMBER 
+        = "MAX_CONCURRENT_THREAD_NUMBER";
 }

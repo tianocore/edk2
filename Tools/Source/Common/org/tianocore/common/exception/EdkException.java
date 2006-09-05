@@ -20,7 +20,7 @@ package org.tianocore.common.exception;
 
 public class EdkException extends Exception {
     static final long serialVersionUID = -8494188017252114029L;
-    private StackTraceElement[] stackTrace;
+
     public static boolean isPrintStack = false;
 
     public EdkException(String message) {

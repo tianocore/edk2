@@ -26,10 +26,12 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.tianocore.build.fpd.FpdParserForThread;
 import org.tianocore.build.fpd.FpdParserTask;
+import org.tianocore.build.global.GenBuildLogger;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.toolchain.ConfigReader;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.common.definitions.ToolDefinitions;
+import org.tianocore.common.logger.EdkLog;
 
 /**
   <p>
@@ -103,6 +105,13 @@ public class FrameworkBuildTask extends Task{
     private String type = "all";
     
     public void execute() throws BuildException {
+        //
+        // set Logger
+        //
+        GenBuildLogger logger = new GenBuildLogger(getProject());
+        EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
+        EdkLog.setLogger(logger);
+
         //
         // Seach build.xml -> .FPD -> .MSA file
         //
@@ -200,7 +209,7 @@ public class FrameworkBuildTask extends Task{
                 fpdParserForThread.setType(type);
                 fpdParserForThread.setProject(getProject());
                 fpdParserForThread.setFpdFile(buildFile);
-                fpdParserForThread.execute();
+                fpdParserForThread.perform();
                 return ;
             }
             
@@ -208,7 +217,7 @@ public class FrameworkBuildTask extends Task{
             fpdParserTask.setType(type);
             fpdParserTask.setProject(getProject());
             fpdParserTask.setFpdFile(buildFile);
-            fpdParserTask.execute();
+            fpdParserTask.perform();
             
             //
             // If cleanall delete the Platform_build.xml
@@ -239,7 +248,7 @@ public class FrameworkBuildTask extends Task{
             }
             genBuildTask.setProject(getProject());
             genBuildTask.setMsaFile(buildFile);
-            genBuildTask.execute();
+            genBuildTask.perform();
         }
     }
     
@@ -268,7 +277,6 @@ public class FrameworkBuildTask extends Task{
             String name = (String)piter.next();
             originalProperties.put(new String(name), new String((String)allProperties.get(name)));
         }
-        
     }
 
     private File intercommuniteWithUser(){
@@ -370,12 +378,12 @@ public class FrameworkBuildTask extends Task{
                 activePlatform = str;
             }
             
-            str = getValue("MULTIPLE_THREAD", targetFileInfo);
+            str = getValue(ToolDefinitions.TARGET_KEY_MULTIPLE_THREAD, targetFileInfo);
             if (str != null && str.trim().equalsIgnoreCase("Enable")) {
                 multithread = true;
             }
             
-            str = getValue("MAX_CONCURRENT_THREAD_NUMBER", targetFileInfo);
+            str = getValue(ToolDefinitions.TARGET_KEY_MAX_CONCURRENT_THREAD_NUMBER, targetFileInfo);
             if (str != null ) {
                 try {
                     int threadNum = Integer.parseInt(str);
