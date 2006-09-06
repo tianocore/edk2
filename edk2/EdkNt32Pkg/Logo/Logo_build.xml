@@ -20,31 +20,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   <property name="BASE_NAME" value="Logo" /> 
   
   <!-- Default target --> 
-  <target name="main" depends="sourcefiles, sections, output" /> 
-
-  <target name="sourcefiles">
-    <copy file="${MODULE_DIR}/Logo.bmp" 
-      tofile="${DEST_DIR_OUTPUT}/Logo.bmp" />
-  </target>
+  <target name="main" depends="sections, output" /> 
   
   <target name="sections">
     <OnDependency>
       <sourcefiles>
-        <file name="${DEST_DIR_OUTPUT}/logo.bmp"/>
+        <file name="${MODULE_DIR}/logo.bmp"/>
       </sourcefiles>
       <targetfiles>
         <file name="${DEST_DIR_OUTPUT}/Logo.sec"/>
       </targetfiles>
       
       <sequential>
-        <gensection inputfile="${DEST_DIR_OUTPUT}/logo.bmp" 
+        <gensection inputfile="${MODULE_DIR}/logo.bmp" 
           outputfile="${DEST_DIR_OUTPUT}/Logo.sec" 
           sectiontype="EFI_SECTION_RAW" />
       </sequential>
     </OnDependency>
   </target>
 
-  <target name="output">
+  <target name="output" depends="sections">
     <OnDependency>
       <sourcefiles>
         <file name="${DEST_DIR_OUTPUT}/Logo.sec"/>
