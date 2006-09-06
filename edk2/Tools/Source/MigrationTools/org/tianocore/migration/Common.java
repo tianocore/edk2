@@ -192,4 +192,19 @@ public final class Common {
 		
 		public abstract String namechange(String oldname);
 	}
+	
+	public static interface Element {
+		
+//		public int replace = 0;
+//		public int type = 1;
+		
+		public String getReplace(String key);
+		
+//		public void getType(String key);
+//		
+//		public void setReplace(int num);
+//		
+//		public void setType(int num);
+		
+	}
 }

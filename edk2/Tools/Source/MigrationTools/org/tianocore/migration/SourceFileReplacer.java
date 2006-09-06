@@ -281,12 +281,21 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
 		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
 		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
-		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
+		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?(.*?R8_(\\w*).*?)////~", Pattern.DOTALL);
 		Matcher mtrr8only = ptnr8only.matcher(line);
 		Matcher mtrr8onlyhead;
+		
+		//add head comment
+		Matcher mtrr8onlyheadcomment = Critic.PTN_NEW_HEAD_COMMENT.matcher(line);
+		if (mtrr8onlyheadcomment.find()) {
+			outfile1.append(mtrr8onlyheadcomment.group() + "\n\n");
+			outfile2.append(mtrr8onlyheadcomment.group() + "\n\n");
+		}
+		
+		//add functions body
 		while (mtrr8only.find()) {
-			if (mi.hashr8only.contains(mtrr8only.group(2))) {
-				paragraph = mtrr8only.group();
+			if (mi.hashr8only.contains(mtrr8only.group(3))) {
+				paragraph = mtrr8only.group(2);
 				outfile1.append(paragraph + "\n\n");
 				if (mtrr8only.group(1).length() != 0) {
 					mi.hashrequiredr9libs.add(mtrr8only.group(1));
