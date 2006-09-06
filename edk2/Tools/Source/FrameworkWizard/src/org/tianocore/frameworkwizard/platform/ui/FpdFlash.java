@@ -162,7 +162,8 @@ public class FpdFlash extends IInternalFrame {
     private String determinedFvBlockSize = null;
     private String erasePolarity = "";
     boolean memModified = false;
-    
+    private FvOptsTableModel fvInFdfOptTableModel = null;
+    private FvOptsTableModel fvAdditionalOptTableModel = null;
     
     public FpdFlash() {
         super();
@@ -1171,7 +1172,7 @@ public class FpdFlash extends IInternalFrame {
                 if (blockSizeWellFormat && numOfBlockWellFormat) {
                     int size = Integer.decode(bSize);
                     int num = Integer.decode(numBlks);
-                    fvSize = size*num + "";
+                    fvSize = "0x" + Integer.toHexString(size*num);
                 }
             }
             fvAdditionalTableModel.addRow(new String[]{fvName, fvSize, fvFile});
@@ -1659,7 +1660,7 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonFvInFdfOptions == null) {
             jButtonFvInFdfOptions = new JButton();
             jButtonFvInFdfOptions.setPreferredSize(new java.awt.Dimension(80,20));
-            jButtonFvInFdfOptions.setEnabled(false);
+            jButtonFvInFdfOptions.setEnabled(true);
             jButtonFvInFdfOptions.setText("Options");
             jButtonFvInFdfOptions.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -1667,10 +1668,28 @@ public class FpdFlash extends IInternalFrame {
                     if (selectedRow < 0) {
                         return;
                     }
+                    String fvName = jTableFvInFdf.getValueAt(selectedRow, 0)+"";
+                    DefaultTableModel dtm = getFvInFdfOptTableModel();
+                    new FpdFvOptions(fvName, dtm, ffc, docConsole);
                 }
             });
         }
         return jButtonFvInFdfOptions;
+    }
+    
+    private DefaultTableModel getFvInFdfOptTableModel() {
+        if (fvInFdfOptTableModel == null) {
+            fvInFdfOptTableModel = new FvOptsTableModel();
+            fvInFdfOptTableModel.addColumn("Name");
+            fvInFdfOptTableModel.addColumn("Value");
+            Vector<Object> v = new Vector<Object>();
+            v.add("EFI_BLOCK_SIZE");
+            v.add("EFI_NUM_BLOCKS");
+            v.add("EFI_FILE_NAME");
+            fvInFdfOptTableModel.setVKeyWords(v);
+            fvInFdfOptTableModel.setVNonEditableName(v);
+        }
+        return fvInFdfOptTableModel;
     }
 
     /**
@@ -1910,7 +1929,7 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonAddFvOptions == null) {
             jButtonAddFvOptions = new JButton();
             jButtonAddFvOptions.setPreferredSize(new java.awt.Dimension(80,20));
-            jButtonAddFvOptions.setEnabled(false);
+            jButtonAddFvOptions.setEnabled(true);
             jButtonAddFvOptions.setText("Options");
             jButtonAddFvOptions.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -2594,6 +2613,57 @@ public class FpdFlash extends IInternalFrame {
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
 
+class FvOptsTableModel extends DefaultTableModel {
+
+    private static final long serialVersionUID = 1L;
+    
+    private Vector<Object> vNonEditableName = new Vector<Object>();
+    private Vector<Object> vKeyWords = new Vector<Object>();
+    
+    public boolean isCellEditable(int row, int col) {
+        if (vNonEditableName.size() > 0 || vKeyWords.size() > 0) {
+            if (vKeyWords.contains(getValueAt(row, 0))) {
+                return false;
+            }
+            if (vNonEditableName.contains(getValueAt(row, 0)) && col == 0) {
+                return false;
+            }
+        }  
+       
+        return true;
+    }
+
+    /**
+     * @return Returns the vKeyWords.
+     */
+    protected Vector<Object> getVKeyWords() {
+        return vKeyWords;
+    }
+
+    /**
+     * @param keyWords The vKeyWords to set.
+     */
+    protected void setVKeyWords(Vector<Object> keyWords) {
+        vKeyWords.removeAllElements();
+        vKeyWords.addAll(keyWords);
+    }
+
+    /**
+     * @return Returns the vNonEditableName.
+     */
+    protected Vector<Object> getVNonEditableName() {
+        return vNonEditableName;
+    }
+
+    /**
+     * @param nonEditableName The vNonEditableName to set.
+     */
+    protected void setVNonEditableName(Vector<Object> nonEditableName) {
+        vNonEditableName.removeAllElements();
+        vNonEditableName.addAll(nonEditableName);
+    }
+    
+}
 class ImageParaTableModel extends DefaultTableModel {
 
     private static final long serialVersionUID = 1L;

@@ -440,6 +440,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private void initialize() {
         this.setSize(664, 515);
+        this.setResizable(false);
         this.centerWindow();
         this.setModal(true);
         this.setTitle("Module Settings");
