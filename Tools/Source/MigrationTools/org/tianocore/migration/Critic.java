@@ -105,7 +105,11 @@ public final class Critic {
 						} else if (inequation && line.trim().length() != 0) {
 							templine.append("#%#%" + line + "\n");
 						} else {
-							templine.append("  " + line.trim() + "\n");
+							if (line.trim().length() == 0) {
+								templine.append("  " + line.trim() + "\n");
+							} else {
+								templine.append("  @return " + line.trim() + "\n");
+							}
 						}
 					}
 				} else {
