@@ -178,10 +178,18 @@ public final class Common {
 	}
 	
 	public static abstract class Laplace {
-		public final void transform(String src, String des) throws Exception {
+		public void transform(String src, String des) throws Exception {
 			Common.string2file(operation(Common.file2string(src)), des);
 		}
 		
+		public void run() {
+			
+		}
+		
 		public abstract String operation(String wholeline);
+		
+		public abstract boolean recognize(String filename);
+		
+		public abstract String namechange(String oldname);
 	}
 }
