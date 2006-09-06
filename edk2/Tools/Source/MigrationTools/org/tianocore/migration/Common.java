@@ -29,9 +29,11 @@ public final class Common {
 	
 	public static final String replaceAll(String line, Pattern ptn, String des) {
 		Matcher mtr = ptn.matcher(line);
+
 		if (mtr.find()) {
 			 return mtr.replaceAll(des);
 		}
+		
 		return line;
 	}
 
