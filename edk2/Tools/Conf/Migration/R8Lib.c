@@ -1,5 +1,8 @@
 /** @file
-  Obsolete library.
+  Obsolete library interfaces.
+
+  This file contains part of obsolete library interfaces in EDK.
+  User is recommended to follow the porting Guide in R8Lib.c to elimante them.
 
   Copyright (c) 2006, Intel Corporation
   All rights reserved. This program and the accompanying materials
@@ -12,7 +15,7 @@
 
 **/
 
-////
+////#UefiBootServicesTableLib
 EFI_STATUS
 R8_EfiLibInstallDriverBinding (
   IN EFI_HANDLE                   ImageHandle,
@@ -32,27 +35,23 @@ Routine Description:
 
 Arguments:
 
-  ImageHandle         - The image handle of the driver
-
+  ImageHandle         - The image handle of the driver.
   SystemTable         - The EFI System Table that was passed to the driver's entry point
-
   DriverBinding       - A Driver Binding Protocol instance that this driver is producing
-
   DriverBindingHandle - The handle that DriverBinding is to be installe onto.  If this
                         parameter is NULL, then a new handle is created.
 
 Returns: 
 
-  EFI_SUCCESS is DriverBinding is installed onto DriverBindingHandle
-
-  Otherwise, then return status from gBS->InstallProtocolInterface()
+  EFI_SUCCESS         - DriverBinding is installed onto DriverBindingHandle
+  Others              - Some error occurs when executing gBS->InstallProtocolInterface()
 
 --*/
 {
   //
   // Porting Guide:
   // This obsolete Edk library interface installs driver binding protocol.
-  // If the entry point of that module only invoke this function, it can
+  // If the entry point of that module ONLY invokes this function, it can
   // use UefiDriverModuleLib in MdePkg and expose "DriverBinding" protocol interface
   // at the <Externs> tag, build tool will auto generate code to handle it.
   // For example:
@@ -63,7 +62,6 @@ Returns:
   // </Externs>
   //
   DriverBinding->ImageHandle          = ImageHandle;
-
   DriverBinding->DriverBindingHandle  = DriverBindingHandle;
 
   return gBS->InstallProtocolInterface (
@@ -75,16 +73,16 @@ Returns:
 }
 ////~
 
-////
+////#UefiBootServicesTableLib
 EFI_STATUS
 R8_EfiLibInstallAllDriverProtocols (
   IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   * SystemTable,
-  IN EFI_DRIVER_BINDING_PROTOCOL        * DriverBinding,
+  IN EFI_SYSTEM_TABLE                   *SystemTable,
+  IN EFI_DRIVER_BINDING_PROTOCOL        *DriverBinding,
   IN EFI_HANDLE                         DriverBindingHandle,
-  IN EFI_COMPONENT_NAME_PROTOCOL        * ComponentName, OPTIONAL
-  IN EFI_DRIVER_CONFIGURATION_PROTOCOL  * DriverConfiguration, OPTIONAL
-  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    * DriverDiagnostics OPTIONAL
+  IN EFI_COMPONENT_NAME_PROTOCOL        *ComponentName, OPTIONAL
+  IN EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics OPTIONAL
   )
 /*++
 
@@ -99,25 +97,18 @@ Routine Description:
 Arguments:
 
   ImageHandle         - The image handle of the driver
-
   SystemTable         - The EFI System Table that was passed to the driver's entry point
-
   DriverBinding       - A Driver Binding Protocol instance that this driver is producing
-
   DriverBindingHandle - The handle that DriverBinding is to be installe onto.  If this
                         parameter is NULL, then a new handle is created.
-
   ComponentName       - A Component Name Protocol instance that this driver is producing
-
   DriverConfiguration - A Driver Configuration Protocol instance that this driver is producing
-  
   DriverDiagnostics   - A Driver Diagnostics Protocol instance that this driver is producing
 
 Returns: 
 
-  EFI_SUCCESS if all the protocols were installed onto DriverBindingHandle
-
-  Otherwise, then return status from gBS->InstallProtocolInterface()
+  EFI_SUCCESS         - DriverBinding is installed onto DriverBindingHandle
+  Others              - Some error occurs when executing gBS->InstallProtocolInterface()
 
 --*/
 {
@@ -125,7 +116,7 @@ Returns:
   // Porting Guide:
   // This obsolete Edk library interface installs driver binding protocol
   // with optional component name, driver configuration & driver diagnotics protocols.
-  // If the entry point of that module only invoke this function, it can
+  // If the entry point of that module ONLY invokes this function, it can
   // use UefiDriverModuleLib in MdePkg and expose "DriverBinding", "ComponentName",
   // "DriverConfiguration" and "DriverDiagnostics" protocol interfaces.
   // at the <Externs> tag, build tool will auto generate code to handle it.
@@ -141,7 +132,15 @@ Returns:
   //
   EFI_STATUS  Status;
 
-  Status = R8_EfiLibInstallDriverBinding (ImageHandle, SystemTable, DriverBinding, DriverBindingHandle);
+  DriverBinding->ImageHandle          = ImageHandle;
+  DriverBinding->DriverBindingHandle  = DriverBindingHandle;
+
+  Status = gBS->InstallProtocolInterface (
+                  &DriverBinding->DriverBindingHandle,
+                  &gEfiDriverBindingProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  DriverBinding
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -242,16 +241,16 @@ R8_BufToHexString (
     At a minimum, any blob of data could be represented as a hex string.
 
   Arguments:
-    Str - Pointer to the string.
+    Str                   - Pointer to the string.
     HexStringBufferLength - Length in bytes of buffer to hold the hex string. Includes tailing '\0' character.
-                                        If routine return with EFI_SUCCESS, containing length of hex string buffer.
-                                        If routine return with EFI_BUFFER_TOO_SMALL, containg length of hex string buffer desired.
-    Buf - Buffer to be converted from.
-    Len - Length in bytes of the buffer to be converted.
+                            If routine return with EFI_SUCCESS, containing length of hex string buffer.
+                            If routine return with EFI_BUFFER_TOO_SMALL, containg length of hex string buffer desired.
+    Buf                   - Buffer to be converted from.
+    Len                   - Length in bytes of the buffer to be converted.
 
   Returns:
-    EFI_SUCCESS: Routine success.
-    EFI_BUFFER_TOO_SMALL: The hex string buffer is too small.
+    EFI_SUCCESS             - Routine success.
+    EFI_BUFFER_TOO_SMALL    - The hex string buffer is too small.
 
 --*/
 {
@@ -308,10 +307,8 @@ Arguments:
   
   str     - Pointer to the null-terminated string to be trimmed. On return, 
             str will hold the trimmed string. 
-  CharC       - Character will be trimmed from str.
+  CharC   - Character will be trimmed from str.
   
-Returns:
-
 --*/
 {
   //
@@ -375,11 +372,8 @@ Routine Description:
 Arguments:
 
   Buffer - Location to place ascii hex string of Value.
-
   Value  - Hex value to convert to a string in Buffer.
-
   Flags  - Flags to use in printing Hex string, see file header for details.
-
   Width  - Width of hex value.
 
 Returns: 
@@ -482,9 +476,8 @@ R8_HexStringToBuf (
     ConvertedStrLen - Length of the Hex String consumed.
 
   Returns:
-    EFI_SUCCESS: Routine Success.
-    EFI_BUFFER_TOO_SMALL: The buffer is too small to hold converted data.
-    EFI_
+    EFI_SUCCESS           - Routine Success.
+    EFI_BUFFER_TOO_SMALL  - The buffer is too small to hold converted data.
 
 --*/
 {
@@ -645,13 +638,13 @@ Routine Description:
   
 Arguments:
 
-  Type          The HOB type to return.
-  HobStart      The first HOB in the HOB list.
+  Type          - The HOB type to return.
+  HobStart      - The first HOB in the HOB list.
     
 Returns:
 
-  HobStart      There were no HOBs found with the requested type.
-  else          Returns the first HOB with the matching type.
+  HobStart      - There were no HOBs found with the requested type.
+  Other         - The first HOB with the matching type.
 
 --*/
 {
@@ -771,13 +764,11 @@ Routine Description:
 Arguments:
 
   HobStart      - Start pointer of hob list
-  
   BootMode      - Current boot mode recorded in PHIT hob
 
 Returns:
 
   EFI_NOT_FOUND     - Invalid hob header
-  
   EFI_SUCCESS       - Boot mode found
 
 --*/
@@ -792,7 +783,7 @@ Returns:
   // EFI_HOB_HANDOFF_INFO_TABLE *HandOffHob;
   //
   // HandOffHob = GetHobList ();  
-  // ASSERT (HandOffHob->Header.HobType = EFI_HOB_TYPE_HANDOFF);
+  // ASSERT (HandOffHob->Header.HobType == EFI_HOB_TYPE_HANDOFF);
   // 
   // BootMode = HandOffHob->BootMode;
   //
@@ -825,15 +816,12 @@ Routine Description:
 Arguments:
 
   HobStart            - Start pointer of hob list
-  
   SizeOfMemorySpace   - Size of memory size
-  
   SizeOfIoSpace       - Size of IO size
 
 Returns:
 
   EFI_NOT_FOUND     - CPU hob not found
-  
   EFI_SUCCESS       - CPU hob found and information got.
 
 --*/
@@ -936,15 +924,12 @@ Routine Description:
 Arguments:
 
   HobStart        - Start pointer of hob list
-  
   BaseAddress     - Start address of next firmware volume
-  
   Length          - Length of next firmware volume
 
 Returns:
 
   EFI_NOT_FOUND   - Next firmware volume not found
-  
   EFI_SUCCESS     - Next firmware volume found with address information
 
 --*/
@@ -998,18 +983,14 @@ Routine Description:
   Get the next guid hob.
   
 Arguments:
-  HobStart        A pointer to the start hob.
-  Guid            A pointer to a guid.
-  Buffer          A pointer to the buffer.
-  BufferSize      Buffer size.
+  HobStart        - A pointer to the start hob.
+  Guid            - A pointer to a guid.
+  Buffer          - A pointer to the buffer.
+  BufferSize      - Buffer size.
   
 Returns:
-  Status code.
-
   EFI_NOT_FOUND          - Next Guid hob not found
-  
   EFI_SUCCESS            - Next Guid hob found and data for this Guid got
-  
   EFI_INVALID_PARAMETER  - invalid parameter
 
 --*/
@@ -1062,7 +1043,6 @@ Routine Description:
 Arguments:
 
   HobStart      - Start pointer of hob list
-  
   PalEntry      - Pointer to PAL entry
 
 Returns:
@@ -1099,7 +1079,6 @@ Routine Description:
 Arguments:
 
   HobStart              - Start pointer of hob list
-  
   IoPortSpaceAddress    - IO port space address
 
 Returns:
