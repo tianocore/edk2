@@ -2847,6 +2847,22 @@ public class FpdFileContents {
         }
     }
     
+    public void removeTypedNamedFvImageNameValue (String fvName, String type, String optName) {
+        Vector<FvImagesDocument.FvImages.FvImage> vFvImage = getFvImagesFvImageWithName(fvName, type);
+        for (int i = 0; i < vFvImage.size(); ++i) {
+            FvImagesDocument.FvImages.FvImage fi = vFvImage.get(i);
+            if (fi.getFvImageOptions() != null && fi.getFvImageOptions().getNameValueList() != null) {
+                ListIterator<FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue> li = fi.getFvImageOptions().getNameValueList().listIterator();
+                while (li.hasNext()) {
+                    FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = li.next();
+                    if (nv.getName().equals(optName)) {
+                        li.remove();
+                    }
+                }
+            }
+        }
+    }
+    
     /**Add name-value pair to FvImage element with type.
      * @param fvName FV name to add name-value pair.
      * @param type FvImage attribute.
@@ -2854,6 +2870,7 @@ public class FpdFileContents {
      * @param value
      */
     public void setTypedNamedFvImageNameValue (String fvName, String type, String name, String value) {
+        boolean fvImageExists = false;
         if (getfpdFlash().getFvImages() == null) {
             return;
         }
@@ -2870,7 +2887,14 @@ public class FpdFileContents {
             if (!fi.getFvImageNamesList().contains(fvName)) {
                 continue;
             }
+            fvImageExists = true;
             setFvImagesFvImageNameValue (fi, name, value, null);
+        }
+        
+        if (!fvImageExists) {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(name, value);
+            genFvImagesFvImage(new String[]{fvName}, type, map);
         }
     }
     
@@ -2895,6 +2919,7 @@ public class FpdFileContents {
             }
             setFvImagesFvImageNameValue (fi, name, value, null);
         }
+        
     }
     
     /**Add to FvImage the name-value pair, or replace old name with newName, or generate new name-value pair if not exists before.
