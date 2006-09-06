@@ -26,6 +26,7 @@ import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.common.definitions.EdkDefinitions;
+import org.tianocore.common.logger.EdkLog;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -129,7 +130,7 @@ public class FfsProcess {
         // Otherwise report warning message
         //
         if (buildType == null) {
-            System.out.println("Warning: this module doesn't specify a FfsFormatKey. ");
+            EdkLog.log(EdkLog.EDK_WARNING, "Warning: this module doesn't specify a FfsFormatKey. ");
         } else {
             throw new BuildException("Can't find the FfsFormatKey [" + buildType + "] attribute in the FPD file!");            
         }

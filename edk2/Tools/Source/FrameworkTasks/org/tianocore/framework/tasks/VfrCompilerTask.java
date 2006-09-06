@@ -167,7 +167,6 @@ public class VfrCompilerTask extends Task implements EfiDefine {
         } else {
             command = toolPath + "/" + "VfrCompile";
         }
-        List<Object> includePath = new ArrayList<Object>();     
         String incPath = "";        
 
         int count = includepathList.size();    

@@ -59,6 +59,18 @@ public class EdkLog {
             logger.putMessage(null, EDK_INFO, message);
         }
     }
+    
+    public static void log(Object o, int level, String message) {
+        if (level <= logLevel) {
+            logger.putMessage(o, level, message);
+        }
+    }
+
+    public static void log(Object o, String message) {
+        if (EDK_INFO <= logLevel) {
+            logger.putMessage(o, EDK_INFO, message);
+        }
+    }
 
     public static void flushLogToFile(File file) {
         logger.flushToFile(file);

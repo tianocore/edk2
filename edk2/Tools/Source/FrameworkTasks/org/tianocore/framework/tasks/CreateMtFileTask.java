@@ -63,12 +63,7 @@ public class CreateMtFileTask extends Task implements EfiDefine {
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
-        //
-        // set Logger
-        //
-        FrameworkLogger logger = new FrameworkLogger(project, "createmtfile");
-        EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
+
         //
         // absolute path of efi tools
         //
@@ -109,20 +104,20 @@ public class CreateMtFileTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(EdkLog.EDK_INFO, (new File(this.outputFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.outputFile)).getName());
             revl = runner.execute();
 
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_VERBOSE, "CreateMtFile succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "CreateMtFile succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("CreateMtFile failed!");
             }
         } catch (Exception e) {

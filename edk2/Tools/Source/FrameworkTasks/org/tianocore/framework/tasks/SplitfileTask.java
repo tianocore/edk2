@@ -59,13 +59,6 @@ public class SplitfileTask extends Task implements EfiDefine {
         Project project = this.getOwningTarget().getProject();
 
         //
-        // set Logger
-        //
-        FrameworkLogger logger = new FrameworkLogger(project, "splitfile");
-        EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
-
-        //
         // absolute path of efi tools
         //
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
@@ -99,19 +92,19 @@ public class SplitfileTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
 
-            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_VERBOSE, "SplitFile succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "SplitFile succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("SplitFile failed!");
             }
         } catch (Exception e) {

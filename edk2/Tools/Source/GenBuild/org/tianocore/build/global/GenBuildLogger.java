@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
 
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.common.logger.LogMethod;
@@ -72,40 +73,40 @@ public class GenBuildLogger implements LogMethod {
         //
         switch (msgLevel) {
         case EdkLog.EDK_ALWAYS:
-            this.project.log(msg, Project.MSG_INFO);
+            log(msgSource, msg, Project.MSG_INFO);
             break;
         case EdkLog.EDK_ERROR:
             if (flag) {
-                this.project.log(msg, Project.MSG_ERR);
+                log(msgSource, msg, Project.MSG_ERR);
             } else {
-                this.project.log(msg, Project.MSG_ERR);
+                log(msgSource, msg, Project.MSG_ERR);
                 v.add(msg);
             }
             break;
         case EdkLog.EDK_WARNING:
             if (flag) {
-                this.project.log(msg, Project.MSG_WARN);
+                log(msgSource, msg, Project.MSG_WARN);
             } else {
                 v.add(msg);
             }
             break;
         case EdkLog.EDK_INFO:
             if (flag) {
-                this.project.log(msg, Project.MSG_INFO);
+                log(msgSource, msg, Project.MSG_INFO);
             } else {
                 v.add(msg);
             }
             break;
         case EdkLog.EDK_VERBOSE:
             if (flag) {
-                this.project.log(msg, Project.MSG_VERBOSE);
+                log(msgSource, msg, Project.MSG_VERBOSE);
             } else {
                 v.add(msg);
             }
             break;
         case EdkLog.EDK_DEBUG:
             if (flag) {
-                this.project.log(msg, Project.MSG_DEBUG);
+                log(msgSource, msg, Project.MSG_DEBUG);
             } else {
                 v.add(msg);
             }
@@ -118,5 +119,13 @@ public class GenBuildLogger implements LogMethod {
         // Sort msg and store to the file (TBD)
         //
 
+    }
+    
+    private void log(Object msgSource, String msg, int level) {
+        if (msgSource instanceof Task) {
+            this.project.log((Task)msgSource, msg, level);
+        } else {
+            this.project.log(msg, level);
+        }
     }
 }

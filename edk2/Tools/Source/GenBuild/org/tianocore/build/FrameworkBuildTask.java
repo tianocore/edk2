@@ -15,6 +15,7 @@ package org.tianocore.build;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -24,6 +25,10 @@ import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+import org.tianocore.build.exception.AutoGenException;
+import org.tianocore.build.exception.GenBuildException;
+import org.tianocore.build.exception.PcdAutogenException;
+import org.tianocore.build.exception.PlatformPcdPreprocessBuildException;
 import org.tianocore.build.fpd.FpdParserForThread;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GenBuildLogger;
@@ -31,6 +36,7 @@ import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.toolchain.ConfigReader;
 import org.tianocore.build.toolchain.ToolChainInfo;
 import org.tianocore.common.definitions.ToolDefinitions;
+import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
 
 /**
@@ -105,6 +111,37 @@ public class FrameworkBuildTask extends Task{
     private String type = "all";
     
     public void execute() throws BuildException {
+        try {
+            processFrameworkBuild();
+        } catch (PcdAutogenException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (AutoGenException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (PlatformPcdPreprocessBuildException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (GenBuildException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (EdkException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        }
+    }
+    
+    private void processFrameworkBuild() throws EdkException, GenBuildException, AutoGenException, PcdAutogenException, PlatformPcdPreprocessBuildException {
         //
         // set Logger
         //
@@ -143,7 +180,7 @@ public class FrameworkBuildTask extends Task{
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new BuildException(e.getMessage());
         }
         
@@ -199,12 +236,12 @@ public class FrameworkBuildTask extends Task{
         // Build every FPD files (PLATFORM build)
         //
         if (buildFile.getName().endsWith(ToolDefinitions.FPD_EXTENSION)) {
-            System.out.println("Processing the FPD file [" + buildFile.getPath() + "] ..>> ");
+            EdkLog.log(this, "Processing the FPD file [" + buildFile.getPath() + "] ..>> ");
             //
             // Iff for platform build will enable the multi-thread if set in target.txt
             //
             if (multithread && type.equalsIgnoreCase("all")) {
-                System.out.println("Multi-thread build is enabled. ");
+                EdkLog.log(this, "Multi-thread build is enabled. ");
                 FpdParserForThread fpdParserForThread = new FpdParserForThread();
                 fpdParserForThread.setType(type);
                 fpdParserForThread.setProject(getProject());
@@ -237,8 +274,8 @@ public class FrameworkBuildTask extends Task{
         //
         else if (buildFile.getName().endsWith(ToolDefinitions.MSA_EXTENSION)) {
             File tmpFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
-            System.out.println("Using the FPD file [" + tmpFile.getPath() + "] for the active platform. ");
-            System.out.println("Processing the MSA file [" + buildFile.getPath() + "] ..>> ");
+            EdkLog.log(this, "Using the FPD file [" + tmpFile.getPath() + "] for the active platform. ");
+            EdkLog.log(this, "Processing the MSA file [" + buildFile.getPath() + "] ..>> ");
             GenBuildTask genBuildTask = new GenBuildTask();
             genBuildTask.setSingleModuleBuild(true);
             genBuildTask.setType(type);
@@ -290,13 +327,13 @@ public class FrameworkBuildTask extends Task{
                 index++;
             }
 
-            System.out.println("Finding " + allFiles.length + " FPD files: ");
+            EdkLog.log(this, "Finding " + allFiles.length + " FPD files: ");
             for (int i = 0; i < allFiles.length; i++) {
                 System.out.println("[" + (i + 1) + "]: " + allFiles[i].getName());
             }
             
             boolean flag = true;
-            System.out.print("Please select one of the following FPD files to build:[1] ");
+            EdkLog.log(this, "Please select one of the following FPD files to build:[1] ");
             do{
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 try {
@@ -308,7 +345,7 @@ public class FrameworkBuildTask extends Task{
                      }
                      int indexSelect = Integer.parseInt(str);
                      if (indexSelect <=0 || indexSelect > allFiles.length) {
-                         System.out.print("Please enter a number between [1.." + allFiles.length + "]:[1] ");
+                         EdkLog.log(this, "Please enter a number between [1.." + allFiles.length + "]:[1] ");
                          continue ;
                      } else {
                          file = allFiles[indexSelect - 1];
@@ -316,7 +353,7 @@ public class FrameworkBuildTask extends Task{
                          continue ;
                      }
                 } catch (Exception e) {
-                    System.out.print("Please enter a valid number:[1] ");
+                    EdkLog.log(this, "Please enter a valid number:[1] ");
                     flag = true;
                 }
             } while (flag);
@@ -335,68 +372,62 @@ public class FrameworkBuildTask extends Task{
         }
     }
     
-    private void readTargetFile(){
-        try {
-            String targetFile = getProject().getProperty("WORKSPACE_DIR") + File.separatorChar + targetFilename;
-            
-            String[][] targetFileInfo = ConfigReader.parse(targetFile);
-            
-            //
-            // Get ToolChain Info from target.txt
-            //
-            ToolChainInfo envToolChainInfo = new ToolChainInfo(); 
-            String str = getValue(ToolDefinitions.TARGET_KEY_TARGET, targetFileInfo);
-            if (str == null || str.trim().equals("")) {
-                envToolChainInfo.addTargets("*");
-            } else {
-                envToolChainInfo.addTargets(str);
-            }
-            str = getValue(ToolDefinitions.TARGET_KEY_TOOLCHAIN, targetFileInfo);
-            if (str == null || str.trim().equals("")) {
-                envToolChainInfo.addTagnames("*");
-            } else {
-                envToolChainInfo.addTagnames(str);
-            }
-            str = getValue(ToolDefinitions.TARGET_KEY_ARCH, targetFileInfo);
-            if (str == null || str.trim().equals("")) {
-                envToolChainInfo.addArchs("*");
-            } else {
-                envToolChainInfo.addArchs(str);
-            }
-            GlobalData.setToolChainEnvInfo(envToolChainInfo);
-            
-            str = getValue(ToolDefinitions.TARGET_KEY_TOOLS_DEF, targetFileInfo);
-            if (str != null && str.trim().length() > 0) {
-                toolsDefFilename = str;
-            }
-            
-            str = getValue(ToolDefinitions.TARGET_KEY_ACTIVE_PLATFORM, targetFileInfo);
-            if (str != null && ! str.trim().equals("")) {
-                if ( ! str.endsWith(".fpd")) {
-                    throw new BuildException("FPD file's extension must be \"" + ToolDefinitions.FPD_EXTENSION + "\"!");
-                }
-                activePlatform = str;
-            }
-            
-            str = getValue(ToolDefinitions.TARGET_KEY_MULTIPLE_THREAD, targetFileInfo);
-            if (str != null && str.trim().equalsIgnoreCase("Enable")) {
-                multithread = true;
-            }
-            
-            str = getValue(ToolDefinitions.TARGET_KEY_MAX_CONCURRENT_THREAD_NUMBER, targetFileInfo);
-            if (str != null ) {
-                try {
-                    int threadNum = Integer.parseInt(str);
-                    if (threadNum > 0) {
-                        MAX_CONCURRENT_THREAD_NUMBER = threadNum;
-                    }
-                } catch (Exception enuma) {
-                    
-                }
-            }
+    private void readTargetFile() throws EdkException{
+        String targetFile = getProject().getProperty("WORKSPACE_DIR") + File.separatorChar + targetFilename;
+        
+        String[][] targetFileInfo = ConfigReader.parse(targetFile);
+        
+        //
+        // Get ToolChain Info from target.txt
+        //
+        ToolChainInfo envToolChainInfo = new ToolChainInfo(); 
+        String str = getValue(ToolDefinitions.TARGET_KEY_TARGET, targetFileInfo);
+        if (str == null || str.trim().equals("")) {
+            envToolChainInfo.addTargets("*");
+        } else {
+            envToolChainInfo.addTargets(str);
         }
-        catch (Exception ex) {
-            throw new BuildException(ex.getMessage());
+        str = getValue(ToolDefinitions.TARGET_KEY_TOOLCHAIN, targetFileInfo);
+        if (str == null || str.trim().equals("")) {
+            envToolChainInfo.addTagnames("*");
+        } else {
+            envToolChainInfo.addTagnames(str);
+        }
+        str = getValue(ToolDefinitions.TARGET_KEY_ARCH, targetFileInfo);
+        if (str == null || str.trim().equals("")) {
+            envToolChainInfo.addArchs("*");
+        } else {
+            envToolChainInfo.addArchs(str);
+        }
+        GlobalData.setToolChainEnvInfo(envToolChainInfo);
+        
+        str = getValue(ToolDefinitions.TARGET_KEY_TOOLS_DEF, targetFileInfo);
+        if (str != null && str.trim().length() > 0) {
+            toolsDefFilename = str;
+        }
+        
+        str = getValue(ToolDefinitions.TARGET_KEY_ACTIVE_PLATFORM, targetFileInfo);
+        if (str != null && ! str.trim().equals("")) {
+            if ( ! str.endsWith(".fpd")) {
+                throw new BuildException("FPD file's extension must be \"" + ToolDefinitions.FPD_EXTENSION + "\"!");
+            }
+            activePlatform = str;
+        }
+        
+        str = getValue(ToolDefinitions.TARGET_KEY_MULTIPLE_THREAD, targetFileInfo);
+        if (str != null && str.trim().equalsIgnoreCase("Enable")) {
+            multithread = true;
+        }
+            
+        str = getValue(ToolDefinitions.TARGET_KEY_MAX_CONCURRENT_THREAD_NUMBER, targetFileInfo);
+        if (str != null ) {
+            try {
+                int threadNum = Integer.parseInt(str);
+                if (threadNum > 0) {
+                    MAX_CONCURRENT_THREAD_NUMBER = threadNum;
+                }
+            } catch (Exception enuma) {
+            }
         }
     }
     
