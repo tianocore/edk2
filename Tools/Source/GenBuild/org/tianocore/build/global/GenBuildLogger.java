@@ -124,6 +124,13 @@ public class GenBuildLogger implements LogMethod {
     private void log(Object msgSource, String msg, int level) {
         if (msgSource instanceof Task) {
             this.project.log((Task)msgSource, msg, level);
+        } else if (msgSource instanceof String){
+            
+            //
+            // Pad 12 space to keep message 
+            //
+            msg = msg.replaceAll("\n", "\n            ");
+            this.project.log(String.format("%12s", "[" + msgSource + "] ") + msg, level);
         } else {
             this.project.log(msg, level);
         }
