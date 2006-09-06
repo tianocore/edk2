@@ -20,7 +20,7 @@
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BuildTargets>DEBUG</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
-    <OutputDirectory/>
+    <OutputDirectory>Build/EdkModule</OutputDirectory>
     <SkuInfo>
       <UiSkuName SkuID="0">DEFAULT</UiSkuName>
     </SkuInfo>

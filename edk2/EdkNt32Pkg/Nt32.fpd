@@ -21,7 +21,7 @@
     <SupportedArchitectures>IA32</SupportedArchitectures>
     <BuildTargets>DEBUG</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
-    <OutputDirectory/>
+    <OutputDirectory>Build/Nt32</OutputDirectory>
     <SkuInfo>
       <UiSkuName SkuID="0">DEFAULT</UiSkuName>
     </SkuInfo>
@@ -7332,7 +7332,7 @@
     <pathconvert property="SecMainPath" targetos="windows">
       <path path="${TARGET_DIR}/IA32"/>
     </pathconvert>
-    <echo file="${PLATFORM_DIR}/run.cmd">@REM
+    <echo file="${BUILD_DIR}/run.cmd">@REM
       @REM Copyright (c) 2006, Intel Corporation
       @REM All rights reserved. This program and the accompanying materials
       @REM are licensed and made available under the terms and conditions of the BSD License
