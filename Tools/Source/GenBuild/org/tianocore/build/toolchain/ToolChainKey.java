@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 package org.tianocore.build.toolchain;
 
-import org.tianocore.common.exception.EdkException;
+import org.tianocore.build.exception.GenBuildException;
 
 /**
    ToolChainKey class is the java class form of the "name" of tool chain definition.
@@ -56,7 +56,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
        @param keyString     The key string value
        @param delimiter     Delimiter charater concatenating the key parts
      **/
-    public ToolChainKey(String keyString, String delimiter) throws EdkException {
+    public ToolChainKey(String keyString, String delimiter) throws GenBuildException {
         setKey(keyString, delimiter);
     }
 
@@ -65,7 +65,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
 
        @param keyString     The key string value
      **/
-    public ToolChainKey(String keyString) throws EdkException {
+    public ToolChainKey(String keyString) throws GenBuildException {
         setKey(keyString);
     }
 
@@ -74,7 +74,7 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
 
        @param keySet
      **/
-    public ToolChainKey(String[] keySet) throws EdkException {
+    public ToolChainKey(String[] keySet) throws GenBuildException {
         setKey(keySet);
     }
 
@@ -156,9 +156,9 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
 
        @param keySet    The string array of key value
      **/
-    public void setKey(String[] keySet) throws EdkException {
+    public void setKey(String[] keySet) throws GenBuildException {
         if (keySet.length != ToolChainKey.keyLength) {
-            throw new EdkException("Invalid ToolChain key");
+            throw new GenBuildException("Invalid ToolChain key");
         }
 
         //
@@ -185,9 +185,9 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
        @param keySetString      The new value of "index" part of key
        @param index             The key part index
      **/
-    public void setKey(String keySetString, int index) throws EdkException {
+    public void setKey(String keySetString, int index) throws GenBuildException {
         if (index >= ToolChainKey.keyLength) {
-            throw new EdkException("Invalid ToolChain key index");
+            throw new GenBuildException("Invalid ToolChain key index");
         }
 
         //
@@ -210,11 +210,11 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
        
        @param keyString     The key value string
      **/
-    public void setKey(String keyString) throws EdkException {
+    public void setKey(String keyString) throws GenBuildException {
         this.keySet = keyString.split(this.delimiter);
 
         if (this.keySet.length != ToolChainKey.keyLength) {
-            throw new EdkException("Invalid ToolChain key");
+            throw new GenBuildException("Invalid ToolChain key");
         }
 
         this.keyString = keyString;
@@ -230,11 +230,11 @@ public class ToolChainKey implements java.io.Serializable, Comparable<ToolChainK
        @param keyString     The key value string
        @param delimiter     The delimiter concatenating the key string
      **/
-    public void setKey(String keyString, String delimiter) throws EdkException {
+    public void setKey(String keyString, String delimiter) throws GenBuildException {
         this.keySet = keyString.split(delimiter);
 
         if (this.keySet.length != ToolChainKey.keyLength) {
-            throw new EdkException("Invalid ToolChain key");
+            throw new GenBuildException("Invalid ToolChain key");
         }
 
         this.keyString = keyString;

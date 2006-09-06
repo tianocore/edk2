@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
-import org.tianocore.common.exception.EdkException;
+import org.tianocore.build.exception.GenBuildException;
 import org.tianocore.build.toolchain.ToolChainKey;
 import org.tianocore.build.toolchain.ToolChainMap;
 
@@ -44,7 +44,7 @@ public class ToolChainConfig {
       
       @param toolChainFile File object representing the tool chain configuration file
     **/
-    public ToolChainConfig (File toolChainFile) throws EdkException {
+    public ToolChainConfig (File toolChainFile) throws GenBuildException {
         config = getToolChainConfig(toolChainFile);
         parseToolChainDefKey(config.keySet());
     }
@@ -57,7 +57,7 @@ public class ToolChainConfig {
        
        @return ToolChainMap
      **/
-    private ToolChainMap getToolChainConfig(File ConfigFile) throws EdkException {
+    private ToolChainMap getToolChainConfig(File ConfigFile) throws GenBuildException {
         ToolChainMap map = new ToolChainMap();
         String[][] toolChainDef = ConfigReader.parse(ConfigFile);
     
