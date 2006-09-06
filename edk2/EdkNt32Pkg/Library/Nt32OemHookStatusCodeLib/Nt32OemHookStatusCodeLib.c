@@ -14,8 +14,6 @@
 
 **/
 
-#include <stdio.h>
-
 //
 // Cache of WinNtThunk protocol 
 //
@@ -152,8 +150,6 @@ OemHookStatusCodeReport (
               &CharCount,
               NULL
               );
-
-    CpuBreakpoint ();
 
     return EFI_SUCCESS;
 
