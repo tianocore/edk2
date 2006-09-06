@@ -302,7 +302,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 				}
 				//generate R8lib.h
 				while ((mtrr8onlyhead = Func.ptnbrace.matcher(paragraph)).find()) {
-					paragraph = mtrr8onlyhead.replaceAll(";\n//");
+					paragraph = mtrr8onlyhead.replaceAll(";");
 				}
 				outfile2.append(paragraph + "\n\n");
 			}
