@@ -613,7 +613,7 @@ public class PlatformBuildFileGenerator {
                 root.appendChild(recursiveNode(childItem, document));
             }
             else if (childItem.getNodeType() == Node.TEXT_NODE){
-                if ( ! childItem.getNodeValue().trim().equalsIgnoreCase("")) {
+                if (!childItem.getNodeValue().trim().equalsIgnoreCase("")) {
                     root.setTextContent(childItem.getNodeValue());
                 }
             }

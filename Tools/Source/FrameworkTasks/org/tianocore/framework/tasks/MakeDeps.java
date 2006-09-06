@@ -16,15 +16,11 @@ package org.tianocore.framework.tasks;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -75,9 +71,6 @@ public class MakeDeps extends Task {
 
         Project prj  = this.getOwningTarget().getProject();
         String  toolPath = prj.getProperty("env.FRAMEWORK_TOOLS_PATH");
-        FrameworkLogger logger = new FrameworkLogger(prj, "makedeps");
-        EdkLog.setLogLevel(prj.getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
 
         ///
         /// compose full tool path
@@ -145,7 +138,7 @@ public class MakeDeps extends Task {
         runner.setAntRun(prj);
         runner.setCommandline(cmd.getCommandline());
 
-        EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmd.getCommandline()));
+        EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmd.getCommandline()));
 
         int result = 0;
         try {
@@ -155,7 +148,7 @@ public class MakeDeps extends Task {
         }
 
         if (result != 0) {
-            EdkLog.log(EdkLog.EDK_INFO, "MakeDeps failed!");
+            EdkLog.log(this, EdkLog.EDK_INFO, "MakeDeps failed!");
             throw new BuildException("MakeDeps: failed to generate dependency file!");
         }
     }

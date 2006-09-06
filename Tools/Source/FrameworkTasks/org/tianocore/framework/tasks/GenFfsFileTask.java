@@ -124,13 +124,6 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
 
         String            ffsSuffix = "";
         String            outputPath = "";
-        Project project = this.getOwningTarget().getProject();
-        //
-        // set Logger
-        //
-        FrameworkLogger logger = new FrameworkLogger(project, "genFfs");
-        EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
         
         //
         //  Get Fraemwork_Tools_Path
@@ -751,7 +744,7 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
         FfsHeader         ffsHeader = new FfsHeader();  
         FfsHeader         orgFfsHeader = new FfsHeader();
            
-        EdkLog.log(EdkLog.EDK_INFO, ffsFile.getName());
+        EdkLog.log(this, EdkLog.EDK_INFO, ffsFile.getName());
       
         try {
             //

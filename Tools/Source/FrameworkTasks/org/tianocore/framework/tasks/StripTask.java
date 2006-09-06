@@ -60,12 +60,7 @@ public class StripTask extends Task implements EfiDefine {
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
-        //
-        // set Logger
-        //
-        FrameworkLogger logger = new FrameworkLogger(project, "strip");
-        EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
+
         //
         // absolute path of efi tools
         //
@@ -106,8 +101,8 @@ public class StripTask extends Task implements EfiDefine {
             //
             // Set debug log information.
             //
-            EdkLog.log(EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
 
             revl = runner.execute();
 
@@ -115,12 +110,12 @@ public class StripTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(EdkLog.EDK_VERBOSE, "Strip succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "Strip succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("Strip failed!");
             }
         } catch (Exception e) {

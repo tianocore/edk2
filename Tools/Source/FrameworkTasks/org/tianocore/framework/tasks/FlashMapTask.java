@@ -142,12 +142,6 @@ public class FlashMapTask extends Task implements EfiDefine {
 
         Project project = this.getOwningTarget().getProject();
         //
-        // set Logger
-        //
-        FrameworkLogger logger = new FrameworkLogger(project, "flashmap");
-        EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
-        //
         // absolute path of efi tools
         //
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
@@ -198,13 +192,13 @@ public class FlashMapTask extends Task implements EfiDefine {
             //
             // log command line string.
             //
-            EdkLog.log(EdkLog.EDK_VERBOSE, cmdProc.getOutputStream().toString());
-            EdkLog.log(EdkLog.EDK_INFO, (new File(this.flashDefFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, cmdProc.getOutputStream().toString());
+            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.flashDefFile)).getName());
             if (exitCode != 0) {
                 int len = cmdOut.read(buf, 0, 1024);
-                EdkLog.log(EdkLog.EDK_INFO, new String(buf, 0, len));
+                EdkLog.log(this, EdkLog.EDK_INFO, new String(buf, 0, len));
             } else {
-                EdkLog.log(EdkLog.EDK_VERBOSE, "FlashMap succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "FlashMap succeeded!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

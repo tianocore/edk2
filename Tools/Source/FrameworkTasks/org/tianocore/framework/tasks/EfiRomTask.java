@@ -112,12 +112,7 @@ public class EfiRomTask extends Task implements EfiDefine {
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
-        //
-        // set Logger
-        //
-        FrameworkLogger logger = new FrameworkLogger(project, "efirom");
-        EdkLog.setLogLevel(project.getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
+
         //
         // absolute path of efi tools
         //
@@ -163,8 +158,8 @@ public class EfiRomTask extends Task implements EfiDefine {
             }
         }
 
-        EdkLog.log(EdkLog.EDK_VERBOSE, argList.toString().replaceAll(",",""));
-        EdkLog.log(EdkLog.EDK_INFO, " ");
+        EdkLog.log(this, EdkLog.EDK_VERBOSE, argList.toString().replaceAll(",",""));
+        EdkLog.log(this, EdkLog.EDK_INFO, " ");
 
         //
         // lauch the program
