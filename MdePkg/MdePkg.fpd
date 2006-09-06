@@ -30,7 +30,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <SupportedArchitectures>IA32 X64 IPF EBC</SupportedArchitectures>
     <BuildTargets>DEBUG</BuildTargets>
     <IntermediateDirectories>UNIFIED</IntermediateDirectories>
-    <OutputDirectory/>
+    <OutputDirectory>Build/Mde</OutputDirectory>
   </PlatformDefinitions>
   <Flash>
     <FlashDefinitionFile>dummy.fdf</FlashDefinitionFile>
