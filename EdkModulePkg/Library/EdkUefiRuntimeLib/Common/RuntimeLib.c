@@ -13,10 +13,6 @@ Module Name:
 
     RuntimeLib.c
 
-Abstract:
-
-  Light weight lib to support Tiano drivers.
-
 --*/
 
 #include <RuntimeLibInternal.h>
@@ -24,13 +20,15 @@ Abstract:
 //
 // Driver Lib Module Globals
 //
-STATIC EFI_EVENT            mRuntimeNotifyEvent;
-STATIC EFI_EVENT            mEfiVirtualNotifyEvent;
-STATIC BOOLEAN              mEfiGoneVirtual         = FALSE;
-STATIC BOOLEAN              mEfiAtRuntime           = FALSE;
 
-EFI_RUNTIME_SERVICES        *mRT                    = NULL;
+STATIC EFI_EVENT              mRuntimeNotifyEvent;
+STATIC EFI_EVENT              mEfiVirtualNotifyEvent;
+STATIC BOOLEAN                mEfiGoneVirtual         = FALSE;
+STATIC BOOLEAN                mEfiAtRuntime           = FALSE;
 
+EFI_RUNTIME_SERVICES          *mRT;
+
+STATIC
 VOID
 EFIAPI
 RuntimeDriverExitBootServices (
@@ -64,6 +62,11 @@ Returns:
     ChildNotifyEventHandler = _gDriverExitBootServicesEvent[Index];
     ChildNotifyEventHandler (Event, NULL);
   }
+
+  //
+  // Clear out BootService globals
+  //
+  gBS             = NULL;
 
   mEfiAtRuntime = TRUE;
 }
@@ -108,13 +111,8 @@ Returns:
   //
   // Update global for Runtime Services Table and IO
   //
-  EfiConvertInternalPointer ((VOID **) &mRT);
+  EfiConvertPointer (0, (VOID **) &mRT);
 
-  //
-  // Clear out BootService globals
-  //
-  gBS             = NULL;
-  gST             = NULL;
   mEfiGoneVirtual = TRUE;
 }
 
@@ -219,6 +217,7 @@ Returns:
 }
 
 BOOLEAN
+EFIAPI
 EfiAtRuntime (
   VOID
   )
@@ -239,6 +238,7 @@ Returns:
 }
 
 BOOLEAN
+EFIAPI
 EfiGoneVirtual (
   VOID
   )

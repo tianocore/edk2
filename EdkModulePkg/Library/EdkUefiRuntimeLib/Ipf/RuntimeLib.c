@@ -13,10 +13,6 @@ Module Name:
 
     RuntimeLib.c
 
-Abstract:
-
-  Light weight lib to support Tiano drivers.
-
 --*/
 
 #include <SalApi.h>
@@ -26,13 +22,12 @@ Abstract:
 // Driver Lib Module Globals
 //
 
-STATIC EFI_EVENT            mRuntimeNotifyEvent;
-STATIC EFI_EVENT            mEfiVirtualNotifyEvent;
-
-STATIC EFI_PLABEL           mPlabel;
+STATIC EFI_EVENT                          mRuntimeNotifyEvent;
+STATIC EFI_EVENT                          mEfiVirtualNotifyEvent;
+STATIC EFI_PLABEL                         mPlabel;
 STATIC EXTENDED_SAL_BOOT_SERVICE_PROTOCOL *mEsalBootService;
 
-EFI_RUNTIME_SERVICES        *mRT                    = NULL;
+EFI_RUNTIME_SERVICES                      *mRT;
 
 STATIC
 VOID
@@ -66,6 +61,11 @@ Returns:
     ChildNotifyEventHandler = _gDriverExitBootServicesEvent[Index];
     ChildNotifyEventHandler (Event, NULL);
   }
+
+  //
+  // Clear out BootService globals
+  //
+  gBS             = NULL;
 }
 
 STATIC
@@ -107,13 +107,6 @@ Returns:
   mRT->ConvertPointer (EFI_IPF_GP_POINTER, (VOID **) &mPlabel.GP);
 
   SetEsalVirtualEntryPoint (mPlabel.EntryPoint, mPlabel.GP);
-
-  //
-  // Clear out BootService globals
-  //
-  gBS             = NULL;
-  gST             = NULL;
-  mRT             = NULL;
 }
 
 EFI_STATUS
@@ -236,6 +229,7 @@ Returns:
 }
 
 BOOLEAN
+EFIAPI
 EfiAtRuntime (
   VOID
   )
@@ -261,6 +255,7 @@ Returns:
 }
 
 BOOLEAN
+EFIAPI
 EfiGoneVirtual (
   VOID
   )
@@ -284,3 +279,4 @@ Returns:
 
   return (BOOLEAN) (ReturnReg.r9 == 1);
 }
+

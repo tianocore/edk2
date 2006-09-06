@@ -20,11 +20,6 @@ Abstract:
 #ifndef __RUNTIMELIBINTERNAL_H__
 #define __RUNTIMELIBINTERNAL_H__
 
-EFI_STATUS
-EfiConvertInternalPointer (
-  IN OUT VOID                  *Address
-  );
-
 extern EFI_RUNTIME_SERVICES   *mRT;
 
 #endif //__RUNTIMELIBINTERNAL_H__

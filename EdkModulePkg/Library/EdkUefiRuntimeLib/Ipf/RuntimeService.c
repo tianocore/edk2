@@ -13,15 +13,12 @@ Module Name:
 
     RuntimeService.c
 
-Abstract:
-
-  Light weight lib to support Tiano drivers.
-
 --*/
 
 #include <RuntimeLibInternal.h>
 
 VOID
+EFIAPI
 EfiResetSystem (
   IN EFI_RESET_TYPE               ResetType,
   IN EFI_STATUS                   ResetStatus,
@@ -69,6 +66,7 @@ Returns:
 // runtime service in the EFI system table.
 //
 EFI_STATUS
+EFIAPI
 EfiGetTime (
   OUT EFI_TIME                    *Time,
   OUT EFI_TIME_CAPABILITIES       *Capabilities
@@ -100,6 +98,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiSetTime (
   IN EFI_TIME                   *Time
   )
@@ -128,6 +127,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiGetWakeupTime (
   OUT BOOLEAN                     *Enabled,
   OUT BOOLEAN                     *Pending,
@@ -160,6 +160,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiSetWakeupTime (
   IN BOOLEAN                      Enable,
   IN EFI_TIME                     *Time
@@ -191,6 +192,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiGetVariable (
   IN CHAR16                       *VariableName,
   IN EFI_GUID                     * VendorGuid,
@@ -239,6 +241,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiGetNextVariableName (
   IN OUT UINTN                    *VariableNameSize,
   IN OUT CHAR16                   *VariableName,
@@ -285,6 +288,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiSetVariable (
   IN CHAR16                       *VariableName,
   IN EFI_GUID                     *VendorGuid,
@@ -331,6 +335,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiGetNextHighMonotonicCount (
   OUT UINT32                      *HighCount
   )
@@ -359,6 +364,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiConvertPointer (
   IN UINTN                  DebugDisposition,
   IN OUT VOID               *Address
@@ -385,6 +391,7 @@ Returns:
 }
 
 EFI_STATUS
+EFIAPI
 EfiConvertList (
   IN UINTN                DebugDisposition,
   IN OUT LIST_ENTRY       *ListHead
@@ -483,6 +490,7 @@ EfiSetVirtualAddressMap (
 
 
 EFI_STATUS
+EFIAPI
 EfiUpdateCapsule (
   IN UEFI_CAPSULE_HEADER	**CapsuleHeaderArray,
   IN UINTN				    CapsuleCount,
@@ -493,6 +501,7 @@ EfiUpdateCapsule (
 }
 
 EFI_STATUS
+EFIAPI
 EfiQueryCapsuleCapabilities (
   IN UEFI_CAPSULE_HEADER	**CapsuleHeaderArray,
   IN UINTN				    CapsuleCount,
@@ -505,6 +514,7 @@ EfiQueryCapsuleCapabilities (
 
 
 EFI_STATUS
+EFIAPI
 EfiQueryVariableInfo (
   IN UINT32			  Attributes,
   OUT UINT64			*MaximumVariableStorageSize,
