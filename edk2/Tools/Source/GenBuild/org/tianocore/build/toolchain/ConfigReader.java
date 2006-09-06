@@ -14,7 +14,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.build.toolchain;
 
-import org.tianocore.common.exception.EdkException;
+import org.tianocore.build.exception.GenBuildException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,7 +38,7 @@ public class ConfigReader {
 
       @return String[][]    The definition array
     **/
-    public static synchronized String[][] parse(String filename) throws EdkException {
+    public static synchronized String[][] parse(String filename) throws GenBuildException {
         return parse(new File(filename));
     }
 
@@ -53,7 +53,7 @@ public class ConfigReader {
       @throws   EdkException
                 Config file's format is not valid
     **/
-    public static synchronized String[][] parse(File configFile) throws EdkException {
+    public static synchronized String[][] parse(File configFile) throws GenBuildException {
         List<String> keyList = new ArrayList<String>(256);
         List<String> valueList = new ArrayList<String>(256);
         int lines = 0;
@@ -78,7 +78,7 @@ public class ConfigReader {
                 // 
                 int index;
                 if ((index = str.indexOf('=')) <= 0) {
-                    throw new EdkException("ERROR Processing file [" + configFile.getAbsolutePath() 
+                    throw new GenBuildException("ERROR Processing file [" + configFile.getAbsolutePath() 
                         + "] (line " + lines + ").\n");
                 }
 
@@ -89,7 +89,7 @@ public class ConfigReader {
                 valueList.add(str.substring(index + 1).trim());
             }
         } catch (Exception e) {
-            throw new EdkException("ERROR Processing file [" + configFile.getAbsolutePath() 
+            throw new GenBuildException("ERROR Processing file [" + configFile.getAbsolutePath() 
                 + "] (line " + lines + ").\n" + e.getMessage());
         }
 
