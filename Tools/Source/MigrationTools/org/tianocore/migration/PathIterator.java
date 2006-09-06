@@ -12,6 +12,7 @@
  **/
 package org.tianocore.migration;
 
+import java.io.File;
 import java.util.*;
 
 public final class PathIterator implements Common.ForDoAll {
@@ -31,6 +32,10 @@ public final class PathIterator implements Common.ForDoAll {
 		pathlist.add(path);
 	}
 
+	public boolean filter(File dir) {
+		return true;
+	}
+	
 	public final String next() {
 		return it.next();
 	}
@@ -41,13 +46,5 @@ public final class PathIterator implements Common.ForDoAll {
 
 	public final String toString() {
 		return pathlist.toString();
-	}
-	
-	public boolean dirFilter(String filepath) {
-		return true;
-	}
-	
-	public boolean fileFilter(String filepath) {
-		return true;
 	}
 }
