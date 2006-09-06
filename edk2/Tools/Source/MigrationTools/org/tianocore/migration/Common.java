@@ -155,19 +155,17 @@ public final class Common {
 		File test;
 
 		if (type == DIR || type == BOTH) {
-			if (fda.dirFilter(path)) {
-				fda.run(path);
-			}
+			fda.run(path);
 		}
 		for (int i = 0 ; i < list.length ; i++) {
 			test = new File(path + File.separator + list[i]);
 			if (test.isDirectory()) {
-				toDoAll(path + File.separator + list[i], fda, type);
+				if (fda.filter(test)) {
+					toDoAll(path + File.separator + list[i], fda, type);
+				}
 			} else {
 				if (type == FILE || type == BOTH) {
-					if (fda.fileFilter(path + File.separator + list[i])) {
-						fda.run(path + File.separator + list[i]);
-					}
+					fda.run(path + File.separator + list[i]);
 				}
 			}
 		}
@@ -176,8 +174,14 @@ public final class Common {
 	public static interface ForDoAll {
 		public void run(String filepath) throws Exception;
 		
-		public boolean dirFilter(String filepath);
+		public boolean filter(File dir);
+	}
+	
+	public static abstract class Laplace {
+		public final void transform(String src, String des) throws Exception {
+			Common.string2file(operation(Common.file2string(src)), des);
+		}
 		
-		public boolean fileFilter(String filepath);
+		public abstract String operation(String wholeline);
 	}
 }

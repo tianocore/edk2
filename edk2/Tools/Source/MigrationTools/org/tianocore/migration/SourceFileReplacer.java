@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public final class SourceFileReplacer implements Common.ForDoAll {
 	private static final SourceFileReplacer SFReplacer = new SourceFileReplacer();
 	private ModuleInfo mi;
-	private static boolean showdetails = true;		// set this as default now, may be changed in the future
+	//private static boolean showdetails = true;		// set this as default now, may be changed in the future
 	
 	private static class r8tor9 {
 		r8tor9(String r8, String r9) {
@@ -38,49 +38,6 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 	private static final Set<r8tor9> fileppi = new HashSet<r8tor9>();
 	private static final Set<r8tor9> fileprotocol = new HashSet<r8tor9>();
 	private static final Set<String> filer8only = new HashSet<String>();
-	
-	private static final String addincludefile(String wholeline, String hfile) {
-		return wholeline.replaceFirst("(\\*/\\s)", "$1\n#include " + hfile + "\n");
-	}
-	
-	private final String convertdxs(String wholeline) {
-		if (mi.getModuleType().equals("PEIM")) {
-			return addincludefile(wholeline, "\\<PeimDepex.h\\>");
-		} else {
-			return addincludefile(wholeline, "\\<DxeDepex.h\\>");
-		}
-	}
-	
-	private final void addr8only() throws Exception {
-		String paragraph = null;
-		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
-		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
-		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
-		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
-		Matcher mtrr8only = ptnr8only.matcher(line);
-		Matcher mtrr8onlyhead;
-		while (mtrr8only.find()) {
-			if (mi.hashr8only.contains(mtrr8only.group(2))) {
-				paragraph = mtrr8only.group();
-				outfile1.append(paragraph + "\n\n");
-				if (mtrr8only.group(1).length() != 0) {
-					mi.hashrequiredr9libs.add(mtrr8only.group(1));
-				}
-				//generate R8lib.h
-				while ((mtrr8onlyhead = Func.ptnbrace.matcher(paragraph)).find()) {
-					paragraph = mtrr8onlyhead.replaceAll(";");
-				}
-				outfile2.append(paragraph + "\n\n");
-			}
-		}
-		outfile1.flush();
-		outfile1.close();
-		outfile2.flush();
-		outfile2.close();
-		
-		mi.localmodulesources.add("R8Lib.h");
-		mi.localmodulesources.add("R8Lib.c");
-	}
 	
 	// Caution : if there is @ in file , it will be replaced with \n , so is you use Doxygen ... God Bless you!
 	private final String sourcefilereplace(String wholeline) throws Exception {
@@ -233,22 +190,32 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 
 		return wholeline;
 	}
+
+	private static final String addincludefile(String wholeline, String hfile) {
+		return wholeline.replaceFirst("(\\*/\\s)", "$1\n#include " + hfile + "\n");
+	}
 	
+	private final String convertdxs(String wholeline) {
+		if (mi.getModuleType().equals("PEIM")) {
+			return addincludefile(wholeline, "\\<PeimDepex.h\\>");
+		} else {
+			return addincludefile(wholeline, "\\<DxeDepex.h\\>");
+		}
+	}
+
 	private static final void show(Set<r8tor9> hash, String sh) {
 		Iterator<r8tor9> it = hash.iterator();
 		r8tor9 temp;
-		if (showdetails) {
-			if (!hash.isEmpty()) {
-				MigrationTool.ui.print("Converting " + sh + " : ");
-				while (it.hasNext()) {
-					temp = it.next();
-					MigrationTool.ui.print("[" + temp.r8thing + "->" + temp.r9thing + "] ");
-				}
-				MigrationTool.ui.println("");
+		if (!hash.isEmpty()) {
+			MigrationTool.ui.print("Converting " + sh + " : ");
+			while (it.hasNext()) {
+				temp = it.next();
+				MigrationTool.ui.print("[" + temp.r8thing + "->" + temp.r9thing + "] ");
 			}
+			MigrationTool.ui.println("");
 		}
 	}
-	
+
 	private static final void replaceGuid(String line, Set<String> hash, String kind, Set<r8tor9> filehash) {
 		Iterator<String> it;
 		String r8thing;
@@ -265,6 +232,37 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 				}
 			}
 		}
+	}
+
+	private final void addr8only() throws Exception {
+		String paragraph = null;
+		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
+		PrintWriter outfile1 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.c")));
+		PrintWriter outfile2 = new PrintWriter(new BufferedWriter(new FileWriter(MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator + "R8Lib.h")));
+		Pattern ptnr8only = Pattern.compile("////#?(\\w*)?.*?R8_(\\w*).*?////~", Pattern.DOTALL);
+		Matcher mtrr8only = ptnr8only.matcher(line);
+		Matcher mtrr8onlyhead;
+		while (mtrr8only.find()) {
+			if (mi.hashr8only.contains(mtrr8only.group(2))) {
+				paragraph = mtrr8only.group();
+				outfile1.append(paragraph + "\n\n");
+				if (mtrr8only.group(1).length() != 0) {
+					mi.hashrequiredr9libs.add(mtrr8only.group(1));
+				}
+				//generate R8lib.h
+				while ((mtrr8onlyhead = Func.ptnbrace.matcher(paragraph)).find()) {
+					paragraph = mtrr8onlyhead.replaceAll(";");
+				}
+				outfile2.append(paragraph + "\n\n");
+			}
+		}
+		outfile1.flush();
+		outfile1.close();
+		outfile2.flush();
+		outfile2.close();
+		
+		mi.localmodulesources.add("R8Lib.h");
+		mi.localmodulesources.add("R8Lib.c");
 	}
 	
 	//-----------------------------------ForDoAll-----------------------------------//
@@ -297,11 +295,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 		}
 	}
 	
-	public boolean dirFilter(String filepath) {
-		return true;
-	}
-	
-	public boolean fileFilter(String filepath) {
+	public boolean filter(File dir) {
 		return true;
 	}
 	//-----------------------------------ForDoAll-----------------------------------//
