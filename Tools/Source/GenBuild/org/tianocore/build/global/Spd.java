@@ -16,21 +16,23 @@
 package org.tianocore.build.global;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tools.ant.BuildException;
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
+import org.tianocore.common.exception.EdkException;
 
 /**
  
  This class is to generate a global table for the content of spd file.
  
- **/
+**/
 public class Spd {
     ///
     ///
@@ -88,12 +90,12 @@ public class Spd {
      
      This function mainly initialize some member variables. 
     **/
-    Spd(File packageFile) throws BuildException {
+    Spd(File packageFile) throws EdkException {
         //
         // If specified package file not exists
         //
         if ( ! packageFile.exists()) {
-            throw new BuildException("Package file [" + packageFile.getPath() + "] does not exist!");
+            throw new EdkException("Package file [" + packageFile.getPath() + "] does not exist!");
         }
         try {
             XmlObject spdDoc = XmlObject.Factory.parse(packageFile);
@@ -101,15 +103,15 @@ public class Spd {
             // Verify SPD file, if is invalid, throw Exception
             //
             if (! spdDoc.validate()) {
-                throw new BuildException("Package Surface Area file [" + packageFile.getPath() + "] format is invalid!");
+                throw new EdkException("Package Surface Area file [" + packageFile.getPath() + "] format is invalid!");
             }
+            //
             // We can change Map to XmlObject
+            //
             Map<String, XmlObject> spdDocMap = new HashMap<String, XmlObject>();
             spdDocMap.put("PackageSurfaceArea", spdDoc);
             SurfaceAreaQuery saq = new SurfaceAreaQuery(spdDocMap);
-            //
-            //
-            //
+
             packageId = saq.getSpdHeader();
             packageId.setSpdFile(packageFile);
             
@@ -127,7 +129,7 @@ public class Spd {
                 moduleId.setPackage(packageId);
                 moduleId.setMsaFile(msaFile);
                 if (msaInfo.containsKey(moduleId)) {
-                    throw new BuildException("Found two modules with the same GUID and Version in package " + packageId + ".\nThey are  module [" + msaInfo.get(moduleId) + "] and MSA file [" + msaFile + "]!");
+                    throw new EdkException("Found two modules with the same GUID and Version in package " + packageId + ".\nThey are  module [" + msaInfo.get(moduleId) + "] and MSA file [" + msaFile + "]!");
                 }
                 msaInfo.put(moduleId, msaFile);
             }
@@ -196,10 +198,14 @@ public class Spd {
                 }
                 libClassHeaderList.put(libraryClassName, headerFiles);
             }
-        }
-        catch (Exception e) {
-            throw new BuildException("Parse of the package description file [" + packageFile.getPath() + "] failed!\n"
-                                     + e.getMessage());
+        } catch (IOException ex) {
+            EdkException edkException = new EdkException("Parse of the package description file [" + packageFile.getPath() + "] failed!\n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
+        } catch (XmlException ex) {
+            EdkException edkException = new EdkException("Parse of the package description file [" + packageFile.getPath() + "] failed!\n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
         }
     }
 

@@ -111,6 +111,13 @@ public class FrameworkBuildTask extends Task{
     private String type = "all";
     
     public void execute() throws BuildException {
+        //
+        // set Logger
+        //
+        GenBuildLogger logger = new GenBuildLogger(getProject());
+        EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
+        EdkLog.setLogger(logger);
+        
         try {
             processFrameworkBuild();
         } catch (PcdAutogenException e) {
@@ -143,13 +150,6 @@ public class FrameworkBuildTask extends Task{
     
     private void processFrameworkBuild() throws EdkException, GenBuildException, AutoGenException, PcdAutogenException, PlatformPcdPreprocessBuildException {
         //
-        // set Logger
-        //
-        GenBuildLogger logger = new GenBuildLogger(getProject());
-        EdkLog.setLogLevel(getProject().getProperty("env.LOGLEVEL"));
-        EdkLog.setLogger(logger);
-
-        //
         // Seach build.xml -> .FPD -> .MSA file
         //
         try {
@@ -180,8 +180,10 @@ public class FrameworkBuildTask extends Task{
                     }
                 }
             }
-        } catch (IOException e) {
-            throw new BuildException(e.getMessage());
+        } catch (IOException ex) {
+            BuildException buildException = new BuildException("Scanning current directory error. \n" + ex.getMessage());
+            buildException.setStackTrace(ex.getStackTrace());
+            throw buildException;
         }
         
         //
@@ -426,7 +428,7 @@ public class FrameworkBuildTask extends Task{
                 if (threadNum > 0) {
                     MAX_CONCURRENT_THREAD_NUMBER = threadNum;
                 }
-            } catch (Exception enuma) {
+            } catch (Exception ex) {
             }
         }
     }

@@ -213,5 +213,4 @@ public class GenBuildThread implements Runnable {
     public void setStatus(int status) {
         this.status = status;
     }
-    
 }

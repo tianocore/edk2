@@ -62,6 +62,7 @@ import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
 import org.tianocore.PcdDriverTypes;
 
+import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
@@ -556,7 +557,7 @@ public class SurfaceAreaQuery {
      * @returns package name list if elements are found at the known xpath
      * @returns null if nothing is there
      */
-    public PackageIdentification[] getDependencePkg(String arch) {
+    public PackageIdentification[] getDependencePkg(String arch) throws EdkException {
         String[] xPath;
         String packageGuid = null;
         String packageVersion = null;
@@ -579,19 +580,13 @@ public class SurfaceAreaQuery {
             if (arch == null || archList == null || contains(archList, arch)) {
                 packageGuid = item.getPackageGuid();
                 packageVersion = item.getPackageVersion();
-                packageIdList.add(new PackageIdentification(null, packageGuid,
-                    packageVersion));
+                PackageIdentification pkgId = new PackageIdentification(null, packageGuid, packageVersion);
+                GlobalData.refreshPackageIdentification(pkgId);
+                packageIdList.add(pkgId);
             }
         }
 
-        //
-        //  transfer packageIdentification list to array.
-        //
-        PackageIdentification[] packageIdArray = new PackageIdentification[packageIdList.size()];
-        for (int i = 0; i < packageIdList.size(); i++) {
-            packageIdArray[i] = new PackageIdentification(null, packageIdList.get(i).getGuid(),packageIdList.get(i).getVersion());
-        }
-        return packageIdArray;
+        return packageIdList.toArray(new PackageIdentification[packageIdList.size()]);
     }
 
     /**
@@ -1107,7 +1102,7 @@ public class SurfaceAreaQuery {
      *          xpath
      * @returns null if nothing is there
      */
-    public ModuleIdentification[] getLibraryInstance(String arch) {
+    public ModuleIdentification[] getLibraryInstance(String arch) throws EdkException {
         String[] xPath;
         String saGuid = null;
         String saVersion = null;
@@ -1144,7 +1139,9 @@ public class SurfaceAreaQuery {
                     saVersion);
             PackageIdentification pkgId = new PackageIdentification(null,
                     pkgGuid, pkgVersion);
+            GlobalData.refreshPackageIdentification(pkgId);
             saId.setPackage(pkgId);
+            GlobalData.refreshModuleIdentification(saId);
 
             saIdList[i] = saId;
 
@@ -1308,7 +1305,7 @@ public class SurfaceAreaQuery {
      * @returns ModuleSA objects list if elements are found at the known xpath
      * @returns Empty ModuleSA list if nothing is there
      */
-    public Map<FpdModuleIdentification, Map<String, XmlObject>> getFpdModules() {
+    public Map<FpdModuleIdentification, Map<String, XmlObject>> getFpdModules() throws EdkException {
         String[] xPath = new String[] { "/FrameworkModules/ModuleSA" };
         Object[] result = get("PlatformSurfaceArea", xPath);
         String arch = null;
@@ -1362,8 +1359,10 @@ public class SurfaceAreaQuery {
             // identification.
             //
             PackageIdentification pkgId = new PackageIdentification(null, pkgGuid, pkgVersion);
+            GlobalData.refreshPackageIdentification(pkgId);
             ModuleIdentification saId = new ModuleIdentification(null, saGuid, saVersion);
-
+            GlobalData.refreshModuleIdentification(saId);
+            
             saId.setPackage(pkgId);
 
             //

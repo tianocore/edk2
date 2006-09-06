@@ -64,17 +64,9 @@ import org.tianocore.build.toolchain.ToolChainMap;
 
   <p>The method parseFpdFile is also prepared for single module build. </p>
 
-  <p>The usage is (take NT32 Platform for example):</p>
-
-  <pre>
-  &lt;FPDParser platformName="Nt32" /&gt;
-  </pre>
-
   @since GenBuild 1.0
 **/
 public class FpdParserTask extends Task {
-
-    private String platformName;
 
     private File fpdFile = null;
 
@@ -124,18 +116,6 @@ public class FpdParserTask extends Task {
     **/
     public void execute() throws BuildException {
         //
-        // If fpdFile is not specified, 
-        // then try to get FPD file by platformName
-        //
-        if ( fpdFile == null) {
-            if (platformName == null) {
-                throw new BuildException("FpdParserTask parameter error. Please specify either the platform name or FPD file!");
-            }
-            platformId = GlobalData.getPlatformByName(platformName);
-            fpdFile = platformId.getFpdFile();
-        }
-
-        //
         // Parse FPD file
         //
         parseFpdFile();
@@ -178,7 +158,6 @@ public class FpdParserTask extends Task {
         //
         // Ant call ${PLATFORM}_build.xml
         //
-
         Ant ant = new Ant();
         ant.setProject(getProject());
         ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
@@ -552,10 +531,6 @@ public class FpdParserTask extends Task {
      **/
     public void addProperty(Property p) {
         properties.addElement(p);
-    }
-
-    public void setPlatformName(String platformName) {
-        this.platformName = platformName;
     }
 
     public void setFpdFile(File fpdFile) {
