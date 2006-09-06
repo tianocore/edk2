@@ -28,6 +28,8 @@ public class HelpInfo {
         for (int i = 0; i < 6; i++) {
             outputSubUsageInfo(UsageString[i], UsageStringInfo[i]);
         }
+        
+        System.out.printf("\n%s", ExampleString);
     }
 
     /** 
@@ -86,9 +88,11 @@ public class HelpInfo {
 
     private static final int MaxSrtingLength = 40;
 
-    private static final String UsageInfoString = "Usage: context [-option1] [args] [-option2] [args] ...";
+    private static final String UsageInfoString = "Usage: ContextTool [-option1] [args] [-option2] [args] ...";
 
     private static final String DetailOfOptionString = "Where options include:";
+    
+    private static final String ExampleString = "Example: ContextTool -a IA32 IA64 EBC -c Tools/Conf/tools_def.txt -t DEBUG";
 
     private static final String HString = "-h";
 
