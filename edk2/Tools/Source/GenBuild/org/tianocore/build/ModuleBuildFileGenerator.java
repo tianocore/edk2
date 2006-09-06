@@ -34,6 +34,7 @@ import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
+import org.tianocore.common.exception.EdkException;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -296,7 +297,7 @@ public class ModuleBuildFileGenerator {
       @param document current BaseName_build.xml XML document
       @param root Root element for current
     **/
-    private void applyLibraryInstance(Document document, Node root) {
+    private void applyLibraryInstance(Document document, Node root) throws EdkException {
         ModuleIdentification[] libinstances = saq.getLibraryInstance(fpdModuleId.getArch());
         for (int i = 0; i < libinstances.length; i++) {
             //

@@ -42,6 +42,7 @@ import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.pcd.action.PCDAutoGenAction;
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.common.definitions.ToolDefinitions;
+import org.tianocore.common.exception.EdkException;
 
 /**
   This class is to generate Autogen.h and Autogen.c according to module surface
@@ -280,7 +281,7 @@ public class AutoGen {
       @throws BuildException
                   Failed to generate AutoGen.h.
     **/
-    void moduleGenAutogenH() throws AutoGenException {
+    void moduleGenAutogenH() throws EdkException, AutoGenException {
 
         Set<String> libClassIncludeH;
         String moduleType;
@@ -406,7 +407,7 @@ public class AutoGen {
       @throws BuildException
                   Failed to generate AutoGen.c.
     **/
-    void moduleGenAutogenC() throws AutoGenException {
+    void moduleGenAutogenC() throws EdkException, AutoGenException {
 
         StringBuffer fileBuffer = new StringBuffer(8192);
         //
@@ -535,7 +536,7 @@ public class AutoGen {
       @throws BuildException
                   Failed to generate AutoGen.c.
     **/
-    void libGenAutogenH() throws AutoGenException {
+    void libGenAutogenH() throws EdkException, AutoGenException {
 
         Set<String> libClassIncludeH;
         String moduleType;
@@ -699,7 +700,7 @@ public class AutoGen {
       @return includeStrList List of *.h file.
     **/
     Set<String> LibraryClassToAutogenH(String[] libClassList)
-    throws AutoGenException {
+    throws EdkException, AutoGenException {
         Set<String> includeStrList = new LinkedHashSet<String>();
         String includeName[];
         String str = "";
@@ -1904,7 +1905,7 @@ public class AutoGen {
       @param
       @return    
     **/
-    private void collectLibInstanceInfo(){
+    private void collectLibInstanceInfo() throws EdkException{
         int index;
 
         String libConstructName = null;

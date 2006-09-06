@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 package org.tianocore.build.global;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.tools.ant.BuildException;
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 
 import org.tianocore.common.exception.EdkException;
@@ -139,7 +140,7 @@ public class GlobalData {
       @throws BuildException
             Framework Dababase or SPD or MSA file is not valid
     **/
-    public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir, String toolsDefFilename ) throws BuildException {
+    public synchronized static void initInfo(String workspaceDatabaseFile, String workspaceDir, String toolsDefFilename ) throws EdkException {
         //
         // ensure this method will be revoked only once
         //
@@ -161,12 +162,9 @@ public class GlobalData {
         // CONF dir + tools definition file name
         //
         File toolsDefFile = new File(workspaceDir + File.separatorChar + toolsDefFilename);
-        EdkLog.log("Init", "Using tool definiton file [" + toolsDefFile.getPath() + "].");
-        try {
-            toolsDef = new ToolChainConfig(toolsDefFile);
-        } catch (Exception e) {
-            throw new BuildException(e.getMessage());
-        }
+        EdkLog.log("Init", "Using tool definition file [" + toolsDefFile.getPath() + "].");
+        toolsDef = new ToolChainConfig(toolsDefFile);
+
 
         //
         // Parse Framework Database
@@ -178,7 +176,7 @@ public class GlobalData {
             // validate FrameworkDatabaseFile
             //
             if (!db.validate()) {
-                throw new BuildException("Framework Database file [" + dbFile.getPath() + "] format is invalid!");
+                throw new EdkException("Framework Database file [" + dbFile.getPath() + "] format is invalid!");
             }
             //
             // Get package list
@@ -190,6 +188,15 @@ public class GlobalData {
                     String fileName = iter.next().getStringValue().trim();
                     Spd spd = new Spd(new File(workspaceDir + File.separatorChar + fileName));
                     packageList.add(spd.getPackageId());
+                    //
+                    // Report warning if existing two packages with same GUID and Version
+                    //
+                    if (spdTable.containsKey(spd.getPackageId())) {
+                        //
+                        // BUGBUG
+                        //
+                        EdkLog.log("Init", EdkLog.EDK_WARNING, "Warning: Existing two packages with same GUID and Version. They are ... " + spd.getPackageId().getSpdFile().getPath());
+                    }
                     spdTable.put(spd.getPackageId(), spd);
                 }
             }
@@ -204,31 +211,43 @@ public class GlobalData {
                     String fileName = iter.next().getStringValue().trim();
                     File fpdFile = new File(workspaceDir + File.separatorChar + fileName);
                     if ( !fpdFile.exists() ) {
-                        throw new BuildException("Platform file [" + fpdFile.getPath() + "] not exists. ");
+                        throw new EdkException("Platform file [" + fpdFile.getPath() + "] not exists. ");
                     }
                     XmlObject fpdDoc = XmlObject.Factory.parse(fpdFile);
                     //
                     // Verify FPD file, if is invalid, throw Exception
                     //
                     if (!fpdDoc.validate()) {
-                        throw new BuildException("Framework Platform Surface Area file [" + fpdFile.getPath() + "] format is invalid!");
+                        throw new EdkException("Framework Platform Surface Area file [" + fpdFile.getPath() + "] format is invalid!");
                     }
                     //
                     // We can change Map to XmlObject
-                    //
-                    //
-                    // TBD check SPD or FPD is existed in FS
                     //
                     Map<String, XmlObject> fpdDocMap = new HashMap<String, XmlObject>();
                     fpdDocMap.put("PlatformSurfaceArea", fpdDoc);
                     SurfaceAreaQuery saq = new SurfaceAreaQuery(fpdDocMap);
                     PlatformIdentification platformId = saq.getFpdHeader();
                     platformId.setFpdFile(fpdFile);
+                    //
+                    // Report warning if existing two platfrom with same GUID and Version
+                    //
+                    if (platformList.contains(platformId)) {
+                        //
+                        // BUGBUG
+                        //
+                        EdkLog.log("Init", EdkLog.EDK_WARNING, "Warning: Existing two platforms with same GUID and Version. They are ... " + fpdFile.getPath());
+                    }
                     platformList.add(platformId);
                 }
             }
-        } catch (Exception e) {
-            throw new BuildException("Parse WORKSPACE Database file [" + dbFile.getPath() + "] Error.\n" + e.getMessage());
+        } catch(IOException ex) {
+            EdkException edkException = new EdkException("Parse WORKSPACE Database file [" + dbFile.getPath() + "] Error.\n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
+        } catch(XmlException ex) {
+            EdkException edkException = new EdkException("Parse WORKSPACE Database file [" + dbFile.getPath() + "] Error.\n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
         }
     }
 
@@ -245,7 +264,7 @@ public class GlobalData {
     /**
       Get the MSA file name with absolute path
      */
-    public synchronized static File getMsaFile(ModuleIdentification moduleId) throws BuildException {
+    public synchronized static File getMsaFile(ModuleIdentification moduleId) throws EdkException {
         File msaFile = null;
         //
         // TBD. Do only when package is null.
@@ -260,13 +279,13 @@ public class GlobalData {
             }
         }
         if (msaFile == null){
-            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
+            throw new EdkException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
         } else {
             return msaFile;
         }
     }
 
-    public synchronized static PackageIdentification getPackageForModule(ModuleIdentification moduleId) {
+    public synchronized static PackageIdentification getPackageForModule(ModuleIdentification moduleId) throws EdkException {
         //
         // If package already defined in module
         //
@@ -285,7 +304,7 @@ public class GlobalData {
             }
         }
         if (packageId == null){
-            throw new BuildException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
+            throw new EdkException("Can't find Module [" + moduleId.getName() + "] in any SPD package!");
         } else {
             return packageId;
         }
@@ -303,7 +322,7 @@ public class GlobalData {
     }
 
 
-    public synchronized static void registerFpdModuleSA(FpdModuleIdentification fpdModuleId, Map<String, XmlObject> doc) {
+    public synchronized static void registerFpdModuleSA(FpdModuleIdentification fpdModuleId, Map<String, XmlObject> doc) throws EdkException{
         Map<String, XmlObject> result = new HashMap<String, XmlObject>();
         Set keySet = doc.keySet();
         Iterator iter = keySet.iterator();
@@ -329,7 +348,7 @@ public class GlobalData {
       @return ModuleSA info and MSA info for fpdModuleId
       @throws BuildException Can't find MSA
     **/
-    public synchronized static Map<String, XmlObject> getDoc(FpdModuleIdentification fpdModuleId) throws BuildException {
+    public synchronized static Map<String, XmlObject> getDoc(FpdModuleIdentification fpdModuleId) throws EdkException{
         if (parsedModules.containsKey(fpdModuleId)) {
             return parsedModules.get(fpdModuleId);
         }
@@ -359,10 +378,11 @@ public class GlobalData {
         return doc;
     }
 
-    public synchronized static Map<String, XmlObject> getDoc(ModuleIdentification moduleId, String arch) throws BuildException {
+    public synchronized static Map<String, XmlObject> getDoc(ModuleIdentification moduleId, String arch) throws EdkException{
         FpdModuleIdentification fpdModuleId = new FpdModuleIdentification(moduleId, arch);
         return getDoc(fpdModuleId);
     }
+    
     /**
       Query the native MSA information with module base name.
 
@@ -374,7 +394,7 @@ public class GlobalData {
       @throws BuildException
               MSA file is not valid
     **/
-    public synchronized static Map<String, XmlObject> getNativeMsa(ModuleIdentification moduleId) throws BuildException {
+    public synchronized static Map<String, XmlObject> getNativeMsa(ModuleIdentification moduleId) throws EdkException {
         if (nativeMsa.containsKey(moduleId)) {
             return nativeMsa.get(moduleId);
         }
@@ -384,9 +404,9 @@ public class GlobalData {
         return msaMap;
     }
 
-    public synchronized static Map<String, XmlObject> getNativeMsa(File msaFile) throws BuildException {
+    public synchronized static Map<String, XmlObject> getNativeMsa(File msaFile) throws EdkException {
         if (!msaFile.exists()) {
-            throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] can't be found!");
+            throw new EdkException("Module Surface Area file [" + msaFile.getPath() + "] can't be found!");
         }
         try {
             ModuleSurfaceAreaDocument doc = (ModuleSurfaceAreaDocument)XmlObject.Factory.parse(msaFile);
@@ -394,7 +414,7 @@ public class GlobalData {
             // Validate File if they accord with XML Schema
             //
             if ( !doc.validate()){
-                throw new BuildException("Module Surface Area file [" + msaFile.getPath() + "] format is invalid!");
+                throw new EdkException("Module Surface Area file [" + msaFile.getPath() + "] format is invalid!");
             }
             //
             // parse MSA file
@@ -412,9 +432,14 @@ public class GlobalData {
             msaMap.put("Externs", cloneXmlObject(msa.getExterns(), true));
             msaMap.put("PcdCoded", cloneXmlObject(msa.getPcdCoded(), true));
             return msaMap;
-        }
-        catch (Exception ex){
-            throw new BuildException("Parsing MSA file [" + msaFile.getPath() + "] error. \n" + ex.getMessage() );
+        } catch(IOException ex) {
+            EdkException edkException = new EdkException("Parsing MSA file [" + msaFile.getPath() + "] error. \n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
+        } catch(XmlException ex) {
+            EdkException edkException = new EdkException("Parsing MSA file [" + msaFile.getPath() + "] error. \n" + ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
         }
     }
 
@@ -422,7 +447,7 @@ public class GlobalData {
         return fpdBuildOptionsMap;
     }
 
-    public static void setFpdBuildOptions(XmlObject fpdBuildOptions) {
+    public static void setFpdBuildOptions(XmlObject fpdBuildOptions) throws EdkException {
         GlobalData.fpdBuildOptions = cloneXmlObject(fpdBuildOptions, true);
         fpdBuildOptionsMap.put("BuildOptions", GlobalData.fpdBuildOptions);
     }
@@ -449,8 +474,7 @@ public class GlobalData {
      * The header file path is relative to workspace dir
      */
     public static String[] getLibraryClassHeaderFiles(
-            PackageIdentification[] packages, String name)
-            throws BuildException {
+            PackageIdentification[] packages, String name) throws EdkException{
         if (packages == null) {
             // throw Exception or not????
             return new String[0];
@@ -468,7 +492,7 @@ public class GlobalData {
         //
         // If can't find library class declaration in every package
         //
-        throw new BuildException("Can not find library class [" + name
+        throw new EdkException("Can not find library class [" + name
                 + "] declaration in any SPD package!");
     }
 
@@ -476,7 +500,7 @@ public class GlobalData {
      * The header file path is relative to workspace dir
      */
     public static String getPackageHeaderFiles(PackageIdentification packages,
-            String moduleType) throws BuildException {
+            String moduleType) {
         if (packages == null) {
             return new String("");
         }
@@ -500,8 +524,7 @@ public class GlobalData {
     /**
      * return two values: {cName, GuidValue}
      */
-    public static String[] getGuid(List<PackageIdentification> packages, String name)
-            throws BuildException {
+    public static String[] getGuid(List<PackageIdentification> packages, String name) {
         if (packages == null) {
             // throw Exception or not????
             return new String[0];
@@ -525,7 +548,7 @@ public class GlobalData {
      * return two values: {cName, GuidValue}
      */
     public static String[] getPpiGuid(List<PackageIdentification> packages,
-            String name) throws BuildException {
+            String name) {
         if (packages == null) {
             return new String[0];
         }
@@ -547,7 +570,7 @@ public class GlobalData {
      * return two values: {cName, GuidValue}
      */
     public static String[] getProtocolGuid(List<PackageIdentification> packages,
-            String name) throws BuildException {
+            String name) {
         if (packages == null) {
             return new String[0];
         }
@@ -566,7 +589,7 @@ public class GlobalData {
 
     }
 
-    public synchronized static PlatformIdentification getPlatformByName(String name) throws BuildException {
+    public synchronized static PlatformIdentification getPlatformByName(String name) throws EdkException {
         Iterator iter = platformList.iterator();
         while(iter.hasNext()){
             PlatformIdentification platformId = (PlatformIdentification)iter.next();
@@ -574,10 +597,10 @@ public class GlobalData {
                 return platformId;
             }
         }
-        throw new BuildException("Can't find platform [" + name + "] in the current WORKSPACE database!");
+        throw new EdkException("Can't find platform [" + name + "] in the current WORKSPACE database!");
     }
 
-    public synchronized static PlatformIdentification getPlatform(String filename) throws BuildException {
+    public synchronized static PlatformIdentification getPlatform(String filename) throws EdkException {
         File file = new File(workspaceDir + File.separatorChar + filename);
         Iterator iter = platformList.iterator();
         while(iter.hasNext()){
@@ -586,10 +609,10 @@ public class GlobalData {
                 return platformId;
             }
         }
-        throw new BuildException("Can't find platform file [" + filename + "] in the current WORKSPACE database!");
+        throw new EdkException("Can't find platform file [" + filename + "] in the current WORKSPACE database!");
     }
 
-    public synchronized static PackageIdentification refreshPackageIdentification(PackageIdentification packageId) throws BuildException {
+    public synchronized static PackageIdentification refreshPackageIdentification(PackageIdentification packageId) throws EdkException {
         Iterator iter = packageList.iterator();
         while(iter.hasNext()){
             PackageIdentification packageItem = (PackageIdentification)iter.next();
@@ -599,15 +622,15 @@ public class GlobalData {
                 return packageId;
             }
         }
-        throw new BuildException("Can't find package GUID value " + packageId.toGuidString() + " in the current workspace!");
+        throw new EdkException("Can't find package GUID value " + packageId.toGuidString() + " in the current workspace!");
     }
 
-    public synchronized static ModuleIdentification refreshModuleIdentification(ModuleIdentification moduleId) throws BuildException {
+    public synchronized static ModuleIdentification refreshModuleIdentification(ModuleIdentification moduleId) throws EdkException {
         PackageIdentification packageId = getPackageForModule(moduleId);
         moduleId.setPackage(packageId);
         Spd spd = spdTable.get(packageId);
         if (spd == null) {
-            throw new BuildException("Can't find package GUID value " + packageId.toGuidString() + " in the current workspace!");
+            throw new EdkException("Can't find package GUID value " + packageId.toGuidString() + " in the current workspace!");
         }
         Set<ModuleIdentification> modules = spd.getModules();
         Iterator<ModuleIdentification> iter = modules.iterator();
@@ -620,7 +643,7 @@ public class GlobalData {
                 return moduleId;
             }
         }
-        throw new BuildException("Can't find module GUID value " + moduleId.toGuidString() + " in " + packageId + " under the current workspace!");
+        throw new EdkException("Can't find module GUID value " + moduleId.toGuidString() + " in " + packageId + " under the current workspace!");
     }
 
     public synchronized static Set<PackageIdentification> getPackageList(){
@@ -636,7 +659,7 @@ public class GlobalData {
       @return XmlObject after clone
       @throws BuildException parse original XmlObject error. 
     **/
-    private static XmlObject cloneXmlObject(XmlObject object, boolean deep) throws BuildException {
+    private static XmlObject cloneXmlObject(XmlObject object, boolean deep) throws EdkException {
         if ( object == null) {
             return null;
         }
@@ -644,8 +667,10 @@ public class GlobalData {
         try {
             result = XmlObject.Factory.parse(object.getDomNode()
                             .cloneNode(deep));
-        } catch (Exception ex) {
-            throw new BuildException(ex.getMessage());
+        } catch (XmlException ex) {
+            EdkException edkException = new EdkException(ex.getMessage());
+            edkException.setStackTrace(ex.getStackTrace());
+            throw edkException;
         }
         return result;
     }

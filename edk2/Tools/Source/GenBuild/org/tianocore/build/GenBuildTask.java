@@ -37,6 +37,10 @@ import org.tianocore.common.definitions.ToolDefinitions;
 import org.tianocore.common.exception.EdkException;
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.autogen.AutoGen;
+import org.tianocore.build.exception.AutoGenException;
+import org.tianocore.build.exception.GenBuildException;
+import org.tianocore.build.exception.PcdAutogenException;
+import org.tianocore.build.exception.PlatformPcdPreprocessBuildException;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
@@ -126,6 +130,37 @@ public class GenBuildTask extends Ant {
               From module build, exception from module surface area invalid.
     **/
     public void execute() throws BuildException {
+        try {
+            processGenBuild();
+        } catch (PcdAutogenException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (AutoGenException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (PlatformPcdPreprocessBuildException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (GenBuildException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        } catch (EdkException e) {
+            //
+            // Add more logic process here
+            //
+            throw new BuildException(e.getMessage());
+        }
+    }
+
+    private void processGenBuild() throws EdkException, BuildException, GenBuildException, AutoGenException, PcdAutogenException, PlatformPcdPreprocessBuildException {
     	if (!FrameworkBuildTask.multithread) {
             cleanupProperties();
         }
@@ -147,20 +182,26 @@ public class GenBuildTask extends Ant {
             String moduleVersion = getProject().getProperty("MODULE_VERSION");
             String packageGuid = getProject().getProperty("PACKAGE_GUID");
             String packageVersion = getProject().getProperty("PACKAGE_VERSION");
+            //
+            // If one of module Guid or package Guid is not specified, report error
+            //
             if (moduleGuid == null || packageGuid == null) {
                 throw new BuildException("GenBuild parameter error.");
             }
+            
             PackageIdentification packageId = new PackageIdentification(packageGuid, packageVersion);
+            GlobalData.refreshPackageIdentification(packageId);
             moduleId = new ModuleIdentification(moduleGuid, moduleVersion);
             moduleId.setPackage(packageId);
+            GlobalData.refreshModuleIdentification(moduleId);
             Map<String, XmlObject> doc = GlobalData.getNativeMsa(moduleId);
             saq = new SurfaceAreaQuery(doc);
-            moduleId = saq.getMsaHeader();
         } else {
             Map<String, XmlObject> doc = GlobalData.getNativeMsa(msaFile);
             saq = new SurfaceAreaQuery(doc);
             moduleId = saq.getMsaHeader();
         }
+        
         String[] producedLibraryClasses = saq.getLibraryClasses("ALWAYS_PRODUCED",null);
         if (producedLibraryClasses.length == 0) {
             moduleId.setLibrary(false);
@@ -176,11 +217,6 @@ public class GenBuildTask extends Ant {
             // Single Module build
             //
             prepareSingleModuleBuild();
-        } else {
-            String packageGuid = getProject().getProperty("PACKAGE_GUID");
-            String packageVersion = getProject().getProperty("PACKAGE_VERSION");
-            PackageIdentification packageId = new PackageIdentification(packageGuid, packageVersion);
-            moduleId.setPackage(packageId);
         }
 
         //
@@ -307,14 +343,15 @@ public class GenBuildTask extends Ant {
       Database must be unique. </p>
 
     **/
-    private void prepareSingleModuleBuild(){
+    private void prepareSingleModuleBuild() throws EdkException {
         //
         // Find out the package which the module belongs to
         // TBD: Enhance it!!!!
         //
         PackageIdentification packageId = GlobalData.getPackageForModule(moduleId);
-
+        GlobalData.refreshPackageIdentification(packageId);
         moduleId.setPackage(packageId);
+        GlobalData.refreshModuleIdentification(moduleId);
 
         //
         // Read ACTIVE_PLATFORM's FPD file 
@@ -540,7 +577,7 @@ public class GenBuildTask extends Ant {
         this.type = type;
     }
 
-    private void applyBuild(String buildTarget, String buildTagname, FpdModuleIdentification fpdModuleId) throws BuildException{
+    private void applyBuild(String buildTarget, String buildTagname, FpdModuleIdentification fpdModuleId) throws EdkException {
         //
         // Call AutoGen to generate AutoGen.c and AutoGen.h
         //
@@ -701,7 +738,7 @@ public class GenBuildTask extends Ant {
         this.isSingleModuleBuild = isSingleModuleBuild;
     }
     
-    private String[] prepareIncludePaths(FpdModuleIdentification fpdModuleId) {
+    private String[] prepareIncludePaths(FpdModuleIdentification fpdModuleId) throws EdkException{
         //
         // Prepare the includes: PackageDependencies and Output debug direactory
         //

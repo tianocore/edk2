@@ -84,9 +84,6 @@ public class PackageIdentification extends Identification{
     }
 
     public String toString(){
-        if (name == null) {
-            GlobalData.refreshPackageIdentification(this);
-        }
         if (version == null || version.trim().equalsIgnoreCase("")) {
             return "package [" + name + "]";
         }
@@ -100,7 +97,6 @@ public class PackageIdentification extends Identification{
       @return Package Directory
     **/
     public String getPackageDir(){
-        prepareSpdFile();
         return spdFile.getParent();
     }
     
@@ -109,7 +105,6 @@ public class PackageIdentification extends Identification{
       @return package relative directory
     **/
     public String getPackageRelativeDir(){
-        prepareSpdFile();
         String relativeDir =spdFile.getParent().substring(GlobalData.getWorkspacePath().length());
         if(relativeDir.startsWith("\\") || relativeDir.startsWith("/")) {
           relativeDir = relativeDir.substring(1);
@@ -117,16 +112,7 @@ public class PackageIdentification extends Identification{
         return relativeDir;
     }
     
-    private void prepareSpdFile(){
-        if (spdFile == null) {
-            GlobalData.refreshPackageIdentification(this);
-        }
-    }
-    
     public String getName() {
-        if (name == null) {
-            GlobalData.refreshPackageIdentification(this);
-        }
         return name;
     }
 }

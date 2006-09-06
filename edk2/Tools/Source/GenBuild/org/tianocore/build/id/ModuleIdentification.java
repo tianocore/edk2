@@ -15,7 +15,6 @@ package org.tianocore.build.id;
 
 import java.io.File;
 
-import org.tianocore.build.global.GlobalData;
 /**
   This class is used to identify a module with Module Guid, Module Version, 
   Package Guid, Package Version. 
@@ -88,7 +87,6 @@ public class ModuleIdentification extends Identification {
       @return MSA File
     **/
     public File getMsaFile() {
-        prepareMsaFile();
         return msaFile;
     }
     
@@ -96,17 +94,10 @@ public class ModuleIdentification extends Identification {
       @return Module relative path to package
     **/
     public String getModuleRelativePath() {
-        prepareMsaFile();
         if (msaFile.getParent().length() == packageId.getPackageDir().length()) {
             return ".";
         }
         return msaFile.getParent().substring(packageId.getPackageDir().length() + 1);
-    }
-
-    private void prepareMsaFile(){
-        if (msaFile == null) {
-            GlobalData.refreshModuleIdentification(this);
-        }
     }
 
     /**
@@ -137,10 +128,7 @@ public class ModuleIdentification extends Identification {
         }
     }
     
-    public String toString(){
-        if (name == null) {
-            GlobalData.refreshModuleIdentification(this);
-        }
+    public String toString() {
         if (version == null || version.trim().equalsIgnoreCase("")) {
             return "Module [" + name + "] in " + packageId;
         }
@@ -167,9 +155,6 @@ public class ModuleIdentification extends Identification {
       @return get module type
     **/
     public String getModuleType() {
-        if (moduleType == null) {
-            GlobalData.refreshModuleIdentification(this);
-        }
         return moduleType;
     }
 
@@ -181,9 +166,6 @@ public class ModuleIdentification extends Identification {
     }
     
     public String getName() {
-        if (name == null) {
-            GlobalData.refreshModuleIdentification(this);
-        }
         return name;
     }
 }
