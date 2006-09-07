@@ -32,6 +32,7 @@ import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.FrameworkBuildTask;
 import org.tianocore.build.GenBuildThread;
 import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
 
 /**
 
@@ -79,7 +80,8 @@ public class FpdParserForThread extends FpdParserTask {
         // Prepare BUILD_DIR
         //
         isUnified = OutputManager.getInstance().prepareBuildDir(getProject());
-
+        String buildDir = getProject().getProperty("BUILD_DIR");
+        
         //
         // For every Target and ToolChain
         //
@@ -90,7 +92,7 @@ public class FpdParserForThread extends FpdParserTask {
                 //
                 // Prepare FV_DIR
                 //
-                String ffsCommonDir = getProject().getProperty("BUILD_DIR") + File.separatorChar
+                String ffsCommonDir = buildDir + File.separatorChar
                                 + targetList[i] + File.separatorChar
                                 + toolchainList[j];
                 File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
@@ -107,7 +109,8 @@ public class FpdParserForThread extends FpdParserTask {
         //
         // Gen build.xml
         //
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq);
+        String platformBuildFile = buildDir + File.separatorChar + platformId.getName() + "_build.xml";
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile);
         fileGenerator.genBuildFile();
         
         //
@@ -135,13 +138,13 @@ public class FpdParserForThread extends FpdParserTask {
         //
         Ant ant = new Ant();
         ant.setProject(getProject());
-        ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
+        ant.setAntfile(platformBuildFile);
         ant.setTarget("prebuild");
         ant.setInheritAll(true);
         ant.init();
         ant.execute();
         
-        System.out.println("Task number is " + allThreads.size());
+        EdkLog.log(this, "Task number is " + allThreads.size());
         
         //
         // Waiting for all thread over, or time out
@@ -189,7 +192,7 @@ public class FpdParserForThread extends FpdParserTask {
                     //
                     // Exist ready thread
                     //
-                    System.out.println("## Exist ready thread");
+                    EdkLog.log(this, "## Exist ready thread");
 
                 } else if (existNoneReady && currentRunNumber == 0) {
                     //
@@ -200,14 +203,14 @@ public class FpdParserForThread extends FpdParserTask {
                     //
                     // Current queue build finish, move to next
                     //
-                    System.out.println("## Current queue build finish, move to next");
+                    EdkLog.log(this, "## Current queue build finish, move to next");
                     ++currentQueueCode;
                     continue ;
                 } else {
                     //
                     // active thread exist, but no ready thread
                     //
-                    System.out.println("## active thread exist, but no ready thread" + currentRunNumber);
+                    EdkLog.log(this, "## active thread exist, but no ready thread" + currentRunNumber);
                 }
 
                 try {
@@ -223,7 +226,7 @@ public class FpdParserForThread extends FpdParserTask {
         //
         ant = new Ant();
         ant.setProject(getProject());
-        ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
+        ant.setAntfile(platformBuildFile);
         ant.setTarget("fvs");
         ant.setInheritAll(true);
         ant.init();
@@ -231,7 +234,7 @@ public class FpdParserForThread extends FpdParserTask {
         
         ant = new Ant();
         ant.setProject(getProject());
-        ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
+        ant.setAntfile(platformBuildFile);
         ant.setTarget("postbuild");
         ant.setInheritAll(true);
         ant.init();

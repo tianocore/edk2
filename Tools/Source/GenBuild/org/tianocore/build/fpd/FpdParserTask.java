@@ -125,6 +125,7 @@ public class FpdParserTask extends Task {
         //
         isUnified = OutputManager.getInstance().prepareBuildDir(getProject());
 
+        String buildDir = getProject().getProperty("BUILD_DIR");
         //
         // For every Target and ToolChain
         //
@@ -135,7 +136,7 @@ public class FpdParserTask extends Task {
                 //
                 // Prepare FV_DIR
                 //
-                String ffsCommonDir = getProject().getProperty("BUILD_DIR") + File.separatorChar
+                String ffsCommonDir = buildDir + File.separatorChar
                                 + targetList[i] + "_"
                                 + toolchainList[j];
                 File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
@@ -152,7 +153,8 @@ public class FpdParserTask extends Task {
         //
         // Gen build.xml
         //
-        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq);
+        String platformBuildFile = buildDir + File.separatorChar + platformId.getName() + "_build.xml";
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile);
         fileGenerator.genBuildFile();
 
         //
@@ -160,7 +162,7 @@ public class FpdParserTask extends Task {
         //
         Ant ant = new Ant();
         ant.setProject(getProject());
-        ant.setAntfile(platformId.getFpdFile().getParent() + File.separatorChar + platformId.getName() + "_build.xml");
+        ant.setAntfile(platformBuildFile);
         ant.setTarget(type);
         ant.setInheritAll(true);
         ant.init();
