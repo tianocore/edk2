@@ -47,8 +47,6 @@ import org.w3c.dom.NodeList;
 **/
 public class PlatformBuildFileGenerator {
 
-    private String platformName;
-    
     ///
     /// Mapping from modules identification to out put file name
     ///
@@ -64,6 +62,8 @@ public class PlatformBuildFileGenerator {
     
     private SurfaceAreaQuery saq = null;
     
+    private File platformBuildFile = null;
+    
     private Project project;
     
     private String info = "DO NOT EDIT \n" 
@@ -72,13 +72,13 @@ public class PlatformBuildFileGenerator {
         + "Abstract:\n"
         + "Auto-generated ANT build file for building EFI Modules and Platforms\n";
 
-    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, boolean isUnified, SurfaceAreaQuery saq){
+    public PlatformBuildFileGenerator(Project project, Map<FpdModuleIdentification, String> outfiles, Map<String, Set<FpdModuleIdentification>> fvs, boolean isUnified, SurfaceAreaQuery saq, String platformBuildFile){
         this.project = project;
         this.outfiles = outfiles;
         this.isUnified = isUnified;
         this.fvs = fvs;
         this.saq = saq;
-        this.platformName = project.getProperty("PLATFORM");
+        this.platformBuildFile = new File(platformBuildFile);
     }
     
     /**
@@ -164,14 +164,10 @@ public class PlatformBuildFileGenerator {
             //
             Source source = new DOMSource(document);
             //
-            // Prepare the output file
-            //
-            File file = new File(project.getProperty("PLATFORM_DIR") + File.separatorChar + platformName + "_build.xml");
-            //
             // generate all directory path
             //
-            (new File(file.getParent())).mkdirs();
-            Result result = new StreamResult(file);
+            (new File(platformBuildFile.getParent())).mkdirs();
+            Result result = new StreamResult(platformBuildFile);
             //
             // Write the DOM document to the file
             //
@@ -180,7 +176,7 @@ public class PlatformBuildFileGenerator {
             xformer.setOutputProperty(OutputKeys.INDENT, "yes");
             xformer.transform(source, result);
         } catch (Exception ex) {
-            throw new BuildException("Generation of the " + platformName + "_build.xml failed!\n" + ex.getMessage());
+            throw new BuildException("Generating platform build file [" + platformBuildFile.getPath() + "_build.xml] failed. \n" + ex.getMessage());
         }
     }
     

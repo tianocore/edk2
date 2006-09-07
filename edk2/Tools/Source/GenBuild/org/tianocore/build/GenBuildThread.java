@@ -25,6 +25,7 @@ import org.tianocore.build.GenBuildTask;
 import org.tianocore.build.fpd.FpdParserForThread;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.common.logger.EdkLog;
 
 /**
   Add more comment here. 
@@ -145,7 +146,7 @@ public class GenBuildThread implements Runnable {
 
         status = FpdParserForThread.STATUS_END_RUN;
         
-        System.out.println(fpdModuleId + " build finished. ");
+        EdkLog.log("GenBuildThread", fpdModuleId + " build finished. ");
         
         //
         // 

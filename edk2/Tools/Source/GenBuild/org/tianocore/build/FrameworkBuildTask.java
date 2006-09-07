@@ -263,7 +263,7 @@ public class FrameworkBuildTask extends Task{
             //
             if (type.compareTo("cleanall") == 0) {
                 File platformBuildFile = 
-                    new File(getProject().getProperty("PLATFORM_DIR") 
+                    new File(getProject().getProperty("BUILD_DIR") 
                                     + File.separatorChar 
                                     + getProject().getProperty("PLATFORM") 
                                     + "_build.xml");
