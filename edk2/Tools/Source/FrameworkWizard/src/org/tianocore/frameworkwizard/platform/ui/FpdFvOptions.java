@@ -37,6 +37,10 @@ import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
  */
 public class FpdFvOptions extends JDialog {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private JPanel jContentPane = null;
     private JPanel jPanelN = null;
     private JPanel jPanelS = null;
@@ -175,7 +179,7 @@ public class FpdFvOptions extends JDialog {
                 public void tableChanged(TableModelEvent arg0) {
                     // TODO Auto-generated method stub
                     int row = arg0.getFirstRow();
-                    int col = arg0.getColumn();
+//                    int col = arg0.getColumn();
                     TableModel m = (TableModel) arg0.getSource();
                     
                     if (arg0.getType() == TableModelEvent.UPDATE) {
@@ -255,6 +259,9 @@ private JButton getJButtonDelete() {
                 }
                 String optName = tableModel.getValueAt(selectedRow, 0)+"";
                 if (((FvOptsTableModel)tableModel).getVKeyWords().contains(optName)){
+                    return;
+                }
+                if (((FvOptsTableModel)tableModel).getVNonEditableName().contains(optName)){
                     return;
                 }
                 
