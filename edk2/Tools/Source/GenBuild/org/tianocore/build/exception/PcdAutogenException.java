@@ -26,7 +26,7 @@ public class PcdAutogenException extends AutoGenException {
       @param expStr exception message string.
     **/
     public PcdAutogenException(String expStr) {
-        super("\r\n[PcdAutogenException] #############################\r\n" + expStr);
+        super(expStr);
     }
     
     public PcdAutogenException() {

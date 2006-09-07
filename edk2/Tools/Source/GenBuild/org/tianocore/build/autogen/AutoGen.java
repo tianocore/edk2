@@ -208,29 +208,28 @@ public class AutoGen {
       @throws BuildException
                   Failed to creat AutoGen.c & AutoGen.h.
     **/
-    public void genAutogen() throws BuildException {
+    public void genAutogen() throws EdkException {
         try {
             //
             // If outputPath do not exist, create it.
             //
             File path = new File(outputPath);
             path.mkdirs();
-
-            //
-            // Check current is library or not, then call the corresponding
-            // function.
-            //
-            if (this.moduleId.isLibrary()) {
-                libGenAutogen();
-            } else {
-                moduleGenAutogen();
-            }
-
-        } catch (Exception e) {
-            throw new BuildException(
-                                    "Failed to create AutoGen.c & AutoGen.h!\n"
-                                    + e.getMessage());
+		} catch (Exception e) {
+            throw new AutoGenException(
+                                    "Failed to create "
+                                    + outputPath + " directory");
         }
+            
+		//
+		// Check current is library or not, then call the corresponding
+		// function.
+		//
+		if (this.moduleId.isLibrary()) {
+			libGenAutogen();
+		} else {
+			moduleGenAutogen();
+		}
     }
 
     /**
@@ -241,17 +240,10 @@ public class AutoGen {
       @throws BuildException
                   Faile to create module AutoGen.c & AutoGen.h.
     **/
-    void moduleGenAutogen() throws BuildException {
-
-        try {
-            collectLibInstanceInfo();
-            moduleGenAutogenC();
-            moduleGenAutogenH();
-        } catch (Exception e) {
-            throw new BuildException(
-                                    "Faile to create module AutoGen.c & AutoGen.h!\n"
-                                    + e.getMessage());
-        }
+    void moduleGenAutogen() throws EdkException {
+		collectLibInstanceInfo();
+		moduleGenAutogenC();
+		moduleGenAutogenH();
     }
 
     /**
@@ -262,15 +254,9 @@ public class AutoGen {
       @throws BuildException
                   Faile to create library AutoGen.c & AutoGen.h
     **/
-    void libGenAutogen() throws BuildException {
-        try {
-            libGenAutogenC();
-            libGenAutogenH();
-        } catch (Exception e) {
-            throw new BuildException(
-                                    "Failed to create library AutoGen.c & AutoGen.h!\n"
-                                    + e.getMessage());
-        }
+    void libGenAutogen() throws EdkException {
+		libGenAutogenC();
+		libGenAutogenH();
     }
 
     /**
@@ -281,7 +267,7 @@ public class AutoGen {
       @throws BuildException
                   Failed to generate AutoGen.h.
     **/
-    void moduleGenAutogenH() throws EdkException, AutoGenException {
+    void moduleGenAutogenH() throws EdkException {
 
         Set<String> libClassIncludeH;
         String moduleType;
@@ -395,7 +381,7 @@ public class AutoGen {
         // Save string buffer content in AutoGen.h.
         //
         if (!saveFile(outputPath + File.separatorChar + "AutoGen.h", fileBuffer)) {
-            throw new BuildException("Failed to generate AutoGen.h !!!");
+            throw new AutoGenException("Failed to generate AutoGen.h !!!");
         }
     }
 
@@ -407,7 +393,7 @@ public class AutoGen {
       @throws BuildException
                   Failed to generate AutoGen.c.
     **/
-    void moduleGenAutogenC() throws EdkException, AutoGenException {
+    void moduleGenAutogenC() throws EdkException {
 
         StringBuffer fileBuffer = new StringBuffer(8192);
         //
@@ -511,19 +497,15 @@ public class AutoGen {
                                                  false, 
                                                  null,
                                                  pcdDriverType);
-        try {
-            this.myPcdAutogen.execute();
-        } catch (Exception exp) {
-            throw new PcdAutogenException (exp.getMessage());
-        }
-
+        
+        this.myPcdAutogen.execute();
         if (this.myPcdAutogen != null) {
             fileBuffer.append("\r\n");
             fileBuffer.append(this.myPcdAutogen.getCAutoGenString());
         }
 
         if (!saveFile(outputPath + File.separatorChar + "AutoGen.c", fileBuffer)) {
-            throw new BuildException("Failed to generate AutoGen.c !!!");
+            throw new AutoGenException("Failed to generate AutoGen.c !!!");
         }
 
     }
@@ -536,7 +518,7 @@ public class AutoGen {
       @throws BuildException
                   Failed to generate AutoGen.c.
     **/
-    void libGenAutogenH() throws EdkException, AutoGenException {
+    void libGenAutogenH() throws EdkException {
 
         Set<String> libClassIncludeH;
         String moduleType;
@@ -641,7 +623,7 @@ public class AutoGen {
         // Save content of string buffer to AutoGen.h file.
         //
         if (!saveFile(outputPath + File.separatorChar + "AutoGen.h", fileBuffer)) {
-            throw new BuildException("Failed to generate AutoGen.h !!!");
+            throw new AutoGenException("Failed to generate AutoGen.h !!!");
         }
     }
 
@@ -653,7 +635,7 @@ public class AutoGen {
       @throws BuildException
                   Failed to generate AutoGen.c.
     **/
-    void libGenAutogenC() throws BuildException, PcdAutogenException {
+    void libGenAutogenC() throws EdkException {
         StringBuffer fileBuffer = new StringBuffer(10240);
 
         //
@@ -672,19 +654,14 @@ public class AutoGen {
                                                  true,
                                                  saq.getModulePcdEntryNameArray(),
                                                  pcdDriverType);
-        try {
-            this.myPcdAutogen.execute();
-        } catch (Exception e) {
-            throw new PcdAutogenException(e.getMessage());
-        }
-
+        this.myPcdAutogen.execute();
         if (this.myPcdAutogen != null) {
             fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);
             fileBuffer.append(this.myPcdAutogen.getCAutoGenString());
         }
 
         if (!saveFile(outputPath + File.separatorChar + "AutoGen.c", fileBuffer)) {
-            throw new BuildException("Failed to generate AutoGen.c !!!");
+            throw new AutoGenException("Failed to generate AutoGen.c !!!");
         }
     }
 
@@ -700,7 +677,7 @@ public class AutoGen {
       @return includeStrList List of *.h file.
     **/
     Set<String> LibraryClassToAutogenH(String[] libClassList)
-    throws EdkException, AutoGenException {
+    throws EdkException {
         Set<String> includeStrList = new LinkedHashSet<String>();
         String includeName[];
         String str = "";
@@ -781,7 +758,7 @@ public class AutoGen {
       @throws Exception
     **/
     void EntryPointToAutoGen(String[] entryPointList, String[] unloadImageList, StringBuffer fileBuffer)
-    throws BuildException {
+    throws EdkException {
 
         String typeStr = saq.getModuleType();
 		int unloadImageCount = 0;
@@ -795,7 +772,7 @@ public class AutoGen {
         
         case CommonDefinition.ModuleTypePeiCore:
             if (entryPointList == null ||entryPointList.length != 1 ) {
-                throw new BuildException(
+                throw new AutoGenException(
                                         "Module type = 'PEI_CORE', can have only one module entry point!");
             } else {
                 fileBuffer.append("EFI_STATUS\r\n");
@@ -827,7 +804,7 @@ public class AutoGen {
         case CommonDefinition.ModuleTypeDxeCore:
             fileBuffer.append("const UINT32 _gUefiDriverRevision = 0;\r\n");
             if (entryPointList == null || entryPointList.length != 1) {
-                throw new BuildException(
+                throw new AutoGenException(
                                         "Module type = 'DXE_CORE', can have only one module entry point!");
             } else {
 
@@ -1294,7 +1271,7 @@ public class AutoGen {
       @throws BuildException
                   Protocol name must set.
     **/
-    void ProtocolGuidToAutogenC(StringBuffer fileBuffer) throws BuildException {
+    void ProtocolGuidToAutogenC(StringBuffer fileBuffer) throws EdkException {
         String[] cNameGuid = null;
 
         String[] protocolList = saq.getProtocolArray(this.arch);
@@ -1334,7 +1311,7 @@ public class AutoGen {
                 //
                 // If can't find protocol GUID declaration in every package
                 //
-                throw new BuildException("Can not find protocol Guid ["
+                throw new AutoGenException("Can not find protocol Guid ["
                                          + protocolKeyWord + "] declaration in any SPD package!");
             }
         }
@@ -1395,21 +1372,17 @@ public class AutoGen {
                  String buffer for AutoGen.c
       @throws BuildException
     **/
-    void LibInstanceToAutogenC(StringBuffer fileBuffer) throws BuildException {
-        try {
-            String moduleType = this.moduleId.getModuleType();
-            //
-            // Add library constructor to AutoGen.c
-            //
-            LibConstructorToAutogenC(libConstructList, moduleType,
-                                     fileBuffer/* autogenC */);
-            //
-            // Add library destructor to AutoGen.c
-            //
-            LibDestructorToAutogenC(libDestructList, moduleType, fileBuffer/* autogenC */);
-        } catch (Exception e) {
-            throw new BuildException(e.getMessage());
-        }
+    void LibInstanceToAutogenC(StringBuffer fileBuffer) throws EdkException {
+		String moduleType = this.moduleId.getModuleType();
+		//
+		// Add library constructor to AutoGen.c
+		//
+		LibConstructorToAutogenC(libConstructList, moduleType,
+								 fileBuffer/* autogenC */);
+		//
+		// Add library destructor to AutoGen.c
+		//
+		LibDestructorToAutogenC(libDestructList, moduleType, fileBuffer/* autogenC */);
     }
 
     /**
@@ -1427,7 +1400,7 @@ public class AutoGen {
       @throws Exception
     **/
     void LibConstructorToAutogenC(List<String> libInstanceList,
-                                  String moduleType, StringBuffer fileBuffer) throws Exception {
+                                  String moduleType, StringBuffer fileBuffer) throws EdkException {
         boolean isFirst = true;
 
         //
@@ -1568,7 +1541,7 @@ public class AutoGen {
       @throws Exception
     **/
     void LibDestructorToAutogenC(List<String> libInstanceList,
-                                 String moduleType, StringBuffer fileBuffer) throws Exception {
+                                 String moduleType, StringBuffer fileBuffer) throws EdkException {
         boolean isFirst = true;
         for (int i = 0; i < libInstanceList.size(); i++) {
             switch (CommonDefinition.getModuleType(moduleType)) {
@@ -1663,7 +1636,7 @@ public class AutoGen {
                  String buffer for AutoGen.c
     **/
     void ExternsDriverBindingToAutoGenC(StringBuffer fileBuffer)
-    throws BuildException {
+    throws EdkException {
 
         //
         // Check what <extern> contains. And the number of following elements
@@ -1702,7 +1675,7 @@ public class AutoGen {
         //
         if (compNamList != null && compNamList.length != 0) {
             if (drvBindList.length != compNamList.length) {
-                throw new BuildException(
+                throw new AutoGenException(
                                         "Different number of Driver Binding and Component Name protocols!");
             }
 
@@ -1719,7 +1692,7 @@ public class AutoGen {
         //
         if (compConfList != null && compConfList.length != 0) {
             if (drvBindList.length != compConfList.length) {
-                throw new BuildException(
+                throw new AutoGenException(
                                         "Different number of Driver Binding and Driver Configuration protocols!");
             }
 
@@ -1736,7 +1709,7 @@ public class AutoGen {
         //
         if (compDiagList != null && compDiagList.length != 0) {
             if (drvBindList.length != compDiagList.length) {
-                throw new BuildException(
+                throw new AutoGenException(
                                         "Different number of Driver Binding and Driver Diagnosis protocols!");
             }
 
@@ -1818,7 +1791,7 @@ public class AutoGen {
       @throws BuildException
     **/
     void ExternCallBackToAutoGenC(StringBuffer fileBuffer)
-    throws BuildException {
+    throws EdkException {
         //
         // Collect module's <SetVirtualAddressMapCallBack> and
         // <ExitBootServiceCallBack> and add to setVirtualAddList
@@ -1879,20 +1852,21 @@ public class AutoGen {
         //  do nothing.
         //
         if ((!outFile.exists()) ||(inFile.lastModified() - outFile.lastModified()) >= 0) {
-            try {
-                if (inFile.exists()) {
-                    FileInputStream fis = new FileInputStream (inFile);
-                    fis.read(buffer);
-                    FileOutputStream fos = new FileOutputStream(outFile);
-                    fos.write(buffer);
-                    fis.close();
-                    fos.close();
-                } else {
-                    throw new AutoGenException("The file, flashMap.h doesn't exist!");
-                }
-            } catch (Exception e) {
-                throw new AutoGenException(e.getMessage());
-            }
+			if (inFile.exists()) {
+				try{
+					FileInputStream fis = new FileInputStream (inFile);
+				    fis.read(buffer);
+				    FileOutputStream fos = new FileOutputStream(outFile);
+				    fos.write(buffer);
+				    fis.close();
+				    fos.close();
+				} catch (IOException e){
+                    throw new AutoGenException("The file, flashMap.h can't be open!");
+				}
+				
+			} else {
+				throw new AutoGenException("The file, flashMap.h doesn't exist!");
+			}
         }
     }
 
@@ -1914,119 +1888,114 @@ public class AutoGen {
         String[] exitBoots = null;
 
         ModuleIdentification[] libraryIdList = saq.getLibraryInstance(this.arch);
-        try {
-            if (libraryIdList != null) {
-                //
-                // Reorder library instance sequence.
-                //
-                AutogenLibOrder libOrder = new AutogenLibOrder(libraryIdList,
-                                                               this.arch);
-                List<ModuleIdentification> orderList = libOrder
-                                                       .orderLibInstance();
 
-                if (orderList != null) {
-                    //
-                    // Process library instance one by one.
-                    //
-                    for (int i = 0; i < orderList.size(); i++) {
+		if (libraryIdList != null) {
+			//
+			// Reorder library instance sequence.
+			//
+			AutogenLibOrder libOrder = new AutogenLibOrder(libraryIdList,
+														   this.arch);
+			List<ModuleIdentification> orderList = libOrder
+												   .orderLibInstance();
 
-                        //
-                        // Get library instance basename.
-                        //
-                        ModuleIdentification libInstanceId = orderList.get(i);
+			if (orderList != null) {
+				//
+				// Process library instance one by one.
+				//
+				for (int i = 0; i < orderList.size(); i++) {
 
-                        //
-                        // Get override map
-                        //
+					//
+					// Get library instance basename.
+					//
+					ModuleIdentification libInstanceId = orderList.get(i);
 
-                        Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstanceId, this.arch);
-                        saq.push(libDoc);
-                        //
-                        // Get <PPis>, <Protocols>, <Guids> list of this library
-                        // instance.
-                        //
-                        String[] ppiList = saq.getPpiArray(this.arch);
-                        String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
-                        String[] protocolList = saq.getProtocolArray(this.arch);
-                        String[] protocolNotifyList = saq.getProtocolNotifyArray(this.arch);
-                        String[] guidList = saq.getGuidEntryArray(this.arch);
-                        PackageIdentification[] pkgList = saq.getDependencePkg(this.arch);
+					//
+					// Get override map
+					//
 
-                        //
-                        // Add those ppi, protocol, guid in global ppi,
-                        // protocol, guid
-                        // list.
-                        //
-                        for (index = 0; index < ppiList.length; index++) {
-                            this.mPpiList.add(ppiList[index]);
-                        }
+					Map<String, XmlObject> libDoc = GlobalData.getDoc(libInstanceId, this.arch);
+					saq.push(libDoc);
+					//
+					// Get <PPis>, <Protocols>, <Guids> list of this library
+					// instance.
+					//
+					String[] ppiList = saq.getPpiArray(this.arch);
+					String[] ppiNotifyList = saq.getPpiNotifyArray(this.arch);
+					String[] protocolList = saq.getProtocolArray(this.arch);
+					String[] protocolNotifyList = saq.getProtocolNotifyArray(this.arch);
+					String[] guidList = saq.getGuidEntryArray(this.arch);
+					PackageIdentification[] pkgList = saq.getDependencePkg(this.arch);
 
-                        for (index = 0; index < ppiNotifyList.length; index++) {
-                            this.mPpiList.add(ppiNotifyList[index]);
-                        }
+					//
+					// Add those ppi, protocol, guid in global ppi,
+					// protocol, guid
+					// list.
+					//
+					for (index = 0; index < ppiList.length; index++) {
+						this.mPpiList.add(ppiList[index]);
+					}
 
-                        for (index = 0; index < protocolList.length; index++) {
-                            this.mProtocolList.add(protocolList[index]);
-                        }
+					for (index = 0; index < ppiNotifyList.length; index++) {
+						this.mPpiList.add(ppiNotifyList[index]);
+					}
 
-                        for (index = 0; index < protocolNotifyList.length; index++) {
-                            this.mProtocolList.add(protocolNotifyList[index]);
-                        }
+					for (index = 0; index < protocolList.length; index++) {
+						this.mProtocolList.add(protocolList[index]);
+					}
 
-                        for (index = 0; index < guidList.length; index++) {
-                            this.mGuidList.add(guidList[index]);
-                        }
-                        for (index = 0; index < pkgList.length; index++) {
-                            if (!this.mDepPkgList.contains(pkgList[index])) {
-                                this.mDepPkgList.add(pkgList[index]);
-                            }
-                        }
+					for (index = 0; index < protocolNotifyList.length; index++) {
+						this.mProtocolList.add(protocolNotifyList[index]);
+					}
 
-                        //
-                        // If not yet parse this library instance's constructor
-                        // element,parse it.
-                        //
-                        libConstructName = saq.getLibConstructorName();
-                        libDestructName = saq.getLibDestructorName();
+					for (index = 0; index < guidList.length; index++) {
+						this.mGuidList.add(guidList[index]);
+					}
+					for (index = 0; index < pkgList.length; index++) {
+						if (!this.mDepPkgList.contains(pkgList[index])) {
+							this.mDepPkgList.add(pkgList[index]);
+						}
+					}
 
-                        //
-                        // Collect SetVirtualAddressMapCallBack and
-                        // ExitBootServiceCallBack.
-                        //
-                        setVirtuals = saq.getSetVirtualAddressMapCallBackArray();
-                        exitBoots = saq.getExitBootServicesCallBackArray();
-                        if (setVirtuals != null) {
-                            for (int j = 0; j < setVirtuals.length; j++) {
-                                this.setVirtalAddList.add(setVirtuals[j]);
-                            }
-                        }
-                        if (exitBoots != null) {
-                            for (int k = 0; k < exitBoots.length; k++) {
-                                this.exitBootServiceList.add(exitBoots[k]);
-                            }
-                        }
-                        saq.pop();
-                        //
-                        // Add dependent library instance constructor function.
-                        //
-                        if (libConstructName != null) {
-                            this.libConstructList.add(libConstructName);
-                        }
-                        //
-                        // Add dependent library instance destructor fuction.
-                        //
-                        if (libDestructName != null) {
-                            this.libDestructList.add(libDestructName);
-                        }
-                    }
-                }
+					//
+					// If not yet parse this library instance's constructor
+					// element,parse it.
+					//
+					libConstructName = saq.getLibConstructorName();
+					libDestructName = saq.getLibDestructorName();
 
-            }
+					//
+					// Collect SetVirtualAddressMapCallBack and
+					// ExitBootServiceCallBack.
+					//
+					setVirtuals = saq.getSetVirtualAddressMapCallBackArray();
+					exitBoots = saq.getExitBootServicesCallBackArray();
+					if (setVirtuals != null) {
+						for (int j = 0; j < setVirtuals.length; j++) {
+							this.setVirtalAddList.add(setVirtuals[j]);
+						}
+					}
+					if (exitBoots != null) {
+						for (int k = 0; k < exitBoots.length; k++) {
+							this.exitBootServiceList.add(exitBoots[k]);
+						}
+					}
+					saq.pop();
+					//
+					// Add dependent library instance constructor function.
+					//
+					if (libConstructName != null) {
+						this.libConstructList.add(libConstructName);
+					}
+					//
+					// Add dependent library instance destructor fuction.
+					//
+					if (libDestructName != null) {
+						this.libDestructList.add(libDestructName);
+					}
+				}
+			}
 
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.out.println("Collect library instance failed!");
-        }
+		}
     }
 	private void setVirtualAddressToAutogenC(StringBuffer fileBuffer){
         //
