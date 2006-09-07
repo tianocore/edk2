@@ -72,7 +72,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <HelpText>The value used by DebugClearMemory () to fill a certain range
                 of memory.</HelpText>
     </PcdEntry>
-    <PcdEntry PcdItemType="PATCHABLE_IN_MODULE">
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdDebugPrintErrorLevel</C_Name>
           <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>The bitmask of flags that specify the kind of debug message

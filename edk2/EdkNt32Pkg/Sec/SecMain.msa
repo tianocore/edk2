@@ -91,20 +91,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
   </Externs>
   <PcdCoded>
-    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
-        the size of PcdWinNtMemorySizeForSecMain in windows platform.
-        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
+        the size of PcdWinNtMemorySizeForSecMain in windows platform.</HelpText>
     </PcdEntry>
-    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtFirmwareVolume</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.
-        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
+      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.</HelpText>
     </PcdEntry>
-    <PcdEntry PcdItemType="FIXED_AT_BUILD">
+    <PcdEntry PcdItemType="DYNAMIC">
       <C_Name>PcdWinNtBootMode</C_Name>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <HelpText>This PCD defines the boot mode for simualtor. 
@@ -119,8 +117,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
           0x10: Boot on S2 resume. 
           0x11: Boot on S3 resume.
           0x12: Boot on flash update.
-          0x20: Boot in reovery mode.
-        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
+          0x20: Boot in reovery mode.</HelpText>
     </PcdEntry>
   </PcdCoded>
 </ModuleSurfaceArea>
