@@ -81,11 +81,11 @@ public class MsaWriter {
 		} else {
 			msaheader.setModuleName(mi.modulename = Query("Module Name Not Found!  Please Input ModuleName"));
 		}
-		if (mi.guidvalue != null) {
-			msaheader.setGuidValue(mi.guidvalue);
-		} else {
-			msaheader.setGuidValue(mi.guidvalue = Query("Guid Value Not Found!  Please Input Guid Value"));
-		}
+		if (mi.guidvalue == null) {
+		  mi.guidvalue = UUID.randomUUID().toString();
+		  MigrationTool.ui.println ("Guid value can not be retrieved from inf file. Generate " + mi.guidvalue + " at random!"); 
+		} 
+		msaheader.setGuidValue(mi.guidvalue);
 		if (mi.moduletype != null) {
 			msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.getModuleType()));
 			/*
