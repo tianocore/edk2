@@ -63,7 +63,7 @@ public final class Critic {
 					templine.append(line + "\n");
 				} else if (line.matches("\\*\\*\\/")) {
 					incomment = false;
-					templine.append(line + "\n");
+					templine.append("\n" + line + "\n");
 				} else if (incomment) {
 					if (line.contains("Routine Description:")) {
 						description = true;
@@ -73,10 +73,12 @@ public final class Critic {
 						description = false;
 						arguments = true;
 						returns = false;
+						templine.append("\n");
 					} else if (line.contains("Returns:")) {
 						description = false;
 						arguments = false;
 						returns = true;
+						templine.append("\n");
 					} else if (description) {
 						if (line.trim().length() != 0) {
 							templine.append("  " + line.trim() + "\n");
@@ -88,11 +90,12 @@ public final class Critic {
 							templine.append("  @param  " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
 						} else if (inequation && line.trim().length() == 0) {
 							inequation = false;
-							templine.append(line + "\n");
 						} else if (inequation && line.trim().length() != 0) {
 							templine.append("#%#%" + line + "\n");
 						} else {
-							templine.append("  " + line.trim() + "\n");
+							if (line.trim().length() != 0) {
+								templine.append("  " + line.trim() + "\n");
+							}
 						}
 					} else if (returns) {
 						mtrcommentequation = ptncommentequation.matcher(line);
@@ -101,13 +104,10 @@ public final class Critic {
 							templine.append("  @retval " + mtrcommentequation.group(1) + "     " + mtrcommentequation.group(2) + "\n");
 						} else if (inequation && line.trim().length() == 0) {
 							inequation = false;
-							templine.append(line + "\n");
 						} else if (inequation && line.trim().length() != 0) {
 							templine.append("#%#%" + line + "\n");
 						} else {
-							if (line.trim().length() == 0) {
-								templine.append("  " + line.trim() + "\n");
-							} else {
+							if (line.trim().length() != 0) {
 								templine.append("  @return " + line.trim() + "\n");
 							}
 						}

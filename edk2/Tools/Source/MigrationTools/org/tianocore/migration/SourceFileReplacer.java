@@ -240,7 +240,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 		}
 	}
 	//---------------------------------------inner classes---------------------------------------//
-	
+
+	//-------------------------------------process functions-------------------------------------//
 	private static final String addincludefile(String wholeline, String hfile) {
 		return wholeline.replaceFirst("(\\*/\\s)", "$1\n#include " + hfile + "\n");
 	}
@@ -315,6 +316,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 		mi.localmodulesources.add("R8Lib.h");
 		mi.localmodulesources.add("R8Lib.c");
 	}
+	//-------------------------------------process functions-------------------------------------//
 	
 	//-----------------------------------ForDoAll-----------------------------------//
 	public void run(String filepath) throws Exception {

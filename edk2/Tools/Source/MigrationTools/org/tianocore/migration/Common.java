@@ -184,10 +184,6 @@ public final class Common {
 			Common.string2file(operation(Common.file2string(src)), des);
 		}
 		
-		public void run() {
-			
-		}
-		
 		public abstract String operation(String wholeline);
 		
 		public abstract boolean recognize(String filename);
