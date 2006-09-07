@@ -14,8 +14,6 @@
  **/
 package org.tianocore.frameworkwizard.common.Identifications;
 
-import javax.swing.tree.TreePath;
-
 import org.tianocore.PackageSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 
@@ -32,13 +30,6 @@ public class OpeningPackageType extends OpeningFileType {
     }
     
     public OpeningPackageType(PackageIdentification identification, PackageSurfaceAreaDocument.PackageSurfaceArea spd) {
-        this.id = identification;
-        this.xmlSpd = spd;
-    }
-    
-    public OpeningPackageType(PackageIdentification identification, PackageSurfaceAreaDocument.PackageSurfaceArea spd, TreePath treePath) {
-        super(treePath);
-        
         this.id = identification;
         this.xmlSpd = spd;
     }

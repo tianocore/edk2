@@ -14,6 +14,7 @@
  **/
 package org.tianocore.frameworkwizard.common.Identifications;
 
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.tree.TreePath;
@@ -139,14 +140,14 @@ public class OpeningPackageList {
         return true;
     }
     
-    public void setTreePathById(PackageIdentification id, TreePath treePath) {
+    public void setTreePathById(PackageIdentification id, Set<TreePath> treePath) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPackageList.elementAt(index).setTreePath(treePath);
         }
     }
     
-    public TreePath getTreePathById(PackageIdentification id) {
+    public Set<TreePath> getTreePathById(PackageIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPackageList.elementAt(index).getTreePath();
@@ -154,7 +155,7 @@ public class OpeningPackageList {
         return null;
     }
     
-    public TreePath getTreePathByIndex(int index) {
+    public Set<TreePath> getTreePathByIndex(int index) {
         if (index > -1) {
             return vOpeningPackageList.elementAt(index).getTreePath();
         }

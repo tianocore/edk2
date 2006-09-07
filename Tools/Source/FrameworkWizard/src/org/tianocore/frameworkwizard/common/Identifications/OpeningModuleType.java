@@ -15,8 +15,6 @@
 
 package org.tianocore.frameworkwizard.common.Identifications;
 
-import javax.swing.tree.TreePath;
-
 import org.tianocore.ModuleSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
 
@@ -33,13 +31,6 @@ public class OpeningModuleType extends OpeningFileType{
     }
     
     public OpeningModuleType(ModuleIdentification identification, ModuleSurfaceAreaDocument.ModuleSurfaceArea msa) {
-        this.id = identification;
-        this.xmlMsa = msa;
-    }
-    
-    public OpeningModuleType(ModuleIdentification identification, ModuleSurfaceAreaDocument.ModuleSurfaceArea msa, TreePath treePath) {
-        super(treePath);
-        
         this.id = identification;
         this.xmlMsa = msa;
     }

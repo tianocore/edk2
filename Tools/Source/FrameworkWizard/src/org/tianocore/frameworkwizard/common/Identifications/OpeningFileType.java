@@ -15,6 +15,9 @@
 
 package org.tianocore.frameworkwizard.common.Identifications;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import javax.swing.tree.TreePath;
 
 
@@ -28,14 +31,10 @@ public class OpeningFileType {
     
     private boolean isOpen = false;
     
-    private TreePath treePath = null;
+    private Set<TreePath> treePath = new LinkedHashSet<TreePath>();
     
     public OpeningFileType() {
         
-    }
-    
-    public OpeningFileType(TreePath treePathValue) {
-        this.treePath = treePathValue;
     }
 
     public boolean isNew() {
@@ -54,19 +53,19 @@ public class OpeningFileType {
         this.isSaved = isSaved;
     }
 
-    public TreePath getTreePath() {
-        return treePath;
-    }
-
-    public void setTreePath(TreePath treePath) {
-        this.treePath = treePath;
-    }
-
     public boolean isOpen() {
         return isOpen;
     }
 
     public void setOpen(boolean isOpen) {
         this.isOpen = isOpen;
+    }
+
+    public Set<TreePath> getTreePath() {
+        return treePath;
+    }
+
+    public void setTreePath(Set<TreePath> treePath) {
+        this.treePath = treePath;
     }
 }
