@@ -360,17 +360,22 @@ public class FpdFileContents {
         getLibraryInstances(moduleKey, saaLib);
         ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
         Vector<ModuleIdentification> vMi = new Vector<ModuleIdentification>();
+        //
+        // create vector for module & library instance MIs.
+        //
         vMi.add(mi);
+        for (int j = 0; j < saaLib.length; ++j) {
+            String libKey = saaLib[j][1] + " " + saaLib[j][2] + " " + saaLib[j][3] + " " + saaLib[j][4];
+            ModuleIdentification libMi = WorkspaceProfile.getModuleId(libKey);
+            vMi.add(libMi);
+        }
+        
         try {
     nextPcd:for (int i = 0; i < saaModuleSaPcd.length; ++i) {
-                if (WorkspaceProfile.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], mi)){
-                    continue;
-                }
-                for (int j = 0; j < saaLib.length; ++j) {
-                    String libKey = saaLib[j][1] + " " + saaLib[j][2] + " " + saaLib[j][3] + " " + saaLib[j][4];
-                    ModuleIdentification libMi = WorkspaceProfile.getModuleId(libKey);
-                    vMi.add(libMi);
-                    if (WorkspaceProfile.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], libMi)) {
+
+                for (int j = 0; j < vMi.size(); ++j) {
+                    ModuleIdentification nextMi = vMi.get(j);
+                    if (WorkspaceProfile.pcdInMsa(saaModuleSaPcd[i][0], saaModuleSaPcd[i][1], nextMi)) {
                         continue nextPcd;
                     }
                 }
@@ -379,7 +384,7 @@ public class FpdFileContents {
             }
         }
         catch (Exception e) {
-            
+            throw e;
         }
         //
         // add new Pcd from MSA file to ModuleSA.
@@ -405,9 +410,6 @@ public class FpdFileContents {
                         }
                     }
                     
-                    Map<String, XmlObject> m = new HashMap<String, XmlObject>();
-                    m.put("ModuleSurfaceArea", msa);
-                    SurfaceAreaQuery.setDoc(m);
                     PackageIdentification[] depPkgs = SurfaceAreaQuery.getDependencePkg(null, vMi.get(i));
                     PcdDeclarationsDocument.PcdDeclarations.PcdEntry spdPcd = LookupPcdDeclaration(msaPcd, depPkgs);
                     if (spdPcd == null) {
