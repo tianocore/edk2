@@ -13,6 +13,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 package org.tianocore.context;
 
+import java.util.LinkedList;
+
 public class HelpInfo {
 
     
@@ -39,17 +41,13 @@ public class HelpInfo {
      * @return no return value
      **/
     private static void outputSubUsageInfo(String str1, String str2) {
+        
         splitString(str2);
-        if (substrnum > 0) {
-            System.out.printf("\n%4s %-30s %s", "", str1, substr[0]);
-            for (int i = 1; i < substrnum; i++) {
-                if (substr[i] != null)
-                    System.out.printf("\n%4s %-30s %s", "", "", substr[i]);
-            }
-            substrnum = 0;
-        } else {
-            System.out.printf("\n%4s %-30s %s", "", str1, str2);
+        System.out.printf("\n%4s %-30s %s", "", str1, List.get(0));
+        for (int i=1; i<List.size(); i++){
+            System.out.printf("\n%4s %-30s %s", "", "", List.get(i));
         }
+        List.clear();
     }
 
     /** 
@@ -60,31 +58,30 @@ public class HelpInfo {
     private static void splitString(String str) {
         int strlength = str.length();
         if (strlength > MaxSrtingLength) {
-            
-            //we should modify the array to list, for it is strange to + 2
-            substrnum = strlength / MaxSrtingLength + 2;
             String[] tokens = str.split("[ ]", 0);
-            substr = new String[substrnum];
+            String tempstr = null;
             int templength = 0;
-            int j = 0;
             int start = 0;
             int end = 0;
             for (int i = 0; i < tokens.length; i++) {
                 if ((templength = end + tokens[i].length() + 1) < (MaxSrtingLength + start)) {
                     end = templength;
                 } else {
-                    substr[j++] = str.substring(start, end);
+                    tempstr = str.substring(start, end);
+                    List.add(tempstr);
                     start = end;
                     i = i - 1;
                 }
             }
-            substr[j] = str.substring(start, end - 1);
+            tempstr = str.substring(start, end - 1);
+            List.add(tempstr);
+        } else {
+            List.add(str);
         }
     }
 
-    private static String[] substr = null;
-
-    private static int substrnum = 0;
+    
+    private static LinkedList<String> List = new LinkedList<String>();
 
     private static final int MaxSrtingLength = 40;
 
