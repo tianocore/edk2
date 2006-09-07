@@ -30,6 +30,16 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 	private static final Set<r8tor9> fileprotocol = new HashSet<r8tor9>();
 	private static final Set<String> filer8only = new HashSet<String>();
 	
+	private static final String[] specialhoblibfunc = {
+		"BuildModuleHob",
+		"BuildResourceDescriptorHob",
+		"BuildFvHob",
+		"BuildCpuHob",
+		"BuildStackHob",
+		"BuildBspStoreHob",
+		"BuildMemoryAllocationHob"
+		};
+	
 	//---------------------------------------inner classes---------------------------------------//
 	private static class r8tor9 {
 		r8tor9(String r8, String r9) {
@@ -163,7 +173,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 			// Converting Pei
 			// First , find all (**PeiServices)-> or (*PeiServices). with arg "PeiServices" , change name and add #%
 			Pattern ptnpei = Pattern.compile("\\(\\*\\*?PeiServices\\)[.-][>]?\\s*(\\w*)(\\s*\\(\\s*PeiServices\\s*,\\s*)", Pattern.MULTILINE);
-			if (mi.moduletype.contains("PEIM")) {
+			if (mi.getModuleType().matches("PEIM")) {
+			//if (mi.moduletype.contains("PEIM")) {
 				Matcher mtrpei = ptnpei.matcher(wholeline);
 				while (mtrpei.find()) {										// ! add a library here !
 					wholeline = mtrpei.replaceAll("PeiServices$1#%$2");
@@ -186,6 +197,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 					wholeline = mtrpeiarg.replaceAll("$1");
 				}
 			}
+			
+			wholeline = hobLibFuncDropStatus(wholeline);
 			
 			Matcher mtrmac;
 			mtrmac = Pattern.compile("EFI_IDIV_ROUND\\((.*), (.*)\\)").matcher(wholeline);
@@ -277,6 +290,20 @@ public final class SourceFileReplacer implements Common.ForDoAll {
 		}
 	}
 
+	private final String hobLibFuncDropStatus(String wholeline) {		// or use regex to find pattern "Status = ..."
+		Pattern ptnhobstatus;
+		Matcher mtrhobstatus;
+		String templine = wholeline;
+		for (int i = 0; i < specialhoblibfunc.length; i++) {
+			ptnhobstatus = Pattern.compile("(Status\\s*=\\s*)?" + specialhoblibfunc[i] + "(.*?\\)\\s*;)", Pattern.DOTALL);
+			mtrhobstatus = ptnhobstatus.matcher(templine);
+			if (mtrhobstatus.find()) {
+				templine = mtrhobstatus.replaceAll(specialhoblibfunc[i] + mtrhobstatus.group(2) + "\n  //Migration comments: R9 Hob-building library functions will assert if build failure.\n  Status = EFI_SUCCESS;");
+			}
+		}
+		return templine;
+	}
+	
 	private final void addr8only() throws Exception {
 		String paragraph = null;
 		String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");
