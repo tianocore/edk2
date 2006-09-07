@@ -100,7 +100,6 @@ public class FpdFlash extends IInternalFrame {
     private ImageParaTableModel fvImageParaTableModel = null;
     private DefaultTableModel fvOptionTableModel = null;
     private JPanel jPanelFvImageC = null;
-    private JCheckBox jCheckBoxFvImagePara = null;
     private JLabel jLabelFvParaType = null;
     private JComboBox jComboBoxFvParaType = null;
     private JLabel jLabelFvImageNames = null;
@@ -115,7 +114,6 @@ public class FpdFlash extends IInternalFrame {
     private JScrollPane jScrollPaneFvInfo = null;
     private JTable jTableFvInfo = null;
     private JButton jButtonDelFvImage = null;
-    private JCheckBox jCheckBoxFvImageOpts = null;
     private JPanel jPanelFvImagePara = null;
     private OpeningPlatformType docConsole = null;
     private FpdFileContents ffc = null;
@@ -160,10 +158,17 @@ public class FpdFlash extends IInternalFrame {
     private String oldFvName = null;
     private Vector<String> vBlockSize = new Vector<String>();
     private String determinedFvBlockSize = null;
+    private final String defaultBlkSize = "0x10000";
     private String erasePolarity = "";
     boolean memModified = false;
     private FvOptsTableModel fvInFdfOptTableModel = null;
     private FvOptsTableModel fvAdditionalOptTableModel = null;
+    private boolean sizeFromOptionDlg = false;
+    private boolean fileFromOptionDlg = false;
+    private JLabel jLabelOptions = null;
+    private JPanel jPanelBgFvName = null;
+    private JPanel jPanelBgFvImage = null;
+    private JPanel jPanelW = null;
     
     public FpdFlash() {
         super();
@@ -197,7 +202,10 @@ public class FpdFlash extends IInternalFrame {
      */
     private JPanel getJPanelContentEast() {
         if (jPanelContentEast == null) {
+            FlowLayout flowLayout7 = new FlowLayout();
+            flowLayout7.setVgap(50);
             jPanelContentEast = new JPanel();
+            jPanelContentEast.setLayout(flowLayout7);
         }
         return jPanelContentEast;
     }
@@ -267,32 +275,16 @@ public class FpdFlash extends IInternalFrame {
         if (jPanelFvImages == null) {
             jPanelFvImages = new JPanel();
             jPanelFvImages.setLayout(new BorderLayout());
-            jPanelFvImages.add(getJPanelFvImageN(), java.awt.BorderLayout.NORTH);
-//            jPanelFvImages.add(getJPanelFvImageW(), java.awt.BorderLayout.WEST);
-            jPanelFvImages.add(getJPanelFvImageS(), java.awt.BorderLayout.SOUTH);
+            jPanelFvImages.add(getJPanelFvImageS(), java.awt.BorderLayout.NORTH);
+            jPanelFvImages.add(getJPanelFvImageN(), java.awt.BorderLayout.SOUTH);
             jPanelFvImages.add(getJPanelFvImageC(), java.awt.BorderLayout.CENTER);
+            jPanelFvImages.add(getJPanelW(), java.awt.BorderLayout.EAST);
             jPanelFvImages.addComponentListener(new java.awt.event.ComponentAdapter() {
                 public void componentShown(java.awt.event.ComponentEvent e) {
-                    fvImageParaTableModel.setRowCount(0);
-                    fvPropertyTableModel.setRowCount(0);
+//                    fvImageParaTableModel.setRowCount(0);
+//                    fvPropertyTableModel.setRowCount(0);
                     
-                    if (ffc.getFvImagesFvImageCount("Attributes") == 0) {
-                        return;
-                    }
-                    String[][] saa = new String[ffc.getFvImagesFvImageCount("Attributes")][2];
-                    ffc.getFvImagesFvImages(saa, "Attributes");
                     
-                    int i = 0;
-                    while (i < saa.length) {
-                        fvImageParaTableModel.addRow(saa[i]);
-                        ++i;
-                    }
-                    
-                    saa = new String[ffc.getFvImagesNameValueCount()][2];
-                    ffc.getFvImagesNameValues(saa);
-                    for (int m = 0; m < saa.length; ++m) {
-                        fvPropertyTableModel.addRow(saa[m]);
-                    }
                 }
             });
             
@@ -317,9 +309,9 @@ public class FpdFlash extends IInternalFrame {
             jLabelFvPropName.setPreferredSize(new java.awt.Dimension(38,20));
             FlowLayout flowLayout2 = new FlowLayout();
             flowLayout2.setAlignment(java.awt.FlowLayout.LEFT);
-            flowLayout2.setHgap(15);
+            flowLayout2.setHgap(5);
             jPanelFvImageN = new JPanel();
-            jPanelFvImageN.setPreferredSize(new java.awt.Dimension(576,100));
+            jPanelFvImageN.setPreferredSize(new java.awt.Dimension(576,130));
             jPanelFvImageN.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
             jPanelFvImageN.setLayout(flowLayout2);
             jPanelFvImageN.add(getJCheckBoxFvProperty(), null);
@@ -343,7 +335,7 @@ public class FpdFlash extends IInternalFrame {
             GridLayout gridLayout2 = new GridLayout();
             gridLayout2.setRows(1);
             jPanelFvImageS = new JPanel();
-            jPanelFvImageS.setPreferredSize(new java.awt.Dimension(480,190));
+            jPanelFvImageS.setPreferredSize(new java.awt.Dimension(480,150));
             jPanelFvImageS.setLayout(gridLayout2);
             jPanelFvImageS.add(getJScrollPaneFvInfo(), null);
         }
@@ -452,7 +444,7 @@ public class FpdFlash extends IInternalFrame {
     private JScrollPane getJScrollPaneFvProp() {
         if (jScrollPaneFvProp == null) {
             jScrollPaneFvProp = new JScrollPane();
-            jScrollPaneFvProp.setPreferredSize(new java.awt.Dimension(350,55));
+            jScrollPaneFvProp.setPreferredSize(new java.awt.Dimension(350,100));
             jScrollPaneFvProp.setViewportView(getJTableFvProp());
         }
         return jScrollPaneFvProp;
@@ -564,15 +556,12 @@ public class FpdFlash extends IInternalFrame {
         if (jPanelFvImageC == null) {
             jLabelFvParaName = new JLabel();
             jLabelFvParaName.setPreferredSize(new Dimension(38, 20));
-            jLabelFvParaName.setEnabled(false);
             jLabelFvParaName.setText("Name");
             jLabelFvImageNames = new JLabel();
             jLabelFvImageNames.setText("FV Image Names");
-            jLabelFvImageNames.setEnabled(false);
             jLabelFvImageNames.setPreferredSize(new java.awt.Dimension(150,20));
             jLabelFvParaType = new JLabel();
             jLabelFvParaType.setText("Type");
-            jLabelFvParaType.setEnabled(false);
             jLabelFvParaType.setPreferredSize(new java.awt.Dimension(70,20));
             FlowLayout flowLayout3 = new FlowLayout();
             flowLayout3.setAlignment(java.awt.FlowLayout.LEFT);
@@ -589,41 +578,6 @@ public class FpdFlash extends IInternalFrame {
 
 
     /**
-     * This method initializes jCheckBox2	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBoxFvImagePara() {
-        if (jCheckBoxFvImagePara == null) {
-            jCheckBoxFvImagePara = new JCheckBox();
-            jCheckBoxFvImagePara.setText("FV Image Parameters");
-            jCheckBoxFvImagePara.setPreferredSize(new java.awt.Dimension(200,20));
-            jCheckBoxFvImagePara.addItemListener(new ItemListener(){
-
-                public void itemStateChanged(ItemEvent arg0) {
-                    // TODO Auto-generated method stub
-                    boolean seleted = jCheckBoxFvImagePara.isSelected();
-                    
-                        jLabelFvParaType.setEnabled(seleted);
-                        jLabelFvImageNames.setEnabled(seleted);
-                        jLabelFvParaName.setEnabled(seleted);
-                        jComboBoxFvParaType.setEnabled(seleted);
-                        jTextFieldFvParaName.setEnabled(seleted);
-                        
-                        jTableFvImageNames.setEnabled(seleted);
-                        jButtonFvParaAdd.setEnabled(seleted);
-                        jButtonFvParaDel.setEnabled(seleted);
-                    
-                   
-                }
-                
-            });
-        }
-        return jCheckBoxFvImagePara;
-    }
-
-
-    /**
      * This method initializes jComboBox	
      * 	
      * @return javax.swing.JComboBox	
@@ -631,17 +585,28 @@ public class FpdFlash extends IInternalFrame {
     private JComboBox getJComboBoxFvParaType() {
         if (jComboBoxFvParaType == null) {
             jComboBoxFvParaType = new JComboBox();
-//            jComboBoxFvParaType.addItem("ImageName");
             jComboBoxFvParaType.addItem("Attributes");
-            jComboBoxFvParaType.addItem("Options");
-//            jComboBoxFvParaType.addItem("Components");
+            jComboBoxFvParaType.addItem("Components");
             jComboBoxFvParaType.setPreferredSize(new java.awt.Dimension(180,20));
-            jComboBoxFvParaType.setEnabled(false);
             jComboBoxFvParaType.addItemListener(new ItemListener() {
 
                 public void itemStateChanged(ItemEvent arg0) {
                     // TODO disable attribute settings when ValidImageNames selected.
+                    int selectedRow = jTableFvInfo.getSelectedRow();
+                    if (selectedRow < 0) {
+                        return;
+                    }
+                    String fvNameList = jTableFvInfo.getValueAt(selectedRow, 0)+"";
+                    String oldType = jTableFvInfo.getValueAt(selectedRow, 1)+"";
+                    int fvImagePos = ffc.getFvImagePosInFvImages(fvNameList, oldType);
+                    if (fvImagePos < 0) {
+                        return;
+                    }
                     
+                    String type = jComboBoxFvParaType.getSelectedItem()+"";
+                    ffc.updateFvImagesFvImageType(fvImagePos, type);
+                    jTableFvInfo.setValueAt(type, selectedRow, 1);
+                    docConsole.setSaved(false);
                 }
                 
             });
@@ -659,7 +624,6 @@ public class FpdFlash extends IInternalFrame {
         if (jTextFieldFvParaName == null) {
             jTextFieldFvParaName = new JTextField();
             jTextFieldFvParaName.setPreferredSize(new java.awt.Dimension(140,20));
-            jTextFieldFvParaName.setEnabled(false);
         }
         return jTextFieldFvParaName;
     }
@@ -674,7 +638,7 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonFvParaAdd == null) {
             jButtonFvParaAdd = new JButton();
             jButtonFvParaAdd.setPreferredSize(new Dimension(80, 20));
-            jButtonFvParaAdd.setEnabled(false);
+            jButtonFvParaAdd.setEnabled(true);
             jButtonFvParaAdd.setText("Add");
             jButtonFvParaAdd.addActionListener(new AbstractAction() {
                 /**
@@ -686,6 +650,20 @@ public class FpdFlash extends IInternalFrame {
                     if (jTextFieldFvParaName.getText().length() > 0){
                         String[] row = {jTextFieldFvParaName.getText()};                        
                         fvImageNameTableModel.addRow(row);
+                        if (jTableFvInfo.getSelectedRow() < 0) {
+                            return;
+                        }
+                        
+                        String fvNameList = jTableFvInfo.getValueAt(jTableFvInfo.getSelectedRow(), 0)+"";
+                        String type = jTableFvInfo.getValueAt(jTableFvInfo.getSelectedRow(), 1)+"";
+                        int fvImagePos = ffc.getFvImagePosInFvImages(fvNameList, type);
+                        
+                        if (fvImagePos < 0) {
+                          // new FvImage.
+                        }
+                        else {
+                          //append Fv name.  
+                        }
                     }
                 }
             });
@@ -702,7 +680,7 @@ public class FpdFlash extends IInternalFrame {
     private JScrollPane getJScrollPaneFvImageNames() {
         if (jScrollPaneFvImageNames == null) {
             jScrollPaneFvImageNames = new JScrollPane();
-            jScrollPaneFvImageNames.setPreferredSize(new java.awt.Dimension(350,50));
+            jScrollPaneFvImageNames.setPreferredSize(new java.awt.Dimension(350,80));
             jScrollPaneFvImageNames.setViewportView(getJTableFvImageNames());
         }
         return jScrollPaneFvImageNames;
@@ -718,8 +696,35 @@ public class FpdFlash extends IInternalFrame {
         if (jTableFvImageNames == null) {
             fvImageNameTableModel = new DefaultTableModel();
             jTableFvImageNames = new JTable(fvImageNameTableModel);
-            jTableFvImageNames.setEnabled(false);
+            jTableFvImageNames.setRowHeight(20);
             fvImageNameTableModel.addColumn("FV Image Name");
+            
+            jTableFvImageNames.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                public void valueChanged(ListSelectionEvent e) {
+                    if (e.getValueIsAdjusting()) {
+                        return;
+                    }
+                    ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+                    if (lsm.isSelectionEmpty()) {
+                        return;
+                    } else {
+                        int selectedRow = lsm.getMinSelectionIndex();
+                        String oldFvName = jTableFvImageNames.getValueAt(selectedRow, 0)+"";
+                    }
+                }
+            });
+            
+            jTableFvImageNames.getModel().addTableModelListener(new TableModelListener() {
+                public void tableChanged(TableModelEvent arg0) {
+                    // TODO Auto-generated method stub
+                    int row = arg0.getFirstRow();
+                    int col = arg0.getColumn();
+                    TableModel m = (TableModel) arg0.getSource();
+                    
+                    if (arg0.getType() == TableModelEvent.UPDATE) {
+                    }
+                }
+            });
         }
         return jTableFvImageNames;
     }
@@ -734,7 +739,7 @@ public class FpdFlash extends IInternalFrame {
         if (jButtonFvParaDel == null) {
             jButtonFvParaDel = new JButton();
             jButtonFvParaDel.setPreferredSize(new Dimension(80, 20));
-            jButtonFvParaDel.setEnabled(false);
+            jButtonFvParaDel.setEnabled(true);
             jButtonFvParaDel.setText("Delete");
             jButtonFvParaDel.addActionListener(new AbstractAction() {
                 /**
@@ -761,6 +766,10 @@ public class FpdFlash extends IInternalFrame {
 
  if (jPanelFvImageOpts == null) {
      //ToDo add ButtonGroup for RadioButtons
+            FlowLayout flowLayout5 = new FlowLayout();
+            flowLayout5.setAlignment(java.awt.FlowLayout.LEFT);
+            jLabelOptions = new JLabel();
+            jLabelOptions.setText("Attribute");
             jLabelFvImageOptValue = new JLabel();
             jLabelFvImageOptValue.setEnabled(true);
             jLabelFvImageOptValue.setText("Value");
@@ -770,21 +779,18 @@ public class FpdFlash extends IInternalFrame {
             jLabelFvImageOptName.setText("Name");
             jLabelFvImageOptName.setPreferredSize(new Dimension(38, 20));
             jPanelFvImageOpts = new JPanel();
-            jPanelFvImageOpts.setPreferredSize(new java.awt.Dimension(480,150));
+            jPanelFvImageOpts.setLayout(flowLayout5);
+            jPanelFvImageOpts.setPreferredSize(new java.awt.Dimension(450,130));
             
-            jPanelFvImageOpts.setLayout(new FlowLayout());
             
 			jPanelFvImageOpts.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.LOWERED));
-			jPanelFvImageOpts.add(getJCheckBoxFvImageOpts(), null);
+			jPanelFvImageOpts.add(jLabelOptions, null);
 			jPanelFvImageOpts.add(jLabelFvImageOptName, null);
 			jPanelFvImageOpts.add(getJTextFieldFvImageOptName(), null);
 			jPanelFvImageOpts.add(jLabelFvImageOptValue, null);
 			jPanelFvImageOpts.add(getJTextFieldFvImageOptValue(), null);
 			jPanelFvImageOpts.add(getJScrollPane(), null);
 			jPanelFvImageOpts.add(getJPanelFvImageOptsButtonGroup(), null);
-			jPanelFvImageOpts.add(getJButtonAddFvImage(), null);
-			jPanelFvImageOpts.add(getJButtonDelFvImage(), null);
-			jPanelFvImageOpts.add(getJButtonUpdateFvImage(), null);
             
             
             			
@@ -803,9 +809,8 @@ public class FpdFlash extends IInternalFrame {
     private JButton getJButtonAddFvImage() {
         if (jButtonAddFvImage == null) {
             jButtonAddFvImage = new JButton();
-            jButtonAddFvImage.setPreferredSize(new java.awt.Dimension(120,20));
-//            jButton4.setEnabled(false);
-            jButtonAddFvImage.setText("Add FV Image");
+            jButtonAddFvImage.setPreferredSize(new java.awt.Dimension(150,20));
+            jButtonAddFvImage.setText("New FV Attributes");
             jButtonAddFvImage.addActionListener(new AbstractAction() {
                 /**
                  * 
@@ -829,16 +834,13 @@ public class FpdFlash extends IInternalFrame {
                     }
                     imageName = imageName.trim();
                     
-                    if (!jCheckBoxFvImageOpts.isSelected() && jComboBoxFvParaType.getSelectedIndex() != 0){
-                        return;
-                      
-                    }
+                    
                     
                     LinkedHashMap<String, String> m = null;
-                    if (jCheckBoxFvImageOpts.isSelected()) {
+//                    if (jCheckBoxFvImageOpts.isSelected()) {
                         m = new LinkedHashMap<String, String>();
                         getOptionNameValue(m);
-                    }
+//                    }
                     ffc.genFvImagesFvImage(imageName.split(" "), jComboBoxFvParaType.getSelectedItem()+"", m);
                     docConsole.setSaved(false);
                     Object[] row = {imageName, jComboBoxFvParaType.getSelectedItem()};
@@ -877,16 +879,8 @@ public class FpdFlash extends IInternalFrame {
             fvImageParaTableModel.addColumn("FvImageNames");
             fvImageParaTableModel.addColumn("Type");
             
-            
-//            TableColumn typeCol = jTableFvInfo.getColumnModel().getColumn(1);
-//            JComboBox cb = new JComboBox();
-//            cb.addItem("ImageName");
-//            cb.addItem("Attributes");
-//            cb.addItem("Options");
-//            cb.addItem("Components");
-//            typeCol.setCellEditor(new DefaultCellEditor(cb));
-            
             jTableFvInfo.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jTableFvInfo.setRowHeight(20);
             jTableFvInfo.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
                 public void valueChanged(ListSelectionEvent e) {
                     if (e.getValueIsAdjusting()){
@@ -898,29 +892,32 @@ public class FpdFlash extends IInternalFrame {
                     }
                     else{
                         int selectedRow = lsm.getMinSelectionIndex();
-                        if (fvImageParaTableModel.getValueAt(selectedRow, 1).equals("ImageName")) {
-                            String[] fvNames = fvImageParaTableModel.getValueAt(selectedRow, 0).toString().split(" ");
-                            for (int i = 0; i < fvNames.length; ++i) {
-                                String[] row = {fvNames[i]};
-                                fvImageNameTableModel.addRow(row);
-                            }
+                        String fvNameList = fvImageParaTableModel.getValueAt(selectedRow, 0)+"";
+                        String type = fvImageParaTableModel.getValueAt(selectedRow, 1)+"";
+                        jComboBoxFvParaType.setSelectedItem(type);
+                        String[] fvNames = fvNameList.split(" ");
+                        fvImageNameTableModel.setRowCount(0);
+                        for (int i = 0; i < fvNames.length; ++i) {
+                            String[] row = { fvNames[i] };
+                            fvImageNameTableModel.addRow(row);
+                        }
+                        
+                        int fvImagePos = ffc.getFvImagePosInFvImages(fvNameList, type);
+                        if (fvImagePos < 0) {
                             return;
                         }
                         LinkedHashMap<String, String> optionMap = new LinkedHashMap<String, String>();
-                        ffc.getFvImagesFvImageOptions(selectedRow, optionMap);
+                        ffc.getFvImagesFvImageOptions(fvImagePos, optionMap);
                         if (optionMap.size() > 0){
                             fvOptionTableModel.setRowCount(0);
                             Set<String> key = optionMap.keySet();
                             Iterator<String> i = key.iterator();
                             while (i.hasNext()) {
-                                
                                 String k = (String)i.next();
                                 String[] row = {k, optionMap.get(k)};
-                                
                                 fvOptionTableModel.addRow(row);
                             }
                         }
-                        
                     }
                 }
             });
@@ -939,9 +936,8 @@ public class FpdFlash extends IInternalFrame {
     private JButton getJButtonDelFvImage() {
         if (jButtonDelFvImage == null) {
             jButtonDelFvImage = new JButton();
-            jButtonDelFvImage.setPreferredSize(new java.awt.Dimension(120,20));
-            jButtonDelFvImage.setEnabled(false);
-            jButtonDelFvImage.setText("Delete Row");
+            jButtonDelFvImage.setPreferredSize(new java.awt.Dimension(150,20));
+            jButtonDelFvImage.setText("Delete FV Attributes");
             jButtonDelFvImage.addActionListener(new AbstractAction() {
                 /**
                  * 
@@ -964,54 +960,28 @@ public class FpdFlash extends IInternalFrame {
 
 
     /**
-     * This method initializes jCheckBox3	
-     * 	
-     * @return javax.swing.JCheckBox	
-     */
-    private JCheckBox getJCheckBoxFvImageOpts() {
-        if (jCheckBoxFvImageOpts == null) {
-            jCheckBoxFvImageOpts = new JCheckBox();
-            jCheckBoxFvImageOpts.setText("FV Image Options");
-            jCheckBoxFvImageOpts.addItemListener(new ItemListener(){
-
-                public void itemStateChanged(ItemEvent arg0) {
-                    // TODO Auto-generated method stub
-//                    boolean selected = jCheckBox3.isSelected();
-                    
-                        if (!jCheckBoxFvImagePara.isSelected() || jComboBoxFvParaType.getSelectedIndex() == 0) {
-                            return;
-                        }
-                        
-                }
-                
-            });
-        }
-        return jCheckBoxFvImageOpts;
-    }
-
-
-    /**
      * This method initializes jPanel6	
      * 	
      * @return javax.swing.JPanel	
      */
     private JPanel getJPanelFvImagePara() {
         if (jPanelFvImagePara == null) {
+            FlowLayout flowLayout6 = new FlowLayout();
+            flowLayout6.setAlignment(java.awt.FlowLayout.LEFT);
             StarLabel starLabel = new StarLabel();
             starLabel.setVisible(false);
             jPanelFvImagePara = new JPanel();
-            jPanelFvImagePara.setPreferredSize(new java.awt.Dimension(480,120));
+            jPanelFvImagePara.setLayout(flowLayout6);
+            jPanelFvImagePara.setPreferredSize(new java.awt.Dimension(450,140));
             jPanelFvImagePara.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED));
-            jPanelFvImagePara.add(getJCheckBoxFvImagePara(), null);
-            jPanelFvImagePara.add(jLabelFvParaType, null);
-            jPanelFvImagePara.add(getJComboBoxFvParaType(), null);
             jPanelFvImagePara.add(new StarLabel(), null);
             jPanelFvImagePara.add(jLabelFvImageNames, null);
             jPanelFvImagePara.add(jLabelFvParaName, null);
             jPanelFvImagePara.add(getJTextFieldFvParaName(), null);
-            jPanelFvImagePara.add(getJButtonFvParaAdd(), null);
             jPanelFvImagePara.add(getJScrollPaneFvImageNames(), null);
-            jPanelFvImagePara.add(getJButtonFvParaDel(), null);
+            jPanelFvImagePara.add(getJPanelBgFvName(), null);
+            jPanelFvImagePara.add(jLabelFvParaType, null);
+            jPanelFvImagePara.add(getJComboBoxFvParaType(), null);
         }
         return jPanelFvImagePara;
     }
@@ -1139,6 +1109,34 @@ public class FpdFlash extends IInternalFrame {
         return jButtonFdfBrowse;
     }
     
+    private void initFvAttributes () {
+        if (ffc.getFvImagesFvImageCount("Attributes") == 0 && ffc.getFvImagesFvImageCount("Components") == 0) {
+            return;
+        }
+        String[][] saa = new String[ffc.getFvImagesFvImageCount("Attributes")][2];
+        ffc.getFvImagesFvImages(saa, "Attributes");
+        
+        int i = 0;
+        while (i < saa.length) {
+            fvImageParaTableModel.addRow(saa[i]);
+            ++i;
+        }
+        
+        saa = new String[ffc.getFvImagesFvImageCount("Components")][2];
+        ffc.getFvImagesFvImages(saa, "Components");
+        i = 0;
+        while (i < saa.length) {
+            fvImageParaTableModel.addRow(saa[i]);
+            ++i;
+        }
+        
+        saa = new String[ffc.getFvImagesNameValueCount()][2];
+        ffc.getFvImagesNameValues(saa);
+        for (int m = 0; m < saa.length; ++m) {
+            fvPropertyTableModel.addRow(saa[m]);
+        }
+    }
+    
     private void initFvAdditionalTable() {
         Vector<String> vFvNames = new Vector<String>();
         ffc.getFvImagesFvImageFvImageNames(vFvNames);
@@ -1147,35 +1145,7 @@ public class FpdFlash extends IInternalFrame {
             if (fvNameExists(fvName)) {
                 continue;
             }
-            HashMap<String, String> mFvOpts = new HashMap<String, String>();
-            ffc.getFvImagesFvImageOptions(fvName, mFvOpts);
-            String bSize = "";
-            String numBlks = "";
-            String fvSize = "";
-            String fvFile = "";
-            if (mFvOpts.get("EFI_FILE_NAME") != null) {
-                fvFile = mFvOpts.get("EFI_FILE_NAME");
-            }
-            if (mFvOpts.get("EFI_BLOCK_SIZE") != null && mFvOpts.get("EFI_NUM_BLOCKS") != null) {
-                bSize = mFvOpts.get("EFI_BLOCK_SIZE");
-                numBlks = mFvOpts.get("EFI_NUM_BLOCKS");
-                boolean blockSizeWellFormat = true;
-                boolean numOfBlockWellFormat = true;
-                if (!DataValidation.isHexDoubleWordDataType(bSize) && !DataValidation.isInt(bSize)) {
-                   blockSizeWellFormat = false;
-                   JOptionPane.showMessageDialog(frame, fvName + " block size bad format.");
-                } 
-                if (!DataValidation.isHexDoubleWordDataType(numBlks) && !DataValidation.isInt(numBlks)) {
-                   numOfBlockWellFormat = false;
-                   JOptionPane.showMessageDialog(frame, fvName + " number of blocks bad format.");
-                }
-                if (blockSizeWellFormat && numOfBlockWellFormat) {
-                    int size = Integer.decode(bSize);
-                    int num = Integer.decode(numBlks);
-                    fvSize = "0x" + Integer.toHexString(size*num);
-                }
-            }
-            fvAdditionalTableModel.addRow(new String[]{fvName, fvSize, fvFile});
+            fvAdditionalTableModel.addRow(getBasicFvInfo(fvName));
             addTabForFv(new FvInfoFromFdf(fvName, "", ""));
         }
     }
@@ -1193,12 +1163,12 @@ public class FpdFlash extends IInternalFrame {
         
         // BugBug: assume all blocks have same size;
         
-        String blkSize = "0x10000";
+        String blkSize = defaultBlkSize;
         if (vBlockSize.size() > 0) {
             blkSize = vBlockSize.get(0);
             if (!DataValidation.isInt(blkSize) && !DataValidation.isHexDoubleWordDataType(blkSize)) {
                 JOptionPane.showMessageDialog(frame, "FDF file does NOT contain valid FV block size. Default size 0x10000 will be used.");
-                blkSize = "0x10000";
+                blkSize = defaultBlkSize;
             }
         }
         determinedFvBlockSize = blkSize;
@@ -1372,7 +1342,7 @@ public class FpdFlash extends IInternalFrame {
     private JScrollPane getJScrollPane() {
         if (jScrollPane == null) {
             jScrollPane = new JScrollPane();
-            jScrollPane.setPreferredSize(new java.awt.Dimension(350,80));
+            jScrollPane.setPreferredSize(new java.awt.Dimension(350,100));
             jScrollPane.setViewportView(getJTableFvImageOpts());
         }
         return jScrollPane;
@@ -1405,10 +1375,10 @@ public class FpdFlash extends IInternalFrame {
     private JButton getJButtonUpdateFvImage() {
         if (jButtonUpdateFvImage == null) {
             jButtonUpdateFvImage = new JButton();
-            jButtonUpdateFvImage.setPreferredSize(new Dimension(120, 20));
+            jButtonUpdateFvImage.setPreferredSize(new java.awt.Dimension(150,20));
             jButtonUpdateFvImage.setActionCommand("Update");
-            jButtonUpdateFvImage.setEnabled(false);
-            jButtonUpdateFvImage.setText("Update FV");
+            jButtonUpdateFvImage.setText("Update FV Attributes");
+            jButtonUpdateFvImage.setVisible(false);
             jButtonUpdateFvImage.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     int row = jTableFvInfo.getSelectedRow();
@@ -1434,25 +1404,6 @@ public class FpdFlash extends IInternalFrame {
         }
         return jButtonUpdateFvImage;
     }
-
-//    private JButton getJButtonTest() {
-//        if (jButtonTest == null) {
-//            jButtonTest = new JButton();
-//            jButtonTest.addActionListener(new java.awt.event.ActionListener() {
-//                public void actionPerformed(java.awt.event.ActionEvent e) {
-//                    docConsole.setSaved(false);
-//                    String[][] includeModules = {{"1", "a"}, {"2", "b"}};
-//                    ffc.genBuildOptionsUserExtensions("FV_RECOVERY", "FvRecovery.inf", null, includeModules);
-//                    int i = ffc.getUserExtsIncModCount("FV_RECOVERY");
-//                    String[][] saa = new String[i][2];
-//                    ffc.getUserExtsIncMods("FV_RECOVERY", saa);
-//                    jTextFieldFdf.setText(saa[0][0] + saa[0][1] + saa[1][0] + saa[1][1]);
-//                    
-//                }
-//            });
-//        }
-//        return jButtonTest;
-//    }
 
     /**
      * This method initializes jPanelFdfN	
@@ -1669,6 +1620,9 @@ public class FpdFlash extends IInternalFrame {
                         return;
                     }
                     String fvName = jTableFvInFdf.getValueAt(selectedRow, 0)+"";
+                    if (fvName.length() == 0) {
+                        return;
+                    }
                     DefaultTableModel dtm = getFvInFdfOptTableModel();
                     new FpdFvOptions(fvName, dtm, ffc, docConsole);
                 }
@@ -1690,6 +1644,20 @@ public class FpdFlash extends IInternalFrame {
             fvInFdfOptTableModel.setVNonEditableName(v);
         }
         return fvInFdfOptTableModel;
+    }
+    
+    private DefaultTableModel getFvAdditionalOptTableModel() {
+        if (fvAdditionalOptTableModel == null) {
+            fvAdditionalOptTableModel = new FvOptsTableModel();
+            fvAdditionalOptTableModel.addColumn("Name");
+            fvAdditionalOptTableModel.addColumn("Value");
+            Vector<Object> v = new Vector<Object>();
+            v.add("EFI_BLOCK_SIZE");
+            v.add("EFI_NUM_BLOCKS");
+            v.add("EFI_FILE_NAME");
+            fvAdditionalOptTableModel.setVNonEditableName(v);
+        }
+        return fvAdditionalOptTableModel;
     }
 
     /**
@@ -1773,7 +1741,7 @@ public class FpdFlash extends IInternalFrame {
                             oldFvName = newFvName;
                         }
                         
-                        if (col == 1) {
+                        if (col == 1 && !sizeFromOptionDlg) {
                             String fvSize = m.getValueAt(row, col) + "";
                             if (!DataValidation.isInt(fvSize) && !DataValidation.isHexDoubleWordDataType(fvSize)) {
                                 JOptionPane.showMessageDialog(frame, "FV size should be Integer or Hex format.");
@@ -1783,9 +1751,15 @@ public class FpdFlash extends IInternalFrame {
                             ffc.getFvImagesFvImageOptions(oldFvName, mFvOpts);
                             String blkSize = mFvOpts.get("EFI_BLOCK_SIZE");
                             if (blkSize == null) {
-                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", determinedFvBlockSize);
+                                if (determinedFvBlockSize != null) {
+                                    blkSize = determinedFvBlockSize;
+                                }
+                                else {
+                                    blkSize = defaultBlkSize;
+                                }
+                                ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", blkSize);
                                 int fs = Integer.decode(fvSize);
-                                int bs = Integer.decode(determinedFvBlockSize);
+                                int bs = Integer.decode(blkSize);
                                 ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
                                 docConsole.setSaved(false);
                             }
@@ -1793,9 +1767,9 @@ public class FpdFlash extends IInternalFrame {
                                 if (!DataValidation.isInt(blkSize) && !DataValidation.isHexDoubleWordDataType(blkSize)) {
                                     int retVal = JOptionPane.showConfirmDialog(frame, "Confirm", "FPD file contains error block size format. Would you like to replace it with a default value?", JOptionPane.YES_NO_OPTION);
                                     if (retVal == JOptionPane.YES_OPTION) {
-                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", determinedFvBlockSize);
+                                        ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_BLOCK_SIZE", defaultBlkSize);
                                         int fs = Integer.decode(fvSize);
-                                        int bs = Integer.decode(determinedFvBlockSize);
+                                        int bs = Integer.decode(defaultBlkSize);
                                         ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_NUM_BLOCKS", (fs/bs)+"");
                                         docConsole.setSaved(false);
                                         return;
@@ -1812,7 +1786,7 @@ public class FpdFlash extends IInternalFrame {
                             }
                         }
                         
-                        if (col == 2) {
+                        if (col == 2 && !fileFromOptionDlg) {
                             ffc.setTypedNamedFvImageNameValue(oldFvName, "Options", "EFI_FILE_NAME", m.getValueAt(row, col)+"");
                             docConsole.setSaved(false);
                         }
@@ -1933,13 +1907,114 @@ public class FpdFlash extends IInternalFrame {
             jButtonAddFvOptions.setText("Options");
             jButtonAddFvOptions.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    System.out.println("actionPerformed()"); // TODO Auto-generated Event stub actionPerformed()
+                    int selectedRow = jTableFvAdditional.getSelectedRow();
+                    if (selectedRow < 0) {
+                        return;
+                    }
+                    String fvName = jTableFvAdditional.getValueAt(selectedRow, 0)+"";
+                    String oldFvSize = jTableFvAdditional.getValueAt(selectedRow, 1)+"";
+                    String oldFileName = jTableFvAdditional.getValueAt(selectedRow, 2)+"";
+                    if (fvName.length() == 0) {
+                        return;
+                    }
+                    DefaultTableModel dtm = getFvAdditionalOptTableModel();
+                    new FpdFvOptions(fvName, dtm, ffc, docConsole);
+                    
+                    String[] updatedFvInfo = getBasicFvInfo (fvName);
+                    if (!oldFvSize.equalsIgnoreCase(updatedFvInfo[1])) {
+                        sizeFromOptionDlg = true;
+                        jTableFvAdditional.setValueAt(updatedFvInfo[1], selectedRow, 1);
+                        sizeFromOptionDlg = false;
+                    }
+                    if (!oldFileName.equals(updatedFvInfo[2])) {
+                        fileFromOptionDlg = true;
+                        jTableFvAdditional.setValueAt(updatedFvInfo[2], selectedRow, 2);
+                        fileFromOptionDlg = false;
+                    }
                 }
             });
         }
         return jButtonAddFvOptions;
     }
     
+    private String[] getBasicFvInfo (String fvName) {
+        HashMap<String, String> mFvOpts = new HashMap<String, String>();
+        ffc.getFvImagesFvImageOptions(fvName, mFvOpts);
+        String bSize = "";
+        String numBlks = "";
+        String fvSize = "";
+        String fvFile = "";
+        if (mFvOpts.get("EFI_FILE_NAME") != null) {
+            fvFile = mFvOpts.get("EFI_FILE_NAME");
+        }
+        if (mFvOpts.get("EFI_BLOCK_SIZE") != null && mFvOpts.get("EFI_NUM_BLOCKS") != null) {
+            bSize = mFvOpts.get("EFI_BLOCK_SIZE");
+            numBlks = mFvOpts.get("EFI_NUM_BLOCKS");
+            boolean blockSizeWellFormat = true;
+            boolean numOfBlockWellFormat = true;
+            if (!DataValidation.isHexDoubleWordDataType(bSize) && !DataValidation.isInt(bSize)) {
+               blockSizeWellFormat = false;
+               JOptionPane.showMessageDialog(frame, fvName + " block size bad format.");
+            } 
+            if (!DataValidation.isHexDoubleWordDataType(numBlks) && !DataValidation.isInt(numBlks)) {
+               numOfBlockWellFormat = false;
+               JOptionPane.showMessageDialog(frame, fvName + " number of blocks bad format.");
+            }
+            if (blockSizeWellFormat && numOfBlockWellFormat) {
+                int size = Integer.decode(bSize);
+                int num = Integer.decode(numBlks);
+                fvSize = "0x" + Integer.toHexString(size*num);
+            }
+        }
+        
+        return new String[]{fvName, fvSize, fvFile};
+
+    }
+    
+    /**
+     * This method initializes jPanelBgFvName	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelBgFvName() {
+        if (jPanelBgFvName == null) {
+            jPanelBgFvName = new JPanel();
+            jPanelBgFvName.setPreferredSize(new java.awt.Dimension(80,55));
+            jPanelBgFvName.add(getJButtonFvParaAdd(), null);
+            jPanelBgFvName.add(getJButtonFvParaDel(), null);
+        }
+        return jPanelBgFvName;
+    }
+
+    /**
+     * This method initializes jPanelBgFvImage	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelBgFvImage() {
+        if (jPanelBgFvImage == null) {
+            jPanelBgFvImage = new JPanel();
+            jPanelBgFvImage.setPreferredSize(new java.awt.Dimension(150,100));
+            jPanelBgFvImage.add(getJButtonAddFvImage(), null);
+            jPanelBgFvImage.add(getJButtonDelFvImage(), null);
+            jPanelBgFvImage.add(getJButtonUpdateFvImage(), null);
+        }
+        return jPanelBgFvImage;
+    }
+
+    /**
+     * This method initializes jPanelW	
+     * 	
+     * @return javax.swing.JPanel	
+     */
+    private JPanel getJPanelW() {
+        if (jPanelW == null) {
+            jPanelW = new JPanel();
+            jPanelW.add(getJPanelBgFvImage(), null);
+        }
+        return jPanelW;
+    }
+
     /**
      * @param args
      */
@@ -1954,7 +2029,7 @@ public class FpdFlash extends IInternalFrame {
      * @return void
      */
     private void initialize() {
-        this.setSize(518, 650);
+        this.setSize(660, 650);
         this.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         this.setContentPane(getJContentPane());
         this.setTitle("FPD Flash Definitions");
@@ -1977,6 +2052,7 @@ public class FpdFlash extends IInternalFrame {
     }
 
     private void init(FpdFileContents ffc) {
+        initFvAttributes();
         
         jTextFieldFdf.setText("");
         String fdfFile = ffc.getFlashDefinitionFile();
