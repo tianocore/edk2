@@ -39,9 +39,9 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
     public static final int MSA_HEADER = 100;
 
     public static final int MSA_LIBRARYCLASSDEFINITIONS = 101;
-    
+
     public static final int MSA_PACKAGEDEPENDENCIES = 102;
-    
+
     public static final int MSA_SOURCEFILES = 103;
 
     public static final int MSA_PROTOCOLS = 104;
@@ -60,8 +60,6 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
 
     public static final int MSA_DATAHUBS = 111;
 
-    //public static final int MSA_FORMSETS = 112;
-    
     public static final int MSA_HIIPACKAGES = 112;
 
     public static final int MSA_GUIDS = 113;
@@ -69,58 +67,64 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
     public static final int MSA_EXTERNS = 114;
 
     public static final int MSA_PCDS = 115;
-    
+
     public static final int MSA_BUILDOPTIONS = 117;
-    
+
     public static final int MSA_USEREXTENSIONS = 118;
-    
+
     public static final int MSA_MODULEDEFINITIONS = 119;
-    
+
     public static final int SPD_HEADER = 200;
-    
+
     public static final int SPD_LIBRARYCLASSDECLARATIONS = 201;
-    
+
     public static final int SPD_MSAFILES = 202;
-    
+
     public static final int SPD_PACKAGEHEADERS = 203;
-    
+
     public static final int SPD_GUIDDECLARATIONS = 204;
-    
+
     public static final int SPD_PROTOCOLDECLARATIONS = 205;
-    
+
     public static final int SPD_PPIDECLARATIONS = 206;
-    
+
     public static final int SPD_PCDDECLARATIONS = 207;
-    
+
     public static final int SPD_PACKAGEDEFINITIONS = 208;
-    
+
     public static final int SPD_INDUSTRYSTDINCLUDES = 209;
-    
+
     public static final int FPD_PLATFORMHEADER = 300;
-    
+
     public static final int FPD_FLASH = 301;
-    
+
     public static final int FPD_FRAMEWORKMODULES = 302;
-    
+
     public static final int FPD_PCDDYNAMICBUILDDECLARATIONS = 303;
-    
+
     public static final int FPD_BUILDOPTIONS = 304;
-    
+
     public static final int FPD_PLATFORMDEFINITIONS = 305;
-    
+
     public static final int WORKSPACE = 0;
-    
-    public static final int MODULE = 1;
 
-    public static final int PACKAGE = 2;
+    public static final int MODULE_DESCRIPTION = 1;
 
-    public static final int PLATFORM = 3;
-    
-    public static final int MODULE_PACKAGE = 4;
-    
-    public static final int MODULE_PACKAGE_LIBRARY = 5;
-    
-    public static final int MODULE_PACKAGE_MODULE = 6;
+    public static final int PACKAGE_DESCRIPTION = 2;
+
+    public static final int PLATFORM_DESCRIPTION = 3;
+
+    public static final int MODULE = 4;
+
+    public static final int PACKAGE = 5;
+
+    public static final int PLATFORM = 6;
+
+    public static final int MODULE_PACKAGE = 7;
+
+    public static final int MODULE_PACKAGE_LIBRARY = 8;
+
+    public static final int MODULE_PACKAGE_MODULE = 9;
 
     //
     //Static final definitions for operation
@@ -146,26 +150,13 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
     //
     private int category = 0;
 
-    private int operation = 0;
-
-    private int location = 0;
-
     private String nodeName = "";
 
     private boolean isOpening = false;
 
     private Identification id = null;
-
-    /**
-     Main class, reserved for test
-     
-     @param args
-     
-     **/
-    public static void main(String[] args) {
-        // TODO Auto-generated method stub
-
-    }
+    
+    private IDefaultMutableTreeNode belongNode = null;
 
     /**
      This is the default constructor
@@ -186,46 +177,13 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
      
      **/
     public IDefaultMutableTreeNode(String strNodeName, int intCategory, boolean bolIsOpening,
-                                   Identification identification) {
+                                   Identification identification, IDefaultMutableTreeNode idmtBelongNode) {
         super(strNodeName);
         this.nodeName = strNodeName;
         this.category = intCategory;
         this.isOpening = bolIsOpening;
         this.id = identification;
-    }
-
-    /**
-     This is the overrided constructor
-     Init clase members with input data
-     
-     @param strNodeName The name of node
-     @param intCategory The category of node
-     @param intOperation The operation of node
-     
-     **/
-    public IDefaultMutableTreeNode(String strNodeName, int intCategory, int intOperation) {
-        super(strNodeName);
-        this.nodeName = strNodeName;
-        this.category = intCategory;
-        this.operation = intOperation;
-    }
-
-    /**
-     This is the overrided constructor
-     Init clase members with input data
-     
-     @param strNodeName The name of node
-     @param intCategory The category of node
-     @param intOperation The operation of node
-     @param intLocation The location of node
-     
-     **/
-    public IDefaultMutableTreeNode(String strNodeName, int intCategory, int intOperation, int intLocation) {
-        super(strNodeName);
-        this.nodeName = strNodeName;
-        this.category = intCategory;
-        this.operation = intOperation;
-        this.location = intLocation;
+        this.belongNode = idmtBelongNode;
     }
 
     /**
@@ -269,46 +227,6 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
     }
 
     /**
-     Get operation of node
-     
-     @return The operation of node
-     
-     **/
-    public int getOperation() {
-        return operation;
-    }
-
-    /**
-     Set operation of node
-     
-     @param operation The input data of node operation
-     
-     **/
-    public void setOperation(int operation) {
-        this.operation = operation;
-    }
-
-    /**
-     Get location of node
-     
-     @return The location of node
-     
-     **/
-    public int getLocation() {
-        return location;
-    }
-
-    /**
-     Set location of node
-     
-     @param location The input data of node location
-     
-     **/
-    public void setLocation(int location) {
-        this.location = location;
-    }
-
-    /**
      Get identification of node
      
      @return
@@ -346,5 +264,17 @@ public class IDefaultMutableTreeNode extends DefaultMutableTreeNode {
      **/
     public void setOpening(boolean isOpening) {
         this.isOpening = isOpening;
+    }
+    
+    public String toString() {
+        return this.nodeName;
+    }
+
+    public IDefaultMutableTreeNode getBelongNode() {
+        return belongNode;
+    }
+
+    public void setBelongNode(IDefaultMutableTreeNode belongNode) {
+        this.belongNode = belongNode;
     }
 }

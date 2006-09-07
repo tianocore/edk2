@@ -26,6 +26,7 @@ import org.tianocore.IndustryStdIncludesDocument.IndustryStdIncludes;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaFilesDocument.MsaFiles;
 import org.tianocore.PackageSurfaceAreaDocument.PackageSurfaceArea;
+import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.SourceFilesDocument.SourceFiles;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.GlobalData;
@@ -295,7 +296,40 @@ public class WorkspaceTools {
             modulePath = modulePaths.get(index);
             ModuleIdentification id = GlobalData.openingModuleList.getIdByPath(modulePath);
             if (id != null) {
-                v.addElement(id);    
+                v.addElement(id);
+            }
+        }
+        Sort.sortModules(v, DataType.SORT_TYPE_ASCENDING);
+        return v;
+    }
+
+    /**
+     Get all module basic information from a platform
+     
+     @param id Package id
+     @return A vector includes all modules' basic information
+     
+     **/
+    public Vector<ModuleIdentification> getAllModules(PlatformIdentification fid) {
+        Vector<ModuleIdentification> v = new Vector<ModuleIdentification>();
+        PlatformSurfaceArea fpd = GlobalData.openingPlatformList.getOpeningPlatformById(fid).getXmlFpd();
+        if (fpd.getFrameworkModules() != null) {
+            for (int index = 0; index < fpd.getFrameworkModules().getModuleSAList().size(); index++) {
+                String guid = fpd.getFrameworkModules().getModuleSAList().get(index).getModuleGuid();
+                String version = fpd.getFrameworkModules().getModuleSAList().get(index).getModuleVersion();
+                ModuleIdentification id = GlobalData.openingModuleList.getIdByGuidVersion(guid, version);
+                if (id != null) {
+                    boolean isFind = false;
+                    for (int indexOfModules = 0; indexOfModules < v.size(); indexOfModules++) {
+                        if (v.elementAt(indexOfModules).equals(id)) {
+                            isFind = true;
+                            break;
+                        }
+                    }
+                    if (!isFind) {
+                        v.addElement(id);    
+                    }
+                }
             }
         }
         Sort.sortModules(v, DataType.SORT_TYPE_ASCENDING);

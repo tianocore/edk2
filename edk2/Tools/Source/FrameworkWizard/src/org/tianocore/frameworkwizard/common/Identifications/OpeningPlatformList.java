@@ -14,6 +14,7 @@
  **/
 package org.tianocore.frameworkwizard.common.Identifications;
 
+import java.util.Set;
 import java.util.Vector;
 
 import javax.swing.tree.TreePath;
@@ -141,14 +142,14 @@ public class OpeningPlatformList {
         return true;
     }
     
-    public void setTreePathById(PlatformIdentification id, TreePath treePath) {
+    public void setTreePathById(PlatformIdentification id, Set<TreePath> treePath) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             vOpeningPlatformList.elementAt(index).setTreePath(treePath);
         }
     }
     
-    public TreePath getTreePathById(PlatformIdentification id) {
+    public Set<TreePath> getTreePathById(PlatformIdentification id) {
         int index = findIndexOfListById(id);
         if (index > -1) {
             return vOpeningPlatformList.elementAt(index).getTreePath();
@@ -156,7 +157,7 @@ public class OpeningPlatformList {
         return null;
     }
     
-    public TreePath getTreePathByIndex(int index) {
+    public Set<TreePath> getTreePathByIndex(int index) {
         if (index > -1) {
             return vOpeningPlatformList.elementAt(index).getTreePath();
         }

@@ -36,6 +36,7 @@ import org.tianocore.PlatformSurfaceAreaDocument.PlatformSurfaceArea;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.FileOperation;
+import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.IFileFilter;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.OpenFile;
@@ -752,7 +753,7 @@ public class Clone extends IDialog {
             // Update <Cloned> Section
             //
             updateModuleClonedId(msa, oldId);
-
+            
             //
             // Save to file
             //
@@ -774,6 +775,12 @@ public class Clone extends IDialog {
             // Update the db file
             //
             wt.addModuleToPackage(mid, psa);
+            
+            //
+            // Update GlobalData
+            //
+            GlobalData.vModuleList.addElement(mid);
+            GlobalData.openingModuleList.insertToOpeningModuleList(mid, msa);
 
             this.returnType = DataType.RETURN_TYPE_MODULE_SURFACE_AREA;
         }
@@ -831,7 +838,13 @@ public class Clone extends IDialog {
             // Update the db file
             //
             wt.addPackageToDatabase(pid);
-
+            
+            //
+            // Update GlobalData
+            //
+            GlobalData.vPackageList.addElement(pid);
+            GlobalData.openingPackageList.insertToOpeningPackageList(pid, spd);
+            
             this.returnType = DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA;
         }
 
@@ -868,6 +881,12 @@ public class Clone extends IDialog {
             // Update the db file
             //
             wt.addPlatformToDatabase(fid);
+            
+            //
+            // Update GlobalData
+            //
+            GlobalData.vPlatformList.addElement(fid);
+            GlobalData.openingPlatformList.insertToOpeningPlatformList(fid, fpd);
 
             this.returnType = DataType.RETURN_TYPE_PLATFORM_SURFACE_AREA;
         }
@@ -1016,7 +1035,7 @@ public class Clone extends IDialog {
         c.setPackageGuid(id.getGuid());
         c.setPackageVersion(id.getVersion());
         c.setId(count.add(new BigInteger("1")));
-        String guid = wt.getModuleFarGuid(oldId);
+        String guid = wt.getPackageFarGuid(oldId);
         if (guid != null && !guid.equals("")) {
             c.setFarGuid(guid);
         }
@@ -1072,7 +1091,7 @@ public class Clone extends IDialog {
         c.setPlatformGuid(id.getGuid());
         c.setPlatformVersion(id.getVersion());
         c.setId(count.add(new BigInteger("1")));
-        String guid = wt.getModuleFarGuid(oldId);
+        String guid = wt.getPlatformFarGuid(oldId);
         if (guid != null && !guid.equals("")) {
             c.setFarGuid(guid);
         }
