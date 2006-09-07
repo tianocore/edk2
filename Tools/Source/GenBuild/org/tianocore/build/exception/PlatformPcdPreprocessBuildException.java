@@ -27,7 +27,7 @@ public class PlatformPcdPreprocessBuildException extends GenBuildException {
       @param expStr exception message string.
     **/
     public PlatformPcdPreprocessBuildException(String expStr) {
-        super("\r\n[PlatformPcdPreprocess Failure] #############################\r\n" + expStr);
+        super(expStr);
     }
 
     public PlatformPcdPreprocessBuildException() {

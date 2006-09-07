@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlObject;
+import org.tianocore.build.exception.AutoGenException;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
+import org.tianocore.common.exception.EdkException;
 
 /**
   This class This class is to reorder library instance sequence according to
@@ -55,7 +57,7 @@ public class AutogenLibOrder {
       @param  libraryList   List of the library instance.
       @throws Exception
     **/
-    AutogenLibOrder(ModuleIdentification[] libraryList, String arch) throws Exception {
+    AutogenLibOrder(ModuleIdentification[] libraryList, String arch) throws EdkException {
         LibraryInstanceNode libInstanceNode;
         String[]       libClassDeclList = null;
         String[]       libClassConsmList = null;
@@ -80,9 +82,9 @@ public class AutogenLibOrder {
                     classStr[k] = libClassConsmList[k];
                 }
                 if (this.libInstanceMap.containsKey(libraryList[i])) {
-                    throw new Exception(
+                    throw new AutoGenException(
                             libraryList[i].getName()
-                                    + "this library instance already exists, please check the library instance list!");
+                                    + "-- this library instance already exists, please check the library instance list!");
                 } else {
                     this.libInstanceMap.put(libraryList[i], classStr);
                 }
@@ -98,7 +100,7 @@ public class AutogenLibOrder {
                         System.out.println(libClassDeclList[j]
                                 + " class is already implement by "
                                 + this.libClassMap.get(libClassDeclList[j]));
-                        throw new Exception("Library Class: " + libClassDeclList
+                        throw new AutoGenException("Library Class: " + libClassDeclList
                                 + " already has a library instance!");
                     } else {
                         this.libClassMap.put(libClassDeclList[j], libraryList[i]);

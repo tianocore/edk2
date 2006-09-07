@@ -28,7 +28,7 @@ public class GenBuildException extends EdkException {
       @param expStr exception message string.
     **/
     public GenBuildException(String expStr) {
-        super("[GenBuildException]:" + expStr);
+        super(expStr);
     }
 
     public GenBuildException() {

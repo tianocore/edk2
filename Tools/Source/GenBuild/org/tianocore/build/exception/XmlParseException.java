@@ -26,7 +26,7 @@ public class XmlParseException extends GenBuildException {
       @param expStr exception message string.
     **/
     public XmlParseException(String expStr) {
-        super("[XmlParseException]:" + expStr);
+        super(expStr);
     }
     
     public XmlParseException() {

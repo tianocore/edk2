@@ -28,7 +28,7 @@ public class TianoToolsException extends EdkException {
       @param expStr exception message string.
     **/
     public TianoToolsException(String expStr) {
-        super("[TianoToolsException]:" + expStr);
+        super(expStr);
     }
 
     public TianoToolsException() {
