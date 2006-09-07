@@ -191,7 +191,9 @@ public final class Critic {
 			}
 			wholeline = templine.toString();
 			//
-
+			// Remove trailing blanks.
+			// 
+			wholeline = wholeline.replaceAll (" +\n", "\n");
 			Common.string2file(wholeline, filepath);
 		}
 	}
