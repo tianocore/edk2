@@ -826,7 +826,7 @@
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdSupportUpdateCapsuleRest</C_Name>
-      <Token>0x00010020</Token>
+      <Token>0x0001001d</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
@@ -834,7 +834,7 @@
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdMaxSizePopulateCapsule</C_Name>
-      <Token>0x00010021</Token>
+      <Token>0x0001001e</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
@@ -842,7 +842,7 @@
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdMaxSizeNonPopulateCapsule</C_Name>
-      <Token>0x00010022</Token>
+      <Token>0x0001001f</Token>
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>

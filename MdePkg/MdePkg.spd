@@ -2285,7 +2285,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Token>0x00000006</Token>
       <TokenSpaceGuidCName>gEfiMdePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
-      <ValidUsage>PATCHABLE_IN_MODULE</ValidUsage>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>0x80000000</DefaultValue>
       <HelpText>The bitmask of flags that specify the kind of debug message
                 output when Debug Print is enabled.</HelpText>

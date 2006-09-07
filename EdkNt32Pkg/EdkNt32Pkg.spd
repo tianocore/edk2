@@ -234,8 +234,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"E:RW;245760;512"</DefaultValue>
       <HelpText>This PCD defines physical disk which will be simualted as a 
-        harddisk in simulator.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
+        harddisk in simulator. The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtVirtualDisk</C_Name>
@@ -245,8 +244,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"FW;40960;512"</DefaultValue>
       <HelpText>This PCD defines the devices which use a file to emulate a hard disk or 
-        removable media device
-        The item type if this PCD can only be "DYNAMIC".</HelpText>
+        removable media device.The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtSerialPort</C_Name>
@@ -273,7 +271,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Token>0x00001004</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L".!..\\..\\..\\..\\..\\EdkShellBinPkg\\bin\\ia32\\Apps"</DefaultValue>
       <HelpText>This PCD defines the windows directory who will be mounted as 
         harddisk in simulator.
@@ -284,28 +282,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Token>0x00001005</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
-      <DefaultValue>L"64!64"</DefaultValue>
-      <HelpText>This PCD defines the size of simulated memory size.
-        The item type of this PCD can only be "DYNAMIC".</HelpText>
-    </PcdEntry>
-    <PcdEntry>
-      <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
-      <Token>0x00001005</Token>
-      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
-      <DatumType>VOID*</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"64!64"</DefaultValue>
       <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
-        the size of PcdWinNtMemorySizeForSecMain in windows platform.
-        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
+        the size of PcdWinNtMemorySize in windows platform.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtBootMode</C_Name>
       <Token>0x00001006</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>1</DefaultValue>
       <HelpText>This PCD defines the boot mode for simualtor. 
         The boot mode can be set as following value:
@@ -319,15 +307,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
           0x10: Boot on S2 resume. 
           0x11: Boot on S3 resume.
           0x12: Boot on flash update.
-          0x20: Boot in reovery mode.
-        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
+          0x20: Boot in reovery mode.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtCpuModel</C_Name>
       <Token>0x00001007</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"Intel(R) Processor Model"</DefaultValue>
       <HelpText>This PCD defines simulated CPU model string.
         The item type of this PCD can only be "DYNAMIC".</HelpText>
@@ -337,26 +324,26 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <Token>0x00001008</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"3000"</DefaultValue>
-      <HelpText>This PCD defines simulated CPU speed string.</HelpText>
+      <HelpText>This PCD defines simulated CPU speed string.
+        The item type of this PCD can only be "DYNAMIC".</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtFirmwareVolume</C_Name>
       <Token>0x00001009</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
       <DefaultValue>L"..\\..\\Fv\\Fv_Recovery.fd"</DefaultValue>
-      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.
-        The item type of this PCD can only be "FIXED_AT_BUILD".</HelpText>
+      <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.</HelpText>
     </PcdEntry>
     <PcdEntry>
       <C_Name>PcdWinNtConsole</C_Name>
       <Token>0x0000100a</Token>
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
-      <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <ValidUsage>DYNAMIC</ValidUsage>
       <DefaultValue>L"Bus Driver Console Window"</DefaultValue>
       <HelpText>This PCD declares the title string of the text console window. 
         such as "My EFI Console".
@@ -370,6 +357,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <ValidUsage>FEATURE_FLAG</ValidUsage>
       <DefaultValue>FALSE</DefaultValue>
       <HelpText>Select which type of driver the library links against.</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdWinNtMemorySizeForSecMain</C_Name>
+      <Token>0x0000100c</Token>
+      <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>VOID*</DatumType>
+      <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
+      <DefaultValue>L"64!64"</DefaultValue>
+      <HelpText>This PCD defines the memory size of simulated machine. Simulator will allocate
+        the size of PcdWinNtMemorySizeForSecMain in windows platform.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
