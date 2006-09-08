@@ -376,7 +376,7 @@ public class Clone extends IDialog {
             this.jLabelBelong.setEnabled(false);
             this.jComboBoxExistingPackage.setEnabled(false);
             this.jButtonBrowse.setVisible(false);
-            this.jTextFieldFilePath.setToolTipText("<html>Input the package's relative path and file name, for example:<br>MdePkg\\MdePkg.fpd</html>");
+            this.jTextFieldFilePath.setToolTipText("<html>Input the package's relative path and file name, for example:<br>MdePkg\\MdePkg.spd</html>");
             this.jTextFieldFilePath.setSize(320, this.jTextFieldFilePath.getSize().height);
             this.jLabelDestinationFile.setText("New Package Path and Filename");
         }
@@ -844,6 +844,33 @@ public class Clone extends IDialog {
             //
             GlobalData.vPackageList.addElement(pid);
             GlobalData.openingPackageList.insertToOpeningPackageList(pid, spd);
+            
+            //
+            // Add all cloned modules
+            //
+            Vector<String> modulePaths = GlobalData.getAllModulesOfPackage(pid.getPath());
+            String modulePath = null;
+            ModuleSurfaceArea msa = null;
+            
+            for (int indexJ = 0; indexJ < modulePaths.size(); indexJ++) {
+                try {
+                    modulePath = modulePaths.get(indexJ);
+                    msa = OpenFile.openMsaFile(modulePath);
+                } catch (IOException e) {
+                    Log.err("Open Module Surface Area " + modulePath, e.getMessage());
+                    continue;
+                } catch (XmlException e) {
+                    Log.err("Open Module Surface Area " + modulePath, e.getMessage());
+                    continue;
+                } catch (Exception e) {
+                    Log.err("Open Module Surface Area " + modulePath, "Invalid file type");
+                    continue;
+                }
+                Identification id = Tools.getId(modulePath, msa);
+                mid = new ModuleIdentification(id, pid);
+                GlobalData.vModuleList.addElement(mid);
+                GlobalData.openingModuleList.insertToOpeningModuleList(mid, msa);
+            }
             
             this.returnType = DataType.RETURN_TYPE_PACKAGE_SURFACE_AREA;
         }
