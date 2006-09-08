@@ -15,18 +15,18 @@ package org.tianocore.migration;
 import java.util.*;
 
 public interface UI {
-	
-	public boolean yesOrNo(String question);
-	
-	public void print(String message);
-	
-	public void println(String message);
-	
-	public void println(Set<String> hash);
-	
-	public String choose(String message, Object[] choicelist);
-	
-	public String getInput(String message);
-	
-	public String getFilepath(String title, int mode);		// necessary ?
+    
+    public boolean yesOrNo(String question);
+    
+    public void print(String message);
+    
+    public void println(String message);
+    
+    public void println(Set<String> hash);
+    
+    public String choose(String message, Object[] choicelist);
+    
+    public String getInput(String message);
+    
+    public String getFilepath(String title, int mode);        // necessary ?
 }

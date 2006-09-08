@@ -19,66 +19,66 @@ import java.util.*;
 import javax.swing.*;
 
 public final class FirstPanel extends JPanel implements ActionListener, ItemListener, UI {
-	/**
-	 *  Define class Serial Version UID
-	 */
-	private static final long serialVersionUID = 207759413522910399L;
-	
-	private static final FirstPanel INSTANCE = FirstPanel.init();
-	
-	private String startpath;
-	
-	private JButton moduleButton, goButton, msaEditorButton, criticButton, specifyCommentButton;
-	private JTextField moduletext;
-	private JTextArea log;
-	private JFileChooser fc = new JFileChooser();
-	private JCheckBox filebox, screenbox, mibox, criticbox, defaultpathbox;
-	
-	private boolean tofile = true, toscreen = true;
-	private PrintWriter logfile;
+    /**
+     *  Define class Serial Version UID
+     */
+    private static final long serialVersionUID = 207759413522910399L;
+    
+    private static final FirstPanel INSTANCE = FirstPanel.init();
+    
+    private String startpath;
+    
+    private JButton moduleButton, goButton, msaEditorButton, criticButton, specifyCommentButton;
+    private JTextField moduletext;
+    private JTextArea log;
+    private JFileChooser fc = new JFileChooser();
+    private JCheckBox filebox, screenbox, mibox, criticbox, defaultpathbox;
+    
+    private boolean tofile = true, toscreen = true;
+    private PrintWriter logfile;
 
-	FirstPanel() {
+    FirstPanel() {
         GridBagLayout gridbag = new GridBagLayout();
         setLayout(gridbag);
         
-		GridBagConstraints cst = new GridBagConstraints();
-		
-		goButton = new JButton("Go");
-		goButton.addActionListener(this);
-		goButton.setActionCommand("go");
-		
-		moduleButton = new JButton("Choose ModulePath");
-		moduleButton.addActionListener(this);
+        GridBagConstraints cst = new GridBagConstraints();
+        
+        goButton = new JButton("Go");
+        goButton.addActionListener(this);
+        goButton.setActionCommand("go");
+        
+        moduleButton = new JButton("Choose ModulePath");
+        moduleButton.addActionListener(this);
 
-		msaEditorButton = new JButton("MsaEditor");
-		msaEditorButton.addActionListener(this);
-		
-		criticButton = new JButton("Critic");
-		criticButton.addActionListener(this);
-		
-		specifyCommentButton = new JButton("Comment Style");
-		specifyCommentButton.addActionListener(this);
-		
-		moduletext = new JTextField(30);
-		
-		filebox = new JCheckBox("Output to logfile", true);
-		filebox.addItemListener(this);
-		
-		screenbox = new JCheckBox("Specify logfile", false);
-		screenbox.addItemListener(this);
-		
-		mibox = new JCheckBox("Print ModuleInfo", false);
-		mibox.addItemListener(this);
-		MigrationTool.printModuleInfo = false;
-		
-		criticbox = new JCheckBox("Run Critic", true);
-		criticbox.addItemListener(this);
-		MigrationTool.doCritic = true;
-		
-		defaultpathbox = new JCheckBox("Use Default Output Path", true);
-		defaultpathbox.addItemListener(this);
-		MigrationTool.defaultoutput = true;
-		
+        msaEditorButton = new JButton("MsaEditor");
+        msaEditorButton.addActionListener(this);
+        
+        criticButton = new JButton("Critic");
+        criticButton.addActionListener(this);
+        
+        specifyCommentButton = new JButton("Comment Style");
+        specifyCommentButton.addActionListener(this);
+        
+        moduletext = new JTextField(30);
+        
+        filebox = new JCheckBox("Output to logfile", true);
+        filebox.addItemListener(this);
+        
+        screenbox = new JCheckBox("Specify logfile", false);
+        screenbox.addItemListener(this);
+        
+        mibox = new JCheckBox("Print ModuleInfo", false);
+        mibox.addItemListener(this);
+        MigrationTool.printModuleInfo = false;
+        
+        criticbox = new JCheckBox("Run Critic", true);
+        criticbox.addItemListener(this);
+        MigrationTool.doCritic = true;
+        
+        defaultpathbox = new JCheckBox("Use Default Output Path", true);
+        defaultpathbox.addItemListener(this);
+        MigrationTool.defaultoutput = true;
+        
         JPanel modulePanel = new JPanel();
         modulePanel.add(moduleButton);
         modulePanel.add(moduletext);
@@ -119,163 +119,163 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
         cst.fill = GridBagConstraints.BOTH;
         gridbag.setConstraints(logScrollPane, cst);
         add(logScrollPane);
-     	}
-	
-	//---------------------------------------------------------------------------------------//
-	
-	public boolean yesOrNo(String question) {
-		return JOptionPane.showConfirmDialog(this, question, "Yes or No", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
-	}
-	
-	public void print(String message) {
-		if (toscreen == true) {
-	        log.append(message);
-	        System.out.print(message);
-		}
-		if (tofile == true) {
-			logfile.append(message);
-		}
-	}
-	
-	public void println(String message) {
-		print(message + "\n");
-	}
+         }
+    
+    //---------------------------------------------------------------------------------------//
+    
+    public boolean yesOrNo(String question) {
+        return JOptionPane.showConfirmDialog(this, question, "Yes or No", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION;
+    }
+    
+    public void print(String message) {
+        if (toscreen == true) {
+            log.append(message);
+            System.out.print(message);
+        }
+        if (tofile == true) {
+            logfile.append(message);
+        }
+    }
+    
+    public void println(String message) {
+        print(message + "\n");
+    }
 
-	public void println(Set<String> hash) {
-		if (toscreen == true) {
-	        log.append(hash + "\n");
-	        System.out.println(hash);
-		}
-		if (tofile == true) {
-			logfile.append(hash + "\n");
-		}
-	}
+    public void println(Set<String> hash) {
+        if (toscreen == true) {
+            log.append(hash + "\n");
+            System.out.println(hash);
+        }
+        if (tofile == true) {
+            logfile.append(hash + "\n");
+        }
+    }
 
-	public String choose(String message, Object[] choicelist) {
-		return (String)JOptionPane.showInputDialog(this, message,"Choose",JOptionPane.PLAIN_MESSAGE,null,choicelist,choicelist[0]);
-	}
-	
-	public String getInput(String message) {
-		return (String)JOptionPane.showInputDialog(message);
-	}
+    public String choose(String message, Object[] choicelist) {
+        return (String)JOptionPane.showInputDialog(this, message,"Choose",JOptionPane.PLAIN_MESSAGE,null,choicelist,choicelist[0]);
+    }
+    
+    public String getInput(String message) {
+        return (String)JOptionPane.showInputDialog(message);
+    }
 
-	//---------------------------------------------------------------------------------------//
+    //---------------------------------------------------------------------------------------//
 
-	public String getFilepath(String title, int mode) {
-		fc.setDialogTitle(title);
-		fc.setFileSelectionMode(mode);
-		if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-			log.append(fc.getSelectedFile().getAbsolutePath() + "\n");
-			return fc.getSelectedFile().getAbsolutePath();
-		}
-		return null;
-	}
+    public String getFilepath(String title, int mode) {
+        fc.setDialogTitle(title);
+        fc.setFileSelectionMode(mode);
+        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            log.append(fc.getSelectedFile().getAbsolutePath() + "\n");
+            return fc.getSelectedFile().getAbsolutePath();
+        }
+        return null;
+    }
 
-	//---------------------------------------------------------------------------------------//
+    //---------------------------------------------------------------------------------------//
 
     public void actionPerformed(ActionEvent e) {
         if ( e.getSource() == moduleButton ) {
-        	startpath = getFilepath("Please choose a starting path", JFileChooser.DIRECTORIES_ONLY);
-        	moduletext.setText(startpath);
+            startpath = getFilepath("Please choose a starting path", JFileChooser.DIRECTORIES_ONLY);
+            moduletext.setText(startpath);
         }
         if ( e.getSource() == goButton ) {
-        	try {
-        		logfile = new PrintWriter(new BufferedWriter(new FileWriter(startpath.replaceAll(Common.strseparate, "$1") + File.separator + "migration.log")));
-        		MigrationTool.startMigrateAll(startpath);
-        		logfile.flush();
-        		logfile.close();
-        	} catch (Exception en) {
-        		println(en.getMessage());
-        	}
+            try {
+                logfile = new PrintWriter(new BufferedWriter(new FileWriter(startpath.replaceAll(Common.strseparate, "$1") + File.separator + "migration.log")));
+                MigrationTool.startMigrateAll(startpath);
+                logfile.flush();
+                logfile.close();
+            } catch (Exception en) {
+                println(en.getMessage());
+            }
         }
         if ( e.getSource() == msaEditorButton) {
-        	try {
-            	MsaTreeEditor.init();
-        	} catch (Exception en) {
-        		println(en.getMessage());
-        	}
+            try {
+                MsaTreeEditor.init();
+            } catch (Exception en) {
+                println(en.getMessage());
+            }
         }
         if ( e.getSource() == criticButton) {
-        	try {
-        		Critic.fireAt(startpath);
-        	} catch (Exception en) {
-        		println(en.getMessage());
-        	}
+            try {
+                Critic.fireAt(startpath);
+            } catch (Exception en) {
+                println(en.getMessage());
+            }
         }
         if ( e.getSource() == specifyCommentButton) {
-        	try {											// input examine is not imposed but should be added
-        		MigrationTool.MIGRATIONCOMMENT = getInput("Please type in wanted comment style used by the tool\nbe sure to start with '//', or you won't enjoy the result");
-        		//MsaWriter.parse("C:\\tianocore\\edk2\\MdePkg\\Library\\BaseLib\\BaseLib.msa");
-        	} catch (Exception en) {
-        		println(en.getMessage());
-        	}
+            try {                                            // input examine is not imposed but should be added
+                MigrationTool.MIGRATIONCOMMENT = getInput("Please type in wanted comment style used by the tool\nbe sure to start with '//', or you won't enjoy the result");
+                //MsaWriter.parse("C:\\tianocore\\edk2\\MdePkg\\Library\\BaseLib\\BaseLib.msa");
+            } catch (Exception en) {
+                println(en.getMessage());
+            }
         }
     }
     
     public void itemStateChanged(ItemEvent e) {
-    	if (e.getSource() == filebox) {
-        	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		System.out.println("filebox DESELECTED");
-        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		System.out.println("filebox SELECTED");
-        	}
-    	} else if (e.getSource() == screenbox) {
-        	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		System.out.println("screenbox DESELECTED");
-        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		System.out.println("screenbox SELECTED");
-        	}
-    	} else if (e.getSource() == mibox) {
-        	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		MigrationTool.printModuleInfo = false;
-        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		MigrationTool.printModuleInfo = true;
-        	}
-    	} else if (e.getSource() == criticbox) {
-        	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		MigrationTool.doCritic = false;
-        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		MigrationTool.doCritic = true;
-        	}
-    	} else if (e.getSource() == defaultpathbox) {
-        	if (e.getStateChange() == ItemEvent.DESELECTED) {
-        		MigrationTool.defaultoutput = false;
-        	} else if (e.getStateChange() == ItemEvent.SELECTED) {
-        		MigrationTool.defaultoutput = true;
-        	}
-    	}
+        if (e.getSource() == filebox) {
+            if (e.getStateChange() == ItemEvent.DESELECTED) {
+                System.out.println("filebox DESELECTED");
+            } else if (e.getStateChange() == ItemEvent.SELECTED) {
+                System.out.println("filebox SELECTED");
+            }
+        } else if (e.getSource() == screenbox) {
+            if (e.getStateChange() == ItemEvent.DESELECTED) {
+                System.out.println("screenbox DESELECTED");
+            } else if (e.getStateChange() == ItemEvent.SELECTED) {
+                System.out.println("screenbox SELECTED");
+            }
+        } else if (e.getSource() == mibox) {
+            if (e.getStateChange() == ItemEvent.DESELECTED) {
+                MigrationTool.printModuleInfo = false;
+            } else if (e.getStateChange() == ItemEvent.SELECTED) {
+                MigrationTool.printModuleInfo = true;
+            }
+        } else if (e.getSource() == criticbox) {
+            if (e.getStateChange() == ItemEvent.DESELECTED) {
+                MigrationTool.doCritic = false;
+            } else if (e.getStateChange() == ItemEvent.SELECTED) {
+                MigrationTool.doCritic = true;
+            }
+        } else if (e.getSource() == defaultpathbox) {
+            if (e.getStateChange() == ItemEvent.DESELECTED) {
+                MigrationTool.defaultoutput = false;
+            } else if (e.getStateChange() == ItemEvent.SELECTED) {
+                MigrationTool.defaultoutput = true;
+            }
+        }
     }
 
     //---------------------------------------------------------------------------------------//
     
     private static final FirstPanel init() {
-    	try {
-        	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        	//UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        	//UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-        	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-        	//UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-    	} catch (Exception e) {
-    		System.out.println(e.getMessage());
-    	}
-    	
-		JFrame frame = new JFrame("MigrationTools");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            //UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        
+        JFrame frame = new JFrame("MigrationTools");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         FirstPanel fp = new FirstPanel();
-		//fp.setLayout(new GridBagLayout());
-		//fp.setLayout(new BoxLayout(fp, BoxLayout.Y_AXIS));
-		fp.setOpaque(true);
+        //fp.setLayout(new GridBagLayout());
+        //fp.setLayout(new BoxLayout(fp, BoxLayout.Y_AXIS));
+        fp.setOpaque(true);
         frame.setContentPane(fp);
 
-		frame.pack();
-		frame.setVisible(true);
-		
-		return fp;
+        frame.pack();
+        frame.setVisible(true);
+        
+        return fp;
     }
     
     public static final FirstPanel getInstance() {
-    	return INSTANCE;
+        return INSTANCE;
     }
 }

@@ -8,19 +8,19 @@ import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
 public class MsaTreeEditor extends JPanel {
-	/**
-	 *  Define class Serial Version UID
-	 */
-	private static final long serialVersionUID = 3169905938472150649L;
-	
-	private 
+    /**
+     *  Define class Serial Version UID
+     */
+    private static final long serialVersionUID = 3169905938472150649L;
+    
+    private 
 /*
-	MsaTreeEditor(ModuleInfo m, UI u, ModuleSurfaceAreaDocument md) {
-		mi = m;
-		ui = u;
-		msadoc = md;
-		
-		//rootNode = msadoc.getDomNode();
+    MsaTreeEditor(ModuleInfo m, UI u, ModuleSurfaceAreaDocument md) {
+        mi = m;
+        ui = u;
+        msadoc = md;
+        
+        //rootNode = msadoc.getDomNode();
         rootNode = new DefaultMutableTreeNode("Root Node");
         treeModel = new DefaultTreeModel(rootNode);
 
@@ -43,9 +43,9 @@ public class MsaTreeEditor extends JPanel {
         
         addNode(rootNode, "1st");
         addNode(rootNode, "2nd");
-	}
+    }
 */
-	MsaTreeEditor() throws Exception {
+    MsaTreeEditor() throws Exception {
         rootNode = new DefaultMutableTreeNode("Root Node");
         treeModel = new DefaultTreeModel(rootNode);
 
@@ -70,92 +70,92 @@ public class MsaTreeEditor extends JPanel {
         menuitemdel.addActionListener(actionListener);
         menuitemedit.addActionListener(actionListener);
 
-		genDomTree(MigrationTool.ui.getFilepath("Select a msa file", JFileChooser.FILES_AND_DIRECTORIES));
-	}
-	
-	//private ModuleSurfaceAreaDocument msadoc;
-	
-	private JTree tree;
-	private DefaultMutableTreeNode rootNode;
-	private DefaultTreeModel treeModel;
-	private JMenuItem menuitemadd, menuitemdel, menuitemedit;
-	
-	private JPopupMenu popupmenu;
-	private MouseAdapter mouseadapter = new MouseAdapter() {
-		public void mouseReleased(MouseEvent me) {
-			if (me.getClickCount() == 1 && SwingUtilities.isRightMouseButton(me)) {
-				tree.setSelectionPath(tree.getPathForLocation(me.getX(), me.getY()));
-				popupmenu.show(tree, me.getX(), me.getY());
-			}
-		}
-	};
-	private ActionListener actionListener = new ActionListener() {
-		public void actionPerformed(ActionEvent ae) {
-			if (ae.getSource() == menuitemadd) {
-				addNode();
-			} else if (ae.getSource() == menuitemdel) {
-				delNode();
-			} else if (ae.getSource() == menuitemedit) {
-				editNode();
-			}
-		}
-	};
-	
-	private void editNode() {
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent());
-		Element element = (Element)node.getUserObject();
-		System.out.println(element.getTextContent());
-	}
-	
-	private void delNode() {
-		treeModel.removeNodeFromParent((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()));
-	}
-	
-	private void addNode() {
-		addNode((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()), MigrationTool.ui.getInput("Input Node Name"));
-	}
-	
-	private DefaultMutableTreeNode addNode(DefaultMutableTreeNode parentNode, Object child) {
+        genDomTree(MigrationTool.ui.getFilepath("Select a msa file", JFileChooser.FILES_AND_DIRECTORIES));
+    }
+    
+    //private ModuleSurfaceAreaDocument msadoc;
+    
+    private JTree tree;
+    private DefaultMutableTreeNode rootNode;
+    private DefaultTreeModel treeModel;
+    private JMenuItem menuitemadd, menuitemdel, menuitemedit;
+    
+    private JPopupMenu popupmenu;
+    private MouseAdapter mouseadapter = new MouseAdapter() {
+        public void mouseReleased(MouseEvent me) {
+            if (me.getClickCount() == 1 && SwingUtilities.isRightMouseButton(me)) {
+                tree.setSelectionPath(tree.getPathForLocation(me.getX(), me.getY()));
+                popupmenu.show(tree, me.getX(), me.getY());
+            }
+        }
+    };
+    private ActionListener actionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent ae) {
+            if (ae.getSource() == menuitemadd) {
+                addNode();
+            } else if (ae.getSource() == menuitemdel) {
+                delNode();
+            } else if (ae.getSource() == menuitemedit) {
+                editNode();
+            }
+        }
+    };
+    
+    private void editNode() {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent());
+        Element element = (Element)node.getUserObject();
+        System.out.println(element.getTextContent());
+    }
+    
+    private void delNode() {
+        treeModel.removeNodeFromParent((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()));
+    }
+    
+    private void addNode() {
+        addNode((DefaultMutableTreeNode)(tree.getSelectionPath().getLastPathComponent()), MigrationTool.ui.getInput("Input Node Name"));
+    }
+    
+    private DefaultMutableTreeNode addNode(DefaultMutableTreeNode parentNode, Object child) {
         DefaultMutableTreeNode childNode = new DefaultMutableTreeNode(child);
         treeModel.insertNodeInto(childNode, parentNode, parentNode.getChildCount());
         tree.scrollPathToVisible(new TreePath(childNode.getPath()));
         return childNode;
-	}
+    }
 
-	private final void handleNode(Node node, DefaultMutableTreeNode parentNode) {
-		DefaultMutableTreeNode curNode = null;
-		if (node.getNodeType() == Node.ELEMENT_NODE) {
-			System.out.println("elem");
-			curNode = addNode(parentNode, node);
-		} else if (node.getNodeType() == Node.DOCUMENT_NODE){
-			System.out.println("doc");
-			curNode = addNode(parentNode, "MsaDocum");			// can Docum be with Root Node?
-		}
+    private final void handleNode(Node node, DefaultMutableTreeNode parentNode) {
+        DefaultMutableTreeNode curNode = null;
+        if (node.getNodeType() == Node.ELEMENT_NODE) {
+            System.out.println("elem");
+            curNode = addNode(parentNode, node);
+        } else if (node.getNodeType() == Node.DOCUMENT_NODE){
+            System.out.println("doc");
+            curNode = addNode(parentNode, "MsaDocum");            // can Docum be with Root Node?
+        }
 
-		NodeList nodelist = node.getChildNodes();
-		for (int i = 0; i < nodelist.getLength(); i++) {
-			handleNode(nodelist.item(i), curNode);
-		}
-	}
-	
-	private final void genDomTree(String filename) throws Exception {
-		DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		Document document = builder.parse(filename);
-		handleNode(document, rootNode);
-	}
-	
-	public static final void init() throws Exception {
-    	UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        NodeList nodelist = node.getChildNodes();
+        for (int i = 0; i < nodelist.getLength(); i++) {
+            handleNode(nodelist.item(i), curNode);
+        }
+    }
+    
+    private final void genDomTree(String filename) throws Exception {
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Document document = builder.parse(filename);
+        handleNode(document, rootNode);
+    }
+    
+    public static final void init() throws Exception {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
-		JFrame frame = new JFrame("MsaTreeEditor");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame frame = new JFrame("MsaTreeEditor");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		MsaTreeEditor mte = new MsaTreeEditor();
-		mte.setLayout(new GridBagLayout());
-		mte.setOpaque(true);
+        MsaTreeEditor mte = new MsaTreeEditor();
+        mte.setLayout(new GridBagLayout());
+        mte.setOpaque(true);
         frame.setContentPane(mte);
 
-		frame.pack();
-		frame.setVisible(true);
-	}
+        frame.pack();
+        frame.setVisible(true);
+    }
 }
