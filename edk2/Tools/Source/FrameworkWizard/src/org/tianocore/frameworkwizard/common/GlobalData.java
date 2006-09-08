@@ -178,7 +178,7 @@ public class GlobalData {
      @return a Vector with all modules' path
      
      **/
-    private static Vector<String> getAllModulesOfPackage(String path) {
+    public static Vector<String> getAllModulesOfPackage(String path) {
         Vector<String> modulePath = new Vector<String>();
         try {
             MsaFiles files = OpenFile.openSpdFile(path).getMsaFiles();

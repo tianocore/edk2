@@ -149,6 +149,8 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
 
     private JMenuItem jMenuItemFileNew = null;
 
+    private JMenuItem jMenuItemFileRefresh = null;
+
     private JMenuItem jMenuItemFileSaveAs = null;
 
     private JMenuItem jMenuItemFileExit = null;
@@ -429,6 +431,9 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             jMenuFile.add(getJMenuItemFileSaveAs());
             jMenuFile.add(getJMenuItemFileSaveAll());
             jMenuFile.addSeparator();
+            
+            jMenuFile.add(getJMenuItemFileRefresh());
+            jMenuFile.addSeparator();
 
             jMenuFile.add(getJMenuItemFilePageSetup());
             jMenuFile.add(getJMenuItemFilePrint());
@@ -456,6 +461,23 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             jMenuItemFileSaveAs.setVisible(false);
         }
         return jMenuItemFileSaveAs;
+    }
+
+    /**
+     This method initializes jMenuItemFileRefresh 
+     
+     @return javax.swing.JMenuItem jMenuItemFileRefresh
+     
+     **/
+    private JMenuItem getJMenuItemFileRefresh() {
+        if (jMenuItemFileRefresh == null) {
+            jMenuItemFileRefresh = new JMenuItem();
+            jMenuItemFileRefresh.setText("Refresh");
+            jMenuItemFileRefresh.setMnemonic('R');
+            jMenuItemFileRefresh.addActionListener(this);
+            jMenuItemFileRefresh.setVisible(true);
+        }
+        return jMenuItemFileRefresh;
     }
 
     /**
@@ -633,6 +655,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             //
             jMenuHelp = new JMenu();
             jMenuHelp.setText("Help");
+            jMenuHelp.setMnemonic('H');
 
             //
             // Add sub menu items
@@ -656,6 +679,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         if (jMenuItemHelpAbout == null) {
             jMenuItemHelpAbout = new JMenuItem();
             jMenuItemHelpAbout.setText("About...");
+            jMenuItemHelpAbout.setMnemonic('A');
             jMenuItemHelpAbout.addActionListener(this);
         }
         return jMenuItemHelpAbout;
@@ -882,6 +906,7 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
         if (jMenuItemFileCloseAll == null) {
             jMenuItemFileCloseAll = new JMenuItem();
             jMenuItemFileCloseAll.setText("Close All");
+            jMenuItemFileCloseAll.setMnemonic('A');
             jMenuItemFileCloseAll.setEnabled(true);
             jMenuItemFileCloseAll.addActionListener(this);
         }
@@ -1858,6 +1883,12 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
 
         if (arg0.getSource() == this.jMenuItemFileSaveAll) {
             this.saveAll();
+        }
+        
+        if (arg0.getSource() == this.jMenuItemFileRefresh) {
+            this.closeAll();
+            this.refresh();
+            this.makeEmptyTree();
         }
 
         if (arg0.getSource() == this.jMenuItemFileExit) {
@@ -3309,13 +3340,13 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             //
             // Reinit whole window
             //
-            closeAll();
+            this.closeAll();
             this.setTitle(DataType.PROJECT_NAME + " " + DataType.PROJECT_VERSION + " " + "- ["
                           + Workspace.getCurrentWorkspace() + "]");
             //
-            // Reinit Global Data
+            // Refrash the tree
             //
-            GlobalData.init();
+            this.refresh();
         }
         sw.dispose();
     }
@@ -3467,8 +3498,8 @@ public class FrameworkWizardUI extends IFrame implements KeyListener, MouseListe
             //
             IDefaultMutableTreeNode node = new IDefaultMutableTreeNode(
                                                                        GlobalData.vPlatformList.lastElement().getName(),
-                                                                       IDefaultMutableTreeNode.PLATFORM,
-                                                                       false, GlobalData.vPlatformList.lastElement(),
+                                                                       IDefaultMutableTreeNode.PLATFORM, false,
+                                                                       GlobalData.vPlatformList.lastElement(),
                                                                        this.dmtnPlatformDescription);
             iTree.addNode(this.dmtnPlatformDescription, node);
         }
