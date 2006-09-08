@@ -138,15 +138,6 @@ public final class ModuleReader {
             Common.ensureDir(mi.modulepath + File.separator + "temp" + File.separator + curFile);
             outfile = new PrintWriter(new BufferedWriter(new FileWriter(mi.modulepath + File.separator + "temp" + File.separator + curFile)));
             
-            /*
-            if (curFile.contains(".dxs")) {
-                if (mi.moduletype.contains("PEI")) {
-                    
-                } else {
-                    
-                }
-            }
-            */
             while ((line = rd.readLine()) != null) {
                 if (line.contains("#include")) {
                     mtrinclude = ptninclude.matcher(line);
