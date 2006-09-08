@@ -25,6 +25,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.xmlbeans.XmlObject;
 
+import org.tianocore.build.global.GenBuildLogger;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.OutputManager;
 import org.tianocore.build.id.FpdModuleIdentification;
@@ -60,6 +61,10 @@ public class FpdParserForThread extends FpdParserTask {
     
     public static int currentRunNumber = 0;
     
+    public static int totalNumber = 0;
+    
+    public static int remainNumber = 0;
+    
     /**
       Public construct method. It is necessary for ANT task.
     **/
@@ -71,6 +76,8 @@ public class FpdParserForThread extends FpdParserTask {
 
     **/
     public void execute() throws BuildException {
+        
+        this.setTaskName(".........");
         //
         // Parse FPD file
         //
@@ -93,7 +100,7 @@ public class FpdParserForThread extends FpdParserTask {
                 // Prepare FV_DIR
                 //
                 String ffsCommonDir = buildDir + File.separatorChar
-                                + targetList[i] + File.separatorChar
+                                + targetList[i] + "_"
                                 + toolchainList[j];
                 File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
                 fvDir.mkdirs();
@@ -144,8 +151,10 @@ public class FpdParserForThread extends FpdParserTask {
         ant.init();
         ant.execute();
         
-        EdkLog.log(this, "Task number is " + allThreads.size());
+        remainNumber = totalNumber = allThreads.size();
         
+        EdkLog.log(this, EdkLog.EDK_ALWAYS, "Total thread number is " + totalNumber);
+        GenBuildLogger.setCacheEnable(true);
         //
         // Waiting for all thread over, or time out
         //
@@ -161,6 +170,9 @@ public class FpdParserForThread extends FpdParserTask {
                 if (currentQueueCode >= queueList.size()) {
                     break ;
                 }
+                
+                int percentage = (totalNumber - remainNumber) * 100 / totalNumber;
+                EdkLog.log(this, EdkLog.EDK_ALWAYS, percentage + "% finished. Has built " + (totalNumber - remainNumber) + " modules of " + totalNumber + " total. ");
 
                 Set<FpdModuleIdentification> currentQueueModules = fvs.get(queueList.get(currentQueueCode));
                 
@@ -192,35 +204,37 @@ public class FpdParserForThread extends FpdParserTask {
                     //
                     // Exist ready thread
                     //
-                    EdkLog.log(this, "## Exist ready thread");
+//                    EdkLog.log(this, EdkLog.EDK_ALWAYS, "Exist ready thread");
 
                 } else if (existNoneReady && currentRunNumber == 0) {
                     //
                     // No active thread, but still have dependency not read thread
                     //
-                    throw new BuildException("Found can't resolve dependencies. ");
+                    throw new BuildException("Existing some modules can't resolve depedencies. ");
                 } else if (!existNoneReady && currentRunNumber == 0) {
                     //
                     // Current queue build finish, move to next
                     //
-                    EdkLog.log(this, "## Current queue build finish, move to next");
+                    EdkLog.log(this, EdkLog.EDK_ALWAYS, "Current queue build finish, move to next");
                     ++currentQueueCode;
                     continue ;
                 } else {
                     //
                     // active thread exist, but no ready thread
                     //
-                    EdkLog.log(this, "## active thread exist, but no ready thread" + currentRunNumber);
+                    EdkLog.log(this, EdkLog.EDK_ALWAYS, "Active thread exist, but no ready thread. Current running number is " + currentRunNumber);
                 }
 
                 try {
                     deamonSemaphore.wait();
-                } catch (InterruptedException e) {
-                   e.printStackTrace();
+                } catch (InterruptedException ex) {
+                    BuildException e = new BuildException("Thread wait Error. \n" + ex.getMessage());
+                    e.setStackTrace(ex.getStackTrace());
+                    throw e;
                 }
             }
         }
-        
+        GenBuildLogger.setCacheEnable(false);
         //
         // call fvs, postbuild
         //
@@ -239,6 +253,8 @@ public class FpdParserForThread extends FpdParserTask {
         ant.setInheritAll(true);
         ant.init();
         ant.execute();
+        
+        EdkLog.flushLogToFile(new File(buildDir + File.separatorChar + "build.log"));
         
     }
 
@@ -358,6 +374,7 @@ public class FpdParserForThread extends FpdParserTask {
     public synchronized static void subCount() {
         synchronized (countSemaphore) {
             --currentRunNumber;
+            --remainNumber;
         }
     }
 }

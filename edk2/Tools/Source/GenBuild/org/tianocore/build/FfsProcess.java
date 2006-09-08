@@ -154,11 +154,9 @@ public class FfsProcess {
         }
         Vector<String> sectionList = new Vector<String>();
         XmlCursor cursor = null;
-        try {
-            cursor = ffsXmlObject.newCursor();
-        } catch (Exception e) {
-            return null;
-        }
+
+        cursor = ffsXmlObject.newCursor();
+
         int mode = MODE_NONE;
         Element genffsfileEle = document.createElement("genffsfile");
         genffsfileEle.setAttribute("outputDir", "${BIN_DIR}");

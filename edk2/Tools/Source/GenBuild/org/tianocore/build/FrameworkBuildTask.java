@@ -420,7 +420,7 @@ public class FrameworkBuildTask extends Task{
         if (str != null && str.trim().equalsIgnoreCase("Enable")) {
             multithread = true;
         }
-            
+
         str = getValue(ToolDefinitions.TARGET_KEY_MAX_CONCURRENT_THREAD_NUMBER, targetFileInfo);
         if (str != null ) {
             try {

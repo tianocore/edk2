@@ -581,7 +581,7 @@ public class GenBuildTask extends Ant {
         //
         // Call AutoGen to generate AutoGen.c and AutoGen.h
         //
-        AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch(), saq);
+        AutoGen autogen = new AutoGen(getProject().getProperty("FV_DIR"), getProject().getProperty("DEST_DIR_DEBUG"), fpdModuleId.getModule(),fpdModuleId.getArch(), saq, parentId);
         autogen.genAutogen();
 
         //

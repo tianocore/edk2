@@ -118,6 +118,8 @@ public class AutoGen {
     private List<String> exitBootServiceList = new ArrayList<String>();
 
     private SurfaceAreaQuery saq = null;
+    
+    private ModuleIdentification parentId = null;
 
     /**
       Construct function
@@ -133,12 +135,13 @@ public class AutoGen {
       @param arch
                  Target architecture.
     **/
-    public AutoGen(String fvDir, String outputPath, ModuleIdentification moduleId, String arch, SurfaceAreaQuery saq) {
+    public AutoGen(String fvDir, String outputPath, ModuleIdentification moduleId, String arch, SurfaceAreaQuery saq, ModuleIdentification parentId) {
         this.outputPath = outputPath;
         this.moduleId = moduleId;
         this.arch = arch;
         this.fvDir = fvDir;
         this.saq = saq;
+        this.parentId = parentId;
     }
 
     /**
@@ -496,7 +499,8 @@ public class AutoGen {
                                                  arch, 
                                                  false, 
                                                  null,
-                                                 pcdDriverType);
+                                                 pcdDriverType, 
+                                                 parentId);
         
         this.myPcdAutogen.execute();
         if (this.myPcdAutogen != null) {
@@ -653,7 +657,8 @@ public class AutoGen {
                                                  arch,
                                                  true,
                                                  saq.getModulePcdEntryNameArray(),
-                                                 pcdDriverType);
+                                                 pcdDriverType, 
+                                                 parentId);
         this.myPcdAutogen.execute();
         if (this.myPcdAutogen != null) {
             fileBuffer.append(ToolDefinitions.LINE_SEPARATOR);

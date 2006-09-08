@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.tianocore.build.FrameworkBuildTask;
 import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.id.ModuleIdentification;
@@ -72,6 +73,7 @@ public class PCDAutoGenAction extends BuildAction {
     ///
     private String[]              pcdNameArrayInMsa;
 
+    private UsageIdentification parentId = null;
     /**
       Set parameter moduleId
 
@@ -142,7 +144,8 @@ public class PCDAutoGenAction extends BuildAction {
                             String               arch,
                             boolean              isBuildUsedLibrary,
                             String[]             pcdNameArrayInMsa,
-                            CommonDefinition.PCD_DRIVER_TYPE pcdDriverType) {
+                            CommonDefinition.PCD_DRIVER_TYPE pcdDriverType,
+                            ModuleIdentification parentId) {
         dbManager       = null;
         hAutoGenString  = "";
         cAutoGenString  = "";
@@ -154,6 +157,15 @@ public class PCDAutoGenAction extends BuildAction {
                                            arch,
                                            moduleId.getVersion(),
                                            moduleId.getModuleType()));
+        if (parentId != null) {
+            this.parentId = new UsageIdentification(parentId.getName(),
+                        parentId.getGuid(),
+                        parentId.getPackage().getName(),
+                        parentId.getPackage().getGuid(),
+                        arch,
+                        parentId.getVersion(),
+                        parentId.getModuleType());
+        }
         setIsBuildUsedLibrary(isBuildUsedLibrary);
         setPcdNameArrayInMsa(pcdNameArrayInMsa);
         setPcdDriverType(pcdDriverType);
@@ -211,53 +223,100 @@ public class PCDAutoGenAction extends BuildAction {
         boolean               found           = false;
 
         usageInstanceArray = null;
-        if (!isBuildUsedLibrary) {
-            usageInstanceArray  = dbManager.getUsageInstanceArrayById(usageId);
-            MemoryDatabaseManager.UsageInstanceContext = usageInstanceArray;
-            MemoryDatabaseManager.CurrentModuleName    = moduleName;
-        } else if ((pcdNameArrayInMsa != null) && (pcdNameArrayInMsa.length > 0)) {
-            usageContext = MemoryDatabaseManager.UsageInstanceContext;
-            //
-            // For building library package, although all module are library, but PCD entries of
-            // these library should be used to autogen.
-            //
-            if (usageContext == null) {
+        
+        if (FrameworkBuildTask.multithread) {
+            if (parentId == null) {
                 usageInstanceArray  = dbManager.getUsageInstanceArrayById(usageId);
-            } else {
-                usageInstanceArray = new ArrayList<UsageInstance>();
+            } else if ((pcdNameArrayInMsa != null) && (pcdNameArrayInMsa.length > 0)) {
+                usageContext = dbManager.getUsageInstanceArrayById(parentId);
+                //
+                // For building library package, although all module are library, but PCD entries of
+                // these library should be used to autogen.
+                //
+                if (usageContext == null) {
+                    usageInstanceArray  = dbManager.getUsageInstanceArrayById(usageId);
+                } else {
+                    usageInstanceArray = new ArrayList<UsageInstance>();
 
-                //
-                // Try to find all PCD defined in library's PCD in all <PcdEntry> in module's
-                // <ModuleSA> in FPD file.
-                //
-                for (index = 0; index < pcdNameArrayInMsa.length; index++) {
-                    found = false;
-                    for (index2 = 0; index2 < usageContext.size(); index2 ++) {
-                        if (pcdNameArrayInMsa[index].equalsIgnoreCase(usageContext.get(index2).parentToken.cName)) {
-                            usageInstanceArray.add(usageContext.get(index2));
-                            found = true;
-                            break;
+                    //
+                    // Try to find all PCD defined in library's PCD in all <PcdEntry> in module's
+                    // <ModuleSA> in FPD file.
+                    //
+                    for (index = 0; index < pcdNameArrayInMsa.length; index++) {
+                        found = false;
+                        for (index2 = 0; index2 < usageContext.size(); index2 ++) {
+                            if (pcdNameArrayInMsa[index].equalsIgnoreCase(usageContext.get(index2).parentToken.cName)) {
+                                usageInstanceArray.add(usageContext.get(index2));
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (!found) {
+                            //
+                            // All library's PCD should instanted in module's <ModuleSA> who
+                            // use this library instance. If not, give errors.
+                            //
+                            throw new BuildActionException (String.format("Module %s using library instance %s; the PCD %s " +
+                                                                          "is required by this library instance, but can not be found " +
+                                                                          "in the %s's <ModuleSA> in the FPD file!",
+                                                                          MemoryDatabaseManager.CurrentModuleName,
+                                                                          moduleName,
+                                                                          pcdNameArrayInMsa[index],
+                                                                          MemoryDatabaseManager.CurrentModuleName
+                                                                          ));
                         }
                     }
-
-                    if (!found) {
-                        //
-                        // All library's PCD should instanted in module's <ModuleSA> who
-                        // use this library instance. If not, give errors.
-                        //
-                        throw new BuildActionException (String.format("Module %s using library instance %s; the PCD %s " +
-                                                                      "is required by this library instance, but can not be found " +
-                                                                      "in the %s's <ModuleSA> in the FPD file!",
-                                                                      MemoryDatabaseManager.CurrentModuleName,
-                                                                      moduleName,
-                                                                      pcdNameArrayInMsa[index],
-                                                                      MemoryDatabaseManager.CurrentModuleName
-                                                                      ));
+                }
+            }
+        } else {
+            if (!isBuildUsedLibrary) {
+                usageInstanceArray  = dbManager.getUsageInstanceArrayById(usageId);
+                MemoryDatabaseManager.UsageInstanceContext = usageInstanceArray;
+                MemoryDatabaseManager.CurrentModuleName    = moduleName;
+            } else if ((pcdNameArrayInMsa != null) && (pcdNameArrayInMsa.length > 0)) {
+                usageContext = MemoryDatabaseManager.UsageInstanceContext;
+                //
+                // For building library package, although all module are library, but PCD entries of
+                // these library should be used to autogen.
+                //
+                if (usageContext == null) {
+                    usageInstanceArray  = dbManager.getUsageInstanceArrayById(usageId);
+                } else {
+                    usageInstanceArray = new ArrayList<UsageInstance>();
+    
+                    //
+                    // Try to find all PCD defined in library's PCD in all <PcdEntry> in module's
+                    // <ModuleSA> in FPD file.
+                    //
+                    for (index = 0; index < pcdNameArrayInMsa.length; index++) {
+                        found = false;
+                        for (index2 = 0; index2 < usageContext.size(); index2 ++) {
+                            if (pcdNameArrayInMsa[index].equalsIgnoreCase(usageContext.get(index2).parentToken.cName)) {
+                                usageInstanceArray.add(usageContext.get(index2));
+                                found = true;
+                                break;
+                            }
+                        }
+    
+                        if (!found) {
+                            //
+                            // All library's PCD should instanted in module's <ModuleSA> who
+                            // use this library instance. If not, give errors.
+                            //
+                            throw new BuildActionException (String.format("Module %s using library instance %s; the PCD %s " +
+                                                                          "is required by this library instance, but can not be found " +
+                                                                          "in the %s's <ModuleSA> in the FPD file!",
+                                                                          MemoryDatabaseManager.CurrentModuleName,
+                                                                          moduleName,
+                                                                          pcdNameArrayInMsa[index],
+                                                                          MemoryDatabaseManager.CurrentModuleName
+                                                                          ));
+                        }
                     }
                 }
             }
         }
-
         if (usageInstanceArray == null) {
             return;
         }

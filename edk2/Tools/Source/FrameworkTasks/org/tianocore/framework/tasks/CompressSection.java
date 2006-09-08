@@ -42,6 +42,8 @@ public class CompressSection implements Section, FfsTypes{
     //
     List<Object>   SectList     = new ArrayList<Object>();
 
+    public static Object semaphore = new Object();
+    
     /**
       toBuffer
       
@@ -85,6 +87,8 @@ public class CompressSection implements Section, FfsTypes{
             }
             Do.close();    
             
+            
+            synchronized (semaphore) {
             //
             //  Call compress
             //
@@ -144,6 +148,7 @@ public class CompressSection implements Section, FfsTypes{
             //
             //di.close();
             //compressOut.delete();
+            }
                 
         }
         catch (Exception e){

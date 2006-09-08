@@ -131,7 +131,16 @@ public class GenBuildThread implements Runnable {
 
         Iterator listenerIter = project.getBuildListeners().iterator();
         while (listenerIter.hasNext()) {
-            newProject.addBuildListener((BuildListener) listenerIter.next());
+            BuildListener item = (BuildListener) listenerIter.next();
+            
+//            if (item instanceof BuildLogger) {
+//                BuildLogger newLogger = new GenBuildLogger(newProject);
+//                BuildLogger oldLogger = (BuildLogger)item;
+//                newLogger.setEmacsMode(true);
+//                EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, "########");
+//            } else {
+                newProject.addBuildListener(item);
+//            }
         }
 
         project.initSubProject(newProject);
@@ -145,8 +154,8 @@ public class GenBuildThread implements Runnable {
         genBuildTask.perform();
 
         status = FpdParserForThread.STATUS_END_RUN;
-        
-        EdkLog.log("GenBuildThread", fpdModuleId + " build finished. ");
+
+        EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, fpdModuleId + " build finished. ");
         
         //
         // 

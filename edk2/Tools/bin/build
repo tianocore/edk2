@@ -9,4 +9,4 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-ant -f $WORKSPACE/build.xml $*
+ant -logger org.tianocore.build.global.GenBuildLogger -f $WORKSPACE/build.xml $*

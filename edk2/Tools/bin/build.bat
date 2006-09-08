@@ -9,4 +9,4 @@
 @REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 @REM
 
-ant -f %WORKSPACE%/build.xml %*
+ant -logger org.tianocore.build.global.GenBuildLogger -f %WORKSPACE%/build.xml %*
