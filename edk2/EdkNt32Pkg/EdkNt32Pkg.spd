@@ -335,7 +335,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
       <TokenSpaceGuidCName>gEfiEdkNt32PkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>VOID*</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE</ValidUsage>
-      <DefaultValue>L"..\\..\\Fv\\Fv_Recovery.fd"</DefaultValue>
+      <DefaultValue>L"..\\Fv\\Fv_Recovery.fd"</DefaultValue>
       <HelpText>This PCD defines the FD file windows path string. Simulator will load the FD file and execute.</HelpText>
     </PcdEntry>
     <PcdEntry>

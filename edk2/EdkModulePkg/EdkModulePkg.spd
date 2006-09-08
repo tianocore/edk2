@@ -812,6 +812,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x08</DefaultValue>
       <HelpText>The maximum number of callback function, which will be triggered when 
         a PCD entry is been set, can be registered for a single PCD entry in PEI phase.</HelpText>
     </PcdEntry>
@@ -821,6 +822,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>The base address of the VPD (Vital Product Data) region. It is 
         normally a region reserved on flash.</HelpText>
     </PcdEntry>
@@ -830,6 +832,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
       <HelpText>Indicate whether platform can support update capsule across a system reset</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -838,6 +841,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Indicate the max size the platform can support in case of populated capsules</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -846,6 +850,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD</ValidUsage>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Indicate the max size the platform can support in case of non-populated capsules</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -901,7 +906,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT16</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
-      <DefaultValue>4</DefaultValue>
+      <DefaultValue>1</DefaultValue>
       <HelpText>kbytes size of GUID'ed HOB, if the GUID'ed HOB is full, create new GUID'ed HOB with this size.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1000,7 +1005,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>FALSE</DefaultValue>
+      <DefaultValue>TRUE</DefaultValue>
       <HelpText>This feature flag can be used to enable or disable the SET capability of PCD service PEIM. If a platform does not do PCD SET operation in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1009,7 +1014,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>FALSE</DefaultValue>
+      <DefaultValue>TRUE</DefaultValue>
       <HelpText>This feature flag can be used to enable or disable the GET size capability of PCD service PEIM. If a platform does not do PCD get size operation in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1018,7 +1023,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>FALSE</DefaultValue>
+      <DefaultValue>TRUE</DefaultValue>
       <HelpText>This feature flag can be used to enable or disable the Callback On SET capability of PCD service PEIM. If a platform does not register any callback on set  in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1027,7 +1032,7 @@
       <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>BOOLEAN</DatumType>
       <ValidUsage>FEATURE_FLAG</ValidUsage>
-      <DefaultValue>FALSE</DefaultValue>
+      <DefaultValue>TRUE</DefaultValue>
       <HelpText>This feature flag can be used to enable or disable the PCD service PEIM to handle DynamicEX PCD. If a platform has no module to use DynamicEX  in PEI phase. This flag can be set to DISABLE to save size.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1036,7 +1041,7 @@
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
-      <DefaultValue>0xFFFB0000</DefaultValue>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Base address of the variable section in NV firmware volume.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1045,7 +1050,7 @@
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
-      <DefaultValue>0x0000A000</DefaultValue>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Size of the variable section in NV firmware volume..</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1054,7 +1059,7 @@
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
-      <DefaultValue>0xFFFC0000</DefaultValue>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Base address of the FTW spare block section in NV firmware volume.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1063,7 +1068,7 @@
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
-      <DefaultValue>0x00010000</DefaultValue>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Size of the FTW spare block section in NV firmware volume.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1072,7 +1077,7 @@
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
-      <DefaultValue>0xFFFBE000</DefaultValue>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Base address of the FTW working block section in NV firmware volume.</HelpText>
     </PcdEntry>
     <PcdEntry>
@@ -1081,7 +1086,7 @@
       <TokenSpaceGuidCName>gEfiGenericPlatformTokenSpaceGuid</TokenSpaceGuidCName>
       <DatumType>UINT32</DatumType>
       <ValidUsage>FIXED_AT_BUILD PATCHABLE_IN_MODULE DYNAMIC</ValidUsage>
-      <DefaultValue>0x00002000</DefaultValue>
+      <DefaultValue>0x0</DefaultValue>
       <HelpText>Size of the FTW working block section in NV firmware volume.</HelpText>
     </PcdEntry>
   </PcdDeclarations>
