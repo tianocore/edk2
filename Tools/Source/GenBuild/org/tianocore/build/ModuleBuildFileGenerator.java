@@ -14,21 +14,26 @@ package org.tianocore.build;
 import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.tianocore.build.exception.GenBuildException;
 import org.tianocore.build.fpd.FpdParserTask;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.FpdModuleIdentification;
@@ -90,7 +95,7 @@ public class ModuleBuildFileGenerator {
       @throws BuildException
               Error throws during BaseName_build.xml generating. 
     **/
-    public void genBuildFile(String buildFilename) throws BuildException {
+    public void genBuildFile(String buildFilename) throws GenBuildException, EdkException {
         FfsProcess fp = new FfsProcess();
         DocumentBuilderFactory domfac = DocumentBuilderFactory.newInstance();
         try {
@@ -229,8 +234,22 @@ public class ModuleBuildFileGenerator {
             xformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             xformer.setOutputProperty(OutputKeys.INDENT, "yes");
             xformer.transform(source, result);
-        } catch (Exception ex) {
-            throw new BuildException("Generating the module [" + fpdModuleId.getModule().getName() + "] build.xml file failed!.\n" + ex.getMessage());
+        } catch (ParserConfigurationException ex) {
+            GenBuildException e = new GenBuildException("Generating the module [" + fpdModuleId.getModule().getName() + "] build.xml file failed!.\n" + ex.getMessage());
+            e.setStackTrace(ex.getStackTrace());
+            throw e;
+        } catch (FileNotFoundException ex) {
+            GenBuildException e = new GenBuildException("Generating the module [" + fpdModuleId.getModule().getName() + "] build.xml file failed!.\n" + ex.getMessage());
+            e.setStackTrace(ex.getStackTrace());
+            throw e;
+        } catch (TransformerConfigurationException ex) {
+            GenBuildException e = new GenBuildException("Generating the module [" + fpdModuleId.getModule().getName() + "] build.xml file failed!.\n" + ex.getMessage());
+            e.setStackTrace(ex.getStackTrace());
+            throw e;
+        } catch (TransformerException ex) {
+            GenBuildException e = new GenBuildException("Generating the module [" + fpdModuleId.getModule().getName() + "] build.xml file failed!.\n" + ex.getMessage());
+            e.setStackTrace(ex.getStackTrace());
+            throw e;
         }
     }
 

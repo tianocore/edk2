@@ -162,7 +162,7 @@ public class GlobalData {
         // CONF dir + tools definition file name
         //
         File toolsDefFile = new File(workspaceDir + File.separatorChar + toolsDefFilename);
-        EdkLog.log("Init", "Using tool definition file [" + toolsDefFile.getPath() + "].");
+        EdkLog.log("Init", EdkLog.EDK_ALWAYS, "Using tool definition file [" + toolsDefFile.getPath() + "].");
         toolsDef = new ToolChainConfig(toolsDefFile);
 
 
@@ -686,8 +686,8 @@ public class GlobalData {
             }
             toolChainInfo.addCommands(toolsDef.getConfigInfo().getCommands());
             toolChainInfo.normalize();
-            EdkLog.log("Init", "Current build tool chain information summary: ");
-            EdkLog.log("Init", toolChainInfo + "");
+            EdkLog.log("Init", EdkLog.EDK_ALWAYS, "Current build tool chain information summary: ");
+            EdkLog.log("Init", EdkLog.EDK_ALWAYS, toolChainInfo + "");
         }
         return toolChainInfo;
     }
