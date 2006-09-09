@@ -14,6 +14,12 @@
 
 **/
 
+//
+// This size must be at or below the smallest cache size possible among all
+// supported processors
+//
+#define CACHE_LINE_SIZE             0x20
+
 /**
   Invalidates the entire instruction cache in cache coherency domain of the
   calling CPU.
@@ -118,19 +124,21 @@ WriteBackInvalidateDataCacheRange (
   IN      UINTN                     Length
   )
 {
-  UINT8                             (*Uint8Ptr)[32];
+  UINTN                             Start, End;
 
   ASSERT (Length <= MAX_ADDRESS - (UINTN)Address + 1);
 
-  Uint8Ptr = Address;
-  while (Length > sizeof (*Uint8Ptr)) {
-    AsmFlushCacheLine (Uint8Ptr++);
-    Length -= sizeof (*Uint8Ptr);
+  if (Length == 0) {
+    return Address;
   }
-  if (Length > 0) {
-    AsmFlushCacheLine (Uint8Ptr);
-    AsmFlushCacheLine (&(*Uint8Ptr)[Length - 1]);
-  }
+
+  Start = (UINTN)Address;
+  End = (Start + Length + (CACHE_LINE_SIZE - 1)) & ~(CACHE_LINE_SIZE - 1);
+  Start &= ~(CACHE_LINE_SIZE - 1);
+
+  do {
+    Start = (UINTN)AsmFlushCacheLine ((VOID*)Start) + CACHE_LINE_SIZE;
+  } while (Start != End);
   return Address;
 }
 
