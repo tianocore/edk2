@@ -36,14 +36,13 @@ public class CompressSection implements Section, FfsTypes{
     //
     // The attribute of compressName.
     //
-    String compressName = "";
+    private String compressName = "";
     //
     // The list contained the SectFile element.
     //
-    List<Object>   SectList     = new ArrayList<Object>();
+    private List<Section> sectList = new ArrayList<Section>();
 
     public static Object semaphore = new Object();
-    
     /**
       toBuffer
       
@@ -69,7 +68,7 @@ public class CompressSection implements Section, FfsTypes{
             //  Get each section which under the compress {};
             //  And add it is contains to File;
             //
-            Iterator SectionIter = SectList.iterator();
+            Iterator SectionIter = sectList.iterator();
             while (SectionIter.hasNext()){
                 sect = (Section)SectionIter.next();
                 
@@ -86,7 +85,6 @@ public class CompressSection implements Section, FfsTypes{
                             
             }
             Do.close();    
-            
             
             synchronized (semaphore) {
             //
@@ -186,7 +184,7 @@ public class CompressSection implements Section, FfsTypes{
       @param sectFile    SectFile element which succeed from section class.
     **/
     public void addSectFile (SectFile sectFile) {
-        SectList.add(sectFile);
+        sectList.add(sectFile);
             
     }    
     
@@ -197,6 +195,6 @@ public class CompressSection implements Section, FfsTypes{
       @param tool        Tool element which succeed from section class.
     **/
     public void addTool (Tool tool) {
-        SectList.add(tool);
+        sectList.add(tool);
     }
 }

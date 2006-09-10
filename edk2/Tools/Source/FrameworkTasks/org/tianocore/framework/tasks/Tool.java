@@ -13,15 +13,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 package org.tianocore.framework.tasks;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
+import org.tianocore.common.logger.EdkLog;
 
 /**
  Class Tool is to define an external tool to be used for genffsfile
@@ -33,7 +37,8 @@ public class Tool implements EfiDefine, Section {
     String outputPath;
     File outputFile ;
     List<Input>    inputFiles = new ArrayList<Input>();
-
+    List<Section>  gensectList = new ArrayList<Section>();
+    String inputArg = "-i ";
     /**
      Call extern tool
 
@@ -107,7 +112,41 @@ public class Tool implements EfiDefine, Section {
         Iterator inputIter = inputFiles.iterator();
         ToolArg toolArg;
         Input file = null;
+              
+        
+        //
+        //  Get each section which under the compress {};
+        //  And add it is contains to File;
+        //
+        Section sect;
+        try{
+            Iterator SectionIter = this.gensectList.iterator();
+            while (SectionIter.hasNext()){
+                sect = (Section)SectionIter.next();
+                //
+                // Parse <genSection> element
+                //
+                File outputFile = File.createTempFile("temp", "sec1",new File(outputPath));
+                FileOutputStream bo = new FileOutputStream(outputFile);
+                DataOutputStream Do = new DataOutputStream (bo);
+                //
+                //  Call each section class's toBuffer function.
+                //
+                try {
+                    sect.toBuffer(Do);
+                }
+                catch (BuildException e) {
+                    System.out.print(e.getMessage());
+                    throw new BuildException ("GenSection failed at Tool!");
+                }  
+                Do.close();
+                this.inputArg += outputFile.getPath() + " ";                        
+            }        
+        } catch (IOException e){
+            throw new BuildException ("Gensection failed at tool!");
+        }
 
+        
         ///
         /// argument of tools
         ///
@@ -120,21 +159,19 @@ public class Tool implements EfiDefine, Section {
         ///
         /// input files for tools
         ///
-        argument += " -i ";
         while (inputIter.hasNext()) {
             file = (Input)inputIter.next();
-            argument += file.toString(" ");
+            inputArg += file.toString(" ");
         }
-
         try {
-            outputFile = File.createTempFile("temp", ".crc", new File(outputPath));
-            argument   = argument + " -o " + outputFile.getPath();
-
+            outputFile = File.createTempFile("temp", null, new File(outputPath));
+            argument   = argument + inputArg + " -o " + outputFile.getPath();
+            EdkLog.log(EdkLog.EDK_INFO, argument);
             ///
             /// execute command line
             ///
-            Process crcProcess = Runtime.getRuntime().exec(command + " " + argument);
-            crcProcess.waitFor();
+            Process process = Runtime.getRuntime().exec(command + " " + argument);
+            process.waitFor();
         } catch (Exception e) {
             System.out.print (e.getMessage());
             throw new BuildException("Execution of externalTool task failed!\n");
@@ -194,6 +231,22 @@ public class Tool implements EfiDefine, Section {
     public void addInput(Input file) {
         inputFiles.add(file);
     }
+    
+//    /**
+//      addTool
+//      
+//      This function is to add instance of Tool to list.
+//      
+//      @param tool             instance of Tool.
+//    **/
+//    public void addTool(Tool tool){
+//        this.toolList.add(tool);
+//    }
+    
+    public void addGenSection(GenSectionTask genSect){
+        this.gensectList.add(genSect);
+    }
+    
 }
 
 
