@@ -2608,7 +2608,7 @@ public class FpdFileContents {
         }
     }
     
-    public void AddFvImageFvImageNames (String[] fvNames) {
+    public void addFvImageFvImageNames (String[] fvNames) {
         FvImagesDocument.FvImages fis = getfpdFlash().getFvImages();
         if (fis == null || fis.getFvImageList() == null) {
             genFvImagesFvImage (fvNames, "ImageName", null);
@@ -2619,14 +2619,35 @@ public class FpdFileContents {
         while (li.hasNext()) {
             FvImagesDocument.FvImages.FvImage fi = li.next();
             if (fi.getType().toString().equals("ImageName")) {
-                for (int i = 0; i < fvNames.length; ++i) {
-                    fi.addFvImageNames(fvNames[i]);
-                }
+                addFvImageNamesInFvImage (fi, fvNames);
                 return;
             }
         }
-        genFvImagesFvImage (fvNames, "ImageName", null);
+        genFvImagesFvImage (fvNames, "ImageName", null);    
+    }
+    
+    public void addFvImageNamesInFvImage (FvImagesDocument.FvImages.FvImage fi, String[] fvNames) {
         
+        for (int i = 0; i < fvNames.length; ++i) {
+            fi.addFvImageNames(fvNames[i]);
+        }
+    }
+    
+    public void addFvImageNamesInFvImage (int i, String[] fvNames) {
+        XmlObject o = getfpdFlash().getFvImages();
+        if (o == null) {
+            return;
+        }
+        XmlCursor cursor = o.newCursor();
+        QName qFvImage = new QName(xmlNs, "FvImage");
+        if (cursor.toChild(qFvImage)) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling(qFvImage);
+            }
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)cursor.getObject();
+            addFvImageNamesInFvImage(fi, fvNames);
+        }
+        cursor.dispose();
     }
     
     public void genFvImagesFvImage(String[] names, String types, Map<String, String> options) {
@@ -2706,6 +2727,22 @@ public class FpdFileContents {
         }
     }
     
+    public void updateFvImageNamesInFvImage (int i, String oldFvName, String newFvName) {
+        XmlObject o = getfpdFlash().getFvImages();
+        if (o == null) {
+            return;
+        }
+        XmlCursor cursor = o.newCursor();
+        QName qFvImage = new QName(xmlNs, "FvImage");
+        if (cursor.toChild(qFvImage)) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling(qFvImage);
+            }
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)cursor.getObject();
+            updateFvImageNamesInFvImage (fi, oldFvName, newFvName);
+        }
+        cursor.dispose();
+    }
     /**
      * @param fi
      * @param oldFvName The FV Name to be replaced.
@@ -2723,7 +2760,7 @@ public class FpdFileContents {
                         cursor.setTextValue(newFvName);
                     }
                     else {
-                            cursor.removeXml();
+                        cursor.removeXml();
                     }
                 }
             }while (cursor.toNextSibling(qFvImageNames));
@@ -2870,6 +2907,22 @@ public class FpdFileContents {
         }
     }
     
+    public void removeFvImageNameValue (int i, String attributeName) {
+        XmlObject o = getfpdFlash().getFvImages();
+        if (o == null) {
+            return;
+        }
+        XmlCursor cursor = o.newCursor();
+        QName qFvImage = new QName(xmlNs, "FvImage");
+        if (cursor.toChild(qFvImage)) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling(qFvImage);
+            }
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)cursor.getObject();
+            removeFvImageNameValue (fi, attributeName);
+        }
+        cursor.dispose();
+    }
     /**Remove from fi the attribute pair with attributeName in FvImageOptions.
      * @param fi
      * @param attributeName
@@ -2953,6 +3006,23 @@ public class FpdFileContents {
         
     }
     
+    public void setFvImagesFvImageNameValue (int i, String name, String value) {
+        XmlObject o = getfpdFlash().getFvImages();
+        if (o == null) {
+            return;
+        }
+        XmlCursor cursor = o.newCursor();
+        QName qFvImage = new QName(xmlNs, "FvImage");
+        if (cursor.toChild(qFvImage)) {
+            for (int j = 0; j < i; ++j) {
+                cursor.toNextSibling(qFvImage);
+            }
+            FvImagesDocument.FvImages.FvImage fi = (FvImagesDocument.FvImages.FvImage)cursor.getObject();
+            setFvImagesFvImageNameValue (fi, name, value, null);
+        }
+        cursor.dispose();
+    }
+    
     /**Add to FvImage the name-value pair, or replace old name with newName, or generate new name-value pair if not exists before.
      * @param fi
      * @param name
@@ -2961,6 +3031,12 @@ public class FpdFileContents {
      */
     public void setFvImagesFvImageNameValue (FvImagesDocument.FvImages.FvImage fi, String name, String value, String newName) {
         if (fi.getFvImageOptions() == null || fi.getFvImageOptions().getNameValueList() == null) {
+            FvImagesDocument.FvImages.FvImage.FvImageOptions.NameValue nv = fi.addNewFvImageOptions().addNewNameValue();
+            nv.setName(name);
+            nv.setValue(value);
+            if (newName != null) {
+                nv.setName(newName);
+            }
             return;
         }
         
@@ -3013,7 +3089,7 @@ public class FpdFileContents {
         }
         
         int pos = -1;
-        String[] fvNameArray = fvNameList.split(" ");
+        String[] fvNameArray = fvNameList.trim().split(" ");
         Vector<String> vFvNames = new Vector<String>();
         
         
