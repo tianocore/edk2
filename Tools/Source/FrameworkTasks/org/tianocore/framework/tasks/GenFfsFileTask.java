@@ -113,7 +113,12 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
     /// The path of Framewor_Tools_Paht.
     ///
     static String path = "";  
- 
+    
+    ///
+    /// Gensection
+    ///
+    List<GenSectionTask> genSectList = new ArrayList<GenSectionTask>();
+    
     /**
       execute
       
@@ -930,5 +935,16 @@ public class GenFfsFileTask extends Task implements EfiDefine, FfsTypes {
             throw new BuildException (e.getMessage());
         }
 
+    }
+    
+    /**
+      addGenSection
+      
+      This function is to add gensection instance to list
+      
+      @param task    Instance of GenSectionTask
+    **/
+    public void addGenSection (GenSectionTask task){
+        this.sectionList.add(task);
     }
 }

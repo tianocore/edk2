@@ -238,7 +238,9 @@ public class FfsProcess {
     **/
     private void dealSections(int mode, Document doc, Element root, XmlCursor cursor, Vector<String> list) {
         String type = cursor.getAttributeText(new QName("EncapsulationType"));
-        if (type == null) {
+        String toolName = cursor.getAttributeText(new QName("ToolName"));
+        String sectType = cursor.getAttributeText(new QName("SectionType"));
+        if (type == null && sectType == null) {
             if (cursor.toFirstChild()) {
                 do {
                     if (cursor.getName().getLocalPart().equalsIgnoreCase("Section")) {
@@ -255,33 +257,69 @@ public class FfsProcess {
             return;
         }
         Element ele;
-        if (type.equalsIgnoreCase("COMPRESS")) {
+        Element toolEle = null;
+        if (type.equalsIgnoreCase("COMPRESS") && (toolName == null || toolName.equalsIgnoreCase(""))) {
             mode = MODE_COMPRESS;
             //
-            // <compress compressName = "dummy">
-            //
-            ele = doc.createElement("compress");
-            ele.setAttribute("compressName", "dummy");
+            // <gensection sectiontype="EFI_SECTION_COMPRESSION">   
+            // 
+            ele = doc.createElement("gensection");
+            ele.setAttribute("sectionType", "EFI_SECTION_COMPRESSION");
+            
         } else {
             mode = MODE_GUID_DEFINED;
+            //
+            // <gensection sectiontype="EFI_SECTION_GUID_DEFINED">
+            // 
+            ele = doc.createElement("gensection");
+            if (type != null) {
+                ele.setAttribute("sectiontype", "EFI_SECTION_GUID_DEFINED");
+            } else {
+                ele.setAttribute("sectiontype", sectType);
+            }
             //
             // <tool toolName="${OEMTOOLPATH}\toolname"
             // outputPath = "${DEST_DIR_OUTPUT}">
             //
-            ele = doc.createElement("tool");
-            ele.setAttribute("toolName", "${WORKSPACE_DIR}" + File.separatorChar + "Tools" + File.separatorChar + "bin"
+            toolEle = doc.createElement("tool");
+            if (toolName == null || toolName.equalsIgnoreCase("")) {
+                toolEle.setAttribute("toolName", "${WORKSPACE_DIR}" + File.separatorChar + "Tools" + File.separatorChar + "bin"
                                          + File.separatorChar + "GenCRC32Section");
-            ele.setAttribute("outputPath", "${DEST_DIR_OUTPUT}");
+            }else{
+                File toolExe = new File(toolName);
+                //
+                //  If <Tool> element exist, add sub element under <tool> . 
+                // 
+                if (toolExe.isAbsolute()) {
+                    toolEle.setAttribute("toolName", toolName);
+                } else {
+                    toolEle.setAttribute("toolName", "${WORKSPACE_DIR}" + File.separatorChar + "Tools" + File.separatorChar + "bin"
+                                         + File.separatorChar + toolName);
+                }
+            }
+            
+            toolEle.setAttribute("outputPath", "${DEST_DIR_OUTPUT}");
+            ele.appendChild(toolEle);
         }
         if (cursor.toFirstChild()) {
             do {
                 if (cursor.getName().getLocalPart().equalsIgnoreCase("Section")) {
                     cursor.push();
-                    dealSection(mode, doc, ele, cursor, list);
+                    if (toolEle == null) {
+                        dealSection(mode, doc, ele, cursor, list);
+                    } else {
+                        dealSection(mode, doc, toolEle, cursor, list);
+                    }
+                    
                     cursor.pop();
                 } else if (cursor.getName().getLocalPart().equalsIgnoreCase("Sections")) {
                     cursor.push();
-                    dealSections(mode, doc, ele, cursor, list);
+                    if (toolEle == null) {
+                        dealSections(mode, doc, ele, cursor, list);
+                    } else {
+                        dealSections(mode, doc, toolEle, cursor, list);
+                    }
+                    
                     cursor.pop();
                 }
             } while (cursor.toNextSibling());

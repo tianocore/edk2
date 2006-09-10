@@ -16,7 +16,12 @@
 
 package org.tianocore.framework.tasks;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -24,8 +29,9 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
+import org.tianocore.common.logger.EdkLog;
 
-public class GenSectionTask extends Task implements EfiDefine {
+public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes {
     ///
     /// inputfile name
     ///
@@ -50,7 +56,11 @@ public class GenSectionTask extends Task implements EfiDefine {
     /// interface string
     ///
     private String interfaceString = "";
-
+    ///
+    /// Section file list
+    ///
+    private List<Section> sectFileList = new ArrayList<Section>();
+   
     /**
       execute
       
@@ -74,7 +84,7 @@ public class GenSectionTask extends Task implements EfiDefine {
         //
         // argument of tools
         //
-        String argument = inputFile + outputFile + sectionType + versionNum
+        String argument = inputFile + outputFile + " -s "+ sectionType + versionNum
                 + interfaceString;
         //
         // return value of gensection execution
@@ -93,8 +103,8 @@ public class GenSectionTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
 
-            log(inputFileName);
-            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
+            EdkLog.log(this, EdkLog.EDK_INFO, inputFileName);
+            EdkLog.log(this, EdkLog.EDK_DEBUG, Commandline.toString(cmdline.getCommandline()));
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 log("GenSection succeeded!", Project.MSG_VERBOSE);
@@ -173,7 +183,7 @@ public class GenSectionTask extends Task implements EfiDefine {
       @param sectionType              section type
     **/
     public void setSectionType(String sectionType) {
-        this.sectionType = " -s " + sectionType;
+        this.sectionType = sectionType;
     }
 
     /**
@@ -214,5 +224,149 @@ public class GenSectionTask extends Task implements EfiDefine {
     **/
     public void setInterfaceString(String interfaceString) {
         this.interfaceString = " -a " + "\"" + interfaceString + "\"";
+    }
+    
+    /**
+      addSectFile
+      
+      This function is to add sectFile to list.
+      
+      @param sectFile     instance of sectFile.
+    **/
+    public void addSectFile(SectFile sectFile){
+        this.sectFileList.add(sectFile);
+    }
+
+    /**
+      setTool
+      
+      This function is to set the class member "Tool";
+      
+      @param tool 
+    **/
+    public void addTool(Tool tool) {
+        this.sectFileList.add(tool);
+    }
+    
+    /**
+      addGenSection
+      
+      This function is to add GenSectin element to list
+      @param task         Instance of genSection
+    **/
+    public void addGenSection(GenSectionTask task){
+        this.sectFileList.add(task);
+    }
+    
+    public void toBuffer(DataOutputStream buffer){
+        //
+        //  Search SectionList find earch section and call it's 
+        //  ToBuffer function.
+        //
+        if (this.sectionType.equalsIgnoreCase("EFI_SECTION_COMPRESSION")){
+            Section    sect;
+            
+            //
+            //  Get section file in compress node.
+            //
+            try{
+                ByteArrayOutputStream bo = new ByteArrayOutputStream ();
+                DataOutputStream Do = new DataOutputStream (bo);
+                
+                //
+                //  Get each section which under the compress {};
+                //  And add it is contains to File;
+                //
+                Iterator SectionIter = this.sectFileList.iterator();
+                while (SectionIter.hasNext()){
+                    sect = (Section)SectionIter.next();
+                    
+                    //
+                    //  Call each section class's toBuffer function.
+                    //
+                    try {
+                        sect.toBuffer(Do);
+                    }
+                    catch (BuildException e) {
+                        System.out.print(e.getMessage());
+                        throw new BuildException ("Compress.toBuffer failed at section");
+                    }    
+                                
+                }
+                Do.close();    
+                
+                //
+                //  Call compress
+                //
+                byte[] fileBuffer = bo.toByteArray();
+                Compress myCompress = new Compress(fileBuffer, fileBuffer.length);            
+                
+                //
+                //  Add Compress header
+                //
+                CompressHeader Ch        = new CompressHeader();
+                Ch.SectionHeader.Size[0] = (byte)((myCompress.outputBuffer.length +
+                                                   Ch.GetSize()) &
+                                                   0xff
+                                                  );
+                Ch.SectionHeader.Size[1] = (byte)(((myCompress.outputBuffer.length + 
+                                                    Ch.GetSize())&
+                                                   0xff00) >> 8
+                                                  );
+                Ch.SectionHeader.Size[2] = (byte)(((myCompress.outputBuffer.length + 
+                                                    Ch.GetSize()) & 
+                                                   0xff0000) >> 16
+                                                 );
+                Ch.SectionHeader.type    = (byte) EFI_SECTION_COMPRESSION;
+                
+                //
+                //  Note: The compressName was not efsfective now. Using the
+                //  EFI_STANDARD_COMPRSSION for compressType .
+                //  That is follow old Genffsfile tools. Some code will be added for 
+                //  the different compressName;
+                //
+                Ch.UncompressLen         = fileBuffer.length;
+                Ch.CompressType          = EFI_STANDARD_COMPRESSION; 
+                
+                //
+                //  Change header struct to byte buffer
+                //
+                byte [] headerBuffer = new byte[Ch.GetSize()];
+                Ch.StructToBuffer(headerBuffer);
+                
+                //
+                //  First add CompressHeader to Buffer, then add Compress data.
+                //
+                buffer.write (headerBuffer);
+                buffer.write(myCompress.outputBuffer);            
+                    
+                //
+                //  Buffer 4 Byte aligment 
+                //
+                int size = Ch.GetSize() + myCompress.outputBuffer.length;
+                
+                while ((size & 0x03) != 0){
+                    size ++;
+                    buffer.writeByte(0);
+                }
+            }
+            catch (Exception e){
+                throw new BuildException("compress.toBuffer failed!\n");
+            }    
+        } else {
+            Section sect;
+            Iterator sectionIter = this.sectFileList.iterator();
+            while (sectionIter.hasNext()) {
+                sect = (Section)sectionIter.next(); 
+                try {
+                    //
+                    //  The last section don't need 4 byte ffsAligment.
+                    //
+                    sect.toBuffer(buffer);
+                } catch (Exception e) {
+                    throw new BuildException (e.getMessage());
+                }
+            }
+        }
     }
 }
