@@ -88,9 +88,10 @@ public final class SourceFileReplacer implements Common.ForDoAll {
     private class CLaplace extends Common.Laplace {
         public  String operation(String wholeline) {
             boolean addr8 = false;
-
             // remove EFI_DRIVER_ENTRY_POINT
-            wholeline = wholeline.replaceAll("(EFI_\\w+_ENTRY_POINT)", MigrationTool.MIGRATIONCOMMENT + " $1");
+            wholeline = wholeline.replaceAll("(EFI_[A-Z]+_ENTRY_POINT\\s*\\(\\s*" + mi.entrypoint + "\\s*\\)\\s*;)", MigrationTool.MIGRATIONCOMMENT + " $1");
+            // redefine module entry point for some self-relocated modules
+            wholeline = wholeline.replaceAll (mi.entrypoint + "([^{]*?})", "_ModuleEntryPoint" + "$1");
             // remove R8 library contractor
             wholeline = wholeline.replaceAll ("(\\b(?:Efi|Dxe)InitializeDriverLib\\b)", MigrationTool.MIGRATIONCOMMENT + " $1");
             // Add Library Class for potential reference of gBS, gRT & gDS.
