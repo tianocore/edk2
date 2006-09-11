@@ -35,6 +35,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         "BuildResourceDescriptorHob",
         "BuildFvHob",
         "BuildCpuHob",
+        "BuildGuidDataHob",
         "BuildStackHob",
         "BuildBspStoreHob",
         "BuildMemoryAllocationHob"

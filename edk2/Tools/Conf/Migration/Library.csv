@@ -159,7 +159,7 @@ PeiLib,LShiftU64,LShiftU64,BaseLib,MdePkg
 PeiLib,MultU64x32,MultU64x32,BaseLib,MdePkg
 PeiLib,PeiBuildHobModule,BuildModuleHob#%,HobLib,MdePkg
 PeiLib,PeiBuildHobResourceDescriptor,BuildResourceDescriptorHob#%,HobLib,MdePkg
-PeiLib,PeiBuildHobGuid,BuildGuidHob#%,HobLib,MdePkg
+PeiLib,PeiBuildHobGuid,R8_PeiBuildHobGuid#%,%,MdePkg
 PeiLib,PeiBuildHobGuidData,BuildGuidDataHob#%,HobLib,MdePkg
 PeiLib,PeiBuildHobFv,BuildFvHob#%,HobLib,MdePkg
 PeiLib,PeiBuildHobCpu,BuildCpuHob#%,HobLib,MdePkg
