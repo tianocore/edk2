@@ -33,6 +33,7 @@ import javax.swing.JRadioButton;
 import org.tianocore.frameworkwizard.common.DataType;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.far.FarIdentification;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
@@ -174,7 +175,7 @@ public class DeleteStepTwo extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Delete Framework Archive(FAR) - Step 2: Choose Delete Mode");
+        this.setTitle(FarStringDefinition.DELETE_STEP_TWO_TITLE);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2);
     }

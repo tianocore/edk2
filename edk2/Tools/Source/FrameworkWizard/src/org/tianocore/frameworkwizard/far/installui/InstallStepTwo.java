@@ -41,6 +41,7 @@ import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.far.Far;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.Workspace;
@@ -287,7 +288,7 @@ public class InstallStepTwo extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Install Framework Archive(FAR) - Step 2: Set Path for Packages and Platforms");
+        this.setTitle(FarStringDefinition.INSTALL_STEP_TWO_TITLE);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2);
     }

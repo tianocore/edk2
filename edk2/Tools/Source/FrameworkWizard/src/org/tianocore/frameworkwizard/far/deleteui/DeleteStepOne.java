@@ -35,6 +35,7 @@ import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.far.AggregationOperation;
 import org.tianocore.frameworkwizard.far.FarIdentification;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 import org.tianocore.frameworkwizard.far.PackageQuery;
 import org.tianocore.frameworkwizard.far.PackageQueryInterface;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
@@ -253,7 +254,7 @@ public class DeleteStepOne extends IDialog implements ListSelectionListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Delete Framework Archive(FAR) - Step 1: Choose FAR from framework database");
+        this.setTitle(FarStringDefinition.DELETE_STEP_ONE_TITLE);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2);
     }
