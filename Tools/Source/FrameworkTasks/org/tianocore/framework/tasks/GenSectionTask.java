@@ -299,6 +299,8 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
                 //  Call compress
                 //
                 byte[] fileBuffer = bo.toByteArray();
+                
+                synchronized (CompressSection.semaphore) {
                 Compress myCompress = new Compress(fileBuffer, fileBuffer.length);            
                 
                 //
@@ -348,6 +350,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
                 while ((size & 0x03) != 0){
                     size ++;
                     buffer.writeByte(0);
+                }
                 }
             }
             catch (Exception e){
