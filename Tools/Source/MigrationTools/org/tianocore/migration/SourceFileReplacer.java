@@ -89,27 +89,20 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         public  String operation(String wholeline) {
             boolean addr8 = false;
 
-            Pattern pat = Pattern.compile("g?(BS|RT)(\\s*->\\s*)([a-zA-Z_]\\w*)", Pattern.MULTILINE);                    // ! only two level () bracket allowed !
-            //Pattern ptnpei = Pattern.compile("\\(\\*\\*?PeiServices\\)[.-][>]?\\s*(\\w*[#$]*)(\\s*\\(([^\\(\\)]*(\\([^\\(\\)]*\\))?[^\\(\\)]*)*\\))", Pattern.MULTILINE);
-
-            // replace BS -> gBS , RT -> gRT
-            Matcher mat = pat.matcher(wholeline);
-            if (mat.find()) {                                                // add a library here
-                MigrationTool.ui.println("Converting all BS->gBS, RT->gRT");
-                wholeline = mat.replaceAll("g$1$2$3");                            //unknown correctiveness
-            }
-            mat.reset();
-            while (mat.find()) {
-                if (mat.group(1).matches("BS")) {
-                    mi.hashrequiredr9libs.add("UefiBootServicesTableLib");
-                }
-                if (mat.group(1).matches("RT")) {
-                    mi.hashrequiredr9libs.add("UefiRuntimeServicesTableLib");
-                }
-            }
             // remove EFI_DRIVER_ENTRY_POINT
             wholeline = wholeline.replaceAll("(EFI_\\w+_ENTRY_POINT)", MigrationTool.MIGRATIONCOMMENT + " $1");
-            
+            // remove R8 library contractor
+            wholeline = wholeline.replaceAll ("(\\b(?:Efi|Dxe)InitializeDriverLib\\b)", MigrationTool.MIGRATIONCOMMENT + " $1");
+            // Add Library Class for potential reference of gBS, gRT & gDS.
+            if (Common.find (wholeline, "\\bg?BS\\b")) {
+                mi.hashrequiredr9libs.add("UefiBootServicesTableLib");
+            }
+            if (Common.find (wholeline, "\\bg?RT\\b")) {
+                mi.hashrequiredr9libs.add ("UefiRuntimeServicesTableLib");
+            }
+            if (Common.find (wholeline, "\\bgDS\\b")) {
+                mi.hashrequiredr9libs.add ("DxeServicesTableLib");
+            }
             // start replacing names
             String r8thing;
             String r9thing;
@@ -118,17 +111,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
             it = mi.hashnonlocalfunc.iterator();
             while (it.hasNext()) {
                 r8thing = it.next();
-                if (r8thing.matches("EfiInitializeDriverLib")) {                    //s
-                    mi.hashrequiredr9libs.add("UefiBootServicesTableLib");            //p
-                    mi.hashrequiredr9libs.add("UefiRuntimeServicesTableLib");        //e
-                } else if (r8thing.matches("DxeInitializeDriverLib")) {                //c
-                    mi.hashrequiredr9libs.add("UefiBootServicesTableLib");            //i
-                    mi.hashrequiredr9libs.add("UefiRuntimeServicesTableLib");        //a
-                    mi.hashrequiredr9libs.add("DxeServicesTableLib");                //l
-                } else {                                                            //
-                    mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));                // add a library here
-                }
-
+                mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));                // add a library here
+ 
                 r8tor9 temp;
                 if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {
                     if (!r8thing.equals(r9thing)) {
