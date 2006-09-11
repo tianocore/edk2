@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Property;
@@ -52,107 +53,106 @@ public class GenBuildThread implements Runnable {
 
     private Thread thread;
 
-    public GenBuildThread() {
-        thread = new Thread(this);
+    public GenBuildThread(ModuleIdentification moduleId, String arch) {
+        this.moduleId = moduleId;
+        this.arch = arch;
+        thread = new Thread(FpdParserForThread.tg, this, moduleId + ":" + arch);
     }
 
     public boolean start() {
         if (highPriority) {
             thread.setPriority(Thread.MAX_PRIORITY);
         }
-        
+
         status = FpdParserForThread.STATUS_START_RUN;
         thread.start();
         return true;
     }
 
     public void run() {
-        
+
         FpdModuleIdentification fpdModuleId = new FpdModuleIdentification(moduleId, arch);
-
-        //
-        // Prepare pass down properties
-        // ARCH, MODULE_GUID, MODULE_VERSION, PACKAGE_GUID, PACKAGE_VERSION, PLATFORM_FILE
-        //
-        Vector<Property> properties = new Vector<Property>();
-        Property property = new Property();
-        property.setName("ARCH");
-        property.setValue(arch);
-        properties.add(property);
-
-        property = new Property();
-        property.setName("MODULE_GUID");
-        property.setValue(moduleId.getGuid());
-        properties.add(property);
-
-        property = new Property();
-        property.setName("MODULE_VERSION");
-        if (moduleId.getVersion() == null) {
-            property.setValue("");
-        } else {
-            property.setValue(moduleId.getVersion());
-        }
-        properties.add(property);
-
-        property = new Property();
-        property.setName("PACKAGE_GUID");
-        property.setValue(moduleId.getPackage().getGuid());
-        properties.add(property);
-
-        property = new Property();
-        property.setName("PACKAGE_VERSION");
-        if (moduleId.getPackage().getVersion() == null) {
-            property.setValue("");
-        } else {
-            property.setValue(moduleId.getPackage().getVersion());
-        }
-        properties.add(property);
-
-        //      property = new Property();
-        //      property.setName("PLATFORM_FILE");
-        //      property.setValue(arch);
-        //      properties.add(property);
-
-        //
-        // Build the Module
-        //
-        GenBuildTask genBuildTask = new GenBuildTask();
-
-        Project newProject = new Project();
-
-        Hashtable passdownProperties = project.getProperties();
-        Iterator iter = passdownProperties.keySet().iterator();
-        while (iter.hasNext()) {
-            String item = (String) iter.next();
-            newProject.setProperty(item, (String) passdownProperties.get(item));
-        }
-
-        newProject.setInputHandler(project.getInputHandler());
-
-        Iterator listenerIter = project.getBuildListeners().iterator();
-        while (listenerIter.hasNext()) {
-            BuildListener item = (BuildListener) listenerIter.next();
+        
+        try {
+            //
+            // Prepare pass down properties
+            // ARCH, MODULE_GUID, MODULE_VERSION, PACKAGE_GUID, PACKAGE_VERSION, PLATFORM_FILE
+            //
+            Vector<Property> properties = new Vector<Property>();
+            Property property = new Property();
+            property.setName("ARCH");
+            property.setValue(arch);
+            properties.add(property);
+    
+            property = new Property();
+            property.setName("MODULE_GUID");
+            property.setValue(moduleId.getGuid());
+            properties.add(property);
+    
+            property = new Property();
+            property.setName("MODULE_VERSION");
+            if (moduleId.getVersion() == null) {
+                property.setValue("");
+            } else {
+                property.setValue(moduleId.getVersion());
+            }
+            properties.add(property);
+    
+            property = new Property();
+            property.setName("PACKAGE_GUID");
+            property.setValue(moduleId.getPackage().getGuid());
+            properties.add(property);
+    
+            property = new Property();
+            property.setName("PACKAGE_VERSION");
+            if (moduleId.getPackage().getVersion() == null) {
+                property.setValue("");
+            } else {
+                property.setValue(moduleId.getPackage().getVersion());
+            }
+            properties.add(property);
+    
+            //
+            // Build the Module
+            //
+            GenBuildTask genBuildTask = new GenBuildTask();
+    
+            Project newProject = new Project();
+    
+            Hashtable passdownProperties = project.getProperties();
+            Iterator iter = passdownProperties.keySet().iterator();
+            while (iter.hasNext()) {
+                String item = (String) iter.next();
+                newProject.setProperty(item, (String) passdownProperties.get(item));
+            }
+    
+            newProject.setInputHandler(project.getInputHandler());
+    
+            Iterator listenerIter = project.getBuildListeners().iterator();
+            while (listenerIter.hasNext()) {
+                newProject.addBuildListener((BuildListener)listenerIter.next());
+            }
+    
+            project.initSubProject(newProject);
+    
+            genBuildTask.setProject(newProject);
+    
+            genBuildTask.setExternalProperties(properties);
+    
+            genBuildTask.parentId = parentModuleId;
+    
+            genBuildTask.execute();
+        } catch (BuildException be) {
+            FpdParserForThread.tg.interrupt();
+            EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, moduleId + " with Arch " + arch +" build error. \n" + be.getMessage());
+            FpdParserForThread.isError = true; 
             
-//            if (item instanceof BuildLogger) {
-//                BuildLogger newLogger = new GenBuildLogger(newProject);
-//                BuildLogger oldLogger = (BuildLogger)item;
-//                newLogger.setEmacsMode(true);
-//                EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, "########");
-//            } else {
-                newProject.addBuildListener(item);
-//            }
+            synchronized (FpdParserForThread.deamonSemaphore) {
+                FpdParserForThread.deamonSemaphore.notifyAll();
+            }
+            return ;
         }
-
-        project.initSubProject(newProject);
-
-        genBuildTask.setProject(newProject);
-
-        genBuildTask.setExternalProperties(properties);
-
-        genBuildTask.parentId = parentModuleId;
-
-        genBuildTask.perform();
-
+        
         status = FpdParserForThread.STATUS_END_RUN;
 
         EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, fpdModuleId + " build finished. ");

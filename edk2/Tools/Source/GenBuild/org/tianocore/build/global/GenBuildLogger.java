@@ -49,6 +49,8 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     /// true means to cache.
     ///
     private static boolean flag = false;
+    
+    private static boolean enableFlag = true;
 
     private static Map<Identification, List<String>> map = new HashMap<Identification, List<String> >(256);
     
@@ -148,6 +150,9 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     }
     
     public void messageLogged(BuildEvent event) {
+        if (!enableFlag) {
+            return ;
+        }
         int currentLevel = event.getPriority();
         //
         // If current level is upper than Ant Level, skip it
@@ -199,6 +204,10 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     
     public static void setCacheEnable(boolean enable) {
         flag = enable;
+    }
+    
+    public static void maskAllLog(boolean enable) {
+        enableFlag = !enable;
     }
     
     protected synchronized void log(String message) {
