@@ -1105,3 +1105,46 @@ Returns:
 }
 ////~
 
+////#HobLib
+EFI_STATUS
+R8_PeiBuildHobGuid (
+  IN  EFI_GUID          *Guid,
+  IN  UINTN             DataLength,
+  OUT VOID              **Hob
+  )
+/*++
+
+Routine Description:
+
+  Builds a custom HOB that is tagged with a GUID for identification
+
+Arguments:
+
+  Guid        - The GUID of the custome HOB type
+  DataLength  - The size of the data payload for the GUIDed HOB
+  Hob         - Pointer to pointer to the created Hob
+
+Returns:
+
+  EFI_SUCCESS - Hob is successfully built.
+  Others      - Errors occur while creating new Hob
+
+--*/
+{
+  //
+  // Porting Guide: Apply the new interface of BuildGuidHob in R9 HobLib.
+  // Pay attention that the return value has been changed to the start address of
+  // GUID HOB data so that caller can fill the customized data. 
+  // For BuildGuidHob (), the HOB Header and Name field is already stripped..
+  //
+  VOID   *HobData; 
+
+  HobData = BuildGuidHob (Guid, DataLength);
+  //
+  // This step is necessary to be compatible with R8 interface!
+  //
+  *Hob    = (VOID *) ((UINT8 *) HobData - sizeof (EFI_HOB_GUID_TYPE)); 
+
+  return EFI_SUCCESS; 
+}
+////~
