@@ -2,8 +2,6 @@ R8.5LibClass,R8.5Lib,R9Lib,R9LibClass,Package
 EfiDriverLib,EfiCopyMem,CopyMem,BaseMemoryLib,MdePkg
 EfiDriverLib,EfiSetMem,SetMem,BaseMemoryLib,MdePkg
 EfiDriverLib,EfiZeroMem,ZeroMem,BaseMemoryLib,MdePkg
-EfiDriverLib,EfiInitializeDriverLib,//EfiInitializeDriverLib,UefiBootServicesTableLib; UefiRuntimeServicesTableLib,MdePkg
-EfiDriverLib,DxeInitializeDriverLib,//DxeInitializeDriverLib,UefiBootServicesTableLib; UefiRuntimeServicesTableLib; DxeServicesTableLib,MdePkg
 EfiDriverLib,EfiLibInstallDriverBinding,R8_EfiLibInstallDriverBinding,%,MdePkg
 EfiDriverLib,EfiLibInstallAllDriverProtocols,R8_EfiLibInstallAllDriverProtocols,%,MdePkg
 EfiDriverLib,EfiLibCompareLanguage,R8_EfiLibCompareLanguage,%,MdePkg

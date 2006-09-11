@@ -37,6 +37,11 @@ public final class Common {
         return line;
     }
 
+    public static final boolean find (String line, String regex) {
+        Pattern ptn = Pattern.compile(regex);
+
+        return ptn.matcher (line).find (); 
+    }
     //-------------------------------------regex------------------------------------------//
     
     //-----------------------------------file&string---------------------------------------//
