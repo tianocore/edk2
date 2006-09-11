@@ -29,6 +29,7 @@ import javax.swing.JTextArea;
 import org.tianocore.frameworkwizard.common.Log;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
@@ -84,8 +85,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
         if (jTextArea == null) {
             jTextArea = new JTextArea();
             jTextArea.setBounds(new java.awt.Rectangle(30, 7, 642, 50));
-            jTextArea.setText("Step 1: Choose Packages and Platforms\n");
-            jTextArea.append("Choose at least one package or platform. ");
+            jTextArea.setText("Choose at least one package or platform. ");
             jTextArea.setEditable(false);
         }
         return jTextArea;
@@ -209,7 +209,7 @@ public class CreateStepTwo extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Create Framework Archive(FAR) - Step 2: Choose Packages and Platform");
+        this.setTitle(FarStringDefinition.CREATE_STEP_TWO_TITLE);
         this.centerWindow();
     }
 

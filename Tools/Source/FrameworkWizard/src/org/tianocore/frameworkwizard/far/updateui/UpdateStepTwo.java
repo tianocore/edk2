@@ -41,6 +41,7 @@ import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.far.AggregationOperation;
 import org.tianocore.frameworkwizard.far.DistributeRule;
 import org.tianocore.frameworkwizard.far.Far;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 import org.tianocore.frameworkwizard.platform.PlatformIdentification;
 import org.tianocore.frameworkwizard.workspace.Workspace;
@@ -220,7 +221,7 @@ public class UpdateStepTwo extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Update Framework Archive(FAR) - Step 2: Summary");
+        this.setTitle(FarStringDefinition.UPDATE_STEP_TWO_TITLE);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2);
     }

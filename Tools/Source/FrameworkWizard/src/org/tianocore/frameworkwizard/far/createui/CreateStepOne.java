@@ -30,6 +30,7 @@ import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.far.FarHeader;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 
 public class CreateStepOne extends IDialog implements MouseListener {
 
@@ -397,7 +398,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 425);
         this.setContentPane(getJScrollPane());
-        this.setTitle("Create Framework Archive(FAR) - Step 1: Set FAR's baseic information");
+        this.setTitle(FarStringDefinition.CREATE_STEP_ONE_TITLE);
         this.centerWindow();
     }
 
@@ -600,7 +601,7 @@ public class CreateStepOne extends IDialog implements MouseListener {
             // Add some logic process here
             //
             if (!valid()) {
-                return;
+                return ;
             }
             if (stepTwo == null) {
                 stepTwo = new CreateStepTwo(this, true, this);

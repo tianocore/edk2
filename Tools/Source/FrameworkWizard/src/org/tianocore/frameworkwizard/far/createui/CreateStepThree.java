@@ -26,6 +26,8 @@ import javax.swing.JLabel;
 
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.iCheckBoxList.ICheckBoxList;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
+
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
@@ -76,8 +78,7 @@ public class CreateStepThree extends IDialog implements MouseListener {
         if (jTextArea == null) {
             jTextArea = new JTextArea();
             jTextArea.setBounds(new java.awt.Rectangle(30, 7, 642, 50));
-            jTextArea.setText("Step 2: Set File Filter\n");
-            jTextArea.append("Add more file filter regular expressions in text field separated with space. \n");
+            jTextArea.setText("Add more file filter regular expressions in text field separated with space. \n");
             jTextArea.append("Note that regular expressions please reference PERL language. ");
             jTextArea.setEditable(false);
         }
@@ -195,7 +196,7 @@ public class CreateStepThree extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Create Framework Archive(FAR) - Step 3: Set File Filter");
+        this.setTitle(FarStringDefinition.CREATE_STEP_THREE_TITLE);
         this.centerWindow();
     }
 

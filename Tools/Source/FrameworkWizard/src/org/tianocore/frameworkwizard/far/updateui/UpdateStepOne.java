@@ -36,6 +36,7 @@ import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.common.ui.IFrame;
 import org.tianocore.frameworkwizard.far.Far;
 import org.tianocore.frameworkwizard.far.FarIdentification;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 import org.tianocore.frameworkwizard.workspace.Workspace;
 import org.tianocore.frameworkwizard.workspace.WorkspaceTools;
 
@@ -200,7 +201,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Update Framework Archive(FAR) - Step 1: Choose FAR File");
+        this.setTitle(FarStringDefinition.UPDATE_STEP_ONE_TITLE);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((d.width - this.getSize().width) / 2, (d.height - this.getSize().height) / 2);
     }
@@ -276,7 +277,7 @@ public class UpdateStepOne extends IDialog implements MouseListener {
             fc.addChoosableFileFilter(new IFileFilter(DataType.FAR_SURFACE_AREA_EXT));
             fc.setCurrentDirectory(new File(Workspace.getCurrentWorkspace()));
 
-            int result = fc.showSaveDialog(new JPanel());
+            int result = fc.showOpenDialog(new JPanel());
             if (result == JFileChooser.APPROVE_OPTION) {
                 this.jTextFieldFarFile.setText(Tools.addPathExt(fc.getSelectedFile().getPath(),
                                                                 DataType.RETURN_TYPE_FAR_SURFACE_AREA));

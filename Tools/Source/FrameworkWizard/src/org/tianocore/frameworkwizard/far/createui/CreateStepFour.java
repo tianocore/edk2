@@ -35,6 +35,7 @@ import org.tianocore.frameworkwizard.common.Tools;
 import org.tianocore.frameworkwizard.common.ui.IDialog;
 import org.tianocore.frameworkwizard.far.AggregationOperation;
 import org.tianocore.frameworkwizard.far.Far;
+import org.tianocore.frameworkwizard.far.FarStringDefinition;
 import org.tianocore.frameworkwizard.far.PackageQuery;
 import org.tianocore.frameworkwizard.far.PackageQueryInterface;
 import org.tianocore.frameworkwizard.packaging.PackageIdentification;
@@ -194,7 +195,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
     private void initialize() {
         this.setSize(700, 400);
         this.setContentPane(getJContentPane());
-        this.setTitle("Create Framework Archive(FAR) - Step 4: Finish");
+        this.setTitle(FarStringDefinition.CREATE_STEP_FOUR_TITLE);
         this.centerWindow();
     }
 
@@ -207,7 +208,7 @@ public class CreateStepFour extends IDialog implements MouseListener {
         if (jContentPane == null) {
             jLabel2 = new JLabel();
             jLabel2.setBounds(new java.awt.Rectangle(30,70,111,18));
-            jLabel2.setText("Select File to Save:  ");
+            jLabel2.setText("File to Save:  ");
             jLabel = new JLabel();
             jLabel.setBounds(new java.awt.Rectangle(29,108,320,20));
             jLabel.setText("This FAR will depend on following packages: ");
