@@ -62,9 +62,9 @@ TOOL_CHAIN_TAG        = MYTOOLS
 #                                             enabling multi-thread will bring much benefit. Otherwise, we 
 #                                             do not recommend to enable this. For multi-thread built, the
 #                                             log will write to ${BUILD_DIR}/build.log. 
-# MULTIPLE_THREAD       = Enable
+MULTIPLE_THREAD       = Enable
 
 # MAX_CONCURRENT_THREAD_NUMBER  NUMBER  Optional  The number of concurrent threads. Default is 2. Recommend to 
 #                                                 set this value to one more than the number of your compurter
 #                                                 cores or CPUs. 
-# MAX_CONCURRENT_THREAD_NUMBER = 2
+MAX_CONCURRENT_THREAD_NUMBER = 2
