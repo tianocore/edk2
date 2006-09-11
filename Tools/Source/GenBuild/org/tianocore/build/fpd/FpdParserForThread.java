@@ -45,9 +45,9 @@ public class FpdParserForThread extends FpdParserTask {
     
     List<String> queueList = new ArrayList<String>();
     
-    public static Object deamonSemaphore =  new Object();
+    public final static Object deamonSemaphore =  new Object();
     
-    static Object countSemaphore =  new Object();
+    private final static Object countSemaphore =  new Object();
     
     public static int STATUS_DEPENDENCY_NOT_READY = 1;
     
@@ -64,6 +64,10 @@ public class FpdParserForThread extends FpdParserTask {
     public static int totalNumber = 0;
     
     public static int remainNumber = 0;
+    
+    public static ThreadGroup tg = new ThreadGroup("Framework");
+    
+    public static boolean isError = false;
     
     /**
       Public construct method. It is necessary for ANT task.
@@ -227,6 +231,16 @@ public class FpdParserForThread extends FpdParserTask {
 
                 try {
                     deamonSemaphore.wait();
+                    if (isError) {
+                        GenBuildLogger.setCacheEnable(false);
+                        EdkLog.flushLogToFile(new File(buildDir + File.separatorChar + "build.log"));
+                        
+                        GenBuildLogger.maskAllLog(true);
+                        FpdParserForThread.tg.destroy();
+                        GenBuildLogger.maskAllLog(false);
+                        
+                        throw new BuildException("One thread error. ");
+                    }
                 } catch (InterruptedException ex) {
                     BuildException e = new BuildException("Thread wait Error. \n" + ex.getMessage());
                     e.setStackTrace(ex.getStackTrace());
@@ -234,6 +248,7 @@ public class FpdParserForThread extends FpdParserTask {
                 }
             }
         }
+        
         GenBuildLogger.setCacheEnable(false);
         //
         // call fvs, postbuild
@@ -277,10 +292,8 @@ public class FpdParserForThread extends FpdParserTask {
             //
             // Generate GenBuildThread
             //
-            GenBuildThread genBuildThread = new GenBuildThread();
-            genBuildThread.setArch(fpdModuleId.getArch());
+            GenBuildThread genBuildThread = new GenBuildThread(fpdModuleId.getModule(), fpdModuleId.getArch());
             genBuildThread.setParentModuleId(null);
-            genBuildThread.setModuleId(fpdModuleId.getModule());
             genBuildThread.setProject(getProject());
             
             Set<FpdModuleIdentification> dependencies = new LinkedHashSet<FpdModuleIdentification>();
@@ -305,10 +318,8 @@ public class FpdParserForThread extends FpdParserTask {
                 //
                 // Create thread for library instances
                 //
-                GenBuildThread liBuildThread = new GenBuildThread();
-                liBuildThread.setArch(fpdModuleId.getArch());
+                GenBuildThread liBuildThread = new GenBuildThread(libinstances[i], fpdModuleId.getArch());
                 liBuildThread.setParentModuleId(fpdModuleId.getModule());
-                liBuildThread.setModuleId(libinstances[i]);
                 liBuildThread.setProject(getProject());
                 liBuildThread.setStatus(STATUS_DEPENDENCY_READY);
                 liBuildThread.setHighPriority(true);
@@ -317,7 +328,8 @@ public class FpdParserForThread extends FpdParserTask {
                 updateFvs("libqueue", libFpdModuleId);
             }
             
-            genBuildThread.setDependencies(dependencies); 
+            genBuildThread.setDependencies(dependencies);
+            
 //            if (dependencies.size() == 0) {
                 genBuildThread.setStatus(STATUS_DEPENDENCY_READY);
 //            }
