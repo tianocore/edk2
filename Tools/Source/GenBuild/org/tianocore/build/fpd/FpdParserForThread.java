@@ -67,7 +67,7 @@ public class FpdParserForThread extends FpdParserTask {
     
     public static ThreadGroup tg = new ThreadGroup("Framework");
     
-    public static boolean isError = false;
+    public static FpdModuleIdentification errorModule = null;
     
     /**
       Public construct method. It is necessary for ANT task.
@@ -163,10 +163,7 @@ public class FpdParserForThread extends FpdParserTask {
         // Waiting for all thread over, or time out
         //
         synchronized (deamonSemaphore) {
-            //
-            // Initialize BUGBUG
-            //
-            
+
             while (true) {
                 //
                 // If all modules are already built
@@ -231,15 +228,22 @@ public class FpdParserForThread extends FpdParserTask {
 
                 try {
                     deamonSemaphore.wait();
-                    if (isError) {
+                    
+                    //
+                    // if find error. Let other threads to finish
+                    //
+                    if (errorModule != null) {
+                        while (currentRunNumber > 0) {
+                            deamonSemaphore.wait();
+                        }
+                        
                         GenBuildLogger.setCacheEnable(false);
+                        
+                        GenBuildLogger.flushErrorModuleLog(errorModule);
+                        
                         EdkLog.flushLogToFile(new File(buildDir + File.separatorChar + "build.log"));
                         
-                        GenBuildLogger.maskAllLog(true);
-                        FpdParserForThread.tg.destroy();
-                        GenBuildLogger.maskAllLog(false);
-                        
-                        throw new BuildException("One thread error. ");
+                        throw new BuildException(errorModule + " build error. ");
                     }
                 } catch (InterruptedException ex) {
                     BuildException e = new BuildException("Thread wait Error. \n" + ex.getMessage());
@@ -270,7 +274,6 @@ public class FpdParserForThread extends FpdParserTask {
         ant.execute();
         
         EdkLog.flushLogToFile(new File(buildDir + File.separatorChar + "build.log"));
-        
     }
 
     

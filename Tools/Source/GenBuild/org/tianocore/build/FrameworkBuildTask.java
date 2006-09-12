@@ -103,7 +103,7 @@ public class FrameworkBuildTask extends Task{
     ///
     /// The concurrent thread number
     ///
-    public static int MAX_CONCURRENT_THREAD_NUMBER = 1;
+    public static int MAX_CONCURRENT_THREAD_NUMBER = 2;
 
     ///
     /// there are three type: all (build), clean and cleanall

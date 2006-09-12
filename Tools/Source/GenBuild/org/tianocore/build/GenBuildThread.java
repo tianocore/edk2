@@ -24,6 +24,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Property;
 import org.tianocore.build.GenBuildTask;
 import org.tianocore.build.fpd.FpdParserForThread;
+import org.tianocore.build.global.GenBuildLogger;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.common.logger.EdkLog;
@@ -65,7 +66,9 @@ public class GenBuildThread implements Runnable {
         }
 
         status = FpdParserForThread.STATUS_START_RUN;
+
         thread.start();
+
         return true;
     }
 
@@ -129,27 +132,40 @@ public class GenBuildThread implements Runnable {
             newProject.setInputHandler(project.getInputHandler());
     
             Iterator listenerIter = project.getBuildListeners().iterator();
+            GenBuildLogger newLogger = null;
             while (listenerIter.hasNext()) {
-                newProject.addBuildListener((BuildListener)listenerIter.next());
+                BuildListener item = (BuildListener)listenerIter.next();
+                if (item instanceof GenBuildLogger) {
+                    newLogger = (GenBuildLogger)((GenBuildLogger)item).clone();
+                    newLogger.setId(fpdModuleId);
+                    newProject.addBuildListener(newLogger);
+                } else {
+                    newProject.addBuildListener(item);
+                }
             }
     
             project.initSubProject(newProject);
-    
+            
             genBuildTask.setProject(newProject);
     
             genBuildTask.setExternalProperties(properties);
     
             genBuildTask.parentId = parentModuleId;
-    
+
             genBuildTask.execute();
         } catch (BuildException be) {
-            FpdParserForThread.tg.interrupt();
+
             EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, moduleId + " with Arch " + arch +" build error. \n" + be.getMessage());
-            FpdParserForThread.isError = true; 
+            
+            if (FpdParserForThread.errorModule == null) {
+                FpdParserForThread.errorModule = fpdModuleId;
+            }
             
             synchronized (FpdParserForThread.deamonSemaphore) {
+                FpdParserForThread.subCount();
                 FpdParserForThread.deamonSemaphore.notifyAll();
             }
+            
             return ;
         }
         
