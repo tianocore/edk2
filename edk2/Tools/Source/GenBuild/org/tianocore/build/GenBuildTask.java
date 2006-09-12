@@ -600,7 +600,7 @@ public class GenBuildTask extends Ant {
         ModuleIdentification[] libinstances = saq.getLibraryInstance(fpdModuleId.getArch());
         String propertyLibs = "";
         for (int i = 0; i < libinstances.length; i++) {
-            propertyLibs += " " + getProject().getProperty("BIN_DIR") + File.separatorChar + libinstances[i].getName() + ".lib";
+            propertyLibs += getProject().getProperty("BIN_DIR") + File.separatorChar + libinstances[i].getName() + ".lib" + " ";
         }
         getProject().setProperty("LIBS", propertyLibs.replaceAll("(\\\\)", "/"));
 

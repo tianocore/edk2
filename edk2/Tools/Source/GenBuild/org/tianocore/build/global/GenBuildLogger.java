@@ -24,7 +24,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -36,13 +37,13 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.util.StringUtils;
 
-import org.tianocore.build.id.Identification;
+import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.common.logger.EdkLog;
 import org.tianocore.common.logger.LogMethod;
 
 public class GenBuildLogger extends DefaultLogger implements LogMethod {
     
-    private Project project = null;
+    Project project = null;
 
     ///
     /// flag to present whether cache all msg or not
@@ -52,9 +53,9 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     
     private static boolean enableFlag = true;
 
-    private static Map<Identification, List<String>> map = new HashMap<Identification, List<String> >(256);
+    private static Map<FpdModuleIdentification, List<String>> map = new LinkedHashMap<FpdModuleIdentification, List<String> >(256);
     
-    private Identification id = null;
+    private FpdModuleIdentification id = null;
     
     public GenBuildLogger () {
         
@@ -62,11 +63,6 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
 
     public GenBuildLogger (Project project) {
         this.project = project;
-    }
-
-    public GenBuildLogger (Project project, Identification id) {
-        this.project = project;
-        this.id = id;
     }
 
     /**
@@ -108,6 +104,16 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
             break;
         }
     }
+    
+    public static void flushErrorModuleLog(FpdModuleIdentification errorModuleId) {
+        List<String> errorLogs = map.get(errorModuleId);
+        if (errorLogs != null) {
+            EdkLog.log("ErrorLog", EdkLog.EDK_ERROR, errorModuleId + " error logs: ");
+            for(int i = 0; i < errorLogs.size(); i++) {
+                EdkLog.log(EdkLog.EDK_ERROR, errorLogs.get(i));
+            }
+        }
+    }
 
     public void flushToFile(File file) {
         //
@@ -117,10 +123,33 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
         log("Logging", msg, Project.MSG_INFO);
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-            List<String> allMessages = map.get(null);
-            for(int i = 0; i < allMessages.size(); i++) {
-                bw.write(allMessages.get(i));
+            Iterator<FpdModuleIdentification> iter = map.keySet().iterator();
+            List<String> mainLogs = null;
+            while (iter.hasNext()) {
+                FpdModuleIdentification item = iter.next();
+                if(item == null) {
+                    mainLogs = map.get(item);
+                    continue ;
+                }
+                bw.write(">>>>>>>>>>>>>");
+                bw.write(" " + item + " Build Log ");
+                bw.write(">>>>>>>>>>>>>");
                 bw.newLine();
+                List<String> allMessages = map.get(item);
+                for(int i = 0; i < allMessages.size(); i++) {
+                    bw.write(allMessages.get(i));
+                    bw.newLine();
+                }
+            }
+            if (mainLogs != null) {
+                bw.write(">>>>>>>>>>>>>");
+                bw.write(" Main Logs (already print to command) ");
+                bw.write(">>>>>>>>>>>>>");
+                bw.newLine();
+                for(int i = 0; i < mainLogs.size(); i++) {
+                    bw.write(mainLogs.get(i));
+                    bw.newLine();
+                }
             }
             bw.flush();
             bw.close();
@@ -197,7 +226,6 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
             } else if(!flag) {
                 printMessage(msg, out, currentLevel);
             } 
-            
             log(msg);
         }
     }
@@ -222,4 +250,26 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
             map.put(this.id, list);
         }
     }
+    
+    public Object clone() {
+        GenBuildLogger newLogger = new GenBuildLogger();
+        //
+        // Transfer emacs mode, out, err, level to new Logger
+        //
+        newLogger.setEmacsMode(this.emacsMode);
+        newLogger.setOutputPrintStream(this.out);
+        newLogger.setErrorPrintStream(this.err);
+        newLogger.setMessageOutputLevel(this.msgOutputLevel);
+        
+        //
+        // Transfer project
+        //
+        newLogger.project = this.project;
+        return newLogger;
+    }
+
+    public void setId(FpdModuleIdentification id) {
+        this.id = id;
+    }
+    
 }
