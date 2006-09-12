@@ -251,12 +251,22 @@ public class FpdFileContents {
     }
     
     public ModuleSADocument.ModuleSA getModuleSA(String key) {
-        String[] s = key.split(" ");
+        
         if (getfpdFrameworkModules().getModuleSAList() == null || getfpdFrameworkModules().getModuleSAList().size() == 0) {
             removeElement(getfpdFrameworkModules());
             fpdFrameworkModules = null;
             return null;
         }
+        String[] s = key.split(" ");
+        String archsInKey = "";
+        if (s.length > 4) {
+            for (int i = 4; i < s.length; ++i) {
+                archsInKey += s[i];
+                archsInKey += " ";
+            }
+            archsInKey = archsInKey.trim();
+        }
+        
         ListIterator li = getfpdFrameworkModules().getModuleSAList().listIterator();
         while(li.hasNext()) {
             ModuleSADocument.ModuleSA moduleSa = (ModuleSADocument.ModuleSA)li.next();
@@ -271,13 +281,17 @@ public class FpdFileContents {
                         continue;
                     }
                 }
-                //ToDo add arch check for s[4]
+                //ToDo add arch check .
                 if (moduleSa.getSupArchList() != null) {
-                    if (!listToString(moduleSa.getSupArchList()).equals(s[4])) {
-                        continue;
+                    if (listToString(moduleSa.getSupArchList()).equals(archsInKey)) {
+                        return moduleSa;
                     }
                 }
-                return moduleSa;
+                else {
+                    if (archsInKey.length() == 0) {
+                        return moduleSa;
+                    }
+                }
             }
         }
         return null;
