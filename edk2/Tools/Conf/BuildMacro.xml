@@ -772,9 +772,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
             <command type="DLINK" cmd="${DLINK}" family="${DLINK_FAMILY}"
                      outputFile="${DEST_DIR_DEBUG}/@{FILEPATH}/@{FILENAME}.dll" >
               <argument value="${DLINK_FLAGS}"/>
-              <libset libs="${LIBS}"/>
-              <libset libs="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib"/>
-              <libset libs="${DLINK_SPATH}" />
+              <libset libs="${DEST_DIR_OUTPUT}/@{FILEPATH}/@{FILENAME}Local.lib ${LIBS} ${DLINK_SPATH}"/>
               <LINK.ARG/>
             </command>
           </cc>
