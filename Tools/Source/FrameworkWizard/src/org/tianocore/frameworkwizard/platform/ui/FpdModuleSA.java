@@ -26,6 +26,7 @@ import javax.swing.table.TableModel;
 
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.GlobalData;
+import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 import org.tianocore.frameworkwizard.platform.ui.global.SurfaceAreaQuery;
@@ -85,10 +86,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JLabel jLabelPcdHelp = null;
     private JButton jButtonOk = null;
     private JButton jButtonCancel = null;
-    private PartialEditableTableModel model = null;
-    private LibraryTableModel selectedInstancesTableModel = null;
-    private LibraryTableModel libClassTableModel = null;
-    private LibraryTableModel libInstanceTableModel = null;
+    private IDefaultTableModel model = null;
+    private IDefaultTableModel selectedInstancesTableModel = null;
+    private IDefaultTableModel libClassTableModel = null;
+    private IDefaultTableModel libInstanceTableModel = null;
     private DefaultTableModel optionsTableModel = null;
     private FpdFileContents ffc = null;
     private String moduleKey = null;
@@ -544,7 +545,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private JTable getJTablePcd() {
         if (jTablePcd == null) {
-            model = new PartialEditableTableModel();
+            model = new IDefaultTableModel();
             jTablePcd = new JTable(model);
             jTablePcd.setRowHeight(20);
             jTablePcd.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
@@ -803,7 +804,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private JTable getJTableSelectedInstances() {
         if (jTableSelectedInstances == null) {
-            selectedInstancesTableModel = new LibraryTableModel();
+            selectedInstancesTableModel = new IDefaultTableModel();
             selectedInstancesTableModel.addColumn("Name");
             selectedInstancesTableModel.addColumn("ModuleGUID");
             selectedInstancesTableModel.addColumn("ModuleVersion");
@@ -839,7 +840,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private JTable getJTableLibClass() {
         if (jTableLibClass == null) {
-            libClassTableModel = new LibraryTableModel();
+            libClassTableModel = new IDefaultTableModel();
             libClassTableModel.addColumn("LibraryClass");
             jTableLibClass = new JTable(libClassTableModel);
             jTableLibClass.setRowHeight(20);
@@ -908,7 +909,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      */
     private JTable getJTableLibInstances() {
         if (jTableLibInstances == null) {
-            libInstanceTableModel = new LibraryTableModel();
+            libInstanceTableModel = new IDefaultTableModel();
             libInstanceTableModel.addColumn("Name");
             libInstanceTableModel.addColumn("ModuleGUID");
             libInstanceTableModel.addColumn("ModuleVersion");
@@ -1632,31 +1633,3 @@ private JPanel getJPanelToolchainC() {
 
 
 }  //  @jve:decl-index=0:visual-constraint="10,10"
-
-class PartialEditableTableModel extends DefaultTableModel {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
-    public boolean isCellEditable(int row, int col) {
-        switch (col){
-        case 2:
-            return false;
-        default:
-            return false; 
-        }
-           
-    }
-}
-
-class LibraryTableModel extends DefaultTableModel {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
-    public boolean isCellEditable(int row, int col) {
-        return false;
-    }
-}

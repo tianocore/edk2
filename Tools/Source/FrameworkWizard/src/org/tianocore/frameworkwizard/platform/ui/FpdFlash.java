@@ -26,11 +26,11 @@ import javax.swing.ListSelectionModel;
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
 import org.tianocore.frameworkwizard.common.GlobalData;
+import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
 import org.tianocore.frameworkwizard.common.ui.StarLabel;
 import org.tianocore.frameworkwizard.module.Identifications.ModuleIdentification;
-import org.tianocore.frameworkwizard.platform.ui.FpdFrameworkModules;
 import org.tianocore.frameworkwizard.platform.ui.global.WorkspaceProfile;
 
 import java.awt.FlowLayout;
@@ -145,7 +145,7 @@ public class FpdFlash extends IInternalFrame {
     private JLabel jLabelFvAdditional = null;
     private JScrollPane jScrollPaneFvInFdf = null;
     private JTable jTableFvInFdf = null;
-    private NonEditableTableModel fvInFdfTableModel = null;  //  @jve:decl-index=0:visual-constraint=""
+    private IDefaultTableModel fvInFdfTableModel = null;  //  @jve:decl-index=0:visual-constraint=""
     private JButton jButtonFvInFdfOptions = null;
     private JScrollPane jScrollPaneFvAdditional = null;
     private JTable jTableFvAdditional = null;
@@ -169,7 +169,6 @@ public class FpdFlash extends IInternalFrame {
     private JPanel jPanelBgFvName = null;
     private JPanel jPanelBgFvImage = null;
     private JPanel jPanelW = null;
-    private String oldFvNameInFvImage = "";
     
     public FpdFlash() {
         super();
@@ -704,7 +703,7 @@ public class FpdFlash extends IInternalFrame {
      */
     private JTable getJTableFvImageNames() {
         if (jTableFvImageNames == null) {
-            fvImageNameTableModel = new NonEditableTableModel();
+            fvImageNameTableModel = new IDefaultTableModel();
             jTableFvImageNames = new JTable(fvImageNameTableModel);
             jTableFvImageNames.setRowHeight(20);
             fvImageNameTableModel.addColumn("FV Image Name");
@@ -1413,7 +1412,7 @@ public class FpdFlash extends IInternalFrame {
      */
     private JTable getJTableFvImageOpts() {
         if (jTableFvImageOpts == null) {
-            fvOptionTableModel = new NonEditableTableModel();
+            fvOptionTableModel = new IDefaultTableModel();
             fvOptionTableModel.addColumn("Name");
             fvOptionTableModel.addColumn("Value");
             jTableFvImageOpts = new JTable(fvOptionTableModel);
@@ -1650,9 +1649,9 @@ public class FpdFlash extends IInternalFrame {
      * 	
      * @return org.tianocore.frameworkwizard.platform.ui.NonEditableTableModel	
      */
-    private NonEditableTableModel getFvInFdfTableModel() {
+    private IDefaultTableModel getFvInFdfTableModel() {
         if (fvInFdfTableModel == null) {
-            fvInFdfTableModel = new NonEditableTableModel();
+            fvInFdfTableModel = new IDefaultTableModel();
             fvInFdfTableModel.addColumn("FV Name");
             fvInFdfTableModel.addColumn("Size");
             fvInFdfTableModel.addColumn("Corresponding File Name");
@@ -2327,8 +2326,8 @@ public class FpdFlash extends IInternalFrame {
         private JButton jButtonDown = null;
         private JButton jButtonOk = null;
         private JButton jButtonCancel = null;
-        private NonEditableTableModel modInFvTableModel = null;
-        private NonEditableTableModel fpdModTableModel = null;
+        private IDefaultTableModel modInFvTableModel = null;
+        private IDefaultTableModel fpdModTableModel = null;
         private HashMap<String, ModuleIdentification> mGuidToModuleId = null;
         private ArrayList<String> listModGuidInFv = null;
         private String title = null;
@@ -2497,7 +2496,7 @@ public class FpdFlash extends IInternalFrame {
          */
         private JTable getJTableModInFv() {
             if (jTableModInFv == null) {
-                modInFvTableModel = new NonEditableTableModel();
+                modInFvTableModel = new IDefaultTableModel();
                 modInFvTableModel.addColumn("Module Orders in FV");
                 jTableModInFv = new JTable(modInFvTableModel);
                 jTableModInFv.setRowHeight(20);
@@ -2549,7 +2548,7 @@ public class FpdFlash extends IInternalFrame {
          */
         private JTable getJTableFpdModules() {
             if (jTableFpdModules == null) {
-                fpdModTableModel = new NonEditableTableModel();
+                fpdModTableModel = new IDefaultTableModel();
                 TableSorter sorter = new TableSorter(fpdModTableModel);
                 jTableFpdModules = new JTable(sorter);
                 jTableFpdModules.setRowHeight(20);
