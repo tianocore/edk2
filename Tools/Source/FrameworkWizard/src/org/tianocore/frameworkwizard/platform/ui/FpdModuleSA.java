@@ -297,13 +297,13 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private ArrayList<String> getInstancesForClass(String cls, PackageIdentification[] depPkgList) throws Exception{
         ArrayList<String> al = new ArrayList<String>();
         
-        for (int i = 0; i < depPkgList.length; ++i) {
+//        for (int i = 0; i < depPkgList.length; ++i) {
             Iterator ismi = GlobalData.vModuleList.iterator();
             while(ismi.hasNext()) {
                 ModuleIdentification mi = (ModuleIdentification)ismi.next();
-                if (!mi.getPackageId().getGuid().equalsIgnoreCase(depPkgList[i].getGuid())) {
-                    continue;
-                }
+//                if (!mi.getPackageId().getGuid().equalsIgnoreCase(depPkgList[i].getGuid())) {
+//                    continue;
+//                }
                 String[] clsProduced = getClassProduced(mi);
                 
                 boolean isPotential = false;
@@ -321,10 +321,10 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 }
                 if (isPotential) {
                     al.add(mi.getGuid() + " " + mi.getVersion() + " " + 
-                           depPkgList[i].getGuid() + " " + depPkgList[i].getVersion());
+                           mi.getPackageId().getGuid() + " " + mi.getPackageId().getVersion());
                 }
             }
-        }
+//        }
         
         return al;
     }
@@ -570,13 +570,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     }
                     else{
                         int selectedRow = lsm.getMinSelectionIndex();
-                        String cName = jTablePcd.getValueAt(selectedRow, 0)+"";
-                        String tsGuid = jTablePcd.getValueAt(selectedRow, 1)+"";
+                        String cName = model.getValueAt(selectedRow, 0)+"";
+                        String tsGuid = model.getValueAt(selectedRow, 1)+"";
+                        String itemType = model.getValueAt(selectedRow, 2)+"";
                         String[] pcdInfo = {"", ""};
                         getPcdInfo(cName, tsGuid, pcdInfo);
                         jTextAreaPcdHelp.setText(pcdInfo[0]);
                         initComboBox(pcdInfo[1]);
-                        jComboBoxItemType.setSelectedItem(pcdInfo[1]);
+                        jComboBoxItemType.setSelectedItem(itemType);
                         jTextFieldMaxDatumSize.setEnabled(true);
                         jTextFieldMaxDatumSize.setVisible(true);
                         jTextFieldMaxDatumSize.setText(jTablePcd.getValueAt(selectedRow, 4)+"");
@@ -603,9 +604,9 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                             jTextFieldMaxDatumSize.setEnabled(false);
                         }
                         
-                        if (!jTablePcd.getValueAt(selectedRow, 2).equals("DYNAMIC") && !jTablePcd.getValueAt(selectedRow, 2).equals("DYNAMIC_EX")) {
-                            jTextFieldPcdDefault.setText(jTablePcd.getValueAt(selectedRow, 6)+"");
-                            if (jTablePcd.getValueAt(selectedRow, 2).equals("FEATURE_FLAG")){
+                        if (!model.getValueAt(selectedRow, 2).equals("DYNAMIC") && !model.getValueAt(selectedRow, 2).equals("DYNAMIC_EX")) {
+                            jTextFieldPcdDefault.setText(model.getValueAt(selectedRow, 6)+"");
+                            if (model.getValueAt(selectedRow, 2).equals("FEATURE_FLAG")){
                                 jTextFieldPcdDefault.setVisible(false);
                                 jComboBoxFeatureFlagValue.setVisible(true);
                                 jComboBoxFeatureFlagValue.setSelectedItem(jTablePcd.getValueAt(selectedRow, 6)+"");
@@ -625,18 +626,6 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                 }
             });
             
-            jTablePcd.getModel().addTableModelListener(new TableModelListener() {
-                public void tableChanged(TableModelEvent arg0) {
-                    // TODO Auto-generated method stub
-//                    int row = arg0.getFirstRow();
-//                    TableModel m = (TableModel)arg0.getSource();
-                    
-                    if (arg0.getType() == TableModelEvent.UPDATE){
-                        //update xml doc here.
-                        
-                    }
-                }
-            });
         }
         return jTablePcd;
     }
@@ -1424,6 +1413,7 @@ private JPanel getJPanelPcdFieldsThirdRow() {
         jPanelPcdFieldsThirdRow.add(jLabelPcdDefaultValue, null);
         jPanelPcdFieldsThirdRow.add(getJTextFieldPcdDefault(), null);
         jPanelPcdFieldsThirdRow.add(getJComboBoxFeatureFlagValue(), null);
+        jPanelPcdFieldsThirdRow.add(getJButtonUpdatePcd(), null);
     }
     return jPanelPcdFieldsThirdRow;
 }
@@ -1443,7 +1433,6 @@ private JPanel getJPanelPcdFieldsFirstRow() {
         jPanelPcdFieldsFirstRow.setLayout(flowLayout1);
         jPanelPcdFieldsFirstRow.add(jLabelItemType, null);
         jPanelPcdFieldsFirstRow.add(getJComboBoxItemType(), null);
-        jPanelPcdFieldsFirstRow.add(getJButtonUpdatePcd(), null);
     }
     return jPanelPcdFieldsFirstRow;
 }
@@ -1459,19 +1448,19 @@ private JComboBox getJComboBoxItemType() {
         jComboBoxItemType.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent e) {
                 int row = jTablePcd.getSelectedRow();
-                if (row < 0 || jTablePcd.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
+                if (row < 0 || model.getValueAt(row, 2).equals(jComboBoxItemType.getSelectedItem())) {
                     return;
                 }
                 if (jComboBoxItemType.getItemCount() == 3) {
                     if (!jComboBoxItemType.getSelectedItem().equals("DYNAMIC")) {
-                        pcdDynamicToNonDynamic(jTablePcd.getValueAt(row, 0)+"", jTablePcd.getValueAt(row, 1)+"");
+                        pcdDynamicToNonDynamic(model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"");
                         if (jComboBoxItemType.getSelectedItem().equals("FIXED_AT_BUILD")) {
                             jTextFieldPcdDefault.setText("");
                             jTextFieldPcdDefault.setEnabled(true);
                         }
                     }
                     else{
-                        pcdNonDynamicToDynamic(jTablePcd.getValueAt(row, 0)+"", jTablePcd.getValueAt(row, 1)+"");
+                        pcdNonDynamicToDynamic(model.getValueAt(row, 0)+"", model.getValueAt(row, 1)+"");
                     }
                 }
             }
@@ -1495,11 +1484,10 @@ private void pcdDynamicToNonDynamic(String cName, String tsGuid) {
     
     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
     for (int i = 0; i < al.size(); ++i) {
-        String[] s = al.get(i).split(" ");
-        String mKey = s[0] + s[1] + s[2] + s[3];
+        String mKey = moduleInfo (al.get(i));
         ffc.updatePcdData(mKey, cName, tsGuid, jComboBoxItemType.getSelectedItem()+"", maxSize, value);
-        s[4] = jComboBoxItemType.getSelectedItem()+"";
-        al.set(i, s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" "+s[4]);
+        String itemType = jComboBoxItemType.getSelectedItem()+"";
+        al.set(i, mKey + " " + itemType);
     }
     
     ffc.removeDynamicPcdBuildData(cName, tsGuid);
@@ -1508,11 +1496,10 @@ private void pcdDynamicToNonDynamic(String cName, String tsGuid) {
 private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
     ArrayList<String> al = ffc.getDynPcdMapValue(cName + " " + tsGuid);
     for (int i = 0; i < al.size(); ++i) {
-        String[] s = al.get(i).split(" ");
-        String mKey = s[0] + " " + s[1]+ " " + s[2] + " " + s[3];
+        String mKey = moduleInfo (al.get(i));
         ffc.updatePcdData(mKey, cName, tsGuid, jComboBoxItemType.getSelectedItem()+"", jTextFieldMaxDatumSize.getText(), jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
-        s[4] = jComboBoxItemType.getSelectedItem()+"";
-        al.set(i, s[0]+" "+s[1]+" "+s[2]+" "+s[3]+" "+s[4]);
+        String itemType = jComboBoxItemType.getSelectedItem()+"";
+        al.set(i, mKey + " " + itemType);
     }
     try{
         ffc.addDynamicPcdBuildData(cName, jTablePcd.getValueAt(jTablePcd.getSelectedRow(), 3), tsGuid, "DYNAMIC", jTablePcd.getValueAt(jTablePcd.getSelectedRow(), 5)+"", jTextFieldPcdDefault.isVisible() ? jTextFieldPcdDefault.getText() : jComboBoxFeatureFlagValue.getSelectedItem()+"");
@@ -1521,6 +1508,12 @@ private void pcdNonDynamicToDynamic(String cName, String tsGuid) {
         JOptionPane.showMessageDialog(frame, "PCD value format: " + e.getMessage());
     }
 }
+
+private String moduleInfo (String pcdInfo) {
+    
+    return pcdInfo.substring(0, pcdInfo.lastIndexOf(" "));
+}
+
 /**
  * This method initializes jTextFieldMaxDatumSize
  * 	
