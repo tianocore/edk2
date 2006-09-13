@@ -1304,5 +1304,20 @@ EnableInterrupt (
   IN IDE_BLK_IO_DEV       *IdeDev
   )
 ;
+/**
+  Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
+
+  @param[in]  Event   Pointer to this event
+  @param[in]  Context Event hanlder private data
+
+  @retval  EFI_SUCCESS - Interrupt cleared
+
+**/
+EFI_STATUS
+ClearInterrupt (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+;
 
 #endif

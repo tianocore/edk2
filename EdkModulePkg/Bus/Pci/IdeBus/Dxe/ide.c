@@ -1769,3 +1769,100 @@ EnableInterrupt (
 
   return EFI_SUCCESS;
 }
+/**
+  Clear pending IDE interrupt before OS loader/kernel take control of the IDE device.
+
+  @param[in]  Event   Pointer to this event
+  @param[in]  Context Event hanlder private data
+
+  @retval  EFI_SUCCESS - Interrupt cleared
+
+**/
+EFI_STATUS
+ClearInterrupt (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS      Status;
+  UINT64          IoPortForBmis;
+  UINT8           RegisterValue;
+  IDE_BLK_IO_DEV  *IdeDev;
+
+  //
+  // Get our context
+  //
+  IdeDev = (IDE_BLK_IO_DEV *) Context;
+
+  //
+  // Obtain IDE IO port registers' base addresses
+  //
+  Status = ReassignIdeResources (IdeDev);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Check whether interrupt is pending
+  //
+
+  //
+  // Reset IDE device to force it de-assert interrupt pin
+  // Note: this will reset all devices on this IDE channel
+  //
+  AtaSoftReset (IdeDev);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Get base address of IDE Bus Master Status Regsiter
+  //
+  if (IdePrimary == IdeDev->Channel) {
+    IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISP_OFFSET;
+  } else {
+    if (IdeSecondary == IdeDev->Channel) {
+      IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISS_OFFSET;
+    } else {
+      return EFI_UNSUPPORTED;
+    }
+  }
+  //
+  // Read BMIS register and clear ERROR and INTR bit
+  //
+  IdeDev->PciIo->Io.Read (
+                      IdeDev->PciIo,
+                      EfiPciIoWidthUint8,
+                      EFI_PCI_IO_PASS_THROUGH_BAR,
+                      IoPortForBmis,
+                      1,
+                      &RegisterValue
+                      );
+
+  RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
+
+  IdeDev->PciIo->Io.Write (
+                      IdeDev->PciIo,
+                      EfiPciIoWidthUint8,
+                      EFI_PCI_IO_PASS_THROUGH_BAR,
+                      IoPortForBmis,
+                      1,
+                      &RegisterValue
+                      );
+
+  //
+  // Select the other device on this channel to ensure this device to release the interrupt pin
+  //
+  if (IdeDev->Device == 0) {
+    RegisterValue = (1 << 4) | 0xe0;
+  } else {
+    RegisterValue = (0 << 4) | 0xe0;
+  }
+  IDEWritePortB (
+    IdeDev->PciIo,
+    IdeDev->IoPort->Head,
+    RegisterValue
+    );
+
+  return EFI_SUCCESS;
+}

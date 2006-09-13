@@ -183,6 +183,7 @@ IDEBusDriverBindingStart (
   UINTN                             DataSize;
   UINT32                            Attributes;
   IDE_BUS_DRIVER_PRIVATE_DATA       *IdeBusDriverPrivateData;
+  EFI_EVENT                         Event;
 
   //
   // Local variables declaration for IdeControllerInit support
@@ -696,6 +697,19 @@ IDEBusDriverBindingStart (
         (EFI_IO_BUS_ATA_ATAPI | EFI_P_PC_ENABLE),
         IdeBlkIoDevicePtr->DevicePath
         );
+      
+      //
+      // Create event to clear pending IDE interrupt
+      //
+      Status = gBS->CreateEvent (
+                      EFI_EVENT_SIGNAL_EXIT_BOOT_SERVICES,
+                      EFI_TPL_NOTIFY,
+                      ClearInterrupt,
+                      IdeBlkIoDevicePtr,
+                      &Event
+                      );
+
+  
       //
       // end of 2nd inner loop ----
       //
