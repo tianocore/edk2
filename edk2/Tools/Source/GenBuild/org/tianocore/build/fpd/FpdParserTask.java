@@ -18,6 +18,7 @@ package org.tianocore.build.fpd;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -30,6 +31,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Ant;
 import org.apache.tools.ant.taskdefs.Property;
+import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
 
 import org.tianocore.common.definitions.EdkDefinitions;
@@ -277,8 +279,10 @@ public class FpdParserTask extends Task {
                 bw.flush();
                 bw.close();
                 fw.close();
-            } catch (Exception e) {
-                throw new BuildException("Generation of the FV file [" + fvFile.getPath() + "] failed!\n" + e.getMessage());
+            } catch (IOException ex) {
+                BuildException buildException = new BuildException("Generation of the FV file [" + fvFile.getPath() + "] failed!\n" + ex.getMessage());
+                buildException.setStackTrace(ex.getStackTrace());
+                throw buildException;
             }
         }
     }
@@ -289,7 +293,7 @@ public class FpdParserTask extends Task {
       @throws BuildException
                   FPD file is not valid.
     **/
-    public void parseFpdFile(File fpdFile) throws BuildException {
+    public void parseFpdFile(File fpdFile) throws BuildException, EdkException {
         this.fpdFile = fpdFile;
         parseFpdFile();
     }
@@ -362,8 +366,18 @@ public class FpdParserTask extends Task {
             //
             PlatformPcdPreprocessActionForBuilding ca = new PlatformPcdPreprocessActionForBuilding();
             ca.perform(platformId.getFpdFile().getPath(), ActionMessage.NULL_MESSAGE_LEVEL);
-        } catch (Exception e) {
-            throw new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + e.getMessage());
+        } catch (IOException ex) {
+            BuildException buildException = new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
+            buildException.setStackTrace(ex.getStackTrace());
+            throw buildException;
+        } catch (XmlException ex) {
+            BuildException buildException = new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
+            buildException.setStackTrace(ex.getStackTrace());
+            throw buildException;
+        } catch (EdkException ex) {
+            BuildException buildException = new BuildException("Parsing of the FPD file [" + fpdFile.getPath() + "] failed!\n" + ex.getMessage());
+            buildException.setStackTrace(ex.getStackTrace());
+            throw buildException;
         }
     }
 
