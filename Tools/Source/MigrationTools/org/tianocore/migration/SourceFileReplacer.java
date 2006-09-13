@@ -40,7 +40,23 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         "BuildBspStoreHob",
         "BuildMemoryAllocationHob"
         };
-    
+    private static final String[] peiserviceslibfunc = {
+        "InstallPpi",
+        "ReInstallPpi",
+        "LocatePpi",
+        "NotifyPpi",
+        "GetBootMode",
+        "SetBootMode",
+        "GetHobList",
+        "CreateHob",
+        "FfsFindNextVolume",
+        "FfsFindNextFile",
+        "FfsFindSectionData",
+        "InstallPeiMemory",
+        "AllocatePages",
+        "AllocatePool",
+        "PeiResetSystem"
+    };
     //---------------------------------------inner classes---------------------------------------//
     private static class r8tor9 {
         r8tor9(String r8, String r9) {
@@ -117,55 +133,20 @@ public final class SourceFileReplacer implements Common.ForDoAll {
             replaceGuid(wholeline, mi.protocol, "protocol", fileprotocol);
 
             // Converting Pei
-            // First , find all (**PeiServices)-> or (*PeiServices). with arg "PeiServices" , change name and add #%
-            Pattern ptnpei = Pattern.compile("\\(\\*\\*?PeiServices\\)[.-][>]?\\s*(\\w*)(\\s*\\(\\s*PeiServices\\s*,\\s*)", Pattern.MULTILINE);
             if (mi.getModuleType().matches("PEIM")) {
-            //if (mi.moduletype.contains("PEIM")) {
-                Matcher mtrpei = ptnpei.matcher(wholeline);
-                while (mtrpei.find()) {                                        // ! add a library here !
-                    wholeline = mtrpei.replaceAll("PeiServices$1#%$2");
-                    mi.hashrequiredr9libs.add("PeiServicesLib");
-                }
-                mtrpei.reset();
-                if (wholeline.contains("PeiServicesCopyMem")) {
-                    wholeline = wholeline.replaceAll("PeiServicesCopyMem#%", "CopyMem");
-                    mi.hashrequiredr9libs.add("BaseMemoryLib");
-                }
-                if (wholeline.contains("PeiServicesSetMem")) {
-                    wholeline = wholeline.replaceAll("PeiServicesSetMem#%", "SetMem");
-                    mi.hashrequiredr9libs.add("BaseMemoryLib");
-                }
-
-                // Second , find all #% to drop the arg "PeiServices"
-                Pattern ptnpeiarg = Pattern.compile("#%+(\\s*\\(+\\s*)PeiServices\\s*,\\s*", Pattern.MULTILINE);
-                Matcher mtrpeiarg = ptnpeiarg.matcher(wholeline);
-                while (mtrpeiarg.find()) {
-                    wholeline = mtrpeiarg.replaceAll("$1");
-                }
+                //
+                // Try to remove PeiServicesTablePointer;
+                // 
+                wholeline = dropPeiServicesPointer (wholeline);
+                //
+                // Drop the possible return Status of Hob building function.
+                // 
+                wholeline = drophobLibReturnStatus (wholeline);
             }
-            
-            wholeline = hobLibFuncDropStatus(wholeline);
-            
-            Matcher mtrmac;
-            mtrmac = Pattern.compile("EFI_IDIV_ROUND\\((.*), (.*)\\)").matcher(wholeline);
-            if (mtrmac.find()) {
-                wholeline = mtrmac.replaceAll("\\($1 \\/ $2 \\+ \\(\\(\\(2 \\* \\($1 \\% $2\\)\\) \\< $2\\) \\? 0 \\: 1\\)\\)");
-            }
-            mtrmac = Pattern.compile("EFI_MIN\\((.*), (.*)\\)").matcher(wholeline);
-            if (mtrmac.find()) {
-                wholeline = mtrmac.replaceAll("\\(\\($1 \\< $2\\) \\? $1 \\: $2\\)");
-            }
-            mtrmac = Pattern.compile("EFI_MAX\\((.*), (.*)\\)").matcher(wholeline);
-            if (mtrmac.find()) {
-                wholeline = mtrmac.replaceAll("\\(\\($1 \\> $2\\) \\? $1 \\: $2\\)");
-            }
-            mtrmac = Pattern.compile("EFI_UINTN_ALIGNED\\((.*)\\)").matcher(wholeline);
-            if (mtrmac.find()) {
-                wholeline = mtrmac.replaceAll("\\(\\(\\(UINTN\\) $1\\) \\& \\(sizeof \\(UINTN\\) \\- 1\\)\\)");
-            }
-            if (wholeline.contains("EFI_UINTN_ALIGN_MASK")) {
-                wholeline = wholeline.replaceAll("EFI_UINTN_ALIGN_MASK", "(sizeof (UINTN) - 1)");
-            }
+            //
+            // Expand obsolete R8 macro.
+            // 
+            wholeline = replaceObsoleteMacro (wholeline);
 
             show(filefunc, "function");
             show(filemacro, "macro");
@@ -236,7 +217,42 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         }
     }
 
-    private final String hobLibFuncDropStatus(String wholeline) {        // or use regex to find pattern "Status = ..."
+    private final String dropPeiServicesPointer (String wholeline) {
+        String peiServicesTablePointer;
+        String peiServicesTableCaller;
+        String regPeiServices;
+        Pattern ptnPei;
+        Matcher mtrPei;
+
+        peiServicesTablePointer = "\\w(?:\\w|[0-9]|->)*";
+        peiServicesTableCaller  = "\\(\\*\\*?\\s*(" + peiServicesTablePointer + ")\\s*\\)[.-]>?\\s*";
+        for (int i = 0; i < peiserviceslibfunc.length; i++) {
+            regPeiServices  = peiServicesTableCaller + peiserviceslibfunc[i] + "\\s*\\(\\s*\\1\\s*,(\\t| )*"; 
+            ptnPei = Pattern.compile (regPeiServices);
+            mtrPei = ptnPei.matcher (wholeline);
+            if (mtrPei.find()) {
+                wholeline = mtrPei.replaceAll("PeiServices" + peiserviceslibfunc[i] + " (");
+                mi.hashrequiredr9libs.add("PeiServicesLib");
+            }
+        }
+        regPeiServices = peiServicesTableCaller + "(CopyMem|SetMem)" + "\\s*\\((\\t| )*";
+        ptnPei = Pattern.compile (regPeiServices);
+        mtrPei = ptnPei.matcher (wholeline);
+        if (mtrPei.find()) {
+            wholeline = mtrPei.replaceAll("$2 (");
+            mi.hashrequiredr9libs.add("BaseMemoryLib");
+        }
+
+        ptnPei = Pattern.compile("#%+(\\s*\\(+\\s*)" + peiServicesTablePointer + "\\s*,\\s*", Pattern.MULTILINE);
+        mtrPei = ptnPei.matcher(wholeline);
+        while (mtrPei.find()) {
+            wholeline = mtrPei.replaceAll("$1");
+        }
+
+        return wholeline;
+    }
+
+    private final String drophobLibReturnStatus (String wholeline) {        // or use regex to find pattern "Status = ..."
         Pattern ptnhobstatus;
         Matcher mtrhobstatus;
         String templine = wholeline;
@@ -244,7 +260,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
             ptnhobstatus = Pattern.compile("(Status\\s*=\\s*)?" + specialhoblibfunc[i] + "(.*?\\)\\s*;)", Pattern.DOTALL);
             mtrhobstatus = ptnhobstatus.matcher(templine);
             if (mtrhobstatus.find()) {
-                templine = mtrhobstatus.replaceAll(specialhoblibfunc[i] + mtrhobstatus.group(2) + "\n  //Migration comments: R9 Hob-building library functions will assert if build failure.\n  Status = EFI_SUCCESS;");
+                templine = mtrhobstatus.replaceAll(specialhoblibfunc[i] + mtrhobstatus.group(2) + "\n  " + 
+                           MigrationTool.MIGRATIONCOMMENT +  "R9 Hob-building library functions will assert if build failure.\n  Status = EFI_SUCCESS;");
             }
         }
         return templine;
@@ -258,7 +275,6 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         it = symbolSet.iterator();
         while (it.hasNext()) {                        //macros are all assumed MdePkg currently
             r8thing = it.next();
-            System.out.println (r8thing);
             //mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));        
             if ((r9thing = MigrationTool.db.getR9Macro(r8thing)) != null) {
                 if (wholeline.contains(r8thing)) {
@@ -303,6 +319,30 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         }                                                            //is any of the guids changed?
         if (addr8 == true) {
             wholeline = addincludefile(wholeline, "\"R8Lib.h\"");
+        }
+        return wholeline;
+    }
+
+    private final String replaceObsoleteMacro (String wholeline) {
+        Matcher mtrmac;
+        mtrmac = Pattern.compile("EFI_IDIV_ROUND\\((.*), (.*)\\)").matcher(wholeline);
+        if (mtrmac.find()) {
+            wholeline = mtrmac.replaceAll("\\($1 \\/ $2 \\+ \\(\\(\\(2 \\* \\($1 \\% $2\\)\\) \\< $2\\) \\? 0 \\: 1\\)\\)");
+        }
+        mtrmac = Pattern.compile("EFI_MIN\\((.*), (.*)\\)").matcher(wholeline);
+        if (mtrmac.find()) {
+            wholeline = mtrmac.replaceAll("\\(\\($1 \\< $2\\) \\? $1 \\: $2\\)");
+        }
+        mtrmac = Pattern.compile("EFI_MAX\\((.*), (.*)\\)").matcher(wholeline);
+        if (mtrmac.find()) {
+            wholeline = mtrmac.replaceAll("\\(\\($1 \\> $2\\) \\? $1 \\: $2\\)");
+        }
+        mtrmac = Pattern.compile("EFI_UINTN_ALIGNED\\((.*)\\)").matcher(wholeline);
+        if (mtrmac.find()) {
+            wholeline = mtrmac.replaceAll("\\(\\(\\(UINTN\\) $1\\) \\& \\(sizeof \\(UINTN\\) \\- 1\\)\\)");
+        }
+        if (wholeline.contains("EFI_UINTN_ALIGN_MASK")) {
+            wholeline = wholeline.replaceAll("EFI_UINTN_ALIGN_MASK", "(sizeof (UINTN) - 1)");
         }
         return wholeline;
     }

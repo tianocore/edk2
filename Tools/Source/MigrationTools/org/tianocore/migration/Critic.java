@@ -45,7 +45,7 @@ public final class Critic {
 
             wholeline = wholeline.replaceAll("\t", "  ");
             wholeline = Common.replaceAll(wholeline, ptnheadcomment, "/** @file$1**/");
-            wholeline = Common.replaceAll(wholeline, ptnfunccomment, "$1/**$3**/$4$2");
+            wholeline = Common.replaceAll(wholeline, ptnfunccomment, "$1\n/**$3\n**/$4$2");
             //wholeline = Common.replaceAll(wholeline, ptncommentstructure, "/**\n#%\n$1\n%#\n#%%\n$2\n%%#\n#%%%\n$3\n%%%#\n**/");
 
             // first scan
