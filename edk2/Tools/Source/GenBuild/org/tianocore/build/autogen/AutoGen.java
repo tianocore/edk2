@@ -34,15 +34,15 @@ import java.util.Set;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.xmlbeans.XmlObject;
-import org.tianocore.build.exception.*;
+import org.tianocore.build.exception.AutoGenException;
 import org.tianocore.build.global.GlobalData;
 import org.tianocore.build.global.SurfaceAreaQuery;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.pcd.action.PCDAutoGenAction;
-import org.tianocore.common.logger.EdkLog;
 import org.tianocore.common.definitions.ToolDefinitions;
 import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
 
 /**
   This class is to generate Autogen.h and Autogen.c according to module surface

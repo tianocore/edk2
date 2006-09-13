@@ -152,7 +152,7 @@ public class GenBuildThread implements Runnable {
     
             genBuildTask.parentId = parentModuleId;
 
-            genBuildTask.execute();
+            genBuildTask.perform();
         } catch (BuildException be) {
 
             EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, moduleId + " with Arch " + arch +" build error. \n" + be.getMessage());

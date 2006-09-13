@@ -165,7 +165,6 @@ public class GlobalData {
         EdkLog.log("Init", EdkLog.EDK_ALWAYS, "Using tool definition file [" + toolsDefFile.getPath() + "].");
         toolsDef = new ToolChainConfig(toolsDefFile);
 
-
         //
         // Parse Framework Database
         //

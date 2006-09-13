@@ -275,6 +275,7 @@ public class FrameworkBuildTask extends Task{
         // Build every MSA files (SINGLE MODULE BUILD)
         //
         else if (buildFile.getName().endsWith(ToolDefinitions.MSA_EXTENSION)) {
+            multithread = false; 
             File tmpFile = new File(GlobalData.getWorkspacePath() + File.separatorChar + activePlatform);
             EdkLog.log(this, "Using the FPD file [" + tmpFile.getPath() + "] for the active platform. ");
             EdkLog.log(this, "Processing the MSA file [" + buildFile.getPath() + "] ..>> ");

@@ -35,7 +35,6 @@ import org.apache.xmlbeans.XmlObject;
 
 import org.tianocore.common.definitions.ToolDefinitions;
 import org.tianocore.common.exception.EdkException;
-import org.tianocore.common.logger.EdkLog;
 import org.tianocore.build.autogen.AutoGen;
 import org.tianocore.build.exception.AutoGenException;
 import org.tianocore.build.exception.GenBuildException;
@@ -270,7 +269,7 @@ public class GenBuildTask extends Ant {
             // Whether the module is built before
             //
             if (moduleId.isLibrary() == false && GlobalData.hasFpdModuleSA(fpdModuleId) == false) {
-                EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: " + moduleId + " for " + archList[k] + " was not found in current platform FPD file!\n");
+                getProject().log(this, "Warning: " + moduleId + " for " + archList[k] + " was not found in current platform FPD file!\n", Project.MSG_WARN);
                 continue;
             } else if (GlobalData.isModuleBuilt(fpdModuleId)) {
                 break;
@@ -295,7 +294,7 @@ public class GenBuildTask extends Ant {
                     // don't do anything if no tools found
                     //
                     if (GlobalData.isCommandSet(targetList[i], toolchainList[j], archList[k]) == false) {
-                        EdkLog.log(this, EdkLog.EDK_WARNING, "Warning: No build issued.  No tools were found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n");
+                        getProject().log(this, "Warning: No build issued.  No tools were found for [target=" + targetList[i] + " toolchain=" + toolchainList[j] + " arch=" + archList[k] + "]\n", Project.MSG_WARN);
                         continue;
                     }
 
@@ -305,8 +304,8 @@ public class GenBuildTask extends Ant {
                     //
                     getProject().setProperty("TOOLCHAIN", toolchainList[j]);
 
-                    EdkLog.log(this, "Build " + moduleId + " start >>>");
-                    EdkLog.log(this, "Target: " + targetList[i] + " Tagname: " + toolchainList[j] + " Arch: " + archList[k]);
+                    getProject().log(this, "Build " + moduleId + " start >>>", Project.MSG_INFO);
+                    getProject().log(this, "Target: " + targetList[i] + " Tagname: " + toolchainList[j] + " Arch: " + archList[k], Project.MSG_INFO);
                     saq.push(GlobalData.getDoc(fpdModuleId));
 
                     //
@@ -615,7 +614,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            EdkLog.log(this, "Call user-defined " + moduleId.getName() + "_build.xml");
+            getProject().log(this, "Call user-defined " + moduleId.getName() + "_build.xml", Project.MSG_INFO);
             
             String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
             antCall(antFilename, null);
@@ -645,7 +644,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            EdkLog.log(this, "Calling user-defined " + moduleId.getName() + "_build.xml");
+            getProject().log(this, "Calling user-defined " + moduleId.getName() + "_build.xml", Project.MSG_INFO);
             
             String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
             antCall(antFilename, "clean");
@@ -663,7 +662,7 @@ public class GenBuildTask extends Ant {
         // then call the exist BaseName_build.xml directly.
         //
         if (moduleId.getModuleType().equalsIgnoreCase("USER_DEFINED")) {
-            EdkLog.log(this, "Calling user-defined " + moduleId.getName() + "_build.xml");
+            getProject().log(this, "Calling user-defined " + moduleId.getName() + "_build.xml", Project.MSG_INFO);
 
             String antFilename = getProject().getProperty("MODULE_DIR") + File.separatorChar + moduleId.getName() + "_build.xml";
             antCall(antFilename, "cleanall");
