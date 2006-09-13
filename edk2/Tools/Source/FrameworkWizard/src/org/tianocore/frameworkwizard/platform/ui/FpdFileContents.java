@@ -91,6 +91,11 @@ public class FpdFileContents {
     
     private HashMap<String, String> defaultPcdValue = new HashMap<String, String>();
     
+    private String itemType (String pcdInfo) {
+        
+        return pcdInfo.substring(pcdInfo.lastIndexOf(" ") + 1);
+    }
+    
     /**
      * look through all pcd data in all ModuleSA, create pcd -> ModuleSA mappings.
      */
@@ -557,6 +562,9 @@ public class FpdFileContents {
             do {
                 PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData)cursor.getObject();
                 if (pcdData.getCName().equals(cName) && pcdData.getTokenSpaceGuidCName().equals(tsGuid)) {
+                    //
+                    // change item type while not updating dynPcdData????
+                    //
                     pcdData.setItemType(PcdItemTypes.Enum.forString(itemType));
                     if(pcdData.getDatumType().equals("VOID*")) {
                         pcdData.setMaxDatumSize(new Integer(maxSize));
@@ -1193,8 +1201,8 @@ public class FpdFileContents {
         // Using existing Pcd type, if this pcd already exists in other ModuleSA
         //
         if (pcdConsumer.size() > 0) {
-            String[] valPart = pcdConsumer.get(0).split(" ");
-            itemType = valPart[5];
+            
+            itemType = itemType (pcdConsumer.get(0));
         }
         String listValue = moduleSa.getModuleGuid() + " " + moduleSa.getModuleVersion() 
         + " " + moduleSa.getPackageGuid() + " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList())
