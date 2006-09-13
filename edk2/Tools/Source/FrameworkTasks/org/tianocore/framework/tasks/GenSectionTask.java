@@ -31,34 +31,30 @@ import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 import org.tianocore.common.logger.EdkLog;
 
-public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes {
-    ///
-    /// inputfile name
-    ///
-    private String inputFile = "";
-    ///
-    /// 
-    /// 
-    private String inputFileName = "";
-    ///
-    /// outputfile name
-    ///
-    private String outputFile = "";
-    ///
-    /// section type
-    ///
-    private String sectionType = "";
-    ///
-    /// version number
-    ///
-    private String versionNum = "";
-    ///
-    /// interface string
-    ///
-    private String interfaceString = "";
-    ///
-    /// Section file list
-    ///
+public class GenSectionTask extends Task implements EfiDefine, Section, FfsTypes {
+    //
+    // inputfile name
+    //
+    private FileArg inputFile = new FileArg();
+    //
+    // outputfile name
+    //
+    private FileArg outputFile = new FileArg();
+    //
+    // section type
+    //
+    private ToolArg sectionType = new ToolArg();
+    //
+    // version number
+    //
+    private ToolArg versionNum = new ToolArg();
+    //
+    // interface string
+    //
+    private ToolArg interfaceString = new ToolArg();
+    //
+    // Section file list
+    //
     private List<Section> sectFileList = new ArrayList<Section>();
    
     /**
@@ -84,8 +80,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
         //
         // argument of tools
         //
-        String argument = inputFile + outputFile + " -s "+ sectionType + versionNum
-                + interfaceString;
+        String argument = "" + inputFile + outputFile + sectionType + versionNum + interfaceString;
         //
         // return value of gensection execution
         //
@@ -103,16 +98,17 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
 
-            EdkLog.log(this, EdkLog.EDK_INFO, inputFileName);
-            EdkLog.log(this, EdkLog.EDK_DEBUG, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, inputFile.toFileList() + " => " + outputFile.toFileList());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                log("GenSection succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "GenSection succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                log("ERROR = " + Integer.toHexString(revl));
+                EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("GenSection failed!");
             }
         } catch (Exception e) {
@@ -128,7 +124,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @return                    name of input file
     **/
     public String getInputFile() {
-        return this.inputFile;
+        return this.inputFile.getValue();
     }
 
     /**
@@ -139,8 +135,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @param inputFile            name of input file
     **/
     public void setInputFile(String inputFile) {
-        this.inputFileName = (new File(inputFile)).getName();
-        this.inputFile = " -i " + inputFile;
+        this.inputFile.setArg(" -i ", inputFile);
     }
 
     /**
@@ -151,7 +146,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @return                      name of output file
     **/
     public String getOutputFile() {
-        return this.outputFile;
+        return this.outputFile.getValue();
     }
 
     /**
@@ -161,7 +156,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @param  outputFile            name of output file
     **/
     public void setOutputfile(String outputFile) {
-        this.outputFile = " -o " + outputFile;
+        this.outputFile.setArg(" -o ", outputFile);
     }
 
     /**
@@ -172,7 +167,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @return                        sectoin type
     **/
     public String getSectionType() {
-        return this.sectionType;
+        return this.sectionType.getValue();
     }
 
     /**
@@ -183,7 +178,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @param sectionType              section type
     **/
     public void setSectionType(String sectionType) {
-        this.sectionType = sectionType;
+        this.sectionType.setArg(" -s ", sectionType);
     }
 
     /**
@@ -193,7 +188,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @return                         version number
     **/
     public String getVersionNum() {
-        return this.versionNum;
+        return this.versionNum.getValue();
     }
 
     /**
@@ -203,7 +198,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @param versionNum               version number
     **/
     public void setVersionNum(String versionNum) {
-        this.versionNum = " -v " + versionNum;
+        this.versionNum.setArg(" -v ", versionNum);
     }
 
     /**
@@ -213,7 +208,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @return                         interface string
     **/
     public String getInterfaceString() {
-        return this.interfaceString;
+        return this.interfaceString.getValue();
     }
 
     /**
@@ -223,7 +218,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
       @param interfaceString            interface string
     **/
     public void setInterfaceString(String interfaceString) {
-        this.interfaceString = " -a " + "\"" + interfaceString + "\"";
+        this.interfaceString.setArg(" -a ", "\"" + interfaceString + "\"");
     }
     
     /**
@@ -263,7 +258,7 @@ public class GenSectionTask extends Task implements EfiDefine, Section,FfsTypes 
         //  Search SectionList find earch section and call it's 
         //  ToBuffer function.
         //
-        if (this.sectionType.equalsIgnoreCase("EFI_SECTION_COMPRESSION")){
+        if (this.sectionType.getValue().equalsIgnoreCase("EFI_SECTION_COMPRESSION")){
             Section    sect;
             
             //

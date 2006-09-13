@@ -26,6 +26,9 @@ import java.util.List;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.taskdefs.LogStreamHandler;
+import org.apache.tools.ant.types.Commandline;
 
 import org.tianocore.common.logger.EdkLog;
 
@@ -35,109 +38,108 @@ import org.tianocore.common.logger.EdkLog;
  * FlashMapTask is used to call FlashMap.exe to generate flash map defition files and fd files.
  */
 public class FlashMapTask extends Task implements EfiDefine {
-    // /
-    // / tool name
-    // /
+    //
+    // tool name
+    //
     private final String toolName = "FlashMap";
 
-    // /
-    // / Flash definition file
-    // /
-    private String flashDefFile = "";
+    //
+    // Flash definition file
+    //
+    private FileArg flashDefFile = new FileArg();
 
-    // /
-    // / Flash device
-    // /
-    private String flashDevice = "";
+    //
+    // Flash device
+    //
+    private ToolArg flashDevice = new ToolArg();
 
-    // /
-    // / Flash device Image
-    // /
-    private String flashDeviceImage = "";
+    //
+    // Flash device Image
+    //
+    private ToolArg flashDeviceImage = new ToolArg();
 
-    // /
-    // / MCI file
-    // /
-    private String mciFile = "";
+    //
+    // MCI file
+    //
+    private FileArg mciFile = new FileArg();
 
-    // /
-    // / MCO file
-    // /
-    private String mcoFile = "";
+    //
+    // MCO file
+    //
+    private FileArg mcoFile = new FileArg();
 
-    // /
-    // / Discover FD image
-    // /
-    private String fdImage = "";
+    //
+    // Discover FD image
+    //
+    private ToolArg fdImage = new ToolArg();
 
-    // /
-    // / Dsc file
-    // /
-    private String dscFile = "";
+    //
+    // Dsc file
+    //
+    private FileArg dscFile = new FileArg();
 
-    // /
-    // / Asm INC file
-    // /
-    private String asmIncFile = "";
+    //
+    // Asm INC file
+    //
+    private FileArg asmIncFile = new FileArg();
 
-    // /
-    // / Image out file
-    // /
-    private String imageOutFile = "";
+    //
+    // Image out file
+    //
+    private FileArg imageOutFile = new FileArg();
 
-    // /
-    // / Header file
-    // /
-    private String headerFile = "";
+    //
+    // Header file
+    //
+    private FileArg headerFile = new FileArg();
 
-    // /
-    // / Input string file
-    // /
+    //
+    // Input string file
+    //
     private String inStrFile = "";
 
-    // /
-    // / Output string file
-    // /
+    //
+    // Output string file
+    //
     private String outStrFile = "";
 
-    // /
-    // / Base address
-    // /
-    private String baseAddr = "";
+    //
+    // 
+    // 
+    private FileArg strFile = new FileArg();
+    //
+    // Base address
+    //
+    private ToolArg baseAddr = new ToolArg();
 
-    // /
-    // / Aligment
-    // /
-    private String aligment = "";
+    //
+    // Aligment
+    //
+    private ToolArg aligment = new ToolArg();
 
-    // /
-    // / Padding value
-    // /
-    private String padValue = "";
+    //
+    // Padding value
+    //
+    private ToolArg padValue = new ToolArg();
 
-    // /
-    // / output directory
-    // /
+    //
+    // output directory
+    //
     private String outputDir = ".";
 
-    // /
-    // / MCI file array
-    // /
-    List<Input> mciFileArray = new ArrayList<Input>();
-
-    // /
-    // / command and argument list
-    // /
-    LinkedList<String> argList = new LinkedList<String>();
+    //
+    // MCI file array
+    //
+    FileArg mciFileArray = new FileArg();
 
     /**
-     * execute
-     *
-     * FlashMapTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      FlashMapTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -149,54 +151,66 @@ public class FlashMapTask extends Task implements EfiDefine {
         if (path == null) {
             command = toolName;
         } else {
-            command = path + File.separatorChar + toolName;
+            command = path + File.separator + toolName;
         }
-        argList.addFirst(command);
 
         //
         // add substituted input file and output file
         //
         if (this.inStrFile != null && this.outStrFile != null
-                && !this.inStrFile.equalsIgnoreCase("")
-                && !this.inStrFile.equalsIgnoreCase("")) {
-            argList.add("-strsub");
-            argList.add(this.inStrFile);
-            argList.add(this.outStrFile);
+            && this.inStrFile.length() > 0 && this.outStrFile.length() > 0) {
+            strFile.setPrefix(" -strsub ");
+            strFile.insValue(this.inStrFile);
+            strFile.insValue(this.outStrFile);
         }
 
+        String argument = "" + flashDefFile + flashDevice + flashDeviceImage
+                             + mciFile + mcoFile + fdImage + dscFile + asmIncFile
+                             + imageOutFile + headerFile + strFile + baseAddr
+                             + aligment + padValue + mciFileArray;
 
-        //
-        // add microcode binary files
-        //
-        if (mciFileArray.size() > 0) {
-            argList.add("-mcmerge");
-            Iterator mciList = mciFileArray.iterator();
-            while (mciList.hasNext()) {
-                argList.addAll(((Input) mciList.next()).getNameList());
-            }
-        }
 
         //
         // lauch the program
         //
-        ProcessBuilder pb = new ProcessBuilder(argList);
-        pb.directory(new File(outputDir));
+        // ProcessBuilder pb = new ProcessBuilder(argList);
+        // pb.directory(new File(outputDir));
         int exitCode = 0;
         try {
-            Process cmdProc = pb.start();
-            InputStreamReader cmdOut = new InputStreamReader(cmdProc
-                    .getInputStream());
-            char[] buf = new char[1024];
+            Commandline cmdline = new Commandline();
+            cmdline.setExecutable(command);
+            cmdline.createArgument().setLine(argument);
 
-            exitCode = cmdProc.waitFor();
+            LogStreamHandler streamHandler = new LogStreamHandler(this,
+                    Project.MSG_INFO, Project.MSG_WARN);
+            Execute runner = new Execute(streamHandler, null);
+
+            runner.setAntRun(project);
+            runner.setCommandline(cmdline.getCommandline());
+
+            if (outputDir != null) {
+                runner.setWorkingDirectory(new File(outputDir)); 
+            }
             //
             // log command line string.
             //
-            EdkLog.log(this, EdkLog.EDK_VERBOSE, cmdProc.getOutputStream().toString());
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.flashDefFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, flashDefFile.toFileList() 
+                             + mciFile.toFileList()
+                             + mciFileArray.toFileList()
+                             + fdImage.toFileList()
+                             + inStrFile
+                             + " => " 
+                             + headerFile.toFileList() 
+                             + imageOutFile.toFileList()
+                             + mcoFile.toFileList()
+                             + dscFile.toFileList()
+                             + asmIncFile.toFileList()
+                             + outStrFile);
+
+            exitCode = runner.execute();
             if (exitCode != 0) {
-                int len = cmdOut.read(buf, 0, 1024);
-                EdkLog.log(this, EdkLog.EDK_INFO, new String(buf, 0, len));
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(exitCode));
             } else {
                 EdkLog.log(this, EdkLog.EDK_VERBOSE, "FlashMap succeeded!");
             }
@@ -210,408 +224,383 @@ public class FlashMapTask extends Task implements EfiDefine {
     }
 
     /**
-     * getFlashDefFile
-     *
-     * This function is to get class member "flashDefFile"
-     *
-     * @return flashDeFile Name of flash definition file.
-     */
+      getFlashDefFile
+     
+      This function is to get class member "flashDefFile"
+     
+      @return flashDeFile Name of flash definition file.
+     **/
     public String getFlashDefFile() {
-        return flashDefFile;
+        return this.flashDefFile.getValue();
     }
 
     /**
-     * setFlashDefFile
-     *
-     * This function is to set class member "flashDefFile"
-     *
-     * @param flashDefFile
-     *            Name of flash definition file.
-     */
+      setFlashDefFile
+     
+      This function is to set class member "flashDefFile"
+     
+      @param flashDefFile
+                 Name of flash definition file.
+     **/
     public void setFlashDefFile(String flashDefFile) {
-        this.flashDefFile = flashDefFile;
-        argList.add("-fdf");
-        argList.add(this.flashDefFile);
+        this.flashDefFile.setArg(" -fdf ", flashDefFile);
     }
 
     /**
-     * getAligment
-     *
-     * This function is to get class member "aligment"
-     *
-     * @return aligment String of aligment value.
-     */
+      getAligment
+     
+      This function is to get class member "aligment"
+     
+      @return aligment String of aligment value.
+     **/
     public String getAligment() {
-        return aligment;
+        return this.aligment.getValue();
     }
 
     /**
-     * setAligment
-     *
-     * This function is to set class member "aligment"
-     *
-     * @param aligment
-     *            String of aligment value.
-     */
+      setAligment
+     
+      This function is to set class member "aligment"
+     
+      @param aligment
+                 String of aligment value.
+     **/
     public void setAligment(String aligment) {
-        this.aligment = aligment;
-        argList.add("-align");
-        argList.add(this.aligment);
+        this.aligment.setArg(" -align ", aligment);
     }
 
     /**
-     * getAsmIncFile
-     *
-     * This function is to get class member "asmIncFile"
-     *
-     * @return asmIncFile String of ASM include file.
-     */
+      getAsmIncFile
+     
+      This function is to get class member "asmIncFile"
+     
+      @return asmIncFile String of ASM include file.
+     **/
     public String getAsmIncFile() {
-        return asmIncFile;
+        return this.asmIncFile.getValue();
     }
 
     /**
-     * setAsmIncFile
-     *
-     * This function is to set class member "asmIncFile"
-     *
-     * @param asmIncFile
-     *            String of ASM include file.
-     */
+      setAsmIncFile
+     
+      This function is to set class member "asmIncFile"
+     
+      @param asmIncFile
+                 String of ASM include file.
+     **/
     public void setAsmIncFile(String asmIncFile) {
-        this.asmIncFile = asmIncFile;
-        argList.add("-asmincfile");
-        argList.add(this.asmIncFile);
+        this.asmIncFile.setArg(" -asmincfile ", asmIncFile);
     }
 
     /**
-     * getBaseAddr
-     *
-     * This function is to get class member "baseAddr"
-     *
-     * @return baseAddr String of base address value.
-     */
+      getBaseAddr
+     
+      This function is to get class member "baseAddr"
+     
+      @return baseAddr String of base address value.
+     **/
     public String getBaseAddr() {
-        return baseAddr;
+        return this.baseAddr.getValue();
     }
 
     /**
-     * setBaseAddr
-     *
-     * This function is to set class member "baseAddr"
-     *
-     * @param baseAddr
-     *            String of base address value.
-     */
+      setBaseAddr
+     
+      This function is to set class member "baseAddr"
+     
+      @param baseAddr
+                 String of base address value.
+     **/
     public void setBaseAddr(String baseAddr) {
-        this.baseAddr = baseAddr;
-        argList.add("-baseaddr");
-        argList.add(this.baseAddr);
+        this.baseAddr.setArg(" -baseaddr ", baseAddr);
     }
 
     /**
-     * getDscFile
-     *
-     * This function is to get class member "dscFile"
-     *
-     * @return dscFile name of DSC file
-     */
+      getDscFile
+     
+      This function is to get class member "dscFile"
+     
+      @return dscFile name of DSC file
+     **/
     public String getDscFile() {
-        return dscFile;
+        return this.dscFile.getValue();
     }
 
     /**
-     * setDscFile
-     *
-     * This function is to set class member "dscFile"
-     *
-     * @param dscFile
-     *            name of DSC file
-     */
+      setDscFile
+     
+      This function is to set class member "dscFile"
+     
+      @param dscFile
+                 name of DSC file
+     **/
     public void setDscFile(String dscFile) {
-        this.dscFile = dscFile;
-        argList.add("-dsc");
-        argList.add(this.dscFile);
+        this.dscFile.setArg(" -dsc ", dscFile);
     }
 
     /**
-     * getFdImage
-     *
-     * This function is to get class member "fdImage"
-     *
-     * @return fdImage name of input FDI image file.
-     */
+      getFdImage
+     
+      This function is to get class member "fdImage"
+     
+      @return fdImage name of input FDI image file.
+     **/
     public String getFdImage() {
-        return fdImage;
+        return this.fdImage.getValue();
     }
 
     /**
-     * setFdImage
-     *
-     * This function is to set class member "fdImage"
-     *
-     * @param fdImage
-     *            name of input FDI image file.
-     */
+      setFdImage
+     
+      This function is to set class member "fdImage"
+     
+      @param fdImage
+                 name of input FDI image file.
+     **/
     public void setFdImage(String fdImage) {
-        this.fdImage = fdImage;
-        argList.add("-discover");
-        argList.add(this.fdImage);
+        this.fdImage.setArg(" -discover ", fdImage);
     }
 
     /**
-     * getFlashDevice
-     *
-     * This function is to get class member "flashDevice".
-     *
-     * @return flashDevice name of flash device.
-     */
+      getFlashDevice
+     
+      This function is to get class member "flashDevice".
+     
+      @return flashDevice name of flash device.
+     **/
     public String getFlashDevice() {
-        return flashDevice;
+        return this.flashDevice.getValue();
     }
 
     /**
-     * setFlashDevice
-     *
-     * This function is to set class member "flashDevice"
-     *
-     * @param flashDevice
-     *            name of flash device.
-     */
+      setFlashDevice
+     
+      This function is to set class member "flashDevice"
+     
+      @param flashDevice
+                 name of flash device.
+     **/
     public void setFlashDevice(String flashDevice) {
-        this.flashDevice = flashDevice;
-        argList.add("-flashdevice");
-        argList.add(this.flashDevice);
+        this.flashDevice.setArg(" -flashdevice ", flashDevice);
     }
 
     /**
-     * getFlashDeviceImage
-     *
-     * This function is to get class member "flashDeviceImage"
-     *
-     * @return flashDeviceImage name of flash device image
-     */
+      getFlashDeviceImage
+     
+      This function is to get class member "flashDeviceImage"
+     
+      @return flashDeviceImage name of flash device image
+     **/
     public String getFlashDeviceImage() {
-        return flashDeviceImage;
+        return this.flashDeviceImage.getValue();
     }
 
     /**
-     * setFlashDeviceImage
-     *
-     * This function is to set class member "flashDeviceImage"
-     *
-     * @param flashDeviceImage
-     *            name of flash device image
-     */
+      setFlashDeviceImage
+     
+      This function is to set class member "flashDeviceImage"
+     
+      @param flashDeviceImage
+                 name of flash device image
+     **/
     public void setFlashDeviceImage(String flashDeviceImage) {
-        this.flashDeviceImage = flashDeviceImage;
-        argList.add("-flashdeviceimage");
-        argList.add(this.flashDeviceImage);
+        this.flashDeviceImage.setArg(" -flashdeviceimage ", flashDeviceImage);
 
     }
 
     /**
-     * getHeaderFile
-     *
-     * This function is to get class member "headerFile"
-     *
-     * @return headerFile name of include file
-     */
+      getHeaderFile
+     
+      This function is to get class member "headerFile"
+     
+      @return headerFile name of include file
+     **/
     public String getHeaderFile() {
-        return headerFile;
+        return this.headerFile.getValue();
     }
 
     /**
-     * setHeaderFile
-     *
-     * This function is to set class member "headerFile"
-     *
-     * @param headerFile
-     *            name of include file
-     */
+      setHeaderFile
+     
+      This function is to set class member "headerFile"
+     
+      @param headerFile
+                 name of include file
+     **/
     public void setHeaderFile(String headerFile) {
-        this.headerFile = headerFile;
-        argList.add("-hfile");
-        argList.add(this.headerFile);
+        this.headerFile.setArg(" -hfile ", headerFile);
     }
 
     /**
-     * getImageOutFile
-     *
-     * This function is to get class member "imageOutFile"
-     *
-     * @return imageOutFile name of output image file
-     */
+      getImageOutFile
+     
+      This function is to get class member "imageOutFile"
+     
+      @return imageOutFile name of output image file
+     **/
     public String getImageOutFile() {
-        return imageOutFile;
+        return this.imageOutFile.getValue();
     }
 
     /**
-     * setImageOutFile
-     *
-     * This function is to set class member "ImageOutFile"
-     *
-     * @param imageOutFile
-     *            name of output image file
-     */
+      setImageOutFile
+     
+      This function is to set class member "ImageOutFile"
+     
+      @param imageOutFile
+                 name of output image file
+     **/
     public void setImageOutFile(String imageOutFile) {
-        this.imageOutFile = imageOutFile;
-        argList.add("-imageout");
-        argList.add(this.imageOutFile);
+        this.imageOutFile.setArg(" -imageout ", imageOutFile);
     }
 
     /**
-     * getInStrFile
-     *
-     * This function is to get class member "inStrFile"
-     *
-     * @return inStrFile name of input file which used to replace symbol names.
-     */
+      getInStrFile
+     
+      This function is to get class member "inStrFile"
+     
+      @return inStrFile name of input file which used to replace symbol names.
+     **/
     public String getInStrFile() {
-        return inStrFile;
+        return this.inStrFile;
     }
 
     /**
-     * setInStrFile
-     *
-     * This function is to set class member "inStrFile"
-     *
-     * @param inStrFile
-     *            name of input file which used to replace symbol names.
-     */
+      setInStrFile
+     
+      This function is to set class member "inStrFile"
+     
+      @param inStrFile
+                 name of input file which used to replace symbol names.
+     **/
     public void setInStrFile(String inStrFile) {
         this.inStrFile = inStrFile;
     }
 
     /**
-     * getMciFile
-     *
-     * This function is to get class member "mciFile"
-     *
-     * @return mciFile name of input microcode file
-     */
+      getMciFile
+     
+      This function is to get class member "mciFile"
+     
+      @return mciFile name of input microcode file
+     **/
     public String getMciFile() {
-        return mciFile;
+        return this.mciFile.getValue();
     }
 
     /**
-     * setMciFile
-     *
-     * This function is to set class member "mciFile"
-     *
-     * @param mciFile
-     *            name of input microcode file
-     */
+      setMciFile
+     
+      This function is to set class member "mciFile"
+     
+      @param mciFile
+                 name of input microcode file
+     **/
     public void setMciFile(String mciFile) {
-        this.mciFile = mciFile;
-        argList.add("-mci");
-        argList.add(this.mciFile);
+        this.mciFile.setArg(" -mci ", mciFile);
     }
 
     /**
-     * getMcoFile
-     *
-     * This function is to get class member "mcoFile"
-     *
-     * @return mcoFile name of output binary microcode image
-     */
+      getMcoFile
+     
+      This function is to get class member "mcoFile"
+     
+      @return mcoFile name of output binary microcode image
+     **/
     public String getMcoFile() {
-        return mcoFile;
+        return this.mcoFile.getValue();
     }
 
     /**
-     * setMcoFile
-     *
-     * This function is to set class member "mcoFile"
-     *
-     * @param mcoFile
-     *            name of output binary microcode image
-     */
+      setMcoFile
+     
+      This function is to set class member "mcoFile"
+     
+      @param mcoFile
+                 name of output binary microcode image
+     **/
     public void setMcoFile(String mcoFile) {
-        this.mcoFile = mcoFile;
-        argList.add("-mco");
-        argList.add(this.mcoFile);
+        this.mcoFile.setArg(" -mco ", mcoFile);
     }
 
     /**
-     * getOutStrFile
-     *
-     * This function is to get class member "outStrFile"
-     *
-     * @return outStrFile name of output string substitution file
-     */
+      getOutStrFile
+     
+      This function is to get class member "outStrFile"
+     
+      @return outStrFile name of output string substitution file
+     **/
     public String getOutStrFile() {
-        return outStrFile;
+        return this.outStrFile;
     }
 
     /**
-     * setOutStrFile
-     *
-     * This function is to set class member "outStrFile"
-     *
-     * @param outStrFile
-     *            name of output string substitution file
-     */
+      setOutStrFile
+     
+      This function is to set class member "outStrFile"
+     
+      @param outStrFile
+                 name of output string substitution file
+     **/
     public void setOutStrFile(String outStrFile) {
         this.outStrFile = outStrFile;
     }
 
     /**
-     * getPadValue
-     *
-     * This function is to get class member "padValue"
-     *
-     * @return padValue string of byte value to use as padding
-     */
+      getPadValue
+     
+      This function is to get class member "padValue"
+     
+      @return padValue string of byte value to use as padding
+     **/
     public String getPadValue() {
-        return padValue;
+        return this.padValue.getValue();
     }
 
     /**
-     * setPadValue
-     *
-     * This function is to set class member "padValue"
-     *
-     * @param padValue
-     *            string of byte value to use as padding
-     */
+      setPadValue
+     
+      This function is to set class member "padValue"
+     
+      @param padValue
+                 string of byte value to use as padding
+     **/
     public void setPadValue(String padValue) {
-        this.padValue = padValue;
-        argList.add("-padvalue");
-        argList.add(this.padValue);
+        this.padValue.setArg(" -padvalue ", padValue);
     }
 
     /**
-     * addMciFile
-     *
-     * This function is to add Microcode binary file
-     *
-     * @param mciFile
-     *            instance of input class
-     */
-    public void addMciFile(Input mciFile) {
-        this.mciFileArray.add(mciFile);
+      addMciFile
+     
+      This function is to add Microcode binary file
+     
+      @param mciFile
+                 instance of input class
+     **/
+    public void addConfiguredMciFile(FileArg mciFile) {
+        this.mciFileArray.setPrefix(" -mcmerge ");
+        this.mciFileArray.insert(mciFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory
-     */
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory
+     **/
     public String getOutputDir() {
         return outputDir;
     }
 
     /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            string of output directory
-     */
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory
+     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }

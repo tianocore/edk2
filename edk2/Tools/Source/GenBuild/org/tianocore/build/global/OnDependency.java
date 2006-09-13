@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Sequential;
+import org.tianocore.common.logger.EdkLog;
 
 /**
  Class OnDepdendency is used to check the timestamp between source files and
@@ -54,7 +55,7 @@ public class OnDependency extends Task {
     /**
      Standard execute method of ANT task
      **/
-    public void execute() {
+    public void execute() throws BuildException {
         if (isOutOfDate() && task != null) {
             task.perform();
         }
@@ -68,6 +69,7 @@ public class OnDependency extends Task {
         /// if no source files specified, take it as a fresh start
         ///
         if (sources.nameList.size() == 0) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, "No source file spcified!");
             return true;
         }
 
@@ -76,6 +78,7 @@ public class OnDependency extends Task {
             String dstFileName = (String)dstIt.next();
             File dstFile = new File(dstFileName);
             if (!dstFile.exists()) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "Target file [" + dstFileName + "] doesn't exist!");
                 return true;
             }
 
@@ -97,6 +100,7 @@ public class OnDependency extends Task {
                 }
 
                 if (dstTimeStamp < srcTimeStamp) {
+                    EdkLog.log(this, EdkLog.EDK_VERBOSE, "Source file [" + srcFileName + "] has been changed since last build!");
                     return true;
                 }
             }

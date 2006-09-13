@@ -35,13 +35,29 @@ public class NestElement extends DataType {
     private List<String> nameList = new ArrayList<String>();
 
     /**
+       Insert content in the newElement into this NestElement
+
+       @param newElement    The new NestElement
+     **/
+    public void insert(NestElement newElement) {
+        this.nameList.addAll(newElement.getNameList());
+    }
+
+    /**
        Handle "name" attribute. No delimiter and special treatment are assumed.
 
        @param name  A single string value of "name" attribute 
      **/
     public void setName(String name) {
         if (name.length() > 0) {
-            nameList.add(name);
+            this.nameList.clear();
+            this.nameList.add(name);
+        }
+    }
+
+    public void insName(String name) {
+        if (name.length() > 0) {
+            this.nameList.add(name);
         }
     }
 
@@ -56,6 +72,7 @@ public class NestElement extends DataType {
             return;
         }
 
+        this.nameList.clear();
         StringTokenizer tokens = new StringTokenizer(nameList, " \t,;", false);
         while (tokens.hasMoreTokens()) {
             String name = tokens.nextToken().trim();
@@ -91,6 +108,7 @@ public class NestElement extends DataType {
             //
             // Read line by line
             // 
+            nameList.clear();
             while((str = in.readLine()) != null){
                 str = str.trim();
                 if (str.length() == 0){
@@ -98,7 +116,7 @@ public class NestElement extends DataType {
                 }
 
                 //getProject().replaceProperties(str);
-                nameList.add(str);
+                this.nameList.add(str);
             }
         } catch (Exception e){
             throw new BuildException(e.getMessage());            
@@ -129,6 +147,15 @@ public class NestElement extends DataType {
     }
 
     /**
+       Add a file or file list into the file list
+
+       @param file  The path of a file
+     **/
+    public void insFile(String file) {
+        insPath(file);
+    }
+
+    /**
        Handle "path" attribute. The value of "path" may contain compound path
        separator (/ or \) which should be cleaned up. Because the "path" string
        will always be passed to external native program which may not handle 
@@ -139,6 +166,16 @@ public class NestElement extends DataType {
        @param path  String value of a file system path
      **/
     public void setPath(String path) {
+        this.nameList.clear();
+        insPath(path);
+    }
+
+    /**
+       Add a path or path list into the path list
+
+       @param path  The path string
+     **/
+    public void insPath(String path) {
         if (path.length() == 0) {
             return;
         }
@@ -184,6 +221,7 @@ public class NestElement extends DataType {
             //
             // Read the file line by line, skipping empty ones
             // 
+            nameList.clear();
             while((path = in.readLine()) != null){
                 path = path.trim();
                 if (path.length() == 0){
@@ -252,6 +290,47 @@ public class NestElement extends DataType {
         }
 
         return string.toString();
+    }
+
+    /**
+       Compose and return the name/path string concatenated by space and
+       with only one "prefix".
+
+       @param prefix    The prefix at the beginning of the string
+       
+       @return String   The string with one prefix at the beginning
+     **/
+    public String toStringWithSinglepPrefix(String prefix) {
+        return prefix + toString(" ");
+    }
+
+    /**
+       Compose a string list with file names only, separated by spcified string
+
+       @param separator     The separator string
+       
+       @return String       The file list
+     **/
+    public String toFileList(String separator) {
+        StringBuffer string = new StringBuffer(1024);
+        int length = nameList.size();
+
+        for (int i = 0; i < length; ++i) {
+            File file = new File(nameList.get(i));
+            string.append(file.getName());
+            string.append(separator);
+        }
+
+        return string.toString();
+    }
+
+    /**
+       Compose a string list with file names only, separated by space
+
+       @return String   The list string
+     **/
+    public String toFileList() {
+        return toFileList(" ");
     }
 
     //

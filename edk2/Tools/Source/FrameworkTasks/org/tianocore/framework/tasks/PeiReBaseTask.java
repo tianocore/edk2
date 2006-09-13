@@ -33,43 +33,39 @@ import org.tianocore.common.logger.EdkLog;
   PeiReBaseTask is used to call PeiReBase.exe to rebase efi fv file.
 **/
 public class PeiReBaseTask extends Task implements EfiDefine {
-    ///
-    /// tool name
-    ///
+    //
+    // tool name
+    //
     private String toolName = "PeiReBase";
-    // /
-    // / Input file
-    // /
-    private String inputFile = "";
-    private String inputFileName = "";
-    // /
-    // / Output file
-    // /
-    private String outputFile = "";
-
-    // /
-    // / Output directory, this variable is added by jave wrap
-    // /
-    private String outputDir = "";
-
-    ///
-    /// Base address
-    ///
-    private String baseAddr = "";
-
-    ///
-    /// Architecture
-    ///
-    private String arch = "";
+    //
+    // Input file
+    //
+    private FileArg inputFile = new FileArg();
+    //
+    // Output file
+    //
+    private FileArg outputFile = new FileArg();
+    //
+    // Base address
+    //
+    private ToolArg baseAddr = new ToolArg();
+    //
+    // 
+    // 
+    private FileArg mapFile = new FileArg();
+    //
+    // Architecture
+    //
+    private String arch = "IA32";
 
     /**
-     * execute
-     *
-     * PeiReBaseTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      PeiReBaseTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -82,28 +78,24 @@ public class PeiReBaseTask extends Task implements EfiDefine {
         String argument;
         if (this.arch.equalsIgnoreCase("IA32")){
             command = toolName + "_IA32";
-        }else if (this.arch.equalsIgnoreCase("X64")){
+        } else if (this.arch.equalsIgnoreCase("X64")){
             command = toolName + "_X64";
-        }else if (this.arch.equalsIgnoreCase("IPF")){
+        } else if (this.arch.equalsIgnoreCase("IPF")){
             command = toolName + "_IPF";
-        }else {
+        } else {
             command = toolName + "_IA32";
         }
         if (path != null) {
-            command = path + File.separatorChar + command;
+            command = path + File.separator + command;
         }
 
         //
         // argument of tools
         //
-        File file = new File(outputFile);
-        if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-            argument = inputFile + " " +  "-O " + outputDir + File.separatorChar
-                    + outputFile + " " + this.baseAddr + " "
-                    + "-M " + outputDir + + File.separatorChar + outputFile + ".map";
-        } else {
-            argument = inputFile + " " + "-O " + outputFile + " " + this.baseAddr+ " " + "-M " + outputFile + ".map";
+        if (mapFile.getValue().length() == 0) {
+            mapFile.setArg(" -M ", outputFile.getValue() + ".map");
         }
+        argument = "" + inputFile + outputFile + baseAddr + mapFile;
 
         //
         // return value of fwimage execution
@@ -125,7 +117,9 @@ public class PeiReBaseTask extends Task implements EfiDefine {
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, this.inputFileName);
+            EdkLog.log(this, EdkLog.EDK_INFO, inputFile.toFileList() + " => " 
+                                              + outputFile.toFileList()
+                                              + mapFile.toFileList());
 
             revl = runner.execute();
 
@@ -147,116 +141,110 @@ public class PeiReBaseTask extends Task implements EfiDefine {
     }
 
     /**
-     * getInputFile
-     *
-     * This function is to get class member "inputFile".
-     *
-     * @return string of input file name.
-     */
+      getInputFile
+     
+      This function is to get class member "inputFile".
+     
+      @return string of input file name.
+     **/
     public String getInputFile() {
-        return inputFile;
+        return inputFile.getValue();
     }
 
     /**
-     * setComponentType
-     *
-     * This function is to set class member "inputFile".
-     *
-     * @param inputFile
-     *            string of input file name.
-     */
+      setComponentType
+     
+      This function is to set class member "inputFile".
+     
+      @param inputFile
+                 string of input file name.
+     **/
     public void setInputFile(String inputFile) {
-        this.inputFileName = (new File(inputFile)).getName();
-        this.inputFile = "-I " + inputFile;
+        this.inputFile.setArg(" -I ", inputFile);
     }
 
     /**
-     * getOutputFile
-     *
-     * This function is to get class member "outputFile"
-     *
-     * @return outputFile string of output file name.
-     */
+      getOutputFile
+     
+      This function is to get class member "outputFile"
+     
+      @return outputFile string of output file name.
+     **/
     public String getOutputFile() {
-        return outputFile;
+        return outputFile.getValue();
     }
 
     /**
-     * setOutputFile
-     *
-     * This function is to set class member "outputFile"
-     *
-     * @param outputFile
-     *            string of output file name.
-     */
+      setOutputFile
+     
+      This function is to set class member "outputFile"
+     
+      @param outputFile
+                 string of output file name.
+     **/
     public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
+        this.outputFile.setArg(" -O ", outputFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory.
-     */
-    public String getOutputDir() {
-        return outputDir;
-    }
-
-    /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            string of output directory.
-     */
-    public void setOutputDir(String outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    /**
-     * getBaseAddr
-     *
-     * This function is to get class member "baseAddr"
-     *
-     * @return baseAddr   string of base address.
-     */
+      getBaseAddr
+     
+      This function is to get class member "baseAddr"
+     
+      @return baseAddr   string of base address.
+     **/
     public String getBaseAddr() {
-        return baseAddr;
+        return baseAddr.getValue();
     }
 
     /**
-     * setBaseAddr
-     *
-     * This function is to set class member "baseAddr"
-     *
-     * @param baseAddr    string of base address
-     */
+      setBaseAddr
+     
+      This function is to set class member "baseAddr"
+     
+      @param baseAddr    string of base address
+     **/
     public void setBaseAddr(String baseAddr) {
-        this.baseAddr = "-B " +  baseAddr;
+        this.baseAddr.setArg(" -B ", baseAddr);
     }
 
     /**
-     * getArch
-     *
-     * This function is to get class member "arch".
-     *
-     * @return arch       Architecture
-     */
+      getArch
+     
+      This function is to get class member "arch".
+     
+      @return arch       Architecture
+     **/
     public String getArch() {
         return arch;
     }
 
     /**
-     * setArch
-     *
-     * This function is to set class member "arch"
-     *
-     * @param arch         Architecture
-     */
+      setArch
+     
+      This function is to set class member "arch"
+     
+      @param arch         Architecture
+     **/
     public void setArch(String arch) {
         this.arch = arch;
+    }
+
+    /**
+       Get the value of map file
+
+       @return String   The map file path
+     **/
+    public String getMapFile() {
+        return mapFile.getValue();
+    }
+
+    /**
+       Set "-M MapFile" argument
+
+       @param mapFile   The path of map file
+     **/
+    public void setMapFile(String mapFile) {
+        this.mapFile.setArg(" -M ", mapFile);
     }
 }

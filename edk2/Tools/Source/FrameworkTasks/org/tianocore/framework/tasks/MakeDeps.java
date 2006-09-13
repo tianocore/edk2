@@ -281,6 +281,7 @@ public class MakeDeps extends Task {
     private boolean isUptodate() {
         File df = new File(depsFile);
         if (!df.exists()) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, depsFile + " doesn't exist!");
             return false;
         }
 
@@ -296,6 +297,7 @@ public class MakeDeps extends Task {
             for (int i = 0, length = fileList.size(); i < length; ++i) {
                 File sf = new File(fileList.get(i));
                 if (sf.lastModified() > depsFileTimeStamp) {
+                    EdkLog.log(this, EdkLog.EDK_VERBOSE, sf.getPath() + " has been changed since last build!");
                     return false;
                 }
             }
@@ -309,26 +311,53 @@ public class MakeDeps extends Task {
         //
         LineNumberReader    lineReader = null;
         FileReader          fileReader = null;
-        boolean             ret = true;
+        boolean             ret = false;
         try {
             fileReader = new FileReader(df);
             lineReader = new LineNumberReader(fileReader);
 
             String line = null;
+            int lines = 0;
             while ((line = lineReader.readLine()) != null) {
-                File sourceFile = new File(line);
+                //
+                // check file end flag "\t" to see if the .dep was generated correctly
+                // 
+                if (line.equals("\t")) {
+                    ret = true;
+                    continue;
+                }
+                line = line.trim();
+                //
+                // skip empty line
+                // 
+                if (line.length() == 0) {
+                    continue;
+                }
+                ++lines;
+
                 //
                 // If a file cannot be found (moved or removed) or newer, regenerate the dep file
                 // 
+                File sourceFile = new File(line);
                 if ((!sourceFile.exists()) || (sourceFile.lastModified() > depsFileTimeStamp)) {
+                    EdkLog.log(this, EdkLog.EDK_VERBOSE, sourceFile.getPath() + " has been (re)moved or changed since last build!");
                     ret = false;
                     break;
                 }
             }
+
+            //
+            // check if the .dep file is empty
+            // 
+            if (lines == 0) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, depsFile + " is empty!");
+                ret = false;
+            }
+
             lineReader.close();
             fileReader.close();
         } catch (IOException e) {
-            log (e.getMessage());
+            throw new BuildException(e.getMessage());
         }
 
         return ret;

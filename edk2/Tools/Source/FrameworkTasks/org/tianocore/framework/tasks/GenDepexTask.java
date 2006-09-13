@@ -14,6 +14,7 @@
 
  **/
 package org.tianocore.framework.tasks;
+
 import java.io.File;
 
 import org.apache.tools.ant.BuildException;
@@ -22,6 +23,9 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
+
+import org.tianocore.common.logger.EdkLog;
+
 /**
   GenDepexTask
   
@@ -29,19 +33,19 @@ import org.apache.tools.ant.types.Commandline;
 
 **/
 public class GenDepexTask extends Task implements EfiDefine {
-    ///
-    /// output binary dependency files name
-    ///
-    private String outputFile = "";
-    ///
-    /// input pre-processed dependency text files name
-    ///
-    private String inputFile = "";
-    private String inputFileName = "";
-    ///
-    /// padding integer value
-    ///
-    private String padding = "";
+    private static String toolName = "GenDepex";
+    //
+    // output binary dependency files name
+    //
+    private FileArg outputFile = new FileArg();
+    //
+    // input pre-processed dependency text files name
+    //
+    private FileArg inputFile = new FileArg();
+    //
+    // padding integer value
+    //
+    private ToolArg padding = new FileArg();
     /**
       execute
       
@@ -57,14 +61,14 @@ public class GenDepexTask extends Task implements EfiDefine {
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "GenDepex";
+            command = toolName;
         } else {
-            command = path + "/" + "GenDepex";
+            command = path + File.separator + toolName;
         }
         //
         // argument of GenDepex tool
         //
-        String argument = inputFile + outputFile + padding;
+        String argument = "" + inputFile + outputFile + padding;
         //
         // reture value of GenDepex execution
         //
@@ -82,16 +86,17 @@ public class GenDepexTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(commandLine.getCommandline());
 
-            log(Commandline.toString(commandLine.getCommandline()), Project.MSG_VERBOSE);
-            log(inputFileName);
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(commandLine.getCommandline()));
+            EdkLog.log(this, inputFile.toFileList() + " => " + outputFile.toFileList());
+
             returnVal = runner.execute();
             if (EFI_SUCCESS == returnVal) {
-                log("GenDepex succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "GenDepex succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                log("ERROR = " + Integer.toHexString(returnVal));
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(returnVal));
                 throw new BuildException("GenDepex failed!");
             }
         } catch (Exception e) {
@@ -106,7 +111,7 @@ public class GenDepexTask extends Task implements EfiDefine {
       @param outputFileName        name of output file
     **/
     public void setOutputFile(String outputFileName) {
-        this.outputFile = " -O " + outputFileName;
+        this.outputFile.setArg(" -O ", outputFileName);
     }
 
     /**
@@ -117,7 +122,7 @@ public class GenDepexTask extends Task implements EfiDefine {
       @return name of ouput file
     **/
     public String getOutputFile() {
-        return this.outputFile;
+        return this.outputFile.getValue();
     }
 
     /**
@@ -127,8 +132,7 @@ public class GenDepexTask extends Task implements EfiDefine {
       @param inputFileName          name of inputFile
     **/
     public void setInputFile(String inputFileName) {
-        this.inputFileName = (new File(inputFileName)).getName();
-        this.inputFile = " -I " + inputFileName;
+        this.inputFile.setArg(" -I ", inputFileName);
     }
 
     /**
@@ -138,7 +142,7 @@ public class GenDepexTask extends Task implements EfiDefine {
       @return                       name of input file
     **/
     public String getInputFile() {
-        return this.inputFile;
+        return this.inputFile.getValue();
     }
 
     /**
@@ -148,7 +152,7 @@ public class GenDepexTask extends Task implements EfiDefine {
       @param paddingNum             padding value
     **/
     public void setPadding(String paddingNum) {
-        this.padding = " -P " + paddingNum;
+        this.padding.setArg(" -P ", paddingNum);
     }
 
     /**
@@ -158,6 +162,6 @@ public class GenDepexTask extends Task implements EfiDefine {
       @return                       value of padding
     **/
     public String getPadding() {
-        return this.padding;
+        return this.padding.getValue();
     }
 }

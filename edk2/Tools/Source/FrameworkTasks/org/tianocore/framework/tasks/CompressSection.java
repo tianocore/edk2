@@ -32,7 +32,7 @@ import org.apache.tools.ant.BuildException;
   CompressSection indicate that all section which in it should be compressed. 
  
 **/
-public class CompressSection implements Section, FfsTypes{
+public class CompressSection implements Section, FfsTypes {
     //
     // The attribute of compressName.
     //
