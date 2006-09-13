@@ -1360,10 +1360,12 @@ public class SurfaceAreaQuery {
             //
             PackageIdentification pkgId = new PackageIdentification(null, pkgGuid, pkgVersion);
             GlobalData.refreshPackageIdentification(pkgId);
+            
             ModuleIdentification saId = new ModuleIdentification(null, saGuid, saVersion);
+            saId.setPackage(pkgId);
             GlobalData.refreshModuleIdentification(saId);
             
-            saId.setPackage(pkgId);
+
 
             //
             // Create FpdModule Identification which have class member of module

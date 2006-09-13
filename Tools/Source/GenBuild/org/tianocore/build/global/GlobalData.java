@@ -299,8 +299,12 @@ public class GlobalData {
             packageId = (PackageIdentification)iter.next();
             moduleId.setPackage(packageId);
             Spd spd = spdTable.get(packageId);
-            if (spd.getModuleFile(moduleId) != null ) {
-                break ;
+            File tempMsaFile = null;
+            if ((tempMsaFile = spd.getModuleFile(moduleId)) != null ) {
+                if (tempMsaFile.getParent().equalsIgnoreCase(moduleId.getMsaFile().getParent())) {
+                    break ;
+                }
+                tempMsaFile = null;
             }
         }
         if (packageId == null){

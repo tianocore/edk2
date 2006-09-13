@@ -130,6 +130,7 @@ public class GenBuildTask extends Ant {
               From module build, exception from module surface area invalid.
     **/
     public void execute() throws BuildException {
+        this.setTaskName("GenBuild");
         try {
             processGenBuild();
         } catch (PcdAutogenException e) {
@@ -200,6 +201,7 @@ public class GenBuildTask extends Ant {
             Map<String, XmlObject> doc = GlobalData.getNativeMsa(msaFile);
             saq = new SurfaceAreaQuery(doc);
             moduleId = saq.getMsaHeader();
+            moduleId.setMsaFile(msaFile);
         }
         
         String[] producedLibraryClasses = saq.getLibraryClasses("ALWAYS_PRODUCED",null);
@@ -346,7 +348,6 @@ public class GenBuildTask extends Ant {
     private void prepareSingleModuleBuild() throws EdkException {
         //
         // Find out the package which the module belongs to
-        // TBD: Enhance it!!!!
         //
         PackageIdentification packageId = GlobalData.getPackageForModule(moduleId);
         GlobalData.refreshPackageIdentification(packageId);

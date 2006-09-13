@@ -271,5 +271,4 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     public void setId(FpdModuleIdentification id) {
         this.id = id;
     }
-    
 }
