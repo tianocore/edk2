@@ -90,7 +90,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     </IndustryStdHeader>
   </IndustryStdIncludes>
   <MsaFiles>
-    <Filename>Dxe/ConPlatform/ConPlatform.msa</Filename>
     <Filename>Dxe/Nt32Platform/MiscSubclass/MiscSubclassDriver.msa</Filename>
     <Filename>Dxe/PlatformBds/PlatformBds.msa</Filename>
     <Filename>Dxe/WinNtThunk/Bus/BlockIo/WinNtBlockIo.msa</Filename>
