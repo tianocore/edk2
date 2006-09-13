@@ -115,7 +115,7 @@ PeimInitializeDxeIpl (
   );
 
 EFI_STATUS
-PeiLoadx64File (
+PeiLoadPeImage (
   IN  EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader,
   IN  VOID                                      *Pe32Data,
   IN  EFI_MEMORY_TYPE                           MemoryType,

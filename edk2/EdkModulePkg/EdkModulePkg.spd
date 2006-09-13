@@ -440,6 +440,7 @@
     <Filename>Universal/WatchdogTimer/Dxe/WatchDogTimer.msa</Filename>
     <Filename>Universal/StatusCode/Pei/PeiStatusCode.msa</Filename>
     <Filename>Universal/StatusCode/Dxe/DxeStatusCode.msa</Filename>
+    <Filename>Universal/ConPlatform/Dxe/ConPlatform.msa</Filename>
   </MsaFiles>
   <PackageHeaders>
     <IncludePkgHeader ModuleType="SEC">Include/EdkPeim.h</IncludePkgHeader>
