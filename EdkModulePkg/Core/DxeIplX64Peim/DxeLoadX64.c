@@ -247,7 +247,7 @@ Returns:
   //
   // Install the PEI Protocols that are shared between PEI and DXE
   //
-  PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderX64Protocol ();
+  PeiEfiPeiPeCoffLoader = (EFI_PEI_PE_COFF_LOADER_PROTOCOL *)GetPeCoffLoaderProtocol ();
   ASSERT (PeiEfiPeiPeCoffLoader != NULL);
 
   //
@@ -313,7 +313,7 @@ Returns:
   //
   // Load the DXE Core from a Firmware Volume
   //
-  Status = PeiLoadx64File (
+  Status = PeiLoadPeImage (
              PeiEfiPeiPeCoffLoader,
              DxeCorePe32Data,
              EfiBootServicesData,
@@ -446,7 +446,7 @@ Returns:
 }
 
 EFI_STATUS
-PeiLoadx64File (
+PeiLoadPeImage (
   IN  EFI_PEI_PE_COFF_LOADER_PROTOCOL           *PeiEfiPeiPeCoffLoader,
   IN  VOID                                      *Pe32Data,
   IN  EFI_MEMORY_TYPE                           MemoryType,
@@ -578,7 +578,7 @@ Returns:
   //
   // Relocate DxeIpl into memory by using loadfile service
   //
-  Status = PeiLoadx64File (
+  Status = PeiLoadPeImage (
             PeiEfiPeiPeCoffLoader,
             (VOID *) (Section + 1),
             EfiBootServicesData,
@@ -659,7 +659,7 @@ Returns:
   //
   // Load the PE image from the FFS file
   //
-  Status = PeiLoadx64File (
+  Status = PeiLoadPeImage (
             PeiEfiPeiPeCoffLoader,
             Pe32Data,
             EfiBootServicesData,
