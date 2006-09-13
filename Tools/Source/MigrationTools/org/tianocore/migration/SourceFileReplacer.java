@@ -53,7 +53,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
     
     private class IdleLaplace extends Common.Laplace {
         public String operation(String wholeline) {
-            return wholeline;
+            return replaceLibrary (wholeline, mi.hashmacro);
         }
         
         public boolean recognize(String filename) {
@@ -105,51 +105,11 @@ public final class SourceFileReplacer implements Common.ForDoAll {
             if (Common.find (wholeline, "\\bgDS\\b")) {
                 mi.hashrequiredr9libs.add ("DxeServicesTableLib");
             }
-            // start replacing names
-            String r8thing;
-            String r9thing;
-            Iterator<String> it;
-            // Converting non-locla function
-            it = mi.hashnonlocalfunc.iterator();
-            while (it.hasNext()) {
-                r8thing = it.next();
-                mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));                // add a library here
- 
-                r8tor9 temp;
-                if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {
-                    if (!r8thing.equals(r9thing)) {
-                        if (wholeline.contains(r8thing)) {
-                            wholeline = wholeline.replaceAll(r8thing, r9thing);
-                            filefunc.add(new r8tor9(r8thing, r9thing));
-                            Iterator<r8tor9> rt = filefunc.iterator();
-                            while (rt.hasNext()) {
-                                temp = rt.next();
-                                if (MigrationTool.db.r8only.contains(temp.r8thing)) {
-                                    filer8only.add(r8thing);
-                                    mi.hashr8only.add(r8thing);
-                                    addr8 = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }                                                            //is any of the guids changed?
-            if (addr8 == true) {
-                wholeline = addincludefile(wholeline, "\"R8Lib.h\"");
-            }
-            
+
+            wholeline = replaceLibrary (wholeline, mi.hashnonlocalfunc);
+            wholeline = replaceLibrary (wholeline, mi.hashmacro);
             // Converting macro
-            it = mi.hashnonlocalmacro.iterator();
-            while (it.hasNext()) {                        //macros are all assumed MdePkg currently
-                r8thing = it.next();
-                //mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));        
-                if ((r9thing = MigrationTool.db.getR9Macro(r8thing)) != null) {
-                    if (wholeline.contains(r8thing)) {
-                        wholeline = wholeline.replaceAll(r8thing, r9thing);
-                        filemacro.add(new r8tor9(r8thing, r9thing));
-                    }
-                }
-            }
+            wholeline = replaceMacro (wholeline, mi.hashnonlocalmacro);
 
             // Converting guid
             replaceGuid(wholeline, mi.guid, "guid", fileguid);
@@ -289,7 +249,64 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         }
         return templine;
     }
-    
+
+    private final String replaceMacro (String wholeline, Set<String> symbolSet) {
+        String r8thing;
+        String r9thing;
+        Iterator<String> it;
+
+        it = symbolSet.iterator();
+        while (it.hasNext()) {                        //macros are all assumed MdePkg currently
+            r8thing = it.next();
+            System.out.println (r8thing);
+            //mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));        
+            if ((r9thing = MigrationTool.db.getR9Macro(r8thing)) != null) {
+                if (wholeline.contains(r8thing)) {
+                    wholeline = wholeline.replaceAll(r8thing, r9thing);
+                    filemacro.add(new r8tor9(r8thing, r9thing));
+                }
+            }
+        }
+        return wholeline;
+    }
+
+    private final String replaceLibrary (String wholeline, Set<String> symbolSet) {
+        boolean addr8 = false;
+        // start replacing names
+        String r8thing;
+        String r9thing;
+        Iterator<String> it;
+        // Converting non-locla function
+        it = symbolSet.iterator();
+        while (it.hasNext()) {
+            r8thing = it.next();
+            mi.hashrequiredr9libs.add(MigrationTool.db.getR9Lib(r8thing));                // add a library here
+ 
+            r8tor9 temp;
+            if ((r9thing = MigrationTool.db.getR9Func(r8thing)) != null) {
+                if (!r8thing.equals(r9thing)) {
+                    if (wholeline.contains(r8thing)) {
+                        wholeline = wholeline.replaceAll(r8thing, r9thing);
+                        filefunc.add(new r8tor9(r8thing, r9thing));
+                        Iterator<r8tor9> rt = filefunc.iterator();
+                        while (rt.hasNext()) {
+                            temp = rt.next();
+                            if (MigrationTool.db.r8only.contains(temp.r8thing)) {
+                                filer8only.add(r8thing);
+                                mi.hashr8only.add(r8thing);
+                                addr8 = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }                                                            //is any of the guids changed?
+        if (addr8 == true) {
+            wholeline = addincludefile(wholeline, "\"R8Lib.h\"");
+        }
+        return wholeline;
+    }
+
     private final void addr8only() throws Exception {
         String paragraph = null;
         String line = Common.file2string(MigrationTool.db.DatabasePath + File.separator + "R8Lib.c");

@@ -41,6 +41,7 @@ public final class ModuleInfo {
     public final Set<String> hashnonlocalmacro = new HashSet<String>();
     public final Set<String> hashEFIcall = new HashSet<String>();
     public final Set<String> hashr8only = new HashSet<String>();
+    public final Set<String> hashmacro = new HashSet<String>();
     
     public final Set<String> hashrequiredr9libs = new HashSet<String>();    // hashrequiredr9libs is now all added in SourceFileReplacer 
     public final Set<String> guid = new HashSet<String>();

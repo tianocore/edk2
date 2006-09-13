@@ -35,6 +35,7 @@ public class Macro {
         String temp = null;
         
         temp = mtr.group();
+        mi.hashmacro.add(temp);
         if (MigrationTool.db.hasMacro(temp)) {                    // only changed macros registered, because the database of macro has only changed ones
             if (!unmacro.contains(temp)) {
                 mi.hashnonlocalmacro.add(temp);

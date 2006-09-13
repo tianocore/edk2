@@ -41,8 +41,8 @@ EfiDriverLib,EfiLibReportStatusCode,ReportStatusCode,ReportStatusCodeLib,MdePkg
 EfiDriverLib,ReportStatusCodeWithDevicePath,ReportStatusCodeWithDevicePath,ReportStatusCodeLib,MdePkg
 EfiDriverLib,EFI_FIELD_OFFSET,EFI_FIELD_OFFSET,BaseLib,MdePkg
 EfiDriverLib,EFI_LIST,LIST_ENTRY,BaseLib,MdePkg
-EfiDriverLib,EFI_LIST_ENTRY,LIST_ENTRY,BaseLib,MdePkg
-EfiDriverLib,EFI_LIST_NODE,LIST_ENTRY,BaseLib,MdePkg
+EfiDriverLib,EFI_LIST_ENTRY,LIST_ENTRY    ,BaseLib,MdePkg
+EfiDriverLib,EFI_LIST_NODE,LIST_ENTRY    ,BaseLib,MdePkg
 EfiDriverLib,FLOCK,EFI_LOCK,UefiLib,MdePkg
 EfiDriverLib,GetFirstNode,GetFirstNode,BaseLib,MdePkg
 EfiDriverLib,GetNextNode,GetNextNode,BaseLib,MdePkg
