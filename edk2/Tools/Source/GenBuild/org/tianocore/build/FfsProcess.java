@@ -273,7 +273,12 @@ public class FfsProcess {
             // 
             ele = doc.createElement("gensection");
             if (type != null) {
-                ele.setAttribute("sectiontype", "EFI_SECTION_GUID_DEFINED");
+                if (type.equalsIgnoreCase("COMPRESS")) {
+                    ele.setAttribute("sectionType", "EFI_SECTION_COMPRESSION");
+                }else {
+                    ele.setAttribute("sectiontype", "EFI_SECTION_GUID_DEFINED");    
+                }
+                
             } else {
                 ele.setAttribute("sectiontype", sectType);
             }

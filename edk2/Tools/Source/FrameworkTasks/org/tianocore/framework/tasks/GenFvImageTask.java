@@ -23,9 +23,6 @@ import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 
 import java.io.File;
-import java.io.InputStreamReader;
-import java.lang.ProcessBuilder;
-import java.util.LinkedList;
 
 import org.tianocore.common.logger.EdkLog;
 
