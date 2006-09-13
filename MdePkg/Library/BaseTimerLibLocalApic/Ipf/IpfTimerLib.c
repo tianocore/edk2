@@ -188,8 +188,8 @@ GetPerformanceCounter (
 UINT64
 EFIAPI
 GetPerformanceCounterProperties (
-  IN      UINT64                    *StartValue,
-  IN      UINT64                    *EndValue
+  OUT      UINT64                    *StartValue,  OPTIONAL
+  OUT      UINT64                    *EndValue     OPTIONAL
   )
 {
   PAL_PROC_RETURN                   PalRet;
