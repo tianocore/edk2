@@ -161,7 +161,7 @@ public class GenBuildLogger extends DefaultLogger implements LogMethod {
     
     private void log(Object msgSource, String msg, int level) {
         if (msgSource instanceof Task) {
-            this.project.log((Task)msgSource, msg, level);
+            ((Task)msgSource).getProject().log((Task)msgSource, msg, level);
         } else if (msgSource instanceof String){
             //
             // Pad 12 space to keep message in unify format
