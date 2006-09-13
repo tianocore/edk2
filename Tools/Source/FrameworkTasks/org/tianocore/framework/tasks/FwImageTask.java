@@ -25,29 +25,34 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 
+import org.tianocore.common.logger.EdkLog;
+
 /**
   FwImageTask class.
 
   FwImageTask is used to call FwImage.ext to generate the FwImage.
 **/
-public class FwImageTask extends Task implements EfiDefine{
-    ///
-    /// time&data
-    ///
-    private String time = "";
-    ///
-    /// input PE image
-    ///
-    private String peImage = "";
-    private String peImageName = "";
-    ///
-    /// output EFI image
-    ///
-    private String outImage = "";
-    ///
-    /// component type
-    ///
-    private String componentType = "";
+public class FwImageTask extends Task implements EfiDefine {
+    //
+    // fwimage tool name
+    // 
+    private static String toolName = "FwImage";
+    //
+    // time&data
+    //
+    private ToolArg time = new ToolArg();
+    //
+    // input PE image
+    //
+    private FileArg peImage = new FileArg();
+    //
+    // output EFI image
+    //
+    private FileArg outImage = new FileArg();
+    //
+    // component type
+    //
+    private ToolArg componentType = new ToolArg();
 
     /**
      * assemble tool command line & execute tool command line
@@ -71,14 +76,14 @@ public class FwImageTask extends Task implements EfiDefine{
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "FwImage";
+            command = toolName;
         } else {
-            command = path + "/" + "FwImage";
+            command = path + "/" + toolName;
         }
         //
         // argument of tools
         //
-        String argument = time + componentType + peImage + outImage;
+        String argument = "" + time + componentType + peImage + outImage;
         //
         // return value of fwimage execution
         //
@@ -96,16 +101,17 @@ public class FwImageTask extends Task implements EfiDefine{
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
 
-            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
-            log(this.peImageName);
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, peImage.toFileList() + " => " + outImage.toFileList());
+
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                log("FwImage succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "FwImage succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                log("ERROR = " + Integer.toHexString(revl));
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("FwImage failed!");
             }
         } catch (Exception e) {
@@ -121,7 +127,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @param time            string of time
     **/
     public void setTime(String time) {
-        this.time = " -t " + time;
+        this.time.setArg(" -t ", time);
     }
 
     /**
@@ -131,7 +137,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @return time          string of time
     **/
     public String getTime() {
-        return this.time;
+        return this.time.getValue();
     }
 
     /**
@@ -141,7 +147,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @return                name of PE image
     **/
     public String getPeImage() {
-        return this.peImage;
+        return this.peImage.getValue();
     }
 
     /**
@@ -151,8 +157,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @param  peImage        name of PE image
     **/
     public void setPeImage(String peImage) {
-        this.peImageName = (new File(peImage)).getName();
-        this.peImage = " " + peImage;
+        this.peImage.setArg(" ", peImage);
     }
 
     /**
@@ -162,7 +167,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @return                 name of output EFI image
     **/
     public String getOutImage() {
-        return this.outImage;
+        return this.outImage.getValue();
     }
 
     /**
@@ -172,7 +177,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @param outImage         name of output EFI image
     **/
     public void setOutImage(String outImage) {
-        this.outImage = " " + outImage;
+        this.outImage.setArg(" ", outImage);
     }
 
     /**
@@ -183,7 +188,7 @@ public class FwImageTask extends Task implements EfiDefine{
       @return                 string of componentType
     **/
     public String getComponentType() {
-        return this.componentType;
+        return this.componentType.getValue();
     }
 
     /**
@@ -193,6 +198,6 @@ public class FwImageTask extends Task implements EfiDefine{
       @param  componentType   string of component type
     **/
     public void setComponentType(String componentType) {
-        this.componentType = " " + componentType;
+        this.componentType.setArg(" ", componentType);
     }
 }

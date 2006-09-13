@@ -286,6 +286,7 @@ Finish:
   // Close our output file
   //
   if ((mGlobals.OutFptr != stdout) && (mGlobals.OutFptr != NULL)) {
+    fprintf(mGlobals.OutFptr, "\t\n");  // file ending flag
     fclose (mGlobals.OutFptr);
   }
 

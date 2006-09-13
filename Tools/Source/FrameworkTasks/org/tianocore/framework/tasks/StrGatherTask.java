@@ -22,6 +22,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
+import org.tianocore.common.logger.EdkLog;
 
 /**
  StrGather Task Class
@@ -48,51 +49,51 @@ public class StrGatherTask extends Task implements EfiDefine {
     ///
     /// common options
     ///
-    private String commandType = "";
+    private ToolArg commandType = new ToolArg();
 
-    private String baseName = "";
+    private ToolArg baseName = new ToolArg();
 
     ///
     /// "all/read/write"
     ///
-    private String verbose = "";
+    private ToolArg verbose = new ToolArg();
 
-    private String outputDatabase = "";
+    private FileArg outputDatabase = new FileArg();
 
-    private List<Database> databaseList = new ArrayList<Database>();
+    private Database databaseList = new Database();
 
-    private List<InputFile> inputFileList = new ArrayList<InputFile>();
+    private InputFile inputFileList = new InputFile();
 
     ///
     /// parse options newDatabase -- "ture/false" unquoteString -- "ture/false"
     ///
-    private String newDatabase = "";
+    private ToolArg newDatabase = new ToolArg();
 
-    private String unquotedString = "";
+    private ToolArg unquotedString = new ToolArg();
 
-    private List<IncludePath> includePathList = new ArrayList<IncludePath>();
+    private IncludePath includePathList = new IncludePath();
 
     ///
     /// scan options ignoreNotFound -- "ture/false"
     ///
-    private String ignoreNotFound = "";
+    private ToolArg ignoreNotFound = new ToolArg();
 
-    private List<SkipExt> skipExtList = new ArrayList<SkipExt>();
+    private SkipExt skipExtList = new SkipExt();
 
     ///
     /// dump options
     ///
-    private String outputString = "";
+    private ToolArg outputString = new ToolArg();
 
-    private String outputDefines = "";
+    private ToolArg outputDefines = new ToolArg();
 
-    private String outputUnicode = "";
+    private ToolArg outputUnicode = new ToolArg();
 
-    private String lang = "";
+    private ToolArg lang = new ToolArg();
 
-    private String indirectionFile = "";
+    private FileArg indirectionFile = new FileArg();
 
-    private String outputHpk = "";
+    private FileArg outputHpk = new FileArg();
 
     ///
     /// global variable
@@ -119,21 +120,13 @@ public class StrGatherTask extends Task implements EfiDefine {
         }
 
         ///
-        /// transfer nested elements into string
-        ///
-        String databases = list2Str(databaseList);
-        String skipExts = list2Str(skipExtList);
-        String includePaths = list2Str(includePathList);
-        String inputFiles = list2Str(inputFileList);
-
-        ///
         /// assemble argument
         ///
-        String argument = commandType + verbose + databases + baseName
-                + outputDatabase + includePaths + newDatabase + unquotedString
-                + skipExts + ignoreNotFound + outputString + outputDefines
+        String argument = "" + commandType + verbose + databaseList + baseName
+                + outputDatabase + includePathList + newDatabase + unquotedString
+                + skipExtList + ignoreNotFound + outputString + outputDefines
                 + outputUnicode + lang + indirectionFile + outputHpk
-                + inputFiles;
+                + inputFileList;
         ///
         /// return value of fwimage execution
         ///
@@ -151,16 +144,27 @@ public class StrGatherTask extends Task implements EfiDefine {
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
 
-            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
-            log(this.commandType.substring(2));
+            String cmdType = getCommandType();
+            if (cmdType.equalsIgnoreCase("parse")) {
+                EdkLog.log(this, "(parse) " + inputFileList.toFileList() + " => " 
+                    + databaseList.toFileList());
+            } else if (cmdType.equalsIgnoreCase("scan")) {
+                EdkLog.log(this, "(scan) " + databaseList.toFileList() + " => " 
+                    + outputDatabase.toFileList());
+            } else {
+                EdkLog.log(this, "(dump) " + databaseList.toFileList() + " => " 
+                    + outputDefines.toFileList() + outputString.toFileList() + outputHpk.toFileList());
+            }
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                log("StrGather succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "StrGather succeeded!");
             } else {
                 ///
                 /// command execution fail
                 ///
-                log("ERROR = " + Integer.toHexString(revl));
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("StrGather failed!");
             }
         } catch (Exception e) {
@@ -174,7 +178,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns commandType parameter
      **/
     public String getCommandType() {
-        return this.commandType;
+        return this.commandType.getValue();
     }
 
     /**
@@ -183,7 +187,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     commandType     type of strgather command [parse/scan/dump]
      **/
     public void setCommandType(String commandType) {
-        this.commandType = " -" + commandType;
+        this.commandType.setArg(" -", commandType);
     }
 
     /**
@@ -192,7 +196,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns verbose parameter
      **/
     public String getVerbose() {
-        return this.verbose;
+        return this.verbose.getValue();
     }
 
     /**
@@ -205,17 +209,17 @@ public class StrGatherTask extends Task implements EfiDefine {
             ///
             /// for verbose output
             ///
-            this.verbose = " -v ";
+            this.verbose.setArg(" -", "v");
         } else if (verbose.equals("read")) {
             ///
             /// for verbose output when reading database
             ///
-            this.verbose = " -vdbr ";
+            this.verbose.setArg(" -", "vdbr");
         } else if (verbose.equals("write")) {
             ///
             /// for verbose output when writing database
             ///
-            this.verbose = " -vdbw ";
+            this.verbose.setArg(" -", "vdbw");
         }
     }
 
@@ -225,7 +229,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns baseName parameter
      **/
     public String getBaseName() {
-        return this.baseName;
+        return this.baseName.getValue();
     }
 
     /**
@@ -234,7 +238,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     baseName    name of the output files of .c and .h
      **/
     public void setBaseName(String baseName) {
-        this.baseName = " -bn " + baseName;
+        this.baseName.setArg(" -bn ", baseName);
     }
 
     /**
@@ -243,7 +247,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns outputDatabase parameter
      **/
     public String getOutputDatabase() {
-        return this.outputDatabase;
+        return this.outputDatabase.getValue();
     }
 
     /**
@@ -252,7 +256,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     outputDatabase  filename of output database file
      **/
     public void setOutputDatabase(String outputDatabase) {
-        this.outputDatabase = " -od " + outputDatabase;
+        this.outputDatabase.setArg(" -od ", outputDatabase);
     }
 
     /**
@@ -260,8 +264,8 @@ public class StrGatherTask extends Task implements EfiDefine {
      
      @returns newDatabase parameter
      **/
-    public String getNewDatabse() {
-        return this.newDatabase;
+    public boolean getNewDatabse() {
+        return this.newDatabase.getPrefix().length() > 0;
     }
 
     /**
@@ -269,9 +273,9 @@ public class StrGatherTask extends Task implements EfiDefine {
      
      @param     newDatabase     whether to not read in existing database file
      **/
-    public void setNewDatabase(String newDatabase) {
-        if (newDatabase.equals("true")) {
-            this.newDatabase = " -newdb ";
+    public void setNewDatabase(boolean newDatabase) {
+        if (newDatabase) {
+            this.newDatabase.setArg(" -", "newdb");
         }
     }
 
@@ -280,8 +284,8 @@ public class StrGatherTask extends Task implements EfiDefine {
      
      @returns unquotedString parameter
      **/
-    public String getUnquotedString() {
-        return this.unquotedString;
+    public boolean getUnquotedString() {
+        return this.unquotedString.getValue().length() > 0;
     }
 
     /**
@@ -290,9 +294,9 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param unquotedString :
                 whether to indicate that unquoted strings are used
      **/
-    public void setUnquotedString(String unquotedString) {
-        if (unquotedString.equals("true")) {
-            this.unquotedString = " -uqs ";
+    public void setUnquotedString(boolean unquotedString) {
+        if (unquotedString) {
+            this.unquotedString.setArg(" -", "uqs");
         }
     }
 
@@ -301,8 +305,8 @@ public class StrGatherTask extends Task implements EfiDefine {
      
      @returns ignoreNotFound parameter
      **/
-    public String getIgnoreNotFound() {
-        return this.ignoreNotFound;
+    public boolean getIgnoreNotFound() {
+        return this.ignoreNotFound.getValue().length() > 0;
     }
 
     /**
@@ -311,9 +315,9 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     ignoreNotFound  whether to ignore if a given STRING_TOKEN(STR) 
                                 is not found in the database
      **/
-    public void setIgnoreNotFound(String ignoreNotFound) {
-        if (ignoreNotFound.equals("true")) {
-            this.ignoreNotFound = " -ignorenotfound ";
+    public void setIgnoreNotFound(boolean ignoreNotFound) {
+        if (ignoreNotFound) {
+            this.ignoreNotFound.setArg(" -", "ignorenotfound");
         }
     }
 
@@ -323,7 +327,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns outputString parameter
      **/
     public String getOutputString() {
-        return this.outputString;
+        return this.outputString.getValue();
     }
 
     /**
@@ -332,7 +336,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     outputString    filename of string data file
      **/
     public void setOutputString(String outputString) {
-        this.outputString = " -oc " + outputString;
+        this.outputString.setArg(" -oc ", outputString);
     }
 
     /**
@@ -341,7 +345,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns outputDefines parameter
      **/
     public String getOutputDefines() {
-        return this.outputDefines;
+        return this.outputDefines.getValue();
     }
 
     /**
@@ -350,7 +354,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     outputDefines   filename of string defines file
      **/
     public void setOutputDefines(String outputDefines) {
-        this.outputDefines = " -oh " + outputDefines;
+        this.outputDefines.setArg(" -oh ", outputDefines);
     }
 
     /**
@@ -359,7 +363,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns outputUnicode parameter
      **/
     public String getOutputUnicode() {
-        return this.outputUnicode;
+        return this.outputUnicode.getValue();
     }
 
     /**
@@ -368,7 +372,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     outputUnicode   filename of unicode file to be dumped database
      **/
     public void setOutputUnicode(String outputUnicode) {
-        this.outputUnicode = " -ou " + outputUnicode;
+        this.outputUnicode.setArg(" -ou ", outputUnicode);
     }
 
     /**
@@ -377,7 +381,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns lang parameter
      **/
     public String getLang() {
-        return this.lang;
+        return this.lang.getValue();
     }
 
     /**
@@ -386,7 +390,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     lang    language of dump
      **/
     public void setLang(String lang) {
-        this.lang = " -lang " + lang;
+        this.lang.setArg(" -lang ", lang);
     }
 
     /**
@@ -395,7 +399,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns indirectionFile parameter
      **/
     public String getIndirectionFile() {
-        return this.indirectionFile;
+        return this.indirectionFile.getValue();
     }
 
     /**
@@ -404,7 +408,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     indirectionFile     filename of indirection file
      **/
     public void setIndirectionFile(String indirectionFile) {
-        this.indirectionFile = " -if " + indirectionFile;
+        this.indirectionFile.setArg(" -if ", indirectionFile);
     }
 
     /**
@@ -413,7 +417,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @returns outputHpk parameter
      **/
     public String getOutputHpk() {
-        return this.outputHpk;
+        return this.outputHpk.getValue();
     }
 
     /**
@@ -422,7 +426,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param     outputHpk   filename of output HII export pack of the strings
      **/
     public void setOutputHpk(String outputHpk) {
-        this.outputHpk = " -hpk " + outputHpk;
+        this.outputHpk.setArg(" -hpk ", outputHpk);
     }
 
     /**
@@ -430,8 +434,8 @@ public class StrGatherTask extends Task implements EfiDefine {
      
      @param     skipExt     skipExt element
      **/
-    public void addSkipext(SkipExt skipExt) {
-        skipExtList.add(skipExt);
+    public void addConfiguredSkipext(SkipExt skipExt) {
+        this.skipExtList.insert(skipExt);
     };
 
     /**
@@ -439,8 +443,8 @@ public class StrGatherTask extends Task implements EfiDefine {
      
      @param     includePath     includePath element
      **/
-    public void addIncludepath(IncludePath includePath) {
-        includePathList.add(includePath);
+    public void addConfiguredIncludepath(IncludePath includePath) {
+        this.includePathList.insert(includePath);
     };
 
     /**
@@ -448,8 +452,8 @@ public class StrGatherTask extends Task implements EfiDefine {
      
      @param     inputFile   inputFile element
      **/
-    public void addInputfile(InputFile inputFile) {
-        inputFileList.add(inputFile);
+    public void addConfiguredInputfile(InputFile inputFile) {
+        this.inputFileList.insert(inputFile);
     };
 
     /**
@@ -458,25 +462,7 @@ public class StrGatherTask extends Task implements EfiDefine {
      @param database :
                 database element
      **/
-    public void addDatabase(Database database) {
-        databaseList.add(database);
-    }
-
-    /**
-       Compose the content in each NestElement into a single string.
-
-       @param list  The NestElement list
-       
-       @return String
-     **/
-    private String list2Str(List list) {
-        int listLength = list.size();
-        String str = "";
-        for (int i = 0; i < listLength; ++i) {
-            NestElement e = (NestElement)list.get(i);
-            str += e.toString();
-        }
-
-        return str;
+    public void addConfiguredDatabase(Database database) {
+        this.databaseList.insert(database);
     }
 }

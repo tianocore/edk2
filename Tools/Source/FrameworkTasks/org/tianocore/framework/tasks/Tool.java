@@ -32,13 +32,12 @@ import org.tianocore.common.logger.EdkLog;
  **/
 public class Tool implements EfiDefine, Section {
 
-    String toolName     = "";
-    List<Object>   toolArgList  = new ArrayList<Object>();
-    String outputPath;
-    File outputFile ;
-    List<Input>    inputFiles = new ArrayList<Input>();
-    List<Section>  gensectList = new ArrayList<Section>();
-    String inputArg = "-i ";
+    private String toolName     = "";
+    private ToolArg toolArgList = new ToolArg();
+    private Input inputFiles = new Input();
+    private String outputPath;
+    private File outputFile ;
+    private List<Section>  gensectList = new ArrayList<Section>();
     /**
      Call extern tool
 
@@ -108,11 +107,6 @@ public class Tool implements EfiDefine, Section {
         String command   = "";
         String argument  = "";
         command          = toolName;
-        Iterator argIter = toolArgList.iterator();
-        Iterator inputIter = inputFiles.iterator();
-        ToolArg toolArg;
-        Input file = null;
-              
         
         //
         //  Get each section which under the compress {};
@@ -126,7 +120,7 @@ public class Tool implements EfiDefine, Section {
                 //
                 // Parse <genSection> element
                 //
-                File outputFile = File.createTempFile("temp", "sec1",new File(outputPath));
+                File outputFile = File.createTempFile("temp", "sec1", new File(outputPath));
                 FileOutputStream bo = new FileOutputStream(outputFile);
                 DataOutputStream Do = new DataOutputStream (bo);
                 //
@@ -140,33 +134,17 @@ public class Tool implements EfiDefine, Section {
                     throw new BuildException ("GenSection failed at Tool!");
                 }  
                 Do.close();
-                this.inputArg += outputFile.getPath() + " ";                        
+                this.inputFiles.insFile(outputFile.getPath());                        
             }        
         } catch (IOException e){
             throw new BuildException ("Gensection failed at tool!");
         }
 
-        
-        ///
-        /// argument of tools
-        ///
-        while (argIter.hasNext()) {
-            toolArg = (ToolArg)argIter.next();
-            argument = argument + toolArg.getLine() + " ";
-
-        }
-
-        ///
-        /// input files for tools
-        ///
-        while (inputIter.hasNext()) {
-            file = (Input)inputIter.next();
-            inputArg += file.toString(" ");
-        }
         try {
             outputFile = File.createTempFile("temp", null, new File(outputPath));
-            argument   = argument + inputArg + " -o " + outputFile.getPath();
-            EdkLog.log(EdkLog.EDK_INFO, argument);
+            argument   = toolArgList + inputFiles.toStringWithSinglepPrefix(" -i ") 
+                         + " -o " + outputFile.getPath();
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, command + " " + argument);
             ///
             /// execute command line
             ///
@@ -183,8 +161,8 @@ public class Tool implements EfiDefine, Section {
 
      @param     toolArg     The ToolArg object containing arguments for the tool
      **/
-    public void addToolArg (ToolArg toolArg) {
-        toolArgList.add (toolArg);
+    public void addConfiguredToolArg (ToolArg toolArg) {
+        toolArgList.insert(toolArg);
     }
 
     /**
@@ -228,8 +206,8 @@ public class Tool implements EfiDefine, Section {
 
      @param     file    The Input objec which represents a file
      **/
-    public void addInput(Input file) {
-        inputFiles.add(file);
+    public void addConfiguredInput(Input file) {
+        inputFiles.insert(file);
     }
     
 //    /**
@@ -245,8 +223,7 @@ public class Tool implements EfiDefine, Section {
     
     public void addGenSection(GenSectionTask genSect){
         this.gensectList.add(genSect);
-    }
-    
+    }    
 }
 
 

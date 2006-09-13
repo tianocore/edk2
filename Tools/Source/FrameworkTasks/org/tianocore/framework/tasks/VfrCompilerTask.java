@@ -25,6 +25,8 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 
+import org.tianocore.common.logger.EdkLog;
+
 /**
  VfrcompilerTask Task Class
   class member 
@@ -36,23 +38,22 @@ import org.apache.tools.ant.types.Commandline;
       -includepathList : add IncPath to the search path for VFR included files
  **/
 public class VfrCompilerTask extends Task implements EfiDefine {
-    private String createListFile = "";
-    private String outPutDir = "";
-    private File outPutFile;
-    private String createIfrBinFile = "";
-    private String processerArg ="";
-    private String vfrFile = "";
-    private String vfrFileName = "";
+    private static String toolName = "VfrCompile";
 
-    private List<IncludePath> includepathList = new ArrayList<IncludePath>();
+    private ToolArg createListFile = new ToolArg();
+    private ToolArg createIfrBinFile = new ToolArg();
+    private ToolArg processerArg = new ToolArg();
+    private FileArg vfrFile = new FileArg();
+    private IncludePath includepathList = new IncludePath();
+    private FileArg outPutDir = new FileArg(" -od ", ".");
 
     /**
      get class member of createList file
 
      @returns file name of createList
      **/
-    public String getCreateListFile() {
-        return createListFile;
+    public boolean getCreateListFile() {
+        return this.createListFile.getValue().length() > 0;
     }
 
     /**
@@ -60,9 +61,10 @@ public class VfrCompilerTask extends Task implements EfiDefine {
 
      @param     createListFile  if createList string equal "on" set '-l' flag
      **/
-    public void setCreateListFile(String createListFile) {
-        if (createListFile.equals("ON")||createListFile.equals("on"))
-            this.createListFile = " -l";
+    public void setCreateListFile(boolean createListFile) {
+        if (createListFile) {
+            this.createListFile.setArg(" -", "l");
+        }
     }
 
     /**
@@ -71,7 +73,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @returns name of output dir
      **/
     public String getOutPutDir() {
-        return outPutDir;
+        return this.outPutDir.getValue();
     }
 
     /**
@@ -80,10 +82,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @param     outPutDir   The directory name for ouput file
      **/
     public void setOutPutDir(String outPutDir) {
-        if (outPutDir != null) {
-            outPutFile = new File(outPutDir);
-        }
-        this.outPutDir = " -od " + outPutDir;
+        this.outPutDir.setArg(" -od ", outPutDir);
     }
 
 
@@ -92,8 +91,8 @@ public class VfrCompilerTask extends Task implements EfiDefine {
 
      @return file name of ifrBinFile
      **/
-    public String getCreateIfrBinFile() {
-        return createIfrBinFile;
+    public boolean getCreateIfrBinFile() {
+        return this.createIfrBinFile.getValue().length() > 0;
     }
 
     /**
@@ -102,9 +101,10 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @param     createIfrBinFile    The flag to specify if the IFR binary file should
                                     be generated or not
      */
-    public void setCreateIfrBinFile(String createIfrBinFile) {
-        if (createIfrBinFile.equals("ON") || createIfrBinFile.equals("on"));
-        this.createIfrBinFile = " -ibin";
+    public void setCreateIfrBinFile(boolean createIfrBinFile) {
+        if (createIfrBinFile) {
+            this.createIfrBinFile.setArg(" -", "ibin");
+        }
     }
 
     /**
@@ -113,7 +113,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @returns name of vfrFile
      **/
     public String getVfrFile() {
-        return vfrFile;
+        return this.vfrFile.getValue();
     }
 
     /**
@@ -122,8 +122,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @param     vfrFile The name of VFR file
      **/
     public void setVfrFile(String vfrFile) {
-        this.vfrFileName = (new File(vfrFile)).getName();
-        this.vfrFile = " " + vfrFile;
+        this.vfrFile.setArg(" ", vfrFile);
     }
 
     /**
@@ -131,10 +130,9 @@ public class VfrCompilerTask extends Task implements EfiDefine {
 
      @param     includepath The IncludePath object which represents include path
      **/
-    public void addIncludepath(IncludePath includepath){
-        includepathList.add(includepath);
+    public void addConfiguredIncludepath(IncludePath includepath){
+        this.includepathList.insert(includepath);
     }
-
 
     /**
      get class member of processerArg
@@ -142,7 +140,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @returns processer argument
      **/
     public String getProcesserArg() {
-        return processerArg;
+        return this.processerArg.getValue();
     }
 
 
@@ -152,7 +150,7 @@ public class VfrCompilerTask extends Task implements EfiDefine {
      @param     processerArg    The processor argument
      */
     public void setProcesserArg(String processerArg) {
-        this.processerArg = " -ppflag " + processerArg;
+        this.processerArg.setArg(" -ppflag ", processerArg);
     }
 
     /**
@@ -163,23 +161,17 @@ public class VfrCompilerTask extends Task implements EfiDefine {
         String  toolPath= project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String  command;
         if (toolPath == null) {
-            command = "VfrCompile";
+            command = toolName;
         } else {
-            command = toolPath + "/" + "VfrCompile";
-        }
-        String incPath = "";        
-
-        int count = includepathList.size();    
-        for (int i = 0; i < count; i++) {
-            incPath += includepathList.get(i).toString();
+            command = toolPath + File.separator + toolName;
         }
 
-        String argument = this.createIfrBinFile +
-                          this.processerArg + 
-                          incPath +
-                          this.outPutDir + 
-                          this.createListFile +
-                          this.vfrFile ;
+        String argument = "" + createIfrBinFile
+                             + processerArg  
+                             + includepathList
+                             + outPutDir
+                             + createListFile
+                             + vfrFile;
         try {
             ///
             /// constructs the command-line
@@ -196,21 +188,18 @@ public class VfrCompilerTask extends Task implements EfiDefine {
                                                                   Project.MSG_WARN);
 
             Execute runner = new Execute(streamHandler,null);
-            runner.setAntRun(project);
-            
+            runner.setAntRun(project);            
             runner.setCommandline(commandLine.getCommandline());
+            runner.setWorkingDirectory(new File(outPutDir.getValue())); 
             
-            if (outPutFile != null && outPutFile.exists()) {
-                runner.setWorkingDirectory(outPutFile); 
-            }
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(commandLine.getCommandline()));
+            EdkLog.log(this, vfrFile.toFileList());
 
-            log(Commandline.toString(commandLine.getCommandline()), Project.MSG_VERBOSE);
-            log(vfrFileName);
             int returnVal = runner.execute();
             if (EFI_SUCCESS == returnVal) {
-                log("VfrCompile succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "VfrCompile succeeded!");
             } else {
-                log("ERROR = " + Integer.toHexString(returnVal));
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(returnVal));
                 throw new BuildException("VfrCompile failed!");
             }
         } catch (IOException e) {

@@ -18,11 +18,16 @@ package org.tianocore.framework.tasks;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.Execute;
+import org.apache.tools.ant.taskdefs.LogStreamHandler;
+import org.apache.tools.ant.types.Commandline;
 
 import java.io.File;
 import java.io.InputStreamReader;
 import java.lang.ProcessBuilder;
 import java.util.LinkedList;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
   GenFvImageTask
@@ -31,22 +36,18 @@ import java.util.LinkedList;
   
 **/
 public class GenFvImageTask extends Task implements EfiDefine{
-    ///
-    /// tool name
-    ///
+    //
+    // tool name
+    //
     static final private String toolName = "GenFvImage";
-    ///
-    /// The name of input inf file
-    ///
-    private String infFile="";
-    ///
-    /// Output directory
-    ///
+    //
+    // The name of input inf file
+    //
+    private FileArg infFile = new FileArg();
+    //
+    // Output directory
+    //
     private String outputDir = ".";
-    ///
-    /// argument list
-    ///
-    LinkedList<String> argList = new LinkedList<String>();
 
     /**
       execute
@@ -58,30 +59,41 @@ public class GenFvImageTask extends Task implements EfiDefine{
         Project project = this.getOwningTarget().getProject();
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
 
+        String command;
         if (path == null) {
-            path = "";
+            command = toolName;
         } else {
-            path += File.separatorChar;
+            command = path + File.separator + toolName;
         }
-        argList.addFirst(path + toolName);
 
-        /// lauch the program
-        ///
-        ProcessBuilder pb = new ProcessBuilder(argList);
-        pb.directory(new File(outputDir));
+        String argument = "" + infFile;
+        //
+        // lauch the program
+        //
         int exitCode = 0;
-        log((new File(this.infFile)).getName());
         try {
-            Process cmdProc = pb.start();
-            InputStreamReader cmdOut = new InputStreamReader(cmdProc.getInputStream());
-            char[] buf = new char[1024];
+            Commandline cmdline = new Commandline();
+            cmdline.setExecutable(command);
+            cmdline.createArgument().setLine(argument);
 
-            exitCode = cmdProc.waitFor();
+            LogStreamHandler streamHandler = new LogStreamHandler(this,
+                    Project.MSG_INFO, Project.MSG_WARN);
+            Execute runner = new Execute(streamHandler, null);
+
+            runner.setAntRun(project);
+            runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir)); 
+            //
+            // log command line string.
+            //
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, infFile.toFileList());
+
+            exitCode = runner.execute();
             if (exitCode != 0) {
-                int len = cmdOut.read(buf, 0, 1024);
-                log(new String(buf, 0, len));
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(exitCode));
             } else {
-                log("GenFvImage succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "GenFvImage succeeded!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -90,7 +102,6 @@ public class GenFvImageTask extends Task implements EfiDefine{
                 throw new BuildException("GenFvImage: failed to generate FV file!");
             }
         }
-
     }
     /**
       getInfFile
@@ -99,7 +110,7 @@ public class GenFvImageTask extends Task implements EfiDefine{
       @return String    name of infFile
     **/
     public String getInfFile() {
-        return infFile;
+        return infFile.getValue();
     }
     
     /**
@@ -110,9 +121,7 @@ public class GenFvImageTask extends Task implements EfiDefine{
       @param infFile  name of infFile
     **/
     public void setInfFile(String infFile) {
-        this.infFile = infFile;
-        argList.add("-I");
-        argList.add(infFile);
+        this.infFile.setArg(" -I ", infFile);
     }
     
     /**
