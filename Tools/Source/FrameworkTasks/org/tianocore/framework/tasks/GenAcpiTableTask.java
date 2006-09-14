@@ -33,29 +33,34 @@ import org.tianocore.common.logger.EdkLog;
   GenAcpiTable is used to call GenAcpiTable.exe to generate ACPI Table image .
 **/
 public class GenAcpiTableTask extends Task implements EfiDefine {
-    // /
-    // / input file
-    // /
-    private String inputFile = "";
+    //
+    // Tool name
+    // 
+    private static String toolName = "GenAcpiTable";
 
-    // /
-    // / output file
-    // /
-    private String outputFile = "";
+    //
+    // input file
+    //
+    private FileArg inputFile = new FileArg();
 
-    // /
-    // / output directory, this variable is added by jave wrap
-    // /
-    private String outputDir = "";
+    //
+    // output file
+    //
+    private FileArg outputFile = new FileArg();
+
+    //
+    // output directory, this variable is added by jave wrap
+    //
+    private String outputDir = ".";
 
     /**
-     * execute
-     *
-     * StripTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      StripTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -66,20 +71,15 @@ public class GenAcpiTableTask extends Task implements EfiDefine {
         String command;
         String argument;
         if (path == null) {
-            command = "GenAcpiTable";
+            command = toolName;
         } else {
-            command = path + File.separatorChar + "GenAcpiTable";
+            command = path + File.separator + toolName;
         }
         //
         // argument of tools
         //
-        File file = new File(outputFile);
-        if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-            argument = inputFile + " " + outputDir + File.separatorChar
-                    + outputFile;
-        } else {
-            argument = inputFile + " " + outputFile;
-        }
+        argument = "" + inputFile + outputFile;
+
         //
         // return value of fwimage execution
         //
@@ -96,24 +96,27 @@ public class GenAcpiTableTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
+
             //
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
-            revl = runner.execute();
+            EdkLog.log(this, EdkLog.EDK_INFO, this.inputFile.toFileList() + " => " 
+                + this.outputFile.toFileList());
 
+            revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "GenAcpiTable succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("GenAcpiTable failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -121,70 +124,70 @@ public class GenAcpiTableTask extends Task implements EfiDefine {
     }
 
     /**
-     * getInputFile
-     *
-     * This function is to get class member "inputFile".
-     *
-     * @return string of input file name.
-     */
+      getInputFile
+     
+      This function is to get class member "inputFile".
+     
+      @return string of input file name.
+     **/
     public String getInputFile() {
-        return inputFile;
+        return inputFile.getValue();
     }
 
     /**
-     * setComponentType
-     *
-     * This function is to set class member "inputFile".
-     *
-     * @param inputFile
-     *            string of input file name.
-     */
+      setComponentType
+     
+      This function is to set class member "inputFile".
+     
+      @param inputFile
+                 string of input file name.
+     **/
     public void setInputFile(String inputFile) {
-        this.inputFile = inputFile;
+        this.inputFile.setArg(" ", inputFile);
     }
 
     /**
-     * getOutputFile
-     *
-     * This function is to get class member "outputFile"
-     *
-     * @return outputFile string of output file name.
-     */
+      getOutputFile
+     
+      This function is to get class member "outputFile"
+     
+      @return outputFile string of output file name.
+     **/
     public String getOutputFile() {
-        return outputFile;
+        return outputFile.getValue();
     }
 
     /**
-     * setOutputFile
-     *
-     * This function is to set class member "outputFile"
-     *
-     * @param outputFile
-     *            string of output file name.
-     */
+      setOutputFile
+     
+      This function is to set class member "outputFile"
+     
+      @param outputFile
+                 string of output file name.
+     **/
     public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
+        this.outputFile.setArg(" ", outputFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory.
-     */
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
     public String getOutputDir() {
         return outputDir;
     }
 
     /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            string of output directory.
-     */
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory.
+     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }

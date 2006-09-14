@@ -33,48 +33,43 @@ import org.tianocore.common.logger.EdkLog;
  * GenTeImageTask is used to call GenAcpiTable.exe to generate ACPI Table image .
  */
 public class GenTeImageTask extends Task implements EfiDefine {
-    ///
-    /// tool name
-    ///
+    //
+    // tool name
+    //
     private String toolName = "GenTeImage";
-    ///
-    /// input file
-    ///
-    private String inputFile = "";
+    //
+    // input file
+    //
+    private FileArg inputFile = new FileArg();
 
-    ///
-    /// output file
-    ///
-    private String outputFile = "";
+    //
+    // output file
+    //
+    private FileArg outputFile = new FileArg();
 
-    ///
-    /// output directory, this variable is added by jave wrap
-    ///
+    //
+    // output directory, this variable is added by jave wrap
+    //
     private String outputDir = "";
 
-    ///
-    /// Verbose flag
-    ///
-    private String verbose = "";
+    //
+    // Verbose flag
+    //
+    private ToolArg verbose = new ToolArg();
 
-    ///
-    /// Dump flag
-    ///
-    private String dump = "";
+    //
+    // Dump flag
+    //
+    private ToolArg dump = new ToolArg();
 
     /**
-     * assemble tool command line & execute tool command line
-     *
-     * @throws BuildException
-     */
-    /**
-     * execute
-     *
-     * GenTeImgaeTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      GenTeImgaeTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -87,20 +82,12 @@ public class GenTeImageTask extends Task implements EfiDefine {
         if (path == null) {
             command = toolName;
         } else {
-            command = path + File.separatorChar + toolName;
+            command = path + File.separator + toolName;
         }
         //
         // argument of tools
         //
-        File file = new File(outputFile);
-        if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-            argument = this.verbose + this.dump + "-o " +this.outputDir
-                    + File.separatorChar + this.outputFile + " "
-                    + this.inputFile;
-        } else {
-            argument = this.verbose + this.dump + "-o " + this.outputFile
-                    + " " + this.inputFile;
-        }
+        argument = "" + this.verbose + this.dump + this.outputFile + this.inputFile;
         //
         // return value of fwimage execution
         //
@@ -117,11 +104,14 @@ public class GenTeImageTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
+
             //
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_INFO, this.inputFile.toFileList()
+                + " => " + this.outputFile.toFileList());
 
             revl = runner.execute();
 
@@ -129,13 +119,13 @@ public class GenTeImageTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "GenTeImage succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = "+ Integer.toHexString(revl));
-                throw new BuildException("GenTeImage failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -143,121 +133,121 @@ public class GenTeImageTask extends Task implements EfiDefine {
     }
 
     /**
-     * getInputFile
-     *
-     * This function is to get class member "inputFile".
-     *
-     * @return string of input file name.
-     */
+      getInputFile
+     
+      This function is to get class member "inputFile".
+     
+      @return string of input file name.
+     **/
     public String getInputFile() {
-        return inputFile;
+        return inputFile.getValue();
     }
 
     /**
-     * setComponentType
-     *
-     * This function is to set class member "inputFile".
-     *
-     * @param inputFile
-     *            string of input file name.
-     */
+      setComponentType
+     
+      This function is to set class member "inputFile".
+     
+      @param inputFile
+                 string of input file name.
+     **/
     public void setInputFile(String inputFile) {
-        this.inputFile = inputFile;
+        this.inputFile.setArg(" ", inputFile);
     }
 
     /**
-     * getOutputFile
-     *
-     * This function is to get class member "outputFile"
-     *
-     * @return outputFile string of output file name.
-     */
+      getOutputFile
+     
+      This function is to get class member "outputFile"
+     
+      @return outputFile string of output file name.
+     **/
     public String getOutputFile() {
-        return outputFile;
+        return outputFile.getValue();
     }
 
     /**
-     * setOutputFile
-     *
-     * This function is to set class member "outputFile"
-     *
-     * @param outputFile
-     *            string of output file name.
-     */
+      setOutputFile
+     
+      This function is to set class member "outputFile"
+     
+      @param outputFile
+                 string of output file name.
+     **/
     public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile  + " ";
+        this.outputFile.setArg(" -o ", outputFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory.
-     */
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
     public String getOutputDir() {
         return outputDir;
     }
 
     /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            string of output directory.
-     */
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory.
+     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }
 
     /**
-     * getVerbose
-     *
-     * This function is to get class member "verbose"
-     *
-     * @return verbose the flag of verbose.
-     */
+      getVerbose
+     
+      This function is to get class member "verbose"
+     
+      @return verbose the flag of verbose.
+     **/
     public String getVerbose() {
-        return this.verbose;
+        return this.verbose.getValue();
     }
 
     /**
-     * setVerbose
-     *
-     * This function is to set class member "verbose"
-     *
-     * @param verbose
-     *            True or False.
-     */
+      setVerbose
+     
+      This function is to set class member "verbose"
+     
+      @param verbose
+                 True or False.
+     **/
     public void setVerbose(boolean verbose) {
         if (verbose) {
-            this.verbose = "-v ";
+            this.verbose.setArg(" -", "v");
         }
     }
 
     /**
-     * getDump
-     *
-     * This function is to get class member "dump"
-     *
-     * @return verbose the flag of dump.
-     */
+      getDump
+     
+      This function is to get class member "dump"
+     
+      @return verbose the flag of dump.
+     **/
     public String getDump() {
-        return dump;
+        return dump.getValue();
     }
 
     /**
-     * setDump
-     *
-     * This function is to set class member "dump"
-     *
-     * @param dump
-     *            True or False.
-     */
+      setDump
+     
+      This function is to set class member "dump"
+     
+      @param dump
+                 True or False.
+     **/
     public void setDump(boolean dump) {
         if (dump) {
-            this.dump = "-dump ";
+            this.dump.setArg(" -", "dump");
         }
     }
 }

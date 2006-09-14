@@ -33,39 +33,39 @@ import org.tianocore.common.logger.EdkLog;
  * SecFixupTask is used to call SecFixup.exe to fix up sec image.
  */
 public class SecFixupTask extends Task implements EfiDefine {
-    // /
-    // / tool name
-    // /
+    //
+    // tool name
+    //
     private String toolName = "SecFixup";
 
-    // /
-    // / input file
-    // /
-    private String secExeFile = "";
+    //
+    // input file
+    //
+    private FileArg secExeFile = new FileArg();
 
-    // /
-    // / output file
-    // /
-    private String resetVectorDataFile = "";
+    //
+    // output file
+    //
+    private FileArg resetVectorDataFile = new FileArg();
 
-    // /
-    // / output directory, this variable is added by jave wrap
-    // /
-    private String outputFile = "";
+    //
+    // output file
+    //
+    private FileArg outputFile = new FileArg();
 
-    // /
-    // / output directory
-    // /
-    private String outputDir = "";
+    //
+    // output directory, this variable is added by jave wrap
+    //
+    private String outputDir = ".";
 
     /**
-     * execute
-     *
-     * SecFixupTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      SecFixupTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -84,13 +84,7 @@ public class SecFixupTask extends Task implements EfiDefine {
         //
         // argument of tools
         //
-        if (!this.outputDir.equalsIgnoreCase("")) {
-            argument = this.secExeFile + " " + this.resetVectorDataFile + " "
-                    + this.outputDir + File.separatorChar + this.outputFile;
-        } else {
-            argument = this.secExeFile + " " + this.resetVectorDataFile + " "
-                    + this.outputFile;
-        }
+        argument = "" + secExeFile + resetVectorDataFile + outputFile;
 
         //
         // return value of fwimage execution
@@ -108,10 +102,14 @@ public class SecFixupTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
+
             //
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, EdkLog.EDK_INFO, secExeFile.toFileList() 
+                + resetVectorDataFile.toFileList() + " => " + outputFile.toFileList());
 
             revl = runner.execute();
 
@@ -119,13 +117,13 @@ public class SecFixupTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "SecFixup succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = "+ Integer.toHexString(revl));
-                throw new BuildException("SecFixup failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -133,93 +131,93 @@ public class SecFixupTask extends Task implements EfiDefine {
     }
 
     /**
-     * getSecExeFile
-     *
-     * This function is to get class member "secExeFile".
-     *
-     * @return string of sectExe file name.
-     */
+      getSecExeFile
+     
+      This function is to get class member "secExeFile".
+     
+      @return string of sectExe file name.
+     **/
     public String getSecExeFile() {
-        return this.secExeFile;
+        return this.secExeFile.getValue();
     }
 
     /**
-     * setSecExeFile
-     *
-     * This function is to set class member "secExeFile".
-     *
-     * @param secExeFile
-     *            string of secExe file name.
-     */
+      setSecExeFile
+     
+      This function is to set class member "secExeFile".
+     
+      @param secExeFile
+                 string of secExe file name.
+     **/
     public void setSecExeFile(String secExeFile) {
-        this.secExeFile = secExeFile;
+        this.secExeFile.setArg(" ", secExeFile);
     }
 
     /**
-     * getResetVectorDataFile
-     *
-     * This function is to get class member "resetVectorDataFile"
-     *
-     * @return resetVectorDataFile string of resetVectorData file name.
-     */
+      getResetVectorDataFile
+     
+      This function is to get class member "resetVectorDataFile"
+     
+      @return resetVectorDataFile string of resetVectorData file name.
+     **/
     public String getResetVectorDataFile() {
-        return this.resetVectorDataFile;
+        return this.resetVectorDataFile.getValue();
     }
 
     /**
-     * setResetVectorDataFile
-     *
-     * This function is to set class member "resetVectorDataFile"
-     *
-     * @param resetVectorDataFile
-     *            string of resetVectorData file name.
-     */
+      setResetVectorDataFile
+     
+      This function is to set class member "resetVectorDataFile"
+     
+      @param resetVectorDataFile
+                 string of resetVectorData file name.
+     **/
     public void setResetVectorDataFile(String resetVectorDataFile) {
-        this.resetVectorDataFile = resetVectorDataFile;
+        this.resetVectorDataFile.setArg(" ", resetVectorDataFile);
     }
 
     /**
-     * getOutputFile
-     *
-     * This function is to get class member "outputFile"
-     *
-     * @return outputFile string of output file name.
-     */
+      getOutputFile
+     
+      This function is to get class member "outputFile"
+     
+      @return outputFile string of output file name.
+     **/
     public String getOutputFile() {
-        return outputFile;
+        return this.outputFile.getValue();
     }
 
     /**
-     * setOutputFile
-     *
-     * This function is to set class member "outputFile"
-     *
-     * @param outputFile
-     *            string of output file name.
-     */
+      setOutputFile
+     
+      This function is to set class member "outputFile"
+     
+      @param outputFile
+                 string of output file name.
+     **/
     public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
+        this.outputFile.setArg(" ", outputFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir name of output directory
-     */
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir name of output directory
+     **/
     public String getOutputDir() {
         return outputDir;
     }
 
     /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            name of output directory
-     */
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 name of output directory
+     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }

@@ -44,16 +44,21 @@ import org.tianocore.common.logger.EdkLog;
       -outputHpk      : create an HII export pack of the strings
  **/
 public class StrGatherTask extends Task implements EfiDefine {
-    ///
-    /// common options
-    ///
+    //
+    // Tool name
+    // 
+    private static String toolName = "StrGather";
+
+    //
+    // common options
+    //
     private ToolArg commandType = new ToolArg();
 
     private ToolArg baseName = new ToolArg();
 
-    ///
-    /// "all/read/write"
-    ///
+    //
+    // "all/read/write"
+    //
     private ToolArg verbose = new ToolArg();
 
     private FileArg outputDatabase = new FileArg();
@@ -62,25 +67,25 @@ public class StrGatherTask extends Task implements EfiDefine {
 
     private InputFile inputFileList = new InputFile();
 
-    ///
-    /// parse options newDatabase -- "ture/false" unquoteString -- "ture/false"
-    ///
+    //
+    // parse options newDatabase -- "ture/false" unquoteString -- "ture/false"
+    //
     private ToolArg newDatabase = new ToolArg();
 
     private ToolArg unquotedString = new ToolArg();
 
     private IncludePath includePathList = new IncludePath();
 
-    ///
-    /// scan options ignoreNotFound -- "ture/false"
-    ///
+    //
+    // scan options ignoreNotFound -- "ture/false"
+    //
     private ToolArg ignoreNotFound = new ToolArg();
 
     private SkipExt skipExtList = new SkipExt();
 
-    ///
-    /// dump options
-    ///
+    //
+    // dump options
+    //
     private ToolArg outputString = new ToolArg();
 
     private ToolArg outputDefines = new ToolArg();
@@ -93,9 +98,9 @@ public class StrGatherTask extends Task implements EfiDefine {
 
     private FileArg outputHpk = new FileArg();
 
-    ///
-    /// global variable
-    ///
+    //
+    // global variable
+    //
     static private Project project;
 
     /**
@@ -112,9 +117,9 @@ public class StrGatherTask extends Task implements EfiDefine {
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH"); 
         String command;
         if (path == null) {
-            command = "StrGather";
+            command = toolName;
         } else {
-            command = path + File.separator + "StrGather";
+            command = path + File.separator + toolName;
         }
 
         ///
@@ -157,13 +162,13 @@ public class StrGatherTask extends Task implements EfiDefine {
 
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "StrGather succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 ///
                 /// command execution fail
                 ///
                 EdkLog.log(this, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("StrGather failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());

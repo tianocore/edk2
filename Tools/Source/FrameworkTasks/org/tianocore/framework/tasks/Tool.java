@@ -49,7 +49,7 @@ public class Tool implements EfiDefine, Section {
         try {
             executeTool ();
         } catch (Exception e) {
-            throw new BuildException("Call to executeTool failed!\n");
+            throw new BuildException("Call to executeTool failed!\n" + e.getMessage());
         }
 
         ///
@@ -83,7 +83,7 @@ public class Tool implements EfiDefine, Section {
                 buffer.writeByte(0);
             }
         } catch (Exception e) {
-            System.out.print(e.getMessage());
+            EdkLog.log(e.getMessage());
             throw new BuildException("Tool call, toBuffer failed!\n");
         } finally {
             try {
@@ -94,7 +94,7 @@ public class Tool implements EfiDefine, Section {
                     fs.close();
                 }
             } catch (Exception e) {
-                System.out.println("WARNING: Cannot close " + outputFile.getPath());
+                EdkLog.log("WARNING: Cannot close " + outputFile.getPath());
             }
         }
     }
@@ -129,7 +129,7 @@ public class Tool implements EfiDefine, Section {
                     sect.toBuffer(Do);
                 }
                 catch (BuildException e) {
-                    System.out.print(e.getMessage());
+                    EdkLog.log(e.getMessage());
                     throw new BuildException ("GenSection failed at Tool!");
                 }  
                 Do.close();
@@ -150,7 +150,7 @@ public class Tool implements EfiDefine, Section {
             Process process = Runtime.getRuntime().exec(command + " " + argument);
             process.waitFor();
         } catch (Exception e) {
-            System.out.print (e.getMessage());
+            EdkLog.log(e.getMessage());
             throw new BuildException("Execution of externalTool task failed!\n");
         }
     }

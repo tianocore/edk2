@@ -50,7 +50,7 @@ public class ConfigReader {
 
       @return   String[][]      The variables defined in the config file
 
-      @throws   EdkException
+      @throws   GenBuildException
                 Config file's format is not valid
     **/
     public static synchronized String[][] parse(File configFile) throws GenBuildException {
@@ -78,7 +78,8 @@ public class ConfigReader {
                 // 
                 int index;
                 if ((index = str.indexOf('=')) <= 0) {
-                    throw new GenBuildException("ERROR Processing file [" + configFile.getAbsolutePath() 
+                    throw new GenBuildException("ERROR Processing file [" 
+                        + configFile.getAbsolutePath() 
                         + "] (line " + lines + ").\n");
                 }
 
@@ -88,9 +89,12 @@ public class ConfigReader {
                 keyList.add(str.substring(0, index).trim());
                 valueList.add(str.substring(index + 1).trim());
             }
-        } catch (Exception e) {
-            throw new GenBuildException("ERROR Processing file [" + configFile.getAbsolutePath() 
-                + "] (line " + lines + ").\n" + e.getMessage());
+        } catch (Exception ex) {
+            GenBuildException e = new GenBuildException("ERROR Processing file [" 
+                + configFile.getAbsolutePath() 
+                + "] (line " + lines + ").\n" + ex.getMessage());
+            e.setStackTrace(ex.getStackTrace());
+            throw e;
         }
 
         String[][] definitions = new String[2][keyList.size()];

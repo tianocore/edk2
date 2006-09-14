@@ -12,12 +12,14 @@
  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
  
- **/
+**/
 
 package org.tianocore.framework.tasks;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.file;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,8 +32,11 @@ import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 import org.tianocore.common.logger.EdkLog;
 
-public class GenSectionTask extends Task implements EfiDefine, Section,
-        FfsTypes {
+public class GenSectionTask extends Task implements EfiDefine, Section, FfsTypes {
+    //
+    // Tool name
+    // 
+    private final static String toolName = "GenSection";
     //
     // inputfile name
     //
@@ -68,13 +73,13 @@ public class GenSectionTask extends Task implements EfiDefine, Section,
     private boolean haveTool = false;
 
     /**
-     * execute
-     * 
-     * GenSectionTaks execute is to assemble tool command line & execute tool
-     * command line.
-     * 
-     * @throws BuildException
-     */
+      execute
+      
+      GenSectionTaks execute is to assemble tool command line & execute tool
+      command line.
+      
+      @throws BuildException
+    **/
     public void execute() throws BuildException {
         String command;
         Project project = this.getOwningTarget().getProject();
@@ -83,15 +88,14 @@ public class GenSectionTask extends Task implements EfiDefine, Section,
         //
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         if (path == null) {
-            command = "GenSection";
+            command = toolName;
         } else {
-            command = path + "/" + "GenSection";
+            command = path + File.separator + toolName;
         }
         //
         // argument of tools
         //
-        String argument = "" + inputFile + outputFile + sectionType
-                + versionNum + interfaceString;
+        String argument = "" + inputFile + outputFile + sectionType + versionNum + interfaceString;
         //
         // return value of gensection execution
         //
@@ -109,21 +113,19 @@ public class GenSectionTask extends Task implements EfiDefine, Section,
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
 
-            EdkLog.log(this, inputFile.toFileList() + " => "
-                    + outputFile.toFileList());
-            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline
-                    .getCommandline()));
+            EdkLog.log(this, inputFile.toFileList() + versionNum.getValue() 
+                + interfaceString.getValue() + " => " + outputFile.toFileList());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
 
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "GenSection succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
-                EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = "
-                        + Integer.toHexString(revl));
-                throw new BuildException("GenSection failed!");
+                EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -131,157 +133,144 @@ public class GenSectionTask extends Task implements EfiDefine, Section,
     }
 
     /**
-     * getInputFile
-     * 
-     * This function is to get class member "inputFile".
-     * 
-     * @return name of input file
-     */
+      getInputFile
+      
+      This function is to get class member "inputFile".
+      
+      @return                    name of input file
+    **/
     public String getInputFile() {
         return this.inputFile.getValue();
     }
 
     /**
-     * setInputFile
-     * 
-     * This function is to set class member "inputFile".
-     * 
-     * @param inputFile
-     *            name of input file
-     */
+      setInputFile
+      
+      This function is to set class member "inputFile".
+      
+      @param inputFile            name of input file
+    **/
     public void setInputFile(String inputFile) {
         this.inputFile.setArg(" -i ", inputFile);
     }
 
     /**
-     * getOutputFile
-     * 
-     * This function is to get class member "outputFile".
-     * 
-     * @return name of output file
-     */
+      getOutputFile
+      
+      This function is to get class member "outputFile".
+      
+      @return                      name of output file
+    **/
     public String getOutputFile() {
         return this.outputFile.getValue();
     }
 
     /**
-     * setOutputfile
-     * 
-     * This function is to set class member "outputFile".
-     * 
-     * @param outputFile
-     *            name of output file
-     */
+      setOutputfile
+      
+      This function is to set class member "outputFile".
+      @param  outputFile            name of output file
+    **/
     public void setOutputfile(String outputFile) {
         this.outputFile.setArg(" -o ", outputFile);
     }
 
     /**
-     * getSectionType
-     * 
-     * This function is to get class member "sectionType".
-     * 
-     * @return sectoin type
-     */
+      getSectionType
+      
+      This function is to get class member "sectionType".
+      
+      @return                        sectoin type
+    **/
     public String getSectionType() {
         return this.sectionType.getValue();
     }
 
     /**
-     * setSectionType
-     * 
-     * This function is to set class member "sectionType".
-     * 
-     * @param sectionType
-     *            section type
-     */
+      setSectionType
+      
+      This function is to set class member "sectionType".
+      
+      @param sectionType              section type
+    **/
     public void setSectionType(String sectionType) {
         this.sectionType.setArg(" -s ", sectionType);
     }
 
     /**
-     * getVersionNum
-     * 
-     * This function is to get class member "versionNum".
-     * 
-     * @return version number
-     */
+      getVersionNum
+      
+      This function is to get class member "versionNum".
+      @return                         version number
+    **/
     public String getVersionNum() {
         return this.versionNum.getValue();
     }
 
     /**
-     * setVersionNume
-     * 
-     * This function is to set class member "versionNum".
-     * 
-     * @param versionNum
-     *            version number
-     */
+      setVersionNume
+      
+      This function is to set class member "versionNum".
+      @param versionNum               version number
+    **/
     public void setVersionNum(String versionNum) {
         this.versionNum.setArg(" -v ", versionNum);
     }
 
     /**
-     * getInterfaceString
-     * 
-     * This function is to get class member "interfaceString".
-     * 
-     * @return interface string
-     */
+      getInterfaceString
+      
+      This function is to get class member "interfaceString".
+      @return                         interface string
+    **/
     public String getInterfaceString() {
         return this.interfaceString.getValue();
     }
 
     /**
-     * setInterfaceString
-     * 
-     * This funcion is to set class member "interfaceString".
-     * 
-     * @param interfaceString
-     *            interface string
-     */
+      setInterfaceString
+      
+      This funcion is to set class member "interfaceString".
+      @param interfaceString            interface string
+    **/
     public void setInterfaceString(String interfaceString) {
         this.interfaceString.setArg(" -a ", "\"" + interfaceString + "\"");
     }
-
+    
     /**
-     * addSectFile
-     * 
-     * This function is to add sectFile to list.
-     * 
-     * @param sectFile
-     *            instance of sectFile.
-     */
-    public void addSectFile(SectFile sectFile) {
+      addSectFile
+      
+      This function is to add sectFile to list.
+      
+      @param sectFile     instance of sectFile.
+    **/
+    public void addSectFile(SectFile sectFile){
         this.sectFileList.add(sectFile);
     }
 
     /**
-     * setTool
-     * 
-     * This function is to set the class member "Tool";
-     * 
-     * @param tool
-     */
+      setTool
+      
+      This function is to set the class member "Tool";
+      
+      @param tool 
+    **/
     public void addTool(Tool tool) {
         this.sectFileList.add(tool);
         this.haveTool = true;
     }
-
+    
     /**
-     * addGenSection
-     * 
-     * This function is to add GenSectin element to list
-     * 
-     * @param task
-     *            Instance of genSection
-     */
-    public void addGenSection(GenSectionTask task) {
+      addGenSection
+      
+      This function is to add GenSectin element to list
+      @param task         Instance of genSection
+    **/
+    public void addGenSection(GenSectionTask task){
         this.sectFileList.add(task);
     }
-
-    public void toBuffer(DataOutputStream buffer) {
+    
+    public void toBuffer(DataOutputStream buffer){
         //
         // Search SectionList find earch section and call it's
         // ToBuffer function.

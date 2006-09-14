@@ -33,60 +33,60 @@ import org.tianocore.common.logger.EdkLog;
   GenCapsuleHdrTask is used to call GenCapsuleHdr.exe to generate capsule.
 **/
 public class GenCapsuleHdrTask extends Task implements EfiDefine {
-    ///
-    /// tool name
-    ///
+    //
+    // tool name
+    //
     private String toolName = "GenCapsuleHdr";
 
-    ///
-    /// script file
-    ///
-    private String scriptFile = "";
+    //
+    // script file
+    //
+    private FileArg scriptFile = new FileArg();
 
-    ///
-    /// output file
-    ///
-    private String outputFile = "";
+    //
+    // output file
+    //
+    private FileArg outputFile = new FileArg();
 
-    ///
-    /// output directory, this variable is added by jave wrap
-    ///
-    private String outputDir = "";
+    //
+    // output directory, this variable is added by jave wrap
+    //
+    private String outputDir = ".";
 
-    ///
-    /// Verbose flag
-    ///
-    private String verbose = "";
+    //
+    // Verbose flag
+    //
+    private ToolArg verbose = new ToolArg();
 
-    ///
-    /// Dump flag
-    ///
-    private String dump = "";
+    //
+    // Dump flag
+    //
+    private ToolArg dump = new ToolArg();
 
-    ///
-    /// Split size
-    ///
-    private String size = "";
+    //
+    // Split size
+    //
+    private ToolArg size = new ToolArg();
 
-    ///
-    /// capsule into one image flag
-    ///
-    private String joinFlag = "";
+    //
+    // capsule into one image flag
+    //
+    private ToolArg joinFlag = new ToolArg();
 
-    ///
-    /// capsule file
-    ///
-    private String capsuleFile = "";
+    //
+    // capsule file
+    //
+    private FileArg capsuleFile = new FileArg();
 
 
     /**
-     * execute
-     *
-     * GenCapsuleHdrTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      GenCapsuleHdrTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -99,20 +99,14 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
         if (path == null) {
             command = toolName;
         } else {
-            command = path + File.separatorChar + toolName;
+            command = path + File.separator + toolName;
         }
         //
         // argument of tools
         //
-        File file = new File(outputFile);
-        if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-            argument = this.verbose + this.dump + "-o " +this.outputDir
-                    + File.separatorChar + this.outputFile + " "
-                    + this.scriptFile + " " + this.size + " " + this.joinFlag + this.capsuleFile;
-        } else {
-            argument = this.verbose + this.dump + "-o " + this.outputFile
-                    + " " + this.scriptFile + " " + this.size + " " + this.joinFlag + this.capsuleFile;
-        }
+        argument = "" + this.verbose + this.dump + this.outputFile
+                      + this.scriptFile + this.size + this.joinFlag + this.capsuleFile;
+
         //
         // return value of fwimage execution
         //
@@ -129,24 +123,27 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
+
             //
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(scriptFile)).getName());
-            revl = runner.execute();
+            EdkLog.log(this, EdkLog.EDK_INFO, scriptFile.toFileList() + " => " +
+                outputFile.toFileList() + capsuleFile.toFileList());
 
+            revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "GenCapsuleHdr succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(this, EdkLog.EDK_ERROR, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("GenCapsuleHdr failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -154,192 +151,191 @@ public class GenCapsuleHdrTask extends Task implements EfiDefine {
     }
 
     /**
-     * getInputFile
-     *
-     * This function is to get class member "scriptFile".
-     *
-     * @return string of input file name.
-     */
+      getInputFile
+     
+      This function is to get class member "scriptFile".
+     
+      @return string of input file name.
+     **/
     public String getScriptFile() {
-        return this.scriptFile;
+        return this.scriptFile.getValue();
     }
 
     /**
-     * setComponentType
-     *
-     * This function is to set class member "inputFile".
-     *
-     * @param inputFile
-     *            string of input file name.
-     */
+      setComponentType
+     
+      This function is to set class member "inputFile".
+     
+      @param inputFile
+                 string of input file name.
+     **/
     public void setScriptFile(String scriptFile) {
-        this.scriptFile = "-script " + scriptFile;
+        this.scriptFile.setArg(" -script ", scriptFile);
     }
 
     /**
-     * getOutputFile
-     *
-     * This function is to get class member "outputFile"
-     *
-     * @return outputFile string of output file name.
-     */
+      getOutputFile
+     
+      This function is to get class member "outputFile"
+     
+      @return outputFile string of output file name.
+     **/
     public String getOutputFile() {
-        return outputFile;
+        return outputFile.getValue();
     }
 
     /**
-     * setOutputFile
-     *
-     * This function is to set class member "outputFile"
-     *
-     * @param outputFile
-     *            string of output file name.
-     */
+      setOutputFile
+     
+      This function is to set class member "outputFile"
+     
+      @param outputFile
+                 string of output file name.
+     **/
     public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile  + " ";
+        this.outputFile.setArg(" -o ", outputFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory.
-     */
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
     public String getOutputDir() {
         return outputDir;
     }
 
     /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            string of output directory.
-     */
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory.
+     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }
 
     /**
-     * getVerbose
-     *
-     * This function is to get class member "verbose"
-     *
-     * @return verbose the flag of verbose.
-     */
+      getVerbose
+     
+      This function is to get class member "verbose"
+     
+      @return verbose the flag of verbose.
+     **/
     public String getVerbose() {
-        return this.verbose;
+        return this.verbose.getValue();
     }
 
     /**
-     * setVerbose
-     *
-     * This function is to set class member "verbose"
-     *
-     * @param verbose
-     *            True or False.
-     */
+      setVerbose
+     
+      This function is to set class member "verbose"
+     
+      @param verbose
+                 True or False.
+     **/
     public void setVerbose(boolean verbose) {
         if (verbose) {
-            this.verbose = "-v ";
+            this.verbose.setArg(" -", "v");
         }
     }
 
     /**
-     * getDump
-     *
-     * This function is to get class member "dump"
-     *
-     * @return verbose the flag of dump.
-     */
+      getDump
+     
+      This function is to get class member "dump"
+     
+      @return verbose the flag of dump.
+     **/
     public String getDump() {
-        return dump;
+        return dump.getValue();
     }
 
     /**
-     * setDump
-     *
-     * This function is to set class member "dump".
-     *
-     * @param dump
-     *            True or False.
-     */
+      setDump
+     
+      This function is to set class member "dump".
+     
+      @param dump
+                 True or False.
+     **/
     public void setDump(boolean dump) {
         if (dump) {
-            this.dump = "-dump ";
+            this.dump.setArg(" -", "dump");
         }
     }
 
     /**
-     * getSize
-     *
-     * This function is to set class member "size".
-     *
-     * @return size   string of size value
-     */
+      getSize
+     
+      This function is to set class member "size".
+     
+      @return size   string of size value
+     **/
     public String getSize() {
-        return size;
+        return size.getValue();
     }
 
     /**
-     * setSize
-     *
-     * This function is to set class member "size".
-     *
-     * @param size  string of size value.
-     */
+      setSize
+     
+      This function is to set class member "size".
+     
+      @param size  string of size value.
+     **/
     public void setSize(String size) {
-        this.size = "-split " + size;
+        this.size.setArg(" -split ", size);
     }
 
     /**
-     * getCapsuleFile
-     *
-     * This function is to get class member "capsuleFile"
-     *
-     * @return capsuleFile   capsule file name
-     */
+      getCapsuleFile
+     
+      This function is to get class member "capsuleFile"
+     
+      @return capsuleFile   capsule file name
+     **/
     public String getCapsuleFile() {
-        return capsuleFile;
+        return capsuleFile.getValue();
     }
 
     /**
-     * setCapsuleFile
-     *
-     * This function is to set class member "capsuleFile"
-     *
-     * @param capsuleFile   capsule file name
-     */
+      setCapsuleFile
+     
+      This function is to set class member "capsuleFile"
+     
+      @param capsuleFile   capsule file name
+     **/
     public void setCapsuleFile(String capsuleFile) {
-        this.capsuleFile = capsuleFile;
+        this.capsuleFile.setArg(" ", capsuleFile);
     }
 
     /**
-     * isJoinFlag
-     *
-     * This function is to get class member "joinFlag"
-     *
-     * @return joinFlag    flag of if need to join split capsule  images into
-     *                     a single image.
-     */
+      isJoinFlag
+     
+      This function is to get class member "joinFlag"
+     
+      @return joinFlag    flag of if need to join split capsule  images into
+                          a single image.
+     **/
     public String getJoinFlag() {
-        return joinFlag;
+        return joinFlag.getValue();
     }
 
     /**
-     * setJoinFlag
-     *
-     * This function is to set class member "joinFlag"
-     *
-     * @param joinFlag     flag of if need to join split capsule  images into
-     *                     a single image.
-     */
+      setJoinFlag
+     
+      This function is to set class member "joinFlag"
+     
+      @param joinFlag     flag of if need to join split capsule  images into
+                          a single image.
+     **/
     public void setJoinFlag(boolean joinFlag) {
         if (joinFlag){
-            this.joinFlag = "-j ";
+            this.joinFlag.setArg(" -", "j");
         }
-
     }
 }
