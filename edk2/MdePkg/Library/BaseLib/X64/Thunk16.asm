@@ -49,7 +49,7 @@ IA32_REGS   ENDS
 
 m16Size         DW      InternalAsmThunk16 - m16Start
 mThunk16Attr    DW      _ThunkAttr - m16Start
-m16Gdt          DW      _NullSegDesc - m16Start
+m16Gdt          DW      _NullSeg - m16Start
 m16GdtrBase     DW      _16GdtrBase - m16Start
 mTransition     DW      _EntryPoint - m16Start
 
@@ -123,10 +123,10 @@ SavedEsp    DD      ?
 _BackFromUserCode   ENDP
 
 _EntryPoint DD      _ToUserCode - m16Start
-            DW      8h
+            DW      CODE16
 _16Gdtr     LABEL   FWORD
-            DW      GdtEnd - _NullSegDesc - 1
-_16GdtrBase DQ      _NullSegDesc
+            DW      GDT_SIZE - 1
+_16GdtrBase DQ      _NullSeg
 _16Idtr     FWORD   (1 SHL 10) - 1
 
 ;------------------------------------------------------------------------------
@@ -134,7 +134,6 @@ _16Idtr     FWORD   (1 SHL 10) - 1
 ; It will be shadowed to somewhere in memory below 1MB.
 ;------------------------------------------------------------------------------
 _ToUserCode PROC
-    mov     edi, ss
     mov     ss, edx                     ; set new segment selectors
     mov     ds, edx
     mov     es, edx
@@ -158,8 +157,9 @@ _ToUserCode PROC
     push    rax
     retf
 @RealMode:
+    DB      6ah, DATA32
     DB      2eh                         ; cs:
-    mov     [rsi + (SavedSs - @Base)], edi
+    pop     [rsi + (SavedSs - @Base)]
     DB      2eh                         ; cs:
     mov     [rsi + (SavedEsp - @Base)], bx
     DB      66h, 2eh                    ; CS and operand size override
@@ -175,22 +175,34 @@ _ToUserCode PROC
     retf                                ; transfer control to user code
 _ToUserCode ENDP
 
-_NullSegDesc    DQ      0
-_16CsDesc       LABEL   QWORD
-                DW      -1
-                DW      0
-                DB      0
-                DB      9bh
-                DB      8fh             ; 16-bit segment, 4GB limit
-                DB      0
-_16DsDesc       LABEL   QWORD
-                DW      -1
-                DW      0
-                DB      0
-                DB      93h
-                DB      8fh             ; 16-bit segment, 4GB limit
-                DB      0
-GdtEnd          LABEL   QWORD
+CODE16  = _16Code - $
+DATA16  = _16Data - $
+DATA32  = _32Data - $
+
+_NullSeg    DQ      0
+_16Code     LABEL   QWORD
+            DW      -1
+            DW      0
+            DB      0
+            DB      9bh
+            DB      8fh                 ; 16-bit segment, 4GB limit
+            DB      0
+_16Data     LABEL   QWORD
+            DW      -1
+            DW      0
+            DB      0
+            DB      93h
+            DB      8fh                 ; 16-bit segment, 4GB limit
+            DB      0
+_32Data     LABEL   QWORD
+            DW      -1
+            DW      0
+            DB      0
+            DB      93h
+            DB      0cfh                ; 16-bit segment, 4GB limit
+            DB      0
+
+GDT_SIZE = $ - _NullSeg
 
 ;------------------------------------------------------------------------------
 ; IA32_REGISTER_SET *
@@ -203,6 +215,7 @@ GdtEnd          LABEL   QWORD
 InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     mov     r10d, ds
     mov     r11d, es
+    mov     r9d, ss
     push    fs
     push    gs
     mov     rsi, rcx
@@ -231,16 +244,19 @@ InternalAsmThunk16  PROC    USES    rbp rbx rsi rdi
     mov     [rcx], ebp                  ; save CR4 in SavedCr4
     and     ebp, 300h                   ; clear all but PCE and OSFXSR bits
     mov     esi, r8d                    ; esi <- 16-bit stack segment
-    push    10h
-    pop     rdx                         ; rdx <- selector for data segments
+    DB      6ah, DATA32                 ; push DATA32
+    pop     rdx                         ; rdx <- 32-bit data segment selector
     lgdt    fword ptr [rcx + (_16Gdtr - SavedCr4)]
+    mov     ss, edx
     pushfq
+    lea     edx, [rdx + DATA16 - DATA32]
     call    fword ptr [rcx + (_EntryPoint - SavedCr4)]
     popfq
     lidt    fword ptr [rsp + 38h]       ; restore protected mode IDTR
     lea     eax, [rbp - sizeof (IA32_REGS)]
     pop     gs
     pop     fs
+    mov     ss, r9d
     mov     es, r11d
     mov     ds, r10d
     ret
