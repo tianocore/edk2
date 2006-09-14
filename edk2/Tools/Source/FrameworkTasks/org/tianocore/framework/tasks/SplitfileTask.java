@@ -35,25 +35,34 @@ import org.tianocore.common.logger.EdkLog;
   file.
 **/
 public class SplitfileTask extends Task implements EfiDefine {
-    ///
-    /// input file
-    ///
-    private String inputFile = "";
+    //
+    // Tool name
+    // 
+    private static String toolName = "SplitFile";
 
-    ///
-    /// offset value
-    ///
-    private String offset = "";
+    //
+    // input file
+    //
+    private FileArg inputFile = new FileArg();
 
+    //
+    // offset value
+    //
+    private ToolArg offset = new ToolArg();
+
+    //
+    // Output directory
+    // 
+    private String outputDir = ".";
 
     /**
-     * execute
-     *
-     * SplitfleTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      SplitfleTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -65,15 +74,15 @@ public class SplitfileTask extends Task implements EfiDefine {
         String command;
         String argument;
         if (path == null) {
-            command = "SplitFile";
+            command = toolName;
         } else {
-            command = path + File.separatorChar + "SplitFile";
+            command = path + File.separator + toolName;
         }
 
         //
         // argument of tools
         //
-        argument = inputFile + " " + offset;
+        argument = "" + inputFile + offset;
 
         //
         // return value of fwimage execution
@@ -91,21 +100,24 @@ public class SplitfileTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
 
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.inputFile)).getName());
+            String fileName = inputFile.toFileList();
+            EdkLog.log(this, EdkLog.EDK_INFO, fileName + " => " + fileName + "1 " + fileName + "2");
+
             revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "SplitFile succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("SplitFile failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -113,26 +125,26 @@ public class SplitfileTask extends Task implements EfiDefine {
     }
 
     /**
-     * getInputFile
-     *
-     * This function is to get class member "inputFile".
-     *
-     * @return string of input file name.
-     */
+      getInputFile
+     
+      This function is to get class member "inputFile".
+     
+      @return string of input file name.
+     **/
     public String getInputFile() {
-        return inputFile;
+        return inputFile.getValue();
     }
 
     /**
-     * setComponentType
-     *
-     * This function is to set class member "inputFile".
-     *
-     * @param inputFile
-     *            string of input file name.
-     */
+      setComponentType
+     
+      This function is to set class member "inputFile".
+     
+      @param inputFile
+                 string of input file name.
+     **/
     public void setInputFile(String inputFile) {
-        this.inputFile = inputFile;
+        this.inputFile.setArg(" ", inputFile);
     }
 
     /**
@@ -143,7 +155,7 @@ public class SplitfileTask extends Task implements EfiDefine {
       @return offset value of string.
     **/
     public String getOffset() {
-        return offset;
+        return offset.getValue();
     }
 
     /**
@@ -155,7 +167,29 @@ public class SplitfileTask extends Task implements EfiDefine {
                  string of offset value.
     **/
     public void setOffset(String offset) {
-        this.offset = offset;
+        this.offset.setArg(" ", offset);
     }
 
+    /**
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
+    public String getOutputDir() {
+        return outputDir;
+    }
+
+    /**
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory.
+     **/
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
+    }
 }

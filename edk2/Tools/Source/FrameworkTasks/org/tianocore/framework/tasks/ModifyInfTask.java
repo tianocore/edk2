@@ -33,39 +33,39 @@ import org.tianocore.common.logger.EdkLog;
   ModifyInfTask is used to call Modify.exe to generate inf file.
 **/
 public class ModifyInfTask extends Task implements EfiDefine {
-    ///
-    /// tool name
-    ///
+    //
+    // tool name
+    //
     private String toolName = "ModifyInf";
 
-    ///
-    /// input FV inf file
-    ///
-    private String inputFVInfFile = "";
+    //
+    // input FV inf file
+    //
+    private FileArg inputFVInfFile = new FileArg();
 
-    ///
-    /// output FV inf file
-    ///
-    private String outputFVInfFile = "";
+    //
+    // output FV inf file
+    //
+    private FileArg outputFVInfFile = new FileArg();
 
-    ///
-    /// pattern string
-    ///
-    private String patternStr = "";
+    //
+    // pattern string
+    //
+    private ToolArg patternStr = new ToolArg();
 
-	///
-	///  Output dir
-	///
-	private String outputDir = "";
+	//
+	//  Output dir
+	//
+	private String outputDir = ".";
 
     /**
-     * execute
-     *
-     * ModifyInfTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      ModifyInfTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -83,18 +83,7 @@ public class ModifyInfTask extends Task implements EfiDefine {
         //
         // argument of tools
         //
-		File file = new File(outputFVInfFile);
-        if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-			argument = this.inputFVInfFile +
-				       this.outputDir +
-					   File.separatorChar +
-					   this.outputFVInfFile +
-					   this.patternStr;
-		} else {
-			argument = this.inputFVInfFile +
-				       this.outputFVInfFile +
-				       this.patternStr;
-		}
+        argument = "" + this.inputFVInfFile + this.outputFVInfFile + this.patternStr;
         //
         // return value of fwimage execution
         //
@@ -111,24 +100,27 @@ public class ModifyInfTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
+
             //
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.inputFVInfFile)).getName());
-            revl = runner.execute();
+            EdkLog.log(this, EdkLog.EDK_INFO, this.inputFVInfFile.toFileList()
+                + " => " + this.inputFVInfFile.toFileList());
 
+            revl = runner.execute();
             if (EFI_SUCCESS == revl) {
                 //
                 // command execution success
                 //
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "ModifyInfTask succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("ModifyInfTask failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -136,93 +128,93 @@ public class ModifyInfTask extends Task implements EfiDefine {
     }
 
     /**
-     * getinputFVInfFile
-     *
-     * This function is to get class member "inputFVInfFile".
-     *
-     * @return string of input inf file name.
-     */
+      getinputFVInfFile
+     
+      This function is to get class member "inputFVInfFile".
+     
+      @return string of input inf file name.
+     **/
     public String getinputFVInfFile() {
-        return this.inputFVInfFile;
+        return this.inputFVInfFile.getValue();
     }
 
     /**
-     * setinputFVInfFile
-     *
-     * This function is to set class member "inputFVInfFile".
-     *
-     * @param inputFile
-     *            string of input inf file name.
-     */
+      setinputFVInfFile
+     
+      This function is to set class member "inputFVInfFile".
+     
+      @param inputFile
+                 string of input inf file name.
+     **/
     public void setinputFVInfFile(String inputFVInfFileName) {
-        this.inputFVInfFile= inputFVInfFileName + " ";
+        this.inputFVInfFile.setArg(" ", inputFVInfFileName);
     }
 
     /**
-     * getoutputFVInfFile
-     *
-     * This function is to get class member "outputFVInfFile"
-     *
-     * @return outputFVInfFile string of output inf file name.
-     */
+      getoutputFVInfFile
+     
+      This function is to get class member "outputFVInfFile"
+     
+      @return outputFVInfFile string of output inf file name.
+     **/
     public String getoutputFVInfFile() {
-        return this.outputFVInfFile;
+        return this.outputFVInfFile.getValue();
     }
 
     /**
-     * setoutputFVInfFile
-     *
-     * This function is to set class member "outputFVInfFile"
-     *
-     * @param outputFVInfFile
-     *            string of output  inf file name.
-     */
+      setoutputFVInfFile
+     
+      This function is to set class member "outputFVInfFile"
+     
+      @param outputFVInfFile
+                 string of output  inf file name.
+     **/
     public void setoutputFVInfFile(String outputFVInfFileName) {
-        this.outputFVInfFile = outputFVInfFileName  + " ";
+        this.outputFVInfFile.setArg(" ", outputFVInfFileName);
     }
 
     /**
-     * getpatternStr
-     *
-     * This function is to get class member "patternStr"
-     *
-     * @return patternStr string of pattern.
-     */
+      getpatternStr
+     
+      This function is to get class member "patternStr"
+     
+      @return patternStr string of pattern.
+     **/
     public String getpatternStr() {
-        return this.patternStr;
+        return this.patternStr.getValue();
     }
 
     /**
-     * setpatternStr
-     *
-     * This function is to set class member "patternStr"
-     *
-     * @param patternStr
-     *            string of patternStr.
-     */
+      setpatternStr
+     
+      This function is to set class member "patternStr"
+     
+      @param patternStr
+                 string of patternStr.
+     **/
     public void setpatternStr(String patternStr) {
-        this.patternStr = patternStr;
+        this.patternStr.setArg(" ", patternStr);
     }
 
 	/**
-     * getoutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory.
-     */
+      getoutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
     public String getoutputDir() {
         return this.outputDir;
     }
 
     /**
-     * setoutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param patternStr
-     *            string of output directory.
-     */
+      setoutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param patternStr
+                 string of output directory.
+     **/
     public void setoutputDir(String outputDir) {
         this.outputDir = outputDir;
     }

@@ -23,6 +23,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
+import org.tianocore.common.logger.EdkLog;
+
 /**
   GuidChkTask
   
@@ -46,49 +48,53 @@ public class GuidChkTask extends Task implements EfiDefine{
      *    -fos     : out put redirect to this file 
      *    
      */
-    ///
-    /// Directory name of exclusion searching 
-    ///
-    private String exDir = "";
-    ///
-    /// File name of exclusion searching.
-    ///
-    private String exFile = "";
-    ///
-    /// Extension name of exclusion searching.
-    ///
-    private String exExt = "";
-    ///
-    /// Extesnion name of sub dir which excluded searching.
-    ///
-    private String exSubDir = "";
-    ///
-    /// Out put file wrote internal GUID+basename list
-    ///
-    private String outFile = "";
-    ///
-    /// Check for duplicate guids.
-    ///
-    private String chkGui = "";
-    ///
-    /// Check for duplicate signatures
-    ///
-    private String chkSign = "";
-    ///
-    /// If set will print guid+defined symbol name
-    ///
-    private String printGuiDef = "";
-    ///
-    /// If set will print all GUIDS found
-    ///
-    private String printAllGuid = "";
-    ///
-    /// redirection file name.
-    ///
+    //
+    // Tool name
+    // 
+    private static String toolName = "GuidChk";
+    //
+    // Directory name of exclusion searching 
+    //
+    private FileArg exDir = new FileArg();
+    //
+    // File name of exclusion searching.
+    //
+    private FileArg exFile = new FileArg();
+    //
+    // Extension name of exclusion searching.
+    //
+    private FileArg exExt = new FileArg();
+    //
+    // Extesnion name of sub dir which excluded searching.
+    //
+    private FileArg exSubDir = new FileArg();
+    //
+    // Out put file wrote internal GUID+basename list
+    //
+    private FileArg outFile = new FileArg();
+    //
+    // Check for duplicate guids.
+    //
+    private ToolArg chkGui = new ToolArg();
+    //
+    // Check for duplicate signatures
+    //
+    private ToolArg chkSign = new ToolArg();
+    //
+    // If set will print guid+defined symbol name
+    //
+    private ToolArg printGuiDef = new ToolArg();
+    //
+    // If set will print all GUIDS found
+    //
+    private ToolArg printAllGuid = new ToolArg();
+    //
+    // redirection file name.
+    //
     private String outPut = "";
-    ///
-    /// out put redirect to this file.
-    ///
+    //
+    // out put redirect to this file.
+    //
     protected PrintWriter fos = null;
     
     //
@@ -99,25 +105,25 @@ public class GuidChkTask extends Task implements EfiDefine{
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "GuidChk";
+            command = toolName;
         } else {
-            command = path + File.separatorChar + "GuidChk";
+            command = path + File.separatorChar + toolName;
         }
-        String argument = exDir +
-                          exFile +
-                          exExt +
-                          exSubDir +
-                          outFile +
-                          chkGui +
-                          chkSign +
-                          printGuiDef + 
-                          printAllGuid;     
+        String argument = "" + exDir +
+                               exFile +
+                               exExt +
+                               exSubDir +
+                               outFile +
+                               chkGui +
+                               chkSign +
+                               printGuiDef + 
+                               printAllGuid;     
         try {
-            log(command + " " + argument, Project.MSG_VERBOSE);
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, command + " " + argument);
             //
             // execute command line 
             //
-            Process proc = Runtime.getRuntime().exec(command + "" + argument);
+            Process proc = Runtime.getRuntime().exec(command + " " + argument);
             //
             // if set output, redirect out put to output file, else print output to screen
             //         
@@ -126,8 +132,8 @@ public class GuidChkTask extends Task implements EfiDefine{
                 BufferedReader bin = new BufferedReader(new InputStreamReader(proc.getInputStream()));
                 String line = bin.readLine();
                 while (line != null ){                  
-                fos.println(line);
-                line = bin.readLine();
+                    fos.println(line);
+                    line = bin.readLine();
                 }
                 fos.close();
             }
@@ -138,9 +144,9 @@ public class GuidChkTask extends Task implements EfiDefine{
                     line = bin.readLine();
                 }               
             }                      
-            log("GuidChkTask Succeeded!", Project.MSG_VERBOSE);
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " Succeeded!");
         } catch (Exception e) {
-            throw new BuildException("GuidChkTask failed!");
+            throw new BuildException(toolName + " failed!");
         }
     }
     /**
@@ -151,7 +157,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return                     string of flag of ChkGui
     **/
     public String getChkGui() {
-        return chkGui;
+        return chkGui.getValue();
     }
     
     /**
@@ -161,11 +167,10 @@ public class GuidChkTask extends Task implements EfiDefine{
       
       @param chkGui               set class member of chkGui
     **/
-    public void setChkGui(String chkGui) {
-        if (chkGui.equals("on")||(chkGui.equals("ON"))){
-            this.chkGui = " -g ";
-        }
-        
+    public void setChkGui(boolean chkGui) {
+        if (chkGui) {
+            this.chkGui.setArg(" -", "g");
+        }        
     }
     
     /**
@@ -176,7 +181,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return                  chkSign
     **/
     public String getChkSign() {
-        return chkSign;
+        return chkSign.getValue();
     }
     
     /**
@@ -185,9 +190,9 @@ public class GuidChkTask extends Task implements EfiDefine{
       This function is to set class member of chkSign
      * @param chkSign
      */
-    public void setChkSign(String chkSign) {
-        if (chkSign.equals("on")|| chkSign.equals("ON")){
-            this.chkSign = " -s ";
+    public void setChkSign(boolean chkSign) {
+        if (chkSign){
+            this.chkSign.setArg(" -", "s");
         }       
     }
     /**
@@ -198,7 +203,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return                 exDir
     **/
     public String getExDir() {
-        return exDir;
+        return exDir.getValue();
     }
     
     /**
@@ -209,7 +214,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @param                   exDir
     **/
     public void setExDir(String exDir) {
-        this.exDir = " -d " + exDir;
+        this.exDir.setArg(" -d ", exDir);
     }
     
     /**
@@ -220,7 +225,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return                    exExt
     **/
     public String getExExt() {
-        return exExt;
+        return exExt.getValue();
     }
     
     /**
@@ -230,7 +235,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @param                      exExt
     **/
     public void setExExt(String exExt) {
-        this.exExt = " -e " + exExt;
+        this.exExt.setArg(" -e ", exExt);
     }
     
     /**
@@ -240,7 +245,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return                    exFile
     **/
     public String getExFile() {
-        return exFile;
+        return exFile.getValue();
     }
     
     /**
@@ -251,7 +256,7 @@ public class GuidChkTask extends Task implements EfiDefine{
      @param                       exFile
     **/
     public void setExFile(String exFile) {
-        this.exFile = " -f " + exFile;
+        this.exFile.setArg(" -f ", exFile);
     }
     
     /**
@@ -262,7 +267,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return                      exSubDir
     **/
     public String getExSubDir() {
-        return exSubDir;
+        return exSubDir.getValue();
     }
     
     /**
@@ -272,7 +277,7 @@ public class GuidChkTask extends Task implements EfiDefine{
      @param                         exSubDir
     **/
     public void setExSubDir(String exSubDir) {
-        this.exSubDir = " -u " + exSubDir;
+        this.exSubDir.setArg(" -u ", exSubDir);
     }
     
     /**
@@ -283,14 +288,14 @@ public class GuidChkTask extends Task implements EfiDefine{
      @return                        outFile
     **/
     public String getOutFile() {
-        return outFile;
+        return outFile.getValue();
     }
     /**
      * set class member of outFile
      * @param outFile
      */
     public void setOutFile(String outFile) {
-        this.outFile = " -b " + outFile;
+        this.outFile.setArg(" -b ", outFile);
     }
     /**
       getPrintGuidDef
@@ -300,7 +305,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return     flage of printing (guid+defined symbol name)
     **/
     public String getPrintGuiDef() {
-        return printGuiDef;
+        return printGuiDef.getValue();
     }
     
     
@@ -310,9 +315,9 @@ public class GuidChkTask extends Task implements EfiDefine{
       This function is to set class member of printGuiDef.
       @param       printGuiDef
     **/
-    public void setPrintGuiDef(String printGuiDef) {
-        if (printGuiDef.equals("on")|| printGuiDef.equals("ON")){
-            this.printGuiDef = " -x ";
+    public void setPrintGuiDef(boolean printGuiDef) {
+        if (printGuiDef){
+            this.printGuiDef.setArg(" -", "x");
         }
         
     }
@@ -345,7 +350,7 @@ public class GuidChkTask extends Task implements EfiDefine{
       @return         printAllGuid
     **/
     public String getPrintAllGuid() {
-        return printAllGuid;
+        return printAllGuid.getValue();
     }
     
     /**
@@ -354,9 +359,9 @@ public class GuidChkTask extends Task implements EfiDefine{
       This function is to set class member of printAllGuid.
       @param          printAllGuid
     **/
-    public void setPrintAllGuid(String printAllGuid) {
-        if (printAllGuid.equals("on")||printAllGuid.equals("ON")) {
-            this.printAllGuid = " -p ";
+    public void setPrintAllGuid(boolean printAllGuid) {
+        if (printAllGuid) {
+            this.printAllGuid.setArg(" -", "p");
         }       
     }
 }

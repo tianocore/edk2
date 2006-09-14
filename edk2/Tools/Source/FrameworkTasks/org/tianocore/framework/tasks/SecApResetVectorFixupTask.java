@@ -35,34 +35,34 @@ import org.tianocore.common.logger.EdkLog;
   Ap reset vector.
 **/
 public class SecApResetVectorFixupTask extends Task implements EfiDefine {
-    ///
-    /// tool name
-    ///
+    //
+    // tool name
+    //
     private String toolName = "SecApResetVectorFixup";
-    // /
-    // / input FV recovery file
-    // /
-    private String fvInputFile = "";
+    //
+    // input FV recovery file
+    //
+    private FileArg fvInputFile = new FileArg();
 
-    // /
-    // / output file
-    // /
-    private String fvOutputFile = "";
+    //
+    // output file
+    //
+    private FileArg fvOutputFile = new FileArg();
 
-    // /
-    // / output directory, this variable is added by jave wrap
-    // /
-    private String outputDir = "";
+    //
+    // output directory, this variable is added by jave wrap
+    //
+    private String outputDir = ".";
 
 
     /**
-     * execute
-     *
-     * SecApResetVectorFixupTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      SecApResetVectorFixupTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -75,18 +75,12 @@ public class SecApResetVectorFixupTask extends Task implements EfiDefine {
         if (path == null) {
             command = toolName;
         } else {
-            command = path + File.separatorChar + toolName;
+            command = path + File.separator + toolName;
         }
         //
         // argument of tools
         //
-        File file = new File(this.fvOutputFile);
-        if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-            argument = this.fvInputFile + " " + outputDir + File.separatorChar
-                    + this.fvOutputFile;
-        } else {
-            argument = this.fvInputFile + " " + this.fvOutputFile;
-        }
+        argument = "" + this.fvInputFile + this.fvOutputFile;
         //
         // return value of fwimage execution
         //
@@ -103,11 +97,14 @@ public class SecApResetVectorFixupTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
+
             //
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.fvInputFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_INFO, this.fvInputFile.toFileList() 
+                + " => " + this.fvOutputFile.toFileList());
 
             revl = runner.execute();
 
@@ -115,13 +112,13 @@ public class SecApResetVectorFixupTask extends Task implements EfiDefine {
                 //
                 // command execution success
                 //
-                EdkLog.log(this, EdkLog.EDK_VERBOSE, "SecApResetVectorFixup succeeded!");
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 //
                 // command execution fail
                 //
                 EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
-                throw new BuildException("SecApResetVectorFixup failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -129,70 +126,70 @@ public class SecApResetVectorFixupTask extends Task implements EfiDefine {
     }
 
     /**
-     * getInputFile
-     *
-     * This function is to get class member "fvInputFile".
-     *
-     * @return string of input file name.
-     */
+      getInputFile
+     
+      This function is to get class member "fvInputFile".
+     
+      @return string of input file name.
+     **/
     public String getfvInputFile() {
-        return this.fvInputFile;
+        return this.fvInputFile.getValue();
     }
 
     /**
-     * setComponentType
-     *
-     * This function is to set class member "fvInputFile".
-     *
-     * @param inputFile
-     *            string of input file name.
-     */
+      setComponentType
+     
+      This function is to set class member "fvInputFile".
+     
+      @param inputFile
+                 string of input file name.
+     **/
     public void setFvInputFile(String inputFile) {
-        this.fvInputFile = inputFile;
+        this.fvInputFile.setArg(" ", inputFile);
     }
 
     /**
-     * getOutputFile
-     *
-     * This function is to get class member "fvOutputFile"
-     *
-     * @return outputFile string of output file name.
-     */
+      getOutputFile
+     
+      This function is to get class member "fvOutputFile"
+     
+      @return outputFile string of output file name.
+     **/
     public String getOutputFile() {
-        return this.fvOutputFile;
+        return this.fvOutputFile.getValue();
     }
 
     /**
-     * setOutputFile
-     *
-     * This function is to set class member "fvOutputFile"
-     *
-     * @param outputFile
-     *            string of output file name.
-     */
+      setOutputFile
+     
+      This function is to set class member "fvOutputFile"
+     
+      @param outputFile
+                 string of output file name.
+     **/
     public void setFvOutputFile(String outputFile) {
-        this.fvOutputFile = outputFile;
+        this.fvOutputFile.setArg(" ", outputFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory.
-     */
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
     public String getOutputDir() {
         return outputDir;
     }
 
     /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            string of output directory.
-     */
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory.
+     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }

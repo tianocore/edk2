@@ -16,13 +16,16 @@
 
 package org.tianocore.framework.tasks;
 
-import java.util.*;
+import java.io.File;
+
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
+
+import org.tianocore.common.logger.EdkLog;
 
 /**
   GenCRC32SectionTask
@@ -31,18 +34,22 @@ import org.apache.tools.ant.types.Commandline;
   
 **/
 public class GenCRC32SectionTask extends Task implements EfiDefine {
-    ///
-    /// output file
-    ///
-    private String outputFile;
-    ///
-    /// inputFile list
-    ///
-    private List<NestElement> inputFileList = new ArrayList<NestElement>();
+    //
+    // Tool name
+    //
+    private static String toolName = "GenCRC32Section";
+    //
+    // output file
+    //
+    private FileArg outputFile = new FileArg();
+    //
+    // inputFile list
+    //
+    private InputFile inputFileList = new InputFile();
     
-    ///
-    /// Project
-    ///
+    //
+    // Project
+    //
     static private Project project;
     
     /**
@@ -62,22 +69,14 @@ public class GenCRC32SectionTask extends Task implements EfiDefine {
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH"); 
         String command;
         if (path == null) {
-            command = "GenCRC32Section";
+            command = toolName;
         } else {
-            command = path + "/" + "GenCRC32Section" ;
+            command = path + File.separator + toolName ;
         }
-        // 
-        // string line of input files 
-        // 
-        String inputFiles = " -i "; 
-        for (int i = 0; i < inputFileList.size(); ++i) {
-            inputFiles += inputFileList.get(i).toString(" ");
-        }
-
         // 
         // assemble argument 
         //
-        String argument =  inputFiles + outputFile; 
+        String argument =  "" + inputFileList.toStringWithSinglepPrefix(" -i ") + outputFile; 
         // 
         // return value of fwimage execution 
         //
@@ -93,21 +92,23 @@ public class GenCRC32SectionTask extends Task implements EfiDefine {
             
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
-            log(Commandline.toString(cmdline.getCommandline()), Project.MSG_VERBOSE);
-            log(" ");
+
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
+            EdkLog.log(this, inputFileList.toFileList() + " => " + outputFile.toFileList());
+
             revl = runner.execute();
             if (EFI_SUCCESS == revl){
                 //
                 //  command execution success 
                 //
-                log("GenCRC32Section succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, toolName + " succeeded!");
             } else {
                 // 
                 // command execution fail
                 //
-                log("ERROR = " + Integer.toHexString(revl));
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(revl));
                 // LAH Added This Line
-                throw new BuildException("GenCRC32Section failed!");
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -120,22 +121,22 @@ public class GenCRC32SectionTask extends Task implements EfiDefine {
       This function is to add a inputFile element into list
       @param inputFile : inputFile element
     **/
-    public void addInputfile(InputFile inputFile) {
-        inputFileList.add(inputFile);
+    public void addConfiguredInputfile(InputFile inputFile) {
+        inputFileList.insert(inputFile);
     }
     
     /**
-     get class member "outputFile"
-     * @return name of output file
-     */
+      get class member "outputFile"
+      @return name of output file
+     **/
     public String getOutputFile() {
-        return this.outputFile;
+        return this.outputFile.getValue();
     }
     /**
-     * set class member "outputFile"
-     * @param outputFile : outputFile parameter 
-     */
+      set class member "outputFile"
+      @param outputFile : outputFile parameter 
+     **/
     public void setOutputFile(String outputFile) {
-        this.outputFile = " -o " + outputFile;
+        this.outputFile.setArg(" -o ", outputFile);
     }
 }

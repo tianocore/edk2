@@ -15,6 +15,7 @@ package org.tianocore.build.global;
 
 import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.BuildException;
 
 import java.io.File;
 import java.io.FileReader;
@@ -77,7 +78,7 @@ public class DpFile  extends DataType {
             lineReader.close();
             fileReader.close();
         } catch (IOException e) {
-            System.out.println (e.getMessage());
+            throw new BuildException(e.getMessage());
         }
     }
 

@@ -22,6 +22,8 @@ import org.apache.tools.ant.taskdefs.Execute;
 import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 
+import org.tianocore.common.logger.EdkLog;
+
 /**
  Class SetStampTask is a wrap class for setstamp.exe.
  **/
@@ -32,10 +34,14 @@ public class SetStampTask extends Task implements EfiDefine {
          -peFile  : file of PE
          -timeFile: Txt file of time
      **/ 
-    
-    private String peFile = "";
 
-    private String timeFile = "";
+    private static String toolName = "SetStamp";
+
+    private FileArg peFile = new FileArg();
+
+    private FileArg timeFile = new FileArg();
+
+    private String outputDir = ".";
 
     /**
      assemble tool command line & execute tool command line
@@ -51,14 +57,14 @@ public class SetStampTask extends Task implements EfiDefine {
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
         String command;
         if (path == null) {
-            command = "SetStamp";
+            command = toolName;
         } else {
-            command = path + "/" + "SetStamp";
+            command = path + File.separator + toolName;
         }
         ///
         /// argument of SetStamp tool
         ///
-        String argument = peFile + timeFile;
+        String argument = "" + peFile + timeFile;
         ///
         /// reture value of SetStamp execution
         ///
@@ -75,19 +81,20 @@ public class SetStampTask extends Task implements EfiDefine {
             Execute runner = new Execute(streamHandler, null);
             runner.setAntRun(project);
             runner.setCommandline(commandLine.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir));
 
-            log(Commandline.toString(commandLine.getCommandline()), Project.MSG_VERBOSE);
-            log((new File(this.peFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(commandLine.getCommandline()));
+            EdkLog.log(this, peFile.toFileList() + " < " + timeFile.toFileList());
 
             returnVal = runner.execute();
             if (EFI_SUCCESS == returnVal) {
-                log("SetStamp succeeded!", Project.MSG_VERBOSE);
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, toolName + " succeeded!");
             } else {
                 ///
                 /// command execution fail
                 ///
-                log("ERROR = " + Integer.toHexString(returnVal));
-                throw new BuildException("SetStamp failed!");
+                EdkLog.log(this, "ERROR = " + Integer.toHexString(returnVal));
+                throw new BuildException(toolName + " failed!");
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -100,7 +107,7 @@ public class SetStampTask extends Task implements EfiDefine {
      @param     peFile  name of PE File
      **/
     public void setPeFile(String peFile) {
-        this.peFile = " " + peFile;
+        this.peFile.setArg(" ", peFile);
     }
 
     /**
@@ -109,7 +116,7 @@ public class SetStampTask extends Task implements EfiDefine {
      @return    peFile  name of PE file
      **/
     public String getPeFile() {
-        return this.peFile;
+        return this.peFile.getValue();
     }
 
     /**
@@ -118,7 +125,7 @@ public class SetStampTask extends Task implements EfiDefine {
      @param     timeFile    name of time file
      **/
     public void setTimeFile(String timeFile) {
-        this.timeFile = " " + timeFile;
+        this.timeFile.setArg(" ", timeFile);
     }
 
     /**
@@ -127,7 +134,29 @@ public class SetStampTask extends Task implements EfiDefine {
      @returns   name of time file
      **/
     public String getTimeFile() {
-        return this.timeFile;
+        return this.timeFile.getValue();
     }
 
+    /**
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
+    public String getOutputDir() {
+        return outputDir;
+    }
+
+    /**
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory.
+     **/
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
+    }
 }

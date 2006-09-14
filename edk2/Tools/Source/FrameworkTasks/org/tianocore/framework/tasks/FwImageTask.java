@@ -16,6 +16,8 @@
  **/
 package org.tianocore.framework.tasks;
 
+import java.io.File;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -53,11 +55,6 @@ public class FwImageTask extends Task implements EfiDefine {
     private ToolArg componentType = new ToolArg();
 
     /**
-     * assemble tool command line & execute tool command line
-     *
-     * @throws BuildException
-     */
-    /**
       execute
 
       FwimageTask execute function is to assemble tool command line & execute
@@ -76,7 +73,7 @@ public class FwImageTask extends Task implements EfiDefine {
         if (path == null) {
             command = toolName;
         } else {
-            command = path + "/" + toolName;
+            command = path + File.separator + toolName;
         }
         //
         // argument of tools

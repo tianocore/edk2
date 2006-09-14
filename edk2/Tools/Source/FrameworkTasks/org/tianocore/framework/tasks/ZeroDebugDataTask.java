@@ -33,30 +33,34 @@ import org.tianocore.common.logger.EdkLog;
   ZeroDebugDataTask is used to call ZeroDebugData.exe to remove debug data.
 **/
 public class ZeroDebugDataTask extends Task implements EfiDefine {
-    // /
-    // / input PE file
-    // /
-    private String peFile = "";
+    //
+    // Tool name
+    // 
+    private static String toolName = "ZeroDebugData";
+    //
+    // input PE file
+    //
+    private FileArg peFile = new FileArg();
 
-    // /
-    // / output file
-    // /
-    private String outputFile = "DebugData.dat";
+    //
+    // output file
+    //
+    private FileArg outputFile = new FileArg(" ", "DebugData.dat");
 
-    // /
-    // / output directory, this variable is added by jave wrap
-    // /
-    private String outputDir = "";
+    //
+    // output directory, this variable is added by jave wrap
+    //
+    private String outputDir = ".";
 
 
     /**
-     * execute
-     *
-     * ZeroDebugDataTask execute function is to assemble tool command line & execute
-     * tool command line
-     *
-     * @throws BuidException
-     */
+      execute
+     
+      ZeroDebugDataTask execute function is to assemble tool command line & execute
+      tool command line
+     
+      @throws BuidException
+     **/
     public void execute() throws BuildException {
 
         Project project = this.getOwningTarget().getProject();
@@ -68,20 +72,16 @@ public class ZeroDebugDataTask extends Task implements EfiDefine {
         String command;
         String argument;
         if (path == null) {
-            command = "ZeroDebugData";
+            command = toolName;
         } else {
-            command = path + File.separatorChar + "ZeroDebugData";
+            command = path + File.separatorChar + toolName;
         }
+
         //
         // argument of tools
         //
-        File file = new File(outputFile);
-        if (!file.isAbsolute() && (!this.outputDir.equalsIgnoreCase(""))) {
-            argument = this.peFile + " " + outputDir + File.separatorChar
-                    + outputFile;
-        } else {
-            argument = this.peFile + " " + outputFile;
-        }
+        argument = "" + peFile + outputFile;
+
         //
         // return value of fwimage execution
         //
@@ -98,11 +98,12 @@ public class ZeroDebugDataTask extends Task implements EfiDefine {
 
             runner.setAntRun(project);
             runner.setCommandline(cmdline.getCommandline());
+            runner.setWorkingDirectory(new File(outputDir)); 
             //
             // Set debug log information.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, EdkLog.EDK_INFO, (new File(this.peFile)).getName());
+            EdkLog.log(this, EdkLog.EDK_INFO, peFile.toFileList() + " => " + outputFile.toFileList());
 
             revl = runner.execute();
 
@@ -117,7 +118,6 @@ public class ZeroDebugDataTask extends Task implements EfiDefine {
                 //
                 EdkLog.log(this, EdkLog.EDK_INFO, "ERROR = " + Integer.toHexString(revl));
                 throw new BuildException("ZeroDebugData failed!");
-
             }
         } catch (Exception e) {
             throw new BuildException(e.getMessage());
@@ -125,70 +125,70 @@ public class ZeroDebugDataTask extends Task implements EfiDefine {
     }
 
     /**
-     * getPeFile
-     *
-     * This function is to get class member "inputFile".
-     *
-     * @return string of input file name.
-     */
+      getPeFile
+     
+      This function is to get class member "inputFile".
+     
+      @return string of input file name.
+     **/
     public String getPeFile() {
-        return this.peFile;
+        return this.peFile.getValue();
     }
 
     /**
-     * setPeFile
-     *
-     * This function is to set class member "peFile".
-     *
-     * @param peFile
-     *            string of input file name.
-     */
+      setPeFile
+     
+      This function is to set class member "peFile".
+     
+      @param peFile
+                 string of input file name.
+     **/
     public void setPeFile(String peFile) {
-        this.peFile = peFile;
+        this.peFile.setArg(" ", peFile);
     }
 
     /**
-     * getOutputFile
-     *
-     * This function is to get class member "outputFile"
-     *
-     * @return outputFile string of output file name.
-     */
+      getOutputFile
+     
+      This function is to get class member "outputFile"
+     
+      @return outputFile string of output file name.
+     **/
     public String getOutputFile() {
-        return outputFile;
+        return this.outputFile.getValue();
     }
 
     /**
-     * setOutputFile
-     *
-     * This function is to set class member "outputFile"
-     *
-     * @param outputFile
-     *            string of output file name.
-     */
+      setOutputFile
+     
+      This function is to set class member "outputFile"
+     
+      @param outputFile
+                 string of output file name.
+     **/
     public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
+        this.outputFile.setArg(" ", outputFile);
     }
 
     /**
-     * getOutputDir
-     *
-     * This function is to get class member "outputDir"
-     *
-     * @return outputDir string of output directory.
-     */
+      getOutputDir
+     
+      This function is to get class member "outputDir"
+     
+      @return outputDir string of output directory.
+     **/
     public String getOutputDir() {
         return outputDir;
     }
 
     /**
-     * setOutputDir
-     *
-     * This function is to set class member "outputDir"
-     *
-     * @param outputDir
-     *            string of output directory.
-     */
+      setOutputDir
+     
+      This function is to set class member "outputDir"
+     
+      @param outputDir
+                 string of output directory.
+     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
     }
