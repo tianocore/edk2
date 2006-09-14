@@ -104,7 +104,6 @@ public final class SourceFileReplacer implements Common.ForDoAll {
     
     private class CLaplace extends Common.Laplace {
         public  String operation(String wholeline) {
-            boolean addr8 = false;
             // remove EFI_DRIVER_ENTRY_POINT
             wholeline = wholeline.replaceAll("(EFI_[A-Z]+_ENTRY_POINT\\s*\\(\\s*" + mi.entrypoint + "\\s*\\)\\s*;)", MigrationTool.MIGRATIONCOMMENT + " $1");
             // redefine module entry point for some self-relocated modules
@@ -390,7 +389,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
     
     //-----------------------------------ForDoAll-----------------------------------//
     public void run(String filepath) throws Exception {
-        String inname = filepath.replace(mi.modulepath + File.separator, "");
+        String inname = filepath.replace(mi.modulepath + File.separator + "temp" + File.separator, "");
         String tempinpath = mi.modulepath + File.separator + "temp" + File.separator;
         String tempoutpath = MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator;
 
@@ -418,7 +417,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         Laplaces.add(new CLaplace());
         Laplaces.add(new IdleLaplace());
         
-        Common.toDoAll(mi.localmodulesources, this);
+        Common.toDoAll(mi.modulepath + File.separator + "temp", this, Common.FILE);
         
         if (!mi.hashr8only.isEmpty()) {
             addr8only();

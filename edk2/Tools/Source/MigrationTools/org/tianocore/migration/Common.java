@@ -22,8 +22,8 @@ public final class Common {
     public static final int FILE = 1;
     public static final int DIR = 2;
     
-    public static final String strseparate = "(.*)\\\\([^\\\\]*)";
-    public static final Pattern ptnseparate = Pattern.compile("(.*)\\\\([^\\\\]*)");
+    public static final String STRSEPARATER = "(.*)\\\\([^\\\\]*)";
+    public static final Pattern PTNSEPARATER = Pattern.compile("(.*)\\\\([^\\\\]*)");
 
     //-------------------------------------regex------------------------------------------//
     
@@ -53,6 +53,7 @@ public final class Common {
         while ((line = rd.readLine()) != null) {
             wholefile.append(line + "\n");
         }
+        rd.close();
         return wholefile.toString();
     }
 
@@ -64,6 +65,10 @@ public final class Common {
         outfile.close();
     }
 
+    public static final void fileCopy(String src, String des) throws Exception {
+    	string2file(file2string(src), des);
+    }
+    
     //-----------------------------------file&string---------------------------------------//
 
     //--------------------------------------dir--------------------------------------------//
@@ -76,7 +81,7 @@ public final class Common {
     */
     public static final void ensureDir(String objFileWhole) {
         File tempdir;
-        Matcher mtrseparate = ptnseparate.matcher(objFileWhole);
+        Matcher mtrseparate = PTNSEPARATER.matcher(objFileWhole);
         if (mtrseparate.find()) {
             tempdir = new File(mtrseparate.group(1));
             if (!tempdir.exists()) tempdir.mkdirs();
@@ -98,7 +103,7 @@ public final class Common {
     }
     
     public static final String dirCopy_(String src) throws Exception {
-        Matcher mtrseparate = Common.ptnseparate.matcher(src);
+        Matcher mtrseparate = Common.PTNSEPARATER.matcher(src);
         if (mtrseparate.find()) {
             dirCopy(src, mtrseparate.group(1) + File.separator + "_" + mtrseparate.group(2));
         }
@@ -109,15 +114,27 @@ public final class Common {
         String[] list = new File(src).list();
         File test;
 
+        ensureDir(des);
         for (int i = 0 ; i < list.length ; i++) {
             test = new File(src + File.separator + list[i]);
             if (test.isDirectory()) {
                 dirCopy(src + File.separator + list[i], des + File.separator + list[i]);
             } else {
-                ensureDir(des + File.separator + list[i]);
+                //ensureDir(des + File.separator + list[i]);
                 string2file(file2string(src + File.separator + list[i]), des + File.separator + list[i]);
             }
         }
+    }
+    
+    public static final void oneLevelDirCopy(String src, String des, String type) throws Exception {
+    	String[] list = new File(src).list();
+    	
+    	ensureDir(des);
+    	for (int i = 0; i < list.length; i++) {
+    		if (list[i].contains(type)) {
+                string2file(file2string(src + File.separator + list[i]), des + File.separator + list[i]);
+    		}
+    	}
     }
 
     //--------------------------------------dir--------------------------------------------//
