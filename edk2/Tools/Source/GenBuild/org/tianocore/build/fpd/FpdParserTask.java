@@ -296,6 +296,43 @@ public class FpdParserTask extends Task {
     public void parseFpdFile(File fpdFile) throws BuildException, EdkException {
         this.fpdFile = fpdFile;
         parseFpdFile();
+        
+        //
+        // Call Platform_build.xml prebuild firstly in stand-alone build
+        // Prepare BUILD_DIR
+        //
+        isUnified = OutputManager.getInstance().prepareBuildDir(getProject());
+
+        String buildDir = getProject().getProperty("BUILD_DIR");
+        //
+        // For every Target and ToolChain
+        //
+        String[] targetList = GlobalData.getToolChainInfo().getTargets();
+        for (int i = 0; i < targetList.length; i++) {
+            String[] toolchainList = GlobalData.getToolChainInfo().getTagnames();
+            for(int j = 0; j < toolchainList.length; j++) {
+                //
+                // Prepare FV_DIR
+                //
+                String ffsCommonDir = buildDir + File.separatorChar
+                                + targetList[i] + "_"
+                                + toolchainList[j];
+                File fvDir = new File(ffsCommonDir + File.separatorChar + "FV");
+                fvDir.mkdirs();
+            }
+        }
+
+        String platformBuildFile = buildDir + File.separatorChar + platformId.getName() + "_build.xml";
+        PlatformBuildFileGenerator fileGenerator = new PlatformBuildFileGenerator(getProject(), outfiles, fvs, isUnified, saq, platformBuildFile);
+        fileGenerator.genBuildFile();
+        
+        Ant ant = new Ant();
+        ant.setProject(getProject());
+        ant.setAntfile(platformBuildFile);
+        ant.setTarget("prebuild");
+        ant.setInheritAll(true);
+        ant.init();
+        ant.execute();
     }
 
     /**

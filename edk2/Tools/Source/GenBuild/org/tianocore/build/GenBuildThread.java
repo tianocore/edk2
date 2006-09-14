@@ -154,8 +154,8 @@ public class GenBuildThread implements Runnable {
 
             genBuildTask.perform();
         } catch (BuildException be) {
-
-            EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, moduleId + " with Arch " + arch +" build error. \n" + be.getMessage());
+            
+            EdkLog.log("GenBuild", EdkLog.EDK_ALWAYS, fpdModuleId + " build error. \n" + be.getMessage());
             
             if (FpdParserForThread.errorModule == null) {
                 FpdParserForThread.errorModule = fpdModuleId;
