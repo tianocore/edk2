@@ -1313,7 +1313,8 @@ EnableInterrupt (
   @retval  EFI_SUCCESS - Interrupt cleared
 
 **/
-EFI_STATUS
+VOID
+EFIAPI
 ClearInterrupt (
   IN EFI_EVENT  Event,
   IN VOID       *Context
