@@ -1775,10 +1775,10 @@ EnableInterrupt (
   @param[in]  Event   Pointer to this event
   @param[in]  Context Event hanlder private data
 
-  @retval  EFI_SUCCESS - Interrupt cleared
 
 **/
-EFI_STATUS
+VOID
+EFIAPI
 ClearInterrupt (
   IN EFI_EVENT  Event,
   IN VOID       *Context
@@ -1799,7 +1799,7 @@ ClearInterrupt (
   //
   Status = ReassignIdeResources (IdeDev);
   if (EFI_ERROR (Status)) {
-    return Status;
+    return;
   }
 
   //
@@ -1812,7 +1812,7 @@ ClearInterrupt (
   //
   AtaSoftReset (IdeDev);
   if (EFI_ERROR (Status)) {
-    return Status;
+    return;
   }
 
   //
@@ -1824,7 +1824,7 @@ ClearInterrupt (
     if (IdeSecondary == IdeDev->Channel) {
       IoPortForBmis = IdeDev->IoPort->BusMasterBaseAddr + BMISS_OFFSET;
     } else {
-      return EFI_UNSUPPORTED;
+      return;
     }
   }
   //
@@ -1864,5 +1864,4 @@ ClearInterrupt (
     RegisterValue
     );
 
-  return EFI_SUCCESS;
 }
