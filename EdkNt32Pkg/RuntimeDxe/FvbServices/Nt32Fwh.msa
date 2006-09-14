@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <!--Copyright (c) 2006, Intel Corporation
 All rights reserved. This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -65,12 +65,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
   </LibraryClassDefinitions>
   <SourceFiles>
     <Filename>Nt32Fwh.dxs</Filename>
-    <Filename SupArchList="IA32">nt32\FWBlockService.c</Filename>
-    <Filename SupArchList="IA32">nt32\FwBlockService.h</Filename>
-    <Filename SupArchList="IA32">nt32\FvbInfo.c</Filename>
-    <Filename ToolCode="DUMMY">Common\FWBlockService.c</Filename>
-    <Filename ToolCode="DUMMY">Common\FwBlockService.h</Filename>
-    <Filename ToolCode="DUMMY">Common\ia32\Ia32Fwh.c</Filename>
+    <Filename SupArchList="IA32">FWBlockService.c</Filename>
+    <Filename SupArchList="IA32">FwBlockService.h</Filename>
+    <Filename SupArchList="IA32">FvbInfo.c</Filename>
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -81,7 +78,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Protocol Usage="SOMETIMES_PRODUCED">
       <ProtocolCName>gEfiDevicePathProtocolGuid</ProtocolCName>
     </Protocol>
-    <Protocol Usage="SOMETIMES_PRODUCED">
+    <Protocol Usage="ALWAYS_PRODUCED">
       <ProtocolCName>gEfiFirmwareVolumeBlockProtocolGuid</ProtocolCName>
     </Protocol>
     <Protocol Usage="ALWAYS_PRODUCED">
