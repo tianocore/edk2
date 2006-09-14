@@ -18,18 +18,19 @@ import java.util.regex.*;
 
 import org.tianocore.*;
 
-public final class ModuleReader {
-    private static ModuleInfo mi;
+public final class ModuleReader implements Common.ForDoAll {
+	private static final ModuleReader modulereader = new ModuleReader();
+    private ModuleInfo mi;
+    private final CommentLaplace commentlaplace = new CommentLaplace();
     
     private static final Pattern ptninfequation = Pattern.compile("([^\\s]*)\\s*=\\s*([^\\s]*)");
     private static final Pattern ptnsection = Pattern.compile("\\[([^\\[\\]]*)\\]([^\\[\\]]*)\\n", Pattern.MULTILINE);
     private static final Pattern ptnfilename = Pattern.compile("[^\\s]+");
     
-    public static final void ModuleScan(ModuleInfo m) throws Exception {
-        mi = m;
-
+    public final void ModuleScan() throws Exception {
         Common.toDoAll(mi.modulepath, ModuleInfo.class.getMethod("enroll", String.class), mi, null, Common.FILE);
 
+        // inf&msa
         String filename = null;
         if (mi.msaorinf.isEmpty()) {
             MigrationTool.ui.println("No INF nor MSA file found!");
@@ -47,13 +48,12 @@ public final class ModuleReader {
         } else if (filename.contains(".msa")) {
             readMsa(filename);
         }
+        // inf&msa
 
-        CommentOutNonLocalHFile();
-        parsePreProcessedSourceCode();
-
+        preProcessModule();
     }
     
-    private static final void readMsa(String name) throws Exception {
+    private final void readMsa(String name) throws Exception {
         ModuleSurfaceAreaDocument msadoc = ModuleSurfaceAreaDocument.Factory.parse(new File(mi.modulepath + File.separator + name));
         ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = msadoc.getModuleSurfaceArea();
         MsaHeaderDocument.MsaHeader msaheader = msa.getMsaHeader();
@@ -73,7 +73,7 @@ public final class ModuleReader {
         }
     }
     
-    private static final void readInf(String name) throws Exception {
+    private final void readInf(String name) throws Exception {
         System.out.println("\nParsing INF file: " + name);
         String wholeline;
         Matcher mtrinfequation;
@@ -113,48 +113,63 @@ public final class ModuleReader {
             if (mtrsection.group(1).contains("sources.")) {
                 mtrfilename = ptnfilename.matcher(mtrsection.group(2));
                 while (mtrfilename.find()) {
+                	mi.infsources.add(mtrfilename.group());
                     if (!mi.localmodulesources.contains(mtrfilename.group())) {
-                        MigrationTool.ui.println("Source File Missing! : " + mtrfilename.group());
+                        MigrationTool.ui.println("Warn: Source File Missing! : " + mtrfilename.group());
                     }
+                }
+            }
+            if (mtrsection.group(1).matches("includes.common")) {
+                mtrfilename = ptnfilename.matcher(mtrsection.group(2));
+                while (mtrfilename.find()) {
+                	mi.infincludes.add(mtrfilename.group());
                 }
             }
         }
     }
     
-    // add '//' to all non-local include lines
-    private static final void CommentOutNonLocalHFile() throws IOException {
-        BufferedReader rd;
-        String line;
-        String curFile;
-        PrintWriter outfile;
-
-        Pattern ptninclude = Pattern.compile("[\"<](.*[.]h)[\">]");
-        Matcher mtrinclude;
-
-        Iterator<String> ii = mi.localmodulesources.iterator();
-        while ( ii.hasNext() ) {
-            curFile = ii.next();
-            rd = new BufferedReader(new FileReader(mi.modulepath + File.separator + curFile));
-            Common.ensureDir(mi.modulepath + File.separator + "temp" + File.separator + curFile);
-            outfile = new PrintWriter(new BufferedWriter(new FileWriter(mi.modulepath + File.separator + "temp" + File.separator + curFile)));
-            
-            while ((line = rd.readLine()) != null) {
-                if (line.contains("#include")) {
-                    mtrinclude = ptninclude.matcher(line);
-                    if (mtrinclude.find() && mi.localmodulesources.contains(mtrinclude.group(1))) {
-                    } else {
-                        line = MigrationTool.MIGRATIONCOMMENT + line;
-                    }
-                }
-                outfile.append(line + '\n');
+    private final void preProcessModule() throws Exception {
+    	// according to .inf file, add extraordinary includes and sourcefiles
+        Common.dirCopy(mi.modulepath, mi.modulepath + File.separator + "temp");
+        
+    	if (!mi.infincludes.isEmpty()) {
+            Iterator<String> it = mi.infincludes.iterator();
+            String tempincludename = null;
+    		while (it.hasNext()) {
+    			tempincludename = it.next();
+    			if (tempincludename.contains("..")) {
+    				Matcher mtr = Common.PTNSEPARATER.matcher(tempincludename);
+    				if (mtr.find() && !mtr.group(2).matches(".")) {
+    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.modulepath + File.separator + "temp", ".h");
+    				} else {
+    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1"), mi.modulepath + File.separator + "temp", ".h");
+    				}
+    			}
+    		}
+    	}
+    	if (!mi.infsources.isEmpty()) {
+            Iterator<String> it = mi.infsources.iterator();
+            String tempsourcename = null;
+            while (it.hasNext()) {
+            	tempsourcename = it.next();
+            	if (tempsourcename.contains("..")) {
+            		Common.ensureDir(mi.modulepath + File.separator + "temp" + File.separator + "MT_Parent_Sources");
+    				Matcher mtr = Common.PTNSEPARATER.matcher(tempsourcename);
+    				if (mtr.find()) {
+    					Common.fileCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.modulepath + File.separator + "temp" + File.separator + "MT_Parent_Sources" + File.separator + mtr.group(2));
+    				}
+            	}
             }
-            outfile.flush();
-            outfile.close();
-            
-        }
+    	}
+
+        //CommentOutNonLocalHFile();
+        Common.toDoAll(mi.modulepath + File.separator + "temp", this, Common.FILE);
+        
+        parsePreProcessedSourceCode();
+
     }
 
-    private static final void parsePreProcessedSourceCode() throws Exception {
+    private final void parsePreProcessedSourceCode() throws Exception {
         //Cl cl = new Cl(modulepath);
         //cl.execute("Fat.c");
         //cl.generateAll(preprocessedccodes);
@@ -262,5 +277,55 @@ public final class ModuleReader {
                 mi.hashnonlocalfunc.add(temp);                    // this set contains both changed and not changed items
             }
         }
+    }
+    
+    public class CommentLaplace extends Common.Laplace {
+        public String operation(String wholeline) {
+        	StringBuffer wholebuffer = new StringBuffer();
+        	String templine = null;
+            Pattern ptnincludefile = Pattern.compile("[\"<](.*[.]h)[\">]");
+            Pattern ptninclude = Pattern.compile("#include\\s*(.*)");
+            Matcher mtrinclude = ptninclude.matcher(wholeline);
+            Matcher mtrincludefile = null;
+            while (mtrinclude.find()) {
+            	mtrincludefile = ptnincludefile.matcher(mtrinclude.group(1));
+            	if (mtrincludefile.find() && mi.localmodulesources.contains(mtrincludefile.group(1))) {
+                	templine = mtrinclude.group();
+            	} else {
+                	templine = MigrationTool.MIGRATIONCOMMENT + mtrinclude.group();
+            	}
+            	mtrinclude.appendReplacement(wholebuffer, templine);
+            }
+            mtrinclude.appendTail(wholebuffer);
+            return wholebuffer.toString();
+        }
+        
+        public boolean recognize(String filename) {
+        	return filename.contains(".c") || filename.contains(".h");
+        }
+        
+        public String namechange(String oldname) {
+        	return oldname;
+        }
+    }
+
+    //-----------------------------------ForDoAll-----------------------------------//
+    public void run(String filepath) throws Exception {
+    	String name = mi.modulepath + File.separator + "temp" + File.separator + filepath.replace(mi.modulepath + File.separator + "temp" + File.separator, "");
+    	commentlaplace.transform(name, name);
+    }
+
+    public boolean filter(File dir) {
+        return true;
+    }
+    //-----------------------------------ForDoAll-----------------------------------//
+    
+    public final void setModuleInfo(ModuleInfo m) {
+    	mi = m;
+    }
+    
+    public static final void aimAt(ModuleInfo mi) throws Exception {
+    	modulereader.setModuleInfo(mi);
+    	modulereader.ModuleScan();
     }
 }

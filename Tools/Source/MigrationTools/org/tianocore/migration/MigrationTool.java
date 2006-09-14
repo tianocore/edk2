@@ -31,7 +31,7 @@ public class MigrationTool {
 
     private static final void mainFlow(ModuleInfo mi) throws Exception {
 
-        ModuleReader.ModuleScan(mi);
+        ModuleReader.aimAt(mi);
         
         //MigrationTool.ui.yesOrNo("go on replace?");
         SourceFileReplacer.fireAt(mi);    // some adding library actions are taken here,so it must be put before "MsaWriter"
@@ -76,7 +76,7 @@ public class MigrationTool {
 
     private static final String assignOutPutPath(String inputpath) {
         if (MigrationTool.defaultoutput) {
-            return inputpath.replaceAll(Common.strseparate, "$1");
+            return inputpath.replaceAll(Common.STRSEPARATER, "$1");
         } else {
             return MigrationTool.ui.getFilepath("Please choose where to place the output module", JFileChooser.DIRECTORIES_ONLY);
         }

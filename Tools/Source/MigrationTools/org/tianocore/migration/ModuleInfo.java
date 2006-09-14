@@ -34,6 +34,8 @@ public final class ModuleInfo {
     public final Set<String> localmodulesources = new HashSet<String>();        //contains both .c and .h
     public final Set<String> preprocessedccodes = new HashSet<String>();
     public final Set<String> msaorinf = new HashSet<String>();                //only a little, hash may be too big for this
+    public final Set<String> infincludes = new HashSet<String>();
+    public final Set<String> infsources = new HashSet<String>();
     
     public final Set<String> hashfuncc = new HashSet<String>();
     public final Set<String> hashfuncd = new HashSet<String>();
