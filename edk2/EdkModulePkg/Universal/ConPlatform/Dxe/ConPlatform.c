@@ -37,7 +37,6 @@ EFI_DRIVER_BINDING_PROTOCOL gConPlatformTextOutDriverBinding = {
   NULL
 };
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextInDriverBindingSupported (
@@ -67,7 +66,6 @@ Returns:
           );
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextOutDriverBindingSupported (
@@ -161,7 +159,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextInDriverBindingStart (
@@ -267,7 +264,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextOutDriverBindingStart (
@@ -405,7 +401,6 @@ Returns:
   return EFI_SUCCESS;
 }
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformDriverBindingStop (

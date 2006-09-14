@@ -20,9 +20,6 @@ Abstract:
 #ifndef CON_MANAGE_H_
 #define CON_MANAGE_H_
 
-//
-//
-//
 #define VarConsoleInpDev  L"ConInDev"
 #define VarConsoleInp     L"ConIn"
 #define VarConsoleOutDev  L"ConOutDev"
@@ -44,7 +41,6 @@ ConPlatformDriverBindingSupported (
   IN  EFI_GUID                     *ProtocolGuid
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextInDriverBindingSupported (
@@ -53,7 +49,6 @@ ConPlatformTextInDriverBindingSupported (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextOutDriverBindingSupported (
@@ -62,7 +57,6 @@ ConPlatformTextOutDriverBindingSupported (
   IN  EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextInDriverBindingStart (
@@ -71,7 +65,6 @@ ConPlatformTextInDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformTextOutDriverBindingStart (
@@ -80,7 +73,6 @@ ConPlatformTextOutDriverBindingStart (
   IN  EFI_DEVICE_PATH_PROTOCOL      *RemainingDevicePath
   );
 
-STATIC
 EFI_STATUS
 EFIAPI
 ConPlatformDriverBindingStop (
