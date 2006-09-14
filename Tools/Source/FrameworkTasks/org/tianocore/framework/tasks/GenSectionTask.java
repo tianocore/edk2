@@ -19,7 +19,6 @@ package org.tianocore.framework.tasks;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.file;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
