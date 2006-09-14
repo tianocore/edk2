@@ -622,6 +622,7 @@ public class FpdFileContents {
                 //
                 sa[0] = spdPcd.getHelpText() + msaPcd.getHelpText();
                 sa[1] = msaPcd.getPcdItemType()+"";
+                sa[2] = msa.getModuleDefinitions().getBinaryModule()+"";
                 return true;
             }
             
