@@ -681,7 +681,7 @@ public class GlobalData {
     ///
     /// Tool Chain Related, try to refine and put some logic process to ToolChainFactory
     ///
-    public static ToolChainInfo getToolChainInfo() {
+    public synchronized static ToolChainInfo getToolChainInfo() {
         if (toolChainInfo == null) {
             toolChainInfo = toolsDef.getConfigInfo().intersection(toolChainEnvInfo);
             if (toolChainPlatformInfo != null) {
