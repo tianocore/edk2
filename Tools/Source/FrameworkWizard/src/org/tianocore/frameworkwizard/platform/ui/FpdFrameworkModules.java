@@ -614,7 +614,7 @@ public class FpdFrameworkModules extends IInternalFrame {
                     if (selectedRow < 0) {
                         return;
                     }
-                    docConsole.setSaved(false);
+                    
 
                     TableSorter sorter = (TableSorter) jTableFpdModules.getModel();
                     selectedRow = sorter.getModelRowIndex(selectedRow);
@@ -627,22 +627,35 @@ public class FpdFrameworkModules extends IInternalFrame {
                     String pv = sa[ffcPkgVer];
                     String arch = sa[ffcModArch];
                     ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv + " " + arch);
-                    mv = mi.getVersion();
-                    pv = mi.getPackageId().getVersion();
-                    modelFpdModules.removeRow(selectedRow);
+                    if (mi != null) {
+                        mv = mi.getVersion();
+                        pv = mi.getPackageId().getVersion();
+                    }
+                    
+                    try {
+                        ffc.removeModuleSA(selectedRow);    
+                    }
+                    catch (Exception exp) {
+                        JOptionPane.showMessageDialog(frame, exp.getCause() + exp.getMessage());
+                        return;
+                    }
+                    
                     if (arch == null) {
                         // if no arch specified in ModuleSA
                         fpdMsa.remove(mg + mv + pg + pv);
                         
                     } else {
                         ArrayList<String> al = fpdMsa.get(mg + mv + pg + pv);
-                        al.remove(arch);
-                        if (al.size() == 0) {
-                            fpdMsa.remove(mg + mv + pg + pv);
+                        if (al != null) {
+                            al.remove(arch);
+                            if (al.size() == 0) {
+                                fpdMsa.remove(mg + mv + pg + pv);
+                            }
                         }
                     }
-
-                    ffc.removeModuleSA(selectedRow);
+                    
+                    modelFpdModules.removeRow(selectedRow);
+                    docConsole.setSaved(false);
                 }
             });
         }
