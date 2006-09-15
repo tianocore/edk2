@@ -70,6 +70,7 @@ import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 public class FpdFileContents {
 
     static final String xmlNs = "http://www.TianoCore.org/2006/Edk2.0";
+    static final String regNewLineAndSpaces = "((\n)|(\r\n)|(\r)|(\u0085)|(\u2028)|(\u2029))(\\s)*";
     
     private PlatformSurfaceAreaDocument fpdd = null;
     
@@ -345,10 +346,21 @@ public class FpdFileContents {
             }
             
             cursor.push();
-            cursor.toPrevToken();
+            while (cursor.hasPrevToken()) {
+                cursor.toPrevToken();
+                if (!cursor.isText()) {
+                    break;
+                }
+                String s = cursor.getTextValue();
+                if (s.matches(regNewLineAndSpaces)) {
+                    continue;
+                }
+            }
+
             if (cursor.isComment()) {
                 cursor.removeXml();
             }
+            
             cursor.pop();
             cursor.removeXml();
             if (getFrameworkModulesCount() == 0) {
@@ -655,6 +667,7 @@ public class FpdFileContents {
                 ModuleSADocument.ModuleSA moduleSA = getModuleSA(moduleKey);
                 if (moduleSA.getPcdBuildDefinition() != null) {
                     XmlCursor cursor = moduleSA.getPcdBuildDefinition().newCursor();
+                    cursor.push();
                     if (cursor.toFirstChild()) {
                         do {
                             PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData) cursor
@@ -668,6 +681,11 @@ public class FpdFileContents {
                                 break;
                             }
                         } while (cursor.toNextSibling());
+                    }
+                    
+                    cursor.pop();
+                    if (moduleSA.getPcdBuildDefinition().getPcdDataList().size() == 0) {
+                        cursor.removeXml();
                     }
                     cursor.dispose();
                 }
@@ -718,7 +736,17 @@ public class FpdFileContents {
                 cursor.toNextSibling();
             }
             cursor.push();
-            cursor.toPrevToken();
+            while (cursor.hasPrevToken()) {
+                cursor.toPrevToken();
+                if (!cursor.isText()) {
+                    break;
+                }
+                String s = cursor.getTextValue();
+                if (s.matches(regNewLineAndSpaces)) {
+                    continue;
+                }
+            }
+            
             if (cursor.isComment()) {
                 cursor.removeXml();
             }
