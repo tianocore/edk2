@@ -675,14 +675,14 @@ Returns:
     //
     PeHdr = (VOID *) ((UINTN) ImageAddress + ImageContext.PeCoffHeaderOffset);
     if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).CheckSum);
     } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
     } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_X64) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
     } else {
       Error (
         NULL,
@@ -705,6 +705,11 @@ Returns:
     }
 
     memcpy (CurrentPe32Section.Pe32Section + 1, (VOID *) MemoryImagePointerAligned, (UINT32) ImageSize);
+    
+    //
+    // Get EntryPoint in Flash Region.
+    //
+    EntryPoint = NewPe32BaseAddress + EntryPoint - ImageAddress;
 
     //
     // If a map file was selected output mapping information for any file that
@@ -712,6 +717,7 @@ Returns:
     //
     if (MapFile != NULL) {
       fprintf (MapFile, "PE32 File: %s Base:%08lx", FileGuidString, BaseAddress);
+      fprintf (MapFile, " EntryPoint:%08lx", EntryPoint);
       if (ImageContext.PdbPointer != NULL) {
         fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
       }
@@ -810,6 +816,8 @@ Returns:
     //
     PeHdr->FileHeader.SizeOfOptionalHeader = (UINT16) (TEImageHeader->StrippedSize - 0x40 - sizeof (UINT32) - sizeof (EFI_IMAGE_FILE_HEADER));
     PeHdr->OptionalHeader.ImageBase = (UINTN) (TEImageHeader->ImageBase - TEImageHeader->StrippedSize + sizeof (EFI_TE_IMAGE_HEADER));
+    PeHdr->OptionalHeader.AddressOfEntryPoint = TEImageHeader->AddressOfEntryPoint;
+    PeHdr->OptionalHeader.BaseOfCode  = TEImageHeader->BaseOfCode;
     PeHdr->OptionalHeader.SizeOfImage = Pe32ImageSize;
     PeHdr->OptionalHeader.Subsystem   = TEImageHeader->Subsystem;
     PeHdr->OptionalHeader.SizeOfImage = Pe32ImageSize;
@@ -907,11 +915,11 @@ Returns:
     //
     PeHdr = (VOID *) ((UINTN) ImageAddress + ImageContext.PeCoffHeaderOffset);
     if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA32) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHdr->OptionalHeader).CheckSum);
     } else if (PeHdr->FileHeader.Machine == EFI_IMAGE_MACHINE_IA64) {
-      PeHdrSizeOfImage  = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
-      PeHdrChecksum     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
+      PeHdrSizeOfImage     = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).SizeOfImage);
+      PeHdrChecksum        = (UINT32 *) (&(*(EFI_IMAGE_OPTIONAL_HEADER64 *) &PeHdr->OptionalHeader).CheckSum);
     } else {
       Error (
         NULL,
@@ -941,6 +949,11 @@ Returns:
       GetLength (CurrentPe32Section.Pe32Section->CommonHeader.Size) - sizeof (EFI_PE32_SECTION) -
       sizeof (EFI_TE_IMAGE_HEADER)
       );
+    
+    //
+    // Get EntryPoint in Flash Region.
+    //
+    EntryPoint = NewPe32BaseAddress + EntryPoint - ImageAddress;
 
     //
     // If a map file was selected output mapping information for any file that
@@ -948,6 +961,7 @@ Returns:
     //
     if (MapFile != NULL) {
       fprintf (MapFile, "TE   File: %s Base:%08lx", FileGuidString, BaseAddress);
+      fprintf (MapFile, " EntryPoint:%08lx", EntryPoint);
       if (ImageContext.PdbPointer != NULL) {
         fprintf (MapFile, " FileName: %s", ImageContext.PdbPointer);
       }
