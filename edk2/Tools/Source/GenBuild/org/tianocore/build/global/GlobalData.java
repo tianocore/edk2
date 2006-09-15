@@ -726,7 +726,7 @@ public class GlobalData {
         return false;
     }
 
-    public static String getCommandSetting(String[] commandDescription, FpdModuleIdentification fpdModuleId) throws EdkException {
+    public synchronized static String getCommandSetting(String[] commandDescription, FpdModuleIdentification fpdModuleId) throws EdkException {
         ToolChainKey toolChainKey = new ToolChainKey(commandDescription);
         ToolChainMap toolChainConfig = toolsDef.getConfig();
         String setting = null;
