@@ -210,7 +210,7 @@ GetPerformanceCounter (
   VOID
   )
 {
-  return (UINT32)InternalX86GetTimerTick (InternalX86GetApicBase ());
+  return (UINT64)(UINT32)InternalX86GetTimerTick (InternalX86GetApicBase ());
 }
 
 /**
@@ -255,5 +255,5 @@ GetPerformanceCounterProperties (
     *EndValue = 0;
   }
 
-  return InternalX86GetTimerFrequency (ApicBase);
+  return (UINT64)InternalX86GetTimerFrequency (ApicBase);
 }
