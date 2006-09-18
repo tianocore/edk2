@@ -75,8 +75,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     rewritePrefix="file:/]]>${env.WORKSPACE}<![CDATA[/Tools/XMLSchema/"/>
 </catalog>]]>
     </echo>
-    <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt" overwrite="false"/>
-    <copy file="Conf/target.template" tofile="Conf/target.txt" overwrite="false"/>
+    <if>
+      <not>
+        <available file="Conf/tools_def.txt"/>
+      </not>
+      <then>
+        <copy file="Conf/tools_def.template" tofile="Conf/tools_def.txt"/>
+      </then>
+    </if>
+
+    <if>
+      <not>
+        <available file="Conf/target.txt"/>
+      </not>
+      <then>
+        <copy file="Conf/target.template" tofile="Conf/target.txt"/>
+      </then>
+    </if>
+
     <if>
       <not>
         <available file="Conf/FrameworkDatabase.db"/>
