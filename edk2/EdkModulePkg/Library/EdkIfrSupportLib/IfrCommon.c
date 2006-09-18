@@ -1,12 +1,12 @@
 /*++
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+        
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   IfrCommon.c
@@ -20,6 +20,7 @@ Revision History:
 --*/
 
 EFI_STATUS
+EFIAPI
 IfrLibConstruct (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -37,12 +38,12 @@ GetCurrentLanguage (
 Routine Description:
 
   Determine what is the current language setting
-  
+
 Arguments:
-  
+
   Lang      - Pointer of system language
-  
-Returns: 
+
+Returns:
 
   Status code
 
@@ -99,21 +100,21 @@ AddString (
 Routine Description:
 
   Add a string to the incoming buffer and return the token and offset data
-  
+
 Arguments:
-  
+
   StringBuffer      - The incoming buffer
-  
+
   Language          - Currrent language
-  
+
   String            - The string to be added
-  
+
   StringToken       - The index where the string placed
-  
-Returns: 
+
+Returns:
 
   EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
+
   EFI_SUCCESS             - String successfully added to the incoming buffer
 
 --*/
@@ -171,11 +172,11 @@ Returns:
         //
         PackDestination[Index] = (UINT16) (PackDestination[Index] + sizeof (RELOFST));
       }
-      
+
       //
       // Add a new stringpointer in the new buffer since we are adding a string.  Null terminate it
       //
-      PackDestination[Index] = (UINT16)(PackDestination[Index-1] + 
+      PackDestination[Index] = (UINT16)(PackDestination[Index-1] +
                                         StrSize((CHAR16 *)((CHAR8 *)(StringPack) + PackSource[Index-1])));
       PackDestination[Index + 1] = (UINT16) 0;
 
@@ -206,7 +207,7 @@ Returns:
         Destination = Destination + StrSize ((CHAR16 *) Source);
         Source      = Source + StrSize ((CHAR16 *) Source);
       }
-      
+
       //
       // This copies the new string to the destination buffer
       //
@@ -238,7 +239,7 @@ Returns:
     StringPackBuffer  = (EFI_HII_STRING_PACK *) ((CHAR8 *) (StringPackBuffer) + StringPack->Header.Length);
     StringPack        = (EFI_HII_STRING_PACK *) ((CHAR8 *) (StringPack) + StringPack->Header.Length);
   }
-  
+
   //
   // If we didn't copy the new data to a stringpack yet
   //
@@ -316,17 +317,17 @@ AddOpCode (
 Routine Description:
 
   Add op-code data to the FormBuffer
-  
+
 Arguments:
-  
+
   FormBuffer      - Form buffer to be inserted to
-  
+
   OpCodeData      - Op-code data to be inserted
-  
-Returns: 
+
+Returns:
 
   EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
+
   EFI_SUCCESS             - Op-code data successfully inserted
 
 --*/
@@ -432,12 +433,12 @@ GetHiiInterface (
 Routine Description:
 
   Get the HII protocol interface
-  
+
 Arguments:
-  
+
   Hii     - HII protocol interface
-  
-Returns: 
+
+Returns:
 
   Status code
 
@@ -470,27 +471,27 @@ ExtractDataFromHiiHandle (
 Routine Description:
 
   Extract information pertaining to the HiiHandle
-  
+
 Arguments:
-  
+
   HiiHandle       - Hii handle
-  
+
   ImageLength     - For input, length of DefaultImage;
                     For output, length of actually required
-                    
+
   DefaultImage    - Image buffer prepared by caller
-  
+
   Guid            - Guid information about the form
-  
-Returns: 
+
+Returns:
 
   EFI_OUT_OF_RESOURCES    - No enough buffer to allocate
-  
+
   EFI_BUFFER_TOO_SMALL    - DefualtImage has no enough ImageLength
-  
+
   EFI_SUCCESS             - Successfully extract data from Hii database.
-  
-  
+
+
 --*/
 {
   EFI_STATUS        Status;
@@ -581,7 +582,7 @@ Returns:
 
     Index = RawData[Index + 1] + Index;
   }
-    
+
   //
   // Return an error if buffer is too small
   //
@@ -649,9 +650,9 @@ Routine Description:
   Finds HII handle for given pack GUID previously registered with the HII.
 
 Arguments:
-  HiiProtocol - pointer to pointer to HII protocol interface. 
+  HiiProtocol - pointer to pointer to HII protocol interface.
                 If NULL, the interface will be found but not returned.
-                If it points to NULL, the interface will be found and 
+                If it points to NULL, the interface will be found and
                 written back to the pointer that is pointed to.
   Guid        - The GUID of the pack that registered with the HII.
 
@@ -766,7 +767,7 @@ Routine Description:
   Validate that the data associated with the HiiHandle in NVRAM is within
   the reasonable parameters for that FormSet.  Values for strings and passwords
   are not verified due to their not having the equivalent of valid range settings.
-  
+
 Arguments:
 
   HiiHandle -   Handle of the HII database entry to query
@@ -774,11 +775,11 @@ Arguments:
   Results -     If return Status is EFI_SUCCESS, Results provides valid data
                 TRUE  = NVRAM Data is within parameters
                 FALSE = NVRAM Data is NOT within parameters
-  
-Returns: 
+
+Returns:
 
   EFI_OUT_OF_RESOURCES      - No enough buffer to allocate
-  
+
   EFI_SUCCESS               - Data successfully validated
 --*/
 {
@@ -880,7 +881,7 @@ Returns:
 
     Index = RawData[Index + 1] + Index;
   }
-    
+
   //
   // Allocate memory for our File Form Tags
   //
