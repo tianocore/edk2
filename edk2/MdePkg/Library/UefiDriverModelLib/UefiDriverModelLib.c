@@ -2,13 +2,13 @@
   EFI Driver Model Library.
 
   Copyright (c) 2006, Intel Corporation<BR>
-  All rights reserved. This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  All rights reserved. This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  UefiDriverModelLib.c
 
@@ -19,13 +19,14 @@
 /**
   The constructor function installs the standard EFI Driver Model Protocols.
 
-  @param[in] ImageHandle The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle The firmware allocated handle for the EFI image.
   @param[in] SystemTable A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS The constructor always return EFI_SUCCESS.
 
 **/
 EFI_STATUS
+EFIAPI
 UefiDriverModelLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -59,7 +60,7 @@ UefiDriverModelLibConstructor (
 
     //
     // Check for all 8 possible combinations of the ComponentName, DriverConfiguration, and DriverDiagnostics Protocol
-    // These are all checks against const pointers, so the optimizing compiler will only select one of the 
+    // These are all checks against const pointers, so the optimizing compiler will only select one of the
     // calls to InstallMultipleProtocolInterfaces()
     //
     if (_gDriverModelProtocolList[0].DriverDiagnostics == NULL) {
@@ -230,13 +231,14 @@ UefiDriverModelLibConstructor (
 /**
   The destructor function uninstalls the standard EFI Driver Model Protocols.
 
-  @param[in] ImageHandle The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle The firmware allocated handle for the EFI image.
   @param[in] SystemTable A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS The destructor always return EFI_SUCCESS.
 
 **/
 EFI_STATUS
+EFIAPI
 UefiDriverModelLibDestructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -269,7 +271,7 @@ UefiDriverModelLibDestructor (
 
     //
     // Check for all 8 possible combinations of the ComponentName, DriverConfiguration, and DriverDiagnostics Protocol
-    // These are all checks against const pointers, so the optimizing compiler will only select one of the 
+    // These are all checks against const pointers, so the optimizing compiler will only select one of the
     // calls to InstallMultipleProtocolInterfaces()
     //
     if (_gDriverModelProtocolList[0].DriverDiagnostics == NULL) {

@@ -21,17 +21,18 @@ STATIC EFI_CPU_IO_PROTOCOL          *mCpuIo = NULL;
 
 /**
   The constructor function caches the pointer to CpuIo protocol.
-  
+
   The constructor function locates CpuIo protocol from protocol database.
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
 EFI_STATUS
+EFIAPI
 IoLibConstructor (
   IN      EFI_HANDLE                ImageHandle,
   IN      EFI_SYSTEM_TABLE          *SystemTable
@@ -53,9 +54,9 @@ IoLibConstructor (
   This function must guarantee that all I/O read and write operations are serialized.
 
   @param  Port          The base address of the I/O operation.
-                        The caller is responsible for aligning the Address if required. 
+                        The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
-  
+
   @return Data read from registers in the EFI CPU I/O space.
 
 **/
@@ -83,10 +84,10 @@ IoReadWorker (
   This function must guarantee that all I/O read and write operations are serialized.
 
   @param  Port          The base address of the I/O operation.
-                        The caller is responsible for aligning the Address if required. 
+                        The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
   @param  Data          The value to write to the I/O port.
-  
+
   @return The paramter of Data.
 
 **/
@@ -107,16 +108,16 @@ IoWriteWorker (
 }
 
 /**
-  Reads memory-mapped registers in the EFI system memory space. 
+  Reads memory-mapped registers in the EFI system memory space.
 
   Reads the MMIO registers specified by Address with registers width specified by Width.
   The read value is returned. If such operations are not supported, then ASSERT().
   This function must guarantee that all MMIO read and write operations are serialized.
 
   @param  Address       The MMIO register to read.
-                        The caller is responsible for aligning the Address if required. 
+                        The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/
@@ -137,16 +138,16 @@ MmioReadWorker (
 }
 
 /**
-  Writes memory-mapped registers in the EFI system memory space. 
+  Writes memory-mapped registers in the EFI system memory space.
 
   Writes the MMIO registers specified by Address with registers width and value specified by Width
   and Data respectively. Data is returned. If such operations are not supported, then ASSERT().
   This function must guarantee that all MMIO read and write operations are serialized.
 
   @param  Address       The MMIO register to read.
-                        The caller is responsible for aligning the Address if required. 
+                        The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/
