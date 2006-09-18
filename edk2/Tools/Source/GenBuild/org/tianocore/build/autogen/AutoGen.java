@@ -781,7 +781,7 @@ public class AutoGen {
                                         "Module type = 'PEI_CORE', can have only one module entry point!");
             } else {
                 fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
+                //fileBuffer.append("EFIAPI\r\n");
                 fileBuffer.append(entryPointList[0]);
                 fileBuffer.append(" (\r\n");
                 fileBuffer
@@ -814,7 +814,7 @@ public class AutoGen {
             } else {
 
                 fileBuffer.append("VOID\r\n");
-                fileBuffer.append("EFIAPI\r\n");
+                //fileBuffer.append("EFIAPI\r\n");
                 fileBuffer.append(entryPointList[0]);
                 fileBuffer.append(" (\n");
                 fileBuffer.append("  IN VOID  *HobStart\r\n");
@@ -851,7 +851,7 @@ public class AutoGen {
             }
             for (int i = 0; i < entryPointList.length; i++) {
                 fileBuffer.append("EFI_STATUS\r\n");
-                fileBuffer.append("EFIAPI\r\n");
+                //fileBuffer.append("EFIAPI\r\n");
                 fileBuffer.append(entryPointList[i]);
                 fileBuffer.append(" (\r\n");
                 fileBuffer
@@ -920,7 +920,7 @@ public class AutoGen {
             } else {
                 for (int i = 0; i < entryPointList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    //fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(entryPointList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
@@ -987,7 +987,7 @@ public class AutoGen {
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    //fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(unloadImageList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer
@@ -1067,7 +1067,7 @@ public class AutoGen {
                 for (int i = 0; i < entryPointList.length; i++) {
 
                     fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    //fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(entryPointList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
@@ -1146,17 +1146,12 @@ public class AutoGen {
             //
             // Add ModuleUnloadImage for DxeDriver and UefiDriver module type.
             //
-            //entryPointList = SurfaceAreaQuery.getModuleUnloadImageArray();
-            //
-            // Remover duplicate unload entry point.
-            //
-            //entryPointList = CommonDefinition.remDupString(entryPointList);
-            //entryPointCount = 0;
+            
 			unloadImageCount = 0;
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
-                    fileBuffer.append("EFIAPI\r\n");
+                    //fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(unloadImageList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer
