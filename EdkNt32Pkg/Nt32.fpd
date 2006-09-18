@@ -230,7 +230,7 @@
         <FfsFormatKey>CUSTOM_BUILD</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="52C05B14-0B98-496c-BC3B-04B50211D680">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="52C05B14-0B98-496c-BC3B-04B50211D680">
       <Libraries>
         <Instance ModuleGuid="434b164e-5fa6-4a3d-bc04-02da2a4eeb26" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
         <Instance ModuleGuid="b3b0654a-969d-4096-86cb-27e262a02083" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -323,7 +323,7 @@
         <FfsFormatKey>PEI_CORE</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="9B3ADA4F-AE56-4c24-8DEA-F03B7558AE50">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="9B3ADA4F-AE56-4c24-8DEA-F03B7558AE50">
       <Libraries>
         <Instance ModuleGuid="fa177ff7-1fc7-458d-a358-d9d62ae61cec" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -462,7 +462,7 @@
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="1EC0F53A-FDE0-4576-8F25-7A1A410F58EB">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="1EC0F53A-FDE0-4576-8F25-7A1A410F58EB">
       <Libraries>
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
@@ -476,7 +476,7 @@
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <Instance ModuleGuid="e6e9c1f8-2c8a-4f4b-a27c-c382e4bb8e67" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
-        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" ModuleVersion="1.0" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" PackageVersion="0.3"/>
+        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" ModuleVersion="1.0" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" PackageVersion="0.3"/>
         <Instance ModuleGuid="F3E4E221-D5CA-4dc9-8CB2-C5123C4827D5" ModuleVersion="1.0" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3" PackageVersion="0.3"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -806,7 +806,7 @@
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="736EB068-8C01-47c5-964B-1C57BD5D4D64">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="736EB068-8C01-47c5-964B-1C57BD5D4D64">
       <Libraries>
         <Instance ModuleGuid="fa177ff7-1fc7-458d-a358-d9d62ae61cec" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -887,7 +887,7 @@
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="34C8C28F-B61C-45a2-8F2E-89E46BECC63B">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="34C8C28F-B61C-45a2-8F2E-89E46BECC63B">
       <Libraries>
         <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -1224,7 +1224,7 @@
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="86D70125-BAA3-4296-A62F-602BEBBB9081">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="86D70125-BAA3-4296-A62F-602BEBBB9081">
       <Libraries>
         <Instance ModuleGuid="3c5702f2-9b17-4273-b60c-b96e6cd13066" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
         <Instance ModuleGuid="fa177ff7-1fc7-458d-a358-d9d62ae61cec" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -1233,8 +1233,8 @@
         <Instance ModuleGuid="1c747f6b-0a58-49ae-8ea3-0327a4fa10e3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="9643128f-ac24-4b3e-b6be-d8849a306153" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="d774c4d9-c121-4da3-a5e2-0f317e3c630c" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="e5566134-c75e-4ace-bad1-e23a3b335e30" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="d774c4d9-c121-4da3-a5e2-0f317e3c630c" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="e5566134-c75e-4ace-bad1-e23a3b335e30" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="8c690838-7a22-45c4-aa58-a33e3e515cd4" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -1312,16 +1312,16 @@
         <FfsFormatKey>PE32_PEIM</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="D6A2CB7F-6A18-4e2f-B43B-9920A733700A">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="D6A2CB7F-6A18-4e2f-B43B-9920A733700A">
       <Libraries>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="123dd843-57c9-4158-8418-ce68b3944ce7" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="5c12c06f-5cf8-48a6-9860-6c5b2c036bbf" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="cef487a1-751d-4fe0-a39b-e6892b4610c8" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="942e0182-3e1d-47f9-92dc-4939d1a0ba00" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="ed3de5c8-c389-44f2-a35e-2ebdc9802a49" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="5c12c06f-5cf8-48a6-9860-6c5b2c036bbf" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="cef487a1-751d-4fe0-a39b-e6892b4610c8" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="942e0182-3e1d-47f9-92dc-4939d1a0ba00" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="ed3de5c8-c389-44f2-a35e-2ebdc9802a49" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="882ee1a3-35b2-412c-b8a2-7a8d34a7c390" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="d258d6af-2fc0-4019-9c1f-1101c3dd19b5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -1411,7 +1411,7 @@
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="80CF7257-87AB-47f9-A3FE-D50B76D89541">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="80CF7257-87AB-47f9-A3FE-D50B76D89541">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -1515,7 +1515,7 @@
         </Options>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="51C9F40C-5243-4473-B265-B3C8FFAFF9FA">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="51C9F40C-5243-4473-B265-B3C8FFAFF9FA">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -1523,7 +1523,7 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -2034,8 +2034,8 @@
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="1ec995b2-d15b-44f6-abd2-050ea7dd37d2" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="08c1a0e4-1208-47f8-a2c5-f42eabee653a" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="ea55bada-d488-427b-9d2d-227e0aaa3707" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="08c1a0e4-1208-47f8-a2c5-f42eabee653a" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="ea55bada-d488-427b-9d2d-227e0aaa3707" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="1e2c4c2e-67e6-4e57-b3ae-cf5a5af72c2c" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2122,7 +2122,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="F099D67F-71AE-4c36-B2A3-DCEB0EB2B7D8">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="F099D67F-71AE-4c36-B2A3-DCEB0EB2B7D8">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2132,7 +2132,7 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -2205,13 +2205,13 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="B601F8C4-43B7-4784-95B1-F4226CB40CEE">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="B601F8C4-43B7-4784-95B1-F4226CB40CEE">
       <Libraries>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2288,7 +2288,7 @@
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="AD608272-D07F-4964-801E-7BD3B7888652">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="AD608272-D07F-4964-801E-7BD3B7888652">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2299,7 +2299,7 @@
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -2372,7 +2372,7 @@
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="FEDE0A1B-BCA2-4A9F-BB2B-D9FD7DEC2E9F">
       <Libraries>
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2386,8 +2386,8 @@
         <Instance ModuleGuid="3a004ba5-efe0-4a61-9f1a-267a46ae5ba9" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="b5a05743-9b71-489b-a0ed-a0eb3950d23b" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="926c9cd0-4bb8-479b-9ac4-8a2a23f85307" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="E4541241-8897-411a-91F8-7D7E45837146" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="F3E4E221-D5CA-4dc9-8CB2-C5123C4827D5" PackageGuid="0fb2aa2d-10d5-40a5-a9dc-060c12a4a3f3"/>
         <Instance ModuleGuid="1c747f6b-0a58-49ae-8ea3-0327a4fa10e3" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
         <Instance ModuleGuid="a804239b-4155-446f-acc8-f0825d74908c" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
@@ -2565,8 +2565,8 @@
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="baa1baa3-0a8d-402c-8042-985115fae953" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="9ba1d976-0624-41a3-8650-28165e8d9ae8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -2641,7 +2641,7 @@
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="4C862FC6-0E54-4e36-8C8F-FF6F3167951F">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="4C862FC6-0E54-4e36-8C8F-FF6F3167951F">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2651,7 +2651,7 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
         <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
@@ -2759,7 +2759,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CBD2E4D5-7068-4FF5-B462-9822B4AD8D60">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="CBD2E4D5-7068-4FF5-B462-9822B4AD8D60">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2769,10 +2769,10 @@
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="baa1baa3-0a8d-402c-8042-985115fae953" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="f12b59c9-76d0-4661-ad7c-f04d1bef0558" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="bd4d540e-04b0-4b10-8fd5-4a7bb533cf67" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="bd4d540e-04b0-4b10-8fd5-4a7bb533cf67" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <!--Pkg: MdePkg Mod: DxePcdLib Path: MdePkg\Library\DxePcdLib\DxePcdLib.msa-->
         <Instance ModuleGuid="af97eb89-4cc6-45f8-a514-ca025b346480" ModuleVersion="1.0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec" PackageVersion="0.3"/>
       </Libraries>
@@ -2863,7 +2863,7 @@
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="42857F0A-13F2-4B21-8A23-53D3F714B840">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="42857F0A-13F2-4B21-8A23-53D3F714B840">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2873,7 +2873,7 @@
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="baa1baa3-0a8d-402c-8042-985115fae953" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="9ba1d976-0624-41a3-8650-28165e8d9ae8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="b1ee6c28-54aa-4d17-b705-3e28ccb27b2e" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -2963,7 +2963,7 @@
         <FfsFormatKey>RT_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="F80697E9-7FD6-4665-8646-88E33EF71DFC">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="F80697E9-7FD6-4665-8646-88E33EF71DFC">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -2972,7 +2972,7 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -3045,7 +3045,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="73E9457A-CEA1-4917-9A9C-9F1F0F0FD322">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="73E9457A-CEA1-4917-9A9C-9F1F0F0FD322">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3130,7 +3130,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="911D584C-35F7-4955-BEF9-B452769DDC3A">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="911D584C-35F7-4955-BEF9-B452769DDC3A">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3211,7 +3211,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="51ccf399-4fdf-4e55-a45b-e123f84d456a">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="51ccf399-4fdf-4e55-a45b-e123f84d456a">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3221,7 +3221,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3297,7 +3297,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="408edcec-cf6d-477c-a5a8-b4844e3de281">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="408edcec-cf6d-477c-a5a8-b4844e3de281">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3380,7 +3380,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CCCB0C28-4B24-11d5-9A5A-0090273FC14D">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="CCCB0C28-4B24-11d5-9A5A-0090273FC14D">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3464,7 +3464,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="9E863906-A40F-4875-977F-5B93FF237FC6">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="9E863906-A40F-4875-977F-5B93FF237FC6">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3474,7 +3474,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3550,7 +3550,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="53BCC14F-C24F-434C-B294-8ED2D4CC1860">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="53BCC14F-C24F-434C-B294-8ED2D4CC1860">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3633,7 +3633,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CA515306-00CE-4032-874E-11B755FF6866">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="CA515306-00CE-4032-874E-11B755FF6866">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3713,7 +3713,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="9B680FCE-AD6B-4F3A-B60B-F59899003443">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="9B680FCE-AD6B-4F3A-B60B-F59899003443">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3797,7 +3797,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="6B38F7B4-AD98-40e9-9093-ACA2B5A253C4">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="6B38F7B4-AD98-40e9-9093-ACA2B5A253C4">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3880,7 +3880,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="13AC6DD0-73D0-11D4-B06B-00AA00BD6DE7">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="13AC6DD0-73D0-11D4-B06B-00AA00BD6DE7">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -3889,7 +3889,7 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -3963,7 +3963,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="96B5C032-DF4C-4b6e-8232-438DCF448D0E">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="96B5C032-DF4C-4b6e-8232-438DCF448D0E">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4046,7 +4046,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="FCD337AB-B1D3-4EF8-957C-8048606FF670">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="FCD337AB-B1D3-4EF8-957C-8048606FF670">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4056,7 +4056,7 @@
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="ea55bada-d488-427b-9d2d-227e0aaa3707" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="ea55bada-d488-427b-9d2d-227e0aaa3707" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
       </Libraries>
       <PcdBuildDefinition>
         <PcdData ItemType="FIXED_AT_BUILD">
@@ -4129,7 +4129,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="1FA1F39E-FEFF-4aae-BD7B-38A070A3B609">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="1FA1F39E-FEFF-4aae-BD7B-38A070A3B609">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4219,7 +4219,7 @@
         <FfsFormatKey>CUSTOM_BUILD</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="93B80004-9FB3-11d4-9A3A-0090273FC14D">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="93B80004-9FB3-11d4-9A3A-0090273FC14D">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4228,7 +4228,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4305,7 +4305,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="EBf342FE-B1D3-4EF8-957C-8048606FF670">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="EBf342FE-B1D3-4EF8-957C-8048606FF670">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4316,7 +4316,7 @@
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="331deb15-454b-48d8-9b74-70d01f3f3556" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="08c1a0e4-1208-47f8-a2c5-f42eabee653a" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="08c1a0e4-1208-47f8-a2c5-f42eabee653a" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="1e2c4c2e-67e6-4e57-b3ae-cf5a5af72c2c" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -4390,7 +4390,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="FE3542FE-C1D3-4EF8-657C-8048606FF670">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="FE3542FE-C1D3-4EF8-657C-8048606FF670">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4401,8 +4401,8 @@
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="a86fbfca-0183-4eeb-aa8a-762e3b7da1f3" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="08c1a0e4-1208-47f8-a2c5-f42eabee653a" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
-        <Instance ModuleGuid="ea55bada-d488-427b-9d2d-227e0aaa3707" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="08c1a0e4-1208-47f8-a2c5-f42eabee653a" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
+        <Instance ModuleGuid="ea55bada-d488-427b-9d2d-227e0aaa3707" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="1e2c4c2e-67e6-4e57-b3ae-cf5a5af72c2c" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -4477,7 +4477,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="CD3BAFB6-50FB-4fe8-8E4E-AB74D2C1A600">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="CD3BAFB6-50FB-4fe8-8E4E-AB74D2C1A600">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4557,7 +4557,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="E49061CE-99A7-41d3-AB3A-36E5CFBAD63E">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="E49061CE-99A7-41d3-AB3A-36E5CFBAD63E">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4566,7 +4566,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -4641,7 +4641,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="555F76EA-785F-40d7-9174-153C43636C68">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="555F76EA-785F-40d7-9174-153C43636C68">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4650,7 +4650,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -4725,7 +4725,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="69FD8E47-A161-4550-B01A-5594CEB2B2B2">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="69FD8E47-A161-4550-B01A-5594CEB2B2B2">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4735,7 +4735,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4820,7 +4820,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4829,7 +4829,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -4904,7 +4904,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="BDFE430E-8F2A-4db0-9991-6F856594777E">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="BDFE430E-8F2A-4db0-9991-6F856594777E">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4913,7 +4913,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -4988,7 +4988,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="0167CCC4-D0F7-4f21-A3EF-9E64B7CDCE8B">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="0167CCC4-D0F7-4f21-A3EF-9E64B7CDCE8B">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -4997,9 +4997,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="46c9adef-aee6-410c-99e4-240e3af18d8b" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="46c9adef-aee6-410c-99e4-240e3af18d8b" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -5074,7 +5074,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="0A66E322-3740-4cce-AD62-BD172CECCA35">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="0A66E322-3740-4cce-AD62-BD172CECCA35">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5083,9 +5083,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="46c9adef-aee6-410c-99e4-240e3af18d8b" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="46c9adef-aee6-410c-99e4-240e3af18d8b" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -5159,7 +5159,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="B40612B9-A063-11d4-9A3A-0090273FC14D">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="B40612B9-A063-11d4-9A3A-0090273FC14D">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5168,9 +5168,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -5244,7 +5244,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="240612B7-A063-11d4-9A3A-0090273FC14D">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="240612B7-A063-11d4-9A3A-0090273FC14D">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5253,9 +5253,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="91c1677a-e57f-4191-8b8e-eb7711a716e0" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -5330,7 +5330,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="A3527D16-E6CC-42f5-BADB-BF3DE177742B">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="A3527D16-E6CC-42f5-BADB-BF3DE177742B">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5339,9 +5339,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -5415,7 +5415,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="B40612B2-A063-11d4-9A3A-0090273FC14D">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="B40612B2-A063-11d4-9A3A-0090273FC14D">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5424,9 +5424,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -5500,7 +5500,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="2D2E62CF-9ECF-43b7-8219-94E7FC713DFE">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="2D2E62CF-9ECF-43b7-8219-94E7FC713DFE">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="19cbbb97-ff61-45ff-8c3f-dfa66dd118c8" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5510,9 +5510,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -5586,7 +5586,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="A5C6D68B-E78A-4426-9278-A8F0D9EB4D8F">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="A5C6D68B-E78A-4426-9278-A8F0D9EB4D8F">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5595,9 +5595,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -5671,7 +5671,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="2D2E62AA-9ECF-43b7-8219-94E7FC713DFE">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="2D2E62AA-9ECF-43b7-8219-94E7FC713DFE">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5680,9 +5680,9 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="87eb5df9-722a-4241-ad7f-370d0b3a56d7" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
       <PcdBuildDefinition>
@@ -5756,7 +5756,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="A3f436EA-A127-4EF8-957C-8048606FF670">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="A3f436EA-A127-4EF8-957C-8048606FF670">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5765,7 +5765,7 @@
         <Instance ModuleGuid="52af22ae-9901-4484-8cdc-622dd5838b09" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="3ddc3b12-99ea-4364-b315-6310a2050be5" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="bda39d3a-451b-4350-8266-81ab10fa0523" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
-        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+        <Instance ModuleGuid="50bcb105-6634-441d-b403-659110a03ad2" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="4674739d-3195-4fb2-8094-ac1d22d00194" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
       </Libraries>
@@ -5840,7 +5840,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="a46c3330-be36-4977-9d24-a7cf92eef0fe">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="a46c3330-be36-4977-9d24-a7cf92eef0fe">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="f1bbe03d-2f28-4dee-bec7-d98d7a30c36a" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -5923,7 +5923,7 @@
         <FfsFormatKey>BS_DRIVER</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="A2f436EA-A127-4EF8-957C-8048606FF670">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="A2f436EA-A127-4EF8-957C-8048606FF670">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="fd44e603-002a-4b29-9f5f-529e815b6165" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
@@ -6719,7 +6719,7 @@
         <FfsFormatKey>CUSTOM_BUILD</FfsFormatKey>
       </ModuleSaBuildOptions>
     </ModuleSA>
-    <ModuleSA SupArchList="IA32" PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674" ModuleGuid="6987936E-ED34-44db-AE97-1FA5E4ED2116">
+    <ModuleSA SupArchList="IA32" PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d" ModuleGuid="6987936E-ED34-44db-AE97-1FA5E4ED2116">
       <Libraries>
         <Instance ModuleGuid="ff5c7a2c-ab7a-4366-8616-11c6e53247b6" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
         <Instance ModuleGuid="27d67720-ea68-48ae-93da-a3a074c90e30" PackageGuid="5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec"/>
