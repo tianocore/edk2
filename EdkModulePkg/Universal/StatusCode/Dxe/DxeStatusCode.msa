@@ -99,7 +99,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   </SourceFiles>
   <PackageDependencies>
     <Package PackageGuid="5E0E9358-46B6-4AE2-8218-4AB8B9BBDCEC"/>
-    <Package PackageGuid="B6EC423C-21D2-490D-85C6-DD5864EAA674"/>
+    <Package PackageGuid="68169ab0-d41b-4009-9060-292c253ac43d"/>
   </PackageDependencies>
   <Protocols>
     <Protocol Usage="ALWAYS_CONSUMED">

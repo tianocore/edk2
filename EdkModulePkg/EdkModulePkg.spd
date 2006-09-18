@@ -2,7 +2,7 @@
 <PackageSurfaceArea xmlns="http://www.TianoCore.org/2006/Edk2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SpdHeader>
     <PackageName>EdkModulePkg</PackageName>
-    <GuidValue>B6EC423C-21D2-490D-85C6-DD5864EAA674</GuidValue>
+    <GuidValue>68169ab0-d41b-4009-9060-292c253ac43d</GuidValue>
     <Version>0.3</Version>
     <Abstract>Edk Module Package Reference Implementations</Abstract>
     <Description>This Module provides standard reference information for EFI/Tiano implementations.</Description>
