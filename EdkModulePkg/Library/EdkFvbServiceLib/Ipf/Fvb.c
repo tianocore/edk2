@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
   
@@ -26,6 +26,7 @@ Abstract:
 --*/
 
 EFI_STATUS
+EFIAPI
 FvbLibInitialize (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
@@ -38,7 +39,7 @@ Routine Description:
 Arguments:
   None
 
-Returns: 
+Returns:
   EFI_SUCCESS
 
 --*/
@@ -155,7 +156,7 @@ Routine Description:
   resulting attributes in output parameter
 
 Arguments:
-  Instance              - The FV instance whose attributes is going to be 
+  Instance              - The FV instance whose attributes is going to be
                           returned
   Attributes            - Output buffer which contains attributes
 
@@ -177,13 +178,13 @@ EfiFvbSetVolumeAttributes (
 /*++
 
 Routine Description:
-  Modifies the current settings of the firmware volume according to the 
+  Modifies the current settings of the firmware volume according to the
   input parameter, and returns the new setting of the volume
 
 Arguments:
-  Instance              - The FV instance whose attributes is going to be 
+  Instance              - The FV instance whose attributes is going to be
                           modified
-  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES 
+  Attributes            - On input, it is a pointer to EFI_FVB_ATTRIBUTES
                           containing the desired firmware volume settings.
                           On successful return, it contains the new settings
                           of the firmware volume
@@ -211,9 +212,9 @@ Routine Description:
 Arguments:
   Instance              - The FV instance whose base address is going to be
                           returned
-  BaseAddress           - Pointer to a caller allocated EFI_PHYSICAL_ADDRESS 
+  BaseAddress           - Pointer to a caller allocated EFI_PHYSICAL_ADDRESS
                           that on successful return, contains the base address
-                          of the firmware volume. 
+                          of the firmware volume.
 
 Returns:
   Status code
@@ -249,7 +250,7 @@ Arguments:
                           BlockSize
 
 Returns:
-  EFI_SUCCESS           - The firmware volume was read successfully and 
+  EFI_SUCCESS           - The firmware volume was read successfully and
                           contents are in Buffer
 
 --*/
@@ -285,7 +286,7 @@ Routine Description:
 Arguments:
   Instance              - The FV instance to be erased
   StartLba              - The starting logical block index to be erased
-  OffsetStartLba        - Offset into the starting block at which to 
+  OffsetStartLba        - Offset into the starting block at which to
                           begin erasing
   LastLba               - The last logical block index to be erased
   OffsetLastLba         - Offset into the last block at which to end erasing

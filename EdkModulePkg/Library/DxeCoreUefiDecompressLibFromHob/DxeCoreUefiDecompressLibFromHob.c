@@ -1,13 +1,13 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation                                                         
-All rights reserved. This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006, Intel Corporation
+All rights reserved. This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 Module Name:
 
@@ -15,13 +15,14 @@ Module Name:
 
 Abstract:
 
-  UEFI Decompress Library from HOBs 
+  UEFI Decompress Library from HOBs
 
 --*/
 
 static DECOMPRESS_LIBRARY  mEfiDecompress;
 
 EFI_STATUS
+EFIAPI
 DxeCoreUefiDecompressLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
@@ -40,7 +41,7 @@ Returns:
 
   GuidHob = GetFirstGuidHob (&gEfiDecompressProtocolGuid);
   ASSERT (GuidHob != NULL);
-  CopyMem (&mEfiDecompress, GET_GUID_HOB_DATA (GuidHob), sizeof (mEfiDecompress));  
+  CopyMem (&mEfiDecompress, GET_GUID_HOB_DATA (GuidHob), sizeof (mEfiDecompress));
   return EFI_SUCCESS;
 }
 
