@@ -90,6 +90,40 @@ FCopyFile (
   return STATUS_SUCCESS;
 }
 
+static
+STATUS
+FReadFile (
+  FILE    *in,
+  VOID    **Buffer,
+  UINTN   *Length
+  )
+{
+  fseek (in, 0, SEEK_END);
+  *Length = ftell (in);
+  *Buffer = malloc (*Length);
+  fseek (in, 0, SEEK_SET);
+  fread (*Buffer, *Length, 1, in);
+  return STATUS_SUCCESS;
+}
+
+static
+STATUS
+FWriteFile (
+  FILE    *out,
+  VOID    *Buffer,
+  UINTN   Length
+  )
+{
+  fseek (out, 0, SEEK_SET);
+  fwrite (Buffer, Length, 1, out);
+  if ((ULONG) ftell (out) != Length) {
+    Error (NULL, 0, 0, "write error", NULL);
+    return STATUS_ERROR;
+  }
+  free (Buffer);
+  return STATUS_SUCCESS;
+}
+
 int
 main (
   int  argc,
@@ -120,13 +154,22 @@ Returns:
   UCHAR             outname[500];
   FILE              *fpIn;
   FILE              *fpOut;
-  EFI_IMAGE_DOS_HEADER  DosHdr;
-  EFI_IMAGE_NT_HEADERS  PeHdr;
+  VOID              *ZeroBuffer;
+  EFI_IMAGE_DOS_HEADER  *DosHdr;
+  EFI_IMAGE_NT_HEADERS  *PeHdr;
+  EFI_IMAGE_OPTIONAL_HEADER32  *Optional32;
+  EFI_IMAGE_OPTIONAL_HEADER64  *Optional64;
   time_t            TimeStamp;
   struct tm         TimeStruct;
   EFI_IMAGE_DOS_HEADER  BackupDosHdr;
   ULONG             Index;
+  ULONG             Index1;
   BOOLEAN           TimeStampPresent;
+  UINTN                                 RelocSize;
+  UINTN                                 Delta;
+  EFI_IMAGE_SECTION_HEADER              *SectionHeader;
+  UINT8      *FileBuffer;
+  UINTN      FileLength;
 
   SetUtilityName (UTILITY_NAME);
   //
@@ -245,24 +288,26 @@ Returns:
     Error (NULL, 0, 0, argv[2], "failed to open input file for reading");
     return STATUS_ERROR;
   }
+
+  FReadFile (fpIn, (VOID **)&FileBuffer, &FileLength);
+
   //
   // Read the dos & pe hdrs of the image
   //
-  fseek (fpIn, 0, SEEK_SET);
-  fread (&DosHdr, sizeof (DosHdr), 1, fpIn);
-  if (DosHdr.e_magic != EFI_IMAGE_DOS_SIGNATURE) {
+  DosHdr = (EFI_IMAGE_DOS_HEADER *)FileBuffer;
+  if (DosHdr->e_magic != EFI_IMAGE_DOS_SIGNATURE) {
     Error (NULL, 0, 0, argv[2], "DOS header signature not found in source image");
     fclose (fpIn);
     return STATUS_ERROR;
   }
 
-  fseek (fpIn, DosHdr.e_lfanew, SEEK_SET);
-  fread (&PeHdr, sizeof (PeHdr), 1, fpIn);
-  if (PeHdr.Signature != EFI_IMAGE_NT_SIGNATURE) {
+  PeHdr = (EFI_IMAGE_NT_HEADERS *)(FileBuffer + DosHdr->e_lfanew);
+  if (PeHdr->Signature != EFI_IMAGE_NT_SIGNATURE) {
     Error (NULL, 0, 0, argv[2], "PE header signature not found in source image");
     fclose (fpIn);
     return STATUS_ERROR;
   }
+
   //
   // open output file
   //
@@ -290,42 +335,146 @@ Returns:
     fclose (fpIn);
     return STATUS_ERROR;
   }
-  //
-  // Copy the file
-  //
-  if (FCopyFile (fpIn, fpOut) != STATUS_SUCCESS) {
-    fclose (fpIn);
-    fclose (fpOut);
-    return STATUS_ERROR;
-  }
+
   //
   // Zero all unused fields of the DOS header
   //
-  memcpy (&BackupDosHdr, &DosHdr, sizeof (DosHdr));
-  memset (&DosHdr, 0, sizeof (DosHdr));
-  DosHdr.e_magic  = BackupDosHdr.e_magic;
-  DosHdr.e_lfanew = BackupDosHdr.e_lfanew;
-  fseek (fpOut, 0, SEEK_SET);
-  fwrite (&DosHdr, sizeof (DosHdr), 1, fpOut);
+  memcpy (&BackupDosHdr, DosHdr, sizeof (EFI_IMAGE_DOS_HEADER));
+  memset (DosHdr, 0, sizeof (EFI_IMAGE_DOS_HEADER));
+  DosHdr->e_magic  = BackupDosHdr.e_magic;
+  DosHdr->e_lfanew = BackupDosHdr.e_lfanew;
 
-  fseek (fpOut, sizeof (DosHdr), SEEK_SET);
-  for (Index = sizeof (DosHdr); Index < (ULONG) DosHdr.e_lfanew; Index++) {
-    fwrite (&DosHdr.e_cp, 1, 1, fpOut);
+  for (Index = sizeof (EFI_IMAGE_DOS_HEADER); Index < (ULONG) DosHdr->e_lfanew; Index++) {
+    FileBuffer[Index] = DosHdr->e_cp;
   }
+
   //
   // Path the PE header
   //
-  PeHdr.OptionalHeader.Subsystem = (USHORT) Type;
+  PeHdr->OptionalHeader.Subsystem = (USHORT) Type;
   if (TimeStampPresent) {
-    PeHdr.FileHeader.TimeDateStamp = (UINT32) TimeStamp;
+    PeHdr->FileHeader.TimeDateStamp = (UINT32) TimeStamp;
   }
 
-  PeHdr.OptionalHeader.SizeOfStackReserve = 0;
-  PeHdr.OptionalHeader.SizeOfStackCommit  = 0;
-  PeHdr.OptionalHeader.SizeOfHeapReserve  = 0;
-  PeHdr.OptionalHeader.SizeOfHeapCommit   = 0;
-  fseek (fpOut, DosHdr.e_lfanew, SEEK_SET);
-  fwrite (&PeHdr, sizeof (PeHdr), 1, fpOut);
+  RelocSize = 0;
+  if (PeHdr->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    Optional32 = (EFI_IMAGE_OPTIONAL_HEADER32 *)&PeHdr->OptionalHeader;
+    Optional32->MajorLinkerVersion          = 0;
+    Optional32->MinorLinkerVersion          = 0;
+    Optional32->MajorOperatingSystemVersion = 0;
+    Optional32->MinorOperatingSystemVersion = 0;
+    Optional32->MajorImageVersion           = 0;
+    Optional32->MinorImageVersion           = 0;
+    Optional32->MajorSubsystemVersion       = 0;
+    Optional32->MinorSubsystemVersion       = 0;
+    Optional32->Win32VersionValue           = 0;
+    Optional32->CheckSum                    = 0;
+    Optional32->SizeOfStackReserve = 0;
+    Optional32->SizeOfStackCommit  = 0;
+    Optional32->SizeOfHeapReserve  = 0;
+    Optional32->SizeOfHeapCommit   = 0;
+
+    //
+    // Zero the .pdata section if the machine type is X64 and the Debug Directoty entry is empty
+    //
+    if (PeHdr->FileHeader.Machine == 0x8664) { // X64
+      if (Optional32->NumberOfRvaAndSizes >= 4) {
+        if (Optional32->NumberOfRvaAndSizes < 7 || (Optional32->NumberOfRvaAndSizes >= 7 && Optional32->DataDirectory[6].Size == 0)) {
+          SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
+          for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
+            if (SectionHeader->VirtualAddress == Optional32->DataDirectory[3].VirtualAddress) {
+              for (Index1 = 0; Index1 < Optional32->DataDirectory[3].Size; Index1++) {
+                FileBuffer[SectionHeader->PointerToRawData + Index1] = 0;
+              }
+            }
+          }
+          Optional32->DataDirectory[3].Size = 0;
+          Optional32->DataDirectory[3].VirtualAddress = 0;
+        }
+      }
+    }
+
+    //
+    // Strip zero padding at the end of the .reloc section 
+    //
+    if (Optional32->NumberOfRvaAndSizes >= 6) {
+      if (Optional32->DataDirectory[5].Size != 0) {
+        SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
+        for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
+          if (SectionHeader->VirtualAddress == Optional32->DataDirectory[5].VirtualAddress) {
+            FileLength = SectionHeader->PointerToRawData + Optional32->DataDirectory[5].Size;
+            FileLength = (FileLength + 7) & 0xfffffff8;
+            RelocSize = FileLength - SectionHeader->PointerToRawData;
+          }
+        }
+      }
+    }
+  } 
+  if (PeHdr->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
+    Optional64 = (EFI_IMAGE_OPTIONAL_HEADER64 *)&PeHdr->OptionalHeader;
+    Optional64->MajorLinkerVersion          = 0;
+    Optional64->MinorLinkerVersion          = 0;
+    Optional64->MajorOperatingSystemVersion = 0;
+    Optional64->MinorOperatingSystemVersion = 0;
+    Optional64->MajorImageVersion           = 0;
+    Optional64->MinorImageVersion           = 0;
+    Optional64->MajorSubsystemVersion       = 0;
+    Optional64->MinorSubsystemVersion       = 0;
+    Optional64->Win32VersionValue           = 0;
+    Optional64->CheckSum                    = 0;
+    Optional64->SizeOfStackReserve = 0;
+    Optional64->SizeOfStackCommit  = 0;
+    Optional64->SizeOfHeapReserve  = 0;
+    Optional64->SizeOfHeapCommit   = 0;
+
+    //
+    // Zero the .pdata section if the machine type is X64 and the Debug Directory is empty
+    //
+    if (PeHdr->FileHeader.Machine == 0x8664) { // X64
+      if (Optional64->NumberOfRvaAndSizes >= 4) {
+        if (Optional64->NumberOfRvaAndSizes < 7 || (Optional64->NumberOfRvaAndSizes >= 7 && Optional64->DataDirectory[6].Size == 0)) {
+          SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
+          for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
+            if (SectionHeader->VirtualAddress == Optional64->DataDirectory[3].VirtualAddress) {
+              for (Index1 = 0; Index1 < Optional64->DataDirectory[3].Size; Index1++) {
+                FileBuffer[SectionHeader->PointerToRawData + Index1] = 0;
+              }
+            }
+          }
+          Optional64->DataDirectory[3].Size = 0;
+          Optional64->DataDirectory[3].VirtualAddress = 0;
+        }
+      }
+    }
+
+    //
+    // Strip zero padding at the end of the .reloc section 
+    //
+    if (Optional64->NumberOfRvaAndSizes >= 6) {
+      if (Optional64->DataDirectory[5].Size != 0) {
+        SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
+        for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
+          if (SectionHeader->VirtualAddress == Optional64->DataDirectory[5].VirtualAddress) {
+            FileLength = SectionHeader->PointerToRawData + Optional64->DataDirectory[5].Size;
+            FileLength = (FileLength + 7) & 0xfffffff8;
+            RelocSize = FileLength - SectionHeader->PointerToRawData;
+          }
+        }
+      }
+    }
+  }
+
+  if (RelocSize != 0) {
+    SectionHeader = (EFI_IMAGE_SECTION_HEADER *)(FileBuffer + DosHdr->e_lfanew + sizeof(UINT32) + sizeof (EFI_IMAGE_FILE_HEADER) + PeHdr->FileHeader.SizeOfOptionalHeader);
+    for (Index = 0; Index < PeHdr->FileHeader.NumberOfSections; Index++, SectionHeader++) {
+      if (strcmp(SectionHeader->Name, ".reloc") == 0) {
+        SectionHeader->Misc.VirtualSize = (RelocSize + 0x1f) & 0xffffffe0;
+        SectionHeader->SizeOfRawData = RelocSize;
+      }
+    }
+  }
+
+  FWriteFile (fpOut, FileBuffer, FileLength);
 
   //
   // Done
