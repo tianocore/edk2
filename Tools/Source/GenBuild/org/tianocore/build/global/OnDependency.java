@@ -73,6 +73,11 @@ public class OnDependency extends Task {
             return true;
         }
 
+        if (targets.nameList.size() == 0) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, "No target file found!");
+            return true;
+        }
+
         Iterator dstIt = targets.nameList.iterator();
         while (dstIt.hasNext()) {
             String dstFileName = (String)dstIt.next();
@@ -106,6 +111,7 @@ public class OnDependency extends Task {
             }
         }
 
+        EdkLog.log(this, EdkLog.EDK_VERBOSE, "Target files are up-to-date!");
         return false;
     }
 
