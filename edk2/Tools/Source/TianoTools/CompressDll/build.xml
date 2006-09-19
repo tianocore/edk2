@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" 
       objdir="${BUILD_DIR}" 
       outtype="shared" 
+      debug="true"
       optimize="speed" 
       outfile="${BIN_DIR}/${LibName}"
       outputfileproperty="result"
