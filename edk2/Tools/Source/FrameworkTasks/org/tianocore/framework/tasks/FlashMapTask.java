@@ -135,6 +135,16 @@ public class FlashMapTask extends Task implements EfiDefine {
       @throws BuidException
      **/
     public void execute() throws BuildException {
+        if (isUptodate()) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, headerFile.toFileList() 
+                                                 + imageOutFile.toFileList()
+                                                 + mcoFile.toFileList()
+                                                 + dscFile.toFileList()
+                                                 + asmIncFile.toFileList()
+                                                 + outStrFile
+                                                 + " is/are up-to-date!");
+            return;
+        }
 
         Project project = this.getOwningTarget().getProject();
         //
@@ -597,5 +607,144 @@ public class FlashMapTask extends Task implements EfiDefine {
      **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    //
+    // Dependency check
+    // 
+    private boolean isUptodate() {
+        long srcTimeStamp = 0;
+        String srcName = "";
+        long dstTimeStamp = 0;
+        String dstName = "";
+        long timeStamp = 0;
+
+        if (!flashDefFile.isEmpty()) {
+            srcName = flashDefFile.getValue();
+            timeStamp = new File(srcName).lastModified();
+            if (timeStamp > srcTimeStamp) {
+                srcTimeStamp = timeStamp;
+            }
+        }
+
+        if (!mciFile.isEmpty()) {
+            srcName = mciFile.getValue();
+            timeStamp = new File(srcName).lastModified();
+            if (timeStamp > srcTimeStamp) {
+                srcTimeStamp = timeStamp;
+            }
+        }
+
+        if (!fdImage.isEmpty()) {
+            srcName = fdImage.getValue();
+            timeStamp = new File(srcName).lastModified();
+            if (timeStamp > srcTimeStamp) {
+                srcTimeStamp = timeStamp;
+            }
+        }
+
+        if (inStrFile.length() != 0) {
+            srcName = inStrFile;
+            timeStamp = new File(srcName).lastModified();
+            if (timeStamp > srcTimeStamp) {
+                srcTimeStamp = timeStamp;
+            }
+        }
+
+        if (!mciFileArray.isEmpty()) {
+            for (int i = 0; i < mciFileArray.nameList.size(); ++i) {
+                srcName += mciFileArray.nameList.get(i) + " ";
+                timeStamp = new File(mciFileArray.nameList.get(i)).lastModified();
+                if (timeStamp > srcTimeStamp) {
+                    srcTimeStamp = timeStamp;
+                }
+            }
+        }
+
+        if (!headerFile.isEmpty()) {
+            dstName = headerFile.getValue();
+            File dstFile = new File(dstName);
+            if (!dstFile.isAbsolute()) {
+                dstName = outputDir + File.separator + dstName;
+                dstFile = new File(dstName);
+            }
+
+            if (srcTimeStamp > dstFile.lastModified()) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        if (!imageOutFile.isEmpty()) {
+            dstName = imageOutFile.getValue();
+            File dstFile = new File(dstName);
+            if (!dstFile.isAbsolute()) {
+                dstName = outputDir + File.separator + dstName;
+                dstFile = new File(dstName);
+            }
+
+            if (srcTimeStamp > dstFile.lastModified()) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        if (!mcoFile.isEmpty()) {
+            dstName = mcoFile.getValue();
+            File dstFile = new File(dstName);
+            if (!dstFile.isAbsolute()) {
+                dstName = outputDir + File.separator + dstName;
+                dstFile = new File(dstName);
+            }
+
+            if (srcTimeStamp > dstFile.lastModified()) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        if (!dscFile.isEmpty()) {
+            dstName = dscFile.getValue();
+            File dstFile = new File(dstName);
+            if (!dstFile.isAbsolute()) {
+                dstName = outputDir + File.separator + dstName;
+                dstFile = new File(dstName);
+            }
+
+            if (srcTimeStamp > dstFile.lastModified()) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        if (!asmIncFile.isEmpty()) {
+            dstName = asmIncFile.getValue();
+            File dstFile = new File(dstName);
+            if (!dstFile.isAbsolute()) {
+                dstName = outputDir + File.separator + dstName;
+                dstFile = new File(dstName);
+            }
+
+            if (srcTimeStamp > dstFile.lastModified()) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        if (outStrFile.length() != 0) {
+            dstName = outStrFile;
+            File dstFile = new File(dstName);
+            if (!dstFile.isAbsolute()) {
+                dstName = outputDir + File.separator + dstName;
+                dstFile = new File(dstName);
+            }
+
+            if (srcTimeStamp > dstFile.lastModified()) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        return true;
     }
 }

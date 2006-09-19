@@ -32,7 +32,7 @@ public class NestElement extends DataType {
     // The name list. All the name strings got from setXXX methods will be put
     // in here.
     //
-    private List<String> nameList = new ArrayList<String>();
+    protected List<String> nameList = new ArrayList<String>();
 
     /**
        Insert content in the newElement into this NestElement

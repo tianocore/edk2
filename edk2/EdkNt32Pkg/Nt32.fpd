@@ -7209,7 +7209,7 @@
     </Ffs>
   </BuildOptions>
   <UserExtensions UserID="TianoCore" Identifier="1">
-    <concat destfile="${FV_DIR}/FV_RECOVERY.fd" binary="true">
+    <concat destfile="${FV_DIR}/FV_RECOVERY.fd" binary="true" force="no">
       <fileset dir="${FV_DIR}" includes="*.fv"/>
     </concat>
     <!--Generate Run.cmd file. This file will call SecMain.exe to start shell.-->
