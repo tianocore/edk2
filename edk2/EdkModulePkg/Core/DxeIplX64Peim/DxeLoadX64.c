@@ -62,17 +62,17 @@ static EFI_PEI_PPI_DESCRIPTOR     mPpiSignal = {
   NULL
 };
 
-DECOMPRESS_LIBRARY  gEfiDecompress = {
+GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gEfiDecompress = {
   UefiDecompressGetInfo,
   UefiDecompress
 };
 
-DECOMPRESS_LIBRARY  gTianoDecompress = {
+GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gTianoDecompress = {
   TianoDecompressGetInfo,
   TianoDecompress
 };
 
-DECOMPRESS_LIBRARY  gCustomDecompress = {
+GLOBAL_REMOVE_IF_UNREFERENCED DECOMPRESS_LIBRARY  gCustomDecompress = {
   CustomDecompressGetInfo,
   CustomDecompress
 };
@@ -842,14 +842,24 @@ Returns:
 
         switch (CompressionSection->CompressionType) {
         case EFI_STANDARD_COMPRESSION:
-          DecompressLibrary = &gTianoDecompress;
+          if (FeaturePcdGet (PcdDxeIplSupportTianoDecompress)) {
+            DecompressLibrary = &gTianoDecompress;
+          } else {
+            ASSERT (FALSE);
+            return EFI_NOT_FOUND;
+          }
           break;
 
         case EFI_CUSTOMIZED_COMPRESSION:
           //
           // Load user customized compression protocol.
           //
-          DecompressLibrary = &gCustomDecompress;
+          if (FeaturePcdGet (PcdDxeIplSupportCustomDecompress)) {
+            DecompressLibrary = &gCustomDecompress;
+          } else {
+            ASSERT (FALSE);
+            return EFI_NOT_FOUND;
+          }
           break;
 
         case EFI_NOT_COMPRESSED:
