@@ -36,6 +36,9 @@ public class MigrationTool {
         //MigrationTool.ui.yesOrNo("go on replace?");
         SourceFileReplacer.fireAt(mi);    // some adding library actions are taken here,so it must be put before "MsaWriter"
 
+        //MigrationTool.ui.yesOrNo("go on delete?");
+        Common.deleteDir(mi.modulepath + File.separator + "temp");
+
         //MigrationTool.ui.yesOrNo("go on show?");
         // show result
         if (MigrationTool.printModuleInfo) {
@@ -59,9 +62,6 @@ public class MigrationTool {
         if (MigrationTool.doCritic) {
             Critic.fireAt(ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename);
         }
-
-        //MigrationTool.ui.yesOrNo("go on delete?");
-        Common.deleteDir(mi.modulepath + File.separator + "temp");
 
         MigrationTool.ui.println("Errors Left : " + MigrationTool.db.error);
         MigrationTool.ui.println("Complete!");

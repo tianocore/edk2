@@ -97,7 +97,7 @@ public final class ModuleReader implements Common.ForDoAll {
                     }
                 }
             }
-            if (mtrsection.group(1).matches("nmake.common")) {
+            if (mtrsection.group(1).contains("nmake.")) {
                 mtrinfequation = ptninfequation.matcher(mtrsection.group(2));
                 while (mtrinfequation.find()) {
                     if (mtrinfequation.group(1).matches("IMAGE_ENTRY_POINT")) {
@@ -130,7 +130,7 @@ public final class ModuleReader implements Common.ForDoAll {
     
     private final void preProcessModule() throws Exception {
     	// according to .inf file, add extraordinary includes and sourcefiles
-        Common.dirCopy(mi.modulepath, mi.modulepath + File.separator + "temp");
+        Common.dirCopy(mi.modulepath, mi.modulepath + File.separator + "temp");	// collect all Laplace.namechange to here???
         
     	if (!mi.infincludes.isEmpty()) {
             Iterator<String> it = mi.infincludes.iterator();

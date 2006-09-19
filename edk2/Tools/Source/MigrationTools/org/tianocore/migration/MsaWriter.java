@@ -123,6 +123,7 @@ public class MsaWriter {
         md.setOutputFileBasename(mi.modulename);
         
         pd.addNewPackage().setPackageGuid("5e0e9358-46b6-4ae2-8218-4ab8b9bbdcec");
+        pd.addNewPackage().setPackageGuid("68169ab0-d41b-4009-9060-292c253ac43d");
         externs.addNewSpecification().setStringValue("EFI_SPECIFICATION_VERSION 0x00020000");
         externs.addNewSpecification().setStringValue("EDK_RELEASE_VERSION 0x00020000");
         externs.addNewExtern().setModuleEntryPoint(mi.entrypoint);
