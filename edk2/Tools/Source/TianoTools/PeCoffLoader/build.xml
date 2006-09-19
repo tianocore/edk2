@@ -66,6 +66,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IA32}" 
         outfile="${LIB_DIR}/${LibName}_Ia32"
         outtype="static"
+        debug="true"
         optimize="speed">
 
       <defineset>
@@ -87,6 +88,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR_IPF}" 
         outfile="${LIB_DIR}/${LibName}_Ipf"
         outtype="static"
+        debug="true"
         optimize="speed">
 
       <defineset>
@@ -108,6 +110,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR_X64}" 
         outfile="${LIB_DIR}/${LibName}_X64"
         outtype="static"
+        debug="true"
         optimize="speed">
 
       <defineset>

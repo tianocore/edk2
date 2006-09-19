@@ -36,6 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${LIB_DIR}/${LibName}"
         outtype="static"
+        debug="true"
         optimize="speed">
 
       <fileset dir="${basedir}/CustomizedCompress" 
