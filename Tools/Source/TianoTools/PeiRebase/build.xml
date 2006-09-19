@@ -39,6 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}_Ia32"
         outtype="executable"
+        debug="true"
         optimize="speed">
       <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
 
@@ -56,6 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}_Ipf"
         outtype="executable"
+        debug="true"
         optimize="speed">
       <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
       <fileset dir="${basedir}/${ToolName}" 
@@ -72,6 +74,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     <cc name="${ToolChain}" objdir="${BUILD_DIR}" 
         outfile="${BIN_DIR}/${ToolName}_X64"
         outtype="executable"
+        debug="true"
         optimize="speed">
       <compilerarg value="${ExtraArgus}" if="ExtraArgus" />
       <fileset dir="${basedir}/${ToolName}" 
