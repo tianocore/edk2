@@ -2253,6 +2253,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDevicePathSupportDevicePathToText</C_Name>
+          <Token>0x00010037</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDevicePathSupportDevicePathFromText</C_Name>
+          <Token>0x00010038</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -2337,6 +2353,22 @@
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
         </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDevicePathSupportDevicePathToText</C_Name>
+          <Token>0x00010037</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDevicePathSupportDevicePathFromText</C_Name>
+          <Token>0x00010038</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
         <FvBinding>NULL</FvBinding>
@@ -2420,6 +2452,22 @@
           <DatumType>UINT32</DatumType>
           <MaxDatumSize>4</MaxDatumSize>
           <Value>10000000</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDevicePathSupportDevicePathToText</C_Name>
+          <Token>0x00010037</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
+        </PcdData>
+        <PcdData ItemType="FEATURE_FLAG">
+          <C_Name>PcdDevicePathSupportDevicePathFromText</C_Name>
+          <Token>0x00010038</Token>
+          <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+          <DatumType>BOOLEAN</DatumType>
+          <MaxDatumSize>1</MaxDatumSize>
+          <Value>TRUE</Value>
         </PcdData>
       </PcdBuildDefinition>
       <ModuleSaBuildOptions>
