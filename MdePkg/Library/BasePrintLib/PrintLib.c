@@ -19,7 +19,7 @@
 #define WARNING_STATUS_NUMBER          4
 #define ERROR_STATUS_NUMBER            24
 
-STATIC CONST CHAR8 *StatusString [] = {
+GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *StatusString [] = {
   "Success",                      //  RETURN_SUCCESS                = 0
   "Warning Unknown Glyph",        //  RETURN_WARN_UNKNOWN_GLYPH     = 1
   "Warning Delete Failure",       //  RETURN_WARN_DELETE_FAILURE    = 2
