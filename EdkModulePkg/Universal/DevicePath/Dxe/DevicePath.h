@@ -21,23 +21,8 @@ Abstract:
 #ifndef _DEVICE_PATH_DRIVER_H
 #define _DEVICE_PATH_DRIVER_H
 
-extern EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid;
-extern EFI_GUID mEfiDevicePathMessagingSASGuid;
-
-#define DEVICE_PATH_DRIVER_SIGNATURE EFI_SIGNATURE_32 ('D', 'P', 'D', 'V')
-
-typedef struct {
-
-  UINT32                             Signature;
-  EFI_HANDLE                         Handle;
-  //
-  // Produced protocols
-  //
-  EFI_DEVICE_PATH_UTILITIES_PROTOCOL DevicePathUtilities;
-  EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL DevicePathFromText;
-  EFI_DEVICE_PATH_TO_TEXT_PROTOCOL   DevicePathToText;
-
-} DEVICE_PATH_DRIVER_PRIVATE_DATA;
+extern const EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid;
+extern const EFI_GUID mEfiDevicePathMessagingSASGuid;
 
 #define MAX_CHAR                   480
 

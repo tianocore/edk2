@@ -22,10 +22,31 @@ Abstract:
 
 #include "DevicePath.h"
 
-DEVICE_PATH_DRIVER_PRIVATE_DATA mPrivateData;
+EFI_HANDLE  mDevicePathHandle = NULL;
 
-EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid = DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL;
-EFI_GUID mEfiDevicePathMessagingSASGuid             = DEVICE_PATH_MESSAGING_SAS;
+GLOBAL_REMOVE_IF_UNREFERENCED const EFI_DEVICE_PATH_UTILITIES_PROTOCOL mDevicePathUtilities = {
+  GetDevicePathSizeProtocolInterface,
+  DuplicateDevicePathProtocolInterface,
+  AppendDevicePathProtocolInterface,
+  AppendDeviceNodeProtocolInterface,
+  AppendDevicePathInstanceProtocolInterface,
+  GetNextDevicePathInstanceProtocolInterface,
+  IsDevicePathMultiInstanceProtocolInterface,
+  CreateDeviceNodeProtocolInterface
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED const EFI_DEVICE_PATH_TO_TEXT_PROTOCOL   mDevicePathToText = {
+  ConvertDeviceNodeToText,
+  ConvertDevicePathToText
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED const EFI_DEVICE_PATH_FROM_TEXT_PROTOCOL mDevicePathFromText = {
+  ConvertTextToDeviceNode,  
+  ConvertTextToDevicePath  
+};
+
+GLOBAL_REMOVE_IF_UNREFERENCED const EFI_GUID mEfiDevicePathMessagingUartFlowControlGuid = DEVICE_PATH_MESSAGING_UART_FLOW_CONTROL;
+GLOBAL_REMOVE_IF_UNREFERENCED const EFI_GUID mEfiDevicePathMessagingSASGuid             = DEVICE_PATH_MESSAGING_SAS;
 
 EFI_STATUS
 EFIAPI
@@ -49,36 +70,40 @@ DevicePathEntryPoint (
 --*/
 {
   EFI_STATUS  Status;
-
-  mPrivateData.Signature = DEVICE_PATH_DRIVER_SIGNATURE;
-
-  mPrivateData.DevicePathUtilities.GetDevicePathSize         = GetDevicePathSizeProtocolInterface;
-  mPrivateData.DevicePathUtilities.DuplicateDevicePath       = DuplicateDevicePathProtocolInterface;
-  mPrivateData.DevicePathUtilities.AppendDevicePath          = AppendDevicePathProtocolInterface;
-  mPrivateData.DevicePathUtilities.AppendDeviceNode          = AppendDeviceNodeProtocolInterface;
-  mPrivateData.DevicePathUtilities.AppendDevicePathInstance  = AppendDevicePathInstanceProtocolInterface;
-  mPrivateData.DevicePathUtilities.GetNextDevicePathInstance = GetNextDevicePathInstanceProtocolInterface;
-  mPrivateData.DevicePathUtilities.IsDevicePathMultiInstance = IsDevicePathMultiInstanceProtocolInterface;
-  mPrivateData.DevicePathUtilities.CreateDeviceNode          = CreateDeviceNodeProtocolInterface;
-
-  mPrivateData.DevicePathToText.ConvertDeviceNodeToText      = ConvertDeviceNodeToText;
-  mPrivateData.DevicePathToText.ConvertDevicePathToText      = ConvertDevicePathToText;
-
-  mPrivateData.DevicePathFromText.ConvertTextToDeviceNode    = ConvertTextToDeviceNode;
-  mPrivateData.DevicePathFromText.ConvertTextToDevicePath    = ConvertTextToDevicePath;
-
-  mPrivateData.Handle                                        = NULL;
-  
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mPrivateData.Handle,
-                  &gEfiDevicePathUtilitiesProtocolGuid,
-                  &mPrivateData.DevicePathUtilities,
-                  &gEfiDevicePathToTextProtocolGuid,
-                  &mPrivateData.DevicePathToText,
-                  &gEfiDevicePathFromTextProtocolGuid,
-                  &mPrivateData.DevicePathFromText,
-                  NULL
-                  );
-
+ 
+  Status = EFI_UNSUPPORTED;
+  if (FeaturePcdGet (PcdDevicePathSupportDevicePathToText)) {
+    if (FeaturePcdGet (PcdDevicePathSupportDevicePathFromText)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mDevicePathHandle,
+                      &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
+                      &gEfiDevicePathToTextProtocolGuid,    &mDevicePathToText,
+                      &gEfiDevicePathFromTextProtocolGuid,  &mDevicePathFromText,
+                      NULL
+                      );
+    } else {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mDevicePathHandle,
+                      &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
+                      &gEfiDevicePathToTextProtocolGuid,    &mDevicePathToText,
+                      NULL
+                      );
+    }
+  } else {
+    if (FeaturePcdGet (PcdDevicePathSupportDevicePathFromText)) {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mDevicePathHandle,
+                      &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
+                      &gEfiDevicePathFromTextProtocolGuid,  &mDevicePathFromText,
+                      NULL
+                      );
+    } else {
+      Status = gBS->InstallMultipleProtocolInterfaces (
+                      &mDevicePathHandle,
+                      &gEfiDevicePathUtilitiesProtocolGuid, &mDevicePathUtilities,
+                      NULL
+                      );
+    }
+  }
   return Status;
 }
