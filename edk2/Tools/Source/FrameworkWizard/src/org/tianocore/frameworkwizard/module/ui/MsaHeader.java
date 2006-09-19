@@ -928,6 +928,8 @@ public class MsaHeader extends IInternalFrame {
         }
         if (arg0.getSource() == jButtonGenerateGuid) {
             jTextFieldGuid.setText(Tools.generateUuidString());
+            jTextFieldGuid.requestFocus();
+            jButtonGenerateGuid.requestFocus();
         }
     }
 
