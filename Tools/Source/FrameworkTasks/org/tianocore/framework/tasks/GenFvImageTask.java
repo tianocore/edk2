@@ -23,6 +23,16 @@ import org.apache.tools.ant.taskdefs.LogStreamHandler;
 import org.apache.tools.ant.types.Commandline;
 
 import java.io.File;
+import java.io.InputStreamReader;
+import java.lang.ProcessBuilder;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.Iterator;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import org.tianocore.common.logger.EdkLog;
 
@@ -37,6 +47,10 @@ public class GenFvImageTask extends Task implements EfiDefine{
     // tool name
     //
     static final private String toolName = "GenFvImage";
+    //
+    // Pattern to match the section header (e.g. [options], [files])
+    // 
+    static final private Pattern sectionHeader = Pattern.compile("\\[([^\\[\\]]+)\\]");
     //
     // The name of input inf file
     //
@@ -55,6 +69,11 @@ public class GenFvImageTask extends Task implements EfiDefine{
     public void execute() throws BuildException  {
         Project project = this.getOwningTarget().getProject();
         String path = project.getProperty("env.FRAMEWORK_TOOLS_PATH");
+
+        if (isUptodate()) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, infFile.toFileList() + " is uptodate!");
+            return;
+        }
 
         String command;
         if (path == null) {
@@ -141,5 +160,118 @@ public class GenFvImageTask extends Task implements EfiDefine{
     **/
     public void setOutputDir(String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    //
+    // dependency check
+    // 
+    private boolean isUptodate() {
+        String infName = this.infFile.getValue();
+        String fvName = "";
+        List<String> ffsFiles = new LinkedList<String>();
+        File inf = new File(infName);
+
+        try {
+            FileReader reader = new FileReader(inf);
+            BufferedReader in = new BufferedReader(reader);
+            String str;
+
+            //
+            // Read the inf file line by line
+            // 
+            boolean inFiles = false;
+            boolean inOptions = false;
+            while ((str = in.readLine()) != null) {
+                str = str.trim();
+                if (str.length() == 0) {
+                    continue;
+                }
+
+                Matcher matcher = sectionHeader.matcher(str);
+                if (matcher.find()) {
+                    //
+                    // We take care of only "options" and "files" section
+                    // 
+                    String sectionName = str.substring(matcher.start(1), matcher.end(1));
+                    if (sectionName.equalsIgnoreCase("options")) {
+                        inOptions = true;
+                        inFiles = false;
+                    } else if (sectionName.equalsIgnoreCase("files")) {
+                        inFiles = true;
+                        inOptions = false;
+                    } else {
+                        inFiles = false;
+                        inOptions = false;
+                    }
+                    continue;
+                }
+
+                //
+                // skip invalid line
+                // 
+                int equalMarkPos = str.indexOf("=");
+                if (equalMarkPos < 0) {
+                    continue;
+                }
+
+                //
+                // we have only interest in EFI_FILE_NAME
+                // 
+                String fileNameFlag = str.substring(0, equalMarkPos).trim();
+                String fileName = str.substring(equalMarkPos + 1).trim();
+                if (!fileNameFlag.equalsIgnoreCase("EFI_FILE_NAME")
+                    || fileName.length() == 0) {
+                    continue;
+                }
+
+                if (inFiles) {
+                    //
+                    // files specified beneath the [files] section are source files
+                    // 
+                    ffsFiles.add(fileName);
+                } else if (inOptions) {
+                    //
+                    // file specified beneath the [options] section is the target file
+                    // 
+                    fvName = outputDir + File.separator + fileName;
+                }
+            }
+        } catch (Exception ex) {
+            throw new BuildException(ex.getMessage());
+        }
+
+        //
+        // if destionation file doesn't exist, we need to generate it.
+        // 
+        File fvFile = new File(fvName);
+        if (!fvFile.exists()) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, fvName + " doesn't exist!");
+            return false;
+        }
+
+        //
+        // the inf file itself will be taken as source file, check its timestamp
+        // against the target file
+        // 
+        long fvFileTimeStamp = fvFile.lastModified();
+        if (inf.lastModified() > fvFileTimeStamp) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, infName + " has been changed since last build!");
+            return false;
+        }
+
+        //
+        // no change in the inf file, we need to check each source files in it
+        // against the target file
+        // 
+        for (Iterator it = ffsFiles.iterator(); it.hasNext(); ) {
+            String fileName = (String)it.next();
+            File file = new File(fileName);
+            if (file.lastModified() > fvFileTimeStamp) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, fileName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        return true;
     }
 }

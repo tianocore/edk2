@@ -193,6 +193,12 @@ public class FpdParserTask extends Task {
             getProject().setProperty("FV_FILENAME", validFv[i]);
 
             File fvFile = new File(getProject().replaceProperties( getProject().getProperty("FV_DIR") + File.separatorChar + validFv[i] + ".inf"));
+            if (fvFile.exists() && (fvFile.lastModified() >= fpdFile.lastModified())) {
+                //
+                // don't re-generate FV.inf if fpd has not been changed
+                // 
+                continue;
+            }
             fvFile.getParentFile().mkdirs();
 
             try {

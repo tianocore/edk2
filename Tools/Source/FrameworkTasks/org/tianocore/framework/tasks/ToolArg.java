@@ -139,4 +139,13 @@ public class ToolArg extends NestElement {
     public String toString() {
         return super.toString(prefix);
     }
+
+    /**
+       Check if the argument is empty or not
+
+       @return boolean
+     **/
+    public boolean isEmpty() {
+        return (prefix.length() == 0) && (nameList.isEmpty());
+    }
 }

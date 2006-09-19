@@ -67,6 +67,10 @@ public class PeiReBaseTask extends Task implements EfiDefine {
       @throws BuidException
      **/
     public void execute() throws BuildException {
+        if (isUptodate()) {
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, outputFile.toFileList() + " is up-to-date!");
+            return;
+        }
 
         Project project = this.getOwningTarget().getProject();
 
@@ -246,5 +250,19 @@ public class PeiReBaseTask extends Task implements EfiDefine {
      **/
     public void setMapFile(String mapFile) {
         this.mapFile.setArg(" -M ", mapFile);
+    }
+
+    //
+    // Dependency check
+    // 
+    private boolean isUptodate() {
+        File srcFile = new File(inputFile.getValue());
+        File dstFile = new File(outputFile.getValue());
+
+        if (srcFile.lastModified() > dstFile.lastModified()) {
+            return false;
+        }
+
+        return true;
     }
 }
