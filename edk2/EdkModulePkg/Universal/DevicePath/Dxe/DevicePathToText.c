@@ -1255,7 +1255,7 @@ DevPathToTextNodeUnknown (
   CatPrint (Str, L"?");
 }
 
-DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED const DEVICE_PATH_TO_TEXT_TABLE DevPathToTextTable[] = {
   {HARDWARE_DEVICE_PATH, HW_PCI_DP, DevPathToTextPci},
   {HARDWARE_DEVICE_PATH, HW_PCCARD_DP, DevPathToTextPccard},
   {HARDWARE_DEVICE_PATH, HW_MEMMAP_DP, DevPathToTextMemMap},

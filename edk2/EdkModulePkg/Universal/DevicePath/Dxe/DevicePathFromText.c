@@ -2174,7 +2174,7 @@ DevPathFromTextBBS (
   return (EFI_DEVICE_PATH_PROTOCOL *) Bbs;
 }
 
-DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED DEVICE_PATH_FROM_TEXT_TABLE DevPathFromTextTable[] = {
   {L"Pci", DevPathFromTextPci},
   {L"PcCard", DevPathFromTextPcCard},
   {L"MemoryMapped", DevPathFromTextMemoryMapped},
