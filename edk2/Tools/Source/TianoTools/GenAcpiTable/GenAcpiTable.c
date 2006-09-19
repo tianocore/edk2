@@ -196,6 +196,7 @@ Returns:
   UINT32                      PESigOffset;
   EFI_IMAGE_FILE_HEADER       FileHeader;
   EFI_IMAGE_OPTIONAL_HEADER32 OptionalHeader32;
+  EFI_IMAGE_OPTIONAL_HEADER64 OptionalHeader64;
   EFI_IMAGE_SECTION_HEADER    SectionHeader;
   UINT8                       *Buffer;
   long                        SaveFilePosition;
@@ -266,7 +267,7 @@ Returns:
       goto Finish;
     }
 
-    if (fread (&OptionalHeader32, sizeof (EFI_IMAGE_OPTIONAL_HEADER64), 1, InFptr) != 1) {
+    if (fread (&OptionalHeader64, sizeof (EFI_IMAGE_OPTIONAL_HEADER64), 1, InFptr) != 1) {
       Error (NULL, 0, 0, InFileName, "failed to read optional header from input file");
       goto Finish;
     }
