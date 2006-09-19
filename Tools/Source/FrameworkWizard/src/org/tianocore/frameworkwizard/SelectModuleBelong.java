@@ -28,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import org.tianocore.ModuleTypeDef;
 import org.tianocore.MsaHeaderDocument;
 import org.tianocore.SpdHeaderDocument;
 import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
@@ -593,6 +594,7 @@ public class SelectModuleBelong extends IDialog {
             msaHeader.setModuleName(this.jTextFieldName.getText());
             msaHeader.setGuidValue(this.jTextFieldGuid.getText());
             msaHeader.setVersion(this.jTextFieldVersion.getText());
+            msaHeader.setModuleType(ModuleTypeDef.BASE);
 
             msa.setMsaHeader(msaHeader);
         } catch (Exception e) {
