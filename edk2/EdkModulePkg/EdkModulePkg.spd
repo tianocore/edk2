@@ -1090,5 +1090,50 @@
       <DefaultValue>0x0</DefaultValue>
       <HelpText>Size of the FTW working block section in NV firmware volume.</HelpText>
     </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDxeIplSupportEfiDecompress</C_Name>
+      <Token>0x00010034</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the EFI Compression algorithm</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDxeIplSupportTianoDecompress</C_Name>
+      <Token>0x00010035</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Tiano Compression algorithm</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDxeIplSupportCustomDecompress</C_Name>
+      <Token>0x00010036</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>TRUE</DefaultValue>
+      <HelpText>If this feature is enabled, then the DXE IPL must support decompressing files compressed with the Custom Compression algorithm</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDevicePathSupportDevicePathToText</C_Name>
+      <Token>0x00010037</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If TRUE, then the Device Path To Text Protocol should be produced by the platform</HelpText>
+    </PcdEntry>
+    <PcdEntry>
+      <C_Name>PcdDevicePathSupportDevicePathFromText</C_Name>
+      <Token>0x00010038</Token>
+      <TokenSpaceGuidCName>gEfiEdkModulePkgTokenSpaceGuid</TokenSpaceGuidCName>
+      <DatumType>BOOLEAN</DatumType>
+      <ValidUsage>FEATURE_FLAG</ValidUsage>
+      <DefaultValue>FALSE</DefaultValue>
+      <HelpText>If TRUE, then the Device Path From Text Protocol should be produced by the platform</HelpText>
+    </PcdEntry>
   </PcdDeclarations>
 </PackageSurfaceArea>
