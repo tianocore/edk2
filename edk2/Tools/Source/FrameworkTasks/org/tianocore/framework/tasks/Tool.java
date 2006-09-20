@@ -34,6 +34,7 @@ public class Tool implements EfiDefine, Section {
     private String toolName     = "";
     private ToolArg toolArgList = new ToolArg();
     private Input inputFiles = new Input();
+    private Input tempInputFile = new Input();
     private String outputPath;
     private File outputFile ;
     private List<Section>  gensectList = new ArrayList<Section>();
@@ -93,6 +94,7 @@ public class Tool implements EfiDefine, Section {
                 if (fs != null) {
                     fs.close();
                 }
+                outputFile.delete(); 
             } catch (Exception e) {
                 EdkLog.log("WARNING: Cannot close " + outputFile.getPath());
             }
@@ -133,7 +135,7 @@ public class Tool implements EfiDefine, Section {
                     throw new BuildException ("GenSection failed at Tool!");
                 }  
                 Do.close();
-                this.inputFiles.insFile(outputFile.getPath());                        
+                this.tempInputFile.insFile(outputFile.getPath());
             }        
         } catch (IOException e){
             throw new BuildException ("Gensection failed at tool!");
@@ -142,13 +144,20 @@ public class Tool implements EfiDefine, Section {
         try {
             outputFile = File.createTempFile("temp", null, new File(outputPath));
             argument   = toolArgList + inputFiles.toStringWithSinglepPrefix(" -i ") 
-                         + " -o " + outputFile.getPath();
+                         + tempInputFile.toString(" ")+ " -o " + outputFile.getPath();
             EdkLog.log(this, EdkLog.EDK_VERBOSE, command + " " + argument);
             ///
             /// execute command line
             ///
             Process process = Runtime.getRuntime().exec(command + " " + argument);
             process.waitFor();
+            Iterator tempFile = tempInputFile.getNameList().iterator();
+            while (tempFile.hasNext()){
+                File file = new File((String)tempFile.next());
+                if (file.exists()) {
+                    file.delete();
+                }
+            }
         } catch (Exception e) {
             EdkLog.log(e.getMessage());
             throw new BuildException("Execution of externalTool task failed!\n");
