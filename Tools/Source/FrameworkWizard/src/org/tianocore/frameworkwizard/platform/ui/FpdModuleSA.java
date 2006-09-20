@@ -124,6 +124,8 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JPanel jPanelCustomToolChain = null;
     private JPanel jPanelToolchainS = null;
     private JPanel jPanelToolchainC = null;
+    private JPanel jPanelLibraryCenterN = null;
+    private JPanel jPanelLibraryCenterC = null;  //  @jve:decl-index=0:visual-constraint="20,224"
     /**
      * This is the default constructor
      */
@@ -420,19 +422,14 @@ public class FpdModuleSA extends JDialog implements ActionListener {
         libInstanceTableModel.setRowCount(0);
     }
     
-    private void addLibInstance (ModuleIdentification libMi) {
+    private void addLibInstance (ModuleIdentification libMi) throws Exception{
         
-        ffc.genLibraryInstance(libMi, moduleKey);
         //
         // Add pcd information of selected instance to current moduleSA
         //
-        try{
-            ffc.addFrameworkModulesPcdBuildDefs(libMi, null, ffc.getModuleSA(moduleKey));
-        }
-        catch (Exception exception) {
-            JOptionPane.showMessageDialog(frame, "Adding Instance" + libMi.getName() + ": "+ exception.getMessage());
-        }
+        ffc.addFrameworkModulesPcdBuildDefs(libMi, null, ffc.getModuleSA(moduleKey));
         
+        ffc.genLibraryInstance(libMi, moduleKey);
     }
     /**
      * This method initializes this
@@ -440,7 +437,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
      * @return void
      */
     private void initialize() {
-        this.setSize(664, 515);
+        this.setSize(877, 555);
         this.setResizable(false);
         this.centerWindow();
         this.setModal(true);
@@ -488,7 +485,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JPanel getJPanelPcd() {
         if (jPanelPcd == null) {
             jLabelPcdData = new JLabel();
-            jLabelPcdData.setText("PcdData");
+            jLabelPcdData.setText(" PCD Data");
             jPanelPcd = new JPanel();
             jPanelPcd.setLayout(new BorderLayout());
             jPanelPcd.add(jLabelPcdData, java.awt.BorderLayout.NORTH);
@@ -548,7 +545,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             model = new IDefaultTableModel();
             jTablePcd = new JTable(model);
             jTablePcd.setRowHeight(20);
-            jTablePcd.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+            jTablePcd.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
             model.addColumn("CName");
             model.addColumn("TokenSpaceGUID");
             model.addColumn("ItemType");
@@ -783,7 +780,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JScrollPane getJScrollPaneSelectedInstances() {
         if (jScrollPaneSelectedInstances == null) {
             jScrollPaneSelectedInstances = new JScrollPane();
-            jScrollPaneSelectedInstances.setPreferredSize(new java.awt.Dimension(453,150));
+            jScrollPaneSelectedInstances.setPreferredSize(new java.awt.Dimension(600,150));
             jScrollPaneSelectedInstances.setViewportView(getJTableSelectedInstances());
         }
         return jScrollPaneSelectedInstances;
@@ -888,7 +885,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JScrollPane getJScrollPaneQualifiedInstance() {
         if (jScrollPaneQualifiedInstance == null) {
             jScrollPaneQualifiedInstance = new JScrollPane();
-            jScrollPaneQualifiedInstance.setPreferredSize(new java.awt.Dimension(430,170));
+            jScrollPaneQualifiedInstance.setPreferredSize(new java.awt.Dimension(600,170));
             jScrollPaneQualifiedInstance.setViewportView(getJTableLibInstances());
         }
         return jScrollPaneQualifiedInstance;
@@ -940,12 +937,11 @@ public class FpdModuleSA extends JDialog implements ActionListener {
             jLabelSelectedInstances = new JLabel();
             jLabelSelectedInstances.setText("Selected Instances");
             jPanelLibraryCenter = new JPanel();
-            jPanelLibraryCenter.add(jLabelInstanceHelp, null);
-            jPanelLibraryCenter.add(getJScrollPaneInstanceHelp(), null);
-            jPanelLibraryCenter.add(getJButtonAdd(), null);
-            jPanelLibraryCenter.add(getJButtonDeleteInstance(), null);
-            jPanelLibraryCenter.add(jLabelSelectedInstances, null);
-            jPanelLibraryCenter.add(getJScrollPaneSelectedInstances(), null);
+            jPanelLibraryCenter.setLayout(new BorderLayout());
+
+            jPanelLibraryCenter.add(getJPanelLibraryCenterC(), java.awt.BorderLayout.CENTER);
+            jPanelLibraryCenter.add(getJPanelLibraryCenterN(), java.awt.BorderLayout.NORTH);
+
         }
         return jPanelLibraryCenter;
     }
@@ -958,7 +954,7 @@ public class FpdModuleSA extends JDialog implements ActionListener {
     private JScrollPane getJScrollPaneInstanceHelp() {
         if (jScrollPaneInstanceHelp == null) {
             jScrollPaneInstanceHelp = new JScrollPane();
-            jScrollPaneInstanceHelp.setPreferredSize(new java.awt.Dimension(300,50));
+            jScrollPaneInstanceHelp.setPreferredSize(new java.awt.Dimension(400,50));
             jScrollPaneInstanceHelp.setViewportView(getJTextAreaInstanceHelp());
         }
         return jScrollPaneInstanceHelp;
@@ -993,17 +989,24 @@ public class FpdModuleSA extends JDialog implements ActionListener {
                     if (row < 0) {
                         return;
                     }
-                    docConsole.setSaved(false);
-                    Object[] s = {libInstanceTableModel.getValueAt(row, 0), libInstanceTableModel.getValueAt(row, 1),
-                                  libInstanceTableModel.getValueAt(row, 2), libInstanceTableModel.getValueAt(row, 3),
-                                  libInstanceTableModel.getValueAt(row, 4)};
-                    selectedInstancesTableModel.addRow(s);
+                    
                     String instanceValue = libInstanceTableModel.getValueAt(row, 1) + " " +
                     libInstanceTableModel.getValueAt(row, 2) + " " +
                     libInstanceTableModel.getValueAt(row, 3) + " " +
                     libInstanceTableModel.getValueAt(row, 4);
                     ModuleIdentification libMi = WorkspaceProfile.getModuleId(instanceValue);
-                    addLibInstance (libMi);
+                    try {
+                        addLibInstance (libMi);
+                    }
+                    catch (Exception exception) {
+                        JOptionPane.showMessageDialog(frame, "Adding Instance" + libMi.getName() + ": "+ exception.getMessage());
+                        return;
+                    }
+                    docConsole.setSaved(false);
+                    Object[] s = {libInstanceTableModel.getValueAt(row, 0), libInstanceTableModel.getValueAt(row, 1),
+                                  libInstanceTableModel.getValueAt(row, 2), libInstanceTableModel.getValueAt(row, 3),
+                                  libInstanceTableModel.getValueAt(row, 4)};
+                    selectedInstancesTableModel.addRow(s);
                     resolveLibraryInstances(instanceValue);
                     showClassToResolved();
                 }
@@ -1633,6 +1636,38 @@ private JPanel getJPanelToolchainC() {
         jPanelToolchainC.add(getJScrollPaneModuleSaOptions(), null);
     }
     return jPanelToolchainC;
+}
+/**
+ * This method initializes jPanelLibraryCenterN	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanelLibraryCenterN() {
+    if (jPanelLibraryCenterN == null) {
+        FlowLayout flowLayout5 = new FlowLayout();
+        flowLayout5.setAlignment(java.awt.FlowLayout.CENTER);
+        flowLayout5.setHgap(10);
+        jPanelLibraryCenterN = new JPanel();
+        jPanelLibraryCenterN.setLayout(flowLayout5);
+        jPanelLibraryCenterN.add(jLabelInstanceHelp, null);
+        jPanelLibraryCenterN.add(getJScrollPaneInstanceHelp(), null);
+        jPanelLibraryCenterN.add(getJButtonAdd(), null);
+        jPanelLibraryCenterN.add(getJButtonDeleteInstance(), null);
+    }
+    return jPanelLibraryCenterN;
+}
+/**
+ * This method initializes jPanelLibraryCenterC	
+ * 	
+ * @return javax.swing.JPanel	
+ */
+private JPanel getJPanelLibraryCenterC() {
+    if (jPanelLibraryCenterC == null) {
+        jPanelLibraryCenterC = new JPanel();
+        jPanelLibraryCenterC.add(jLabelSelectedInstances, null);
+        jPanelLibraryCenterC.add(getJScrollPaneSelectedInstances(), null);
+    }
+    return jPanelLibraryCenterC;
 }
 
 
