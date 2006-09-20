@@ -207,7 +207,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JPanel getJPanelTop() {
         if (jPanelTop == null) {
             jLabel = new JLabel();
-            jLabel.setText("Modules in Workspace");
+            jLabel.setText("  Modules in Workspace");
             jPanelTop = new JPanel();
             jPanelTop.setLayout(new BorderLayout());
             jPanelTop.add(jLabel, java.awt.BorderLayout.NORTH);
@@ -227,7 +227,7 @@ public class FpdFrameworkModules extends IInternalFrame {
     private JPanel getJPanelBottom() {
         if (jPanelBottom == null) {
             jLabelModulesAdded = new JLabel();
-            jLabelModulesAdded.setText("Modules Added");
+            jLabelModulesAdded.setText("  Modules Added into Platform");
             jPanelBottom = new JPanel();
             jPanelBottom.setLayout(new BorderLayout());
             jPanelBottom.add(jLabelModulesAdded, java.awt.BorderLayout.NORTH);

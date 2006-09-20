@@ -70,7 +70,7 @@ import org.tianocore.frameworkwizard.packaging.PackageIdentification;
 public class FpdFileContents {
 
     static final String xmlNs = "http://www.TianoCore.org/2006/Edk2.0";
-    static final String regNewLineAndSpaces = "((\n)|(\r\n)|(\r)|(\u0085)|(\u2028)|(\u2029))(\\s)*";
+    static final String regExpNewLineAndSpaces = "((\n)|(\r\n)|(\r)|(\u0085)|(\u2028)|(\u2029))(\\s)*";
     
     private PlatformSurfaceAreaDocument fpdd = null;
     
@@ -352,7 +352,7 @@ public class FpdFileContents {
                     break;
                 }
                 String s = cursor.getTextValue();
-                if (s.matches(regNewLineAndSpaces)) {
+                if (s.matches(regExpNewLineAndSpaces)) {
                     continue;
                 }
             }
@@ -401,7 +401,6 @@ public class FpdFileContents {
             vMi.add(libMi);
         }
         
-        try {
     nextPcd:for (int i = 0; i < saaModuleSaPcd.length; ++i) {
 
                 for (int j = 0; j < vMi.size(); ++j) {
@@ -413,16 +412,10 @@ public class FpdFileContents {
                 removePcdData(seqModuleSa, saaModuleSaPcd[i][0], saaModuleSaPcd[i][1]);
                 dataModified = true;
             }
-        }
-        catch (Exception e) {
-            throw e;
-        }
         //
         // add new Pcd from MSA file to ModuleSA.
         //
-        try {
-       
-            for (int i = 0; i < vMi.size(); ++i) {
+           for (int i = 0; i < vMi.size(); ++i) {
                 ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea) WorkspaceProfile
                                                                                                                           .getModuleXmlObject(vMi
                                                                                                                                                  .get(i));
@@ -462,10 +455,6 @@ public class FpdFileContents {
                  }
 
             }
-        }
-        catch (Exception e){
-           throw e;
-        }
         
         return dataModified;
     }
@@ -648,12 +637,44 @@ public class FpdFileContents {
         return false;
     }
     
+    private boolean multiSourcePcd (String cName, String tsGuidCName, String moduleKey) {
+        int libCount = getLibraryInstancesCount(moduleKey);
+        String[][] saaLib = new String[libCount][5];
+        getLibraryInstances(moduleKey, saaLib);
+        ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+        Vector<ModuleIdentification> vMi = new Vector<ModuleIdentification>();
+        //
+        // create vector for module & library instance MIs.
+        //
+        vMi.add(mi);
+        for (int j = 0; j < saaLib.length; ++j) {
+            String libKey = saaLib[j][1] + " " + saaLib[j][2] + " " + saaLib[j][3] + " " + saaLib[j][4];
+            ModuleIdentification libMi = WorkspaceProfile.getModuleId(libKey);
+            vMi.add(libMi);
+        }
+        
+        int pcdSourceCount = 0;
+        for (int i = 0; i < vMi.size(); ++i) {
+            if (WorkspaceProfile.pcdInMsa(cName, tsGuidCName, vMi.get(i))) {
+                pcdSourceCount++;
+            }
+        }
+        
+        if (pcdSourceCount < 2) {
+            return false;
+        }
+        else {
+            return true;
+        }
+        
+    }
+    
     /**Remove PCDBuildDefinition entries from ModuleSA
      * @param moduleKey identifier of ModuleSA.
      * @param consumer where these entries come from.
      */
     public void removePcdData(String moduleKey, ModuleIdentification consumer) {
-        try {
+        
             ModuleSurfaceAreaDocument.ModuleSurfaceArea msa = (ModuleSurfaceAreaDocument.ModuleSurfaceArea)WorkspaceProfile.getModuleXmlObject(consumer);
             if (msa.getPcdCoded() == null) {
                 return;
@@ -672,8 +693,10 @@ public class FpdFileContents {
                         do {
                             PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData pcdData = (PcdBuildDefinitionDocument.PcdBuildDefinition.PcdData) cursor
                                                                                                                                                           .getObject();
-                            if (msaPcd.getCName().equals(pcdData.getCName())
-                                && msaPcd.getTokenSpaceGuidCName().equals(pcdData.getTokenSpaceGuidCName())) {
+                            String cName = msaPcd.getCName();
+                            String tsGuidCName = msaPcd.getTokenSpaceGuidCName();
+                            if (cName.equals(pcdData.getCName())
+                                && tsGuidCName.equals(pcdData.getTokenSpaceGuidCName()) && !multiSourcePcd(cName, tsGuidCName, moduleKey)) {
 
                                 maintainDynPcdMap(pcdData.getCName() + " " + pcdData.getTokenSpaceGuidCName(),
                                                   moduleKey);
@@ -690,12 +713,7 @@ public class FpdFileContents {
                     cursor.dispose();
                 }
             }
-            
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            
-        }
+        
     }
     //
     // key for ModuleSA : "ModuleGuid ModuleVer PackageGuid PackageVer Arch"
@@ -742,7 +760,7 @@ public class FpdFileContents {
                     break;
                 }
                 String s = cursor.getTextValue();
-                if (s.matches(regNewLineAndSpaces)) {
+                if (s.matches(regExpNewLineAndSpaces)) {
                     continue;
                 }
             }
@@ -1227,15 +1245,24 @@ public class FpdFileContents {
             pcdConsumer = new ArrayList<String>();
         }
         //
+        // Check whether this PCD has already added to ModuleSA, if so, just return.
+        //
+        String moduleInfo = moduleSa.getModuleGuid().toLowerCase() + " " + moduleSa.getModuleVersion() 
+        + " " + moduleSa.getPackageGuid().toLowerCase() + " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList());
+        for (int i = 0; i < pcdConsumer.size(); ++i) {
+            String pcdInfo = pcdConsumer.get(i);
+            if (moduleInfo.equals(pcdInfo.substring(0, pcdInfo.lastIndexOf(" ")))){
+                return;
+            }
+        }
+        //
         // Using existing Pcd type, if this pcd already exists in other ModuleSA
         //
         if (pcdConsumer.size() > 0) {
             
             itemType = itemType (pcdConsumer.get(0));
         }
-        String listValue = moduleSa.getModuleGuid() + " " + moduleSa.getModuleVersion() 
-        + " " + moduleSa.getPackageGuid() + " " + moduleSa.getPackageVersion() + " " + listToString(moduleSa.getSupArchList())
-        + " " + itemType;
+        String listValue = moduleInfo + " " + itemType;
         pcdConsumer.add(listValue);
         dynPcdMap.put(cName + " " + tsGuid, pcdConsumer);
         
