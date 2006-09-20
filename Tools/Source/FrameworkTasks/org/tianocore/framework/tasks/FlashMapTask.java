@@ -98,8 +98,8 @@ public class FlashMapTask extends Task implements EfiDefine {
     private String outStrFile = "";
 
     //
-    // 
-    // 
+    //
+    //
     private FileArg strFile = new FileArg();
     //
     // Base address
@@ -128,15 +128,16 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       execute
-     
+
       FlashMapTask execute function is to assemble tool command line & execute
       tool command line
-     
+
       @throws BuidException
      **/
     public void execute() throws BuildException {
+        /*
         if (isUptodate()) {
-            EdkLog.log(this, EdkLog.EDK_VERBOSE, headerFile.toFileList() 
+            EdkLog.log(this, EdkLog.EDK_VERBOSE, headerFile.toFileList()
                                                  + imageOutFile.toFileList()
                                                  + mcoFile.toFileList()
                                                  + dscFile.toFileList()
@@ -145,6 +146,7 @@ public class FlashMapTask extends Task implements EfiDefine {
                                                  + " is/are up-to-date!");
             return;
         }
+        */
 
         Project project = this.getOwningTarget().getProject();
         //
@@ -193,19 +195,19 @@ public class FlashMapTask extends Task implements EfiDefine {
             runner.setCommandline(cmdline.getCommandline());
 
             if (outputDir != null) {
-                runner.setWorkingDirectory(new File(outputDir)); 
+                runner.setWorkingDirectory(new File(outputDir));
             }
             //
             // log command line string.
             //
             EdkLog.log(this, EdkLog.EDK_VERBOSE, Commandline.toString(cmdline.getCommandline()));
-            EdkLog.log(this, flashDefFile.toFileList() 
+            EdkLog.log(this, flashDefFile.toFileList()
                              + mciFile.toFileList()
                              + mciFileArray.toFileList()
                              + fdImage.toFileList()
                              + inStrFile
-                             + " => " 
-                             + headerFile.toFileList() 
+                             + " => "
+                             + headerFile.toFileList()
                              + imageOutFile.toFileList()
                              + mcoFile.toFileList()
                              + dscFile.toFileList()
@@ -229,9 +231,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getFlashDefFile
-     
+
       This function is to get class member "flashDefFile"
-     
+
       @return flashDeFile Name of flash definition file.
      **/
     public String getFlashDefFile() {
@@ -240,9 +242,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setFlashDefFile
-     
+
       This function is to set class member "flashDefFile"
-     
+
       @param flashDefFile
                  Name of flash definition file.
      **/
@@ -252,9 +254,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getAligment
-     
+
       This function is to get class member "aligment"
-     
+
       @return aligment String of aligment value.
      **/
     public String getAligment() {
@@ -263,9 +265,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setAligment
-     
+
       This function is to set class member "aligment"
-     
+
       @param aligment
                  String of aligment value.
      **/
@@ -275,9 +277,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getAsmIncFile
-     
+
       This function is to get class member "asmIncFile"
-     
+
       @return asmIncFile String of ASM include file.
      **/
     public String getAsmIncFile() {
@@ -286,9 +288,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setAsmIncFile
-     
+
       This function is to set class member "asmIncFile"
-     
+
       @param asmIncFile
                  String of ASM include file.
      **/
@@ -298,9 +300,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getBaseAddr
-     
+
       This function is to get class member "baseAddr"
-     
+
       @return baseAddr String of base address value.
      **/
     public String getBaseAddr() {
@@ -309,9 +311,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setBaseAddr
-     
+
       This function is to set class member "baseAddr"
-     
+
       @param baseAddr
                  String of base address value.
      **/
@@ -321,9 +323,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getDscFile
-     
+
       This function is to get class member "dscFile"
-     
+
       @return dscFile name of DSC file
      **/
     public String getDscFile() {
@@ -332,9 +334,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setDscFile
-     
+
       This function is to set class member "dscFile"
-     
+
       @param dscFile
                  name of DSC file
      **/
@@ -344,9 +346,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getFdImage
-     
+
       This function is to get class member "fdImage"
-     
+
       @return fdImage name of input FDI image file.
      **/
     public String getFdImage() {
@@ -355,9 +357,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setFdImage
-     
+
       This function is to set class member "fdImage"
-     
+
       @param fdImage
                  name of input FDI image file.
      **/
@@ -367,9 +369,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getFlashDevice
-     
+
       This function is to get class member "flashDevice".
-     
+
       @return flashDevice name of flash device.
      **/
     public String getFlashDevice() {
@@ -378,9 +380,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setFlashDevice
-     
+
       This function is to set class member "flashDevice"
-     
+
       @param flashDevice
                  name of flash device.
      **/
@@ -390,9 +392,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getFlashDeviceImage
-     
+
       This function is to get class member "flashDeviceImage"
-     
+
       @return flashDeviceImage name of flash device image
      **/
     public String getFlashDeviceImage() {
@@ -401,9 +403,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setFlashDeviceImage
-     
+
       This function is to set class member "flashDeviceImage"
-     
+
       @param flashDeviceImage
                  name of flash device image
      **/
@@ -414,9 +416,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getHeaderFile
-     
+
       This function is to get class member "headerFile"
-     
+
       @return headerFile name of include file
      **/
     public String getHeaderFile() {
@@ -425,9 +427,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setHeaderFile
-     
+
       This function is to set class member "headerFile"
-     
+
       @param headerFile
                  name of include file
      **/
@@ -437,9 +439,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getImageOutFile
-     
+
       This function is to get class member "imageOutFile"
-     
+
       @return imageOutFile name of output image file
      **/
     public String getImageOutFile() {
@@ -448,9 +450,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setImageOutFile
-     
+
       This function is to set class member "ImageOutFile"
-     
+
       @param imageOutFile
                  name of output image file
      **/
@@ -460,9 +462,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getInStrFile
-     
+
       This function is to get class member "inStrFile"
-     
+
       @return inStrFile name of input file which used to replace symbol names.
      **/
     public String getInStrFile() {
@@ -471,9 +473,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setInStrFile
-     
+
       This function is to set class member "inStrFile"
-     
+
       @param inStrFile
                  name of input file which used to replace symbol names.
      **/
@@ -483,9 +485,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getMciFile
-     
+
       This function is to get class member "mciFile"
-     
+
       @return mciFile name of input microcode file
      **/
     public String getMciFile() {
@@ -494,9 +496,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setMciFile
-     
+
       This function is to set class member "mciFile"
-     
+
       @param mciFile
                  name of input microcode file
      **/
@@ -506,9 +508,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getMcoFile
-     
+
       This function is to get class member "mcoFile"
-     
+
       @return mcoFile name of output binary microcode image
      **/
     public String getMcoFile() {
@@ -517,9 +519,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setMcoFile
-     
+
       This function is to set class member "mcoFile"
-     
+
       @param mcoFile
                  name of output binary microcode image
      **/
@@ -529,9 +531,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getOutStrFile
-     
+
       This function is to get class member "outStrFile"
-     
+
       @return outStrFile name of output string substitution file
      **/
     public String getOutStrFile() {
@@ -540,9 +542,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setOutStrFile
-     
+
       This function is to set class member "outStrFile"
-     
+
       @param outStrFile
                  name of output string substitution file
      **/
@@ -552,9 +554,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getPadValue
-     
+
       This function is to get class member "padValue"
-     
+
       @return padValue string of byte value to use as padding
      **/
     public String getPadValue() {
@@ -563,9 +565,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setPadValue
-     
+
       This function is to set class member "padValue"
-     
+
       @param padValue
                  string of byte value to use as padding
      **/
@@ -575,9 +577,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       addMciFile
-     
+
       This function is to add Microcode binary file
-     
+
       @param mciFile
                  instance of input class
      **/
@@ -588,9 +590,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       getOutputDir
-     
+
       This function is to get class member "outputDir"
-     
+
       @return outputDir string of output directory
      **/
     public String getOutputDir() {
@@ -599,9 +601,9 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     /**
       setOutputDir
-     
+
       This function is to set class member "outputDir"
-     
+
       @param outputDir
                  string of output directory
      **/
@@ -611,7 +613,7 @@ public class FlashMapTask extends Task implements EfiDefine {
 
     //
     // Dependency check
-    // 
+    //
     private boolean isUptodate() {
         long srcTimeStamp = 0;
         String srcName = "";
