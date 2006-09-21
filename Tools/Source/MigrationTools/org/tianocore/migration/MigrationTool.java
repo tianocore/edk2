@@ -73,7 +73,11 @@ public class MigrationTool {
         MigrationTool.ui.println(show + hash.size());
         MigrationTool.ui.println(hash);
     }
-
+/*
+    public static final String getTempDir(String modulepath) {
+    	return "C:" + File.separator + "MigrationTool_Temp" + File.separator + modulepath.replaceAll(ui., arg1);
+    }
+*/
     private static final String assignOutPutPath(String inputpath) {
         if (MigrationTool.defaultoutput) {
             return inputpath.replaceAll(Common.STRSEPARATER, "$1");

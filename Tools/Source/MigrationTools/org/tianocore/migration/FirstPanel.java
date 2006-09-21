@@ -26,7 +26,7 @@ public final class FirstPanel extends JPanel implements ActionListener, ItemList
     
     private static final FirstPanel INSTANCE = FirstPanel.init();
     
-    private String startpath;
+    private String startpath = null;
     
     private JButton moduleButton, goButton, msaEditorButton, criticButton, specifyCommentButton;
     private JTextField moduletext;

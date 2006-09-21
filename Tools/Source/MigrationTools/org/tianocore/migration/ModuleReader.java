@@ -193,13 +193,11 @@ public final class ModuleReader implements Common.ForDoAll {
         ii = mi.preprocessedccodes.iterator();
         
         Pattern patefifuncc = Pattern.compile("g?(BS|RT)\\s*->\\s*([a-zA-Z_]\\w*)",Pattern.MULTILINE);
-        Pattern patentrypoint = Pattern.compile("EFI_([A-Z]*)_ENTRY_POINT\\s*\\(([^\\(\\)]*)\\)",Pattern.MULTILINE);
         Matcher matguid;
         Matcher matfuncc;
         Matcher matfuncd;
         Matcher matenclosereplace;
         Matcher matefifuncc;
-        Matcher matentrypoint;
         Matcher matmacro;
         
         while (ii.hasNext()) {
@@ -210,17 +208,6 @@ public final class ModuleReader implements Common.ForDoAll {
                 wholefile.append(line + '\n');
             }
             line = wholefile.toString();
-            
-            // if this is a Pei phase module , add these library class to .msa
-            matentrypoint = patentrypoint.matcher(line);
-            if (matentrypoint.find()) {
-                mi.entrypoint = matentrypoint.group(2);
-                if (matentrypoint.group(1).matches("PEIM")) {
-                    mi.hashrequiredr9libs.add("PeimEntryPoint");
-                } else {
-                    mi.hashrequiredr9libs.add("UefiDriverEntryPoint");
-                }
-            }
             
             // find guid
             matguid = Guid.ptnguid.matcher(line);                                        // several ways to implement this , which one is faster ? :
