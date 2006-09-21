@@ -33,8 +33,7 @@ public class Func {
     public String r9libname;
 
     public static Pattern ptnbrace = Pattern.compile("\\{[^\\{\\}]*\\}",Pattern.MULTILINE);
-    //public static Pattern ptnfuncc = Pattern.compile("([a-zA-Z_]\\w*)\\s*\\([^\\)\\(]*\\)",Pattern.MULTILINE);
-    public static Pattern ptnfuncc = Pattern.compile("([a-zA-Z_]\\w*)\\s*\\(",Pattern.MULTILINE);
+    public static Pattern ptnfuncc = Pattern.compile("(?<!->)([a-zA-Z_]\\w*)\\s*\\(",Pattern.MULTILINE);
     public static Pattern ptnfuncd = Pattern.compile("([a-zA-Z_]\\w*)\\s*\\([^\\)\\(]*\\)\\s*@",Pattern.MULTILINE);
     public static Pattern ptnlowcase = Pattern.compile("[a-z]");                // must be removed
     
