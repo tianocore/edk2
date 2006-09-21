@@ -102,7 +102,6 @@ public final class ModuleReader implements Common.ForDoAll {
                 while (mtrinfequation.find()) {
                     if (mtrinfequation.group(1).matches("IMAGE_ENTRY_POINT")) {
                         mi.entrypoint = mtrinfequation.group(2);
-                        mi.hashrequiredr9libs.add("EntryPointLib");
                     }
                     if (mtrinfequation.group(1).matches("DPX_SOURCE")) {
                         if (!mi.localmodulesources.contains(mtrinfequation.group(2))) {

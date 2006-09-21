@@ -88,13 +88,6 @@ public class MsaWriter {
         msaheader.setGuidValue(mi.guidvalue);
         if (mi.moduletype != null) {
             msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.getModuleType()));
-            /*
-            if (mi.moduletype.contains("PEI")) {
-                msaheader.setModuleType(ModuleTypeDef.Enum.forString("PEIM"));
-            } else {
-                msaheader.setModuleType(ModuleTypeDef.Enum.forString("DXE_DRIVER"));
-            }
-            */
         } else {
             msaheader.setModuleType(ModuleTypeDef.Enum.forString(mi.moduletype = Query("Guid Value Not Found!  Please Input Guid Value")));
         }
@@ -126,8 +119,16 @@ public class MsaWriter {
         pd.addNewPackage().setPackageGuid("68169ab0-d41b-4009-9060-292c253ac43d");
         externs.addNewSpecification().setStringValue("EFI_SPECIFICATION_VERSION 0x00020000");
         externs.addNewSpecification().setStringValue("EDK_RELEASE_VERSION 0x00020000");
-        externs.addNewExtern().setModuleEntryPoint(mi.entrypoint);
-        
+        if (mi.entrypoint != null) {
+          externs.addNewExtern().setModuleEntryPoint(mi.entrypoint);
+          org.tianocore.ModuleTypeDef.Enum moduleType = msaheader.getModuleType();
+          if (moduleType == ModuleTypeDef.PEIM) {
+              mi.hashrequiredr9libs.add("PeimEntryPoint");
+          } else {
+              mi.hashrequiredr9libs.add("UefiDriverEntryPoint");
+          }
+        }
+       
         it = mi.localmodulesources.iterator();
         while (it.hasNext()) {
             addSourceFiles(it.next());
