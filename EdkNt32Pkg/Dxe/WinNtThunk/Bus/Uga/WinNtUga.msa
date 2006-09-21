@@ -16,9 +16,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Abstract>Uga driver</Abstract>
     <Description>
       UGA is short hand for Universal Graphics Abstraction protocol.
-      This file is a verision of UgaIo the uses WinNtThunk system calls as an IO 
+      This file is a verision of UgaIo the uses WinNtThunk system calls as an IO
       abstraction. For a PCI device WinNtIo would be replaced with
-      a PCI IO abstraction that abstracted a specific PCI device. 
+      a PCI IO abstraction that abstracted a specific PCI device.
     </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
@@ -100,8 +100,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gWinNtUgaDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gWinNtUgaComponentName</ComponentName>
     </Extern>
   </Externs>

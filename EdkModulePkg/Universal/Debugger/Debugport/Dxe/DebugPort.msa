@@ -99,8 +99,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </Extern>
     <Extern>
       <DriverBinding>gDebugPortDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gDebugPortComponentName</ComponentName>
     </Extern>
   </Externs>

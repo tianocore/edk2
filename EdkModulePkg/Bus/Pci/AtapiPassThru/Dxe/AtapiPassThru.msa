@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Version>1.0</Version>
     <Abstract>Description file for the Atapi Passthru component.</Abstract>
     <Description>
-      This driver simulates SCSI devices with Atapi devices to test the SCSI io  
-      protocol. 
+      This driver simulates SCSI devices with Atapi devices to test the SCSI io
+      protocol.
     </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
@@ -79,8 +79,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gAtapiScsiPassThruDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gAtapiScsiPassThruComponentName</ComponentName>
     </Extern>
   </Externs>

@@ -16,8 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Abstract>Simple filesystem driver</Abstract>
     <Description>
       Produce Simple File System abstractions for directories on your PC using Win32 APIs.
-      The configuration of what devices to mount or emulate comes from NT 
-      environment variables. The variables must be visible to the Microsoft* 
+      The configuration of what devices to mount or emulate comes from NT
+      environment variables. The variables must be visible to the Microsoft*
       Developer Studio for them to work.
     </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
@@ -97,8 +97,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gWinNtSimpleFileSystemDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gWinNtSimpleFileSystemComponentName</ComponentName>
     </Extern>
   </Externs>

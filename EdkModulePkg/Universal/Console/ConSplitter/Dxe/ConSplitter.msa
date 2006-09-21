@@ -110,26 +110,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     </Extern>
     <Extern>
       <DriverBinding>gConSplitterConInDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gConSplitterConInComponentName</ComponentName>
     </Extern>
     <Extern>
       <DriverBinding>gConSplitterSimplePointerDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gConSplitterSimplePointerComponentName</ComponentName>
     </Extern>
     <Extern>
       <DriverBinding>gConSplitterConOutDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gConSplitterConOutComponentName</ComponentName>
     </Extern>
     <Extern>
       <DriverBinding>gConSplitterStdErrDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gConSplitterStdErrComponentName</ComponentName>
     </Extern>
   </Externs>

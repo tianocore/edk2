@@ -82,8 +82,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gScsiDiskDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gScsiDiskComponentName</ComponentName>
     </Extern>
   </Externs>

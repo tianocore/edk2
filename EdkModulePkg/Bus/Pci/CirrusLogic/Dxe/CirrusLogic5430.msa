@@ -15,11 +15,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Version>1.0</Version>
     <Abstract>Component description file for CirrusLogic5430 module</Abstract>
     <Description>
-      Cirrus Logic 5430 Controller Driver.This driver is a sample implementation 
-      of the UGA Draw Protocol for the Cirrus Logic 5430 family of PCI video controllers. 
-      This driver is only usable in the EFI pre-boot environment.  This sample is 
-      intended to show how the UGA Draw Protocol is able to function.  The UGA I/O 
-      Protocol is not implemented in this sample.  A fully compliant EFI UGA driver 
+      Cirrus Logic 5430 Controller Driver.This driver is a sample implementation
+      of the UGA Draw Protocol for the Cirrus Logic 5430 family of PCI video controllers.
+      This driver is only usable in the EFI pre-boot environment.  This sample is
+      intended to show how the UGA Draw Protocol is able to function.  The UGA I/O
+      Protocol is not implemented in this sample.  A fully compliant EFI UGA driver
       requires both the UGA Draw and the UGA I/O Protocol.  Please refer to Microsoft's
       documentation on UGA for details on how to write a UGA driver that is able
       to function both in the EFI pre-boot environment and from the OS runtime.
@@ -86,8 +86,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gCirrusLogic5430DriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gCirrusLogic5430ComponentName</ComponentName>
     </Extern>
   </Externs>

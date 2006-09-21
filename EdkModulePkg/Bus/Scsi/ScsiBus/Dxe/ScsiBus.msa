@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Version>1.0</Version>
     <Abstract>Component description file for Scsi Bus module.</Abstract>
     <Description>
-      SCSI bus driver. This driver scans all SCSI devices and export SCSI IO protocol    
+      SCSI bus driver. This driver scans all SCSI devices and export SCSI IO protocol
     </Description>
     <Copyright>Copyright (c) 2006, Intel Corporation</Copyright>
     <License>All rights reserved. This program and the accompanying materials
@@ -85,8 +85,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.-->
     <Specification>EDK_RELEASE_VERSION 0x00020000</Specification>
     <Extern>
       <DriverBinding>gSCSIBusDriverBinding</DriverBinding>
-    </Extern>
-    <Extern>
       <ComponentName>gScsiBusComponentName</ComponentName>
     </Extern>
   </Externs>
