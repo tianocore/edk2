@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 
 import org.tianocore.frameworkwizard.common.DataType;
+import org.tianocore.frameworkwizard.common.Tools;
 
 /**
  The class is used to override Dialog to provides customized interfaces
@@ -148,10 +149,7 @@ public class IDialog extends JDialog implements ActionListener {
      
      **/
     public boolean isEmpty(String strValue) {
-        if (strValue.length() > 0) {
-            return false;
-        }
-        return true;
+        return Tools.isEmpty(strValue);
     }
     
     /**

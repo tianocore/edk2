@@ -35,6 +35,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import org.tianocore.frameworkwizard.common.Tools;
+
 /**
  * The class is used to override JInternalFrame to provides customized
  * interfaces It extends JInternalFrame implements ActionListener
@@ -124,10 +126,7 @@ public class IInternalFrame extends JInternalFrame implements ActionListener, Co
      * 
      */
     public boolean isEmpty(String strValue) {
-        if (strValue.length() > 0) {
-            return false;
-        }
-        return true;
+        return Tools.isEmpty(strValue);
     }
 
     public void actionPerformed(ActionEvent arg0) {

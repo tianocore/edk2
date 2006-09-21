@@ -61,6 +61,10 @@ public class DataType {
     public static final String DOS_LINE_SEPARATOR = "\r\n";
 
     public static final String UNIX_LINE_SEPARATOR = "\n";
+    
+    public static final String LINE_SEPARATOR = UNIX_LINE_SEPARATOR;
+    
+    public static final String HTML_LINE_SEPARATOR = "<br>";
 
     public static final String EMPTY_SELECT_ITEM = "----";
 

@@ -24,19 +24,23 @@ public class EnumerationData {
     
     public final static String EXTERNS_SPECIFICATION = "Specification";
     
+    public final static String EXTERNS_IMAGE = "Image";
     public final static String EXTERNS_MODULE_ENTRY_POINT = "ModuleEntryPoint";
     public final static String EXTERNS_MODULE_UNLOAD_IMAGE = "ModuleUnloadImage";
     
+    public final static String EXTERNS_LIBRARY = "Library";
     public final static String EXTERNS_CONSTRUCTOR = "Constructor";
     public final static String EXTERNS_DESTRUCTOR = "Destructor";
     
+    public final static String EXTERNS_DRIVER = "Driver";
     public final static String EXTERNS_DRIVER_BINDING = "DriverBinding";
     public final static String EXTERNS_COMPONENT_NAME = "ComponentName";
     public final static String EXTERNS_DRIVER_CONFIG = "DriverConfig";
     public final static String EXTERNS_DRIVER_DIAG = "DriverDiag";
     
-    public final static String EXTERNS_SET_VIRTUAL_ADDRESS_MAP_CALL_BACK = "SetVirtualAddressMapCallBack";
-    public final static String EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK = "ExitBootServicesCallBack";
+    public final static String EXTERNS_CALL_BACK = "Call Back";
+    public final static String EXTERNS_VIRTUAL_ADDRESS_MAP_CALL_BACK = "VirtualAddressMap";
+    public final static String EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK = "ExitBootServices";
     
     //
     // Common data
@@ -669,28 +673,33 @@ public class EnumerationData {
     private void initExternTypes() {
         vExternTypes.removeAllElements();
         
-        vExternTypes.addElement(EnumerationData.EXTERNS_PCD_IS_DRIVER);
-
         vExternTypes.addElement(EnumerationData.EXTERNS_SPECIFICATION);
+        vExternTypes.addElement(EnumerationData.EXTERNS_IMAGE);
+        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER);
+        vExternTypes.addElement(EnumerationData.EXTERNS_LIBRARY);
+        vExternTypes.addElement(EnumerationData.EXTERNS_CALL_BACK);
         
-        vExternTypes.addElement(EnumerationData.EXTERNS_MODULE_ENTRY_POINT);
-        vExternTypes.addElement(EnumerationData.EXTERNS_MODULE_UNLOAD_IMAGE);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_PCD_IS_DRIVER);
+//
+//        vExternTypes.addElement(EnumerationData.EXTERNS_SPECIFICATION);
+//        
+//        vExternTypes.addElement(EnumerationData.EXTERNS_MODULE_ENTRY_POINT);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_MODULE_UNLOAD_IMAGE);
+//        
+//        vExternTypes.addElement(EnumerationData.EXTERNS_CONSTRUCTOR);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_DESTRUCTOR);
         
-        vExternTypes.addElement(EnumerationData.EXTERNS_CONSTRUCTOR);
-        vExternTypes.addElement(EnumerationData.EXTERNS_DESTRUCTOR);
-        
-        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_BINDING);
-        vExternTypes.addElement(EnumerationData.EXTERNS_COMPONENT_NAME);
-        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_CONFIG);
-        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_DIAG);
-        
-        vExternTypes.addElement(EnumerationData.EXTERNS_SET_VIRTUAL_ADDRESS_MAP_CALL_BACK);
-        vExternTypes.addElement(EnumerationData.EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_BINDING);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_COMPONENT_NAME);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_CONFIG);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_DRIVER_DIAG);
+//        
+//        vExternTypes.addElement(EnumerationData.EXTERNS_SET_VIRTUAL_ADDRESS_MAP_CALL_BACK);
+//        vExternTypes.addElement(EnumerationData.EXTERNS_EXIT_BOOT_SERVICES_CALL_BACK);
     }
     
     private void initPcdDriverTypes() {
-        vPcdDriverTypes.removeAllElements();
-        vPcdDriverTypes.addElement(DataType.EMPTY_SELECT_ITEM);
+        vPcdDriverTypes.removeAllElements();        
         vPcdDriverTypes.addElement("PEI_PCD_DRIVER");
         vPcdDriverTypes.addElement("DXE_PCD_DRIVER");
     }

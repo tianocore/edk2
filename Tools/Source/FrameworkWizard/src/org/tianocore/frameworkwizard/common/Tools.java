@@ -632,4 +632,21 @@ public class Tools {
         count = wholeString.split(searchString).length;
         return count;
     }
+    
+    /**
+     * Check the input data is empty or not
+     * 
+     * @param strValue
+     *            The input data which need be checked
+     * 
+     * @retval true - The input data is empty
+     * @retval fals - The input data is not empty
+     * 
+     */
+    public static boolean isEmpty(String strValue) {
+        if (strValue.length() > 0) {
+            return false;
+        }
+        return true;
+    }
 }
