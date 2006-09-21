@@ -168,7 +168,7 @@ public class MsaWriter {
         }
         it = mi.hashrequiredr9libs.iterator();
         while (it.hasNext()) {
-            if ((temp = it.next()) != null && !temp.matches("%")) {
+            if ((temp = it.next()) != null && !temp.matches("%") && !temp.matches("n/a")) {
                 LibraryClassDocument.LibraryClass lc = libclassdefs.addNewLibraryClass();
                 lc.setKeyword(temp);
                 lc.setUsage(UsageTypes.ALWAYS_CONSUMED);
