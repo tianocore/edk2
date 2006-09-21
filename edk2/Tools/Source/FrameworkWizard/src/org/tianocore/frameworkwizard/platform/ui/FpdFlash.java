@@ -25,7 +25,6 @@ import javax.swing.ListSelectionModel;
 
 import org.tianocore.PlatformSurfaceAreaDocument;
 import org.tianocore.frameworkwizard.common.DataValidation;
-import org.tianocore.frameworkwizard.common.GlobalData;
 import org.tianocore.frameworkwizard.common.IDefaultTableModel;
 import org.tianocore.frameworkwizard.common.Identifications.OpeningPlatformType;
 import org.tianocore.frameworkwizard.common.ui.IInternalFrame;
@@ -39,10 +38,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -2305,7 +2305,108 @@ public class FpdFlash extends IInternalFrame {
         }
 
     }
-        
+    
+//    class ModuleSAInfo {
+//        private int rowNumber = -1;
+//        private String moduleGuid = null;
+//        private String moduleVersion = null;
+//        private String packageGuid = null;
+//        private String packageVersion = null;
+//        private String arch = null;
+//        
+//        public ModuleSAInfo (String mg, String mv, String pg, String pv, String a) {
+//            moduleGuid = mg;
+//            moduleVersion = mv;
+//            packageGuid = pg;
+//            packageVersion = pv;
+//            arch = a;
+//        }
+//
+//        /**
+//         * @return Returns the arch.
+//         */
+//        public String getArch() {
+//            return arch;
+//        }
+//
+//        /**
+//         * @param arch The arch to set.
+//         */
+//        public void setArch(String arch) {
+//            this.arch = arch;
+//        }
+//
+//        /**
+//         * @return Returns the moduleGuid.
+//         */
+//        public String getModuleGuid() {
+//            return moduleGuid;
+//        }
+//
+//        /**
+//         * @param moduleGuid The moduleGuid to set.
+//         */
+//        public void setModuleGuid(String moduleGuid) {
+//            this.moduleGuid = moduleGuid;
+//        }
+//
+//        /**
+//         * @return Returns the moduleVersion.
+//         */
+//        public String getModuleVersion() {
+//            return moduleVersion;
+//        }
+//
+//        /**
+//         * @param moduleVersion The moduleVersion to set.
+//         */
+//        public void setModuleVersion(String moduleVersion) {
+//            this.moduleVersion = moduleVersion;
+//        }
+//
+//        /**
+//         * @return Returns the packageGuid.
+//         */
+//        public String getPackageGuid() {
+//            return packageGuid;
+//        }
+//
+//        /**
+//         * @param packageGuid The packageGuid to set.
+//         */
+//        public void setPackageGuid(String packageGuid) {
+//            this.packageGuid = packageGuid;
+//        }
+//
+//        /**
+//         * @return Returns the packageVersion.
+//         */
+//        public String getPackageVersion() {
+//            return packageVersion;
+//        }
+//
+//        /**
+//         * @param packageVersion The packageVersion to set.
+//         */
+//        public void setPackageVersion(String packageVersion) {
+//            this.packageVersion = packageVersion;
+//        }
+//
+//        /**
+//         * @return Returns the rowNumber.
+//         */
+//        public int getRowNumber() {
+//            return rowNumber;
+//        }
+//
+//        /**
+//         * @param rowNumber The rowNumber to set.
+//         */
+//        public void setRowNumber(int rowNumber) {
+//            this.rowNumber = rowNumber;
+//        }
+//    }
+    
     private class ModuleOrderPane extends JPanel {
 
         /**
@@ -2328,8 +2429,8 @@ public class FpdFlash extends IInternalFrame {
         private JButton jButtonCancel = null;
         private IDefaultTableModel modInFvTableModel = null;
         private IDefaultTableModel fpdModTableModel = null;
-        private HashMap<String, ModuleIdentification> mGuidToModuleId = null;
-        private ArrayList<String> listModGuidInFv = null;
+//        private ArrayList<ModuleSAInfo> listTableModInFvModuleSAInfo = null;
+//        private ArrayList<ModuleSAInfo> listTableFpdModulesModuleSAInfo = null;
         private String title = null;
         private String outputFileName = null;
         
@@ -2337,8 +2438,8 @@ public class FpdFlash extends IInternalFrame {
             super(new BorderLayout());
             title = tabTitle;
             outputFileName = file;
-            mGuidToModuleId = new HashMap<String, ModuleIdentification>();
-            listModGuidInFv = new ArrayList<String>();
+//            listTableModInFvModuleSAInfo = new ArrayList<ModuleSAInfo>();
+//            listTableFpdModulesModuleSAInfo = new ArrayList<ModuleSAInfo>();
             add(getJPanelModOrderN(), java.awt.BorderLayout.NORTH);
             add(getJPanelModOrderS(), java.awt.BorderLayout.SOUTH);
             add(getJPanelModOrderC(), java.awt.BorderLayout.CENTER);
@@ -2350,34 +2451,40 @@ public class FpdFlash extends IInternalFrame {
             int size = ffc.getUserExtsIncModCount(fvName);
             
             if (size != -1) {
-                String[][] saa = new String[size][2];
+                String[][] saa = new String[size][5];
                 ffc.getUserExtsIncMods(fvName, saa);
 
                 for (int i = 0; i < size; ++i) {
-                    listModGuidInFv.add(saa[i][0].toLowerCase());
-                    String name = getModuleName(saa[i][0]);
-                    String[] row = { name };
+                    String moduleKey = saa[i][0] + " " + saa[i][1] + " " + saa[i][2] + " " + saa[i][3];
+                    ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+                    String name = "N/A";
+                    if (mi != null) {
+                        name = mi.getName();
+                    }
+                    String[] row = { name, saa[i][0] , saa[i][1], saa[i][2] , saa[i][3], saa[i][4] };
                     modInFvTableModel.addRow(row);
                 }
             }
             //
             // From ModuleSAs, get module guids with FvBinding = fvName.
             //
-            Vector<String> vGuid = new Vector<String>();
-            ffc.getFrameworkModuleGuid(fvName, vGuid);
+            Vector<String[]> vModuleSA = new Vector<String[]>();
+            ffc.getFrameworkModuleSAByFvBinding(fvName, vModuleSA);
             //
             // If BuildOptions->UserExtensions already contain these module info,
             // no need to add them into table again.
             //
-            Iterator<String> iter = vGuid.iterator();
+            Iterator<String[]> iter = vModuleSA.iterator();
             while (iter.hasNext()){
-                String guid = iter.next();
-//                String moduleName = getModuleName(guid);
-//                if (existedInTable(moduleName, modInFvTableModel)) {
-//                    vGuid.remove(guid);
-//                }
-                if (!listModGuidInFv.contains(guid.toLowerCase())) {
-                    String[] row = {getModuleName(guid)};
+                String[] sa = iter.next();
+                if (!moduleInfoInTable (sa, modInFvTableModel)) {
+                    String moduleKey = sa[0] + " " + sa[1] + " " + sa[2] + " " + sa[3];
+                    ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+                    String name = "N/A";
+                    if (mi != null) {
+                        name = mi.getName();
+                    }
+                    String[] row = { name, sa[0] , sa[1], sa[2] , sa[3], sa[4] };
                     modInFvTableModel.addRow(row);
                 }
             }
@@ -2390,11 +2497,16 @@ public class FpdFlash extends IInternalFrame {
             ffc.getFrameworkModulesInfo(saa);
             
             for (int i = 0; i < size; ++i) {
-                String name = getModuleName(saa[i][0]);
-                if (existedInTable(name, modInFvTableModel) || existedInTable(name, fpdModTableModel)) {
+                if (moduleInfoInTable(saa[i], modInFvTableModel) || moduleInfoInTable(saa[i], fpdModTableModel)) {
                     continue;
                 }
-                String[] row = {name};
+                String moduleKey = saa[i][0] + " " + saa[i][1] + " " + saa[i][2] + " " + saa[i][3];
+                ModuleIdentification mi = WorkspaceProfile.getModuleId(moduleKey);
+                String name = "N/A";
+                if (mi != null) {
+                    name = mi.getName();
+                }
+                String[] row = { name, saa[i][0] , saa[i][1], saa[i][2] , saa[i][3], saa[i][4] };
                 fpdModTableModel.addRow(row);
             }
             
@@ -2402,29 +2514,35 @@ public class FpdFlash extends IInternalFrame {
             sorter.setSortState(0, TableSorter.ASCENDING);
         }
         
-        private String getModuleName (String guid) {
-            
-            for (int i = 0; i < GlobalData.vModuleList.size(); ++i) {
-                ModuleIdentification mi = GlobalData.vModuleList.get(i);
-                String mg = mi.getGuid();
-                if (mg == null) {
-                    continue;
-                }
-                if (mg.equalsIgnoreCase(guid)) {
-                    mGuidToModuleId.put(guid.toLowerCase(), mi);
-                    return mi.getName();
-                }
-            }
-            
-            return "";
-        }
         
-        private boolean existedInTable (String name, DefaultTableModel model) {
+        private boolean moduleInfoInTable (String[] moduleInfo, DefaultTableModel model) {
+            boolean matched = false;
             int size = model.getDataVector().size();
             for (int i = 0; i < size; ++i) {
-                if (((Vector)model.getDataVector().elementAt(i)).contains(name)) {
+                Vector rowData = (Vector)model.getDataVector().elementAt(i);
+                for (int j = 1; j < rowData.size(); ++j) {
+                    if (rowData.elementAt(j) == null && moduleInfo[j-1] == null) {
+                        matched = true;
+                    }
+                    else if (rowData.elementAt(j).equals("null") && moduleInfo[j-1] == null) {
+                        matched = true;
+                    }
+                    else if (rowData.elementAt(j) == null && moduleInfo[j-1].equals("null")) {
+                        matched = true;
+                    }
+                    else if (rowData.elementAt(j) != null && rowData.elementAt(j).toString().equalsIgnoreCase(moduleInfo[j-1])) {
+                        matched = true;
+                    }
+                    else {
+                        matched = false;
+                        break;
+                    }
+                }
+                
+                if (matched) {
                     return true;
                 }
+                
             }
             return false;
         }
@@ -2497,11 +2615,77 @@ public class FpdFlash extends IInternalFrame {
         private JTable getJTableModInFv() {
             if (jTableModInFv == null) {
                 modInFvTableModel = new IDefaultTableModel();
+                
+                jTableModInFv = new JTable(modInFvTableModel){
+                    /**
+                     * 
+                     */
+                    private static final long serialVersionUID = 4903583933542581721L;
+
+                    public String getToolTipText(MouseEvent e) {
+                        String tip = null;
+                        java.awt.Point p = e.getPoint();
+                        int rowIndex = rowAtPoint(p);
+//                        int colIndex = columnAtPoint(p);
+//                        int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                        TableModel model = getModel();
+                        String mg = (String) model.getValueAt(rowIndex, 1);
+                        String mv = (String) model.getValueAt(rowIndex, 2);
+                        String pg = (String) model.getValueAt(rowIndex, 3);
+                        String pv = (String) model.getValueAt(rowIndex, 4);
+                        String arch = (String) model.getValueAt(rowIndex, 5);
+                        ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                        if (mi != null) {
+                            tip = "Path: " + mi.getPath() + "; Arch: " + arch + ";";
+                        }
+                        else {
+                            tip = "No Module Path Information."; 
+                        }
+                             
+                        return tip;
+                    }
+
+                };
                 modInFvTableModel.addColumn("Module Orders in FV");
-                jTableModInFv = new JTable(modInFvTableModel);
+                modInFvTableModel.addColumn("mg");
+                modInFvTableModel.addColumn("mv");
+                modInFvTableModel.addColumn("pg");
+                modInFvTableModel.addColumn("pv");
+                modInFvTableModel.addColumn("arch");
+                
+                for (int i = 1; i < 6; ++i) {
+                    jTableModInFv.removeColumn(jTableModInFv.getColumnModel().getColumn(jTableModInFv.getColumnCount()-1));
+                }
+                
                 jTableModInFv.setRowHeight(20);
                 jTableModInFv.setShowGrid(false);
-                
+//                jTableModInFv.setAutoCreateColumnsFromModel(false);
+                jTableModInFv.addMouseListener(new MouseAdapter() {
+
+                    /* (non-Javadoc)
+                     * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+                     */
+                    @Override
+                    public void mouseClicked(MouseEvent arg0) {
+                        if (arg0.getButton() == MouseEvent.BUTTON3) {
+                            java.awt.Point p = arg0.getPoint();
+                            int rowIndex = jTableModInFv.rowAtPoint(p);
+                            TableModel model = jTableModInFv.getModel();
+                            String mg = (String) model.getValueAt(rowIndex, 1);
+                            String mv = (String) model.getValueAt(rowIndex, 2);
+                            String pg = (String) model.getValueAt(rowIndex, 3);
+                            String pv = (String) model.getValueAt(rowIndex, 4);
+                            ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                            String details = "PackageGuid: " + pg + "; ModuleVer:" + mv + "; PkgVer:" + pv;
+                            if (mi != null) {
+                                details = "In Package " + mi.getPackageId().getName() + "; ModuleVer:" + mv + "; PkgVer:" + pv;
+                            }
+                            JOptionPane.showMessageDialog(frame, details);
+                        }
+                    }
+                    
+                });
             }
             return jTableModInFv;
         }
@@ -2550,10 +2734,76 @@ public class FpdFlash extends IInternalFrame {
             if (jTableFpdModules == null) {
                 fpdModTableModel = new IDefaultTableModel();
                 TableSorter sorter = new TableSorter(fpdModTableModel);
-                jTableFpdModules = new JTable(sorter);
+                jTableFpdModules = new JTable(sorter){
+                    /**
+                     * 
+                     */
+                    private static final long serialVersionUID = -4666296888377637808L;
+
+                    public String getToolTipText(MouseEvent e) {
+                        String tip = null;
+                        java.awt.Point p = e.getPoint();
+                        int rowIndex = rowAtPoint(p);
+//                        int colIndex = columnAtPoint(p);
+//                        int realColumnIndex = convertColumnIndexToModel(colIndex);
+
+                        TableModel model = getModel();
+                        String mg = (String) model.getValueAt(rowIndex, 1);
+                        String mv = (String) model.getValueAt(rowIndex, 2);
+                        String pg = (String) model.getValueAt(rowIndex, 3);
+                        String pv = (String) model.getValueAt(rowIndex, 4);
+                        String arch = (String) model.getValueAt(rowIndex, 5);
+                        ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                        if (mi != null) {
+                            tip = "Path: " + mi.getPath() + "; Arch: " + arch + ";";
+                        }
+                        else {
+                            tip = "No Module Path Information."; 
+                        }
+                             
+                        return tip;
+                    }
+
+                };
+                
+                fpdModTableModel.addColumn("Modules in Platform");
+                fpdModTableModel.addColumn("mg");
+                fpdModTableModel.addColumn("mv");
+                fpdModTableModel.addColumn("pg");
+                fpdModTableModel.addColumn("pv");
+                fpdModTableModel.addColumn("arch");
+                
+                for (int i = 1; i < 6; ++i) {
+                    jTableFpdModules.removeColumn(jTableFpdModules.getColumnModel().getColumn(jTableFpdModules.getColumnCount()-1));
+                }
                 jTableFpdModules.setRowHeight(20);
                 jTableFpdModules.setShowGrid(false);
-                fpdModTableModel.addColumn("Modules in Platform");
+//                jTableFpdModules.setAutoCreateColumnsFromModel(false);
+                jTableFpdModules.addMouseListener(new MouseAdapter() {
+
+                    /* (non-Javadoc)
+                     * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
+                     */
+                    @Override
+                    public void mouseClicked(MouseEvent arg0) {
+                        if (arg0.getButton() == MouseEvent.BUTTON3) {
+                            java.awt.Point p = arg0.getPoint();
+                            int rowIndex = jTableFpdModules.rowAtPoint(p);
+                            TableModel model = jTableFpdModules.getModel();
+                            String mg = (String) model.getValueAt(rowIndex, 1);
+                            String mv = (String) model.getValueAt(rowIndex, 2);
+                            String pg = (String) model.getValueAt(rowIndex, 3);
+                            String pv = (String) model.getValueAt(rowIndex, 4);
+                            ModuleIdentification mi = WorkspaceProfile.getModuleId(mg + " " + mv + " " + pg + " " + pv);
+                            String details = "PackageGuid: " + pg + "; ModuleVer:" + mv + "; PkgVer:" + pv;
+                            if (mi != null) {
+                                details = "In Package " + mi.getPackageId().getName() + "; ModuleVer:" + mv + "; PkgVer:" + pv;
+                            }
+                            JOptionPane.showMessageDialog(frame, details);
+                        }
+                    }
+                    
+                });
 
             }
             return jTableFpdModules;
@@ -2602,8 +2852,17 @@ public class FpdFlash extends IInternalFrame {
                         }
                         
                         int rowInModel = ((TableSorter)jTableFpdModules.getModel()).getModelRowIndex(selectedRowRight);
+                        String name = fpdModTableModel.getValueAt(selectedRowRight, 0)+"";
+                        String mg = fpdModTableModel.getValueAt(selectedRowRight, 1)+"";
+                        String mv = fpdModTableModel.getValueAt(selectedRowRight, 2)+"";
+                        String pg = fpdModTableModel.getValueAt(selectedRowRight, 3)+"";
+                        String pv = fpdModTableModel.getValueAt(selectedRowRight, 4)+"";
+                        String arch = fpdModTableModel.getValueAt(selectedRowRight, 5)+"";
+                        String[] row = {name, mg, mv, pg, pv, arch};
+                        if (name.length() == 0 || name.equals("N/A")) {
+                            return;
+                        }
                         
-                        String[] row = {jTableFpdModules.getValueAt(selectedRowRight, 0)+""};
                         int selectedRowLeft = jTableModInFv.getSelectedRow();
                         if (selectedRowLeft < 0) {
                             modInFvTableModel.addRow(row);
@@ -2637,7 +2896,17 @@ public class FpdFlash extends IInternalFrame {
                             return;
                         }
                         
-                        String[] row = {jTableModInFv.getValueAt(selectedRowLeft, 0)+""};
+                        String name = modInFvTableModel.getValueAt(selectedRowLeft, 0)+"";
+                        String mg = modInFvTableModel.getValueAt(selectedRowLeft, 1)+"";
+                        String mv = modInFvTableModel.getValueAt(selectedRowLeft, 2)+"";
+                        String pg = modInFvTableModel.getValueAt(selectedRowLeft, 3)+"";
+                        String pv = modInFvTableModel.getValueAt(selectedRowLeft, 4)+"";
+                        String arch = modInFvTableModel.getValueAt(selectedRowLeft, 5)+"";
+                        String[] row = {name, mg, mv, pg, pv, arch};
+                        if (name.length() == 0 || name.equals("N/A")) {
+                            return;
+                        }
+                        
                         fpdModTableModel.addRow(row);
                         int viewIndex = ((TableSorter) jTableFpdModules.getModel()).getViewIndexArray()[jTableFpdModules
                                                                                                                         .getRowCount() - 1];
@@ -2694,23 +2963,22 @@ public class FpdFlash extends IInternalFrame {
                         //
                         Vector<String[]> vModInFv = new Vector<String[]>();
                         for (int i = 0; i < jTableModInFv.getRowCount(); ++i) {
-                            String moduleName = jTableModInFv.getValueAt(i, 0)+"";
-                            if (moduleName.length() == 0) {
+                            String moduleName = modInFvTableModel.getValueAt(i, 0)+"";
+                            if (moduleName.length() == 0 || moduleName.equals("N/A")) {
                                 continue;
                             }
-                            ModuleIdentification mi = null;
-                            Set<String> key = mGuidToModuleId.keySet();
-                            Iterator<String> iter = key.iterator();
-                            while (iter.hasNext()) {
-                                String guid = iter.next();
-                                mi = mGuidToModuleId.get(guid);
-                                if (mi.getName().equals(moduleName)) {
-                                    String[] sa = {guid, WorkspaceProfile.getModuleBaseName(mi)};
-                                    vModInFv.add(sa);
-                                    ffc.updateFvBindingInModuleSA (mi, title);
-                                    break;
-                                }
-                            }
+                            
+                            String mg = modInFvTableModel.getValueAt(i, 1)+"";
+                            String mv = modInFvTableModel.getValueAt(i, 2)+"";
+                            String pg = modInFvTableModel.getValueAt(i, 3)+"";
+                            String pv = modInFvTableModel.getValueAt(i, 4)+"";
+                            String arch = modInFvTableModel.getValueAt(i, 5)+"";
+                           
+                            String moduleInfo = mg + " " + mv + " " + pg + " " + pv + " " + arch;
+                                
+                            String[] sa = { mg, mv, pg, pv, arch};
+                            vModInFv.add(sa);
+                            ffc.updateFvBindingInModuleSA(moduleInfo, title);
                             
                         }
                         ffc.removeBuildOptionsUserExtensions(title);
