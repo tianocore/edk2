@@ -781,7 +781,6 @@ public class AutoGen {
                                         "Module type = 'PEI_CORE', can have only one module entry point!");
             } else {
                 fileBuffer.append("EFI_STATUS\r\n");
-                //fileBuffer.append("EFIAPI\r\n");
                 fileBuffer.append(entryPointList[0]);
                 fileBuffer.append(" (\r\n");
                 fileBuffer
@@ -814,7 +813,6 @@ public class AutoGen {
             } else {
 
                 fileBuffer.append("VOID\r\n");
-                //fileBuffer.append("EFIAPI\r\n");
                 fileBuffer.append(entryPointList[0]);
                 fileBuffer.append(" (\n");
                 fileBuffer.append("  IN VOID  *HobStart\r\n");
@@ -851,7 +849,6 @@ public class AutoGen {
             }
             for (int i = 0; i < entryPointList.length; i++) {
                 fileBuffer.append("EFI_STATUS\r\n");
-                //fileBuffer.append("EFIAPI\r\n");
                 fileBuffer.append(entryPointList[i]);
                 fileBuffer.append(" (\r\n");
                 fileBuffer
@@ -920,7 +917,6 @@ public class AutoGen {
             } else {
                 for (int i = 0; i < entryPointList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
-                    //fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(entryPointList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
@@ -987,7 +983,6 @@ public class AutoGen {
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
-                    //fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(unloadImageList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer
@@ -1067,7 +1062,6 @@ public class AutoGen {
                 for (int i = 0; i < entryPointList.length; i++) {
 
                     fileBuffer.append("EFI_STATUS\r\n");
-                    //fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(entryPointList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer.append("  IN EFI_HANDLE        ImageHandle,\r\n");
@@ -1146,12 +1140,17 @@ public class AutoGen {
             //
             // Add ModuleUnloadImage for DxeDriver and UefiDriver module type.
             //
-            
+            //entryPointList = SurfaceAreaQuery.getModuleUnloadImageArray();
+            //
+            // Remover duplicate unload entry point.
+            //
+            //entryPointList = CommonDefinition.remDupString(entryPointList);
+            //entryPointCount = 0;
 			unloadImageCount = 0;
             if (unloadImageList != null) {
                 for (int i = 0; i < unloadImageList.length; i++) {
                     fileBuffer.append("EFI_STATUS\r\n");
-                    //fileBuffer.append("EFIAPI\r\n");
+                    fileBuffer.append("EFIAPI\r\n");
                     fileBuffer.append(unloadImageList[i]);
                     fileBuffer.append(" (\r\n");
                     fileBuffer
@@ -1639,88 +1638,76 @@ public class AutoGen {
     throws EdkException {
 
         //
-        // Check what <extern> contains. And the number of following elements
-        // under <extern> should be same. 1. DRIVER_BINDING 2. COMPONENT_NAME
-        // 3.DRIVER_CONFIGURATION 4. DRIVER_DIAGNOSTIC
+        // Get the arry of extern. The driverBindingGroup is a 2 dimension array.
+		// The second dimension is include following element: DriverBinding, 
+		// ComponentName, DriverConfiguration, DriverDiag;
+		// 
+        String[][] driverBindingGroup = this.saq.getExternProtocolGroup();
+
         //
-
-        String[] drvBindList = saq.getDriverBindingArray();
-
-        //
-        // If component name protocol,component configuration protocol,
-        // component diagnostic protocol is not null or empty, check
-        // if every one have the same number of the driver binding protocol.
-        //
-        if (drvBindList == null || drvBindList.length == 0) {
-            return;
-        }
-
-        String[] compNamList = saq.getComponentNameArray();
-        String[] compConfList = saq.getDriverConfigArray();
-        String[] compDiagList = saq.getDriverDiagArray();
-
+        // inital BitMask;
+		// 
         int BitMask = 0;
 
         //
         // Write driver binding protocol extern to autogen.c
         //
-        for (int i = 0; i < drvBindList.length; i++) {
-            fileBuffer.append("extern EFI_DRIVER_BINDING_PROTOCOL ");
-            fileBuffer.append(drvBindList[i]);
-            fileBuffer.append(";\r\n");
+        for (int i = 0; i < driverBindingGroup.length; i++) {
+			if (driverBindingGroup[i][0] != null) {
+				fileBuffer.append("extern EFI_DRIVER_BINDING_PROTOCOL ");
+                fileBuffer.append(driverBindingGroup[i][0]);
+                fileBuffer.append(";\r\n");
+			} 
         }
 
         //
         // Write component name protocol extern to autogen.c
         //
-        if (compNamList != null && compNamList.length != 0) {
-            if (drvBindList.length != compNamList.length) {
-                throw new AutoGenException(
-                                        "Different number of Driver Binding and Component Name protocols!");
-            }
-
-            BitMask |= 0x01;
-            for (int i = 0; i < compNamList.length; i++) {
-                fileBuffer.append("extern EFI_COMPONENT_NAME_PROTOCOL ");
-                fileBuffer.append(compNamList[i]);
-                fileBuffer.append(";\r\n");
-            }
-        }
+		for (int i = 0; i < driverBindingGroup.length; i++) {
+			if (driverBindingGroup[i][1]!= null) {
+				if (driverBindingGroup[i][0] != null) {
+					BitMask |= 0x01;
+				    fileBuffer.append("extern EFI_COMPONENT_NAME_PROTOCOL ");
+                    fileBuffer.append(driverBindingGroup[i][1]);
+                    fileBuffer.append(";\r\n");
+				} else {
+                    throw new AutoGenException("DriverBinding can't be empty!!");
+				}
+			}
+		}
 
         //
         // Write driver configration protocol extern to autogen.c
         //
-        if (compConfList != null && compConfList.length != 0) {
-            if (drvBindList.length != compConfList.length) {
-                throw new AutoGenException(
-                                        "Different number of Driver Binding and Driver Configuration protocols!");
-            }
-
-            BitMask |= 0x02;
-            for (int i = 0; i < compConfList.length; i++) {
-                fileBuffer.append("extern EFI_DRIVER_CONFIGURATION_PROTOCOL ");
-                fileBuffer.append(compConfList[i]);
-                fileBuffer.append(";\r\n");
-            }
-        }
-
+		for (int i = 0; i < driverBindingGroup.length; i++) {
+			if (driverBindingGroup[i][2] != null) {
+				if (driverBindingGroup[i][0] != null) {
+                    BitMask |= 0x02;
+				    fileBuffer.append("extern EFI_DRIVER_CONFIGURATION_PROTOCOL ");
+                    fileBuffer.append(driverBindingGroup[i][2]);
+                    fileBuffer.append(";\r\n");
+				} else {
+                    throw new AutoGenException("DriverBinding can't be empty!!");
+				}
+			}
+		}
+        
         //
         // Write driver dignastic protocol extern to autogen.c
         //
-        if (compDiagList != null && compDiagList.length != 0) {
-            if (drvBindList.length != compDiagList.length) {
-                throw new AutoGenException(
-                                        "Different number of Driver Binding and Driver Diagnosis protocols!");
-            }
-
-            BitMask |= 0x04;
-            for (int i = 0; i < compDiagList.length; i++) {
-                fileBuffer.append("extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL ");
-                fileBuffer.append(compDiagList[i]);
-                fileBuffer.append(";\r\n");
-            }
-        }
-
+		for (int i = 0; i < driverBindingGroup.length; i++) {
+			if (driverBindingGroup[i][3] != null) {
+				if (driverBindingGroup[i][0] != null) {
+                    BitMask |= 0x04;
+                    fileBuffer.append("extern EFI_DRIVER_DIAGNOSTICS_PROTOCOL ");
+                    fileBuffer.append(driverBindingGroup[i][3]);
+                    fileBuffer.append(";\r\n");
+				} else {
+                    throw new AutoGenException("DriverBinding can't be empty!!");
+				}
+			}
+		}
+      
         //
         // Write driver module protocol bitmask.
         //
@@ -1735,49 +1722,58 @@ public class AutoGen {
         fileBuffer
         .append("GLOBAL_REMOVE_IF_UNREFERENCED const UINTN  _gDriverModelProtocolListEntries = ");
 
-        fileBuffer.append(Integer.toString(drvBindList.length));
+        fileBuffer.append(Integer.toString(driverBindingGroup.length));
         fileBuffer.append(";\r\n");
 
         //
         // Write drive module protocol list to autogen.c
         //
-        fileBuffer
+		if (driverBindingGroup.length > 0) {
+			fileBuffer
         .append("GLOBAL_REMOVE_IF_UNREFERENCED const EFI_DRIVER_MODEL_PROTOCOL_LIST  _gDriverModelProtocolList[] = {");
-        for (int i = 0; i < drvBindList.length; i++) {
+		}
+        
+		
+        for (int i = 0; i < driverBindingGroup.length; i++) {
             if (i != 0) {
                 fileBuffer.append(",");
             }
-            fileBuffer.append("\r\n {\r\n");
+			
+			fileBuffer.append("\r\n {\r\n");
             fileBuffer.append("  &");
-            fileBuffer.append(drvBindList[i]);
+            fileBuffer.append(driverBindingGroup[i][0]);
             fileBuffer.append(", \r\n");
+			
 
-            if (compNamList != null) {
+            if (driverBindingGroup[i][1] != null) {
                 fileBuffer.append("  &");
-                fileBuffer.append(compNamList[i]);
+                fileBuffer.append(driverBindingGroup[i][1]);
                 fileBuffer.append(", \r\n");
             } else {
                 fileBuffer.append("  NULL, \r\n");
             }
 
-            if (compConfList != null) {
+            if (driverBindingGroup[i][2] != null) {
                 fileBuffer.append("  &");
-                fileBuffer.append(compConfList[i]);
+                fileBuffer.append(driverBindingGroup[i][2]);
                 fileBuffer.append(", \r\n");
             } else {
                 fileBuffer.append("  NULL, \r\n");
             }
 
-            if (compDiagList != null) {
+            if (driverBindingGroup[i][3] != null) {
                 fileBuffer.append("  &");
-                fileBuffer.append(compDiagList[i]);
+                fileBuffer.append(driverBindingGroup[i][3]);
                 fileBuffer.append(", \r\n");
             } else {
                 fileBuffer.append("  NULL, \r\n");
             }
             fileBuffer.append("  }");
         }
-        fileBuffer.append("\r\n};\r\n");
+
+		if (driverBindingGroup.length > 0) {
+			fileBuffer.append("\r\n};\r\n");
+		}
     }
 
     /**
