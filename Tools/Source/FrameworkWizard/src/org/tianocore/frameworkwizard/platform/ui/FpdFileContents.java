@@ -190,7 +190,7 @@ public class FpdFileContents {
         return fpdFrameworkModules;
     }
     
-    public void getFrameworkModuleGuid (String fvName, Vector<String> vGuid) {
+    public void getFrameworkModuleSAByFvBinding (String fvName, Vector<String[]> vGuid) {
         if (getFrameworkModulesCount() == 0){
             return;
         }
@@ -208,8 +208,15 @@ public class FpdFileContents {
             
             String[] fvNames = fvBinding.split(" ");
             for (int i = 0; i < fvNames.length; ++i) {
+                //
+                // BugBug : underscore "_" should not be replaced!!! 
+                // But Fv name FVMAIN from fdf file not consist with FV_MAIN in fpd file.
+                //
                 if (fvNames[i].equals(fvName) || fvNames[i].replaceAll("_", "").equals(fvName)) {
-                    vGuid.add(moduleSa.getModuleGuid());
+                    String[] sa = new String[] {moduleSa.getModuleGuid(), moduleSa.getModuleVersion(),
+                                                moduleSa.getPackageGuid(), moduleSa.getPackageVersion(), 
+                                                listToString(moduleSa.getSupArchList())};
+                    vGuid.add(sa);
                     break;
                 }
             }
@@ -964,14 +971,9 @@ public class FpdFileContents {
         setFvBinding (moduleSa, newFvNameList.trim());
     }
     
-    public void updateFvBindingInModuleSA (ModuleIdentification mi, String fvName) {
-        Vector<Object> vSupArchs = new Vector<Object>();
-        getPlatformDefsSupportedArchs(vSupArchs);
-        String moduleInfo = mi.getGuid() + " " + mi.getVersion() + " " + mi.getPackageId().getGuid() + " " + mi.getPackageId().getVersion();
-        for (int i = 0; i < vSupArchs.size(); ++i) {
-            String moduleKey = moduleInfo + " " + vSupArchs.get(i);
-            appendFvBinding (moduleKey, fvName);
-        }
+    public void updateFvBindingInModuleSA (String moduleKey, String fvName) {
+       
+        appendFvBinding (moduleKey, fvName);
     }
     
     public String getFfsFileNameGuid(String moduleKey){
@@ -1759,7 +1761,10 @@ public class FpdFileContents {
         for (int i = 0; i < includeModules.size(); ++i) {
             cursor.beginElement(elementModule);
             cursor.insertAttributeWithValue("ModuleGuid", includeModules.get(i)[0]);
-            cursor.insertAttributeWithValue("BaseName", includeModules.get(i)[1]);
+            cursor.insertAttributeWithValue("ModuleVersion", includeModules.get(i)[1]);
+            cursor.insertAttributeWithValue("PackageGuid", includeModules.get(i)[2]);
+            cursor.insertAttributeWithValue("PackageVersion", includeModules.get(i)[3]);
+            cursor.insertAttributeWithValue("Arch", includeModules.get(i)[4]);
             cursor.toEndToken();
             cursor.toNextToken();
         }
@@ -1807,7 +1812,10 @@ public class FpdFileContents {
         QName elementFvName = new QName (xmlNs, "FvName");
         QName elementIncludeModules = new QName(xmlNs, "IncludeModules");
         QName attribModuleGuid = new QName("ModuleGuid");
-        QName attribBaseName = new QName("BaseName");
+        QName attribModuleVersion = new QName("ModuleVersion");
+        QName attribPackageGuid = new QName("PackageGuid");
+        QName attribPackageVersion = new QName("PackageVersion");
+        QName attribArch = new QName("Arch");
         
         if (cursor.toChild(elementUserExts)) {
             do {
@@ -1821,7 +1829,10 @@ public class FpdFileContents {
                             int i = 0;
                             do {
                                 saa[i][0] = cursor.getAttributeText(attribModuleGuid);
-                                saa[i][1] = cursor.getAttributeText(attribBaseName);
+                                saa[i][1] = cursor.getAttributeText(attribModuleVersion);
+                                saa[i][2] = cursor.getAttributeText(attribPackageGuid);
+                                saa[i][3] = cursor.getAttributeText(attribPackageVersion);
+                                saa[i][4] = cursor.getAttributeText(attribArch);
                                 ++i;
                             }while (cursor.toNextSibling());
                         }
