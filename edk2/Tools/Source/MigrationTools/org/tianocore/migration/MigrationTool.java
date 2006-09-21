@@ -29,15 +29,14 @@ public class MigrationTool {
     
     public static final HashMap<ModuleInfo, String> ModuleInfoMap = new HashMap<ModuleInfo, String>();
 
+    private static String startpath = null;
+    
     private static final void mainFlow(ModuleInfo mi) throws Exception {
 
         ModuleReader.aimAt(mi);
         
         //MigrationTool.ui.yesOrNo("go on replace?");
         SourceFileReplacer.fireAt(mi);    // some adding library actions are taken here,so it must be put before "MsaWriter"
-
-        //MigrationTool.ui.yesOrNo("go on delete?");
-        Common.deleteDir(mi.modulepath + File.separator + "temp");
 
         //MigrationTool.ui.yesOrNo("go on show?");
         // show result
@@ -73,11 +72,11 @@ public class MigrationTool {
         MigrationTool.ui.println(show + hash.size());
         MigrationTool.ui.println(hash);
     }
-/*
+
     public static final String getTempDir(String modulepath) {
-    	return "C:" + File.separator + "MigrationTool_Temp" + File.separator + modulepath.replaceAll(ui., arg1);
+    	return "C:" + File.separator + "MigrationTool_Temp" + modulepath.replace(startpath, "");
     }
-*/
+
     private static final String assignOutPutPath(String inputpath) {
         if (MigrationTool.defaultoutput) {
             return inputpath.replaceAll(Common.STRSEPARATER, "$1");
@@ -93,8 +92,14 @@ public class MigrationTool {
     }
 
     public static final void startMigrateAll(String path) throws Exception {
+    	startpath = path;
         MigrationTool.ui.println("Project Migration");
         MigrationTool.ui.println("Copyright (c) 2006, Intel Corporation");
+        
+        if (new File("C:" + File.separator + "MigrationTool_Temp").exists()) {
+            Common.deleteDir("C:" + File.separator + "MigrationTool_Temp");
+        }
+        
         Common.toDoAll(path, MigrationTool.class.getMethod("seekModule", String.class), null, null, Common.DIR);
         
         Iterator<ModuleInfo> miit = ModuleInfoMap.keySet().iterator();
@@ -103,6 +108,8 @@ public class MigrationTool {
         }
         
         ModuleInfoMap.clear();
+        
+        Common.deleteDir("C:" + File.separator + "MigrationTool_Temp");
     }
 
     public static void main(String[] args) throws Exception {

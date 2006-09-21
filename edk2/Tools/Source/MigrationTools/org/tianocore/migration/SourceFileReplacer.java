@@ -389,8 +389,8 @@ public final class SourceFileReplacer implements Common.ForDoAll {
     
     //-----------------------------------ForDoAll-----------------------------------//
     public void run(String filepath) throws Exception {
-        String inname = filepath.replace(mi.modulepath + File.separator + "temp" + File.separator, "");
-        String tempinpath = mi.modulepath + File.separator + "temp" + File.separator;
+        String inname = filepath.replace(mi.temppath + File.separator, "");
+        String tempinpath = mi.temppath + File.separator;
         String tempoutpath = MigrationTool.ModuleInfoMap.get(mi) + File.separator + "Migration_" + mi.modulename + File.separator;
 
         Iterator<Common.Laplace> itLaplace = Laplaces.iterator();
@@ -417,7 +417,7 @@ public final class SourceFileReplacer implements Common.ForDoAll {
         Laplaces.add(new CLaplace());
         Laplaces.add(new IdleLaplace());
         
-        Common.toDoAll(mi.modulepath + File.separator + "temp", this, Common.FILE);
+        Common.toDoAll(mi.temppath, this, Common.FILE);
         
         if (!mi.hashr8only.isEmpty()) {
             addr8only();

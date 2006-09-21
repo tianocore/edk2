@@ -22,9 +22,11 @@ information and all the temporary data.
 public final class ModuleInfo {
     ModuleInfo(String modulepath) throws Exception {
         this.modulepath = modulepath;
+        this.temppath = MigrationTool.getTempDir(this.modulepath);
     }
 
     public final String modulepath;
+    public final String temppath;
     
     public String modulename = null;
     public String guidvalue = null;
