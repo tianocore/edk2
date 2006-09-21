@@ -17,6 +17,14 @@
 package org.tianocore.framework.tasks;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
+
+import java.util.List;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.BuildException;
@@ -35,8 +43,14 @@ public class FlashMapTask extends Task implements EfiDefine {
     //
     // tool name
     //
-    private final String toolName = "FlashMap";
+    private static final String toolName = "FlashMap";
 
+    //
+    // 
+    // 
+    private static Pattern fileBlock = Pattern.compile("\\s*File\\s*\\{([^\\{\\}]+)\\}");
+    private static Pattern fileNameDef = Pattern.compile("\\bName\\s*=\\s*\"([^\"]+)\"");
+    
     //
     // Flash definition file
     //
@@ -135,7 +149,6 @@ public class FlashMapTask extends Task implements EfiDefine {
       @throws BuidException
      **/
     public void execute() throws BuildException {
-        /*
         if (isUptodate()) {
             EdkLog.log(this, EdkLog.EDK_VERBOSE, headerFile.toFileList()
                                                  + imageOutFile.toFileList()
@@ -143,10 +156,9 @@ public class FlashMapTask extends Task implements EfiDefine {
                                                  + dscFile.toFileList()
                                                  + asmIncFile.toFileList()
                                                  + outStrFile
-                                                 + " is/are up-to-date!");
+                                                 + " is up-to-date!");
             return;
         }
-        */
 
         Project project = this.getOwningTarget().getProject();
         //
@@ -689,6 +701,13 @@ public class FlashMapTask extends Task implements EfiDefine {
                 EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
                 return false;
             }
+
+            //
+            // we need to check the time stamp of each FV file specified in fdf file
+            // 
+            if (!isFdUptodate(dstName, getFvFiles(flashDefFile.getValue()))) {
+                return false;
+            }
         }
 
         if (!mcoFile.isEmpty()) {
@@ -743,6 +762,84 @@ public class FlashMapTask extends Task implements EfiDefine {
 
             if (srcTimeStamp > dstFile.lastModified()) {
                 EdkLog.log(this, EdkLog.EDK_VERBOSE, srcName + " has been changed since last build!");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    //
+    // Parse the flash definition file and find out the FV file names
+    // 
+    private List<String> getFvFiles(String fdfFileName) {
+        File fdfFile = new File(fdfFileName);
+        int fileLength = (int)fdfFile.length();
+        char[] fdfContent = new char[fileLength];
+        List<String> fileList = new ArrayList<String>();
+
+        try {
+            FileReader reader = new FileReader(fdfFile);
+            BufferedReader in = new BufferedReader(reader);
+
+            in.read(fdfContent, 0, fileLength);
+            String str = new String(fdfContent);
+
+            //
+            // match the 
+            //      File {
+            //        ...
+            //      }
+            // block
+            // 
+            Matcher matcher = fileBlock.matcher(str);
+            while (matcher.find()) {
+                String fileBlockContent = str.substring(matcher.start(1), matcher.end(1));
+                //
+                // match the definition like
+                //      Name = "..."
+                //  
+                Matcher nameMatcher = fileNameDef.matcher(fileBlockContent);
+                if (nameMatcher.find()) {
+                    fileList.add(fileBlockContent.substring(nameMatcher.start(1), nameMatcher.end(1)));
+                }
+            }
+
+            in.close();
+            reader.close();
+        } catch (Exception ex) {
+            throw new BuildException(ex.getMessage());
+        }
+
+        return fileList;
+    }
+
+    private boolean isFdUptodate(String fdFile, List<String> fvFileList) {
+        String fvDir = ".";
+        File fd = new File(fdFile);
+
+        if (outputDir.equals(".")) {
+            if (!fd.isAbsolute()) {
+                //
+                // If we cannot get the absolute path of fd file, we caanot
+                // get its time stamp. Re-generate it always in such situation.
+                // 
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, "Cannot retrieve the time stamp of " + fdFile);
+                return false;
+            }
+            fvDir = fd.getParent();
+        } else {
+            fvDir = outputDir;
+            if (!fd.isAbsolute()) {
+                fd = new File(fvDir + File.separator + fdFile);
+            }
+        }
+
+        long fdTimeStamp = fd.lastModified();
+        for (int i = 0; i < fvFileList.size(); ++i) {
+            File fv = new File(fvDir + File.separator + fvFileList.get(i));
+            if (fv.lastModified() > fdTimeStamp) {
+                EdkLog.log(this, EdkLog.EDK_VERBOSE, fv.getPath() + " has been changed since last build!");
                 return false;
             }
         }

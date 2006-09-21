@@ -22,6 +22,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Sequential;
 import org.tianocore.common.logger.EdkLog;
+import org.tianocore.common.cache.FileTimeStamp;
 
 /**
  Class OnDepdendency is used to check the timestamp between source files and
@@ -29,26 +30,24 @@ import org.tianocore.common.logger.EdkLog;
  be re-generated from source files.
  **/
 public class OnDependency extends Task {
-    ///
-    /// cache the modified timestamp of files accessed, to speed up the depencey check
-    /// 
-    private Map<String, Long> timeStampCache = new HashMap<String, Long>();
-    ///
-    /// source files list
-    ///
+    //
+    // source files list
+    //
     private DpFileList sources = null;
-    ///
-    /// target files list
-    ///
+
+    //
+    // target files list
+    //
     private DpFileList targets = null;
-    ///
-    /// tasks to be performed to generate target files
-    ///
+
+    //
+    // tasks to be performed to generate target files
+    //
     private Sequential  task = null;
 
-    ///
-    /// An empty constructor for an ANT task can avoid some potential issues
-    ///
+    /**
+     An empty constructor for an ANT task can avoid some potential issues
+     **/
     public OnDependency(){
     }
 
@@ -59,11 +58,18 @@ public class OnDependency extends Task {
         if (isOutOfDate() && task != null) {
             task.perform();
         }
+
+        //
+        // Update the time stamp of target files since they are just re-generated
+        // 
+        for (Iterator dstIt = targets.nameList.iterator(); dstIt.hasNext();) {
+            FileTimeStamp.update((String)dstIt.next());
+        }
     }
 
-    ///
-    /// check if the target files are outofdate
-    ///
+    //
+    // check if the target files are outofdate
+    //
     private boolean isOutOfDate() {
         ///
         /// if no source files specified, take it as a fresh start
@@ -87,21 +93,17 @@ public class OnDependency extends Task {
                 return true;
             }
 
-            long dstTimeStamp = dstFile.lastModified();
+            long dstTimeStamp = FileTimeStamp.get(dstFileName);
             Iterator srcIt = sources.nameList.iterator();
             while (srcIt.hasNext()) {
                 String srcFileName = (String)srcIt.next();
-                long srcTimeStamp;
+                long srcTimeStamp = FileTimeStamp.get(srcFileName);
 
-                if (timeStampCache.containsKey(srcFileName)) {
-                    srcTimeStamp = ((Long)timeStampCache.get(srcFileName)).longValue();
-                } else {
-                    File srcFile = new File(srcFileName);
-                    if (!srcFile.exists()) {
-                        throw new BuildException("Source File name: " + srcFileName + " doesn't exist!!!");
-                    }
-                    srcTimeStamp = srcFile.lastModified();
-                    timeStampCache.put(srcFileName, new Long(srcTimeStamp));
+                if (srcTimeStamp == 0) {
+                    //
+                    // time stamp 0 means that the file doesn't exist
+                    // 
+                    throw new BuildException("Source File name: " + srcFileName + " doesn't exist!!!");
                 }
 
                 if (dstTimeStamp < srcTimeStamp) {
