@@ -23,53 +23,25 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.w3c.dom.Node;
-
+import org.tianocore.ExternsDocument.Externs.Extern;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlString;
-
-import org.tianocore.BuildOptionsDocument;
-import org.tianocore.CNameType;
-import org.tianocore.ExternsDocument;
-import org.tianocore.FileNameConvention;
-import org.tianocore.FvImagesDocument;
-import org.tianocore.GuidDeclarationsDocument;
-import org.tianocore.GuidsDocument;
-import org.tianocore.LibrariesDocument;
-import org.tianocore.LibraryClassDeclarationsDocument;
-import org.tianocore.LibraryClassDocument;
-import org.tianocore.ModuleDefinitionsDocument;
-import org.tianocore.ModuleSADocument;
-import org.tianocore.ModuleSaBuildOptionsDocument;
-import org.tianocore.ModuleTypeDef;
-import org.tianocore.MsaFilesDocument;
-import org.tianocore.MsaHeaderDocument;
-import org.tianocore.OptionDocument;
-import org.tianocore.PPIsDocument;
-import org.tianocore.PackageDependenciesDocument;
-import org.tianocore.PackageHeadersDocument;
-import org.tianocore.PcdCodedDocument;
-import org.tianocore.PlatformDefinitionsDocument;
-import org.tianocore.PlatformHeaderDocument;
-import org.tianocore.PpiDeclarationsDocument;
-import org.tianocore.ProtocolDeclarationsDocument;
-import org.tianocore.Sentence;
-import org.tianocore.SpdHeaderDocument;
-import org.tianocore.UserExtensionsDocument;
+import org.tianocore.*;
+import org.tianocore.ExternsDocument.Externs;
 import org.tianocore.FilenameDocument.Filename;
+import org.tianocore.ModuleSurfaceAreaDocument.ModuleSurfaceArea;
 import org.tianocore.MsaHeaderDocument.MsaHeader;
 import org.tianocore.ProtocolsDocument.Protocols.Protocol;
 import org.tianocore.ProtocolsDocument.Protocols.ProtocolNotify;
-import org.tianocore.PcdDriverTypes;
-
-import org.tianocore.common.exception.EdkException;
-import org.tianocore.common.logger.EdkLog;
+import org.tianocore.build.autogen.CommonDefinition;
 import org.tianocore.build.id.FpdModuleIdentification;
 import org.tianocore.build.id.ModuleIdentification;
 import org.tianocore.build.id.PackageIdentification;
 import org.tianocore.build.id.PlatformIdentification;
 import org.tianocore.build.toolchain.ToolChainInfo;
-import org.tianocore.build.autogen.CommonDefinition;
+import org.tianocore.common.exception.EdkException;
+import org.tianocore.common.logger.EdkLog;
+import org.w3c.dom.Node;
 
 /**
  * SurfaceAreaQuery class is used to query Surface Area information from msa,
@@ -1251,6 +1223,62 @@ public class SurfaceAreaQuery {
         return getCNames("Externs", xPath);
     }
 
+    /**
+     * Retrive DriverBinding, ComponentName, DriverConfig,
+     * DriverDiag group array
+     * 
+     * @returns DriverBinding group name list if elements are found
+     *        at the known xpath
+     * @returns null if nothing is there
+     */
+	public String[][] getExternProtocolGroup() {
+		String[] xPath = new String[] {"/Extern"};
+		Object[] returns = get("Externs",xPath);
+
+        if (returns == null) {
+			return new String[0][4];
+		}
+		List<Extern> externList = new ArrayList<Extern>();
+		for (int i = 0; i < returns.length; i++) {
+			org.tianocore.ExternsDocument.Externs.Extern extern = (org.tianocore.ExternsDocument.Externs.Extern)returns[i];
+			if (extern.getDriverBinding() != null) {
+				externList.add(extern);
+			}
+		}
+
+		String[][] externGroup = new String[externList.size()][4];
+		for (int i = 0; i < externList.size(); i++) {
+            String driverBindingStr = externList.get(i).getDriverBinding();
+			if ( driverBindingStr != null){
+				externGroup[i][0] = driverBindingStr;
+			} else {
+				externGroup[i][0] = null;
+			}
+
+			String componentNameStr = externList.get(i).getComponentName();
+			if (componentNameStr != null) {
+				externGroup[i][1] = componentNameStr;
+			} else {
+				externGroup[i][1] = null;
+			}
+
+			String driverConfigStr = externList.get(i).getDriverConfig();
+			if (driverConfigStr != null) {
+				externGroup[i][2] = driverConfigStr;
+			} else {
+				externGroup[i][2] = null;
+			}
+
+			String driverDiagStr = externList.get(i).getDriverDiag();
+			if (driverDiagStr != null) {
+			    externGroup[i][3] = driverDiagStr;
+			} else {
+				externGroup[i][3] = null;
+			}
+		}
+		return externGroup;
+	}
+    
     /**
      * Retrive SetVirtualAddressMapCallBack names
      *
