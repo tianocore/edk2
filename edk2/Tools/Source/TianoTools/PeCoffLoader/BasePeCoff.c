@@ -858,7 +858,7 @@ Returns:
     Base = PeCoffLoaderImageAddress (ImageContext, Section->VirtualAddress);
     End = PeCoffLoaderImageAddress (
             ImageContext,
-            Section->VirtualAddress + Section->SizeOfRawData - 1
+            Section->VirtualAddress + Section->Misc.VirtualSize - 1
             );
     if (ImageContext->IsTeImage) {
       Base  = (CHAR8 *) ((UINTN) Base + sizeof (EFI_TE_IMAGE_HEADER) - (UINTN) TeHdr->StrippedSize);
