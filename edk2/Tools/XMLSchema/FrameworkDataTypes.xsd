@@ -258,7 +258,6 @@
       <xs:enumeration value="SOMETIMES_CONSUMED"/>
       <xs:enumeration value="ALWAYS_PRODUCED"/>
       <xs:enumeration value="SOMETIMES_PRODUCED"/>
-      <xs:enumeration value="DEFAULT"/>
       <xs:enumeration value="PRIVATE"/>
     </xs:restriction>
   </xs:simpleType>
@@ -320,7 +319,6 @@
       <xs:enumeration value="SOMETIMES_CONSUMED"/>
       <xs:enumeration value="ALWAYS_PRODUCED"/>
       <xs:enumeration value="SOMETIMES_PRODUCED"/>
-      <xs:enumeration value="DEFAULT"/>
       <xs:enumeration value="PRIVATE"/>
     </xs:restriction>
   </xs:simpleType>
@@ -365,7 +363,6 @@
     <xs:restriction base="UsageTypes">
       <xs:enumeration value="ALWAYS_CONSUMED"/>
       <xs:enumeration value="SOMETIMES_CONSUMED"/>
-      <xs:enumeration value="DEFAULT"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="PcdListType">
@@ -404,7 +401,6 @@
   <xs:simpleType name="PcdFeatureFlagUsage">
     <xs:restriction base="UsageTypes">
       <xs:enumeration value="ALWAYS_PRODUCED"/>
-      <xs:enumeration value="DEFAULT"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="PcdItemTypes">
@@ -422,7 +418,6 @@
       <xs:enumeration value="SOMETIMES_CONSUMED"/>
       <xs:enumeration value="ALWAYS_PRODUCED"/>
       <xs:enumeration value="SOMETIMES_PRODUCED"/>
-      <xs:enumeration value="DEFAULT"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="PpiNotifyUsage">
@@ -522,7 +517,6 @@
       <xs:enumeration value="TO_START"/>
       <xs:enumeration value="BY_START"/>
       <xs:enumeration value="PRIVATE"/>
-      <xs:enumeration value="DEFAULT"/>
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="VariableOffsetValues">
