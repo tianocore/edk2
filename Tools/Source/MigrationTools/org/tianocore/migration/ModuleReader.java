@@ -130,7 +130,7 @@ public final class ModuleReader implements Common.ForDoAll {
     
     private final void preProcessModule() throws Exception {
     	// according to .inf file, add extraordinary includes and sourcefiles
-        Common.dirCopy(mi.modulepath, mi.modulepath + File.separator + "temp");	// collect all Laplace.namechange to here???
+        Common.dirCopy(mi.modulepath, mi.temppath);	// collect all Laplace.namechange to here???
         
     	if (!mi.infincludes.isEmpty()) {
             Iterator<String> it = mi.infincludes.iterator();
@@ -140,9 +140,9 @@ public final class ModuleReader implements Common.ForDoAll {
     			if (tempincludename.contains("..")) {
     				Matcher mtr = Common.PTNSEPARATER.matcher(tempincludename);
     				if (mtr.find() && !mtr.group(2).matches(".")) {
-    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.modulepath + File.separator + "temp", ".h");
+    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.temppath, ".h");
     				} else {
-    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1"), mi.modulepath + File.separator + "temp", ".h");
+    					Common.oneLevelDirCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1"), mi.temppath, ".h");
     				}
     			}
     		}
@@ -153,17 +153,17 @@ public final class ModuleReader implements Common.ForDoAll {
             while (it.hasNext()) {
             	tempsourcename = it.next();
             	if (tempsourcename.contains("..")) {
-            		Common.ensureDir(mi.modulepath + File.separator + "temp" + File.separator + "MT_Parent_Sources");
+            		Common.ensureDir(mi.temppath + File.separator + "MT_Parent_Sources");
     				Matcher mtr = Common.PTNSEPARATER.matcher(tempsourcename);
     				if (mtr.find()) {
-    					Common.fileCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.modulepath + File.separator + "temp" + File.separator + "MT_Parent_Sources" + File.separator + mtr.group(2));
+    					Common.fileCopy(mi.modulepath.replaceAll(Common.STRSEPARATER, "$1") + File.separator + mtr.group(2), mi.temppath + File.separator + "MT_Parent_Sources" + File.separator + mtr.group(2));
     				}
             	}
             }
     	}
 
         //CommentOutNonLocalHFile();
-        Common.toDoAll(mi.modulepath + File.separator + "temp", this, Common.FILE);
+        Common.toDoAll(mi.temppath, this, Common.FILE);
         
         parsePreProcessedSourceCode();
 
@@ -203,7 +203,7 @@ public final class ModuleReader implements Common.ForDoAll {
         while (ii.hasNext()) {
             StringBuffer wholefile = new StringBuffer();
             ifile = ii.next();
-            rd = new BufferedReader(new FileReader(mi.modulepath + File.separator + "temp" + File.separator + ifile));
+            rd = new BufferedReader(new FileReader(mi.temppath + File.separator + ifile));
             while ((line = rd.readLine()) != null) {
                 wholefile.append(line + '\n');
             }
@@ -298,7 +298,7 @@ public final class ModuleReader implements Common.ForDoAll {
 
     //-----------------------------------ForDoAll-----------------------------------//
     public void run(String filepath) throws Exception {
-    	String name = mi.modulepath + File.separator + "temp" + File.separator + filepath.replace(mi.modulepath + File.separator + "temp" + File.separator, "");
+    	String name = mi.temppath + File.separator + filepath.replace(mi.temppath + File.separator, "");
     	commentlaplace.transform(name, name);
     }
 
